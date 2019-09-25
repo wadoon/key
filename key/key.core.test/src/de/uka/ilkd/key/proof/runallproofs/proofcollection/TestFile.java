@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.strategy.conflictbasedinst.CbiStatistics;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -28,7 +29,7 @@ import de.uka.ilkd.key.util.Pair;
  * and a {@link #path} String for the file location. Method
  * {@link #runKey(ProofCollectionSettings)} will verify {@link #testProperty}
  * for the given file.
- * 
+ *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class TestFile<Directories extends RunAllProofsDirectories> implements Serializable {
@@ -38,14 +39,14 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
    private final TestProperty testProperty;
    private final String path;
    private final ProofCollectionSettings settings;
-   
+
    public final Directories directories;
 
    /**
     * In order to ensure that the implementation is independent of working
     * directory, this method can be used to return an absolute {@link File}
     * object.
-    * 
+    *
     * @param baseDirectory
     *           Base directory that will be used as start location in case given
     *           path name is a relative path.
@@ -102,7 +103,7 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
    /**
     * Returns a {@link File} object that points to the .key file that will be
     * tested.
-    * 
+    *
     * @throws IOException
     *            Is thrown in case given .key-file is not a directory or does
     *            not exist.
@@ -138,7 +139,7 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
    /**
     * Use KeY to verify that given {@link #testProperty} holds for KeY file that
     * is at file system location specified by {@link #path} string.
-    * 
+    *
     * @param settings
     *           {@link ProofCollectionSettings} object that specifies settings
     *           which will be used for the test run.
@@ -197,6 +198,8 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
             return getRunAllProofsTestResult(true, settings);
          }
 
+         CbiStatistics.startProof(keyFile);
+
          autoMode(env, loadedProof, script);
 
          success = (testProperty == TestProperty.PROVABLE) == loadedProof
@@ -209,6 +212,7 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
          StatisticsFile statisticsFile = settings.getStatisticsFile();
          if (statisticsFile != null) {
             statisticsFile.appendStatistics(loadedProof, keyFile);
+            CbiStatistics.append(settings.getCbiStatFile());
          }
 
          /*
@@ -276,10 +280,10 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
    }
 
    /**
-    * 
+    *
     * Reload proof that was previously saved at the location corresponding to
     * the given {@link File} object.
-    * 
+    *
     * @param proofFile
     *           File that contains the proof that will be (re-)loaded.
     */
@@ -320,7 +324,7 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
          }
       }
    }
-   
+
    public ProofCollectionSettings getSettings() {
       return settings;
    }

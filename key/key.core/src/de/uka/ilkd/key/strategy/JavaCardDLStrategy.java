@@ -36,6 +36,7 @@ import de.uka.ilkd.key.strategy.conflictbasedinst.AllQuantorInAntecFeature;
 import de.uka.ilkd.key.strategy.conflictbasedinst.CbiPreferenceFeature;
 import de.uka.ilkd.key.strategy.conflictbasedinst.CbiProjection;
 import de.uka.ilkd.key.strategy.conflictbasedinst.ExQuantorInSuccFeature;
+import de.uka.ilkd.key.strategy.conflictbasedinst.normalization.Normalizer;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
 import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
@@ -632,19 +633,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         setupSystemInvariantSimp(d);
 
-        if (quantifierInstantiatedEnabled()) {
-            // TODO reenable normalisation
+        // Only normalize by rules if instantiation and rule-normalisation is enabled
+        if (quantifierInstantiatedEnabled() && normalisationByRulesEnabled()) {
             setupFormulaNormalisation(d, numbers, locSetLDT);
-            //            bindRuleSet(d, "negationNormalForm", inftyConst());
-            //            bindRuleSet(d, "moveQuantToLeft", inftyConst());
-            //            bindRuleSet(d, "conjNormalForm", inftyConst());
-            //            bindRuleSet(d, "apply_equations_andOr", inftyConst());
-            //            bindRuleSet(d, "elimQuantifier", inftyConst());
-            //            bindRuleSet(d, "distrQuantifier", inftyConst());
-            //            bindRuleSet(d, "swapQuantifiers", inftyConst());
-            //            bindRuleSet(d, "pullOutQuantifierAll", inftyConst());
-            //            bindRuleSet(d, "pullOutQuantifierEx", inftyConst());
+            Normalizer.disable();
         } else {
+            Normalizer.enable();
             bindRuleSet(d, "negationNormalForm", inftyConst());
             bindRuleSet(d, "moveQuantToLeft", inftyConst());
             bindRuleSet(d, "conjNormalForm", inftyConst());
@@ -987,6 +981,18 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private boolean quantifierInstantiatedEnabled() {
         return !StrategyProperties.QUANTIFIERS_NONE.equals(strategyProperties
                 .getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY));
+    }
+
+    private boolean conflictBasedInstantiationEnabled() {
+        return strategyProperties.getProperty(StrategyProperties.CBI_OPTIONS_KEY).equals(StrategyProperties.CBI_ENABLED);
+    }
+
+    private boolean normalisationByRulesEnabled() {
+        return strategyProperties.getProperty(StrategyProperties.NORMAL_FORM_BUILDING_KEY).equals(StrategyProperties.NORMAL_FORM_BUILDING_BY_RULE);
+    }
+
+    private boolean conflictInducingInstancesEnabled() {
+        return strategyProperties.getProperty(StrategyProperties.CBI_MODE_OPTIONS_KEY).equals(StrategyProperties.CBI_MODE_CONFLICT_INDUCING);
     }
 
     private boolean classAxiomDelayedApplication() {

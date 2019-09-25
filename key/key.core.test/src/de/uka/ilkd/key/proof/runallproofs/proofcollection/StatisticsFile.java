@@ -1,6 +1,12 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +22,7 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
  * Class for managing a file which contains statistics recorded during a
  * {@link RunAllProofsTest} run. Statistics are recorded as a table, which
  * contains one line for each tested file.
- * 
+ *
  * This class must be immutable because it is part of
  * {@link ProofCollectionSettings}, which is immutable as well.
  */
@@ -132,6 +138,10 @@ public class StatisticsFile implements Serializable {
       this.statisticsFile = location;
    }
 
+   public File getFile() {
+       return statisticsFile;
+   }
+
    /**
     * Deletes an old statistics file and sets up a new one that has column names
     * as first row.
@@ -159,7 +169,7 @@ public class StatisticsFile implements Serializable {
 
    /**
     * Method used for writing a new line into the table of statistics entries.
-    * 
+    *
     * @param entries
     *           List representing a line in the table. Each list entry
     *           corresponds to one table cell.
@@ -184,7 +194,7 @@ public class StatisticsFile implements Serializable {
 
    /**
     * Append statistics for one proof to statistics file.
-    * 
+    *
     * @param proof
     *           {@link Proof}, whose statistics will be added.
     * @param keyFile

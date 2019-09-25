@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.strategy.conflictbasedinst;
 
-import java.time.LocalDateTime;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -12,12 +10,6 @@ import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 public class CbiProjection extends BinaryFeature implements ProjectionToTerm{
-
-    private CbiStats stats;
-
-    private CbiProjection() {
-        stats = CbiStats.getInstance();
-    }
 
     private static class CbiProjectionHolder {
         private static final CbiProjection instance = new CbiProjection();
@@ -41,9 +33,9 @@ public class CbiProjection extends BinaryFeature implements ProjectionToTerm{
         }
         this.sequent = sequent;
         this.formula = formula;
-        LocalDateTime start = LocalDateTime.now();
+        CbiStatistics.startFeature(formula, InstMethod.CBI);
         result = ConflictBasedInstantiation.getInstance().findConflictingTerm(formula, sequent, pos, services);
-        stats.addStat(formula, start, LocalDateTime.now(), result);
+        CbiStatistics.finishFeature(result != null);
         return result;
     }
 

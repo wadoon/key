@@ -86,6 +86,13 @@ public final class StrategyProperties extends Properties {
             "QUANTIFIERS_NON_SPLITTING_WITH_PROGS";
     public static final String QUANTIFIERS_INSTANTIATE = "QUANTIFIERS_INSTANTIATE";
 
+    /**
+     *
+     */
+    public static final String NORMAL_FORM_BUILDING_KEY = "NORMAL_FORM_BUILDING_KEY";
+    public static final String NORMAL_FORM_BUILDING_BY_RULE = "NORMAL_FORM_BUILDING_BY_RULE";
+    public static final String NORMAL_FORM_BUILDING_IN_BACKGROUND = "NORMAL_FORM_BUILDING_IN_BACKGROUND";
+
     public static final String CBI_OPTIONS_KEY = "CBI_OPTIONS_KEY";
     public static final String CBI_DISABLED = "CBI_DISABLED";
     public static final String CBI_ENABLED = "CBI_ENABLED";
@@ -93,10 +100,6 @@ public final class StrategyProperties extends Properties {
     public static final String CBI_MODE_OPTIONS_KEY = "CBI_MODE_OPTIONS_KEY";
     public static final String CBI_MODE_ONLY_CONFLICTING = "CBI_MODE_ONLY_CONFLICTING";
     public static final String CBI_MODE_CONFLICT_INDUCING = "CBI_MODE_CONFLICT_INDUCING";
-
-    public static final String CBI_NORMALIZATION_OPTIONS_KEY = "CBI_NORMALIZATION_OPTIONS_KEY";
-    public static final String CBI_NORMALIZATION_BY_RULES = "CBI_NORMALIZATION_BY_RULES";
-    public static final String CBI_NORMALIZATION_IN_BACKGROUND = "CBI_NORMALIZATION_IN_BACKGROUND";
 
     public static final String VBT_PHASE = "VBT_PHASE"; //Used for verification-based testing
     public static final String VBT_SYM_EX = "VBT_SYM_EX";
@@ -200,7 +203,7 @@ public final class StrategyProperties extends Properties {
             OSS_OPTIONS_KEY, OSS_ON, OSS_OFF,
             CBI_OPTIONS_KEY, CBI_DISABLED, CBI_ENABLED,
             CBI_MODE_OPTIONS_KEY, CBI_MODE_CONFLICT_INDUCING, CBI_MODE_ONLY_CONFLICTING,
-            CBI_NORMALIZATION_OPTIONS_KEY, CBI_NORMALIZATION_IN_BACKGROUND, CBI_NORMALIZATION_BY_RULES,
+            NORMAL_FORM_BUILDING_KEY, NORMAL_FORM_BUILDING_BY_RULE, NORMAL_FORM_BUILDING_IN_BACKGROUND,
             QUANTIFIERS_OPTIONS_KEY, QUANTIFIERS_NONE, QUANTIFIERS_NON_SPLITTING,
             QUANTIFIERS_NON_SPLITTING_WITH_PROGS, QUANTIFIERS_INSTANTIATE,
             VBT_PHASE, VBT_SYM_EX, VBT_QUAN_INST, VBT_MODEL_GEN,
@@ -230,7 +233,7 @@ public final class StrategyProperties extends Properties {
         DEFAULT_MAP.setProperty(OSS_OPTIONS_KEY, OSS_ON);
         DEFAULT_MAP.setProperty(CBI_OPTIONS_KEY, CBI_ENABLED);
         DEFAULT_MAP.setProperty(CBI_MODE_OPTIONS_KEY, CBI_MODE_ONLY_CONFLICTING);
-        DEFAULT_MAP.setProperty(CBI_NORMALIZATION_OPTIONS_KEY, CBI_NORMALIZATION_IN_BACKGROUND);
+        DEFAULT_MAP.setProperty(NORMAL_FORM_BUILDING_KEY, NORMAL_FORM_BUILDING_BY_RULE);
         DEFAULT_MAP.setProperty(DEP_OPTIONS_KEY, DEP_ON);
         DEFAULT_MAP.setProperty(QUERY_OPTIONS_KEY, QUERY_OFF);
         DEFAULT_MAP.setProperty(QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON);

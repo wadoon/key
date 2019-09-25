@@ -27,6 +27,9 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.conflictbasedinst.CbiStatistics;
+import de.uka.ilkd.key.strategy.conflictbasedinst.InstMethod;
+import de.uka.ilkd.key.strategy.conflictbasedinst.normalization.Normalizer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 
@@ -41,21 +44,19 @@ public class HeuristicInstantiation implements TermGenerator {
             PosInOccurrence pos,
             Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
-        //System.out.println("Calling HEUR generate");
-        final Term qf = pos.sequentFormula ().formula ();
-        final Sequent seq = goal.sequent();
-        final Services services = goal.proof().getServices();
+        Term qf = pos.sequentFormula ().formula ();
         final QuantifiableVariable var =
                 qf.varsBoundHere ( 0 ).last ();
-        //final LinkedHashSet<Term> cbi = ConflictBasedInstantiation.create(qf, seq, services).getInstantiation();
-        //        if(!cbi.isEmpty()) {
-        //            System.out.println("Ignoring E-Matching in favor of CBI");
-        //            return new HIIterator(cbi.iterator(), var, services);
-        //        }
-        //        System.out.println("CBI found nothing, try E-Matching");
-        final Instantiation ia = Instantiation.create ( qf, goal.sequent(),
+        CbiStatistics.startFeature(qf, InstMethod.HEUR);
+
+        CbiStatistics.startNormalization();
+        qf = Normalizer.negatedNormalForm(qf);
+        Sequent seq = Normalizer.negatedNormalForm(goal.sequent());
+        CbiStatistics.finishNormalization();
+        final Instantiation ia = Instantiation.create ( qf, seq,
                 goal.proof().getServices() );
         HIIterator hiit = new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices() );
+        CbiStatistics.finishFeature(hiit.hasNext());
         return hiit;
     }
 

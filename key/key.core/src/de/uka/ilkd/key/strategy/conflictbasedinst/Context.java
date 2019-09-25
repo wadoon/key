@@ -163,6 +163,7 @@ public class Context {
         if (services.getProof().name().toString().startsWith("CBI_SUBPROOF")) {
             return false;
         }
+        CbiStatistics.pauseFeatureStopwatch();
         ProofEnvironment env = SideProofUtil
                 .cloneProofEnvironmentWithOwnOneStepSimplifier(
                         services.getProof());
@@ -179,7 +180,9 @@ public class Context {
         ps.setMaxRuleApplications(maxRuleApps);
         ps.setTimeout(timeoutInMillis);
         final ApplyStrategyInfo info = ps.start();
-        return info.getProof().closed();
+        boolean ret = info.getProof().closed();
+        CbiStatistics.resumeFeatureStopwatch();
+        return ret;
     }
 
     protected StrategyProperties setupStrategy() {

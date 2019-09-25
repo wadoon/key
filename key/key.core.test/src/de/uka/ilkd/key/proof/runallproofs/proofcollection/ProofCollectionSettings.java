@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
+import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbsoluteFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -14,7 +16,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbsoluteFile;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
@@ -40,7 +41,7 @@ public class ProofCollectionSettings implements Serializable {
    private static final String TEMP_DIR = "tempDir";
    private static final String RUN_ONLY_ON = "runOnlyOn";
    private static final String DIRECTORY = "directory";
-   
+
    /**
     * The time at which the corresponding runallproofs run has been started.
     */
@@ -60,6 +61,11 @@ public class ProofCollectionSettings implements Serializable {
     * File in which statistics are written.
     */
    private final StatisticsFile statisticsFile;
+
+   /**
+    * File in which cbi statistics are written.
+    */
+   private final File cbiStatFile;
 
    /**
     * {@link List} of settings entries that are created from system properties.
@@ -153,10 +159,12 @@ public class ProofCollectionSettings implements Serializable {
       String statisticsFileName = get(STATISTICS_FILE);
       if (statisticsFileName == null) {
          statisticsFile = null;
+         cbiStatFile = null;
       }
       else {
          statisticsFile = new StatisticsFile(getAbsoluteFile(
                getBaseDirectory(), statisticsFileName));
+         cbiStatFile = getAbsoluteFile(getBaseDirectory(), "../../key.core.test/testresults/runallproofs/cbiStatistics.csv");
       }
    }
 
@@ -200,6 +208,7 @@ public class ProofCollectionSettings implements Serializable {
        * Inherit statistics file from parent settings.
        */
       statisticsFile = parentSettings.getStatisticsFile();
+      cbiStatFile = parentSettings.cbiStatFile;
    }
 
    /**
@@ -291,6 +300,10 @@ public class ProofCollectionSettings implements Serializable {
     */
    public StatisticsFile getStatisticsFile() {
       return statisticsFile;
+   }
+
+   public File getCbiStatFile() {
+       return cbiStatFile;
    }
 
    public File getTempDir() throws IOException {
