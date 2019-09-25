@@ -145,6 +145,48 @@
         (declare-fun sqrtDouble (Float64) Float64)
     </entry>
 
+    <!--TODO implemented the rest if needed-->
+    <entry key="powDouble.axioms">
+        <!-- If the second argument is positive or negative zero, then the result is 1.0.-->
+        (assert (forall ((a Float64)(b Float64)) (=> (or (fp.eq b (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)) (fp.eq b (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))) (fp.eq (powDouble a b) (fp #b0 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+        <!-- If the second argument is 1.0, then the result is the same as the first argument.-->
+        (assert (forall ((a Float64)(b Float64)) (=> (fp.eq b (fp #b0 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (powDouble a b) a))))
+
+        <!-- If the second argument is NaN, then the result is NaN.-->
+        (assert (forall ((a Float64)(b Float64)) (=> (fp.isNaN b) (fp.isNaN (powDouble a b)))))
+
+        <!-- If the first argument is NaN and the second argument is nonzero, then the result is NaN.-->
+        (assert (forall ((a Float64)(b Float64)) (=> (and (fp.isNaN a) (not (or (fp.eq b (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)) (fp.eq b (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))) (fp.isNaN (powDouble a b)))))
+
+        <!-- If the first argument is positive zero and the second argument is greater than zero, or
+         the first argument is positive infinity and the second argument is less than zero,
+         then the result is positive zero.-->
+        (assert (forall ((a Float64)(b Float64)) (=> (or (and (fp.eq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)) (fp.gt b (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(and (and (fp.isInfinite a)(fp.gt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))) (fp.lt b (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))) (fp.eq (powDouble a b) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+        <!-- If the first argument is positive zero and the second argument is less than zero, or
+         the first argument is positive infinity and the second argument is greater than zero,
+         then the result is positive infinity.-->
+        (assert (forall ((a Float64)(b Float64)) (=> (or (and (fp.eq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)) (fp.lt b (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(and (and (fp.isInfinite a)(fp.gt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))) (fp.gt b (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))) (and (fp.isInfinite (powDouble a b))(fp.gt (powDouble a b)(fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+    </entry>
+
     <entry key="powDouble.decls">
         (declare-fun powDouble (Float64 Float64) Float64)
     </entry>
@@ -157,6 +199,7 @@
         (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.lt a (fp #b0 #b00000000000
         #b0000000000000000000000000000000000000000000000000000))) (fp.eq (expDouble a)(fp #b0 #b00000000000
         #b0000000000000000000000000000000000000000000000000000)))))
+        (assert (forall ((a Float64)) (=> (not (fp.isNaN a)) (not(fp.isNaN (expDouble a))))))
     </entry>
     <entry key="expDouble.decls">
         (declare-fun expDouble (Float64) Float64)
