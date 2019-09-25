@@ -785,7 +785,10 @@ public interface SolverType  {
                         Z3_SOLVER,
                         CVC3_SOLVER,
                         SIMPLIFY_SOLVER,
-                        YICES_SOLVER
+                        YICES_SOLVER,
+						Z3_FP_SOLVER,
+						CVC4_SOLVER,
+						Z3_NEW_TL_SOLVER
                         ));
 }
 
