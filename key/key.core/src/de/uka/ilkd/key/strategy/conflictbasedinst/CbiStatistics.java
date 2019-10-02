@@ -19,6 +19,12 @@ public class CbiStatistics {
         return InstanceHolder.INSTANCE;
     }
 
+    private static boolean enabled = false;
+
+    public static void enable() {
+        enabled = true;
+    }
+
     public static void startProof(File keyFile) {
         String name = keyFile.getAbsolutePath();
         final int slashIndex = name.lastIndexOf("examples/");
@@ -26,12 +32,7 @@ public class CbiStatistics {
         instance().startProof(name);
     }
 
-    public static void setProofHasNoStatistics() {
-        instance().currentProofStat.setStatistics(false);
-    }
-
     private CbiStatistics() {
-        System.out.println("Creating CBI statistics");
         proofStatistics = new LinkedList<ProofStat>();
     }
 
@@ -40,29 +41,35 @@ public class CbiStatistics {
     private List<ProofStat> proofStatistics;
 
     private void startProof(String name) {
+        if(!enabled) return;
         currentProofStat = new ProofStat(name);
         proofStatistics.add(currentProofStat);
     }
 
     public static void startFeature(Term formula, InstMethod meth) {
+        if(!enabled) return;
         instance().currentFeatureStat = new FeatureStat(formula, meth);
         instance().currentFeatureStat.start();
     }
 
     public static void pauseFeatureStopwatch() {
+        if(!enabled) return;
         instance().currentFeatureStat.pause();
     }
 
     public static void resumeFeatureStopwatch() {
+        if(!enabled) return;
         instance().currentFeatureStat.resume();
     }
 
     public static void finishFeature(boolean succ) {
+        if(!enabled) return;
         instance().currentFeatureStat.finish(succ);
         instance().currentProofStat.addStat(instance().currentFeatureStat);
     }
 
     public void flush(File statFile) {
+        if(!enabled) return;
         StringBuilder sb = new StringBuilder();
         ProofStat ps = currentProofStat;
         sb.append(ps.getName());
@@ -85,21 +92,19 @@ public class CbiStatistics {
         sb.append("|");
         sb.append(instHEUR);
         sb.append("|");
-        sb.append(ps.hasStatistics());
-        sb.append("|");
         sb.append(eq);
-        sb.append("|");
-        sb.append(eq && ps.hasStatistics());
         writeLine(sb.toString(), statFile);
     }
 
     // TODO File writing components to other class
 
     public static void append(File statFile) {
+        if(!enabled) return;
         instance().flush(statFile);
     }
 
     private static void writeLine(String s, File statFile) {
+        if(!enabled) return;
         if(statFile == null) {
             System.out.println("Could not write, statfile is null");
             return;
@@ -112,16 +117,17 @@ public class CbiStatistics {
             fw.close();
         }
         catch (IOException e) {
-            System.out.println("Could now write line to statistics file: " + e.getMessage());
+            System.out.println("Could not write line to statistics file: " + e.getMessage());
         }
 
     }
 
     public static void setUp(File statFile) {
+        enabled = true;
         if(statFile.exists()) statFile.delete();
         try {
             statFile.createNewFile();
-            writeLine("NAME|#INST|#CBI|#HEUR|STAT|EQ|SIGNIFICANT", statFile);
+            writeLine("NAME|#INST|#CBI|#HEUR|EQ", statFile);
         }
         catch (IOException e) {
             System.out.println("Could not create statistics file:" + e.getMessage());
@@ -129,10 +135,12 @@ public class CbiStatistics {
     }
 
     public static void startNormalization() {
+        if(!enabled) return;
         instance().currentFeatureStat.startNormalization();
     }
 
     public static void finishNormalization() {
+        if(!enabled) return;
         instance().currentFeatureStat.finishNormalization();
     }
 }

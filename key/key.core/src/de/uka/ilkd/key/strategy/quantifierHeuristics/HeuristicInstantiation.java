@@ -29,7 +29,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.conflictbasedinst.CbiStatistics;
 import de.uka.ilkd.key.strategy.conflictbasedinst.InstMethod;
-import de.uka.ilkd.key.strategy.conflictbasedinst.normalization.Normalizer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 
@@ -50,8 +49,7 @@ public class HeuristicInstantiation implements TermGenerator {
         CbiStatistics.startFeature(qf, InstMethod.HEUR);
 
         CbiStatistics.startNormalization();
-        qf = Normalizer.negatedNormalForm(qf);
-        Sequent seq = Normalizer.negatedNormalForm(goal.sequent());
+        Sequent seq = goal.sequent();
         CbiStatistics.finishNormalization();
         final Instantiation ia = Instantiation.create ( qf, seq,
                 goal.proof().getServices() );

@@ -95,11 +95,8 @@ public final class StrategyProperties extends Properties {
 
     public static final String CBI_OPTIONS_KEY = "CBI_OPTIONS_KEY";
     public static final String CBI_DISABLED = "CBI_DISABLED";
-    public static final String CBI_ENABLED = "CBI_ENABLED";
-
-    public static final String CBI_MODE_OPTIONS_KEY = "CBI_MODE_OPTIONS_KEY";
-    public static final String CBI_MODE_ONLY_CONFLICTING = "CBI_MODE_ONLY_CONFLICTING";
-    public static final String CBI_MODE_CONFLICT_INDUCING = "CBI_MODE_CONFLICT_INDUCING";
+    public static final String CBI_CONFLICTING = "CBI_CONFLICTING";
+    public static final String CBI_INDUCING = "CBI_INDUCING";
 
     public static final String VBT_PHASE = "VBT_PHASE"; //Used for verification-based testing
     public static final String VBT_SYM_EX = "VBT_SYM_EX";
@@ -201,8 +198,7 @@ public final class StrategyProperties extends Properties {
             NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE, NON_LIN_ARITH_DEF_OPS,
             NON_LIN_ARITH_COMPLETION,
             OSS_OPTIONS_KEY, OSS_ON, OSS_OFF,
-            CBI_OPTIONS_KEY, CBI_DISABLED, CBI_ENABLED,
-            CBI_MODE_OPTIONS_KEY, CBI_MODE_CONFLICT_INDUCING, CBI_MODE_ONLY_CONFLICTING,
+            CBI_OPTIONS_KEY, CBI_DISABLED, CBI_CONFLICTING, CBI_INDUCING,
             NORMAL_FORM_BUILDING_KEY, NORMAL_FORM_BUILDING_BY_RULE, NORMAL_FORM_BUILDING_IN_BACKGROUND,
             QUANTIFIERS_OPTIONS_KEY, QUANTIFIERS_NONE, QUANTIFIERS_NON_SPLITTING,
             QUANTIFIERS_NON_SPLITTING_WITH_PROGS, QUANTIFIERS_INSTANTIATE,
@@ -231,15 +227,14 @@ public final class StrategyProperties extends Properties {
         DEFAULT_MAP.setProperty(METHOD_OPTIONS_KEY, METHOD_CONTRACT);
         DEFAULT_MAP.setProperty(MPS_OPTIONS_KEY, MPS_MERGE);
         DEFAULT_MAP.setProperty(OSS_OPTIONS_KEY, OSS_ON);
-        DEFAULT_MAP.setProperty(CBI_OPTIONS_KEY, CBI_ENABLED);
-        DEFAULT_MAP.setProperty(CBI_MODE_OPTIONS_KEY, CBI_MODE_ONLY_CONFLICTING);
-        DEFAULT_MAP.setProperty(NORMAL_FORM_BUILDING_KEY, NORMAL_FORM_BUILDING_BY_RULE);
         DEFAULT_MAP.setProperty(DEP_OPTIONS_KEY, DEP_ON);
         DEFAULT_MAP.setProperty(QUERY_OPTIONS_KEY, QUERY_OFF);
         DEFAULT_MAP.setProperty(QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON);
         DEFAULT_MAP.setProperty(NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE);
         DEFAULT_MAP.setProperty(QUANTIFIERS_OPTIONS_KEY,
                 QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+        DEFAULT_MAP.setProperty(CBI_OPTIONS_KEY, CBI_DISABLED);
+        DEFAULT_MAP.setProperty(NORMAL_FORM_BUILDING_KEY, NORMAL_FORM_BUILDING_BY_RULE);
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
             DEFAULT_MAP.setProperty(userTacletsOptionsKey(i),
                     USER_TACLETS_OFF);
@@ -271,6 +266,8 @@ public final class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
             put(userTacletsOptionsKey(i), DEFAULT_MAP.get(userTacletsOptionsKey(i)));
         }
+        put(CBI_OPTIONS_KEY, DEFAULT_MAP.get(CBI_OPTIONS_KEY));
+        put(NORMAL_FORM_BUILDING_KEY, DEFAULT_MAP.get(NORMAL_FORM_BUILDING_KEY));
         put(INF_FLOW_CHECK_PROPERTY, DEFAULT_MAP.get(INF_FLOW_CHECK_PROPERTY));
         put(STOPMODE_OPTIONS_KEY, DEFAULT_MAP.get(STOPMODE_OPTIONS_KEY));
         put(VBT_PHASE, DEFAULT_MAP.getProperty(VBT_PHASE));
@@ -303,6 +300,8 @@ public final class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
             sp.put(userTacletsOptionsKey(i), readSingleOption(p, userTacletsOptionsKey(i)));
         }
+        sp.put(CBI_OPTIONS_KEY, readSingleOption(p, CBI_OPTIONS_KEY));
+        sp.put(NORMAL_FORM_BUILDING_KEY, readSingleOption(p, NORMAL_FORM_BUILDING_KEY));
         sp.put(INF_FLOW_CHECK_PROPERTY, readSingleOption(p, INF_FLOW_CHECK_PROPERTY));
         sp.put(STOPMODE_OPTIONS_KEY, readSingleOption(p, STOPMODE_OPTIONS_KEY));
         sp.put(VBT_PHASE, readSingleOption(p, VBT_PHASE));
@@ -375,6 +374,8 @@ public final class StrategyProperties extends Properties {
                 quantifierInstantiationWithSplitting ?
                         StrategyProperties.QUANTIFIERS_INSTANTIATE
                         : StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+        sp.setProperty(StrategyProperties.CBI_OPTIONS_KEY, StrategyProperties.CBI_DISABLED);
+        sp.setProperty(StrategyProperties.NORMAL_FORM_BUILDING_KEY, StrategyProperties.NORMAL_FORM_BUILDING_BY_RULE);
         sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
                 aliasChecks ?
                         StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY
@@ -461,6 +462,10 @@ public final class StrategyProperties extends Properties {
                 get(OSS_OPTIONS_KEY));
         p.put(STRATEGY_PROPERTY + QUANTIFIERS_OPTIONS_KEY,
                 get(QUANTIFIERS_OPTIONS_KEY));
+        p.put(STRATEGY_PROPERTY + CBI_OPTIONS_KEY,
+                get(CBI_OPTIONS_KEY));
+        p.put(STRATEGY_PROPERTY + NORMAL_FORM_BUILDING_KEY,
+                get(NORMAL_FORM_BUILDING_KEY));
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
             p.put(STRATEGY_PROPERTY + userTacletsOptionsKey(i),
                     get(userTacletsOptionsKey(i)));

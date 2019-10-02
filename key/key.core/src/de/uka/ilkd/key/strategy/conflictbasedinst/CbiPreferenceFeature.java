@@ -3,29 +3,21 @@ package de.uka.ilkd.key.strategy.conflictbasedinst;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
-import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 
-public class CbiPreferenceFeature implements Feature{
+public class CbiPreferenceFeature extends BinaryFeature {
 
-    private Feature feature;
+    private CbiPreferenceFeature() {}
 
-    public CbiPreferenceFeature(Feature feature) {
-        this.feature = feature;
-    }
+    public static final CbiPreferenceFeature INSTANCE = new CbiPreferenceFeature();
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
-            Goal goal) {
-        if(ConflictBasedInstantiationOld.getInstance().solved(pos, goal)) {
-            return TopRuleAppCost.INSTANCE;
-        }
-        return feature.computeCost(app, pos, goal);
+    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+        boolean solved = CbiProjection.getInstance().solved(app, pos, goal);
+        System.out.println("CBI Preference:  " + solved);
+        return !solved;
     }
 
-    public static Feature create(Feature feature) {
-        return new CbiPreferenceFeature(feature);
-    }
+
 
 }

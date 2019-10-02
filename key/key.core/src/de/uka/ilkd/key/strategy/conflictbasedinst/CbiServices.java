@@ -9,6 +9,7 @@ public class CbiServices {
     private static TermBuilder termBuiler;
     private static TermFactory termFactory;
     private static Services services;
+    private static boolean inducing;
 
     public static TermBuilder getTermBuiler() {
         return termBuiler;
@@ -27,6 +28,14 @@ public class CbiServices {
     }
     public static void setServices(Services services) {
         CbiServices.services = services;
+    }
+
+    public static boolean getInducing() {
+        return inducing;
+    }
+
+    public static void setInducing(boolean cinducing) {
+        inducing = cinducing;
     }
 
 

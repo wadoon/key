@@ -19,6 +19,10 @@ public class CbiProjection extends BinaryFeature implements ProjectionToTerm{
         return CbiProjectionHolder.instance;
     }
 
+    public static void setup(boolean conflictInducing) {
+        CbiServices.setInducing(conflictInducing);
+    }
+
     private Term formula;
     private Sequent sequent;
     private Term result;
@@ -42,6 +46,10 @@ public class CbiProjection extends BinaryFeature implements ProjectionToTerm{
     @Override
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
         return toTerm(app,pos,goal) != null;
+    }
+
+    public boolean solved(RuleApp app, PosInOccurrence pos, Goal goal) {
+        return toTerm(app, pos, goal) != null;
     }
 
 }

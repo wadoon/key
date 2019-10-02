@@ -22,11 +22,6 @@ import de.uka.ilkd.key.strategy.conflictbasedinst.EquivalenceClosure.Equivalence
 public class ConflictBasedInstantiation {
 
     /*
-     * CUSTOMIZABLE BEHAVIOR
-     */
-    private static final boolean FIND_INDUCING = false;
-
-    /*
      * SINGLETON BEHAVIOR
      */
 
@@ -57,12 +52,6 @@ public class ConflictBasedInstantiation {
     }
 
     /**
-     * The universally quantified formula in antecedent or the existentially
-     * quantified formula in succedent.
-     */
-    private Term formula;
-
-    /**
      * The formula that was used in the last run, saved to return same result if
      * called on the same formula/sequent twice.
      */
@@ -71,11 +60,6 @@ public class ConflictBasedInstantiation {
      * The sequent to build the context from.
      */
     private Sequent sequent;
-
-    /**
-     * The current goals services.
-     */
-    private Services services;
 
     /**
      * The holder for CBIs TermBuilder
@@ -155,7 +139,6 @@ public class ConflictBasedInstantiation {
          */
         this.lastFormula = formula;
         this.sequent = sequent;
-        this.services = services;
         // register current termbuilder
         this.tb = services.getTermBuilder();
         this.tf = services.getTermFactory();
@@ -189,20 +172,16 @@ public class ConflictBasedInstantiation {
         LinkedHashSet<Term> boundVars = new LinkedHashSet<Term>();
         Term prepForm = prepareFormula(
                 formula, replaceMap, boundVars);
-        //System.out.println("Prepared formula: " + prepForm);
-        //System.out.println("ReplacementMap: " + replaceMap);
 
         /*
          * Create context
          */
         context = new Context(prepForm, sequent);
         ContextSingleton.setContext(context);
-        //TODO remove prints
-        //System.out.println("Context: " + context.toString());
+
         LinkedHashSet<CbiPair> pairs = falsify(prepForm, true,
                 new ConstrainedAssignment(),
                 MatchingConstraints.extractFrom(prepForm));
-        //System.out.println(pairs);
         return extractConflictingSubstitution(pairs);
     }
 
@@ -308,12 +287,16 @@ public class ConflictBasedInstantiation {
                 // System.out.println("Not feasible: " + ca.toString());
             }
         }
-        Iterator<Term> it = inducing.iterator();
-        if(it.hasNext()) {
-            result = it.next();
-            //System.out.println("found result: " + result);
-            return result;
+        if(CbiServices.getInducing()) {
+            Iterator<Term> it = inducing.iterator();
+            if(it.hasNext()) {
+                result = it.next();
+                return result;
+            }
+        }else {
+            System.out.println("No Inducing today");
         }
+
         return null;
     }
 

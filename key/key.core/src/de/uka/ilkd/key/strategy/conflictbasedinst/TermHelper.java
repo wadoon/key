@@ -8,13 +8,15 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-class TermHelper {
+public class TermHelper {
 
     private static TermBuilder tb() {
         return CbiServices.getTermBuiler();
@@ -71,6 +73,10 @@ class TermHelper {
         return term.op() == Junctor.IMP;
     }
 
+    public static boolean isEquiv(Term term) {
+        return term.op() == Equality.EQV;
+    }
+
     public static boolean isTrue(Term term) {
         return term.op() == Junctor.TRUE;
     }
@@ -85,6 +91,20 @@ class TermHelper {
 
     public static boolean isExists(Term term) {
         return term.op() == Quantifier.EX;
+    }
+
+    public static boolean isLiteral(Term term) {
+        return (term.op() == Junctor.NOT) ?
+                isAtom(term.sub(0)):
+                isAtom(term);
+    }
+
+    public static boolean isAtom(Term term) {
+        final Operator op = term.op();
+        return !(op instanceof Junctor
+                || op == Equality.EQV
+                || op instanceof IfThenElse
+                || op instanceof Quantifier);
     }
 
     public static boolean containsEqualityInScope(Term term) {

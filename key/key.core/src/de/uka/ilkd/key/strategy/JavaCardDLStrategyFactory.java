@@ -283,14 +283,12 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "is not applied on Skolemized formulas in order to<br>"
             + "limit the number of inductive proofs." + "</html>";
 
-    public static final String TOOL_TIP_CBI_ENABLED =
-            "Enables the conflict based instantiation of quantified formulas.";
     public static final String TOOL_TIP_CBI_DISABLED =
             "Disables the conflict based instantiation of quantified formulas.";
-    public static final String TOOL_TIP_CBI_ONLY_CONFLICTING =
-            "Instantiate only instances that directly lead to close the sequence.";
-    public static final String TOOL_TIP_CBI_CONFLICT_INDUCING =
-            "Instantiate instances that do not directly lead to close the sequence.";
+    public static final String TOOL_TIP_CBI_CONFLICTING =
+            "Enables the conflict based instantiation of quantified formulas with conflicting instances only.";
+    public static final String TOOL_TIP_CBI_INDUCING =
+            "Enables the conflict based instantiation of quantified formulas with conflict inducing instances.";
     public static final String TOOL_TIP_NORMAL_FORM_BUILDING_BY_RULE =
             "Perform rules to establish negation normal form of the sequent before instantiation";
     public static final String TOOL_TIP_NORMAL_FORM_BUILDING_IN_BACKGROUND =
@@ -498,19 +496,11 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         StrategyProperties.CBI_DISABLED,
                         "Disabled", TOOL_TIP_CBI_DISABLED),
                 new StrategyPropertyValueDefinition(
-                        StrategyProperties.CBI_ENABLED,
-                        "Enabled", TOOL_TIP_CBI_ENABLED));
-    }
-
-    private static OneOfStrategyPropertyDefinition getConflictBasedInstantiationMode() {
-        return new OneOfStrategyPropertyDefinition(
-                StrategyProperties.CBI_MODE_OPTIONS_KEY, "Conflict based instantiation mode",
+                        StrategyProperties.CBI_CONFLICTING,
+                        "Conflicting", TOOL_TIP_CBI_CONFLICTING),
                 new StrategyPropertyValueDefinition(
-                        StrategyProperties.CBI_MODE_ONLY_CONFLICTING,
-                        "Conflicting only", TOOL_TIP_CBI_ONLY_CONFLICTING),
-                new StrategyPropertyValueDefinition(
-                        StrategyProperties.CBI_MODE_CONFLICT_INDUCING,
-                        "Conflict inducing", TOOL_TIP_CBI_CONFLICT_INDUCING));
+                        StrategyProperties.CBI_INDUCING,
+                        "Inducing", TOOL_TIP_CBI_INDUCING));
     }
 
     private static OneOfStrategyPropertyDefinition getFormulaNormalization() {
@@ -618,7 +608,6 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
         final OneOfStrategyPropertyDefinition arithmeticTreatment = getArithmeticTreatment();
         final OneOfStrategyPropertyDefinition quantifierTreatment = getQuantifierTreatment();
         final OneOfStrategyPropertyDefinition conflictBasedInstantiation = getConflictBasedInstantiation();
-        final OneOfStrategyPropertyDefinition cbiMode = getConflictBasedInstantiationMode();
         final OneOfStrategyPropertyDefinition formulaNormalization = getFormulaNormalization();
         final OneOfStrategyPropertyDefinition classAxiom = getClassAxiom();
         final OneOfStrategyPropertyDefinition autoInduction = getAutoInduction();
@@ -628,6 +617,6 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                 proofSplitting, loopTreatment, blockTreatment, methodTreatment,
                 mergePointStatementTreatment, dependencyContracts,
                 queryTreatment, arithmeticTreatment, quantifierTreatment,
-                conflictBasedInstantiation, cbiMode, formulaNormalization, classAxiom, autoInduction, userOptions);
+                conflictBasedInstantiation, formulaNormalization, classAxiom, autoInduction, userOptions);
     }
 }
