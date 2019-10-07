@@ -1,0 +1,187 @@
+package org.key_project.machlearning;
+
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.GoalChooser;
+import de.uka.ilkd.key.prover.ProverCore;
+import de.uka.ilkd.key.prover.impl.ApplyStrategy;
+import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
+import de.uka.ilkd.key.ui.Verbosity;
+import org.jetbrains.annotations.NotNull;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import java.io.File;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.function.Function;
+
+public class KeYConnection {
+
+    static interface Handler {
+        JSONObject handle(JSONObject json) throws Exception;
+    }
+
+    private final ConsoleUserInterfaceControl uiCtrl;
+    private Proof ongoingProof;
+
+    private Map<String, Handler> commands = new HashMap<>();
+    {
+        commands.put("load", this::loadFile);
+        commands.put("execute", this::executeTactic);
+        commands.put("rewind", this::rewind);
+        commands.put("features", this::extractFeatures);
+        commands.put("tactics", this::listTactics);
+    }
+
+    private Map<String, Tactic> tactics = new HashMap<>();
+    {
+        tactics.put("AUTO", new AutoTactic());
+        tactics.put("NOTHING", (a,b,c,d) -> {});
+        tactics.put("SMT", new SMTTactic());
+    }
+    public KeYConnection(int verbosity) {
+        uiCtrl = new MachLearningUICtrl((byte) verbosity);
+    }
+
+    public JSONObject handle(JSONObject jsonCommand) throws Exception {
+        String command = Objects.toString(jsonCommand.get("command"));
+        if (command == null) {
+            throw new IllegalArgumentException("No command set!");
+        }
+
+        Handler handler = commands.get(command);
+        if (handler == null) {
+            throw new IllegalArgumentException("Unknown command: " + command);
+        }
+
+        return handler.handle(jsonCommand);
+    }
+
+    private JSONObject executeTactic(JSONObject jsonObject) {
+
+        int id;
+        try {
+            id = Integer.parseInt(jsonObject.get("id").toString());
+        } catch(Exception ex) {
+            throw new IllegalArgumentException("Missing/Illegal id parameter", ex);
+        }
+
+        Goal goal = findGoal(id);
+
+        final GoalChooser goalChooser = ongoingProof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
+        final ProverCore applyStrategy = new ApplyStrategy(goalChooser);
+
+        applyStrategy.start(ongoingProof, goal);
+
+        return Server.success("ids", filterGoalIds(id));
+    }
+
+    private Goal findGoal(int id) {
+        for (Goal openGoal : ongoingProof.openGoals()) {
+            if (openGoal.node().serialNr() == id) {
+                return openGoal;
+            }
+        }
+        throw new NoSuchElementException("Unknown id " + id + " among the goals.");
+    }
+
+    private Node findNode(int id) {
+        // Recursion may not been an option due to stack overflow
+        Deque<Node> todo = new LinkedList<>();
+        todo.push(ongoingProof.root());
+        while(!todo.isEmpty()) {
+            Node node = todo.pop();
+            if (node.serialNr() == id) {
+                return node;
+            }
+            Iterator<Node> it = node.childrenIterator();
+            while (it.hasNext()) {
+                todo.push(it.next());
+            }
+        }
+        throw new NoSuchElementException("Unknown id " + id + " among the nodes.");
+    }
+
+    private JSONObject loadFile(JSONObject obj) {
+        String filename = Objects.toString(obj.get("filename"));
+        System.err.println("Loading: " + filename);
+
+        if (ongoingProof != null) {
+            ongoingProof.dispose();
+        }
+
+        uiCtrl.loadProblem(new File(filename));
+        ongoingProof = uiCtrl.getMediator().getSelectedProof();
+
+        return Server.success("ids", filterGoalIds(1));
+    }
+
+
+    // find all goal ids below a given serial number
+    private JSONArray filterGoalIds(int below) {
+        JSONArray ids = new JSONArray();
+        for (Goal goal : ongoingProof.openGoals()) {
+            if(below == 1 || isBelow(goal.node(), below))
+            ids.add(goal.node().serialNr());
+        }
+        return ids;
+    }
+
+    private static boolean isBelow(Node node, int below) {
+        while (node != null) {
+            if (node.serialNr() == below) {
+                return true;
+            }
+            node = node.parent();
+        }
+        return false;
+    }
+
+    private JSONObject extractFeatures(JSONObject jsonObject) {
+        int id;
+        try {
+            id = Integer.parseInt(jsonObject.get("id").toString());
+        } catch(Exception ex) {
+            throw new IllegalArgumentException("Missing/Illegal id parameter", ex);
+        }
+
+        Goal goal = findGoal(id);
+
+        JSONObject result = new JSONObject();
+        result.put("id", id);
+        result.put("numberOfFormulas",
+                goal.node().sequent().succedent().size() + goal.node().sequent().antecedent().size());
+        // ...
+        // probably in a class of its own.
+
+        return result;
+    }
+
+    private JSONObject rewind(JSONObject jsonObject) {
+         int id;
+        try {
+            id = Integer.parseInt(jsonObject.get("id").toString());
+        } catch(Exception ex) {
+            throw new IllegalArgumentException("Missing/Illegal id parameter", ex);
+        }
+
+        Node node = findNode(id);
+
+        ongoingProof.pruneProof(node);
+
+        return Server.success();
+    }
+
+    private JSONObject listTactics(JSONObject jsonObject) {
+        JSONArray array = new JSONArray();
+        array.addAll(tactics.keySet());
+        return Server.success("tactics", array);
+    }
+}

@@ -1,0 +1,70 @@
+# Communication between machine learning tool and KeY.
+
+The outside tool acts as master and instructs KeY to appy individual
+tactics to chosen proof goals.
+
+Feature extraction will mainly happen on the KeY side.
+
+Tactic application must be reversible.
+
+Communication works via textually (JSON) represented commands.
+over a socket interface (or a pipe ...)
+
+For example, the command to load "test.key" would be represented as
+{ "command": "loadFile", "filename": "test.key" }.
+
+For readability, it is shown here as "loadFile(filename:str)".
+
+tac is the enumeration type for tactics.
+
+## Commands
+
+Initiated by the learning tool, responses by KeY. may be asynchronous.
+
+### Loading of proof
+
+   >    load(filename:str)
+   <    success
+or <    error(type:int, message:str)
+
+Discards old proof from memory. load new proof obligation.
+
+### Preparing initial proof obligations
+
+We call this "symbolic execution"
+
+   >    symbex
+   <    success(obligation_ids: int[])
+or <    error(type:int, message:str)
+
+### Executing a tactic
+
+   >    execute(obligation_id: int, tactic: tac)
+   <    success(obligation_ids: int[])
+or <    error(type:int, message:str)
+
+in particular: error: obligation is not an open goal
+
+### Abort execution
+
+   >    execute(obligation_id: int, tactic: tac)
+   >    abort
+   <    success(obligation_ids: int[])
+or <    error(type:int, message:str)
+
+success if the execution has finished despite the abort
+error(ABORT, "The execution has been aborted") if abort was successful.
+
+### Prune a proof / Undo execution
+
+   >    rewind(obligation_id)
+   <    success
+or <    error(type:int, message:str)
+
+### Evaluate obligation
+
+Feature extraction
+
+   >    features(obligation_id)
+   <    success(features...)
+or <    error(type:int, message:str)
