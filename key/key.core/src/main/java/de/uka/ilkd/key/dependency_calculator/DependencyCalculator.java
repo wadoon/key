@@ -39,14 +39,31 @@ public class DependencyCalculator {
 				dependencies.addAll(calculateDependenciesForConcreteInvariant(concreteInv, services, self, kjt));
 			}
 		}
+		
 		return dependencies;
 	}
 	
 	public static HashSet<Term> calculateDependenciesForConcreteInvariant(ClassInvariant invariant, Services services, ProgramVariable self, KeYJavaType kjt){
 								
 		DepVisitor depVisitor = new DepVisitor(services, kjt);
-		invariant.getInv(self, services).execPostOrder(depVisitor);
-
+		invariant.getInv(self, services).execPostOrder(depVisitor);		
 		return depVisitor.getDependencies();
+		//return purgeTermsWithFreeVars(depVisitor.getDependencies());
+	}
+	
+	private static HashSet<Term> purgeTermsWithFreeVars(HashSet<Term> set){
+		
+		HashSet<Term> result = new HashSet<Term>();
+		
+		System.out.println("Purge Dep-Terms with FreeVars.");
+		for (Term t : set) {
+			if(t.freeVars().isEmpty()) {
+				result.add(t);
+			} else {
+				System.out.println("Removed from Dependencies:" + t.toString());
+			}
+		}
+		System.out.println("Purging done.");
+		return result;
 	}
 }

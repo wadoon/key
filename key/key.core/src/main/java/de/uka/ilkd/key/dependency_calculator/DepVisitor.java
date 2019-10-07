@@ -16,9 +16,11 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -101,6 +103,7 @@ public class DepVisitor extends DefaultVisitor {
 	
 		// Create helper set because the dependencies set cannot be modified during the foreach loop
 		HashSet<Term> helper = new HashSet<Term>();
+		HashSet<Term> removeList = new HashSet<Term>();
 		for (Term term : dependencies) {
 						
 			if(term.op() == locSetLDT.getSingleton()) {
@@ -112,6 +115,14 @@ public class DepVisitor extends DefaultVisitor {
 					// Quantified variable is used in subformula of quantifier
 					if(potentiallyQuantifiedVarbiable.equalsModIrrelevantTermLabels(quantifiedVariable)) {
 						helper.add(tb.allObjects(term.sub(1)));
+						removeList.add(term);
+						//System.out.println("TEst:" + term.toString());
+					}
+					
+					else if(quantVarUsedInSelAsObj(potentiallyQuantifiedVarbiable, quantifiedVariable)) {
+						helper.add(tb.allObjects(term.sub(1)));
+						removeList.add(term);
+						//System.out.println("TEst:" + term.toString());						
 					}
 								
 					// Array access in subformula of quantifier
@@ -119,8 +130,20 @@ public class DepVisitor extends DefaultVisitor {
 						Term accessIndex = term.sub(1).sub(0);									
 						if(quantifiedVariable.equalsModIrrelevantTermLabels(accessIndex)) {
 							helper.add(tb.allFields(term.sub(0)));
+							removeList.add(term);
+							//System.out.println("Term welcher removed wird:" + term.toString());
 						}
 					}
+//					else{
+//						//System.out.println("Freie Variablen:" + term.sub(0).freeVars());
+//						//System.out.println("Die Quantifizierte Variable:" + quantifiedVariable.toString());
+//						for (QuantifiableVariable qvar : term.sub(0).freeVars()) {
+//							if(quantifiedVariable.equalsModIrrelevantTermLabels(tb.var(qvar))) {
+//								//System.out.println("Der folgende Term wird entfernt:" + term.toString());
+//								removeList.add(term);
+//							}
+//						}
+//					}
 				}
 			}
 						
@@ -154,8 +177,23 @@ public class DepVisitor extends DefaultVisitor {
 			}
 		}
 		dependencies.addAll(helper);		
+		// TODO: Test this a bit more
+		dependencies.removeAll(removeList);
 	}
 	
+	private boolean quantVarUsedInSelAsObj(Term t,Term quantvar) {
+		//System.out.println("Suche nach nutzung von " + quantvar.toString() + " in:" + t.toString());
+		while(heapLDT.isSelectOp(t.op())) {
+			t = t.sub(1);
+			//System.out.println("Reduzierung auf: " + t.toString());
+		}
+		if(quantvar.equalsModIrrelevantTermLabels(t)) {
+			//System.out.println("Ich hab was gefunden");
+			return true;
+		}
+		return false;
+	}
+
 	public HashSet<Term> getDependencies(){
 		return this.dependencies;
 	}
