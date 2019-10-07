@@ -22,7 +22,7 @@ public class ContainsSamePartialInvariant extends BinaryFeature {
 	@Override
 	protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
 	    Operator findOp = pos.subTerm().op();
-		
+	    
 	    for (SequentFormula sf : findInAntec ? goal.sequent().succedent() : goal.sequent().antecedent()) {
 	    	OpCollector collector = new OpCollector();
 	    	collector.visit(sf.formula());

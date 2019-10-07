@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -175,13 +176,13 @@ public final class PartialInvAxiom extends ClassAxiom {
             
             // TODO: treat static invariants.
             if(i == 0) {
-                Taclet intermediateToConcreteInvariantTaclet = 
+                ImmutableSet<Taclet> intermediateToConcreteInvariantTaclets = 
                 		TG.generateIntermediateToConcreteInvTaclet(selfSV,
                 													inv,
                 													services);
                 // check whether the taclet was created successfully
-                if(intermediateToConcreteInvariantTaclet != null) {
-                	taclets = taclets.add(intermediateToConcreteInvariantTaclet);
+                if(intermediateToConcreteInvariantTaclets != null) {
+                	taclets = taclets.union(intermediateToConcreteInvariantTaclets);
                 }            	
             }
             

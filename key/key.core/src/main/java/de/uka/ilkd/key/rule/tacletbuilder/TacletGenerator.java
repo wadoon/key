@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -133,7 +134,7 @@ public class TacletGenerator {
                                         Term originalAxiom,
                                         ImmutableList<ProgramVariable> programVars,
                                         TermServices services,
-                                        RuleSet... ruleSet) {
+                                        RuleSet ruleSet) {
         // create schema terms
         final ImmutableList<SchemaVariable> schemaVars =
                 createSchemaVariables(programVars);
@@ -151,12 +152,59 @@ public class TacletGenerator {
         tacletBuilder.addGoalTerm(schemaAxiom.term);
         tacletBuilder.addVarsNotFreeIn(boundSVs, schemaVars);
         
+        tacletBuilder.addRuleSet(ruleSet);
+		
+        return tacletBuilder.getTaclet();
+    }
+    
+    public Taclet generatePartialInvExpandTaclet(Name tacletName,
+            Term originalFind,
+            Term originalAxiom,
+            ImmutableList<ProgramVariable> programVars,
+            TermServices services,
+            boolean forAntec,
+            RuleSet... ruleSet) {
+    	// create schema terms
+		final ImmutableList<SchemaVariable> schemaVars =
+		createSchemaVariables(programVars);
+		final TermAndBoundVarPair schemaFind =
+		createSchemaTerm(originalFind, programVars, schemaVars, services);
+		final TermAndBoundVarPair schemaAxiom =
+		createSchemaTerm(originalAxiom, programVars, schemaVars, services);
+		final ImmutableSet<VariableSV> boundSVs =
+		schemaFind.boundVars.union(schemaAxiom.boundVars);
+		
+		final TacletBuilder tacletBuilder;
+		
+		if(forAntec) {
+	        //create taclet
+	        final AntecTacletBuilder antecTacletBuilder = new AntecTacletBuilder();
+	        antecTacletBuilder.setFind(schemaFind.term);
+	        antecTacletBuilder.addTacletGoalTemplate(new TacletGoalTemplate(Sequent.EMPTY_SEQUENT.addFormula(
+	        		new SequentFormula(schemaAxiom.term), true, true).sequent(), ImmutableSLList.<Taclet>nil())); //.addGoalTerm(schemaAxiom.term);
+	        
+	        
+	        tacletBuilder = antecTacletBuilder;
+		} else {
+			//create taclet
+			final RewriteTacletBuilder  rewriteTacletBuilder = new RewriteTacletBuilder<>();
+			
+			rewriteTacletBuilder.setFind(schemaFind.term);
+			rewriteTacletBuilder.setApplicationRestriction(RewriteTaclet.SUCCEDENT_POLARITY);
+			rewriteTacletBuilder.addGoalTerm(schemaAxiom.term);
+			
+			tacletBuilder = rewriteTacletBuilder;
+		}
+		
+		tacletBuilder.setName(tacletName);
+		tacletBuilder.addVarsNotFreeIn(boundSVs, schemaVars);
+        
         for (RuleSet rs : ruleSet) {
         	tacletBuilder.addRuleSet(rs);
 		}
-        return tacletBuilder.getTaclet();
+		
+		return tacletBuilder.getTaclet();		
     }
-
 
     public Taclet generateRelationalRepresentsTaclet(Name tacletName,
                                                      Term originalAxiom,
@@ -790,7 +838,7 @@ public class TacletGenerator {
      * If no corresponding concrete invariant is found, this method returns null.
      * 
      */
-    public Taclet generateIntermediateToConcreteInvTaclet( SchemaVariable selfSV,
+    public ImmutableSet<Taclet> generateIntermediateToConcreteInvTaclet( SchemaVariable selfSV,
     														ClassInvariant intermediate,
     														Services services) {
     	// Retrieve the concrete invariant matching to the intermediate one
@@ -809,15 +857,32 @@ public class TacletGenerator {
     	params = params.append(concreteInv.getOrigVars().self);
     	
     	// Create replace taclet to transform the intermediate invariant to the concrete one
-        Taclet taclet =
-        	generateRewriteTaclet(new Name("Intermediate_to_concrete_inv_for_" + intermediate.getName()), 
+        Taclet antecTaclet =
+        	generatePartialInvExpandTaclet(new Name("Antec_intermediate_to_concrete_inv_for_" + intermediate.getName()), 
         							intermediate.getOriginalInv(), 
         							concreteInv.getOriginalInv(),
         							params,
         							services, 
+        							true,
         							new RuleSet(new Name("classAxiom")),
-        							new RuleSet(new Name("partialInvExpand")));
-        return taclet;
+        							new RuleSet(new Name("partialInvExpandAntec")));
+        
+        Taclet succTaclet =
+        		generatePartialInvExpandTaclet(new Name("Succ_intermediate_to_concrete_inv_for_" + intermediate.getName()), 
+            							intermediate.getOriginalInv(), 
+            							concreteInv.getOriginalInv(),
+            							params,
+            							services,
+            							false,
+            							new RuleSet(new Name("classAxiom")),
+            							new RuleSet(new Name("partialInvExpandSucc")));
+        
+        ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
+        
+        result = result.add(antecTaclet);
+        result = result.add(succTaclet);
+        
+        return result;
     }
 
     @SuppressWarnings("unused")
