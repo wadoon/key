@@ -108,42 +108,36 @@ public class DepVisitor extends DefaultVisitor {
 						
 			if(term.op() == locSetLDT.getSingleton()) {
 						
-				Term potentiallyQuantifiedVarbiable = term.sub(0);
+				Term objectOfSingleton = term.sub(0);
+				Term fieldOfSingleton = term.sub(1);
 				
 				for (Term quantifiedVariable : quantifiedVariablesTerm) {
 								
-					// Quantified variable is used in subformula of quantifier
-					if(potentiallyQuantifiedVarbiable.equalsModIrrelevantTermLabels(quantifiedVariable)) {
-						helper.add(tb.allObjects(term.sub(1)));
+					// objectOfSingleton can be a complexe select term. We have to check whether the quantified
+					// variable is used as an object on the lowest level of the select statement.
+					// Example use cases: singleton(a.b,c)
+					//					  singleton(a,b)
+					if(varUsedInSelectTermAsObject(objectOfSingleton, quantifiedVariable)) {
+						helper.add(tb.allObjects(fieldOfSingleton));
 						removeList.add(term);
-						//System.out.println("TEst:" + term.toString());
 					}
 					
-					else if(quantVarUsedInSelAsObj(potentiallyQuantifiedVarbiable, quantifiedVariable)) {
-						helper.add(tb.allObjects(term.sub(1)));
+					// Recursively check for array access in objectOfSingleton
+					// Example use case: singleton(a[i],x)
+					else if(arrayAccessInObjectOfSingleton(objectOfSingleton, quantifiedVariable)) {
+						helper.add(tb.allObjects(fieldOfSingleton));
 						removeList.add(term);
-						//System.out.println("TEst:" + term.toString());						
 					}
 								
-					// Array access in subformula of quantifier
-					else if(term.sub(1).op() == heapLDT.getArr()) {
-						Term accessIndex = term.sub(1).sub(0);									
+					// Check for array access in fieldOfSingleton
+					// Example use case: singleton(a, arr(i))
+					else if(fieldOfSingleton.op() == heapLDT.getArr()) {
+						Term accessIndex = fieldOfSingleton.sub(0);									
 						if(quantifiedVariable.equalsModIrrelevantTermLabels(accessIndex)) {
 							helper.add(tb.allFields(term.sub(0)));
 							removeList.add(term);
-							//System.out.println("Term welcher removed wird:" + term.toString());
 						}
 					}
-//					else{
-//						//System.out.println("Freie Variablen:" + term.sub(0).freeVars());
-//						//System.out.println("Die Quantifizierte Variable:" + quantifiedVariable.toString());
-//						for (QuantifiableVariable qvar : term.sub(0).freeVars()) {
-//							if(quantifiedVariable.equalsModIrrelevantTermLabels(tb.var(qvar))) {
-//								//System.out.println("Der folgende Term wird entfernt:" + term.toString());
-//								removeList.add(term);
-//							}
-//						}
-//					}
 				}
 			}
 						
@@ -154,6 +148,7 @@ public class DepVisitor extends DefaultVisitor {
 								
 					if(potentiallyQuantifiedVariable.equalsModIrrelevantTermLabels(quantifiedVariable)) {
 						helper.add(tb.allLocs());
+						removeList.add(term);
 					}
 				}
 							
@@ -171,6 +166,7 @@ public class DepVisitor extends DefaultVisitor {
 						
 						if(arrayIndex.equalsModIrrelevantTermLabels(quantifiedVariable)) {
 							helper.add(tb.allLocs());
+							removeList.add(term);
 						}
 					}
 				}
@@ -181,17 +177,32 @@ public class DepVisitor extends DefaultVisitor {
 		dependencies.removeAll(removeList);
 	}
 	
-	private boolean quantVarUsedInSelAsObj(Term t,Term quantvar) {
-		//System.out.println("Suche nach nutzung von " + quantvar.toString() + " in:" + t.toString());
+	/* Checks whether objectSingleton is a select term and if it is, whether the field of the select term is an array
+	 * access which uses a quantifiedVariable
+	 */
+	private boolean arrayAccessInObjectOfSingleton(Term objectOfSingleton, Term quantifiedVariable) {
+
+		if(!heapLDT.isSelectOp(objectOfSingleton.op())){
+			return false;
+		}
+		
+		Term possibleArrTerm = objectOfSingleton.sub(2);
+		
+		return (possibleArrTerm.op() == heapLDT.getArr() && possibleArrTerm.sub(0) == quantifiedVariable) ? true : false;
+	}
+
+	/*
+	 * If the term t is a select term, then the object field of the select is retrieved recursively until the result term 
+	 * is not a select statement anymore. Then the method checks, whether the retrieved result is equal to the given variable
+	 * var.
+	 * 
+	 * If the term t is not a select term, then the method simply checks, wether t and var are the same variables. 
+	 */
+	private boolean varUsedInSelectTermAsObject(Term t,Term var) {
 		while(heapLDT.isSelectOp(t.op())) {
 			t = t.sub(1);
-			//System.out.println("Reduzierung auf: " + t.toString());
 		}
-		if(quantvar.equalsModIrrelevantTermLabels(t)) {
-			//System.out.println("Ich hab was gefunden");
-			return true;
-		}
-		return false;
+		return var.equalsModIrrelevantTermLabels(t) ? true : false;
 	}
 
 	public HashSet<Term> getDependencies(){
