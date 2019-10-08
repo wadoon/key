@@ -1,5 +1,10 @@
 package org.key_project.machlearning;
 
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -37,6 +42,7 @@ public class KeYConnection {
         commands.put("execute", this::executeTactic);
         commands.put("rewind", this::rewind);
         commands.put("features", this::extractFeatures);
+        commands.put("ast", this::getAST);
         commands.put("tactics", this::listTactics);
     }
 
@@ -165,7 +171,7 @@ public class KeYConnection {
     }
 
     private JSONObject rewind(JSONObject jsonObject) {
-         int id;
+        int id;
         try {
             id = Integer.parseInt(jsonObject.get("id").toString());
         } catch(Exception ex) {
@@ -184,4 +190,48 @@ public class KeYConnection {
         array.addAll(tactics.keySet());
         return Server.success("tactics", array);
     }
+
+    private JSONObject getAST(JSONObject jsonObject) {
+
+        int id;
+        try {
+            id = Integer.parseInt(jsonObject.get("id").toString());
+        } catch(Exception ex) {
+            throw new IllegalArgumentException("Missing/Illegal id parameter", ex);
+        }
+
+        Goal goal = findGoal(id);
+        Sequent sequent = goal.sequent();
+
+        JSONObject result = new JSONObject();
+        result.put("response", "success");
+        result.put("id", id);
+        result.put("antecedent", semiSequentToJSON(sequent.antecedent()));
+        result.put("succedent", semiSequentToJSON(sequent.succedent()));
+        return result;
+    }
+
+    private JSONArray semiSequentToJSON(Semisequent semiseq) {
+        JSONArray result = new JSONArray();
+        Iterator<SequentFormula> it = semiseq.iterator();
+        while(it.hasNext()) {
+            result.add(termToJSON(it.next().formula()));
+        }
+        return result;
+    }
+
+    private JSONObject termToJSON(Term term) {
+        Operator op = term.op();
+        JSONObject result = new JSONObject();
+        result.put("op", op.name().toString());
+        result.put("op_class", op.getClass().toString());
+        JSONArray children = new JSONArray();
+        for (Term sub : term.subs()) {
+            children.add(termToJSON(sub));
+        }
+        result.put("children", children);
+        return result;
+    }
+
+
 }
