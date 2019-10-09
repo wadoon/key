@@ -16,7 +16,8 @@ public class ContainsPartialInvariantTwice extends BinaryFeature {
 	    int encountered = 0;
 	    for (SequentFormula sf : goal.sequent().antecedent()) {
 	    	OpCollector collector = new OpCollector();
-	    	collector.visit(sf.formula());
+	    	//collector.visit(sf.formula());
+	    	sf.formula().execPreOrder(collector);
 	    	if (collector.contains(findOp)) encountered++;
 	    }
 		if(encountered > 1) {

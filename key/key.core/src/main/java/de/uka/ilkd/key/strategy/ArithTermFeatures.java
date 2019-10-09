@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.strategy.termfeature.ConstantTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
@@ -105,6 +106,8 @@ class ArithTermFeatures extends StaticFeatureCollection {
                 = rec(any(),
                         add(add(not(divF), not(modF)),
                                 add(not(jdivF), not(jmodF))));
+        
+        partInvSymb = PartialInvSymbol.INSTANCE;
     }
 
     final Sort intS;
@@ -171,5 +174,7 @@ class ArithTermFeatures extends StaticFeatureCollection {
 
     final TermFeature notContainsProduct;
     final TermFeature notContainsDivMod;
+
+	public TermFeature partInvSymb;
 
 }

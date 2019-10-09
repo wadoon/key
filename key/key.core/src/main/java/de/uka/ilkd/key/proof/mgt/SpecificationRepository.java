@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -1301,8 +1302,18 @@ public final class SpecificationRepository {
                 if (kjt != selfKjt && JavaInfo.isPrivate(kjt)) {
                     continue; // only non-private classes
                 }
-                final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(
-                        kjt);
+                final ClassInvariant[] myInvs = getClassInvariants(
+                        kjt).toArray(new ClassInvariant[0]);
+                
+                Arrays.sort(myInvs, new Comparator<ClassInvariant>() {
+
+					@Override
+					public int compare(ClassInvariant arg0, ClassInvariant arg1) {
+						// TODO Auto-generated method stub
+						return arg0.getOriginalInv().op().name().compareTo(arg1.getOriginalInv().op().name());
+					}
+				});
+                
                 final ProgramVariable selfVar = tb.selfVar(kjt, false);
                 Term invDef = tb.tt();
                 for (ClassInvariant inv : myInvs) {

@@ -562,39 +562,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         if (classAxiomApplicationEnabled()) {
             bindRuleSet(d, "classAxiom", longConst(-250));
             
-            Feature partialExpandFeatureSucc =
-            		ifZero(TopLevelFindFeature.SUCC, 
-            				ifZero(ContainsSamePartialInvariant.SUCC_INSTANCE, longConst(600)),
-            				longConst(1200));
-            
-            //Letzter Test
-//            Feature partialExpandFeatureAntec = 
-//            		ifZero(TopLevelFindFeature.ANTEC,
-//            				ifZero(ContainsSamePartialInvariant.ANTEC_INSTANCE, longConst(-300)),
-//            				longConst(600)
-//            				);
+			Feature partialExpandFeatureSucc = ifZero(TopLevelFindFeature.SUCC,
+					ifZero(ContainsSamePartialInvariant.SUCC_INSTANCE, longConst(600)), longConst(1200));
 
-            // Das hat nicht wirklich funktioniert
-//            Feature partialExpandFeatureAntec = 
-//            		ifZero(ContainsSamePartialInvariant.SUCC_INSTANCE,
-//            				longConst(1200),
-//            				ifZero(ContainsSamePartialInvariant.ANTEC_INSTANCE, longConst(-300), longConst(600)));
-            
-            Feature partialExpandFeatureAntec = 
-            		ifZero(new ContainsPartialInvariantTwice(),
-            				longConst(1200),
-            				longConst(-300));
-            
-            
-            // Richard's Version
-//            Feature partialExpandFeature =
-//            		ifZero(ifZero(TopLevelFindFeature.SUCC, 
-//            				ContainsSamePartialInvariant.SUCC_INSTANCE),
-//            				longConst(600), 
-//            				ifZero(TopLevelFindFeature.ANTEC, longConst(-800),longConst(1200)));
-            
-            bindRuleSet(d, "partialInvExpandAntec", partialExpandFeatureAntec);
-            bindRuleSet(d, "partialInvExpandSucc", partialExpandFeatureSucc);
+			Feature partialExpandFeatureAntec = ifZero(new ContainsPartialInvariantTwice(), longConst(1200),
+					ifZero(ContainsSamePartialInvariant.ANTEC_INSTANCE, longConst(12000), longConst(-5000)));
+
+			bindRuleSet(d, "partialInvExpandAntec", partialExpandFeatureAntec);
+			bindRuleSet(d, "partialInvExpandSucc", partialExpandFeatureSucc);
         } else {
             bindRuleSet(d, "classAxiom", inftyConst());
         }
@@ -1119,6 +1094,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                    ifZero(applyTF(FocusProjection.INSTANCE,
                                               opSub(tf.eq, any(), vf.nullTerm)),
                                           longConst(-5), longConst(0)),
+									// prefer cuts over partial invariants
+//                                 ifZero(applyTF(FocusProjection.INSTANCE,
+//                                            tf.partInvSymb),
+//                                        longConst(-2000), longConst(0)),                                   
                                    // punish cuts over formulas containing anon heap functions
                                    ifZero(applyTF(cutFormula,
                                               rec(any(), not(AnonHeapTermFeature.INSTANCE))),

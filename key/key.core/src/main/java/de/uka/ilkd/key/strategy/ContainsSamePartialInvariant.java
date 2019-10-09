@@ -1,8 +1,11 @@
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -23,10 +26,13 @@ public class ContainsSamePartialInvariant extends BinaryFeature {
 	protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
 	    Operator findOp = pos.subTerm().op();
 	    
+	    final Services services = goal.proof().getServices();
+	    final IObserverFunction inv = services.getJavaInfo().getInv();
+	    
 	    for (SequentFormula sf : findInAntec ? goal.sequent().succedent() : goal.sequent().antecedent()) {
 	    	OpCollector collector = new OpCollector();
-	    	collector.visit(sf.formula());
-	    	if (collector.contains(findOp)) return true;
+	    	sf.formula().execPostOrder(collector);
+	    	if (collector.contains(findOp)|| collector.contains(inv)) return true;
 	    }
 		return false;
 	}
