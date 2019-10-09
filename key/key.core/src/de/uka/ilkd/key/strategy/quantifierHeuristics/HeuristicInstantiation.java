@@ -27,8 +27,10 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.conflictbasedinst.CbiStatistics;
-import de.uka.ilkd.key.strategy.conflictbasedinst.InstMethod;
+import de.uka.ilkd.key.strategy.conflictbasedinst.CbiResult;
+import de.uka.ilkd.key.strategy.conflictbasedinst.ConflictBasedInstantiation;
+import de.uka.ilkd.key.strategy.conflictbasedinst.TermHelper;
+import de.uka.ilkd.key.strategy.conflictbasedinst.statistics.CbiStatistics;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 
@@ -43,19 +45,24 @@ public class HeuristicInstantiation implements TermGenerator {
             PosInOccurrence pos,
             Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
+
         Term qf = pos.sequentFormula ().formula ();
+        Sequent sequent = goal.sequent();
+        Services services = goal.proof().getServices();
         final QuantifiableVariable var =
                 qf.varsBoundHere ( 0 ).last ();
-        CbiStatistics.startFeature(qf, InstMethod.HEUR);
-
-        CbiStatistics.startNormalization();
-        Sequent seq = goal.sequent();
-        CbiStatistics.finishNormalization();
-        final Instantiation ia = Instantiation.create ( qf, seq,
+        if(TermHelper.containsEqualityInScope(qf)) {
+            CbiStatistics.incEqualityInScope();
+            if(ConflictBasedInstantiation.enabled()) {
+                CbiResult result = ConflictBasedInstantiation.getInstance().findConflictingTerm(qf, sequent, services);
+                if(result.getResult() != null) {
+                    return new HIIterator(result.getIterator(), var, services);
+                }
+            }
+        }
+        final Instantiation ia = Instantiation.create ( qf, sequent,
                 goal.proof().getServices() );
-        HIIterator hiit = new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices() );
-        CbiStatistics.finishFeature(hiit.hasNext());
-        return hiit;
+        return new HIIterator ( ia.getSubstitution ().iterator (), var, services );
     }
 
     private HIIterator empty(QuantifiableVariable var, Services services) {

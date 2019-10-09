@@ -28,7 +28,7 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 public class InstantiationCost implements Feature {
 
 	final private ProjectionToTerm varInst;
-	
+
 	private InstantiationCost(ProjectionToTerm var) {
 		varInst = var;
 	}
@@ -36,7 +36,7 @@ public class InstantiationCost implements Feature {
 	public static Feature create(ProjectionToTerm varInst) {
 	    return new InstantiationCost(varInst);
 	}
-    
+
 	/**
 	 * Compute the cost of a RuleApp.
 	 */
@@ -46,7 +46,7 @@ public class InstantiationCost implements Feature {
         final Term formula = pos.sequentFormula ().formula ();
         final Term instance = varInst.toTerm ( app, pos, goal );
 
-        return Instantiation.computeCost ( instance, formula, goal.sequent (), 
+        return Instantiation.computeCost ( instance, formula, goal.sequent (),
                 goal.proof().getServices() );
 	}
 }

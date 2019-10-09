@@ -25,7 +25,7 @@ public class CbiProjection extends BinaryFeature implements ProjectionToTerm{
 
     private Term formula;
     private Sequent sequent;
-    private Term result;
+    private CbiResult result;
 
     @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
@@ -33,14 +33,12 @@ public class CbiProjection extends BinaryFeature implements ProjectionToTerm{
         final Sequent sequent = goal.sequent();
         final Services services = goal.proof().getServices();
         if(this.formula == formula && this.sequent == sequent) {
-            return this.result;
+            return this.result.getResult();
         }
         this.sequent = sequent;
         this.formula = formula;
-        CbiStatistics.startFeature(formula, InstMethod.CBI);
-        result = ConflictBasedInstantiation.getInstance().findConflictingTerm(formula, sequent, pos, services);
-        CbiStatistics.finishFeature(result != null);
-        return result;
+        result = ConflictBasedInstantiation.getInstance().findConflictingTerm(formula, sequent, services);
+        return result.getResult();
     }
 
     @Override
@@ -50,6 +48,10 @@ public class CbiProjection extends BinaryFeature implements ProjectionToTerm{
 
     public boolean solved(RuleApp app, PosInOccurrence pos, Goal goal) {
         return toTerm(app, pos, goal) != null;
+    }
+
+    public boolean instantiated(Term formula, Sequent sequent) {
+        return this.formula == formula && this.sequent == sequent && this.result != null && this.result.getResult() != null;
     }
 
 }

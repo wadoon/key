@@ -2,7 +2,8 @@ package de.uka.ilkd.key.strategy.conflictbasedinst;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -10,11 +11,11 @@ import de.uka.ilkd.key.logic.op.Junctor;
 
 public class EquivalenceClosure {
 
-    private Set<EquivalenceClass> closure;
+    private LinkedHashSet<EquivalenceClass> closure;
     private HashMap<Term, EquivalenceClass> lookUpMap;
 
     public EquivalenceClosure() {
-        closure = new HashSet<EquivalenceClass>();
+        closure = new LinkedHashSet<EquivalenceClass>();
         lookUpMap = new HashMap<Term, EquivalenceClosure.EquivalenceClass>();
     }
 
@@ -33,7 +34,7 @@ public class EquivalenceClosure {
         return addEquality(term.sub(0), term.sub(1), negated);
     }
 
-    public Set<EquivalenceClass> getEquivalenceClasses() {
+    public LinkedHashSet<EquivalenceClass> getEquivalenceClasses() {
         return closure;
     }
 
@@ -135,6 +136,12 @@ public class EquivalenceClosure {
                 ground = term;
             }
             return super.add(term);
+        }
+
+        public Term first() {
+            Iterator<Term> it = iterator();
+            if(it.hasNext()) return it.next();
+            return null;
         }
 
 

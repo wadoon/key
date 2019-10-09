@@ -12,6 +12,10 @@ public class Literal {
     private final boolean polarity;
 
     private Literal(Term term, boolean polarity) {
+        if(term.op() == Junctor.NOT) {
+            term = term.sub(0);
+            polarity = !polarity;
+        }
         this.term = term;
         this.polarity = polarity;
     }
@@ -20,8 +24,12 @@ public class Literal {
         this(term.op() == Junctor.NOT ? term.sub(0): term, term.op() != Junctor.NOT);
     }
 
-    public static Literal fromTerm(Term term) {
-        return new Literal(term);
+    public static Literal fromTerm(Term term, boolean polarity) {
+        return new Literal(term, polarity);
+    }
+
+    public static Literal fromTerm(Term a) {
+        return new Literal(a);
     }
 
     public Literal complement() {
@@ -30,7 +38,6 @@ public class Literal {
 
     @Override
     public int hashCode() {
-        // TODO might not be what you want but i am pretty sure.
         return Objects.hash(term, polarity);
     }
 

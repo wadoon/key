@@ -155,95 +155,7 @@ group comprehensions {
 }
 
 group conflictBasedInstantiation {
-   provable ./newBook/09.list_modelfield/ArrayList.add.key
-   provable ./newBook/09.list_modelfield/ArrayList.remFirst.key
    provable ./conflictbased/simple.key
-   provable ./heap/javacard/arrayFillNonAtomic.key
-   provable ./heap/coincidence_count/project.key
-   provable ./heap/fm12_01_LRS/lcp.key
-   provable ./heap/SemanticSlicing/project.key
-   provable ./heap/information_flow/ArrayList_contains.key
-   provable ./heap/list/ArrayList_add.key
-   provable ./heap/list/ArrayList_concatenate.key
-   provable ./heap/list/ArrayList_contains_dep.key
-   provable ./heap/list/ArrayList_enlarge.key
-   provable ./heap/list/ArrayList_get_dep.key
-   provable ./heap/list/ArrayList_get_exceptional.key
-   provable ./heap/list/ArrayList_get_normal.key
-   provable ./heap/list/ArrayList_inv.key
-   provable ./heap/list/ArrayList_iterator.key
-   provable ./heap/list/ArrayList_size.key
-   provable ./heap/list/ArrayList.ArrayListIterator_ArrayListIterator.key
-   provable ./heap/list/ArrayList.ArrayListIterator_hasNext_dep.key
-   provable ./heap/list/ArrayList.ArrayListIterator_hasNext.key
-   provable ./heap/list/ArrayList.ArrayListIterator_inv.key
-   provable ./heap/list/ArrayList.ArrayListIterator_next_exceptional.key
-   provable ./heap/list/ArrayList.ArrayListIterator_next_normal.key
-   provable ./heap/list/LinkedList_get_exceptional.key
-   provable ./heap/list/LinkedList_get_normal.key
-   provable ./heap/list/LinkedList_size_dep.key
-   provable ./heap/list/LinkedList_size.key
-   provable ./heap/list/MySet_footprint.key
-   provable ./heap/list_ghost/ArrayList_add.key
-   provable ./heap/list_ghost/ArrayList_enlarge.key
-   provable ./heap/list_recursiveSpec/ListOperationsNonNull_getNextNN_normal_behavior.key
-   provable ./heap/list_recursiveSpec/ListOperationsNonNull_setValueAt_normal_behavior.key
-   provable ./heap/list_recursiveSpec/ListOperationsNonNull_remove_normal_behavior.key
-   provable ./heap/list_seq/SimplifiedLinkedList.remove.key
-   provable ./heap/list_seq/ArrayList.add.key
-   provable ./heap/list_seq/ArrayList.contains.key
-   provable ./heap/list_seq/ArrayList.enlarge.key
-   provable ./heap/list_seq/ArrayList.get.key
-   provable ./heap/list_seq/ArrayList.remove.0.key
-   provable ./heap/list_seq/ArrayList.remove.1.key
-   provable ./heap/observer/ExampleSubject_addObserver.key
-   provable ./heap/observer/ExampleSubject_change.key
-   provable ./heap/observer/ExampleSubject_inv.key
-   provable ./heap/removeDups/arrayPart.key
-   provable ./heap/removeDups/contains.key
-   provable ./heap/removeDups/removeDup.key
-   provable ./heap/saddleback_search/Saddleback_search.key
-   #provable ./heap/quicksort/sort.key
-   #provable ./heap/quicksort/split.key
-   provable ./heap/simple/loop2.key
-   provable ./heap/simple/parse_lmtd.key
-   provable ./heap/SmansEtAl/ArrayList_add.key
-   provable ./heap/SmansEtAl/Stack_push.key
-   provable ./heap/vacid0_01_SparseArray/Harness_sparseArrayTestHarness1.key
-   provable ./heap/vacid0_01_SparseArray/Harness_sparseArrayTestHarness2.key
-   provable ./heap/vacid0_01_SparseArray/SparseArray_get_dep.key
-   provable ./heap/vacid0_01_SparseArray/SparseArray_get.key
-   provable ./heap/vacid0_01_SparseArray/SparseArray_inv.key
-   provable ./heap/vstte10_01_SumAndMax/SumAndMax_sumAndMax.key
-   provable ./heap/vstte10_03_LinkedList/Node_search.key
-   provable ./heap/vstte10_04_Queens/Queens_isConsistent.key
-   provable ./heap/vstte10_04_Queens/Queens_nQueens.key
-   provable ./heap/WeideEtAl_02_BinarySearch/BinarySearch_search.key
-   provable ./standard_key/arith/check_jdiv.key
-   provable ./standard_key/arith/check_jdiv_instantiated.key
-   provable ./standard_key/arith/euclidean/gcdHelp-post.key
-   provable ./standard_key/java_dl/arrayMax.key
-   provable ./standard_key/java_dl/deepNonNull/deepNonNull0.key
-   provable ./standard_key/java_dl/deepNonNull/deepNonNull1.key
-   provable ./standard_key/java_dl/deepNonNull/deepNonNull3.key
-   provable ./standard_key/java_dl/java5/for_ReferenceArray.key
-   provable ./standard_key/java_dl/jml-information-flow.key
-   provable ./standard_key/java_dl/polishFlagSort.key
-   provable ./standard_key/java_dl/quantifiedQuery.key
-   provable ./standard_key/java_dl/reverseArray.key
-   provable ./standard_key/java_dl/reverseArray2.key
-   provable ./standard_key/java_dl/symmArray.key
-   provable ./standard_key/pred_log/count2.key
-   provable ./standard_key/pred_log/count3.key
-   provable ./standard_key/pred_log/functions.key
-   provable ./standard_key/pred_log/tptp/PUZ/PUZ001p1-eq.key
-   provable ./standard_key/pred_log/jbyteIfEx.key
-   provable ./standard_key/quantifiers/heuristic_PUZ001p1-eq.key
-   provable ./standard_key/quantifiers/injectivity.key
-   provable ./heap/permissions/permissions_method3.key
-   provable ./heap/permissions/threads/AFilter_startTransfer_contract.key
-   provable ./heap/permissions/threads/BFilter_startTransfer_contract.key
-   provable ./firstTouch/05-ReverseArray/reverseArray.key
 } 
 
 # Performance tests
@@ -409,14 +321,9 @@ group removeDups {
 provable ./heap/saddleback_search/Saddleback_search.key
 
 group quicksort {
-   localSettings="
-     [Choice]DefaultChoices=moreSeqRules-moreSeqRules:on
-   "
-   directory = ./heap/quicksort
-
-   provable toplevel.key
-   provable sort.key
-   provable split.key
+   provable ./heap/quicksort/toplevel.key
+   provable ./heap/quicksort/sort.key
+   provable ./heap/quicksort/split.key
 }
 
 /*

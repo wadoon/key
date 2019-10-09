@@ -20,7 +20,8 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.strategy.conflictbasedinst.CbiStatistics;
+import de.uka.ilkd.key.strategy.conflictbasedinst.statistics.CbiStatistics;
+import de.uka.ilkd.key.strategy.conflictbasedinst.statistics.CbiStatisticsPrinter;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -198,7 +199,7 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
             return getRunAllProofsTestResult(true, settings);
          }
 
-         CbiStatistics.startProof(keyFile);
+         CbiStatistics.newProof(keyFile);
 
          autoMode(env, loadedProof, script);
 
@@ -212,7 +213,8 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
          StatisticsFile statisticsFile = settings.getStatisticsFile();
          if (statisticsFile != null) {
             statisticsFile.appendStatistics(loadedProof, keyFile);
-            CbiStatistics.append(settings.getCbiStatFile());
+            CbiStatistics.finishProof(loadedProof);
+            CbiStatisticsPrinter.append(settings.getCbiStatFile(), CbiStatistics.getProofStatistics());
          }
 
          /*

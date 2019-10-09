@@ -26,7 +26,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
-import de.uka.ilkd.key.strategy.conflictbasedinst.CbiStatistics;
+import de.uka.ilkd.key.strategy.conflictbasedinst.statistics.CbiStatisticsPrinter;
 
 /**
  * This test case captures all functional run-all-proof scenarios.
@@ -67,7 +67,7 @@ public class RunAllProofsFunctional extends RunAllProofsTest {
     public static void setUpStatisticsFile() throws IOException {
         StatisticsFile statisticsFile = proofCollection.getSettings().getStatisticsFile();
         statisticsFile.setUp();
-        CbiStatistics.setUp(proofCollection.getSettings().getCbiStatFile());
+        CbiStatisticsPrinter.setUp(proofCollection.getSettings().getCbiStatFile());
     }
 
     @AfterClass

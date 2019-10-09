@@ -109,7 +109,7 @@ public class TermHelper {
 
     public static boolean containsEqualityInScope(Term term) {
         if(term.op() == Equality.EQUALS) return true;
-        if(term.op() instanceof Junctor || term.op() == Quantifier.ALL) {
+        if(term.op() instanceof Junctor || term.op() == Quantifier.ALL || term.op() == Equality.EQV || term.op() == IfThenElse.IF_THEN_ELSE) {
             for(Term sub : term.subs()) {
                 if(containsEqualityInScope(sub)) return true;
             }

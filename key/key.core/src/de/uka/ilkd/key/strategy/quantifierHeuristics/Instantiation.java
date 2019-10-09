@@ -38,6 +38,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.conflictbasedinst.CbiProjection;
+import de.uka.ilkd.key.strategy.conflictbasedinst.normalization.FormulaNormalization;
+import de.uka.ilkd.key.strategy.conflictbasedinst.statistics.CbiStatistics;
 
 class Instantiation {
 
@@ -87,12 +90,22 @@ class Instantiation {
             if (qf == lastQuantifiedFormula && seq == lastSequent)
                 return lastResult;
         }
-        final Instantiation result = new Instantiation(qf, seq, services);
+        Sequent norm_seq = seq;
+        Term norm_qf = qf;
+        if(FormulaNormalization.enabled()) {
+            FormulaNormalization fn = FormulaNormalization.create(qf, seq, services);
+            norm_seq = fn.getNormalizedSequent();
+            norm_qf = fn.getNormalizedQf();
+        }
+
+        CbiStatistics.startEmatching();
+        final Instantiation result = new Instantiation(norm_qf, norm_seq, services);
         synchronized(Instantiation.class) {
             lastQuantifiedFormula = qf;
             lastSequent = seq;
             lastResult = result;
         }
+        CbiStatistics.finishEmatching(!result.getSubstitution().isEmpty());
         return result;
     }
 
@@ -195,6 +208,9 @@ class Instantiation {
      */
     static RuleAppCost computeCost(Term inst, Term form, Sequent seq,
             Services services) {
+        if(CbiProjection.getInstance().instantiated(form, seq)) {
+            return NumberRuleAppCost.create(0);
+        }
         if(!Instantiation.instantiated(form, seq)) {
             return NumberRuleAppCost.create(Long.MAX_VALUE);
         }
@@ -213,7 +229,6 @@ class Instantiation {
         }
         if (cost.longValue() == -1)
             return TopRuleAppCost.INSTANCE;
-
         return NumberRuleAppCost.create(cost.longValue());
     }
 

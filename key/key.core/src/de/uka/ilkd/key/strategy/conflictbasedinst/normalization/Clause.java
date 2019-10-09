@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.strategy.conflictbasedinst.normalization;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -18,6 +19,10 @@ public class Clause {
 
     private Clause() {
         literals = DefaultImmutableSet.<Literal>nil();
+    }
+
+    public Clause(ImmutableSet<Literal> literals) {
+        this.literals = literals;
     }
 
     public static Clause fromLiteral(Literal literal) {
@@ -115,9 +120,42 @@ public class Clause {
 
         @Override
         public Term toTerm(TermBuilder tb) {
-            return tb.TRUE();
+            return tb.tt();
         }
 
     }
+
+
+
+    public ImmutableSet<Literal> getLiterals() {
+        return literals;
+    }
+
+    public boolean contains(LinkedHashSet<Term> quantified) {
+        for(Literal lit: literals) {
+            Term term = lit.getTerm();
+            if(contains(quantified, term)) return true;
+        }
+        return false;
+    }
+
+    public static boolean contains(LinkedHashSet<Term> quantified, Term term) {
+        if(quantified.contains(term)) return true;
+        if(term.arity() == 0) return false;
+        for(Term sub : term.subs()) {
+            if(contains(quantified, sub)) return true;
+        }
+        return false;
+    }
+
+    // !(a | b | c) --> !a & !b & !c
+    public ClauseSet invert() {
+        LinkedHashSet<Clause> cs = new LinkedHashSet<Clause>();
+        for(Literal lit: literals) {
+            cs.add(Clause.fromLiteral(lit.complement()));
+        }
+        return ClauseSet.create(DefaultImmutableSet.fromSet(cs));
+    }
+
 
 }

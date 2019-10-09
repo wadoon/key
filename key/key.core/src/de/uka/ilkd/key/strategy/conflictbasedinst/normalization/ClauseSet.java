@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.strategy.conflictbasedinst.normalization;
 
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
@@ -32,6 +33,10 @@ public class ClauseSet {
     public static ClauseSet fromLiteral(Literal lit) {
         ClauseSet cs = new ClauseSet();
         return cs.and(Clause.fromLiteral(lit));
+    }
+
+    public static ClauseSet create(ImmutableSet<Clause> clauses) {
+        return new ClauseSet(clauses);
     }
 
     public ClauseSet and(ClauseSet cs) {
@@ -70,5 +75,25 @@ public class ClauseSet {
         clauses.forEach(clause -> terms.add(clause.toTerm(tb)));
         return tb.and(terms);
     }
+
+    public ImmutableSet<Clause> getClauses() {
+        return clauses;
+    }
+
+    public ClauseSet invert() {
+        if(clauses.isEmpty()) return new ClauseSet();
+        Iterator<Clause> it = clauses.iterator();
+        ClauseSet inv = it.next().invert();
+        while(it.hasNext()) {
+            inv = inv.or(it.next().invert());
+        }
+        return inv;
+    }
+
+    @Override
+    public String toString() {
+        return clauses.toString();
+    }
+
 
 }

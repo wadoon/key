@@ -33,9 +33,10 @@ import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.conflictbasedinst.AllQuantorInAntecFeature;
-import de.uka.ilkd.key.strategy.conflictbasedinst.CbiPreferenceFeature;
 import de.uka.ilkd.key.strategy.conflictbasedinst.CbiProjection;
+import de.uka.ilkd.key.strategy.conflictbasedinst.ConflictBasedInstantiation;
 import de.uka.ilkd.key.strategy.conflictbasedinst.ExQuantorInSuccFeature;
+import de.uka.ilkd.key.strategy.conflictbasedinst.normalization.FormulaNormalization;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
 import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
@@ -633,7 +634,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupSystemInvariantSimp(d);
 
         // Only normalize by rules if instantiation and rule-normalisation is enabled
-        if (quantifierInstantiatedEnabled() && !backgroundNormalizationEnabled()) {
+        if (quantifierInstantiatedEnabled() & !backgroundNormalizationEnabled()) {
             setupFormulaNormalisation(d, numbers, locSetLDT);
         } else {
             bindRuleSet(d, "negationNormalForm", inftyConst());
@@ -986,6 +987,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private boolean cbiInducingEnabled() {
         return strategyProperties.getProperty(StrategyProperties.CBI_OPTIONS_KEY).equals(StrategyProperties.CBI_INDUCING);
+    }
+
+    private void setupConflictBasedInstantiation() {
+        ConflictBasedInstantiation.setEnabled(cbiEnabled());
+        ConflictBasedInstantiation.setInducing(cbiInducingEnabled());
+    }
+
+    private void setupFormulaNormalization() {
+        FormulaNormalization.setEnabled(backgroundNormalizationEnabled());
     }
 
     private boolean backgroundNormalizationEnabled() {
@@ -1396,6 +1406,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private void setupQuantifierInstantiation(RuleSetDispatchFeature d) {
         if (quantifierInstantiatedEnabled()) {
+            setupConflictBasedInstantiation();
+            setupFormulaNormalization();
             final TermBuffer varInst = new TermBuffer();
             final Feature branchPrediction =
                     InstantiationCostScalerFeature.create(
@@ -1409,13 +1421,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             SumFeature.createSum(
                                     new Feature[] {
                                             //cbiEnabled() ? CbiPreferenceFeature.INSTANCE : longConst(0),
-                                            FocusInAntecFeature.INSTANCE,
-                                            not(isInstantiated("t")),
+                                            backgroundNormalizationEnabled() ? longConst(0) : FocusInAntecFeature.INSTANCE,
                                             applyTF(FocusProjection.create(0),
-                                                    add(ff.quantifiedClauseSet,
-                                                            instQuantifiersWithQueries() ?
-                                                                    longTermConst(0)
-                                                                    : ff.notContainsExecutable)),
+                                                    add(backgroundNormalizationEnabled() ?
+                                                            longTermConst(0) : ff.quantifiedClauseSet,
+                                                        instQuantifiersWithQueries() ?
+                                                            longTermConst(0) : ff.notContainsExecutable)),
                                             forEach(varInst,
                                                     HeuristicInstantiation.INSTANCE,
                                                     add(instantiate("t", varInst),
@@ -1443,13 +1454,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private void setupQuantifierInstantiationApproval(RuleSetDispatchFeature d) {
         if (quantifierInstantiatedEnabled()) {
+            setupConflictBasedInstantiation();
+            setupFormulaNormalization();
             final TermBuffer varInst = new TermBuffer();
 
             bindRuleSet(
                     d,
                     "gamma",
                             add(isInstantiated("t"),
-                                    cbiEnabled() ? CbiPreferenceFeature.INSTANCE : longConst(0),
                                     not(sum(varInst, HeuristicInstantiation.INSTANCE,
                                             not(eq(instOf("t"), varInst)))),
                                     InstantiationCostScalerFeature.create(
@@ -2760,7 +2772,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
-        setupConflictBasedQuantifierInstantiation(d);
+        //setupConflictBasedQuantifierInstantiation(d);
         setupQuantifierInstantiation(d);
 
         setupArithPrimaryCategories(d);

@@ -14,7 +14,6 @@ public class CbiPreferenceFeature extends BinaryFeature {
     @Override
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
         boolean solved = CbiProjection.getInstance().solved(app, pos, goal);
-        System.out.println("CBI Preference:  " + solved);
         return !solved;
     }
 

@@ -16,11 +16,6 @@ public class CBIIterator implements Iterator<Term>{
         this.quantifiableVariable = quantifiableVariable;
         this.services = services;
         int i = 0;
-        System.out.println("Print all instances.");
-        while(this.instances.hasNext()) {
-            i++;
-            System.out.println("Instance " + i + ": " + this.instances.next().toString());
-        }
     }
 
     @Override

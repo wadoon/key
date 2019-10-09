@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.strategy.conflictbasedinst.normalization;
 
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -8,6 +10,7 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
 
 public class QuantifiedClauseSet {
 
@@ -24,20 +27,16 @@ public class QuantifiedClauseSet {
         return new QuantifiedClauseSet(ClauseSet.fromLiteral(lit), DefaultImmutableSet.<QuantifiedTerm> nil().toImmutableList());
     }
 
-    public static QuantifiedClauseSet createAll(QuantifiableVariable qv,
+    public static QuantifiedClauseSet create(Quantifier quantifier, QuantifiableVariable qv,
             QuantifiedClauseSet sub) {
         return new QuantifiedClauseSet(sub.cs,
                 DefaultImmutableSet.<QuantifiedTerm> nil().toImmutableList()
-                        .append(QuantifiedTerm.createAll(qv))
+                        .append(new QuantifiedTerm(quantifier, qv))
                         .append(sub.quantifiers));
     }
 
-    public static QuantifiedClauseSet createEx(QuantifiableVariable qv,
-            QuantifiedClauseSet sub) {
-        return new QuantifiedClauseSet(sub.cs,
-                DefaultImmutableSet.<QuantifiedTerm> nil().toImmutableList()
-                        .append(QuantifiedTerm.createEx(qv))
-                        .append(sub.quantifiers));
+    public static QuantifiedClauseSet create(ImmutableList<QuantifiedTerm> quantifiers, ClauseSet cs) {
+        return new QuantifiedClauseSet(cs, quantifiers);
     }
 
     public Term toTerm(TermBuilder tb) {
@@ -49,32 +48,9 @@ public class QuantifiedClauseSet {
         if (!it.hasNext())
             return term;
         QuantifiedTerm qt = it.next();
-        return qt.isAll() ? tb.all(qt.qv, toTerm(it, term, tb))
-                : tb.ex(qt.qv, toTerm(it, term, tb));
-    }
 
-    private static class QuantifiedTerm {
-
-        private final boolean all;
-        private final QuantifiableVariable qv;
-
-        private QuantifiedTerm(boolean all, QuantifiableVariable qv) {
-            this.all = all;
-            this.qv = qv;
-        }
-
-        public static QuantifiedTerm createAll(QuantifiableVariable qv) {
-            return new QuantifiedTerm(true, qv);
-        }
-
-        public static QuantifiedTerm createEx(QuantifiableVariable qv) {
-            return new QuantifiedTerm(false, qv);
-        }
-
-        public boolean isAll() {
-            return all;
-        }
-
+        return qt.getQuantifier() == Quantifier.ALL ? tb.all(qt.getQv(), toTerm(it, term, tb))
+                : tb.ex(qt.getQv(), toTerm(it, term, tb));
     }
 
     public QuantifiedClauseSet and(QuantifiedClauseSet qcs) {
@@ -84,5 +60,56 @@ public class QuantifiedClauseSet {
     public QuantifiedClauseSet or(QuantifiedClauseSet qcs) {
         return new QuantifiedClauseSet(this.cs.or(qcs.cs), this.quantifiers.append(qcs.quantifiers));
     }
+
+    public ImmutableList<QuantifiedTerm> getQuantifiers() {
+        return quantifiers;
+    }
+
+    public ClauseSet getClauseSet() {
+        return cs;
+    }
+
+    public LinkedHashSet<Clause> getUnquantifiedClauses(TermBuilder tb) {
+        LinkedHashSet<Clause> unqClauses = new LinkedHashSet<Clause>();
+        if(quantifiers.isEmpty()) {
+            for(Clause clause : cs.getClauses()) {
+                unqClauses.add(clause);
+            }
+            return unqClauses;
+        }
+        LinkedHashSet<Term> quantified = new LinkedHashSet<Term>();
+        for(QuantifiedTerm qt : quantifiers) {
+            quantified.add(tb.var(qt.getQv()));
+        }
+
+        for(Clause clause : cs.getClauses()) {
+            if(!clause.contains(quantified)) {
+                unqClauses.add(clause);
+            }
+        }
+        return unqClauses;
+    }
+
+    public Collection<? extends Term> getQuantifiersAsTerms(TermBuilder tb) {
+        LinkedHashSet<Term> quantifiers = new LinkedHashSet<Term>();
+        for(QuantifiedTerm qt : this.quantifiers) {
+            quantifiers.add(tb.var(qt.getQv()));
+        }
+        return quantifiers;
+    }
+
+    public QuantifiedClauseSet invert() {
+        QuantifiedClauseSet inversion = new QuantifiedClauseSet(cs.invert(), this.quantifiers);
+        return inversion;
+    }
+
+    @Override
+    public String toString() {
+        String ret = quantifiers.toString();
+        ret += cs.toString();
+        return ret;
+    }
+
+
 
 }
