@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.Term;
 
 public class CbiResult {
 
+    public static final CbiResult NONE = new CbiResult(null, false);
     private final Term result;
     private boolean inducing;
 

@@ -32,10 +32,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.strategy.conflictbasedinst.AllQuantorInAntecFeature;
 import de.uka.ilkd.key.strategy.conflictbasedinst.CbiProjection;
 import de.uka.ilkd.key.strategy.conflictbasedinst.ConflictBasedInstantiation;
-import de.uka.ilkd.key.strategy.conflictbasedinst.ExQuantorInSuccFeature;
 import de.uka.ilkd.key.strategy.conflictbasedinst.normalization.FormulaNormalization;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
@@ -1420,7 +1418,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     "gamma",
                             SumFeature.createSum(
                                     new Feature[] {
-                                            //cbiEnabled() ? CbiPreferenceFeature.INSTANCE : longConst(0),
+                                            cbiEnabled() ? not(CbiProjection.getInstance()) : longConst(0),
                                             backgroundNormalizationEnabled() ? longConst(0) : FocusInAntecFeature.INSTANCE,
                                             applyTF(FocusProjection.create(0),
                                                     add(backgroundNormalizationEnabled() ?
@@ -1484,17 +1482,28 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private void setupConflictBasedQuantifierInstantiation(
             RuleSetDispatchFeature d) {
-        if(!cbiEnabled()) {
+        if(!(quantifierInstantiatedEnabled() && cbiEnabled())) {
             bindRuleSet(d, "epsilon", inftyConst());
             return;
         }
         CbiProjection.setup(cbiInducingEnabled());
         bindRuleSet(d, "epsilon", add(
-                or(ExQuantorInSuccFeature.INSTANCE, AllQuantorInAntecFeature.INSTANCE),
                 not(isInstantiated("v")), // v not already instantiated
                 CbiProjection.getInstance(), // cbi finds instance
                 instantiate("v", CbiProjection.getInstance()), // instantiate it
-                longConst(-10000))); // low costs
+                longConst(-550))); // low costs
+    }
+
+    private void setupConflictBasedQuantifierInstantiationApproval(RuleSetDispatchFeature d) {
+        if(!(quantifierInstantiatedEnabled() && cbiEnabled())) {
+            bindRuleSet(d, "epsilon", inftyConst());
+            return;
+        }
+        setupConflictBasedInstantiation();
+        setupFormulaNormalization();
+
+        bindRuleSet(d, "epsilon", add(isInstantiated("v"),
+                eq(instOf("v"), CbiProjection.getInstance()), longConst(-550)));
     }
 
 
@@ -2669,7 +2678,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 NonDuplicateAppModPositionFeature.INSTANCE);
 
         setupClassAxiomApproval(d);
-        //setupConflictBasedQuantifierInstantiationApproval(d);
+        setupConflictBasedQuantifierInstantiationApproval(d);
         setupQuantifierInstantiationApproval(d);
         setupSplittingApproval(d);
 
@@ -2772,7 +2781,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
-        //setupConflictBasedQuantifierInstantiation(d);
+        setupConflictBasedQuantifierInstantiation(d);
         setupQuantifierInstantiation(d);
 
         setupArithPrimaryCategories(d);

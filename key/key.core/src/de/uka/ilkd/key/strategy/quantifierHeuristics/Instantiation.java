@@ -90,16 +90,14 @@ class Instantiation {
             if (qf == lastQuantifiedFormula && seq == lastSequent)
                 return lastResult;
         }
-        Sequent norm_seq = seq;
         Term norm_qf = qf;
+        CbiStatistics.startEmatching();
         if(FormulaNormalization.enabled()) {
             FormulaNormalization fn = FormulaNormalization.create(qf, seq, services);
-            norm_seq = fn.getNormalizedSequent();
             norm_qf = fn.getNormalizedQf();
         }
 
-        CbiStatistics.startEmatching();
-        final Instantiation result = new Instantiation(norm_qf, norm_seq, services);
+        final Instantiation result = new Instantiation(norm_qf, seq, services);
         synchronized(Instantiation.class) {
             lastQuantifiedFormula = qf;
             lastSequent = seq;

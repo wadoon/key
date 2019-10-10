@@ -15,6 +15,10 @@ import de.uka.ilkd.key.strategy.conflictbasedinst.statistics.CbiStatistics;
 
 public class ConflictBasedInstantiation {
 
+    private static final long FALSIFY_TIMEOUT = 100;
+    private static final boolean print = false;
+    private long falsify_start;
+
     /*
      * SINGLETON BEHAVIOR
      */
@@ -123,6 +127,11 @@ public class ConflictBasedInstantiation {
         if (this.lastFormula == formula && this.lastSequent == sequent) {
             return result;
         }
+        if(!enabled() || !TermHelper.containsEqualityInScope(formula)) {
+            result = CbiResult.NONE;
+        }
+        println("Run CBI...");
+        long start = System.currentTimeMillis();
         /*
          * Find conflicting term on fresh formula
          */
@@ -137,26 +146,36 @@ public class ConflictBasedInstantiation {
         CbiServices.setTermFactory(tf);
         CbiServices.setServices(services);
 
+        print("normalize... ");
         FormulaNormalization fn = FormulaNormalization.create(formula, sequent, services);
         formula = fn.getSkolemizedQf();
         Term prepForm = fn.getSkolemizedQfClauseSet().getClauseSet().toTerm(tb);
         QuantifiedClauseSet formulaCl = fn.getSkolemizedQfClauseSet();
         LinkedHashSet<QuantifiedClauseSet> ante = fn.getSkolemizedAnteClauseSets();
         LinkedHashSet<QuantifiedClauseSet> succ = fn.getSkolemizedSuccClauseSets();
+        println("finished");
 
         /*
          * Create context
          */
         this.context = new Context(ante, succ, formulaCl);
+        print("create context... ");
         ContextSingleton.setContext(context);
+        println("finished.");
 
         this.variables = new LinkedHashSet<Term>();
         variables.addAll(formulaCl.getQuantifiersAsTerms(tb));
+        print("falsify... ");
+        falsify_start = System.currentTimeMillis();
         LinkedHashSet<CbiPair> pairs = falsify(prepForm, true,
                 new ConstrainedAssignment(),
                 MatchingConstraints.extractFrom(prepForm));
+        println("finished.");
+        print("extract... ");
         result = extractConflictingSubstitution(pairs);
         CbiStatistics.finishCbi(result.getResult() != null, result.isInducing());
+        println("finished.");
+        println(result + " took: " + (System.currentTimeMillis() - start) + "ms");
         return result;
     }
 
@@ -205,7 +224,7 @@ public class ConflictBasedInstantiation {
                                         return result;
                                     }
                                     else {
-                                        // System.out.println("found inducing: " +
+                                        // println("found inducing: " +
                                         // result.toString());
                                         result.setInducing(true);
                                         inducing.add(result);
@@ -216,7 +235,7 @@ public class ConflictBasedInstantiation {
                     }
                 }
             }else {
-                //System.out.println("Not feasible: " + ca);
+                //println("Not feasible: " + ca);
             }
         }
         if(CbiServices.getInducing()) {
@@ -233,6 +252,9 @@ public class ConflictBasedInstantiation {
     private LinkedHashSet<CbiPair> falsify(Term formula, boolean polarity,
             ConstrainedAssignment ca, MatchingConstraints mc) {
         LinkedHashSet<CbiPair> result = new LinkedHashSet<CbiPair>();
+        if((System.currentTimeMillis() - falsify_start) > FALSIFY_TIMEOUT) {
+            return result;
+        }
         if(!context.feasible(ca)) {
             return result;
         }
@@ -305,9 +327,12 @@ public class ConflictBasedInstantiation {
 
     private LinkedHashSet<CbiPair> match(MatchingConstraints mc,
             ConstrainedAssignment ca, MatchingConstraints rest) {
-        //System.out.println("Match: \t" + mc.toString() + "\t" + ca.toString()
+        //println("Match: \t" + mc.toString() + "\t" + ca.toString()
         //+ "\t" + rest.toString());
         LinkedHashSet<CbiPair> ret = new LinkedHashSet<CbiPair>();
+        if((System.currentTimeMillis() - falsify_start) > FALSIFY_TIMEOUT) {
+            return ret;
+        }
         if(!context.feasible(ca)) {
             return ret;
         }
@@ -326,6 +351,16 @@ public class ConflictBasedInstantiation {
             }
         }
         return ret;
+    }
+
+    private void print(Object x) {
+        if(print == false) return;
+        System.out.print(x);
+    }
+
+    private void println(Object x) {
+        if(print == false) return;
+        System.out.println(x);
     }
 
 }

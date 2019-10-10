@@ -23,21 +23,21 @@ public class CbiProjection extends BinaryFeature implements ProjectionToTerm{
         CbiServices.setInducing(conflictInducing);
     }
 
-    private Term formula;
-    private Sequent sequent;
-    private CbiResult result;
+    private static Term formula;
+    private static Sequent sequent;
+    private static CbiResult result;
 
     @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Term formula = pos.sequentFormula().formula();
         final Sequent sequent = goal.sequent();
         final Services services = goal.proof().getServices();
-        if(this.formula == formula && this.sequent == sequent) {
-            return this.result.getResult();
+        if(CbiProjection.formula == formula && CbiProjection.sequent == sequent) {
+            return CbiProjection.result.getResult();
         }
-        this.sequent = sequent;
-        this.formula = formula;
-        result = ConflictBasedInstantiation.getInstance().findConflictingTerm(formula, sequent, services);
+        CbiProjection.sequent = sequent;
+        CbiProjection.formula = formula;
+        CbiProjection.result = ConflictBasedInstantiation.getInstance().findConflictingTerm(formula, sequent, services);
         return result.getResult();
     }
 
@@ -46,12 +46,8 @@ public class CbiProjection extends BinaryFeature implements ProjectionToTerm{
         return toTerm(app,pos,goal) != null;
     }
 
-    public boolean solved(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return toTerm(app, pos, goal) != null;
-    }
-
     public boolean instantiated(Term formula, Sequent sequent) {
-        return this.formula == formula && this.sequent == sequent && this.result != null && this.result.getResult() != null;
+        return CbiProjection.formula == formula && CbiProjection.sequent == sequent && CbiProjection.result != null && CbiProjection.result.getResult() != null;
     }
 
 }
