@@ -70,8 +70,12 @@ public class Clause {
         return ret;
     }
 
+    private Term clauseTerm;
+
     public Term toTerm(TermBuilder tb) {
-        return tb.or(termList(tb));
+        if(clauseTerm != null) return clauseTerm;
+        clauseTerm = tb.or(termList(tb));
+        return clauseTerm;
     }
 
     private List<Term> termList(TermBuilder tb) {
@@ -155,6 +159,25 @@ public class Clause {
             cs.add(Clause.fromLiteral(lit.complement()));
         }
         return ClauseSet.create(DefaultImmutableSet.fromSet(cs));
+    }
+
+    public LinkedHashSet<Literal> getGroundLiterals(LinkedHashSet<Term> qTerms) {
+        LinkedHashSet<Literal> gLits = new LinkedHashSet<Literal>();
+        if(literals.size() != 1) return gLits;
+        literals.forEach(lit -> {if(!containsQTerm(lit, qTerms)) gLits.add(lit);});
+        return gLits;
+    }
+
+    public static boolean containsQTerm(Literal lit, LinkedHashSet<Term> qTerms) {
+        return containsQTerm(lit.getTerm(), qTerms);
+    }
+
+    private static boolean containsQTerm(Term term, LinkedHashSet<Term> qTerms) {
+        if(qTerms.contains(term)) return true;
+        for(Term sub: term.subs()) {
+            if(containsQTerm(sub, qTerms)) return true;
+        }
+        return false;
     }
 
 

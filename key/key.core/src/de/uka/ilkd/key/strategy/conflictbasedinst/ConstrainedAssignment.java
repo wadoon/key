@@ -19,30 +19,31 @@ public class ConstrainedAssignment {
 
     private LinkedHashMap<Term, LinkedHashSet<Term>> assignments;
     private LinkedHashSet<Term> constraints;
-    private LinkedHashMap<Term, LinkedHashSet<Term>> eqClassMap;
-    private LinkedHashMap<Term, LinkedHashSet<Term>> uneqMap;
     private LinkedHashSet<Term> terms;
     private TermBuilder tb;
+    private Context context;
 
-    public ConstrainedAssignment() {
+    public ConstrainedAssignment(Context context) {
         assignments = new LinkedHashMap<Term, LinkedHashSet<Term>>();
         constraints = new LinkedHashSet<Term>();
-        eqClassMap = new LinkedHashMap<Term, LinkedHashSet<Term>>(ContextSingleton.getContext().getEqualityClassMap());
-        uneqMap = new LinkedHashMap<Term, LinkedHashSet<Term>>(ContextSingleton.getContext().getUnequalityMap());
+        this.context = context;
         tb = CbiServices.getTermBuiler();
     }
 
-    public ConstrainedAssignment addConstraint(Term equation) {
+    public ConstrainedAssignment addConstraint(Term equation) throws ContextUnsatisfiableException {
         ConstrainedAssignment ca = copy();
+        ca.context.addEquality(equation);
         ca.constraints.add(equation);
         return ca;
     }
 
-    public ConstrainedAssignment addAssignment(Term terma, Term termb) {
+    public ConstrainedAssignment addAssignment(Term terma, Term termb) throws ContextUnsatisfiableException {
         assert terma.arity() == termb.arity() : "Can not add assignment with unequal arities";
         ConstrainedAssignment ca = copy();
+        ca.context.addEquality(terma, termb);
         ca.assignments.computeIfAbsent(terma, map -> new LinkedHashSet<Term>()).add(termb);
         for(int i = 0; i < terma.arity(); i++) {
+            ca.context.addEquality(terma.sub(i), termb.sub(i));
             Term constraint = tb.equals(terma.sub(i), termb.sub(i));
             ca.constraints.add(constraint);
         }
@@ -50,7 +51,7 @@ public class ConstrainedAssignment {
     }
 
     private ConstrainedAssignment copy() {
-        ConstrainedAssignment ca = new ConstrainedAssignment();
+        ConstrainedAssignment ca = new ConstrainedAssignment(context.copy());
         for(Map.Entry<Term, LinkedHashSet<Term>> equation : assignments.entrySet()) {
             ca.assignments.put(equation.getKey(), equation.getValue());
         }

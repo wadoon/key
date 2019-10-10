@@ -233,7 +233,7 @@ public final class StrategyProperties extends Properties {
         DEFAULT_MAP.setProperty(NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE);
         DEFAULT_MAP.setProperty(QUANTIFIERS_OPTIONS_KEY,
                 QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
-        DEFAULT_MAP.setProperty(CBI_OPTIONS_KEY, CBI_CONFLICTING);
+        DEFAULT_MAP.setProperty(CBI_OPTIONS_KEY, CBI_INDUCING);
         DEFAULT_MAP.setProperty(NORMAL_FORM_BUILDING_KEY, NORMAL_FORM_BUILDING_BY_RULE);
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
             DEFAULT_MAP.setProperty(userTacletsOptionsKey(i),
@@ -374,7 +374,7 @@ public final class StrategyProperties extends Properties {
                 quantifierInstantiationWithSplitting ?
                         StrategyProperties.QUANTIFIERS_INSTANTIATE
                         : StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
-        sp.setProperty(StrategyProperties.CBI_OPTIONS_KEY, StrategyProperties.CBI_CONFLICTING);
+        sp.setProperty(StrategyProperties.CBI_OPTIONS_KEY, StrategyProperties.CBI_INDUCING);
         sp.setProperty(StrategyProperties.NORMAL_FORM_BUILDING_KEY, StrategyProperties.NORMAL_FORM_BUILDING_BY_RULE);
         sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
                 aliasChecks ?

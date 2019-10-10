@@ -127,8 +127,13 @@ public class ConflictBasedInstantiation {
         if (this.lastFormula == formula && this.lastSequent == sequent) {
             return result;
         }
-        if(!enabled() || !TermHelper.containsEqualityInScope(formula)) {
+        if(!enabled()) {
             result = CbiResult.NONE;
+        }
+        if(!TermHelper.containsEqualityInScope(formula)) {
+            result = CbiResult.NONE;
+        }else {
+            CbiStatistics.incEqualityInScope();
         }
         println("Run CBI...");
         long start = System.currentTimeMillis();
@@ -158,7 +163,13 @@ public class ConflictBasedInstantiation {
         /*
          * Create context
          */
-        this.context = new Context(ante, succ, formulaCl);
+        try {
+            this.context = new Context(ante, succ, formulaCl);
+        }
+        catch (ContextUnsatisfiableException e) {
+            result = CbiResult.NONE;
+            return result;
+        }
         print("create context... ");
         ContextSingleton.setContext(context);
         println("finished.");
@@ -168,7 +179,7 @@ public class ConflictBasedInstantiation {
         print("falsify... ");
         falsify_start = System.currentTimeMillis();
         LinkedHashSet<CbiPair> pairs = falsify(prepForm, true,
-                new ConstrainedAssignment(),
+                new ConstrainedAssignment(context.copy()),
                 MatchingConstraints.extractFrom(prepForm));
         println("finished.");
         print("extract... ");
@@ -184,58 +195,54 @@ public class ConflictBasedInstantiation {
         for(CbiPair pair: pairs) {
             ConstrainedAssignment ca = pair.getConstrainedAssignment();
             CbiResult result = null;
-            if(context.feasible(ca)) {
-                LinkedHashSet<Term> b = new LinkedHashSet<Term>();
-                LinkedHashSet<Term> c = new LinkedHashSet<Term>();
-                EquivalenceClosure ec = new EquivalenceClosure();
+            LinkedHashSet<Term> b = new LinkedHashSet<Term>();
+            LinkedHashSet<Term> c = new LinkedHashSet<Term>();
+            EquivalenceClosure ec = new EquivalenceClosure();
 
-                for (Term term : ca.getTerms()) {
-                    if (ec.addEquality(term)) {
-                        b.add(term);
-                    }
-                    else {
-                        c.add(term);
-                    }
+            for (Term term : ca.getTerms()) {
+                if (ec.addEquality(term)) {
+                    b.add(term);
+                }
+                else {
+                    c.add(term);
+                }
+            }
+
+            LinkedHashSet<Term> groundSubst = new LinkedHashSet<Term>();
+            for (EquivalenceClass eqc : ec.getEquivalenceClasses()) {
+                LinkedHashSet<Term> subst = new LinkedHashSet<Term>(c);
+                Term grnd = null;
+                if (eqc.containsGround()) {
+                    grnd = eqc.getGroundTerm();
+                }else {
+                    grnd = context.arbitrary(eqc.first());
+                }
+                if(grnd == null) {
+                    continue;
                 }
 
-                LinkedHashSet<Term> groundSubst = new LinkedHashSet<Term>();
-                for (EquivalenceClass eqc : ec.getEquivalenceClasses()) {
-                    Term subst = tb.and(c);
-                    Term grnd = null;
-                    if (eqc.containsGround()) {
-                        grnd = eqc.getGroundTerm();
-                    }else {
-                        grnd = context.arbitrary(eqc.first());
-                    }
-                    if(grnd == null) {
-                        continue;
-                    }
-
-                    for (Term term : eqc) {
-                        if (!(term.equals(grnd))) {
-                            //subst = tb.subst(qv, grnd, subst);
-                            subst = TermHelper.replaceAll(term, grnd, subst);
-                            if (variables.contains(term)) {
-                                groundSubst.add(grnd);
-                                if(variables.iterator().next().equals(term)) {
-                                    result = new CbiResult(grnd, false);
-                                    if (context.entails(subst)) {
-                                        this.result = result;
-                                        return result;
-                                    }
-                                    else {
-                                        // println("found inducing: " +
-                                        // result.toString());
-                                        result.setInducing(true);
-                                        inducing.add(result);
-                                    }
+                for (Term term : eqc) {
+                    if (!(term.equals(grnd))) {
+                        //subst = tb.subst(qv, grnd, subst);
+                        subst = TermHelper.replaceAll(term, grnd, subst);
+                        if (variables.contains(term)) {
+                            groundSubst.add(grnd);
+                            if(variables.iterator().next().equals(term)) {
+                                result = new CbiResult(grnd, false);
+                                if (context.entails(subst)) {
+                                    this.result = result;
+                                    return result;
+                                }
+                                else {
+                                    // println("found inducing: " +
+                                    // result.toString());
+                                    result.setInducing(true);
+                                    inducing.add(result);
                                 }
                             }
                         }
                     }
                 }
-            }else {
-                //println("Not feasible: " + ca);
             }
         }
         if(CbiServices.getInducing()) {
@@ -255,20 +262,22 @@ public class ConflictBasedInstantiation {
         if((System.currentTimeMillis() - falsify_start) > FALSIFY_TIMEOUT) {
             return result;
         }
-        if(!context.feasible(ca)) {
-            return result;
-        }
         if (TermHelper.isGround((formula))) {
-            if (context.entails(polarity ? formula : tb.not(formula))) {
+            if (context.entails(formula) != polarity) {
                 result.add(new CbiPair(ca, mc));
             }
             return result;
         }
         else if (TermHelper.isEquality(formula)) {
             Term constraint = polarity ? TermHelper.negate(formula) : formula;
-            return match(mc.only(formula.subs()),
-                    ca.addConstraint(constraint),
-                    mc.without(formula.subs()));
+            try {
+                return match(mc.only(formula.subs()),
+                        ca.addConstraint(constraint),
+                        mc.without(formula.subs()));
+            }
+            catch (ContextUnsatisfiableException e) {
+                return result;
+            }
         }
         else if (TermHelper.isNegation(formula)) {
             result.addAll(falsify(formula.sub(0), !polarity, ca, mc));
@@ -333,9 +342,6 @@ public class ConflictBasedInstantiation {
         if((System.currentTimeMillis() - falsify_start) > FALSIFY_TIMEOUT) {
             return ret;
         }
-        if(!context.feasible(ca)) {
-            return ret;
-        }
         if (mc.isEmpty()) {
             ret.add(new CbiPair(ca, mc));
         }
@@ -346,8 +352,13 @@ public class ConflictBasedInstantiation {
                     .union(rest.only(constraint.subs()));
             MatchingConstraints newRest = rest.without(constraint.subs());
             for (Term match : matches) {
-                ret.addAll(match(newMc, ca.addAssignment(constraint, match),
-                        newRest));
+                try {
+                    ret.addAll(match(newMc, ca.addAssignment(constraint, match),
+                            newRest));
+                }
+                catch (ContextUnsatisfiableException e) {
+                    continue;
+                }
             }
         }
         return ret;

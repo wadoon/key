@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.strategy.conflictbasedinst;
 
+import java.util.LinkedHashSet;
+
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.Name;
@@ -125,6 +127,15 @@ public class TermHelper {
             subs[i] = replaceAll(term, grnd, subst.subs().get(i));
         }
         return tf().createTerm(subst.op(), new ImmutableArray<Term>(subs), subst.boundVars(), subst.javaBlock(), subst.getLabels());
+    }
+
+    public static LinkedHashSet<Term> replaceAll(Term term, Term grnd,
+            LinkedHashSet<Term> subst) {
+        LinkedHashSet<Term> ret = new LinkedHashSet<Term>();
+        for(Term t: subst) {
+            ret.add(replaceAll(term, grnd, t));
+        }
+        return ret;
     }
 
 }

@@ -27,6 +27,9 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.conflictbasedinst.ConflictBasedInstantiation;
+import de.uka.ilkd.key.strategy.conflictbasedinst.TermHelper;
+import de.uka.ilkd.key.strategy.conflictbasedinst.statistics.CbiStatistics;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 
@@ -47,6 +50,11 @@ public class HeuristicInstantiation implements TermGenerator {
         Services services = goal.proof().getServices();
         final QuantifiableVariable var =
                 qf.varsBoundHere ( 0 ).last ();
+        if(!ConflictBasedInstantiation.enabled()) {
+            if(TermHelper.containsEqualityInScope(qf)) {
+                CbiStatistics.incEqualityInScope();
+            }
+        }
         final Instantiation ia = Instantiation.create ( qf, sequent,
                 goal.proof().getServices() );
         return new HIIterator ( ia.getSubstitution ().iterator (), var, services );

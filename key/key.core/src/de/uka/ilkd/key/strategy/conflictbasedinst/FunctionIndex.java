@@ -21,6 +21,20 @@ public class FunctionIndex {
         this.index = new LinkedHashMap<LinkedList<LinkedHashSet<Term>>, Term>();
     }
 
+
+
+    private FunctionIndex(
+            LinkedHashMap<LinkedList<LinkedHashSet<Term>>, Term> index,
+            HashMap<Term, LinkedHashSet<Term>> eqMap,
+            HashMap<Operator, Term> funMap) {
+        super();
+        this.index = index;
+        this.eqMap = eqMap;
+        this.funMap = funMap;
+    }
+
+
+
     public void add(Term term) {
         Term representant = funMap.get(term.op());
         if(representant == null) return;
@@ -37,6 +51,16 @@ public class FunctionIndex {
             argClasses.add(eqMap.computeIfAbsent(sub, set -> new LinkedHashSet<Term>(Arrays.asList(sub))));
         }
         return argClasses;
+    }
+
+    public FunctionIndex copy(HashMap<Term, LinkedHashSet<Term>> eqMap, HashMap<Operator, Term> funMap) {
+        LinkedHashMap<LinkedList<LinkedHashSet<Term>>, Term> index = new LinkedHashMap<LinkedList<LinkedHashSet<Term>>, Term>();
+        this.index.forEach((key, value) -> {
+            LinkedList<LinkedHashSet<Term>> list = new LinkedList<LinkedHashSet<Term>>();
+            key.forEach(set -> list.add(new LinkedHashSet<Term>(set)));
+            index.put(list, value);
+        });
+        return new FunctionIndex(index, eqMap, funMap);
     }
 
 }

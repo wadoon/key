@@ -2,17 +2,15 @@ package de.uka.ilkd.key.strategy.conflictbasedinst;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -27,9 +25,8 @@ import de.uka.ilkd.key.util.SideProofUtil;
 
 public class Context {
 
-    private QuantifiedClauseSet qf;
-    /** A set of all unquantified clauses that are assumed to be true within the sequent **/
-    private LinkedHashSet<Clause> clauses;
+    private static boolean print = false;
+    /** All literals that are assumed to be true */
     private LinkedHashSet<Literal> literals;
     private LinkedHashSet<Term> terms;
 
@@ -43,16 +40,30 @@ public class Context {
     private TermBuilder tb;
     private Services services;
 
-    /** The antecedent for sub-proofs contains all unquantified clauses */
-    private Semisequent cntx;
+    public Context(LinkedHashSet<Literal> literals, LinkedHashSet<Term> terms,
+            HashMap<Term, LinkedHashSet<Term>> eqMap,
+            HashMap<Term, LinkedHashSet<Term>> uneqMap,
+            HashMap<Operator, Term> funMap,
+            LinkedHashMap<Operator, FunctionIndex> funIndexMap,
+            LinkedHashMap<Operator, ExtendedFunctionIndex> extFunIndexMap,
+            TermBuilder tb, Services services) {
+        super();
+        this.literals = literals;
+        this.terms = terms;
+        this.eqMap = eqMap;
+        this.uneqMap = uneqMap;
+        this.funMap = funMap;
+        this.funIndexMap = funIndexMap;
+        this.extFunIndexMap = extFunIndexMap;
+        this.tb = tb;
+        this.services = services;
+    }
 
     public Context(LinkedHashSet<QuantifiedClauseSet> ante,
             LinkedHashSet<QuantifiedClauseSet> succ,
-            QuantifiedClauseSet qf) {
+            QuantifiedClauseSet qf) throws ContextUnsatisfiableException {
         this.tb = CbiServices.getTermBuiler();
         this.services = CbiServices.getServices();
-        this.qf = qf;
-        this.clauses = new LinkedHashSet<Clause>();
         this.literals = new LinkedHashSet<Literal>();
         this.terms = new LinkedHashSet<Term>();
         this.eqMap = new LinkedHashMap<Term, LinkedHashSet<Term>>();
@@ -60,23 +71,15 @@ public class Context {
         this.funMap = new LinkedHashMap<Operator, Term>();
         this.funIndexMap = new LinkedHashMap<Operator, FunctionIndex>();
         this.extFunIndexMap = new LinkedHashMap<Operator, ExtendedFunctionIndex>();
-        ante.forEach(qcv -> addAnte(qcv));
-        succ.forEach(qcv -> addSucc(qcv));
+        for(QuantifiedClauseSet qcs : ante) {
+            addAnte(qcs);
+        }
+        for(QuantifiedClauseSet qcs : succ) {
+            addSucc(qcs);
+        }
         buildFunctionIndex(qf);
         buildExtendedFunctionIndex();
-        cntx = createCntx();
-    }
-
-    private Semisequent createCntx() {
-        Semisequent cntx = Semisequent.EMPTY_SEMISEQUENT;
-        Iterator<Clause> it = clauses.iterator();
-        while(it.hasNext()) {
-            Clause clause = it.next();
-            if(clause.getLiterals().size() != 1) continue;
-            Term term = clause.toTerm(tb);
-            cntx = cntx.insertLast(new SequentFormula(term)).semisequent();
-        }
-        return cntx;
+        print("Context created.\nEqMap: " + eqMap.toString() + "\nunEqMap: " + uneqMap.toString() + "\nfunIndexMap: " + funMap.toString() + "\nextFunIdx: " + extFunIndexMap + "\nlits: " + literals);
     }
 
     private void buildFunctionIndex(QuantifiedClauseSet qf) {
@@ -89,7 +92,9 @@ public class Context {
     }
 
     private void buildFunctionIndex(Term term) {
-        funIndexMap.computeIfAbsent(term.op(), fi -> new FunctionIndex(eqMap, funMap)).add(term);
+        if(TermHelper.isAtom(term)) {
+            funIndexMap.computeIfAbsent(term.op(), fi -> new FunctionIndex(eqMap, funMap)).add(term);
+        }
         term.subs().forEach(sub -> buildFunctionIndex(sub));
     }
 
@@ -110,98 +115,87 @@ public class Context {
         return eqClass.contains(rep_b);
     }
 
-    private void addAnte(QuantifiedClauseSet qcv) {
+    private void addAnte(QuantifiedClauseSet qcv) throws ContextUnsatisfiableException {
         addClauseSet(qcv, true);
     }
 
-    private void addSucc(QuantifiedClauseSet qcv) {
+    private void addSucc(QuantifiedClauseSet qcv) throws ContextUnsatisfiableException {
         addClauseSet(qcv, false);
     }
 
-    private void addClauseSet(QuantifiedClauseSet qcs, boolean polarity) {
-        if(qcs == qf) {
-            return;
-        }
+    private void addClauseSet(QuantifiedClauseSet qcs, boolean polarity) throws ContextUnsatisfiableException {
         if(!polarity) {
             qcs = qcs.invert();
         }
-        qcs.getUnquantifiedClauses(tb).forEach(clause -> {
-                addClause(clause);
-        });
-    }
-
-    private void addClause(Clause clause) {
-        clauses.add(clause);
-        for(Literal lit: clause.getLiterals()) {
-            addLiteral(lit);
+        for(Literal gLit: qcs.getGroundLiterals(tb)) {
+            addLiteral(gLit);
         }
     }
 
-    private void addLiteral(Literal lit) {
+    private void addLiteral(Literal lit) throws ContextUnsatisfiableException {
         //System.out.println("literal: " + lit);
         literals.add(lit);
+        if(lit.getPolarity() == false) {
+            addTerm(lit.toTerm(tb));
+        }
         Term term = lit.getTerm();
-        boolean polarity = lit.getPolarity();
         addTerm(term);
 
         Operator op = term.op();
         if(op == Equality.EQUALS) {
-            if(polarity) {
+            if(lit.getPolarity()) {
                 addEquality(term.sub(0), term.sub(1));
             }else {
                 addUnequality(term.sub(0), term.sub(1));
             }
-
-        }else {
-            funMap.putIfAbsent(op, term);
         }
 
     }
 
     private void addTerm(Term term) {
         terms.add(term);
+        if(TermHelper.isAtom(term)) {
+            funMap.computeIfAbsent(term.op(), t -> term);
+        }
         term.subs().forEach(sub -> addTerm(sub));
     }
 
-    private void addEquality(Term a, Term b) {
+    void addEquality(Term a, Term b) throws ContextUnsatisfiableException {
+        if(unequal(a, b)) {
+            throw new ContextUnsatisfiableException();
+        }
         LinkedHashSet<Term> eq_a = eqMap.computeIfAbsent(a, set -> new LinkedHashSet<Term>(Arrays.asList(a)));
         LinkedHashSet<Term> eq_b = eqMap.computeIfAbsent(b, set -> new LinkedHashSet<Term>(Arrays.asList(b)));
         eq_a.addAll(eq_b);
+        for(Term x: eq_a) {
+            for(Term y: eq_b) {
+                if(x == y) continue;
+                if(unequal(x, y)) {
+                    throw new ContextUnsatisfiableException();
+                }
+            }
+        }
         eq_a.forEach(term -> eqMap.put(term, eq_a));
     }
 
-    private void addUnequality(Term a, Term b) {
+    private static final LinkedHashSet<Term> EMPTY = new LinkedHashSet<Term>();
+
+    private boolean unequal(Term x, Term y) {
+        return uneqMap.getOrDefault(x, EMPTY).contains(y);
+    }
+
+    private boolean equal(Term x, Term y) {
+        return eqMap.getOrDefault(x, EMPTY).contains(y);
+    }
+
+    private void addUnequality(Term a, Term b) throws ContextUnsatisfiableException {
+        if(equal(a,b)) {
+            throw new ContextUnsatisfiableException();
+        }
         LinkedHashSet<Term> ueq_a = uneqMap.computeIfAbsent(a, set -> new LinkedHashSet<Term>());
         LinkedHashSet<Term> ueq_b = uneqMap.computeIfAbsent(b, set -> new LinkedHashSet<Term>());
         ueq_a.add(b);
         ueq_b.add(a);
-    }
-
-    public boolean equals(Term a, Term b) {
-        LinkedHashSet<Term> eq_a = eqMap.get(a);
-        if(eq_a == null) return false;
-        return eq_a.contains(b);
-    }
-
-    public boolean unequals(Term a, Term b) {
-        LinkedHashSet<Term> uneq_a = uneqMap.get(a);
-        if(uneq_a == null) return false;
-        return uneq_a.contains(b);
-    }
-
-    public boolean feasible(ConstrainedAssignment ca) {
-        return feasible(tb.and(ca.getTerms()));
-    }
-
-    public boolean feasible(Term term) {
-        return !entails(tb.not(term));
-    }
-
-    public boolean entails(Term term) {
-        Sequent seq = Sequent.createSequent(cntx, new Semisequent(new SequentFormula(term)));
-        boolean b =  closeable(seq);
-        //System.out.println(literals + " entail " + seq + " : " + b);
-        return b;
     }
 
     private boolean closeable(Sequent seq) {
@@ -274,11 +268,77 @@ public class Context {
         return null;
     }
 
-    public LinkedHashSet<Literal> getLiterals() {
-        return literals;
+    private void print(Object o) {
+        if(print) System.out.print(o);
     }
 
-    public Semisequent getCntx() {
-        return cntx;
+    private void println(Object o) {
+        if(print) System.out.println(o);
+    }
+
+    public boolean entails(Term term) {
+        if(term.op() == Junctor.NOT) {
+            return !entails(term.sub(0));
+        }else if (term.op() == Junctor.AND) {
+            return entails(term.sub(0)) && entails(term.sub(1));
+        }else if (term.op() == Junctor.OR) {
+            return entails(term.sub(0)) || entails(term.sub(1));
+        }else if (term.op() == Equality.EQUALS) {
+            return equal(term.sub(0), term.sub(1)) || entailsGroundEquality(term.sub(0), term.sub(1));
+        }else {
+            return literals.contains(Literal.fromTerm(term));
+        }
+    }
+
+    public boolean entails(LinkedHashSet<Term> subst) {
+        for(Term term: subst) {
+            if(!entails(term)) return false;
+        }
+        return true;
+    }
+
+    public Context copy() {
+        LinkedHashSet<Literal> literals = new LinkedHashSet<Literal>(this.literals);
+        LinkedHashSet<Term> terms = new LinkedHashSet<Term>(this.terms);
+
+        HashMap<Term, LinkedHashSet<Term>> eqMap = new HashMap<Term, LinkedHashSet<Term>>();
+        this.eqMap.entrySet().forEach(entry -> {
+            LinkedHashSet<Term> eqs = new LinkedHashSet<Term>(entry.getValue());
+            eqMap.put(entry.getKey(), eqs);
+        });
+        HashMap<Term, LinkedHashSet<Term>> uneqMap = new HashMap<Term, LinkedHashSet<Term>>();
+        this.uneqMap.forEach((key, value) -> {
+            uneqMap.put(key, new LinkedHashSet<Term>(value));
+        });
+        HashMap<Operator, Term> funMap = new HashMap<Operator, Term>();
+        this.funMap.forEach((key,value) -> {
+            funMap.put(key,value);
+        });
+
+        LinkedHashMap<Operator, FunctionIndex> funIndexMap = new LinkedHashMap<Operator, FunctionIndex>();
+        this.funIndexMap.forEach((key, value) -> {
+            funIndexMap.put(key, value.copy(eqMap, funMap));
+        });
+        LinkedHashMap<Operator, ExtendedFunctionIndex> extFunIndexMap = new LinkedHashMap<Operator, ExtendedFunctionIndex>();
+        this.extFunIndexMap.forEach((key, value) -> {
+            extFunIndexMap.put(key, value.copy(eqMap));
+        });
+
+        return new Context(literals, terms, eqMap, uneqMap, funMap, funIndexMap, extFunIndexMap, tb, services);
+
+    }
+
+    public void addEquality(Term constraint) throws ContextUnsatisfiableException {
+        boolean p = true;
+        if(constraint.op() == Junctor.NOT) {
+            p = false;
+            constraint = constraint.sub(0);
+        }
+        assert(constraint.op() == Equality.EQUALS): "can only add equalities";
+        if(p) {
+            addEquality(constraint.sub(0), constraint.sub(1));
+        }else {
+            addUnequality(constraint.sub(0), constraint.sub(1));
+        }
     }
 }

@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.strategy.conflictbasedinst.normalization;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
@@ -69,6 +68,18 @@ public class QuantifiedClauseSet {
         return cs;
     }
 
+    private LinkedHashSet<Literal> grounds = null;
+
+    public LinkedHashSet<Literal> getGroundLiterals(TermBuilder tb) {
+        if(grounds != null) return grounds;
+        grounds = new LinkedHashSet<Literal>();
+        LinkedHashSet<Term> qTerms = getQuantifiersAsTerms(tb);
+        for(Clause clause: cs.getClauses()) {
+            grounds.addAll(clause.getGroundLiterals(qTerms));
+        }
+        return grounds;
+    }
+
     public LinkedHashSet<Clause> getUnquantifiedClauses(TermBuilder tb) {
         LinkedHashSet<Clause> unqClauses = new LinkedHashSet<Clause>();
         if(quantifiers.isEmpty()) {
@@ -90,12 +101,15 @@ public class QuantifiedClauseSet {
         return unqClauses;
     }
 
-    public Collection<? extends Term> getQuantifiersAsTerms(TermBuilder tb) {
-        LinkedHashSet<Term> quantifiers = new LinkedHashSet<Term>();
-        for(QuantifiedTerm qt : this.quantifiers) {
-            quantifiers.add(tb.var(qt.getQv()));
+    private LinkedHashSet<Term> qTerms = null;
+
+    public LinkedHashSet<Term> getQuantifiersAsTerms(TermBuilder tb) {
+        if(qTerms != null) return qTerms;
+        qTerms = new LinkedHashSet<Term>();
+        for(QuantifiedTerm qt : quantifiers) {
+            qTerms.add(tb.var(qt.getQv()));
         }
-        return quantifiers;
+        return qTerms;
     }
 
     public QuantifiedClauseSet invert() {
