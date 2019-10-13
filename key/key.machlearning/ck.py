@@ -16,21 +16,39 @@ if len(sys.argv) % 2 == 0:
     print("Need an odd number of arguments")
     exit(2)
 
-command = { "command": sys.argv.pop(0) }
+order = sys.argv.pop(0)
+command = { "command": order }
 
 while len(sys.argv) > 0:
     k = sys.argv.pop(0)
     v = sys.argv.pop(0)
     command[k] = v
 
-json = json.dumps(command)
+commandStr = json.dumps(command)
 
-print("command:  " + json);
+print("command:  " + commandStr);
     
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect(('localhost', 5533))
-    s.sendall(json.encode('utf-8'))
+    s.sendall(commandStr.encode('utf-8'))
     s.shutdown(1)
-    data = s.recv(1024)
+    data = s.recv(32768)
 
 print("response: " + data.decode("utf-8"))
+
+
+def ast(form):
+    args = []
+    for child in form["children"]:
+        args.append(ast(child))
+    result = form["op"] + "(" + ", ".join(args) + ")"
+    return result
+
+if order == "ast":
+    response = json.loads(data.decode("utf-8"))
+    for form in response["antecedent"]:
+        print(" " + ast(form))
+    print("==>")
+    for form in response["succedent"]:
+        print(" " + ast(form))
+
