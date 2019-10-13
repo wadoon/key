@@ -81,10 +81,24 @@ public class KeYConnection {
 
         Goal goal = findGoal(id);
 
+        String tacName = Objects.toString(jsonObject.get("tactic"));
+        Tactic tactic = tactics.get(tacName);
+        if (tactic == null) {
+            throw new IllegalArgumentException("Unknown/Missing tactic " + tacName);
+        }
+
+        try {
+            tactic.apply(uiCtrl, ongoingProof, goal, jsonObject);
+        } catch (Exception e) {
+            return Server.error(e);
+        }
+
+        /*
         final GoalChooser goalChooser = ongoingProof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
         final ProverCore applyStrategy = new ApplyStrategy(goalChooser);
 
         applyStrategy.start(ongoingProof, goal);
+        */
 
         return Server.success("ids", filterGoalIds(id));
     }
