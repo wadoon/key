@@ -94,12 +94,12 @@ class Z3Socket extends AbstractSolverSocket {
 		if (message.indexOf("success") == -1)
 			sc.addMessage(message);
 		if (type == Pipe.ERROR_MESSAGE) {
-			throw new RuntimeException("Error while executing CVC4:\n" + message);
+			throw new RuntimeException("Error while executing z3:\n" + message);
 		}
 
 		// temp hack TODO js/mu
 		if (message.contains("(error ")) {
-			throw new RuntimeException("Something went wrong somewhere in CVC4: " + message);
+			throw new RuntimeException("Something went wrong somewhere in z3: " + message);
 		}
 
 		if (sc.getState() == WAIT_FOR_RESULT) {
