@@ -81,67 +81,49 @@ public abstract class AbstractSolverSocket implements PipeListener<SolverCommuni
 
 }
 
-class Z3Socket extends AbstractSolverSocket{
+class Z3Socket extends AbstractSolverSocket {
 
 	public Z3Socket(String name, ModelExtractor query) {
-		super(name, query);	    
+		super(name, query);
 	}
 
 	public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
 		SolverCommunication sc = pipe.getSession();
-        message = message.trim();
-		if(type == Pipe.ERROR_MESSAGE || message.startsWith("(error")){
+		message = message.trim();
+		if ("".equals(message)) return;
+		if (message.indexOf("success") == -1)
 			sc.addMessage(message);
-			if(message.indexOf("WARNING:")>-1){
-				return;
+		if (type == Pipe.ERROR_MESSAGE) {
+			throw new RuntimeException("Error while executing CVC4:\n" + message);
+		}
+
+		// temp hack TODO js/mu
+		if (message.contains("(error ")) {
+			throw new RuntimeException("Something went wrong somewhere in CVC4: " + message);
+		}
+
+		if (sc.getState() == WAIT_FOR_RESULT) {
+			if (message.indexOf(UNSAT) > -1) {
+				sc.setFinalResult(SMTSolverResult.createValidResult(name));
+				sc.setState(FINISH);
+				pipe.close();
+			} else if (message.indexOf(SAT) > -1) {
+				sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
+				pipe.sendMessage("(get-model)");
+				pipe.sendMessage("(exit)\n");
+				sc.setState(WAIT_FOR_DETAILS);
+			} else if (message.indexOf(UNKNOWN) > -1) {
+				sc.setFinalResult(SMTSolverResult.createUnknownResult(name));
+				sc.setState(FINISH);
+				pipe.close();
 			}
-			throw new RuntimeException("Error while executing Z3:\n" +message);
-		}
-		if (!message.equals("success")) {
-			sc.addMessage(message);
-		}
-
-		switch (sc.getState()) {
-			case WAIT_FOR_RESULT:
-				if(message.equals("unsat")){
-					sc.setFinalResult(SMTSolverResult.createValidResult(name));
-					// One cannot ask for proofs and models at one time
-					// rather have modesl than proofs (MU, 2013-07-19)
-					// pipe.sendMessage("(get-proof)\n");
-					pipe.sendMessage("(exit)\n");
-					sc.setState(WAIT_FOR_DETAILS);
-				}
-				if(message.equals("sat")){
-					sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
-					pipe.sendMessage("(get-model)");
-					pipe.sendMessage("(exit)\n");
-					sc.setState(WAIT_FOR_DETAILS);
-
-				}
-				if(message.equals("unknown")){
-					sc.setFinalResult(SMTSolverResult.createUnknownResult(name));
-					sc.setState(WAIT_FOR_DETAILS);
-					pipe.sendMessage("(exit)\n");
-				}
-				break;
-
-			case WAIT_FOR_DETAILS:
-				if(message.equals("success")){
-					pipe.close();
-				}
-				break;
+		} else if (sc.getState() == WAIT_FOR_DETAILS) {
+			if (message.equals("success")) {
+				pipe.close();
+			}
 		}
 	}
-
-	@Override
-	public void exceptionOccurred(Pipe<SolverCommunication> pipe,
-			Throwable exception) {
-
-
-	}
-
 }
-
 
 class MATHSAT_FPSocket extends AbstractSolverSocket{
 
