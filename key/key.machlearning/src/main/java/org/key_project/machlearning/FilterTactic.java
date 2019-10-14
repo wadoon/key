@@ -16,6 +16,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
 import org.json.simple.JSONObject;
 
@@ -57,7 +58,7 @@ public class FilterTactic implements Tactic {
     }
 
     @Override
-    public void apply(ConsoleUserInterfaceControl ui, Proof proof, Goal goal, JSONObject command) throws Exception {
+    public void apply(AbstractMediatorUserInterfaceControl ui, Proof proof, Goal goal, JSONObject command) throws Exception {
 
         Strategy oldStrategy = goal.getGoalStrategy();
         Strategy newStrategy = new FilterStrategy(oldStrategy);
@@ -114,7 +115,7 @@ public class FilterTactic implements Tactic {
                         return delegate.computeCost(app, pio, goal);
                     }
                 }
-                System.err.println(taclet.getRuleSets() + " not in " + rulesets);
+                // System.err.println(taclet.getRuleSets() + " not in " + rulesets);
             }
 
             return TopRuleAppCost.INSTANCE;

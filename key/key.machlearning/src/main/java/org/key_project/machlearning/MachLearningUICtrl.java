@@ -29,8 +29,9 @@ public class MachLearningUICtrl extends ConsoleUserInterfaceControl {
         }
 
         if (info.getSource() instanceof ProblemLoader) {
-             System.err.println("... Finished loading");
-             return;
+            System.err.println("... Finished loading");
+            fireTaskFinished(info);
+            return;
         }
 
         super.taskFinished(info);

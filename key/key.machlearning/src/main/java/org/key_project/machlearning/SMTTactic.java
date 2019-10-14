@@ -13,6 +13,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
 import org.json.simple.JSONObject;
 
@@ -26,7 +27,7 @@ public class SMTTactic implements Tactic {
     private List<SolverType> SOLVERS = Arrays.asList(SolverType.Z3_SOLVER);
 
     @Override
-    public void apply(ConsoleUserInterfaceControl ui, Proof proof, Goal goal, JSONObject command) throws Exception {
+    public void apply(AbstractMediatorUserInterfaceControl ui, Proof proof, Goal goal, JSONObject command) throws Exception {
 
         SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), goal.proof());

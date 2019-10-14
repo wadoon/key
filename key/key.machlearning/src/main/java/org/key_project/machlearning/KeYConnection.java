@@ -1,5 +1,6 @@
 package org.key_project.machlearning;
 
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -8,15 +9,11 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.GoalChooser;
-import de.uka.ilkd.key.prover.ProverCore;
-import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
-import de.uka.ilkd.key.ui.Verbosity;
-import org.jetbrains.annotations.NotNull;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.util.Deque;
 import java.util.HashMap;
@@ -25,7 +22,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.function.Function;
 
 public class KeYConnection {
 
@@ -33,7 +29,7 @@ public class KeYConnection {
         JSONObject handle(JSONObject json) throws Exception;
     }
 
-    private final ConsoleUserInterfaceControl uiCtrl;
+    private final AbstractMediatorUserInterfaceControl uiCtrl;
     private Proof ongoingProof;
 
     private Map<String, Handler> commands = new HashMap<>();
@@ -44,6 +40,7 @@ public class KeYConnection {
         commands.put("features", this::extractFeatures);
         commands.put("ast", this::getAST);
         commands.put("tactics", this::listTactics);
+        commands.put("set", this::setProperty);
     }
 
     private Map<String, Tactic> tactics = new HashMap<>();
@@ -53,14 +50,23 @@ public class KeYConnection {
         tactics.put("SMT", new SMTTactic());
         FilterTactic.registerTactics(tactics);
     }
-    public KeYConnection(int verbosity) {
-        uiCtrl = new MachLearningUICtrl((byte) verbosity);
+
+    public KeYConnection(int verbosity, boolean interactive) {
+        if (interactive) {
+            uiCtrl = MainWindow.getInstance(true).getUserInterface();
+        } else {
+            uiCtrl = new MachLearningUICtrl((byte) verbosity);
+        }
     }
 
     public JSONObject handle(JSONObject jsonCommand) throws Exception {
         String command = Objects.toString(jsonCommand.get("command"));
         if (command == null) {
             throw new IllegalArgumentException("No command set!");
+        }
+
+        if (ongoingProof == null && !"load".equals(command)) {
+            throw new IllegalStateException("Cannot do anything until a problem has been loaded.");
         }
 
         Handler handler = commands.get(command);
@@ -130,7 +136,7 @@ public class KeYConnection {
         throw new NoSuchElementException("Unknown id " + id + " among the nodes.");
     }
 
-    private JSONObject loadFile(JSONObject obj) {
+    private JSONObject loadFile(JSONObject obj) throws InterruptedException {
         String filename = Objects.toString(obj.get("filename"));
         System.err.println("Loading: " + filename);
 
@@ -138,8 +144,21 @@ public class KeYConnection {
             ongoingProof.dispose();
         }
 
+        // The window-bases ui ctrl does this asynchronously.
+        // So better wait for it to finish ...
+        LoadFinishListener listener = new LoadFinishListener();
+        uiCtrl.addProverTaskListener(listener);
         uiCtrl.loadProblem(new File(filename));
+        listener.waitFinished();
+        uiCtrl.removeProverTaskListener(listener);
+
         ongoingProof = uiCtrl.getMediator().getSelectedProof();
+        while (ongoingProof == null) {
+            // TODO Limit this to n iterations
+            System.err.println("Wait for (potentially asynchronous) load ...");
+            Thread.sleep(400);
+            ongoingProof = uiCtrl.getMediator().getSelectedProof();
+        }
 
         return Server.success("ids", filterGoalIds(1));
     }
@@ -248,5 +267,40 @@ public class KeYConnection {
         return result;
     }
 
+    private JSONObject setProperty(JSONObject command) {
+
+        String name = Objects.toString(command.get("property"));
+        if (name == null) {
+            throw new IllegalArgumentException("Missing 'property' argument");
+        }
+
+        Object value = command.get("value");
+        if (value == null) {
+            throw new IllegalArgumentException("Missing 'value' argument");
+        }
+
+        try {
+            PropertyDescriptor pd = new PropertyDescriptor(name, getClass());
+            pd.getWriteMethod().invoke(this, value);
+        } catch (Exception e) {
+            throw new RuntimeException("Error while setting property", e);
+        }
+
+        return Server.success();
+    }
+
+
+    public void setMaxSteps(String steps) {
+        if (ongoingProof != null) {
+            ongoingProof.getSettings()
+                    .getStrategySettings().setMaxSteps(Integer.parseInt(steps));
+        } else {
+            throw new IllegalStateException("No proof loaded");
+        }
+    }
+
+    public String getMaxSteps() {
+        return null;
+    }
 
 }

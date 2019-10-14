@@ -46,9 +46,10 @@ def ast(form):
 
 if order == "ast":
     response = json.loads(data.decode("utf-8"))
-    for form in response["antecedent"]:
-        print(" " + ast(form))
-    print("==>")
-    for form in response["succedent"]:
-        print(" " + ast(form))
+    if response["response"] == "success":
+        for form in response["antecedent"]:
+            print(" " + ast(form))
+        print("==>")
+        for form in response["succedent"]:
+            print(" " + ast(form))
 

@@ -21,6 +21,7 @@ public class Server {
     private static final String PORT_PARAM = "--port";
     private static final String HELP_PARAM = "--help";
     private static final String VERBOSITY_PARAM = "--verbosity";
+    private static final String SCREEN_PARAM = "--screen";
 
     private static final int DEFAULT_PORT = 5533;
     private static final JSONObject SUCCESS =
@@ -33,10 +34,11 @@ public class Server {
         cl.addOption(PORT_PARAM, "port", "Listen to this port");
         cl.addOption(HELP_PARAM, null, "Print help");
         cl.addOption(VERBOSITY_PARAM, "level", "Detail level of output (0..4)");
+        cl.addOption(SCREEN_PARAM, null, "Show KeY window");
         cl.parse(args);
 
         int verbosity = cl.getInteger(VERBOSITY_PARAM, Verbosity.HIGH);
-        keyConnection = new KeYConnection(verbosity);
+        keyConnection = new KeYConnection(verbosity, cl.isSet(SCREEN_PARAM));
 
         if (cl.isSet(HELP_PARAM)) {
             cl.printUsage(System.out);
