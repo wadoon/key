@@ -12,24 +12,159 @@
 //
 package de.uka.ilkd.key.rule.abstractexecution;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import junit.framework.TestCase;
+import de.uka.ilkd.key.util.ProofStarter;
+import de.uka.ilkd.key.util.SideProofUtil;
 
 /**
  * @author Dominic Steinhoefel
  */
-public class AbstractUpdateTests extends TestCase {
+public class AbstractUpdateTests {
+    private static Services DUMMY_SERVICES;
+    private static Proof DUMMY_PROOF;
+    private static Sort INT_SORT;
+    private static TermBuilder TB;
 
-    @Test
-    public void testTest() throws ProblemLoaderException {
-        KeYEnvironment<DefaultUserInterfaceControl> env = //
+    @BeforeClass
+    public static void prepare() throws ProblemLoaderException {
+        final KeYEnvironment<DefaultUserInterfaceControl> env = //
                 HelperClassForTests.createKeYEnvironment();
-        assertNotNull(env);
+        DUMMY_SERVICES = env.getServices();
+        DUMMY_PROOF = DUMMY_SERVICES.getProof();
+        INT_SORT = DUMMY_SERVICES.getNamespaces().sorts().lookup("int");
+        TB = DUMMY_SERVICES.getTermBuilder();
+    }
+
+    //@formatter:off
+    //    {U_P(w:=x)}
+    //      {U_Q(y:=z)}p(w,x,y,z)
+    //<-> {U_Q(y:=z)}
+    //      {U_P(w:=x)}p(w,x,y,z)
+    //@formatter:on
+    @Test
+    public void reorderIndependentAbstractUpdates()
+            throws ProblemLoaderException, ProofInputException {
+        final LocationVariable lvW = intVar("w");
+        final LocationVariable lvX = intVar("x");
+        final LocationVariable lvY = intVar("y");
+        final LocationVariable lvZ = intVar("z");
+
+        final Term u1 = abstractUpdate(aps("P"), new PVLoc(lvW), lvX);
+        final Term u2 = abstractUpdate(aps("Q"), new PVLoc(lvY), lvZ);
+
+        final Term pred = TB.func(
+                new Function(new Name("p"), Sort.FORMULA, INT_SORT, INT_SORT, INT_SORT, INT_SORT),
+                TB.var(lvW), TB.var(lvX), TB.var(lvY), TB.var(lvZ));
+
+        final Term equivalence = TB.equals(TB.apply(u1, TB.apply(u2, pred)),
+                TB.apply(u2, TB.apply(u1, pred)));
+
+        final Proof proof = startProofFor(equivalence);
+        assertEquals(true, proof.closed());
+    }
+
+    //@formatter:off
+    //    {y:=x}
+    //      {U_P(y!:=y,w)}
+    //        {x:=y}p(x,w)
+    //<-> {U_P(x!:=x,w)}p(x,w)
+    //@formatter:on
+    @Test
+    public void renamingTest() throws ProofInputException {
+        final LocationVariable w = intVar("w");
+        final LocationVariable x = intVar("x");
+        final LocationVariable y = intVar("y");
+
+        final Term u1 = abstractUpdate(aps("P"), new HasToLoc(new PVLoc(y)), new LocationVariable[] { y, w });
+        final Term u2 = abstractUpdate(aps("P"), new HasToLoc(new PVLoc(x)), new LocationVariable[] { x, w });
+
+        final Term pred = TB.func(new Function( //
+                new Name("p"), Sort.FORMULA, INT_SORT, INT_SORT), TB.var(x), TB.var(w));
+
+        final Term equivalence = TB.equals(
+                TB.apply(TB.elementary(TB.var(y), TB.var(x)),
+                        TB.apply(u1, TB.apply(TB.elementary(TB.var(x), TB.var(y)), pred))),
+                TB.apply(u2, pred));
+
+        final Proof proof = startProofFor(equivalence);
+        assertEquals(true, proof.closed());
+    }
+
+    private Proof startProofFor(Term formula) throws ProofInputException {
+        final ProofEnvironment proofEnv = SideProofUtil
+                .cloneProofEnvironmentWithOwnOneStepSimplifier(DUMMY_PROOF);
+        final ProofStarter proofStarter = SideProofUtil.createSideProof(proofEnv,
+                Sequent.createSuccSequent(new Semisequent(new SequentFormula(formula))), "test");
+        final ApplyStrategyInfo applInfo = proofStarter.start();
+        return applInfo.getProof();
+    }
+
+    private AbstractPlaceholderStatement aps(String id) {
+        return new AbstractPlaceholderStatement(id);
+    }
+
+    private Term abstractUpdate(AbstractPlaceholderStatement aps, AbstractUpdateAssgnLoc lhs,
+            LocationVariable rhs) {
+        return abstractUpdate(aps, new AbstractUpdateAssgnLoc[] { lhs },
+                new LocationVariable[] { rhs });
+    }
+
+    private Term abstractUpdate(AbstractPlaceholderStatement aps, AbstractUpdateAssgnLoc lhs,
+            LocationVariable[] rhs) {
+        return abstractUpdate(aps, new AbstractUpdateAssgnLoc[] { lhs }, rhs);
+    }
+
+    private Term abstractUpdate(AbstractPlaceholderStatement aps, AbstractUpdateAssgnLoc[] lhs,
+            LocationVariable[] rhs) {
+        final TermBuilder tb = DUMMY_SERVICES.getTermBuilder();
+
+        final AbstractUpdateFactory abstrUpdF = DUMMY_SERVICES.abstractUpdateFactory();
+
+        final Set<AbstractUpdateAssgnLoc> lhsLocs = Arrays.stream(lhs).collect(Collectors.toSet());
+        final Term rhsLocs = tb.setUnion(Arrays.stream(rhs).map(tb::var).map(tb::singletonPV)
+                .map(tb::setSingleton).collect(Collectors.toList()));
+
+        final AbstractUpdate upd = //
+                abstrUpdF.getInstance(aps, lhsLocs, DUMMY_SERVICES);
+        return tb.abstractUpdate(upd, rhsLocs);
+    }
+
+    private LocationVariable intVar(final String name) {
+        return new LocationVariable(new ProgramElementName(name),
+                DUMMY_SERVICES.getNamespaces().sorts().lookup("int"));
     }
 
 }
