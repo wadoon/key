@@ -3370,6 +3370,9 @@ location_term returns[Term result]
     :
     LPAREN obj=equivalence_term COMMA field=equivalence_term RPAREN
             { $result = getServices().getTermBuilder().singleton(obj, field); }
+    |
+    PV LPAREN pv=equivalence_term RPAREN
+            { $result = getServices().getTermBuilder().singletonPV(pv); }
     ;
 
 substitutionterm returns [Term _substitution_term = null] 

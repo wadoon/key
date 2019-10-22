@@ -321,6 +321,8 @@ lexer grammar KeYLexer;
 	KEYSETTINGS : '\\settings';
         PROFILE : '\\profile';
 
+    // special keyword for PVs in locset terms
+    PV : 'pv' ;
         // Those guys can stay being keywords
 	TRUE : 'true';
 	FALSE : 'false';

@@ -41,6 +41,10 @@ import de.uka.ilkd.key.proof.ProgVarReplacer;
  */
 public class FieldLocLHS extends HeapLocLHS {
     private final Term objTerm;
+    // XXX (DS, 2019-10-22): If possible, switch from LocationVariable to Term here,
+    // since it's quite questionable to use this "canonical program variable" for
+    // which one has to rely on a specific name of the field, which won't work in
+    // general, e.g. in hand-written KeY files.
     private final LocationVariable fieldPV;
 
     public FieldLocLHS(Term objTerm, LocationVariable fieldPV) {

@@ -984,8 +984,8 @@ public class TermBuilder {
         final AbstractPlaceholderStatement aps = new AbstractPlaceholderStatement(apsId);
         final AbstractUpdate abstrUpd = //
                 services.abstractUpdateFactory().getInstance(aps, lhs, Optional.empty(), services);
-
-        return skip();
+        
+        return abstractUpdate(abstrUpd, rhs);
     }
 
     /**
