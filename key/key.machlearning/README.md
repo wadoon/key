@@ -67,6 +67,22 @@ or <    error(message:str)
 in particular: error if obligation id is not an open goal
 `ids` may be empty if closing
 
+### Setting properties
+
+````
+   >    set(property:str, value: str)
+   <    success
+or <    error(message:str)
+````
+
+Currently the following properties are supported:
+
+| Property      | Meaning |
+| ------------- |:-------------:| -----:|
+| `maxStep`     | maximum number of proof steps executed in tactic execution |
+| `timeout`     | timeout (in ms) after which automation terminates |
+
+
 ### Prune a proof / Undo execution
 
 ````
@@ -98,6 +114,14 @@ AST transfer
 or <    error(message: str)
 ````
 with `term` the recursive structure `{ "op":"...", "op_class":"...", children:term[] }`.
+
+### Quitting the server
+
+````
+   >    quit
+````
+No response. 
+The process terminates.
 
 
 # Invoking the server

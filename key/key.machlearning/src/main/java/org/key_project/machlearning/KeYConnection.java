@@ -41,6 +41,7 @@ public class KeYConnection {
         commands.put("ast", this::getAST);
         commands.put("tactics", this::listTactics);
         commands.put("set", this::setProperty);
+        commands.put("quit", c -> { System.exit(0); return null; });
     }
 
     private Map<String, Tactic> tactics = new HashMap<>();
@@ -65,7 +66,7 @@ public class KeYConnection {
             throw new IllegalArgumentException("No command set!");
         }
 
-        if (ongoingProof == null && !"load".equals(command)) {
+        if (ongoingProof == null && !"load".equals(command) && !"quit".equals(command)) {
             throw new IllegalStateException("Cannot do anything until a problem has been loaded.");
         }
 
@@ -269,7 +270,7 @@ public class KeYConnection {
 
     private JSONObject setProperty(JSONObject command) {
 
-        String name = Objects.toString(command.get("property"));
+        Object name = command.get("property");
         if (name == null) {
             throw new IllegalArgumentException("Missing 'property' argument");
         }
@@ -280,7 +281,7 @@ public class KeYConnection {
         }
 
         try {
-            PropertyDescriptor pd = new PropertyDescriptor(name, getClass());
+            PropertyDescriptor pd = new PropertyDescriptor(name.toString(), getClass());
             pd.getWriteMethod().invoke(this, value);
         } catch (Exception e) {
             throw new RuntimeException("Error while setting property", e);
@@ -300,6 +301,19 @@ public class KeYConnection {
     }
 
     public String getMaxSteps() {
+        return null;
+    }
+
+    public void setTimeout(String timeout) {
+        if (ongoingProof != null) {
+            ongoingProof.getSettings()
+                    .getStrategySettings().setTimeout(Long.parseLong(timeout));
+        } else {
+            throw new IllegalStateException("No proof loaded");
+        }
+    }
+
+    public String getTimeout() {
         return null;
     }
 
