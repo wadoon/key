@@ -2573,13 +2573,20 @@ termEOF returns [Term _term = null]
 elementary_update_term returns[Term _elementary_update_term=null]
 @after { _elementary_update_term = result; }
 :
-        result=equivalence_term 
         (
-            ASSIGN a=equivalence_term
-            {
-                result = getServices().getTermBuilder().elementary(result, a);
-            }
-        )?
+          result=equivalence_term 
+          (
+              ASSIGN a=equivalence_term
+              {
+                  result = getServices().getTermBuilder().elementary(result, a);
+              }
+          )?
+          |
+          (
+            (u = ABSTR_UPD) LPAREN (assgn = locset_term) ASSIGN (access = locset_term) RPAREN
+            { result = getServices().getTermBuilder().abstractUpdate(u, assgn, access); }
+          )
+        )
    ;
         catch [TermCreationException ex] {
               raiseException
@@ -3404,7 +3411,11 @@ updateterm returns [Term _update_term = null]
 @init{ Term result = null; }
 @after{ _update_term = result; }
 :
-        LBRACE u=term RBRACE 
+        LBRACE
+        (
+          u=term
+        )
+        RBRACE 
         ( 
             a2=term110 
             | 

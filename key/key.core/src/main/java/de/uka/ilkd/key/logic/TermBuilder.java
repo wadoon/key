@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.antlr.runtime.Token;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -35,6 +36,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.java.Services;
@@ -975,6 +977,15 @@ public class TermBuilder {
 
     public Term abstractUpdate(AbstractUpdate abstrUpd, Term rhs) {
         return tf.createTerm(abstrUpd, rhs);
+    }
+    
+    public Term abstractUpdate(Token updSym, Term lhs, Term rhs) {
+        final String apsId = updSym.getText().substring(2);
+        final AbstractPlaceholderStatement aps = new AbstractPlaceholderStatement(apsId);
+        final AbstractUpdate abstrUpd = //
+                services.abstractUpdateFactory().getInstance(aps, lhs, Optional.empty(), services);
+
+        return skip();
     }
 
     /**

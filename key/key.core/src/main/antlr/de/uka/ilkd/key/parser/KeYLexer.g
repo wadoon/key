@@ -408,6 +408,10 @@ COLON
 DOUBLECOLON
 :    '::'
   ;
+  
+ABSTR_UPD
+:    'U_' LETTER +
+  ;
 
 ASSIGN
 :    ':='

@@ -472,6 +472,10 @@ public class AbstractUpdateFactory {
             final Term obj = //
                     normalizeSelfVar(t.sub(0), runtimeInstance, services);
             final Term field = t.sub(1);
+            // XXX (DS. 2019-10-22): It's problematic to convert the field to a PV here; we
+            // can, for instance, pass the location (o,f) for some symbols o, f created out
+            // of the blue inside a KeY file, then there's no name inside the f that we
+            // could extract and that call will fail.
             result.add(new FieldLocLHS(obj, fieldPVFromFieldFunc(field, services)));
         } else if (t.op() == locSetLDT.getAllFields() && t.subs().size() == 1) {
             result.add(new AllFieldsLocLHS(t.sub(0)));
