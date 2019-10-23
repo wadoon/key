@@ -21,7 +21,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import recoder.service.ConstantEvaluator;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -75,7 +74,6 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.ldt.PermissionLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
@@ -88,6 +86,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
+import recoder.service.ConstantEvaluator;
 
 public final class TypeConverter {
 
@@ -153,9 +152,6 @@ public final class TypeConverter {
         return (BooleanLDT) getLDT(BooleanLDT.NAME);
     }
 
-    public SetLDT getSetLDT() {
-        return (SetLDT) getLDT(SetLDT.NAME);
-    }
     public LocSetLDT getLocSetLDT() {
 	return (LocSetLDT) getLDT(LocSetLDT.NAME);
     }

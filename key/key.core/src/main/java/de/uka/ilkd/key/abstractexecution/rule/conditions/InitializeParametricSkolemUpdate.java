@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -44,8 +45,7 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
     private final SchemaVariable updateSV;
     private final ProgramSV abstrProgSV;
 
-    public InitializeParametricSkolemUpdate(SchemaVariable updateSV,
-            ProgramSV abstrProgSV) {
+    public InitializeParametricSkolemUpdate(SchemaVariable updateSV, ProgramSV abstrProgSV) {
         this.updateSV = updateSV;
         this.abstrProgSV = abstrProgSV;
     }
@@ -57,38 +57,31 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
 
         final Optional<LocationVariable> runtimeInstance = Optional
                 .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
-                .filter(LocationVariable.class::isInstance)
-                .map(LocationVariable.class::cast);
+                .filter(LocationVariable.class::isInstance).map(LocationVariable.class::cast);
 
         if (svInst.isInstantiated(this.updateSV)) {
             return matchCond;
         }
 
         final AbstractPlaceholderStatement abstrStmt = //
-                (AbstractPlaceholderStatement) svInst
-                        .getInstantiation(this.abstrProgSV);
+                (AbstractPlaceholderStatement) svInst.getInstantiation(this.abstrProgSV);
 
         final TermBuilder tb = services.getTermBuilder();
 
-        final Pair<Set<AbstractUpdateLoc>, Set<AbstractUpdateAssgnLoc>> accessibleAndAssignableClause = //
-                AbstractExecutionContractUtils
-                        .getAccessibleAndAssignableTermsForNoBehaviorContract(
-                                abstrStmt, matchCond, services,
-                                runtimeInstance);
+        final Pair<List<AbstractUpdateLoc>, Set<AbstractUpdateAssgnLoc>> accessibleAndAssignableClause = //
+                AbstractExecutionContractUtils.getAccessibleAndAssignableTermsForNoBehaviorContract(
+                        abstrStmt, matchCond, services, runtimeInstance);
 
         final Term update = //
-                tb.abstractUpdate(abstrStmt,
-                        accessibleAndAssignableClause.second,
+                tb.abstractUpdate(abstrStmt, accessibleAndAssignableClause.second,
                         accessibleAndAssignableClause.first);
 
-        return matchCond
-                .setInstantiations(svInst.add(this.updateSV, update, services));
+        return matchCond.setInstantiations(svInst.add(this.updateSV, update, services));
     }
 
     @Override
     public String toString() {
-        return String.format(
-                "\\varcond (\\initializeParametricSkolemUpdate(%s, %s))",
+        return String.format("\\varcond (\\initializeParametricSkolemUpdate(%s, %s))",
                 this.updateSV, this.abstrProgSV);
     }
 }

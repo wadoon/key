@@ -16,11 +16,9 @@ package de.uka.ilkd.key.abstractexecution.rule.conditions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -45,8 +43,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *
  * @author Dominic Steinhoefel
  */
-public class InitializeParametricSkolemPathCondition
-        implements VariableCondition {
+public class InitializeParametricSkolemPathCondition implements VariableCondition {
     private final SchemaVariable pathCondSV;
     private final ProgramSV abstrProgSV;
 
@@ -63,24 +60,29 @@ public class InitializeParametricSkolemPathCondition
 
         final Optional<LocationVariable> runtimeInstance = Optional
                 .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
-                .filter(LocationVariable.class::isInstance)
-                .map(LocationVariable.class::cast);
+                .filter(LocationVariable.class::isInstance).map(LocationVariable.class::cast);
 
         if (svInst.isInstantiated(pathCondSV)) {
             return matchCond;
         }
 
-        final AbstractPlaceholderStatement abstrStmt = (AbstractPlaceholderStatement) svInst
-                .getInstantiation(abstrProgSV);
+        final AbstractPlaceholderStatement abstrStmt = //
+                (AbstractPlaceholderStatement) svInst.getInstantiation(abstrProgSV);
+
+        final List<Term> accessibles = AbstractExecutionContractUtils
+                .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, matchCond,
+                        services, runtimeInstance).first.stream().map(loc -> loc.toTerm(services))
+                                .collect(Collectors.toList());
+        final Sort[] accessiblesSorts = accessibles.stream().map(Term::sort)
+                .collect(Collectors.toList()).toArray(new Sort[0]);
 
         final TermBuilder tb = services.getTermBuilder();
 
         /*
-         * NOTE (DS, 2019-01-31): We reuse the function symbols because
-         * otherwise, there will be different ones around which can, and will,
-         * lead to problems, since they should represent the same thing. It will
-         * however be problematic if someone decides to introduce such a
-         * function symbol elsewhere...
+         * NOTE (DS, 2019-01-31): We reuse the function symbols because otherwise, there
+         * will be different ones around which can, and will, lead to problems, since
+         * they should represent the same thing. It will however be problematic if
+         * someone decides to introduce such a function symbol elsewhere...
          */
         final String pathCondName = //
                 pathCondSV.name().toString() + "_" + abstrStmt.getId();
@@ -91,22 +93,14 @@ public class InitializeParametricSkolemPathCondition
 
         Function funcSymb = functions.lookup(funcSymbName);
         if (funcSymb == null) {
-            final Sort setSort = //
-                    services.getTypeConverter().getSetLDT().targetSort();
             funcSymb = new Function(//
-                    funcSymbName, Sort.FORMULA, true, true, setSort);
+                    funcSymbName, Sort.FORMULA, true, true, accessiblesSorts);
             functions.add(funcSymb);
         }
 
-        final Set<AbstractUpdateLoc> accessibles = AbstractExecutionContractUtils
-                .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
-                        matchCond, services, runtimeInstance).first;
+        final Term pathCond = tb.func(funcSymb, accessibles.toArray(new Term[0]));
 
-        final Term pathCond = tb.func(funcSymb, services.abstractUpdateFactory()
-                .accessiblesToSetUnion(accessibles, services));
-
-        return matchCond
-                .setInstantiations(svInst.add(pathCondSV, pathCond, services));
+        return matchCond.setInstantiations(svInst.add(pathCondSV, pathCond, services));
     }
 
     @Override
@@ -118,8 +112,7 @@ public class InitializeParametricSkolemPathCondition
         final String svsString = svs.stream().map(SchemaVariable::toString)
                 .collect(Collectors.joining(", "));
 
-        return String.format(
-                "\\varcond (\\initializeParametricSkolemPathCondition(%s))",
+        return String.format("\\varcond (\\initializeParametricSkolemPathCondition(%s))",
                 svsString);
     }
 }

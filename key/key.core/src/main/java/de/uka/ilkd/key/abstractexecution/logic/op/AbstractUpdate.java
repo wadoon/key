@@ -53,6 +53,11 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     private final Set<AbstractUpdateAssgnLoc> assignables;
 
     /**
+     * The sorts of the abstract update's arguments.
+     */
+    private final Sort[] argSorts;
+
+    /**
      * The hash code of this {@link AbstractUpdate}; computed of the
      * {@link AbstractPlaceholderStatement} identifier and the left-hand side
      * (assignables).
@@ -76,15 +81,17 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @param services    The {@link Services} object.
      */
     AbstractUpdate(final AbstractPlaceholderStatement phs,
-            final Set<AbstractUpdateAssgnLoc> assignables, final Services services) {
+            final Set<AbstractUpdateAssgnLoc> assignables, final Sort[] argSorts,
+            final Services services) {
         super(new Name("U_" + phs.getId() + "("
                 + assignables.stream().map(lhs -> lhs.toString()).collect(Collectors.joining(","))
-                + ")"), new Sort[] { services.getTypeConverter().getSetLDT().targetSort() },
+                + ")"), argSorts,
                 Sort.UPDATE, false);
 
         this.services = services;
         this.phs = phs;
         this.assignables = Collections.unmodifiableSet(assignables);
+        this.argSorts = argSorts;
         this.hashCode = 5 + 17 * phs.getId().hashCode() + 27 * assignables.hashCode();
     }
 
@@ -99,7 +106,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @return A new {@link AbstractUpdate} with the given left-hand side.
      */
     AbstractUpdate changeAssignables(final Set<AbstractUpdateAssgnLoc> newAssignables) {
-        return new AbstractUpdate(phs, newAssignables, services);
+        return new AbstractUpdate(phs, newAssignables, argSorts, services);
     }
 
     public AbstractPlaceholderStatement getAbstractPlaceholderStatement() {
@@ -175,8 +182,10 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      *         (includes "have-to"s).
      */
     public boolean mayAssign(AbstractUpdateLoc loc) {
-        return getMaybeAssignables().stream().anyMatch(assignable -> assignable.mayAssign(loc, services))
-                || getHasToAssignables().stream().anyMatch(assignable -> assignable.mayAssign(loc, services));
+        return getMaybeAssignables().stream()
+                .anyMatch(assignable -> assignable.mayAssign(loc, services))
+                || getHasToAssignables().stream()
+                        .anyMatch(assignable -> assignable.mayAssign(loc, services));
     }
 
     /**
@@ -195,7 +204,8 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @return
      */
     public boolean hasToAssign(AbstractUpdateLoc loc) {
-        return getHasToAssignables().stream().anyMatch(assignable -> assignable.mayAssign(loc, services));
+        return getHasToAssignables().stream()
+                .anyMatch(assignable -> assignable.mayAssign(loc, services));
     }
 
     /**

@@ -60,7 +60,7 @@ public class AbstractExecutionContractUtils {
      * @return The accessible locations for the given
      *         {@link AbstractPlaceholderStatement}.
      */
-    public static Set<AbstractUpdateLoc> getAccessibleTermsForNoBehaviorContract(
+    public static List<AbstractUpdateLoc> getAccessibleTermsForNoBehaviorContract(
             AbstractPlaceholderStatement aps, ProgramElement context, Services services) {
         return getAccessibleAndAssignableTermsForNoBehaviorContract(aps, context, services).first;
     }
@@ -233,7 +233,7 @@ public class AbstractExecutionContractUtils {
      * @return A pair of (1) the accessible and (2) the assignable locations for the
      *         {@link AbstractPlaceholderStatement}.
      */
-    public static Pair<Set<AbstractUpdateLoc>, Set<AbstractUpdateAssgnLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
+    public static Pair<List<AbstractUpdateLoc>, Set<AbstractUpdateAssgnLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractPlaceholderStatement abstrStmt, final ProgramElement contextProgram,
             final Services services) {
         final ProgramVariableCollector pvColl = //
@@ -260,11 +260,11 @@ public class AbstractExecutionContractUtils {
      * @return A pair of (1) the accessible and (2) the assignable locations for the
      *         {@link AbstractPlaceholderStatement}.
      */
-    public static Pair<Set<AbstractUpdateLoc>, Set<AbstractUpdateAssgnLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
+    public static Pair<List<AbstractUpdateLoc>, Set<AbstractUpdateAssgnLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractPlaceholderStatement abstrStmt,
             final Set<LocationVariable> surroundingVars, Optional<LocationVariable> runtimeInstance,
             final Services services) {
-        Set<AbstractUpdateLoc> accessibleClause;
+        List<AbstractUpdateLoc> accessibleClause;
         Set<AbstractUpdateAssgnLoc> assignableClause;
 
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
@@ -273,7 +273,7 @@ public class AbstractExecutionContractUtils {
                 getNoBehaviorContracts(abstrStmt, services);
 
         if (contracts.isEmpty()) {
-            accessibleClause = Collections.singleton(new AllLocsLoc(locSetLDT.getAllLocs()));
+            accessibleClause = Collections.singletonList(new AllLocsLoc(locSetLDT.getAllLocs()));
             assignableClause = Collections.singleton(new AllLocsLoc(locSetLDT.getAllLocs()));
         } else {
             final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
@@ -284,8 +284,7 @@ public class AbstractExecutionContractUtils {
             accessibleClause = AbstractUpdateFactory
                     .abstrUpdateLocsFromTermSafe(contract.getAccessibleClause(heap),
                             runtimeInstance, services)
-                    .stream().map(AbstractUpdateLoc.class::cast)
-                    .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+                    .stream().map(AbstractUpdateLoc.class::cast).collect(Collectors.toList());
             assignableClause = AbstractUpdateFactory
                     .abstrUpdateAssgnLocsFromTermSafe(contract.getAssignable(heap), runtimeInstance,
                             services)
@@ -293,7 +292,7 @@ public class AbstractExecutionContractUtils {
                     .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
         }
 
-        return new Pair<Set<AbstractUpdateLoc>, Set<AbstractUpdateAssgnLoc>>(accessibleClause,
+        return new Pair<List<AbstractUpdateLoc>, Set<AbstractUpdateAssgnLoc>>(accessibleClause,
                 assignableClause);
     }
 
@@ -314,7 +313,7 @@ public class AbstractExecutionContractUtils {
      * @return A pair of (1) the accessible and (2) the assignable locations for the
      *         {@link AbstractPlaceholderStatement}.
      */
-    public static Pair<Set<AbstractUpdateLoc>, Set<AbstractUpdateAssgnLoc>> //
+    public static Pair<List<AbstractUpdateLoc>, Set<AbstractUpdateAssgnLoc>> //
             getAccessibleAndAssignableTermsForNoBehaviorContract(
                     final AbstractPlaceholderStatement abstrStmt, final MatchConditions matchCond,
                     final Services services, Optional<LocationVariable> runtimeInstance) {

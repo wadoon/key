@@ -15,6 +15,7 @@ package de.uka.ilkd.key.rule.abstractexecution;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,7 @@ import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderState
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -82,8 +84,8 @@ public class AbstractUpdateTests {
         final LocationVariable lvY = intVar("y");
         final LocationVariable lvZ = intVar("z");
 
-        final Term u1 = abstractUpdate(aps("P"), new PVLoc(lvW), lvX);
-        final Term u2 = abstractUpdate(aps("Q"), new PVLoc(lvY), lvZ);
+        final Term u1 = abstractUpdate(aps("P"), new PVLoc(lvW), new PVLoc(lvX));
+        final Term u2 = abstractUpdate(aps("Q"), new PVLoc(lvY), new PVLoc(lvZ));
 
         final Term pred = TB.func(
                 new Function(new Name("p"), Sort.FORMULA, INT_SORT, INT_SORT, INT_SORT, INT_SORT),
@@ -108,8 +110,10 @@ public class AbstractUpdateTests {
         final LocationVariable x = intVar("x");
         final LocationVariable y = intVar("y");
 
-        final Term u1 = abstractUpdate(aps("P"), new HasToLoc(new PVLoc(y)), new LocationVariable[] { y, w });
-        final Term u2 = abstractUpdate(aps("P"), new HasToLoc(new PVLoc(x)), new LocationVariable[] { x, w });
+        final Term u1 = abstractUpdate(aps("P"), new HasToLoc(new PVLoc(y)),
+                new PVLoc[] { new PVLoc(y), new PVLoc(w) });
+        final Term u2 = abstractUpdate(aps("P"), new HasToLoc(new PVLoc(x)),
+                new PVLoc[] { new PVLoc(y), new PVLoc(w) });
 
         final Term pred = TB.func(new Function( //
                 new Name("p"), Sort.FORMULA, INT_SORT, INT_SORT), TB.var(x), TB.var(w));
@@ -137,29 +141,28 @@ public class AbstractUpdateTests {
     }
 
     private Term abstractUpdate(AbstractPlaceholderStatement aps, AbstractUpdateAssgnLoc lhs,
-            LocationVariable rhs) {
+            AbstractUpdateLoc rhs) {
         return abstractUpdate(aps, new AbstractUpdateAssgnLoc[] { lhs },
-                new LocationVariable[] { rhs });
+                new AbstractUpdateLoc[] { rhs });
     }
 
     private Term abstractUpdate(AbstractPlaceholderStatement aps, AbstractUpdateAssgnLoc lhs,
-            LocationVariable[] rhs) {
+            AbstractUpdateLoc[] rhs) {
         return abstractUpdate(aps, new AbstractUpdateAssgnLoc[] { lhs }, rhs);
     }
 
     private Term abstractUpdate(AbstractPlaceholderStatement aps, AbstractUpdateAssgnLoc[] lhs,
-            LocationVariable[] rhs) {
+            AbstractUpdateLoc[] rhs) {
         final TermBuilder tb = DUMMY_SERVICES.getTermBuilder();
 
         final AbstractUpdateFactory abstrUpdF = DUMMY_SERVICES.abstractUpdateFactory();
 
         final Set<AbstractUpdateAssgnLoc> lhsLocs = Arrays.stream(lhs).collect(Collectors.toSet());
-        final Term rhsLocs = tb.setUnion(Arrays.stream(rhs).map(tb::var).map(tb::singletonPV)
-                .map(tb::setSingleton).collect(Collectors.toList()));
+        final List<AbstractUpdateLoc> rhsLocs = Arrays.stream(rhs).collect(Collectors.toList());
 
         final AbstractUpdate upd = //
-                abstrUpdF.getInstance(aps, lhsLocs, DUMMY_SERVICES);
-        return tb.abstractUpdate(upd, rhsLocs);
+                abstrUpdF.getInstance(aps, lhsLocs, rhsLocs, DUMMY_SERVICES);
+        return tb.abstractUpdate(upd, rhs);
     }
 
     private LocationVariable intVar(final String name) {

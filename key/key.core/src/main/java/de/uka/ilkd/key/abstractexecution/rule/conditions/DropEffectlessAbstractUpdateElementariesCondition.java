@@ -202,7 +202,8 @@ public final class DropEffectlessAbstractUpdateElementariesCondition implements 
 
         final Set<AbstractUpdateAssgnLoc> newAssignables = assignables.stream()
                 .filter(op -> !opsHaveToAssignBeforeUsed.contains(op))
-                .filter(loc -> locsInTarget.stream().anyMatch(targLoc -> loc.mayAssign(targLoc, services)))
+                .filter(loc -> locsInTarget.stream()
+                        .anyMatch(targLoc -> loc.mayAssign(targLoc, services)))
                 .map(loc -> abstrUpd.hasToAssign(loc) ? new HasToLoc(loc) : loc)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
@@ -218,10 +219,10 @@ public final class DropEffectlessAbstractUpdateElementariesCondition implements 
             return null;
         }
 
-        final Set<AbstractUpdateLoc> newAccessibles = //
+        final List<AbstractUpdateLoc> newAccessibles = //
                 accessibleLocs.stream().map(AbstractUpdateLoc.class::cast)
                         // .filter(loc -> visitor.getResult().contains(loc))
-                        .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+                        .collect(Collectors.toList());
 
         if (abstrUpd.getAllAssignables().stream().noneMatch(op -> !newAssignables.contains(op))) {
             // No change.

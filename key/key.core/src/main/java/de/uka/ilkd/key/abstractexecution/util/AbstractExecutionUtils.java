@@ -32,7 +32,6 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLocRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.HeapLocRHS;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
@@ -40,7 +39,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
@@ -269,36 +267,6 @@ public class AbstractExecutionUtils {
         }
 
         return result;
-    }
-
-    /**
-     * Returns {@link Term}s of the RHS of an {@link AbstractUpdate} term.
-     *
-     * @param update The {@link AbstractUpdate} {@link Term} for which to return the
-     *               accessibles.
-     * @param tb     The {@link TermBuilder}, needed for disassembling the update
-     *               {@link Term}.
-     * @return All {@link Term}s in the RHS of an {@link AbstractUpdate} term.
-     */
-    public static Set<Term> getAccessiblesForAbstractUpdate(Term update, TermBuilder tb) {
-        assert update.op() instanceof AbstractUpdate;
-        assert update.arity() == 1;
-
-        return tb.setUnionToSet(update.sub(0));
-    }
-
-    /**
-     * Checks whether an {@link AbstractUpdate} accesses the allLocs location set.
-     *
-     * @param update   The {@link AbstractUpdate} to check.
-     * @param services The {@link Services} object (for the {@link LocSetLDT}).
-     * @return true iff the {@link AbstractUpdate} accesseaccesses allLocs location
-     *         set.
-     */
-    public static boolean accessesAllLocs(Term update, Services services) {
-        final Operator allLocs = services.getTypeConverter().getLocSetLDT().getAllLocs();
-        return getAccessiblesForAbstractUpdate(update, services.getTermBuilder()).stream()
-                .anyMatch(t -> t.op() == allLocs);
     }
 
     /**

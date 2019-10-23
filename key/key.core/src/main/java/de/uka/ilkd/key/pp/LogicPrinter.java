@@ -19,8 +19,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
-
 import java.util.stream.Collectors;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -38,7 +38,6 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -1525,9 +1524,8 @@ public class LogicPrinter {
         boolean isKeyword = false;
         if (services != null) {
             final LocSetLDT loc = services.getTypeConverter().getLocSetLDT();
-            final SetLDT set = services.getTypeConverter().getSetLDT();
             isKeyword = (t.op() == Junctor.AND || t.op() == Junctor.OR || t.op() == Junctor.IMP
-                    || t.op() == Equality.EQV || t.op() == loc.getUnion() || t.op() == set.getUnion());
+                    || t.op() == Equality.EQV || t.op() == loc.getUnion());
         }
         int indent = name.length() + 1;
         startTerm(2);

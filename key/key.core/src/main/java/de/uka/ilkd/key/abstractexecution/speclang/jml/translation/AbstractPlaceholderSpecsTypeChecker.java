@@ -25,7 +25,6 @@ import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -343,7 +342,6 @@ public class AbstractPlaceholderSpecsTypeChecker {
     private static Operator locSetElemTermsToOp(Term elemTerm,
             Services services) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        final SetLDT setLDT = services.getTypeConverter().getSetLDT();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
         final Operator op = elemTerm.op();
@@ -359,8 +357,6 @@ public class AbstractPlaceholderSpecsTypeChecker {
             return locSetElemTermsToOp(elemTerm.sub(0), services);
         } else if (op == locSetLDT.getSingleton()) {
             return locSetElemTermsToOp(elemTerm.sub(1), services);
-        } else if (op == setLDT.getSingleton()) {
-            return locSetElemTermsToOp(elemTerm.sub(0), services);
         } else if (op == locSetLDT.getHasTo()) {
             return locSetElemTermsToOp(elemTerm.sub(0), services);
         } else if (heapLDT.isSelectOp(op)) {

@@ -12,8 +12,8 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.Term;
 
 /**
@@ -23,11 +23,9 @@ import de.uka.ilkd.key.logic.Term;
  */
 public interface AbstractUpdateLoc {
     /**
-     * @param services
-     *            The {@link Services} object.
-     * @return A {@link Term} of {@link SetLDT} type suitable as a right-hand
-     *         side of an abstract update (but not yet wrapped in a setSingleton
-     *         or the like).
+     * @param services The {@link Services} object.
+     * @return A {@link Term} representation of this {@link AbstractUpdateLoc} for
+     *         use in the right-hand side of an {@link AbstractUpdate} {@link Term}.
      */
     Term toTerm(Services services);
 }
