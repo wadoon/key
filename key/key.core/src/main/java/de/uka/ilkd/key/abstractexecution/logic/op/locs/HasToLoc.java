@@ -58,7 +58,7 @@ public class HasToLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
 
     @Override
     public String toString() {
-        return String.format("hasTo(%s)", child.toString());
+        return String.format("%s!", child.toString());
     }
 
     @Override
