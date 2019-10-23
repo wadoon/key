@@ -16,10 +16,14 @@ package de.uka.ilkd.key.rule.conditions;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -27,6 +31,7 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.OpCollector;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -85,6 +90,48 @@ public final class DropEffectlessElementariesCondition
                 }
             }
         } else if (update.op() instanceof AbstractUpdate) {
+            final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
+            
+            final Predicate<LocationVariable> hasToAssign = //
+                    rv -> abstrUpd.hasToAssign((AbstractUpdateLoc) new PVLoc(rv));
+            final Predicate<LocationVariable> mayAssign = //
+                    rv -> abstrUpd.mayAssign((AbstractUpdateLoc) new PVLoc(rv));
+                    
+            if (relevantVars.stream().anyMatch(hasToAssign)) {
+                relevantVars.removeIf(hasToAssign);
+                return null;
+            } else if (!relevantVars.stream().anyMatch(mayAssign)) {
+                /*
+                 * We're looking for a PV which doesn't exist, which effectively means that
+                 * we're looking for the allLocs symbol in accessibles of APSs, since then,
+                 * we can only drop the APS if it does not assign anything.
+                 */
+                final LocationVariable nonexistingPV = new LocationVariable(
+                        new ProgramElementName("XXX-XXX"),
+                        services.getTypeConverter().getBooleanType());
+                
+                /*
+                 * XXX (DS, 2019-10-23): If Skolem locations can be substituted by anything,
+                 * then we may also not drop *concrete* update!
+                 */
+                if (abstrUpd.assignsNothing() // nothing is always OK to remove
+                        || (!abstrUpd.assignsAllLocs() // should not assign everything
+                                /*
+                                 * we don't know what the Skolem locations stand for, also stop if
+                                 * they're present
+                                 */
+                                && !abstrUpd.getHasToAssignables().stream()
+                                        .anyMatch(SkolemLoc.class::isInstance)
+                                && !abstrUpd.getMaybeAssignables().stream()
+                                        .anyMatch(SkolemLoc.class::isInstance)
+                                && !containsAbstractStatementUsingLHS(target, nonexistingPV,
+                                        services))) {
+                    return services.getTermBuilder().skip();
+                } else {
+                    return null;
+                }
+            }
+            
             return null;
         } else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
             Term sub0 = update.sub(0);

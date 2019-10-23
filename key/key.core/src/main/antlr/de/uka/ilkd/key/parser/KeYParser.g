@@ -3373,6 +3373,9 @@ location_term returns[Term result]
     |
     PV LPAREN pv=equivalence_term RPAREN
             { $result = getServices().getTermBuilder().singletonPV(pv); }
+    |
+    HAS_TO LPAREN t=location_term RPAREN
+            { $result = getServices().getTermBuilder().hasTo(t); }
     ;
 
 substitutionterm returns [Term _substitution_term = null] 
@@ -3881,13 +3884,10 @@ varexp[TacletBuilder b]
     | varcond_getVariant[b]
     | varcond_initializeParametricSkolemUpdate[b]
     | varcond_initializeParametricSkolemPathCondition[b]
-    | varcond_abstrUpdatesIndependent[b]
     | varcond_dropEffectlessElementaries[b]
-    | varcond_applyAbstrOnConcrUpdate[b]
-    | varcond_applyConcrOnAbstrUpdate[b]
+    | varcond_applyOnAbstractUpdate[b]
     | varcond_dropEffectlessAbstractUpdateAssignments[b]
     | varcond_dropEffectlessAbstractUpdate[b]
-    | varcond_canUnifyAbstrUpdateLHSForTarget[b]
     | varcond_instantiateVarsFresh[b]
     | varcond_newPV[b]
     | varcond_initializeExpression[b]
@@ -4129,37 +4129,14 @@ varcond_freshAbstractProgram[TacletBuilder b]
    }
 ;
 
-varcond_abstrUpdatesIndependent[TacletBuilder b]
+varcond_applyOnAbstractUpdate[TacletBuilder b]
 :
-   ABSTR_UPDATES_INDEPENDENT LPAREN u1=varId COMMA u2=varId RPAREN 
+   APPLY_ON_ABSTRACT_UPDATE LPAREN u1=varId COMMA u2=varId COMMA result=varId RPAREN 
    {
-      b.addVariableCondition(new AbstrUpdatesIndependentCondition((UpdateSV)u1, (UpdateSV)u2));
+      b.addVariableCondition(new ApplyOnAbstractUpdateCondition((UpdateSV)u1, 
+                                                                (UpdateSV)u2, 
+                                                                (UpdateSV)result));
    }
-;
-
-varcond_applyConcrOnAbstrUpdate[TacletBuilder b]
-:
-   APPLY_CONCR_ON_ABSTR_UPDATE LPAREN u1=varId COMMA u2=varId COMMA phi=varId COMMA result=varId RPAREN 
-   //APPLY_CONCR_ON_ABSTR_UPDATE LPAREN u1=varId COMMA u2=varId COMMA result=varId RPAREN
-   {
-      b.addVariableCondition(new ApplyConcrOnAbstrUpdateCondition((UpdateSV)u1, 
-                                                                  (UpdateSV)u2, 
-                                                                  (SchemaVariable)phi, 
-                                                                  (SchemaVariable)result)
-     );
-  }
-;
-
-varcond_applyAbstrOnConcrUpdate[TacletBuilder b]
-:
-   APPLY_ABSTR_ON_CONCR_UPDATE LPAREN u1=varId COMMA u2=varId COMMA phi=varId COMMA result=varId RPAREN 
-   {
-      b.addVariableCondition(new ApplyAbstrOnConcrUpdateCondition((UpdateSV)u1, 
-                                                                  (UpdateSV)u2, 
-                                                                  (SchemaVariable)phi, 
-                                                                  (SchemaVariable)result)
-     );
-  }
 ;
 
 varcond_dropEffectlessAbstractUpdateAssignments[TacletBuilder b]
@@ -4169,17 +4146,6 @@ varcond_dropEffectlessAbstractUpdateAssignments[TacletBuilder b]
       b.addVariableCondition(new DropEffectlessAbstractUpdateElementariesCondition((UpdateSV)u, 
                                                              (SchemaVariable)target, 
                                                              (SchemaVariable)result));
-   }
-;
-
-varcond_canUnifyAbstrUpdateLHSForTarget[TacletBuilder b]
-:
-   CAN_UNIFY_ABSTR_UPD_LHS_FOR_TARGETS LPAREN u1=varId COMMA target1=varId COMMA u2=varId COMMA target2=varId RPAREN 
-   {
-      b.addVariableCondition(new CanUnifyAbstrUpdLHSForTargetsCondition((UpdateSV)u1, 
-                                                             (SchemaVariable)target1,
-                                                             (UpdateSV)u2, 
-                                                             (SchemaVariable)target2));
    }
 ;
 

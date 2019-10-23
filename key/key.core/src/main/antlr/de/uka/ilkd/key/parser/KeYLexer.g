@@ -250,12 +250,9 @@ lexer grammar KeYLexer;
     FRESHFOR : '\\freshFor';
     INITIALIZE_EXPRESSION : '\\initializeExpression';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
-	ABSTR_UPDATES_INDEPENDENT : '\\abstrUpdatesIndependent';
-	APPLY_ABSTR_ON_CONCR_UPDATE : '\\applyAbstrOnConcrUpdate';
-	APPLY_CONCR_ON_ABSTR_UPDATE : '\\applyConcrOnAbstrUpdate';
+	APPLY_ON_ABSTRACT_UPDATE : '\\applyOnAbstractUpdate' ;
 	DROP_EFFECTLESS_ABSTRACT_UPDATE_ASSIGNMENTS : '\\dropEffectlessAbstractUpdateAssignments';
 	DROP_EFFECTLESS_ABSTRACT_UPDATE : '\\dropEffectlessAbstractUpdate';
-	CAN_UNIFY_ABSTR_UPD_LHS_FOR_TARGETS : '\\canUnifyAbstrUpdLHSForTargets';
 	DROP_EFFECTLESS_ELEMENTARIES : '\\dropEffectlessElementaries';
 	DROP_EFFECTLESS_STORES : '\\dropEffectlessStores';
 	ABSTRACT_UPDATE : '\\abstractUpdate';
@@ -321,8 +318,9 @@ lexer grammar KeYLexer;
 	KEYSETTINGS : '\\settings';
         PROFILE : '\\profile';
 
-    // special keyword for PVs in locset terms
+    // special keyword for use in locset terms
     PV : 'pv' ;
+    HAS_TO : '\\hasTo' ;
         // Those guys can stay being keywords
 	TRUE : 'true';
 	FALSE : 'false';

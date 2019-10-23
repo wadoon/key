@@ -191,7 +191,7 @@ public final class DropEffectlessAbstractUpdateCondition implements VariableCond
 
     @Override
     public String toString() {
-        return String.format("\\dropEffectlessAbstractUpdate(%s, %s)", uSV, targetSV, resultSV);
+        return String.format("\\dropEffectlessAbstractUpdate(%s, %s, %s)", uSV, targetSV, resultSV);
     }
 
 }

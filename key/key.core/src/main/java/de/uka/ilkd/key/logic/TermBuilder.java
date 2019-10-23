@@ -962,6 +962,17 @@ public class TermBuilder {
                 .collect(Collectors.toList()).toArray(new Term[0]));
     }
 
+    /**
+     * Creates an abstract update. <strong>NOTE:</strong> The Term rhs is expected
+     * to be a LocSet union term! This term will be disassembled before it's used as
+     * an argument, and this will fail if it's not a LocSet term. Use
+     * {@link #abstractUpdate(AbstractUpdate, Term[])} if you want to use terms as
+     * they are as arguments for an abstract update.
+     * 
+     * @param abstrUpd The {@link AbstractUpdate} operator.
+     * @param rhs The right-hand side (LocSet union term).
+     * @return The {@link AbstractUpdate} term for the given right-hand side.
+     */
     public Term abstractUpdate(AbstractUpdate abstrUpd, Term rhs) {
         final AbstractUpdateLoc[] accessibles = //
                 AbstractUpdateFactory.abstrUpdateLocsFromTermSafe(rhs, Optional.empty(), services)
@@ -969,6 +980,10 @@ public class TermBuilder {
                         .toArray(new AbstractUpdateLoc[0]);
 
         return abstractUpdate(abstrUpd, accessibles);
+    }
+
+    public Term abstractUpdate(AbstractUpdate abstrUpd, Term[] rhs) {
+        return tf.createTerm(abstrUpd, rhs);
     }
 
     public Term abstractUpdate(AbstractUpdate abstrUpd, AbstractUpdateLoc... rhs) {
@@ -1472,7 +1487,7 @@ public class TermBuilder {
 
     public Term hasTo(Term locSetTerm) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-//        assert locSetTerm.sort() == locSetLDT.targetSort();
+        assert locSetTerm.sort() == locSetLDT.targetSort();
         return func(locSetLDT.getHasTo(), locSetTerm);
     }
     public Term union(Term s1, Term s2) {

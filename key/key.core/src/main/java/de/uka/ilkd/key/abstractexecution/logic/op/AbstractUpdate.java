@@ -55,7 +55,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     /**
      * The sorts of the abstract update's arguments.
      */
-    private final Sort[] argSorts;
+    private final Sort[] argSorts; //remove, accessible through super class
 
     /**
      * The hash code of this {@link AbstractUpdate}; computed of the
@@ -208,6 +208,9 @@ public final class AbstractUpdate extends AbstractSortedOperator {
                 .anyMatch(assignable -> assignable.mayAssign(loc, services));
     }
 
+    // TODO (DS, 2019-10-23): Do we need that method? The other hasToAssign seems
+    // much more sensible... But maybe there's a problem since the type hierarchies
+    // are distinct?!?
     /**
      * True if the given {@link AbstractUpdate} has to assign the given location.
      *
