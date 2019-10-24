@@ -319,8 +319,9 @@ lexer grammar KeYLexer;
         PROFILE : '\\profile';
 
     // special keyword for use in locset terms
-    PV : 'pv' ;
+    PV : '\\pv' ;
     HAS_TO : '\\hasTo' ;
+    FUN : '\\fun' ;
         // Those guys can stay being keywords
 	TRUE : 'true';
 	FALSE : 'false';
@@ -410,7 +411,7 @@ DOUBLECOLON
   ;
   
 ABSTR_UPD
-:    'U_' LETTER +
+:    'U_' ( LETTER | DIGIT ) ( LETTER | DIGIT | '_' ) *
   ;
 
 ASSIGN

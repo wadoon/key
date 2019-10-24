@@ -2573,20 +2573,36 @@ termEOF returns [Term _term = null]
 elementary_update_term returns[Term _elementary_update_term=null]
 @after { _elementary_update_term = result; }
 :
+          result = concrete_elementary_update_term
+        | result = abstract_elementary_update_term
+   ;
+        catch [TermCreationException ex] {
+              raiseException
+			(new KeYSemanticException(input, getSourceName(), ex));
+        }
+
+concrete_elementary_update_term returns[Term _elementary_update_term=null]
+@after { _elementary_update_term = result; }
+:
+        result=equivalence_term 
         (
-          result=equivalence_term 
-          (
-              ASSIGN a=equivalence_term
-              {
-                  result = getServices().getTermBuilder().elementary(result, a);
-              }
-          )?
-          |
-          (
-            (u = ABSTR_UPD) LPAREN (assgn = locset_term) ASSIGN (access = locset_term) RPAREN
-            { result = getServices().getTermBuilder().abstractUpdate(u, assgn, access); }
-          )
-        )
+            ASSIGN a=equivalence_term
+            {
+                result = getServices().getTermBuilder().elementary(result, a);
+            }
+        )?
+   ;
+        catch [TermCreationException ex] {
+              raiseException
+			(new KeYSemanticException(input, getSourceName(), ex));
+        }
+
+abstract_elementary_update_term returns[Term _elementary_update_term=null; Term result=null]
+@after { _elementary_update_term = result; }
+:
+        (u = ABSTR_UPD) LPAREN (assgn = locset_term) ASSIGN (access = locset_term) RPAREN
+        { result = getServices().getTermBuilder().abstractUpdate(u, assgn, access); }
+        
    ;
         catch [TermCreationException ex] {
               raiseException
@@ -3373,6 +3389,9 @@ location_term returns[Term result]
     |
     PV LPAREN pv=equivalence_term RPAREN
             { $result = getServices().getTermBuilder().singletonPV(pv); }
+    |
+    FUN LPAREN fun=equivalence_term RPAREN
+            { $result = fun; }
     |
     HAS_TO LPAREN t=location_term RPAREN
             { $result = getServices().getTermBuilder().hasTo(t); }

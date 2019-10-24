@@ -15,6 +15,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -33,6 +34,7 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -48,163 +50,214 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
-public final class DropEffectlessElementariesCondition
-        implements VariableCondition {
-    private final UpdateSV u;
-    private final SchemaVariable x;
-    private final SchemaVariable result;
+public final class DropEffectlessElementariesCondition implements VariableCondition {
+    private final UpdateSV uSV;
+    private final SchemaVariable targetSV;
+    private final SchemaVariable resultSV;
 
-    public DropEffectlessElementariesCondition(UpdateSV u, SchemaVariable x,
-            SchemaVariable x2) {
-        this.u = u;
-        this.x = x;
-        this.result = x2;
+    public DropEffectlessElementariesCondition(UpdateSV uSV, SchemaVariable targetSV,
+            SchemaVariable resultSV) {
+        this.uSV = uSV;
+        this.targetSV = targetSV;
+        this.resultSV = resultSV;
     }
 
-    private static Term dropEffectlessElementariesHelper(Term update,
-            Term target, Set<LocationVariable> relevantVars,
+    @Override
+    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
             Services services) {
-        if (update.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate eu = (ElementaryUpdate) update.op();
-            LocationVariable lhs = (LocationVariable) eu.lhs();
-            if (relevantVars.contains(lhs)) {
-                relevantVars.remove(lhs);
-                // removed, see bug #1269 (MU, CS)
-                // updates of the form "x:=x" can be discarded (MU,CS)
-                //@formatter:off
-//                if (lhs.equals(update.sub(0).op())) {
-//                    return TB.skip();
-//                }
-                //@formatter:on
-                return null;
-            } else {
-                /*
-                 * In the standard case, we can drop the update here. However,
-                 * if the target contains abstract programs that might access
-                 * the left-hand-side of this update, we have to keep it.
-                 */
-                if (!containsAbstractStatementUsingLHS(target, lhs, services)) {
-                    return services.getTermBuilder().skip();
-                } else {
-                    return null;
-                }
-            }
-        } else if (update.op() instanceof AbstractUpdate) {
-            final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
-            
-            final Predicate<LocationVariable> hasToAssign = //
-                    rv -> abstrUpd.hasToAssign((AbstractUpdateLoc) new PVLoc(rv));
-            final Predicate<LocationVariable> mayAssign = //
-                    rv -> abstrUpd.mayAssign((AbstractUpdateLoc) new PVLoc(rv));
-                    
-            if (relevantVars.stream().anyMatch(hasToAssign)) {
-                relevantVars.removeIf(hasToAssign);
-                return null;
-            } else if (!relevantVars.stream().anyMatch(mayAssign)) {
-                /*
-                 * We're looking for a PV which doesn't exist, which effectively means that
-                 * we're looking for the allLocs symbol in accessibles of APSs, since then,
-                 * we can only drop the APS if it does not assign anything.
-                 */
-                final LocationVariable nonexistingPV = new LocationVariable(
-                        new ProgramElementName("XXX-XXX"),
-                        services.getTypeConverter().getBooleanType());
-                
-                /*
-                 * XXX (DS, 2019-10-23): If Skolem locations can be substituted by anything,
-                 * then we may also not drop *concrete* update!
-                 */
-                if (abstrUpd.assignsNothing() // nothing is always OK to remove
-                        || (!abstrUpd.assignsAllLocs() // should not assign everything
-                                /*
-                                 * we don't know what the Skolem locations stand for, also stop if
-                                 * they're present
-                                 */
-                                && !abstrUpd.getHasToAssignables().stream()
-                                        .anyMatch(SkolemLoc.class::isInstance)
-                                && !abstrUpd.getMaybeAssignables().stream()
-                                        .anyMatch(SkolemLoc.class::isInstance)
-                                && !containsAbstractStatementUsingLHS(target, nonexistingPV,
-                                        services))) {
-                    return services.getTermBuilder().skip();
-                } else {
-                    return null;
-                }
-            }
-            
+        final SVInstantiations svInst = mc.getInstantiations();
+        final Term update = (Term) svInst.getInstantiation(uSV);
+        final Term target = (Term) svInst.getInstantiation(targetSV);
+        final Term previousResult = (Term) svInst.getInstantiation(resultSV);
+
+        if (update == null || target == null) {
+            return mc;
+        }
+
+        final Optional<Term> maybeResult = dropEffectlessElementaries(update, target, services);
+
+        if (!maybeResult.isPresent()) {
             return null;
-        } else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
-            Term sub0 = update.sub(0);
-            Term sub1 = update.sub(1);
-            /*
-             * first descend to the second sub-update to keep relevantVars in
-             * good order
-             */
-            Term newSub1 = dropEffectlessElementariesHelper(sub1, target,
-                    relevantVars, services);
-            Term newSub0 = dropEffectlessElementariesHelper(sub0, target,
-                    relevantVars, services);
-            if (newSub0 == null && newSub1 == null) {
-                return null;
-            } else {
-                newSub0 = newSub0 == null ? sub0 : newSub0;
-                newSub1 = newSub1 == null ? sub1 : newSub1;
-                return services.getTermBuilder().parallel(newSub0, newSub1);
-            }
-        } else if (update.op() == UpdateApplication.UPDATE_APPLICATION) {
-            Term sub0 = update.sub(0);
-            Term sub1 = update.sub(1);
-            Term newSub1 = dropEffectlessElementariesHelper(sub1, target,
-                    relevantVars, services);
-            return newSub1 == null ? null
-                    : services.getTermBuilder().apply(sub0, newSub1, null);
+        }
+
+        final Term result = maybeResult.get();
+        if (previousResult == null) {
+            return mc.setInstantiations(svInst.add(resultSV, result, services));
+        } else if (previousResult.equals(result)) {
+            return mc;
         } else {
             return null;
         }
     }
 
-    private static Term dropEffectlessElementaries(Term update, Term target,
+    /**
+     * Returns, if possible, a simplified term <code>{update'}target</code> which is
+     * equivalent to <code>{update}target</code>. Returns {@link Optional#empty()}
+     * if simplification is not possible.
+     * 
+     * @param update   The update to simplify.
+     * @param target   The target formula, for extracting locations.
+     * @param services The {@link Services} object.
+     * @return The simplified update application {@link Term}, or
+     *         {@link Optional#empty()}.
+     */
+    private static Optional<Term> dropEffectlessElementaries(Term update, Term target,
             Services services) {
-        TermProgramVariableCollector collector = services.getFactory()
-                .create(services);
+        final TermProgramVariableCollector collector = services.getFactory().create(services);
         target.execPostOrder(collector);
-        Set<LocationVariable> varsInTarget = collector.result();
-        Term simplifiedUpdate = dropEffectlessElementariesHelper(update, target,
-                varsInTarget, services);
-        return simplifiedUpdate == null ? null
-                : services.getTermBuilder().apply(simplifiedUpdate, target,
-                        null);
+        final Set<LocationVariable> varsInTarget = collector.result();
+        final TermBuilder tb = services.getTermBuilder();
+
+        return dropEffectlessElementariesHelper(update, target, varsInTarget, services)
+                .map(upd -> tb.apply(upd, target, null));
     }
 
-    @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
-            MatchConditions mc, Services services) {
-        SVInstantiations svInst = mc.getInstantiations();
-        Term uInst = (Term) svInst.getInstantiation(u);
-        Term xInst = (Term) svInst.getInstantiation(x);
-        Term resultInst = (Term) svInst.getInstantiation(result);
-        if (uInst == null || xInst == null) {
-            return mc;
-        }
+    /**
+     * Returns, if possible, a simplified term <code>{update'}target</code> which is
+     * equivalent to <code>{update}target</code>. Uses the locations in relevantVars
+     * to decide what to drop in the simplification step (updates not assigning
+     * relevant variables can be dropped). Returns {@link Optional#empty()} if
+     * simplification is not possible.
+     * 
+     * @param update   The update to simplify.
+     * @param target   The target formula, for extracting locations.
+     * @param services The {@link Services} object.
+     * @return The simplified update application {@link Term}, or
+     *         {@link Optional#empty()}.
+     */
+    private static Optional<Term> dropEffectlessElementariesHelper(final Term update,
+            final Term target, final Set<LocationVariable> relevantVars, final Services services) {
+        final TermBuilder tb = services.getTermBuilder();
 
-        Term properResultInst = dropEffectlessElementaries(uInst, xInst,
-                services);
-        if (properResultInst == null) {
-            return null;
-        } else if (resultInst == null) {
-            svInst = svInst.add(result, properResultInst, services);
-            return mc.setInstantiations(svInst);
-        } else if (resultInst.equals(properResultInst)) {
-            return mc;
+        if (update.op() instanceof ElementaryUpdate) {
+            return maybeDropElementaryUpdate(update, target, relevantVars, services);
+        } else if (update.op() instanceof AbstractUpdate) {
+            return maybeDropOrSimplifyAbstractUpdate(update, target, relevantVars, services);
+        } else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
+            final Term sub1 = update.sub(0);
+            final Term sub2 = update.sub(1);
+
+            /*
+             * First descend to the second sub-update to keep relevantVars in good order.
+             */
+            final Optional<Term> maybeNewSub1 = //
+                    dropEffectlessElementariesHelper(sub2, target, relevantVars, services);
+            final Optional<Term> maybeNewSub0 = //
+                    dropEffectlessElementariesHelper(sub1, target, relevantVars, services);
+
+            if (!maybeNewSub0.isPresent() && !maybeNewSub1.isPresent()) {
+                return Optional.empty();
+            }
+
+            return Optional.of( //
+                    tb.parallel(maybeNewSub0.orElse(sub1), maybeNewSub1.orElse(sub2)));
+        } else if (update.op() == UpdateApplication.UPDATE_APPLICATION) {
+            final Term appliedUpdate = update.sub(0);
+            final Term targetUpdate = update.sub(1);
+
+            return dropEffectlessElementariesHelper(targetUpdate, target, relevantVars, services)
+                    .map(newSub -> tb.apply(appliedUpdate, newSub, null));
         } else {
-            return null;
+            // Unknown operator.
+            return Optional.empty();
         }
     }
 
-    @Override
-    public String toString() {
-        return "\\dropEffectlessElementaries(" + u + ", " + x + ", " + result
-                + ")";
+    /**
+     * Returns a SKIP update, a simplified abstract update (less assignables), or an
+     * empty optional if no simplification is possible. Like
+     * {@link #dropElementary(Term, Term, Set, Services, TermBuilder)}, but for the
+     * much more complex setting of an abstract update.
+     * 
+     * @param update   The abstract update to check.
+     * @param target   The target formula, for extracting locations.
+     * @param services The {@link Services} object.
+     * @return The simplified update {@link Term}, or {@link Optional#empty()}.
+     */
+    private static Optional<Term> maybeDropOrSimplifyAbstractUpdate(final Term update,
+            final Term target, final Set<LocationVariable> relevantVars, final Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
+
+        final Predicate<LocationVariable> hasToAssign = //
+                rv -> abstrUpd.hasToAssign((AbstractUpdateLoc) new PVLoc(rv));
+        final Predicate<LocationVariable> mayAssign = //
+                rv -> abstrUpd.mayAssign((AbstractUpdateLoc) new PVLoc(rv));
+
+        if (relevantVars.stream().anyMatch(hasToAssign)) {
+            relevantVars.removeIf(hasToAssign);
+            return Optional.empty();
+        } else if (!relevantVars.stream().anyMatch(mayAssign)) {
+            /*
+             * We're looking for a PV which doesn't exist, which effectively means that
+             * we're looking for the allLocs symbol in accessibles of APSs, since then, we
+             * can only drop the APS if it does not assign anything.
+             */
+            final LocationVariable nonexistingPV = new LocationVariable(
+                    new ProgramElementName("XXX-XXX"),
+                    services.getTypeConverter().getBooleanType());
+
+            /*
+             * XXX (DS, 2019-10-23): If Skolem locations can be substituted by anything,
+             * then we may also not drop *concrete* update!
+             */
+            if (abstrUpd.assignsNothing() // nothing is always OK to remove
+                    || (!abstrUpd.assignsAllLocs() // should not assign everything
+                            /*
+                             * we don't know what the Skolem locations stand for, also stop if
+                             * they're present
+                             */
+                            && !abstrUpd.getHasToAssignables().stream()
+                                    .anyMatch(SkolemLoc.class::isInstance)
+                            && !abstrUpd.getMaybeAssignables().stream()
+                                    .anyMatch(SkolemLoc.class::isInstance)
+                            && !containsAbstractStatementUsingLHS(target, nonexistingPV,
+                                    services))) {
+                return Optional.of(tb.skip());
+            } else {
+                return Optional.empty();
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Returns either a SKIP update if the elementary update <code>update</code> can
+     * be dropped (which is the case if it assigns a variable that is not relevant),
+     * or an empty optional if it assigns a relevant variable. In that case, as a
+     * <strong>side effect</strong>, that variable is removed from the set of
+     * relevant variables, since it's overwritten.
+     * 
+     * @param update   The elementary update to check.
+     * @param target   The target formula, for extracting locations.
+     * @param services The {@link Services} object.
+     * @return The simplified update {@link Term}, or {@link Optional#empty()}.
+     */
+    private static Optional<Term> maybeDropElementaryUpdate(final Term update, final Term target,
+            final Set<LocationVariable> relevantVars, final Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final ElementaryUpdate eu = (ElementaryUpdate) update.op();
+        final LocationVariable lhs = (LocationVariable) eu.lhs();
+        if (relevantVars.contains(lhs)) {
+
+            relevantVars.remove(lhs); // SIDE EFFECT!
+
+            /* NOTE: Cannot discard updates of the form x:=x, see bug #1269 (MU, CS) */
+            return Optional.empty();
+        } else {
+            // TODO Remove, those vars should be in relevantVars
+            /*
+             * In the standard case, we can drop the update here. However, if the target
+             * contains abstract programs that might access the left-hand-side of this
+             * update, we have to keep it.
+             */
+            if (!containsAbstractStatementUsingLHS(target, lhs, services)) {
+                return Optional.of(tb.skip());
+            } else {
+                return Optional.empty();
+            }
+        }
     }
 
     /*
@@ -212,25 +265,23 @@ public final class DropEffectlessElementariesCondition
      * collecting variables in a JavaBlock, also the variables in the contracts
      * should be collected for an abstract placeholder statement...
      */
-    private static boolean containsAbstractStatementUsingLHS(Term target,
-            LocationVariable lhs, Services services) {
+    private static boolean containsAbstractStatementUsingLHS(Term target, LocationVariable lhs,
+            Services services) {
         final ContainsAbstractStatementUsingLHSVisitor visitor = //
                 new ContainsAbstractStatementUsingLHSVisitor(
-                        MergeRuleUtils.getJavaBlockRecursive(target).program(),
-                        lhs, services);
+                        MergeRuleUtils.getJavaBlockRecursive(target).program(), lhs, services);
         visitor.start();
         return visitor.result();
     }
 
-    private static class ContainsAbstractStatementUsingLHSVisitor
-            extends JavaASTVisitor {
+    private static class ContainsAbstractStatementUsingLHSVisitor extends JavaASTVisitor {
         final LocationVariable lhs;
         final Services services;
 
         boolean result = false;
 
-        public ContainsAbstractStatementUsingLHSVisitor(ProgramElement root,
-                LocationVariable lhs, Services services) {
+        public ContainsAbstractStatementUsingLHSVisitor(ProgramElement root, LocationVariable lhs,
+                Services services) {
             super(root, services);
             this.services = services;
             this.lhs = lhs;
@@ -240,29 +291,24 @@ public final class DropEffectlessElementariesCondition
         protected void doDefaultAction(SourceElement node) {
             if (node instanceof AbstractPlaceholderStatement) {
                 final List<Operator> accessibles = //
-                        getAccessiblesFromAbstrPlaceholderStmt(
-                                (AbstractPlaceholderStatement) node);
+                        getAccessiblesFromAbstrPlaceholderStmt((AbstractPlaceholderStatement) node);
 
                 /*
-                 * The result should be true if (1) the lhs is contained in the
-                 * accessibles of this abstract placeholder statement OR (2) the
-                 * accessibles contain allLocs, then lhs is contained as a
-                 * default.
+                 * The result should be true if (1) the lhs is contained in the accessibles of
+                 * this abstract placeholder statement OR (2) the accessibles contain allLocs,
+                 * then lhs is contained as a default.
                  */
 
                 /*
-                 * TODO (DS, 2019-01-14): That's a hack, having problems with
-                 * renamings again...
+                 * TODO (DS, 2019-01-14): That's a hack, having problems with renamings again...
                  */
                 // if (accessibles.contains(lhs)) {
-                if (accessibles.stream()
-                        .anyMatch(op -> op instanceof LocationVariable
-                                && op.name().equals(lhs.name()))) {
+                if (accessibles.stream().anyMatch(
+                        op -> op instanceof LocationVariable && op.name().equals(lhs.name()))) {
                     result = true;
                 }
 
-                if (accessibles.contains(services.getTypeConverter()
-                        .getLocSetLDT().getAllLocs())) {
+                if (accessibles.contains(services.getTypeConverter().getLocSetLDT().getAllLocs())) {
                     result = true;
                 }
             }
@@ -277,32 +323,32 @@ public final class DropEffectlessElementariesCondition
             final TypeConverter typeConverter = services.getTypeConverter();
 
             final List<BlockContract> contracts = //
-                    AbstractExecutionContractUtils.getNoBehaviorContracts(aps,
-                            services);
+                    AbstractExecutionContractUtils.getNoBehaviorContracts(aps, services);
 
             if (contracts.isEmpty()) {
-                return Collections.singletonList(
-                        typeConverter.getLocSetLDT().getAllLocs());
+                return Collections.singletonList(typeConverter.getLocSetLDT().getAllLocs());
             }
 
             final OpCollector opColl = new OpCollector();
 
             for (BlockContract contract : contracts) {
                 /*
-                 * TODO (DS, 2019-01-14): Might not be a good idea to loop over
-                 * *all* contracts; however, it's not unsound since if we're too
-                 * broad elementaries will *not* be dropped (although they could
-                 * be), it's rather a completeness issue. Alternatively, we'd
-                 * have to find the right contract for this position.
+                 * TODO (DS, 2019-01-14): Might not be a good idea to loop over *all* contracts;
+                 * however, it's not unsound since if we're too broad elementaries will *not* be
+                 * dropped (although they could be), it's rather a completeness issue.
+                 * Alternatively, we'd have to find the right contract for this position.
                  */
-                final Term accessiblesTerm = contract.getAccessibleClause(
-                        typeConverter.getHeapLDT().getHeap());
+                final Term accessiblesTerm = contract
+                        .getAccessibleClause(typeConverter.getHeapLDT().getHeap());
                 accessiblesTerm.execPostOrder(opColl);
             }
 
-            return opColl.ops().stream().filter(op -> op.arity() == 0)
-                    .collect(Collectors.toList());
+            return opColl.ops().stream().filter(op -> op.arity() == 0).collect(Collectors.toList());
         }
+    }
 
+    @Override
+    public String toString() {
+        return "\\dropEffectlessElementaries(" + uSV + ", " + targetSV + ", " + resultSV + ")";
     }
 }
