@@ -65,7 +65,9 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     @Override
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
             Services services) {
+        final TermBuilder tb = services.getTermBuilder();
         final SVInstantiations svInst = mc.getInstantiations();
+
         final Term update = (Term) svInst.getInstantiation(uSV);
         final Term target = (Term) svInst.getInstantiation(targetSV);
         final Term previousResult = (Term) svInst.getInstantiation(resultSV);
@@ -74,7 +76,13 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
             return mc;
         }
 
-        final Optional<Term> maybeResult = dropEffectlessElementaries(update, target, services);
+        final Optional<Term> maybeResult = //
+                dropEffectlessElementaries( //
+                        update, //
+                        target, //
+                        collectLocations(target, services), //
+                        services).map( //
+                                upd -> tb.apply(upd, target, null));
 
         if (!maybeResult.isPresent()) {
             return null;
@@ -91,25 +99,17 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     }
 
     /**
-     * Returns, if possible, a simplified term <code>{update'}target</code> which is
-     * equivalent to <code>{update}target</code>. Returns {@link Optional#empty()}
-     * if simplification is not possible.
+     * Collects read locations in the target {@link Term}.
      * 
-     * @param update   The update to simplify.
-     * @param target   The target formula, for extracting locations.
+     * @param target   The {@link Term} from which to collect locations.
      * @param services The {@link Services} object.
-     * @return The simplified update application {@link Term}, or
-     *         {@link Optional#empty()}.
+     * @return The relevant locations in {@link Term}.
      */
-    private static Optional<Term> dropEffectlessElementaries(Term update, Term target,
-            Services services) {
+    private static Set<LocationVariable> collectLocations(Term target, Services services) {
         final TermProgramVariableCollector collector = services.getFactory().create(services);
         target.execPostOrder(collector);
         final Set<LocationVariable> varsInTarget = collector.result();
-        final TermBuilder tb = services.getTermBuilder();
-
-        return dropEffectlessElementariesHelper(update, target, varsInTarget, services)
-                .map(upd -> tb.apply(upd, target, null));
+        return varsInTarget;
     }
 
     /**
@@ -125,8 +125,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      * @return The simplified update application {@link Term}, or
      *         {@link Optional#empty()}.
      */
-    private static Optional<Term> dropEffectlessElementariesHelper(final Term update,
-            final Term target, final Set<LocationVariable> relevantVars, final Services services) {
+    private static Optional<Term> dropEffectlessElementaries(final Term update, final Term target,
+            final Set<LocationVariable> relevantVars, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         if (update.op() instanceof ElementaryUpdate) {
@@ -141,9 +141,9 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
              * First descend to the second sub-update to keep relevantVars in good order.
              */
             final Optional<Term> maybeNewSub1 = //
-                    dropEffectlessElementariesHelper(sub2, target, relevantVars, services);
+                    dropEffectlessElementaries(sub2, target, relevantVars, services);
             final Optional<Term> maybeNewSub0 = //
-                    dropEffectlessElementariesHelper(sub1, target, relevantVars, services);
+                    dropEffectlessElementaries(sub1, target, relevantVars, services);
 
             if (!maybeNewSub0.isPresent() && !maybeNewSub1.isPresent()) {
                 return Optional.empty();
@@ -155,7 +155,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
             final Term appliedUpdate = update.sub(0);
             final Term targetUpdate = update.sub(1);
 
-            return dropEffectlessElementariesHelper(targetUpdate, target, relevantVars, services)
+            return dropEffectlessElementaries(targetUpdate, target, relevantVars, services)
                     .map(newSub -> tb.apply(appliedUpdate, newSub, null));
         } else {
             // Unknown operator.
