@@ -113,11 +113,11 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     }
 
     /**
-     * Returns, if possible, a simplified term <code>{update'}target</code> which is
-     * equivalent to <code>{update}target</code>. Uses the locations in relevantVars
-     * to decide what to drop in the simplification step (updates not assigning
-     * relevant variables can be dropped). Returns {@link Optional#empty()} if
-     * simplification is not possible.
+     * Returns, if possible, a simplified update <code>update'</code> such that
+     * <code>{update'}target</code> is equivalent to <code>{update}target</code>.
+     * Uses the locations in relevantVars to decide what to drop in the
+     * simplification step (updates not assigning relevant variables can be
+     * dropped). Returns {@link Optional#empty()} if simplification is not possible.
      * 
      * @param update   The update to simplify.
      * @param target   The target formula, for extracting locations.
@@ -127,40 +127,80 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      */
     private static Optional<Term> dropEffectlessElementaries(final Term update, final Term target,
             final Set<LocationVariable> relevantVars, final Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-
         if (update.op() instanceof ElementaryUpdate) {
             return maybeDropElementaryUpdate(update, target, relevantVars, services);
         } else if (update.op() instanceof AbstractUpdate) {
             return maybeDropOrSimplifyAbstractUpdate(update, target, relevantVars, services);
         } else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
-            final Term sub1 = update.sub(0);
-            final Term sub2 = update.sub(1);
-
-            /*
-             * First descend to the second sub-update to keep relevantVars in good order.
-             */
-            final Optional<Term> maybeNewSub1 = //
-                    dropEffectlessElementaries(sub2, target, relevantVars, services);
-            final Optional<Term> maybeNewSub0 = //
-                    dropEffectlessElementaries(sub1, target, relevantVars, services);
-
-            if (!maybeNewSub0.isPresent() && !maybeNewSub1.isPresent()) {
-                return Optional.empty();
-            }
-
-            return Optional.of( //
-                    tb.parallel(maybeNewSub0.orElse(sub1), maybeNewSub1.orElse(sub2)));
+            return dropEffectlessElementariesInParallelUpdate( //
+                    update, target, relevantVars, services);
         } else if (update.op() == UpdateApplication.UPDATE_APPLICATION) {
-            final Term appliedUpdate = update.sub(0);
-            final Term targetUpdate = update.sub(1);
-
-            return dropEffectlessElementaries(targetUpdate, target, relevantVars, services)
-                    .map(newSub -> tb.apply(appliedUpdate, newSub, null));
+            return dropEffectlessElementariesInUpdateApplication( //
+                    update, target, relevantVars, services);
         } else {
             // Unknown operator.
             return Optional.empty();
         }
+    }
+
+    /**
+     * Returns, if possible, a simplified update <code>update'</code> such that
+     * <code>{update'}target</code> is equivalent to <code>{update}target</code>,
+     * for the case that update is an update application. Uses the locations in
+     * relevantVars to decide what to drop in the simplification step (updates not
+     * assigning relevant variables can be dropped). Returns
+     * {@link Optional#empty()} if simplification is not possible.
+     * 
+     * @param update   The update application update to simplify.
+     * @param target   The target formula, for extracting locations.
+     * @param services The {@link Services} object.
+     * @return The simplified update application {@link Term}, or
+     *         {@link Optional#empty()}.
+     */
+    private static Optional<Term> dropEffectlessElementariesInUpdateApplication(final Term update,
+            final Term target, final Set<LocationVariable> relevantVars, final Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final Term appliedUpdate = update.sub(0);
+        final Term targetUpdate = update.sub(1);
+
+        return dropEffectlessElementaries(targetUpdate, target, relevantVars, services)
+                .map(newSub -> tb.apply(appliedUpdate, newSub, null));
+    }
+
+    /**
+     * Returns, if possible, a simplified update <code>update'</code> such that
+     * <code>{update'}target</code> is equivalent to <code>{update}target</code>,
+     * for the case that update is a parallel update. Uses the locations in
+     * relevantVars to decide what to drop in the simplification step (updates not
+     * assigning relevant variables can be dropped). Returns
+     * {@link Optional#empty()} if simplification is not possible.
+     * 
+     * @param update   The parallel update to simplify.
+     * @param target   The target formula, for extracting locations.
+     * @param services The {@link Services} object.
+     * @return The simplified update application {@link Term}, or
+     *         {@link Optional#empty()}.
+     */
+    private static Optional<Term> dropEffectlessElementariesInParallelUpdate(final Term update,
+            final Term target, final Set<LocationVariable> relevantVars, final Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final Term sub1 = update.sub(0);
+        final Term sub2 = update.sub(1);
+
+        /*
+         * First descend to the second sub-update to keep relevantVars in good order.
+         */
+        final Optional<Term> maybeNewSub1 = //
+                dropEffectlessElementaries(sub2, target, relevantVars, services);
+        final Optional<Term> maybeNewSub0 = //
+                dropEffectlessElementaries(sub1, target, relevantVars, services);
+
+        if (!maybeNewSub0.isPresent() && !maybeNewSub1.isPresent()) {
+            return Optional.empty();
+        }
+
+        return Optional.of( //
+                tb.parallel(maybeNewSub0.orElse(sub1), maybeNewSub1.orElse(sub2)));
     }
 
     /**
