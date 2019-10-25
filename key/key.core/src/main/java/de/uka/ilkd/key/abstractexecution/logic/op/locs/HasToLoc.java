@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -25,7 +24,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  *
  * @author Dominic Steinhoefel
  */
-public class HasToLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
+public class HasToLoc implements AbstractUpdateAssgnLoc {
     private final AbstractUpdateAssgnLoc child;
 
     public HasToLoc(AbstractUpdateAssgnLoc child) {
@@ -37,12 +36,6 @@ public class HasToLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
 
     public AbstractUpdateAssgnLoc child() {
         return child;
-    }
-
-    @Override
-    public Term toTerm(Services services) {
-        // TODO Implement.
-        return null;
     }
 
     @Override

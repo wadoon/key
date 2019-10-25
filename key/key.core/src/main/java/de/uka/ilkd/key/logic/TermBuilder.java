@@ -986,6 +986,10 @@ public class TermBuilder {
         return tf.createTerm(abstrUpd, rhs);
     }
 
+    public Term abstractUpdate(AbstractUpdate abstrUpd, ImmutableArray<Term> rhs) {
+        return tf.createTerm(abstrUpd, rhs, null, null);
+    }
+
     public Term abstractUpdate(AbstractUpdate abstrUpd, AbstractUpdateLoc... rhs) {
         return tf.createTerm(abstrUpd, Arrays.stream(rhs).map(loc -> loc.toTerm(services))
                 .collect(Collectors.toList()).toArray(new Term[0]));
