@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -31,6 +30,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.UniqueArrayList;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
@@ -955,9 +955,9 @@ public class TermBuilder {
     }
 
     public Term abstractUpdate(AbstractPlaceholderStatement phs,
-            Set<AbstractUpdateAssgnLoc> assignables, List<AbstractUpdateLoc> accessibles) {
+            UniqueArrayList<AbstractUpdateAssgnLoc> assignables, List<AbstractUpdateLoc> accessibles) {
         final AbstractUpdate au = services.abstractUpdateFactory()
-                .getInstance(phs, assignables, accessibles, services);
+                .getInstance(phs, assignables, accessibles);
         return tf.createTerm(au, accessibles.stream().map(loc -> loc.toTerm(services))
                 .collect(Collectors.toList()).toArray(new Term[0]));
     }
@@ -999,8 +999,7 @@ public class TermBuilder {
         final String apsId = updSym.getText().substring(2);
         final AbstractPlaceholderStatement aps = new AbstractPlaceholderStatement(apsId);
         final AbstractUpdate abstrUpd = //
-                services.abstractUpdateFactory().getInstance(aps, lhs, rhs, Optional.empty(),
-                        services);
+                services.abstractUpdateFactory().getInstance(aps, lhs, rhs, Optional.empty());
 
         return abstractUpdate(abstrUpd, rhs);
     }
@@ -1024,7 +1023,7 @@ public class TermBuilder {
     public Term abstractUpdate(AbstractPlaceholderStatement phs, Term lhs,
             Term rhs, Optional<LocationVariable> runtimeInstance) {
         final AbstractUpdate au = services.abstractUpdateFactory()
-                .getInstance(phs, lhs, rhs, runtimeInstance, services);
+                .getInstance(phs, lhs, rhs, runtimeInstance);
         return tf.createTerm(au, rhs);
     }
     

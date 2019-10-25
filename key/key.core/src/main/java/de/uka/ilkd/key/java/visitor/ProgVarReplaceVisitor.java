@@ -51,7 +51,6 @@ import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
@@ -221,17 +220,17 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             Operator op = t.op();
             if (op instanceof ElementaryUpdate) {
                 ElementaryUpdate uop = (ElementaryUpdate) t.op();
-                if (replaceMap.containsKey(uop.lhs())) {
+                if (replaceMap.containsKey((LocationVariable) uop.lhs())) {
                     UpdateableOperator replacedLhs = (UpdateableOperator) replaceMap
-                            .get(uop.lhs());
+                            .get((LocationVariable) uop.lhs());
                     op = ElementaryUpdate.getInstance(replacedLhs);
                     changed = changed || uop != op;
                 }
             }
             if (op instanceof AbstractUpdate) {
                 final AbstractUpdate origOp = (AbstractUpdate) op;
-                op = services.abstractUpdateFactory().changeAssignables(origOp,
-                        replaceMap, services);
+                op = services.abstractUpdateFactory().changeAssignablePVs(origOp,
+                        replaceMap);
                 changed = changed || origOp != op;
             }
             return changed ? services.getTermFactory().createTerm(op, subTerms,

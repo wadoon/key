@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.key_project.util.collection.UniqueArrayList;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
@@ -157,11 +158,12 @@ public class AbstractUpdateTests {
 
         final AbstractUpdateFactory abstrUpdF = DUMMY_SERVICES.abstractUpdateFactory();
 
-        final Set<AbstractUpdateAssgnLoc> lhsLocs = Arrays.stream(lhs).collect(Collectors.toSet());
+        final UniqueArrayList<AbstractUpdateAssgnLoc> lhsLocs = Arrays.stream(lhs)
+                .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
         final List<AbstractUpdateLoc> rhsLocs = Arrays.stream(rhs).collect(Collectors.toList());
 
         final AbstractUpdate upd = //
-                abstrUpdF.getInstance(aps, lhsLocs, rhsLocs, DUMMY_SERVICES);
+                abstrUpdF.getInstance(aps, lhsLocs, rhsLocs);
         return tb.abstractUpdate(upd, rhs);
     }
 

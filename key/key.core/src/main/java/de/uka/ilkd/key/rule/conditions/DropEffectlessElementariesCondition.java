@@ -271,23 +271,24 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
                         .anyMatch(loc -> hasToLoc.mayAssign(loc, services)))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
-        final Set<AbstractUpdateAssgnLoc> assignablesToRetainFromAbstrUpd = abstrUpd
-                .getAllAssignables().stream().filter(assgn -> isRelevant(assgn, relevantLocations,
+        final Set<AbstractUpdateAssgnLoc> assignablesToRemoveFromAbstrUpd = abstrUpd
+                .getAllAssignables().stream().filter(assgn -> !isRelevant(assgn, relevantLocations,
                         overwrittenLocations, services))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
         Term newAbstractUpdateTerm = null;
 
-        if (assignablesToRetainFromAbstrUpd.isEmpty()) {
+        if (assignablesToRemoveFromAbstrUpd.containsAll(abstrUpd.getAllAssignables())
+                || abstrUpd.assignsNothing()) {
             /*
              * We may drop the abstract update, not assigning anything relevant or not
              * overwritten
              */
             newAbstractUpdateTerm = tb.skip();
-        } else if (!assignablesToRetainFromAbstrUpd.containsAll(abstrUpd.getAllAssignables())) {
+        } else if (!assignablesToRemoveFromAbstrUpd.isEmpty()) {
             /* We cannot drop the update, but remove some assignables */
             final AbstractUpdate newAbstrUpd = services.abstractUpdateFactory()
-                    .changeAssignables(abstrUpd, assignablesToRetainFromAbstrUpd);
+                    .removeAssignables(abstrUpd, assignablesToRemoveFromAbstrUpd);
             newAbstractUpdateTerm = tb.abstractUpdate(newAbstrUpd, update.subs());
         }
 

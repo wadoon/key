@@ -158,7 +158,7 @@ public class Services implements TermServices {
     	javainfo = new JavaInfo(new KeYProgModelInfo(this, typeconverter,
     	                                             new KeYRecoderExcHandler()), this);
     	nameRecorder = new NameRecorder();
-        this.abstractUpdateFactory = new AbstractUpdateFactory();
+        this.abstractUpdateFactory = new AbstractUpdateFactory(this);
     }
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping rec2key, 
@@ -178,7 +178,7 @@ public class Services implements TermServices {
     	javainfo = new JavaInfo
     			(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
     	nameRecorder = new NameRecorder();
-        this.abstractUpdateFactory = new AbstractUpdateFactory();
+        this.abstractUpdateFactory = new AbstractUpdateFactory(this);
     }
 
     private Services(Services s) {

@@ -28,10 +28,13 @@ public class HasToLoc implements AbstractUpdateAssgnLoc {
     private final AbstractUpdateAssgnLoc child;
 
     public HasToLoc(AbstractUpdateAssgnLoc child) {
-        assert !(child instanceof HasToLoc);
         assert !(child instanceof AllLocsLoc);
 
-        this.child = child;
+        if (child instanceof HasToLoc) {
+            this.child = ((HasToLoc) child).child;
+        } else {
+            this.child = child;
+        }
     }
 
     public AbstractUpdateAssgnLoc child() {

@@ -12,6 +12,7 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -21,6 +22,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.key_project.util.collection.UniqueArrayList;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
@@ -65,6 +68,7 @@ public class AbstractUpdateFactory {
     private final HashMap<String, //
             HashMap<Integer, AbstractUpdate>> abstractUpdateInstances = //
                     new LinkedHashMap<>();
+    private final Services services;
 
     /**
      * Constructor. NOTE: You should not use this constructor, but instead access
@@ -72,7 +76,8 @@ public class AbstractUpdateFactory {
      * {@link AbstractUpdate}s. You'll probably face incompleteness issues if you
      * don't follow this rule.
      */
-    public AbstractUpdateFactory() {
+    public AbstractUpdateFactory(final Services services) {
+        this.services = services;
     }
 
     /**
@@ -88,23 +93,22 @@ public class AbstractUpdateFactory {
      * @param runtimeInstance An optional runtime instance {@link LocationVariable}
      *                        to normalize self terms (because otherwise, there
      *                        might be different such terms around).
-     * @param services        The {@link Services} object.
      * @return The {@link AbstractUpdate} for the given
      *         {@link AbstractPlaceholderStatement} and left-hand side.
      */
     public AbstractUpdate getInstance(AbstractPlaceholderStatement phs, Term lhs, Term rhs,
-            Optional<LocationVariable> runtimeInstance, Services services) {
-        final LinkedHashSet<AbstractUpdateAssgnLoc> assignables = //
+            Optional<LocationVariable> runtimeInstance) {
+        final UniqueArrayList<AbstractUpdateAssgnLoc> assignables = //
                 abstrUpdateAssgnLocsFromTermSafe(lhs, runtimeInstance, services).stream()
                         .map(AbstractUpdateAssgnLoc.class::cast)
-                        .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+                        .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
 
         final Sort[] accessiblesSorts = //
                 abstrUpdateLocsFromTermSafe(rhs, runtimeInstance, services).stream()
                         .map(AbstractUpdateLoc.class::cast).map(loc -> loc.toTerm(services))
                         .map(Term::sort).collect(Collectors.toList()).toArray(new Sort[0]);
 
-        return getInstance(phs, assignables, accessiblesSorts, services);
+        return getInstance(phs, assignables, accessiblesSorts);
     }
 
     /**
@@ -117,17 +121,15 @@ public class AbstractUpdateFactory {
      * @param accessibles The accessible locations -- for extracting their sorts,
      *                    which determine the argument sorts for the abstract update
      *                    operator.
-     * @param services    The {@link Services} object.
      * @return The {@link AbstractUpdate} for the given
      *         {@link AbstractPlaceholderStatement} and left-hand side.
      */
     public AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
-            Set<AbstractUpdateAssgnLoc> assignables, List<AbstractUpdateLoc> accessibles,
-            Services services) {
+            UniqueArrayList<AbstractUpdateAssgnLoc> assignables,
+            List<AbstractUpdateLoc> accessibles) {
         return getInstance(
                 phs, assignables, accessibles.stream().map(loc -> loc.toTerm(services))
-                        .map(Term::sort).collect(Collectors.toList()).toArray(new Sort[0]),
-                services);
+                        .map(Term::sort).collect(Collectors.toList()).toArray(new Sort[0]));
     }
 
     /**
@@ -139,12 +141,11 @@ public class AbstractUpdateFactory {
      * @param assignables The update's left-hand side.
      * @param argSorts    argument sorts for the operator (corresponding to
      *                    right-hand side/accessibles)
-     * @param services    The {@link Services} object.
      * @return The {@link AbstractUpdate} for the given
      *         {@link AbstractPlaceholderStatement} and left-hand side.
      */
     public AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
-            Set<AbstractUpdateAssgnLoc> assignables, final Sort[] argSorts, Services services) {
+            UniqueArrayList<AbstractUpdateAssgnLoc> assignables, final Sort[] argSorts) {
         final String phsID = phs.getId();
         if (abstractUpdateInstances.get(phsID) == null) {
             abstractUpdateInstances.put(phsID, new LinkedHashMap<>());
@@ -162,27 +163,42 @@ public class AbstractUpdateFactory {
     }
 
     /**
-     * Returns a new abstract update for the same
-     * {@link AbstractPlaceholderStatement}, but with the supplied assignables.
+     * Returns a new {@link AbstractUpdate} for the same
+     * {@link AbstractPlaceholderStatement}, but with a different assignable set
+     * defined by the supplied substitutions.
      *
-     * @param abstrUpd       The original {@link AbstractUpdate}.
-     * @param newAssignables The new assignables (left-hand sides).
-     * @return A new {@link AbstractUpdate} for the same
-     *         {@link AbstractPlaceholderStatement}, but with the supplied
-     *         assignables.
+     * @param abstrUpd   The original {@link AbstractUpdate}.
+     * @param replaceMap The replacement map for assignable locations.
+     * @return A new {@link AbstractUpdate} with the left-hand side changed
+     *         according to replaceMap.
      */
-    public AbstractUpdate changeAssignables(AbstractUpdate abstrUpd,
-            Set<AbstractUpdateAssgnLoc> assignables) {
+    public AbstractUpdate changeAssignables(final AbstractUpdate abstrUpd,
+            final Map<AbstractUpdateAssgnLoc, AbstractUpdateAssgnLoc> replaceMap) {
         final String phsID = abstrUpd.getAbstractPlaceholderStatement().getId();
         if (abstractUpdateInstances.get(phsID) == null) {
             abstractUpdateInstances.put(phsID, new LinkedHashMap<>());
         }
 
-        final int assgnHashCode = assignables.hashCode();
+        // Also replace locations if they're wrapped in hasTos
+        final Map<AbstractUpdateAssgnLoc, AbstractUpdateAssgnLoc> augmentedReplaceMap = //
+                new LinkedHashMap<>(replaceMap);
+        replaceMap.entrySet().stream().forEach(entry -> {
+            if (!(entry.getKey() instanceof HasToLoc)) {
+                augmentedReplaceMap.put(new HasToLoc(entry.getKey()),
+                        new HasToLoc(entry.getValue()));
+            }
+        });
+
+        final UniqueArrayList<AbstractUpdateAssgnLoc> newAssignables = //
+                abstrUpd.getAllAssignables().stream().map(
+                        assgn -> Optional.ofNullable(augmentedReplaceMap.get(assgn)).orElse(assgn))
+                        .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
+
+        final int assgnHashCode = newAssignables.hashCode();
         AbstractUpdate result = //
                 abstractUpdateInstances.get(phsID).get(assgnHashCode);
         if (result == null) {
-            result = abstrUpd.changeAssignables(assignables);
+            result = abstrUpd.changeAssignables(newAssignables);
             abstractUpdateInstances.get(phsID).put(assgnHashCode, result);
         }
 
@@ -193,21 +209,37 @@ public class AbstractUpdateFactory {
      * Returns a new {@link AbstractUpdate} of the supplied one with the
      * {@link ProgramVariable}s in the assignables replaced according to the
      * supplied map.
-     *
-     * @param replMap  The replace map.
-     * @param services The {@link Services} object.
+     * 
+     * @param replMap The replace map.
      *
      * @return A new {@link AbstractUpdate} of this one with the
      *         {@link ProgramVariable}s in the assignables replaced according to the
      *         supplied map.
      */
-    public AbstractUpdate changeAssignables(AbstractUpdate abstrUpd,
-            Map<ProgramVariable, ProgramVariable> replMap, Services services) {
-        final Set<AbstractUpdateAssgnLoc> newAssignables = abstrUpd.getAllAssignables().stream()
-                .map(lhs -> lhs.replaceVariables(replMap, services))
-                .map(AbstractUpdateAssgnLoc.class::cast)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-        return changeAssignables(abstrUpd, newAssignables);
+    public AbstractUpdate changeAssignablePVs(AbstractUpdate abstrUpd,
+            Map<ProgramVariable, ProgramVariable> replMap) {
+        final Map<AbstractUpdateAssgnLoc, AbstractUpdateAssgnLoc> locReplMap = //
+                replMap.entrySet().stream()
+                        .collect(Collectors.toMap(e -> new PVLoc((LocationVariable) e.getKey()),
+                                e -> new PVLoc((LocationVariable) e.getValue())));
+
+        return changeAssignables(abstrUpd, locReplMap);
+    }
+
+    /**
+     * Removes the given assignables inasmuch as they're replaced by the
+     * <code>empty</code> LocSet constant.
+     * 
+     * @param abstrUpd     The {@link AbstractUpdate} from which to remove the given
+     *                     assignable locations.
+     * @param locsToRemove Locations to remove.
+     * @return The changed {@link AbstractUpdate}.
+     */
+    public AbstractUpdate removeAssignables(final AbstractUpdate abstrUpd,
+            final Collection<AbstractUpdateAssgnLoc> locsToRemove) {
+        return changeAssignables(abstrUpd, locsToRemove.stream().collect(Collectors.toMap(
+                loc -> loc,
+                loc -> new EmptyLoc(services.getTypeConverter().getLocSetLDT().getEmpty()))));
     }
 
     /**
