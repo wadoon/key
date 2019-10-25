@@ -3905,8 +3905,6 @@ varexp[TacletBuilder b]
     | varcond_initializeParametricSkolemPathCondition[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_applyOnAbstractUpdate[b]
-    | varcond_dropEffectlessAbstractUpdateAssignments[b]
-    | varcond_dropEffectlessAbstractUpdate[b]
     | varcond_instantiateVarsFresh[b]
     | varcond_newPV[b]
     | varcond_initializeExpression[b]
@@ -4155,26 +4153,6 @@ varcond_applyOnAbstractUpdate[TacletBuilder b]
       b.addVariableCondition(new ApplyOnAbstractUpdateCondition((UpdateSV)u1, 
                                                                 (UpdateSV)u2, 
                                                                 (UpdateSV)result));
-   }
-;
-
-varcond_dropEffectlessAbstractUpdateAssignments[TacletBuilder b]
-:
-   DROP_EFFECTLESS_ABSTRACT_UPDATE_ASSIGNMENTS LPAREN u=varId COMMA target=varId COMMA result=varId RPAREN 
-   {
-      b.addVariableCondition(new DropEffectlessAbstractUpdateElementariesCondition((UpdateSV)u, 
-                                                             (SchemaVariable)target, 
-                                                             (SchemaVariable)result));
-   }
-;
-
-varcond_dropEffectlessAbstractUpdate[TacletBuilder b]
-:
-   DROP_EFFECTLESS_ABSTRACT_UPDATE LPAREN u=varId COMMA target=varId COMMA result=varId RPAREN 
-   {
-      b.addVariableCondition(new DropEffectlessAbstractUpdateCondition((UpdateSV)u, 
-                                                             (SchemaVariable)target, 
-                                                             (SchemaVariable)result));
    }
 ;
 
