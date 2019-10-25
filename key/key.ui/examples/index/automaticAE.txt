@@ -127,6 +127,17 @@ keySettings = "#Proof-Settings-Config-File
 [Strategy]ActiveStrategy=JavaCardDLStrategy
 "
 
+group abstract_updates {
+  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest1.key
+  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest2.key
+  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest3-INCORR.key
+  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest4.key
+  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest5-INCORR.key
+  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest6.key
+  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest7.key
+  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest8-INCORR.key 
+}
+
 # Examples used in the Abstract Execution paper submitted to FM 2019
 group aepaper_provable {
    provable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.key
