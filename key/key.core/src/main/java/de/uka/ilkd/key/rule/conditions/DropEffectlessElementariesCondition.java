@@ -22,6 +22,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.java.Services;
@@ -272,8 +273,9 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
         final Set<AbstractUpdateAssgnLoc> assignablesToRemoveFromAbstrUpd = abstrUpd
-                .getAllAssignables().stream().filter(assgn -> !isRelevant(assgn, relevantLocations,
-                        overwrittenLocations, services))
+                .getAllAssignables().stream().filter(assgn -> !(assgn instanceof EmptyLoc))
+                .filter(assgn -> !isRelevant(assgn, relevantLocations, overwrittenLocations,
+                        services))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
         Term newAbstractUpdateTerm = null;

@@ -14,7 +14,6 @@ package de.uka.ilkd.key.abstractexecution.logic.op;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -46,6 +45,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -65,9 +65,21 @@ import de.uka.ilkd.key.util.MiscTools;
  * @author Dominic Steinhoefel
  */
 public class AbstractUpdateFactory {
-    private final HashMap<String, //
-            HashMap<Integer, AbstractUpdate>> abstractUpdateInstances = //
-                    new LinkedHashMap<>();
+    /**
+     * Map from abstract program element (APE) identifiers to maps from hash codes
+     * of assignables to abstract updates. Idea: Give me an APE name and the
+     * left-hand side, I'll give you the {@link AbstractUpdate} operator if it has
+     * been created already.
+     */
+    private final Map<String, Map<Integer, AbstractUpdate>> abstractUpdateInstances = new LinkedHashMap<>();
+
+    /**
+     * Map from abstract update names to maps from place numbers in abstract updates
+     * to functions representing the effect of the abstract update on the location
+     * (has to be a program variable, other things don't make sense) at that place.
+     */
+    private final Map<String, Map<Integer, Function>> abstrUpdCharacteristicFuncInsts = new LinkedHashMap<>();
+
     private final Services services;
 
     /**
@@ -127,9 +139,8 @@ public class AbstractUpdateFactory {
     public AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
             UniqueArrayList<AbstractUpdateAssgnLoc> assignables,
             List<AbstractUpdateLoc> accessibles) {
-        return getInstance(
-                phs, assignables, accessibles.stream().map(loc -> loc.toTerm(services))
-                        .map(Term::sort).collect(Collectors.toList()).toArray(new Sort[0]));
+        return getInstance(phs, assignables, accessibles.stream().map(loc -> loc.toTerm(services))
+                .map(Term::sort).collect(Collectors.toList()).toArray(new Sort[0]));
     }
 
     /**
@@ -157,6 +168,48 @@ public class AbstractUpdateFactory {
         if (result == null) {
             result = new AbstractUpdate(phs, assignables, argSorts, services);
             abstractUpdateInstances.get(phsID).put(assgnHashCode, result);
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns the characteristic function for the position-th position in abstrUpd.
+     * Assumes the assignable operator at that position in the update to be a
+     * {@link PVLoc}, otherwise will fail.
+     *
+     * @param abstrUpd The {@link AbstractUpdate} for which to create the
+     *                 characteristic function.
+     * @param position The position for which to create the function.
+     * @return The created (or cached) function.
+     */
+    public Function getCharacteristicFunctionForPosition(AbstractUpdate abstrUpd, int position) {
+        final String abstractUpdName = abstrUpd.getUpdateName();
+        if (abstrUpdCharacteristicFuncInsts.get(abstractUpdName) == null) {
+            abstrUpdCharacteristicFuncInsts.put(abstractUpdName, new LinkedHashMap<>());
+        }
+
+        Function result = //
+                abstrUpdCharacteristicFuncInsts.get(abstractUpdName).get(position);
+        if (result == null) {
+            final String funName = services.getTermBuilder()
+                    .newName(abstractUpdName + "_" + position);
+
+            final AbstractUpdateAssgnLoc relevantAssignable = //
+                    abstrUpd.getAllAssignables().get(position);
+
+            assert relevantAssignable instanceof PVLoc || (relevantAssignable instanceof HasToLoc
+                    && ((HasToLoc) relevantAssignable).child() instanceof PVLoc) : //
+            "Characteristic abstract update functions only make sense for program variables!";
+
+            final LocationVariable relAssgnVar = (relevantAssignable instanceof HasToLoc
+                    ? (PVLoc) ((HasToLoc) relevantAssignable).child()
+                    : (PVLoc) relevantAssignable).getVar();
+
+            result = new Function(new Name(funName), relAssgnVar.sort(), true, true,
+                    abstrUpd.argSorts().toArray(new Sort[0]));
+
+            abstrUpdCharacteristicFuncInsts.get(abstractUpdName).put(position, result);
         }
 
         return result;
