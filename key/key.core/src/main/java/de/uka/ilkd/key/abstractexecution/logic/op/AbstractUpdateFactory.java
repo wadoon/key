@@ -198,7 +198,7 @@ public class AbstractUpdateFactory {
                 abstrUpdCharacteristicFuncInsts.get(abstractUpdName).get(position);
         if (result == null) {
             final String funName = services.getTermBuilder()
-                    .newName(abstractUpdName + "_" + position);
+                    .newName("f_" + abstractUpdName + "_" + position);
 
             final AbstractUpdateAssgnLoc relevantAssignable = //
                     abstrUpd.getAllAssignables().get(position);
