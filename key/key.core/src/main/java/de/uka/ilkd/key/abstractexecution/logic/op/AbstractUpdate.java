@@ -208,21 +208,6 @@ public final class AbstractUpdate extends AbstractSortedOperator {
                 .anyMatch(assignable -> assignable.mayAssign(loc, services));
     }
 
-    // TODO (DS, 2019-10-23): Do we need that method? The other hasToAssign seems
-    // much more sensible... But maybe there's a problem since the type hierarchies
-    // are distinct?!?
-    /**
-     * True if the given {@link AbstractUpdate} has to assign the given location.
-     *
-     * @param loc
-     * @return
-     */
-    public boolean hasToAssign(AbstractUpdateAssgnLoc loc) {
-        return loc instanceof HasToLoc //
-                ? getHasToAssignables().contains(((HasToLoc) loc).child())
-                : getHasToAssignables().contains(loc);
-    }
-
     /**
      * @return True iff this {@link AbstractUpdate} assigns no location at all.
      */
