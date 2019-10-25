@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramLocationsCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 /**
@@ -57,12 +58,15 @@ public class TermAccessibleLocationsCollector extends DefaultVisitor {
             result.add(new PVLoc((LocationVariable) t.op()));
         }
 
-        if (t.op() instanceof AbstractUpdate) {
-            for (int i = 0; i < t.arity(); i++) {
-                result.addAll( //
-                        AbstractUpdateFactory.abstrUpdateLocsFromTermSafe( //
-                                t.sub(i), Optional.empty(), services));
-            }
+        final java.util.function.Function<Term, Set<AbstractUpdateLoc>> subToLoc = //
+                sub -> AbstractUpdateFactory.abstrUpdateLocsFromTermSafe( //
+                        sub, Optional.empty(), services);
+
+        if (t.op() instanceof Function
+                && services.abstractUpdateFactory().isAbstractPathCondition((Function) t.op())) {
+            t.subs().stream().map(subToLoc).forEach(result::addAll);
+        } else if (t.op() instanceof AbstractUpdate) {
+            t.subs().stream().map(subToLoc).forEach(result::addAll);
         }
 
         if (!t.javaBlock().isEmpty()) {

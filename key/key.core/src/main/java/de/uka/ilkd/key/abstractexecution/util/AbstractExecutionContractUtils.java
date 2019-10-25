@@ -276,8 +276,8 @@ public class AbstractExecutionContractUtils {
 
         if (contracts.isEmpty()) {
             accessibleClause = Collections.singletonList(new AllLocsLoc(locSetLDT.getAllLocs()));
-            assignableClause = new UniqueArrayList<AbstractUpdateAssgnLoc>(
-                    Collections.singletonList(new AllLocsLoc(locSetLDT.getAllLocs())));
+            assignableClause = new UniqueArrayList<AbstractUpdateAssgnLoc>();
+            assignableClause.add(new AllLocsLoc(locSetLDT.getAllLocs()));
         } else {
             final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
 

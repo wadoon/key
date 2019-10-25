@@ -30,13 +30,6 @@ public class UniqueArrayList<E> extends ArrayList<E> {
         super();
     }
 
-    /**
-     * See {@link ArrayList#ArrayList(Collection)}
-     */
-    public UniqueArrayList(Collection<? extends E> c) {
-        super(c);
-    }
-
     @Override
     public boolean add(E e) {
         if (!contains(e)) {

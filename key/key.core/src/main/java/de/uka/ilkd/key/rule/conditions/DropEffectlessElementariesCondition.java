@@ -29,12 +29,14 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.TermAccessibleLocationsCollector;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -86,6 +88,15 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
         if (update == null || target == null) {
             return mc;
+        }
+
+        /*
+         * Not applicable for location set symbols. We don't know what they represent,
+         * at least not without further information.
+         */
+        final Sort locSetSort = services.getTypeConverter().getLocSetLDT().targetSort();
+        if (target.op() instanceof Function && target.arity() == 0 && target.sort() == locSetSort) {
+            return null;
         }
 
         final Optional<Term> maybeResult = //
@@ -257,8 +268,6 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
          * 
          * - All locations that *have to* be assigned by an abstract update are no
          *   longer relevant (and also registered as overwritten).
-         * - All assignable locations of an abstract update that are not relevant 
-         *   can be removed, leading to a simplified abstract update. 
          * - An abstract update not assigning relevant locations can be dropped.
          */
         //@formatter:on
@@ -287,11 +296,6 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
              * overwritten
              */
             newAbstractUpdateTerm = tb.skip();
-        } else if (!assignablesToRemoveFromAbstrUpd.isEmpty()) {
-            /* We cannot drop the update, but remove some assignables */
-            final AbstractUpdate newAbstrUpd = services.abstractUpdateFactory()
-                    .removeAssignables(abstrUpd, assignablesToRemoveFromAbstrUpd);
-            newAbstractUpdateTerm = tb.abstractUpdate(newAbstrUpd, update.subs());
         }
 
         relevantLocations.removeAll(newIrrelevantLocations);

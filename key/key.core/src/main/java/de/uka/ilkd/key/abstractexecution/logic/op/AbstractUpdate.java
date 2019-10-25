@@ -225,6 +225,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @return True iff this {@link AbstractUpdate} assigns no location at all.
      */
     public boolean assignsNothing() {
+        // Second case should not happen.
         return assignables.isEmpty() || assignables.stream().allMatch(EmptyLoc.class::isInstance);
     }
 }

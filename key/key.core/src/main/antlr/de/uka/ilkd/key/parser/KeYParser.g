@@ -2159,10 +2159,15 @@ location_ident returns [int kind = NORMAL_NONRIGID]
 func_decl
 @init{
     boolean unique = false;
+    boolean rigid = true;
 }
     :
         (
             UNIQUE {unique=true;}
+        )?
+        
+        (
+            NONRIGID {rigid=false;}
         )?
         
         retSort = any_sortId_check[!skip_functions]
@@ -2207,7 +2212,9 @@ func_decl
 	                             retSort, 
 	                             argSorts,
 	                             whereToBind,
-	                             unique);                    
+	                             unique,
+	                             rigid,
+	                             false /* isSkolemConstant */);                    
 	        }
 		if (lookup(f.name()) != null) {
 		    if(!isProblemParser()) {

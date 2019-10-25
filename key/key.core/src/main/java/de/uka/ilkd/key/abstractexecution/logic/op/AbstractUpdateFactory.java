@@ -12,7 +12,6 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -72,6 +71,12 @@ public class AbstractUpdateFactory {
      * been created already.
      */
     private final Map<String, Map<Integer, AbstractUpdate>> abstractUpdateInstances = new LinkedHashMap<>();
+
+    /**
+     * Map from abstract program element (APE) identifiers to function symbols for
+     * corresponding abstract path conditions.
+     */
+    private final Map<String, Function> abstractPathConditionInstances = new LinkedHashMap<>();
 
     /**
      * Map from abstract update names to maps from place numbers in abstract updates
@@ -216,6 +221,45 @@ public class AbstractUpdateFactory {
     }
 
     /**
+     * Returns abstract path condition operator for the passed
+     * {@link AbstractPlaceholderStatement} and argument sorts.
+     *
+     * @param phs      The {@link AbstractPlaceholderStatement} for which this
+     *                 abstract path condition operator should be created.
+     * @param argSorts argument sorts for the operator (corresponding to right-hand
+     *                 side/accessibles)
+     * @return The abstract path condition operator for the passed
+     *         {@link AbstractPlaceholderStatement} and argument sorts.
+     */
+    public Function getAbstractPathConditionInstance(AbstractPlaceholderStatement phs,
+            final Sort[] argSorts) {
+        final String phsID = phs.getId();
+        Function result = abstractPathConditionInstances.get(phsID);
+
+        if (result == null) {
+            final String funName = services.getTermBuilder().newName("C_" + phsID);
+            result = new Function(new Name(funName), Sort.FORMULA, argSorts);
+
+            abstractPathConditionInstances.put(phsID, result);
+        }
+
+        return result;
+    }
+
+    /**
+     * Checks whether the given function symbol is an abstract path condition.
+     * Abstract path conditions are those created via
+     * {@link #getAbstractPathConditionInstance(AbstractPlaceholderStatement, Sort[])},
+     * other symbols won't be recognized.
+     * 
+     * @param f The {@link Function} symbol to check.
+     * @return true iff this function symbol is an abstract path condition.
+     */
+    public boolean isAbstractPathCondition(Function f) {
+        return abstractPathConditionInstances.containsValue(f);
+    }
+
+    /**
      * Returns a new {@link AbstractUpdate} for the same
      * {@link AbstractPlaceholderStatement}, but with a different assignable set
      * defined by the supplied substitutions.
@@ -277,22 +321,6 @@ public class AbstractUpdateFactory {
                                 e -> new PVLoc((LocationVariable) e.getValue())));
 
         return changeAssignables(abstrUpd, locReplMap);
-    }
-
-    /**
-     * Removes the given assignables inasmuch as they're replaced by the
-     * <code>empty</code> LocSet constant.
-     * 
-     * @param abstrUpd     The {@link AbstractUpdate} from which to remove the given
-     *                     assignable locations.
-     * @param locsToRemove Locations to remove.
-     * @return The changed {@link AbstractUpdate}.
-     */
-    public AbstractUpdate removeAssignables(final AbstractUpdate abstrUpd,
-            final Collection<AbstractUpdateAssgnLoc> locsToRemove) {
-        return changeAssignables(abstrUpd, locsToRemove.stream().collect(Collectors.toMap(
-                loc -> loc,
-                loc -> new EmptyLoc(services.getTypeConverter().getLocSetLDT().getEmpty()))));
     }
 
     /**

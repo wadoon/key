@@ -351,6 +351,7 @@ lexer grammar KeYLexer;
 	FUNCTIONS : '\\functions';
 	TRANSFORMERS : '\\transformers';
 	UNIQUE : '\\unique';
+	NONRIGID : '\\nonRigid';
 
 	RULES : '\\rules';
 	AXIOMS : '\\axioms';

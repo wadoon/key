@@ -21,8 +21,6 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -78,25 +76,30 @@ public class InitializeParametricSkolemPathCondition implements VariableConditio
 
         final TermBuilder tb = services.getTermBuilder();
 
+        //@formatter:off
         /*
          * NOTE (DS, 2019-01-31): We reuse the function symbols because otherwise, there
          * will be different ones around which can, and will, lead to problems, since
          * they should represent the same thing. It will however be problematic if
          * someone decides to introduce such a function symbol elsewhere...
          */
-        final String pathCondName = //
-                pathCondSV.name().toString() + "_" + abstrStmt.getId();
+//        final String pathCondName = //
+//                pathCondSV.name().toString() + "_" + abstrStmt.getId();
+//
+//        final Name funcSymbName = new Name(pathCondName);
+//        final Namespace<Function> functions = //
+//                services.getNamespaces().functions();
+//
+//        Function funcSymb = functions.lookup(funcSymbName);
+//        if (funcSymb == null) {
+//            funcSymb = new Function(//
+//                    funcSymbName, Sort.FORMULA, true, true, accessiblesSorts);
+//            functions.add(funcSymb);
+//        }
+        //@formatter:on
 
-        final Name funcSymbName = new Name(pathCondName);
-        final Namespace<Function> functions = //
-                services.getNamespaces().functions();
-
-        Function funcSymb = functions.lookup(funcSymbName);
-        if (funcSymb == null) {
-            funcSymb = new Function(//
-                    funcSymbName, Sort.FORMULA, true, true, accessiblesSorts);
-            functions.add(funcSymb);
-        }
+        final Function funcSymb = services.abstractUpdateFactory()
+                .getAbstractPathConditionInstance(abstrStmt, accessiblesSorts);
 
         final Term pathCond = tb.func(funcSymb, accessibles.toArray(new Term[0]));
 
