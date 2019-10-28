@@ -14,8 +14,16 @@
 package org.key_project.util.collection;
 
 import java.lang.reflect.Array;
-import java.util.*;
-import java.util.function.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 
 /**
@@ -49,7 +57,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     }
 
     public static <T> ImmutableSLList<T> singleton(T obj) {
-		return new Cons(obj, nil());
+		return new Cons<T>(obj, nil());
     }
 
     /**

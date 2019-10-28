@@ -2608,7 +2608,7 @@ abstract_elementary_update_term returns[Term _elementary_update_term=null; Term 
 @after { _elementary_update_term = result; }
 :
         (u = ABSTR_UPD) LPAREN (assgn = locset_term) ASSIGN (access = locset_term) RPAREN
-        { result = getServices().getTermBuilder().abstractUpdate(u, assgn, access); }
+        { result = getServices().getTermBuilder().abstractUpdate(u.getText().substring(2), assgn, access); }
         
    ;
         catch [TermCreationException ex] {

@@ -24,7 +24,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.antlr.runtime.Token;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -945,20 +944,44 @@ public class TermBuilder {
     }
 
     // -------------------------------------------------------------------------
-    // updates
+    // abstract updates
     // -------------------------------------------------------------------------
 
-    public Term elementary(UpdateableOperator lhs, Term rhs) {
-        ElementaryUpdate eu = ElementaryUpdate.getInstance(lhs);
-        return tf.createTerm(eu, rhs);
-    }
-
+    /**
+     * Creates a new {@link AbstractUpdate} for the given locations. The right-hand
+     * sides are wrapped inside a "value(...)" application to convert LocSets to the
+     * corresponding values.
+     * 
+     * @param phs         The {@link AbstractPlaceholderStatement} for which to
+     *                    create the {@link AbstractUpdate}.
+     * @param assignables The assignable locations (the "frame").
+     * @param accessibles The accessible locations (the "footprint").
+     * @return The {@link AbstractUpdate} created <em>fresh for</em> phs.
+     */
     public Term abstractUpdate(AbstractPlaceholderStatement phs,
             UniqueArrayList<AbstractUpdateLoc> assignables, List<AbstractUpdateLoc> accessibles) {
         final AbstractUpdate au = services.abstractUpdateFactory()
                 .getInstance(phs, assignables, accessibles);
         return tf.createTerm(au, accessibles.stream().map(loc -> loc.toTerm(services))
-                .collect(Collectors.toList()).toArray(new Term[0]));
+                .map(this::wrapInValue).collect(Collectors.toList()).toArray(new Term[0]));
+    }
+    
+    /**
+     * Wraps t in a "value(...)" application if it is not already wrapped. Note that
+     * argument of "value" has to be of LocSet type.
+     * 
+     * @param t The {@link Term} to wrap.
+     * @return The wrapped {@link Term}.
+     */
+    private Term wrapInValue(Term t) {
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        final Function valueFun = locSetLDT.getValue();
+        if (t.op() != valueFun) {
+            assert t.sort() == locSetLDT.targetSort();
+            return value(t);
+        } else {
+            return t;
+        }
     }
 
     /**
@@ -980,22 +1003,59 @@ public class TermBuilder {
 
         return abstractUpdate(abstrUpd, accessibles);
     }
-
-    public Term abstractUpdate(AbstractUpdate abstrUpd, Term[] rhs) {
-        return tf.createTerm(abstrUpd, rhs);
-    }
-
-    public Term abstractUpdate(AbstractUpdate abstrUpd, ImmutableArray<Term> rhs) {
-        return tf.createTerm(abstrUpd, rhs, null, null);
-    }
-
-    public Term abstractUpdate(AbstractUpdate abstrUpd, AbstractUpdateLoc... rhs) {
-        return tf.createTerm(abstrUpd, Arrays.stream(rhs).map(loc -> loc.toTerm(services))
-                .collect(Collectors.toList()).toArray(new Term[0]));
+    
+    /**
+     * Creates an AbstractUpdate term for the given {@link AbstractUpdate} operator
+     * and right-hand sides. The right-hand sides are wrapped inside a "value(...)"
+     * application to convert LocSets to the corresponding values.
+     * 
+     * @param abstrUpd    The {@link AbstractUpdate} operator.
+     * @param accessibles The accessible locations (the "footprint").
+     * @return The {@link AbstractUpdate} created <em>fresh for</em> phs.
+     */
+    public Term abstractUpdate(AbstractUpdate abstrUpd, Term[] accessibles) {
+        return abstractUpdate(abstrUpd, new ImmutableArray<>(accessibles));
     }
     
-    public Term abstractUpdate(Token updSym, Term lhs, Term rhs) {
-        final String apsId = updSym.getText().substring(2);
+    /**
+     * Creates an AbstractUpdate term for the given {@link AbstractUpdate} operator
+     * and right-hand sides. The right-hand sides are wrapped inside a "value(...)"
+     * application to convert LocSets to the corresponding values.
+     * 
+     * @param abstrUpd    The {@link AbstractUpdate} operator.
+     * @param accessibles The accessible locations (the "footprint").
+     * @return The {@link AbstractUpdate} created <em>fresh for</em> phs.
+     */
+    public Term abstractUpdate(AbstractUpdate abstrUpd, ImmutableArray<Term> accessibles) {
+        return tf.createTerm(abstrUpd, accessibles.stream().map(this::wrapInValue)
+                .collect(ImmutableArray.toImmutableArray()), null, null);
+    }
+    
+    /**
+     * Creates an AbstractUpdate term for the given {@link AbstractUpdate} operator
+     * and right-hand sides. The right-hand sides are wrapped inside a "value(...)"
+     * application to convert LocSets to the corresponding values.
+     * 
+     * @param abstrUpd    The {@link AbstractUpdate} operator.
+     * @param accessibles The accessible locations (the "footprint").
+     * @return The {@link AbstractUpdate} created <em>fresh for</em> phs.
+     */
+    public Term abstractUpdate(AbstractUpdate abstrUpd, AbstractUpdateLoc... rhs) {
+        return tf.createTerm(abstrUpd, Arrays.stream(rhs).map(loc -> loc.toTerm(services))
+                .map(this::wrapInValue).collect(Collectors.toList()).toArray(new Term[0]));
+    }
+    
+    /**
+     * Creates an {@link AbstractUpdate} {@link Term} for the given APS identifier,
+     * frame (lhs) and footprint (rhs). The right-hand sides are wrapped inside a
+     * "value(...)" application to convert LocSets to the corresponding values.
+     * 
+     * @param apsId The APS identifier.
+     * @param lhs   The frame.
+     * @param rhs   The footprint.
+     * @return The {@link AbstractUpdate} {@link Term}.
+     */
+    public Term abstractUpdate(String apsId, Term lhs, Term rhs) {
         final AbstractPlaceholderStatement aps = new AbstractPlaceholderStatement(apsId);
         final AbstractUpdate abstrUpd = //
                 services.abstractUpdateFactory().getInstance(aps, lhs, rhs, Optional.empty());
@@ -1024,6 +1084,35 @@ public class TermBuilder {
         final AbstractUpdate au = services.abstractUpdateFactory()
                 .getInstance(phs, lhs, rhs, runtimeInstance);
         return tf.createTerm(au, rhs);
+    }
+
+    // -------------------------------------------------------------------------
+    // (concrete) updates
+    // -------------------------------------------------------------------------
+
+    @Deprecated
+    public Term concatenated(Term... updates) {
+        Term result = skip();
+        for (int i = 0; i < updates.length; i++) {
+            result = concatenated(result, updates[i]);
+        }
+        return result;
+    }
+
+    @Deprecated
+    public Term concatenated(Iterable<Term> updates) {
+        return concatenated(StreamSupport.stream(updates.spliterator(), false)
+                .collect(Collectors.toList()).toArray(new Term[0]));
+    }
+
+    @Deprecated
+    public Term concatenated(ImmutableList<Term> updates) {
+        return concatenated(updates.toArray(new Term[updates.size()]));
+    }
+
+    public Term elementary(UpdateableOperator lhs, Term rhs) {
+        ElementaryUpdate eu = ElementaryUpdate.getInstance(lhs);
+        return tf.createTerm(eu, rhs);
     }
     
     public Term elementary(Term lhs, Term rhs) {
@@ -1121,23 +1210,7 @@ public class TermBuilder {
 
         return tf.createTerm(UpdateJunctor.CONCATENATED_UPDATE, u1, u2);
     }
-
-    public Term concatenated(Term... updates) {
-        Term result = skip();
-        for (int i = 0; i < updates.length; i++) {
-            result = concatenated(result, updates[i]);
-        }
-        return result;
-    }
-
-    public Term concatenated(Iterable<Term> updates) {
-        return concatenated(StreamSupport.stream(updates.spliterator(), false)
-                .collect(Collectors.toList()).toArray(new Term[0]));
-    }
-
-    public Term concatenated(ImmutableList<Term> updates) {
-        return concatenated(updates.toArray(new Term[updates.size()]));
-    }
+    
     public Term sequential(Term u1, Term u2) {
         return parallel(u1, apply(u1, u2, null));
     }
