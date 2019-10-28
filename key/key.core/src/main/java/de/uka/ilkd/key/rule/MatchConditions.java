@@ -44,6 +44,7 @@ public class MatchConditions {
      * contracts, then this can be removed again (DS, 2019-01-30).
      */
     private final Optional<SequentFormula> maybeSeqFor;
+    
     public MatchConditions() {
         this.instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         this.renameTable = RenameTable.EMPTY_TABLE;

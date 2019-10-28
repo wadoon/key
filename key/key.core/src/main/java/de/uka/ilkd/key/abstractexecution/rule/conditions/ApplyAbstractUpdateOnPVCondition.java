@@ -34,9 +34,11 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
  * Variable condition for an abstract update on a program variable in certain
- * situations. Schematically:
- * <code>{U_P(empty, y!:=x, w)}y --> f_P_2(x, w)</code>, where f_P_2 is a fresh
- * symbol generated for the 2nd position in update U_P.
+ * situations. Schematically: <code>{U_P(x, y!:=x, w)}y --> f_P_2(x, w)</code>,
+ * where f_P_2 is a fresh symbol generated for the 2nd position in update U_P.
+ * 
+ * Only works for {@link PVLoc}s, i.e., y above really has to be a location
+ * variable and may not, e.g., be an abstract Skolem location term.
  *
  * @author Dominic Steinhoefel
  */
@@ -79,8 +81,8 @@ public final class ApplyAbstractUpdateOnPVCondition implements VariableCondition
 
         for (int i = 0; i < allAssignables.size(); i++) {
             final AbstractUpdateLoc assignable = allAssignables.get(i);
-            if (assignable instanceof HasToLoc
-                    && assignable.mayAssign(new PVLoc(locVar), services)) {
+            if (assignable instanceof HasToLoc && ((HasToLoc) assignable).child() instanceof PVLoc
+                    && ((PVLoc) ((HasToLoc) assignable).child()).getVar().equals(locVar)) {
                 final Term replacement = tb.func(
                         abstractUpdateFactory.getCharacteristicFunctionForPosition(abstrUpd, i),
                         updateTerm.subs().toArray(new Term[0]));

@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -104,7 +105,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
                         target, //
                         collectLocations(target, services), //
                         new LinkedHashSet<>(), //
-                        services//
+                        services //
                 ).map( //
                         upd -> tb.apply(upd, target, null));
 
@@ -227,19 +228,19 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
         /*
          * First descend to the second sub-update to keep relevantVars in good order.
          */
-        final Optional<Term> maybeNewSub1 = //
+        final Optional<Term> maybeNewSub2 = //
                 dropEffectlessElementaries(sub2, target, relevantLocations, overwrittenLocations,
                         services);
-        final Optional<Term> maybeNewSub0 = //
+        final Optional<Term> maybeNewSub1 = //
                 dropEffectlessElementaries(sub1, target, relevantLocations, overwrittenLocations,
                         services);
 
-        if (!maybeNewSub0.isPresent() && !maybeNewSub1.isPresent()) {
+        if (!maybeNewSub1.isPresent() && !maybeNewSub2.isPresent()) {
             return Optional.empty();
         }
 
         return Optional.of( //
-                tb.parallel(maybeNewSub0.orElse(sub1), maybeNewSub1.orElse(sub2)));
+                tb.parallel(maybeNewSub1.orElse(sub1), maybeNewSub2.orElse(sub2)));
     }
 
     /**
@@ -259,7 +260,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      */
     private static Optional<Term> maybeDropAbstractUpdate(final Term update, final Term target,
             final Set<AbstractUpdateLoc> relevantLocations,
-            Set<AbstractUpdateLoc> overwrittenLocations, final Services services) {
+            final Set<AbstractUpdateLoc> overwrittenLocations, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
 
@@ -282,8 +283,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
                         .anyMatch(loc -> hasToLoc.mayAssign(loc, services)))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
-        final Set<AbstractUpdateLoc> assignablesToRemoveFromAbstrUpd = abstrUpd
-                .getAllAssignables().stream().filter(assgn -> !(assgn instanceof EmptyLoc))
+        final Set<AbstractUpdateLoc> assignablesToRemoveFromAbstrUpd = abstrUpd.getAllAssignables()
+                .stream().filter(assgn -> !(assgn instanceof EmptyLoc))
                 .filter(assgn -> !isRelevant(assgn, relevantLocations, overwrittenLocations,
                         services))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
@@ -325,6 +326,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
         final TermBuilder tb = services.getTermBuilder();
         final ElementaryUpdate eu = (ElementaryUpdate) update.op();
         final LocationVariable lhs = (LocationVariable) eu.lhs();
+
         if (isRelevant(lhs, relevantLocations, overwrittenLocations, services)) {
 
             removeFromLocationSet(lhs, relevantLocations); // SIDE EFFECT!
@@ -386,10 +388,34 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
          * disjointness of loc from the relevant locations.
          */
 
-        return !overwrittenLocations.contains(loc) && (relevantLocations.stream()
-                .anyMatch(AllLocsLoc.class::isInstance)
-                || relevantLocations.stream().anyMatch(SkolemLoc.class::isInstance)
-                || relevantLocations.stream().anyMatch(relLoc -> loc.mayAssign(relLoc, services)));
+        if (overwrittenLocations.contains(loc)) {
+            return false;
+        }
+
+        if (relevantLocations.stream().anyMatch(AllLocsLoc.class::isInstance)) {
+            return true;
+        }
+
+        final List<SkolemLoc> skolemLocs = relevantLocations.stream()
+                .filter(SkolemLoc.class::isInstance).map(SkolemLoc.class::cast)
+                .collect(Collectors.toList());
+
+        boolean disjointWithSkolemTerms = true;
+        if (!skolemLocs.isEmpty()) {
+            //@formatter:off
+//            for (final SkolemLoc skLoc : skolemLocs) {
+//                final TermBuilder tb = services.getTermBuilder();
+//                final Term disjointness1 = tb.equals( //
+//                        tb.intersect(loc.toTerm(services), skLoc.toTerm(services)), tb.empty());
+//                final Term disjointness2 = tb.equals( //
+//                        tb.intersect(skLoc.toTerm(services), loc.toTerm(services)), tb.empty());
+//            }
+            //@formatter:on
+            disjointWithSkolemTerms = false;
+        }
+
+        return !disjointWithSkolemTerms
+                || relevantLocations.stream().anyMatch(relLoc -> loc.mayAssign(relLoc, services));
     }
 
     /**
