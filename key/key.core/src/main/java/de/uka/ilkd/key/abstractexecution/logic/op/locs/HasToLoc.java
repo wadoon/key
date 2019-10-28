@@ -12,12 +12,10 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
-import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * A has-to location for use in an abstract update.
@@ -39,12 +37,6 @@ public class HasToLoc implements AbstractUpdateAssgnLoc {
 
     public AbstractUpdateAssgnLoc child() {
         return child;
-    }
-
-    @Override
-    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
-            Services services) {
-        return new HasToLoc((AbstractUpdateAssgnLoc) child.replaceVariables(replMap, services));
     }
 
     @Override

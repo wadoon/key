@@ -12,11 +12,9 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs.heap;
 
-import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
@@ -24,7 +22,6 @@ import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * An array location for use in an {@link AbstractUpdate} left-hand side.
@@ -58,12 +55,6 @@ public class ArrayLocLHS extends HeapLocLHS {
      */
     public Term getIndex() {
         return index;
-    }
-
-    @Override
-    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
-            Services services) {
-        return this; // TODO?
     }
 
     @Override

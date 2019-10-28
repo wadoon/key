@@ -13,7 +13,6 @@
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
@@ -21,7 +20,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * A Skolem location set suitable for use in an {@link AbstractUpdate}.
@@ -38,12 +36,6 @@ public class SkolemLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
     @Override
     public Term toTerm(Services services) {
         return services.getTermBuilder().func(skLoc);
-    }
-
-    @Override
-    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
-            Services services) {
-        return this;
     }
 
     @Override

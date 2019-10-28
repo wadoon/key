@@ -13,12 +13,9 @@
 package de.uka.ilkd.key.abstractexecution.logic.op.locs.heap;
 
 import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
@@ -30,9 +27,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.proof.ProgVarReplacer;
 
 /**
  * A field location for use in an {@link AbstractUpdate}.
@@ -58,18 +53,6 @@ public class FieldLocLHS extends HeapLocLHS {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
         return tb.singleton(objTerm, tb.func(heapLDT.getFieldSymbolForPV(fieldPV, services)));
-    }
-
-    @Override
-    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
-            Services services) {
-        final ProgVarReplacer pvr = new ProgVarReplacer(replMap, services);
-
-        final LocationVariable lFieldPV = Optional.ofNullable(replMap.get(fieldPV))
-                .map(LocationVariable.class::cast).orElse(fieldPV);
-        final Term lObjTerm = pvr.replace(objTerm);
-
-        return new FieldLocLHS(lObjTerm, lFieldPV);
     }
 
     @Override

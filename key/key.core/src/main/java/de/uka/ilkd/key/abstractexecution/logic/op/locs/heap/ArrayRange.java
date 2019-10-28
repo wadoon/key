@@ -12,19 +12,15 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs.heap;
 
-import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * @author Dominic Steinhoefel
@@ -48,19 +44,6 @@ public class ArrayRange extends HeapLocLHS implements HeapLocRHS {
         left.execPostOrder(opColl);
         right.execPostOrder(opColl);
         return opColl.ops();
-    }
-
-    @Override
-    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
-            Services services) {
-        /*
-         * (NOTE, 2019-05-24): Is that the right thing to do (not replacing anything in
-         * left and right)?
-         */
-        return new ArrayRange(GenericTermReplacer.replace(array,
-                t -> t.op() instanceof ProgramVariable && replMap.containsKey(t.op()),
-                t -> services.getTermBuilder().var(replMap.get((ProgramVariable) t.op())),
-                services), left, right);
     }
 
     @Override

@@ -12,19 +12,15 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs.heap;
 
-import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * An "all fields" array location ("myArray[*]").
@@ -49,15 +45,6 @@ public class AllFieldsLocLHS extends HeapLocLHS {
     public Term toTerm(Services services) {
         final TermBuilder tb = services.getTermBuilder();
         return tb.allFields(array);
-    }
-
-    @Override
-    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
-            Services services) {
-        return new AllFieldsLocLHS(GenericTermReplacer.replace(array,
-                t -> t.op() instanceof ProgramVariable && replMap.containsKey(t.op()),
-                t -> services.getTermBuilder().var(replMap.get((ProgramVariable) t.op())),
-                services));
     }
 
     @Override

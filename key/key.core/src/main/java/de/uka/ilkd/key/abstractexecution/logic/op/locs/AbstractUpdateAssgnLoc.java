@@ -12,14 +12,12 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
-import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.AllFieldsLocRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayLocRHS;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * A left-hand side of an abstract update.
@@ -35,21 +33,6 @@ public interface AbstractUpdateAssgnLoc {
      *         container represents.
      */
     Set<Operator> childOps();
-    
-    /**
-     * Returns a new {@link AbstractUpdateLoc} of this one with the
-     * {@link ProgramVariable}s replaced according to the supplied map.
-     *
-     * @param replMap
-     *            The replace map.
-     * @param services
-     *            The {@link Services} object.
-     * @return A new {@link AbstractUpdateLoc} of this one with the
-     *         {@link ProgramVariable}s replaced according to the supplied map.
-     */
-    AbstractUpdateAssgnLoc replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap, Services services);
-
     /**
      * Evaluates whether this {@link AbstractUpdateAssgnLoc} may assign otherLoc. This is
      * the case, for instance, if this {@link AbstractUpdateAssgnLoc} is a {@link PVLoc}

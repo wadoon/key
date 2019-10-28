@@ -13,14 +13,12 @@
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * The special "allLocs" location.
@@ -37,12 +35,6 @@ public class AllLocsLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
     @Override
     public Term toTerm(Services services) {
         return services.getTermBuilder().func(allLocs);
-    }
-
-    @Override
-    public AbstractUpdateAssgnLoc replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap, Services services) {
-        return this;
     }
 
     @Override
