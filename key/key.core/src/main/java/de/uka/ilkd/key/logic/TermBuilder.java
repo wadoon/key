@@ -974,7 +974,7 @@ public class TermBuilder {
      */
     public Term abstractUpdate(AbstractUpdate abstrUpd, Term rhs) {
         final AbstractUpdateLoc[] accessibles = //
-                AbstractUpdateFactory.abstrUpdateLocsFromTermSafe(rhs, Optional.empty(), services)
+                AbstractUpdateFactory.abstrUpdateLocsFromTerm(rhs, Optional.empty(), services)
                         .stream().map(AbstractUpdateLoc.class::cast).collect(Collectors.toList())
                         .toArray(new AbstractUpdateLoc[0]);
 

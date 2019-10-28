@@ -78,7 +78,7 @@ public class ProgramLocationsCollector extends ProgramVariableCollector {
         for (final LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             final Term accessibleClause = contract.getAccessibleClause(heap, services);
             if (accessibleClause != null) {
-                locations.addAll(AbstractUpdateFactory.abstrUpdateLocsFromTermSafe( //
+                locations.addAll(AbstractUpdateFactory.abstrUpdateLocsFromTerm( //
                         accessibleClause, Optional.empty(), services));
             }
         }

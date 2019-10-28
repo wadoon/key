@@ -12,20 +12,12 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs.heap;
 
-import java.util.Optional;
-import java.util.Set;
-
-import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
-import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
@@ -35,48 +27,6 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * @author Dominic Steinhoefel
  */
 public abstract class HeapLocLHS implements AbstractUpdateLoc {
-
-    /**
-     * Applies an update to this {@link HeapLocLHS}. For instance, the application
-     * of the update <code>A:=_A</code> on <code>A.*</code> yields
-     * <code>_A.*</code>. For program variables, this is not done, but heap objects
-     * like fields or array contents are reference types, and therefore this is
-     * necessary.
-     * 
-     * XXX (DS, 2019-10-28): Do we need this?
-     * 
-     * @param proof  The parent {@link Proof} -- for update simplification.
-     * @param update The update to apply.
-     * @return The new {@link HeapLocLHS}, or an empty optional if the update could
-     *         not be applied.
-     */
-    public Optional<HeapLocLHS> applyUpdate(Proof proof, Term update) {
-        final Services services = proof.getServices();
-
-        final Term termWithoutUpd = toTerm(services);
-
-        final Term simplTerm = //
-                AbstractExecutionUtils.applyUpdate(update, termWithoutUpd, services);
-
-        final OpCollector opColl = new OpCollector();
-        simplTerm.execPostOrder(opColl);
-        if (simplTerm.op() != termWithoutUpd.op()
-                || opColl.ops().stream().anyMatch(op -> op instanceof ElementaryUpdate)) {
-            // There should be no more updates any more
-            return Optional.empty();
-        }
-
-        final Set<AbstractUpdateLoc> newLocs = AbstractUpdateFactory
-                .abstrUpdateAssgnLocsFromTermUnsafe(simplTerm, Optional.empty(), services);
-
-        if (newLocs == null || newLocs.size() != 1) {
-            return Optional.empty();
-        } else {
-            final AbstractUpdateLoc elem = newLocs.iterator().next();
-            return elem instanceof HeapLocLHS ? Optional.of((HeapLocLHS) elem) : Optional.empty();
-        }
-    }
-
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
         if (otherLoc instanceof PVLoc) {

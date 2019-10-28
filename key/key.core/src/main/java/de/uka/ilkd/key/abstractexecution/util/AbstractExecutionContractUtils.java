@@ -275,11 +275,11 @@ public class AbstractExecutionContractUtils {
                     services);
 
             accessibleClause = AbstractUpdateFactory
-                    .abstrUpdateLocsFromTermSafe(contract.getAccessibleClause(heap),
+                    .abstrUpdateLocsFromTerm(contract.getAccessibleClause(heap),
                             runtimeInstance, services)
                     .stream().map(AbstractUpdateLoc.class::cast).collect(Collectors.toList());
             assignableClause = AbstractUpdateFactory
-                    .abstrUpdateAssgnLocsFromTermSafe(contract.getAssignable(heap), runtimeInstance,
+                    .abstrUpdateLocsFromTerm(contract.getAssignable(heap), runtimeInstance,
                             services)
                     .stream().map(AbstractUpdateLoc.class::cast)
                     .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
