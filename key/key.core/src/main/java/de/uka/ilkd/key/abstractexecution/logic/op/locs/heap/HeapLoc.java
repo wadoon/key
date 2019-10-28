@@ -26,7 +26,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * 
  * @author Dominic Steinhoefel
  */
-public abstract class HeapLocLHS implements AbstractUpdateLoc {
+public abstract class HeapLoc implements AbstractUpdateLoc {
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
         if (otherLoc instanceof PVLoc) {
@@ -52,10 +52,10 @@ public abstract class HeapLocLHS implements AbstractUpdateLoc {
     }
 
     /**
-     * Converts this {@link HeapLocLHS} to a term representation.
+     * Converts this {@link HeapLoc} to a term representation.
      * 
      * @param services The {@link Services} object.
-     * @return A term representation of this {@link HeapLocLHS}, sort is LocSet.
+     * @return A term representation of this {@link HeapLoc}, sort is LocSet.
      */
     public abstract Term toTerm(Services services);
 

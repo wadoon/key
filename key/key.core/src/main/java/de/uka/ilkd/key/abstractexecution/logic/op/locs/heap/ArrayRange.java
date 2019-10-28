@@ -26,7 +26,7 @@ import de.uka.ilkd.key.logic.op.Operator;
  * @author Dominic Steinhoefel
  *
  */
-public class ArrayRange extends HeapLocLHS {
+public class ArrayRange extends HeapLoc {
     final Term array;
     final Term left;
     final Term right;
@@ -53,7 +53,7 @@ public class ArrayRange extends HeapLocLHS {
         } else if (otherLoc instanceof PVLoc) {
             return ((PVLoc) otherLoc).getVar()
                     .equals(services.getTypeConverter().getHeapLDT().getHeap());
-        } else if (otherLoc instanceof ArrayLocLHS || otherLoc instanceof ArrayRange) {
+        } else if (otherLoc instanceof ArrayLoc || otherLoc instanceof ArrayRange) {
             super.mayAssign(otherLoc, services);
         }
 

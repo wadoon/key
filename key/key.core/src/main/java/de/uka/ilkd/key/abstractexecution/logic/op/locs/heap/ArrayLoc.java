@@ -28,11 +28,11 @@ import de.uka.ilkd.key.logic.op.Operator;
  *
  * @author Dominic Steinhoefel
  */
-public class ArrayLocLHS extends HeapLocLHS {
+public class ArrayLoc extends HeapLoc {
     private final Term array;
     private final Term index;
 
-    public ArrayLocLHS(Term array, Term index) {
+    public ArrayLoc(Term array, Term index) {
         this.array = array;
         this.index = index;
     }
@@ -40,6 +40,7 @@ public class ArrayLocLHS extends HeapLocLHS {
     @Override
     public Term toTerm(Services services) {
         final TermBuilder tb = services.getTermBuilder();
+        // XXX (DS, 2019-10-28): Not a LocSet Term! That's wrong! Fix if there's time!
         return tb.dotArr(array, index);
     }
 
@@ -76,7 +77,7 @@ public class ArrayLocLHS extends HeapLocLHS {
         } else if (otherLoc instanceof PVLoc) {
             return ((PVLoc) otherLoc).getVar()
                     .equals(services.getTypeConverter().getHeapLDT().getHeap());
-        } else if (otherLoc instanceof ArrayLocLHS || otherLoc instanceof ArrayRange) {
+        } else if (otherLoc instanceof ArrayLoc || otherLoc instanceof ArrayRange) {
             return super.mayAssign(otherLoc, services);
         }
 
@@ -90,7 +91,7 @@ public class ArrayLocLHS extends HeapLocLHS {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof ArrayLocLHS && obj.hashCode() == hashCode();
+        return obj instanceof ArrayLoc && obj.hashCode() == hashCode();
     }
 
     @Override

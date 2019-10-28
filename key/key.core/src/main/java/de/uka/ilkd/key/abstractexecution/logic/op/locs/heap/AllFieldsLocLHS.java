@@ -27,7 +27,7 @@ import de.uka.ilkd.key.logic.op.Operator;
  *
  * @author Dominic Steinhoefel
  */
-public class AllFieldsLocLHS extends HeapLocLHS {
+public class AllFieldsLocLHS extends HeapLoc {
     private final Term array;
 
     public AllFieldsLocLHS(Term array) {
@@ -56,12 +56,12 @@ public class AllFieldsLocLHS extends HeapLocLHS {
 
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        if (otherLoc instanceof ArrayLocLHS) {
-            return ((ArrayLocLHS) otherLoc).getArray().equals(this.array);
+        if (otherLoc instanceof ArrayLoc) {
+            return ((ArrayLoc) otherLoc).getArray().equals(this.array);
         } else if (otherLoc instanceof PVLoc) {
             return ((PVLoc) otherLoc).getVar()
                     .equals(services.getTypeConverter().getHeapLDT().getHeap());
-        } else if (otherLoc instanceof ArrayLocLHS) {
+        } else if (otherLoc instanceof ArrayLoc) {
             return ((AllFieldsLocLHS) otherLoc).getArray().equals(this.array);
         } else if (otherLoc instanceof ArrayRange) {
             super.mayAssign(otherLoc, services);

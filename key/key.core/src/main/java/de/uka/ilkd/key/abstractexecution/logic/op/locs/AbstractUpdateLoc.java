@@ -15,7 +15,7 @@ package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.AllFieldsLocLHS;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayLocLHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -39,7 +39,7 @@ public interface AbstractUpdateLoc {
      * Evaluates whether this {@link AbstractUpdateLoc} may assign otherLoc.
      * This is the case, for instance, if this {@link AbstractUpdateLoc} is a
      * {@link PVLoc} assigning the program variable of otherLoc which is also a
-     * {@link PVLoc}; but also, if otherLoc is an {@link ArrayLocLHS} for array A
+     * {@link PVLoc}; but also, if otherLoc is an {@link ArrayLoc} for array A
      * and this {@link AbstractUpdateLoc} is an {@link AllFieldsLocLHS} for A.
      *
      * XXX (DS, 2019-10-28): Have to make the semantics of this more precise. What

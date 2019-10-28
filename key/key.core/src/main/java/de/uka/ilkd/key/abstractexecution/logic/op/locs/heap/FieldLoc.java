@@ -34,7 +34,7 @@ import de.uka.ilkd.key.logic.sort.NullSort;
  *
  * @author Dominic Steinhoefel
  */
-public class FieldLocLHS extends HeapLocLHS {
+public class FieldLoc extends HeapLoc {
     private final Term objTerm;
     // XXX (DS, 2019-10-22): If possible, switch from LocationVariable to Term here,
     // since it's quite questionable to use this "canonical program variable" for
@@ -42,7 +42,7 @@ public class FieldLocLHS extends HeapLocLHS {
     // general, e.g. in hand-written KeY files.
     private final LocationVariable fieldPV;
 
-    public FieldLocLHS(Term objTerm, LocationVariable fieldPV) {
+    public FieldLoc(Term objTerm, LocationVariable fieldPV) {
         this.objTerm = objTerm;
         this.fieldPV = fieldPV;
     }
@@ -75,9 +75,9 @@ public class FieldLocLHS extends HeapLocLHS {
          */
         return (otherLoc instanceof PVLoc && ((PVLoc) otherLoc).getVar()
                 .equals(services.getTypeConverter().getHeapLDT().getHeap()))
-                || (otherLoc instanceof FieldLocLHS
-                        && ((FieldLocLHS) otherLoc).objTerm.equals(this.objTerm)
-                        && ((FieldLocLHS) otherLoc).fieldPV.equals(this.fieldPV));
+                || (otherLoc instanceof FieldLoc
+                        && ((FieldLoc) otherLoc).objTerm.equals(this.objTerm)
+                        && ((FieldLoc) otherLoc).fieldPV.equals(this.fieldPV));
     }
 
     /**
@@ -97,7 +97,7 @@ public class FieldLocLHS extends HeapLocLHS {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof FieldLocLHS && obj.hashCode() == hashCode();
+        return obj instanceof FieldLoc && obj.hashCode() == hashCode();
     }
 
     @Override

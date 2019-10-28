@@ -961,23 +961,23 @@ public class TermBuilder {
     public Term abstractUpdate(AbstractPlaceholderStatement phs,
             UniqueArrayList<AbstractUpdateLoc> assignables, List<AbstractUpdateLoc> accessibles) {
         final AbstractUpdate au = services.abstractUpdateFactory()
-                .getInstance(phs, assignables, accessibles);
+                .getInstance(phs, assignables, accessibles.size());
         return tf.createTerm(au, accessibles.stream().map(loc -> loc.toTerm(services))
                 .map(this::wrapInValue).collect(Collectors.toList()).toArray(new Term[0]));
     }
     
     /**
-     * Wraps t in a "value(...)" application if it is not already wrapped. Note that
-     * argument of "value" has to be of LocSet type.
+     * Wraps t in a "value(...)" application if it is not already wrapped, and if
+     * the argument is of LocSet type.
      * 
      * @param t The {@link Term} to wrap.
-     * @return The wrapped {@link Term}.
+     * @return The wrapped {@link Term} (or the original one, if the argument is
+     *         already wrapped or not of locSet sort).
      */
     private Term wrapInValue(Term t) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final Function valueFun = locSetLDT.getValue();
-        if (t.op() != valueFun) {
-            assert t.sort() == locSetLDT.targetSort();
+        if (t.op() != valueFun && t.sort() == locSetLDT.targetSort()) {
             return value(t);
         } else {
             return t;

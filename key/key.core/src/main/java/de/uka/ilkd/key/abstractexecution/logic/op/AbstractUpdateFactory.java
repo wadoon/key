@@ -12,9 +12,9 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -30,9 +30,9 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.AllFieldsLocLHS;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayLocLHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayRange;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLocLHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -113,47 +113,25 @@ public class AbstractUpdateFactory {
                         .map(AbstractUpdateLoc.class::cast)
                         .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
 
-        final Sort[] accessiblesSorts = //
-                abstrUpdateLocsFromTerm(rhs, runtimeInstance, services).stream()
-                        .map(AbstractUpdateLoc.class::cast).map(loc -> loc.toTerm(services))
-                        .map(Term::sort).collect(Collectors.toList()).toArray(new Sort[0]);
+        final int numArgs = //
+                (int) abstrUpdateLocsFromTerm(rhs, runtimeInstance, services).stream().count();
 
-        return getInstance(phs, assignables, accessiblesSorts);
+        return getInstance(phs, assignables, numArgs);
     }
 
     /**
      * Returns abstract update operator for the passed
      * {@link AbstractPlaceholderStatement} and left-hand side.
      *
-     * @param phs         The {@link AbstractPlaceholderStatement} for which this
-     *                    {@link AbstractUpdate} should be created.
-     * @param assignables The update's left-hand side.
-     * @param accessibles The accessible locations -- for extracting their sorts,
-     *                    which determine the argument sorts for the abstract update
-     *                    operator.
+     * @param phs      The {@link AbstractPlaceholderStatement} for which this
+     *                 {@link AbstractUpdate} should be created.
+     * @param numArgs  The update's left-hand side.
+     * @param argSorts The number of arguments of the abstract update.
      * @return The {@link AbstractUpdate} for the given
      *         {@link AbstractPlaceholderStatement} and left-hand side.
      */
     public AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
-            UniqueArrayList<AbstractUpdateLoc> assignables, List<AbstractUpdateLoc> accessibles) {
-        return getInstance(phs, assignables, accessibles.stream().map(loc -> loc.toTerm(services))
-                .map(Term::sort).collect(Collectors.toList()).toArray(new Sort[0]));
-    }
-
-    /**
-     * Returns abstract update operator for the passed
-     * {@link AbstractPlaceholderStatement} and left-hand side.
-     *
-     * @param phs         The {@link AbstractPlaceholderStatement} for which this
-     *                    {@link AbstractUpdate} should be created.
-     * @param assignables The update's left-hand side.
-     * @param argSorts    argument sorts for the operator (corresponding to
-     *                    right-hand side/accessibles)
-     * @return The {@link AbstractUpdate} for the given
-     *         {@link AbstractPlaceholderStatement} and left-hand side.
-     */
-    public AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
-            UniqueArrayList<AbstractUpdateLoc> assignables, final Sort[] argSorts) {
+            UniqueArrayList<AbstractUpdateLoc> assignables, final int numArgs) {
         final String phsID = phs.getId();
         if (abstractUpdateInstances.get(phsID) == null) {
             abstractUpdateInstances.put(phsID, new LinkedHashMap<>());
@@ -163,7 +141,9 @@ public class AbstractUpdateFactory {
         AbstractUpdate result = //
                 abstractUpdateInstances.get(phsID).get(assgnHashCode);
         if (result == null) {
-            result = new AbstractUpdate(phs, assignables, argSorts, services);
+            final Sort[] sorts = new Sort[numArgs];
+            Arrays.fill(sorts, Sort.ANY);
+            result = new AbstractUpdate(phs, assignables, sorts, services);
             abstractUpdateInstances.get(phsID).put(assgnHashCode, result);
         }
 
@@ -354,8 +334,8 @@ public class AbstractUpdateFactory {
             result.addAll(subResult);
         } else if (op == locSetLDT.getHasTo()) {
             // There is exactly one location inside a hasTo
-            final AbstractUpdateLoc subResult = abstrUpdateLocsFromTerm(t.sub(0),
-                    runtimeInstance, services).iterator().next();
+            final AbstractUpdateLoc subResult = abstrUpdateLocsFromTerm(t.sub(0), runtimeInstance,
+                    services).iterator().next();
             result.add(new HasToLoc((AbstractUpdateLoc) subResult));
         } else if (op == locSetLDT.getUnion()) {
             final Set<AbstractUpdateLoc> subResult1 = //
@@ -405,7 +385,7 @@ public class AbstractUpdateFactory {
         final Operator op = t.op();
 
         if (op == locSetLDT.getSingleton() && t.sub(1).op() == heapLDT.getArr()) {
-            result.add(new ArrayLocLHS(t.sub(0), t.sub(1).sub(0)));
+            result.add(new ArrayLoc(t.sub(0), t.sub(1).sub(0)));
         } else if (op == locSetLDT.getSingleton()) {
             final Term obj = //
                     normalizeSelfVar(t.sub(0), runtimeInstance, services);
@@ -414,7 +394,7 @@ public class AbstractUpdateFactory {
             // can, for instance, pass the location (o,f) for some symbols o, f created out
             // of the blue inside a KeY file, then there's no name inside the f that we
             // could extract and that call will fail.
-            result.add(new FieldLocLHS(obj, fieldPVFromFieldFunc(field, services)));
+            result.add(new FieldLoc(obj, fieldPVFromFieldFunc(field, services)));
         } else if (t.op() == locSetLDT.getAllFields() && t.subs().size() == 1) {
             result.add(new AllFieldsLocLHS(t.sub(0)));
         } else if (t.op() == locSetLDT.getArrayRange()) {

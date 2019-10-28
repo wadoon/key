@@ -17,7 +17,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.BeforeClass;
@@ -202,10 +201,9 @@ public class AbstractUpdateTests {
 
         final UniqueArrayList<AbstractUpdateLoc> lhsLocs = Arrays.stream(lhs)
                 .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
-        final List<AbstractUpdateLoc> rhsLocs = Arrays.stream(rhs).collect(Collectors.toList());
 
         final AbstractUpdate upd = //
-                abstrUpdF.getInstance(aps, lhsLocs, rhsLocs);
+                abstrUpdF.getInstance(aps, lhsLocs, rhs.length);
         return tb.abstractUpdate(upd, rhs);
     }
 

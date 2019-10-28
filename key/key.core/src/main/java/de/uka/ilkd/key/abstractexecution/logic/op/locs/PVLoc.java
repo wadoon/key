@@ -18,6 +18,7 @@ import java.util.Set;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 
@@ -35,7 +36,8 @@ public class PVLoc implements AbstractUpdateLoc {
 
     @Override
     public Term toTerm(Services services) {
-        return services.getTermBuilder().var(locVar);
+        final TermBuilder tb = services.getTermBuilder();
+        return tb.singletonPV(tb.var(locVar));
     }
 
     @Override
