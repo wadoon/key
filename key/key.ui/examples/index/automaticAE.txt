@@ -128,14 +128,18 @@ keySettings = "#Proof-Settings-Config-File
 "
 
 group abstract_updates {
-  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest1.key
-  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest2.key
-  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest3-INCORR.key
-  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest4.key
-  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest5-INCORR.key
-  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest6.key
-  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest7.key
-  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest8-INCORR.key 
+  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest01.key
+  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest02.key
+  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest03-INCORR.key
+  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest04.key
+  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest05-INCORR.key
+  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest06.key
+  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest07.key
+  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest08-INCORR.key
+  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest09-INCORR.key
+  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest10.key
+  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest11.key
+  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest12-INCORR.key
 }
 
 # Examples used in the Abstract Execution paper submitted to FM 2019

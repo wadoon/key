@@ -307,7 +307,7 @@ public class AbstractExecutionUtils {
 
         final Term abstrUpdLocUnionTerm = abstrUpdateAccLocs.stream()
                 .filter(HeapLocRHS.class::isInstance).map(HeapLocRHS.class::cast)
-                //.map(l -> l.toTerm(services))
+                // .map(l -> l.toTerm(services))
                 .map(rhs -> convertHeapLocRHStoLocSetTerm(rhs, services))
                 .collect(Collectors.reducing(tb.empty(), (t1, t2) -> tb.union(t1, t2)));
 
@@ -401,32 +401,19 @@ public class AbstractExecutionUtils {
 
     /**
      * Checks whether the given {@link Term} is an abstract Skolem location set
-     * term. Those are non-rigid, nullary constants of type LocSet. Note that the
-     * allLocs symbol shipped with KeY by default does not belong to this category.
+     * value term. Those are {@link Term}s of the shape "value(someLocsetConstant)".
+     * category.
      * 
      * @param t        The {@link Term} to check.
      * @param services The {@link Services} object.
      * @return true iff the operator of <code>t</code> is an abstract Skolem
      *         location set.
      */
-    public static boolean isAbstractSkolemLocationSetTerm(Term t, Services services) {
-        final Sort locSetSort = services.getTypeConverter().getLocSetLDT().targetSort();
-        return t.op() instanceof Function && t.arity() == 0 && t.sort() == locSetSort
-                && t.op().isRigid() == false;
-    }
-
-    /**
-     * Checks whether the given operator is an abstract Skolem location set. Those
-     * are non-rigid, nullary constants of type LocSet. Note that the allLocs symbol
-     * shipped with KeY by default does not belong to this category.
-     * 
-     * @param op       The {@link Operator} to check.
-     * @param services The {@link Services} object.
-     * @return true iff op is an abstract Skolem location set.
-     */
-    public static boolean isAbstractSkolemLocationSetOp(Operator op, Services services) {
-        final Sort locSetSort = services.getTypeConverter().getLocSetLDT().targetSort();
-        return op instanceof Function && op.arity() == 0 && ((Function) op).sort() == locSetSort
-                && op.isRigid() == false;
+    public static boolean isAbstractSkolemLocationSetValueTerm(Term t, Services services) {
+        final Function locsetToValueFunction = services.getTypeConverter().getLocSetLDT()
+                .getValue();
+        return t.op() == locsetToValueFunction && //
+                t.sub(0).op() instanceof Function && //
+                t.sub(0).arity() == 0;
     }
 }

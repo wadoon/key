@@ -1493,6 +1493,13 @@ public class TermBuilder {
         assert locSetTerm.sort() == locSetLDT.targetSort();
         return func(locSetLDT.getHasTo(), locSetTerm);
     }
+
+    public Term value(Term locSetTerm) {
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        assert locSetTerm.sort() == locSetLDT.targetSort();
+        return func(locSetLDT.getValue(), locSetTerm);
+    }
+    
     public Term union(Term s1, Term s2) {
         final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
         if (s1.op() == ldt.getEmpty()) {

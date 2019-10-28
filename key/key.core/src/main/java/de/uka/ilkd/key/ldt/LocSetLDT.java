@@ -53,10 +53,11 @@ public final class LocSetLDT extends LDT {
     private final Function disjoint;
     private final Function createdInHeap;
 
-
     private final Function finalFunc;
     private final Function singletonPV;
     private final Function hasTo;
+    private final Function value;
+    
     public LocSetLDT(TermServices services) {
 	super(NAME, services);
         empty	         = addFunction(services, "empty");
@@ -77,6 +78,7 @@ public final class LocSetLDT extends LDT {
         singletonPV = addFunction(services, "singletonPV");
         finalFunc = addFunction(services, "final");
         hasTo = addFunction(services, "hasTo");
+        value = addFunction(services, "value");
     }
 
 
@@ -164,6 +166,10 @@ public final class LocSetLDT extends LDT {
 
     public Function getHasTo() {
         return hasTo;
+    }
+
+    public Function getValue() {
+        return value;
     }
 
     @Override

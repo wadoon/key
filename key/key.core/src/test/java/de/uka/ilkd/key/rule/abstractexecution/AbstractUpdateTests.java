@@ -13,10 +13,11 @@
 package de.uka.ilkd.key.rule.abstractexecution;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.BeforeClass;
@@ -33,6 +34,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -61,6 +63,10 @@ public class AbstractUpdateTests {
     private static Sort INT_SORT;
     private static TermBuilder TB;
 
+    // /////////////////////////////////// //
+    // ////////////// SETUP ////////////// //
+    // /////////////////////////////////// //
+
     @BeforeClass
     public static void prepare() throws ProblemLoaderException {
         final KeYEnvironment<DefaultUserInterfaceControl> env = //
@@ -70,6 +76,10 @@ public class AbstractUpdateTests {
         INT_SORT = DUMMY_SERVICES.getNamespaces().sorts().lookup("int");
         TB = DUMMY_SERVICES.getTermBuilder();
     }
+
+    // /////////////////////////////////// //
+    // ////////////// TESTS ////////////// //
+    // /////////////////////////////////// //
 
     //@formatter:off
     //    {U_P(w:=x)}
@@ -114,7 +124,7 @@ public class AbstractUpdateTests {
         final Term u1 = abstractUpdate(aps("P"), new HasToLoc(new PVLoc(y)),
                 new PVLoc[] { new PVLoc(y), new PVLoc(w) });
         final Term u2 = abstractUpdate(aps("P"), new HasToLoc(new PVLoc(x)),
-                new PVLoc[] { new PVLoc(y), new PVLoc(w) });
+                new PVLoc[] { new PVLoc(x), new PVLoc(w) });
 
         final Term pred = TB.func(new Function( //
                 new Name("p"), Sort.FORMULA, INT_SORT, INT_SORT), TB.var(x), TB.var(w));
@@ -127,6 +137,39 @@ public class AbstractUpdateTests {
         final Proof proof = startProofFor(equivalence);
         assertEquals(true, proof.closed());
     }
+
+    @Test
+    public void skolemLocValConversion() throws ProofInputException {
+        final LocSetLDT locSetLDT = DUMMY_SERVICES.getTypeConverter().getLocSetLDT();
+        final Sort locSetSort = locSetLDT.targetSort();
+        final Function valueFun = locSetLDT.getValue();
+
+        final Function abstractLocSetFun = //
+                new Function(new Name("abstrLocSet"), locSetSort, false, true, new Sort[0]);
+        final LocationVariable x = intVar("x");
+
+        final Term xAssignedOne = TB.elementary(TB.var(x), TB.one());
+        final Term abstrLocSetTerm = TB.func(abstractLocSetFun);
+        final Term valOfAbstrLocSet = TB.func(valueFun, abstrLocSetTerm);
+
+        // Provable: {x:=1}abstrLocSet = abstrLocSet
+        final Term equivalenceOne = //
+                TB.equals(TB.apply(xAssignedOne, abstrLocSetTerm), abstrLocSetTerm);
+
+        final Proof proofOne = startProofFor(equivalenceOne);
+        assertTrue(proofOne.closed());
+
+        // NOT Provable: {x:=1}value(abstrLocSet) = value(abstrLocSet)
+        final Term equivalenceTwo = //
+                TB.equals(TB.apply(xAssignedOne, valOfAbstrLocSet), valOfAbstrLocSet);
+
+        final Proof proofTwo = startProofFor(equivalenceTwo);
+        assertFalse(proofTwo.closed());
+    }
+
+    // //////////////////////////////////////////// //
+    // ////////////// HELPER METHODS ////////////// //
+    // //////////////////////////////////////////// //
 
     private Proof startProofFor(Term formula) throws ProofInputException {
         final ProofEnvironment proofEnv = SideProofUtil

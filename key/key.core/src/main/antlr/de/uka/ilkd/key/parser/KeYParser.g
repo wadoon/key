@@ -3400,6 +3400,9 @@ location_term returns[Term result]
     FUN LPAREN fun=equivalence_term RPAREN
             { $result = fun; }
     |
+    VALUE LPAREN t=location_term RPAREN
+            { $result = getServices().getTermBuilder().hasTo(t); }
+    |
     HAS_TO LPAREN t=location_term RPAREN
             { $result = getServices().getTermBuilder().hasTo(t); }
     ;

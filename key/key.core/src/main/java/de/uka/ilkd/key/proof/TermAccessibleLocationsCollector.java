@@ -61,8 +61,8 @@ public class TermAccessibleLocationsCollector extends DefaultVisitor {
             result.add(new PVLoc((LocationVariable) t.op()));
         }
 
-        if (AbstractExecutionUtils.isAbstractSkolemLocationSetTerm(t, services)) {
-            result.add(new SkolemLoc((Function) t.op()));
+        if (AbstractExecutionUtils.isAbstractSkolemLocationSetValueTerm(t, services)) {
+            result.add(new SkolemLoc((Function) t.sub(0).op()));
         }
 
         final Function allLocs = services.getTypeConverter().getLocSetLDT().getAllLocs();
@@ -70,16 +70,16 @@ public class TermAccessibleLocationsCollector extends DefaultVisitor {
             result.add(new AllLocsLoc(allLocs));
         }
 
-        final java.util.function.Function<Term, Set<AbstractUpdateLoc>> subToLoc = //
-                sub -> AbstractUpdateFactory.abstrUpdateLocsFromTermSafe( //
-                        sub, Optional.empty(), services);
-
-        if (t.op() instanceof Function
-                && services.abstractUpdateFactory().isAbstractPathCondition((Function) t.op())) {
-            t.subs().stream().map(subToLoc).forEach(result::addAll);
-        } else if (t.op() instanceof AbstractUpdate) {
-            t.subs().stream().map(subToLoc).forEach(result::addAll);
-        }
+//        final java.util.function.Function<Term, Set<AbstractUpdateLoc>> subToLoc = //
+//                sub -> AbstractUpdateFactory.abstrUpdateLocsFromTermSafe( //
+//                        sub, Optional.empty(), services);
+//
+//        if (t.op() instanceof Function
+//                && services.abstractUpdateFactory().isAbstractPathCondition((Function) t.op())) {
+//            t.subs().stream().map(subToLoc).forEach(result::addAll);
+//        } else if (t.op() instanceof AbstractUpdate) {
+//            t.subs().stream().map(subToLoc).forEach(result::addAll);
+//        }
 
         if (!t.javaBlock().isEmpty()) {
             final ProgramLocationsCollector pvc = new ProgramLocationsCollector(

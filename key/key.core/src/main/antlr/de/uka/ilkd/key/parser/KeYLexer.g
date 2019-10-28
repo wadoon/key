@@ -321,6 +321,7 @@ lexer grammar KeYLexer;
     PV : '\\pv' ;
     HAS_TO : '\\hasTo' ;
     FUN : '\\fun' ;
+    VALUE : '\\value' ;
         // Those guys can stay being keywords
 	TRUE : 'true';
 	FALSE : 'false';
