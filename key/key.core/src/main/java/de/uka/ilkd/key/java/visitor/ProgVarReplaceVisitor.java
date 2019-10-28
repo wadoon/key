@@ -431,6 +431,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newPostconditions =
                 new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> newFreePostconditions =
+                new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newModifiesClauses =
                 new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newDeclaresClauses = new LinkedHashMap<LocationVariable, Term>();
@@ -441,6 +443,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             final Term oldPrecondition = oldContract.getPrecondition(heap,
                     services);
             final Term oldPostcondition = oldContract.getPostcondition(heap,
+                    services);
+            final Term oldFreePostcondition = oldContract.getFreePostcondition(heap,
                     services);
             final Term oldModifies = oldContract.getModifiesClause(heap,
                     services);
@@ -453,6 +457,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     oldPrecondition);
             final Term newPostcondition = replaceVariablesInTerm(
                     oldPostcondition);
+            final Term newFreePostcondition = replaceVariablesInTerm(
+                    oldFreePostcondition);
             final Term newModifies = replaceVariablesInTerm(oldModifies);
             final Term newDeclares = replaceVariablesInTerm(oldDeclares);
             final Term newAccessible = replaceVariablesInTerm(oldAccessible);
@@ -461,6 +467,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     ? newPrecondition : oldPrecondition);
             newPostconditions.put(heap, (newPostcondition != oldPostcondition)
                     ? newPostcondition : oldPostcondition);
+            newFreePostconditions.put(heap,
+                    (newFreePostcondition != oldFreePostcondition) ? newFreePostcondition
+                            : oldFreePostcondition);
             newModifiesClauses.put(heap,
                     (newModifies != oldModifies) ? newModifies : oldModifies);
             newDeclaresClauses.put(heap,
@@ -482,11 +491,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         OpReplacer replacer = new OpReplacer(
                 replaceMap, services.getTermFactory(), services.getProof());
 
-        return changed ? oldContract.update(newBlock, newPreconditions,
-                newPostconditions, newModifiesClauses,
-                newDeclaresClauses, newAccessibleClauses, newInfFlowSpecs,
-                newVariables,
-                replacer.replace(oldContract.getMby())) : oldContract;
+        return changed ? oldContract.update(newBlock, newPreconditions, newPostconditions,
+                newFreePostconditions, newModifiesClauses, newDeclaresClauses, newAccessibleClauses,
+                newInfFlowSpecs, newVariables, replacer.replace(oldContract.getMby()))
+                : oldContract;
     }
 
     private LoopContract createNewLoopContract(
@@ -497,6 +505,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         final Map<LocationVariable, Term> newPreconditions =
                 new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newPostconditions =
+                new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> newFreePostconditions =
                 new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newModifiesClauses =
                 new LinkedHashMap<LocationVariable, Term>();
@@ -510,6 +520,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     services);
             final Term oldPostcondition = oldContract.getPostcondition(heap,
                     services);
+            final Term oldFreePostcondition = oldContract.getFreePostcondition(heap,
+                    services);
             final Term oldModifies = oldContract.getModifiesClause(heap,
                     services);
 
@@ -521,6 +533,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     oldPrecondition);
             final Term newPostcondition = replaceVariablesInTerm(
                     oldPostcondition);
+            final Term newFreePostcondition = replaceVariablesInTerm(
+                    oldFreePostcondition);
             final Term newModifies = replaceVariablesInTerm(oldModifies);
             final Term newDeclares = replaceVariablesInTerm(oldDeclares);
             final Term newAccessible = replaceVariablesInTerm(oldAccessible);
@@ -529,6 +543,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     ? newPrecondition : oldPrecondition);
             newPostconditions.put(heap, (newPostcondition != oldPostcondition)
                     ? newPostcondition : oldPostcondition);
+            newFreePostconditions.put(heap, (newFreePostcondition != oldFreePostcondition)
+                    ? newFreePostcondition : oldFreePostcondition);
             newModifiesClauses.put(heap,
                     (newModifies != oldModifies) ? newModifies : oldModifies);
             newDeclaresClauses.put(heap,
@@ -554,16 +570,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             return oldContract;
         } else if (newStatement instanceof StatementBlock) {
             return oldContract.update((StatementBlock) newStatement, newPreconditions,
-                    newPostconditions, newModifiesClauses,
-                    newDeclaresClauses, newAccessibleClauses, newInfFlowSpecs,
-                    newVariables,
+                    newPostconditions, newFreePostconditions, newModifiesClauses,
+                    newDeclaresClauses, newAccessibleClauses, newInfFlowSpecs, newVariables,
                     replacer.replace(oldContract.getMby()),
                     replacer.replace(oldContract.getDecreases()));
         } else {
             return oldContract.update((LoopStatement) newStatement, newPreconditions,
-                    newPostconditions, newModifiesClauses,
-                    newDeclaresClauses, newAccessibleClauses, newInfFlowSpecs,
-                    newVariables,
+                    newPostconditions, newFreePostconditions, newModifiesClauses,
+                    newDeclaresClauses, newAccessibleClauses, newInfFlowSpecs, newVariables,
                     replacer.replace(oldContract.getMby()),
                     replacer.replace(oldContract.getDecreases()));
         }

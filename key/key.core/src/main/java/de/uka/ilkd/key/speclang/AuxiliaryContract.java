@@ -253,6 +253,43 @@ public interface AuxiliaryContract extends SpecificationElement {
      *
      * @param heap
      *            the heap to use.
+     * @param variables
+     *            the variables to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *            services.
+     * @return this contract's postcondition on the specified heap.
+     */
+    public Term getFreePostcondition(LocationVariable heap, Variables variables, Services services);
+
+    /**
+     *
+     * @param heapVariable
+     *            the heap to use.
+     * @param heap
+     *            the heap to use.
+     * @param terms
+     *            the terms to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *            services.
+     * @return this contract's precondition on the specified heap.
+     */
+    public Term getFreePostcondition(LocationVariable heapVariable, Term heap, Terms terms,
+            Services services);
+
+    /**
+     *
+     * @param heap     the heap to use.
+     * @param services services.
+     * @return this contract's free precondition on the specified heap. Free
+     *         postconditions don't have to be proved, so they're basically
+     *         assumptions/axioms.
+     */
+    public Term getFreePostcondition(LocationVariable heap, Services services);
+
+    /**
+     *
+     * @param heap
+     *            the heap to use.
      * @param self
      *            the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
      * @param services

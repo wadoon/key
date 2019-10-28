@@ -1352,9 +1352,10 @@ public class JMLSpecFactory {
         }
         return new BlockContractImpl.Creator("JML " + behavior + "block contract", block, labels,
                 method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
-                clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
-                clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
-                clauses.declares, clauses.accessibles, clauses.hasMod, services).create();
+                clauses.ensuresFree, clauses.infFlowSpecs, clauses.breaks, clauses.continues,
+                clauses.returns, clauses.signals, clauses.signalsOnly, clauses.diverges,
+                clauses.assignables, clauses.declares, clauses.accessibles, clauses.hasMod,
+                services).create();
     }
 
     /**
@@ -1387,10 +1388,10 @@ public class JMLSpecFactory {
                 = translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new LoopContractImpl.Creator("JML " + behavior + "loop contract", loop, labels,
                 method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
-                clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
-                clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
-                clauses.declares, clauses.accessibles,
-                clauses.hasMod, clauses.decreases, services).create();
+                clauses.ensuresFree, clauses.infFlowSpecs, clauses.breaks, clauses.continues,
+                clauses.returns, clauses.signals, clauses.signalsOnly, clauses.diverges,
+                clauses.assignables, clauses.declares, clauses.accessibles, clauses.hasMod,
+                clauses.decreases, services).create();
     }
 
     /**
@@ -1423,9 +1424,10 @@ public class JMLSpecFactory {
                 = translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new LoopContractImpl.Creator("JML " + behavior + "loop contract", block, labels,
                 method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
-                clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
-                clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
-                clauses.declares, clauses.accessibles, clauses.hasMod, clauses.decreases, services).create();
+                clauses.ensuresFree, clauses.infFlowSpecs, clauses.breaks, clauses.continues,
+                clauses.returns, clauses.signals, clauses.signalsOnly, clauses.diverges,
+                clauses.assignables, clauses.declares, clauses.accessibles, clauses.hasMod,
+                clauses.decreases, services).create();
     }
 
     /**

@@ -1525,8 +1525,9 @@ assume_statement[ImmutableList<String> mods]
 :
     assume_keyword ps=expression
     {
-        raiseNotSupported("assume statements");
-	result = ImmutableSLList.<TextualJMLConstruct>nil();
+        //raiseNotSupported("assume statements");
+	    //result = ImmutableSLList.<TextualJMLConstruct>nil();
+	    result = ImmutableSLList.<TextualJMLConstruct>nil().append(TextualJMLSpecCase.assume2blockContract(mods,ps));
     }
 ;
 
