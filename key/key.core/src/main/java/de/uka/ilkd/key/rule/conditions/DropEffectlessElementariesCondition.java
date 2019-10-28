@@ -160,13 +160,13 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
             return maybeDropElementaryUpdate(update, target, relevantLocations,
                     overwrittenLocations, services);
         } else if (update.op() instanceof AbstractUpdate) {
-            return maybeDropOrSimplifyAbstractUpdate(update, target, relevantLocations,
-                    overwrittenLocations, services);
+            return maybeDropAbstractUpdate(update, target, relevantLocations, overwrittenLocations,
+                    services);
         } else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
-            return dropEffectlessElementariesInParallelUpdate( //
+            return descendInParallelUpdate( //
                     update, target, relevantLocations, overwrittenLocations, services);
         } else if (update.op() == UpdateApplication.UPDATE_APPLICATION) {
-            return dropEffectlessElementariesInUpdateApplication( //
+            return descendInUpdateApplication( //
                     update, target, relevantLocations, overwrittenLocations, services);
         } else {
             // Unknown operator.
@@ -190,8 +190,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      * @return The simplified update application {@link Term}, or
      *         {@link Optional#empty()}.
      */
-    private static Optional<Term> dropEffectlessElementariesInUpdateApplication(final Term update,
-            final Term target, final Set<AbstractUpdateLoc> relevantLocations,
+    private static Optional<Term> descendInUpdateApplication(final Term update, final Term target,
+            final Set<AbstractUpdateLoc> relevantLocations,
             final Set<AbstractUpdateAssgnLoc> overwrittenLocations, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Term appliedUpdate = update.sub(0);
@@ -218,8 +218,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      * @return The simplified update application {@link Term}, or
      *         {@link Optional#empty()}.
      */
-    private static Optional<Term> dropEffectlessElementariesInParallelUpdate(final Term update,
-            final Term target, final Set<AbstractUpdateLoc> relevantLocations,
+    private static Optional<Term> descendInParallelUpdate(final Term update, final Term target,
+            final Set<AbstractUpdateLoc> relevantLocations,
             final Set<AbstractUpdateAssgnLoc> overwrittenLocations, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Term sub1 = update.sub(0);
@@ -244,10 +244,12 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     }
 
     /**
-     * Returns a SKIP update, a simplified abstract update (less assignables), or an
-     * empty optional if no simplification is possible. Like
-     * {@link #dropElementary(Term, Term, Set, Services, TermBuilder)}, but for the
-     * much more complex setting of an abstract update.
+     * Returns a SKIP update or an empty optional if dropping the abstract update is
+     * not possible. Abstract updates cannot be "simplified", either they're
+     * relevant or not.
+     * 
+     * Like {@link #dropElementary(Term, Term, Set, Services, TermBuilder)}, but for
+     * the much more complex setting of an abstract update.
      * 
      * @param update               The abstract update to check.
      * @param target               The target formula, for extracting locations.
@@ -256,8 +258,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      * @param services             The {@link Services} object.
      * @return The simplified update {@link Term}, or {@link Optional#empty()}.
      */
-    private static Optional<Term> maybeDropOrSimplifyAbstractUpdate(final Term update,
-            final Term target, final Set<AbstractUpdateLoc> relevantLocations,
+    private static Optional<Term> maybeDropAbstractUpdate(final Term update, final Term target,
+            final Set<AbstractUpdateLoc> relevantLocations,
             Set<AbstractUpdateAssgnLoc> overwrittenLocations, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
