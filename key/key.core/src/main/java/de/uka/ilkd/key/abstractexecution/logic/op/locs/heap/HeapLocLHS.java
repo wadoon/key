@@ -44,6 +44,8 @@ public abstract class HeapLocLHS implements AbstractUpdateAssgnLoc {
      * like fields or array contents are reference types, and therefore this is
      * necessary.
      * 
+     * XXX (DS, 2019-10-28): Do we need this?
+     * 
      * @param proof  The parent {@link Proof} -- for update simplification.
      * @param update The update to apply.
      * @return The new {@link HeapLocLHS}, or an empty optional if the update could
