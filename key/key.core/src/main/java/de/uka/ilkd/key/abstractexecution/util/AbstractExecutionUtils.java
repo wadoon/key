@@ -40,11 +40,9 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
@@ -370,23 +368,6 @@ public class AbstractExecutionUtils {
         }
 
         return target;
-
-        //@formatter:off
-//        final Proof proof = services.getProof();
-//
-//        final Term termAfterUpdAppl = tb.apply(upd, target);
-//        final Function pred = //
-//                new Function(new Name("auxiliary-pred"), Sort.FORMULA, termAfterUpdAppl.sort());
-//        final Term predTerm = tb.func(pred, termAfterUpdAppl);
-//        Term simplTerm;
-//        try {
-//            simplTerm = MergeRuleUtils.simplify(proof, predTerm, 1000);
-//        } catch (ProofInputException e) {
-//            return termAfterUpdAppl;
-//        }
-//
-//        return simplTerm.sub(0);
-        //@formatter:on
     }
 
     /**
