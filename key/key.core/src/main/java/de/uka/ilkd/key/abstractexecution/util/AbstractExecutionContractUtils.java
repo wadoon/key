@@ -81,9 +81,8 @@ public class AbstractExecutionContractUtils {
     public static List<ProgramVariable> getAccessibleProgVarsForNoBehaviorContract(
             AbstractPlaceholderStatement aps, ProgramElement context, Services services) {
         return getAccessibleTermsForNoBehaviorContract(aps, context, services).stream()
-                .filter(PVLoc.class::isInstance).map(PVLoc.class::cast).map(PVLoc::childOps)
-                .flatMap(Collection::stream).map(ProgramVariable.class::cast)
-                .collect(Collectors.toList());
+                .filter(PVLoc.class::isInstance).map(PVLoc.class::cast).map(PVLoc::getVar)
+                .map(ProgramVariable.class::cast).collect(Collectors.toList());
     }
 
     /**
@@ -117,9 +116,8 @@ public class AbstractExecutionContractUtils {
             AbstractPlaceholderStatement aps, ProgramElement context, Services services) {
         return getAssignableOpsForNoBehaviorContract(aps, context, services).stream()
                 .map(loc -> loc instanceof HasToLoc ? ((HasToLoc) loc).child() : loc)
-                .filter(PVLoc.class::isInstance).map(PVLoc.class::cast).map(PVLoc::childOps)
-                .flatMap(Collection::stream).map(LocationVariable.class::cast)
-                .collect(Collectors.toList());
+                .filter(PVLoc.class::isInstance).map(PVLoc.class::cast).map(PVLoc::getVar)
+                .map(LocationVariable.class::cast).collect(Collectors.toList());
     }
 
     /**

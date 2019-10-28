@@ -26,22 +26,29 @@ import de.uka.ilkd.key.logic.op.Operator;
  */
 public interface AbstractUpdateAssgnLoc {
     /**
-     * All {@link AbstractUpdateLoc}s are containers. This method returns the
-     * "real" KeY {@link Operator}s which they represent.
+     * All {@link AbstractUpdateLoc}s are containers. This method returns the "real"
+     * KeY {@link Operator}s which they represent.
      *
      * @return The KeY {@link Operator}s that this {@link AbstractUpdateLoc}
      *         container represents.
      */
     Set<Operator> childOps();
+
     /**
-     * Evaluates whether this {@link AbstractUpdateAssgnLoc} may assign otherLoc. This is
-     * the case, for instance, if this {@link AbstractUpdateAssgnLoc} is a {@link PVLoc}
-     * assigning the program variable of otherLoc which is also a {@link PVLoc}; but
-     * also, if otherLoc is an {@link ArrayLocRHS} for array A and this
-     * {@link AbstractUpdateAssgnLoc} is an {@link AllFieldsLocRHS} for A.
+     * Evaluates whether this {@link AbstractUpdateAssgnLoc} may assign otherLoc.
+     * This is the case, for instance, if this {@link AbstractUpdateAssgnLoc} is a
+     * {@link PVLoc} assigning the program variable of otherLoc which is also a
+     * {@link PVLoc}; but also, if otherLoc is an {@link ArrayLocRHS} for array A
+     * and this {@link AbstractUpdateAssgnLoc} is an {@link AllFieldsLocRHS} for A.
+     *
+     * XXX (DS, 2019-10-28): Have to make the semantics of this more precise. What
+     * about a program variable that may assign (part of) an abstract Skolem
+     * location set? At the end, it will have to be an overapproximation, i.e., only
+     * return false if it's really sure that this operator does not change the
+     * valuation of the other one. Example would be to PVLocs with different names.
      * 
      * @param otherLoc The location for which to evaluate whether we can assign it.
-     * @param services TODO
+     * @param services The {@link Services} object.
      * @return true if this {@link AbstractUpdateAssgnLoc} may assign otherLoc.
      */
     boolean mayAssign(AbstractUpdateLoc otherLoc, Services services);
