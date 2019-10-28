@@ -26,7 +26,7 @@ import de.uka.ilkd.key.logic.op.Operator;
  *
  * @author Dominic Steinhoefel
  */
-public class SkolemLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
+public class SkolemLoc implements AbstractUpdateLoc {
     private final Function skLoc;
 
     public SkolemLoc(Function skLoc) {
@@ -55,6 +55,8 @@ public class SkolemLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
 
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
+        // XXX (DS, 2019-10-28): Only correct if those locsets are disjoint, which is
+        // not clear with the knowledge we have!
         return otherLoc instanceof SkolemLoc && otherLoc.equals(this);
     }
 

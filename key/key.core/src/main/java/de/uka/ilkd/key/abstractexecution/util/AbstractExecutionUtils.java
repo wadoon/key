@@ -14,12 +14,14 @@ package de.uka.ilkd.key.abstractexecution.util;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
@@ -79,5 +81,18 @@ public class AbstractExecutionUtils {
         return t.op() == locsetToValueFunction && //
                 t.sub(0).op() instanceof Function && //
                 t.sub(0).arity() == 0;
+    }
+
+    /**
+     * Abstract Skolem location sets are nullary constants of type LocSet.
+     * 
+     * @param op       The {@link Operator} to check.
+     * @param services The {@link Services} object (for the {@link LocSetLDT}).
+     * @return true iff the given operator is an abstract Skolem location set.
+     */
+    public static boolean isAbstractSkolemLocationSet(final Operator op, final Services services) {
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        return op instanceof Function && op.arity() == 0
+                && ((Function) op).sort() == locSetLDT.targetSort();
     }
 }

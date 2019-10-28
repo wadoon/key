@@ -67,7 +67,7 @@ public class TermAccessibleLocationsCollector extends DefaultVisitor {
             result.add(new AllLocsLoc(allLocs));
         }
 
-//        final java.util.function.Function<Term, Set<AbstractUpdateLoc>> subToLoc = //
+//        final java.util.function.Function<Term, Set<AbstractUpdateAssgnLoc>> subToLoc = //
 //                sub -> AbstractUpdateFactory.abstrUpdateLocsFromTermSafe( //
 //                        sub, Optional.empty(), services);
 //

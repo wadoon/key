@@ -27,7 +27,6 @@ import org.key_project.util.collection.UniqueArrayList;
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
@@ -184,24 +183,24 @@ public class AbstractUpdateTests {
         return new AbstractPlaceholderStatement(id);
     }
 
-    private Term abstractUpdate(AbstractPlaceholderStatement aps, AbstractUpdateAssgnLoc lhs,
+    private Term abstractUpdate(AbstractPlaceholderStatement aps, AbstractUpdateLoc lhs,
             AbstractUpdateLoc rhs) {
-        return abstractUpdate(aps, new AbstractUpdateAssgnLoc[] { lhs },
+        return abstractUpdate(aps, new AbstractUpdateLoc[] { lhs },
                 new AbstractUpdateLoc[] { rhs });
     }
 
-    private Term abstractUpdate(AbstractPlaceholderStatement aps, AbstractUpdateAssgnLoc lhs,
+    private Term abstractUpdate(AbstractPlaceholderStatement aps, AbstractUpdateLoc lhs,
             AbstractUpdateLoc[] rhs) {
-        return abstractUpdate(aps, new AbstractUpdateAssgnLoc[] { lhs }, rhs);
+        return abstractUpdate(aps, new AbstractUpdateLoc[] { lhs }, rhs);
     }
 
-    private Term abstractUpdate(AbstractPlaceholderStatement aps, AbstractUpdateAssgnLoc[] lhs,
+    private Term abstractUpdate(AbstractPlaceholderStatement aps, AbstractUpdateLoc[] lhs,
             AbstractUpdateLoc[] rhs) {
         final TermBuilder tb = DUMMY_SERVICES.getTermBuilder();
 
         final AbstractUpdateFactory abstrUpdF = DUMMY_SERVICES.abstractUpdateFactory();
 
-        final UniqueArrayList<AbstractUpdateAssgnLoc> lhsLocs = Arrays.stream(lhs)
+        final UniqueArrayList<AbstractUpdateLoc> lhsLocs = Arrays.stream(lhs)
                 .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
         final List<AbstractUpdateLoc> rhsLocs = Arrays.stream(rhs).collect(Collectors.toList());
 

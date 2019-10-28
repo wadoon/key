@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
@@ -154,7 +153,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      */
     private static Optional<Term> dropEffectlessElementaries(final Term update, final Term target,
             final Set<AbstractUpdateLoc> relevantLocations,
-            final Set<AbstractUpdateAssgnLoc> overwrittenLocations, final Services services) {
+            final Set<AbstractUpdateLoc> overwrittenLocations, final Services services) {
 
         if (update.op() instanceof ElementaryUpdate) {
             return maybeDropElementaryUpdate(update, target, relevantLocations,
@@ -192,7 +191,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      */
     private static Optional<Term> descendInUpdateApplication(final Term update, final Term target,
             final Set<AbstractUpdateLoc> relevantLocations,
-            final Set<AbstractUpdateAssgnLoc> overwrittenLocations, final Services services) {
+            final Set<AbstractUpdateLoc> overwrittenLocations, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Term appliedUpdate = update.sub(0);
         final Term targetUpdate = update.sub(1);
@@ -220,7 +219,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      */
     private static Optional<Term> descendInParallelUpdate(final Term update, final Term target,
             final Set<AbstractUpdateLoc> relevantLocations,
-            final Set<AbstractUpdateAssgnLoc> overwrittenLocations, final Services services) {
+            final Set<AbstractUpdateLoc> overwrittenLocations, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Term sub1 = update.sub(0);
         final Term sub2 = update.sub(1);
@@ -260,7 +259,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      */
     private static Optional<Term> maybeDropAbstractUpdate(final Term update, final Term target,
             final Set<AbstractUpdateLoc> relevantLocations,
-            Set<AbstractUpdateAssgnLoc> overwrittenLocations, final Services services) {
+            Set<AbstractUpdateLoc> overwrittenLocations, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
 
@@ -277,13 +276,13 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
         final Set<AbstractUpdateLoc> newIrrelevantLocations = relevantLocations.stream()
                 .filter(abstrUpd::hasToAssign)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-        final Set<AbstractUpdateAssgnLoc> newOverwrittenLocations = abstrUpd.getHasToAssignables()
+        final Set<AbstractUpdateLoc> newOverwrittenLocations = abstrUpd.getHasToAssignables()
                 .stream()
                 .filter(hasToLoc -> newIrrelevantLocations.stream()
                         .anyMatch(loc -> hasToLoc.mayAssign(loc, services)))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
-        final Set<AbstractUpdateAssgnLoc> assignablesToRemoveFromAbstrUpd = abstrUpd
+        final Set<AbstractUpdateLoc> assignablesToRemoveFromAbstrUpd = abstrUpd
                 .getAllAssignables().stream().filter(assgn -> !(assgn instanceof EmptyLoc))
                 .filter(assgn -> !isRelevant(assgn, relevantLocations, overwrittenLocations,
                         services))
@@ -322,7 +321,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      */
     private static Optional<Term> maybeDropElementaryUpdate(final Term update, final Term target,
             final Set<AbstractUpdateLoc> relevantLocations,
-            final Set<AbstractUpdateAssgnLoc> overwrittenLocations, final Services services) {
+            final Set<AbstractUpdateLoc> overwrittenLocations, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final ElementaryUpdate eu = (ElementaryUpdate) update.op();
         final LocationVariable lhs = (LocationVariable) eu.lhs();
@@ -353,7 +352,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      */
     private static boolean isRelevant(final LocationVariable lv,
             final Set<AbstractUpdateLoc> relevantLocations,
-            final Set<AbstractUpdateAssgnLoc> overwrittenLocations, Services services) {
+            final Set<AbstractUpdateLoc> overwrittenLocations, Services services) {
         /*
          * NOTE (DS, 2019-10-25): In an older version, we had to perform checks by names
          * of LVs for occurrences in APS specs, since there were those problems with
@@ -368,7 +367,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      * Checks whether the given location is relevant w.r.t. the given set of
      * relevant locations.
      * 
-     * @param loc                  The {@link AbstractUpdateAssgnLoc} to check for
+     * @param loc                  The {@link AbstractUpdateLoc} to check for
      *                             relevance.
      * @param relevantLocations    The relevant locations.
      * @param overwrittenLocations A set of locations that are overwritten and
@@ -377,9 +376,9 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      * @return true iff the given location is relevant w.r.t. the given set of
      *         relevant locations.
      */
-    private static boolean isRelevant(final AbstractUpdateAssgnLoc loc,
+    private static boolean isRelevant(final AbstractUpdateLoc loc,
             final Set<AbstractUpdateLoc> relevantLocations,
-            final Set<AbstractUpdateAssgnLoc> overwrittenLocations, Services services) {
+            final Set<AbstractUpdateLoc> overwrittenLocations, Services services) {
         /*
          * For now, we perform an overapproximation: Whenever there's allLocs or a
          * Skolem location set in the relevant locations set, we say that the location
@@ -400,7 +399,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      * @param locs The locations.
      */
     private static void addToAssngLocationSet(final LocationVariable lv,
-            final Set<AbstractUpdateAssgnLoc> locs) {
+            final Set<AbstractUpdateLoc> locs) {
         locs.add(new PVLoc(lv));
     }
 

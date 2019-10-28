@@ -26,7 +26,7 @@ import de.uka.ilkd.key.logic.op.Operator;
  * @author Dominic Steinhoefel
  *
  */
-public class ArrayRange extends HeapLocLHS implements HeapLocRHS {
+public class ArrayRange extends HeapLocLHS {
     final Term array;
     final Term left;
     final Term right;
@@ -48,12 +48,12 @@ public class ArrayRange extends HeapLocLHS implements HeapLocRHS {
 
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        if (otherLoc instanceof AllFieldsLocRHS) {
-            return ((AllFieldsLocRHS) otherLoc).getArray().equals(array);
+        if (otherLoc instanceof AllFieldsLocLHS) {
+            return ((AllFieldsLocLHS) otherLoc).getArray().equals(array);
         } else if (otherLoc instanceof PVLoc) {
             return ((PVLoc) otherLoc).getVar()
                     .equals(services.getTypeConverter().getHeapLDT().getHeap());
-        } else if (otherLoc instanceof ArrayLocRHS || otherLoc instanceof ArrayRange) {
+        } else if (otherLoc instanceof ArrayLocLHS || otherLoc instanceof ArrayRange) {
             super.mayAssign(otherLoc, services);
         }
 

@@ -56,17 +56,17 @@ public class AllFieldsLocLHS extends HeapLocLHS {
 
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        if (otherLoc instanceof ArrayLocRHS) {
-            return ((ArrayLocRHS) otherLoc).getArray().equals(this.array);
+        if (otherLoc instanceof ArrayLocLHS) {
+            return ((ArrayLocLHS) otherLoc).getArray().equals(this.array);
         } else if (otherLoc instanceof PVLoc) {
             return ((PVLoc) otherLoc).getVar()
                     .equals(services.getTypeConverter().getHeapLDT().getHeap());
-        } else if (otherLoc instanceof AllFieldsLocRHS) {
-            return ((AllFieldsLocRHS) otherLoc).getArray().equals(this.array);
+        } else if (otherLoc instanceof ArrayLocLHS) {
+            return ((AllFieldsLocLHS) otherLoc).getArray().equals(this.array);
         } else if (otherLoc instanceof ArrayRange) {
             super.mayAssign(otherLoc, services);
         }
-        
+
         return false;
     }
 

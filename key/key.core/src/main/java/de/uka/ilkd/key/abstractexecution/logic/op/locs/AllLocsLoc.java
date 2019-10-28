@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.op.Operator;
  *
  * @author Dominic Steinhoefel
  */
-public class AllLocsLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
+public class AllLocsLoc implements AbstractUpdateLoc {
     private final Function allLocs;
 
     public AllLocsLoc(Function allLocs) {

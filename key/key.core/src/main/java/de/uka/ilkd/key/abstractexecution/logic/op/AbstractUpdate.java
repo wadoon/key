@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import org.key_project.util.collection.UniqueArrayList;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
@@ -39,10 +38,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
 /**
  * Class of operators for abstract updates (in the sense of Abstract Execution),
  * i.e., updates of the form "U(assignables := accessibles)", where assignables
- * and accessibles are lists of {@link AbstractUpdateAssgnLoc} /
- * {@link AbstractUpdateLoc} (generally, locations, like location variables).
- * The arity of these lists is fixed. Left-hand sides will always be locations,
- * right-hand sides are values that can be updated.
+ * and accessibles are lists of {@link AbstractUpdateLoc} (generally,
+ * locations, like location variables). The arity of these lists is fixed.
+ * Left-hand sides will always be locations, right-hand sides are values that
+ * can be updated.
  * 
  * There is one such operator for every left hand side "assignables". Each of
  * these operator is unary, accepting a list "accessibles" of accessible
@@ -61,7 +60,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * sorts of assignables. Should never be modified (create a new
      * {@link AbstractUpdate} to change the assignables).
      */
-    private final UniqueArrayList<AbstractUpdateAssgnLoc> assignables;
+    private final UniqueArrayList<AbstractUpdateLoc> assignables;
 
     /**
      * The hash code of this {@link AbstractUpdate}; computed of the
@@ -87,7 +86,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @param services    The {@link Services} object.
      */
     AbstractUpdate(final AbstractPlaceholderStatement phs,
-            final UniqueArrayList<AbstractUpdateAssgnLoc> assignables, final Sort[] argSorts,
+            final UniqueArrayList<AbstractUpdateLoc> assignables, final Sort[] argSorts,
             final Services services) {
         super(new Name("U_" + phs.getId() + "("
                 + assignables.stream().map(lhs -> lhs.toString()).collect(Collectors.joining(","))
@@ -117,7 +116,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @param newAssignables The new left-hand side for the {@link AbstractUpdate}.
      * @return A new {@link AbstractUpdate} with the given left-hand side.
      */
-    AbstractUpdate changeAssignables(final UniqueArrayList<AbstractUpdateAssgnLoc> newAssignables) {
+    AbstractUpdate changeAssignables(final UniqueArrayList<AbstractUpdateLoc> newAssignables) {
         return new AbstractUpdate( //
                 phs, newAssignables, super.argSorts().toArray(new Sort[0]), services);
     }
@@ -145,7 +144,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      *
      * @return All assignables.
      */
-    public List<AbstractUpdateAssgnLoc> getAllAssignables() {
+    public List<AbstractUpdateLoc> getAllAssignables() {
         return assignables;
     }
 
@@ -155,9 +154,9 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @return The elements of the assignables union of this abstract update that
      *         may be assigned.
      */
-    public Set<AbstractUpdateAssgnLoc> getMaybeAssignables() {
+    public Set<AbstractUpdateLoc> getMaybeAssignables() {
         return assignables.stream().filter(lhs -> !(lhs instanceof HasToLoc))
-                .map(AbstractUpdateAssgnLoc.class::cast)
+                .map(AbstractUpdateLoc.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
@@ -167,9 +166,9 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @return The elements of the assignables union of this abstract update that
      *         have to be assigned.
      */
-    public Set<AbstractUpdateAssgnLoc> getHasToAssignables() {
+    public Set<AbstractUpdateLoc> getHasToAssignables() {
         return assignables.stream().filter(HasToLoc.class::isInstance).map(HasToLoc.class::cast)
-                .map(HasToLoc::child).map(AbstractUpdateAssgnLoc.class::cast)
+                .map(HasToLoc::child).map(AbstractUpdateLoc.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 

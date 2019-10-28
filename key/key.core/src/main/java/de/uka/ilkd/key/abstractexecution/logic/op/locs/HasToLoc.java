@@ -15,6 +15,7 @@ package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 
 /**
@@ -22,10 +23,10 @@ import de.uka.ilkd.key.logic.op.Operator;
  *
  * @author Dominic Steinhoefel
  */
-public class HasToLoc implements AbstractUpdateAssgnLoc {
-    private final AbstractUpdateAssgnLoc child;
+public class HasToLoc implements AbstractUpdateLoc {
+    private final AbstractUpdateLoc child;
 
-    public HasToLoc(AbstractUpdateAssgnLoc child) {
+    public HasToLoc(AbstractUpdateLoc child) {
         assert !(child instanceof AllLocsLoc);
 
         if (child instanceof HasToLoc) {
@@ -35,7 +36,12 @@ public class HasToLoc implements AbstractUpdateAssgnLoc {
         }
     }
 
-    public AbstractUpdateAssgnLoc child() {
+    @Override
+    public Term toTerm(Services services) {
+        return services.getTermBuilder().hasTo(child.toTerm(services));
+    }
+
+    public AbstractUpdateLoc child() {
         return child;
     }
 
@@ -51,7 +57,8 @@ public class HasToLoc implements AbstractUpdateAssgnLoc {
 
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        return child.mayAssign(otherLoc, services);
+        return child.mayAssign(
+                otherLoc instanceof HasToLoc ? ((HasToLoc) otherLoc).child() : otherLoc, services);
     }
 
     @Override

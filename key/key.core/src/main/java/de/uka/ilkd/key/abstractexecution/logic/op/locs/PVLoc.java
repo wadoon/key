@@ -26,7 +26,7 @@ import de.uka.ilkd.key.logic.op.Operator;
  *
  * @author Dominic Steinhoefel
  */
-public class PVLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
+public class PVLoc implements AbstractUpdateLoc {
     private final LocationVariable locVar;
 
     public PVLoc(LocationVariable locVar) {

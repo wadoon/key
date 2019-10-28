@@ -12,7 +12,6 @@
 //
 package de.uka.ilkd.key.abstractexecution.util;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -24,12 +23,10 @@ import org.key_project.util.collection.UniqueArrayList;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLocRHS;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
@@ -96,7 +93,7 @@ public class AbstractExecutionContractUtils {
      * @return The assignable locations for the given
      *         {@link AbstractPlaceholderStatement}.
      */
-    public static UniqueArrayList<AbstractUpdateAssgnLoc> getAssignableOpsForNoBehaviorContract(
+    public static UniqueArrayList<AbstractUpdateLoc> getAssignableOpsForNoBehaviorContract(
             AbstractPlaceholderStatement aps, ProgramElement context, Services services) {
         return getAccessibleAndAssignableTermsForNoBehaviorContract(aps, context, services).second;
     }
@@ -220,11 +217,6 @@ public class AbstractExecutionContractUtils {
      * {@link SpecificationRepository}. The default for both is allLocs (everything
      * assignable and accessible).
      *
-     * Note that this method does not perform normalization of self terms, it is
-     * therefore not suitable in the general case for extracting
-     * {@link FieldLocRHS}s, but has no problem with extracting the other
-     * {@link AbstractUpdateLoc}s.
-     *
      * @param abstrStmt      The {@link AbstractPlaceholderStatement} for which to
      *                       extract the accessible and assignable clause.
      * @param contextProgram The context program to determine the right contract
@@ -233,7 +225,7 @@ public class AbstractExecutionContractUtils {
      * @return A pair of (1) the accessible and (2) the assignable locations for the
      *         {@link AbstractPlaceholderStatement}.
      */
-    public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateAssgnLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
+    public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractPlaceholderStatement abstrStmt, final ProgramElement contextProgram,
             final Services services) {
         final ProgramVariableCollector pvColl = //
@@ -260,12 +252,12 @@ public class AbstractExecutionContractUtils {
      * @return A pair of (1) the accessible and (2) the assignable locations for the
      *         {@link AbstractPlaceholderStatement}.
      */
-    public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateAssgnLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
+    public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractPlaceholderStatement abstrStmt,
             final Set<LocationVariable> surroundingVars, Optional<LocationVariable> runtimeInstance,
             final Services services) {
         List<AbstractUpdateLoc> accessibleClause;
-        UniqueArrayList<AbstractUpdateAssgnLoc> assignableClause = null;
+        UniqueArrayList<AbstractUpdateLoc> assignableClause = null;
 
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
 
@@ -274,7 +266,7 @@ public class AbstractExecutionContractUtils {
 
         if (contracts.isEmpty()) {
             accessibleClause = Collections.singletonList(new AllLocsLoc(locSetLDT.getAllLocs()));
-            assignableClause = new UniqueArrayList<AbstractUpdateAssgnLoc>();
+            assignableClause = new UniqueArrayList<AbstractUpdateLoc>();
             assignableClause.add(new AllLocsLoc(locSetLDT.getAllLocs()));
         } else {
             final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
@@ -289,11 +281,11 @@ public class AbstractExecutionContractUtils {
             assignableClause = AbstractUpdateFactory
                     .abstrUpdateAssgnLocsFromTermSafe(contract.getAssignable(heap), runtimeInstance,
                             services)
-                    .stream().map(AbstractUpdateAssgnLoc.class::cast)
+                    .stream().map(AbstractUpdateLoc.class::cast)
                     .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
         }
 
-        return new Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateAssgnLoc>>(
+        return new Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>>(
                 accessibleClause, assignableClause);
     }
 
@@ -314,7 +306,7 @@ public class AbstractExecutionContractUtils {
      * @return A pair of (1) the accessible and (2) the assignable locations for the
      *         {@link AbstractPlaceholderStatement}.
      */
-    public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateAssgnLoc>> //
+    public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> //
             getAccessibleAndAssignableTermsForNoBehaviorContract(
                     final AbstractPlaceholderStatement abstrStmt, final MatchConditions matchCond,
                     final Services services, Optional<LocationVariable> runtimeInstance) {

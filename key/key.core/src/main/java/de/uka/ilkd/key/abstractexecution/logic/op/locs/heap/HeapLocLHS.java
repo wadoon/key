@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
@@ -35,7 +34,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * 
  * @author Dominic Steinhoefel
  */
-public abstract class HeapLocLHS implements AbstractUpdateAssgnLoc {
+public abstract class HeapLocLHS implements AbstractUpdateLoc {
 
     /**
      * Applies an update to this {@link HeapLocLHS}. For instance, the application
@@ -67,13 +66,13 @@ public abstract class HeapLocLHS implements AbstractUpdateAssgnLoc {
             return Optional.empty();
         }
 
-        final Set<AbstractUpdateAssgnLoc> newLocs = AbstractUpdateFactory
+        final Set<AbstractUpdateLoc> newLocs = AbstractUpdateFactory
                 .abstrUpdateAssgnLocsFromTermUnsafe(simplTerm, Optional.empty(), services);
 
         if (newLocs == null || newLocs.size() != 1) {
             return Optional.empty();
         } else {
-            final AbstractUpdateAssgnLoc elem = newLocs.iterator().next();
+            final AbstractUpdateLoc elem = newLocs.iterator().next();
             return elem instanceof HeapLocLHS ? Optional.of((HeapLocLHS) elem) : Optional.empty();
         }
     }

@@ -35,7 +35,6 @@ import org.key_project.util.collection.UniqueArrayList;
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -955,7 +954,7 @@ public class TermBuilder {
     }
 
     public Term abstractUpdate(AbstractPlaceholderStatement phs,
-            UniqueArrayList<AbstractUpdateAssgnLoc> assignables, List<AbstractUpdateLoc> accessibles) {
+            UniqueArrayList<AbstractUpdateLoc> assignables, List<AbstractUpdateLoc> accessibles) {
         final AbstractUpdate au = services.abstractUpdateFactory()
                 .getInstance(phs, assignables, accessibles);
         return tf.createTerm(au, accessibles.stream().map(loc -> loc.toTerm(services))

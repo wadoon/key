@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.op.Operator;
  *
  * @author Dominic Steinhoefel
  */
-public class EmptyLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
+public class EmptyLoc implements AbstractUpdateLoc {
     private final Function emptyLocSet;
 
     public EmptyLoc(Function empty) {

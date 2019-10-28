@@ -17,7 +17,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
@@ -74,11 +74,11 @@ public final class ApplyAbstractUpdateOnPVCondition implements VariableCondition
         final TermBuilder tb = services.getTermBuilder();
 
         final AbstractUpdate abstrUpd = (AbstractUpdate) updateTerm.op();
-        final List<AbstractUpdateAssgnLoc> allAssignables = abstrUpd.getAllAssignables();
+        final List<AbstractUpdateLoc> allAssignables = abstrUpd.getAllAssignables();
         final LocationVariable locVar = (LocationVariable) pvTerm.op();
 
         for (int i = 0; i < allAssignables.size(); i++) {
-            final AbstractUpdateAssgnLoc assignable = allAssignables.get(i);
+            final AbstractUpdateLoc assignable = allAssignables.get(i);
             if (assignable instanceof HasToLoc
                     && assignable.mayAssign(new PVLoc(locVar), services)) {
                 final Term replacement = tb.func(

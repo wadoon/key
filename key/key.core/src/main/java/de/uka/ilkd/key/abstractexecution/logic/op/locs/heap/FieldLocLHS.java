@@ -75,9 +75,9 @@ public class FieldLocLHS extends HeapLocLHS {
          */
         return (otherLoc instanceof PVLoc && ((PVLoc) otherLoc).getVar()
                 .equals(services.getTypeConverter().getHeapLDT().getHeap()))
-                || (otherLoc instanceof FieldLocRHS
-                        && ((FieldLocRHS) otherLoc).getObjTerm().equals(this.objTerm)
-                        && ((FieldLocRHS) otherLoc).getFieldPV().equals(this.fieldPV));
+                || (otherLoc instanceof FieldLocLHS
+                        && ((FieldLocLHS) otherLoc).objTerm.equals(this.objTerm)
+                        && ((FieldLocLHS) otherLoc).fieldPV.equals(this.fieldPV));
     }
 
     /**
