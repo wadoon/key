@@ -20,7 +20,10 @@ import java.util.Set;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramLocationsCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
@@ -56,6 +59,15 @@ public class TermAccessibleLocationsCollector extends DefaultVisitor {
     public void visit(Term t) {
         if (t.op() instanceof LocationVariable) {
             result.add(new PVLoc((LocationVariable) t.op()));
+        }
+
+        if (AbstractExecutionUtils.isAbstractSkolemLocationSetTerm(t, services)) {
+            result.add(new SkolemLoc((Function) t.op()));
+        }
+
+        final Function allLocs = services.getTypeConverter().getLocSetLDT().getAllLocs();
+        if (t.op() == allLocs) {
+            result.add(new AllLocsLoc(allLocs));
         }
 
         final java.util.function.Function<Term, Set<AbstractUpdateLoc>> subToLoc = //

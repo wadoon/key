@@ -165,7 +165,7 @@ public class JavaDocument extends DefaultStyledDocument {
         "accessible", "accessible_redundantly", "assert", "assert_redundantly", "assignable",
         "assignable_redundantly", "assume", "assume_redudantly", "breaks", "breaks_redundantly",
         "\\by", "callable", "callable_redundantly", "captures", "captures_redundantly",
-        "continues", "continues_redundantly", "debug", "\\declassifies", "decreases",
+        "continues", "continues_redundantly", "debug", "declares", "\\declassifies", "decreases",
         "decreases_redundantly", "decreasing", "decreasing_redundantly", "diverges",
         "determines", "diverges_redundantly", "duration", "duration_redundantly", "ensures",
         "ensures_redundantly", "\\erases", "forall", "for_example", "hence_by", "implies_that",

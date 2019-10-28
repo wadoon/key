@@ -37,11 +37,14 @@ import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
@@ -394,5 +397,36 @@ public class AbstractExecutionUtils {
         final OpCollector opColl = new OpCollector();
         updateTerm.execPostOrder(opColl);
         return opColl.ops().stream().anyMatch(AbstractUpdate.class::isInstance);
+    }
+
+    /**
+     * Checks whether the given {@link Term} is an abstract Skolem location set
+     * term. Those are non-rigid, nullary constants of type LocSet. Note that the
+     * allLocs symbol shipped with KeY by default does not belong to this category.
+     * 
+     * @param t        The {@link Term} to check.
+     * @param services The {@link Services} object.
+     * @return true iff the operator of <code>t</code> is an abstract Skolem
+     *         location set.
+     */
+    public static boolean isAbstractSkolemLocationSetTerm(Term t, Services services) {
+        final Sort locSetSort = services.getTypeConverter().getLocSetLDT().targetSort();
+        return t.op() instanceof Function && t.arity() == 0 && t.sort() == locSetSort
+                && t.op().isRigid() == false;
+    }
+
+    /**
+     * Checks whether the given operator is an abstract Skolem location set. Those
+     * are non-rigid, nullary constants of type LocSet. Note that the allLocs symbol
+     * shipped with KeY by default does not belong to this category.
+     * 
+     * @param op       The {@link Operator} to check.
+     * @param services The {@link Services} object.
+     * @return true iff op is an abstract Skolem location set.
+     */
+    public static boolean isAbstractSkolemLocationSetOp(Operator op, Services services) {
+        final Sort locSetSort = services.getTypeConverter().getLocSetLDT().targetSort();
+        return op instanceof Function && op.arity() == 0 && ((Function) op).sort() == locSetSort
+                && op.isRigid() == false;
     }
 }
