@@ -411,6 +411,11 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
 
         // loc has to be disjoint from *all* relevant locations.
         for (final AbstractUpdateLoc relevantLoc : relevantLocations) {
+            if (locUnwrapped instanceof PVLoc && relevantLoc instanceof PVLoc
+                    && !loc.equals(relevantLoc)) {
+                continue;
+            }
+            
             final Optional<PosInOccurrence> maybeIrrelevanceEvidence = //
                     isIrrelevant(locUnwrapped, relevantLoc, goal, services);
 
