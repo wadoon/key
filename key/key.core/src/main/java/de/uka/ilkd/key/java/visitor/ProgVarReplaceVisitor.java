@@ -136,7 +136,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return new LocationVariable(
                 VariableNamer.parseName(name.toString() + postFix,
                         name.getCreationInfo()),
-                pv.getKeYJavaType(), pv.isFinal());
+                pv.getKeYJavaType(), pv.isFinal(), pv.getPositionInfo());
     }
 
     @Override

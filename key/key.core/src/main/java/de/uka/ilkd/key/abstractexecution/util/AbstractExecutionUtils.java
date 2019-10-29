@@ -13,6 +13,8 @@
 package de.uka.ilkd.key.abstractexecution.util;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
@@ -94,5 +96,20 @@ public class AbstractExecutionUtils {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         return op instanceof Function && op.arity() == 0
                 && ((Function) op).sort() == locSetLDT.targetSort();
+    }
+
+    /**
+     * Unwraps a {@link HasToLoc}. Returns the original loc if it's not a
+     * {@link HasToLoc}.
+     * 
+     * @param loc The location to unwrap.
+     * @return The unwrapped location.
+     */
+    public static AbstractUpdateLoc unwrapHasTo(AbstractUpdateLoc loc) {
+        if (loc instanceof HasToLoc) {
+            return ((HasToLoc) loc).child();
+        }
+    
+        return loc;
     }
 }

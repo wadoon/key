@@ -1294,7 +1294,7 @@ public class Recoder2KeYConverter {
             final ProgramElementName name = VariableNamer
                     .parseName(makeAdmissibleName(recoderVarSpec.getName()));
             final ProgramVariable pv = new LocationVariable(name,
-                    getKeYJavaType(recoderType), recoderVarSpec.isFinal());
+                    getKeYJavaType(recoderType), recoderVarSpec.isFinal(), positionInfo(recoderVarSpec));
             varSpec = new VariableSpecification(
                     collectChildren(recoderVarSpec), pv, recoderVarSpec
                     .getDimensions(), pv.getKeYJavaType());

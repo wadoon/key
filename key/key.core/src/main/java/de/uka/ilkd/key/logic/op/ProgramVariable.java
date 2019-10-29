@@ -199,19 +199,19 @@ public abstract class ProgramVariable extends AbstractSortedOperator
     
     @Override
     public Position getStartPosition(){
-	return Position.UNDEFINED;
+	return getPositionInfo().getStartPosition();
     }
 
     
     @Override
     public Position getEndPosition(){
-	return Position.UNDEFINED;
+	return getPositionInfo().getEndPosition();
     }
     
 
     @Override
     public Position getRelativePosition(){
-	return  Position.UNDEFINED;
+	return getPositionInfo().getRelativePosition();
     }
 
     
