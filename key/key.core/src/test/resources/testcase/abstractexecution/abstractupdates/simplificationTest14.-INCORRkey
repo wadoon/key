@@ -1,0 +1,16 @@
+\functions {
+  LocSet lsA;
+  LocSet lsB;
+  LocSet lsC;
+  LocSet lsD;
+}
+
+\problem {
+        disjoint(lsA,lsC)
+      & disjoint(lsA,lsD)
+      & disjoint(lsB,lsC)
+      // & disjoint(lsB,lsD)
+    ->
+      {U_P({\fun(lsA)}:={\fun(lsB)})||U_Q({\fun(lsC)}:={\fun(lsD)})}value(allLocs) =
+      {U_Q({\fun(lsC)}:={\fun(lsD)})||U_P({\fun(lsA)}:={\fun(lsB)})}value(allLocs)
+}
