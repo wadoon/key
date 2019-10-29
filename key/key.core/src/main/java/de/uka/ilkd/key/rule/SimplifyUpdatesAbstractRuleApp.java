@@ -478,7 +478,7 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
      *         <em>not</em> relevant, and a premise proving the irrelevance (i.e.,
      *         disjointness) in the other case.
      */
-    private static Optional<PosInOccurrence> isIrrelevant(final AbstractUpdateLoc loc,
+    public static Optional<PosInOccurrence> isIrrelevant(final AbstractUpdateLoc loc,
             final AbstractUpdateLoc relevantLoc, final Goal goal, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
 

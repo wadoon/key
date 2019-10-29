@@ -41,6 +41,7 @@ import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.QueryExpand;
+import de.uka.ilkd.key.rule.ReorderAbstractUpdatesRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SimplifyUpdatesAbstractRule;
@@ -205,7 +206,8 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(QueryExpand.INSTANCE)
                                    .prepend(MergeRule.INSTANCE)
                                    .prepend(LoopApplyHeadRule.INSTANCE)
-                                   .prepend(SimplifyUpdatesAbstractRule.INSTANCE);
+                                   .prepend(SimplifyUpdatesAbstractRule.INSTANCE)
+                                   .prepend(ReorderAbstractUpdatesRule.INSTANCE);
 
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact
         // that Contract insertion rule is the FIRST element of this list!
