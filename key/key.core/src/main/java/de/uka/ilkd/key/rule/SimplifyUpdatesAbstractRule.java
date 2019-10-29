@@ -74,43 +74,6 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
         return newGoals;
     }
 
-    /**
-     * Replaces in the given {@link Term}
-     * <code>term> the position indicated by the <code>index</code>-th suffix in
-     * <code>pit</code> by replacement. The first <code>index</code> entries in pit
-     * are ignored, in other words.
-     * 
-     * @param term        The {@link Term} in which to replace.
-     * @param replacement The replacement {@link Term}.
-     * @param index       The index defining the interesting suffix in pit.
-     * @param pit         The position to replace (defined together with index).
-     * @param services    The {@link Services} object.
-     * @return The replaced {@link Term}.
-     */
-    private static Term replaceInTerm(final Term term, final Term replacement, final int index,
-            final PosInTerm pit, final Services services) {
-        if (pit.isTopLevel()) {
-            return replacement;
-        }
-
-        final Term[] newSubs = new Term[term.subs().size()];
-        final int posToLookFor = pit.getIndexAt(index);
-        for (int i = 0; i < newSubs.length; i++) {
-            if (i == posToLookFor) {
-                if (pit.depth() - 1 == index) {
-                    newSubs[i] = replacement;
-                } else {
-                    newSubs[i] = replaceInTerm(term.sub(i), replacement, index + 1, pit, services);
-                }
-            } else {
-                newSubs[i] = term.sub(i);
-            }
-        }
-
-        return services.getTermFactory().createTerm(term.op(), new ImmutableArray<>(newSubs),
-                term.boundVars(), term.javaBlock(), term.getLabels());
-    }
-
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         if (pio == null || pio.subTerm() == null) {
@@ -169,6 +132,43 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
         return new SimplifyUpdatesAbstractRuleApp(this, pos);
+    }
+
+    /**
+     * Replaces in the given {@link Term}
+     * <code>term> the position indicated by the <code>index</code>-th suffix in
+     * <code>pit</code> by replacement. The first <code>index</code> entries in pit
+     * are ignored, in other words.
+     * 
+     * @param term        The {@link Term} in which to replace.
+     * @param replacement The replacement {@link Term}.
+     * @param index       The index defining the interesting suffix in pit.
+     * @param pit         The position to replace (defined together with index).
+     * @param services    The {@link Services} object.
+     * @return The replaced {@link Term}.
+     */
+    private static Term replaceInTerm(final Term term, final Term replacement, final int index,
+            final PosInTerm pit, final Services services) {
+        if (pit.isTopLevel()) {
+            return replacement;
+        }
+
+        final Term[] newSubs = new Term[term.subs().size()];
+        final int posToLookFor = pit.getIndexAt(index);
+        for (int i = 0; i < newSubs.length; i++) {
+            if (i == posToLookFor) {
+                if (pit.depth() - 1 == index) {
+                    newSubs[i] = replacement;
+                } else {
+                    newSubs[i] = replaceInTerm(term.sub(i), replacement, index + 1, pit, services);
+                }
+            } else {
+                newSubs[i] = term.sub(i);
+            }
+        }
+
+        return services.getTermFactory().createTerm(term.op(), new ImmutableArray<>(newSubs),
+                term.boundVars(), term.javaBlock(), term.getLabels());
     }
 
 }
