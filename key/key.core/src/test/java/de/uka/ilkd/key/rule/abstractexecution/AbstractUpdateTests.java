@@ -16,7 +16,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.BeforeClass;
@@ -48,6 +51,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+import de.uka.ilkd.key.rule.merge.MergeRuleTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
@@ -56,6 +60,9 @@ import de.uka.ilkd.key.util.SideProofUtil;
  * @author Dominic Steinhoefel
  */
 public class AbstractUpdateTests {
+    private static final File TEST_RESOURCES_DIR_PREFIX = new File(
+            HelperClassForTests.TESTCASE_DIRECTORY, "abstractexecution/abstractupdates/");
+
     private static Services DUMMY_SERVICES;
     private static Proof DUMMY_PROOF;
     private static Sort INT_SORT;
@@ -163,6 +170,30 @@ public class AbstractUpdateTests {
 
         final Proof proofTwo = startProofFor(equivalenceTwo);
         assertFalse(proofTwo.closed());
+    }
+
+    @Test
+    public void simplificationTests() {
+        final Map<String, Boolean> simplificationTests = new LinkedHashMap<>();
+        simplificationTests.put("simplificationTest01.key", true);
+        simplificationTests.put("simplificationTest02.key", true);
+        simplificationTests.put("simplificationTest03-INCORR.key", false);
+        simplificationTests.put("simplificationTest04.key", true);
+        simplificationTests.put("simplificationTest05-INCORR.key", false);
+        simplificationTests.put("simplificationTest06.key", true);
+        simplificationTests.put("simplificationTest07.key", true);
+        simplificationTests.put("simplificationTest08-INCORR.key", false);
+        simplificationTests.put("simplificationTest09-INCORR.key", false);
+        simplificationTests.put("simplificationTest10.key", true);
+        simplificationTests.put("simplificationTest11.key", true);
+        simplificationTests.put("simplificationTest12-INCORR.key", false);
+
+        for (final String keyFile : simplificationTests.keySet()) {
+            final Proof proof = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX, keyFile);
+            MergeRuleTests.startAutomaticStrategy(proof);
+
+            assertEquals("Failed " + keyFile, simplificationTests.get(keyFile), proof.closed());
+        }
     }
 
     // //////////////////////////////////////////// //

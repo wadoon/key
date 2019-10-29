@@ -14,17 +14,15 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -382,40 +380,45 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
             final Set<AbstractUpdateLoc> relevantLocations,
             final Set<AbstractUpdateLoc> overwrittenLocations, Services services) {
         /*
-         * For now, we perform an overapproximation: Whenever there's allLocs or a
-         * Skolem location set in the relevant locations set, we say that the location
-         * is relevant. For fine-grained and more useful checks, we'd have to check
-         * disjointness of loc from the relevant locations.
+         * In this class, we perform an overapproximation: Whenever there's location
+         * that's not a PVLoc in the relevant locations set, we say that the location
+         * loc is relevant. More fine-grained checks are deferred to other rules.
          */
 
-        if (overwrittenLocations.contains(loc)) {
+        final AbstractUpdateLoc locUnwrapped = unwrapHasTo(loc);
+
+        if (overwrittenLocations.contains(locUnwrapped) || relevantLocations.isEmpty()) {
             return false;
         }
 
-        if (relevantLocations.stream().anyMatch(AllLocsLoc.class::isInstance)) {
+        if (!(locUnwrapped instanceof PVLoc || locUnwrapped instanceof EmptyLoc)) {
             return true;
         }
 
-        final List<SkolemLoc> skolemLocs = relevantLocations.stream()
-                .filter(SkolemLoc.class::isInstance).map(SkolemLoc.class::cast)
-                .collect(Collectors.toList());
-
-        boolean disjointWithSkolemTerms = true;
-        if (!skolemLocs.isEmpty()) {
-            //@formatter:off
-//            for (final SkolemLoc skLoc : skolemLocs) {
-//                final TermBuilder tb = services.getTermBuilder();
-//                final Term disjointness1 = tb.equals( //
-//                        tb.intersect(loc.toTerm(services), skLoc.toTerm(services)), tb.empty());
-//                final Term disjointness2 = tb.equals( //
-//                        tb.intersect(skLoc.toTerm(services), loc.toTerm(services)), tb.empty());
-//            }
-            //@formatter:on
-            disjointWithSkolemTerms = false;
+        if (relevantLocations.stream().anyMatch(//
+                relLoc -> !(relLoc instanceof PVLoc || relLoc instanceof EmptyLoc))) {
+            return true;
         }
 
-        return !disjointWithSkolemTerms
-                || relevantLocations.stream().anyMatch(relLoc -> loc.mayAssign(relLoc, services));
+        return relevantLocations.stream() //
+                .filter(PVLoc.class::isInstance) //
+                .map(PVLoc.class::cast) //
+                .anyMatch(locUnwrapped::equals);
+    }
+
+    /**
+     * Unwraps a {@link HasToLoc}. Returns the original loc if it's not a
+     * {@link HasToLoc}.
+     * 
+     * @param loc The location to unwrap.
+     * @return The unwrapped location.
+     */
+    private static AbstractUpdateLoc unwrapHasTo(AbstractUpdateLoc loc) {
+        if (loc instanceof HasToLoc) {
+            return ((HasToLoc) loc).child();
+        }
+
+        return loc;
     }
 
     /**
