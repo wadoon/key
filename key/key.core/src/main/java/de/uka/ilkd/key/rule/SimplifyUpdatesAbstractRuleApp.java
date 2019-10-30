@@ -22,7 +22,9 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
@@ -377,7 +379,8 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
 
     /**
      * Checks whether the given location is relevant w.r.t. the given set of
-     * relevant locations.
+     * relevant locations. Changes {@link #ifInsts} in case that evicence was used
+     * in a successful irrelevance "proof".
      * 
      * <p>
      * This method is the significant difference to
@@ -401,21 +404,47 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
         ImmutableList<PosInOccurrence> localIfInsts = ImmutableSLList.<PosInOccurrence>nil();
         final AbstractUpdateLoc locUnwrapped = AbstractExecutionUtils.unwrapHasTo(loc);
 
+        //@formatter:off
+        /*
+         * A location l1 (set) is *not* relevant w.r.t. another location l2 (set) if:
+         * 
+         * 1) l1 is overwritten, or there is no relevant location l2, or
+         * 2) l1 is a PVLoc and l2 a different PVLoc, or
+         * 3) l1 is not a PVLoc, and l2 is a fresh auxiliary program variable, or
+         * 4) l1 is a fresh auxiliary program variable and l2 is an abstract location set, or
+         * 5) there is evidence in the proof that l1 and l2 are disjoint.
+         * 
+         * In all other cases, l1 is relevant w.r.t. l2. It is relevant w.r.t. a set of
+         * locations if it is relevant for any location in the set.
+         * 
+         * Case 4 is because the variable wouldn't be fresh if it was contained by the
+         * possible instantiations of any abstract location set.
+         */
+        //@formatter:on
+
         if (overwrittenLocations.contains(locUnwrapped) || relevantLocations.isEmpty()) {
             return false;
         }
 
-        if (loc instanceof PVLoc && locIsCreatedFresh(((PVLoc) loc).getVar(), goal, services)) {
-            return false;
+        final Set<AbstractUpdateLoc> relevantLocsCopy = new LinkedHashSet<>(relevantLocations);
+        if (locUnwrapped instanceof PVLoc) {
+            // If loc is a PVLoc, we can safely remove all PVLocs that aren't equal.
+            relevantLocsCopy.removeIf(ploc -> ploc instanceof PVLoc && !ploc.equals(locUnwrapped));
+        } else {
+            /*
+             * Even if loc is allLocs, the "fresh" locations cannot be meant! We remove
+             * them. They only should play a role if loc is a PVLoc.
+             */
+            relevantLocsCopy.removeIf(ploc -> locIsCreatedFresh(ploc, goal, services));
         }
 
         // loc has to be disjoint from *all* relevant locations.
-        for (final AbstractUpdateLoc relevantLoc : relevantLocations) {
-            if (locUnwrapped instanceof PVLoc && relevantLoc instanceof PVLoc
-                    && !loc.equals(relevantLoc)) {
+        for (final AbstractUpdateLoc relevantLoc : relevantLocsCopy) {
+            if ((relevantLoc instanceof AllLocsLoc || relevantLoc instanceof SkolemLoc)
+                    && locIsCreatedFresh(locUnwrapped, goal, services)) {
                 continue;
             }
-            
+
             final Optional<PosInOccurrence> maybeIrrelevanceEvidence = //
                     isIrrelevant(locUnwrapped, relevantLoc, goal, services);
 
@@ -436,14 +465,23 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
      * assumptions created a-priori. Therefore, this method checks whether the given
      * location variable loc is irrelevant for abstract location sets.
      * 
-     * @param loc      The {@link LocationVariable} to check.
+     * <p>
+     * Pure method.
+     * 
+     * @param loc      The {@link AbstractUpdateLoc} to check.
      * @param goal     The context {@link Goal}.
      * @param services The {@link Services} object.
      * @return true iff loc is irrelevant for Skolem location sets since it is
      *         created fresh by KeY rules.
      */
-    private static boolean locIsCreatedFresh(final LocationVariable loc, final Goal goal,
+    private static boolean locIsCreatedFresh(final AbstractUpdateLoc loc, final Goal goal,
             final Services services) {
+        if (!(AbstractExecutionUtils.unwrapHasTo(loc) instanceof PVLoc)) {
+            return false;
+        }
+
+        final LocationVariable locVar = ((PVLoc) AbstractExecutionUtils.unwrapHasTo(loc)).getVar();
+
         /*
          * Location variables that either are already present in the root sequent, or
          * are not related to the source, are considered fresh. We consider variables
@@ -455,12 +493,12 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
         final OpCollector opColl = new OpCollector();
         StreamSupport.stream(goal.proof().root().sequent().spliterator(), true)
                 .map(SequentFormula::formula).forEach(term -> term.execPostOrder(opColl));
-        if (opColl.ops().contains(loc)) {
+        if (opColl.ops().contains(locVar)) {
             // Location was already present in the root node.
             return false;
         }
 
-        return loc.getPositionInfo() == PositionInfo.UNDEFINED;
+        return locVar.getPositionInfo() == PositionInfo.UNDEFINED;
     }
 
     /**
@@ -469,6 +507,9 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
      * performance reasons, but KeY should bring the disjointness assertions to a
      * normal form of the shape <code>loc1 \cap loc2 = {}</code>, therefore it
      * should be OK. There are no proofs involved.
+     * 
+     * <p>
+     * Pure method.
      * 
      * @param loc         The location to check for relevance.
      * @param relevantLoc A location known to be relevant.

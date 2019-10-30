@@ -55,6 +55,7 @@ public class InitializeParametricSkolemPathCondition implements VariableConditio
     public MatchConditions check(SchemaVariable sv, SVSubstitute instCandidate,
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
+        final TermBuilder tb = services.getTermBuilder();
 
         final Optional<LocationVariable> runtimeInstance = Optional
                 .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
@@ -70,33 +71,9 @@ public class InitializeParametricSkolemPathCondition implements VariableConditio
         final List<Term> accessibles = AbstractExecutionContractUtils
                 .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, matchCond,
                         services, runtimeInstance).first.stream().map(loc -> loc.toTerm(services))
-                                .collect(Collectors.toList());
+                                .map(tb::value).collect(Collectors.toList());
         final Sort[] accessiblesSorts = accessibles.stream().map(Term::sort)
                 .collect(Collectors.toList()).toArray(new Sort[0]);
-
-        final TermBuilder tb = services.getTermBuilder();
-
-        //@formatter:off
-        /*
-         * NOTE (DS, 2019-01-31): We reuse the function symbols because otherwise, there
-         * will be different ones around which can, and will, lead to problems, since
-         * they should represent the same thing. It will however be problematic if
-         * someone decides to introduce such a function symbol elsewhere...
-         */
-//        final String pathCondName = //
-//                pathCondSV.name().toString() + "_" + abstrStmt.getId();
-//
-//        final Name funcSymbName = new Name(pathCondName);
-//        final Namespace<Function> functions = //
-//                services.getNamespaces().functions();
-//
-//        Function funcSymb = functions.lookup(funcSymbName);
-//        if (funcSymb == null) {
-//            funcSymb = new Function(//
-//                    funcSymbName, Sort.FORMULA, true, true, accessiblesSorts);
-//            functions.add(funcSymb);
-//        }
-        //@formatter:on
 
         final Function funcSymb = services.abstractUpdateFactory()
                 .getAbstractPathConditionInstance(abstrStmt, accessiblesSorts);
