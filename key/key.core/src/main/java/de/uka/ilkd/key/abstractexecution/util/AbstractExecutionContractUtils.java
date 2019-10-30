@@ -29,6 +29,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.OpCollector;
@@ -241,21 +242,21 @@ public class AbstractExecutionContractUtils {
      * {@link SpecificationRepository}. The default for both is allLocs (everything
      * assignable and accessible).
      *
-     * @param abstrStmt       The {@link AbstractPlaceholderStatement} for which to
-     *                        extract the accessible and assignable clause.
-     * @param surroundingVars {@link LocationVariable}s in the context to
-     *                        distinguish several contracts.
-     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
-     *                        to normalize self terms (because otherwise, there
-     *                        might be different such terms around).
-     * @param services        The {@link Services} object.
+     * @param abstrStmt        The {@link AbstractPlaceholderStatement} for which to
+     *                         extract the accessible and assignable clause.
+     * @param surroundingVars  {@link LocationVariable}s in the context to
+     *                         distinguish several contracts.
+     * @param executionContext An optional runtime instance {@link LocationVariable}
+     *                         to normalize self terms (because otherwise, there
+     *                         might be different such terms around).
+     * @param services         The {@link Services} object.
      * @return A pair of (1) the accessible and (2) the assignable locations for the
      *         {@link AbstractPlaceholderStatement}.
      */
     public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractPlaceholderStatement abstrStmt,
-            final Set<LocationVariable> surroundingVars, Optional<LocationVariable> runtimeInstance,
-            final Services services) {
+            final Set<LocationVariable> surroundingVars,
+            Optional<ExecutionContext> executionContext, final Services services) {
         List<AbstractUpdateLoc> accessibleClause;
         UniqueArrayList<AbstractUpdateLoc> assignableClause = null;
 
@@ -275,11 +276,11 @@ public class AbstractExecutionContractUtils {
                     services);
 
             accessibleClause = AbstractUpdateFactory
-                    .abstrUpdateLocsFromTerm(contract.getAccessibleClause(heap),
-                            runtimeInstance, services)
+                    .abstrUpdateLocsFromTerm(contract.getAccessibleClause(heap), executionContext,
+                            services)
                     .stream().map(AbstractUpdateLoc.class::cast).collect(Collectors.toList());
             assignableClause = AbstractUpdateFactory
-                    .abstrUpdateLocsFromTerm(contract.getAssignable(heap), runtimeInstance,
+                    .abstrUpdateLocsFromTerm(contract.getAssignable(heap), executionContext,
                             services)
                     .stream().map(AbstractUpdateLoc.class::cast)
                     .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
@@ -295,21 +296,21 @@ public class AbstractExecutionContractUtils {
      * {@link SpecificationRepository}. The default for both is allLocs (everything
      * assignable and accessible).
      *
-     * @param abstrStmt       The {@link AbstractPlaceholderStatement} for which to
-     *                        extract the accessible and assignable locations.
-     * @param services        The {@link Services} object.
-     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
-     *                        to normalize self terms (because otherwise, there
-     *                        might be different such terms around).
-     * @param svInst          The current {@link SVInstantiations} (for the
-     *                        context).
+     * @param abstrStmt        The {@link AbstractPlaceholderStatement} for which to
+     *                         extract the accessible and assignable locations.
+     * @param services         The {@link Services} object.
+     * @param executionContext An optional runtime instance {@link LocationVariable}
+     *                         to normalize self terms (because otherwise, there
+     *                         might be different such terms around).
+     * @param svInst           The current {@link SVInstantiations} (for the
+     *                         context).
      * @return A pair of (1) the accessible and (2) the assignable locations for the
      *         {@link AbstractPlaceholderStatement}.
      */
     public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> //
             getAccessibleAndAssignableTermsForNoBehaviorContract(
                     final AbstractPlaceholderStatement abstrStmt, final MatchConditions matchCond,
-                    final Services services, Optional<LocationVariable> runtimeInstance) {
+                    final Services services, Optional<ExecutionContext> executionContext) {
         final Set<LocationVariable> surroundingVars = new LinkedHashSet<>();
         final ProgramVariableCollector pvc = //
                 new ProgramVariableCollector(
@@ -334,9 +335,8 @@ public class AbstractExecutionContractUtils {
             surroundingVars.addAll(result);
         });
 
-        matchCond.getInstantiations().getExecutionContext().getRuntimeInstance();
         return getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, surroundingVars,
-                runtimeInstance, services);
+                executionContext, services);
     }
 
     /**

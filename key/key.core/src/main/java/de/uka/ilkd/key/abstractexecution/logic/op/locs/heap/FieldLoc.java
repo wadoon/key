@@ -12,7 +12,6 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs.heap;
 
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
@@ -21,63 +20,81 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.OpCollector;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * A field location for use in an {@link AbstractUpdate}.
+ * 
+ * TODO Currently no explicit support for static fields.
  *
  * @author Dominic Steinhoefel
  */
 public class FieldLoc extends HeapLoc {
     private final Term objTerm;
-    // XXX (DS, 2019-10-22): If possible, switch from LocationVariable to Term here,
-    // since it's quite questionable to use this "canonical program variable" for
-    // which one has to rely on a specific name of the field, which won't work in
-    // general, e.g. in hand-written KeY files.
-    private final LocationVariable fieldPV;
+    private final Term fieldTerm;
+    private final Sort sort;
 
-    public FieldLoc(Term objTerm, LocationVariable fieldPV) {
+    public FieldLoc(Term objTerm, Term fieldTerm, Services services) {
         this.objTerm = objTerm;
-        this.fieldPV = fieldPV;
+        this.fieldTerm = fieldTerm;
+
+        Sort sort = null;
+        try {
+            sort = ((ProgramVariable) services.getTypeConverter().getHeapLDT()
+                    .translateTerm(fieldTerm, null, services)).sort();
+        } catch (Exception e) {
+            sort = services.getJavaInfo().objectSort();
+        }
+        this.sort = sort;
     }
+
+    /*
+     * Maybe interesting for getting correct self term (where it's converted):
+     * services.getTypeConverter().findThisForSort( pm.getContainerType().getSort(),
+     * execContext) (see MethodCall class)
+     */
 
     @Override
     public Term toTerm(Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        return tb.singleton(objTerm, fieldTerm);
+    }
 
-        return tb.singleton(objTerm, tb.func(heapLDT.getFieldSymbolForPV(fieldPV, services)));
+    /**
+     * @return the objTerm
+     */
+    public Term getObjTerm() {
+        return objTerm;
+    }
+
+    /**
+     * @return the fieldTerm
+     */
+    public Term getFieldTerm() {
+        return fieldTerm;
     }
 
     @Override
     public Set<Operator> childOps() {
-        final Set<Operator> result = new LinkedHashSet<>();
-        result.add(fieldPV);
-
         final OpCollector opColl = new OpCollector();
         objTerm.execPostOrder(opColl);
-        result.addAll(opColl.ops());
-
-        return result;
+        fieldTerm.execPostOrder(opColl);
+        return opColl.ops();
     }
 
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        /*
-         * The comparison to the name of the base heap is ugly, but for now, I would
-         * rather not also pass the services object here...
-         */
         return (otherLoc instanceof PVLoc && ((PVLoc) otherLoc).getVar()
                 .equals(services.getTypeConverter().getHeapLDT().getHeap()))
                 || (otherLoc instanceof FieldLoc
                         && ((FieldLoc) otherLoc).objTerm.equals(this.objTerm)
-                        && ((FieldLoc) otherLoc).fieldPV.equals(this.fieldPV));
+                        && ((FieldLoc) otherLoc).fieldTerm.equals(this.fieldTerm));
     }
 
     /**
@@ -90,9 +107,7 @@ public class FieldLoc extends HeapLoc {
 
     @Override
     public String toString() {
-        return String.format("%s.%s",
-                isStatic() ? fieldPV.getContainerType().getName() : objTerm.toString(),
-                ((ProgramElementName) fieldPV.name()).getProgramName());
+        return String.format("%s.%s", objTerm, HeapLDT.getPrettyFieldName(fieldTerm.op()));
     }
 
     @Override
@@ -102,7 +117,12 @@ public class FieldLoc extends HeapLoc {
 
     @Override
     public int hashCode() {
-        return 5 + 7 * objTerm.hashCode() + 11 * fieldPV.hashCode();
+        return 5 + 7 * objTerm.hashCode() + 11 * fieldTerm.hashCode();
+    }
+
+    @Override
+    public Sort sort() {
+        return sort;
     }
 
 }

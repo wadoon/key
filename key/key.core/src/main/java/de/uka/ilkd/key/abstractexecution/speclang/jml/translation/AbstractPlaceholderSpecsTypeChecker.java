@@ -68,8 +68,8 @@ public class AbstractPlaceholderSpecsTypeChecker {
     private final AbstractPlaceholderStatement aps;
     private final TypeConverter typeConverter;
 
-    public AbstractPlaceholderSpecsTypeChecker(IProgramMethod method,
-            StatementBlock block, ContractClauses clauses, Services services) {
+    public AbstractPlaceholderSpecsTypeChecker(IProgramMethod method, StatementBlock block,
+            ContractClauses clauses, Services services) {
         assert block.getChildAt(0) instanceof AbstractPlaceholderStatement;
 
         this.method = method;
@@ -85,37 +85,46 @@ public class AbstractPlaceholderSpecsTypeChecker {
                 getDeclaredOps();
 
         /* Check that all accessibles are declared */
-        final List<Operator> undeclaredAccessedOps = //
-                getUndeclaredAccessedOps(declaredOps);
-
-        if (!undeclaredAccessedOps.isEmpty()) {
-            throw new SLTranslationException(String.format(
-                    "The following locations are specified to be "
-                            + "accessible by abstract program %s, but are not declared: %s",
-                    aps.getId(),
-                    undeclaredAccessedOps.stream().map(Operator::toString)
-                            .collect(Collectors.joining(", "))));
-        }
+        /*
+         * NOTE (DS, 2019-10-30): The below checks assumes that abstract locations are
+         * always declared as locals by APSs. With unifiction of AE with the dynamic
+         * frames theory, that makes no sense anymore. Maybe we want to replace that by
+         * something else---look into thesis once it's finished, there's a list of
+         * syntactic contstraints that the type checker should check.
+         */
+        //@formatter:off
+//        final List<Operator> undeclaredAccessedOps = //
+//                getUndeclaredAccessedOps(declaredOps);
+//
+//        if (!undeclaredAccessedOps.isEmpty()) {
+//            throw new SLTranslationException(String.format(
+//                    "The following locations are specified to be "
+//                            + "accessible by abstract program %s, but are not declared: %s",
+//                    aps.getId(),
+//                    undeclaredAccessedOps.stream().map(Operator::toString)
+//                            .collect(Collectors.joining(", "))));
+//        }
+        //@formatter:on
 
         /* Check that all assignables are not declared final before */
-        final List<Operator> assignedFinalOps = //
-                getAssignedFinalOps(declaredOps);
-
-        if (!assignedFinalOps.isEmpty()) {
-            throw new SLTranslationException(String.format(
-                    "The following locations are specified to be "
-                            + "assignable by abstract program %s, but declared final: %s",
-                    aps.getId(),
-                    assignedFinalOps.stream().map(Operator::toString)
-                            .collect(Collectors.joining(", "))));
-        }
+        //@formatter:off
+//        final List<Operator> assignedFinalOps = //
+//                getAssignedFinalOps(declaredOps);
+//
+//        if (!assignedFinalOps.isEmpty()) {
+//            throw new SLTranslationException(String.format(
+//                    "The following locations are specified to be "
+//                            + "assignable by abstract program %s, but declared final: %s",
+//                    aps.getId(), assignedFinalOps.stream().map(Operator::toString)
+//                            .collect(Collectors.joining(", "))));
+//        }
+        //@formatter:on
 
         if (method.isStatic()) {
             /* For static methods, the heap may not be assigned or accessed! */
 
             if (collectElementsOfLocSetTerm(assignablesTerm(),
-                    typeConverter.getLocSetLDT().getUnion(), services)
-                            .contains(heap())) {
+                    typeConverter.getLocSetLDT().getUnion(), services).contains(heap())) {
                 throw new SLTranslationException(String.format(
                         "Abstract program %s is specified to assign the heap, "
                                 + "but containing method %s is declared static.",
@@ -123,8 +132,7 @@ public class AbstractPlaceholderSpecsTypeChecker {
             }
 
             if (collectElementsOfLocSetTerm(accessiblesTerm(),
-                    typeConverter.getLocSetLDT().getUnion(), services)
-                            .contains(heap())) {
+                    typeConverter.getLocSetLDT().getUnion(), services).contains(heap())) {
                 throw new SLTranslationException(String.format(
                         "Abstract program %s is specified to access the heap, "
                                 + "but containing method %s is declared static.",
@@ -133,9 +141,9 @@ public class AbstractPlaceholderSpecsTypeChecker {
         }
 
         /*
-         * TODO (DS, 2019-01-04): After adding declare specifications, also take
-         * into account declared Skolem method parameters, and make sure that
-         * abstract programs can only declare their own locals!
+         * TODO (DS, 2019-01-04): After adding declare specifications, also take into
+         * account declared Skolem method parameters, and make sure that abstract
+         * programs can only declare their own locals!
          */
     }
 
@@ -145,22 +153,19 @@ public class AbstractPlaceholderSpecsTypeChecker {
 
     private List<Operator> getUndeclaredAccessedOps(
             List<Pair<? extends Operator, Boolean>> declaredOps) {
-        final Set<Operator> collectedOps = collectElementsOfLocSetTerm(
-                accessiblesTerm(), typeConverter.getLocSetLDT().getUnion(),
-                services);
-        return collectedOps.stream().filter(op -> op.arity() == 0).filter(
-                op -> !declaredOps.stream().anyMatch(p -> p.first.equals(op)))
+        final Set<Operator> collectedOps = collectElementsOfLocSetTerm(accessiblesTerm(),
+                typeConverter.getLocSetLDT().getUnion(), services);
+        return collectedOps.stream().filter(op -> op.arity() == 0)
+                .filter(op -> !declaredOps.stream().anyMatch(p -> p.first.equals(op)))
                 .collect(Collectors.toList());
     }
 
     private List<Operator> getAssignedFinalOps(
             List<Pair<? extends Operator, Boolean>> declaredOps) {
-        final Set<Operator> collectedOps = collectElementsOfLocSetTerm(
-                assignablesTerm(), typeConverter.getLocSetLDT().getUnion(),
-                services);
+        final Set<Operator> collectedOps = collectElementsOfLocSetTerm(assignablesTerm(),
+                typeConverter.getLocSetLDT().getUnion(), services);
         return collectedOps.stream().filter(op -> op.arity() == 0)
-                .filter(op -> declaredOps.stream()
-                        .anyMatch(p -> p.first.equals(op) && p.second))
+                .filter(op -> declaredOps.stream().anyMatch(p -> p.first.equals(op) && p.second))
                 .collect(Collectors.toList());
     }
 
@@ -205,80 +210,65 @@ public class AbstractPlaceholderSpecsTypeChecker {
         declaredOps.addAll(declaredSymbolsWalker.walk(method.getBody()));
     }
 
-    private void addDeclaredDefaults(
-            final List<Pair<? extends Operator, Boolean>> declaredOps) {
+    private void addDeclaredDefaults(final List<Pair<? extends Operator, Boolean>> declaredOps) {
         final List<Operator> declaredDefaults = new ArrayList<>();
         declaredDefaults.add(heap());
         declaredDefaults.add(typeConverter.getLocSetLDT().getAllLocs());
         declaredDefaults.add(typeConverter.getLocSetLDT().getEmpty());
 
-        declaredDefaults.stream().map(op -> new Pair<>(op, false))
-                .forEach(p -> declaredOps.add(p));
+        declaredDefaults.stream().map(op -> new Pair<>(op, false)).forEach(p -> declaredOps.add(p));
     }
 
     private void collectDeclaredSkolemLocSetsFromMethodContract(
             final List<Pair<? extends Operator, Boolean>> declaredOps) {
         /*
-         * TODO (DS, 2019-01-14): Check whether there can be multiple contracts
-         * with that particular base name. In this case, we might have to filter
-         * for the one that has a declares directive
+         * TODO (DS, 2019-01-14): Check whether there can be multiple contracts with
+         * that particular base name. In this case, we might have to filter for the one
+         * that has a declares directive
          */
         final Optional<FunctionalOperationContract> maybeMethodContract = services
                 .getSpecificationRepository()
-                .getOperationContracts(method.getContainerType(), method)
-                .stream().filter(contr -> contr.getBaseName()
-                        .equals("JML operation contract"))
-                .findFirst();
+                .getOperationContracts(method.getContainerType(), method).stream()
+                .filter(contr -> contr.getBaseName().equals("JML operation contract")).findFirst();
         maybeMethodContract.map(FunctionalOperationContract::getDeclares)
-                .map(this::extractDeclaredSkolemLocSetConsts)
-                .ifPresent(declaredOps::addAll);
+                .map(this::extractDeclaredSkolemLocSetConsts).ifPresent(declaredOps::addAll);
     }
 
-    private void collectParameters(
-            final List<Pair<? extends Operator, Boolean>> declaredOps) {
-        declaredOps.addAll(method.getParameters().stream()
-                .map(decl -> new Pair<>(
-                        decl.getVariables().get(0).getProgramVariable(),
-                        decl.isFinal()))
+    private void collectParameters(final List<Pair<? extends Operator, Boolean>> declaredOps) {
+        declaredOps.addAll(method.getParameters().stream().map(
+                decl -> new Pair<>(decl.getVariables().get(0).getProgramVariable(), decl.isFinal()))
                 .collect(Collectors.toList()));
     }
 
-    private void collectFields(
-            final List<Pair<? extends Operator, Boolean>> declaredOps) {
+    private void collectFields(final List<Pair<? extends Operator, Boolean>> declaredOps) {
         final Type containerType = method.getContainerType().getJavaType();
         if (containerType instanceof ClassDeclaration) {
             final ClassDeclaration classDecl = (ClassDeclaration) containerType;
             declaredOps.addAll(classDecl.getAllFields(null).stream()
                     .filter(FieldSpecification.class::isInstance)
-                    .map(FieldSpecification.class::cast)
-                    .map(FieldSpecification::getProgramVariable)
+                    .map(FieldSpecification.class::cast).map(FieldSpecification::getProgramVariable)
                     .map(LocationVariable.class::cast)
-                    .map(lv -> new Pair<>(
-                            services.getTypeConverter().getHeapLDT()
-                                    .getFieldSymbolForPV(lv, services),
-                            lv.isFinal()))
+                    .map(lv -> new Pair<>(services.getTypeConverter().getHeapLDT()
+                            .getFieldSymbolForPV(lv, services), lv.isFinal()))
                     .collect(Collectors.toList()));
         }
     }
 
-    private List<Pair<? extends Operator, Boolean>>
-            extractDeclaredOpsFromPE(ProgramElement pe) {
+    private List<Pair<? extends Operator, Boolean>> extractDeclaredOpsFromPE(ProgramElement pe) {
         if (pe instanceof VariableDeclaration) {
             return getTargetsFromVarDecl((VariableDeclaration) pe);
         } else if (pe instanceof AbstractPlaceholderStatement) {
-            return getDeclsFromAbstrPlaceholderStmt(
-                    (AbstractPlaceholderStatement) pe);
+            return getDeclsFromAbstrPlaceholderStmt((AbstractPlaceholderStatement) pe);
         } else {
             // impossible since not called then...
             throw new RuntimeException();
         }
     }
 
-    private List<Pair<? extends Operator, Boolean>>
-            getDeclsFromAbstrPlaceholderStmt(AbstractPlaceholderStatement aps) {
+    private List<Pair<? extends Operator, Boolean>> getDeclsFromAbstrPlaceholderStmt(
+            AbstractPlaceholderStatement aps) {
         final List<BlockContract> contracts = //
-                AbstractExecutionContractUtils.getNoBehaviorContracts(aps,
-                        services);
+                AbstractExecutionContractUtils.getNoBehaviorContracts(aps, services);
 
         /* At this point, there should at most be one contract... */
 
@@ -295,8 +285,8 @@ public class AbstractPlaceholderSpecsTypeChecker {
         return extractDeclaredSkolemLocSetConsts(declaresTerm);
     }
 
-    private List<Pair<? extends Operator, Boolean>>
-            extractDeclaredSkolemLocSetConsts(final Term declaresTerm) {
+    private List<Pair<? extends Operator, Boolean>> extractDeclaredSkolemLocSetConsts(
+            final Term declaresTerm) {
         /*
          * The declares term is a (possibly singleton) union of
          *
@@ -313,34 +303,29 @@ public class AbstractPlaceholderSpecsTypeChecker {
         final DeclaredLocSetsVisitor declLSVisitor = //
                 new DeclaredLocSetsVisitor(typeConverter.getLocSetLDT());
         /*
-         * NOTE (DS, 2019-01-14): Have to walk in preorder to handle the final
-         * specifier correctly.
+         * NOTE (DS, 2019-01-14): Have to walk in preorder to handle the final specifier
+         * correctly.
          */
         declaresTerm.execPreOrder(declLSVisitor);
 
         return declLSVisitor.getResult();
     }
 
-    private List<Pair<? extends Operator, Boolean>>
-            getTargetsFromVarDecl(VariableDeclaration decl) {
-        return decl.getVariables().stream()
-                .map(VariableSpecification::getProgramVariable)
-                .map(pv -> new Pair<>(pv, decl.isFinal()))
-                .collect(Collectors.toList());
+    private List<Pair<? extends Operator, Boolean>> getTargetsFromVarDecl(
+            VariableDeclaration decl) {
+        return decl.getVariables().stream().map(VariableSpecification::getProgramVariable)
+                .map(pv -> new Pair<>(pv, decl.isFinal())).collect(Collectors.toList());
     }
 
     /**
-     * Extracts the relevant operator for an element of a set / loc set union.
-     * E.g., for a singleton(self, someField) returns someField.
+     * Extracts the relevant operator for an element of a set / loc set union. E.g.,
+     * for a singleton(self, someField) returns someField.
      *
-     * @param elemTerm
-     *     The element of the (loc) set union.
-     * @param services
-     *     The {@link Services} object.
+     * @param elemTerm The element of the (loc) set union.
+     * @param services The {@link Services} object.
      * @return The relevant {@link Operator} of the (loc) set union.
      */
-    private static Operator locSetElemTermsToOp(Term elemTerm,
-            Services services) {
+    private static Operator locSetElemTermsToOp(Term elemTerm, Services services) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
@@ -370,42 +355,36 @@ public class AbstractPlaceholderSpecsTypeChecker {
     }
 
     /**
-     * A mapper that can be applied to the elements of a loc set union to
-     * extract the relevant operator.
+     * A mapper that can be applied to the elements of a loc set union to extract
+     * the relevant operator.
      *
-     * @param services
-     *     The {@link Services} object.
+     * @param services The {@link Services} object.
      *
-     * @return A mapper to apply on the element {@link Term}s of a loc set
-     * union.
-     * @see AbstractPlaceholderSpecsTypeChecker#locSetElemTermsToOp(Term,
-     * Services)
+     * @return A mapper to apply on the element {@link Term}s of a loc set union.
+     * @see AbstractPlaceholderSpecsTypeChecker#locSetElemTermsToOp(Term, Services)
      */
-    private static java.util.function.Function<? super Term, ? extends Operator>
-            locSetElemTermsToOpMapper(Services services) {
-        return elemTerm -> AbstractPlaceholderSpecsTypeChecker
-                .locSetElemTermsToOp(elemTerm, services);
+    private static java.util.function.Function<? super Term, ? extends Operator> locSetElemTermsToOpMapper(
+            Services services) {
+        return elemTerm -> AbstractPlaceholderSpecsTypeChecker.locSetElemTermsToOp(elemTerm,
+                services);
     }
 
     /**
-     * Returns the target operators in a set-like union term. Expects a union
-     * term consisting of (1) Skolem loc set functions (result will contain that
-     * function), (2) singletonPV(...) applications on location variables
-     * (result will contain the variable), and (3) singleton(...) applications
-     * on an object and a function symbol representing a field (result will
-     * contain the function symbol).
+     * Returns the target operators in a set-like union term. Expects a union term
+     * consisting of (1) Skolem loc set functions (result will contain that
+     * function), (2) singletonPV(...) applications on location variables (result
+     * will contain the variable), and (3) singleton(...) applications on an object
+     * and a function symbol representing a field (result will contain the function
+     * symbol).
      *
-     * @param t
-     *     The loc set union term to dissect.
-     * @param t
-     *     The union function symbol, for instance of the LocSet theory.
-     * @param services
-     *     The {@link Services} object (for {@link TypeConverter}.
-     * @return The {@link Operator}s in the {@link Term} (location variables,
-     * field function symbols, and Skolem location set functions).
+     * @param t        The loc set union term to dissect.
+     * @param t        The union function symbol, for instance of the LocSet theory.
+     * @param services The {@link Services} object (for {@link TypeConverter}.
+     * @return The {@link Operator}s in the {@link Term} (location variables, field
+     *         function symbols, and Skolem location set functions).
      */
-    private static Set<Operator> collectElementsOfLocSetTerm(Term t,
-            Function union, Services services) {
+    private static Set<Operator> collectElementsOfLocSetTerm(Term t, Function union,
+            Services services) {
         return MiscTools.disasembleSetTerm(t, union).stream()
                 .map(locSetElemTermsToOpMapper(services))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
@@ -418,8 +397,7 @@ public class AbstractPlaceholderSpecsTypeChecker {
 
         private boolean elemFound = false;
 
-        public JavaASTFindPathWalker(ProgramElement searched,
-                Predicate<ProgramElement> filter,
+        public JavaASTFindPathWalker(ProgramElement searched, Predicate<ProgramElement> filter,
                 java.util.function.Function<ProgramElement, ? extends Collection<C>> mapper) {
             this.searched = searched;
             this.filter = filter;
@@ -452,13 +430,13 @@ public class AbstractPlaceholderSpecsTypeChecker {
 
                 // decrease depth
                 /*
-                 * At this point, we exit a container statement in which we did
-                 * not find the searched element -> clear current result list!
+                 * At this point, we exit a container statement in which we did not find the
+                 * searched element -> clear current result list!
                  */
                 if (node instanceof StatementContainer && !elemFound
                         && !(((StatementContainer) node).getChildCount() == 1
-                                && ((StatementContainer) node).getChildAt(
-                                        0) instanceof AbstractPlaceholderStatement)) {
+                                && ((StatementContainer) node)
+                                        .getChildAt(0) instanceof AbstractPlaceholderStatement)) {
                     return Collections.emptyList();
                 }
             }
@@ -479,20 +457,15 @@ public class AbstractPlaceholderSpecsTypeChecker {
         public void visit(Term visited) {
             if (visited.op() == locSetLDT.getFinal()) {
                 /* a "final(locSet)" term -- add the argument as final. */
-                assert visited.subs().size() == 1
-                        && visited.sub(0).subs().size() == 0;
+                assert visited.subs().size() == 1 && visited.sub(0).subs().size() == 0;
                 result.add(new Pair<>(visited.sub(0).op(), true));
-            } else if (visited.subs().size() == 0
-                    && visited.op() != locSetLDT.getEmpty()) {
+            } else if (visited.subs().size() == 0 && visited.op() != locSetLDT.getEmpty()) {
                 /*
-                 * a LocSet constant -- add as non-final if not seen before
-                 * (because then, it's most likely already added as a final
-                 * LocSet, or it's redundant).
+                 * a LocSet constant -- add as non-final if not seen before (because then, it's
+                 * most likely already added as a final LocSet, or it's redundant).
                  */
                 final Optional<Pair<? extends Operator, Boolean>> maybeConst = //
-                        result.stream()
-                                .filter(pair -> pair.first == visited.op())
-                                .findAny();
+                        result.stream().filter(pair -> pair.first == visited.op()).findAny();
                 if (!maybeConst.isPresent()) {
                     result.add(new Pair<>(visited.op(), false));
                 }

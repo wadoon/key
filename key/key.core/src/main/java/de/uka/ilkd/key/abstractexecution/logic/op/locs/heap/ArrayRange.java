@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * @author Dominic Steinhoefel
@@ -69,6 +70,14 @@ public class ArrayRange extends HeapLoc {
     @Override
     public String toString() {
         return String.format("%s[%s..%s]", array, left, right);
+    }
+
+    @Override
+    public Sort sort() {
+        /*
+         * TODO (DS, 2019-10-30): Should be possible to return sort of array elements.
+         */
+        throw new UnsupportedOperationException();
     }
 
 }

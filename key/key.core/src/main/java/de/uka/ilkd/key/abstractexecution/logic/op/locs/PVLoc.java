@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * A program variable location for use in an {@link AbstractUpdate}.
@@ -70,5 +71,10 @@ public class PVLoc implements AbstractUpdateLoc {
     @Override
     public int hashCode() {
         return 5 + 17 * locVar.hashCode();
+    }
+
+    @Override
+    public Sort sort() {
+        return locVar.sort();
     }
 }

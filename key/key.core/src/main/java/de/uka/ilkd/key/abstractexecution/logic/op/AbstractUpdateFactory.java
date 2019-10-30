@@ -34,9 +34,9 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayRange;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -46,7 +46,6 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -94,27 +93,27 @@ public class AbstractUpdateFactory {
      * Returns abstract update operator for the passed
      * {@link AbstractPlaceholderStatement} and left-hand side.
      *
-     * @param phs             The {@link AbstractPlaceholderStatement} for which
-     *                        this {@link AbstractUpdate} should be created.
-     * @param lhs             The update's left-hand side. Should be a
-     *                        {@link SetLDT} term.
-     * @param rhs             The right-hand side for the abstract update; needed to
-     *                        extract the argument sorts for the operator.
-     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
-     *                        to normalize self terms (because otherwise, there
-     *                        might be different such terms around).
+     * @param phs              The {@link AbstractPlaceholderStatement} for which
+     *                         this {@link AbstractUpdate} should be created.
+     * @param lhs              The update's left-hand side. Should be a
+     *                         {@link SetLDT} term.
+     * @param rhs              The right-hand side for the abstract update; needed
+     *                         to extract the argument sorts for the operator.
+     * @param executionContext An optional runtime instance {@link LocationVariable}
+     *                         to normalize self terms (because otherwise, there
+     *                         might be different such terms around).
      * @return The {@link AbstractUpdate} for the given
      *         {@link AbstractPlaceholderStatement} and left-hand side.
      */
     public AbstractUpdate getInstance(AbstractPlaceholderStatement phs, Term lhs, Term rhs,
-            Optional<LocationVariable> runtimeInstance) {
+            Optional<ExecutionContext> executionContext) {
         final UniqueArrayList<AbstractUpdateLoc> assignables = //
-                abstrUpdateLocsFromTerm(lhs, runtimeInstance, services).stream()
+                abstrUpdateLocsFromTerm(lhs, executionContext, services).stream()
                         .map(AbstractUpdateLoc.class::cast)
                         .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
 
         final int numArgs = //
-                (int) abstrUpdateLocsFromTerm(rhs, runtimeInstance, services).stream().count();
+                (int) abstrUpdateLocsFromTerm(rhs, executionContext, services).stream().count();
 
         return getInstance(phs, assignables, numArgs);
     }
@@ -175,21 +174,27 @@ public class AbstractUpdateFactory {
             final AbstractUpdateLoc relevantAssignable = //
                     abstrUpd.getAllAssignables().get(position);
 
-            assert relevantAssignable instanceof PVLoc || (relevantAssignable instanceof HasToLoc
-                    && ((HasToLoc) relevantAssignable).child() instanceof PVLoc) : //
-            "Characteristic abstract update functions only make sense for program variables!";
+            assert characteristicFunctionCreatedSupportedFor(relevantAssignable) : //
+            "Characteristic abstract update functions not supported for type "
+                    + relevantAssignable.getClass().getCanonicalName();
 
-            final LocationVariable relAssgnVar = (relevantAssignable instanceof HasToLoc
-                    ? (PVLoc) ((HasToLoc) relevantAssignable).child()
-                    : (PVLoc) relevantAssignable).getVar();
-
-            result = new Function(new Name(funName), relAssgnVar.sort(), true, true,
+            result = new Function(new Name(funName), relevantAssignable.sort(), true, true,
                     abstrUpd.argSorts().toArray(new Sort[0]));
 
             abstrUpdCharacteristicFuncInsts.get(abstractUpdName).put(position, result);
         }
 
         return result;
+    }
+
+    /**
+     * @param loc The {@link AbstractUpdateLoc} to check.
+     * @return true iff we can create a characteristic function for the given
+     *         location.
+     */
+    private static boolean characteristicFunctionCreatedSupportedFor(final AbstractUpdateLoc loc) {
+        final AbstractUpdateLoc unwrappedLoc = AbstractExecutionUtils.unwrapHasTo(loc);
+        return unwrappedLoc instanceof PVLoc || unwrappedLoc instanceof FieldLoc;
     }
 
     /**
@@ -242,7 +247,7 @@ public class AbstractUpdateFactory {
      *         according to replaceMap.
      */
     public AbstractUpdate changeAssignables(final AbstractUpdate abstrUpd,
-            final Map<AbstractUpdateLoc, AbstractUpdateLoc> replaceMap) {
+            final Map<? extends AbstractUpdateLoc, ? extends AbstractUpdateLoc> replaceMap) {
         final String phsID = abstrUpd.getAbstractPlaceholderStatement().getId();
         if (abstractUpdateInstances.get(phsID) == null) {
             abstractUpdateInstances.put(phsID, new LinkedHashMap<>());
@@ -300,17 +305,17 @@ public class AbstractUpdateFactory {
      * representing. Throws a {@link RuntimeException} if the given {@link Term} is
      * not directly representing any locations (i.e., is not a LocSet term).
      *
-     * @param t               The {@link Term} to extract all
-     *                        {@link AbstractUpdateLoc}s from.
-     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
-     *                        to normalize self terms (because otherwise, there
-     *                        might be different such terms around).
-     * @param services        The {@link Services} object.
+     * @param t                The {@link Term} to extract all
+     *                         {@link AbstractUpdateLoc}s from.
+     * @param executionContext An optional runtime instance {@link LocationVariable}
+     *                         to normalize self terms (because otherwise, there
+     *                         might be different such terms around).
+     * @param services         The {@link Services} object.
      * @return All {@link AbstractUpdateLoc}s from the given {@link Term} or null if
      *         the {@link Term} does not represent {@link AbstractUpdateLoc}s.
      */
     public static Set<AbstractUpdateLoc> abstrUpdateLocsFromTerm(Term t,
-            Optional<LocationVariable> runtimeInstance, Services services) {
+            Optional<ExecutionContext> executionContext, Services services) {
         final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
         t = MiscTools.simplifyUpdatesInTerm(t, services);
 
@@ -329,25 +334,25 @@ public class AbstractUpdateFactory {
             result.add(new SkolemLoc((Function) op));
         } else if (op == locSetLDT.getSingletonPV()) {
             final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTerm(t.sub(0),
-                    runtimeInstance, services);
+                    executionContext, services);
 
             result.addAll(subResult);
         } else if (op == locSetLDT.getHasTo()) {
             // There is exactly one location inside a hasTo
-            final AbstractUpdateLoc subResult = abstrUpdateLocsFromTerm(t.sub(0), runtimeInstance,
+            final AbstractUpdateLoc subResult = abstrUpdateLocsFromTerm(t.sub(0), executionContext,
                     services).iterator().next();
             result.add(new HasToLoc((AbstractUpdateLoc) subResult));
         } else if (op == locSetLDT.getUnion()) {
             final Set<AbstractUpdateLoc> subResult1 = //
-                    abstrUpdateLocsFromTerm(t.sub(0), runtimeInstance, services);
+                    abstrUpdateLocsFromTerm(t.sub(0), executionContext, services);
             final Set<AbstractUpdateLoc> subResult2 = //
-                    abstrUpdateLocsFromTerm(t.sub(1), runtimeInstance, services);
+                    abstrUpdateLocsFromTerm(t.sub(1), executionContext, services);
 
             result.addAll(subResult1);
             result.addAll(subResult2);
         } else if (isHeapOp(op, locSetLDT, heapLDT)) {
             final Set<AbstractUpdateLoc> subResult = //
-                    abstrUpdateAssgnLocsFromHeapTerm(t, runtimeInstance, services);
+                    abstrUpdateAssgnLocsFromHeapTerm(t, executionContext, services);
 
             result.addAll(subResult);
         } else {
@@ -369,14 +374,14 @@ public class AbstractUpdateFactory {
      * 
      * Returns null if it {@link Term} operator is unexpected.
      *
-     * @param t               The {@link Term} to transform.
-     * @param runtimeInstance The optional runtime instance for self variable
-     *                        transformation.
-     * @param services        The {@link Services} object.
+     * @param t                The {@link Term} to transform.
+     * @param executionContext The optional runtime instance for self variable
+     *                         transformation.
+     * @param services         The {@link Services} object.
      * @return The contained {@link AbstractUpdateLoc}s.
      */
     private static Set<AbstractUpdateLoc> abstrUpdateAssgnLocsFromHeapTerm(Term t,
-            Optional<LocationVariable> runtimeInstance, Services services) {
+            Optional<ExecutionContext> executionContext, Services services) {
         final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
 
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
@@ -387,14 +392,9 @@ public class AbstractUpdateFactory {
         if (op == locSetLDT.getSingleton() && t.sub(1).op() == heapLDT.getArr()) {
             result.add(new ArrayLoc(t.sub(0), t.sub(1).sub(0)));
         } else if (op == locSetLDT.getSingleton()) {
-            final Term obj = //
-                    normalizeSelfVar(t.sub(0), runtimeInstance, services);
+            final Term obj = normalizeSelfVar(t.sub(0), executionContext, services);
             final Term field = t.sub(1);
-            // XXX (DS. 2019-10-22): It's problematic to convert the field to a PV here; we
-            // can, for instance, pass the location (o,f) for some symbols o, f created out
-            // of the blue inside a KeY file, then there's no name inside the f that we
-            // could extract and that call will fail.
-            result.add(new FieldLoc(obj, fieldPVFromFieldFunc(field, services)));
+            result.add(new FieldLoc(obj, field, services));
         } else if (t.op() == locSetLDT.getAllFields() && t.subs().size() == 1) {
             result.add(new AllFieldsLocLHS(t.sub(0)));
         } else if (t.op() == locSetLDT.getArrayRange()) {
@@ -414,70 +414,77 @@ public class AbstractUpdateFactory {
 
     /**
      * If the operator of the given {@link Term} is a "self" variable, we normalize
-     * it to the given runtimeInstance if the {@link KeYJavaType}s of the variable
+     * it to the given executionContext if the {@link KeYJavaType}s of the variable
      * and the instance are the same.
      *
-     * @param objTerm         The objTerm to normalize.
-     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
-     *                        to normalize self terms (because otherwise, there
-     *                        might be different such terms around). For an empty
-     *                        optional, we return objTerm.
-     * @param services        The {@link Services} object (for the
-     *                        {@link TermBuilder}).
-     * @return The original objTemr if runtimeInstance if empty, the objTerm is not
-     *         a "self" term, or the types of the objTerm and the runtimeInstance
+     * @param objTerm          The objTerm to normalize.
+     * @param executionContext An optional runtime instance {@link LocationVariable}
+     *                         to normalize self terms (because otherwise, there
+     *                         might be different such terms around). For an empty
+     *                         optional, we return objTerm.
+     * @param services         The {@link Services} object (for the
+     *                         {@link TermBuilder}).
+     * @return The original objTemr if executionContext if empty, the objTerm is not
+     *         a "self" term, or the types of the objTerm and the executionContext
      *         are different, or otherwise a {@link Term} with the runtime instance.
      */
-    private static Term normalizeSelfVar(Term objTerm, Optional<LocationVariable> runtimeInstance,
+    private static Term normalizeSelfVar(Term objTerm, Optional<ExecutionContext> executionContext,
             Services services) {
         // objTerm = MiscTools.simplifyUpdateApplication(objTerm, services);
 
-        if (!runtimeInstance.isPresent() || !(objTerm.op() instanceof LocationVariable)
+        if (!executionContext.isPresent() || !(objTerm.op() instanceof LocationVariable)
                 || !objTerm.op().toString().equals("self")
-                || !((LocationVariable) objTerm.op()).sort().equals(runtimeInstance.get().sort())) {
+                || !((LocationVariable) objTerm.op()).sort().equals(
+                        executionContext.get().getMethodContext().getContainerType().getSort())) {
             return objTerm;
         }
 
-        return services.getTermBuilder().var(runtimeInstance.get());
+        return services.getTypeConverter().findThisForSort(
+                executionContext.get().getMethodContext().getContainerType().getSort(),
+                executionContext.get());
     }
 
-    /**
-     * Returns, for a term representing a field, the "canonical" field program
-     * variable.
-     *
-     * @param field    The field term, something like "my.package.Type::$field", of
-     *                 Sort "Field" (of {@link HeapLDT}).
-     * @param services The {@link Services} object (for {@link JavaInfo} and
-     *                 {@link HeapLDT}).
-     * @return The canonical program variable representing the field.
-     */
-    private static LocationVariable fieldPVFromFieldFunc(Term field, Services services) {
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final JavaInfo javaInfo = services.getJavaInfo();
-        assert field.sort() == heapLDT.getFieldSort();
-
-        /*
-         * NOTE (DS, 2019-03-12): It sometimes happens that we get passed an update
-         * application here. In this case, the target is the field.
-         */
-        if (field.op() == UpdateApplication.UPDATE_APPLICATION) {
-            field = UpdateApplication.getTarget(field);
-            assert field.sort() == heapLDT.getFieldSort();
-        }
-
-        int sepIdx = field.toString().indexOf("::$");
-        int sepSize = 3;
-        if (sepIdx < 0) {
-            sepIdx = field.toString().indexOf("::<");
-            sepSize = 2;
-        }
-
-        assert sepIdx > 0;
-
-        final String typeStr = field.toString().substring(0, sepIdx);
-        final String fieldStr = field.toString().substring(sepIdx + sepSize);
-
-        final KeYJavaType kjt = javaInfo.getKeYJavaType(typeStr);
-        return (LocationVariable) javaInfo.getCanonicalFieldProgramVariable(fieldStr, kjt);
-    }
+    // TODO (DS, 2019-10-30): Leaving this code here for now in case that I need it.
+    // Delete soon if that's not the case!
+    //@formatter:off
+//    /**
+//     * Returns, for a term representing a field, the "canonical" field program
+//     * variable.
+//     *
+//     * @param field    The field term, something like "my.package.Type::$field", of
+//     *                 Sort "Field" (of {@link HeapLDT}).
+//     * @param services The {@link Services} object (for {@link JavaInfo} and
+//     *                 {@link HeapLDT}).
+//     * @return The canonical program variable representing the field.
+//     */
+//    private static LocationVariable fieldPVFromFieldFunc(Term field, Services services) {
+//        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+//        final JavaInfo javaInfo = services.getJavaInfo();
+//        assert field.sort() == heapLDT.getFieldSort();
+//
+//        /*
+//         * NOTE (DS, 2019-03-12): It sometimes happens that we get passed an update
+//         * application here. In this case, the target is the field.
+//         */
+//        if (field.op() == UpdateApplication.UPDATE_APPLICATION) {
+//            field = UpdateApplication.getTarget(field);
+//            assert field.sort() == heapLDT.getFieldSort();
+//        }
+//
+//        int sepIdx = field.toString().indexOf("::$");
+//        int sepSize = 3;
+//        if (sepIdx < 0) {
+//            sepIdx = field.toString().indexOf("::<");
+//            sepSize = 2;
+//        }
+//
+//        assert sepIdx > 0;
+//
+//        final String typeStr = field.toString().substring(0, sepIdx);
+//        final String fieldStr = field.toString().substring(sepIdx + sepSize);
+//
+//        final KeYJavaType kjt = javaInfo.getKeYJavaType(typeStr);
+//        return (LocationVariable) javaInfo.getCanonicalFieldProgramVariable(fieldStr, kjt);
+//    }
+    //@formatter:on
 }

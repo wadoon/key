@@ -17,6 +17,7 @@ import java.util.Set;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.AllFieldsLocLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayLoc;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 
@@ -25,7 +26,7 @@ import de.uka.ilkd.key.logic.op.Operator;
  *
  * @author Dominic Steinhoefel
  */
-public interface AbstractUpdateLoc {
+public interface AbstractUpdateLoc extends Sorted {
     /**
      * All {@link AbstractUpdateLoc}s are containers. This method returns the "real"
      * KeY {@link Operator}s which they represent.

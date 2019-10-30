@@ -39,6 +39,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -1005,6 +1006,18 @@ public class TermBuilder {
     }
     
     /**
+     * Creates an {@link AbstractUpdate} term where the old {@link AbstractUpdate}
+     * operator is replaced by the new one.
+     * 
+     * @param oldAbstrUpdTerm Old {@link AbstractUpdate} {@link Term}.
+     * @param newAbstrUpd The new {@link AbstractUpdate} operator.
+     * @return the new {@link AbstractUpdate} {@link Term}.
+     */
+    public Term abstractUpdate(Term oldAbstrUpdTerm, AbstractUpdate newAbstrUpd) {
+        return tf.createTerm(newAbstrUpd, oldAbstrUpdTerm.subs(), null, null);
+    }
+    
+    /**
      * Creates an AbstractUpdate term for the given {@link AbstractUpdate} operator
      * and right-hand sides. The right-hand sides are wrapped inside a "value(...)"
      * application to convert LocSets to the corresponding values.
@@ -1066,23 +1079,19 @@ public class TermBuilder {
     /**
      * Creates an {@link AbstractUpdate} term.
      *
-     * @param phs
-     *            The {@link AbstractPlaceholderStatement} for which to create
-     *            an {@link AbstractUpdate}.
-     * @param lhs
-     *            The {@link AbstractUpdate}'s left-hand side.
-     * @param rhs
-     *            The {@link AbstractUpdate}'s left-hand side.
-     * @param runtimeInstance
-     *            An optional runtime instance {@link LocationVariable} to
-     *            normalize self terms (because otherwise, there might be
-     *            different such terms around).
+     * @param phs              The {@link AbstractPlaceholderStatement} for which to
+     *                         create an {@link AbstractUpdate}.
+     * @param lhs              The {@link AbstractUpdate}'s left-hand side.
+     * @param rhs              The {@link AbstractUpdate}'s left-hand side.
+     * @param ec An optional {@link ExecutionContext} to normalize
+     *                         self terms (because otherwise, there might be
+     *                         different such terms around).
      * @return the {@link AbstractUpdate} term.
      */
-    public Term abstractUpdate(AbstractPlaceholderStatement phs, Term lhs,
-            Term rhs, Optional<LocationVariable> runtimeInstance) {
-        final AbstractUpdate au = services.abstractUpdateFactory()
-                .getInstance(phs, lhs, rhs, runtimeInstance);
+    public Term abstractUpdate(AbstractPlaceholderStatement phs, Term lhs, Term rhs,
+            Optional<ExecutionContext> ec) {
+        final AbstractUpdate au = //
+                services.abstractUpdateFactory().getInstance(phs, lhs, rhs, ec);
         return tf.createTerm(au, rhs);
     }
 

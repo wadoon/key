@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * The special "allLocs" location.
@@ -60,5 +61,10 @@ public class EmptyLoc implements AbstractUpdateLoc {
     @Override
     public int hashCode() {
         return 5 + 17 * emptyLocSet.hashCode();
+    }
+
+    @Override
+    public Sort sort() {
+        return emptyLocSet.sort();
     }
 }

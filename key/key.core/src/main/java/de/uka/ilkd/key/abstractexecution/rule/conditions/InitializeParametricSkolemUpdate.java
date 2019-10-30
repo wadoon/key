@@ -22,9 +22,9 @@ import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderState
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -55,9 +55,8 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
-        final Optional<LocationVariable> runtimeInstance = Optional
-                .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
-                .filter(LocationVariable.class::isInstance).map(LocationVariable.class::cast);
+        final Optional<ExecutionContext> executionContext = Optional
+                .ofNullable(svInst.getExecutionContext());
 
         if (svInst.isInstantiated(this.updateSV)) {
             return matchCond;
@@ -70,7 +69,7 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
 
         final Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> accessibleAndAssignableClause = //
                 AbstractExecutionContractUtils.getAccessibleAndAssignableTermsForNoBehaviorContract(
-                        abstrStmt, matchCond, services, runtimeInstance);
+                        abstrStmt, matchCond, services, executionContext);
 
         final Term update = //
                 tb.abstractUpdate(abstrStmt, accessibleAndAssignableClause.second,

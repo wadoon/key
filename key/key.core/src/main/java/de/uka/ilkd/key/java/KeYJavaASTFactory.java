@@ -346,7 +346,43 @@ public abstract class KeYJavaASTFactory {
      */
     public static ProgramVariable localVariable(ProgramElementName name,
 	    KeYJavaType kjt) {
-	return new LocationVariable(name, kjt);
+	return localVariable(name, kjt, PositionInfo.UNDEFINED);
+    }
+
+    /**
+     * create a local variable
+     * 
+     * @param posInfo
+     *            a {@link PositionInfo} object for the new {@link ProgramVariable}.
+     */
+    public static ProgramVariable localVariable(ProgramElementName name,
+            KeYJavaType kjt, final PositionInfo posInfo) {
+        return new LocationVariable(name, kjt, posInfo);
+    }
+
+    /**
+     * Create a local variable with a unique name.
+     * 
+     * @param services
+     *            the {@link Services} whose {@link VariableNamer} is used
+     * @param name
+     *            the {@link String} on which the variable's unique name is
+     *            based
+     * @param type
+     *            the variable's static {@link KeYJavaType}
+     * @param posInfo
+     *            a {@link PositionInfo} object for the new {@link ProgramVariable}.
+     * @return a new {@link ProgramVariable} of static type <code>type</code>
+     *         and with a unique name based on <code>name</code>
+     */
+    public static ProgramVariable localVariable(final Services services,
+            final String name, final KeYJavaType type, final PositionInfo posInfo) {
+        final ProgramElementName uniqueName = services.getVariableNamer()
+                .getTemporaryNameProposal(name);
+        final ProgramVariable variable = KeYJavaASTFactory.localVariable(
+                uniqueName, type, posInfo);
+
+        return variable;
     }
 
     /**
@@ -364,12 +400,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static ProgramVariable localVariable(final Services services,
 	    final String name, final KeYJavaType type) {
-	final ProgramElementName uniqueName = services.getVariableNamer()
-		.getTemporaryNameProposal(name);
-	final ProgramVariable variable = KeYJavaASTFactory.localVariable(
-		uniqueName, type);
-
-	return variable;
+	return localVariable(services, name, type, PositionInfo.UNDEFINED);
     }
 
     /**

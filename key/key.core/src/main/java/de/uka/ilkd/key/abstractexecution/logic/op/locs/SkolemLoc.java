@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * A Skolem location set suitable for use in an {@link AbstractUpdate}.
@@ -63,5 +64,10 @@ public class SkolemLoc implements AbstractUpdateLoc {
     @Override
     public int hashCode() {
         return 5 + 17 * skLoc.hashCode();
+    }
+
+    @Override
+    public Sort sort() {
+        return skLoc.sort();
     }
 }

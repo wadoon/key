@@ -21,10 +21,10 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -57,9 +57,8 @@ public class InitializeParametricSkolemPathCondition implements VariableConditio
         final SVInstantiations svInst = matchCond.getInstantiations();
         final TermBuilder tb = services.getTermBuilder();
 
-        final Optional<LocationVariable> runtimeInstance = Optional
-                .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
-                .filter(LocationVariable.class::isInstance).map(LocationVariable.class::cast);
+        final Optional<ExecutionContext> executionContext = Optional
+                .ofNullable(svInst.getExecutionContext());
 
         if (svInst.isInstantiated(pathCondSV)) {
             return matchCond;
@@ -70,7 +69,7 @@ public class InitializeParametricSkolemPathCondition implements VariableConditio
 
         final List<Term> accessibles = AbstractExecutionContractUtils
                 .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, matchCond,
-                        services, runtimeInstance).first.stream().map(loc -> loc.toTerm(services))
+                        services, executionContext).first.stream().map(loc -> loc.toTerm(services))
                                 .map(tb::value).collect(Collectors.toList());
         final Sort[] accessiblesSorts = accessibles.stream().map(Term::sort)
                 .collect(Collectors.toList()).toArray(new Sort[0]);
