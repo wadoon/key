@@ -107,7 +107,7 @@ public class AbstractExecutionUtils {
      */
     public static AbstractUpdateLoc unwrapHasTo(AbstractUpdateLoc loc) {
         if (loc instanceof HasToLoc) {
-            return ((HasToLoc) loc).child();
+            return ((HasToLoc<?>) loc).child();
         }
     
         return loc;

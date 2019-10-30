@@ -24,14 +24,15 @@ import de.uka.ilkd.key.logic.sort.Sort;
  *
  * @author Dominic Steinhoefel
  */
-public class HasToLoc implements AbstractUpdateLoc {
-    private final AbstractUpdateLoc child;
+public class HasToLoc<L extends AbstractUpdateLoc> implements AbstractUpdateLoc {
+    private final L child;
 
-    public HasToLoc(AbstractUpdateLoc child) {
+    @SuppressWarnings("unchecked")
+    public HasToLoc(L child) {
         assert !(child instanceof AllLocsLoc);
 
         if (child instanceof HasToLoc) {
-            this.child = ((HasToLoc) child).child;
+            this.child = (L) ((HasToLoc<L>) child).child;
         } else {
             this.child = child;
         }
@@ -42,7 +43,7 @@ public class HasToLoc implements AbstractUpdateLoc {
         return services.getTermBuilder().hasTo(child.toTerm(services));
     }
 
-    public AbstractUpdateLoc child() {
+    public L child() {
         return child;
     }
 
@@ -59,7 +60,8 @@ public class HasToLoc implements AbstractUpdateLoc {
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
         return child.mayAssign(
-                otherLoc instanceof HasToLoc ? ((HasToLoc) otherLoc).child() : otherLoc, services);
+                otherLoc instanceof HasToLoc ? ((HasToLoc<?>) otherLoc).child() : otherLoc,
+                services);
     }
 
     @Override

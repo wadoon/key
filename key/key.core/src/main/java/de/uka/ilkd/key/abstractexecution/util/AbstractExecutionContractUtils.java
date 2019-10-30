@@ -113,7 +113,7 @@ public class AbstractExecutionContractUtils {
     public static List<ProgramVariable> getAssignableProgVarsForNoBehaviorContract(
             AbstractPlaceholderStatement aps, ProgramElement context, Services services) {
         return getAssignableOpsForNoBehaviorContract(aps, context, services).stream()
-                .map(loc -> loc instanceof HasToLoc ? ((HasToLoc) loc).child() : loc)
+                .map(loc -> loc instanceof HasToLoc ? ((HasToLoc<?>) loc).child() : loc)
                 .filter(PVLoc.class::isInstance).map(PVLoc.class::cast).map(PVLoc::getVar)
                 .map(LocationVariable.class::cast).collect(Collectors.toList());
     }

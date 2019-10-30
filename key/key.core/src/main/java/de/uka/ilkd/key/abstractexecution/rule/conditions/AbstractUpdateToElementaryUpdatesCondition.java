@@ -86,7 +86,7 @@ public final class AbstractUpdateToElementaryUpdatesCondition implements Variabl
         final List<AbstractUpdateLoc> allAssignables = abstrUpd.getAllAssignables();
 
         ImmutableList<Term> extractedElementaries = ImmutableSLList.<Term>nil();
-        final Map<HasToLoc, AbstractUpdateLoc> extractedHasTosMap = new LinkedHashMap<>();
+        final Map<HasToLoc<?>, AbstractUpdateLoc> extractedHasTosMap = new LinkedHashMap<>();
 
         for (int i = 0; i < allAssignables.size(); i++) {
             final AbstractUpdateLoc assignable = allAssignables.get(i);
@@ -95,8 +95,10 @@ public final class AbstractUpdateToElementaryUpdatesCondition implements Variabl
                         AbstractExecutionUtils.unwrapHasTo(assignable);
 
                 if (unwrappedLoc instanceof PVLoc) {
-                    final PVLoc pvLoc = (PVLoc) unwrappedLoc;
-                    extractedHasTosMap.put((HasToLoc) assignable, pvLoc);
+                    @SuppressWarnings("unchecked")
+                    final HasToLoc<PVLoc> castAssignable = (HasToLoc<PVLoc>) assignable;
+                    final PVLoc pvLoc = castAssignable.child();
+                    extractedHasTosMap.put(castAssignable, pvLoc);
 
                     final Term updateLHS = tb.var(pvLoc.getVar());
                     final Term updateRHS = tb.func(
@@ -105,8 +107,10 @@ public final class AbstractUpdateToElementaryUpdatesCondition implements Variabl
                     extractedElementaries = extractedElementaries
                             .append(tb.elementary(updateLHS, updateRHS));
                 } else if (unwrappedLoc instanceof FieldLoc) {
-                    final FieldLoc fieldLoc = (FieldLoc) unwrappedLoc;
-                    extractedHasTosMap.put((HasToLoc) assignable, fieldLoc);
+                    @SuppressWarnings("unchecked")
+                    final HasToLoc<FieldLoc> castAssignable = (HasToLoc<FieldLoc>) assignable;
+                    final FieldLoc fieldLoc = castAssignable.child();
+                    extractedHasTosMap.put(castAssignable, fieldLoc);
 
                     final Term updateLHS = tb.getBaseHeap();
                     final Term characteristicFunctionTerm = tb.func(

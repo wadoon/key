@@ -258,8 +258,8 @@ public class AbstractUpdateFactory {
                 new LinkedHashMap<>(replaceMap);
         replaceMap.entrySet().stream().forEach(entry -> {
             if (!(entry.getKey() instanceof HasToLoc)) {
-                augmentedReplaceMap.put(new HasToLoc(entry.getKey()),
-                        new HasToLoc(entry.getValue()));
+                augmentedReplaceMap.put(new HasToLoc<AbstractUpdateLoc>(entry.getKey()),
+                        new HasToLoc<AbstractUpdateLoc>(entry.getValue()));
             }
         });
 
@@ -339,9 +339,9 @@ public class AbstractUpdateFactory {
             result.addAll(subResult);
         } else if (op == locSetLDT.getHasTo()) {
             // There is exactly one location inside a hasTo
-            final AbstractUpdateLoc subResult = abstrUpdateLocsFromTerm(t.sub(0), executionContext,
-                    services).iterator().next();
-            result.add(new HasToLoc((AbstractUpdateLoc) subResult));
+            final AbstractUpdateLoc subResult = //
+                    abstrUpdateLocsFromTerm(t.sub(0), executionContext, services).iterator().next();
+            result.add(new HasToLoc<AbstractUpdateLoc>(subResult));
         } else if (op == locSetLDT.getUnion()) {
             final Set<AbstractUpdateLoc> subResult1 = //
                     abstrUpdateLocsFromTerm(t.sub(0), executionContext, services);
