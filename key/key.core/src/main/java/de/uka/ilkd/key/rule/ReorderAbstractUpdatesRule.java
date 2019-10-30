@@ -55,7 +55,7 @@ public class ReorderAbstractUpdatesRule implements BuiltInRule {
                 MiscTools.replaceInTerm(oldSeqFor.formula(), app.getSimplifiedTerm().get(), 0,
                         app.getPioToReplace().posInTerm(), services));
 
-        newGoals.head().changeFormula(newSeqFor, app.posInOccurrence());
+        newGoals.head().changeFormula(newSeqFor, app.getPioToReplace());
 
         return newGoals;
     }
