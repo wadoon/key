@@ -126,9 +126,9 @@ public class AbstractUpdateTests {
         final LocationVariable x = intVar("x");
         final LocationVariable y = intVar("y");
 
-        final Term u1 = abstractUpdate(aps("P"), new HasToLoc(new PVLoc(y)),
+        final Term u1 = abstractUpdate(aps("P"), new HasToLoc<PVLoc>(new PVLoc(y)),
                 new PVLoc[] { new PVLoc(y), new PVLoc(w) });
-        final Term u2 = abstractUpdate(aps("P"), new HasToLoc(new PVLoc(x)),
+        final Term u2 = abstractUpdate(aps("P"), new HasToLoc<PVLoc>(new PVLoc(x)),
                 new PVLoc[] { new PVLoc(x), new PVLoc(w) });
 
         final Term pred = TB.func(new Function( //
@@ -189,7 +189,8 @@ public class AbstractUpdateTests {
         simplificationTests.put("simplificationTest12-INCORR.key", false);
         simplificationTests.put("simplificationTest13.key", true);
         simplificationTests.put("simplificationTest14-INCORR.key", false);
-        simplificationTests.put("simplificationTest15.key", true); // Currently fails because of strategy...
+        simplificationTests.put("simplificationTest15.key", true); // Currently fails because of
+                                                                   // strategy...
 
         for (final String keyFile : simplificationTests.keySet()) {
             final Proof proof = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX, keyFile);
