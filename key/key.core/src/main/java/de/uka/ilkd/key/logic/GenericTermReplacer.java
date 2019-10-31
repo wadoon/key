@@ -15,15 +15,17 @@ import de.uka.ilkd.key.java.Services;
 public class GenericTermReplacer {
     public static Term replace(final Term t, final Predicate<Term> filter,
             final Function<Term, Term> replacer, Services services) {
+        Term newTopLevelTerm = t;
         if (filter.test(t)) {
-            return replacer.apply(t);
+            newTopLevelTerm = replacer.apply(t);
         }
 
-        final Term[] newSubs = t.subs().stream()
-                .map(sub -> replace(sub, filter, replacer, services))
-                .collect(Collectors.toList()).toArray(new Term[0]);
+        final Term[] newSubs = newTopLevelTerm.subs().stream()
+                .map(sub -> replace(sub, filter, replacer, services)).collect(Collectors.toList())
+                .toArray(new Term[0]);
 
-        return services.getTermFactory().createTerm(t.op(), newSubs,
-                t.boundVars(), t.javaBlock(), t.getLabels());
+        return services.getTermFactory().createTerm(newTopLevelTerm.op(), newSubs,
+                newTopLevelTerm.boundVars(), newTopLevelTerm.javaBlock(),
+                newTopLevelTerm.getLabels());
     }
 }
