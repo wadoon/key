@@ -12,7 +12,7 @@
 //
 package de.uka.ilkd.key.rule.abstractexecution;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * TODO (DS, 2019-10-31): These tests don't work any more, since with new
@@ -21,7 +21,10 @@ import junit.framework.TestCase;
  * @author Dominic Steinhoefel
  *
  */
-public class AEPostConditionTests extends TestCase {
+public class AEPostConditionTests {
+    @Test
+    public void testPlaceholder() {}
+    
     //@formatter:off
 //    private static final File TEST_RESOURCES_DIR_PREFIX = new File(
 //            HelperClassForTests.TESTCASE_DIRECTORY, "abstractexecution/");    
