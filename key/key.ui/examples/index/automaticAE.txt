@@ -140,8 +140,14 @@ group abstract_updates {
   provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest10.key
   provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest11.key
   notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest12-INCORR.key
+  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest13.key
+  notprovable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest14-INCORR.key
+  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest15.key
 }
 
+// TODO (DS, 2019-10-31): Update Refactoring Examples!
+
+/*
 # Examples used in the Abstract Execution paper submitted to FM 2019
 group aepaper_provable {
    provable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.key
@@ -174,6 +180,7 @@ group aepaper_loops {
    loadable ./abstract_execution/RemoveControlFlag/CorrectWithUnrollingInvRule/removeControlFlag.proof
    loadable ./abstract_execution/RemoveControlFlag/Correct/removeControlFlag.proof
 }
+*/
 
 # These are the proof files which can be loaded from the examples menu.
 # They must work with the current version.
