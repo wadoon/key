@@ -409,6 +409,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     @Override
     public Term getFreePostcondition(final LocationVariable heapVariable, final Term heap,
             final Terms terms, final Services services) {
+//        final Term freePostcondition = freePostconditions.get(heapVariable);
+//        return freePostcondition == null ? null : getTerm(freePostcondition, heap, terms, services);
         return getTerm(freePostconditions.get(heapVariable), heap, terms, services);
     }
 
@@ -1429,14 +1431,14 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * be proved, so they're assumptions/axioms.
          */
         protected Map<LocationVariable, Term> buildFreePostconditions() {
-            final Map<LocationVariable, Term> postconditions
+            final Map<LocationVariable, Term> freePostconditions
                     = new LinkedHashMap<LocationVariable, Term>();
             for (LocationVariable heap : heaps) {
-                if (ensures.get(heap) != null) {
-                    postconditions.put(heap, convertToFormula(ensuresFree.get(heap)));
+                if (ensuresFree.get(heap) != null) {
+                    freePostconditions.put(heap, convertToFormula(ensuresFree.get(heap)));
                 }
             }
-            return postconditions;
+            return freePostconditions;
         }
 
         /**
@@ -1865,6 +1867,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         protected void addConditionsFrom(final T contract) {
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 final Term precondition = addPreconditionFrom(contract, heap);
+                addFreePostconditionFrom(precondition, contract, heap);
                 addPostconditionFrom(precondition, contract, heap);
                 addModifiesClauseFrom(contract, heap);
                 addAccessibleClauseFrom(contract, heap);
@@ -1926,7 +1929,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 final Term conditionalPostcondition
                         = imp(preify(freePostcondition), unconditionalPostcondition);
                 freePostconditions.put(heap,
-                        andPossiblyNull(postconditions.get(heap), conditionalPostcondition));
+                        andPossiblyNull(freePostconditions.get(heap), conditionalPostcondition));
             }
         }
 

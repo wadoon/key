@@ -255,7 +255,7 @@ public class TermBuilder {
         if (makeNameUnique) {
             name = newName(name);
         }
-        return new LocationVariable(new ProgramElementName(name), kjt);
+        return new LocationVariable(new ProgramElementName(name), kjt, null, false, false, false, false, true);
     }
 
     /**
@@ -352,7 +352,7 @@ public class TermBuilder {
                 name = newName(name);
             }
             return new LocationVariable(new ProgramElementName(name),
-                    pm.getReturnType());
+                    pm.getReturnType(), null, false, false, false, false, true);
         }
     }
 
@@ -374,7 +374,8 @@ public class TermBuilder {
             name = newName(name);
         }
         return new LocationVariable(new ProgramElementName(name),
-                services.getJavaInfo().getTypeByClassName(JAVA_LANG_THROWABLE));
+                services.getJavaInfo().getTypeByClassName(JAVA_LANG_THROWABLE), null, false, false,
+                false, false, true);
     }
 
     /**

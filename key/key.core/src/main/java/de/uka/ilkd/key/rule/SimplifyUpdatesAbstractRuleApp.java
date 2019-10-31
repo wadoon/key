@@ -484,11 +484,17 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
 
         /*
          * Location variables that either are already present in the root sequent, or
-         * are not related to the source, are considered fresh. We consider variables
-         * that don't have position information as not related to the source. It would
-         * be soundness critical if declarations of variables in the source code were
-         * not given position information.
+         * are not related to the source, are considered fresh. Additionally, there is a
+         * freshness flag for special variables like the exc, self and result variables
+         * created in operation POs. We consider variables that don't have position
+         * information as not related to the source. It would be soundness critical if
+         * declarations of variables in the source code were not given position
+         * information.
          */
+        
+        if (locVar.isFreshVariable()) {
+            return true;
+        }
 
         final OpCollector opColl = new OpCollector();
         StreamSupport.stream(goal.proof().root().sequent().spliterator(), true)
@@ -530,7 +536,8 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
 
         for (SequentFormula premise : goal.sequent().antecedent()) {
             final Term premiseFor = premise.formula();
-            if (premiseFor.equals(locsetDisjointTerm1) || premiseFor.equals(locsetDisjointTerm2)) {
+            if (premiseFor.equalsModIrrelevantTermLabels(locsetDisjointTerm1)
+                    || premiseFor.equalsModIrrelevantTermLabels(locsetDisjointTerm2)) {
                 return Optional.of(new PosInOccurrence(premise, PosInTerm.getTopLevel(), true));
             }
         }

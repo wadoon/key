@@ -228,6 +228,7 @@ lexer grammar KeYLexer;
         // Keywords for varcond and related stuff
 	SAME_OBSERVER : '\\sameObserver';
     HAS_AE_PREDICATE : '\\hasAEPredicate' ;
+    IS_LOCSET_FORMULA : '\\isLocsetFormula' ;
     INITIALIZE_PARAMETRIC_SKOLEM_UPDATE : '\\initializeParametricSkolemUpdate' ;
     INITIALIZE_PARAMETRIC_SKOLEM_PATH_CONDITION : '\\initializeParametricSkolemPathCondition' ;
     PREFIX_CONTAINS_ELEMENT : '\\prefixContainsElement' ;

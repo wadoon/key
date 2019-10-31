@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -995,8 +996,9 @@ public final class AuxiliaryContractBuilders {
         public Term buildFreePostcondition() {
             Term result = tt();
             for (LocationVariable heap : heaps) {
-                result = and(result,
-                        contract.getFreePostcondition(heap, getBaseHeap(), terms, services));
+                final Term freePostcondition = //
+                        contract.getFreePostcondition(heap, getBaseHeap(), terms, services);
+                result = and(result, Optional.ofNullable(freePostcondition).orElse(tt()));
             }
             return result;
         }

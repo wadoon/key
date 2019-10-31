@@ -3945,6 +3945,7 @@ varexp[TacletBuilder b]
     (   varcond_abstractOrInterface[b, negated]
 	    | varcond_prefixContainsElement[b, negated]
 	    | varcond_isLabeled[b, negated]
+	    | varcond_isLocsetFormula[b, negated]
 	    | varcond_array[b, negated]
         | varcond_isDefined[b, negated]	
         | varcond_abstractUpdate[b, negated]
@@ -4207,6 +4208,14 @@ varcond_isLabeled[TacletBuilder b, boolean negated]
    IS_LABELED LPAREN t=varId RPAREN
    {
       b.addVariableCondition(new IsLabeledCondition((ProgramSV)t, negated));
+   }
+;
+
+varcond_isLocsetFormula[TacletBuilder b, boolean negated]
+:
+   IS_LOCSET_FORMULA LPAREN phi=varId RPAREN
+   {
+      b.addVariableCondition(new IsLocsetFormulaCondition((SchemaVariable)phi, negated));
    }
 ;
 

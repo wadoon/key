@@ -32,6 +32,7 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredica
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -164,6 +165,31 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     protected void doAction(ProgramElement node) {
         node.visit(this);
     }
+    
+    @Override
+    protected void doDefaultAction(SourceElement x) {
+        super.doDefaultAction(x);
+        
+        /*
+         * NOTE (DS, 2019-10-31): In some cases, block contracts talk about variables
+         * that are not contained in the block. This visitor, as a default implemented
+         * in CreatingASTVisitor, only changes block contracts for changed blocks, which
+         * is not enough. If the blocks weren't changed, the default action is
+         * triggered. Therefore, here we give special treatment to the default action of
+         * a statement block. Example situations where this matters are assume/assert
+         * statements (which are internally translated to block contracts) and Abstract
+         * Statement specifications.
+         */
+        
+        if (x instanceof StatementBlock) {
+            final StatementBlock block = (StatementBlock) x;
+            /*
+             * We remove the old contract since otherwise, it will still be applied by the
+             * block contract rules.
+             */
+            performActionOnBlockContract(block, block, true);
+        }
+    }
 
     /** starts the walker */
     @Override
@@ -285,12 +311,20 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     @Override
     public void performActionOnBlockContract(final StatementBlock oldBlock,
                                              final StatementBlock newBlock) {
-        ImmutableSet<BlockContract> oldContracts = services
-                .getSpecificationRepository().getBlockContracts(oldBlock);
+        performActionOnBlockContract(oldBlock, newBlock, false);
+    }
+
+    public void performActionOnBlockContract(final StatementBlock oldBlock,
+            final StatementBlock newBlock, boolean removeOldContract) {
+        ImmutableSet<BlockContract> oldContracts = services.getSpecificationRepository()
+                .getBlockContracts(oldBlock);
         for (BlockContract oldContract : oldContracts) {
-            services.getSpecificationRepository()
-                    .addBlockContract(createNewBlockContract(oldContract,
-                            newBlock, !oldBlock.equals(newBlock)));
+            final BlockContract newContract = //
+                    createNewBlockContract(oldContract, newBlock, !oldBlock.equals(newBlock));
+            services.getSpecificationRepository().addBlockContract(newContract);
+            if (removeOldContract && oldContract != newContract) {
+                services.getSpecificationRepository().removeBlockContract(oldContract);
+            }
         }
     }
 
@@ -481,6 +515,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
             changed |= ((newPrecondition != oldPrecondition)
                     || (newPostcondition != oldPostcondition)
+                    || (newFreePostcondition != oldFreePostcondition)
                     || (newModifies != oldModifies)
                     || (newDeclares != oldDeclares)
                     || (newAccessible != oldAccessible));
