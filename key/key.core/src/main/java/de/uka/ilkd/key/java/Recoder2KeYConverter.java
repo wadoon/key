@@ -25,7 +25,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
@@ -1064,8 +1065,8 @@ public class Recoder2KeYConverter {
         return new MergePointStatement(locVar, comments);
     }
 
-    public AbstractPlaceholderStatement convert(
-            de.uka.ilkd.key.java.recoderext.AbstractPlaceholderStatement aps) {
+    public AbstractStatement convert(
+            de.uka.ilkd.key.java.recoderext.AbstractStatement aps) {
         final PositionInfo pi = positionInfo(aps);
 
         Comment[] comments;
@@ -1078,8 +1079,26 @@ public class Recoder2KeYConverter {
             }
         }
 
-        return new AbstractPlaceholderStatement(aps.getId(), comments, pi);
+        return new AbstractStatement(aps.getId(), comments, pi);
     }
+
+    public AbstractExpression convert(
+            de.uka.ilkd.key.java.recoderext.AbstractExpression aps) {
+        final PositionInfo pi = positionInfo(aps);
+
+        Comment[] comments;
+        if (aps.getComments() == null) {
+            comments = new Comment[0];
+        } else {
+            comments = new Comment[aps.getComments().size()];
+            for (int i = 0; i < aps.getComments().size(); i++) {
+                comments[i] = convert(aps.getComments().get(i));
+            }
+        }
+
+        return new AbstractExpression(aps.getId(), comments, pi);
+    }
+    
     public CatchAllStatement convert(
 	    	de.uka.ilkd.key.java.recoderext.CatchAllStatement cas) {
         return new CatchAllStatement

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.abstractexecution.java.statement;
 
 import org.key_project.util.ExtList;
 
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -22,29 +23,28 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 
 /**
- * An abstract placeholder statement "_abstract P;" represents an arbitrary Java
- * statement and is handled as such. In particular, it may return and throw an
- * exception, and access all accessible variables / fields. Abstract statements
- * are the core of Abstract Execution and Lazy Symbolic Execution.
+ * An abstract placeholder statement "\abstract_statement P;" represents an
+ * arbitrary Java statement and is handled as such. In particular, it may return
+ * and throw an exception, and access all accessible variables / fields.
+ * Abstract statements are the core of Abstract Execution.
  *
  * @author Dominic Steinhoefel
  */
-public class AbstractPlaceholderStatement extends JavaStatement
-        implements Named {
+public class AbstractStatement extends JavaStatement implements Named, AbstractProgramElement {
     protected final String id;
     protected final Name name;
     protected final Comment[] comments;
 
     private final int hashCode;
 
-    public AbstractPlaceholderStatement(String id) {
+    public AbstractStatement(String id) {
         this.id = id;
         this.name = new Name(id);
         this.comments = null;
         this.hashCode = id.hashCode();
     }
 
-    public AbstractPlaceholderStatement(String id, Comment[] comments, PositionInfo pi) {
+    public AbstractStatement(String id, Comment[] comments, PositionInfo pi) {
         super(pi);
         this.id = id;
         this.name = new Name(id);
@@ -52,7 +52,7 @@ public class AbstractPlaceholderStatement extends JavaStatement
         this.hashCode = id.hashCode();
     }
 
-    public AbstractPlaceholderStatement(ExtList children) {
+    public AbstractStatement(ExtList children) {
         super(children);
         id = children.get(String.class);
         this.name = new Name(id);
@@ -76,16 +76,15 @@ public class AbstractPlaceholderStatement extends JavaStatement
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof AbstractPlaceholderStatement)) {
+        if (!(o instanceof AbstractStatement)) {
             return false;
         }
 
-        return ((AbstractPlaceholderStatement) o).getId().equals(this.id);
+        return ((AbstractStatement) o).getId().equals(this.id);
     }
 
     @Override
-    public boolean equalsModRenaming(SourceElement se,
-            NameAbstractionTable nat) {
+    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
         return se.equals(this);
     }
 
@@ -108,12 +107,11 @@ public class AbstractPlaceholderStatement extends JavaStatement
      * calls the corresponding method of a visitor in order to perform some
      * action/transformation on this element
      *
-     * @param v
-     *            the Visitor
+     * @param v the Visitor
      */
     @Override
     public void visit(Visitor v) {
-        v.performActionOnAbstractPlaceholderStatement(this);
+        v.performActionOnAbstractStatement(this);
     }
 
     @Override

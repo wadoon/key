@@ -58,13 +58,14 @@ public class TermAccessibleLocationsCollector extends DefaultVisitor {
             result.add(new PVLoc((LocationVariable) t.op()));
         }
 
-        if (AbstractExecutionUtils.isAbstractSkolemLocationSetValueTerm(t, services)) {
-            result.add(new SkolemLoc((Function) t.sub(0).op()));
-        }
-
         final Function allLocs = services.getTypeConverter().getLocSetLDT().getAllLocs();
         if (t.op() == allLocs) {
             result.add(new AllLocsLoc(allLocs));
+        }
+
+        if (AbstractExecutionUtils.isAbstractSkolemLocationSetValueTerm(t, services)) {
+            final Function op = (Function) t.sub(0).op();
+            result.add(op == allLocs ? new AllLocsLoc(allLocs) : new SkolemLoc(op));
         }
 
 //        final java.util.function.Function<Term, Set<AbstractUpdateAssgnLoc>> subToLoc = //

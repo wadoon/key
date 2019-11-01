@@ -13,12 +13,12 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**
  * Term transformer which relates, in the context of Abstract Execution, the
- * continues flag of an {@link AbstractPlaceholderStatement} with a potentially
+ * continues flag of an {@link AbstractStatement} with a potentially
  * existing continues behavior precondition. More precisely, it creates the
  * formula "(continues <-> PRECONDITION) & (continues -> POSTCONDITION)".
  *

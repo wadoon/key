@@ -509,6 +509,7 @@ TOKEN :
 {
   < ABSTRACT: "abstract" >
 | < ABSTRACT_PROGRAM: "\\abstract_statement" >
+| < ABSTRACT_EXPRESSION: "\\abstract_expression" >
 | < ASSERT: "assert" >  {
       if (!SchemaJavaParser.jdk1_4) {
           matchedToken.kind = IDENTIFIER;
@@ -2736,6 +2737,8 @@ Expression UnaryExpression() :
      |
      result = UnaryExpressionNotPlusMinus()
      |
+     result = AbstractExpression()
+     |
      result = ADTGetter()
      |
      ("#create-object" "(" expr = ExpressionSV()  ")"
@@ -3603,7 +3606,7 @@ Statement Statement() :
      | result = WhileStatement()
      | result = MergePointStatement()
      | result = LoopScopeStatement()
-     | result = AbstractPlaceholderStatement()
+     | result = AbstractStatement()
      | result = DoStatement()
      | result = ForStatement()
      | result = TransactionStatement()
@@ -4513,9 +4516,9 @@ Statement stat;
     }
 }
 
-AbstractPlaceholderStatement AbstractPlaceholderStatement() :
+AbstractStatement AbstractStatement() :
 {
-  AbstractPlaceholderStatement result;
+  AbstractStatement result;
   String id = null;
 }
 {
@@ -4531,6 +4534,25 @@ AbstractPlaceholderStatement AbstractPlaceholderStatement() :
 	checkConstruction(result);
 	return result;
     }
+}
+
+AbstractExpression AbstractExpression() :
+{
+  AbstractExpression result;
+  String id = null;
+}
+{
+  <ABSTRACT_EXPRESSION>
+  {
+    result = factory.createAbstractExpression();
+    setPrefixInfo(result);
+  }
+  (<IDENTIFIER> { id = token.image; })
+  {
+    result.setId(id);
+    checkConstruction(result);
+    return result;
+  }
 }
 
 LoopScopeBlock LoopScopeStatement() :

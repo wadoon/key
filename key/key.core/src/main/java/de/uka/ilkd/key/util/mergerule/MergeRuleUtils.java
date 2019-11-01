@@ -744,15 +744,15 @@ public class MergeRuleUtils {
     public static boolean isUpdateNormalForm(Term u, boolean abstractUpdatesAllowed) {
         if (u.op() instanceof ElementaryUpdate) {
             return true;
+        } else if (abstractUpdatesAllowed && u.op() instanceof AbstractUpdate) {
+            return true;
         } else if (u.op() == UpdateJunctor.PARALLEL_UPDATE) {
             boolean result = true;
             for (Term sub : u.subs()) {
-                result = result && isUpdateNormalForm(sub);
+                result = result && isUpdateNormalForm(sub, abstractUpdatesAllowed);
             }
             return result;
         } else if (u.op() == UpdateJunctor.SKIP) {
-            return true;
-        } else if (abstractUpdatesAllowed && u.op() instanceof AbstractUpdate) {
             return true;
         } else {
             return false;

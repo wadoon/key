@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -36,7 +36,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * Instantiates a parametric skolem path condition for abstract execution. The
  * such generated formula receives one LocSet for its assignable; those are
- * obtained from the block contracts of the {@link AbstractPlaceholderStatement}
+ * obtained from the block contracts of the {@link AbstractStatement}
  * it is generated for.
  *
  * @author Dominic Steinhoefel
@@ -64,8 +64,8 @@ public class InitializeParametricSkolemPathCondition implements VariableConditio
             return matchCond;
         }
 
-        final AbstractPlaceholderStatement abstrStmt = //
-                (AbstractPlaceholderStatement) svInst.getInstantiation(abstrProgSV);
+        final AbstractStatement abstrStmt = //
+                (AbstractStatement) svInst.getInstantiation(abstrProgSV);
 
         final List<Term> accessibles = AbstractExecutionContractUtils
                 .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, matchCond,

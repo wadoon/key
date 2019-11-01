@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.logic.label;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 
@@ -39,7 +39,7 @@ public class AbstractExecutionTermLabel implements TermLabel {
     /**
      * The abstract program contained in this label.
      */
-    private final AbstractPlaceholderStatement abstrPlaceholderStmt;
+    private final AbstractStatement abstrPlaceholderStmt;
 
     /**
      * Constructor.
@@ -48,7 +48,7 @@ public class AbstractExecutionTermLabel implements TermLabel {
      *            The abstract program contained in this label.
      */
     public AbstractExecutionTermLabel(
-            AbstractPlaceholderStatement abstrPlaceholderStmt) {
+            AbstractStatement abstrPlaceholderStmt) {
         this.abstrPlaceholderStmt = abstrPlaceholderStmt;
     }
 
@@ -87,7 +87,7 @@ public class AbstractExecutionTermLabel implements TermLabel {
     /**
      * @return The abstract program contained in this label.
      */
-    public AbstractPlaceholderStatement getAbstrPlaceholderStmt() {
+    public AbstractStatement getAbstrPlaceholderStmt() {
         return abstrPlaceholderStmt;
     }
 

@@ -26,8 +26,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -119,14 +120,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     // %%% HACK: there should be a central facility for introducing new program
     // variables; this method is also used in <code>MethodCall</code> to
     // create copies of parameter variables
-    public static LocationVariable copy(ProgramVariable pv) {
+    public LocationVariable copy(ProgramVariable pv) {
         return copy(pv, "");
     }
 
     // %%% HACK: there should be a central facility for introducing new program
     // variables; this method is also used in <code>MethodCall</code> to
     // create copies of parameter variables
-    public static LocationVariable copy(ProgramVariable pv, String postFix) {
+    public LocationVariable copy(ProgramVariable pv, String postFix) {
         ProgramElementName name = pv.getProgramElementName();
         // %%% HACK: final local variables are not renamed since they can occur
         // in an
@@ -137,7 +138,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return new LocationVariable(
                 VariableNamer.parseName(name.toString() + postFix,
                         name.getCreationInfo()),
-                pv.getKeYJavaType(), pv.isFinal(), pv.getPositionInfo());
+                MiscTools.fixKeYJavaType(pv, services), pv.isFinal(), pv.getPositionInfo());
     }
 
     @Override
@@ -188,9 +189,15 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
              * block contract rules.
              */
             performActionOnBlockContract(block, block, true);
+        } else if (x instanceof AbstractProgramElement) {
+            final StatementBlock block = //
+                    AbstractExecutionUtils.createArtificialStatementBlockForAPE(
+                            (AbstractProgramElement) x, services);
+
+            performActionOnBlockContract(block, block, true);
         }
     }
-
+    
     /** starts the walker */
     @Override
     public void start() {
@@ -373,7 +380,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     @Override
-    public void performActionOnAbstractPlaceholderStatementContract(
+    public void performActionOnAbstractProgramElementContract(
             BlockContract x) {
         // services.getSpecificationRepository().removeBlockContract(x);
         /*
@@ -388,19 +395,20 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     @Override
-    protected void performActionOnAbstractPlaceholderStatementContract(
-            AbstractPlaceholderStatement oldAbstrStmt,
-            AbstractPlaceholderStatement newAbstrStmt) {
-        final ImmutableSet<BlockContract> oldContracts = services
-                .getSpecificationRepository()
-                .getAbstractPlaceholderStatementContracts(oldAbstrStmt);
+    protected void performActionOnAbstractProgramElementContract(
+            final AbstractProgramElement oldElem, final AbstractProgramElement newElem) {
+        final ImmutableSet<BlockContract> oldContracts = services.getSpecificationRepository()
+                .getAbstractProgramElementContracts(oldElem);
+        
+        final StatementBlock block = AbstractExecutionUtils
+                .createArtificialStatementBlockForAPE(newElem, services);
+                        
         for (BlockContract oldContract : oldContracts) {
-            services.getSpecificationRepository()
-                    .addBlockContract(createNewBlockContract(oldContract,
-                            new StatementBlock(newAbstrStmt),
-                            !oldAbstrStmt.equals(newAbstrStmt)));
+            services.getSpecificationRepository().addBlockContract(
+                    createNewBlockContract(oldContract, block, !oldElem.equals(newElem)));
         }
     }
+    
     private MergeContract createNewMergeContract(
             final MergeContract oldContract, final MergePointStatement newMps,
             final boolean changed) {

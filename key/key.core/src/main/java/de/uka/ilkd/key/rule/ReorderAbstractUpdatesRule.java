@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * Pushes an abstract update in a parallel update to the front if it's
@@ -74,8 +75,24 @@ public class ReorderAbstractUpdatesRule implements BuiltInRule {
         if (pio.up().subTerm().op() != UpdateJunctor.PARALLEL_UPDATE) {
             return false;
         }
+        
+        PosInOccurrence parallelUpdPio = pio;
+        do {
+            parallelUpdPio = parallelUpdPio.up();
+        } while (!parallelUpdPio.isTopLevel()
+                && parallelUpdPio.up().subTerm().op() == UpdateJunctor.PARALLEL_UPDATE);
+        
+        if (!MergeRuleUtils.isUpdateNormalForm(parallelUpdPio.subTerm(), true)) {
+            return false;
+        }
 
-        return true;
+        /*
+         * Now the lengthy check... Try to create an app. Note that we could also return
+         * true here, but then the rule will appear in the interactive menu although
+         * it's not applicable
+         */
+
+        return createApp(pio, goal.proof().getServices()).tryToInstantiate(goal).complete();
     }
 
     @Override
@@ -99,7 +116,7 @@ public class ReorderAbstractUpdatesRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public ReorderAbstractUpdatesRuleApp createApp(PosInOccurrence pos, TermServices services) {
         return new ReorderAbstractUpdatesRuleApp(this, pos);
     }
 

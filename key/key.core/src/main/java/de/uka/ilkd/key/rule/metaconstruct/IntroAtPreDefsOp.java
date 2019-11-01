@@ -24,7 +24,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -345,7 +345,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             Services services, final TermBuilder tb) {
         for (StatementBlock block : blocks) {
             if (block.getChildCount() == 1 && block
-                    .getChildAt(0) instanceof AbstractPlaceholderStatement) {
+                    .getChildAt(0) instanceof AbstractStatement) {
                 /*
                  * NOTE (DS, 2019-02-01): We're not doing this for APSs (->
                  * Abstract Execution). There, block contracts are just re- or

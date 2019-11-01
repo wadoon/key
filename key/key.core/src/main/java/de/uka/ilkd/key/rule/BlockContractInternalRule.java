@@ -19,7 +19,7 @@ import java.util.Map;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -336,11 +336,11 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         // perform abstract execution and not apply a block contract (which in
         // any case would not be provable, if it's non-trivial).
         final JavaStatement stmt = instantiation.statement;
-        if (stmt instanceof AbstractPlaceholderStatement
+        if (stmt instanceof AbstractStatement
                 || (stmt instanceof StatementBlock
                         && ((StatementBlock) stmt).getStatementCount() == 1
                         && ((StatementBlock) stmt).getChildAt(
-                                0) instanceof AbstractPlaceholderStatement)) {
+                                0) instanceof AbstractStatement)) {
             return false;
         }
         

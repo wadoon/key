@@ -31,7 +31,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.UniqueArrayList;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
@@ -954,13 +955,13 @@ public class TermBuilder {
      * sides are wrapped inside a "value(...)" application to convert LocSets to the
      * corresponding values.
      * 
-     * @param phs         The {@link AbstractPlaceholderStatement} for which to
+     * @param phs         The {@link AbstractProgramElement} for which to
      *                    create the {@link AbstractUpdate}.
      * @param assignables The assignable locations (the "frame").
      * @param accessibles The accessible locations (the "footprint").
      * @return The {@link AbstractUpdate} created <em>fresh for</em> phs.
      */
-    public Term abstractUpdate(AbstractPlaceholderStatement phs,
+    public Term abstractUpdate(AbstractProgramElement phs,
             UniqueArrayList<AbstractUpdateLoc> assignables, List<AbstractUpdateLoc> accessibles) {
         final AbstractUpdate au = services.abstractUpdateFactory()
                 .getInstance(phs, assignables, accessibles.size());
@@ -1004,6 +1005,24 @@ public class TermBuilder {
                         .toArray(new AbstractUpdateLoc[0]);
 
         return abstractUpdate(abstrUpd, accessibles);
+    }
+    
+    
+    /**
+     * Creates an {@link AbstractUpdate} term for a given replacement map of
+     * assignables in the {@link AbstractUpdate} operator.
+     * 
+     * @param oldAbstrUpdTerm Old {@link AbstractUpdate} {@link Term}.
+     * @param assgnReplMap    The assignable replacements.
+     * @return the new {@link AbstractUpdate} {@link Term}.
+     */
+    public Term changeAbstractUpdateAssignables(Term oldAbstrUpdTerm,
+            Map<? extends AbstractUpdateLoc, ? extends AbstractUpdateLoc> assgnReplMap) {
+        assert oldAbstrUpdTerm.op() instanceof AbstractUpdate;
+        final AbstractUpdate abstrUpd = (AbstractUpdate) oldAbstrUpdTerm.op();
+        final AbstractUpdate newAbstrUpd = services.abstractUpdateFactory()
+                .changeAssignables(abstrUpd, assgnReplMap);
+        return tf.createTerm(newAbstrUpd, oldAbstrUpdTerm.subs(), null, null);
     }
     
     /**
@@ -1070,7 +1089,7 @@ public class TermBuilder {
      * @return The {@link AbstractUpdate} {@link Term}.
      */
     public Term abstractUpdate(String apsId, Term lhs, Term rhs) {
-        final AbstractPlaceholderStatement aps = new AbstractPlaceholderStatement(apsId);
+        final AbstractProgramElement aps = new AbstractStatement(apsId);
         final AbstractUpdate abstrUpd = //
                 services.abstractUpdateFactory().getInstance(aps, lhs, rhs, Optional.empty());
 
@@ -1080,7 +1099,7 @@ public class TermBuilder {
     /**
      * Creates an {@link AbstractUpdate} term.
      *
-     * @param phs              The {@link AbstractPlaceholderStatement} for which to
+     * @param phs              The {@link AbstractProgramElement} for which to
      *                         create an {@link AbstractUpdate}.
      * @param lhs              The {@link AbstractUpdate}'s left-hand side.
      * @param rhs              The {@link AbstractUpdate}'s left-hand side.
@@ -1089,7 +1108,7 @@ public class TermBuilder {
      *                         different such terms around).
      * @return the {@link AbstractUpdate} term.
      */
-    public Term abstractUpdate(AbstractPlaceholderStatement phs, Term lhs, Term rhs,
+    public Term abstractUpdate(AbstractProgramElement phs, Term lhs, Term rhs,
             Optional<ExecutionContext> ec) {
         final AbstractUpdate au = //
                 services.abstractUpdateFactory().getInstance(phs, lhs, rhs, ec);

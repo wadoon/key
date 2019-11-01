@@ -65,8 +65,9 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
         final ImmutableList<Goal> newGoals = goal.split(1);
 
         final SequentFormula oldSeqFor = app.posInOccurrence().sequentFormula();
-        final SequentFormula newSeqFor = new SequentFormula(MiscTools.replaceInTerm(oldSeqFor.formula(),
-                app.getSimplifiedTerm().get(), 0, app.posInOccurrence().posInTerm(), services));
+        final SequentFormula newSeqFor = new SequentFormula(
+                MiscTools.replaceInTerm(oldSeqFor.formula(), app.getSimplifiedTerm().get(), 0,
+                        app.posInOccurrence().posInTerm(), services));
 
         newGoals.head().changeFormula(newSeqFor, app.posInOccurrence());
 
@@ -101,11 +102,21 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
         final OpCollector updOpColl = new OpCollector();
         update.execPostOrder(updOpColl);
 
-        return updOpColl.ops().stream() //
+        if (!updOpColl.ops().stream() //
                 .filter(AbstractUpdate.class::isInstance).map(AbstractUpdate.class::cast) //
                 .anyMatch(upd -> upd.getAllAssignables().stream()
                         .map(AbstractExecutionUtils::unwrapHasTo) //
-                        .anyMatch(interestingLoc));
+                        .anyMatch(interestingLoc))) {
+            return false;
+        }
+
+        /*
+         * Now the lengthy check... Try to create an app. Note that we could also return
+         * true here, but then the rule will appear in the interactive menu although
+         * it's not applicable
+         */
+
+        return createApp(pio, goal.proof().getServices()).tryToInstantiate(goal).complete();
     }
 
     @Override
@@ -129,7 +140,7 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public SimplifyUpdatesAbstractRuleApp createApp(PosInOccurrence pos, TermServices services) {
         return new SimplifyUpdatesAbstractRuleApp(this, pos);
     }
 

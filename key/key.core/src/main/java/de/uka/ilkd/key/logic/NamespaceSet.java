@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -28,7 +28,7 @@ public class NamespaceSet {
     private Namespace<RuleSet> ruleSetNS = new Namespace<RuleSet>();
     private Namespace<Sort> sortNS = new Namespace<Sort>();
     private Namespace<Choice> choiceNS = new Namespace<Choice>();
-    private Namespace<AbstractPlaceholderStatement> abstractProgramSymbolsNS = new Namespace<>();
+    private Namespace<AbstractProgramElement> abstractProgramSymbolsNS = new Namespace<>();
 
     public NamespaceSet() {
     }
@@ -39,7 +39,7 @@ public class NamespaceSet {
                         Namespace<RuleSet> ruleSetNS,
 			Namespace<Choice> choiceNS,
 			Namespace<IProgramVariable> programVarNS,
-            Namespace<AbstractPlaceholderStatement> abstractProgramSymbolsNS) {
+            Namespace<AbstractProgramElement> abstractProgramSymbolsNS) {
 	this.varNS     = varNS;
 	this.progVarNS = programVarNS;
 	this.funcNS    = funcNS;
@@ -85,7 +85,7 @@ public class NamespaceSet {
 	return progVarNS;
     }
 
-    public Namespace<AbstractPlaceholderStatement> abstractProgramSymbols() {
+    public Namespace<AbstractProgramElement> abstractProgramSymbols() {
         return abstractProgramSymbolsNS;
     }
     public void setProgramVariables(Namespace<IProgramVariable> progVarNS) {

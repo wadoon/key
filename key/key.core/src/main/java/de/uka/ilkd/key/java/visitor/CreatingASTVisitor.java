@@ -19,7 +19,9 @@ import java.util.Deque;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
+import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
@@ -240,15 +242,26 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     @Override
-    public void performActionOnAbstractPlaceholderStatement(
-            AbstractPlaceholderStatement x) {
+    public void performActionOnAbstractStatement(AbstractStatement x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
-                AbstractPlaceholderStatement newAbstrStmt =
-                        new AbstractPlaceholderStatement(changeList);
-                performActionOnAbstractPlaceholderStatementContract(x, newAbstrStmt);
+                AbstractStatement newAbstrStmt = new AbstractStatement(changeList);
+                performActionOnAbstractProgramElementContract(x, newAbstrStmt);
                 return newAbstrStmt;
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnAbstractExpression(AbstractExpression x) {
+        DefaultAction def = new DefaultAction(x) {
+            @Override
+            ProgramElement createNewElement(ExtList changeList) {
+                AbstractExpression newAbstrExpr = new AbstractExpression(changeList);
+                performActionOnAbstractProgramElementContract(x, newAbstrExpr);
+                return newAbstrExpr;
             }
         };
         def.doAction(x);
@@ -267,9 +280,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    protected void performActionOnAbstractPlaceholderStatementContract(
-            final AbstractPlaceholderStatement oldAbstrStmt,
-            final AbstractPlaceholderStatement newAbstrStmt) {
+    protected void performActionOnAbstractProgramElementContract(
+            final AbstractProgramElement oldElem,
+            final AbstractProgramElement newElem) {
         // do nothing
     }
 

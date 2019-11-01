@@ -31,7 +31,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.speclang.jml.translation.AbstractPlaceholderSpecsTypeChecker;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Label;
@@ -1344,7 +1344,7 @@ public class JMLSpecFactory {
         final ContractClauses clauses
                 = translateJMLClauses(method, specificationCase, programVariables, behavior);
         if (!block.getBody().isEmpty() && block.getBody()
-                .get(0) instanceof AbstractPlaceholderStatement) {
+                .get(0) instanceof AbstractStatement) {
             final AbstractPlaceholderSpecsTypeChecker checker = //
                     new AbstractPlaceholderSpecsTypeChecker(method, block,
                             clauses, services);

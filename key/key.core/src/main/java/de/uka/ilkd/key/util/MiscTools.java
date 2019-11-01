@@ -34,7 +34,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.KeYCollections;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -42,6 +42,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -578,8 +579,8 @@ public final class MiscTools {
                 if (!pv.isMember() && !declaredPVs.contains(pv)) {
                     result = result.add(pv);
                 }
-            } else if (node instanceof AbstractPlaceholderStatement) {
-                final AbstractPlaceholderStatement aps = (AbstractPlaceholderStatement) node;
+            } else if (node instanceof AbstractStatement) {
+                final AbstractStatement aps = (AbstractStatement) node;
 
                 for (final ProgramVariable pv : AbstractExecutionContractUtils
                         .getAccessibleProgVarsForNoBehaviorContract(aps, root,
@@ -633,8 +634,8 @@ public final class MiscTools {
                         writtenPVs = writtenPVs.add(pv);
                     }
                 }
-            } else if (node instanceof AbstractPlaceholderStatement) {
-                final AbstractPlaceholderStatement aps = (AbstractPlaceholderStatement) node;
+            } else if (node instanceof AbstractStatement) {
+                final AbstractStatement aps = (AbstractStatement) node;
 
                 for (final ProgramVariable pv : AbstractExecutionContractUtils
                         .getAssignableProgVarsForNoBehaviorContract(aps, root,
@@ -1096,5 +1097,28 @@ public final class MiscTools {
 
         return services.getTermFactory().createTerm(term.op(), new ImmutableArray<>(newSubs),
                 term.boundVars(), term.javaBlock(), term.getLabels());
+    }
+
+    /**
+     * Returns the {@link KeYJavaType} for a {@link ProgramVariable} where only the
+     * {@link Sort} has been set. Works if in the {@link Services} object, there is
+     * a {@link KeYJavaType} for the given {@link Sort}.
+     * 
+     * @param var      The variable for which to return the {@link KeYJavaType}.
+     * @param services The {@link Services} object.
+     * @return the {@link KeYJavaType} (hopefully), or null.
+     */
+    public static KeYJavaType fixKeYJavaType(ProgramVariable var, Services services) {
+        KeYJavaType kjt = var.getKeYJavaType();
+        if (kjt == null) {
+            /*
+             * NOTE (DS, 2010-10-31): This case is introduced since I needed a dummy
+             * variable for Abstract Expressions, and I could not get a proper KJT
+             * at creation time.
+             */
+            return services.getJavaInfo().getKeYJavaType(var.sort());
+        } else {
+            return kjt;
+        }
     }
 }

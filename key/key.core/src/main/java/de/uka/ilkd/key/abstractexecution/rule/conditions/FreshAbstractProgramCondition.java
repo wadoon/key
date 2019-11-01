@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
@@ -26,7 +27,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
  * Instantiates a {@link SchemaVariable} for an
- * {@link AbstractPlaceholderStatement} with a new abstract program.
+ * {@link AbstractStatement} with a new abstract program.
  *
  * @author Dominic Steinhoefel
  */
@@ -46,7 +47,7 @@ public class FreshAbstractProgramCondition implements VariableCondition {
             return matchCond;
         }
 
-        final Namespace<AbstractPlaceholderStatement> namespace = services
+        final Namespace<AbstractProgramElement> namespace = services
                 .getNamespaces().abstractProgramSymbols();
         final String basename = "P_";
 
@@ -57,8 +58,8 @@ public class FreshAbstractProgramCondition implements VariableCondition {
             cnt++;
         } while (namespace.lookup(name) != null);
 
-        final AbstractPlaceholderStatement resultInst = //
-                new AbstractPlaceholderStatement(name.toString());
+        final AbstractStatement resultInst = //
+                new AbstractStatement(name.toString());
 
         namespace.add(resultInst);
 

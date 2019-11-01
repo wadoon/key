@@ -92,7 +92,7 @@ public class ReorderAbstractUpdatesRuleApp extends DefaultBuiltInRuleApp {
             parallelUpdPio = parallelUpdPio.up();
         } while (!parallelUpdPio.isTopLevel()
                 && parallelUpdPio.up().subTerm().op() == UpdateJunctor.PARALLEL_UPDATE);
-        
+
         pioToReplace = parallelUpdPio;
 
         final List<Term> elementaries = MergeRuleUtils
@@ -132,7 +132,7 @@ public class ReorderAbstractUpdatesRuleApp extends DefaultBuiltInRuleApp {
     public PosInOccurrence getPioToReplace() {
         return pioToReplace;
     }
-    
+
     // ///////////////////////////////////////////////// //
     // //////////////// PRIVATE METHODS //////////////// //
     // ///////////////////////////////////////////////// //
@@ -232,29 +232,14 @@ public class ReorderAbstractUpdatesRuleApp extends DefaultBuiltInRuleApp {
      */
     private boolean isRelevant(final AbstractUpdateLoc loc,
             final List<AbstractUpdateLoc> relevantLocations, final Goal goal, Services services) {
-        ImmutableList<PosInOccurrence> localIfInsts = ImmutableSLList.<PosInOccurrence>nil();
-        final AbstractUpdateLoc locUnwrapped = AbstractExecutionUtils.unwrapHasTo(loc);
+        final ImmutableList<PosInOccurrence> evidence = AbstractExecutionUtils.isRelevant(loc,
+                relevantLocations, goal, services);
 
-        // loc has to be disjoint from *all* relevant locations.
-        for (final AbstractUpdateLoc relevantLoc : relevantLocations) {
-            if (locUnwrapped instanceof PVLoc && relevantLoc instanceof PVLoc
-                    && !loc.equals(relevantLoc)) {
-                continue;
-            }
-
-            final Optional<PosInOccurrence> maybeIrrelevanceEvidence = //
-                    SimplifyUpdatesAbstractRuleApp.isIrrelevant( //
-                            locUnwrapped, relevantLoc, goal, services);
-
-            if (maybeIrrelevanceEvidence.isPresent()) {
-                localIfInsts = localIfInsts.append(maybeIrrelevanceEvidence.get());
-            } else {
-                // Not irrelevant for this relevantLoc
-                return true;
-            }
+        if (evidence == null) {
+            return true;
         }
 
-        this.ifInsts = this.ifInsts.append(localIfInsts);
+        this.ifInsts = this.ifInsts.append(evidence);
         return false;
     }
 }

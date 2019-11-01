@@ -26,7 +26,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.util.collection.UniqueArrayList;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
@@ -213,22 +213,22 @@ public class AbstractUpdateTests {
         return applInfo.getProof();
     }
 
-    private AbstractPlaceholderStatement aps(String id) {
-        return new AbstractPlaceholderStatement(id);
+    private AbstractStatement aps(String id) {
+        return new AbstractStatement(id);
     }
 
-    private Term abstractUpdate(AbstractPlaceholderStatement aps, AbstractUpdateLoc lhs,
+    private Term abstractUpdate(AbstractStatement aps, AbstractUpdateLoc lhs,
             AbstractUpdateLoc rhs) {
         return abstractUpdate(aps, new AbstractUpdateLoc[] { lhs },
                 new AbstractUpdateLoc[] { rhs });
     }
 
-    private Term abstractUpdate(AbstractPlaceholderStatement aps, AbstractUpdateLoc lhs,
+    private Term abstractUpdate(AbstractStatement aps, AbstractUpdateLoc lhs,
             AbstractUpdateLoc[] rhs) {
         return abstractUpdate(aps, new AbstractUpdateLoc[] { lhs }, rhs);
     }
 
-    private Term abstractUpdate(AbstractPlaceholderStatement aps, AbstractUpdateLoc[] lhs,
+    private Term abstractUpdate(AbstractStatement aps, AbstractUpdateLoc[] lhs,
             AbstractUpdateLoc[] rhs) {
         final TermBuilder tb = DUMMY_SERVICES.getTermBuilder();
 

@@ -24,7 +24,14 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.JavaReduxFileCollection;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
@@ -238,6 +245,40 @@ public final class SLEnvInput extends AbstractEnvInput {
         }
     }
 
+    private void addAPEContracts(SpecExtractor specExtractor,
+            final SpecificationRepository specRepos, final IProgramMethod pm)
+            throws ProofInputException {
+        final JavaASTCollector abstractStatementCollector = new JavaASTCollector(pm.getBody(),
+                AbstractStatement.class);
+        abstractStatementCollector.start();
+        for (ProgramElement abstractStmt : abstractStatementCollector.getNodes()) {
+            final StatementBlock block = AbstractExecutionUtils
+                    .createArtificialStatementBlockForAPE((AbstractStatement) abstractStmt);
+            
+            final ImmutableSet<BlockContract> blockContracts = //
+                    specExtractor.extractBlockContracts(pm, block);
+            for (BlockContract specification : blockContracts) {
+                specRepos.addBlockContract(specification, true);
+            }
+        }
+
+        final JavaASTCollector abstractExpressionCollector = //
+                new JavaASTCollector(pm.getBody(), AbstractExpression.class);
+        abstractExpressionCollector.start();
+        for (ProgramElement abstractExpr : abstractExpressionCollector.getNodes()) {
+            final StatementBlock block = AbstractExecutionUtils
+                    .createArtificialStatementBlockForAPE((AbstractExpression) abstractExpr,
+                            initConfig.sortNS().lookup("java.lang.Object"));
+
+            final ImmutableSet<BlockContract> blockContracts = //
+                    specExtractor.extractBlockContracts(pm, block);
+            
+            for (BlockContract specification : blockContracts) {
+                specRepos.addBlockContract(specification, true);
+            }
+        }
+    }
+
     private void addMergePointStatements(SpecExtractor specExtractor,
                                          final SpecificationRepository specRepos,
                                          final IProgramMethod pm,
@@ -341,6 +382,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 addLoopInvariants(specExtractor, specRepos, kjt, pm);
                 addLoopContracts(specExtractor, specRepos, kjt, pm);
                 addBlockAndLoopContracts(specExtractor, specRepos, pm);
+                addAPEContracts(specExtractor, specRepos, pm);
                 addMergePointStatements(specExtractor, specRepos, pm, methodSpecs);
                 addLabeledBlockContracts(specExtractor, specRepos, pm);
                 addLabeledLoopContracts(specExtractor, specRepos, pm);

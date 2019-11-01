@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 import org.key_project.util.collection.UniqueArrayList;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
@@ -91,9 +91,9 @@ public class AbstractUpdateFactory {
 
     /**
      * Returns abstract update operator for the passed
-     * {@link AbstractPlaceholderStatement} and left-hand side.
+     * {@link AbstractProgramElement} and left-hand side.
      *
-     * @param phs              The {@link AbstractPlaceholderStatement} for which
+     * @param phs              The {@link AbstractProgramElement} for which
      *                         this {@link AbstractUpdate} should be created.
      * @param lhs              The update's left-hand side. Should be a
      *                         {@link SetLDT} term.
@@ -103,9 +103,9 @@ public class AbstractUpdateFactory {
      *                         to normalize self terms (because otherwise, there
      *                         might be different such terms around).
      * @return The {@link AbstractUpdate} for the given
-     *         {@link AbstractPlaceholderStatement} and left-hand side.
+     *         {@link AbstractProgramElement} and left-hand side.
      */
-    public AbstractUpdate getInstance(AbstractPlaceholderStatement phs, Term lhs, Term rhs,
+    public AbstractUpdate getInstance(AbstractProgramElement phs, Term lhs, Term rhs,
             Optional<ExecutionContext> executionContext) {
         final UniqueArrayList<AbstractUpdateLoc> assignables = //
                 abstrUpdateLocsFromTerm(lhs, executionContext, services).stream()
@@ -120,16 +120,16 @@ public class AbstractUpdateFactory {
 
     /**
      * Returns abstract update operator for the passed
-     * {@link AbstractPlaceholderStatement} and left-hand side.
+     * {@link AbstractProgramElement} and left-hand side.
      *
-     * @param phs      The {@link AbstractPlaceholderStatement} for which this
+     * @param phs      The {@link AbstractProgramElement} for which this
      *                 {@link AbstractUpdate} should be created.
      * @param numArgs  The update's left-hand side.
      * @param argSorts The number of arguments of the abstract update.
      * @return The {@link AbstractUpdate} for the given
-     *         {@link AbstractPlaceholderStatement} and left-hand side.
+     *         {@link AbstractProgramElement} and left-hand side.
      */
-    public AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
+    public AbstractUpdate getInstance(AbstractProgramElement phs,
             UniqueArrayList<AbstractUpdateLoc> assignables, final int numArgs) {
         final String phsID = phs.getId();
         if (abstractUpdateInstances.get(phsID) == null) {
@@ -199,16 +199,16 @@ public class AbstractUpdateFactory {
 
     /**
      * Returns abstract path condition operator for the passed
-     * {@link AbstractPlaceholderStatement} and argument sorts.
+     * {@link AbstractProgramElement} and argument sorts.
      *
-     * @param phs      The {@link AbstractPlaceholderStatement} for which this
+     * @param phs      The {@link AbstractProgramElement} for which this
      *                 abstract path condition operator should be created.
      * @param argSorts argument sorts for the operator (corresponding to right-hand
      *                 side/accessibles)
      * @return The abstract path condition operator for the passed
-     *         {@link AbstractPlaceholderStatement} and argument sorts.
+     *         {@link AbstractProgramElement} and argument sorts.
      */
-    public Function getAbstractPathConditionInstance(AbstractPlaceholderStatement phs,
+    public Function getAbstractPathConditionInstance(AbstractProgramElement phs,
             final Sort[] argSorts) {
         final String phsID = phs.getId();
         Function result = abstractPathConditionInstances.get(phsID);
@@ -226,7 +226,7 @@ public class AbstractUpdateFactory {
     /**
      * Checks whether the given function symbol is an abstract path condition.
      * Abstract path conditions are those created via
-     * {@link #getAbstractPathConditionInstance(AbstractPlaceholderStatement, Sort[])},
+     * {@link #getAbstractPathConditionInstance(AbstractProgramElement, Sort[])},
      * other symbols won't be recognized.
      * 
      * @param f The {@link Function} symbol to check.
@@ -238,7 +238,7 @@ public class AbstractUpdateFactory {
 
     /**
      * Returns a new {@link AbstractUpdate} for the same
-     * {@link AbstractPlaceholderStatement}, but with a different assignable set
+     * {@link AbstractProgramElement}, but with a different assignable set
      * defined by the supplied substitutions.
      *
      * @param abstrUpd   The original {@link AbstractUpdate}.

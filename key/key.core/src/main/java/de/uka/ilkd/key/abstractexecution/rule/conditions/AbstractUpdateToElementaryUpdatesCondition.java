@@ -129,10 +129,8 @@ public final class AbstractUpdateToElementaryUpdatesCondition implements Variabl
         }
 
         if (extractedElementaries.size() < allAssignables.size()) {
-            final AbstractUpdate newAbstrUpd = services.abstractUpdateFactory()
-                    .changeAssignables(abstrUpd, extractedHasTosMap);
             extractedElementaries = extractedElementaries
-                    .prepend(tb.abstractUpdate(updateTerm, newAbstrUpd));
+                    .prepend(tb.changeAbstractUpdateAssignables(updateTerm, extractedHasTosMap));
         }
 
         return mc.setInstantiations(

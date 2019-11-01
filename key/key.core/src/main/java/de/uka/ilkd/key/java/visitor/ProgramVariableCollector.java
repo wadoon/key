@@ -90,7 +90,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     }
 
     @Override
-    public void performActionOnAbstractPlaceholderStatementContract(
+    public void performActionOnAbstractProgramElementContract(
             BlockContract x) {
         performActionOnBlockContract(x);
     }

@@ -1160,11 +1160,11 @@ public interface AuxiliaryContract extends SpecificationElement {
 
             for (ProgramVariable var : localOutVariables) {
                 result.put((LocationVariable) var,
-                        createVariable(var.name() + REMEMBRANCE_SUFFIX, var.getKeYJavaType()));
+                        createVariable(var.name() + REMEMBRANCE_SUFFIX, MiscTools.fixKeYJavaType(var, services)));
             }
             return result;
         }
-
+        
         /**
          *
          * @return a map from every heap to its outer remembrance heap.
@@ -1216,7 +1216,7 @@ public interface AuxiliaryContract extends SpecificationElement {
 
             for (ProgramVariable var : localInVariables) {
                 result.put((LocationVariable) var, createVariable(
-                        var.name() + OUTER_REMEMBRANCE_SUFFIX, var.getKeYJavaType()));
+                        var.name() + OUTER_REMEMBRANCE_SUFFIX, MiscTools.fixKeYJavaType(var, services)));
             }
             return result;
         }

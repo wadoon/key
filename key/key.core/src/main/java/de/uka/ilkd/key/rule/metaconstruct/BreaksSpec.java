@@ -13,12 +13,12 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**
  * Term transformer which relates, in the context of Abstract Execution, the
- * breaks flag of an {@link AbstractPlaceholderStatement} with a potentially
+ * breaks flag of an {@link AbstractStatement} with a potentially
  * existing breaks_behavior precondition. More precisely, it creates the formula
  * "(breaks <-> PRECONDITION) & (breaks -> POSTCONDITION)".
  *

@@ -23,7 +23,8 @@ import java.util.Stack;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -2368,7 +2369,7 @@ public class PrettyPrinter {
     }
 
     public void printAbstractPlaceholderStatement(
-            AbstractPlaceholderStatement x) throws IOException {
+            AbstractStatement x) throws IOException {
         markStart(0, x);
         printHeader(x);
         writeInternalIndentation(x);
@@ -2378,6 +2379,16 @@ public class PrettyPrinter {
         printFooter(x);
         markEnd(0, x);
     }
+
+    public void printAbstractExpression(
+            AbstractExpression x) throws IOException {
+        markStart(0, x);
+        printHeader(x);
+        write("\\abstract_expression ");
+        write(x.getId());
+        markEnd(0, x);
+    }
+    
     public void printImport(Import x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);

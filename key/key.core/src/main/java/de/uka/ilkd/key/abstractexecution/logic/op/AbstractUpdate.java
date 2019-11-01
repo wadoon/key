@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 import org.key_project.util.collection.UniqueArrayList;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
@@ -38,10 +38,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 /**
  * Class of operators for abstract updates (in the sense of Abstract Execution),
  * i.e., updates of the form "U(assignables := accessibles)", where assignables
- * and accessibles are lists of {@link AbstractUpdateLoc} (generally,
- * locations, like location variables). The arity of these lists is fixed.
- * Left-hand sides will always be locations, right-hand sides are values that
- * can be updated.
+ * and accessibles are lists of {@link AbstractUpdateLoc} (generally, locations,
+ * like location variables). The arity of these lists is fixed. Left-hand sides
+ * will always be locations, right-hand sides are values that can be updated.
  * 
  * There is one such operator for every left hand side "assignables". Each of
  * these operator is unary, accepting a list "accessibles" of accessible
@@ -52,7 +51,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public final class AbstractUpdate extends AbstractSortedOperator {
 
-    private final AbstractPlaceholderStatement phs;
+    private final AbstractProgramElement phs;
 
     /**
      * Assignables, both "has-to" and "maybe". Use {@link #getMaybeAssignables()} or
@@ -64,7 +63,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
 
     /**
      * The hash code of this {@link AbstractUpdate}; computed of the
-     * {@link AbstractPlaceholderStatement} identifier and the left-hand side
+     * {@link AbstractProgramElement} identifier and the left-hand side
      * (assignables).
      */
     private final int hashCode;
@@ -78,14 +77,14 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     /**
      * Private constructor since there should be exactly one abstract update per
      * left-hand side, similarly as for {@link ElementaryUpdate}. Use
-     * {@link #getInstance(AbstractPlaceholderStatement, Term, Optional)}.
+     * {@link #getInstance(AbstractProgramElement, Term, Optional)}.
      *
-     * @param phs         The {@link AbstractPlaceholderStatement} for which this
+     * @param phs         The {@link AbstractProgramElement} for which this
      *                    {@link AbstractUpdate} should be created.
      * @param assignables The update's left-hand side (assignables).
      * @param services    The {@link Services} object.
      */
-    AbstractUpdate(final AbstractPlaceholderStatement phs,
+    AbstractUpdate(final AbstractProgramElement phs,
             final UniqueArrayList<AbstractUpdateLoc> assignables, final Sort[] argSorts,
             final Services services) {
         super(new Name("U_" + phs.getId() + "("
@@ -100,7 +99,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
 
     /**
      * Returns a new {@link AbstractUpdate} for the same
-     * {@link AbstractPlaceholderStatement}, but with the given assignables set.
+     * {@link AbstractProgramElement}, but with the given assignables set.
      * 
      * Only use {@link AbstractUpdateFactory#changeAssignables(AbstractUpdate, Map)}
      * or relatives, since
@@ -121,7 +120,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
                 phs, newAssignables, super.argSorts().toArray(new Sort[0]), services);
     }
 
-    public AbstractPlaceholderStatement getAbstractPlaceholderStatement() {
+    public AbstractProgramElement getAbstractPlaceholderStatement() {
         return this.phs;
     }
 

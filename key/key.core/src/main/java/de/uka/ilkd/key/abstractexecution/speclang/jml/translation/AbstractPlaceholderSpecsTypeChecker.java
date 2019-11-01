@@ -4,7 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -53,15 +53,15 @@ public class AbstractPlaceholderSpecsTypeChecker {
 //    private final StatementBlock block;
     private final Services services;
     private final ContractClauses clauses;
-    private final AbstractPlaceholderStatement aps;
+    private final AbstractStatement aps;
     private final TypeConverter typeConverter;
 
     public AbstractPlaceholderSpecsTypeChecker(IProgramMethod method, StatementBlock block,
             ContractClauses clauses, Services services) {
-        assert block.getChildAt(0) instanceof AbstractPlaceholderStatement;
+        assert block.getChildAt(0) instanceof AbstractStatement;
 
         this.method = method;
-        this.aps = (AbstractPlaceholderStatement) block.getChildAt(0);
+        this.aps = (AbstractStatement) block.getChildAt(0);
 //        this.block = block;
         this.clauses = clauses;
         this.services = services;

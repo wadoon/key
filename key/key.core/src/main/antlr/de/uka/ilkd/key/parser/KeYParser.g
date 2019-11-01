@@ -3912,6 +3912,7 @@ varexp[TacletBuilder b]
     | varcond_getFreeInvariant[b]
     | varcond_getVariant[b]
     | varcond_initializeParametricSkolemUpdate[b]
+    | varcond_initializeParametricSkolemUpdateForAExp[b]
     | varcond_initializeParametricSkolemPathCondition[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_applyOnAbstractUpdate[b]
@@ -4092,6 +4093,22 @@ varcond_initializeParametricSkolemUpdate[TacletBuilder b]
       b.addVariableCondition(
         new InitializeParametricSkolemUpdate(
           (SchemaVariable) updateSV, 
+          (ProgramSV) abstrProgramSV));
+   }
+;
+
+varcond_initializeParametricSkolemUpdateForAExp[TacletBuilder b]
+:
+   INITIALIZE_PARAMETRIC_SKOLEM_UPDATE_FOR_AEXP LPAREN
+     updateSV=varId COMMA
+     lhsSV=varId COMMA
+     abstrProgramSV=varId
+   RPAREN 
+   {
+      b.addVariableCondition(
+        new InitializeParametricSkolemUpdate(
+          (SchemaVariable) updateSV, 
+          (ProgramSV) lhsSV, 
           (ProgramSV) abstrProgramSV));
    }
 ;

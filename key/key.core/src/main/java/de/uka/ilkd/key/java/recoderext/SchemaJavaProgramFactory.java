@@ -102,8 +102,12 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         return new LoopScopeBlock();
     }
 
-    public AbstractPlaceholderStatement createAbstractPlaceholderStatement() {
-        return new AbstractPlaceholderStatement();
+    public AbstractStatement createAbstractPlaceholderStatement() {
+        return new AbstractStatement();
+    }
+
+    public AbstractExpression createAbstractExpression() {
+        return new AbstractExpression();
     }
     
     public RMethodBodyStatement createRMethodBodyStatement

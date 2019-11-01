@@ -264,8 +264,10 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                 instantiatedOp = p_operatorToBeInstantiated;
             }
             else if (p_operatorToBeInstantiated instanceof ProgramSV
-                    && ((ProgramSV) p_operatorToBeInstantiated)
-                            .sort() == ProgramSVSort.ABSTRACTPROGRAM) {
+                    && ((((ProgramSV) p_operatorToBeInstantiated)
+                            .sort() == ProgramSVSort.ABSTRACTSTATEMENT)
+                            || ((ProgramSV) p_operatorToBeInstantiated)
+                                    .sort() == ProgramSVSort.ABSTRACTEXPRESSION)) {
                 instantiatedOp = p_operatorToBeInstantiated;
             } else {
                 instantiatedOp = (Operator)svInst.getInstantiation((SchemaVariable)p_operatorToBeInstantiated);
@@ -321,7 +323,9 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                 && (!(visitedOp instanceof ProgramSV && (((ProgramSV) visitedOp)
                         .isListSV()
                         || ((ProgramSV) visitedOp)
-                                .sort() == ProgramSVSort.ABSTRACTPROGRAM)))) {
+                                .sort() == ProgramSVSort.ABSTRACTSTATEMENT
+                        || ((ProgramSV) visitedOp)
+                                .sort() == ProgramSVSort.ABSTRACTEXPRESSION)))) {
             final Term newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp, svInst.getExecutionContext(), services));
             final Term labeledTerm = TermLabelManager.label(services,
                     termLabelState,

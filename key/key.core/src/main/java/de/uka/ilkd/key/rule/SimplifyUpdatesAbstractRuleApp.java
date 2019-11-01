@@ -12,26 +12,23 @@
 //
 package de.uka.ilkd.key.rule;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.IrrelevantAssignable;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -109,12 +106,12 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
 
         if (!maybeResult.isPresent()) {
             ifInsts = ImmutableSLList.<PosInOccurrence>nil();
-            return this;
         } else {
             complete = true;
             simplifiedTerm = maybeResult;
-            return this;
         }
+
+        return this;
     }
 
     // ///////////////////////////////////////////////// //
@@ -289,26 +286,37 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
          */
         //@formatter:on
 
-        //@formatter:off
-//        final Set<AbstractUpdateLoc> newIrrelevantLocations = relevantLocations.stream()
-//                .filter(abstrUpd::hasToAssign)
-//                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-//        final Set<AbstractUpdateLoc> newOverwrittenLocations = abstrUpd.getHasToAssignables()
-//                .stream()
-//                .filter(hasToLoc -> newIrrelevantLocations.stream()
-//                        .anyMatch(loc -> hasToLoc.mayAssign(loc, services)))
-//                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-        //@formatter:on
+        final Map<AbstractUpdateLoc, AbstractUpdateLoc> assgnReplMap = new LinkedHashMap<>();
+        boolean allLocsIrrelevant = true;
+        int i = -1;
+        for (final AbstractUpdateLoc assgn : abstrUpd.getAllAssignables()) {
+            i++;
+            if (assgn instanceof IrrelevantAssignable) {
+                continue;
+            }
 
-        if (abstrUpd.getAllAssignables().stream().noneMatch(
-                loc -> isRelevant(loc, relevantLocations, overwrittenLocations, goal, services))) {
+            if (isRelevant(assgn, relevantLocations, overwrittenLocations, goal, services)) {
+                allLocsIrrelevant = false;
+
+                if (assgn instanceof HasToLoc) {
+                    final AbstractUpdateLoc unwrappedLoc = //
+                            AbstractExecutionUtils.unwrapHasTo(assgn);
+                    relevantLocations.remove(unwrappedLoc);
+                    overwrittenLocations.add(unwrappedLoc);
+                }
+            } else {
+                assgnReplMap.put(assgn, new IrrelevantAssignable(i, assgn.sort()));
+            }
+        }
+
+        if (allLocsIrrelevant) {
             return Optional.of(tb.skip());
         }
 
-        //@formatter:off
-//        relevantLocations.removeAll(newIrrelevantLocations);
-//        overwrittenLocations.addAll(newOverwrittenLocations);
-        //@formatter:on
+        if (!assgnReplMap.isEmpty()) {
+            return Optional.of(tb.changeAbstractUpdateAssignables(update, assgnReplMap));
+        }
+
         return Optional.empty();
     }
 
@@ -383,6 +391,10 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
      * in a successful irrelevance "proof".
      * 
      * <p>
+     * See
+     * {@link AbstractExecutionUtils#isRelevant(AbstractUpdateLoc, Set, Set, Goal, Services)}.
+     * 
+     * <p>
      * This method is the significant difference to
      * {@link DropEffectlessElementariesCondition}, since here, we look for premises
      * about disjointness of locsets.
@@ -401,148 +413,15 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
     private boolean isRelevant(final AbstractUpdateLoc loc,
             final Set<AbstractUpdateLoc> relevantLocations,
             final Set<AbstractUpdateLoc> overwrittenLocations, final Goal goal, Services services) {
-        ImmutableList<PosInOccurrence> localIfInsts = ImmutableSLList.<PosInOccurrence>nil();
-        final AbstractUpdateLoc locUnwrapped = AbstractExecutionUtils.unwrapHasTo(loc);
+        ImmutableList<PosInOccurrence> evidence = AbstractExecutionUtils.isRelevant(loc,
+                relevantLocations, overwrittenLocations, goal, services);
 
-        //@formatter:off
-        /*
-         * A location l1 (set) is *not* relevant w.r.t. another location l2 (set) if:
-         * 
-         * 1) l1 is overwritten, or there is no relevant location l2, or
-         * 2) l1 is a PVLoc and l2 a different PVLoc, or
-         * 3) l1 is not a PVLoc, and l2 is a fresh auxiliary program variable, or
-         * 4) l1 is a fresh auxiliary program variable and l2 is an abstract location set, or
-         * 5) there is evidence in the proof that l1 and l2 are disjoint.
-         * 
-         * In all other cases, l1 is relevant w.r.t. l2. It is relevant w.r.t. a set of
-         * locations if it is relevant for any location in the set.
-         * 
-         * Case 4 is because the variable wouldn't be fresh if it was contained by the
-         * possible instantiations of any abstract location set.
-         */
-        //@formatter:on
-
-        if (overwrittenLocations.contains(locUnwrapped) || relevantLocations.isEmpty()) {
-            return false;
-        }
-
-        final Set<AbstractUpdateLoc> relevantLocsCopy = new LinkedHashSet<>(relevantLocations);
-        if (locUnwrapped instanceof PVLoc) {
-            // If loc is a PVLoc, we can safely remove all PVLocs that aren't equal.
-            relevantLocsCopy.removeIf(ploc -> ploc instanceof PVLoc && !ploc.equals(locUnwrapped));
-        } else {
-            /*
-             * Even if loc is allLocs, the "fresh" locations cannot be meant! We remove
-             * them. They only should play a role if loc is a PVLoc.
-             */
-            relevantLocsCopy.removeIf(ploc -> locIsCreatedFresh(ploc, goal, services));
-        }
-
-        // loc has to be disjoint from *all* relevant locations.
-        for (final AbstractUpdateLoc relevantLoc : relevantLocsCopy) {
-            if ((relevantLoc instanceof AllLocsLoc || relevantLoc instanceof SkolemLoc)
-                    && locIsCreatedFresh(locUnwrapped, goal, services)) {
-                continue;
-            }
-
-            final Optional<PosInOccurrence> maybeIrrelevanceEvidence = //
-                    isIrrelevant(locUnwrapped, relevantLoc, goal, services);
-
-            if (maybeIrrelevanceEvidence.isPresent()) {
-                localIfInsts = localIfInsts.append(maybeIrrelevanceEvidence.get());
-            } else {
-                // Not irrelevant for this relevantLoc
-                return true;
-            }
-        }
-
-        this.ifInsts = this.ifInsts.append(localIfInsts);
-        return false;
-    }
-
-    /**
-     * For location variables introduced fresh by KeY, there can be no disjointness
-     * assumptions created a-priori. Therefore, this method checks whether the given
-     * location variable loc is irrelevant for abstract location sets.
-     * 
-     * <p>
-     * Pure method.
-     * 
-     * @param loc      The {@link AbstractUpdateLoc} to check.
-     * @param goal     The context {@link Goal}.
-     * @param services The {@link Services} object.
-     * @return true iff loc is irrelevant for Skolem location sets since it is
-     *         created fresh by KeY rules.
-     */
-    private static boolean locIsCreatedFresh(final AbstractUpdateLoc loc, final Goal goal,
-            final Services services) {
-        if (!(AbstractExecutionUtils.unwrapHasTo(loc) instanceof PVLoc)) {
-            return false;
-        }
-
-        final LocationVariable locVar = ((PVLoc) AbstractExecutionUtils.unwrapHasTo(loc)).getVar();
-
-        /*
-         * Location variables that either are already present in the root sequent, or
-         * are not related to the source, are considered fresh. Additionally, there is a
-         * freshness flag for special variables like the exc, self and result variables
-         * created in operation POs. We consider variables that don't have position
-         * information as not related to the source. It would be soundness critical if
-         * declarations of variables in the source code were not given position
-         * information.
-         */
-        
-        if (locVar.isFreshVariable()) {
+        if (evidence == null) {
             return true;
         }
 
-        final OpCollector opColl = new OpCollector();
-        StreamSupport.stream(goal.proof().root().sequent().spliterator(), true)
-                .map(SequentFormula::formula).forEach(term -> term.execPostOrder(opColl));
-        if (opColl.ops().contains(locVar)) {
-            // Location was already present in the root node.
-            return false;
-        }
-
-        return locVar.getPositionInfo() == PositionInfo.UNDEFINED;
-    }
-
-    /**
-     * Looks in the antecedent of the given {@link Goal} for a premise asserting
-     * that loc and relevantLoc are disjoint. The check is done syntactically for
-     * performance reasons, but KeY should bring the disjointness assertions to a
-     * normal form of the shape <code>loc1 \cap loc2 = {}</code>, therefore it
-     * should be OK. There are no proofs involved.
-     * 
-     * <p>
-     * Pure method.
-     * 
-     * @param loc         The location to check for relevance.
-     * @param relevantLoc A location known to be relevant.
-     * @param goal        The context {@link Goal}.
-     * @param services    The {@link Services} object.
-     * @return An empty {@link Optional} if it could not proven that loc is
-     *         <em>not</em> relevant, and a premise proving the irrelevance (i.e.,
-     *         disjointness) in the other case.
-     */
-    public static Optional<PosInOccurrence> isIrrelevant(final AbstractUpdateLoc loc,
-            final AbstractUpdateLoc relevantLoc, final Goal goal, final Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-
-        final Term locsetDisjointTerm1 = tb.equals(
-                tb.intersect(loc.toTerm(services), relevantLoc.toTerm(services)), tb.empty());
-        final Term locsetDisjointTerm2 = tb.equals(
-                tb.intersect(relevantLoc.toTerm(services), loc.toTerm(services)), tb.empty());
-
-        for (SequentFormula premise : goal.sequent().antecedent()) {
-            final Term premiseFor = premise.formula();
-            if (premiseFor.equalsModIrrelevantTermLabels(locsetDisjointTerm1)
-                    || premiseFor.equalsModIrrelevantTermLabels(locsetDisjointTerm2)) {
-                return Optional.of(new PosInOccurrence(premise, PosInTerm.getTopLevel(), true));
-            }
-        }
-
-        return Optional.empty();
+        this.ifInsts = this.ifInsts.append(evidence);
+        return false;
     }
 
     /**

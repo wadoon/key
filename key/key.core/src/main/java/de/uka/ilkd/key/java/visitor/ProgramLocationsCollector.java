@@ -72,8 +72,8 @@ public class ProgramLocationsCollector extends ProgramVariableCollector {
     }
 
     @Override
-    public void performActionOnAbstractPlaceholderStatementContract(BlockContract contract) {
-        super.performActionOnAbstractPlaceholderStatementContract(contract);
+    public void performActionOnAbstractProgramElementContract(BlockContract contract) {
+        super.performActionOnAbstractProgramElementContract(contract);
 
         for (final LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             final Term accessibleClause = contract.getAccessibleClause(heap, services);

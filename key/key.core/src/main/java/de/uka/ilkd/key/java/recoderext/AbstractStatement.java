@@ -17,25 +17,25 @@ import recoder.java.*;
 import recoder.java.statement.JavaStatement;
 
 /**
- * An abstract placeholder statement "_abstract P;" represents an arbitrary Java
- * statement and is handled as such. In particular, it may return and throw an
- * exception, and access all accessible variables / fields. Abstract statements
- * are the core of Abstract Execution and Lazy Symbolic Execution.
+ * An {@link AbstractStatement} "\abstract_statement P;" represents an arbitrary
+ * Java statement and is handled as such. In particular, it may return and throw
+ * an exception, and access all accessible variables / fields. Abstract
+ * statements are the core of Abstract Execution.
  *
  * @author Dominic Steinhoefel
  */
-public class AbstractPlaceholderStatement extends JavaStatement {
+public class AbstractStatement extends JavaStatement implements AbstractProgramElement {
     private static final long serialVersionUID = 1L;
 
     private StatementContainer astParent;
     private String id;
 
-    public AbstractPlaceholderStatement(String id) {
+    public AbstractStatement(String id) {
         makeParentRoleValid();
         this.id = id;
     }
 
-    public AbstractPlaceholderStatement() {
+    public AbstractStatement() {
         this(null);
     }
 
@@ -73,14 +73,11 @@ public class AbstractPlaceholderStatement extends JavaStatement {
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
-     * @param index
-     *            an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
