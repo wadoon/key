@@ -323,6 +323,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     public void performActionOnBlockContract(final StatementBlock oldBlock,
             final StatementBlock newBlock, boolean removeOldContract) {
+        if (AbstractExecutionUtils.getAPEFromArtificialBlock(oldBlock).isPresent()) {
+            performActionOnAbstractProgramElementContract(
+                    AbstractExecutionUtils.getAPEFromArtificialBlock(oldBlock).get(),
+                    AbstractExecutionUtils.getAPEFromArtificialBlock(newBlock).get());
+            return;
+        }
+        
         ImmutableSet<BlockContract> oldContracts = services.getSpecificationRepository()
                 .getBlockContracts(oldBlock);
         for (BlockContract oldContract : oldContracts) {

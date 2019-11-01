@@ -25,17 +25,36 @@
  */
 public class ConsolidateDuplicateConditionalFragments {
     public Object before(Object result) {
+        /*@ assume \disjoint(\dl_heap, \dl_frameTryProg) &&
+          @        \disjoint(this, \dl_frameTryProg) &&
+          @        \disjoint(\dl_heap, \dl_framePostfixProg) &&
+          @        \disjoint(this, \dl_framePostfixProg);
+          @*/
+        { ; }
+      
         try {
+            //@ assignable \dl_frameTryProg;
             //@ return_behavior requires false;
-            { \abstract_statement TryProg; }
-            
+            \abstract_statement TryProg;
+
+            //@ assignable \dl_framePostfixProg;
+            //@ accessible \dl_footprintPostfixProg;
             \abstract_statement Postfix;
         }
         catch (Throwable t) {
+            /*@ assume \disjoint(t, \dl_footprintCatchProg) &&
+              @        \disjoint(t, \dl_footprintPostfixProg);
+              @*/
+            { ; }
+
+            //@ assignable \dl_frameCatchProg;
+            //@ accessible t, \dl_footprintCatchProg;
             //@ exceptional_behavior requires false;
             //@ return_behavior requires false;
-            { \abstract_statement CatchProg; }
-            
+            \abstract_statement CatchProg;
+
+            //@ assignable \dl_framePostfixProg;
+            //@ accessible \dl_footprintPostfixProg;
             \abstract_statement Postfix;
         }
 
@@ -43,15 +62,32 @@ public class ConsolidateDuplicateConditionalFragments {
     }
 
     public Object after(Object result) {
+        /*@ assume \disjoint(\dl_heap, \dl_frameTryProg) &&
+          @        \disjoint(this, \dl_frameTryProg) &&
+          @        \disjoint(\dl_heap, \dl_framePostfixProg) &&
+          @        \disjoint(this, \dl_framePostfixProg);
+          @*/
+        { ; }
+        
         try {
+            //@ assignable \dl_frameTryProg;
             //@ return_behavior requires false;
             { \abstract_statement TryProg; }
         }
         catch (Throwable t) {
+            /*@ assume \disjoint(t, \dl_footprintCatchProg) &&
+              @        \disjoint(t, \dl_footprintPostfixProg);
+              @*/
+            { ; }
+
+            //@ assignable \dl_frameCatchProg;
+            //@ accessible t, \dl_footprintCatchProg;
             //@ exceptional_behavior requires false;
             //@ return_behavior requires false;
-            { \abstract_statement CatchProg; }
+            \abstract_statement CatchProg;
         } finally {
+            //@ assignable \dl_framePostfixProg;
+            //@ accessible \dl_footprintPostfixProg;
             \abstract_statement Postfix;
         }
 
