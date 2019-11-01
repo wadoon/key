@@ -168,6 +168,12 @@ public final class LocSetLDT extends LDT {
         return hasTo;
     }
 
+    /**
+     * Returns the "value" function which transforms LocSet location specifiers to
+     * their represented values. Used for Abstract Execution.
+     * 
+     * @return the "value" function.
+     */
     public Function getValue() {
         return value;
     }

@@ -43,13 +43,21 @@ public class StatementBlock extends JavaStatement
     
     private final int prefixLength; 
     
-    private final MethodFrame innerMostMethodFrame; 
+    private final MethodFrame innerMostMethodFrame;
+    
+    /**
+     * Introduced for Abstract Execution, where we're creating blocks just for using
+     * existing block contract procedures. Those blocks are then artificial. Once we
+     * know that, we can, if needed, extract the "actual" statements contained.
+     */
+    private final boolean isArtificialStatementBlock;
     
     
     public StatementBlock() {
         body = new ImmutableArray<Statement>();
         prefixLength = 1;
         innerMostMethodFrame = null;
+        isArtificialStatementBlock = false;
     }
     
 
@@ -59,6 +67,10 @@ public class StatementBlock extends JavaStatement
      */
 
     public StatementBlock(ExtList children) {
+        this(children, false);
+    }
+
+    public StatementBlock(ExtList children, boolean isArtificialStatementBlock) {
         super(children);
         body = new
             ImmutableArray<Statement>(children.collect(Statement.class));
@@ -66,8 +78,9 @@ public class StatementBlock extends JavaStatement
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);        
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
+        this.isArtificialStatementBlock = isArtificialStatementBlock;
     }
-
+    
     public StatementBlock(ImmutableArray<? extends Statement> as) {
         // check for non-null elements (bug fix)
         Debug.assertDeepNonNull(as, "statement block contructor");
@@ -75,6 +88,7 @@ public class StatementBlock extends JavaStatement
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
+        isArtificialStatementBlock = false;
     }
 
 
@@ -85,6 +99,18 @@ public class StatementBlock extends JavaStatement
     public StatementBlock(Statement... body) {
 	this(new ImmutableArray<Statement>(body));
     }
+
+    /**
+     * Introduced for Abstract Execution, where we're creating blocks just for using
+     * existing block contract procedures. Those blocks are then artificial. Once we
+     * know that, we can, if needed, extract the "actual" statements contained.
+     * 
+     * @return the true iff this {@link StatementBlock} is "artificial".
+     */
+    public boolean isArtificialStatementBlock() {
+        return isArtificialStatementBlock;
+    }
+
 
     @Override
     public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {

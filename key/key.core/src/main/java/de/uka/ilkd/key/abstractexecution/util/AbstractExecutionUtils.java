@@ -35,7 +35,9 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.IrrelevantAssignable;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Assignment;
@@ -158,7 +160,7 @@ public class AbstractExecutionUtils {
         final ExtList children = new ExtList(abstractStmt.getComments());
         children.add(abstractStmt);
         children.add(abstractStmt.getPositionInfo());
-        return new StatementBlock(children);
+        return new StatementBlock(children, true);
     }
 
     /**
@@ -230,7 +232,48 @@ public class AbstractExecutionUtils {
         children.add(assign);
         children.add(abstractExpr.getPositionInfo());
 
-        return new StatementBlock(children);
+        return new StatementBlock(children, true);
+    }
+
+    /**
+     * Returns, for an artificial {@link StatementBlock} (see, e.g.,
+     * {@link #createArtificialStatementBlockForAPE(AbstractStatement)}), the actual
+     * {@link AbstractProgramElement}, if any.
+     * 
+     * @param block The artificial {@link StatementBlock} (if it's not a
+     *              StatementBlock, this method always returns an empty Optional).
+     * @return The {@link AbstractProgramElement} contained.
+     */
+    public static Optional<AbstractProgramElement> getAPEFromArtificialBlock(Statement stmt) {
+        if (!(stmt instanceof StatementBlock)) {
+            return Optional.empty();
+        }
+
+        return getAPEFromArtificialBlock((StatementBlock) stmt);
+    }
+
+    /**
+     * Returns, for an artificial {@link StatementBlock} (see, e.g.,
+     * {@link #createArtificialStatementBlockForAPE(AbstractStatement)}), the actual
+     * {@link AbstractProgramElement}, if any.
+     * 
+     * @param block The artificial {@link StatementBlock}.
+     * @return The {@link AbstractProgramElement} contained.
+     */
+    public static Optional<AbstractProgramElement> getAPEFromArtificialBlock(StatementBlock block) {
+        if (!block.isArtificialStatementBlock()) {
+            return Optional.empty();
+        }
+
+        final ProgramElement firstChild = block.getChildAt(0);
+        if (firstChild instanceof AbstractStatement) {
+            return Optional.of((AbstractStatement) firstChild);
+        } else if (firstChild instanceof CopyAssignment
+                && ((CopyAssignment) firstChild).getChildAt(1) instanceof AbstractExpression) {
+            return Optional.of((AbstractExpression) ((CopyAssignment) firstChild).getChildAt(1));
+        }
+
+        return Optional.empty();
     }
 
     /**

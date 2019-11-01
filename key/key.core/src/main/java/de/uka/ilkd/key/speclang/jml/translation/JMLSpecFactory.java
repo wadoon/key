@@ -33,6 +33,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.speclang.jml.translation.AbstractPlaceholderSpecsTypeChecker;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -49,6 +50,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.BranchStatement;
+import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
@@ -1502,7 +1504,14 @@ public class JMLSpecFactory {
                             .prepend((ProgramVariable) variables.get(j).getProgramVariable());
                 }
             }
-            if (s == statement) {
+            
+            if (container instanceof Catch) {
+                result = result.prepend((ProgramVariable) ((Catch) container)
+                        .getParameterDeclaration().getVariables().get(0).getProgramVariable());
+            }
+            
+            if (s == statement || AbstractExecutionUtils.getAPEFromArtificialBlock(statement)
+                    .map(s::equals).orElse(false)) {
                 return result;
             } else if (s instanceof LocalVariableDeclaration) {
                 final ImmutableArray<VariableSpecification> variables
@@ -1511,22 +1520,34 @@ public class JMLSpecFactory {
                     result = result
                             .prepend((ProgramVariable) variables.get(j).getProgramVariable());
                 }
-            } else if (s instanceof StatementContainer) {
-                final ImmutableList<ProgramVariable> visibleLocalVariables
-                        = collectLocalVariablesVisibleTo(statement, (StatementContainer) s);
-                if (visibleLocalVariables != null) {
-                    result = result.prepend(visibleLocalVariables);
-                    return result;
-                }
-            } else if (s instanceof BranchStatement) {
-                final BranchStatement branch = (BranchStatement) s;
-                final int branchCount = branch.getBranchCount();
-                for (int j = 0; j < branchCount; j++) {
-                    final ImmutableList<ProgramVariable> visibleLocalVariables
-                            = collectLocalVariablesVisibleTo(statement, branch.getBranchAt(j));
+            } else if (s instanceof StatementContainer || s instanceof BranchStatement) {
+                /*
+                 * Note (DS, 2019-11-01): There are StatementContainers that are also
+                 * BranchStatements, like Try statements. We need to follow the statements in
+                 * the Try and also the branches; otherwise, the variable for an exception in
+                 * a Catch clause, for instance, will not be available to JML constructs in
+                 * that branch.
+                 */
+                
+                if (s instanceof StatementContainer) {
+                    final ImmutableList<ProgramVariable> visibleLocalVariables = //
+                            collectLocalVariablesVisibleTo(statement, (StatementContainer) s);
                     if (visibleLocalVariables != null) {
                         result = result.prepend(visibleLocalVariables);
                         return result;
+                    }
+                }
+
+                if (s instanceof BranchStatement) {
+                    final BranchStatement branch = (BranchStatement) s;
+                    final int branchCount = branch.getBranchCount();
+                    for (int j = 0; j < branchCount; j++) {
+                        final ImmutableList<ProgramVariable> visibleLocalVariables = //
+                                collectLocalVariablesVisibleTo(statement, branch.getBranchAt(j));
+                        if (visibleLocalVariables != null) {
+                            result = result.prepend(visibleLocalVariables);
+                            return result;
+                        }
                     }
                 }
             }

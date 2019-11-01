@@ -18,8 +18,8 @@
  * @author Dominic Steinhoefel
  */
 public class ConsolidateDuplicateConditionalFragmentsPostfix {
-    public int before(Object result, boolean b) {
-        if (b) {
+    public int before(Object result) {
+        if (\abstract_expression e) {
             \abstract_statement Q1;
             \abstract_statement P;
         }
@@ -31,8 +31,8 @@ public class ConsolidateDuplicateConditionalFragmentsPostfix {
         return result;
     }
 
-    public int after(Object result, boolean b) {
-        if (b) {
+    public int after(Object result) {
+        if (\abstract_expression e) {
             \abstract_statement Q1;
         }
         else {

@@ -29,28 +29,27 @@ public class ConsolidateDuplicateConditionalFragments {
     //@ declares \dl_args;
     public Object before(Object res) {
         try {
-            //@ declares \dl_localsTryProg;
-            //@ assignable res, \dl_heap, \dl_localsTryProg, \dl_args;
-            //@ accessible res, \dl_heap, \dl_localsTryProg, \dl_args;
-            { \abstract_statement TryProg; }
+            //@ assignable \dl_frameTryProg;
+            //@ accessible \dl_footprintTryProg;
+            \abstract_statement TryProg;
             
-            //@ declares \dl_localsPostfix;
-            //@ assignable res, \dl_heap, \dl_localsPostfix, \dl_args;
-            //@ accessible res, \dl_heap, \dl_localsPostfix, \dl_args;
+            //@ assignable \dl_framePostfixProg;
+            //@ accessible \dl_footprintPostfixProg;
             //@ exceptional_behavior requires false;
-            { \abstract_statement Postfix; }
+            \abstract_statement Postfix;
         }
         catch (Throwable t) {
-            //@ declares \dl_localsCatchProg;
-            //@ assignable res, \dl_heap, \dl_localsCatchProg, \dl_args;
-            //@ accessible res, \dl_heap, \dl_localsCatchProg, \dl_args;
-            { \abstract_statement CatchProg; }
+            //@ assume \disjoint(t, \dl_footprintCatchProg);
+            { ; }
             
-            //@ declares \dl_localsPostfix;
-            //@ assignable res, \dl_heap, \dl_localsPostfix, \dl_args;
-            //@ accessible res, \dl_heap, \dl_localsPostfix, \dl_args;
+            //@ assignable \dl_frameCatchProg;
+            //@ accessible t, \dl_footprintCatchProg;
+            \abstract_statement CatchProg;
+
+            //@ assignable \dl_framePostfixProg;
+            //@ accessible \dl_footprintPostfixProg;
             //@ exceptional_behavior requires false;
-            { \abstract_statement Postfix; }
+            \abstract_statement Postfix;
         }
 
         return res;
@@ -59,23 +58,23 @@ public class ConsolidateDuplicateConditionalFragments {
     //@ declares \dl_args;
     public Object after(Object res) {
         try {
-            //@ declares \dl_localsTryProg;
-            //@ assignable res, \dl_heap, \dl_localsTryProg, \dl_args;
-            //@ accessible res, \dl_heap, \dl_localsTryProg, \dl_args;
-            { \abstract_statement TryProg; }
+            //@ assignable \dl_frameTryProg;
+            //@ accessible \dl_footprintTryProg;
+            \abstract_statement TryProg;
         }
         catch (Throwable t) {
-            //@ declares \dl_localsCatchProg;
-            //@ assignable res, \dl_heap, \dl_localsCatchProg, \dl_args;
-            //@ accessible res, \dl_heap, \dl_localsCatchProg, \dl_args;
-            { \abstract_statement CatchProg; }
+            //@ assume \disjoint(t, \dl_footprintCatchProg);
+            { ; }
+            
+            //@ assignable \dl_frameCatchProg;
+            //@ accessible t, \dl_footprintCatchProg;
+            \abstract_statement CatchProg;
         }
-        
-        //@ declares \dl_localsPostfix;
-        //@ assignable res, \dl_heap, \dl_localsPostfix, \dl_args;
-        //@ accessible res, \dl_heap, \dl_localsPostfix, \dl_args;
+
+        //@ assignable \dl_framePostfixProg;
+        //@ accessible \dl_footprintPostfixProg;
         //@ exceptional_behavior requires false;
-        { \abstract_statement Postfix; }
+        \abstract_statement Postfix;
 
         return res;
     }

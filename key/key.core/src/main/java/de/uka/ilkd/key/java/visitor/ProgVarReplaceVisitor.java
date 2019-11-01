@@ -188,13 +188,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
              * We remove the old contract since otherwise, it will still be applied by the
              * block contract rules.
              */
-            performActionOnBlockContract(block, block, true);
+            performActionOnBlockContract(block, block, false);
         } else if (x instanceof AbstractProgramElement) {
             final StatementBlock block = //
                     AbstractExecutionUtils.createArtificialStatementBlockForAPE(
                             (AbstractProgramElement) x, services);
 
-            performActionOnBlockContract(block, block, true);
+            performActionOnBlockContract(block, block, false);
         }
     }
     

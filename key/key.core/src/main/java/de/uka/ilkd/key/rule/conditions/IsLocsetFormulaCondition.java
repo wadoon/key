@@ -14,25 +14,30 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * Checks whether the given formula is a locset formula.
- *
+ * Checks whether the given formula is a locset formula, or a non-"value" LocSet
+ * term.
+ * 
+ * @see LocSetLDT#getValue()
  * @author Dominic Steinhoefel
  */
 public class IsLocsetFormulaCondition implements VariableCondition {
     private final boolean negated;
-    private final SchemaVariable formulaSV;
+    private final SchemaVariable termSV;
 
-    public IsLocsetFormulaCondition(SchemaVariable formulaSV, boolean negated) {
-        this.formulaSV = formulaSV;
+    public IsLocsetFormulaCondition(SchemaVariable termSV, boolean negated) {
+        this.termSV = termSV;
         this.negated = negated;
     }
 
@@ -41,9 +46,22 @@ public class IsLocsetFormulaCondition implements VariableCondition {
             Services services) {
         final SVInstantiations svInst = mc.getInstantiations();
 
-        final Term formula = (Term) svInst.getInstantiation(formulaSV);
-        final boolean isLocsetFormula = formula.op() instanceof Function && services
-                .getTypeConverter().getLocSetLDT().containsFunction((Function) formula.op());
+        final Term term = (Term) svInst.getInstantiation(termSV);
+        boolean isLocsetFormula = false;
+
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        
+        if (term.sort() == Sort.FORMULA) {
+            // Something like "disjoint"
+            isLocsetFormula = term.op() instanceof Function
+                    && locSetLDT.containsFunction((Function) term.op());
+        } else {
+            // Any LocSet term which is not a "value" term
+            isLocsetFormula = term.sort() == locSetLDT.targetSort();
+            final OpCollector opColl = new OpCollector();
+            term.execPostOrder(opColl);
+            isLocsetFormula &= !opColl.contains(locSetLDT.getValue());
+        }
 
         return negated ? bool2mc(!isLocsetFormula, mc) : bool2mc(isLocsetFormula, mc);
     }
@@ -54,6 +72,6 @@ public class IsLocsetFormulaCondition implements VariableCondition {
 
     @Override
     public String toString() {
-        return String.format("\\varcond (%s\\isLabeled(%s)", negated ? "\\not" : "", formulaSV);
+        return String.format("\\varcond (%s\\isLocsetFormula(%s)", negated ? "\\not" : "", termSV);
     }
 }

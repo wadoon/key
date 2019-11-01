@@ -24,6 +24,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.IrrelevantAssignable;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
@@ -98,7 +99,8 @@ public final class AbstractUpdateToElementaryUpdatesCondition implements Variabl
                     @SuppressWarnings("unchecked")
                     final HasToLoc<PVLoc> castAssignable = (HasToLoc<PVLoc>) assignable;
                     final PVLoc pvLoc = castAssignable.child();
-                    extractedHasTosMap.put(castAssignable, pvLoc);
+                    extractedHasTosMap.put(castAssignable,
+                            new IrrelevantAssignable(i, pvLoc.sort()));
 
                     final Term updateLHS = tb.var(pvLoc.getVar());
                     final Term updateRHS = tb.func(
@@ -110,7 +112,8 @@ public final class AbstractUpdateToElementaryUpdatesCondition implements Variabl
                     @SuppressWarnings("unchecked")
                     final HasToLoc<FieldLoc> castAssignable = (HasToLoc<FieldLoc>) assignable;
                     final FieldLoc fieldLoc = castAssignable.child();
-                    extractedHasTosMap.put(castAssignable, fieldLoc);
+                    extractedHasTosMap.put(castAssignable,
+                            new IrrelevantAssignable(i, fieldLoc.sort()));
 
                     final Term updateLHS = tb.getBaseHeap();
                     final Term characteristicFunctionTerm = tb.func(
