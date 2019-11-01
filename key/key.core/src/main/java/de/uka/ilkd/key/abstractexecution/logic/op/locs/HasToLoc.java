@@ -12,43 +12,39 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
-import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * A has-to location for use in an abstract update.
  *
  * @author Dominic Steinhoefel
  */
-public class HasToLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
-    private final AbstractUpdateAssgnLoc child;
+public class HasToLoc<L extends AbstractUpdateLoc> implements AbstractUpdateLoc {
+    private final L child;
 
-    public HasToLoc(AbstractUpdateAssgnLoc child) {
-        assert !(child instanceof HasToLoc);
+    @SuppressWarnings("unchecked")
+    public HasToLoc(L child) {
         assert !(child instanceof AllLocsLoc);
 
-        this.child = child;
-    }
-
-    public AbstractUpdateAssgnLoc child() {
-        return child;
+        if (child instanceof HasToLoc) {
+            this.child = (L) ((HasToLoc<L>) child).child;
+        } else {
+            this.child = child;
+        }
     }
 
     @Override
     public Term toTerm(Services services) {
-        // TODO Implement.
-        return null;
+        return services.getTermBuilder().hasTo(child.toTerm(services));
     }
 
-    @Override
-    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
-            Services services) {
-        return new HasToLoc((AbstractUpdateAssgnLoc) child.replaceVariables(replMap, services));
+    public L child() {
+        return child;
     }
 
     @Override
@@ -58,12 +54,14 @@ public class HasToLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
 
     @Override
     public String toString() {
-        return String.format("hasTo(%s)", child.toString());
+        return String.format("%s!", child.toString());
     }
 
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        return child.mayAssign(otherLoc, services);
+        return child.mayAssign(
+                otherLoc instanceof HasToLoc ? ((HasToLoc<?>) otherLoc).child() : otherLoc,
+                services);
     }
 
     @Override
@@ -74,5 +72,10 @@ public class HasToLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
     @Override
     public int hashCode() {
         return 5 + 17 * child.hashCode();
+    }
+
+    @Override
+    public Sort sort() {
+        return child.sort();
     }
 }

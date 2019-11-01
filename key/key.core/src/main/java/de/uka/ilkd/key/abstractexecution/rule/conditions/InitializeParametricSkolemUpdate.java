@@ -13,14 +13,19 @@
 
 package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
+import org.key_project.util.collection.UniqueArrayList;
+
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -35,19 +40,27 @@ import de.uka.ilkd.key.util.Pair;
 /**
  * Instantiates a parametric skolem update for abstract execution. The update
  * receives two LocSets for its assignable and accessible locations; those are
- * obtained from the block contracts of the {@link AbstractPlaceholderStatement}
- * it is generated for.
+ * obtained from the block contracts of the {@link AbstractStatement} it is
+ * generated for.
  *
  * @author Dominic Steinhoefel
  */
 public class InitializeParametricSkolemUpdate implements VariableCondition {
     private final SchemaVariable updateSV;
+    private final Optional<ProgramSV> maybeLhsSV; // for abstract expressions
     private final ProgramSV abstrProgSV;
 
-    public InitializeParametricSkolemUpdate(SchemaVariable updateSV,
+    public InitializeParametricSkolemUpdate(SchemaVariable updateSV, ProgramSV abstrProgSV) {
+        this.updateSV = updateSV;
+        this.abstrProgSV = abstrProgSV;
+        this.maybeLhsSV = Optional.empty();
+    }
+
+    public InitializeParametricSkolemUpdate(SchemaVariable updateSV, ProgramSV lhsSV,
             ProgramSV abstrProgSV) {
         this.updateSV = updateSV;
         this.abstrProgSV = abstrProgSV;
+        this.maybeLhsSV = Optional.of(lhsSV);
     }
 
     @Override
@@ -55,40 +68,40 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
-        final Optional<LocationVariable> runtimeInstance = Optional
-                .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
-                .filter(LocationVariable.class::isInstance)
-                .map(LocationVariable.class::cast);
+        final Optional<ExecutionContext> executionContext = Optional
+                .ofNullable(svInst.getExecutionContext());
 
         if (svInst.isInstantiated(this.updateSV)) {
             return matchCond;
         }
 
-        final AbstractPlaceholderStatement abstrStmt = //
-                (AbstractPlaceholderStatement) svInst
-                        .getInstantiation(this.abstrProgSV);
+        final AbstractProgramElement ape = //
+                (AbstractProgramElement) svInst.getInstantiation(this.abstrProgSV);
 
         final TermBuilder tb = services.getTermBuilder();
 
-        final Pair<Set<AbstractUpdateLoc>, Set<AbstractUpdateAssgnLoc>> accessibleAndAssignableClause = //
-                AbstractExecutionContractUtils
-                        .getAccessibleAndAssignableTermsForNoBehaviorContract(
-                                abstrStmt, matchCond, services,
-                                runtimeInstance);
+        final Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> accessibleAndAssignableClause = //
+                AbstractExecutionContractUtils.getAccessibleAndAssignableTermsForNoBehaviorContract(
+                        ape, matchCond, services, executionContext);
 
-        final Term update = //
-                tb.abstractUpdate(abstrStmt,
-                        accessibleAndAssignableClause.second,
-                        accessibleAndAssignableClause.first);
+        final UniqueArrayList<AbstractUpdateLoc> assignables = accessibleAndAssignableClause.second;
 
-        return matchCond
-                .setInstantiations(svInst.add(this.updateSV, update, services));
+        maybeLhsSV.map(svInst::getInstantiation).map(LocationVariable.class::cast).map(PVLoc::new)
+                .map(HasToLoc::new).ifPresent(assignables::add);
+
+        final Term update = tb.abstractUpdate(ape, assignables,
+                accessibleAndAssignableClause.first);
+
+        return matchCond.setInstantiations(svInst.add(this.updateSV, update, services));
     }
 
     @Override
     public String toString() {
-        return String.format(
-                "\\varcond (\\initializeParametricSkolemUpdate(%s, %s))",
-                this.updateSV, this.abstrProgSV);
+        return maybeLhsSV
+                .map(lhsSv -> String.format(
+                        "\\varcond (\\initializeParametricSkolemUpdate(%s, %s, %s))", this.updateSV,
+                        lhsSv, this.abstrProgSV))
+                .orElse(String.format("\\varcond (\\initializeParametricSkolemUpdate(%s, %s))",
+                        this.updateSV, this.abstrProgSV));
     }
 }

@@ -16,8 +16,15 @@ package org.key_project.util.collection;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -218,5 +225,42 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
      */
     public Stream<S> stream() {
         return StreamSupport.stream(spliterator(), false);
+    }
+
+    public static <T> Collector<T, List<T>, ImmutableArray<T>> toImmutableArray() {
+        return new ImmutableArrayCollector<>();
+    }
+
+    static class ImmutableArrayCollector<T>
+            implements Collector<T, List<T>, ImmutableArray<T>> {
+
+        @Override
+        public Supplier<List<T>> supplier() {
+            return () -> new ArrayList<>();
+        }
+
+        @Override
+        public BiConsumer<List<T>, T> accumulator() {
+            return (list, entry) -> list.add(entry);
+        }
+
+        @Override
+        public BinaryOperator<List<T>> combiner() {
+            return (l1, l2) -> {
+                l1.addAll(l2);
+                return l1;
+            };
+        }
+
+        @Override
+        public Function<List<T>, ImmutableArray<T>> finisher() {
+            return list -> new ImmutableArray<T>(list);
+        }
+
+        @Override
+        public Set<Characteristics> characteristics() {
+            Set<Characteristics> result = new HashSet<>();
+            return result;
+        }
     }
 }

@@ -18,7 +18,8 @@ import java.util.function.Predicate;
 
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.Name;
@@ -59,13 +60,13 @@ public class RetrieveAESpecTransformer extends AbstractTermTransformer {
     public Term transform(Term term, SVInstantiations svInst, Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
-        final AbstractPlaceholderStatement abstrStmt = (AbstractPlaceholderStatement) svInst
+        final AbstractProgramElement ape = (AbstractProgramElement) svInst
                 .getInstantiation((SchemaVariable) term.sub(0).op());
 
         final LocationVariable flag = (LocationVariable) term.sub(1).op();
 
         final ImmutableSet<BlockContract> contracts = services.getSpecificationRepository()
-                .getAbstractPlaceholderStatementContracts(abstrStmt);
+                .getAbstractProgramElementContracts(ape);
 
         for (final BlockContract contract : contracts) {
             if (contract.getBaseName().contains(behavior.toString())) {

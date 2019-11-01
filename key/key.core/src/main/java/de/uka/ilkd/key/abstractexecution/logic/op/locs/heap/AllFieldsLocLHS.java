@@ -12,26 +12,23 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs.heap;
 
-import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * An "all fields" array location ("myArray[*]").
  *
  * @author Dominic Steinhoefel
  */
-public class AllFieldsLocLHS extends HeapLocLHS {
+public class AllFieldsLocLHS extends HeapLoc {
     private final Term array;
 
     public AllFieldsLocLHS(Term array) {
@@ -52,15 +49,6 @@ public class AllFieldsLocLHS extends HeapLocLHS {
     }
 
     @Override
-    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
-            Services services) {
-        return new AllFieldsLocLHS(GenericTermReplacer.replace(array,
-                t -> t.op() instanceof ProgramVariable && replMap.containsKey(t.op()),
-                t -> services.getTermBuilder().var(replMap.get((ProgramVariable) t.op())),
-                services));
-    }
-
-    @Override
     public Set<Operator> childOps() {
         final OpCollector opColl = new OpCollector();
         array.execPostOrder(opColl);
@@ -69,17 +57,17 @@ public class AllFieldsLocLHS extends HeapLocLHS {
 
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        if (otherLoc instanceof ArrayLocRHS) {
-            return ((ArrayLocRHS) otherLoc).getArray().equals(this.array);
+        if (otherLoc instanceof ArrayLoc) {
+            return ((ArrayLoc) otherLoc).getArray().equals(this.array);
         } else if (otherLoc instanceof PVLoc) {
             return ((PVLoc) otherLoc).getVar()
                     .equals(services.getTypeConverter().getHeapLDT().getHeap());
-        } else if (otherLoc instanceof AllFieldsLocRHS) {
-            return ((AllFieldsLocRHS) otherLoc).getArray().equals(this.array);
+        } else if (otherLoc instanceof ArrayLoc) {
+            return ((AllFieldsLocLHS) otherLoc).getArray().equals(this.array);
         } else if (otherLoc instanceof ArrayRange) {
             super.mayAssign(otherLoc, services);
         }
-        
+
         return false;
     }
 
@@ -96,5 +84,13 @@ public class AllFieldsLocLHS extends HeapLocLHS {
     @Override
     public int hashCode() {
         return 31 + 7 * array.hashCode();
+    }
+
+    @Override
+    public Sort sort() {
+        /*
+         * TODO (DS, 2019-10-30): Should be possible to return sort of array elements.
+         */
+        throw new UnsupportedOperationException();
     }
 }

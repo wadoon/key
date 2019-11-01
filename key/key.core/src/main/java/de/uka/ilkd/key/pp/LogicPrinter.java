@@ -19,14 +19,14 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
-
 import java.util.stream.Collectors;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -38,7 +38,6 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -1525,9 +1524,8 @@ public class LogicPrinter {
         boolean isKeyword = false;
         if (services != null) {
             final LocSetLDT loc = services.getTypeConverter().getLocSetLDT();
-            final SetLDT set = services.getTypeConverter().getSetLDT();
             isKeyword = (t.op() == Junctor.AND || t.op() == Junctor.OR || t.op() == Junctor.IMP
-                    || t.op() == Equality.EQV || t.op() == loc.getUnion() || t.op() == set.getUnion());
+                    || t.op() == Equality.EQV || t.op() == loc.getUnion());
         }
         int indent = name.length() + 1;
         startTerm(2);
@@ -1581,43 +1579,47 @@ public class LogicPrinter {
         layouter.end();
     }
 
-   /**
+    /**
      * Print an abstract update. This looks like
-     * <code>U_P(locset1 := locset2)</code>. If line breaks are necessary, the
-     * format is
+     * <code>U_P(assignablesLocSet := arg1, arg2, ..., argn)</code>. If line breaks
+     * are necessary, the format is
      *
      * <pre>
-     * U_P(locset1 :=
-     *     locset2)
+     * U_P(assignablesLocSet :=
+     *     arg1, arg2, ..., argn)
      * </pre>
      *
-     * @param asgn
-     *            the update operator (including spaces)
+     * @param asgn the update operator (including spaces)
      */
     public void printAbstractUpdate(String asgn, Term t, int ass2)
             throws IOException {
         AbstractUpdate op = (AbstractUpdate) t.op();
 
-        assert t.arity() == 1;
         String updateName = op.getUpdateName();
-        layouter.beginC(updateName.length() + 1).print(updateName);
-        startTerm(1);
+        layouter.print(updateName);
+        startTerm(op.arity());
 
-        layouter.print("(");
+        layouter.print("(").beginC(0);
 
         layouter.print(op.getAllAssignables().stream()
-                .map(AbstractUpdateAssgnLoc::toString).collect(Collectors.joining(", ")));
+                .map(AbstractUpdateLoc::toString).collect(Collectors.joining(", ")));
 
-        layouter.print(asgn);
+        layouter.print(asgn).end().beginC(0);
         layouter.brk(0);
+        
+        if (t.arity() > 0) {
+            for (int i = 0, n = t.arity(); i < n; i++) {
+                markStartSub();
+                printTerm(t.sub(i));
+                markEndSub();
 
-        markStartSub();
-        printTerm(t.sub(0));
-        markEndSub();
-
-        layouter.print(")");
-
-        layouter.end();
+                if (i < n - 1) {
+                    layouter.print(",").brk(1, 0);
+                }
+            }
+        }
+        
+        layouter.print(")").end();
     }
 
     /**

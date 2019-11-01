@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic.op;
 
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -25,6 +26,17 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public final class LocationVariable extends ProgramVariable
 			            implements UpdateableOperator {
+    private PositionInfo posInfo = PositionInfo.UNDEFINED;
+    
+    /**
+     * This flag indicates that this location variable was created freshly for
+     * proving purposes. E.e., the exception variable exc created for a standard
+     * Java proof obligation is such a variable. The idea is to introduce a sound
+     * approximation, i.e., if this flag is true, the variable is fresh for sure,
+     * otherwise we do not know.
+     */
+    private boolean isFreshVariable = false;
+
     public LocationVariable(ProgramElementName name,
                         KeYJavaType        t,
                         KeYJavaType        containingType,
@@ -33,6 +45,13 @@ public final class LocationVariable extends ProgramVariable
                         boolean isGhost,
                         boolean isFinal) {
         super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, isFinal);
+    }
+    
+
+    public LocationVariable(ProgramElementName name, KeYJavaType t, KeYJavaType containingType,
+            boolean isStatic, boolean isModel, boolean isGhost, boolean isFinal, boolean fresh) {
+        super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, isFinal);
+        this.isFreshVariable = fresh;
     }
     
     public LocationVariable(ProgramElementName name,
@@ -47,10 +66,20 @@ public final class LocationVariable extends ProgramVariable
     public LocationVariable(ProgramElementName name, KeYJavaType t) {
         super(name, t.getSort(), t, null, false, false, false);
     }
+    
+    public LocationVariable(ProgramElementName name, KeYJavaType t, PositionInfo posInfo) {
+        super(name, t.getSort(), t, null, false, false, false);
+        this.posInfo = posInfo;
+    }
 
 
     public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isFinal) {
         super(name, t.getSort(), t, null, false, false, false, isFinal);
+    }
+    
+    public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isFinal, PositionInfo posInfo) {
+        super(name, t.getSort(), t, null, false, false, false, isFinal);
+        this.posInfo = posInfo;
     }
 
     public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isGhost, boolean isFinal) {
@@ -66,7 +95,24 @@ public final class LocationVariable extends ProgramVariable
     public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
         v.performActionOnLocationVariable(this);
     }
+    
+    @Override
+    public PositionInfo getPositionInfo() {
+        return posInfo;
+    }
 
+    /**
+     * This flag indicates that this location variable was created freshly for
+     * proving purposes. E.e., the exception variable exc created for a standard
+     * Java proof obligation is such a variable. The idea is to introduce a sound
+     * approximation, i.e., if this flag is true, the variable is fresh for sure,
+     * otherwise we do not know.
+     *
+     * @return whether this {@link LocationVariable} is freshly introduced.
+     */
+    public boolean isFreshVariable() {
+        return isFreshVariable;
+    }
 
     @Override
     public UpdateableOperator rename(Name name) {

@@ -225,7 +225,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
                 instantiatedOp = p_operatorToBeInstantiated;
             } else if (p_operatorToBeInstantiated instanceof ProgramSV
                     && ((ProgramSV) p_operatorToBeInstantiated)
-                            .sort() == ProgramSVSort.ABSTRACTPROGRAM) {
+                            .sort() == ProgramSVSort.ABSTRACTSTATEMENT) {
                 instantiatedOp = p_operatorToBeInstantiated;
             } else {
                 instantiatedOp = (Operator) svInst.getInstantiation(
@@ -283,7 +283,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
                 && (!(visitedOp instanceof ProgramSV && (((ProgramSV) visitedOp)
                         .isListSV()
                         || ((ProgramSV) visitedOp)
-                                .sort() == ProgramSVSort.ABSTRACTPROGRAM)))) {
+                                .sort() == ProgramSVSort.ABSTRACTSTATEMENT)))) {
             final Term newTerm = toTerm(
                     svInst.getTermInstantiation((SchemaVariable) visitedOp,
                             svInst.getExecutionContext(), services));

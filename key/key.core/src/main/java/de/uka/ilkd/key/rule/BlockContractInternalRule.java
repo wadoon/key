@@ -19,7 +19,7 @@ import java.util.Map;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -134,14 +134,20 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
             final Map<LocationVariable, Function> anonymisationHeaps,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
+        final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
+        // NOTE (DS, 2019-10-28): Free postconditions are as free invariants, they don't have
+        // to be proven, but may be assumed. We realize this behavior by not merging them in
+        // the first component of the returned array, which is the one that will be proven in
+        // the validity goal. The others are really just assumptions that are used as
+        // preconditions in the usage goal.
         final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
                 .buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
         final Term reachableOutCondition
                 = conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
         final Term atMostOneFlagSetCondition
                 = conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
-        return new Term[] { postcondition, wellFormedAnonymisationHeapsCondition,
-            reachableOutCondition, atMostOneFlagSetCondition };
+        return new Term[] { postcondition, freePostcondition, wellFormedAnonymisationHeapsCondition,
+                reachableOutCondition, atMostOneFlagSetCondition };
     }
 
     /**
@@ -282,6 +288,12 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
                 = conditionsAndClausesBuilder.buildModifiesClauses();
         final Term frameCondition
                 = conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
+        
+        // NOTE (DS, 2019-10-28): The first Term in "assumptions" has to be the post condition,
+        // since this is expected in the creation of the validity goal and the Term that
+        // will have to be proven. The order of the other Terms does not matter, they'll be
+        // added as real assumptions to the usage goal.
+        
         final Term[] assumptions = createAssumptions(localOutVariables, anonymisationHeaps,
                 conditionsAndClausesBuilder);
         final Term[] updates = createUpdates(instantiation.update, heaps, anonymisationHeaps,
@@ -324,11 +336,11 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         // perform abstract execution and not apply a block contract (which in
         // any case would not be provable, if it's non-trivial).
         final JavaStatement stmt = instantiation.statement;
-        if (stmt instanceof AbstractPlaceholderStatement
+        if (stmt instanceof AbstractStatement
                 || (stmt instanceof StatementBlock
                         && ((StatementBlock) stmt).getStatementCount() == 1
                         && ((StatementBlock) stmt).getChildAt(
-                                0) instanceof AbstractPlaceholderStatement)) {
+                                0) instanceof AbstractStatement)) {
             return false;
         }
         

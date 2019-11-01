@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.antlr.runtime.RecognitionException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;

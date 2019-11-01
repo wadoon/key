@@ -19,7 +19,8 @@ import java.util.Map;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.NamedProgramElement;
@@ -310,7 +311,9 @@ public abstract class ProgramSVSort extends AbstractSort {
     public static final ProgramSVSort NONSTRINGLITERAL = new NonStringLiteralSort();
     public static final ProgramSVSort STRINGLITERAL = new StringLiteralSort();
 
-    public static final ProgramSVSort ABSTRACTPROGRAM = new AbstractProgramSort();
+    public static final ProgramSVSort ABSTRACTSTATEMENT = new AbstractStatementSort();
+    public static final ProgramSVSort ABSTRACTEXPRESSION = new AbstractExpressionSort();
+    
     //--------------- Specials that match on certain names-----------------
 
     public static final ProgramSVSort ARRAYLENGTH
@@ -676,9 +679,9 @@ public abstract class ProgramSVSort extends AbstractSort {
 	}
     }
 
-    private static class AbstractProgramSort extends ProgramSVSort {
-        public AbstractProgramSort() {
-            super(new Name("AbstractProgram"));
+    private static class AbstractStatementSort extends ProgramSVSort {
+        public AbstractStatementSort() {
+            super(new Name("AbstractStatement"));
         }
 
         @Override
@@ -688,10 +691,26 @@ public abstract class ProgramSVSort extends AbstractSort {
 
         @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
-            return pe instanceof AbstractPlaceholderStatement;
+            return pe instanceof AbstractStatement;
+        }
+    }
+
+    private static class AbstractExpressionSort extends ProgramSVSort {
+        public AbstractExpressionSort() {
+            super(new Name("AbstractExpression"));
         }
 
+        @Override
+        public boolean canStandFor(Term t) {
+            return false;
+        }
+
+        @Override
+        protected boolean canStandFor(ProgramElement pe, Services services) {
+            return pe instanceof AbstractExpression;
+        }
     }
+    
     //----------- Initialisation and Creation expressions -------------------
 
     

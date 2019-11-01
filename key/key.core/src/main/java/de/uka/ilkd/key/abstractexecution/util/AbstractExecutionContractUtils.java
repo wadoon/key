@@ -12,7 +12,6 @@
 //
 package de.uka.ilkd.key.abstractexecution.util;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -20,16 +19,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import org.key_project.util.collection.UniqueArrayList;
+
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLocRHS;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.OpCollector;
@@ -51,73 +51,71 @@ public class AbstractExecutionContractUtils {
 
     /**
      * Returns the accessible locations of the "right" no-behavior contract for the
-     * given {@link AbstractPlaceholderStatement}.
+     * given {@link AbstractProgramElement}.
      *
-     * @param aps      The {@link AbstractPlaceholderStatement} for which to return
-     *                 the accessible locations.
+     * @param aps      The {@link AbstractProgramElement} for which to return the
+     *                 accessible locations.
      * @param context  The context program (for choosing the "right" contract).
      * @param services The {@link Services} object.
      * @return The accessible locations for the given
-     *         {@link AbstractPlaceholderStatement}.
+     *         {@link AbstractProgramElement}.
      */
-    public static Set<AbstractUpdateLoc> getAccessibleTermsForNoBehaviorContract(
-            AbstractPlaceholderStatement aps, ProgramElement context, Services services) {
+    public static List<AbstractUpdateLoc> getAccessibleTermsForNoBehaviorContract(
+            AbstractProgramElement aps, ProgramElement context, Services services) {
         return getAccessibleAndAssignableTermsForNoBehaviorContract(aps, context, services).first;
     }
 
     /**
      * Returns the accessible {@ProgramVariable}s of the "right" no-behavior
-     * contract for the given {@link AbstractPlaceholderStatement}.
+     * contract for the given {@link AbstractProgramElement}.
      *
-     * @param aps      The {@link AbstractPlaceholderStatement} for which to return
-     *                 the accessible {@link ProgramVariable}s.
+     * @param aps      The {@link AbstractProgramElement} for which to return the
+     *                 accessible {@link ProgramVariable}s.
      * @param context  The context program (for choosing the "right" contract).
      * @param services The {@link Services} object.
      * @return The accessible {@link ProgramVariable}s for the given
-     *         {@link AbstractPlaceholderStatement}.
+     *         {@link AbstractProgramElement}.
      */
     public static List<ProgramVariable> getAccessibleProgVarsForNoBehaviorContract(
-            AbstractPlaceholderStatement aps, ProgramElement context, Services services) {
+            AbstractProgramElement aps, ProgramElement context, Services services) {
         return getAccessibleTermsForNoBehaviorContract(aps, context, services).stream()
-                .filter(PVLoc.class::isInstance).map(PVLoc.class::cast).map(PVLoc::childOps)
-                .flatMap(Collection::stream).map(ProgramVariable.class::cast)
-                .collect(Collectors.toList());
+                .filter(PVLoc.class::isInstance).map(PVLoc.class::cast).map(PVLoc::getVar)
+                .map(ProgramVariable.class::cast).collect(Collectors.toList());
     }
 
     /**
      * Returns the assignable locations of the "right" no-behavior contract for the
-     * given {@link AbstractPlaceholderStatement}.
+     * given {@link AbstractProgramElement}.
      *
-     * @param aps      The {@link AbstractPlaceholderStatement} for which to return
-     *                 the assignable locations.
+     * @param aps      The {@link AbstractProgramElement} for which to return the
+     *                 assignable locations.
      * @param context  The context program (for choosing the "right" contract).
      * @param services The {@link Services} object.
      * @return The assignable locations for the given
-     *         {@link AbstractPlaceholderStatement}.
+     *         {@link AbstractProgramElement}.
      */
-    public static Set<AbstractUpdateAssgnLoc> getAssignableOpsForNoBehaviorContract(
-            AbstractPlaceholderStatement aps, ProgramElement context, Services services) {
+    public static UniqueArrayList<AbstractUpdateLoc> getAssignableOpsForNoBehaviorContract(
+            AbstractProgramElement aps, ProgramElement context, Services services) {
         return getAccessibleAndAssignableTermsForNoBehaviorContract(aps, context, services).second;
     }
 
     /**
      * Returns the assignable {@ProgramVariable}s of the "right" no-behavior
-     * contract for the given {@link AbstractPlaceholderStatement}.
+     * contract for the given {@link AbstractProgramElement}.
      *
-     * @param aps      The {@link AbstractPlaceholderStatement} for which to return
-     *                 the assignable {@link ProgramVariable}s.
+     * @param aps      The {@link AbstractProgramElement} for which to return the
+     *                 assignable {@link ProgramVariable}s.
      * @param context  The context program (for choosing the "right" contract).
      * @param services The {@link Services} object.
      * @return The assignable {@link ProgramVariable}s for the given
-     *         {@link AbstractPlaceholderStatement}.
+     *         {@link AbstractProgramElement}.
      */
     public static List<ProgramVariable> getAssignableProgVarsForNoBehaviorContract(
-            AbstractPlaceholderStatement aps, ProgramElement context, Services services) {
+            AbstractProgramElement aps, ProgramElement context, Services services) {
         return getAssignableOpsForNoBehaviorContract(aps, context, services).stream()
-                .map(loc -> loc instanceof HasToLoc ? ((HasToLoc) loc).child() : loc)
-                .filter(PVLoc.class::isInstance).map(PVLoc.class::cast).map(PVLoc::childOps)
-                .flatMap(Collection::stream).map(LocationVariable.class::cast)
-                .collect(Collectors.toList());
+                .map(loc -> loc instanceof HasToLoc ? ((HasToLoc<?>) loc).child() : loc)
+                .filter(PVLoc.class::isInstance).map(PVLoc.class::cast).map(PVLoc::getVar)
+                .map(LocationVariable.class::cast).collect(Collectors.toList());
     }
 
     /**
@@ -216,25 +214,20 @@ public class AbstractExecutionContractUtils {
 
     /**
      * Extracts the accessible and assignable locations for the given
-     * {@link AbstractPlaceholderStatement} based on the current context from the
+     * {@link AbstractProgramElement} based on the current context from the
      * {@link SpecificationRepository}. The default for both is allLocs (everything
      * assignable and accessible).
      *
-     * Note that this method does not perform normalization of self terms, it is
-     * therefore not suitable in the general case for extracting
-     * {@link FieldLocRHS}s, but has no problem with extracting the other
-     * {@link AbstractUpdateLoc}s.
-     *
-     * @param abstrStmt      The {@link AbstractPlaceholderStatement} for which to
-     *                       extract the accessible and assignable clause.
+     * @param abstrStmt      The {@link AbstractProgramElement} for which to extract
+     *                       the accessible and assignable clause.
      * @param contextProgram The context program to determine the right contract
      *                       (after renamings).
      * @param services       The {@link Services} object.
      * @return A pair of (1) the accessible and (2) the assignable locations for the
-     *         {@link AbstractPlaceholderStatement}.
+     *         {@link AbstractProgramElement}.
      */
-    public static Pair<Set<AbstractUpdateLoc>, Set<AbstractUpdateAssgnLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
-            final AbstractPlaceholderStatement abstrStmt, final ProgramElement contextProgram,
+    public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
+            final AbstractProgramElement abstrStmt, final ProgramElement contextProgram,
             final Services services) {
         final ProgramVariableCollector pvColl = //
                 new ProgramVariableCollector(contextProgram, services);
@@ -245,27 +238,26 @@ public class AbstractExecutionContractUtils {
 
     /**
      * Extracts the accessible and assignable locations for the given
-     * {@link AbstractPlaceholderStatement} based on the current context from the
+     * {@link AbstractProgramElement} based on the current context from the
      * {@link SpecificationRepository}. The default for both is allLocs (everything
      * assignable and accessible).
      *
-     * @param abstrStmt       The {@link AbstractPlaceholderStatement} for which to
-     *                        extract the accessible and assignable clause.
-     * @param surroundingVars {@link LocationVariable}s in the context to
-     *                        distinguish several contracts.
-     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
-     *                        to normalize self terms (because otherwise, there
-     *                        might be different such terms around).
-     * @param services        The {@link Services} object.
+     * @param abstrStmt        The {@link AbstractProgramElement} for which to
+     *                         extract the accessible and assignable clause.
+     * @param surroundingVars  {@link LocationVariable}s in the context to
+     *                         distinguish several contracts.
+     * @param executionContext An optional runtime instance {@link LocationVariable}
+     *                         to normalize self terms (because otherwise, there
+     *                         might be different such terms around).
+     * @param services         The {@link Services} object.
      * @return A pair of (1) the accessible and (2) the assignable locations for the
-     *         {@link AbstractPlaceholderStatement}.
+     *         {@link AbstractProgramElement}.
      */
-    public static Pair<Set<AbstractUpdateLoc>, Set<AbstractUpdateAssgnLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
-            final AbstractPlaceholderStatement abstrStmt,
-            final Set<LocationVariable> surroundingVars, Optional<LocationVariable> runtimeInstance,
-            final Services services) {
-        Set<AbstractUpdateLoc> accessibleClause;
-        Set<AbstractUpdateAssgnLoc> assignableClause;
+    public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
+            final AbstractProgramElement abstrStmt, final Set<LocationVariable> surroundingVars,
+            Optional<ExecutionContext> executionContext, final Services services) {
+        List<AbstractUpdateLoc> accessibleClause;
+        UniqueArrayList<AbstractUpdateLoc> assignableClause = null;
 
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
 
@@ -273,8 +265,9 @@ public class AbstractExecutionContractUtils {
                 getNoBehaviorContracts(abstrStmt, services);
 
         if (contracts.isEmpty()) {
-            accessibleClause = Collections.singleton(new AllLocsLoc(locSetLDT.getAllLocs()));
-            assignableClause = Collections.singleton(new AllLocsLoc(locSetLDT.getAllLocs()));
+            accessibleClause = Collections.singletonList(new AllLocsLoc(locSetLDT.getAllLocs()));
+            assignableClause = new UniqueArrayList<AbstractUpdateLoc>();
+            assignableClause.add(new AllLocsLoc(locSetLDT.getAllLocs()));
         } else {
             final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
 
@@ -282,42 +275,41 @@ public class AbstractExecutionContractUtils {
                     services);
 
             accessibleClause = AbstractUpdateFactory
-                    .abstrUpdateLocsFromTermSafe(contract.getAccessibleClause(heap),
-                            runtimeInstance, services)
-                    .stream().map(AbstractUpdateLoc.class::cast)
-                    .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-            assignableClause = AbstractUpdateFactory
-                    .abstrUpdateAssgnLocsFromTermSafe(contract.getAssignable(heap), runtimeInstance,
+                    .abstrUpdateLocsFromTerm(contract.getAccessibleClause(heap), executionContext,
                             services)
-                    .stream().map(AbstractUpdateAssgnLoc.class::cast)
-                    .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+                    .stream().map(AbstractUpdateLoc.class::cast).collect(Collectors.toList());
+            assignableClause = AbstractUpdateFactory
+                    .abstrUpdateLocsFromTerm(contract.getAssignable(heap), executionContext,
+                            services)
+                    .stream().map(AbstractUpdateLoc.class::cast)
+                    .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
         }
 
-        return new Pair<Set<AbstractUpdateLoc>, Set<AbstractUpdateAssgnLoc>>(accessibleClause,
-                assignableClause);
+        return new Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>>(
+                accessibleClause, assignableClause);
     }
 
     /**
      * Extracts the accessible and assignable locations for the given
-     * {@link AbstractPlaceholderStatement} based on the current context from the
+     * {@link AbstractProgramElement} based on the current context from the
      * {@link SpecificationRepository}. The default for both is allLocs (everything
      * assignable and accessible).
      *
-     * @param abstrStmt       The {@link AbstractPlaceholderStatement} for which to
-     *                        extract the accessible and assignable locations.
-     * @param services        The {@link Services} object.
-     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
-     *                        to normalize self terms (because otherwise, there
-     *                        might be different such terms around).
-     * @param svInst          The current {@link SVInstantiations} (for the
-     *                        context).
+     * @param abstrStmt        The {@link AbstractProgramElement} for which to
+     *                         extract the accessible and assignable locations.
+     * @param services         The {@link Services} object.
+     * @param executionContext An optional runtime instance {@link LocationVariable}
+     *                         to normalize self terms (because otherwise, there
+     *                         might be different such terms around).
+     * @param svInst           The current {@link SVInstantiations} (for the
+     *                         context).
      * @return A pair of (1) the accessible and (2) the assignable locations for the
-     *         {@link AbstractPlaceholderStatement}.
+     *         {@link AbstractProgramElement}.
      */
-    public static Pair<Set<AbstractUpdateLoc>, Set<AbstractUpdateAssgnLoc>> //
+    public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> //
             getAccessibleAndAssignableTermsForNoBehaviorContract(
-                    final AbstractPlaceholderStatement abstrStmt, final MatchConditions matchCond,
-                    final Services services, Optional<LocationVariable> runtimeInstance) {
+                    final AbstractProgramElement abstrStmt, final MatchConditions matchCond,
+                    final Services services, Optional<ExecutionContext> executionContext) {
         final Set<LocationVariable> surroundingVars = new LinkedHashSet<>();
         final ProgramVariableCollector pvc = //
                 new ProgramVariableCollector(
@@ -342,26 +334,24 @@ public class AbstractExecutionContractUtils {
             surroundingVars.addAll(result);
         });
 
-        matchCond.getInstantiations().getExecutionContext().getRuntimeInstance();
         return getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, surroundingVars,
-                runtimeInstance, services);
+                executionContext, services);
     }
 
     /**
-     * Returns the contracts for the given {@link AbstractPlaceholderStatement}.
-     * This refers to the "standard" contracts, i.e. without any specific behavior
-     * (like "exceptional_behavior" etc.).
+     * Returns the contracts for the given {@link AbstractProgramElement}. This
+     * refers to the "standard" contracts, i.e. without any specific behavior (like
+     * "exceptional_behavior" etc.).
      *
-     * @param abstrStmt The {@link AbstractPlaceholderStatement} for which to return
-     *                  the contracts.
+     * @param abstrStmt The {@link AbstractProgramElement} for which to return the
+     *                  contracts.
      * @param services  The {@link Services} object.
-     * @return All the contracts for the given {@link AbstractPlaceholderStatement}.
+     * @return All the contracts for the given {@link AbstractProgramElement}.
      */
-    public static List<BlockContract> getNoBehaviorContracts(
-            final AbstractPlaceholderStatement abstrStmt, final Services services) {
-        return services.getSpecificationRepository()
-                .getAbstractPlaceholderStatementContracts(abstrStmt).stream()
-                .filter(contract -> contract.getBaseName().equals("JML block contract"))
+    public static List<BlockContract> getNoBehaviorContracts(final AbstractProgramElement abstrStmt,
+            final Services services) {
+        return services.getSpecificationRepository().getAbstractProgramElementContracts(abstrStmt)
+                .stream().filter(contract -> contract.getBaseName().equals("JML block contract"))
                 /*
                  * We exclude return_behavior etc. here, because from those contracts we only
                  * consider the precondition.

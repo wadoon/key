@@ -28,7 +28,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
+import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -36,6 +38,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.Name;
@@ -144,9 +147,8 @@ public final class SpecificationRepository {
     private final Map<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>
         blockContracts =
             new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>();
-    private final Map<Pair<AbstractPlaceholderStatement, Integer>, ImmutableSet<BlockContract>>
-        abstractPlaceholderStatementContracts =
-            new LinkedHashMap<>();
+    private final Map<Pair<AbstractProgramElement, Integer>, ImmutableSet<BlockContract>>
+        abstractProgramElementContracts = new LinkedHashMap<>();
     private final Map<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>
         loopContracts =
             new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>();
@@ -1652,23 +1654,19 @@ public final class SpecificationRepository {
         }
     }
 
-    public ImmutableSet<BlockContract> getAbstractPlaceholderStatementContracts(
-            AbstractPlaceholderStatement stmt) {
-        final Pair<AbstractPlaceholderStatement, Integer> abstrStmtWithLineNo =
-                new Pair<>(stmt, stmt.getStartPosition().getLine());
-        final ImmutableSet<BlockContract> contracts =
-                abstractPlaceholderStatementContracts.get(abstrStmtWithLineNo);
-        return Optional.ofNullable(contracts)
-                .orElseGet(() -> DefaultImmutableSet.nil());
+    public ImmutableSet<BlockContract> getAbstractProgramElementContracts(
+            AbstractProgramElement ape) {
+        final Pair<AbstractProgramElement, Integer> abstrStmtWithLineNo = new Pair<>(ape,
+                ape.getStartPosition().getLine());
+        final ImmutableSet<BlockContract> contracts = abstractProgramElementContracts
+                .get(abstrStmtWithLineNo);
+        return Optional.ofNullable(contracts).orElseGet(() -> DefaultImmutableSet.nil());
     }
 
-    public ImmutableSet<BlockContract> getAbstractPlaceholderStatementContracts(
-            String abstrPlaceholderStmtId) {
-        return abstractPlaceholderStatementContracts.keySet().stream().filter(
-                stmt -> stmt.first.getId().equals(abstrPlaceholderStmtId))
-                .findAny()
-                .map(lineStmtPair -> abstractPlaceholderStatementContracts
-                        .get(lineStmtPair))
+    public ImmutableSet<BlockContract> getAbstractProgramElementContracts(String apeId) {
+        return abstractProgramElementContracts.keySet().stream()
+                .filter(stmt -> stmt.first.getId().equals(apeId)).findAny()
+                .map(lineStmtPair -> abstractProgramElementContracts.get(lineStmtPair))
                 .orElseGet(() -> DefaultImmutableSet.nil());
     }
 
@@ -1809,23 +1807,74 @@ public final class SpecificationRepository {
         final StatementBlock block = contract.getBlock();
         final Pair<StatementBlock, Integer> b = new Pair<>(
                 block, block.getStartPosition().getLine());
-        final ImmutableSet<BlockContract> newContractSet = getBlockContracts(block).add(contract);
+        blockContracts.put(b, getBlockContracts(block).add(contract));
 
-        blockContracts.put(b, newContractSet);
-
-        if (block.getBody().size() == 1 && block.getBody()
-                .get(0) instanceof AbstractPlaceholderStatement) {
-            final AbstractPlaceholderStatement abstrStmt =
-                    (AbstractPlaceholderStatement) block.getBody().get(0);
-            final Pair<AbstractPlaceholderStatement, Integer> abstrStmtWithLineNo =
-                    new Pair<>(abstrStmt,
-                            abstrStmt.getStartPosition().getLine());
-            abstractPlaceholderStatementContracts.put( //
-                    abstrStmtWithLineNo, newContractSet);
-        }
+        handleAddForFakeAEBlock(contract, block);
 
         if (addFunctionalContract) {
             addContract(cf.funcBlock(contract));
+        }
+    }
+
+    /**
+     * For Abstract Execution, we hack our way into reusing the existing block
+     * contract architecture by wrapping Abstract Program Elements into artificial
+     * blocks. Here, we check whether it's such an artificial block, and if so,
+     * register the actual contracts in which we're interested.
+     * 
+     * @param contract The contract.
+     * @param block    The block to check.
+     */
+    private void handleAddForFakeAEBlock(final BlockContract contract, final StatementBlock block) {
+        extractAPEFromArtificialBlock(block).ifPresent(ape -> {
+            final Pair<AbstractProgramElement, Integer> abstrStmtWithLineNo = new Pair<>(ape,
+                    ape.getStartPosition().getLine());
+            abstractProgramElementContracts.put(abstrStmtWithLineNo,
+                    getAbstractProgramElementContracts(ape).add(contract));
+        });
+    }
+
+    /**
+     * For Abstract Execution, we hack our way into reusing the existing block
+     * contract architecture by wrapping Abstract Program Elements into artificial
+     * blocks. Here, we check whether it's such an artificial block, and if so,
+     * remove the contract from the APE contracts.
+     * 
+     * @param contract The contract.
+     * @param block    The block to check.
+     */
+    private void handleRemoveForFakeAEBlock(final BlockContract contract,
+            final StatementBlock block) {
+        extractAPEFromArtificialBlock(block).ifPresent(ape -> {
+            final Pair<AbstractProgramElement, Integer> abstrStmtWithLineNo = new Pair<>(ape,
+                    ape.getStartPosition().getLine());
+            abstractProgramElementContracts.put(abstrStmtWithLineNo,
+                    getAbstractProgramElementContracts(ape).remove(contract));
+        });
+    }
+
+    /**
+     * If the given {@link StatementBlock} is an artificial block used in Abstract
+     * Execution (see
+     * {@link #handleAddForFakeAEBlock(BlockContract, StatementBlock)}, returns the
+     * {@link AbstractProgramElement} in the block. Otherwise an empty
+     * {@link Optional}.
+     * 
+     * @param block The block to check.
+     * @return the {@link AbstractProgramElement} in the block, or an empty
+     *         {@link Optional}.
+     */
+    private Optional<AbstractProgramElement> extractAPEFromArtificialBlock(
+            final StatementBlock block) {
+        if (block.getBody().size() == 1 && block.getBody().get(0) instanceof AbstractStatement) {
+            return Optional.of((AbstractProgramElement) block.getBody().get(0));
+        } else if (block.getBody().size() == 1 && block.getBody().get(0) instanceof CopyAssignment
+                && ((CopyAssignment) block.getBody().get(0))
+                        .getLastElement() instanceof AbstractExpression) {
+            return Optional.of((AbstractProgramElement) ((CopyAssignment) block.getBody().get(0))
+                    .getLastElement());
+        } else {
+            return Optional.empty();
         }
     }
 
@@ -1845,16 +1894,7 @@ public final class SpecificationRepository {
         final ImmutableSet<BlockContract> newContractSet = set.remove(contract);
         blockContracts.put(b, newContractSet);
 
-        if (block.getBody().size() == 1 && block.getBody()
-                .get(0) instanceof AbstractPlaceholderStatement) {
-            final AbstractPlaceholderStatement abstrStmt =
-                    (AbstractPlaceholderStatement) block.getBody().get(0);
-            final Pair<AbstractPlaceholderStatement, Integer> abstrStmtWithLineNo =
-                    new Pair<>(abstrStmt,
-                            abstrStmt.getStartPosition().getLine());
-            abstractPlaceholderStatementContracts.put( //
-                    abstrStmtWithLineNo, newContractSet);
-        }
+        handleRemoveForFakeAEBlock(contract, block);
     }
 
     /**

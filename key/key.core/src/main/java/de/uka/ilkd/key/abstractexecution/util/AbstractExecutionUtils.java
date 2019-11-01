@@ -12,39 +12,50 @@
 //
 package de.uka.ilkd.key.abstractexecution.util;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
+import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.IrrelevantAssignable;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.AllFieldsLocRHS;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayLocRHS;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayRange;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLocRHS;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.HeapLocRHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.expression.Assignment;
+import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.OpCollector;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
@@ -53,329 +64,6 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * @author Dominic Steinhoefel
  */
 public class AbstractExecutionUtils {
-    /**
-     * Computes the sets of assigned-before-used and used-before-assigned operators
-     * in the target term. In case of a conflict, i.e. in one subterm an operator is
-     * used before assigned and in the other vice versa, used before assigned always
-     * wins. The returned pair consists of the assigned-before-used set as first and
-     * the used-before-assigned set as second element. The two sets are disjunct.
-     *
-     * @param target          The term for which to analyze the assigned-before-used
-     *                        relationships.
-     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
-     *                        to normalize self terms (because otherwise, there
-     *                        might be different such terms around).
-     * @param services        The {@link Services} object.
-     * @return (1) assigned-before-used and (2) used-before-assigned operators. Sets
-     *         are ordered. May be an empty optional if there is a construct not
-     *         (yet) supported, in this case, the condition should not be
-     *         applicable.
-     */
-    public static Optional<Pair<Set<AbstractUpdateAssgnLoc>, Set<AbstractUpdateLoc>>> opsAssignedBeforeUsed(
-            Term target, Optional<LocationVariable> runtimeInstance, Services services) {
-        final Set<AbstractUpdateAssgnLoc> assignedBeforeUsed = new LinkedHashSet<>();
-        final Set<AbstractUpdateLoc> usedBeforeAssigned = new LinkedHashSet<>();
-
-        final Set<AbstractUpdateLoc> locs = AbstractUpdateFactory
-                .abstrUpdateLocsFromTermUnsafe(target, runtimeInstance, services);
-
-        if (locs != null) {
-            locs.stream().filter(AbstractUpdateLoc.class::isInstance)
-                    .map(AbstractUpdateLoc.class::cast).forEach(usedBeforeAssigned::add);
-        }
-
-        // Update applications -- those are most interesting
-        else if (target.op() == UpdateApplication.UPDATE_APPLICATION) {
-            final Term update = target.sub(0);
-            final Term updateTarget = target.sub(1);
-
-            // Update in sequential normal form
-            if (MergeRuleUtils.isUpdateNormalForm(update)) {
-                final List<Term> elems = MergeRuleUtils.getElementaryUpdates(update,
-                        services.getTermBuilder());
-
-                for (final Term elem : elems) {
-                    assert elem.op() instanceof ElementaryUpdate;
-                    assert ((ElementaryUpdate) elem.op()).lhs() instanceof LocationVariable;
-
-                    final UpdateableOperator lhs = //
-                            ((ElementaryUpdate) elem.op()).lhs();
-                    final AbstractUpdateAssgnLoc lhsLoc = //
-                            new PVLoc((LocationVariable) lhs);
-                    final Term rhs = elem.sub(0);
-
-                    AbstractUpdateFactory
-                            .extractAbstrUpdateLocsFromTerm(rhs, runtimeInstance, services).stream()
-                            .filter(AbstractUpdateLoc.class::isInstance)
-                            .map(AbstractUpdateLoc.class::cast)
-                            .filter(loc -> assignedBeforeUsed.stream()
-                                    .noneMatch(assgnLoc -> assgnLoc.mayAssign(loc, services)))
-                            .forEach(usedBeforeAssigned::add);
-
-                    if (!usedBeforeAssigned.stream()
-                            .anyMatch(loc -> lhsLoc.mayAssign(loc, services))) {
-                        assignedBeforeUsed.add(lhsLoc);
-                    }
-                }
-            }
-
-            // Abstract Update
-            else if (update.op() instanceof AbstractUpdate) {
-                opsHaveToAssignBeforeUsedForAbstrUpd(update, assignedBeforeUsed, usedBeforeAssigned,
-                        runtimeInstance, services);
-            }
-
-            // Concatenated abstract update
-            else if (update.op() == UpdateJunctor.CONCATENATED_UPDATE) {
-                final List<Term> abstractUpdateTerms = //
-                        abstractUpdatesFromConcatenation(update);
-                for (Term abstrUpdTerm : abstractUpdateTerms) {
-                    opsHaveToAssignBeforeUsedForAbstrUpd(abstrUpdTerm, assignedBeforeUsed,
-                            usedBeforeAssigned, runtimeInstance, services);
-                }
-            }
-
-            // Something else -- ignore for now, exit (completeness relevant)
-            else {
-                // Probably a nested application
-                return Optional.empty();
-            }
-
-            final Pair<Set<AbstractUpdateAssgnLoc>, Set<AbstractUpdateLoc>> subResult = //
-                    opsAssignedBeforeUsed(updateTarget, runtimeInstance, services).orElse(null);
-
-            if (subResult == null) {
-                return Optional.empty();
-            }
-
-            usedBeforeAssigned.addAll(subResult.second.stream()
-                    .filter(rhsLoc -> !assignedBeforeUsed.stream()
-                            .anyMatch(lhsLoc -> lhsLoc.mayAssign(rhsLoc, services)))
-                    .collect(Collectors.toSet()));
-
-            assignedBeforeUsed.addAll(subResult.first.stream()
-                    .filter(lhsLoc -> !usedBeforeAssigned.stream()
-                            .anyMatch(rhsLoc -> lhsLoc.mayAssign(rhsLoc, services)))
-                    .collect(Collectors.toSet()));
-        }
-
-        else if (target.op() instanceof Modality) {
-            /*
-             * TODO (DS, 2019-02-01): Use some existing collector for programs.
-             */
-            return Optional.empty();
-        }
-
-        // Any other term
-        else {
-            for (final Term sub : target.subs()) {
-                final Pair<Set<AbstractUpdateAssgnLoc>, Set<AbstractUpdateLoc>> subResult = //
-                        opsAssignedBeforeUsed(sub, runtimeInstance, services).orElse(null);
-
-                if (subResult == null) {
-                    return Optional.empty();
-                }
-
-                /* Add all "used before assigned" */
-                usedBeforeAssigned.addAll(subResult.second);
-
-                /* Add all "assigned before used" */
-                assignedBeforeUsed.addAll(subResult.first);
-
-                /*
-                 * Now, remove those from "assigned before used" that are used before assigned.
-                 * Take that term as example:
-                 *
-                 * {U}({x:=y}phi & (psi(x)))
-                 *
-                 * Here, x should be used before assigned and not assigned before used.
-                 * Therefore the removal.
-                 */
-                assignedBeforeUsed.removeIf(abu -> usedBeforeAssigned.stream()
-                        .anyMatch(uba -> abu.mayAssign(uba, services)));
-            }
-        }
-
-        /*
-         * At the end, all operators that are assigned before used should not be in the
-         * used before assigned set.
-         */
-        assert assignedBeforeUsed.stream().noneMatch(
-                abu -> usedBeforeAssigned.stream().anyMatch(uba -> abu.mayAssign(uba, services)));
-
-        /* Also vice versa */
-        assert usedBeforeAssigned.isEmpty() || usedBeforeAssigned.stream().noneMatch(
-                uba -> assignedBeforeUsed.stream().anyMatch(abu -> abu.mayAssign(uba, services)));
-
-        return Optional.of(new Pair<>(assignedBeforeUsed, usedBeforeAssigned));
-    }
-
-    /**
-     * Calculates for an abstract update which operators in it are "have-to"
-     * assigned before used. The "maybe" assignables are ignored! The current use
-     * case is to drop assignables in prior abstract updates that are overwritten,
-     * which does not have to be the case for "maybes".
-     *
-     * @param update             The abstract update to check.
-     * @param assignedBeforeUsed A set of assigned-before-used operators. Results
-     *                           are added to the passed set.
-     * @param usedBeforeAssigned A set of used-before-assigned operators. Results
-     *                           are added to the passed set.
-     * @param runtimeInstance    An optional runtime instance
-     *                           {@link LocationVariable} to normalize self terms
-     *                           (because otherwise, there might be different such
-     *                           terms around).
-     * @param services           The {@link Services} object.
-     */
-    private static void opsHaveToAssignBeforeUsedForAbstrUpd(final Term update,
-            final Set<AbstractUpdateAssgnLoc> assignedBeforeUsed,
-            final Set<AbstractUpdateLoc> usedBeforeAssigned,
-            Optional<LocationVariable> runtimeInstance, Services services) {
-        assert update.op() instanceof AbstractUpdate;
-
-        usedBeforeAssigned.addAll(AbstractUpdateFactory
-                .extractAbstrUpdateLocsFromTerm(update.sub(0), runtimeInstance, services).stream()
-                .filter(AbstractUpdateLoc.class::isInstance)
-                .filter(op -> assignedBeforeUsed.stream()
-                        .noneMatch(assgn -> assgn.mayAssign(op, services)))
-                .map(AbstractUpdateLoc.class::cast)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>())));
-
-        final AbstractUpdate abstrUpdate = (AbstractUpdate) update.op();
-        assignedBeforeUsed.addAll(abstrUpdate.getHasToAssignables().stream()
-                .filter(hasToAssgn -> usedBeforeAssigned.stream()
-                        .noneMatch(used -> hasToAssgn.mayAssign(used, services)))
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>())));
-    }
-
-    /**
-     * Extracts the list of abstract updates from a concatenation of such.
-     *
-     * @param concatenation A concatenation of abstract updates
-     *                      <code>U1 ++ U2 ++ ... ++ Un</code>.
-     * @return The contained abstract updates of the concatenation in the original
-     *         order.
-     */
-    public static List<Term> abstractUpdatesFromConcatenation(Term concatenation) {
-        final List<Term> result = new ArrayList<>();
-
-        if (concatenation.op() instanceof AbstractUpdate) {
-            result.add(concatenation);
-        } else if (concatenation.op() == UpdateJunctor.CONCATENATED_UPDATE) {
-            result.addAll(abstractUpdatesFromConcatenation(concatenation.sub(0)));
-            result.addAll(abstractUpdatesFromConcatenation(concatenation.sub(1)));
-        } else {
-            throw new RuntimeException("Not an abstract update or concatenation: " + concatenation);
-        }
-
-        return result;
-    }
-
-    /**
-     * Returns {@link Term}s of the RHS of an {@link AbstractUpdate} term.
-     *
-     * @param update The {@link AbstractUpdate} {@link Term} for which to return the
-     *               accessibles.
-     * @param tb     The {@link TermBuilder}, needed for disassembling the update
-     *               {@link Term}.
-     * @return All {@link Term}s in the RHS of an {@link AbstractUpdate} term.
-     */
-    public static Set<Term> getAccessiblesForAbstractUpdate(Term update, TermBuilder tb) {
-        assert update.op() instanceof AbstractUpdate;
-        assert update.arity() == 1;
-
-        return tb.setUnionToSet(update.sub(0));
-    }
-
-    /**
-     * Checks whether an {@link AbstractUpdate} accesses the allLocs location set.
-     *
-     * @param update   The {@link AbstractUpdate} to check.
-     * @param services The {@link Services} object (for the {@link LocSetLDT}).
-     * @return true iff the {@link AbstractUpdate} accesseaccesses allLocs location
-     *         set.
-     */
-    public static boolean accessesAllLocs(Term update, Services services) {
-        final Operator allLocs = services.getTypeConverter().getLocSetLDT().getAllLocs();
-        return getAccessiblesForAbstractUpdate(update, services.getTermBuilder()).stream()
-                .anyMatch(t -> t.op() == allLocs);
-    }
-
-    /**
-     * Evaluates whether the given abstract update accesses "abstractly" a given
-     * location term. This is done by trying to prove that the specified heap
-     * locations are disjoint. If this can be shown, the method returns "false", if
-     * not, it returns "true" (which is, so to say, the default value, and
-     * represents both "true" and "unknown"). Callers of the method should therefore
-     * not induce unsound behavior if this method returns true as a false negative.
-     * If the method returns false, on the other hand, it can be taken for granted
-     * that there is not relation between the location sets.
-     * 
-     * @param abstrUpdTerm The abstract update term.
-     * @param lhsLoc       The location for which abstract access should be checked.
-     * @param services     The {@link Services} object.
-     * @return true iff the abstract update accesses abstractly the given location.
-     */
-    public static boolean accessesAbstractly(Term abstrUpdTerm, AbstractUpdateLoc rhsLoc,
-            Services services) {
-        final Set<AbstractUpdateLoc> abstrUpdateAccLocs = AbstractUpdateFactory
-                .abstrUpdateLocsFromTermSafe(abstrUpdTerm.sub(0), Optional.empty(), services);
-
-        if (abstrUpdateAccLocs.stream().anyMatch(AllLocsLoc.class::isInstance)) {
-            return true;
-        }
-
-        if (!(rhsLoc instanceof HeapLocRHS)) {
-            return false;
-        }
-
-        final Term rhsLocTermAsLhsLocTerm = //
-                convertHeapLocRHStoLocSetTerm((HeapLocRHS) rhsLoc, services);
-
-        final TermBuilder tb = services.getTermBuilder();
-
-        final Term abstrUpdLocUnionTerm = abstrUpdateAccLocs.stream()
-                .filter(HeapLocRHS.class::isInstance).map(HeapLocRHS.class::cast)
-                //.map(l -> l.toTerm(services))
-                .map(rhs -> convertHeapLocRHStoLocSetTerm(rhs, services))
-                .collect(Collectors.reducing(tb.empty(), (t1, t2) -> tb.union(t1, t2)));
-
-        if (abstrUpdLocUnionTerm.equals(tb.empty())) {
-            return false;
-        }
-
-        final Term disjointTerm = tb.disjoint(rhsLocTermAsLhsLocTerm, abstrUpdLocUnionTerm);
-
-        final boolean provablyDisjoint = //
-                MergeRuleUtils.isProvableWithSplitting(disjointTerm, services, 1000);
-
-        if (provablyDisjoint) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private static Term convertHeapLocRHStoLocSetTerm(HeapLocRHS toConvert, Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-
-        if (toConvert instanceof ArrayLocRHS) {
-            return tb.singleton(((ArrayLocRHS) toConvert).getArray(),
-                    tb.arr(((ArrayLocRHS) toConvert).getIndex()));
-        } else if (toConvert instanceof FieldLocRHS) {
-            final Term objTerm = ((FieldLocRHS) toConvert).getObjTerm();
-            final LocationVariable fieldPV = ((FieldLocRHS) toConvert).getFieldPV();
-            final Term fieldSymbol = tb.func(heapLDT.getFieldSymbolForPV(fieldPV, services));
-            return tb.singleton(objTerm, fieldSymbol);
-        } else if (toConvert instanceof ArrayRange || toConvert instanceof AllFieldsLocRHS) {
-            // Here, the result is the same.
-            return toConvert.toTerm(services);
-        }
-
-        return null;
-    }
-
     /**
      * Applies the given update (concrete & in normal form!) to the target. This is
      * done by performing a simple substitution of left-hand sides for right-hand
@@ -399,23 +87,6 @@ public class AbstractExecutionUtils {
         }
 
         return target;
-
-        //@formatter:off
-//        final Proof proof = services.getProof();
-//
-//        final Term termAfterUpdAppl = tb.apply(upd, target);
-//        final Function pred = //
-//                new Function(new Name("auxiliary-pred"), Sort.FORMULA, termAfterUpdAppl.sort());
-//        final Term predTerm = tb.func(pred, termAfterUpdAppl);
-//        Term simplTerm;
-//        try {
-//            simplTerm = MergeRuleUtils.simplify(proof, predTerm, 1000);
-//        } catch (ProofInputException e) {
-//            return termAfterUpdAppl;
-//        }
-//
-//        return simplTerm.sub(0);
-        //@formatter:on
     }
 
     /**
@@ -426,5 +97,329 @@ public class AbstractExecutionUtils {
         final OpCollector opColl = new OpCollector();
         updateTerm.execPostOrder(opColl);
         return opColl.ops().stream().anyMatch(AbstractUpdate.class::isInstance);
+    }
+
+    /**
+     * Checks whether the given {@link Term} is an abstract Skolem location set
+     * value term. Those are {@link Term}s of the shape "value(someLocsetConstant)".
+     * category. Also returns true for \value(allLocs)!
+     * 
+     * @param t        The {@link Term} to check.
+     * @param services The {@link Services} object.
+     * @return true iff the operator of <code>t</code> is an abstract Skolem
+     *         location set.
+     */
+    public static boolean isAbstractSkolemLocationSetValueTerm(Term t, Services services) {
+        final Function locsetToValueFunction = services.getTypeConverter().getLocSetLDT()
+                .getValue();
+        return t.op() == locsetToValueFunction && //
+                t.sub(0).op() instanceof Function && //
+                t.sub(0).arity() == 0;
+    }
+
+    /**
+     * Abstract Skolem location sets are nullary constants of type LocSet.
+     * 
+     * @param op       The {@link Operator} to check.
+     * @param services The {@link Services} object (for the {@link LocSetLDT}).
+     * @return true iff the given operator is an abstract Skolem location set.
+     */
+    public static boolean isAbstractSkolemLocationSet(final Operator op, final Services services) {
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        return op instanceof Function && op.arity() == 0
+                && ((Function) op).sort() == locSetLDT.targetSort();
+    }
+
+    /**
+     * Unwraps a {@link HasToLoc}. Returns the original loc if it's not a
+     * {@link HasToLoc}.
+     * 
+     * @param loc The location to unwrap.
+     * @return The unwrapped location.
+     */
+    public static AbstractUpdateLoc unwrapHasTo(AbstractUpdateLoc loc) {
+        if (loc instanceof HasToLoc) {
+            return ((HasToLoc<?>) loc).child();
+        }
+
+        return loc;
+    }
+
+    /**
+     * Creates an artificial {@link StatementBlock} for the given
+     * {@link AbstractProgramElement}, since we re-use the existing block contract
+     * architecture --- and thus need blocks...
+     * 
+     * @param abstractStmt The APE for which to create a {@link StatementBlock}
+     * @return The {@link StatementBlock}
+     */
+    public static StatementBlock createArtificialStatementBlockForAPE(
+            AbstractStatement abstractStmt) {
+        final ExtList children = new ExtList(abstractStmt.getComments());
+        children.add(abstractStmt);
+        children.add(abstractStmt.getPositionInfo());
+        return new StatementBlock(children);
+    }
+
+    /**
+     * Creates an artificial {@link StatementBlock} for the given
+     * {@link AbstractProgramElement}, since we re-use the existing block contract
+     * architecture --- and thus need blocks...
+     * 
+     * @param abstractExpr The APE for which to create a {@link StatementBlock}
+     * @param services     The {@link Services} object.
+     * @return The {@link StatementBlock}
+     */
+    public static StatementBlock createArtificialStatementBlockForAPE( //
+            AbstractProgramElement ape, Services services) {
+        return ape instanceof AbstractStatement
+                ? AbstractExecutionUtils
+                        .createArtificialStatementBlockForAPE((AbstractStatement) ape)
+                : AbstractExecutionUtils.createArtificialStatementBlockForAPE(
+                        (AbstractExpression) ape, services.getJavaInfo().getJavaLangObject());
+    }
+
+    /**
+     * Creates an artificial {@link StatementBlock} for the given
+     * {@link AbstractProgramElement}, since we re-use the existing block contract
+     * architecture --- and thus need blocks...
+     * 
+     * @param abstractExpr The APE for which to create a {@link StatementBlock}
+     * @param kjt          The type of the {@link AbstractExpression} target.
+     * @return The {@link StatementBlock}
+     */
+    public static StatementBlock createArtificialStatementBlockForAPE(
+            AbstractExpression abstractExpr, KeYJavaType kjt) {
+        return createArtificialStatementBlockForAPE(abstractExpr, kjt, null);
+    }
+
+    /**
+     * Creates an artificial {@link StatementBlock} for the given
+     * {@link AbstractProgramElement}, since we re-use the existing block contract
+     * architecture --- and thus need blocks...
+     * 
+     * @param abstractExpr The APE for which to create a {@link StatementBlock}
+     * @param sort         The sort of the {@link AbstractExpression} target. Prefer
+     *                     {@link #createArtificialStatementBlockForAPE(AbstractExpression, KeYJavaType)}
+     *                     whenever a {@link KeYJavaType} is available.
+     * @return The {@link StatementBlock}
+     */
+    public static StatementBlock createArtificialStatementBlockForAPE(
+            AbstractExpression abstractExpr, Sort sort) {
+        return createArtificialStatementBlockForAPE(abstractExpr, null, sort);
+    }
+
+    /**
+     * Creates an artificial {@link StatementBlock} for the given
+     * {@link AbstractProgramElement}, since we re-use the existing block contract
+     * architecture --- and thus need blocks...
+     * 
+     * @param abstractExpr The APE for which to create a {@link StatementBlock}
+     * @param kjt          The type of the {@link AbstractExpression} target.
+     * @param sort         Optional sort, if kjt not known.
+     * @return The {@link StatementBlock}
+     */
+    public static StatementBlock createArtificialStatementBlockForAPE(
+            AbstractExpression abstractExpr, KeYJavaType kjt, Sort sort) {
+        final LocationVariable dummyVar = //
+                kjt == null ? new LocationVariable(new ProgramElementName("dummy"), sort)
+                        : new LocationVariable(new ProgramElementName("dummy"), kjt);
+        final Assignment assign = new CopyAssignment(dummyVar, (AbstractExpression) abstractExpr);
+
+        final ExtList children = new ExtList(abstractExpr.getComments());
+        children.add(assign);
+        children.add(abstractExpr.getPositionInfo());
+
+        return new StatementBlock(children);
+    }
+
+    /**
+     * For location variables introduced fresh by KeY, there can be no disjointness
+     * assumptions created a-priori. Therefore, this method checks whether the given
+     * location variable loc is irrelevant for abstract location sets.
+     * 
+     * <p>
+     * Pure method.
+     * 
+     * @param loc      The {@link AbstractUpdateLoc} to check.
+     * @param goal     The context {@link Goal}.
+     * @param services The {@link Services} object.
+     * @return true iff loc is irrelevant for Skolem location sets since it is
+     *         created fresh by KeY rules.
+     */
+    public static boolean locIsCreatedFresh(final AbstractUpdateLoc loc, final Goal goal,
+            final Services services) {
+        if (!(unwrapHasTo(loc) instanceof PVLoc)) {
+            return false;
+        }
+
+        final LocationVariable locVar = ((PVLoc) unwrapHasTo(loc)).getVar();
+
+        /*
+         * Location variables that either are already present in the root sequent, or
+         * are not related to the source, are considered fresh. Additionally, there is a
+         * freshness flag for special variables like the exc, self and result variables
+         * created in operation POs. We consider variables that don't have position
+         * information as not related to the source. It would be soundness critical if
+         * declarations of variables in the source code were not given position
+         * information.
+         */
+
+        if (locVar.isFreshVariable()) {
+            return true;
+        }
+
+        final OpCollector opColl = new OpCollector();
+        StreamSupport.stream(goal.proof().root().sequent().spliterator(), true)
+                .map(SequentFormula::formula).forEach(term -> term.execPostOrder(opColl));
+        if (opColl.ops().contains(locVar)) {
+            // Location was already present in the root node.
+            return false;
+        }
+
+        return locVar.getPositionInfo() == PositionInfo.UNDEFINED;
+    }
+
+    /**
+     * Checks whether the given location is relevant w.r.t. the given set of
+     * relevant locations. Returns null if the location is relevant, and a list of
+     * formula positions used as evidence for irrelevance in the other case. The
+     * returned list can be empty for trivial cases.
+     * 
+     * @param loc               The {@link AbstractUpdateLoc} to check for
+     *                          relevance.
+     * @param relevantLocations The relevant locations.
+     * @param goal              The goal in which the {@link Rule} should be
+     *                          applied.
+     * @param services          The {@link Services} object.
+     * @return true iff the given location is relevant w.r.t. the given set of
+     *         relevant locations.
+     */
+    public static ImmutableList<PosInOccurrence> isRelevant(final AbstractUpdateLoc loc,
+            final Collection<AbstractUpdateLoc> relevantLocations, final Goal goal,
+            Services services) {
+        return isRelevant(loc, relevantLocations, Collections.emptySet(), goal, services);
+    }
+
+    /**
+     * Checks whether the given location is relevant w.r.t. the given set of
+     * relevant and overwritten locations. Returns null if the location is relevant,
+     * and a list of formula positions used as evidence for irrelevance in the other
+     * case. The returned list can be empty for trivial cases.
+     * 
+     * @param loc                  The {@link AbstractUpdateLoc} to check for
+     *                             relevance.
+     * @param relevantLocations    The relevant locations.
+     * @param overwrittenLocations A set of locations that are overwritten and
+     *                             therefore definitely irrelevant.
+     * @param goal                 The goal in which the {@link Rule} should be
+     *                             applied.
+     * @param services             The {@link Services} object.
+     * @return true iff the given location is relevant w.r.t. the given set of
+     *         relevant locations.
+     */
+    public static ImmutableList<PosInOccurrence> isRelevant(final AbstractUpdateLoc loc,
+            final Collection<AbstractUpdateLoc> relevantLocations,
+            final Collection<AbstractUpdateLoc> overwrittenLocations, final Goal goal,
+            Services services) {
+        final ImmutableSLList<PosInOccurrence> emptyList = ImmutableSLList.<PosInOccurrence>nil();
+        ImmutableList<PosInOccurrence> result = emptyList;
+        final AbstractUpdateLoc locUnwrapped = AbstractExecutionUtils.unwrapHasTo(loc);
+
+        //@formatter:off
+        /*
+         * A location l1 (set) is *not* relevant w.r.t. another location l2 (set) if:
+         * 
+         * 1) l1 is overwritten, or there is no relevant location l2, or
+         * 2) l1 is a PVLoc and l2 a different PVLoc, or
+         * 3) l1 is not a PVLoc, and l2 is a fresh auxiliary program variable, or
+         * 4) l1 is a fresh auxiliary program variable and l2 is an abstract location set, or
+         * 5) there is evidence in the proof that l1 and l2 are disjoint.
+         * 
+         * In all other cases, l1 is relevant w.r.t. l2. It is relevant w.r.t. a set of
+         * locations if it is relevant for any location in the set.
+         * 
+         * Case 4 is because the variable wouldn't be fresh if it was contained by the
+         * possible instantiations of any abstract location set.
+         */
+        //@formatter:on
+
+        if (loc instanceof IrrelevantAssignable || loc instanceof EmptyLoc
+                || overwrittenLocations.contains(locUnwrapped) || relevantLocations.isEmpty()) {
+            // Irrelevant, but no evidence needed
+            return emptyList;
+        }
+
+        final Set<AbstractUpdateLoc> relevantLocsCopy = new LinkedHashSet<>(relevantLocations);
+        if (locUnwrapped instanceof PVLoc) {
+            // If loc is a PVLoc, we can safely remove all PVLocs that aren't equal.
+            relevantLocsCopy.removeIf(ploc -> ploc instanceof PVLoc && !ploc.equals(locUnwrapped));
+        } else {
+            /*
+             * Even if loc is allLocs, the "fresh" locations cannot be meant! We remove
+             * them. They only should play a role if loc is a PVLoc.
+             */
+            relevantLocsCopy.removeIf(
+                    ploc -> AbstractExecutionUtils.locIsCreatedFresh(ploc, goal, services));
+        }
+
+        // loc has to be disjoint from *all* relevant locations.
+        for (final AbstractUpdateLoc relevantLoc : relevantLocsCopy) {
+            if ((relevantLoc instanceof AllLocsLoc || relevantLoc instanceof SkolemLoc)
+                    && AbstractExecutionUtils.locIsCreatedFresh(locUnwrapped, goal, services)) {
+                continue;
+            }
+
+            final Optional<PosInOccurrence> maybeIrrelevanceEvidence = //
+                    isIrrelevant(locUnwrapped, relevantLoc, goal, services);
+
+            if (maybeIrrelevanceEvidence.isPresent()) {
+                result = result.append(maybeIrrelevanceEvidence.get());
+            } else {
+                // Relevant for this relevantLoc, return null
+                return null;
+            }
+        }
+
+        // Irrelevant --- return evidence
+        return result;
+    }
+
+    /**
+     * Looks in the antecedent of the given {@link Goal} for a premise asserting
+     * that loc and relevantLoc are disjoint. The check is done syntactically for
+     * performance reasons, but KeY should bring the disjointness assertions to a
+     * normal form of the shape <code>loc1 \cap loc2 = {}</code>, therefore it
+     * should be OK. There are no proofs involved.
+     * 
+     * <p>
+     * Pure method.
+     * 
+     * @param loc         The location to check for relevance.
+     * @param relevantLoc A location known to be relevant.
+     * @param goal        The context {@link Goal}.
+     * @param services    The {@link Services} object.
+     * @return An empty {@link Optional} if it could not proven that loc is
+     *         <em>not</em> relevant, and a premise proving the irrelevance (i.e.,
+     *         disjointness) in the other case.
+     */
+    private static Optional<PosInOccurrence> isIrrelevant(final AbstractUpdateLoc loc,
+            final AbstractUpdateLoc relevantLoc, final Goal goal, final Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+
+        final Term locsetDisjointTerm1 = tb.equals(
+                tb.intersect(loc.toTerm(services), relevantLoc.toTerm(services)), tb.empty());
+        final Term locsetDisjointTerm2 = tb.equals(
+                tb.intersect(relevantLoc.toTerm(services), loc.toTerm(services)), tb.empty());
+
+        for (SequentFormula premise : goal.sequent().antecedent()) {
+            final Term premiseFor = premise.formula();
+            if (premiseFor.equalsModIrrelevantTermLabels(locsetDisjointTerm1)
+                    || premiseFor.equalsModIrrelevantTermLabels(locsetDisjointTerm2)) {
+                return Optional.of(new PosInOccurrence(premise, PosInTerm.getTopLevel(), true));
+            }
+        }
+
+        return Optional.empty();
     }
 }

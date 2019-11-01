@@ -13,7 +13,6 @@
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
@@ -21,14 +20,14 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * A Skolem location set suitable for use in an {@link AbstractUpdate}.
  *
  * @author Dominic Steinhoefel
  */
-public class SkolemLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
+public class SkolemLoc implements AbstractUpdateLoc {
     private final Function skLoc;
 
     public SkolemLoc(Function skLoc) {
@@ -38,12 +37,6 @@ public class SkolemLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
     @Override
     public Term toTerm(Services services) {
         return services.getTermBuilder().func(skLoc);
-    }
-
-    @Override
-    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
-            Services services) {
-        return this;
     }
 
     @Override
@@ -63,11 +56,18 @@ public class SkolemLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
 
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
+        // XXX (DS, 2019-10-28): Only correct if those locsets are disjoint, which is
+        // not clear with the knowledge we have!
         return otherLoc instanceof SkolemLoc && otherLoc.equals(this);
     }
 
     @Override
     public int hashCode() {
         return 5 + 17 * skLoc.hashCode();
+    }
+
+    @Override
+    public Sort sort() {
+        return skLoc.sort();
     }
 }

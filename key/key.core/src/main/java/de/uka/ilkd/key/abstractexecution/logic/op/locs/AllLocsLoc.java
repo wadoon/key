@@ -13,21 +13,20 @@
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * The special "allLocs" location.
  *
  * @author Dominic Steinhoefel
  */
-public class AllLocsLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
+public class AllLocsLoc implements AbstractUpdateLoc {
     private final Function allLocs;
 
     public AllLocsLoc(Function allLocs) {
@@ -37,12 +36,6 @@ public class AllLocsLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
     @Override
     public Term toTerm(Services services) {
         return services.getTermBuilder().func(allLocs);
-    }
-
-    @Override
-    public AbstractUpdateAssgnLoc replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap, Services services) {
-        return this;
     }
 
     @Override
@@ -69,5 +62,10 @@ public class AllLocsLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
     @Override
     public int hashCode() {
         return 5 + 17 * allLocs.hashCode();
+    }
+
+    @Override
+    public Sort sort() {
+        return allLocs.sort();
     }
 }

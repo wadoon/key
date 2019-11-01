@@ -151,14 +151,15 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
             final Map<LocationVariable, Function> anonymisationHeaps,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
+        final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
         final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
                 .buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
         final Term reachableOutCondition
                 = conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
         final Term atMostOneFlagSetCondition
                 = conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
-        return new Term[] { postcondition, wellFormedAnonymisationHeapsCondition,
-            reachableOutCondition, atMostOneFlagSetCondition };
+        return new Term[] { postcondition, freePostcondition, wellFormedAnonymisationHeapsCondition,
+                reachableOutCondition, atMostOneFlagSetCondition };
     }
 
     @Override

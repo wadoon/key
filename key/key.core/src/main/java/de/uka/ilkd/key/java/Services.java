@@ -20,7 +20,7 @@ import java.util.Map.Entry;
 
 import java.util.Optional;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
@@ -118,7 +118,7 @@ public class Services implements TermServices {
     /**
      * The {@link AbstractUpdateFactory} for creating {@link AbstractUpdate}s
      * and related constructs. Put into the {@link Services} since it maintains
-     * a map from {@link AbstractPlaceholderStatement}s and left-hand sides to
+     * a map from {@link AbstractStatement}s and left-hand sides to
      * {@link AbstractUpdate}s for reusing {@link AbstractUpdate}s; when
      * discarding the {@link Services} object, this can also be removed from memory.
      */
@@ -131,7 +131,7 @@ public class Services implements TermServices {
      * is generated, it is generated like a normal Skolem variable (i.e.,
      * fresh), but every other time within the same proof, that new name is
      * recycled for the same instantiation. The intuition behind this are
-     * "abstract program symbols" (see {@link AbstractPlaceholderStatement}),
+     * "abstract program symbols" (see {@link AbstractStatement}),
      * where the same abstract program can occur multiple times in a sequent,
      * and should then express the same behavior. For this, we need that
      * instantiations memory.
@@ -158,7 +158,7 @@ public class Services implements TermServices {
     	javainfo = new JavaInfo(new KeYProgModelInfo(this, typeconverter,
     	                                             new KeYRecoderExcHandler()), this);
     	nameRecorder = new NameRecorder();
-        this.abstractUpdateFactory = new AbstractUpdateFactory();
+        this.abstractUpdateFactory = new AbstractUpdateFactory(this);
     }
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping rec2key, 
@@ -178,7 +178,7 @@ public class Services implements TermServices {
     	javainfo = new JavaInfo
     			(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
     	nameRecorder = new NameRecorder();
-        this.abstractUpdateFactory = new AbstractUpdateFactory();
+        this.abstractUpdateFactory = new AbstractUpdateFactory(this);
     }
 
     private Services(Services s) {

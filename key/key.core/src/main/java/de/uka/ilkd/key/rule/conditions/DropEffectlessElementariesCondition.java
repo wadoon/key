@@ -13,249 +13,423 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.TermAccessibleLocationsCollector;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
-public final class DropEffectlessElementariesCondition
-        implements VariableCondition {
-    private final UpdateSV u;
-    private final SchemaVariable x;
-    private final SchemaVariable result;
+/**
+ * Drops effectless elementary updates, effectless assignables in abstract
+ * updates or whole effectless abstract updates from update terms. If the target
+ * term does not contain abstract updates or abstract program elements (in the
+ * sense of Abstract Execution), the behavior of this condition corresponds to
+ * the old version only considering concrete updates.
+ * 
+ * This class realizes a conservative behavior in the presence of abstract
+ * location sets. If there are <em>any</em> abstract location sets in the target
+ * that are not guaranteed to be overwritten, nothing will be dropped at all
+ * (apart from abstract updates strictly assigning <em>nothing</em>). A precise
+ * solution would check disjointness of location sets, but that's not the
+ * purpose of this class which should not perform any reasoning.
+ * 
+ * Integration of Abstract Execution was the reason to consider not only the set
+ * of relevant variables, but also the set of variables that are guaranteed to
+ * be overwritten, since this allows for some degree of precision in the
+ * presence of abstract updates or abstract program elements.
+ * 
+ * @author Dominic Steinhoefel
+ * @author (numerous unknown others)
+ */
+public final class DropEffectlessElementariesCondition implements VariableCondition {
+    private final UpdateSV uSV;
+    private final SchemaVariable targetSV;
+    private final SchemaVariable resultSV;
 
-    public DropEffectlessElementariesCondition(UpdateSV u, SchemaVariable x,
-            SchemaVariable x2) {
-        this.u = u;
-        this.x = x;
-        this.result = x2;
-    }
-
-    private static Term dropEffectlessElementariesHelper(Term update,
-            Term target, Set<LocationVariable> relevantVars,
-            Services services) {
-        if (update.op() instanceof ElementaryUpdate) {
-            ElementaryUpdate eu = (ElementaryUpdate) update.op();
-            LocationVariable lhs = (LocationVariable) eu.lhs();
-            if (relevantVars.contains(lhs)) {
-                relevantVars.remove(lhs);
-                // removed, see bug #1269 (MU, CS)
-                // updates of the form "x:=x" can be discarded (MU,CS)
-                //@formatter:off
-//                if (lhs.equals(update.sub(0).op())) {
-//                    return TB.skip();
-//                }
-                //@formatter:on
-                return null;
-            } else {
-                /*
-                 * In the standard case, we can drop the update here. However,
-                 * if the target contains abstract programs that might access
-                 * the left-hand-side of this update, we have to keep it.
-                 */
-                if (!containsAbstractStatementUsingLHS(target, lhs, services)) {
-                    return services.getTermBuilder().skip();
-                } else {
-                    return null;
-                }
-            }
-        } else if (update.op() instanceof AbstractUpdate) {
-            return null;
-        } else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
-            Term sub0 = update.sub(0);
-            Term sub1 = update.sub(1);
-            /*
-             * first descend to the second sub-update to keep relevantVars in
-             * good order
-             */
-            Term newSub1 = dropEffectlessElementariesHelper(sub1, target,
-                    relevantVars, services);
-            Term newSub0 = dropEffectlessElementariesHelper(sub0, target,
-                    relevantVars, services);
-            if (newSub0 == null && newSub1 == null) {
-                return null;
-            } else {
-                newSub0 = newSub0 == null ? sub0 : newSub0;
-                newSub1 = newSub1 == null ? sub1 : newSub1;
-                return services.getTermBuilder().parallel(newSub0, newSub1);
-            }
-        } else if (update.op() == UpdateApplication.UPDATE_APPLICATION) {
-            Term sub0 = update.sub(0);
-            Term sub1 = update.sub(1);
-            Term newSub1 = dropEffectlessElementariesHelper(sub1, target,
-                    relevantVars, services);
-            return newSub1 == null ? null
-                    : services.getTermBuilder().apply(sub0, newSub1, null);
-        } else {
-            return null;
-        }
-    }
-
-    private static Term dropEffectlessElementaries(Term update, Term target,
-            Services services) {
-        TermProgramVariableCollector collector = services.getFactory()
-                .create(services);
-        target.execPostOrder(collector);
-        Set<LocationVariable> varsInTarget = collector.result();
-        Term simplifiedUpdate = dropEffectlessElementariesHelper(update, target,
-                varsInTarget, services);
-        return simplifiedUpdate == null ? null
-                : services.getTermBuilder().apply(simplifiedUpdate, target,
-                        null);
+    public DropEffectlessElementariesCondition(UpdateSV uSV, SchemaVariable targetSV,
+            SchemaVariable resultSV) {
+        this.uSV = uSV;
+        this.targetSV = targetSV;
+        this.resultSV = resultSV;
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
-            MatchConditions mc, Services services) {
-        SVInstantiations svInst = mc.getInstantiations();
-        Term uInst = (Term) svInst.getInstantiation(u);
-        Term xInst = (Term) svInst.getInstantiation(x);
-        Term resultInst = (Term) svInst.getInstantiation(result);
-        if (uInst == null || xInst == null) {
+    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
+            Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final SVInstantiations svInst = mc.getInstantiations();
+
+        final Term update = (Term) svInst.getInstantiation(uSV);
+        final Term target = (Term) svInst.getInstantiation(targetSV);
+        final Term previousResult = (Term) svInst.getInstantiation(resultSV);
+
+        if (update == null || target == null) {
             return mc;
         }
 
-        Term properResultInst = dropEffectlessElementaries(uInst, xInst,
-                services);
-        if (properResultInst == null) {
+        /*
+         * Not applicable for location set symbols. We don't know what they represent,
+         * at least not without further information.
+         */
+        final Sort locSetSort = services.getTypeConverter().getLocSetLDT().targetSort();
+        if (target.op() instanceof Function && target.arity() == 0 && target.sort() == locSetSort) {
             return null;
-        } else if (resultInst == null) {
-            svInst = svInst.add(result, properResultInst, services);
-            return mc.setInstantiations(svInst);
-        } else if (resultInst.equals(properResultInst)) {
+        }
+
+        final Optional<Term> maybeResult = //
+                dropEffectlessElementaries( //
+                        update, //
+                        target, //
+                        collectLocations(target, services), //
+                        new LinkedHashSet<>(), //
+                        services //
+                ).map( //
+                        upd -> tb.apply(upd, target, null));
+
+        if (!maybeResult.isPresent()) {
+            return null;
+        }
+
+        final Term result = maybeResult.get();
+        if (previousResult == null) {
+            return mc.setInstantiations(svInst.add(resultSV, result, services));
+        } else if (previousResult.equals(result)) {
             return mc;
         } else {
             return null;
         }
+    }
+
+    /**
+     * Collects read locations in the target {@link Term}.
+     * 
+     * @param target   The {@link Term} from which to collect locations.
+     * @param services The {@link Services} object.
+     * @return The relevant locations in {@link Term}.
+     */
+    private static Set<AbstractUpdateLoc> collectLocations(Term target, Services services) {
+        final TermAccessibleLocationsCollector collector = //
+                new TermAccessibleLocationsCollector(services);
+        target.execPostOrder(collector);
+        return collector.locations();
+    }
+
+    /**
+     * Returns, if possible, a simplified update <code>update'</code> such that
+     * <code>{update'}target</code> is equivalent to <code>{update}target</code>.
+     * Uses the locations in relevantVars to decide what to drop in the
+     * simplification step (updates not assigning relevant variables can be
+     * dropped). Returns {@link Optional#empty()} if simplification is not possible.
+     * 
+     * @param update               The update to simplify.
+     * @param target               The target formula, for extracting locations.
+     * @param overwrittenLocations A set of locations that are overwritten and
+     *                             therefore definitely irrelevant.
+     * @param services             The {@link Services} object.
+     * @return The simplified update application {@link Term}, or
+     *         {@link Optional#empty()}.
+     */
+    private static Optional<Term> dropEffectlessElementaries(final Term update, final Term target,
+            final Set<AbstractUpdateLoc> relevantLocations,
+            final Set<AbstractUpdateLoc> overwrittenLocations, final Services services) {
+
+        if (update.op() instanceof ElementaryUpdate) {
+            return maybeDropElementaryUpdate(update, target, relevantLocations,
+                    overwrittenLocations, services);
+        } else if (update.op() instanceof AbstractUpdate) {
+            return maybeDropAbstractUpdate(update, target, relevantLocations, overwrittenLocations,
+                    services);
+        } else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
+            return descendInParallelUpdate( //
+                    update, target, relevantLocations, overwrittenLocations, services);
+        } else if (update.op() == UpdateApplication.UPDATE_APPLICATION) {
+            return descendInUpdateApplication( //
+                    update, target, relevantLocations, overwrittenLocations, services);
+        } else {
+            // Unknown operator.
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Returns, if possible, a simplified update <code>update'</code> such that
+     * <code>{update'}target</code> is equivalent to <code>{update}target</code>,
+     * for the case that update is an update application. Uses the locations in
+     * relevantVars to decide what to drop in the simplification step (updates not
+     * assigning relevant variables can be dropped). Returns
+     * {@link Optional#empty()} if simplification is not possible.
+     * 
+     * @param update               The update application update to simplify.
+     * @param target               The target formula, for extracting locations.
+     * @param overwrittenLocations A set of locations that are overwritten and
+     *                             therefore definitely irrelevant.
+     * @param services             The {@link Services} object.
+     * @return The simplified update application {@link Term}, or
+     *         {@link Optional#empty()}.
+     */
+    private static Optional<Term> descendInUpdateApplication(final Term update, final Term target,
+            final Set<AbstractUpdateLoc> relevantLocations,
+            final Set<AbstractUpdateLoc> overwrittenLocations, final Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final Term appliedUpdate = update.sub(0);
+        final Term targetUpdate = update.sub(1);
+
+        return dropEffectlessElementaries(targetUpdate, target, relevantLocations,
+                overwrittenLocations, services)
+                        .map(newSub -> tb.apply(appliedUpdate, newSub, null));
+    }
+
+    /**
+     * Returns, if possible, a simplified update <code>update'</code> such that
+     * <code>{update'}target</code> is equivalent to <code>{update}target</code>,
+     * for the case that update is a parallel update. Uses the locations in
+     * relevantVars to decide what to drop in the simplification step (updates not
+     * assigning relevant variables can be dropped). Returns
+     * {@link Optional#empty()} if simplification is not possible.
+     * 
+     * @param update               The parallel update to simplify.
+     * @param target               The target formula, for extracting locations.
+     * @param overwrittenLocations A set of locations that are overwritten and
+     *                             therefore definitely irrelevant.
+     * @param services             The {@link Services} object.
+     * @return The simplified update application {@link Term}, or
+     *         {@link Optional#empty()}.
+     */
+    private static Optional<Term> descendInParallelUpdate(final Term update, final Term target,
+            final Set<AbstractUpdateLoc> relevantLocations,
+            final Set<AbstractUpdateLoc> overwrittenLocations, final Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final Term sub1 = update.sub(0);
+        final Term sub2 = update.sub(1);
+
+        /*
+         * First descend to the second sub-update to keep relevantVars in good order.
+         */
+        final Optional<Term> maybeNewSub2 = //
+                dropEffectlessElementaries(sub2, target, relevantLocations, overwrittenLocations,
+                        services);
+        final Optional<Term> maybeNewSub1 = //
+                dropEffectlessElementaries(sub1, target, relevantLocations, overwrittenLocations,
+                        services);
+
+        if (!maybeNewSub1.isPresent() && !maybeNewSub2.isPresent()) {
+            return Optional.empty();
+        }
+
+        return Optional.of( //
+                tb.parallel(maybeNewSub1.orElse(sub1), maybeNewSub2.orElse(sub2)));
+    }
+
+    /**
+     * Returns a SKIP update or an empty optional if dropping the abstract update is
+     * not possible. Abstract updates cannot be "simplified", either they're
+     * relevant or not.
+     * 
+     * Like {@link #dropElementary(Term, Term, Set, Services, TermBuilder)}, but for
+     * the much more complex setting of an abstract update.
+     * 
+     * @param update               The abstract update to check.
+     * @param target               The target formula, for extracting locations.
+     * @param overwrittenLocations A set of locations that are overwritten and
+     *                             therefore definitely irrelevant.
+     * @param services             The {@link Services} object.
+     * @return The simplified update {@link Term}, or {@link Optional#empty()}.
+     */
+    private static Optional<Term> maybeDropAbstractUpdate(final Term update, final Term target,
+            final Set<AbstractUpdateLoc> relevantLocations,
+            final Set<AbstractUpdateLoc> overwrittenLocations, final Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
+
+        if (abstrUpd.assignsNothing()) {
+            // Rare special case
+            return Optional.of(tb.skip());
+        }
+
+        //@formatter:off
+        /*
+         * Logic:
+         * 
+         * - All locations that *have to* be assigned by an abstract update are no
+         *   longer relevant (and also registered as overwritten).
+         * - An abstract update not assigning relevant locations can be dropped.
+         */
+        //@formatter:on
+
+        final Set<AbstractUpdateLoc> newIrrelevantLocations = relevantLocations.stream()
+                .filter(abstrUpd::hasToAssign)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+        final Set<AbstractUpdateLoc> newOverwrittenLocations = abstrUpd.getHasToAssignables()
+                .stream()
+                .filter(hasToLoc -> newIrrelevantLocations.stream()
+                        .anyMatch(loc -> hasToLoc.mayAssign(loc, services)))
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+
+        Term newAbstractUpdateTerm = null;
+
+        if (abstrUpd.getAllAssignables().stream().noneMatch(
+                loc -> isRelevant(loc, relevantLocations, overwrittenLocations, services))) {
+            /*
+             * We may drop the abstract update, not assigning anything relevant or not
+             * overwritten
+             */
+            newAbstractUpdateTerm = tb.skip();
+        }
+
+        relevantLocations.removeAll(newIrrelevantLocations);
+        overwrittenLocations.addAll(newOverwrittenLocations);
+        return Optional.ofNullable(newAbstractUpdateTerm);
+    }
+
+    /**
+     * Returns either a SKIP update if the elementary update <code>update</code> can
+     * be dropped (which is the case if it assigns a variable that is not relevant),
+     * or an empty optional if it assigns a relevant variable. In that case, as a
+     * <strong>side effect</strong>, that variable is removed from the set of
+     * relevant variables and added to the set of overwritten locations, since it's
+     * overwritten.
+     * 
+     * @param update               The elementary update to check.
+     * @param target               The target formula, for extracting locations.
+     * @param overwrittenLocations A set of locations that are overwritten and
+     *                             therefore definitely irrelevant.
+     * @param services             The {@link Services} object.
+     * @return The simplified update {@link Term}, or {@link Optional#empty()}.
+     */
+    private static Optional<Term> maybeDropElementaryUpdate(final Term update, final Term target,
+            final Set<AbstractUpdateLoc> relevantLocations,
+            final Set<AbstractUpdateLoc> overwrittenLocations, final Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final ElementaryUpdate eu = (ElementaryUpdate) update.op();
+        final LocationVariable lhs = (LocationVariable) eu.lhs();
+
+        if (isRelevant(lhs, relevantLocations, overwrittenLocations, services)) {
+
+            removeFromLocationSet(lhs, relevantLocations); // SIDE EFFECT!
+            addToAssngLocationSet(lhs, overwrittenLocations); // SIDE EFFECT!
+
+            /* NOTE: Cannot discard updates of the form x:=x, see bug #1269 (MU, CS) */
+            return Optional.empty();
+        } else {
+            return Optional.of(tb.skip());
+        }
+    }
+
+    /**
+     * Checks whether the given location is relevant w.r.t. the given set of
+     * relevant locations.
+     * 
+     * @param lv                   The {@link LocationVariable} to check for
+     *                             relevance.
+     * @param relevantLocations    The relevant locations.
+     * @param overwrittenLocations A set of locations that are overwritten and
+     *                             therefore definitely irrelevant.
+     * @param services             The {@link Services} object.
+     * @return true iff the given location is relevant w.r.t. the given set of
+     *         relevant locations.
+     */
+    private static boolean isRelevant(final LocationVariable lv,
+            final Set<AbstractUpdateLoc> relevantLocations,
+            final Set<AbstractUpdateLoc> overwrittenLocations, Services services) {
+        /*
+         * NOTE (DS, 2019-10-25): In an older version, we had to perform checks by names
+         * of LVs for occurrences in APS specs, since there were those problems with
+         * renamings. Keep that in mind if the surface again. It would however be better
+         * to avoid such hacks in any case.
+         */
+
+        return isRelevant(new PVLoc(lv), relevantLocations, overwrittenLocations, services);
+    }
+
+    /**
+     * Checks whether the given location is relevant w.r.t. the given set of
+     * relevant locations.
+     * 
+     * @param loc                  The {@link AbstractUpdateLoc} to check for
+     *                             relevance.
+     * @param relevantLocations    The relevant locations.
+     * @param overwrittenLocations A set of locations that are overwritten and
+     *                             therefore definitely irrelevant.
+     * @param services             The {@link Services} object.
+     * @return true iff the given location is relevant w.r.t. the given set of
+     *         relevant locations.
+     */
+    private static boolean isRelevant(final AbstractUpdateLoc loc,
+            final Set<AbstractUpdateLoc> relevantLocations,
+            final Set<AbstractUpdateLoc> overwrittenLocations, Services services) {
+        /*
+         * In this class, we perform an overapproximation: Whenever there's location
+         * that's not a PVLoc in the relevant locations set, we say that the location
+         * loc is relevant. More fine-grained checks are deferred to other rules.
+         */
+
+        final AbstractUpdateLoc locUnwrapped = AbstractExecutionUtils.unwrapHasTo(loc);
+
+        if (loc instanceof EmptyLoc || overwrittenLocations.contains(locUnwrapped)
+                || relevantLocations.isEmpty()) {
+            return false;
+        }
+
+        if (!(locUnwrapped instanceof PVLoc || locUnwrapped instanceof EmptyLoc)) {
+            return true;
+        }
+
+        if (relevantLocations.stream().anyMatch(//
+                relLoc -> !(relLoc instanceof PVLoc || relLoc instanceof EmptyLoc))) {
+            return true;
+        }
+
+        return relevantLocations.stream() //
+                .filter(PVLoc.class::isInstance) //
+                .map(PVLoc.class::cast) //
+                .anyMatch(locUnwrapped::equals);
+    }
+
+    /**
+     * Adds lv to the given set of locations (as a side effect).
+     * 
+     * @param lv   The location to add.
+     * @param locs The locations.
+     */
+    private static void addToAssngLocationSet(final LocationVariable lv,
+            final Set<AbstractUpdateLoc> locs) {
+        locs.add(new PVLoc(lv));
+    }
+
+    /**
+     * Removes lv from the given set of locations (as a side effect).
+     * 
+     * @param lv   The location to remove.
+     * @param locs The locations.
+     */
+    private static void removeFromLocationSet(final LocationVariable lv,
+            final Set<AbstractUpdateLoc> locs) {
+        locs.remove(new PVLoc(lv));
     }
 
     @Override
     public String toString() {
-        return "\\dropEffectlessElementaries(" + u + ", " + x + ", " + result
-                + ")";
-    }
-
-    /*
-     * TODO (DS, 2019-01-04): Maybe we actually don't need this, since when
-     * collecting variables in a JavaBlock, also the variables in the contracts
-     * should be collected for an abstract placeholder statement...
-     */
-    private static boolean containsAbstractStatementUsingLHS(Term target,
-            LocationVariable lhs, Services services) {
-        final ContainsAbstractStatementUsingLHSVisitor visitor = //
-                new ContainsAbstractStatementUsingLHSVisitor(
-                        MergeRuleUtils.getJavaBlockRecursive(target).program(),
-                        lhs, services);
-        visitor.start();
-        return visitor.result();
-    }
-
-    private static class ContainsAbstractStatementUsingLHSVisitor
-            extends JavaASTVisitor {
-        final LocationVariable lhs;
-        final Services services;
-
-        boolean result = false;
-
-        public ContainsAbstractStatementUsingLHSVisitor(ProgramElement root,
-                LocationVariable lhs, Services services) {
-            super(root, services);
-            this.services = services;
-            this.lhs = lhs;
-        }
-
-        @Override
-        protected void doDefaultAction(SourceElement node) {
-            if (node instanceof AbstractPlaceholderStatement) {
-                final List<Operator> accessibles = //
-                        getAccessiblesFromAbstrPlaceholderStmt(
-                                (AbstractPlaceholderStatement) node);
-
-                /*
-                 * The result should be true if (1) the lhs is contained in the
-                 * accessibles of this abstract placeholder statement OR (2) the
-                 * accessibles contain allLocs, then lhs is contained as a
-                 * default.
-                 */
-
-                /*
-                 * TODO (DS, 2019-01-14): That's a hack, having problems with
-                 * renamings again...
-                 */
-                // if (accessibles.contains(lhs)) {
-                if (accessibles.stream()
-                        .anyMatch(op -> op instanceof LocationVariable
-                                && op.name().equals(lhs.name()))) {
-                    result = true;
-                }
-
-                if (accessibles.contains(services.getTypeConverter()
-                        .getLocSetLDT().getAllLocs())) {
-                    result = true;
-                }
-            }
-        }
-
-        public boolean result() {
-            return result;
-        }
-
-        private List<Operator> getAccessiblesFromAbstrPlaceholderStmt(
-                AbstractPlaceholderStatement aps) {
-            final TypeConverter typeConverter = services.getTypeConverter();
-
-            final List<BlockContract> contracts = //
-                    AbstractExecutionContractUtils.getNoBehaviorContracts(aps,
-                            services);
-
-            if (contracts.isEmpty()) {
-                return Collections.singletonList(
-                        typeConverter.getLocSetLDT().getAllLocs());
-            }
-
-            final OpCollector opColl = new OpCollector();
-
-            for (BlockContract contract : contracts) {
-                /*
-                 * TODO (DS, 2019-01-14): Might not be a good idea to loop over
-                 * *all* contracts; however, it's not unsound since if we're too
-                 * broad elementaries will *not* be dropped (although they could
-                 * be), it's rather a completeness issue. Alternatively, we'd
-                 * have to find the right contract for this position.
-                 */
-                final Term accessiblesTerm = contract.getAccessibleClause(
-                        typeConverter.getHeapLDT().getHeap());
-                accessiblesTerm.execPostOrder(opColl);
-            }
-
-            return opColl.ops().stream().filter(op -> op.arity() == 0)
-                    .collect(Collectors.toList());
-        }
-
+        return "\\dropEffectlessElementaries(" + uSV + ", " + targetSV + ", " + resultSV + ")";
     }
 }

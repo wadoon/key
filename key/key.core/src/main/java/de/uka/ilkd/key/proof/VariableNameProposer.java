@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -139,13 +139,13 @@ public class VariableNameProposer implements InstantiationProposer {
         else if (p_var instanceof SkolemSV
                 && ((SkolemSV) p_var).getFreshForSV() != null
                 && ((SkolemSV) p_var).getFreshForSV()
-                        .sort() == ProgramSVSort.ABSTRACTPROGRAM) {
+                        .sort() == ProgramSVSort.ABSTRACTSTATEMENT) {
             result = "" + p_var.name()
                     + Optional
                             .ofNullable(p_app.instantiations().getInstantiation(
                                     ((SkolemSV) p_var).getFreshForSV()))
-                            .map(AbstractPlaceholderStatement.class::cast)
-                            .map(AbstractPlaceholderStatement::getId)
+                            .map(AbstractStatement.class::cast)
+                            .map(AbstractStatement::getId)
                             .map(id -> "_" + id).orElse("");
         }
         else {

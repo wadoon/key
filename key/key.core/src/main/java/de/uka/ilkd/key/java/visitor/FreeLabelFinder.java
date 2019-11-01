@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -31,7 +31,7 @@ public class FreeLabelFinder {
     public boolean findLabel(Label label, ProgramElement node) {
         if (!(node instanceof LabeledStatement
                 && ((LabeledStatement) node).getLabel().equals(label))) {
-            if (node instanceof AbstractPlaceholderStatement) {
+            if (node instanceof AbstractStatement) {
                 /*
                  * NOTE (DS, 2018-11-30): An abstract placeholder statement
                  * might break to any of the outer labels, therefore we have too

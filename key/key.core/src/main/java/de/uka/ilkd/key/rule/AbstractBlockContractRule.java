@@ -10,7 +10,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
@@ -390,7 +390,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         }
 
         if (instantiation.statement.getChildCount() == 1 && instantiation.statement
-                .getChildAt(0) instanceof AbstractPlaceholderStatement) {
+                .getChildAt(0) instanceof AbstractStatement) {
             /*
              * NOTE (DS, 2019-02-01): I'm using parts of the block contract
              * machinery for Abstract Execution, but the normal block contract

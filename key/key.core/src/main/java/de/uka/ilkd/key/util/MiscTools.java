@@ -13,18 +13,28 @@
 
 package de.uka.ilkd.key.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
-import org.key_project.util.collection.*;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.KeYCollections;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -32,6 +42,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -48,6 +59,7 @@ import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -567,8 +579,8 @@ public final class MiscTools {
                 if (!pv.isMember() && !declaredPVs.contains(pv)) {
                     result = result.add(pv);
                 }
-            } else if (node instanceof AbstractPlaceholderStatement) {
-                final AbstractPlaceholderStatement aps = (AbstractPlaceholderStatement) node;
+            } else if (node instanceof AbstractStatement) {
+                final AbstractStatement aps = (AbstractStatement) node;
 
                 for (final ProgramVariable pv : AbstractExecutionContractUtils
                         .getAccessibleProgVarsForNoBehaviorContract(aps, root,
@@ -622,8 +634,8 @@ public final class MiscTools {
                         writtenPVs = writtenPVs.add(pv);
                     }
                 }
-            } else if (node instanceof AbstractPlaceholderStatement) {
-                final AbstractPlaceholderStatement aps = (AbstractPlaceholderStatement) node;
+            } else if (node instanceof AbstractStatement) {
+                final AbstractStatement aps = (AbstractStatement) node;
 
                 for (final ProgramVariable pv : AbstractExecutionContractUtils
                         .getAssignableProgVarsForNoBehaviorContract(aps, root,
@@ -1048,5 +1060,65 @@ public final class MiscTools {
                     .getPermissionHeap());
         }
         return result;
+    }
+
+    /**
+     * Replaces in the given {@link Term}
+     * <code>term> the position indicated by the <code>index</code>-th suffix in
+     * <code>pit</code> by <code>replacement</code>. The first <code>index</code>
+     * entries in pit are ignored, in other words.
+     * 
+     * @param term        The {@link Term} in which to replace.
+     * @param replacement The replacement {@link Term}.
+     * @param index       The index defining the interesting suffix in pit.
+     * @param pit         The position to replace (defined together with index).
+     * @param services    The {@link Services} object.
+     * @return The replaced {@link Term}.
+     */
+    public static Term replaceInTerm(final Term term, final Term replacement, final int index,
+            final PosInTerm pit, final Services services) {
+        if (pit.isTopLevel()) {
+            return replacement;
+        }
+
+        final Term[] newSubs = new Term[term.subs().size()];
+        final int posToLookFor = pit.getIndexAt(index);
+        for (int i = 0; i < newSubs.length; i++) {
+            if (i == posToLookFor) {
+                if (pit.depth() - 1 == index) {
+                    newSubs[i] = replacement;
+                } else {
+                    newSubs[i] = replaceInTerm(term.sub(i), replacement, index + 1, pit, services);
+                }
+            } else {
+                newSubs[i] = term.sub(i);
+            }
+        }
+
+        return services.getTermFactory().createTerm(term.op(), new ImmutableArray<>(newSubs),
+                term.boundVars(), term.javaBlock(), term.getLabels());
+    }
+
+    /**
+     * Returns the {@link KeYJavaType} for a {@link ProgramVariable} where only the
+     * {@link Sort} has been set. Works if in the {@link Services} object, there is
+     * a {@link KeYJavaType} for the given {@link Sort}.
+     * 
+     * @param var      The variable for which to return the {@link KeYJavaType}.
+     * @param services The {@link Services} object.
+     * @return the {@link KeYJavaType} (hopefully), or null.
+     */
+    public static KeYJavaType fixKeYJavaType(ProgramVariable var, Services services) {
+        KeYJavaType kjt = var.getKeYJavaType();
+        if (kjt == null) {
+            /*
+             * NOTE (DS, 2010-10-31): This case is introduced since I needed a dummy
+             * variable for Abstract Expressions, and I could not get a proper KJT
+             * at creation time.
+             */
+            return services.getJavaInfo().getKeYJavaType(var.sort());
+        } else {
+            return kjt;
+        }
     }
 }

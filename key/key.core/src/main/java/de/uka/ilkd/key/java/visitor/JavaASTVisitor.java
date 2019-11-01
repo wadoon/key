@@ -14,7 +14,9 @@
 package de.uka.ilkd.key.java.visitor;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
+import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
@@ -27,7 +29,6 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
@@ -84,15 +85,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker
                     .getMergeContracts((MergePointStatement) node);
             mcs.forEach(mc -> performActionOnMergeContract(mc));
         }
-        else if (node instanceof AbstractPlaceholderStatement
-                && services != null) {
-            ImmutableSet<BlockContract> contracts =
-                    services.getSpecificationRepository()
-                            .getAbstractPlaceholderStatementContracts(
-                                    (AbstractPlaceholderStatement) node);
-            contracts.forEach(
-                    this::performActionOnAbstractPlaceholderStatementContract);
-    }
+        else if (node instanceof AbstractProgramElement && services != null) {
+            ImmutableSet<BlockContract> contracts = services.getSpecificationRepository()
+                    .getAbstractProgramElementContracts((AbstractProgramElement) node);
+            contracts.forEach(this::performActionOnAbstractProgramElementContract);
+        }
 
     }
 
@@ -112,7 +109,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     protected abstract void doDefaultAction(SourceElement node);
 
     @Override
-    public void performActionOnAbstractProgramElement(AbstractProgramElement x) {
+    public void performActionOnAbstractProgramElement(de.uka.ilkd.key.rule.AbstractProgramElement x) {
         doDefaultAction(x);
     }
 
@@ -912,8 +909,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
-    public void performActionOnAbstractPlaceholderStatementContract(
-            BlockContract x) {
+    public void performActionOnAbstractProgramElementContract(BlockContract x) {
         // do nothing
     }
 
@@ -928,8 +924,12 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
-    public void performActionOnAbstractPlaceholderStatement(
-            AbstractPlaceholderStatement x) {
+    public void performActionOnAbstractStatement(AbstractStatement x) {
+        doDefaultAction(x);
+    }
+    
+    @Override
+    public void performActionOnAbstractExpression(AbstractExpression x) {
         doDefaultAction(x);
     }
 }

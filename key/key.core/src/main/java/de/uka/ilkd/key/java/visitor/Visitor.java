@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.CompilationUnit;
 import de.uka.ilkd.key.java.ContextStatementBlock;
@@ -515,9 +516,11 @@ public interface Visitor {
 
     public void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
 
-    void performActionOnAbstractPlaceholderStatement(
-            AbstractPlaceholderStatement abstractPlaceholderStatement);
+    void performActionOnAbstractStatement(
+            AbstractStatement abstractPlaceholderStatement);
 
-    void performActionOnAbstractPlaceholderStatementContract(BlockContract x);
+    void performActionOnAbstractProgramElementContract(BlockContract x);
+
+    void performActionOnAbstractExpression(AbstractExpression abstractExpression);
 
 }

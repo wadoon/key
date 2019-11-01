@@ -13,22 +13,22 @@
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * A program variable location for use in an {@link AbstractUpdate}.
  *
  * @author Dominic Steinhoefel
  */
-public class PVLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
+public class PVLoc implements AbstractUpdateLoc {
     private final LocationVariable locVar;
 
     public PVLoc(LocationVariable locVar) {
@@ -37,17 +37,8 @@ public class PVLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
 
     @Override
     public Term toTerm(Services services) {
-        return services.getTermBuilder().var(locVar);
-    }
-
-    @Override
-    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
-            Services services) {
-        if (replMap.containsKey(locVar)) {
-            return new PVLoc((LocationVariable) replMap.get(locVar));
-        } else {
-            return this;
-        }
+        final TermBuilder tb = services.getTermBuilder();
+        return tb.singletonPV(tb.var(locVar));
     }
 
     @Override
@@ -80,5 +71,10 @@ public class PVLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
     @Override
     public int hashCode() {
         return 5 + 17 * locVar.hashCode();
+    }
+
+    @Override
+    public Sort sort() {
+        return locVar.sort();
     }
 }

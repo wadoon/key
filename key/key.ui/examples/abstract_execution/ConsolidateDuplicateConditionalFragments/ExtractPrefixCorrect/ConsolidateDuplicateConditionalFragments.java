@@ -19,32 +19,51 @@
  * @author Dominic Steinhoefel
  */
 public class ConsolidateDuplicateConditionalFragments {
-    public int before(Object result, boolean b) {
-        if (b) {
-            //@ assignable \dl_heap, \dl_localsP, result;
-            //@ accessible \dl_heap, \dl_localsP, result;
-            //@ declares \dl_localsP;
-            { \abstract_statement P; }
+    public int before(Object result) {
+        /*@ assume \disjoint(\dl_frameE, \dl_footprintP) &&
+          @        \disjoint(\dl_frameP, \dl_footprintE) &&
+          @        \disjoint(\dl_frameP, \dl_frameE);
+          @*/
+        { ; }
+        
+        if (
+            //@ assignable \dl_frameE;
+            //@ accessible \dl_footprintE;
+            //@ exceptional_behavior requires false;
+            \abstract_expression e
+        ) {
+            //@ assignable \dl_frameP;
+            //@ accessible \dl_footprintP;
+            \abstract_statement P;
             \abstract_statement Q1;
         }
         else {
-            //@ assignable \dl_heap, \dl_localsP, result;
-            //@ accessible \dl_heap, \dl_localsP, result;
-            //@ declares \dl_localsP;
-            { \abstract_statement P; }
+            //@ assignable \dl_frameP;
+            //@ accessible \dl_footprintP;
+            \abstract_statement P;
             \abstract_statement Q2;
         }
 
         return result;
     }
 
-    public int after(Object result, boolean b) {
-        //@ assignable \dl_heap, \dl_localsP, result;
-        //@ accessible \dl_heap, \dl_localsP, result;
-        //@ declares \dl_localsP;
-        { \abstract_statement P; }
+    public int after(Object result) {
+        /*@ assume \disjoint(\dl_frameE, \dl_footprintP) &&
+          @        \disjoint(\dl_frameP, \dl_footprintE) &&
+          @        \disjoint(\dl_frameP, \dl_frameE);
+          @*/
+        { ; }
+      
+        //@ assignable \dl_frameP;
+        //@ accessible \dl_footprintP;
+        \abstract_statement P;
         
-        if (b) {
+        if (
+            //@ assignable \dl_frameE;
+            //@ accessible \dl_footprintE;
+            //@ exceptional_behavior requires false;
+            \abstract_expression e
+        ) {
             \abstract_statement Q1;
         }
         else {

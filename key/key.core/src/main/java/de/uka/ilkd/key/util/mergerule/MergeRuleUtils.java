@@ -31,6 +31,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
@@ -239,9 +240,12 @@ public class MergeRuleUtils {
 
         if (u.op() instanceof ElementaryUpdate) {
             result.add(u);
+        } else if (u.op() instanceof AbstractUpdate) {
+            // Note: Conflicts aren't cleaned for abstract updates!
+            result.add(u);
         } else if (u.op() == UpdateJunctor.PARALLEL_UPDATE) {
             for (Term sub : u.subs()) {
-                result.addAll(getElementaryUpdates(sub, tb));
+                result.addAll(getElementaryUpdates(sub, cleanConflicts, tb));
             }
         } else if (u.op() == UpdateJunctor.SKIP) {
             return result;
@@ -723,12 +727,29 @@ public class MergeRuleUtils {
      * @return true iff u is in normal form.
      */
     public static boolean isUpdateNormalForm(Term u) {
+        return isUpdateNormalForm(u, false);
+    }
+
+    /**
+     * Checks if an update is of the form { x := v || ... || z := q}. Individual
+     * updates may also be {@link AbstractUpdate}s iff
+     * <code>abstractUpdatesAllowed</code> is set to true.
+     * 
+     * @param u                      Update to check.
+     * @param abstractUpdatesAllowed Set to true to allow abstract updates (and not
+     *                               only elementaries and Skip) in the parallel
+     *                               update.
+     * @return true iff u is in normal form.
+     */
+    public static boolean isUpdateNormalForm(Term u, boolean abstractUpdatesAllowed) {
         if (u.op() instanceof ElementaryUpdate) {
+            return true;
+        } else if (abstractUpdatesAllowed && u.op() instanceof AbstractUpdate) {
             return true;
         } else if (u.op() == UpdateJunctor.PARALLEL_UPDATE) {
             boolean result = true;
             for (Term sub : u.subs()) {
-                result = result && isUpdateNormalForm(sub);
+                result = result && isUpdateNormalForm(sub, abstractUpdatesAllowed);
             }
             return result;
         } else if (u.op() == UpdateJunctor.SKIP) {

@@ -16,19 +16,15 @@ package de.uka.ilkd.key.abstractexecution.rule.conditions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -40,13 +36,12 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * Instantiates a parametric skolem path condition for abstract execution. The
  * such generated formula receives one LocSet for its assignable; those are
- * obtained from the block contracts of the {@link AbstractPlaceholderStatement}
+ * obtained from the block contracts of the {@link AbstractStatement}
  * it is generated for.
  *
  * @author Dominic Steinhoefel
  */
-public class InitializeParametricSkolemPathCondition
-        implements VariableCondition {
+public class InitializeParametricSkolemPathCondition implements VariableCondition {
     private final SchemaVariable pathCondSV;
     private final ProgramSV abstrProgSV;
 
@@ -60,53 +55,31 @@ public class InitializeParametricSkolemPathCondition
     public MatchConditions check(SchemaVariable sv, SVSubstitute instCandidate,
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
+        final TermBuilder tb = services.getTermBuilder();
 
-        final Optional<LocationVariable> runtimeInstance = Optional
-                .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
-                .filter(LocationVariable.class::isInstance)
-                .map(LocationVariable.class::cast);
+        final Optional<ExecutionContext> executionContext = Optional
+                .ofNullable(svInst.getExecutionContext());
 
         if (svInst.isInstantiated(pathCondSV)) {
             return matchCond;
         }
 
-        final AbstractPlaceholderStatement abstrStmt = (AbstractPlaceholderStatement) svInst
-                .getInstantiation(abstrProgSV);
+        final AbstractStatement abstrStmt = //
+                (AbstractStatement) svInst.getInstantiation(abstrProgSV);
 
-        final TermBuilder tb = services.getTermBuilder();
+        final List<Term> accessibles = AbstractExecutionContractUtils
+                .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, matchCond,
+                        services, executionContext).first.stream().map(loc -> loc.toTerm(services))
+                                .map(tb::value).collect(Collectors.toList());
+        final Sort[] accessiblesSorts = accessibles.stream().map(Term::sort)
+                .collect(Collectors.toList()).toArray(new Sort[0]);
 
-        /*
-         * NOTE (DS, 2019-01-31): We reuse the function symbols because
-         * otherwise, there will be different ones around which can, and will,
-         * lead to problems, since they should represent the same thing. It will
-         * however be problematic if someone decides to introduce such a
-         * function symbol elsewhere...
-         */
-        final String pathCondName = //
-                pathCondSV.name().toString() + "_" + abstrStmt.getId();
+        final Function funcSymb = services.abstractUpdateFactory()
+                .getAbstractPathConditionInstance(abstrStmt, accessiblesSorts);
 
-        final Name funcSymbName = new Name(pathCondName);
-        final Namespace<Function> functions = //
-                services.getNamespaces().functions();
+        final Term pathCond = tb.func(funcSymb, accessibles.toArray(new Term[0]));
 
-        Function funcSymb = functions.lookup(funcSymbName);
-        if (funcSymb == null) {
-            final Sort setSort = //
-                    services.getTypeConverter().getSetLDT().targetSort();
-            funcSymb = new Function(//
-                    funcSymbName, Sort.FORMULA, true, true, setSort);
-            functions.add(funcSymb);
-        }
-
-        final Set<AbstractUpdateLoc> accessibles = AbstractExecutionContractUtils
-                .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
-                        matchCond, services, runtimeInstance).first;
-
-        final Term pathCond = tb.func(funcSymb, services.abstractUpdateFactory()
-                .accessiblesToSetUnion(accessibles, services));
-
-        return matchCond
-                .setInstantiations(svInst.add(pathCondSV, pathCond, services));
+        return matchCond.setInstantiations(svInst.add(pathCondSV, pathCond, services));
     }
 
     @Override
@@ -118,8 +91,7 @@ public class InitializeParametricSkolemPathCondition
         final String svsString = svs.stream().map(SchemaVariable::toString)
                 .collect(Collectors.joining(", "));
 
-        return String.format(
-                "\\varcond (\\initializeParametricSkolemPathCondition(%s))",
+        return String.format("\\varcond (\\initializeParametricSkolemPathCondition(%s))",
                 svsString);
     }
 }

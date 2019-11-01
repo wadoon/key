@@ -12,35 +12,35 @@
 //
 package de.uka.ilkd.key.rule.abstractexecution;
 
-import java.io.File;
-
 import org.junit.Test;
 
-import de.uka.ilkd.key.rule.merge.MergeRuleTests;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.util.HelperClassForTests;
-import junit.framework.TestCase;
-
 /**
+ * TODO (DS, 2019-10-31): Test cases here don't work any more since type checker
+ * was deactivated for the most part. Have to add tests once that it checks
+ * anything again.
+ * 
  * @author Dominic Steinhoefel
- *
  */
-public class AETypeCheckerTests extends TestCase {
-    private static final File TEST_RESOURCES_DIR_PREFIX = new File(
-            HelperClassForTests.TESTCASE_DIRECTORY, "abstractexecution/typechecker/");
-
+public class AETypeCheckerTests {
     @Test
-    public void testIncorrectAccessible() {
-        final String expectedMsg = "The following locations are specified to be "
-                + "accessible by abstract program Q, but are not declared: localsP";
-
-        try {
-            MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX,
-                    "IncorrectAccessible/extractMethodRefactoring.key", false);
-            fail("This proof should not load.");
-        } catch (Throwable e) {
-            assertEquals(SLTranslationException.class, e.getCause().getClass());
-            assertEquals(expectedMsg, e.getMessage());
-        }
-    }
+    public void testPlaceholder() {}
+    
+    //@formatter:off
+//    private static final File TEST_RESOURCES_DIR_PREFIX = new File(
+//            HelperClassForTests.TESTCASE_DIRECTORY, "abstractexecution/typechecker/");
+//
+//    @Test
+//    public void testIncorrectAccessible() {
+//        final String expectedMsg = "The following locations are specified to be "
+//                + "accessible by abstract program Q, but are not declared: localsP";
+//
+//        try {
+//            MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX,
+//                    "IncorrectAccessible/extractMethodRefactoring.key", false);
+//            fail("This proof should not load.");
+//        } catch (Throwable e) {
+//            assertEquals(SLTranslationException.class, e.getCause().getClass());
+//            assertEquals(expectedMsg, e.getMessage());
+//        }
+//    }
 }

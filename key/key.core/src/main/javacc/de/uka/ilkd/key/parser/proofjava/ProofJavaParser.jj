@@ -427,6 +427,7 @@ TOKEN :
 {
   < ABSTRACT: "abstract" >
 | < ABSTRACT_PROGRAM: "\\abstract_statement" >
+| < ABSTRACT_EXPRESSION: "\\abstract_expression" >
 | < ASSERT: "assert" >  {
       if (!ProofJavaParser.jdk1_4) {
           matchedToken.kind = IDENTIFIER;
@@ -2707,6 +2708,8 @@ Expression UnaryExpression() :
 |
   result = UnaryExpressionNotPlusMinus()
 |
+  result = AbstractExpression()
+|
   result = ADTGetter()
 |
   result = GeneralEscapeExpression()
@@ -3647,7 +3650,7 @@ Statement Statement() :
 }
 {
 (
-  result = AbstractPlaceholderStatement()
+  result = AbstractStatement()
 | LOOKAHEAD(2)
   result = LabeledStatement()
 | result = Block()
@@ -4036,9 +4039,9 @@ Expression StatementExpression() :
   }
 }
 
-AbstractPlaceholderStatement AbstractPlaceholderStatement() :
+AbstractStatement AbstractStatement() :
 {
-  AbstractPlaceholderStatement result;
+  AbstractStatement result;
   String id = null;
 }
 {
@@ -4053,6 +4056,25 @@ AbstractPlaceholderStatement AbstractPlaceholderStatement() :
     result.setId(id);
     checkConstruction(result);
     setPostfixInfo(result);
+    return result;
+  }
+}
+
+AbstractExpression AbstractExpression() :
+{
+  AbstractExpression result;
+  String id = null;
+}
+{
+  <ABSTRACT_EXPRESSION>
+  {
+    result = factory.createAbstractExpression();
+    setPrefixInfo(result);
+  }
+  (<IDENTIFIER> { id = token.image; })
+  {
+    result.setId(id);
+    checkConstruction(result);
     return result;
   }
 }

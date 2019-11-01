@@ -26,12 +26,14 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
@@ -51,7 +53,6 @@ import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
@@ -119,14 +120,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     // %%% HACK: there should be a central facility for introducing new program
     // variables; this method is also used in <code>MethodCall</code> to
     // create copies of parameter variables
-    public static LocationVariable copy(ProgramVariable pv) {
+    public LocationVariable copy(ProgramVariable pv) {
         return copy(pv, "");
     }
 
     // %%% HACK: there should be a central facility for introducing new program
     // variables; this method is also used in <code>MethodCall</code> to
     // create copies of parameter variables
-    public static LocationVariable copy(ProgramVariable pv, String postFix) {
+    public LocationVariable copy(ProgramVariable pv, String postFix) {
         ProgramElementName name = pv.getProgramElementName();
         // %%% HACK: final local variables are not renamed since they can occur
         // in an
@@ -137,7 +138,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return new LocationVariable(
                 VariableNamer.parseName(name.toString() + postFix,
                         name.getCreationInfo()),
-                pv.getKeYJavaType(), pv.isFinal());
+                MiscTools.fixKeYJavaType(pv, services), pv.isFinal(), pv.getPositionInfo());
     }
 
     @Override
@@ -165,7 +166,38 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     protected void doAction(ProgramElement node) {
         node.visit(this);
     }
+    
+    @Override
+    protected void doDefaultAction(SourceElement x) {
+        super.doDefaultAction(x);
+        
+        /*
+         * NOTE (DS, 2019-10-31): In some cases, block contracts talk about variables
+         * that are not contained in the block. This visitor, as a default implemented
+         * in CreatingASTVisitor, only changes block contracts for changed blocks, which
+         * is not enough. If the blocks weren't changed, the default action is
+         * triggered. Therefore, here we give special treatment to the default action of
+         * a statement block. Example situations where this matters are assume/assert
+         * statements (which are internally translated to block contracts) and Abstract
+         * Statement specifications.
+         */
+        
+        if (x instanceof StatementBlock) {
+            final StatementBlock block = (StatementBlock) x;
+            /*
+             * We remove the old contract since otherwise, it will still be applied by the
+             * block contract rules.
+             */
+            performActionOnBlockContract(block, block, true);
+        } else if (x instanceof AbstractProgramElement) {
+            final StatementBlock block = //
+                    AbstractExecutionUtils.createArtificialStatementBlockForAPE(
+                            (AbstractProgramElement) x, services);
 
+            performActionOnBlockContract(block, block, true);
+        }
+    }
+    
     /** starts the walker */
     @Override
     public void start() {
@@ -221,17 +253,17 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             Operator op = t.op();
             if (op instanceof ElementaryUpdate) {
                 ElementaryUpdate uop = (ElementaryUpdate) t.op();
-                if (replaceMap.containsKey(uop.lhs())) {
+                if (replaceMap.containsKey((LocationVariable) uop.lhs())) {
                     UpdateableOperator replacedLhs = (UpdateableOperator) replaceMap
-                            .get(uop.lhs());
+                            .get((LocationVariable) uop.lhs());
                     op = ElementaryUpdate.getInstance(replacedLhs);
                     changed = changed || uop != op;
                 }
             }
             if (op instanceof AbstractUpdate) {
                 final AbstractUpdate origOp = (AbstractUpdate) op;
-                op = services.abstractUpdateFactory().changeAssignables(origOp,
-                        replaceMap, services);
+                op = services.abstractUpdateFactory().changeAssignablePVs(origOp,
+                        replaceMap);
                 changed = changed || origOp != op;
             }
             return changed ? services.getTermFactory().createTerm(op, subTerms,
@@ -286,12 +318,20 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     @Override
     public void performActionOnBlockContract(final StatementBlock oldBlock,
                                              final StatementBlock newBlock) {
-        ImmutableSet<BlockContract> oldContracts = services
-                .getSpecificationRepository().getBlockContracts(oldBlock);
+        performActionOnBlockContract(oldBlock, newBlock, false);
+    }
+
+    public void performActionOnBlockContract(final StatementBlock oldBlock,
+            final StatementBlock newBlock, boolean removeOldContract) {
+        ImmutableSet<BlockContract> oldContracts = services.getSpecificationRepository()
+                .getBlockContracts(oldBlock);
         for (BlockContract oldContract : oldContracts) {
-            services.getSpecificationRepository()
-                    .addBlockContract(createNewBlockContract(oldContract,
-                            newBlock, !oldBlock.equals(newBlock)));
+            final BlockContract newContract = //
+                    createNewBlockContract(oldContract, newBlock, !oldBlock.equals(newBlock));
+            services.getSpecificationRepository().addBlockContract(newContract);
+            if (removeOldContract && oldContract != newContract) {
+                services.getSpecificationRepository().removeBlockContract(oldContract);
+            }
         }
     }
 
@@ -340,7 +380,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     @Override
-    public void performActionOnAbstractPlaceholderStatementContract(
+    public void performActionOnAbstractProgramElementContract(
             BlockContract x) {
         // services.getSpecificationRepository().removeBlockContract(x);
         /*
@@ -355,19 +395,20 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     @Override
-    protected void performActionOnAbstractPlaceholderStatementContract(
-            AbstractPlaceholderStatement oldAbstrStmt,
-            AbstractPlaceholderStatement newAbstrStmt) {
-        final ImmutableSet<BlockContract> oldContracts = services
-                .getSpecificationRepository()
-                .getAbstractPlaceholderStatementContracts(oldAbstrStmt);
+    protected void performActionOnAbstractProgramElementContract(
+            final AbstractProgramElement oldElem, final AbstractProgramElement newElem) {
+        final ImmutableSet<BlockContract> oldContracts = services.getSpecificationRepository()
+                .getAbstractProgramElementContracts(oldElem);
+        
+        final StatementBlock block = AbstractExecutionUtils
+                .createArtificialStatementBlockForAPE(newElem, services);
+                        
         for (BlockContract oldContract : oldContracts) {
-            services.getSpecificationRepository()
-                    .addBlockContract(createNewBlockContract(oldContract,
-                            new StatementBlock(newAbstrStmt),
-                            !oldAbstrStmt.equals(newAbstrStmt)));
+            services.getSpecificationRepository().addBlockContract(
+                    createNewBlockContract(oldContract, block, !oldElem.equals(newElem)));
         }
     }
+    
     private MergeContract createNewMergeContract(
             final MergeContract oldContract, final MergePointStatement newMps,
             final boolean changed) {
@@ -432,6 +473,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newPostconditions =
                 new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> newFreePostconditions =
+                new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newModifiesClauses =
                 new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newDeclaresClauses = new LinkedHashMap<LocationVariable, Term>();
@@ -442,6 +485,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             final Term oldPrecondition = oldContract.getPrecondition(heap,
                     services);
             final Term oldPostcondition = oldContract.getPostcondition(heap,
+                    services);
+            final Term oldFreePostcondition = oldContract.getFreePostcondition(heap,
                     services);
             final Term oldModifies = oldContract.getModifiesClause(heap,
                     services);
@@ -454,6 +499,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     oldPrecondition);
             final Term newPostcondition = replaceVariablesInTerm(
                     oldPostcondition);
+            final Term newFreePostcondition = replaceVariablesInTerm(
+                    oldFreePostcondition);
             final Term newModifies = replaceVariablesInTerm(oldModifies);
             final Term newDeclares = replaceVariablesInTerm(oldDeclares);
             final Term newAccessible = replaceVariablesInTerm(oldAccessible);
@@ -462,6 +509,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     ? newPrecondition : oldPrecondition);
             newPostconditions.put(heap, (newPostcondition != oldPostcondition)
                     ? newPostcondition : oldPostcondition);
+            newFreePostconditions.put(heap,
+                    (newFreePostcondition != oldFreePostcondition) ? newFreePostcondition
+                            : oldFreePostcondition);
             newModifiesClauses.put(heap,
                     (newModifies != oldModifies) ? newModifies : oldModifies);
             newDeclaresClauses.put(heap,
@@ -473,6 +523,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
             changed |= ((newPrecondition != oldPrecondition)
                     || (newPostcondition != oldPostcondition)
+                    || (newFreePostcondition != oldFreePostcondition)
                     || (newModifies != oldModifies)
                     || (newDeclares != oldDeclares)
                     || (newAccessible != oldAccessible));
@@ -483,11 +534,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         OpReplacer replacer = new OpReplacer(
                 replaceMap, services.getTermFactory(), services.getProof());
 
-        return changed ? oldContract.update(newBlock, newPreconditions,
-                newPostconditions, newModifiesClauses,
-                newDeclaresClauses, newAccessibleClauses, newInfFlowSpecs,
-                newVariables,
-                replacer.replace(oldContract.getMby())) : oldContract;
+        return changed ? oldContract.update(newBlock, newPreconditions, newPostconditions,
+                newFreePostconditions, newModifiesClauses, newDeclaresClauses, newAccessibleClauses,
+                newInfFlowSpecs, newVariables, replacer.replace(oldContract.getMby()))
+                : oldContract;
     }
 
     private LoopContract createNewLoopContract(
@@ -498,6 +548,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         final Map<LocationVariable, Term> newPreconditions =
                 new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newPostconditions =
+                new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> newFreePostconditions =
                 new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newModifiesClauses =
                 new LinkedHashMap<LocationVariable, Term>();
@@ -511,6 +563,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     services);
             final Term oldPostcondition = oldContract.getPostcondition(heap,
                     services);
+            final Term oldFreePostcondition = oldContract.getFreePostcondition(heap,
+                    services);
             final Term oldModifies = oldContract.getModifiesClause(heap,
                     services);
 
@@ -522,6 +576,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     oldPrecondition);
             final Term newPostcondition = replaceVariablesInTerm(
                     oldPostcondition);
+            final Term newFreePostcondition = replaceVariablesInTerm(
+                    oldFreePostcondition);
             final Term newModifies = replaceVariablesInTerm(oldModifies);
             final Term newDeclares = replaceVariablesInTerm(oldDeclares);
             final Term newAccessible = replaceVariablesInTerm(oldAccessible);
@@ -530,6 +586,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     ? newPrecondition : oldPrecondition);
             newPostconditions.put(heap, (newPostcondition != oldPostcondition)
                     ? newPostcondition : oldPostcondition);
+            newFreePostconditions.put(heap, (newFreePostcondition != oldFreePostcondition)
+                    ? newFreePostcondition : oldFreePostcondition);
             newModifiesClauses.put(heap,
                     (newModifies != oldModifies) ? newModifies : oldModifies);
             newDeclaresClauses.put(heap,
@@ -555,16 +613,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             return oldContract;
         } else if (newStatement instanceof StatementBlock) {
             return oldContract.update((StatementBlock) newStatement, newPreconditions,
-                    newPostconditions, newModifiesClauses,
-                    newDeclaresClauses, newAccessibleClauses, newInfFlowSpecs,
-                    newVariables,
+                    newPostconditions, newFreePostconditions, newModifiesClauses,
+                    newDeclaresClauses, newAccessibleClauses, newInfFlowSpecs, newVariables,
                     replacer.replace(oldContract.getMby()),
                     replacer.replace(oldContract.getDecreases()));
         } else {
             return oldContract.update((LoopStatement) newStatement, newPreconditions,
-                    newPostconditions, newModifiesClauses,
-                    newDeclaresClauses, newAccessibleClauses, newInfFlowSpecs,
-                    newVariables,
+                    newPostconditions, newFreePostconditions, newModifiesClauses,
+                    newDeclaresClauses, newAccessibleClauses, newInfFlowSpecs, newVariables,
                     replacer.replace(oldContract.getMby()),
                     replacer.replace(oldContract.getDecreases()));
         }

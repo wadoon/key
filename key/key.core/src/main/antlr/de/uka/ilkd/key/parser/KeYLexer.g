@@ -228,7 +228,9 @@ lexer grammar KeYLexer;
         // Keywords for varcond and related stuff
 	SAME_OBSERVER : '\\sameObserver';
     HAS_AE_PREDICATE : '\\hasAEPredicate' ;
+    IS_LOCSET_FORMULA : '\\isLocsetFormula' ;
     INITIALIZE_PARAMETRIC_SKOLEM_UPDATE : '\\initializeParametricSkolemUpdate' ;
+    INITIALIZE_PARAMETRIC_SKOLEM_UPDATE_FOR_AEXP : '\\initializeParametricSkolemUpdateForAExp' ;
     INITIALIZE_PARAMETRIC_SKOLEM_PATH_CONDITION : '\\initializeParametricSkolemPathCondition' ;
     PREFIX_CONTAINS_ELEMENT : '\\prefixContainsElement' ;
     INSTANTIATE_VARS_FRESH : '\\instantiateVarsFresh' ;
@@ -250,12 +252,8 @@ lexer grammar KeYLexer;
     FRESHFOR : '\\freshFor';
     INITIALIZE_EXPRESSION : '\\initializeExpression';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
-	ABSTR_UPDATES_INDEPENDENT : '\\abstrUpdatesIndependent';
-	APPLY_ABSTR_ON_CONCR_UPDATE : '\\applyAbstrOnConcrUpdate';
-	APPLY_CONCR_ON_ABSTR_UPDATE : '\\applyConcrOnAbstrUpdate';
-	DROP_EFFECTLESS_ABSTRACT_UPDATE_ASSIGNMENTS : '\\dropEffectlessAbstractUpdateAssignments';
-	DROP_EFFECTLESS_ABSTRACT_UPDATE : '\\dropEffectlessAbstractUpdate';
-	CAN_UNIFY_ABSTR_UPD_LHS_FOR_TARGETS : '\\canUnifyAbstrUpdLHSForTargets';
+	APPLY_ON_ABSTRACT_UPDATE : '\\applyOnAbstractUpdate' ;
+	ABSTRACT_UPDATE_TO_ELEMENTARY_UPDATES : '\\abstractUpdateToElementaryUpdates' ;
 	DROP_EFFECTLESS_ELEMENTARIES : '\\dropEffectlessElementaries';
 	DROP_EFFECTLESS_STORES : '\\dropEffectlessStores';
 	ABSTRACT_UPDATE : '\\abstractUpdate';
@@ -321,6 +319,11 @@ lexer grammar KeYLexer;
 	KEYSETTINGS : '\\settings';
         PROFILE : '\\profile';
 
+    // special keyword for use in locset terms
+    PV : '\\pv' ;
+    HAS_TO : '\\hasTo' ;
+    FUN : '\\fun' ;
+    VALUE : '\\value' ;
         // Those guys can stay being keywords
 	TRUE : 'true';
 	FALSE : 'false';
@@ -351,6 +354,7 @@ lexer grammar KeYLexer;
 	FUNCTIONS : '\\functions';
 	TRANSFORMERS : '\\transformers';
 	UNIQUE : '\\unique';
+	NONRIGID : '\\nonRigid';
 
 	RULES : '\\rules';
 	AXIOMS : '\\axioms';
@@ -407,6 +411,10 @@ COLON
 
 DOUBLECOLON
 :    '::'
+  ;
+  
+ABSTR_UPD
+:    'U_' ( LETTER | DIGIT ) ( LETTER | DIGIT | '_' ) *
   ;
 
 ASSIGN

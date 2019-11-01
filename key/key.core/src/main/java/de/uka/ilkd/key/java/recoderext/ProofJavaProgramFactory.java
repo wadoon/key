@@ -407,9 +407,14 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         return new LoopScopeBlock();
     }
     
-    public AbstractPlaceholderStatement createAbstractPlaceholderStatement() {
-        return new AbstractPlaceholderStatement();
+    public AbstractStatement createAbstractPlaceholderStatement() {
+        return new AbstractStatement();
     }
+    
+    public AbstractExpression createAbstractExpression() {
+        return new AbstractExpression();
+    }
+    
     public MergePointStatement createMergePointStatement() {
         return new MergePointStatement();
     }

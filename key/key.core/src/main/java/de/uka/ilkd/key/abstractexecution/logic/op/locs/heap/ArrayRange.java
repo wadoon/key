@@ -12,25 +12,22 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs.heap;
 
-import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * @author Dominic Steinhoefel
  *
  */
-public class ArrayRange extends HeapLocLHS implements HeapLocRHS {
+public class ArrayRange extends HeapLoc {
     final Term array;
     final Term left;
     final Term right;
@@ -51,26 +48,13 @@ public class ArrayRange extends HeapLocLHS implements HeapLocRHS {
     }
 
     @Override
-    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
-            Services services) {
-        /*
-         * (NOTE, 2019-05-24): Is that the right thing to do (not replacing anything in
-         * left and right)?
-         */
-        return new ArrayRange(GenericTermReplacer.replace(array,
-                t -> t.op() instanceof ProgramVariable && replMap.containsKey(t.op()),
-                t -> services.getTermBuilder().var(replMap.get((ProgramVariable) t.op())),
-                services), left, right);
-    }
-
-    @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        if (otherLoc instanceof AllFieldsLocRHS) {
-            return ((AllFieldsLocRHS) otherLoc).getArray().equals(array);
+        if (otherLoc instanceof AllFieldsLocLHS) {
+            return ((AllFieldsLocLHS) otherLoc).getArray().equals(array);
         } else if (otherLoc instanceof PVLoc) {
             return ((PVLoc) otherLoc).getVar()
                     .equals(services.getTypeConverter().getHeapLDT().getHeap());
-        } else if (otherLoc instanceof ArrayLocRHS || otherLoc instanceof ArrayRange) {
+        } else if (otherLoc instanceof ArrayLoc || otherLoc instanceof ArrayRange) {
             super.mayAssign(otherLoc, services);
         }
 
@@ -86,6 +70,14 @@ public class ArrayRange extends HeapLocLHS implements HeapLocRHS {
     @Override
     public String toString() {
         return String.format("%s[%s..%s]", array, left, right);
+    }
+
+    @Override
+    public Sort sort() {
+        /*
+         * TODO (DS, 2019-10-30): Should be possible to return sort of array elements.
+         */
+        throw new UnsupportedOperationException();
     }
 
 }
