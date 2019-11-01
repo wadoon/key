@@ -185,7 +185,7 @@ public class AbstractExecutionContractUtils {
          * namespaces such that we choose the contract for which the locals are known.
          * We could also make the contracts goal-local somehow. Option (1) is the
          * ugliest which also might fail, but the other ones require more actions or
-         * passing through more parameters wo this method.
+         * passing through more parameters to this method.
          *
          * Below, there is a quick implementation of method (1).
          */
@@ -311,12 +311,12 @@ public class AbstractExecutionContractUtils {
                     final AbstractProgramElement abstrStmt, final MatchConditions matchCond,
                     final Services services, Optional<ExecutionContext> executionContext) {
         final Set<LocationVariable> surroundingVars = new LinkedHashSet<>();
-        final ProgramVariableCollector pvc = //
-                new ProgramVariableCollector(
-                        matchCond.getInstantiations().getContextInstantiation().contextProgram(),
-                        services);
-        pvc.start();
-        surroundingVars.addAll(pvc.result());
+//        final ProgramVariableCollector pvc = //
+//                new ProgramVariableCollector(
+//                        matchCond.getInstantiations().getContextInstantiation().contextProgram(),
+//                        services);
+//        pvc.start();
+//        surroundingVars.addAll(pvc.result());
         matchCond.getMaybeSeqFor().ifPresent(sf -> {
             /*
              * NOTE (DS, 2019-01-30): Here, we just could use a TermProgramVariableCollector
@@ -329,8 +329,8 @@ public class AbstractExecutionContractUtils {
             final Set<LocationVariable> result = opColl.ops().stream()
                     .filter(op -> op instanceof LocationVariable).map(LocationVariable.class::cast)
                     .collect(Collectors.toSet());
-            surroundingVars.removeIf(
-                    lv1 -> result.stream().anyMatch(lv2 -> lv1.toString().equals(lv2.toString())));
+//            surroundingVars.removeIf(
+//                    lv1 -> result.stream().anyMatch(lv2 -> lv1.toString().equals(lv2.toString())));
             surroundingVars.addAll(result);
         });
 

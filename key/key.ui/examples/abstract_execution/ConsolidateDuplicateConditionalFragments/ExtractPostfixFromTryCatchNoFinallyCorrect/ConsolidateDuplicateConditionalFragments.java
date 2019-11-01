@@ -20,14 +20,29 @@
  * the intended meaning, interestingly that actually complicates the
  * refactoring, finally blocks are even executed after returns.
  * 
+ * <p>
  * Discovered: We have to forbid Postfix to throw an exception; otherwise, the
  * additional effects of CatchProg prevent closing the goal.
+ * 
+ * <p>
+ * The assumption that TryProg does not change the heap is only needed for
+ * proving well-formedness of the heap etc. after "application" of the assume
+ * statements in the catch clauses, which are realized as Block Contracts.
+ * Alternatively, we could get that assumptions from elsewhere, like from the AE
+ * rules. It would anyway make sense that legal instantiations leave the heap
+ * well-formed. Disjointness from "this" should be natural, we need it for the
+ * same proof obligations for technical reasons.
  *
  * @author Dominic Steinhoefel
  */
 public class ConsolidateDuplicateConditionalFragments {
     //@ declares \dl_args;
     public Object before(Object res) {
+        /*@ assume \disjoint(\dl_heap, \dl_frameTryProg) &&
+          @        \disjoint(this, \dl_frameTryProg);
+          @*/
+        { ; }
+        
         try {
             //@ assignable \dl_frameTryProg;
             //@ accessible \dl_footprintTryProg;
@@ -39,7 +54,9 @@ public class ConsolidateDuplicateConditionalFragments {
             \abstract_statement Postfix;
         }
         catch (Throwable t) {
-            //@ assume \disjoint(t, \dl_footprintCatchProg);
+            /*@ assume \disjoint(t, \dl_footprintCatchProg) &&
+              @        \disjoint(t, \dl_footprintPostfixProg);
+              @*/
             { ; }
             
             //@ assignable \dl_frameCatchProg;
@@ -57,13 +74,20 @@ public class ConsolidateDuplicateConditionalFragments {
 
     //@ declares \dl_args;
     public Object after(Object res) {
+        /*@ assume \disjoint(\dl_heap, \dl_frameTryProg) &&
+          @        \disjoint(this, \dl_frameTryProg);
+          @*/
+        { ; }
+        
         try {
             //@ assignable \dl_frameTryProg;
             //@ accessible \dl_footprintTryProg;
             \abstract_statement TryProg;
         }
         catch (Throwable t) {
-            //@ assume \disjoint(t, \dl_footprintCatchProg);
+            /*@ assume \disjoint(t, \dl_footprintCatchProg) &&
+              @        \disjoint(t, \dl_footprintPostfixProg);
+              @*/
             { ; }
             
             //@ assignable \dl_frameCatchProg;
