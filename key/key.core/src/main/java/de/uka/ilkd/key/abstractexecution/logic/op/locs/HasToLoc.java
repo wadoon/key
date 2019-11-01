@@ -78,4 +78,9 @@ public class HasToLoc<L extends AbstractUpdateLoc> implements AbstractUpdateLoc 
     public Sort sort() {
         return child.sort();
     }
+    
+    @Override
+    public boolean isAbstract() {
+        return child.isAbstract();
+    }
 }

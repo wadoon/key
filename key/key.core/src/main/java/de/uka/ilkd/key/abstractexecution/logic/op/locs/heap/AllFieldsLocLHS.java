@@ -93,4 +93,9 @@ public class AllFieldsLocLHS extends HeapLoc {
          */
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public boolean isAbstract() {
+        return true;
+    }
 }

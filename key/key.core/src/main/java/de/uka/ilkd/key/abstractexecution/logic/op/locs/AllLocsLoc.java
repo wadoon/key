@@ -68,4 +68,9 @@ public class AllLocsLoc implements AbstractUpdateLoc {
     public Sort sort() {
         return allLocs.sort();
     }
+
+    @Override
+    public boolean isAbstract() {
+        return true;
+    }
 }

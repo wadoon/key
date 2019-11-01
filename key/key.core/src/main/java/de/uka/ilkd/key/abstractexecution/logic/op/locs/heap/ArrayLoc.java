@@ -107,4 +107,9 @@ public class ArrayLoc extends HeapLoc {
          */
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public boolean isAbstract() {
+        return false;
+    }
 }

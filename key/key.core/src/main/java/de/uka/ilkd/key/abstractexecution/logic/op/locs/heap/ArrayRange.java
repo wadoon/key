@@ -80,4 +80,9 @@ public class ArrayRange extends HeapLoc {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean isAbstract() {
+        return true;
+    }
+
 }

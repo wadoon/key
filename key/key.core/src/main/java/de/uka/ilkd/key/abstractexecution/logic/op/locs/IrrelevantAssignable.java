@@ -77,4 +77,9 @@ public class IrrelevantAssignable implements AbstractUpdateLoc {
         return "_";
     }
 
+    @Override
+    public boolean isAbstract() {
+        return false;
+    }
+
 }

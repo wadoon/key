@@ -67,4 +67,9 @@ public class EmptyLoc implements AbstractUpdateLoc {
     public Sort sort() {
         return emptyLocSet.sort();
     }
+
+    @Override
+    public boolean isAbstract() {
+        return false;
+    }
 }

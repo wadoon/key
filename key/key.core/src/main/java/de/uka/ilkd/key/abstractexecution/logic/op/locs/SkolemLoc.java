@@ -70,4 +70,9 @@ public class SkolemLoc implements AbstractUpdateLoc {
     public Sort sort() {
         return skLoc.sort();
     }
+
+    @Override
+    public boolean isAbstract() {
+        return true;
+    }
 }

@@ -18,7 +18,6 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
@@ -93,8 +92,7 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
         final TermAccessibleLocationsCollector targetOpColl = //
                 new TermAccessibleLocationsCollector(services);
         target.execPostOrder(targetOpColl);
-        final Predicate<? super AbstractUpdateLoc> interestingLoc = //
-                loc -> !(loc instanceof PVLoc || loc instanceof EmptyLoc);
+        final Predicate<? super AbstractUpdateLoc> interestingLoc = AbstractUpdateLoc::isAbstract;
         if (targetOpColl.locations().stream().anyMatch(interestingLoc)) {
             return true;
         }

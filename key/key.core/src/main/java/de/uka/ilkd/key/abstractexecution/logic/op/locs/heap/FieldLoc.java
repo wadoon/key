@@ -125,4 +125,9 @@ public class FieldLoc extends HeapLoc {
         return sort;
     }
 
+    @Override
+    public boolean isAbstract() {
+        return false;
+    }
+
 }

@@ -37,11 +37,11 @@ public interface AbstractUpdateLoc extends Sorted {
     Set<Operator> childOps();
 
     /**
-     * Evaluates whether this {@link AbstractUpdateLoc} may assign otherLoc.
-     * This is the case, for instance, if this {@link AbstractUpdateLoc} is a
-     * {@link PVLoc} assigning the program variable of otherLoc which is also a
-     * {@link PVLoc}; but also, if otherLoc is an {@link ArrayLoc} for array A
-     * and this {@link AbstractUpdateLoc} is an {@link AllFieldsLocLHS} for A.
+     * Evaluates whether this {@link AbstractUpdateLoc} may assign otherLoc. This is
+     * the case, for instance, if this {@link AbstractUpdateLoc} is a {@link PVLoc}
+     * assigning the program variable of otherLoc which is also a {@link PVLoc}; but
+     * also, if otherLoc is an {@link ArrayLoc} for array A and this
+     * {@link AbstractUpdateLoc} is an {@link AllFieldsLocLHS} for A.
      *
      * XXX (DS, 2019-10-28): Have to make the semantics of this more precise. What
      * about a program variable that may assign (part of) an abstract Skolem
@@ -60,4 +60,15 @@ public interface AbstractUpdateLoc extends Sorted {
      * @return A LocSet term corresponding to this location.
      */
     Term toTerm(Services services);
+
+    /**
+     * Some {@link AbstractUpdateLoc}s are not really abstract, e.g., FieldLocs,
+     * PVLocs, EmptyLocs. For those, this method return false. For location that
+     * describe more than one concrete element, like SkolemLocs or AlllFieldsLocs,
+     * it returns true.
+     * 
+     * @return true iff this location describes a non-trivial set of concrete
+     *         locations.
+     */
+    boolean isAbstract();
 }

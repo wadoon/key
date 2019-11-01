@@ -77,4 +77,9 @@ public class PVLoc implements AbstractUpdateLoc {
     public Sort sort() {
         return locVar.sort();
     }
+
+    @Override
+    public boolean isAbstract() {
+        return false;
+    }
 }
