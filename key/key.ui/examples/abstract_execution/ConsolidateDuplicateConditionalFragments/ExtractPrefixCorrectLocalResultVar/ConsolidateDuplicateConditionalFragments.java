@@ -15,6 +15,11 @@
  * A model of a variant of the "consolidate duplicate conditional fragments"
  * refactoring by M. Fowler. Note that this refactoring is *not* correct without
  * the additional specifications, since P might access the variable b.
+ * 
+ * <p>
+ * P either hasTo set res, or must not do so. Having it as maybe does not work.
+ * Note that since both directions work, maybe also works theoretically, but we
+ * don't have proof rules for such case distinctions (currently).
  *
  * @author Dominic Steinhoefel
  */
@@ -25,6 +30,7 @@ public class ConsolidateDuplicateConditionalFragments {
         /*@ assume \disjoint(\dl_frameE, \dl_footprintP) &&
           @        \disjoint(\dl_frameP, \dl_footprintE) &&
           @        \disjoint(\dl_frameP, \dl_frameE) &&
+          @        \disjoint(\dl_frameE, res) &&
           @        \disjoint(\dl_footprintE, res) &&
           @        \disjoint(\dl_footprintP, res) &&
           @        \disjoint(\dl_footprintQ1, res) &&
@@ -38,21 +44,21 @@ public class ConsolidateDuplicateConditionalFragments {
             //@ exceptional_behavior requires false;
             \abstract_expression e
         ) {
-            //@ assignable \dl_frameP;
+            //@ assignable \dl_frameP, \hasTo(res);
             //@ accessible \dl_footprintP;
             \abstract_statement P;
             
             //@ assignable \dl_frameQ1, \dl_hasTo(res);
-            //@ accessible \dl_footprintQ1;
+            //@ accessible \dl_footprintQ1, res;
             \abstract_statement Q1;
         }
         else {
-            //@ assignable \dl_frameP;
+            //@ assignable \dl_frameP, \hasTo(res);
             //@ accessible \dl_footprintP;
             \abstract_statement P;
             
             //@ assignable \dl_frameQ2, \dl_hasTo(res);
-            //@ accessible \dl_footprintQ2;
+            //@ accessible \dl_footprintQ2, res;
             \abstract_statement Q2;
         }
 
@@ -65,6 +71,7 @@ public class ConsolidateDuplicateConditionalFragments {
         /*@ assume \disjoint(\dl_frameE, \dl_footprintP) &&
           @        \disjoint(\dl_frameP, \dl_footprintE) &&
           @        \disjoint(\dl_frameP, \dl_frameE) &&
+          @        \disjoint(\dl_frameE, res) &&
           @        \disjoint(\dl_footprintE, res) &&
           @        \disjoint(\dl_footprintP, res) &&
           @        \disjoint(\dl_footprintQ1, res) &&
@@ -72,7 +79,7 @@ public class ConsolidateDuplicateConditionalFragments {
           @*/
         { ; }
       
-        //@ assignable \dl_frameP;
+        //@ assignable \dl_frameP, \hasTo(res);
         //@ accessible \dl_footprintP;
         \abstract_statement P;
         
@@ -83,12 +90,12 @@ public class ConsolidateDuplicateConditionalFragments {
             \abstract_expression e
         ) {
             //@ assignable \dl_frameQ1, \dl_hasTo(res);
-            //@ accessible \dl_footprintQ1;
+            //@ accessible \dl_footprintQ1, res;
             \abstract_statement Q1;
         }
         else {
             //@ assignable \dl_frameQ2, \dl_hasTo(res);
-            //@ accessible \dl_footprintQ2;
+            //@ accessible \dl_footprintQ2, res;
             \abstract_statement Q2;
         }
 

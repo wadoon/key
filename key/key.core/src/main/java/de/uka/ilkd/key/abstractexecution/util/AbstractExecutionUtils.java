@@ -405,6 +405,9 @@ public class AbstractExecutionUtils {
             relevantLocsCopy.removeIf(
                     ploc -> AbstractExecutionUtils.locIsCreatedFresh(ploc, goal, services));
         }
+        
+        relevantLocsCopy.removeIf(IrrelevantAssignable.class::isInstance);
+        relevantLocsCopy.removeIf(EmptyLoc.class::isInstance);
 
         // loc has to be disjoint from *all* relevant locations.
         for (final AbstractUpdateLoc relevantLoc : relevantLocsCopy) {
