@@ -32,6 +32,14 @@
  * rules. It would anyway make sense that legal instantiations leave the heap
  * well-formed. Disjointness from "this" should be natural, we need it for the
  * same proof obligations for technical reasons.
+ * 
+ * <p>
+ * The example shows how we can deal with locally declared variables (that
+ * receive different names in KeY in different methods, which can be very
+ * problematic for our abstract relational proofs): Refer them explicitly
+ * in the footprint and make them disjoint from the remaining footpring.
+ * That way, they can be replaced with a value, which will be the same (the
+ * exception thrown by TryProg) in both branches.
  *
  * @author Dominic Steinhoefel
  */
