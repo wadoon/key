@@ -1,6 +1,6 @@
-example.name = Extract Postfix from Try-Catch Block
+example.name = Extract Prefix
 example.path = Abstract Execution/Consolidate Duplicate Conditional Fragments/
 example.file = consolidateDuplicateConditionalFragments.key
 example.additionalFile.1 = ConsolidateDuplicateConditionalFragments.java
 
-Thhe "Extract Prefix" variant of Martin Fowler's "Consolidate Duplicate Conditional Fragments" refactoring.
+The "Extract Prefix" variant of Martin Fowler's "Consolidate Duplicate Conditional Fragments" refactoring.
