@@ -52,6 +52,11 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
      * @see #toLoopContract()
      */
     private LoopContract loopContract = null;
+    
+    /**
+     * @see #creationTime()
+     */
+    private final long creationTime;
 
     /**
      *
@@ -98,6 +103,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         super(baseName, block, labels, method, modality, preconditions, measuredBy, postconditions,
                 freePostconditions, modifiesClauses, declaresClauses, accessibleClauses,
                 infFlowSpecs, variables, transactionApplicable, hasMod, functionalContracts);
+        
+        this.creationTime = System.currentTimeMillis();
     }
 
     /**
@@ -111,6 +118,11 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
     public static BlockContract combine(ImmutableSet<BlockContract> contracts, Services services) {
         return new Combinator(contracts.toArray(new BlockContract[contracts.size()]), services)
                 .combine();
+    }
+    
+    @Override
+    public long creationTime() {
+        return creationTime;
     }
 
     /**

@@ -41,6 +41,15 @@ import de.uka.ilkd.key.util.InfFlowSpec;
  * @author wacker, lanzinger
  */
 public interface BlockContract extends AuxiliaryContract {
+    
+    /**
+     * This is introduced to find the most recent of a set of
+     * {@link BlockContract}s. Occasionally needed in the presence of many contracts
+     * for one block arising from variable renamings.
+     * 
+     * @return The creation timestamp for this {@link AuxiliaryContract}.
+     */
+    public long creationTime();
 
     /**
     *

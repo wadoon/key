@@ -13,6 +13,7 @@
 package de.uka.ilkd.key.abstractexecution.util;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -175,6 +176,8 @@ public class AbstractExecutionContractUtils {
     public static BlockContract findRightContract(final List<BlockContract> contracts,
             final Set<LocationVariable> surroundingVars, final LocationVariable heap,
             Services services) {
+        assert contracts != null && !contracts.isEmpty();
+
         /*
          * TODO (DS, 2018-12-21): Choose the right contract! There is probably a
          * contract from the other branch with wrong renamings. We somehow have to find
@@ -190,26 +193,78 @@ public class AbstractExecutionContractUtils {
          * Below, there is a quick implementation of method (1).
          */
 
-        BlockContract contract = null;
-        if (contracts.size() > 1) {
-            int varsNotInContext = Integer.MAX_VALUE;
-            for (BlockContract bc : contracts) {
-                final OpCollector opColl = new OpCollector();
-                bc.getAccessibleClause(heap).execPostOrder(opColl);
-                bc.getAssignable(heap).execPostOrder(opColl);
-                final int currVarsNotInContext = (int) opColl.ops().stream()
-                        .filter(op -> op instanceof LocationVariable)
-                        .map(LocationVariable.class::cast)
-                        .filter(pv -> !surroundingVars.contains(pv)).count();
-                if (currVarsNotInContext < varsNotInContext) {
-                    varsNotInContext = currVarsNotInContext;
-                    contract = bc;
+        /*
+         * Sort such that a contract with more variables in common comes first, and if
+         * two contracts have the same number of variables in common, than the newer
+         * contract comes first.
+         */
+        contracts.sort(new Comparator<BlockContract>() {
+            @Override
+            public int compare(BlockContract c1, BlockContract c2) {
+                final int sharedVarsDiff = numSharedVars(surroundingVars, c2, services)
+                        - numSharedVars(surroundingVars, c1, services);
+                // c1 is smaller if sharing *more* variables
+                if (sharedVarsDiff < 0) {
+                    return -1;
+                } else if (sharedVarsDiff > 0) {
+                    return 1;
                 }
+
+                assert sharedVarsDiff == 0;
+
+                final int varsNotSharedDiff = numOfVarsNotInCommon(surroundingVars, c1, services)
+                        - numOfVarsNotInCommon(surroundingVars, c2, services);
+                // c1 is smaller if it has a lower number of variables not in common
+                if (varsNotSharedDiff < 0) {
+                    return -1;
+                } else if (varsNotSharedDiff > 0) {
+                    return 1;
+                }
+
+                assert varsNotSharedDiff == 0;
+
+                // c1 is smaller if newer
+                return Math.round(Math.signum(c2.creationTime() - c1.creationTime()));
             }
-        } else {
-            contract = contracts.iterator().next();
-        }
-        return contract;
+
+        });
+
+        return contracts.get(0);
+    }
+
+    /**
+     * Calculates the number of variables shared by the given contract with the
+     * given set of variables.
+     * 
+     * @param varsToCheck The variables to check.
+     * @param contract    The contract.
+     * @param services    The {@link Services} object (for the variable collector).
+     * @return The number of shared variables.
+     */
+    private static int numSharedVars(final Set<LocationVariable> varsToCheck,
+            BlockContract contract, Services services) {
+        final ProgramVariableCollector pvColl = //
+                new ProgramVariableCollector(contract.getBlock(), services);
+        pvColl.performActionOnBlockContract(contract);
+        return (int) pvColl.result().stream().filter(varsToCheck::contains).count();
+    }
+
+    /**
+     * Calculates the number of variables which the given contract has not in common
+     * with the given set of variables.
+     * 
+     * @param varsToCheck The variables to check.
+     * @param contract    The contract.
+     * @param services    The {@link Services} object (for the variable collector).
+     * @return The number of shared variables.
+     */
+    private static int numOfVarsNotInCommon(final Set<LocationVariable> varsToCheck,
+            BlockContract contract, Services services) {
+        final ProgramVariableCollector pvColl = //
+                new ProgramVariableCollector(contract.getBlock(), services);
+        pvColl.performActionOnBlockContract(contract);
+        return (int) pvColl.result().stream().filter(pv -> !varsToCheck.contains(pv)).count()
+                + (int) varsToCheck.stream().filter(pv -> !pvColl.result().contains(pv)).count();
     }
 
     /**
@@ -311,12 +366,23 @@ public class AbstractExecutionContractUtils {
                     final AbstractProgramElement abstrStmt, final MatchConditions matchCond,
                     final Services services, Optional<ExecutionContext> executionContext) {
         final Set<LocationVariable> surroundingVars = new LinkedHashSet<>();
-        final ProgramVariableCollector pvc = //
-                new ProgramVariableCollector(
-                        matchCond.getInstantiations().getContextInstantiation().contextProgram(),
-                        services);
-        pvc.start();
-        surroundingVars.addAll(pvc.result());
+        /*
+         * NOTE (DS, 2019-11-04): Considering the program proved to be a bad idea, since
+         * then, all block contracts (also the "wrong" ones) of APSs will be considered,
+         * leading to a wrong result. The sequent is more reliable.
+         */
+        /*
+         * NOTE (DS, 2019-11-04): We could circumvent all these hacks with Goal-local
+         * contracts, which is not possible though currently, since, e.g., in
+         * VariableConditions, the Goal is not available, and AE rules are implemented
+         * as Taclets.
+         */
+//        final ProgramVariableCollector pvc = //
+//                new ProgramVariableCollector(
+//                        matchCond.getInstantiations().getContextInstantiation().contextProgram(),
+//                        services);
+//        pvc.start();
+//        surroundingVars.addAll(pvc.result());
         matchCond.getMaybeSeqFor().ifPresent(sf -> {
             /*
              * NOTE (DS, 2019-01-30): Here, we just could use a TermProgramVariableCollector
@@ -327,10 +393,10 @@ public class AbstractExecutionContractUtils {
             final OpCollector opColl = new OpCollector();
             sf.formula().execPostOrder(opColl);
             final Set<LocationVariable> result = opColl.ops().stream()
-                    .filter(op -> op instanceof LocationVariable).map(LocationVariable.class::cast)
+                    .filter(LocationVariable.class::isInstance).map(LocationVariable.class::cast)
                     .collect(Collectors.toSet());
-            surroundingVars.removeIf(
-                    lv1 -> result.stream().anyMatch(lv2 -> lv1.toString().equals(lv2.toString())));
+//            surroundingVars.removeIf(
+//                    lv1 -> result.stream().anyMatch(lv2 -> lv1.toString().equals(lv2.toString())));
             surroundingVars.addAll(result);
         });
 

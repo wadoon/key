@@ -670,68 +670,84 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         } else if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
+        
         AbstractAuxiliaryContractImpl other = (AbstractAuxiliaryContractImpl) obj;
-        if ((block == null && other.block != null)
-                || (block != null && !block.equals(other.block))) {
+        
+        if (checkUnequal(block, other.block)) {
             return false;
-        } else if ((hasMod == null && other.hasMod != null)
-                || (hasMod != null && !hasMod.equals(other.hasMod))) {
+        } else if (checkUnequal(accessibleClauses, other.accessibleClauses)) {
             return false;
-        } else if ((infFlowSpecs == null && other.infFlowSpecs != null)
-                || (infFlowSpecs != null && !infFlowSpecs.equals(other.infFlowSpecs))) {
+        } else if (checkUnequal(declaresClauses, other.declaresClauses)) {
             return false;
-        } else if ((instantiationSelf == null && other.instantiationSelf != null)
-                || (instantiationSelf != null
-                        && !instantiationSelf.equals(other.instantiationSelf))) {
+        } else if (checkUnequal(freePostconditions, other.freePostconditions)) {
             return false;
-        } else if ((labels == null && other.labels != null)
-                || (labels != null && !labels.equals(other.labels))) {
+        } else if (checkUnequal(hasMod, other.hasMod)) {
             return false;
-        } else if ((method == null && other.method != null)
-                || (method != null && !method.equals(other.method))) {
+        } else if (checkUnequal(infFlowSpecs, other.infFlowSpecs)) {
             return false;
-        } else if ((modality == null && other.modality != null)
-                || (modality != null && !modality.equals(other.modality))) {
+        } else if (checkUnequal(instantiationSelf, other.instantiationSelf)) {
             return false;
-        } else if ((modifiesClauses == null && other.modifiesClauses != null)
-                || (modifiesClauses != null && !modifiesClauses.equals(other.modifiesClauses))) {
+        } else if (checkUnequal(labels, other.labels)) {
             return false;
-        } else if ((declaresClauses == null && other.declaresClauses != null)
-                || (declaresClauses != null
-                        && !declaresClauses.equals(other.declaresClauses))) {
+        } else if (checkUnequal(measuredBy, other.measuredBy)) {
             return false;
-        } else if ((postconditions == null && other.postconditions != null)
-                || (postconditions != null && !postconditions.equals(other.postconditions))) {
+        } else if (checkUnequal(method, other.method)) {
             return false;
-        } else if ((preconditions == null && other.preconditions != null)
-                || (preconditions != null && !preconditions.equals(other.preconditions))) {
+        } else if (checkUnequal(modality, other.modality)) {
             return false;
-        } else if (transactionApplicable != other.transactionApplicable) {
+        } else if (checkUnequal(modifiesClauses, other.modifiesClauses)) {
             return false;
-        } else if ((variables == null && other.variables != null)
-                || (variables != null && !variables.equals(other.variables))) {
+        } else if (checkUnequal(postconditions, other.postconditions)) {
+            return false;
+        } else if (checkUnequal(preconditions, other.preconditions)) {
+            return false;
+        } else if (checkUnequal(transactionApplicable, other.transactionApplicable)) {
+            return false;
+        } else if (checkUnequal(variables, other.variables)) {
             return false;
         }
+
         return true;
+    }
+    
+    /**
+     * Returns true iff thisVal and otherVal are <em>not</em> equal. Also works for
+     * null values.
+     * 
+     * @param thisVal  The first value.
+     * @param otherVal The second Value.
+     * @return true iff thisVal and otherVal are not equal.
+     */
+    private static <A> boolean checkUnequal(A thisVal, A otherVal) {
+        return (thisVal == null && otherVal != null)
+                || (thisVal != null && !thisVal.equals(otherVal));
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((block == null) ? 0 : block.hashCode());
-        result = prime * result + ((hasMod == null) ? 0 : hasMod.hashCode());
-        result = prime * result + ((infFlowSpecs == null) ? 0 : infFlowSpecs.hashCode());
-        result = prime * result + ((instantiationSelf == null) ? 0 : instantiationSelf.hashCode());
-        result = prime * result + ((labels == null) ? 0 : labels.hashCode());
-        result = prime * result + ((method == null) ? 0 : method.hashCode());
-        result = prime * result + ((modality == null) ? 0 : modality.hashCode());
-        result = prime * result + ((modifiesClauses == null) ? 0 : modifiesClauses.hashCode());
-        result = prime * result + ((postconditions == null) ? 0 : postconditions.hashCode());
-        result = prime * result + ((preconditions == null) ? 0 : preconditions.hashCode());
-        result = prime * result + (transactionApplicable ? 1231 : 1237);
-        result = prime * result + ((variables == null) ? 0 : variables.hashCode());
+        result = prime * result + getHash(block);
+        result = prime * result + getHash(accessibleClauses);
+        result = prime * result + getHash(declaresClauses);
+        result = prime * result + getHash(freePostconditions);
+        result = prime * result + getHash(hasMod);
+        result = prime * result + getHash(infFlowSpecs);
+        result = prime * result + getHash(instantiationSelf);
+        result = prime * result + getHash(labels);
+        result = prime * result + getHash(measuredBy);
+        result = prime * result + getHash(method);
+        result = prime * result + getHash(modality);
+        result = prime * result + getHash(modifiesClauses);
+        result = prime * result + getHash(postconditions);
+        result = prime * result + getHash(preconditions);
+        result = prime * result + getHash(variables);
+        result = prime * result + getHash(transactionApplicable);
         return result;
+    }
+    
+    private static <A> int getHash(A a) {
+        return a == null ? 0 : a.hashCode();
     }
 
     @Override

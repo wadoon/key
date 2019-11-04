@@ -72,7 +72,7 @@ public class ConsolidateDuplicateConditionalFragments {
         try {
             //@ assignable \dl_frameTryProg;
             //@ return_behavior requires false;
-            { \abstract_statement TryProg; }
+            \abstract_statement TryProg;
         }
         catch (Throwable t) {
             /*@ assume \disjoint(t, \dl_footprintCatchProg) &&
