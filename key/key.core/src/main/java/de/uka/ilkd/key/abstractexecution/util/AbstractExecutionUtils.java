@@ -320,7 +320,8 @@ public class AbstractExecutionUtils {
             return false;
         }
 
-        return locVar.getPositionInfo() == PositionInfo.UNDEFINED;
+        return locVar.getPositionInfo() == PositionInfo.UNDEFINED
+                || !locVar.getPositionInfo().startEndValid();
     }
 
     /**
@@ -413,6 +414,7 @@ public class AbstractExecutionUtils {
         for (final AbstractUpdateLoc relevantLoc : relevantLocsCopy) {
             if ((relevantLoc instanceof AllLocsLoc || relevantLoc instanceof SkolemLoc)
                     && AbstractExecutionUtils.locIsCreatedFresh(locUnwrapped, goal, services)) {
+                System.err.println("DEBUG: Classifying PV " + locUnwrapped + " as fresh.");
                 continue;
             }
 

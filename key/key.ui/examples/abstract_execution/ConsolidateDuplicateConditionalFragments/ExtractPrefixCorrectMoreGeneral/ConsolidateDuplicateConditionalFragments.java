@@ -22,7 +22,8 @@ public class ConsolidateDuplicateConditionalFragments {
     public Object before(Object result) {
         /*@ assume \disjoint(\dl_frameE, \dl_footprintP) &&
           @        \disjoint(\dl_frameP, \dl_footprintE) &&
-          @        \disjoint(\dl_frameP, \dl_frameE);
+          @        \disjoint(\dl_frameP, \dl_frameE) &&
+          @        \disjoint(\dl_frameE, \dl_relevant);
           @*/
         { ; }
         
@@ -35,12 +36,18 @@ public class ConsolidateDuplicateConditionalFragments {
             //@ assignable \dl_frameP;
             //@ accessible \dl_footprintP;
             \abstract_statement P;
+            
+            //@ assignable \dl_frameQ1;
+            //@ accessible \dl_footprintQ1;
             \abstract_statement Q1;
         }
         else {
             //@ assignable \dl_frameP;
             //@ accessible \dl_footprintP;
             \abstract_statement P;
+            
+            //@ assignable \dl_frameQ2;
+            //@ accessible \dl_footprintQ2;
             \abstract_statement Q2;
         }
 
@@ -50,7 +57,8 @@ public class ConsolidateDuplicateConditionalFragments {
     public Object after(Object result) {
         /*@ assume \disjoint(\dl_frameE, \dl_footprintP) &&
           @        \disjoint(\dl_frameP, \dl_footprintE) &&
-          @        \disjoint(\dl_frameP, \dl_frameE);
+          @        \disjoint(\dl_frameP, \dl_frameE) &&
+          @        \disjoint(\dl_frameE, \dl_relevant);
           @*/
         { ; }
       
@@ -64,9 +72,13 @@ public class ConsolidateDuplicateConditionalFragments {
             //@ exceptional_behavior requires false;
             \abstract_expression boolean e
         ) {
+            //@ assignable \dl_frameQ1;
+            //@ accessible \dl_footprintQ1;
             \abstract_statement Q1;
         }
         else {
+            //@ assignable \dl_frameQ2;
+            //@ accessible \dl_footprintQ2;
             \abstract_statement Q2;
         }
 
