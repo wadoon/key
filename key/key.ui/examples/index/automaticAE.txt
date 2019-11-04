@@ -145,6 +145,18 @@ group abstract_updates {
   provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest15.key
 }
 
+group aepaper_provable {
+   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfix/consolidateDuplicateConditionalFragmentsPostfix.key
+   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchCorrect/consolidateDuplicateConditionalFragments.key
+   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchNoFinallyCorrect/consolidateDuplicateConditionalFragments.key
+   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrect/consolidateDuplicateConditionalFragments.key
+   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrectLocalResultVar/consolidateDuplicateConditionalFragments.key
+}
+
+group aepaper_notprovable {
+   notprovable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixIncorrect/consolidateDuplicateConditionalFragments.key
+}
+
 // TODO (DS, 2019-10-31): Update Refactoring Examples!
 
 /*

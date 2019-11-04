@@ -14,7 +14,7 @@
 /**
  * A model of a variant of the "consolidate duplicate conditional fragments"
  * refactoring by M. Fowler. Note that this refactoring is *not* correct without
- * the additional specifications, since P might access the variable b.
+ * the additional specifications, since P might access the if guard (AExp e).
  *
  * @author Dominic Steinhoefel
  */
