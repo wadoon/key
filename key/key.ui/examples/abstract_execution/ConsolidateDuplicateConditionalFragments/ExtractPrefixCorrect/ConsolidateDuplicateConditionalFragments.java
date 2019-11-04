@@ -30,7 +30,7 @@ public class ConsolidateDuplicateConditionalFragments {
             //@ assignable \dl_frameE;
             //@ accessible \dl_footprintE;
             //@ exceptional_behavior requires false;
-            \abstract_expression e
+            \abstract_expression boolean e
         ) {
             //@ assignable \dl_frameP;
             //@ accessible \dl_footprintP;
@@ -62,7 +62,7 @@ public class ConsolidateDuplicateConditionalFragments {
             //@ assignable \dl_frameE;
             //@ accessible \dl_footprintE;
             //@ exceptional_behavior requires false;
-            \abstract_expression e
+            \abstract_expression boolean e
         ) {
             \abstract_statement Q1;
         }

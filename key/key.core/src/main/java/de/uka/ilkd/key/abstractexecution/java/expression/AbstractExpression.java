@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.abstractexecution.java.expression;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import org.key_project.util.ExtList;
 
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
@@ -46,25 +46,16 @@ public class AbstractExpression extends JavaNonTerminalProgramElement
     protected final String id;
     protected final Name name;
     protected final Comment[] comments;
-    protected final Optional<KeYJavaType> maybeKJT;
+    protected final TypeReference typeReference;
 
     private final int hashCode;
 
-    public AbstractExpression(String id) {
-        this.id = id;
-        this.name = new Name(id);
-        this.comments = null;
-        this.hashCode = id.hashCode();
-        this.maybeKJT = Optional.empty();
-    }
-
-    public AbstractExpression(String id, Optional<KeYJavaType> maybeKJT, Comment[] comments,
-            PositionInfo pi) {
+    public AbstractExpression(String id, TypeReference typeReference, Comment[] comments, PositionInfo pi) {
         this.id = id;
         this.name = new Name(id);
         this.comments = comments;
         this.hashCode = id.hashCode();
-        this.maybeKJT = maybeKJT;
+        this.typeReference = typeReference;
     }
 
     public AbstractExpression(ExtList children) {
@@ -73,7 +64,7 @@ public class AbstractExpression extends JavaNonTerminalProgramElement
         this.name = new Name(id);
         comments = children.get(Comment[].class);
         this.hashCode = id.hashCode();
-        this.maybeKJT = Optional.ofNullable(children.get(KeYJavaType.class));
+        this.typeReference = children.get(TypeReference.class);
     }
 
     public String getId() {
@@ -121,22 +112,21 @@ public class AbstractExpression extends JavaNonTerminalProgramElement
 
     @Override
     public String toString() {
-        return "\\abstract_expression " + id;
+        return "\\abstract_expression " + typeReference.toString() + " " + id;
     }
 
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-        // XXX (DS, 2019-10-31): This might fail, e.g. when used as a guard...
-        return maybeKJT.orElse(javaServ.getJavaInfo().getJavaLangObject());
+        return typeReference.getKeYJavaType();
     }
 
     @Override
     public int getChildCount() {
-        return 0;
+        return 1;
     }
 
     @Override
     public ProgramElement getChildAt(int index) {
-        return null;
+        return index == 0 ? typeReference : null;
     }
 }

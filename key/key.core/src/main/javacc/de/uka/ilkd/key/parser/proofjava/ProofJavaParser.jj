@@ -4063,6 +4063,7 @@ AbstractStatement AbstractStatement() :
 AbstractExpression AbstractExpression() :
 {
   AbstractExpression result;
+  TypeReference tr;
   String id = null;
 }
 {
@@ -4071,9 +4072,11 @@ AbstractExpression AbstractExpression() :
     result = factory.createAbstractExpression();
     setPrefixInfo(result);
   }
+  (tr = Type())
   (<IDENTIFIER> { id = token.image; })
   {
     result.setId(id);
+    result.setTypeReference(tr);
     checkConstruction(result);
     return result;
   }

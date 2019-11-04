@@ -19,7 +19,7 @@
  */
 public class ConsolidateDuplicateConditionalFragmentsPostfix {
     public int before(Object result) {
-        if (\abstract_expression e) {
+        if (\abstract_expression boolean e) {
             \abstract_statement Q1;
             \abstract_statement P;
         }
@@ -32,7 +32,7 @@ public class ConsolidateDuplicateConditionalFragmentsPostfix {
     }
 
     public int after(Object result) {
-        if (\abstract_expression e) {
+        if (\abstract_expression boolean e) {
             \abstract_statement Q1;
         }
         else {

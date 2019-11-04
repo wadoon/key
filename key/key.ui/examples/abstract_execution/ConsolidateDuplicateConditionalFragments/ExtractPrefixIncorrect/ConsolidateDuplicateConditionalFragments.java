@@ -19,8 +19,11 @@
  * @author Dominic Steinhoefel
  */
 public class ConsolidateDuplicateConditionalFragments {
-    public Object before(Object result, boolean b) {
-        if (b) {
+    public Object before(Object result) {
+        if (
+            //@ exceptional_behavior requires false;
+            \abstract_expression boolean e
+        ) {
             \abstract_statement P;
             \abstract_statement Q1;
         }
@@ -32,10 +35,13 @@ public class ConsolidateDuplicateConditionalFragments {
         return result;
     }
 
-    public Object after(Object result, boolean b) {
+    public Object after(Object result) {
         \abstract_statement P;
 
-        if (b) {
+        if (
+            //@ exceptional_behavior requires false;
+            \abstract_expression boolean e
+        ) {
             \abstract_statement Q1;
         }
         else {

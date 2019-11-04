@@ -21,6 +21,7 @@ import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.StatementContainer;
 import recoder.java.expression.Assignment;
+import recoder.java.reference.TypeReference;
 
 /**
  * An {@link AbstractExpression} "\abstract_expression e;" represents an
@@ -32,6 +33,8 @@ import recoder.java.expression.Assignment;
 public class AbstractExpression extends JavaNonTerminalProgramElement
         implements Expression, AbstractProgramElement {
     private static final long serialVersionUID = 1L;
+    private TypeReference typeReference;
+
     // NOTE (DS, 2019-10-31): Don't know what I'm doing here...
     private ExpressionContainer expressionContainer = null;
 
@@ -59,6 +62,20 @@ public class AbstractExpression extends JavaNonTerminalProgramElement
         this.id = id;
     }
 
+    /**
+     * @return the typeReference
+     */
+    public TypeReference getTypeReference() {
+        return typeReference;
+    }
+
+    /**
+     * @param typeReference the typeReference to set
+     */
+    public void setTypeReference(TypeReference typeReference) {
+        this.typeReference = typeReference;
+    }
+
     public String getName() {
         return "_abstract " + id;
     }
@@ -80,28 +97,36 @@ public class AbstractExpression extends JavaNonTerminalProgramElement
 
     @Override
     public void setExpressionContainer(ExpressionContainer expressionContainer) {
-        this.expressionContainer = expressionContainer;        
+        this.expressionContainer = expressionContainer;
     }
 
     @Override
-    public ProgramElement getChildAt(int arg0) {
-        // TODO Auto-generated method stub
-        return null;
+    public ProgramElement getChildAt(int i) {
+        if (i == 0) {
+            return typeReference;
+        } else {
+            throw new IndexOutOfBoundsException();
+        }
     }
 
     @Override
     public int getChildCount() {
-        // TODO Auto-generated method stub
-        return 0;
+        return 1;
     }
 
     @Override
     public int getChildPositionCode(ProgramElement pe) {
-        return 0;
+        return typeReference.equals(pe) ? 0 : -1;
     }
 
     @Override
     public boolean replaceChild(ProgramElement pe1, ProgramElement pe2) {
+        if (typeReference.equals(pe1)) {
+            assert pe2 instanceof TypeReference;
+            typeReference = (TypeReference) pe2;
+            return true;
+        }
+
         return false;
     }
 }

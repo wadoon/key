@@ -42,7 +42,7 @@ public class ConsolidateDuplicateConditionalFragments {
             //@ assignable \dl_frameE;
             //@ accessible \dl_footprintE;
             //@ exceptional_behavior requires false;
-            \abstract_expression e
+            \abstract_expression boolean e
         ) {
             //@ assignable \dl_frameP, \hasTo(res);
             //@ accessible \dl_footprintP;
@@ -87,7 +87,7 @@ public class ConsolidateDuplicateConditionalFragments {
             //@ assignable \dl_frameE;
             //@ accessible \dl_footprintE;
             //@ exceptional_behavior requires false;
-            \abstract_expression e
+            \abstract_expression boolean e
         ) {
             //@ assignable \dl_frameQ1, \dl_hasTo(res);
             //@ accessible \dl_footprintQ1, res;
