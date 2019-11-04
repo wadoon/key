@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Optional;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -1095,8 +1096,21 @@ public class Recoder2KeYConverter {
                 comments[i] = convert(aps.getComments().get(i));
             }
         }
+        
+        Optional<KeYJavaType> maybeKJT = Optional.empty();
+        if (aps.getExpressionContainer() != null && aps
+                .getExpressionContainer() instanceof recoder.java.expression.operator.TypeCast) {
+            /*
+             * If there is an explicit type cast in front of the AExpr, legal instantiations
+             * are assumed to be exactly of that type.
+             */
+            final recoder.java.expression.operator.TypeCast typeCast = //
+                    (recoder.java.expression.operator.TypeCast) aps.getExpressionContainer();
+            maybeKJT = Optional.of(
+                    ((TypeReference) callConvert(typeCast.getTypeReference())).getKeYJavaType());
+        }
 
-        return new AbstractExpression(aps.getId(), comments, pi);
+        return new AbstractExpression(aps.getId(), maybeKJT, comments, pi);
     }
     
     public CatchAllStatement convert(

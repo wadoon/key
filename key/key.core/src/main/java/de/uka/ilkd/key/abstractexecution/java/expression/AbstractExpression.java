@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.abstractexecution.java.expression;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.key_project.util.ExtList;
 
@@ -45,6 +46,7 @@ public class AbstractExpression extends JavaNonTerminalProgramElement
     protected final String id;
     protected final Name name;
     protected final Comment[] comments;
+    protected final Optional<KeYJavaType> maybeKJT;
 
     private final int hashCode;
 
@@ -53,13 +55,16 @@ public class AbstractExpression extends JavaNonTerminalProgramElement
         this.name = new Name(id);
         this.comments = null;
         this.hashCode = id.hashCode();
+        this.maybeKJT = Optional.empty();
     }
 
-    public AbstractExpression(String id, Comment[] comments, PositionInfo pi) {
+    public AbstractExpression(String id, Optional<KeYJavaType> maybeKJT, Comment[] comments,
+            PositionInfo pi) {
         this.id = id;
         this.name = new Name(id);
         this.comments = comments;
         this.hashCode = id.hashCode();
+        this.maybeKJT = maybeKJT;
     }
 
     public AbstractExpression(ExtList children) {
@@ -68,6 +73,7 @@ public class AbstractExpression extends JavaNonTerminalProgramElement
         this.name = new Name(id);
         comments = children.get(Comment[].class);
         this.hashCode = id.hashCode();
+        this.maybeKJT = Optional.ofNullable(children.get(KeYJavaType.class));
     }
 
     public String getId() {
@@ -112,7 +118,7 @@ public class AbstractExpression extends JavaNonTerminalProgramElement
     public void prettyPrint(PrettyPrinter w) throws IOException {
         w.printAbstractExpression(this);
     }
-    
+
     @Override
     public String toString() {
         return "\\abstract_expression " + id;
@@ -121,7 +127,7 @@ public class AbstractExpression extends JavaNonTerminalProgramElement
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         // XXX (DS, 2019-10-31): This might fail, e.g. when used as a guard...
-        return javaServ.getJavaInfo().getJavaLangObject();
+        return maybeKJT.orElse(javaServ.getJavaInfo().getJavaLangObject());
     }
 
     @Override
