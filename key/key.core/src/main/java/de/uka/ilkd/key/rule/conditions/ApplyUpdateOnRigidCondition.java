@@ -69,6 +69,16 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 	    return null;
 	}
 	
+	if (xInst.op() == services.getTypeConverter().getLocSetLDT().getSingletonPV()) {
+            /*
+             * NOTE (DS, 2019-11-05): singletonPV is a special operator converting program
+             * variables to location specifiers. We shall not substitute program variables
+             * within the scope of this operator.
+             */
+	    
+	    return null;
+	}
+	
 	Term properX2Inst = applyUpdateOnRigid(uInst, xInst, services);
 	if(x2Inst == null) {
 	    svInst = svInst.add(x2, properX2Inst, services);

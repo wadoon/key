@@ -319,11 +319,6 @@ lexer grammar KeYLexer;
 	KEYSETTINGS : '\\settings';
         PROFILE : '\\profile';
 
-    // special keyword for use in locset terms
-    PV : '\\pv' ;
-    HAS_TO : '\\hasTo' ;
-    FUN : '\\fun' ;
-    VALUE : '\\value' ;
         // Those guys can stay being keywords
 	TRUE : 'true';
 	FALSE : 'false';
