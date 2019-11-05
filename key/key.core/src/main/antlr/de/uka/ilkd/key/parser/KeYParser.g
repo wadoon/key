@@ -50,6 +50,8 @@ options {
   import java.io.*;
   import java.util.HashSet;
   import java.util.Iterator;
+  import java.util.ArrayList;
+  import java.util.List;
   import java.util.LinkedHashMap;
   import java.util.LinkedHashSet;
   import java.util.LinkedList;
@@ -2604,11 +2606,22 @@ concrete_elementary_update_term returns[Term _elementary_update_term=null]
 			(new KeYSemanticException(input, getSourceName(), ex));
         }
 
-abstract_elementary_update_term returns[Term _elementary_update_term=null; Term result=null]
+abstract_elementary_update_term returns[
+  Term _elementary_update_term=null;
+  Term result=null;
+  List<Term> assignables = new ArrayList<>();
+  List<Term> accessibles = new ArrayList<>()  
+]
 @after { _elementary_update_term = result; }
 :
-        (u = ABSTR_UPD) LPAREN (assgn = locset_term) ASSIGN (access = locset_term) RPAREN
-        { result = getServices().getTermBuilder().abstractUpdate(u.getText().substring(2), assgn, access); }
+        (u = ABSTR_UPD) LPAREN
+        ( assgn = equivalence_term { assignables.add(assgn); } )
+        ( COMMA assgn = equivalence_term { assignables.add(assgn); } ) *
+        ASSIGN
+        ( access = equivalence_term { accessibles.add(access); } )
+        ( COMMA access = equivalence_term { accessibles.add(access); } ) *
+        RPAREN
+        { result = getServices().getTermBuilder().abstractUpdate(u.getText().substring(2), assignables, accessibles); }
         
    ;
         catch [TermCreationException ex] {

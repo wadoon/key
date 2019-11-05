@@ -1088,12 +1088,20 @@ public class TermBuilder {
      * @param rhs   The footprint.
      * @return The {@link AbstractUpdate} {@link Term}.
      */
-    public Term abstractUpdate(String apsId, Term lhs, Term rhs) {
+    public Term abstractUpdate(String apsId, List<Term> lhs, List<Term> rhs) {
         final AbstractProgramElement aps = new AbstractStatement(apsId);
+        final UniqueArrayList<AbstractUpdateLoc> assignables = lhs.stream()
+                .map(term -> AbstractUpdateFactory.abstrUpdateLocsFromTerm( //
+                        term, Optional.empty(), services))
+                .map(set -> set.iterator().next())
+                .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
+        final ImmutableArray<Term> accessibles = rhs.stream().map(this::wrapInValue)
+                .collect(ImmutableArray.toImmutableArray());
+        
         final AbstractUpdate abstrUpd = //
-                services.abstractUpdateFactory().getInstance(aps, lhs, rhs, Optional.empty());
+                services.abstractUpdateFactory().getInstance(aps, assignables, rhs.size());
 
-        return abstractUpdate(abstrUpd, rhs);
+        return tf.createTerm(abstrUpd, accessibles, null, null);
     }
 
     /**
