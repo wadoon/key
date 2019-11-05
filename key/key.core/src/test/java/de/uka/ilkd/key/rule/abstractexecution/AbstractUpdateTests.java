@@ -22,6 +22,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.antlr.runtime.RecognitionException;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.key_project.util.collection.UniqueArrayList;
@@ -46,6 +48,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -59,7 +62,7 @@ import de.uka.ilkd.key.util.SideProofUtil;
 /**
  * @author Dominic Steinhoefel
  */
-public class AbstractUpdateTests {
+public class AbstractUpdateTests extends AbstractTestTermParser {
     private static final File TEST_RESOURCES_DIR_PREFIX = new File(
             HelperClassForTests.TESTCASE_DIRECTORY, "abstractexecution/abstractupdates/");
 
@@ -80,6 +83,18 @@ public class AbstractUpdateTests {
         DUMMY_PROOF = DUMMY_SERVICES.getProof();
         INT_SORT = DUMMY_SERVICES.getNamespaces().sorts().lookup("int");
         TB = DUMMY_SERVICES.getTermBuilder();
+    }
+
+    @Before
+    public void setUp() throws RecognitionException {
+        parseDecls("\\programVariables {" //
+                + "byte[] newObject;" //
+                + "byte[] arr;" //
+                + "}" //
+                + "\\functions {" //
+                + "\\unique LocSet locset1;" //
+                + "\\unique LocSet locset2;" //
+                + "}");
     }
 
     // /////////////////////////////////// //
@@ -170,6 +185,20 @@ public class AbstractUpdateTests {
 
         final Proof proofTwo = startProofFor(equivalenceTwo);
         assertFalse(proofTwo.closed());
+    }
+
+    @Test
+    public void updatesInFrontOfLocsetTerms() throws Exception {
+        final Term arrayRangeEquiv = parseFormula(
+                "{newObject:=arr}arrayRange(newObject,0,-1+newObject.length)="
+                        + "arrayRange(arr,0,-1+arr.length)");
+        final Proof arrayRangeEquivProof = startProofFor(arrayRangeEquiv);
+        assertTrue(arrayRangeEquivProof.closed());
+        
+        final Term locsetCapEquiv = parseFormula(
+                "{newObject:=arr}(disjoint(locset1,locset2))<->disjoint(locset1,locset2)");
+        final Proof locsetCapEquivProof = startProofFor(locsetCapEquiv);
+        assertTrue(locsetCapEquivProof.closed());
     }
 
     @Test

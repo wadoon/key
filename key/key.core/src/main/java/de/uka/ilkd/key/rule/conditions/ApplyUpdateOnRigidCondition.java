@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateSV;
@@ -67,17 +66,6 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 	}
 	
 	if(!xInst.op().isRigid() || xInst.op().arity() == 0) {
-	    return null;
-	}
-	
-        if (xInst.op() instanceof Function && services.getTypeConverter().getLocSetLDT()
-                .containsFunction((Function) xInst.op())) {
-            /*
-             * NOTE (DS, 2018-10-31) We now have assume statements in JML to add axiomatic
-             * assumption within the Java code. In Abstract Execution, those are also locset
-             * type formulas. We must not apply updates on locset expressions, since they
-             * don't work on values, but on location identifiers.
-             */
 	    return null;
 	}
 	
