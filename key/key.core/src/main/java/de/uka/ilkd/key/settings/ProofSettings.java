@@ -22,6 +22,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -119,6 +120,10 @@ public class ProofSettings {
         if (lastLoadedProperties != null) {
             settings.readSettings(lastLoadedProperties);
         }
+    }
+
+    public List<Settings> getSettings() {
+        return Collections.unmodifiableList(settings);
     }
 
     /**

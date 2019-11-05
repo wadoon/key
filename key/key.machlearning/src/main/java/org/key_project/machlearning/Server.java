@@ -1,5 +1,6 @@
 package org.key_project.machlearning;
 
+import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.ui.Verbosity;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;

@@ -46,7 +46,8 @@ public class KeYConnection {
 
     private Map<String, Tactic> tactics = new HashMap<>();
     {
-        tactics.put("AUTO", new AutoTactic());
+        tactics.put("AUTO", new AutoTactic(""));
+        tactics.put("AUTO_NOSPLIT", new AutoTactic("[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_OFF"));
         tactics.put("NOTHING", (a,b,c,d) -> {});
         tactics.put("SMT", new SMTTactic());
         FilterTactic.registerTactics(tactics);
