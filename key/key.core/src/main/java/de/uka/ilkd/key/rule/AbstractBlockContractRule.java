@@ -44,7 +44,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -77,15 +77,13 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             return DefaultImmutableSet.nil();
         }
         return getApplicableContracts(
-                services.getSpecificationRepository(),
                 instantiation.statement,
-                instantiation.modality, goal);
+                instantiation.modality,
+                goal);
     }
 
     /**
      *
-     * @param specifications
-     *            a specification repository.
      * @param statement
      *            a block.
      * @param modality
@@ -95,9 +93,10 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
      * @return all applicable block contracts for the block from the repository.
      */
     public static ImmutableSet<BlockContract> getApplicableContracts(
-            final SpecificationRepository specifications, final JavaStatement statement,
-            final Modality modality, final Goal goal) {
+            final JavaStatement statement, final Modality modality,
+            final Goal goal) {
         if (statement instanceof StatementBlock) {
+            final GoalLocalSpecificationRepository specifications = goal.getLocalSpecificationRepository();
             StatementBlock block = (StatementBlock) statement;
 
             ImmutableSet<BlockContract> collectedContracts
@@ -366,7 +365,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             final ExecutionContext ec, final Services services) {
         // create proof obligation
         InfFlowPOSnippetFactory infFlowFactory
-                = POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, ec, services);
+                = POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, ec, infFlowGoal.getLocalSpecificationRepository(), services);
 
         final SequentFormula poFormula = buildBodyPreservesSequent(infFlowFactory, proof);
 
@@ -473,7 +472,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         // generate information flow contract application predicate
         // and associated taclet
         final InfFlowBlockContractTacletBuilder ifContractBuilder
-                = new InfFlowBlockContractTacletBuilder(services);
+                = new InfFlowBlockContractTacletBuilder(infFlowGoal.getLocalSpecificationRepository(), services);
         ifContractBuilder.setContract(contract);
         ifContractBuilder.setExecutionContext(instantiation.context);
         ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
@@ -531,8 +530,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         protected boolean hasApplicableContracts(final Services services,
                 final JavaStatement statement, final Modality modality, Goal goal) {
             ImmutableSet<BlockContract> contracts = getApplicableContracts(
-                    services.getSpecificationRepository(),
-                    statement, modality, goal);
+                    statement,
+                    modality, goal);
 
             return contracts != null && !contracts.isEmpty();
         }

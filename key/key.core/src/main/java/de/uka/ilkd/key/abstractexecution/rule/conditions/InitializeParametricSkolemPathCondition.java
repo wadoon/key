@@ -37,8 +37,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * Instantiates a parametric skolem path condition for abstract execution. The
  * such generated formula receives one LocSet for its assignable; those are
- * obtained from the block contracts of the {@link AbstractStatement}
- * it is generated for.
+ * obtained from the block contracts of the {@link AbstractStatement} it is
+ * generated for.
  *
  * @author Dominic Steinhoefel
  */
@@ -70,8 +70,9 @@ public class InitializeParametricSkolemPathCondition implements VariableConditio
 
         final List<Term> accessibles = AbstractExecutionContractUtils
                 .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, matchCond,
-                        services, executionContext).first.stream().map(loc -> loc.toTerm(services))
-                                .map(tb::value).collect(Collectors.toList());
+                        goal.getLocalSpecificationRepository(), services, executionContext).first
+                                .stream().map(loc -> loc.toTerm(services)).map(tb::value)
+                                .collect(Collectors.toList());
         final Sort[] accessiblesSorts = accessibles.stream().map(Term::sort)
                 .collect(Collectors.toList()).toArray(new Sort[0]);
 

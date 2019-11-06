@@ -31,11 +31,11 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * Abstract base class for all default implementations of the sub-interfaces of
@@ -1285,6 +1285,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * A map specifying on which heaps this contract has a modifies clause.
          */
         private final Map<LocationVariable, Boolean> hasMod;
+        
+        private final GoalLocalSpecificationRepository localSpecRepo;
 
         /**
          *
@@ -1328,6 +1330,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          *            map from every heap to an assignable term.
          * @param hasMod
          *            map specifying on which heaps this contract has a modifies clause.
+         * @param localSpecRepo TODO
          * @param services
          *            services.
          */
@@ -1342,7 +1345,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 final Map<LocationVariable, Term> assignables,
                 final Map<LocationVariable, Term> declares,
                 final Map<LocationVariable, Term> accessibles,
-                final Map<LocationVariable, Boolean> hasMod, final Services services) {
+                final Map<LocationVariable, Boolean> hasMod, GoalLocalSpecificationRepository localSpecRepo, final Services services) {
             super(services.getTermFactory(), services);
             this.baseName = baseName;
             this.block = block;
@@ -1366,6 +1369,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             this.declares = declares;
             this.heaps = services.getTypeConverter().getHeapLDT().getAllHeaps();
             this.hasMod = hasMod;
+            this.localSpecRepo = localSpecRepo;
         }
 
         /**
@@ -1706,12 +1710,12 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             result = result.add(build(baseName, block, labels, method,
                     diverges.equals(ff()) ? Modality.DIA : Modality.BOX, preconditions, measuredBy,
                     postconditions, freePostconditions, modifiesClauses, declaresClauses,
-                    accessibleClauses, infFlowSpecs, variables, transactionApplicable, hasMod));
+                    accessibleClauses, infFlowSpecs, variables, transactionApplicable, hasMod, localSpecRepo));
             if (divergesConditionCannotBeExpressedByAModality()) {
                 result = result.add(build(baseName, block, labels, method, Modality.DIA,
                         addNegatedDivergesConditionToPreconditions(preconditions), measuredBy,
                         postconditions, freePostconditions, modifiesClauses, declaresClauses,
-                        accessibleClauses, infFlowSpecs, variables, transactionApplicable, hasMod));
+                        accessibleClauses, infFlowSpecs, variables, transactionApplicable, hasMod, localSpecRepo));
             }
             return result;
         }
@@ -1744,6 +1748,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          *            whether or not this contract is applicable for transactions.
          * @param hasMod
          *            a map specifying on which heaps this contract has a modified clause.
+         * @param localSpecRepo TODO
          * @return an instance of {@code T} with the specified attributes.
          */
         protected abstract T build(String baseName, StatementBlock block, List<Label> labels,
@@ -1754,7 +1759,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 Map<LocationVariable, Term> declaresClauses,
                 Map<LocationVariable, Term> accessibleClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
-                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod);
+                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod, GoalLocalSpecificationRepository localSpecRepo);
 
         /**
          *
@@ -1838,15 +1843,18 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @see BlockSpecificationElement#getAccessibleClause(LocationVariable)
          */
         protected final Map<LocationVariable, Term> accessibleClauses;
+        
+        protected final GoalLocalSpecificationRepository localSpecRepo;
 
         /**
          *
          * @param contracts
          *            the contracts to combine.
+         * @param localSpecRepo TODO
          * @param services
          *            services.
          */
-        public Combinator(final T[] contracts, final Services services) {
+        public Combinator(final T[] contracts, GoalLocalSpecificationRepository localSpecRepo, final Services services) {
             super(services.getTermFactory(), services);
             this.contracts = sort(contracts);
             preconditions = new LinkedHashMap<LocationVariable, Term>();
@@ -1855,6 +1863,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             modifiesClauses = new LinkedHashMap<LocationVariable, Term>();
             accessibleClauses = new LinkedHashMap<LocationVariable, Term>();
             declaresClauses = new LinkedHashMap<LocationVariable, Term>();
+            this.localSpecRepo = localSpecRepo;
         }
 
         /**

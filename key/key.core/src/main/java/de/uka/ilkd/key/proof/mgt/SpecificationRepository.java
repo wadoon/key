@@ -553,11 +553,12 @@ public final class SpecificationRepository {
      *            initially clause
      * @param kjt
      *            constructors of this type are added a post-condition
+     * @param localSpecRepo TODO
      * @throws SLTranslationException
      *             during contract construction from history constraint
      */
     private void createContractsFromInitiallyClause(InitiallyClause inv,
-            KeYJavaType kjt) throws SLTranslationException {
+            KeYJavaType kjt, GoalLocalSpecificationRepository localSpecRepo) throws SLTranslationException {
         if (!kjt.equals(inv.getKJT())) {
             inv = inv.setKJT(kjt);
         }
@@ -575,7 +576,7 @@ public final class SpecificationRepository {
                 }
                 if (oldFuncContracts.isEmpty()) {
                     final FunctionalOperationContract iniContr = cf.func(pm,
-                            inv);
+                            inv, localSpecRepo);
                     addContractNoInheritance(iniContr);
                     assert getContracts(kjt, pm)
                             .size() == (WellDefinednessCheck.isOn() ? 2 : 1)
@@ -1104,20 +1105,21 @@ public final class SpecificationRepository {
     /**
      * Adds postconditions raising from initially clauses to all constructors.
      * <b>Warning</b>: To be called after all contracts have been registered.
+     * @param localSpecRepo TODO
      *
      * @throws SLTranslationException
      *             may be thrown during contract extraction
      */
-    public void createContractsFromInitiallyClauses()
+    public void createContractsFromInitiallyClauses(GoalLocalSpecificationRepository localSpecRepo)
             throws SLTranslationException {
         for (KeYJavaType kjt : initiallyClauses.keySet()) {
             for (InitiallyClause inv : initiallyClauses.get(kjt)) {
-                createContractsFromInitiallyClause(inv, kjt);
+                createContractsFromInitiallyClause(inv, kjt, localSpecRepo);
                 if (VisibilityModifier.allowsInheritance(inv.getVisibility())) {
                     final ImmutableList<KeYJavaType> subs = services
                             .getJavaInfo().getAllSubtypes(kjt);
                     for (KeYJavaType sub : subs) {
-                        createContractsFromInitiallyClause(inv, sub);
+                        createContractsFromInitiallyClause(inv, sub, localSpecRepo);
                     }
                 }
             }

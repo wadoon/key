@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -51,7 +52,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
 
     @Override
     public Term transform(Term term, SVInstantiations svInst,
-            Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final Term loopFormula = term.sub(0);
         final ProgramVariable heapBeforePV = //
                 (ProgramVariable) term.sub(1).op();
@@ -61,7 +62,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
                 (ProgramVariable) term.sub(3).op();
 
         final Optional<LoopSpecification> loopSpec = //
-                MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
+                MiscTools.getSpecForTermWithLoopStmt(loopFormula, localSpecRepo);
 
         final boolean isTransaction = MiscTools
                 .isTransaction((Modality) loopFormula.op());

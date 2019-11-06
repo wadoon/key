@@ -144,6 +144,7 @@ import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 /**
  * Walks through a java AST in depth-left-fist-order.
@@ -164,12 +165,13 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
      *            the ProgramElement where to begin
      * @param preservesPos
      *            whether the position should be preserved
+     * @param localSpecRepo TODO
      * @param services
      *            the services instance
      */
     public CreatingASTVisitor(ProgramElement root, boolean preservesPos,
-            Services services) {
-        super(root, services);
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        super(root, localSpecRepo, services);
         this.preservesPositionInfo = preservesPos;
     }
 

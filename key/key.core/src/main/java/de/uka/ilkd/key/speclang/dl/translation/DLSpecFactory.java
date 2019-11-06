@@ -40,6 +40,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
@@ -53,15 +54,18 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
  */
 public final class DLSpecFactory {
     private final Services services;
+    private final GoalLocalSpecificationRepository localSpecRepo;
 
 
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
 
-    public DLSpecFactory(Services services) {
+    public DLSpecFactory(GoalLocalSpecificationRepository localSpecRepo, Services services) {
 	assert services != null;
+	assert localSpecRepo != null;
 	this.services = services;
+	this.localSpecRepo = localSpecRepo;
     }
 
 

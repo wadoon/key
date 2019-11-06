@@ -37,6 +37,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationByAddRules;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
@@ -60,6 +61,11 @@ public class InitConfig {
      * program model
      */
     private final Services services;
+    
+    /**
+     * Specification elements that after initialization will be local to each goal.
+     */
+    private final GoalLocalSpecificationRepository localSpecRepo;
 
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
 
@@ -107,8 +113,9 @@ public class InitConfig {
     //constructors
     //-------------------------------------------------------------------------
 
-    public InitConfig(Services services) {
+    public InitConfig(GoalLocalSpecificationRepository localSpecRepo, Services services) {
        this.services  = services;
+       this.localSpecRepo = localSpecRepo;
        
        category2DefaultChoice = ProofSettings.DEFAULT_SETTINGS
              .getChoiceSettings()
@@ -133,6 +140,13 @@ public class InitConfig {
      */
     public final Services getServices() {
         return services;
+    }
+
+    /**
+     * @return the goal-local specification repositories for initial configuration.
+     */
+    public GoalLocalSpecificationRepository getInitialLocalSpecRepo() {
+        return localSpecRepo;
     }
 
 
@@ -424,7 +438,7 @@ public class InitConfig {
      */
     @SuppressWarnings("unchecked")
     public InitConfig copyWithServices(Services services) {
-        InitConfig ic = new InitConfig(services);
+        InitConfig ic = new InitConfig(localSpecRepo.clone(), services);
         if (settings != null) {
            ic.setSettings(new ProofSettings(settings));
         }

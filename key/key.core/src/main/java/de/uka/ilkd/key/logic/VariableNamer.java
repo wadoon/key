@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -48,6 +47,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InstantiationProposer;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
@@ -656,8 +656,8 @@ public abstract class VariableNamer implements InstantiationProposer {
     public String getSuggestiveNameProposalForProgramVariable(
                                                 SchemaVariable sv,
                                                 TacletApp app,
-						Services services,
-						ImmutableList<String> previousProposals){
+						GoalLocalSpecificationRepository localSpecRepo,
+						Services services, ImmutableList<String> previousProposals){
 	if(suggestive_off) {
 	    return getProposal(app, sv, services, null, previousProposals);
 	}
@@ -680,7 +680,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
 	            if (v.hasInitializer()) {
 			ProgramElement rhs = instantiateExpression(
-			    v.getInitializer(), app.instantiations(), services);
+			    v.getInitializer(), app.instantiations(), localSpecRepo, services);
 			name = ProofSaver.printProgramElement(rhs).toString();
 			break;
 		    } else if (c.getStatementAt(1) instanceof CopyAssignment) {
@@ -720,8 +720,8 @@ public abstract class VariableNamer implements InstantiationProposer {
 
     private ProgramElement instantiateExpression(ProgramElement e,
                                                  SVInstantiations svInst,
-						 Services services) {
-        ProgramReplaceVisitor trans = new ProgramReplaceVisitor(e, services, svInst);
+						 GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        ProgramReplaceVisitor trans = new ProgramReplaceVisitor(e, localSpecRepo, services, svInst);
         trans.start();
         return trans.result();
     }

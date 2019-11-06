@@ -61,7 +61,7 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
             for (BlockContract contract : selection) {
                 contracts = contracts.add(contract);
             }
-            return BlockContractImpl.combine(contracts, services);
+            return BlockContractImpl.combine(contracts, localSpecRepo, services);
         }        
     }
 

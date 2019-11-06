@@ -14,6 +14,7 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -80,7 +81,8 @@ public class FinishAuxiliaryBlockComputationMacro
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final Taclet rwTaclet = buildBlockInfFlowUnfoldTaclet(
-                services, blockRuleApp, contract, ifVars, result);
+                initiatingGoal.getLocalSpecificationRepository(), services, blockRuleApp, contract,
+                ifVars, result);
         
         initiatingProof.addLabeledTotalTerm(result);
         initiatingProof.addLabeledIFSymbol(rwTaclet);
@@ -99,6 +101,7 @@ public class FinishAuxiliaryBlockComputationMacro
 
     /**
      * constructs a taclet to unfold block contracts for information flow reasoning
+     * @param localSpecRepo TODO
      * @param services the Services
      * @param blockRuleApp the rule application of the block contract
      * @param contract the block contract
@@ -107,12 +110,12 @@ public class FinishAuxiliaryBlockComputationMacro
      * @return the created taclet
      */
     private Taclet buildBlockInfFlowUnfoldTaclet(
+            GoalLocalSpecificationRepository localSpecRepo,
             final Services services,
-            final BlockContractInternalBuiltInRuleApp blockRuleApp,
-            final BlockContract contract, IFProofObligationVars ifVars,
-            final Term result) {
+            final BlockContractInternalBuiltInRuleApp blockRuleApp, final BlockContract contract,
+            IFProofObligationVars ifVars, final Term result) {
         final BlockInfFlowUnfoldTacletBuilder tacletBuilder =
-                new BlockInfFlowUnfoldTacletBuilder(services);
+                new BlockInfFlowUnfoldTacletBuilder(localSpecRepo, services);
         tacletBuilder.setContract(contract);
         tacletBuilder.setExecutionContext(blockRuleApp.getExecutionContext());
         tacletBuilder.setInfFlowVars(ifVars);

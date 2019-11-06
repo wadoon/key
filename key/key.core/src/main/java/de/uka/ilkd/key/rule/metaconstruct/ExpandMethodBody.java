@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -53,8 +54,8 @@ public class ExpandMethodBody extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement[] transform(ProgramElement pe, GoalLocalSpecificationRepository localSpecRepo,
+            Services services, SVInstantiations svInst) {
 
         MethodBodyStatement mbs = (MethodBodyStatement) pe;
         // MethodReference mr = mbs.getMethodReference();
@@ -87,7 +88,7 @@ public class ExpandMethodBody extends ProgramTransformer {
             map.put((ProgramVariable) pv, (ProgramVariable) argsAsParam.get(i));
         }
         ProgVarReplaceVisitor paramRepl = new ProgVarReplaceVisitor(result, map,
-            services);
+            localSpecRepo, services);
         paramRepl.start();
         result = (StatementBlock) paramRepl.result();
 

@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -41,7 +42,7 @@ public class SetLastComponentOfAEPredsToFalseTransformer
 
     @Override
     public Term transform(Term term, SVInstantiations svInst,
-            Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final Term origTerm = term.sub(0);
 
         final TermLabel aeLabel = ParameterlessTermLabel.AE_EQUIV_PROOF_LABEL;

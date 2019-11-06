@@ -47,6 +47,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -111,6 +112,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
      * Services.
      */
     private final Services services;
+    
+    private final GoalLocalSpecificationRepository localSpecRepo;
 
     /**
      * @see LoopContract#getLoopLabels()
@@ -165,6 +168,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
      *            the contract's decreases clause.
      * @param functionalContracts
      *            the functional contracts corresponding to this contract.
+     * @param localSpecRepo TODO
      * @param services
      *            services.
      */
@@ -179,7 +183,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
             final Term decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
-            Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         super(baseName, block, labels, method, modality, preconditions, measuredBy, postconditions,
                 freePostconditions, modifiesClauses, declaresClauses, accessibleClauses,
                 infFlowSpecs, variables, transactionApplicable, hasMod, functionalContracts);
@@ -187,6 +191,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         onBlock = true;
         this.decreases = decreases;
         this.services = services;
+        this.localSpecRepo = localSpecRepo;
 
         Set<Label> loopLabels = new HashSet<Label>();
         Label outerLabel = new ProgramElementName("breakLoop");
@@ -212,7 +217,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             ExecutionContext ec = KeYJavaASTFactory.executionContext(
                     method.getContainerType(), method, null);
             enhancedForElim = new EnhancedForElimination(ec, (EnhancedFor) first);
-            enhancedForElim.transform((EnhancedFor) first, services, null);
+            enhancedForElim.transform((EnhancedFor) first, localSpecRepo, services, null);
             loop = enhancedForElim.getLoop();
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
@@ -231,7 +236,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         this.loopLabels = new ArrayList<>(loopLabels);
         head = getHeadStatement(loop, block, enhancedForElim);
         guard = loop.getGuardExpression();
-        body = getBodyStatement(loop, block, outerLabel, innerLabel, this.loopLabels, services);
+        body = getBodyStatement(loop, block, outerLabel, innerLabel, this.loopLabels, localSpecRepo, services);
         tail = getTailStatement(loop, block);
 
         internalOnly = loop instanceof EnhancedFor || loop instanceof For;
@@ -270,6 +275,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
      *            the contract's decreases clause.
      * @param functionalContracts
      *            the functional contracts corresponding to this contract.
+     * @param localSpecRepo TODO
      * @param services
      *            services.
      */
@@ -284,7 +290,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
             final Term decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
-            Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         super(baseName, new StatementBlock(loop), labels, method, modality, preconditions,
                 measuredBy, postconditions, freePostconditions, modifiesClauses, declaresClauses,
                 accessibleClauses, infFlowSpecs, variables, transactionApplicable, hasMod,
@@ -293,6 +299,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         onBlock = false;
         this.decreases = decreases;
         this.services = services;
+        this.localSpecRepo = localSpecRepo;
         this.loop = loop;
 
         Set<Label> loopLabels = new HashSet<Label>();
@@ -306,7 +313,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             ExecutionContext ec = KeYJavaASTFactory.executionContext(
                     method.getContainerType(), method, null);
             enhancedForElim = new EnhancedForElimination(ec, (EnhancedFor) loop);
-            enhancedForElim.transform(loop, services, null);
+            enhancedForElim.transform(loop, localSpecRepo, services, null);
             nonEnhancedLoop = enhancedForElim.getLoop();
         }
 
@@ -322,7 +329,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         head = getHeadStatement(nonEnhancedLoop, block, enhancedForElim);
         guard = nonEnhancedLoop.getGuardExpression();
         body = getBodyStatement(
-                nonEnhancedLoop, block, outerLabel, innerLabel, this.loopLabels, services);
+                nonEnhancedLoop, block, outerLabel, innerLabel, this.loopLabels, localSpecRepo, services);
         tail = new StatementBlock();
 
         internalOnly = loop instanceof EnhancedFor || loop instanceof For;
@@ -332,13 +339,15 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
      *
      * @param contracts
      *            a set of loop contracts to combine.
+     * @param localSpecRepo TODO
      * @param services
      *            services.
      * @return the combination of the specified loop contracts.
      */
-    public static LoopContract combine(ImmutableSet<LoopContract> contracts, Services services) {
-        return new Combinator(contracts.toArray(new LoopContract[contracts.size()]), services)
-                .combine();
+    public static LoopContract combine(ImmutableSet<LoopContract> contracts,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        return new Combinator(contracts.toArray(new LoopContract[contracts.size()]), localSpecRepo,
+                services).combine();
     }
 
     /**
@@ -444,13 +453,14 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
      *            the label to use for continue statements.
      * @param loopLabels
      *            all labels belonging to the loop.
+     * @param localSpecRepo TODO
      * @param services
      *            services.
      * @return the loop's body. If the loop is a for-loop, it is transformed to a while-loop.
      * @see InnerBreakAndContinueReplacer
      */
     private static StatementBlock getBodyStatement(LoopStatement loop, StatementBlock block,
-            Label outerLabel, Label innerLabel, List<Label> loopLabels, Services services) {
+            Label outerLabel, Label innerLabel, List<Label> loopLabels, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final StatementBlock sb;
 
         if (loop instanceof While) {
@@ -464,7 +474,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             bodyStatements.add(loop.getBody());
             StatementBlock innerBody = new InnerBreakAndContinueReplacer(
                     new StatementBlock(bodyStatements), loopLabels, outerLabel, innerLabel,
-                    services).replace();
+                    localSpecRepo, services).replace();
 
             ExtList updateStatements = new ExtList();
             for (Expression statement : loop.getUpdates()) {
@@ -829,7 +839,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 newPreconditions, newMeasuredBy, newPostconditions, newFreePostconditions,
                 newModifiesClauses, newDeclaresClauses, accessibleClauses, newinfFlowSpecs,
                 newVariables, transactionApplicable, hasMod, newDecreases, getFunctionalContracts(),
-                services);
+                localSpecRepo, services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -848,7 +858,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 newPreconditions, newMeasuredBy, newPostconditions, newFreePostconditions,
                 newModifiesClauses, newDeclaresClauses, newAccessibleClauses, newinfFlowSpecs,
                 newVariables, transactionApplicable, hasMod, newDecreases, getFunctionalContracts(),
-                services);
+                localSpecRepo, services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -931,7 +941,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         LoopContractImpl result = new LoopContractImpl(baseName, newBlock, labels, method, modality,
                 preconditions, measuredBy, postconditions, freePostconditions, modifiesClauses,
                 declaresClauses, accessibleClauses, infFlowSpecs, variables, transactionApplicable,
-                hasMod, decreases, getFunctionalContracts(), services);
+                hasMod, decreases, getFunctionalContracts(), localSpecRepo, services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -945,7 +955,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         LoopContractImpl result = new LoopContractImpl(baseName, newLoop, labels, method, modality,
                 preconditions, measuredBy, postconditions, freePostconditions, modifiesClauses,
                 declaresClauses, accessibleClauses, infFlowSpecs, variables, transactionApplicable,
-                hasMod, decreases, getFunctionalContracts(), services);
+                hasMod, decreases, getFunctionalContracts(), localSpecRepo, services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -963,7 +973,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 (IProgramMethod) newPM, modality, preconditions, measuredBy, postconditions,
                 freePostconditions, modifiesClauses, declaresClauses, accessibleClauses,
                 infFlowSpecs, variables, transactionApplicable, hasMod, decreases,
-                getFunctionalContracts(), services);
+                getFunctionalContracts(), localSpecRepo, services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -1040,6 +1050,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
          *            map specifying on which heaps this contract has a modifies clause.
          * @param decreases
          *            the decreases term.
+         * @param localSpecRepo TODO
          * @param services
          *            services.
          */
@@ -1052,10 +1063,10 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 Term diverges, Map<LocationVariable, Term> assignables,
                 final Map<LocationVariable, Term> declares,
                 final Map<LocationVariable, Term> accessibles, Map<LocationVariable, Boolean> hasMod,
-                Term decreases, Services services) {
+                Term decreases, GoalLocalSpecificationRepository localSpecRepo, Services services) {
             super(baseName, block, labels, method, behavior, variables, requires, measuredBy,
                     ensures, freeEnsures, infFlowSpecs, breaks, continues, returns, signals,
-                    signalsOnly, diverges, assignables, declares, accessibles, hasMod, services);
+                    signalsOnly, diverges, assignables, declares, accessibles, hasMod, localSpecRepo, services);
 
             this.decreases = decreases;
         }
@@ -1104,6 +1115,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
          *            map specifying on which heaps this contract has a modifies clause.
          * @param decreases
          *            the decreases term.
+         * @param localSpecRepo TODO
          * @param services
          *            services.
          */
@@ -1116,10 +1128,10 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 Term diverges, Map<LocationVariable, Term> assignables,
                 final Map<LocationVariable, Term> declares,
                 final Map<LocationVariable, Term> accessibles, Map<LocationVariable, Boolean> hasMod,
-                Term decreases, Services services) {
+                Term decreases, GoalLocalSpecificationRepository localSpecRepo, Services services) {
             super(baseName, null, labels, method, behavior, variables, requires, measuredBy,
                     ensures, freeEnsures, infFlowSpecs, breaks, continues, returns, signals,
-                    signalsOnly, diverges, assignables, declares, accessibles, hasMod, services);
+                    signalsOnly, diverges, assignables, declares, accessibles, hasMod, localSpecRepo, services);
 
             this.loop = loop;
             this.decreases = decreases;
@@ -1134,18 +1146,18 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 Map<LocationVariable, Term> declaresClauses,
                 Map<LocationVariable, Term> accessibleClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
-                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod) {
+                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod, GoalLocalSpecificationRepository localSpecRepo) {
             if (block != null) {
                 return new LoopContractImpl(baseName, block, labels, method, modality,
                         preconditions, measuredBy, postconditions, freePostconditions,
                         modifiesClauses, declaresClauses, accessibleClauses, infFlowSpecs,
-                        variables, transactionApplicable, hasMod, decreases, null, services);
+                        variables, transactionApplicable, hasMod, decreases, null, localSpecRepo, services);
             } else {
                 assert loop != null;
                 return new LoopContractImpl(baseName, loop, labels, method, modality, preconditions,
                         measuredBy, postconditions, freePostconditions, modifiesClauses,
                         declaresClauses, accessibleClauses, infFlowSpecs, variables,
-                        transactionApplicable, hasMod, decreases, null, services);
+                        transactionApplicable, hasMod, decreases, null, localSpecRepo, services);
             }
         }
 
@@ -1174,11 +1186,12 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
          *
          * @param contracts
          *            the contracts to combine.
+         * @param localSpecRepo TODO
          * @param services
          *            services.
          */
-        public Combinator(LoopContract[] contracts, Services services) {
-            super(contracts, services);
+        public Combinator(LoopContract[] contracts, GoalLocalSpecificationRepository localSpecRepo, Services services) {
+            super(contracts, localSpecRepo, services);
         }
 
         @Override
@@ -1224,7 +1237,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                     contracts[0].getMby(), postconditions, freePostconditions, modifiesClauses,
                     declaresClauses, accessibleClauses, head.getInfFlowSpecs(),
                     placeholderVariables, head.isTransactionApplicable(), hasMod,
-                    contracts[0].getDecreases(), functionalContracts, services);
+                    contracts[0].getDecreases(), functionalContracts, localSpecRepo, services);
 
             return result;
         }

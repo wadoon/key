@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 /**
  * Collects the accessible locations in a {@link Term} (an over-approximation,
@@ -42,9 +43,11 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 public class TermAccessibleLocationsCollector extends DefaultVisitor {
     private final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
     private final Services services;
+    private final GoalLocalSpecificationRepository localSpecRepo;
 
-    public TermAccessibleLocationsCollector(final Services services) {
+    public TermAccessibleLocationsCollector(GoalLocalSpecificationRepository localSpecRepo, final Services services) {
         this.services = services;
+        this.localSpecRepo = localSpecRepo;
     }
 
     /**
@@ -81,7 +84,7 @@ public class TermAccessibleLocationsCollector extends DefaultVisitor {
 
         if (!t.javaBlock().isEmpty()) {
             final ProgramLocationsCollector pvc = new ProgramLocationsCollector(
-                    t.javaBlock().program(), services);
+                    t.javaBlock().program(), localSpecRepo, services);
             pvc.start();
             result.addAll(pvc.locations());
         }

@@ -40,6 +40,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
@@ -284,8 +285,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public LoopSpecification retrieveLoopInvariantFromSpecification(
-            Services services) {
-        return services.getSpecificationRepository().getLoopSpec(loop);
+            GoalLocalSpecificationRepository localSpecRepo) {
+        return localSpecRepo.getLoopSpec(loop);
     }
 
     @Override
@@ -321,7 +322,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             return this;
         }
         final Services services = goal.proof().getServices();
-        LoopSpecification inv = retrieveLoopInvariantFromSpecification(services);
+        LoopSpecification inv = retrieveLoopInvariantFromSpecification(goal.getLocalSpecificationRepository());
         Modality m = (Modality)programTerm().op();
         boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION); 
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv,

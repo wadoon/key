@@ -778,7 +778,7 @@ public final class SourceView extends JComponent {
                         if (subtreeRoot.javaBlock() != null) {
                             JavaASTVisitor visitor = new JavaASTVisitor(
                                     subtreeRoot.javaBlock().program(),
-                                    mainWindow.getMediator().getServices()) {
+                                    localSpecRepo, mainWindow.getMediator().getServices()) {
 
                                 @Override
                                 protected void doDefaultAction(SourceElement el) {

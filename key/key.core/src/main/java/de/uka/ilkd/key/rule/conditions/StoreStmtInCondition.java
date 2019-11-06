@@ -58,7 +58,8 @@ public class StoreStmtInCondition implements VariableCondition {
         }
 
         final LightweightSyntacticalReplaceVisitor replVisitor = //
-                new LightweightSyntacticalReplaceVisitor(svInst, services);
+                new LightweightSyntacticalReplaceVisitor(svInst,
+                        goal.getLocalSpecificationRepository(), services);
         term.execPostOrder(replVisitor);
         final Term instantiatedTerm = replVisitor.getTerm();
 

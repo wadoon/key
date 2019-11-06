@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -19,10 +20,12 @@ public class BlockInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTaclet
 
     private BlockContract contract;
     private ExecutionContext executionContext;
+    private final GoalLocalSpecificationRepository localSpecRepo;
 
 
-    public BlockInfFlowUnfoldTacletBuilder(Services services) {
+    public BlockInfFlowUnfoldTacletBuilder(GoalLocalSpecificationRepository localSpecRepo, Services services) {
         super(services);
+        this.localSpecRepo = localSpecRepo;
     }
 
 
@@ -49,7 +52,7 @@ public class BlockInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTaclet
                 POSnippetFactory.getInfFlowFactory(contract,
                                                    ifVars.c1, ifVars.c2,
                                                    executionContext,
-                                                   services);
+                                                   localSpecRepo, services);
         return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
     }
 }

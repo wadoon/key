@@ -63,8 +63,8 @@ public class InspectorForFormulas implements CheckedUserInputInspector{
             KeYParserF parser =
                     new KeYParserF (ParserMode.TERM, new KeYLexerF (
                                      new StringReader ( toBeChecked ), ""),
-                                     services,   // should not be needed
-                                     services.getNamespaces() );
+                                     localSpecRepo,   // should not be needed
+                                     services, services.getNamespaces() );
                 return parser.term();
              } catch (Throwable e) {
                  

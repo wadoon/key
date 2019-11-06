@@ -51,6 +51,7 @@ import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
@@ -71,6 +72,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalR
 public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
     private final SVInstantiations svInst;
     private final Services services;
+    private final GoalLocalSpecificationRepository localSpecRepo;
     private final TermBuilder tb;
     private Term computedResult = null;
 
@@ -91,19 +93,21 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
      *
      * @param svInst
      *     mapping of schemavariables to their instantiation
+     * @param localSpecRepo TODO
      * @param services
      *     the Services
      */
     public LightweightSyntacticalReplaceVisitor(SVInstantiations svInst,
-            Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         this.services = services;
+        this.localSpecRepo = localSpecRepo;
         this.tb = services.getTermBuilder();
         this.svInst = svInst;
         subStack = new Stack<Object>(); // of Term
     }
 
-    public LightweightSyntacticalReplaceVisitor(Services services) {
-        this(SVInstantiations.EMPTY_SVINSTANTIATIONS, services);
+    public LightweightSyntacticalReplaceVisitor(GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        this(SVInstantiations.EMPTY_SVINSTANTIATIONS, localSpecRepo, services);
     }
 
     private JavaProgramElement addContext(StatementBlock pe) {
@@ -134,11 +138,11 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
             trans = new ProgramReplaceVisitor(
                     new StatementBlock(
                             ((ContextStatementBlock) jb.program()).getBody()), // TODO
-                    services, svInst);
+                    localSpecRepo, services, svInst);
             trans.start();
             result = addContext((StatementBlock) trans.result());
         } else {
-            trans = new ProgramReplaceVisitor(jb.program(), services, svInst);
+            trans = new ProgramReplaceVisitor(jb.program(), localSpecRepo, services, svInst);
             trans.start();
             result = trans.result();
         }
@@ -386,7 +390,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
         if (subtreeRoot.op() instanceof TermTransformer) {
             final TermTransformer mop = (TermTransformer) subtreeRoot.op();
             final Term newTerm = //
-                    mop.transform((Term) subStack.pop(), svInst, services);
+                    mop.transform((Term) subStack.pop(), svInst, localSpecRepo, services);
             pushNew(newTerm);
         }
     }

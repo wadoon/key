@@ -24,7 +24,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.LoopContract;
 
 /**
@@ -53,7 +53,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
         if (instantiation == null) {
             return DefaultImmutableSet.nil();
         }
-        return getApplicableContracts(services.getSpecificationRepository(),
+        return getApplicableContracts(goal.getLocalSpecificationRepository(),
                 instantiation.statement, instantiation.modality, goal);
     }
 
@@ -70,7 +70,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      * @return all applicable loop contracts for the block from the repository.
      */
     public static ImmutableSet<LoopContract> getApplicableContracts(
-            final SpecificationRepository specifications, final JavaStatement statement,
+            final GoalLocalSpecificationRepository specifications, final JavaStatement statement,
             final Modality modality, final Goal goal) {
         ImmutableSet<LoopContract> collectedContracts;
 
@@ -269,7 +269,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
         protected boolean hasApplicableContracts(final Services services,
                 final JavaStatement statement, final Modality modality, Goal goal) {
             ImmutableSet<LoopContract> contracts = getApplicableContracts(
-                    services.getSpecificationRepository(),
+                    goal.getLocalSpecificationRepository(),
                     statement, modality, goal);
 
             return contracts != null && !contracts.isEmpty();

@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -95,12 +96,12 @@ public class ForToWhile extends ProgramTransformer {
 
     @Override
     public ProgramElement[] transform(ProgramElement pe,
-            Services services, SVInstantiations svInst) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services, SVInstantiations svInst) {
 
         WhileLoopTransformation w = new ForToWhileTransformation(pe,
                 (ProgramElementName) svInst.getInstantiation(outerLabel),
                 (ProgramElementName) svInst.getInstantiation(innerLabel),
-                services);
+                localSpecRepo, services);
 
         w.start();
         return new ProgramElement[] { w.result() };

@@ -43,8 +43,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -72,7 +71,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
     }
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Term target = term.sub(0);
 
@@ -103,17 +102,17 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 = initAtPreUpdate(methodName, atPres, atPreVars, atPreHeapVars, services, tb);
         // create atPre for parameters
         atPreUpdate = updateAtPreUpdateForLoopInvariants(loops, methodName, atPres, atPreVars,
-                atPreUpdate, services, tb);
+                atPreUpdate, services, tb, localSpecRepo);
         atPreUpdate = updateAtPreUpdateForBlockAndLoopContracts(blocks, methodName, atPres,
-                atPreVars, atPreHeapVars, atPreUpdate, services, tb);
+                atPreVars, atPreHeapVars, atPreUpdate, localSpecRepo, services, tb);
         atPreUpdate = updateAtPreUpdateForMergePointStatements(mpss, methodName, atPres, atPreVars,
                 atPreUpdate, services, tb);
         // update loop invariants
-        selfTerm = updateLoopInvariants(loops, frame, selfTerm, atPres, services, tb);
+        selfTerm = updateLoopInvariants(loops, frame, selfTerm, atPres, localSpecRepo, services, tb);
         // update merge contracts
         updateMergeContracts(mpss, atPres, services);
         // update block contracts
-        updateBlockAndLoopContracts(blocks, loops, atPreVars, atPreHeapVars, services);
+        updateBlockAndLoopContracts(blocks, loops, atPreVars, atPreHeapVars, localSpecRepo, services);
 
         return tb.apply(atPreUpdate, target, null);
     }
@@ -128,16 +127,17 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
      * @param loops the loops whose contracts to update.
      * @param atPreVars all remembrance variables.
      * @param atPreHeapVars all remembrance heaps.
+     * @param localSpecRepo TODO
      * @param services services.
      */
-    public void updateBlockAndLoopContracts(
-            final ImmutableSet<StatementBlock> blocks,
+    public void updateBlockAndLoopContracts(final ImmutableSet<StatementBlock> blocks,
             final ImmutableSet<LoopStatement> loops,
             Map<LocationVariable, LocationVariable> atPreVars,
-            Map<LocationVariable, LocationVariable> atPreHeapVars, Services services) {
+            Map<LocationVariable, LocationVariable> atPreHeapVars,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         updateBlockAndLoopContracts(
-                DefaultImmutableSet.<JavaStatement>nil().union(blocks).union(loops),
-                atPreVars, atPreHeapVars, services);
+                DefaultImmutableSet.<JavaStatement>nil().union(blocks).union(loops), atPreVars,
+                atPreHeapVars, localSpecRepo, services);
     }
 
     /**
@@ -149,12 +149,13 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
      * @param statements the blocks and loops whose contracts to update.
      * @param atPreVars all remembrance variables.
      * @param atPreHeapVars all remembrance heaps.
+     * @param localSpecRepo TODO
      * @param services services.
      */
-    public void updateBlockAndLoopContracts(
-            final ImmutableSet<? extends JavaStatement> statements,
+    public void updateBlockAndLoopContracts(final ImmutableSet<? extends JavaStatement> statements,
             Map<LocationVariable, LocationVariable> atPreVars,
-            Map<LocationVariable, LocationVariable> atPreHeapVars, Services services) {
+            Map<LocationVariable, LocationVariable> atPreHeapVars,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         for (JavaStatement statement : statements) {
             ImmutableSet<AuxiliaryContract> contracts = DefaultImmutableSet.nil();
 
@@ -162,19 +163,19 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 StatementBlock block = (StatementBlock) statement;
 
                 for (BlockContract c
-                        : services.getSpecificationRepository().getBlockContracts(block)) {
+                        : localSpecRepo.getBlockContracts(block)) {
                     contracts = contracts.add(c);
                 }
 
                 for (LoopContract c
-                        : services.getSpecificationRepository().getLoopContracts(block)) {
+                        : localSpecRepo.getLoopContracts(block)) {
                     contracts = contracts.add(c);
                 }
             } else {
                 LoopStatement loop = (LoopStatement) statement;
 
                 for (LoopContract c
-                        : services.getSpecificationRepository().getLoopContracts(loop)) {
+                        : localSpecRepo.getLoopContracts(loop)) {
                     contracts = contracts.add(c);
                 }
             }
@@ -226,7 +227,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 }
                 updateBlockOrLoopContract(statement, contract, newVariables, newPreconditions,
                         newPostconditions, newFreePostconditions, newModifiesClauses, newDeclaresClauses,
-                        newAccessibleClauses, goal, services);
+                        newAccessibleClauses, localSpecRepo, services);
             }
         }
     }
@@ -272,7 +273,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             collectLoopsBlocksAndMergePointStatements(final ProgramElement pe, Services services) {
         final Quadruple<MethodFrame, ImmutableSet<LoopStatement>, ImmutableSet<StatementBlock>,
                 ImmutableSet<MergePointStatement>> frameAndLoopsAndBlocks
-                        = new JavaASTVisitor(pe, services) {
+                        = new JavaASTVisitor(pe, new GoalLocalSpecificationRepository(services), services) {
                             private MethodFrame frame = null;
                             private ImmutableSet<LoopStatement> loops
                                     = DefaultImmutableSet.<LoopStatement>nil();
@@ -306,9 +307,9 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
     private Term updateAtPreUpdateForLoopInvariants(final ImmutableSet<LoopStatement> loops,
             final String methodName, Map<LocationVariable, Term> atPres,
             Map<LocationVariable, LocationVariable> atPreVars, Term atPreUpdate, Services services,
-            final TermBuilder tb) {
+            final TermBuilder tb, GoalLocalSpecificationRepository localSpecRepo) {
         for (LoopStatement loop : loops) {
-            LoopSpecification inv = services.getSpecificationRepository().getLoopSpec(loop);
+            LoopSpecification inv = localSpecRepo.getLoopSpec(loop);
             if (inv != null) {
                 // Nasty bug! The order of these things was not constant! Would
                 // fail indeterministically
@@ -343,7 +344,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             final ImmutableSet<StatementBlock> blocks, final String methodName,
             Map<LocationVariable, Term> atPres, Map<LocationVariable, LocationVariable> atPreVars,
             Map<LocationVariable, LocationVariable> atPreHeapVars, Term atPreUpdate,
-            Services services, final TermBuilder tb) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services, final TermBuilder tb) {
         for (StatementBlock block : blocks) {
             if (block.getChildCount() == 1 && block
                     .getChildAt(0) instanceof AbstractStatement) {
@@ -356,10 +357,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             }
             ImmutableSet<AuxiliaryContract> contracts = DefaultImmutableSet.nil();
 
-            for (BlockContract c : services.getSpecificationRepository().getBlockContracts(block)) {
+            for (BlockContract c : localSpecRepo.getBlockContracts(block)) {
                 contracts = contracts.add(c);
             }
-            for (LoopContract c : services.getSpecificationRepository().getLoopContracts(block)) {
+            for (LoopContract c : localSpecRepo.getLoopContracts(block)) {
                 contracts = contracts.add(c);
             }
 
@@ -464,9 +465,9 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
     private Term updateLoopInvariants(final ImmutableSet<LoopStatement> loops,
             final MethodFrame frame, Term selfTerm, Map<LocationVariable, Term> atPres,
-            Services services, final TermBuilder tb) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services, final TermBuilder tb) {
         for (LoopStatement loop : loops) {
-            LoopSpecification spec = services.getSpecificationRepository().getLoopSpec(loop);
+            LoopSpecification spec = localSpecRepo.getLoopSpec(loop);
             if (spec != null) {
                 if (selfTerm != null && spec.getInternalSelfTerm() == null) {
                     selfTerm = null; // we're calling a static method from an instance context
@@ -505,13 +506,13 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                         newFreeInvariants.put(heap, freeInv);
                     }
                 }
-                ImmutableList<Term> newLocalIns = tb.var(MiscTools.getLocalIns(loop, services));
-                ImmutableList<Term> newLocalOuts = tb.var(MiscTools.getLocalOuts(loop, services));
+                ImmutableList<Term> newLocalIns = tb.var(MiscTools.getLocalIns(loop, localSpecRepo, services));
+                ImmutableList<Term> newLocalOuts = tb.var(MiscTools.getLocalOuts(loop, localSpecRepo, services));
                 final LoopSpecification newInv = spec.create(loop, frame.getProgramMethod(),
                         frame.getProgramMethod().getContainerType(), newInvariants,
                         newFreeInvariants, newMods, newInfFlowSpecs, newVariant, selfTerm,
                         newLocalIns, newLocalOuts, atPres);
-                services.getSpecificationRepository().addLoopInvariant(newInv);
+                localSpecRepo.addLoopInvariant(newInv);
             }
         }
         return selfTerm;
@@ -553,7 +554,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             final Map<LocationVariable, Term> newFreePostconditions,
             final Map<LocationVariable, Term> newModifiesClauses,
             final Map<LocationVariable, Term> newDeclaresClauses,
-            final Map<LocationVariable, Term> newAccessibleClauses, Goal goal, Services services) {
+            final Map<LocationVariable, Term> newAccessibleClauses, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         if (contract instanceof BlockContract) {
             final BlockContract newBlockContract = ((BlockContract) contract).update(
                     (StatementBlock) statement, newPreconditions, newPostconditions,
@@ -561,8 +562,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     newAccessibleClauses, contract.getInfFlowSpecs(), newVariables,
                     contract.getMby(newVariables, services));
 
-            services.getSpecificationRepository().removeBlockContract((BlockContract) contract);
-            services.getSpecificationRepository().addBlockContract(newBlockContract, false);
+            localSpecRepo.removeBlockContract((BlockContract) contract);
+            localSpecRepo.addBlockContract(newBlockContract, false);
         } else if (contract instanceof LoopContract) {
             final LoopContract newLoopContract;
 
@@ -582,8 +583,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                         ((LoopContract) contract).getDecreases(newVariables, services));
             }
 
-            services.getSpecificationRepository().removeLoopContract((LoopContract) contract);
-            services.getSpecificationRepository().addLoopContract(newLoopContract, false);
+            localSpecRepo.removeLoopContract((LoopContract) contract);
+            localSpecRepo.addLoopContract(newLoopContract, false);
         }
     }
 }

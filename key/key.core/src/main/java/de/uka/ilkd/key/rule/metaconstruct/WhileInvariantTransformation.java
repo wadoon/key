@@ -37,6 +37,7 @@ import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -71,6 +72,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
      *            the ProgramElementName of the outer label
      * @param innerLabel
      *            the ProgramElementName of the inner label
+     * @param localSpecRepo TODO
      */
     public WhileInvariantTransformation(ProgramElement root,
             ProgramElementName outerLabel, ProgramElementName innerLabel,
@@ -78,9 +80,9 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             ProgramVariable excParam, ProgramVariable thrownException,
             ProgramVariable brk, ProgramVariable rtrn,
             ProgramVariable returnExpr, 
-            LinkedList<BreakToBeReplaced> breakList, Services services) {
+            LinkedList<BreakToBeReplaced> breakList, GoalLocalSpecificationRepository localSpecRepo, Services services) {
 
-	super(root, outerLabel, innerLabel, services);
+	super(root, outerLabel, innerLabel, localSpecRepo, services);
         this.cont = cont;
         this.exc = exc;
         this.excParam = excParam;
@@ -99,11 +101,12 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
      *            the ProgramElement where to begin
      * @param inst
      *            the SVInstantiations if available
+     * @param localSpecRepo TODO
      */
     public WhileInvariantTransformation(ProgramElement root,
 					SVInstantiations inst,
-                                        Services services) {
-	super(root, inst, services);
+                                        GoalLocalSpecificationRepository localSpecRepo, Services services) {
+	super(root, inst, localSpecRepo, services);
         this.breakList = new LinkedList<BreakToBeReplaced>();
     }
 
@@ -288,7 +291,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                                 : changeList.removeFirst());
                 While newLoop = KeYJavaASTFactory.whileLoop(guard, body,
                         x.getPositionInfo());
-                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                localSpecRepo.copyLoopInvariant(x, newLoop);
                 addChild(newLoop);
                 changed();
             } else {

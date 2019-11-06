@@ -13,6 +13,10 @@
 
 package de.uka.ilkd.key.proof;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -28,9 +32,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.TacletForTests;
-
-import static org.junit.Assert.*;
 
 /** class tests the goal, especially the split and set back mechanism. */
 
@@ -41,7 +44,7 @@ public class TestGoal {
         @Before
         public void setUp() {
                 TacletForTests.parse();
-                proof = new Proof("", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));     
+                proof = new Proof("", new InitConfig(GoalLocalSpecificationRepository.DUMMY_REPO, new Services(AbstractProfile.getDefaultProfile())));     
         }
 
         @After
@@ -59,7 +62,7 @@ public class TestGoal {
                                                                                 TacletForTests.parseTerm("A")))
                                                 .semisequent());
 
-                final InitConfig initConfig = new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
+                final InitConfig initConfig = new InitConfig(GoalLocalSpecificationRepository.DUMMY_REPO, new Services(AbstractProfile.getDefaultProfile()));
 				proof = new Proof("", 
                                   seq,
                                   "",

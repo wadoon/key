@@ -83,7 +83,8 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
 
         final Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> accessibleAndAssignableClause = //
                 AbstractExecutionContractUtils.getAccessibleAndAssignableTermsForNoBehaviorContract(
-                        ape, matchCond, services, executionContext);
+                        ape, matchCond, goal.getLocalSpecificationRepository(), services,
+                        executionContext);
 
         final UniqueArrayList<AbstractUpdateLoc> assignables = accessibleAndAssignableClause.second;
 

@@ -16,8 +16,6 @@ package de.uka.ilkd.key.parser;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import junit.framework.TestCase;
-
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -36,6 +34,8 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
+import junit.framework.TestCase;
 
 
 public class TestDeclParser extends TestCase {
@@ -56,7 +56,7 @@ public class TestDeclParser extends TestCase {
 	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(sorts,
 			"No file. Call of parser from logic/TestClashFreeSubst.java"),
-		serv, nss);
+		GoalLocalSpecificationRepository.DUMMY_REPO, serv, nss);
 	try {
 	    basicSortsParser.parseSorts();
 	} catch(Exception e) {
@@ -71,7 +71,7 @@ public class TestDeclParser extends TestCase {
 	return new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(s,
 			"No file. Call of parser from parser/TestDeclParser.java"),
-		serv, nss);
+		GoalLocalSpecificationRepository.DUMMY_REPO, serv, nss);
     }
 
     private void parseDecls(String s) {

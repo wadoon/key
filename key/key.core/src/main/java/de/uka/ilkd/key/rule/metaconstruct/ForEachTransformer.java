@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -62,8 +63,8 @@ public class ForEachTransformer extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement[] transform(ProgramElement pe, GoalLocalSpecificationRepository localSpecRepo,
+            Services services, SVInstantiations svInst) {
         final ProgramElement[] indexVarInsts = Arrays.stream(indexVariables)
                 .map(sv -> (ProgramElement) svInst.getInstantiation(sv))
                 .collect(Collectors.toList()).toArray(new ProgramElement[0]);
@@ -81,7 +82,7 @@ public class ForEachTransformer extends ProgramTransformer {
                 final ProgramElement substitution = (ProgramElement) listVarInsts[j]
                         .get(i);
                 final ProgramElementReplacer replacer = new ProgramElementReplacer(
-                    (JavaProgramElement) currResult, services);
+                    (JavaProgramElement) currResult, localSpecRepo, services);
                 currResult = replacer.replace(placeholder, substitution);
                 System.err.println();
             }

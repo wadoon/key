@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -35,10 +36,12 @@ public final class InfFlowMethodContractTacletBuilder
         extends AbstractInfFlowContractAppTacletBuilder {
 
     private FunctionalOperationContract methodContract;
+    private final GoalLocalSpecificationRepository localSpecRepo;
 
 
-    public InfFlowMethodContractTacletBuilder(final Services services) {
+    public InfFlowMethodContractTacletBuilder(GoalLocalSpecificationRepository localSpecRepo, final Services services) {
         super(services);
+        this.localSpecRepo = localSpecRepo;
     }
 
 
@@ -57,7 +60,7 @@ public final class InfFlowMethodContractTacletBuilder
     Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
                                Services services) {
         BasicPOSnippetFactory fAssumes =
-                POSnippetFactory.getBasicFactory(methodContract, schemaDataAssumes, services);
+                POSnippetFactory.getBasicFactory(methodContract, schemaDataAssumes, localSpecRepo, services);
         return fAssumes.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
     }
 
@@ -66,7 +69,7 @@ public final class InfFlowMethodContractTacletBuilder
     Term generateSchemaFind(ProofObligationVars schemaDataFind,
                             Services services) {
         BasicPOSnippetFactory fFind =
-                POSnippetFactory.getBasicFactory(methodContract, schemaDataFind, services);
+                POSnippetFactory.getBasicFactory(methodContract, schemaDataFind, localSpecRepo, services);
         return fFind.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
     }
 
@@ -75,7 +78,7 @@ public final class InfFlowMethodContractTacletBuilder
     Term getContractApplPred(ProofObligationVars appData) {
         BasicPOSnippetFactory f =
                 POSnippetFactory.getBasicFactory(methodContract, appData,
-                                                 services);
+                                                 localSpecRepo, services);
         return f.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
     }
 
@@ -91,7 +94,7 @@ public final class InfFlowMethodContractTacletBuilder
         for (InformationFlowContract cont : ifContracts) {
             InfFlowPOSnippetFactory f =
                     POSnippetFactory.getInfFlowFactory(cont, contAppData,
-                                                       contAppData2, services);
+                                                       contAppData2, localSpecRepo, services);
             contractsApplications =
                     contractsApplications.append(
                     f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL));

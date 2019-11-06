@@ -76,6 +76,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -129,13 +130,14 @@ public final class MiscTools {
      * All variables read in the specified program element, excluding newly declared variables.
      *
      * @param pe a program element.
+     * @param localSpecRepo TODO
      * @param services services.
      * @return all variables read in the specified program element,
      *  excluding newly declared variables.
      */
     public static ImmutableSet<ProgramVariable> getLocalIns(ProgramElement pe,
-            Services services) {
-        final ReadPVCollector rpvc = new ReadPVCollector(pe, services);
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        final ReadPVCollector rpvc = new ReadPVCollector(pe, localSpecRepo, services);
         rpvc.start();
         return rpvc.result();
     }
@@ -144,14 +146,15 @@ public final class MiscTools {
      * All variables changed in the specified program element, excluding newly declared variables.
      *
      * @param pe a program element.
+     * @param localSpecRepo TODO
      * @param services services.
      * @return all variables changed in the specified program element,
      *  excluding newly declared variables.
      */
     public static ImmutableSet<ProgramVariable> getLocalOuts(
             ProgramElement pe,
-            Services services) {
-        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, services);
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, localSpecRepo, services);
         wpvc.start();
         return wpvc.getWrittenPVs();
     }
@@ -160,14 +163,15 @@ public final class MiscTools {
      * All variables changed in the specified program element, including newly declared variables.
      *
      * @param pe a program element.
+     * @param localSpecRepo TODO
      * @param services services.
      * @return all variables changed in the specified program element,
      *  including newly declared variables.
      */
     public static ImmutableSet<ProgramVariable> getLocalOutsAndDeclared(
             ProgramElement pe,
-            Services services) {
-        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, services);
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, localSpecRepo, services);
         wpvc.start();
         return wpvc.getWrittenPVs().union(wpvc.getDeclaredPVs());
     }
@@ -176,13 +180,14 @@ public final class MiscTools {
      * All variables newly declared in the specified program element.
      *
      * @param pe a program element.
+     * @param localSpecRepo TODO
      * @param services services.
      * @return all variables newly declared in the specified program element.
      */
     public static ImmutableSet<ProgramVariable> getLocallyDeclaredVars(
             ProgramElement pe,
-            Services services) {
-        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, services);
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, localSpecRepo, services);
         wpvc.start();
         return wpvc.getDeclaredPVs();
     }
@@ -566,8 +571,10 @@ public final class MiscTools {
                 .<ProgramVariable>nil();
 
         private final ProgramElement root;
-        public ReadPVCollector(ProgramElement root, Services services) {
-            super(root, services);
+
+        public ReadPVCollector(ProgramElement root, GoalLocalSpecificationRepository localSpecRepo,
+                Services services) {
+            super(root, localSpecRepo, services);
             this.root = root;
         }
 
@@ -583,7 +590,7 @@ public final class MiscTools {
 
                 for (final ProgramVariable pv : AbstractExecutionContractUtils
                         .getAccessibleProgVarsForNoBehaviorContract(aps, root,
-                                services)) {
+                                localSpecRepo, services)) {
                     if (!pv.isMember() && !declaredPVs.contains(pv)) {
                         result = result.add(pv);
                     }
@@ -618,8 +625,10 @@ public final class MiscTools {
                 DefaultImmutableSet.<ProgramVariable>nil();
 
         private final ProgramElement root;
-        public WrittenAndDeclaredPVCollector(ProgramElement root, Services services) {
-            super(root, services);
+
+        public WrittenAndDeclaredPVCollector(ProgramElement root,
+                GoalLocalSpecificationRepository localSpecRepo, Services services) {
+            super(root, localSpecRepo, services);
             this.root = root;
         }
 
@@ -638,7 +647,7 @@ public final class MiscTools {
 
                 for (final ProgramVariable pv : AbstractExecutionContractUtils
                         .getAssignableProgVarsForNoBehaviorContract(aps, root,
-                                services)) {
+                                localSpecRepo, services)) {
                     if (!pv.isMember() && !declaredPVs.contains(pv)) {
                         writtenPVs = writtenPVs.add(pv);
                     }
@@ -777,14 +786,14 @@ public final class MiscTools {
      *
      * @param t
      *     The {@link Term} from which to collect.
+     * @param localSpecRepo TODO
      * @param services
      *     The {@link Services} object, for the
      *     {@link ProgramVariableCollector}.
-     *
      * @return All {@link LocationVariable}s in the given {@link Term}.
      */
     public static Set<LocationVariable> collectLocVars(final Term t,
-            Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final OpCollector opColl = new OpCollector();
         t.execPostOrder(opColl);
         final Set<LocationVariable> occurringLocVars = opColl.ops().stream()
@@ -794,7 +803,7 @@ public final class MiscTools {
         if (t.containsJavaBlockRecursive()) {
             final JavaBlock jb = MergeRuleUtils.getJavaBlockRecursive(t);
             final ProgramVariableCollector pvc = new ProgramVariableCollector(
-                    jb.program(), services);
+                    jb.program(), localSpecRepo, services);
             pvc.start();
             occurringLocVars.addAll(pvc.result());
         }
@@ -983,15 +992,13 @@ public final class MiscTools {
      *
      * @param loopTerm
      *     The term for which to return the {@link LoopSpecification}.
-     * @param services
-     *     The {@link Services} object.
-     *
+     * @param localSpecRepo TODO
      * @return The {@link LoopSpecification} for the loop statement in the given
      * term or an empty optional if there is no specified invariant for the
      * loop.
      */
     public static Optional<LoopSpecification>
-            getSpecForTermWithLoopStmt(final Term loopTerm, Services services) {
+            getSpecForTermWithLoopStmt(final Term loopTerm, GoalLocalSpecificationRepository localSpecRepo) {
         assert loopTerm.op() instanceof Modality;
         assert loopTerm.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
 
@@ -1003,8 +1010,7 @@ public final class MiscTools {
         final LoopStatement loop = //
                 (LoopStatement) ((StatementBlock) pe).getFirstElement();
 
-        return Optional.ofNullable(
-                services.getSpecificationRepository().getLoopSpec(loop));
+        return Optional.ofNullable(localSpecRepo.getLoopSpec(loop));
     }
 
     /**

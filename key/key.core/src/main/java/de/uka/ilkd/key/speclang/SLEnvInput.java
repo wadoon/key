@@ -48,6 +48,7 @@ import de.uka.ilkd.key.proof.io.AbstractEnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -181,7 +182,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addLoopInvariants(SpecExtractor specExtractor,
-                                   final SpecificationRepository specRepos,
+                                   final GoalLocalSpecificationRepository specRepos,
                                    final KeYJavaType kjt,
                                    final IProgramMethod pm)
                                            throws ProofInputException {
@@ -200,7 +201,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addLoopContracts(SpecExtractor specExtractor,
-                                   final SpecificationRepository specRepos,
+                                   final GoalLocalSpecificationRepository specRepos,
                                    final KeYJavaType kjt,
                                    final IProgramMethod pm)
                                            throws ProofInputException {
@@ -221,7 +222,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addBlockAndLoopContracts(SpecExtractor specExtractor,
-                                          final SpecificationRepository specRepos,
+                                          final GoalLocalSpecificationRepository specRepos,
                                           final IProgramMethod pm)
                                       throws ProofInputException {
         // Block and loop contracts.
@@ -246,7 +247,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addAPEContracts(SpecExtractor specExtractor,
-            final SpecificationRepository specRepos, final IProgramMethod pm)
+            final GoalLocalSpecificationRepository specRepos, final IProgramMethod pm)
             throws ProofInputException {
         final JavaASTCollector abstractStatementCollector = new JavaASTCollector(pm.getBody(),
                 AbstractStatement.class);
@@ -302,7 +303,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addLabeledBlockContracts(SpecExtractor specExtractor,
-                                          final SpecificationRepository specRepos,
+                                          final GoalLocalSpecificationRepository specRepos,
                                           final IProgramMethod pm)
                                       throws ProofInputException {
         final JavaASTCollector labeledCollector =
@@ -318,7 +319,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addLabeledLoopContracts(SpecExtractor specExtractor,
-                                          final SpecificationRepository specRepos,
+                                          final GoalLocalSpecificationRepository specRepos,
                                           final IProgramMethod pm)
                                       throws ProofInputException {
         final JavaASTCollector labeledCollector =
@@ -338,6 +339,8 @@ public final class SLEnvInput extends AbstractEnvInput {
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
         final SpecificationRepository specRepos =
                 initConfig.getServices().getSpecificationRepository();
+        final GoalLocalSpecificationRepository localSpecRepo = 
+                initConfig.getInitialLocalSpecRepo();
 
         //read DL library specs before any other specs
         ImmutableSet<PositionedString> warnings = createDLLibrarySpecs();
@@ -379,13 +382,13 @@ public final class SLEnvInput extends AbstractEnvInput {
                     = specExtractor.extractMethodSpecs(pm, staticInvPresent);
                 specRepos.addSpecs(methodSpecs);
 
-                addLoopInvariants(specExtractor, specRepos, kjt, pm);
-                addLoopContracts(specExtractor, specRepos, kjt, pm);
-                addBlockAndLoopContracts(specExtractor, specRepos, pm);
-                addAPEContracts(specExtractor, specRepos, pm);
+                addLoopInvariants(specExtractor, localSpecRepo, kjt, pm);
+                addLoopContracts(specExtractor, localSpecRepo, kjt, pm);
+                addBlockAndLoopContracts(specExtractor, localSpecRepo, pm);
+                addAPEContracts(specExtractor, localSpecRepo, pm);
                 addMergePointStatements(specExtractor, specRepos, pm, methodSpecs);
-                addLabeledBlockContracts(specExtractor, specRepos, pm);
-                addLabeledLoopContracts(specExtractor, specRepos, pm);
+                addLabeledBlockContracts(specExtractor, localSpecRepo, pm);
+                addLabeledLoopContracts(specExtractor, localSpecRepo, pm);
             }
 
             //constructor contracts
@@ -401,7 +404,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         }
 
         //add initially clauses to constructor contracts
-        specRepos.createContractsFromInitiallyClauses();
+        specRepos.createContractsFromInitiallyClauses(localSpecRepo);
 
         //update warnings to user
         warnings = warnings.union(specExtractor.getWarnings());
@@ -424,7 +427,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
         if (gs.useJML()) {
-            return createSpecs(new JMLSpecExtractor(initConfig.getServices()));
+            return createSpecs(new JMLSpecExtractor(initConfig.getInitialLocalSpecRepo(), initConfig.getServices()));
         } else {
             return null;
         }

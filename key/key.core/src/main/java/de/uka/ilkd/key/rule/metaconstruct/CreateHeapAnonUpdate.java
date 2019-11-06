@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -48,10 +49,10 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
 
     @Override
     public Term transform(Term term, SVInstantiations svInst,
-            Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final Term loopTerm = term.sub(0);
         final Optional<LoopSpecification> loopSpec = //
-                MiscTools.getSpecForTermWithLoopStmt(loopTerm, services);
+                MiscTools.getSpecForTermWithLoopStmt(loopTerm, localSpecRepo);
 
         if (!loopSpec.isPresent()) {
             return null;

@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
 
 /**
@@ -43,11 +44,13 @@ public class ProgramLocationsCollector extends ProgramVariableCollector {
      * collects all program variables occurring in the AST <tt>root</tt> using this
      * constructor is equivalent to <tt>ProggramVariableCollector(root, false)</tt>
      *
-     * @param root     the ProgramElement which is the root of the AST
-     * @param services the Services object
+     * @param root          the ProgramElement which is the root of the AST
+     * @param localSpecRepo TODO
+     * @param services      the Services object
      */
-    public ProgramLocationsCollector(ProgramElement root, Services services) {
-        super(root, services);
+    public ProgramLocationsCollector(ProgramElement root,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        super(root, localSpecRepo, services);
     }
 
     /**

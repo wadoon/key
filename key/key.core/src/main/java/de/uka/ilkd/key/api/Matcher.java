@@ -191,7 +191,7 @@ public class Matcher {
         return new KeYParserF(ParserMode.DECLARATION,
                 new KeYLexerF(s,
                         "No file. parser/TestTacletParser.stringDeclParser(" + s + ")"),
-                services, services.getNamespaces());
+                localSpecRepo, services, services.getNamespaces());
     }
     /**
      * Parse the declaration string for the current pattern and add the variables to the namespace
@@ -214,7 +214,7 @@ public class Matcher {
     private KeYParserF stringTacletParser(String s, Services services) {
         return new KeYParserF(ParserMode.TACLET, new KeYLexerF(s,
                 "No file. CreateTacletForTests.stringTacletParser(" + s + ")"),
-                services, services.getNamespaces());
+                localSpecRepo, services, services.getNamespaces());
     }
 
     private Taclet parseTaclet(String s, Services services) throws RecognitionException {

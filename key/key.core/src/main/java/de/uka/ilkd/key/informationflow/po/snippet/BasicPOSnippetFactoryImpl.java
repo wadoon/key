@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -47,8 +48,8 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
 
     BasicPOSnippetFactoryImpl(FunctionalOperationContract contract,
                               ProofObligationVars poVars,
-                              Services services) {
-        this.data = new BasicSnippetData(contract, services);
+                              GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        this.data = new BasicSnippetData(contract, localSpecRepo, services);
         this.poVars = poVars;
         registerFactoryMethods();
     }
@@ -57,8 +58,8 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
                               ProofObligationVars poVars,
                               ExecutionContext context,
                               Term guardTerm,
-                              Services services) {
-        this.data = new BasicSnippetData(invariant, context, guardTerm, services);
+                              GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        this.data = new BasicSnippetData(invariant, context, guardTerm, localSpecRepo, services);
         this.poVars = poVars;
         registerFactoryMethods();
     }
@@ -66,8 +67,8 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
 
     BasicPOSnippetFactoryImpl(InformationFlowContract contract,
                               ProofObligationVars poVars,
-                              Services services) {
-        this.data = new BasicSnippetData(contract, services);
+                              GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        this.data = new BasicSnippetData(contract, localSpecRepo, services);
         this.poVars = poVars;
         registerFactoryMethods();
     }
@@ -76,8 +77,8 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
     BasicPOSnippetFactoryImpl(BlockContract contract,
                               ProofObligationVars poVars,
                               ExecutionContext context,
-                              Services services) {
-        this.data = new BasicSnippetData(contract, context, services);
+                              GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        this.data = new BasicSnippetData(contract, context, localSpecRepo, services);
         this.poVars = poVars;
         registerFactoryMethods();
     }

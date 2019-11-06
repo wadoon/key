@@ -27,6 +27,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -50,11 +51,13 @@ public class ProgramVariableCollector extends JavaASTVisitor {
      *
      * @param root
      *            the ProgramElement which is the root of the AST
+     * @param localSpecRepo TODO
      * @param services
      *            the Services object
      */
-    public ProgramVariableCollector(ProgramElement root, Services services) {
-        super(root, services);
+    public ProgramVariableCollector(ProgramElement root,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        super(root, localSpecRepo, services);
         assert services != null;
         collectHeapVariables();
     }
@@ -109,7 +112,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         PredicateAbstractionMergeContract pamc = (PredicateAbstractionMergeContract) x;
 
         TermProgramVariableCollector tpvc = services.getFactory()
-                .create(services);
+                .create(localSpecRepo, services);
 
         Map<LocationVariable, Term> atPres = pamc.getAtPres();
 
@@ -125,7 +128,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     @Override
     public void performActionOnLoopInvariant(LoopSpecification x) {
         TermProgramVariableCollector tpvc = services.getFactory()
-                .create(services);
+                .create(localSpecRepo, services);
         Term selfTerm = x.getInternalSelfTerm();
 
         Map<LocationVariable, Term> atPres = x.getInternalAtPres();
@@ -188,7 +191,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     @Override
     public void performActionOnBlockContract(BlockContract x) {
         TermProgramVariableCollector collector = services.getFactory()
-                .create(services);
+                .create(localSpecRepo, services);
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {
             Term precondition = x.getPrecondition(heap, services);
@@ -235,7 +238,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     @Override
     public void performActionOnLoopContract(LoopContract x) {
         TermProgramVariableCollector collector = services.getFactory()
-                .create(services);
+                .create(localSpecRepo, services);
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {
             Term precondition = x.getPrecondition(heap, services);

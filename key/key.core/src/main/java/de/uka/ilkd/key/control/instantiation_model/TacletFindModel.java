@@ -227,7 +227,7 @@ public class TacletFindModel extends AbstractTableModel {
     private IdDeclaration parseIdDeclaration(String s) throws ParserException {
         KeYParserF parser = null;
         try {
-            parser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s, ""), services, nss);
+            parser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s, ""), localSpecRepo, services, nss);
             return parser.id_declaration();
         } catch (RecognitionException re) {
             // parser cannot be null

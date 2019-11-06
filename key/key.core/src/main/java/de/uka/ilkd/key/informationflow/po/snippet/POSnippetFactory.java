@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -19,8 +20,8 @@ public class POSnippetFactory {
     public static BasicPOSnippetFactory getBasicFactory(
             FunctionalOperationContract contract,
             ProofObligationVars vars,
-            Services services) {
-        return new BasicPOSnippetFactoryImpl(contract, vars, services);
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        return new BasicPOSnippetFactoryImpl(contract, vars, localSpecRepo, services);
     }
     
     public static BasicPOSnippetFactory getBasicFactory(
@@ -28,24 +29,24 @@ public class POSnippetFactory {
             ProofObligationVars vars,
             ExecutionContext context,
             Term guardTerm,
-            Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         return new BasicPOSnippetFactoryImpl(invariant, vars, context,
-                                             guardTerm, services);
+                                             guardTerm, localSpecRepo, services);
     }
 
     public static BasicPOSnippetFactory getBasicFactory(
             InformationFlowContract contract,
             ProofObligationVars vars,
-            Services services) {
-        return new BasicPOSnippetFactoryImpl(contract, vars, services);
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        return new BasicPOSnippetFactoryImpl(contract, vars, localSpecRepo, services);
     }    
 
     public static BasicPOSnippetFactory getBasicFactory(
             BlockContract contract,
             ProofObligationVars vars,
             ExecutionContext context,
-            Services services) {
-        return new BasicPOSnippetFactoryImpl(contract, vars, context, services);
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        return new BasicPOSnippetFactoryImpl(contract, vars, context, localSpecRepo, services);
     }
 
     static BasicPOSnippetFactory getBasicFactory(
@@ -60,17 +61,17 @@ public class POSnippetFactory {
             ProofObligationVars vars2,
             ExecutionContext context,
             Term guardTerm,
-            Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         return new InfFlowPOSnippetFactoryImpl(invariant, vars1, vars2, context,
-                                               guardTerm, services);
+                                               guardTerm, localSpecRepo, services);
     }
     
     public static InfFlowPOSnippetFactory getInfFlowFactory(
             InformationFlowContract contract,
             ProofObligationVars vars1,
             ProofObligationVars vars2,
-            Services services) {
-        return new InfFlowPOSnippetFactoryImpl(contract, vars1, vars2, services);
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        return new InfFlowPOSnippetFactoryImpl(contract, vars1, vars2, localSpecRepo, services);
     }
     
     public static InfFlowPOSnippetFactory getInfFlowFactory(
@@ -78,9 +79,9 @@ public class POSnippetFactory {
             ProofObligationVars vars1,
             ProofObligationVars vars2,
             ExecutionContext context,
-            Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         return new InfFlowPOSnippetFactoryImpl(contract, vars1, vars2,
-                                               context, services);
+                                               context, localSpecRepo, services);
     }
 
     static InfFlowPOSnippetFactory getInfFlowFactory(

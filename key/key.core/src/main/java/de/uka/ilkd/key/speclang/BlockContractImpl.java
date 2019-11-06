@@ -33,7 +33,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -111,13 +111,15 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
      *
      * @param contracts
      *            a set of block contracts to combine.
+     * @param localSpecRepo TODO
      * @param services
      *            services.
      * @return the combination of the specified block contracts.
      */
-    public static BlockContract combine(ImmutableSet<BlockContract> contracts, Services services) {
-        return new Combinator(contracts.toArray(new BlockContract[contracts.size()]), services)
-                .combine();
+    public static BlockContract combine(ImmutableSet<BlockContract> contracts,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        return new Combinator(contracts.toArray(new BlockContract[contracts.size()]), localSpecRepo,
+                services).combine();
     }
     
     @Override
@@ -329,6 +331,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
          *            map from every heap to an assignable term.
          * @param hasMod
          *            map specifying on which heaps this contract has a modifies clause.
+         * @param localSpecRepo TODO
          * @param services
          *            services.
          */
@@ -340,10 +343,10 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 Map<Label, Term> continues, Term returns, Term signals, Term signalsOnly,
                 Term diverges, Map<LocationVariable, Term> assignables,
                 Map<LocationVariable, Term> declares, Map<LocationVariable, Term> accessibles,
-                Map<LocationVariable, Boolean> hasMod, Services services) {
+                Map<LocationVariable, Boolean> hasMod, GoalLocalSpecificationRepository localSpecRepo, Services services) {
             super(baseName, block, labels, method, behavior, variables, requires, measuredBy,
                     ensures, freeEnsures, infFlowSpecs, breaks, continues, returns, signals,
-                    signalsOnly, diverges, assignables, declares, accessibles, hasMod, services);
+                    signalsOnly, diverges, assignables, declares, accessibles, hasMod, localSpecRepo, services);
         }
 
         @Override
@@ -355,7 +358,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 Map<LocationVariable, Term> declaresClauses,
                 Map<LocationVariable, Term> accessibleClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
-                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod) {
+                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod, GoalLocalSpecificationRepository localSpecRepo) {
             return new BlockContractImpl(baseName, block, labels, method, modality, preconditions,
                     measuredBy, postconditions, freePostconditions, modifiesClauses,
                     declaresClauses, accessibleClauses, infFlowSpecs, variables,
@@ -374,11 +377,13 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
          *
          * @param contracts
          *            the contracts to combine.
+         * @param localSpecRepo TODO
          * @param services
          *            services.
          */
-        public Combinator(BlockContract[] contracts, Services services) {
-            super(contracts, services);
+        public Combinator(BlockContract[] contracts, GoalLocalSpecificationRepository localSpecRepo,
+                Services services) {
+            super(contracts, localSpecRepo, services);
         }
 
         @Override

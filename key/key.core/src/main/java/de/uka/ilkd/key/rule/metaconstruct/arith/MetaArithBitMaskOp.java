@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public abstract class MetaArithBitMaskOp extends AbstractTermTransformer {
@@ -16,7 +17,7 @@ public abstract class MetaArithBitMaskOp extends AbstractTermTransformer {
 
 	protected abstract BigInteger bitmaskOp(BigInteger left, BigInteger right);
 
-	public Term transform(Term term, SVInstantiations svInst, Services services) {
+	public Term transform(Term term, SVInstantiations svInst, GoalLocalSpecificationRepository localSpecRepo, Services services) {
 		Term arg1 = term.sub(0);
 		Term arg2 = term.sub(1);
 		BigInteger left;

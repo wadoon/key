@@ -304,7 +304,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
          }
          // Collect local variables
          StatementBlock result = getStatementBlock(getPm().getBody());
-         ProgramVariableCollector variableCollector = new ProgramVariableCollector(result, getProof().getServices());
+         ProgramVariableCollector variableCollector = new ProgramVariableCollector(result, localSpecRepo, getProof().getServices());
          variableCollector.start();
          Set<LocationVariable> undeclaredVariables = variableCollector.result();
          for (LocationVariable x : undeclaredVariables) {

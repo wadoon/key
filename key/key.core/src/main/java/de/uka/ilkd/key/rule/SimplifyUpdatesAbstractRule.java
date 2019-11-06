@@ -90,7 +90,8 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
         final Term target = UpdateApplication.getTarget(t);
 
         final TermAccessibleLocationsCollector targetOpColl = //
-                new TermAccessibleLocationsCollector(services);
+                new TermAccessibleLocationsCollector(goal.getLocalSpecificationRepository(),
+                        services);
         target.execPostOrder(targetOpColl);
         final Predicate<? super AbstractUpdateLoc> interestingLoc = AbstractUpdateLoc::isAbstract;
         if (targetOpColl.locations().stream().anyMatch(interestingLoc)) {

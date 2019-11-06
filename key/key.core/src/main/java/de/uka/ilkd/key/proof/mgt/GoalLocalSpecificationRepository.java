@@ -48,6 +48,12 @@ import de.uka.ilkd.key.util.Pair;
  * @author Dominic Steinhoefel
  */
 public class GoalLocalSpecificationRepository {
+    /**
+     * Dummy for classes like Java AST Walkers that generally need this, but not in
+     * all situations.
+     */
+    public final static GoalLocalSpecificationRepository DUMMY_REPO = new GoalLocalSpecificationRepository();
+
     private final Map<Pair<LoopStatement, Integer>, LoopSpecification> loopInvs;
     private final Map<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>> blockContracts;
     private final Map<Pair<AbstractProgramElement, Integer>, ImmutableSet<BlockContract>> abstractProgramElementContracts;
@@ -414,6 +420,19 @@ public class GoalLocalSpecificationRepository {
         this.loopContractsOnLoops = loopContractsOnLoops;
         this.services = services;
         this.cf = new ContractFactory(services);
+    }
+
+    /**
+     * Only for {@link #DUMMY_REPO}.
+     */
+    private GoalLocalSpecificationRepository() {
+        this.loopInvs = new LinkedHashMap<>();
+        this.blockContracts = new LinkedHashMap<>();
+        this.abstractProgramElementContracts = new LinkedHashMap<>();
+        this.loopContracts = new LinkedHashMap<>();
+        this.loopContractsOnLoops = new LinkedHashMap<>();
+        this.services = null;
+        this.cf = null;
     }
 
     /**

@@ -38,6 +38,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
@@ -63,15 +64,19 @@ public final class ProgVarReplacer {
      * The services object
      */
     private final Services services;
+    
+    private final GoalLocalSpecificationRepository localSpecRepo;
 
 
     /**
      * creates a ProgVarReplacer that replaces program variables as specified
      * by the map parameter
+     * @param localSpecRepo TODO
      */
-    public ProgVarReplacer(Map<ProgramVariable, ProgramVariable> map, Services services) {
+    public ProgVarReplacer(Map<ProgramVariable, ProgramVariable> map, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         this.map = map;
         this.services = services;
+        this.localSpecRepo = localSpecRepo;
     }
 
 
@@ -345,7 +350,7 @@ public final class ProgVarReplacer {
         ProgVarReplaceVisitor pvrv = new ProgVarReplaceVisitor(pe,
                                                                map,
                                                                false,
-                                                               services);
+                                                               services, localSpecRepo);
 	pvrv.start();
 	return pvrv.result();
     }

@@ -88,9 +88,9 @@ public final class DefaultTermParser {
             parser
                 = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""),
 				new Recoder2KeY (services, nss),
+                                localSpecRepo, 
                                 services, 
-                                nss, 
-                                scm);
+                                nss, scm);
 
             final Term result = parser.termEOF();
             if (sort != null &&  ! result.sort().extendsTrans(sort))
@@ -116,7 +116,7 @@ public final class DefaultTermParser {
             throws ParserException {
         KeYParserF p = null;
         try {
-            p = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""), new Recoder2KeY(services, nss), services, nss, scm);
+            p = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""), new Recoder2KeY(services, nss), localSpecRepo, services, nss, scm);
             final Sequent seq = p.seqEOF();
                 return seq;
         } catch (RecognitionException re) {

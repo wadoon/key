@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.TermAccessibleLocationsCollector;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.conditions.DropEffectlessElementariesCondition;
 
 /**
@@ -98,7 +99,7 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
                 dropEffectlessElementaries( //
                         update, //
                         target, //
-                        collectLocations(target, services), //
+                        collectLocations(target, goal.getLocalSpecificationRepository(), services), //
                         new LinkedHashSet<>(), //
                         goal, services //
                 ).map( //
@@ -121,13 +122,15 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
     /**
      * Collects read locations in the target {@link Term}.
      * 
-     * @param target   The {@link Term} from which to collect locations.
-     * @param services The {@link Services} object.
+     * @param target        The {@link Term} from which to collect locations.
+     * @param localSpecRepo TODO
+     * @param services      The {@link Services} object.
      * @return The relevant locations in {@link Term}.
      */
-    private static Set<AbstractUpdateLoc> collectLocations(Term target, Services services) {
+    private static Set<AbstractUpdateLoc> collectLocations(Term target,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final TermAccessibleLocationsCollector collector = //
-                new TermAccessibleLocationsCollector(services);
+                new TermAccessibleLocationsCollector(localSpecRepo, services);
         target.execPostOrder(collector);
         return collector.locations();
     }

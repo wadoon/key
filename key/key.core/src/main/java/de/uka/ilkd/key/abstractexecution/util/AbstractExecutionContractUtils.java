@@ -36,6 +36,7 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -54,33 +55,38 @@ public class AbstractExecutionContractUtils {
      * Returns the accessible locations of the "right" no-behavior contract for the
      * given {@link AbstractProgramElement}.
      *
-     * @param aps      The {@link AbstractProgramElement} for which to return the
-     *                 accessible locations.
-     * @param context  The context program (for choosing the "right" contract).
-     * @param services The {@link Services} object.
+     * @param aps           The {@link AbstractProgramElement} for which to return
+     *                      the accessible locations.
+     * @param context       The context program (for choosing the "right" contract).
+     * @param localSpecRepo TODO
+     * @param services      The {@link Services} object.
      * @return The accessible locations for the given
      *         {@link AbstractProgramElement}.
      */
     public static List<AbstractUpdateLoc> getAccessibleTermsForNoBehaviorContract(
-            AbstractProgramElement aps, ProgramElement context, Services services) {
-        return getAccessibleAndAssignableTermsForNoBehaviorContract(aps, context, services).first;
+            AbstractProgramElement aps, ProgramElement context,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        return getAccessibleAndAssignableTermsForNoBehaviorContract(aps, context, localSpecRepo,
+                services).first;
     }
 
     /**
      * Returns the accessible {@ProgramVariable}s of the "right" no-behavior
      * contract for the given {@link AbstractProgramElement}.
      *
-     * @param aps      The {@link AbstractProgramElement} for which to return the
-     *                 accessible {@link ProgramVariable}s.
-     * @param context  The context program (for choosing the "right" contract).
-     * @param services The {@link Services} object.
+     * @param aps           The {@link AbstractProgramElement} for which to return
+     *                      the accessible {@link ProgramVariable}s.
+     * @param context       The context program (for choosing the "right" contract).
+     * @param localSpecRepo TODO
+     * @param services      The {@link Services} object.
      * @return The accessible {@link ProgramVariable}s for the given
      *         {@link AbstractProgramElement}.
      */
     public static List<ProgramVariable> getAccessibleProgVarsForNoBehaviorContract(
-            AbstractProgramElement aps, ProgramElement context, Services services) {
-        return getAccessibleTermsForNoBehaviorContract(aps, context, services).stream()
-                .filter(PVLoc.class::isInstance).map(PVLoc.class::cast).map(PVLoc::getVar)
+            AbstractProgramElement aps, ProgramElement context,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        return getAccessibleTermsForNoBehaviorContract(aps, context, localSpecRepo, services)
+                .stream().filter(PVLoc.class::isInstance).map(PVLoc.class::cast).map(PVLoc::getVar)
                 .map(ProgramVariable.class::cast).collect(Collectors.toList());
     }
 
@@ -88,32 +94,37 @@ public class AbstractExecutionContractUtils {
      * Returns the assignable locations of the "right" no-behavior contract for the
      * given {@link AbstractProgramElement}.
      *
-     * @param aps      The {@link AbstractProgramElement} for which to return the
-     *                 assignable locations.
-     * @param context  The context program (for choosing the "right" contract).
-     * @param services The {@link Services} object.
+     * @param aps           The {@link AbstractProgramElement} for which to return
+     *                      the assignable locations.
+     * @param context       The context program (for choosing the "right" contract).
+     * @param localSpecRepo TODO
+     * @param services      The {@link Services} object.
      * @return The assignable locations for the given
      *         {@link AbstractProgramElement}.
      */
     public static UniqueArrayList<AbstractUpdateLoc> getAssignableOpsForNoBehaviorContract(
-            AbstractProgramElement aps, ProgramElement context, Services services) {
-        return getAccessibleAndAssignableTermsForNoBehaviorContract(aps, context, services).second;
+            AbstractProgramElement aps, ProgramElement context,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        return getAccessibleAndAssignableTermsForNoBehaviorContract(aps, context, localSpecRepo,
+                services).second;
     }
 
     /**
      * Returns the assignable {@ProgramVariable}s of the "right" no-behavior
      * contract for the given {@link AbstractProgramElement}.
      *
-     * @param aps      The {@link AbstractProgramElement} for which to return the
-     *                 assignable {@link ProgramVariable}s.
-     * @param context  The context program (for choosing the "right" contract).
-     * @param services The {@link Services} object.
+     * @param aps           The {@link AbstractProgramElement} for which to return
+     *                      the assignable {@link ProgramVariable}s.
+     * @param context       The context program (for choosing the "right" contract).
+     * @param localSpecRepo TODO
+     * @param services      The {@link Services} object.
      * @return The assignable {@link ProgramVariable}s for the given
      *         {@link AbstractProgramElement}.
      */
     public static List<ProgramVariable> getAssignableProgVarsForNoBehaviorContract(
-            AbstractProgramElement aps, ProgramElement context, Services services) {
-        return getAssignableOpsForNoBehaviorContract(aps, context, services).stream()
+            AbstractProgramElement aps, ProgramElement context,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        return getAssignableOpsForNoBehaviorContract(aps, context, localSpecRepo, services).stream()
                 .map(loc -> loc instanceof HasToLoc ? ((HasToLoc<?>) loc).child() : loc)
                 .filter(PVLoc.class::isInstance).map(PVLoc.class::cast).map(PVLoc::getVar)
                 .map(LocationVariable.class::cast).collect(Collectors.toList());
@@ -123,19 +134,21 @@ public class AbstractExecutionContractUtils {
      * Selects, amongst a given list of {@link BlockContract}s, the matching one for
      * the current context. Note that the current implementation is quite ad-hoc
      * (see inlined TODO in
-     * {@link #findRightContract(List, ProgramElement, LocationVariable, Services)}).
+     * {@link #findRightContract(List, ProgramElement, LocationVariable, GoalLocalSpecificationRepository, Services)}).
      *
-     * @param contracts The list of contracts for the placeholder statement.
-     * @param svInst    The {@link SVInstantiations}.
-     * @param heap      The heap term.
-     * @param services  The services object.
+     * @param contracts     The list of contracts for the placeholder statement.
+     * @param svInst        The {@link SVInstantiations}.
+     * @param heap          The heap term.
+     * @param localSpecRepo TODO
+     * @param services      The services object.
      * @return The most suitable {@link BlockContract} of the list. Will return null
      *         iff the given contracts list is empty.
      */
     public static BlockContract findRightContract(final List<BlockContract> contracts,
-            final SVInstantiations svInst, final LocationVariable heap, Services services) {
+            final SVInstantiations svInst, final LocationVariable heap,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         return findRightContract(contracts, svInst.getContextInstantiation().contextProgram(), heap,
-                services);
+                localSpecRepo, services);
     }
 
     /**
@@ -146,16 +159,18 @@ public class AbstractExecutionContractUtils {
      * @param contracts      The list of contracts for the placeholder statement.
      * @param contextProgram The context program (for choosing the right contract).
      * @param heap           The heap term.
+     * @param localSpecRepo  TODO
      * @param services       The services object.
      * @return The most suitable {@link BlockContract} of the list. Will return null
      *         iff the given contracts list is empty.
      */
     public static BlockContract findRightContract(final List<BlockContract> contracts,
-            final ProgramElement contextProgram, final LocationVariable heap, Services services) {
+            final ProgramElement contextProgram, final LocationVariable heap,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final ProgramVariableCollector pvColl = //
-                new ProgramVariableCollector(contextProgram, services);
+                new ProgramVariableCollector(contextProgram, localSpecRepo, services);
         pvColl.start();
-        return findRightContract(contracts, pvColl.result(), heap, services);
+        return findRightContract(contracts, pvColl.result(), heap, localSpecRepo, services);
     }
 
     /**
@@ -167,15 +182,16 @@ public class AbstractExecutionContractUtils {
      * selected. In case of a draw, the first one wins.
      *
      * @param contracts      The list of contracts for the placeholder statement.
-     * @param contextProgram The context program (for choosing the right contract).
      * @param heap           The heap term.
+     * @param localSpecRepo  TODO
      * @param services       The services object.
+     * @param contextProgram The context program (for choosing the right contract).
      * @return The most suitable {@link BlockContract} of the list. Will return null
      *         iff the given contracts list is empty.
      */
     public static BlockContract findRightContract(final List<BlockContract> contracts,
             final Set<LocationVariable> surroundingVars, final LocationVariable heap,
-            Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         assert contracts != null && !contracts.isEmpty();
 
         /*
@@ -201,8 +217,8 @@ public class AbstractExecutionContractUtils {
         contracts.sort(new Comparator<BlockContract>() {
             @Override
             public int compare(BlockContract c1, BlockContract c2) {
-                final int sharedVarsDiff = numSharedVars(surroundingVars, c2, services)
-                        - numSharedVars(surroundingVars, c1, services);
+                final int sharedVarsDiff = numSharedVars(surroundingVars, c2, localSpecRepo,
+                        services) - numSharedVars(surroundingVars, c1, localSpecRepo, services);
                 // c1 is smaller if sharing *more* variables
                 if (sharedVarsDiff < 0) {
                     return -1;
@@ -212,8 +228,9 @@ public class AbstractExecutionContractUtils {
 
                 assert sharedVarsDiff == 0;
 
-                final int varsNotSharedDiff = numOfVarsNotInCommon(surroundingVars, c1, services)
-                        - numOfVarsNotInCommon(surroundingVars, c2, services);
+                final int varsNotSharedDiff = numOfVarsNotInCcommon(surroundingVars, c1,
+                        localSpecRepo, services)
+                        - numOfVarsNotInCcommon(surroundingVars, c2, localSpecRepo, services);
                 // c1 is smaller if it has a lower number of variables not in common
                 if (varsNotSharedDiff < 0) {
                     return -1;
@@ -236,15 +253,18 @@ public class AbstractExecutionContractUtils {
      * Calculates the number of variables shared by the given contract with the
      * given set of variables.
      * 
-     * @param varsToCheck The variables to check.
-     * @param contract    The contract.
-     * @param services    The {@link Services} object (for the variable collector).
+     * @param varsToCheck   The variables to check.
+     * @param contract      The contract.
+     * @param localSpecRepo TODO
+     * @param services      The {@link Services} object (for the variable
+     *                      collector).
      * @return The number of shared variables.
      */
     private static int numSharedVars(final Set<LocationVariable> varsToCheck,
-            BlockContract contract, Services services) {
+            BlockContract contract, GoalLocalSpecificationRepository localSpecRepo,
+            Services services) {
         final ProgramVariableCollector pvColl = //
-                new ProgramVariableCollector(contract.getBlock(), services);
+                new ProgramVariableCollector(contract.getBlock(), localSpecRepo, services);
         pvColl.performActionOnBlockContract(contract);
         return (int) pvColl.result().stream().filter(varsToCheck::contains).count();
     }
@@ -253,15 +273,18 @@ public class AbstractExecutionContractUtils {
      * Calculates the number of variables which the given contract has not in common
      * with the given set of variables.
      * 
-     * @param varsToCheck The variables to check.
-     * @param contract    The contract.
-     * @param services    The {@link Services} object (for the variable collector).
+     * @param varsToCheck   The variables to check.
+     * @param contract      The contract.
+     * @param localSpecRepo TODO
+     * @param services      The {@link Services} object (for the variable
+     *                      collector).
      * @return The number of shared variables.
      */
-    private static int numOfVarsNotInCommon(final Set<LocationVariable> varsToCheck,
-            BlockContract contract, Services services) {
+    private static int numOfVarsNotInCcommon(final Set<LocationVariable> varsToCheck,
+            BlockContract contract, GoalLocalSpecificationRepository localSpecRepo,
+            Services services) {
         final ProgramVariableCollector pvColl = //
-                new ProgramVariableCollector(contract.getBlock(), services);
+                new ProgramVariableCollector(contract.getBlock(), localSpecRepo, services);
         pvColl.performActionOnBlockContract(contract);
         return (int) pvColl.result().stream().filter(pv -> !varsToCheck.contains(pv)).count()
                 + (int) varsToCheck.stream().filter(pv -> !pvColl.result().contains(pv)).count();
@@ -277,18 +300,19 @@ public class AbstractExecutionContractUtils {
      *                       the accessible and assignable clause.
      * @param contextProgram The context program to determine the right contract
      *                       (after renamings).
+     * @param localSpecRepo  TODO
      * @param services       The {@link Services} object.
      * @return A pair of (1) the accessible and (2) the assignable locations for the
      *         {@link AbstractProgramElement}.
      */
     public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractProgramElement abstrStmt, final ProgramElement contextProgram,
-            final Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, final Services services) {
         final ProgramVariableCollector pvColl = //
-                new ProgramVariableCollector(contextProgram, services);
+                new ProgramVariableCollector(contextProgram, localSpecRepo, services);
         pvColl.start();
         return getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, pvColl.result(),
-                Optional.empty(), services);
+                Optional.empty(), localSpecRepo, services);
     }
 
     /**
@@ -304,20 +328,22 @@ public class AbstractExecutionContractUtils {
      * @param executionContext An optional runtime instance {@link LocationVariable}
      *                         to normalize self terms (because otherwise, there
      *                         might be different such terms around).
+     * @param localSpecRepo    TODO
      * @param services         The {@link Services} object.
      * @return A pair of (1) the accessible and (2) the assignable locations for the
      *         {@link AbstractProgramElement}.
      */
     public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractProgramElement abstrStmt, final Set<LocationVariable> surroundingVars,
-            Optional<ExecutionContext> executionContext, final Services services) {
+            Optional<ExecutionContext> executionContext,
+            GoalLocalSpecificationRepository localSpecRepo, final Services services) {
         List<AbstractUpdateLoc> accessibleClause;
         UniqueArrayList<AbstractUpdateLoc> assignableClause = null;
 
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
 
         final List<BlockContract> contracts = //
-                getNoBehaviorContracts(abstrStmt, services);
+                getNoBehaviorContracts(abstrStmt, localSpecRepo, services);
 
         if (contracts.isEmpty()) {
             accessibleClause = Collections.singletonList(new AllLocsLoc(locSetLDT.getAllLocs()));
@@ -327,7 +353,7 @@ public class AbstractExecutionContractUtils {
             final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
 
             final BlockContract contract = findRightContract(contracts, surroundingVars, heap,
-                    services);
+                    localSpecRepo, services);
 
             accessibleClause = AbstractUpdateFactory
                     .abstrUpdateLocsFromTerm(contract.getAccessibleClause(heap), executionContext,
@@ -352,6 +378,7 @@ public class AbstractExecutionContractUtils {
      *
      * @param abstrStmt        The {@link AbstractProgramElement} for which to
      *                         extract the accessible and assignable locations.
+     * @param localSpecRepo    TODO
      * @param services         The {@link Services} object.
      * @param executionContext An optional runtime instance {@link LocationVariable}
      *                         to normalize self terms (because otherwise, there
@@ -364,7 +391,8 @@ public class AbstractExecutionContractUtils {
     public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> //
             getAccessibleAndAssignableTermsForNoBehaviorContract(
                     final AbstractProgramElement abstrStmt, final MatchConditions matchCond,
-                    final Services services, Optional<ExecutionContext> executionContext) {
+                    GoalLocalSpecificationRepository localSpecRepo, final Services services,
+                    Optional<ExecutionContext> executionContext) {
         final Set<LocationVariable> surroundingVars = new LinkedHashSet<>();
         /*
          * NOTE (DS, 2019-11-04): Considering the program proved to be a bad idea, since
@@ -401,7 +429,7 @@ public class AbstractExecutionContractUtils {
         });
 
         return getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, surroundingVars,
-                executionContext, services);
+                executionContext, localSpecRepo, services);
     }
 
     /**
@@ -409,14 +437,15 @@ public class AbstractExecutionContractUtils {
      * refers to the "standard" contracts, i.e. without any specific behavior (like
      * "exceptional_behavior" etc.).
      *
-     * @param abstrStmt The {@link AbstractProgramElement} for which to return the
-     *                  contracts.
-     * @param services  The {@link Services} object.
+     * @param abstrStmt     The {@link AbstractProgramElement} for which to return
+     *                      the contracts.
+     * @param localSpecRepo TODO
+     * @param services      The {@link Services} object.
      * @return All the contracts for the given {@link AbstractProgramElement}.
      */
     public static List<BlockContract> getNoBehaviorContracts(final AbstractProgramElement abstrStmt,
-            final Services services) {
-        return services.getSpecificationRepository().getAbstractProgramElementContracts(abstrStmt)
+            GoalLocalSpecificationRepository localSpecRepo, final Services services) {
+        return localSpecRepo.getAbstractProgramElementContracts(abstrStmt)
                 .stream().filter(contract -> contract.getBaseName().equals("JML block contract"))
                 /*
                  * We exclude return_behavior etc. here, because from those contracts we only

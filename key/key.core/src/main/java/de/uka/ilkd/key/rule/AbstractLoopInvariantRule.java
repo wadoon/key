@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -91,7 +91,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final LoopInvariantBuiltInRuleApp loopRuleApp = (LoopInvariantBuiltInRuleApp) ruleApp;
 
         // Get the Instantiation object
-        final Instantiation inst = instantiate(loopRuleApp, services);
+        final Instantiation inst = instantiate(loopRuleApp, goal.getLocalSpecificationRepository(), services);
 
         // Get necessary parts of invariant and sequent
         final Map<LocationVariable, Term> atPres = inst.inv.getInternalAtPres();
@@ -107,7 +107,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         // TODO: reachableIn has been removed since it was not even used in the
         // old invariant rule. Is that OK or was there an earlier mistake?
         final ImmutableSet<ProgramVariable> localOuts = MiscTools
-                .getLocalOuts(inst.loop, services);
+                .getLocalOuts(inst.loop, goal.getLocalSpecificationRepository(), services);
 
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop = //
                 new LinkedHashMap<LocationVariable, Map<Term, Term>>();
@@ -429,6 +429,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @param app
      *            The {@link LoopInvariantBuiltInRuleApp} object for the
      *            application of the {@link LoopScopeInvariantRule}.
+     * @param localSpecRepo TODO
      * @param services
      *            The {@link Services} object.
      * @return The {@link Instantiation} object containing the relevant
@@ -437,13 +438,12 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      *             If the {@link LoopInvariantBuiltInRuleApp} does not contain a
      *             {@link LoopSpecification}.
      */
-    protected static Instantiation instantiate(
-            final LoopInvariantBuiltInRuleApp app, Services services)
+    protected static Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
+            GoalLocalSpecificationRepository localSpecRepo, Services services)
             throws RuleAbortException {
         final Term focusTerm = app.posInOccurrence().subTerm();
 
-        if (focusTerm == lastFocusTerm && lastInstantiation.inv == services
-                .getSpecificationRepository()
+        if (focusTerm == lastFocusTerm && lastInstantiation.inv == localSpecRepo
                 .getLoopSpec(lastInstantiation.loop)) {
             return lastInstantiation;
         }
@@ -482,7 +482,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                 innermostMethodFrame == null ? null
                         : (ExecutionContext) innermostMethodFrame
                                 .getExecutionContext();
-        services.getSpecificationRepository().addLoopInvariant(spec);
+        localSpecRepo.addLoopInvariant(spec);
 
         // cache and return result
         final Instantiation result = new Instantiation( //

@@ -56,6 +56,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.Pair;
@@ -193,12 +194,12 @@ public class EnhancedForElimination extends ProgramTransformer {
      *
      * @see #makeIterableForLoop(LocalVariableDeclaration, Expression, Statement)
      *
-     * @see ProgramTransformer#transform(de.uka.ilkd.key.java.ProgramElement, Services,
-     *      SVInstantiations)
+     * @see ProgramTransformer#transform(de.uka.ilkd.key.java.ProgramElement, GoalLocalSpecificationRepository,
+     *      Services, SVInstantiations)
      */
     @Override
     public ProgramElement[] transform(ProgramElement pe,
-            Services services, SVInstantiations svInst) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services, SVInstantiations svInst) {
 
         assert pe instanceof EnhancedFor : "Only works on enhanced fors";
 
@@ -216,9 +217,9 @@ public class EnhancedForElimination extends ProgramTransformer {
     }
     ProgramElement result;
     if (!isArrayType(expression, services)) {
-        result = makeIterableForLoop(enhancedFor, services);
+        result = makeIterableForLoop(enhancedFor, localSpecRepo, services);
     } else {
-        result = makeArrayForLoop(enhancedFor, services);
+        result = makeArrayForLoop(enhancedFor, localSpecRepo, services);
     }
 
     return new ProgramElement[] { result };
@@ -281,7 +282,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * Transform an enhanced for-loop over an array to a regular for-loop. for(T v : exp) body -->
      * arr = exp; for(int i = 0; i < arr.length; i++) body;
      */
-    private ProgramElement makeArrayForLoop(EnhancedFor enhancedFor, Services services) {
+    private ProgramElement makeArrayForLoop(EnhancedFor enhancedFor, GoalLocalSpecificationRepository localSpecRepo, Services services) {
 
         Expression expression = enhancedFor.getGuardExpression();
         Statement body = enhancedFor.getBody();
@@ -321,7 +322,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         loop = KeYJavaASTFactory.forLoop(inits, guard,
                 updates, declArrayElemVar, getNextElement, body);
 
-        setInvariant(enhancedFor, loop, indexVariable, Optional.empty(), services);
+        setInvariant(enhancedFor, loop, indexVariable, Optional.empty(), localSpecRepo, services);
 
         // arr = exp; for(...) body
         StatementBlock composition = KeYJavaASTFactory.block(arrAssignment, loop);
@@ -333,7 +334,7 @@ public class EnhancedForElimination extends ProgramTransformer {
     /*
      * "{ ; while(<itguard>) <block> } "
      */
-    private ProgramElement makeIterableForLoop(EnhancedFor enhancedFor, Services services) {
+    private ProgramElement makeIterableForLoop(EnhancedFor enhancedFor, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final Expression iterableExpr = enhancedFor.getGuardExpression();
         final KeYJavaType iterableType = iterableExpr.getKeYJavaType(services, execContext);
         final IProgramMethod iteratorMethod = services.getJavaInfo().getProgramMethod(
@@ -374,7 +375,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         head = KeYJavaASTFactory.block(itinit, valuesInit);
         // block
         final StatementBlock outerBlock = KeYJavaASTFactory.block(itinit, valuesInit, loop);
-        setInvariant(enhancedFor, loop, indexVariable, Optional.of(valuesVariable), services);
+        setInvariant(enhancedFor, loop, indexVariable, Optional.of(valuesVariable), localSpecRepo, services);
         return outerBlock;
 
     }
@@ -418,15 +419,17 @@ public class EnhancedForElimination extends ProgramTransformer {
      *
      * @param original    original loop.
      * @param transformed transformed loop.
+     * @param localSpecRepo TODO
      * @param services    services.
      */
-    private void setInvariant (EnhancedFor original, LoopStatement transformed,
-            ProgramVariable loopIdxVar, Optional<ProgramVariable> valuesVar, Services services) {
-        LoopSpecification li = services.getSpecificationRepository().getLoopSpec(original);
+    private void setInvariant(EnhancedFor original, LoopStatement transformed,
+            ProgramVariable loopIdxVar, Optional<ProgramVariable> valuesVar,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        LoopSpecification li = localSpecRepo.getLoopSpec(original);
         if (li != null) {
             li = li.setLoop(transformed);
             li = instantiateIndexValues(li, loopIdxVar, valuesVar, services);
-            services.getSpecificationRepository().addLoopInvariant(li);
+            localSpecRepo.addLoopInvariant(li);
         }
     }
 

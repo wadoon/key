@@ -180,8 +180,8 @@ class StdPredicateEstimator implements PredicateEstimator {
     private Term translate(String estimation, Services services) {
         try {
             KeYParserF parser = new KeYParserF(ParserMode.TERM, new KeYLexerF(
-                    estimation, ""), services, // should not be needed
-                    services.getNamespaces());
+                    estimation, ""), localSpecRepo, // should not be needed
+                    services, services.getNamespaces());
             return parser.term();
         }
         catch (Throwable e) {

@@ -26,7 +26,7 @@ public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions exte
    private IBreakpointStopCondition breakpointStopCondition;
    
    public TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(Services services, IBreakpointStopCondition breakpointStopCondition) {
-       super(services);
+       super(localSpecRepo, services);
        this.breakpointStopCondition = breakpointStopCondition;
    }
    

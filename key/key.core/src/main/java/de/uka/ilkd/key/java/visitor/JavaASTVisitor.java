@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
@@ -44,15 +45,18 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     implements Visitor {
 
     protected final Services services;
+    protected final GoalLocalSpecificationRepository localSpecRepo;
 
 
     /** create the JavaASTVisitor
      * @param root the ProgramElement where to begin
+     * @param localSpecRepo TODO
      * @param services the Services object
      */
-    public JavaASTVisitor(ProgramElement root, Services services) {
+    public JavaASTVisitor(ProgramElement root, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         super(root);
         this.services = services;
+        this.localSpecRepo = localSpecRepo;
     }
 
 
@@ -60,21 +64,21 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     protected void walk(ProgramElement node) {
         super.walk(node);
         if(node instanceof LoopStatement && services != null) {
-            LoopSpecification li = services.getSpecificationRepository()
+            LoopSpecification li = localSpecRepo
                                        .getLoopSpec((LoopStatement) node);
             if(li != null) {
                 performActionOnLoopInvariant(li);
             }
         } else if (node instanceof StatementBlock && services != null) {
             ImmutableSet<BlockContract> bcs =
-                services.getSpecificationRepository()
+                localSpecRepo
                     .getBlockContracts((StatementBlock) node);
             for (BlockContract bc : bcs) {
                 performActionOnBlockContract(bc);
             }
 
             ImmutableSet<LoopContract> lcs =
-                services.getSpecificationRepository()
+                localSpecRepo
                     .getLoopContracts((StatementBlock) node);
             for (LoopContract lc : lcs) {
                 performActionOnLoopContract(lc);
@@ -86,7 +90,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
             mcs.forEach(mc -> performActionOnMergeContract(mc));
         }
         else if (node instanceof AbstractProgramElement && services != null) {
-            ImmutableSet<BlockContract> contracts = services.getSpecificationRepository()
+            ImmutableSet<BlockContract> contracts = localSpecRepo
                     .getAbstractProgramElementContracts((AbstractProgramElement) node);
             contracts.forEach(this::performActionOnAbstractProgramElementContract);
         }

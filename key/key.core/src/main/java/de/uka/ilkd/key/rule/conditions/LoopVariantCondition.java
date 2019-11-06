@@ -38,8 +38,7 @@ public class LoopVariantCondition implements VariableCondition {
 
         final LoopStatement loop = (LoopStatement) svInst
                 .getInstantiation(loopStmtSV);
-        final LoopSpecification loopSpec =//
-                services.getSpecificationRepository().getLoopSpec(loop);
+        final LoopSpecification loopSpec = goal.getLocalSpecificationRepository().getLoopSpec(loop);
 
         if (loopSpec == null) {
             return null;

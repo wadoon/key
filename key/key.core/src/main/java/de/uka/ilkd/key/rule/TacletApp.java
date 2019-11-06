@@ -603,7 +603,7 @@ public abstract class TacletApp implements RuleApp {
             if (sv.sort() == ProgramSVSort.VARIABLE) {
                 String proposal = varNamer
                         .getSuggestiveNameProposalForProgramVariable(sv, this,
-                                services, proposals);
+                                goal.getLocalSpecificationRepository(), services, proposals);
                 ProgramElement pe = app.getProgramElement(proposal, sv,
                         services);
                 app = app.addCheckedInstantiation(sv, pe, goal, services, true);
@@ -720,7 +720,7 @@ public abstract class TacletApp implements RuleApp {
 	    if (sv.sort() == ProgramSVSort.VARIABLE) {
 		String proposal = varNamer
 			.getSuggestiveNameProposalForProgramVariable(sv, this,
-				services, proposals);
+				goal.getLocalSpecificationRepository(), services, proposals);
 		ProgramElement pe = app.getProgramElement(proposal, sv, services);
 		app = app.addCheckedInstantiation(sv, pe, goal, services, true);
 		proposals = proposals.append(proposal);

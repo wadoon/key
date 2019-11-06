@@ -37,7 +37,7 @@ public class LoopContractSelectionPanel extends AuxiliaryContractSelectionPanel<
             for (LoopContract contract : selection) {
                 contracts = contracts.add(contract);
             }
-            return LoopContractImpl.combine(contracts, services);
+            return LoopContractImpl.combine(contracts, localSpecRepo, services);
         }
     }
 }

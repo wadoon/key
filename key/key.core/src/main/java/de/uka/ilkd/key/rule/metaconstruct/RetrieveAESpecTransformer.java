@@ -19,7 +19,6 @@ import java.util.function.Predicate;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.Name;
@@ -32,6 +31,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -57,7 +57,8 @@ public class RetrieveAESpecTransformer extends AbstractTermTransformer {
     }
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         final AbstractProgramElement ape = (AbstractProgramElement) svInst
@@ -65,7 +66,7 @@ public class RetrieveAESpecTransformer extends AbstractTermTransformer {
 
         final LocationVariable flag = (LocationVariable) term.sub(1).op();
 
-        final ImmutableSet<BlockContract> contracts = services.getSpecificationRepository()
+        final ImmutableSet<BlockContract> contracts = localSpecRepo
                 .getAbstractProgramElementContracts(ape);
 
         for (final BlockContract contract : contracts) {

@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class ArrayLength extends ProgramTransformer {
@@ -33,8 +34,8 @@ public class ArrayLength extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations insts) {
+    public ProgramElement[] transform(ProgramElement pe, GoalLocalSpecificationRepository localSpecRepo,
+            Services services, SVInstantiations insts) {
         return new ProgramElement[] { KeYJavaASTFactory.fieldReference(services,
             "length", (Expression) pe, insts.getExecutionContext()) };
     }

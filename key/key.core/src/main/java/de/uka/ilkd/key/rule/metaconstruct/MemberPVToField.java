@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
@@ -35,7 +36,7 @@ public final class MemberPVToField extends AbstractTermTransformer {
     @Override
     public Term transform(Term term, 
 	    		  SVInstantiations svInst, 
-	    		  Services services ) {
+	    		  GoalLocalSpecificationRepository localSpecRepo, Services services ) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();	
  	
  	    

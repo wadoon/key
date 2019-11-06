@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -49,7 +50,7 @@ public abstract class MutualExclusionFormula extends AbstractTermTransformer {
 
     @Override
     public Term transform(Term term, SVInstantiations svInst,
-            Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Sort booleanSort = //
                 services.getTypeConverter().getBooleanLDT().targetSort();

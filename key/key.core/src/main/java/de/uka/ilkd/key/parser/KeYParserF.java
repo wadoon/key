@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.JavaReader;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
@@ -49,12 +50,12 @@ public class KeYParserF extends KeYParser {
     }
 
     public KeYParserF(ParserMode mode, KeYLexerF keYLexerF,
-            JavaReader jr, Services services, NamespaceSet nss, AbbrevMap scm) {
-        super(mode, new CommonTokenStream(keYLexerF), jr, services, nss, scm);
+            JavaReader jr, GoalLocalSpecificationRepository localSpecRepo, Services services, NamespaceSet nss, AbbrevMap scm) {
+        super(mode, new CommonTokenStream(keYLexerF), jr, localSpecRepo, services, nss, scm);
     }
 
-    public KeYParserF(ParserMode mode, KeYLexerF keYLexerF, Services services, NamespaceSet nss) {
-        super(mode, new CommonTokenStream(keYLexerF), services, nss);
+    public KeYParserF(ParserMode mode, KeYLexerF keYLexerF, GoalLocalSpecificationRepository localSpecRepo, Services services, NamespaceSet nss) {
+        super(mode, new CommonTokenStream(keYLexerF), localSpecRepo, services, nss);
     }
 
     /**

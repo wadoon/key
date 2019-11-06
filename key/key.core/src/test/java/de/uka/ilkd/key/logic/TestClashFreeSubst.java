@@ -17,8 +17,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Stack;
 
-import junit.framework.TestCase;
-
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -37,8 +35,10 @@ import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import junit.framework.TestCase;
 
 public class TestClashFreeSubst extends TestCase {
 
@@ -70,7 +70,7 @@ public class TestClashFreeSubst extends TestCase {
 	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(sorts,
 			"No file. Call of parser from logic/TestClashFreeSubst.java"),
-		services, nss);
+		GoalLocalSpecificationRepository.DUMMY_REPO, services, nss);
 	try {
 	    basicSortsParser.parseSorts();
 	} catch(Exception e) {
@@ -137,7 +137,7 @@ public class TestClashFreeSubst extends TestCase {
 	return new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(s,
 			"No file. Call of parser from logic/TestClashFreeSubst.java"),
-		services, nss);
+		GoalLocalSpecificationRepository.DUMMY_REPO, services, nss);
     }
 
     public void parseDecls(String s) {
@@ -161,9 +161,9 @@ public class TestClashFreeSubst extends TestCase {
 			services.getJavaInfo().rec2key(),
 			new NamespaceSet(),
 			services.getTypeConverter()),
+		GoalLocalSpecificationRepository.DUMMY_REPO,
 		services,
-		nss,
-		new AbbrevMap());
+		nss, new AbbrevMap());
     }
 
     public Term parseTerm(String s) {

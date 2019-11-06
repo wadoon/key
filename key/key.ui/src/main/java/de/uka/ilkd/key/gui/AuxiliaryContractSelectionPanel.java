@@ -21,6 +21,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContractImpl;
@@ -33,8 +34,8 @@ import de.uka.ilkd.key.speclang.LoopContractImpl;
  * @param <T>
  * 
  * @see AuxiliaryContractConfigurator
- * @see BlockContractImpl#combine(org.key_project.util.collection.ImmutableSet, Services)
- * @see LoopContractImpl#combine(org.key_project.util.collection.ImmutableSet, Services)
+ * @see BlockContractImpl#combine(org.key_project.util.collection.ImmutableSet, GoalLocalSpecificationRepository, Services)
+ * @see LoopContractImpl#combine(org.key_project.util.collection.ImmutableSet, GoalLocalSpecificationRepository, Services)
  */
 public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContract>
         extends JPanel {

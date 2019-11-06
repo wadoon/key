@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -69,6 +67,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
@@ -125,6 +124,7 @@ public class JMLSpecFactory {
 
     private final de.uka.ilkd.key.logic.TermBuilder tb;
     private final de.uka.ilkd.key.java.Services services;
+    private final GoalLocalSpecificationRepository localSpecRepo;
     private final ContractFactory cf;
     private int invCounter;
     /**
@@ -135,9 +135,10 @@ public class JMLSpecFactory {
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
-    public JMLSpecFactory(Services services) {
+    public JMLSpecFactory(GoalLocalSpecificationRepository localSpecRepo, Services services) {
         assert services != null;
         this.services = services;
+        this.localSpecRepo = localSpecRepo;
         this.tb = services.getTermBuilder();
         cf = new ContractFactory(services);
         modelFields = new LinkedHashSet<Pair<KeYJavaType, IObserverFunction>>();
@@ -1340,7 +1341,7 @@ public class JMLSpecFactory {
 
         final Behavior behavior = specificationCase.getBehavior();
         final BlockContract.Variables variables
-                = BlockContract.Variables.create(block, labels, method, services);
+                = BlockContract.Variables.create(block, labels, method, localSpecRepo, services);
         final ProgramVariableCollection programVariables
                 = createProgramVariables(method, block, variables);
         final ContractClauses clauses
@@ -1357,7 +1358,7 @@ public class JMLSpecFactory {
                 clauses.ensuresFree, clauses.infFlowSpecs, clauses.breaks, clauses.continues,
                 clauses.returns, clauses.signals, clauses.signalsOnly, clauses.diverges,
                 clauses.assignables, clauses.declares, clauses.accessibles, clauses.hasMod,
-                services).create();
+                localSpecRepo, services).create();
     }
 
     /**
@@ -1383,7 +1384,7 @@ public class JMLSpecFactory {
 
         final Behavior behavior = specificationCase.getBehavior();
         final LoopContract.Variables variables
-                = LoopContract.Variables.create(loop, labels, method, services);
+                = LoopContract.Variables.create(loop, labels, method, localSpecRepo, services);
         final ProgramVariableCollection programVariables
                 = createProgramVariables(method, loop, variables);
         final ContractClauses clauses
@@ -1393,7 +1394,7 @@ public class JMLSpecFactory {
                 clauses.ensuresFree, clauses.infFlowSpecs, clauses.breaks, clauses.continues,
                 clauses.returns, clauses.signals, clauses.signalsOnly, clauses.diverges,
                 clauses.assignables, clauses.declares, clauses.accessibles, clauses.hasMod,
-                clauses.decreases, services).create();
+                clauses.decreases, localSpecRepo, services).create();
     }
 
     /**
@@ -1419,7 +1420,7 @@ public class JMLSpecFactory {
 
         final Behavior behavior = specificationCase.getBehavior();
         final LoopContract.Variables variables
-                = LoopContract.Variables.create(block, labels, method, services);
+                = LoopContract.Variables.create(block, labels, method, localSpecRepo, services);
         final ProgramVariableCollection programVariables
                 = createProgramVariables(method, block, variables);
         final ContractClauses clauses
@@ -1429,7 +1430,7 @@ public class JMLSpecFactory {
                 clauses.ensuresFree, clauses.infFlowSpecs, clauses.breaks, clauses.continues,
                 clauses.returns, clauses.signals, clauses.signalsOnly, clauses.diverges,
                 clauses.assignables, clauses.declares, clauses.accessibles, clauses.hasMod,
-                clauses.decreases, services).create();
+                clauses.decreases, localSpecRepo, services).create();
     }
 
     /**
@@ -1603,8 +1604,8 @@ public class JMLSpecFactory {
         // translateToTerm variant
         Term variant = translateToTermVariant(pm, selfVar, atPres, allVars, originalVariant);
 
-        ImmutableList<Term> localIns = tb.var(MiscTools.getLocalIns(loop, services));
-        ImmutableList<Term> localOuts = tb.var(MiscTools.getLocalOuts(loop, services));
+        ImmutableList<Term> localIns = tb.var(MiscTools.getLocalIns(loop, localSpecRepo, services));
+        ImmutableList<Term> localOuts = tb.var(MiscTools.getLocalOuts(loop, localSpecRepo, services));
 
         // create loop invariant annotation
         Term selfTerm = selfVar == null ? null : tb.var(selfVar);

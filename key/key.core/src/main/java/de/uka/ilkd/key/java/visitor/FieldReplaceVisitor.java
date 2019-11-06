@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 /**
  * Replaces field references o.a by methodcalls o._a(). This is needed for unit
@@ -38,7 +39,7 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
     // private KeYJavaType containingKJT=null
 
     public FieldReplaceVisitor(final ProgramElement pe, final Services services) {
-	super(pe, true, services);
+	super(pe, true, GoalLocalSpecificationRepository.DUMMY_REPO, services);
     }
 
     /** starts the walker */

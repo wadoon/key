@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.conditions.SameObserverCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -99,7 +100,7 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
      * @return a non-null Term of sort FORMULA
      * @throws IllegalArgumentException if the term argument is not as expected
      */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         Term termExt = term.sub(0);
         Term termBase = term.sub(1);
 

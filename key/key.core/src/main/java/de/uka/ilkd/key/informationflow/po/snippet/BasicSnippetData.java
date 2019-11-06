@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
@@ -46,6 +47,8 @@ class BasicSnippetData {
     final TermBuilder tb;
 
     final Services services;
+    
+    final GoalLocalSpecificationRepository localSpecRepo;
 
     /**
      * Unified contract content.
@@ -117,10 +120,11 @@ class BasicSnippetData {
 
 
     BasicSnippetData(FunctionalOperationContract contract,
-                     Services services) {
+                     GoalLocalSpecificationRepository localSpecRepo, Services services) {
         this.hasMby = contract.hasMby();
         this.services = services;
         this.tb = services.getTermBuilder();
+        this.localSpecRepo = localSpecRepo;
 
         contractContents.put(Key.TARGET_METHOD, contract.getTarget());
         contractContents.put(Key.FOR_CLASS, contract.getKJT());
@@ -139,10 +143,11 @@ class BasicSnippetData {
     BasicSnippetData(LoopSpecification invariant,
                      ExecutionContext context,
                      Term guardTerm,
-                     Services services) {
+                     GoalLocalSpecificationRepository localSpecRepo, Services services) {
         this.hasMby = false;
         this.services = services;
         this.tb = services.getTermBuilder();
+        this.localSpecRepo = localSpecRepo;
 
         contractContents.put(Key.TARGET_METHOD, invariant.getTarget());
         contractContents.put(Key.FOR_CLASS, invariant.getKJT());
@@ -173,9 +178,9 @@ class BasicSnippetData {
 
         final Term heap = tb.getBaseHeap();
         final ImmutableSet<ProgramVariable> localInVariables =
-                MiscTools.getLocalIns(invariant.getLoop(), services);
+                MiscTools.getLocalIns(invariant.getLoop(), localSpecRepo, services);
         final ImmutableSet<ProgramVariable> localOutVariables =
-                MiscTools.getLocalOuts(invariant.getLoop(), services);
+                MiscTools.getLocalOuts(invariant.getLoop(), localSpecRepo, services);
         final ImmutableList<Term> localInTerms = toTermList(localInVariables);
         final ImmutableList<Term> localOutTerms = toTermList(localOutVariables);
         final ImmutableList<Term> localInsWithoutOutDuplicates =
@@ -188,10 +193,11 @@ class BasicSnippetData {
     
     
     BasicSnippetData(InformationFlowContract contract,
-                     Services services) {
+                     GoalLocalSpecificationRepository localSpecRepo, Services services) {
         this.hasMby = contract.hasMby();
         this.services = services;
         this.tb = services.getTermBuilder();
+        this.localSpecRepo = localSpecRepo;
 
         contractContents.put(Key.TARGET_METHOD, contract.getTarget());
         contractContents.put(Key.FOR_CLASS, contract.getKJT());
@@ -211,10 +217,11 @@ class BasicSnippetData {
 
     BasicSnippetData(BlockContract contract,
                      ExecutionContext context,
-                     Services services) {
+                     GoalLocalSpecificationRepository localSpecRepo, Services services) {
         this.hasMby = false; // Mby of block contracts is not further considered
         this.services = services;
         this.tb = services.getTermBuilder();
+        this.localSpecRepo = localSpecRepo;
 
         contractContents.put(Key.TARGET_METHOD, contract.getTarget());
         contractContents.put(Key.FOR_CLASS, contract.getKJT());
@@ -234,9 +241,9 @@ class BasicSnippetData {
         final Term heap = tb.getBaseHeap();
         BlockContract.Terms vars = contract.getVariablesAsTerms(services);
         final ImmutableSet<ProgramVariable> localInVariables =
-                MiscTools.getLocalIns(contract.getBlock(), services);
+                MiscTools.getLocalIns(contract.getBlock(), localSpecRepo, services);
         final ImmutableSet<ProgramVariable> localOutVariables =
-                MiscTools.getLocalOuts(contract.getBlock(), services);
+                MiscTools.getLocalOuts(contract.getBlock(), localSpecRepo, services);
         final ImmutableList<Term> localInTerms = toTermList(localInVariables);
         final ImmutableList<Term> localOutTerms = toTermList(localOutVariables);
         final ImmutableList<Term> localInsWithoutOutDuplicates =

@@ -63,6 +63,7 @@ import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -416,8 +417,8 @@ public final class ProblemInitializer {
             final ProgramElement pe = term.javaBlock().program();
             final Services serv = rootGoal.proof().getServices();
             final ImmutableSet<ProgramVariable> freeProgVars
-                = MiscTools.getLocalIns(pe, serv)
-                           .union(MiscTools.getLocalOuts(pe, serv));
+                = MiscTools.getLocalIns(pe, rootGoal.getLocalSpecificationRepository(), serv)
+                           .union(MiscTools.getLocalOuts(pe, rootGoal.getLocalSpecificationRepository(), serv));
             for(ProgramVariable pv : freeProgVars) {
                 if(namespaces.programVariables().lookup(pv.name()) == null) {
                     rootGoal.addProgramVariable(pv);
@@ -501,7 +502,7 @@ public final class ProblemInitializer {
            //the first time, read in standard rules
            Profile profile = services.getProfile();
            if(currentBaseConfig == null || profile != currentBaseConfig.getProfile()) {
-               currentBaseConfig = new InitConfig(services);
+               currentBaseConfig = new InitConfig(new GoalLocalSpecificationRepository(services), services);
                RuleSource tacletBase = profile.getStandardRules().getTacletBase();
                if(tacletBase != null) {
                    KeYFile tacletBaseFile

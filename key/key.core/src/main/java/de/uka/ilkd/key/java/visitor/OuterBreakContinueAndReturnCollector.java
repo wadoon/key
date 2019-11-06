@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.java.statement.Switch;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
 
@@ -42,7 +43,7 @@ public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
 
     public OuterBreakContinueAndReturnCollector(final ProgramElement root, final List<Label> alwaysInnerLabels, final Services services)
     {
-        super(root, services);
+        super(root, GoalLocalSpecificationRepository.DUMMY_REPO, services);
         breaks = new LinkedList<Break>();
         continues = new LinkedList<Continue>();
         returns = new LinkedList<Return>();

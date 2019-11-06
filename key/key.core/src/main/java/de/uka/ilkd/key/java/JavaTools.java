@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 /** Miscellaneous static methods related to Java blocks or statements in KeY.
  * Mostly moved from key.util.MiscTools here.
@@ -62,7 +63,7 @@ public final class JavaTools {
         assert jb.program() != null;
         final SourceElement activeStatement = JavaTools.getActiveStatement(jb);
         Statement newProg = (Statement)
-            (new CreatingASTVisitor(jb.program(), false, services) {
+            (new CreatingASTVisitor(jb.program(), false, GoalLocalSpecificationRepository.DUMMY_REPO, services) {
                 private boolean done = false;
                 
                 public ProgramElement go() {
@@ -97,7 +98,7 @@ public final class JavaTools {
      */
     public static MethodFrame getInnermostMethodFrame(ProgramElement pe,
                                       Services services) { 
-        final MethodFrame result = new JavaASTVisitor(pe, services) {
+        final MethodFrame result = new JavaASTVisitor(pe, new GoalLocalSpecificationRepository(services), services) {
             private MethodFrame res;
             @Override
             protected void doAction(ProgramElement node) {

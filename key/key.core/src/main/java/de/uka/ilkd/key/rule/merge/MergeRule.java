@@ -50,6 +50,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -202,7 +203,7 @@ public class MergeRule implements BuiltInRule {
 
             Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> mergeResult = mergeStates(
                     mergeRule, mergedState, state, thisSEState.third,
-                    mergeRuleApp.getDistinguishingFormula(), services);
+                    mergeRuleApp.getDistinguishingFormula(), newGoal.getLocalSpecificationRepository(), services);
             newNames.addAll(mergeResult.second);
             sideConditionsToProve.addAll(mergeResult.third);
 
@@ -331,6 +332,7 @@ public class MergeRule implements BuiltInRule {
      * @param distinguishingFormula
      *            The user-specified distinguishing formula. May be null (for
      *            automatic generation).
+     * @param localSpecRepo TODO
      * @param services
      *            The services object.
      * @return A new merged SE state (U*,C*) which is a weakening of the
@@ -341,7 +343,7 @@ public class MergeRule implements BuiltInRule {
     protected Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>> mergeStates(
             MergeProcedure mergeRule, SymbolicExecutionState state1,
             SymbolicExecutionState state2, Term programCounter,
-            Term distinguishingFormula, Services services) {
+            Term distinguishingFormula, GoalLocalSpecificationRepository localSpecRepo, Services services) {
 
         final TermBuilder tb = services.getTermBuilder();
 
@@ -364,7 +366,7 @@ public class MergeRule implements BuiltInRule {
 
         // Collect program variables in Java block
         progVars = progVars
-                .union(getLocationVariables(programCounter, services));
+                .union(getLocationVariables(programCounter, localSpecRepo, services));
         // Collect program variables in update
         progVars = progVars.union(getUpdateLeftSideLocations(state1.first, services.getTermBuilder()));
         progVars = progVars.union(getUpdateLeftSideLocations(state2.first, services.getTermBuilder()));

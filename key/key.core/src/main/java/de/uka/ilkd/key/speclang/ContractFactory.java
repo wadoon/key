@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -349,12 +350,13 @@ public class ContractFactory {
      *
      * @param pm the {@link IProgramMethod}.
      * @param ini the {@link InitiallyClause}.
+     * @param localSpecRepo TODO
      * @return a new {@link FunctionalOperationContract}.
      * @throws SLTranslationException in case translating the initially clause fails.
      */
     public FunctionalOperationContract
-                func(IProgramMethod pm, InitiallyClause ini) throws SLTranslationException {
-        return new JMLSpecFactory(services).initiallyClauseToContract(ini, pm);
+                func(IProgramMethod pm, InitiallyClause ini, GoalLocalSpecificationRepository localSpecRepo) throws SLTranslationException {
+        return new JMLSpecFactory(localSpecRepo, services).initiallyClauseToContract(ini, pm);
     }
 
     /**

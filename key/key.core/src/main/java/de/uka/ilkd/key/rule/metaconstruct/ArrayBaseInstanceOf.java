@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -43,7 +44,7 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
      * reference array sort or a term with an <tt>exactInstance</tt> symbol as top level 
      * depending on a reference array sort.
      */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final Term array = term.sub(0);
         final Term element = term.sub(1);
 

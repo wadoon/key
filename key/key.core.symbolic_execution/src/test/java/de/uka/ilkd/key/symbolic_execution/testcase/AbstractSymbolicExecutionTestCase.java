@@ -63,6 +63,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
@@ -2097,7 +2098,7 @@ public abstract class AbstractSymbolicExecutionTestCase extends TestCase {
    protected ITermProgramVariableCollectorFactory createNewProgramVariableCollectorFactory(final SymbolicExecutionBreakpointStopCondition breakpointParentStopCondition) {
       ITermProgramVariableCollectorFactory programVariableCollectorFactory = new ITermProgramVariableCollectorFactory() {
          @Override
-         public TermProgramVariableCollector create(Services services) {
+         public TermProgramVariableCollector create(GoalLocalSpecificationRepository localSpecRepo, Services services) {
             return new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(services, breakpointParentStopCondition);
          }
       };

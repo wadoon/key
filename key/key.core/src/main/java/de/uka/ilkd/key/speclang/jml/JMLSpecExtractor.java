@@ -26,7 +26,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Position;
@@ -48,18 +47,16 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -110,9 +107,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
     // constructors
     // -------------------------------------------------------------------------
 
-    public JMLSpecExtractor(Services services) {
+    public JMLSpecExtractor(GoalLocalSpecificationRepository localSpecRepo, Services services) {
         this.services = services;
-        this.jsf = new JMLSpecFactory(services);
+        this.jsf = new JMLSpecFactory(localSpecRepo, services);
     }
 
     // -------------------------------------------------------------------------

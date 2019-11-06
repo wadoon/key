@@ -778,7 +778,7 @@ public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(fin
          };
       }
       // Create new InitConfig
-      final InitConfig initConfig = new InitConfig(sourceInitConfig.getServices().copy(profile, false));
+      final InitConfig initConfig = new InitConfig(sourceInitConfig.getInitialLocalSpecRepo().clone(), sourceInitConfig.getServices().copy(profile, false));
       // Set modified taclet options in which runtime exceptions are banned.
       Choice runtimeExceptionTreatment = new Choice("ban", "runtimeExceptions");
       ImmutableSet<Choice> choices = SideProofUtil.activateChoice(sourceInitConfig.getActivatedChoices(), 

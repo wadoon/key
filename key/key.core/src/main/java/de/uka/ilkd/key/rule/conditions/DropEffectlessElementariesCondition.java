@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.TermAccessibleLocationsCollector;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -102,7 +103,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
                 dropEffectlessElementaries( //
                         update, //
                         target, //
-                        collectLocations(target, services), //
+                        collectLocations(target, goal.getLocalSpecificationRepository(), services), //
                         new LinkedHashSet<>(), //
                         services //
                 ).map( //
@@ -125,13 +126,15 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     /**
      * Collects read locations in the target {@link Term}.
      * 
-     * @param target   The {@link Term} from which to collect locations.
-     * @param services The {@link Services} object.
+     * @param target        The {@link Term} from which to collect locations.
+     * @param localSpecRepo TODO
+     * @param services      The {@link Services} object.
      * @return The relevant locations in {@link Term}.
      */
-    private static Set<AbstractUpdateLoc> collectLocations(Term target, Services services) {
+    private static Set<AbstractUpdateLoc> collectLocations(Term target,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final TermAccessibleLocationsCollector collector = //
-                new TermAccessibleLocationsCollector(services);
+                new TermAccessibleLocationsCollector(localSpecRepo, services);
         target.execPostOrder(collector);
         return collector.locations();
     }

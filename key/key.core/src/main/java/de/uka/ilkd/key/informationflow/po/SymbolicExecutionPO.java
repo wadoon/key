@@ -26,6 +26,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 
@@ -84,7 +85,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
                 POSnippetFactory.getBasicFactory(contract, symbExecVars,
-                                                 initiatingGoal.proof().getServices());
+                        initiatingGoal.getLocalSpecificationRepository(), initiatingGoal.proof().getServices());
 
         // symbolic execution under precondition
         final Term symExec =
@@ -262,7 +263,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
             ImmutableList<LocationVariable> formalParVars,
             ProgramVariable selfVar,
             ProgramVariable resultVar,
-            Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
                 "Please use the POSnippetFactory instead.");
     }

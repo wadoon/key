@@ -41,6 +41,7 @@ import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
@@ -53,7 +54,7 @@ public class TestVariableNamer extends TestCase {
     
 
     private final Proof proof = new Proof("TestVariableNamer", 
-    		new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+    		new InitConfig(GoalLocalSpecificationRepository.DUMMY_REPO, new Services(AbstractProfile.getDefaultProfile())));
     private final Services services = proof.getServices();
     private final ProgramVariable x     = constructProgramVariable("x");
     private final ProgramVariable xx    = constructProgramVariable("x");

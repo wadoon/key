@@ -64,6 +64,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -506,7 +507,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                         createNonModelPOTerm(pm, selfVar, paramVars,
                                              resultVar, exceptionVar,
                                              transactionFlag, modHeaps,
-                                             atPreVars, proofServices);
+                                             atPreVars, proofConfig.getInitialLocalSpecRepo(), proofServices);
                 termPOs.add(applyGlobalUpdate);
                 if (poNames != null) {
                     poNames[nameIndex] = buildPOName(transactionFlag);
@@ -650,13 +651,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param formalParVars Arguments from formal parameters for method call.
      * @param selfVar The self variable.
      * @param resultVar The result variable.
+     * @param localSpecRepo TODO
      * @param services services instance
      * @return operation blocks as statement blocks
      */
     protected abstract ImmutableList<StatementBlock> buildOperationBlocks(
             ImmutableList<LocationVariable> formalParVars,
             ProgramVariable selfVar,
-            ProgramVariable resultVar, Services services);
+            ProgramVariable resultVar, GoalLocalSpecificationRepository localSpecRepo, Services services);
 
 
     /**
@@ -1220,7 +1222,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                               final List<LocationVariable> modHeaps,
                               final Map<LocationVariable, LocationVariable>
                                       atPreVars,
-                              final Services proofServices) {
+                              GoalLocalSpecificationRepository localSpecRepo, final Services proofServices) {
         final ImmutableList<LocationVariable> formalParamVars =
                 createFormalParamVars(paramVars, proofServices);
 
@@ -1228,7 +1230,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // (must be done before pre condition is created).
         final ImmutableList<StatementBlock> sb =
                 buildOperationBlocks(formalParamVars, selfVar,
-                                     resultVar, proofServices);
+                                     resultVar, localSpecRepo, proofServices);
 
         Term permsFor = createPermsFor(pm, modHeaps, proofServices, tb);
         //         final Map<LocationVariable, Map<Term, Term>> heapToAtPre =

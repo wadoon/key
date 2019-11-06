@@ -71,6 +71,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -101,22 +102,22 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                                  final Term guardTerm,
                                                                  final Instantiation inst,
                                                                  LoopSpecification spec,
+                                                                 GoalLocalSpecificationRepository localSpecRepo,
                                                                  Services services,
                                                                  LoopInvariantBuiltInRuleApp ruleApp,
                                                                  final ImmutableSet<ProgramVariable>
                                                                             localIns,
                                                                  final ImmutableSet<ProgramVariable>
                                                                             localOuts,
-                                                                 final Term anonUpdate,
-                                                                 final JavaBlock guardJb)
+                                                                 final Term anonUpdate, final JavaBlock guardJb)
             throws RuleAbortException {
         final TermBuilder tb = services.getTermBuilder();
         final Term baseHeap = anonUpdateData.loopHeapAtPre;
         final Term selfTerm = inst.selfTerm;
 
-        services.getSpecificationRepository().addLoopInvariant(spec);
+        localSpecRepo.addLoopInvariant(spec);
         ruleApp.setLoopInvariant(spec);
-        instantiate(ruleApp, services);
+        instantiate(ruleApp, localSpecRepo, services);
 
         // create heap_Before_LOOP
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -173,7 +174,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         // and associated taclet
         final Pair<Term, Term> updates = new Pair<Term, Term> (inst.u, anonUpdate);
         final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
-                new InfFlowLoopInvariantTacletBuilder(services);
+                new InfFlowLoopInvariantTacletBuilder(localSpecRepo, services);
         ifInvariantBuilder.setInvariant(spec);
         ifInvariantBuilder.setExecutionContext(inst.innermostExecutionContext);
         ifInvariantBuilder.setContextUpdate(/*inst.u*/);
@@ -209,7 +210,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     //-------------------------------------------------------------------------
 
     private static Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
-                                             Services services) throws RuleAbortException {
+                                             GoalLocalSpecificationRepository localSpecRepo, Services services) throws RuleAbortException {
         final Term focusTerm = app.posInOccurrence().subTerm();
 
 	//leading update?
@@ -245,7 +246,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	        innermostMethodFrame == null
 	        ? null
 	        : (ExecutionContext) innermostMethodFrame.getExecutionContext();
-	services.getSpecificationRepository().addLoopInvariant(spec);
+	localSpecRepo.addLoopInvariant(spec);
 
 	//cache and return result
 	final Instantiation result = new Instantiation(u, progPost, loop, spec, selfTerm,
@@ -498,9 +499,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term guard = ruleApp.getGuard();
         InfFlowData infFlowData =
                 prepareSetUpOfInfFlowValidityGoal(anonUpdateData, guard,
-                                                  inst, inv, services, ruleApp,
-                                                  localIns, localOuts,
-                                                  anonUpdate, guardJb);
+                                                  inst, inv, infFlowGoal.getLocalSpecificationRepository(), services,
+                                                  ruleApp, localIns,
+                                                  localOuts, anonUpdate, guardJb);
 
         // generate information flow proof obligation variables
         final IFProofObligationVars ifVars =
@@ -514,7 +515,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(inv, ifVars.c1, ifVars.c2,
                                                    inst.innermostExecutionContext,
-                                                   guard, services);
+                                                   guard, infFlowGoal.getLocalSpecificationRepository(), services);
         final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
         final Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
@@ -592,7 +593,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                                 inst.innermostExecutionContext,
                                                                 null,
                                                                 services);
-        for(SchemaVariable sv : wir.neededInstantiations(inst.loop, svInst)) {
+        for(SchemaVariable sv : wir.neededInstantiations(inst.loop, svInst, bodyGoal.getLocalSpecificationRepository())) {
             assert sv instanceof ProgramSV;
             svInst = svInst.addInteresting(sv, 
                     (Name) new ProgramElementName(sv.name().toString()), 
@@ -808,7 +809,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
 
         //get instantiation
-        final Instantiation inst = instantiate(loopRuleApp, services);
+        final Instantiation inst = instantiate(loopRuleApp, goal.getLocalSpecificationRepository(), services);
 
         final Map<LocationVariable,Term> atPres = inst.inv.getInternalAtPres();
         final List<LocationVariable> heapContext = ((IBuiltInRuleApp)ruleApp).getHeapContext();        
@@ -829,9 +830,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         //collect input and output local variables, 
         //prepare reachableIn and reachableOut
         final ImmutableSet<ProgramVariable> localIns =
-                MiscTools.getLocalIns(inst.loop, services);
+                MiscTools.getLocalIns(inst.loop, goal.getLocalSpecificationRepository(), services);
         final ImmutableSet<ProgramVariable> localOuts =
-                MiscTools.getLocalOuts(inst.loop, services);
+                MiscTools.getLocalOuts(inst.loop, goal.getLocalSpecificationRepository(), services);
         Term reachableIn = tb.tt();
         for(ProgramVariable pv : localIns) {
             reachableIn = tb.and(reachableIn, 

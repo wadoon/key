@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -65,12 +66,13 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
      * 
      * @param root
      *           the ProgramElement where to begin
+     * @param localSpecRepo TODO
      * 
      */
     public ReplaceWhileLoop(ProgramElement root, 
                             StatementBlock toInsert, 
-                            Services services) {	
-        super(root, true, services);
+                            GoalLocalSpecificationRepository localSpecRepo, Services services) {	
+        super(root, true, localSpecRepo, services);
 	this.toInsert = toInsert;
         firstWhileFound = false;
     }
@@ -82,10 +84,11 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
      *           the ProgramElement where to begin
      * @param inst
      *           the SVInstantiations if available
+     * @param localSpecRepo TODO
      */
     public ReplaceWhileLoop(ProgramElement root, SVInstantiations inst,
-			    StatementBlock toInsert, Services services) {
-        super(root, true, services);
+			    StatementBlock toInsert, GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        super(root, true, localSpecRepo, services);
 	this.toInsert = toInsert;
         firstWhileFound = false;
         instantiations = (inst == null ? 

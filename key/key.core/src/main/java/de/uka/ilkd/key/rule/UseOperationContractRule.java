@@ -499,7 +499,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         // generate information flow contract application predicate
         // and associated taclet
         InfFlowMethodContractTacletBuilder ifContractBuilder
-            = new InfFlowMethodContractTacletBuilder(services);
+            = new InfFlowMethodContractTacletBuilder(goal.getLocalSpecificationRepository(), services);
         ifContractBuilder.setContract(contract);
         ifContractBuilder.setContextUpdate(atPreUpdates, inst.u);
         ifContractBuilder.setProofObligationVars(poVars);

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 /**
  * Collects all labels found in a given program.
@@ -30,7 +31,7 @@ public class LabelCollector extends JavaASTVisitor {
     
     public LabelCollector(ProgramElement root,                           
                           Services services) {
-        super(root, services);        
+        super(root, GoalLocalSpecificationRepository.DUMMY_REPO, services);        
         this.labels = new LinkedHashSet<Label>(20);
     }
     
