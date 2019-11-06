@@ -129,28 +129,29 @@ public class TestTacletIndex extends TestCase{
 		   "heuristics is active.",
 		   isRuleIn(variante_one.getAntecedentTaclet(pos,
 			    new IHTacletFilter (true, listofHeuristic),
-   			    null),ruleRewriteNonH1H2)); 
+			    null, null),ruleRewriteNonH1H2)); 
 
  	assertTrue("Noninteractive antecrule is in list, but one of its "+
 		   "heuristics is active.",
 		   !isRuleIn(variante_one.getAntecedentTaclet(pos,
 		             new IHTacletFilter (true, listofHeuristic.prepend(h1)),
-			     null),ruleRewriteNonH1H2));  
+		             null, null),ruleRewriteNonH1H2));  
 
   	assertTrue("Noninteractive nofindrule is not in list, but none of its "+
 		   "heuristics is active.",
 		   isRuleIn(variante_one.getNoFindTaclet(new IHTacletFilter (true, ImmutableSLList.<RuleSet>nil()),
-   			    null),ruleNoFindNonH1H2H3));  
+   			    null, null),ruleNoFindNonH1H2H3));  
 
  	assertTrue("Noninteractive nofindrule is in list, but one of its "+
 		   "heuristics is active.",
-		   !isRuleIn(variante_one.getNoFindTaclet(new IHTacletFilter (true, listofHeuristic), null),ruleNoFindNonH1H2H3));
+		   !isRuleIn(variante_one.getNoFindTaclet(new IHTacletFilter (true, listofHeuristic), null, null),ruleNoFindNonH1H2H3));
 	
     }
 
 
     public void testShownIfHeuristicFits() {
         Services services = new Services(AbstractProfile.getDefaultProfile());
+        Goal goal = null;
         ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
 	listofHeuristic=listofHeuristic.prepend(h3).prepend(h2);
 
@@ -164,28 +165,29 @@ public class TestTacletIndex extends TestCase{
 		   " not in succ list.",
 		   isRuleIn(variante_one.getSuccedentTaclet(posSucc,
 		            new IHTacletFilter (true, listofHeuristic),
-		            services), ruleSucc)); 
+		            goal, services), ruleSucc)); 
         
   	assertTrue("ruleSucc has no heuristics, but is"+
 		   " in rewrite list.",
 		   !isRuleIn(variante_one.getRewriteTaclet(posSucc, new IHTacletFilter (true, listofHeuristic),
-		             services),ruleSucc)); 
+		             goal, services),ruleSucc)); 
 
 
   	assertTrue("ruleSucc has no heuristics, but is"+
 		   " in heuristic succ list.",
 		   !isRuleIn(variante_one.getSuccedentTaclet(posSucc,
 		             new IHTacletFilter (false, listofHeuristic),
-		             services),ruleSucc)); 
+		             goal, services),ruleSucc)); 
 
   	assertTrue("ruleSucc has no heuristics, but is"+
 		   " in heuristic of nofind list.",
 		   !isRuleIn(variante_one.getNoFindTaclet(new IHTacletFilter (false,
-   			     listofHeuristic), services),ruleSucc));
+   			     listofHeuristic), goal, services),ruleSucc));
     }
 
     public void testNoMatchingFindRule() {
         Services services = new Services(AbstractProfile.getDefaultProfile());
+        Goal goal = null;
         ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
 
 	Term term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
@@ -199,7 +201,7 @@ public class TestTacletIndex extends TestCase{
  	assertTrue("rule matched, but no match possible",
 		   !isRuleIn(variante_one.getAntecedentTaclet(posAntec,
 		                                              new IHTacletFilter (true, listofHeuristic),
-		                                              services), 
+		                                              goal, services), 
 			     ruleRewriteNonH1H2));
  
 
@@ -208,11 +210,12 @@ public class TestTacletIndex extends TestCase{
  	assertTrue("ruleSucc matched but matching not possible",
 		   !isRuleIn(variante_one.getSuccedentTaclet(posSucc,
 		             new IHTacletFilter (true, listofHeuristic),
-			     services),ruleSucc));		
+			     goal, services),ruleSucc));		
     }
 
     public void testMatchConflictOccurs() {
         Services services = new Services(AbstractProfile.getDefaultProfile());
+        Goal goal = null;
         TacletIndex ruleIdx=TacletIndexKit.getKit().createTacletIndex();
 	ruleIdx.add(ruleRewriteNonH1H2);
 	ruleIdx.add(ruleNoFindNonH1H2H3);
@@ -229,7 +232,7 @@ public class TestTacletIndex extends TestCase{
  	assertTrue("rule matched, but no match possible",
 		   !isRuleIn(ruleIdx.getAntecedentTaclet(posAntec,
 		             new IHTacletFilter (true, listofHeuristic),
-   			     services),ruleMisMatch));
+   			     goal, services),ruleMisMatch));
  
     }
 

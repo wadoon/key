@@ -115,6 +115,7 @@ public class TestTermTacletAppIndex extends TestCase{
 
     private void doTestIndex0(TermTacletAppIndexCacheSet cache) {
         Services serv = TacletForTests.services ();
+        Goal goal = null;
 
         TacletIndex ruleIdx = TacletIndexKit.getKit().createTacletIndex();
         ruleIdx.add ( remove_f );
@@ -127,16 +128,16 @@ public class TestTermTacletAppIndex extends TestCase{
                                                     false );
 
         TermTacletAppIndex termIdx =
-            TermTacletAppIndex.create ( pio, serv, ruleIdx, NullNewRuleListener.INSTANCE,
-                                        TacletFilter.TRUE,
-                                        cache );
+            TermTacletAppIndex.create ( pio, goal, serv, ruleIdx,
+                                        NullNewRuleListener.INSTANCE,
+                                        TacletFilter.TRUE, cache );
 
         checkTermIndex ( pio, termIdx );
 
         // this should not alter the index, as the formula actually
         // did not change
-        termIdx = termIdx.update ( pio.down ( 0 ), serv, ruleIdx,
-                                   NullNewRuleListener.INSTANCE, cache );
+        termIdx = termIdx.update ( pio.down ( 0 ), goal, serv,
+                                   ruleIdx, NullNewRuleListener.INSTANCE, cache );
 
         checkTermIndex ( pio, termIdx );
 
@@ -146,17 +147,17 @@ public class TestTermTacletAppIndex extends TestCase{
         PosInOccurrence pio2 = new PosInOccurrence ( cfma2,
                                                      PosInTerm.getTopLevel(), false );
 
-        termIdx = termIdx.update ( pio2.down ( 0 ).down ( 0 ).down ( 0 ), serv,
-                                   ruleIdx, NullNewRuleListener.INSTANCE,
-                                   cache );
+        termIdx = termIdx.update ( pio2.down ( 0 ).down ( 0 ).down ( 0 ), goal,
+                                   serv, ruleIdx,
+                                   NullNewRuleListener.INSTANCE, cache );
         checkTermIndex2 ( pio2, termIdx );
 
         // add a new taclet to the index
         ruleIdx.add ( remove_ff );
         SetRuleFilter filter = new SetRuleFilter ();
         filter.addRuleToSet ( ruleIdx.lookup ( remove_ff.taclet().name () ).rule () );
-        termIdx = termIdx.addTaclets ( filter, pio2, serv, ruleIdx,
-                                       NullNewRuleListener.INSTANCE );
+        termIdx = termIdx.addTaclets ( filter, pio2, goal, serv,
+                                       ruleIdx, NullNewRuleListener.INSTANCE );
         checkTermIndex3 ( pio2, termIdx );
     }
 

@@ -35,6 +35,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.TermAccessibleLocationsCollector;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -76,7 +77,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
     @Override
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
-            Services services) {
+            Goal goal, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final SVInstantiations svInst = mc.getInstantiations();
 

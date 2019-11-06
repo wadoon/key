@@ -16,6 +16,7 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.Goal;
 
 
 /** 
@@ -36,6 +37,7 @@ public interface VariableCondition {
      * @param instCandidate the SVSubstitute (e.g. Term, ProgramElement) to be mapped to var
      * @param matchCond the MatchCondition with the current matching state and in particular 
      *    the SVInstantiations that are already known to be needed 
+     * @param goal The current goal (needed for local namespaces and specification repositories, etc.)
      * @param services the program information object
      * @return modified match results if the condition can be satisfied,
      * or <code>null</code> otherwise
@@ -43,6 +45,6 @@ public interface VariableCondition {
     MatchConditions check(SchemaVariable var, 
 	    		  SVSubstitute instCandidate, 
 	    		  MatchConditions matchCond, 
-	    		  Services services);
+	    		  Goal goal, Services services);
 
 }

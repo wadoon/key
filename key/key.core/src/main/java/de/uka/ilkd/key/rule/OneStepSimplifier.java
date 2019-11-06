@@ -248,14 +248,14 @@ public final class OneStepSimplifier implements BuiltInRule {
         final ImmutableList<NoPosTacletApp> apps
         = indices[indexNr].getRewriteTaclet(pos,
                         TacletFilter.TRUE,
-                        services);
+                        goal, services);
         for(TacletApp app : apps) {
             app = app.setPosInOccurrence(pos, services);
             if(app == null) {
                 continue;
             }
             if(!app.complete()) {
-                app = app.tryToInstantiate(services);
+                app = app.tryToInstantiate(goal, services);
                 if(app == null) {
                     continue;
                 }

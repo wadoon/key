@@ -314,27 +314,29 @@ public abstract class TacletIndex  {
     /** returns a list of Taclets and instantiations from the given list of 
      * taclets with
      * respect to term and the filter object.
+     * @param goal TODO
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
      */
     private ImmutableList<NoPosTacletApp> getFindTaclet(ImmutableList<NoPosTacletApp> taclets,
 					       RuleFilter           filter,
 					       PosInOccurrence      pos,
-					       Services             services) { 
+					       Goal goal, Services             services) { 
 	return matchTaclets ( taclets,
 			      filter,
 			      pos,
-			      services );
+			      goal, services );
     }
     
     /**
      * Filter the given list of taclet apps, and match their find
      * parts at the given position of the sequent
+     * @param goal TODO
      */
     protected abstract ImmutableList<NoPosTacletApp> matchTaclets(ImmutableList<NoPosTacletApp> tacletApps,
             final RuleFilter           p_filter,
             final PosInOccurrence      pos,
-            final Services             services);   
+            Goal goal, final Services             services);   
     
     /**
      * returns a selection from the given map with NoPosTacletApps relevant for
@@ -478,19 +480,20 @@ public abstract class TacletIndex  {
    /** get all Taclets for the antecedent.
     * @param pos the PosOfOccurrence describing the formula for which to look 
     * for top level taclets    
-    * @param filter Only return taclets the filter selects
-    * @param services the Services object encapsulating information
+ * @param filter Only return taclets the filter selects
+ * @param goal TODO
+ * @param services the Services object encapsulating information
     * about the java datastructures like (static)types etc.
     * @return IList<NoPosTacletApp> containing all applicable rules
     * and the corresponding instantiations to get the rule fit.
     */
     public ImmutableList<NoPosTacletApp> getAntecedentTaclet(PosInOccurrence pos,						    
 						    RuleFilter filter,
-						    Services   services) {                        
+						    Goal goal, Services   services) {                        
         return getTopLevelTaclets(antecList,
 				  filter,
 				  pos,
-				  services);
+				  goal, services);
     }
 
     /** 
@@ -498,6 +501,7 @@ public abstract class TacletIndex  {
      * @param pos the PosOfOccurrence describing the formula for which to look 
      * for top level taclets 
      * @param filter Only return taclets the filter selects
+     * @param goal TODO
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return IList<NoPosTacletApp> containing all applicable rules
@@ -505,19 +509,19 @@ public abstract class TacletIndex  {
      */
     public ImmutableList<NoPosTacletApp> getSuccedentTaclet(PosInOccurrence pos,						  
 						   RuleFilter filter,
-						   Services   services) {       
+						   Goal goal, Services   services) {       
            
         return getTopLevelTaclets(succList,
 				  filter,
 				  pos,				  
-				  services);
+				  goal, services);
     }
 
     private ImmutableList<NoPosTacletApp>
 	getTopLevelTaclets(HashMap<Object, ImmutableList<NoPosTacletApp>> findTaclets,
 			   RuleFilter filter,
 			   PosInOccurrence pos,			   
-			   Services services) {
+			   Goal goal, Services services) {
       
         assert pos.isTopLevel();
               
@@ -525,36 +529,38 @@ public abstract class TacletIndex  {
                 getFindTaclet(getList(rwList, pos.subTerm(), true), 
                         filter,
                         pos,
-                        services);
+                        goal, services);
         final ImmutableList<NoPosTacletApp> seqTaclets = 
                 getFindTaclet(getList(findTaclets, pos.subTerm(), true),
                         filter,
                         pos,
-                        services);
+                        goal, services);
         return rwTaclets.size() > 0 ? rwTaclets.prependReverse(seqTaclets) : seqTaclets.prependReverse(rwTaclets);
     }
 
 
   /** get all Rewrite-Taclets.
  * @param filter Only return taclets the filter selects
+ * @param goal TODO
  * @param services the Services object encapsulating information
 * about the java datastructures like (static)types etc.
-    * @return IList<NoPosTacletApp> containing all applicable rules
+ * @return IList<NoPosTacletApp> containing all applicable rules
     * and the corresponding instantiations to get the rule fit.
     */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos,
 						 RuleFilter      filter,
-						 Services        services) { 
+						 Goal goal, Services        services) { 
 	ImmutableList<NoPosTacletApp> result = matchTaclets(getList(rwList, pos.subTerm(), false),
 			    filter,
 			    pos,
-			    services);
+			    goal, services);
 	return result;
     }
 
 
     /** get all Taclets having no find expression.
      * @param filter Only return taclets the filter selects
+     * @param goal TODO
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
      * @return IList<NoPosTacletApp> containing all applicable
@@ -562,11 +568,11 @@ public abstract class TacletIndex  {
      * instantiations are necessary.
      */
     public ImmutableList<NoPosTacletApp> getNoFindTaclet(RuleFilter filter,
-	                                        Services   services) {   
+	                                        Goal goal, Services   services) {   
 	return matchTaclets ( noFindList,
 			      filter,
 			      null,
-			      services );
+			      goal, services );
     }
 
 

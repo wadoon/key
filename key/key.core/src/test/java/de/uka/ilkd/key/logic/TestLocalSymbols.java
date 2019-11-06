@@ -150,9 +150,9 @@ public class TestLocalSymbols extends TestCase {
         PosInOccurrence pio = new PosInOccurrence(goal.node().sequent().getFormulabyNr(formulaNo),
                 PosInTerm.getTopLevel(), false);
 
-        app = rule.matchFind(pio, services);
+        app = rule.matchFind(pio, goal, services);
         app = app.setPosInOccurrence(pio , services);
-        app = app.tryToInstantiate(services.getOverlay(goal.getLocalNamespaces()));
+        app = app.tryToInstantiate(goal, services.getOverlay(goal.getLocalNamespaces()));
 
         goal.apply(app);
     }

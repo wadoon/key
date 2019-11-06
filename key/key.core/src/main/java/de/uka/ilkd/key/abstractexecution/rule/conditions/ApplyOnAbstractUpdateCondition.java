@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -46,7 +47,7 @@ public final class ApplyOnAbstractUpdateCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
-            Services services) {
+            Goal goal, Services services) {
         final SVInstantiations svInst = mc.getInstantiations();
 
         final Term u1 = (Term) svInst.getInstantiation(u1SV);

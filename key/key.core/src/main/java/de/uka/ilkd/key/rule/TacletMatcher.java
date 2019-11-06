@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.Goal;
 
 public interface TacletMatcher {
 
@@ -16,9 +17,10 @@ public interface TacletMatcher {
     * formulas of the antecedent or the succedent), starting with the
     * given instantiations and constraint p_matchCond.
     * @param p_toMatch list of constraint formulas to match p_template to
-    * @param p_template template formula as in "match"
-    * @param p_matchCond already performed instantiations
-    * @param p_services the Services object encapsulating information
+ * @param p_template template formula as in "match"
+ * @param p_matchCond already performed instantiations
+ * @param p_goal TODO
+ * @param p_services the Services object encapsulating information
     * about the java datastructures like (static)types etc.
     * @return Two lists (in an IfMatchResult object), containing the
     * the elements of p_toMatch that could successfully be matched
@@ -26,19 +28,20 @@ public interface TacletMatcher {
     */
    public abstract IfMatchResult matchIf(
          ImmutableList<IfFormulaInstantiation> p_toMatch, Term p_template,
-         MatchConditions p_matchCond, Services p_services);
+         MatchConditions p_matchCond, Goal p_goal, Services p_services);
 
    /**
     * Match the whole if sequent using the given list of
     * instantiations of all if sequent formulas, starting with the
     * instantiations given by p_matchCond.
     * PRECONDITION: p_toMatch.size () == ifSequent ().size ()
+ * @param p_goal TODO
     * @return resulting MatchConditions or null if the given list
     * p_toMatch does not match
     */
    public abstract MatchConditions matchIf(
          Iterable<IfFormulaInstantiation> p_toMatch,
-         MatchConditions p_matchCond, Services p_services);
+         MatchConditions p_matchCond, Goal p_goal, Services p_services);
 
    /**
     * checks the provided matches against the variable conditions of this taclet
@@ -46,20 +49,22 @@ public interface TacletMatcher {
     * do not satisfy the variable conditions. If the given matchconditions are <code>null</code>
     * then <code>null</code> is returned
     * @param p_matchconditions the matches to be checked
-    * @param services the {@link Services}
+ * @param goal TODO
+ * @param services the {@link Services}
     * @return the resulting match conditions or <code>null</code> if 
     * given matches do not satisfy the taclet's variable conditions   
     */
-   public abstract MatchConditions checkConditions(MatchConditions p_matchconditions, Services services);
+   public abstract MatchConditions checkConditions(MatchConditions p_matchconditions, Goal goal, Services services);
 
    /**
     * checks if the conditions for a correct instantiation are satisfied
     * @param var the SchemaVariable to be instantiated
-    * @param instantiationCandidate the SVSubstitute, which is a
+ * @param instantiationCandidate the SVSubstitute, which is a
     * candidate for a possible instantiation of var
-    * @param matchCond the MatchConditions which have to be respected
+ * @param matchCond the MatchConditions which have to be respected
     * for the new match
-    * @param services the Services object encapsulating information
+ * @param goal TODO
+ * @param services the Services object encapsulating information
     * about the Java type model
     * @return the match conditions resulting from matching
     * <code>var</code> with <code>instantiationCandidate</code> or
@@ -67,7 +72,7 @@ public interface TacletMatcher {
     */
    public abstract MatchConditions checkVariableConditions(SchemaVariable var, 
            SVSubstitute instantiationCandidate,
-           MatchConditions matchCond, Services services);
+           MatchConditions matchCond, Goal goal, Services services);
 
    /** 
     * matches the given term against the taclet's find term 
@@ -75,40 +80,43 @@ public interface TacletMatcher {
     * is returned
     * @param term the Term to be matched against the find expression 
     * of the taclet
-    * @param matchCond the MatchConditions with side conditions to be 
+ * @param matchCond the MatchConditions with side conditions to be 
     * satisfied, eg. partial instantiations of schema variables; before
     * calling this method the constraint contained in the match conditions
     * must be ensured to be satisfiable, i.e.
     *       <tt> matchCond.getConstraint ().isSatisfiable () </tt>
     * must return true
-    * @param services the Services 
+ * @param goal TODO
+ * @param services the Services 
     * @return the found schema variable mapping or <tt>null</tt> if 
     * the matching failed
     */
-   public abstract MatchConditions matchFind(Term term, MatchConditions matchCond, Services services);
+   public abstract MatchConditions matchFind(Term term, MatchConditions matchCond, Goal goal, Services services);
    
    
    /** 
     * checks whether the given {@link SchemaVariable} {@code sv} matches the {@link Term} {@code term} w.r.t.
     * the constraints (e.g., previous matches of {@code sv}) specified in the {@link MatchConditions} {@code matchCond}
     * @param sv the {@link SchemaVariable} 
-    * @param term the {@link Term} as a candidate for instantition of {@code sv} 
-    * @param matchCond the {@link MatchConditions} with additional constraints that need to be considered
-    * @param services the {@link Services}
+ * @param term the {@link Term} as a candidate for instantition of {@code sv} 
+ * @param matchCond the {@link MatchConditions} with additional constraints that need to be considered
+ * @param goal TODO
+ * @param services the {@link Services}
     * @return {@code null} if the match is not possible or the new {@link MatchConditions} with the instantiation {@code sv <- term} added
     */
-   public abstract MatchConditions matchSV(SchemaVariable sv, Term term, MatchConditions matchCond, Services services);
+   public abstract MatchConditions matchSV(SchemaVariable sv, Term term, MatchConditions matchCond, Goal goal, Services services);
 
    /** 
     * checks whether the given {@link SchemaVariable} {@code sv} matches the {@link ProgramElement} {@code pe} w.r.t.
     * the constraints (e.g., previous matches of {@code sv}) specified in the {@link MatchConditions} {@code matchCond}
     * @param sv the {@link SchemaVariable} 
-    * @param pe the {@link ProgramElement} as a candidate for instantition of {@code sv} 
-    * @param matchCond the {@link MatchConditions} with additional constraints that need to be considered
-    * @param services the {@link Services}
+ * @param matchCond the {@link MatchConditions} with additional constraints that need to be considered
+ * @param goal TODO
+ * @param services the {@link Services}
+ * @param pe the {@link ProgramElement} as a candidate for instantition of {@code sv} 
     * @return {@code null} if the match is not possible or the new {@link MatchConditions} with the instantiation {@code sv <- term} added
     */
-   public abstract MatchConditions matchSV(SchemaVariable sv, ProgramElement term, MatchConditions matchCond, Services services);
+   public abstract MatchConditions matchSV(SchemaVariable sv, ProgramElement term, MatchConditions matchCond, Goal goal, Services services);
 
 
 }

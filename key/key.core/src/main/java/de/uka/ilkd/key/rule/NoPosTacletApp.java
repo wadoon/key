@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.SkolemUpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -355,11 +356,12 @@ public class NoPosTacletApp extends TacletApp {
     /**
      * PRECONDITION: ifFormulaInstantiations () == null &&
      *               ( pos == null || termConstraint.isSatisfiable () )
+     * @param goal TODO
      * @return TacletApp with the resulting instantiations or null
      */
     public NoPosTacletApp matchFind(PosInOccurrence pos,
-				    Services        services) {
-        NoPosTacletApp result = matchFind(pos, services, null);
+				    Goal goal, Services        services) {
+        NoPosTacletApp result = matchFind(pos, goal, services, null);
 	return result;
     }
 
@@ -370,8 +372,8 @@ public class NoPosTacletApp extends TacletApp {
        anyway).
      */
     public NoPosTacletApp matchFind(PosInOccurrence pos,
-				    Services        services,
-				    Term t) {
+				    Goal goal,
+				    Services        services, Term t) {
         if ((t==null) && (pos!=null)) t = pos.subTerm ();
 
         MatchConditions mc = setupMatchConditions(pos, services);
@@ -383,7 +385,7 @@ public class NoPosTacletApp extends TacletApp {
         MatchConditions res;
 	if (taclet() instanceof FindTaclet) {
 		res = ((FindTaclet)taclet())
-		    .getMatcher().matchFind ( t, mc, services );
+		    .getMatcher().matchFind ( t, mc, goal, services );
 		// the following check will partly be repeated within the
 		// constructor; this could be optimised
 		if ( res == null ||

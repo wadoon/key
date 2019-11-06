@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.legacy.LegacyTacletMatcher;
@@ -40,12 +41,12 @@ public class Matcher {
      * results from where the information about instantiated schema variables can be extracted. If no match was possible the list is exmpt.
      * @param pattern a string representation of the pattern sequent against which the current sequent should be matched
      * @param currentSeq current concrete sequent
+     * @param goal TODO
      * @param assignments variables appearing in the pattern as schemavariables with their corresponding type in KeY
-     *
      * @return List of VariableAssignments (possibly empty if no match was found)
      */
     //List of VarAssignment
-    public List<VariableAssignments> matchPattern(String pattern, Sequent currentSeq, VariableAssignments assignments){
+    public List<VariableAssignments> matchPattern(String pattern, Sequent currentSeq, Goal goal, VariableAssignments assignments){
         //copy services in order to not accidently set assignments and namespace for environment
 
         Services copyServices = api.getEnv().getServices().copy(false);
@@ -101,7 +102,7 @@ public class Matcher {
                 //System.out.println(inAntecedent ? "In Antec: " : "In Succ");
 
                 IfMatchResult ma = ltm.matchIf((inAntecedent ?
-                        antecCand : succCand), node.getPatternTerm(), node.mc, copyServices);
+                        antecCand : succCand), node.getPatternTerm(), node.mc, goal, copyServices);
 
                 if (!ma.getMatchConditions().isEmpty()) {
                     ImmutableList<MatchConditions> testma = ma.getMatchConditions();

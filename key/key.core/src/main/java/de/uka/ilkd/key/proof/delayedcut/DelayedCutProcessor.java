@@ -186,7 +186,7 @@ public class DelayedCutProcessor implements Runnable {
         TacletApp app = apps.head();
 
         app = app.addCheckedInstantiation(app.uninstantiatedVars().iterator()
-                .next(), cut.getFormula(), cut.getServices(), true);
+                .next(), cut.getFormula(), goal, cut.getServices(), true);
         return goal.apply(app);
     }
 
@@ -405,7 +405,7 @@ public class DelayedCutProcessor implements Runnable {
         if (app instanceof TacletApp) {
             NoPosTacletApp noPosApp = NoPosTacletApp
                     .createNoPosTacletApp((Taclet) app.rule());
-            if (noPosApp.matchFind(newPos, services) == null) {
+            if (noPosApp.matchFind(newPos, goal, services) == null) {
 
                 throw new RuntimeException("Cannot apply taclet-app");
             }

@@ -109,7 +109,7 @@ public class TestCollisionResolving extends TestCase {
 	    (coll_varSV, coll_varSV.getMatcher().matchFind
 	     (term,
 	      MatchConditions.EMPTY_MATCHCONDITIONS,
-	      services),
+	      goal, services),
 	      services);
 
 	SchemaVariable b
@@ -167,7 +167,7 @@ public class TestCollisionResolving extends TestCase {
 	    = PosTacletApp.createPosTacletApp(coll_varSV, coll_varSV.getMatcher().matchFind
 					      (term.sub(0),
 					       MatchConditions.EMPTY_MATCHCONDITIONS,
-					       services),pos, services);
+					       goal, services),pos, services);
 
 	SchemaVariable b
 	    =  TacletForTests.getSchemaVariables().lookup(new Name("b"));
@@ -197,7 +197,7 @@ public class TestCollisionResolving extends TestCase {
 					      taclet.getMatcher().
 					      matchFind(term.sub(0),
 							   MatchConditions.EMPTY_MATCHCONDITIONS,
-							   null),
+							   goal, null),
 			                      pos,
 			                      services);
 	TacletApp app1=app.prepareUserInstantiation(services);
@@ -289,9 +289,9 @@ public class TestCollisionResolving extends TestCase {
 
 	NoPosTacletApp app0 = NoPosTacletApp.createNoPosTacletApp ( taclet );
 	app0 = app0.matchFind ( pos,
-				       services);
+				       goal, services);
 	app0 = (NoPosTacletApp)app0.findIfFormulaInstantiations
-	( seq, services ).head ();
+	( seq, goal, services ).head ();
 	TacletApp app = app0.setPosInOccurrence ( pos, services );
 	/*
 	IList<SVInstantiations> sviList=taclet.matchIf
@@ -418,7 +418,7 @@ public class TestCollisionResolving extends TestCase {
 						true);
 	MatchConditions mc=taclet.getMatcher().matchFind(term.sub(0),
 					MatchConditions.EMPTY_MATCHCONDITIONS,
-					null);
+					goal, null);
 	TacletApp app
 	    = PosTacletApp.createPosTacletApp(taclet, mc, pos, services);
 	TacletApp app1=app.prepareUserInstantiation(services);

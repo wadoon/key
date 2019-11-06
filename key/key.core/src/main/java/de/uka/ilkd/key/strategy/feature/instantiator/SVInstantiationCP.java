@@ -116,8 +116,8 @@ public class SVInstantiationCP implements Feature {
             final RuleApp newApp =
                 tapp.addCheckedInstantiation ( sv,
                                                instTerm,
-                                               goal.proof ().getServices (),
-                                               true );
+                                               goal,
+                                               goal.proof ().getServices (), true );
 
             final CPBranch branch = new CPBranch () {
                 public void choose() {}

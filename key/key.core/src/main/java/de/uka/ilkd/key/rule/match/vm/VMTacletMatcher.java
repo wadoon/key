@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.IfMatchResult;
@@ -99,13 +100,13 @@ public class VMTacletMatcher implements TacletMatcher {
     
 
     /** (non-Javadoc)
-     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(ImmutableList, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
+     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(ImmutableList, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.rule.MatchConditions, Goal, de.uka.ilkd.key.java.Services)
      */
     @Override
     public final IfMatchResult matchIf (   ImmutableList<IfFormulaInstantiation> p_toMatch,
             Term                             p_template,
             MatchConditions                  p_matchCond,
-            Services                         p_services ) {
+            Goal p_goal, Services                         p_services ) {
         TacletMatchProgram prg = assumesMatchPrograms.get(p_template);
 
         
@@ -133,7 +134,7 @@ public class VMTacletMatcher implements TacletMatcher {
             }
             if (formula != null) {// update context not present or update context match succeeded
                 final MatchConditions newMC = 
-                        checkConditions(prg.match(formula, p_matchCond, p_services), p_services);
+                        checkConditions(prg.match(formula, p_matchCond, p_services), p_goal, p_services);
 
                 if (newMC != null) {
                     resFormulas = resFormulas.prepend(cf);
@@ -184,12 +185,12 @@ public class VMTacletMatcher implements TacletMatcher {
 
 
     /**
-     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(java.lang.Iterable, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
+     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(java.lang.Iterable, de.uka.ilkd.key.rule.MatchConditions, Goal, de.uka.ilkd.key.java.Services)
      */
     @Override
     public final MatchConditions matchIf ( Iterable<IfFormulaInstantiation> p_toMatch,
             MatchConditions                  p_matchCond,
-            Services                         p_services ) {
+            Goal p_goal, Services                         p_services ) {
 
         final Iterator<SequentFormula>     itIfSequent   = assumesSequent .iterator ();
 
@@ -201,7 +202,7 @@ public class VMTacletMatcher implements TacletMatcher {
                     .prepend ( candidateInst ),
                     itIfSequent.next ().formula (),
                     p_matchCond,
-                    p_services ).getMatchConditions ();
+                    p_goal, p_services ).getMatchConditions ();
 
             if ( newMC.isEmpty() )
                 return null;
@@ -216,21 +217,21 @@ public class VMTacletMatcher implements TacletMatcher {
     /**
      * {@inheritDoc}
      */
-    public final MatchConditions checkConditions(MatchConditions cond, Services services) {
+    public final MatchConditions checkConditions(MatchConditions cond, Goal goal, Services services) {
         MatchConditions result = cond;
         if (result != null) {
             final Iterator<SchemaVariable> svIterator = 
                     cond.getInstantiations().svIterator();
 
             if (!svIterator.hasNext()) {
-                return checkVariableConditions(null, null, cond, services);//XXX
+                return checkVariableConditions(null, null, cond, goal, services);//XXX
             }
 
             while (result != null && svIterator.hasNext()) {
                 final SchemaVariable sv = svIterator.next();
                 final Object o = result.getInstantiations().getInstantiation(sv);
                 if (o instanceof SVSubstitute) {
-                    result = checkVariableConditions(sv, (SVSubstitute)o , result, services);
+                    result = checkVariableConditions(sv, (SVSubstitute)o , result, goal, services);
                 }
             }
         }
@@ -270,7 +271,7 @@ public class VMTacletMatcher implements TacletMatcher {
     public final MatchConditions checkVariableConditions(SchemaVariable var, 
             SVSubstitute instantiationCandidate,
             MatchConditions matchCond,
-            Services services) {        
+            Goal goal, Services services) {        
         if (matchCond != null) {
             if (instantiationCandidate instanceof Term) {
                 final Term term = (Term) instantiationCandidate;
@@ -284,7 +285,7 @@ public class VMTacletMatcher implements TacletMatcher {
             }
             // check generic conditions
             for (final VariableCondition vc : varconditions) {
-                matchCond = vc.check(var, instantiationCandidate, matchCond, services);       
+                matchCond = vc.check(var, instantiationCandidate, matchCond, goal, services);       
                 if (matchCond == null) {       
                     return null; // FAILED
                 }
@@ -326,7 +327,7 @@ public class VMTacletMatcher implements TacletMatcher {
     @Override
     public final MatchConditions matchFind(Term term, 
             MatchConditions matchCond,
-            Services services) {        
+            Goal goal, Services services) {        
         if (findMatchProgram != TacletMatchProgram.EMPTY_PROGRAM) {
             if (ignoreTopLevelUpdates) {
                 Pair</* term below updates */Term, MatchConditions> resultUpdateMatch = 
@@ -334,7 +335,7 @@ public class VMTacletMatcher implements TacletMatcher {
                 term = resultUpdateMatch.first;
                 matchCond = resultUpdateMatch.second;
             }
-            matchCond = checkConditions(findMatchProgram.match(term, matchCond, services), services);
+            matchCond = checkConditions(findMatchProgram.match(term, matchCond, services), goal, services);
         } else {
             matchCond = null;
         }
@@ -348,14 +349,14 @@ public class VMTacletMatcher implements TacletMatcher {
      */
     @Override
     public MatchConditions matchSV(SchemaVariable sv, Term term,
-            MatchConditions matchCond, Services services) {
+            MatchConditions matchCond, Goal goal, Services services) {
 
         final MatchSchemaVariableInstruction<? extends SchemaVariable> instr = TacletMatchProgram.getMatchInstructionForSV(sv);
         
         matchCond = instr.match(term, matchCond, services);
 
         if (matchCond != null) {
-            matchCond = checkVariableConditions(sv, term, matchCond, services);
+            matchCond = checkVariableConditions(sv, term, matchCond, goal, services);
         }
 
         return matchCond; 
@@ -365,12 +366,12 @@ public class VMTacletMatcher implements TacletMatcher {
      * {@inheritDoc}
      */
    @Override
-    public MatchConditions matchSV(SchemaVariable sv, ProgramElement pe, MatchConditions matchCond, Services services) {
+    public MatchConditions matchSV(SchemaVariable sv, ProgramElement pe, MatchConditions matchCond, Goal goal, Services services) {
        final MatchSchemaVariableInstruction<? extends SchemaVariable> instr = TacletMatchProgram.getMatchInstructionForSV(sv);
        matchCond = instr.match(pe, matchCond, services);
        
        if (matchCond != null) {
-           matchCond = checkConditions(matchCond, services);
+           matchCond = checkConditions(matchCond, goal, services);
        }
        
        return matchCond;

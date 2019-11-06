@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
@@ -55,7 +56,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
     @Override
     public MatchConditions check(SchemaVariable var,
             SVSubstitute instCandidate, MatchConditions matchCond,
-            Services services) {
+            Goal goal, Services services) {
         if (var != labelSV && 
                 matchCond.getInstantiations().isInstantiated(labelSV)) { 
             var = labelSV;

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.ProgramList;
@@ -71,7 +72,7 @@ public class InstantiateVarsFreshCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable sv, SVSubstitute instCandidate,
-            MatchConditions matchCond, Services services) {
+            MatchConditions matchCond, Goal goal, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         if (svInst.isInstantiated(varsList)) {

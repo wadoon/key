@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -62,7 +63,7 @@ public final class EqualUniqueCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var, 
 	    		  	 SVSubstitute instCandidate, 
 	    		  	 MatchConditions mc, 
-	    		  	 Services services) {
+	    		  	 Goal goal, Services services) {
 	SVInstantiations svInst = mc.getInstantiations();
 	Term tInst   = (Term) svInst.getInstantiation(t);
 	Term t2Inst  = (Term) svInst.getInstantiation(t2);

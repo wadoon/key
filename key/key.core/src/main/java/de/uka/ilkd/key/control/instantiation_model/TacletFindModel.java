@@ -406,8 +406,8 @@ public class TacletFindModel extends AbstractTableModel {
 
                     if (sv instanceof VariableSV) {
                         LogicVariable lv = new LogicVariable(new Name(idd.getName()), sort);
-                        result = result.addCheckedInstantiation(sv, addOrigin(tb.var(lv)), services,
-                                true);
+                        result = result.addCheckedInstantiation(sv, addOrigin(tb.var(lv)), goal,
+                                services, true);
                     } else {
                         // sv instanceof SkolemTermSV
                         final Named n = namespaces().lookupLogicSymbol(new Name(idd.getName()));
@@ -421,7 +421,7 @@ public class TacletFindModel extends AbstractTableModel {
                     }
                 } else if (sv instanceof ProgramSV) {
                     final ProgramElement pe = parseRow(irow);
-                    result = result.addCheckedInstantiation(sv, pe, services, true);
+                    result = result.addCheckedInstantiation(sv, pe, goal, services, true);
                 }
             }
             SchemaVariable problemVarSV = result.varSVNameConflict();
@@ -448,7 +448,7 @@ public class TacletFindModel extends AbstractTableModel {
 
                 if (sv instanceof ProgramSV) {
                     final ProgramElement pe = parseRow(irow);
-                    result = result.addCheckedInstantiation(sv, pe, services, true);
+                    result = result.addCheckedInstantiation(sv, pe, goal, services, true);
                 } else {
                     if (isInputAvailable(irow)) {
                         final Namespace<QuantifiableVariable> extVarNS = result
@@ -462,7 +462,7 @@ public class TacletFindModel extends AbstractTableModel {
 
                         try {
                             result = result.addCheckedInstantiation(sv, addOrigin(instance),
-                                    services, true);
+                                    goal, services, true);
                         } catch (RigidnessException e) {
                             throw new SVRigidnessException("" + sv, irow, 0);
                         } catch (IllegalInstantiationException iae) {

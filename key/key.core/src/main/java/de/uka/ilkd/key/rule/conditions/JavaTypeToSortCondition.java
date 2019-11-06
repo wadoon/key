@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
@@ -73,7 +74,7 @@ public final class JavaTypeToSortCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var,
                                  SVSubstitute svSubst,
                                  MatchConditions matchCond,
-                                 Services services) {
+                                 Goal goal, Services services) {
         if ( var != exprOrTypeSV ) {
             return matchCond;
         }

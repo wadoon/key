@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -40,7 +41,7 @@ public class AbstractUpdateCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable sv, SVSubstitute instCandidate,
-            MatchConditions matchCond, Services services) {
+            MatchConditions matchCond, Goal goal, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
         final Term uInst = (Term) svInst.getInstantiation(u);
         if (negated ^ AbstractExecutionUtils.containsAbstractUpdate(uInst)) {

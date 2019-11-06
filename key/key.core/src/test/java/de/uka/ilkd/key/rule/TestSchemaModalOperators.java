@@ -141,6 +141,7 @@ public class TestSchemaModalOperators extends TestCase {
 	//	Debug.ENABLE_DEBUG = true;
 	
 	RewriteTacletBuilder<RewriteTaclet> rtb = new RewriteTacletBuilder<>();
+	Goal goal = null;
 
 	SchemaVariable fsv = SchemaVariableFactory.createFormulaSV(new Name("post"), true);
 	ImmutableSet<Modality> modalities = DefaultImmutableSet.<Modality>nil();
@@ -170,20 +171,20 @@ public class TestSchemaModalOperators extends TestCase {
 
 	RewriteTaclet t = rtb.getRewriteTaclet();
 
-	Term goal = TB.prog(
+	Term t_goal = TB.prog(
 	    Modality.DIA, 
             JavaBlock.EMPTY_JAVABLOCK,
             TB.ff());
          MatchConditions mc=t.getMatcher().matchFind                                                   
-                            (goal,                                                        
-                             MatchConditions.EMPTY_MATCHCONDITIONS, services);
+                            (t_goal,                                                        
+                             MatchConditions.EMPTY_MATCHCONDITIONS, goal, services);
 	 assertNotNull(mc);
 	 assertNotNull(mc.getInstantiations().getInstantiation(osv));
 	 assertTrue("Schemamodality " + osv + " has not been instantiated", 
 	         mc.getInstantiations().isInstantiated(osv));
 	 assertTrue(mc.getInstantiations().getInstantiation(osv) == Modality.DIA);
 
-	 PosInOccurrence pos = new PosInOccurrence(new SequentFormula(goal), PosInTerm.getTopLevel(), true);
+	 PosInOccurrence pos = new PosInOccurrence(new SequentFormula(t_goal), PosInTerm.getTopLevel(), true);
 	 PosTacletApp tacletApp = PosTacletApp.createPosTacletApp(t, mc, pos, services);
 	 Term instReplace = 
 	         t.getRewriteResult(null, new TermLabelState(), services, tacletApp).formula();

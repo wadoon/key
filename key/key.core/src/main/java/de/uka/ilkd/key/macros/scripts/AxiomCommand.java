@@ -45,7 +45,7 @@ public class AxiomCommand
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
         app = app.addCheckedInstantiation(sv, parameter.formula,
-                state.getProof().getServices(), true);
+                state.getFirstOpenAutomaticGoal(), state.getProof().getServices(), true);
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 

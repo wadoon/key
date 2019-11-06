@@ -178,17 +178,17 @@ public class TacletAppIndex  {
         this.seq = getNode ().sequent ();
 
         antecIndex = new SemisequentTacletAppIndex ( getSequent (), true,
+                                                     goal,
                                                      getServices (),
                                                      tacletIndex (),
                                                      getNewRulePropagator (),
-                                                     getRuleFilter (),
-                                                     indexCaches );
+                                                     getRuleFilter (), indexCaches );
         succIndex = new SemisequentTacletAppIndex ( getSequent (), false,
+                                                    goal,
                                                     getServices (),
                                                     tacletIndex (),
                                                     getNewRulePropagator (),
-                                                    getRuleFilter (),
-                                                    indexCaches );
+                                                    getRuleFilter (), indexCaches );
     }
 
     private void ensureIndicesExist () {
@@ -284,7 +284,7 @@ public class TacletAppIndex  {
     public ImmutableList<NoPosTacletApp> getNoFindTaclet(TacletFilter filter,
                                                 Services services) {
         RuleFilter effectiveFilter = new AndRuleFilter ( filter, ruleFilter );
-        return tacletIndex ().getNoFindTaclet ( effectiveFilter, services );
+        return tacletIndex ().getNoFindTaclet ( effectiveFilter, goal, services );
     }
 
     /** 
@@ -365,24 +365,24 @@ public class TacletAppIndex  {
     private void updateIndices(SequentChangeInfo sci) {
         seq = sci.sequent ();
 
-        antecIndex = antecIndex.sequentChanged ( sci, getServices (),
-                                                 tacletIndex (),
-                                                 getNewRulePropagator () );
+        antecIndex = antecIndex.sequentChanged ( sci, goal,
+                                                 getServices (),
+                                                 tacletIndex (), getNewRulePropagator () );
 
-        succIndex = succIndex.sequentChanged ( sci, getServices (),
-                                               tacletIndex (),
-                                               getNewRulePropagator () );
+        succIndex = succIndex.sequentChanged ( sci, goal,
+                                               getServices (),
+                                               tacletIndex (), getNewRulePropagator () );
     }
     
     private void updateIndices(final SetRuleFilter newTaclets) {
         antecIndex = antecIndex.addTaclets ( newTaclets, getSequent (),
+                                             goal,
                                              getServices (),
-                                             tacletIndex (),
-                                             getNewRulePropagator () );
+                                             tacletIndex (), getNewRulePropagator () );
         succIndex = succIndex.addTaclets ( newTaclets, getSequent (),
+                                           goal,
                                            getServices (),
-                                           tacletIndex (),
-                                           getNewRulePropagator () );
+                                           tacletIndex (), getNewRulePropagator () );
     }
 
 
