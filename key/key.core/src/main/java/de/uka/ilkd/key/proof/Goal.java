@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
@@ -62,42 +63,56 @@ public final class Goal {
      */
     private final Properties strategyInfos;
     private Node node;
+    
     /**
      * all possible rule applications at this node are managed with this index
      */
     private RuleAppIndex ruleAppIndex;
+    
     /**
      * list of all applied rule applications at this branch
      */
     private ImmutableList<RuleApp> appliedRuleApps = ImmutableSLList.<RuleApp>nil();
+    
     /**
      * this object manages the tags for all formulas of the sequent
      */
     private FormulaTagManager tagManager;
+    
     /**
      * the strategy object that determines automated application of rules
      */
     private Strategy goalStrategy = null;
+    
     /**
      * This is the object which keeps book about all applicable rules.
      */
     private AutomatedRuleApplicationManager ruleAppManager;
+    
     /**
      * goal listeners
      */
     private List<GoalListener> listeners = new ArrayList<GoalListener>(10);
+    
     /**
      * a goal has been excluded from automatic rule application iff automatic == false
      */
     private boolean automatic = true;
+    
     /**
      * Marks this goal as linked (-> {@link MergeRule})
      */
     private Goal linkedGoal = null;
+    
     /**
      * The namespaces local to this goal. This may evolve over time.
      */
     private NamespaceSet localNamespaces;
+    
+    /**
+     * The specification repository local to this goal.
+     */
+    private GoalLocalSpecificationRepository localSpecificationRepository;
 
     /*
      * creates a new goal referencing the given node.
@@ -108,7 +123,7 @@ public final class Goal {
                  FormulaTagManager tagManager,
                  AutomatedRuleApplicationManager ruleAppManager,
                  Properties strategyInfos,
-                 NamespaceSet localNamespace) {
+                 NamespaceSet localNamespace, GoalLocalSpecificationRepository localSpecificationRepository) {
         this.node = node;
         this.ruleAppIndex = ruleAppIndex;
         this.appliedRuleApps = appliedRuleApps;
@@ -118,6 +133,7 @@ public final class Goal {
         this.strategyInfos = strategyInfos;
         setRuleAppManager(ruleAppManager);
         this.localNamespaces = localNamespace;
+        this.localSpecificationRepository = localSpecificationRepository;
     }
 
     private Goal(Node node,
@@ -125,7 +141,7 @@ public final class Goal {
                  ImmutableList<RuleApp> appliedRuleApps,
                  AutomatedRuleApplicationManager ruleAppManager,
                  Properties strategyInfos,
-                 NamespaceSet localNamespace) {
+                 NamespaceSet localNamespace, GoalLocalSpecificationRepository localSpecificationRepository) {
         this.node = node;
         this.ruleAppIndex = ruleAppIndex;
         this.appliedRuleApps = appliedRuleApps;
@@ -135,6 +151,7 @@ public final class Goal {
         setRuleAppManager(ruleAppManager);
         this.tagManager = new FormulaTagManager(this);
         this.localNamespaces = localNamespace;
+        this.localSpecificationRepository = localSpecificationRepository;
     }
 
     /**
@@ -149,7 +166,8 @@ public final class Goal {
                 null,
                 new QueueRuleApplicationManager(),
                 new MapProperties(),
-                node.proof().getServices().getNamespaces().copyWithParent().copyWithParent());
+                node.proof().getServices().getNamespaces().copyWithParent().copyWithParent(),
+                new GoalLocalSpecificationRepository(node.proof().getServices()));
         tagManager = new FormulaTagManager(this);
     }
 
@@ -217,6 +235,13 @@ public final class Goal {
      */
     public NamespaceSet getLocalNamespaces() {
         return localNamespaces;
+    }
+
+    /**
+     * @return the local goal-local specification repository
+     */
+    public GoalLocalSpecificationRepository getLocalSpecificationRepository() {
+        return localSpecificationRepository;
     }
 
     /**
@@ -537,7 +562,8 @@ public final class Goal {
                     appliedRuleApps,
                     ruleAppManager.copy(),
                     strategyInfos.clone(),
-                    localNamespaces);
+                    localNamespaces,
+                    localSpecificationRepository.clone());
         } else {
             clone = new Goal(node,
                     ruleAppIndex.copy(),
@@ -545,7 +571,8 @@ public final class Goal {
                     getFormulaTagManager().copy(),
                     ruleAppManager.copy(),
                     strategyInfos.clone(),
-                    localNamespaces);
+                    localNamespaces,
+                    localSpecificationRepository.clone());
         }
         clone.listeners = (List<GoalListener>)
                 ((ArrayList<GoalListener>) listeners).clone();
