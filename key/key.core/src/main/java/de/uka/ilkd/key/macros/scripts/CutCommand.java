@@ -49,7 +49,7 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
         app = app.addCheckedInstantiation(sv, args.formula,
-                state.getProof().getServices(), true);
+                state.getFirstOpenAutomaticGoal(), state.getProof().getServices(), true);
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 

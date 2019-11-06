@@ -212,7 +212,7 @@ public class IfInstantiator {
         final ImmutableList<IfFormulaInstantiation> formulas = getSequentFormulas(antec,
                 !lastIfFormula || p_alreadyMatchedNewFor);
         final IfMatchResult mr = getTaclet().getMatcher().matchIf(formulas, p_ifSeqTail.head().formula(), p_matchCond,
-                getServices());
+                goal, getServices());
 
         // For each matching formula call the method again to match
         // the remaining terms

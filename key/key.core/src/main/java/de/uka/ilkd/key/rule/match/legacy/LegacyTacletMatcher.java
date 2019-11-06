@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.IfMatchResult;
@@ -219,13 +220,13 @@ public final class LegacyTacletMatcher implements TacletMatcher {
 
 
     /** (non-Javadoc)
-     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(ImmutableList, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
+     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(ImmutableList, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.rule.MatchConditions, Goal, de.uka.ilkd.key.java.Services)
      */
     @Override
     public final IfMatchResult matchIf (   ImmutableList<IfFormulaInstantiation> p_toMatch,
             Term                             p_template,
             MatchConditions                  p_matchCond,
-            Services                         p_services ) {
+            Goal p_goal, Services                         p_services ) {
         ImmutableList<IfFormulaInstantiation> resFormulas = ImmutableSLList.<IfFormulaInstantiation>nil();
         ImmutableList<MatchConditions> resMC = ImmutableSLList.<MatchConditions>nil();
 
@@ -237,7 +238,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
                     .getUpdateContext(), p_template);
 
         for (IfFormulaInstantiation cf: p_toMatch) {
-            final MatchConditions newMC = checkConditions(match(cf.getConstrainedFormula().formula(), updateFormula, p_matchCond, p_services), p_services);
+            final MatchConditions newMC = checkConditions(match(cf.getConstrainedFormula().formula(), updateFormula, p_matchCond, p_services), p_goal, p_services);
             if (newMC != null) {
                 resFormulas = resFormulas.prepend(cf);
                 resMC       = resMC.prepend(newMC);
@@ -249,12 +250,12 @@ public final class LegacyTacletMatcher implements TacletMatcher {
 
 
     /**
-     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(java.lang.Iterable, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)    
+     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(java.lang.Iterable, de.uka.ilkd.key.rule.MatchConditions, Goal, de.uka.ilkd.key.java.Services)    
      */
     @Override
     public final MatchConditions matchIf ( Iterable<IfFormulaInstantiation> p_toMatch,
             MatchConditions                  p_matchCond,
-            Services                         p_services ) {
+            Goal p_goal, Services                         p_services ) {
         final Iterator<SequentFormula>     itIfSequent   = assumesSequent .iterator ();
 
         ImmutableList<MatchConditions>            newMC;   
@@ -265,7 +266,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
                     .prepend ( candidateInst ),
                     itIfSequent.next ().formula (),
                     p_matchCond,
-                    p_services ).getMatchConditions ();
+                    p_goal, p_services ).getMatchConditions ();
 
             if ( newMC.isEmpty() )
                 return null;
@@ -281,21 +282,21 @@ public final class LegacyTacletMatcher implements TacletMatcher {
     /**
      * {@inheritDoc}
      */
-    public final MatchConditions checkConditions(MatchConditions cond, Services services) {
+    public final MatchConditions checkConditions(MatchConditions cond, Goal goal, Services services) {
         MatchConditions result = cond;
         if (result != null) {
             final Iterator<SchemaVariable> svIterator = 
                     cond.getInstantiations().svIterator();
 
             if (!svIterator.hasNext()) {
-                return checkVariableConditions(null, null, cond, services);//XXX
+                return checkVariableConditions(null, null, cond, goal, services);//XXX
             }
 
             while (result != null && svIterator.hasNext()) {
                 final SchemaVariable sv = svIterator.next();
                 final Object o = result.getInstantiations().getInstantiation(sv);
                 if (o instanceof SVSubstitute) {
-                    result = checkVariableConditions(sv, (SVSubstitute)o , result, services);
+                    result = checkVariableConditions(sv, (SVSubstitute)o , result, goal, services);
                 }
             }
         }
@@ -336,7 +337,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
     public final MatchConditions checkVariableConditions(SchemaVariable var, 
             SVSubstitute instantiationCandidate,
             MatchConditions matchCond,
-            Services services) {        
+            Goal goal, Services services) {        
         if (matchCond != null) {
             if (instantiationCandidate instanceof Term) {
                 final Term term = (Term) instantiationCandidate;
@@ -350,7 +351,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
             }
             // check generic conditions
             for (final VariableCondition vc : varconditions) {
-                matchCond = vc.check(var, instantiationCandidate, matchCond, services);       
+                matchCond = vc.check(var, instantiationCandidate, matchCond, goal, services);       
                 if (matchCond == null) {       
                     return null; // FAILED
                 }
@@ -394,7 +395,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
     @Override
     public final MatchConditions matchFind(Term term, 
             MatchConditions matchCond,
-            Services services) {
+            Goal goal, Services services) {
         
         if (findExp != null) {
             if (ignoreTopLevelUpdates) {
@@ -403,7 +404,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
                 term = resultUpdateMatch.first;
                 matchCond = resultUpdateMatch.second;
             }
-            matchCond = checkConditions(match(term, findExp, matchCond, services), services);
+            matchCond = checkConditions(match(term, findExp, matchCond, services), goal, services);
         } else {
             matchCond = null;
         }
@@ -417,7 +418,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
      */
     @Override
     public MatchConditions matchSV(SchemaVariable sv, Term term,
-            MatchConditions matchCond, Services services) {
+            MatchConditions matchCond, Goal goal, Services services) {
         MatchConditions cond = matchCond;
 
         if (sv.arity() == 0) {
@@ -427,7 +428,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
         }
 
         if (cond != null) {
-            cond = checkVariableConditions(sv, term, cond, services); 
+            cond = checkVariableConditions(sv, term, cond, goal, services); 
         }
 
         return cond; 
@@ -439,11 +440,11 @@ public final class LegacyTacletMatcher implements TacletMatcher {
      */
     @Override
     public MatchConditions matchSV(SchemaVariable sv, ProgramElement pe,
-            MatchConditions matchCond, Services services) {        
+            MatchConditions matchCond, Goal goal, Services services) {        
         matchCond = ElementMatcher.getElementMatcherFor(sv).match(sv, pe, matchCond, services);
         
         if (matchCond != null) {
-            matchCond = checkConditions(matchCond, services);
+            matchCond = checkConditions(matchCond, goal, services);
         }
         
         return matchCond;

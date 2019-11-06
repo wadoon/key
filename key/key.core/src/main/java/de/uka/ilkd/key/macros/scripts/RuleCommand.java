@@ -168,9 +168,9 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
              * (DS, 2019-01-31): Try to instantiate first, otherwise, we cannot
              * apply taclets with "\newPV", Skolem terms etc.
              */
-            final TacletApp maybeInstApp = result
-                    .tryToInstantiateAsMuchAsPossible(services.getOverlay(state
-                            .getFirstOpenAutomaticGoal().getLocalNamespaces()));
+            final TacletApp maybeInstApp = result.tryToInstantiateAsMuchAsPossible(
+                    state.getFirstOpenAutomaticGoal(),
+                    services.getOverlay(state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
 
             if (maybeInstApp != null) {
                 result = maybeInstApp;
@@ -195,8 +195,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
 
         // try to instantiate remaining symbols
-        result = result.tryToInstantiate(services.getOverlay(
-                state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
+        result = result.tryToInstantiate(state.getFirstOpenAutomaticGoal(),
+                services.getOverlay(state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
 
         if (result == null) {
             throw new ScriptException("Cannot instantiate this rule");
@@ -204,7 +204,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         if (recheckMatchConditions) {
             final MatchConditions appMC = result.taclet().getMatcher()
-                    .checkConditions(result.matchConditions(), services);
+                    .checkConditions(result.matchConditions(), state.getFirstOpenAutomaticGoal(), services);
             if (appMC == null) {
                 return null;
             } else {

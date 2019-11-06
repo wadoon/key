@@ -114,7 +114,7 @@ public class TestDropEffectlessElementary extends TestCase {
 
         MatchConditions mc = MatchConditions.EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
         // first 2 args are not used in the following method, hence, can be null.
-        mc = cond.check(null, null, mc, TacletForTests.services());
+        mc = cond.check(null, null, mc, null, TacletForTests.services());
 
         if(mc == null) {
             return term; 

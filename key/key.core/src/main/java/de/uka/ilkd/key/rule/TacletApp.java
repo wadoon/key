@@ -33,7 +33,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
@@ -499,6 +498,7 @@ public abstract class TacletApp implements RuleApp {
      *            the SchemaVariable to be instantiated
      * @param term
      *            the Term the SchemaVariable is instantiated with
+     * @param goal TODO
      * @param services
      *            the services object
      * @param interesting
@@ -508,8 +508,8 @@ public abstract class TacletApp implements RuleApp {
      */
     public TacletApp addCheckedInstantiation(SchemaVariable sv,
                                              Term term,
-                                             Services services,
-                                             boolean interesting) {
+                                             Goal goal,
+                                             Services services, boolean interesting) {
         if (sv instanceof VariableSV && !(term.op() instanceof LogicVariable)) {
             throw new IllegalInstantiationException("Could not add "
                 + "the instantiation of " + sv + " because " + term
@@ -517,7 +517,7 @@ public abstract class TacletApp implements RuleApp {
         }
 
         final MatchConditions newMC =
-                taclet.getMatcher().matchSV(sv, term, matchConditions(), services);
+                taclet.getMatcher().matchSV(sv, term, matchConditions(), goal, services);
 
         if (newMC == null) {
             throw new IllegalInstantiationException("Instantiation " + term
@@ -557,11 +557,12 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
+     * @param goal TODO
      * @return A taclet app which is more complete than the original one
      *         (although there might still be some leftover uninstantiated
      *         variables) or null if nothing changed.
      */
-    public final TacletApp tryToInstantiateAsMuchAsPossible(Services services) {
+    public final TacletApp tryToInstantiateAsMuchAsPossible(Goal goal, Services services) {
         final VariableNamer varNamer = services.getVariableNamer();
         final TermBuilder tb = services.getTermBuilder();
 
@@ -579,7 +580,7 @@ public abstract class TacletApp implements RuleApp {
                                 services, proposals);
                 ProgramElement pe = app.getProgramElement(proposal, sv,
                         services);
-                app = app.addCheckedInstantiation(sv, pe, services, true);
+                app = app.addCheckedInstantiation(sv, pe, goal, services, true);
                 proposals = proposals.append(proposal);
             }
             else if (sv.sort() == ProgramSVSort.LABEL) {
@@ -591,8 +592,8 @@ public abstract class TacletApp implements RuleApp {
                             services);
                     proposals = proposals.prepend(proposal);
                     try {
-                        app = app.addCheckedInstantiation(sv, pe, services,
-                                true);
+                        app = app.addCheckedInstantiation(sv, pe, goal,
+                                services, true);
                     }
                     catch (IllegalInstantiationException iie) {
                         // name clash
@@ -645,8 +646,8 @@ public abstract class TacletApp implements RuleApp {
                 LogicVariable v = new LogicVariable(new Name(proposal),
                         getRealSort(sv, services));
 
-                app = app.addCheckedInstantiation(sv, tb.var(v), services,
-                        true);
+                app = app.addCheckedInstantiation(sv, tb.var(v), goal,
+                        services, true);
             }
             else {
                 continue;
@@ -655,7 +656,7 @@ public abstract class TacletApp implements RuleApp {
 
         if (app != this) {
             final MatchConditions appMC = app.taclet().getMatcher()
-                    .checkConditions(app.matchConditions(), services);
+                    .checkConditions(app.matchConditions(), goal, services);
             if (appMC == null) {
                 return null;
             }
@@ -667,9 +668,10 @@ public abstract class TacletApp implements RuleApp {
     }
 
      /**
-      * @return A TacletApp with this.sufficientlyComplete() or null
+      * @param goal TODO
+     * @return A TacletApp with this.sufficientlyComplete() or null
       */
-     public final TacletApp tryToInstantiate(Services services) {
+     public final TacletApp tryToInstantiate(Goal goal, Services services) {
         /*
          * TODO (DS, 2019-02-22): It should be possible to unify this with
          * tryToInstantiateAsMuchAsPossible: Apply that method, check whether
@@ -693,7 +695,7 @@ public abstract class TacletApp implements RuleApp {
 			.getSuggestiveNameProposalForProgramVariable(sv, this,
 				services, proposals);
 		ProgramElement pe = app.getProgramElement(proposal, sv, services);
-		app = app.addCheckedInstantiation(sv, pe, services, true);
+		app = app.addCheckedInstantiation(sv, pe, goal, services, true);
 		proposals = proposals.append(proposal);
 	    } else if (sv.sort() == ProgramSVSort.LABEL) {
 		boolean nameclash;
@@ -703,7 +705,7 @@ public abstract class TacletApp implements RuleApp {
 		    ProgramElement pe = app.getProgramElement(proposal, sv, services);
 		    proposals = proposals.prepend(proposal);
 		    try {
-			app = app.addCheckedInstantiation(sv, pe, services, true);
+			app = app.addCheckedInstantiation(sv, pe, goal, services, true);
 		    } catch (IllegalInstantiationException iie) {
 			// name clash
 			nameclash = true;
@@ -746,14 +748,14 @@ public abstract class TacletApp implements RuleApp {
 		LogicVariable v = new LogicVariable(new Name(proposal), getRealSort(sv, services));
 
 		app = app
-			.addCheckedInstantiation(sv, tb.var(v), services, true);
+			.addCheckedInstantiation(sv, tb.var(v), goal, services, true);
 	    } else {
 		return null;
 	    }
 	}
 
 	if (app != this) {
-	    final MatchConditions appMC = app.taclet().getMatcher().checkConditions(app.matchConditions(), services);
+	    final MatchConditions appMC = app.taclet().getMatcher().checkConditions(app.matchConditions(), goal, services);
 	    if (appMC == null) {
 		return null;
 	    } else {
@@ -919,7 +921,7 @@ public abstract class TacletApp implements RuleApp {
      * (beside some very rudimentary tests) if the instantiation is possible. If
      * you cannot guarantee that adding the entry <code>(sv, pe)</code> will
      * result in a valid taclet instantiation, you have to use
-     * {@link #addCheckedInstantiation(SchemaVariable, ProgramElement, Services, boolean)}
+     * {@link #addCheckedInstantiation(SchemaVariable, ProgramElement, Goal, Services, boolean)}
      * instead
      *
      * @param sv
@@ -949,6 +951,7 @@ public abstract class TacletApp implements RuleApp {
      *            the SchemaVariable to be instantiated
      * @param pe
      *            the ProgramElement the SV is instantiated with
+     * @param goal TODO
      * @param services
      *            the Services
      * @param interesting
@@ -968,10 +971,10 @@ public abstract class TacletApp implements RuleApp {
      */
     public TacletApp addCheckedInstantiation(SchemaVariable sv,
 	    				     ProgramElement pe,
-	    				     Services services,
-	    				     boolean interesting) {
+	    				     Goal goal,
+	    				     Services services, boolean interesting) {
 
-        final MatchConditions cond = taclet().getMatcher().matchSV(sv, pe, matchConditions, services);
+        final MatchConditions cond = taclet().getMatcher().matchSV(sv, pe, matchConditions, goal, services);
 
         if (cond == null) {
             throw new IllegalInstantiationException("SchemaVariable " + sv + " could not be matched with program element " +
@@ -1040,15 +1043,16 @@ public abstract class TacletApp implements RuleApp {
      * the formulas of the if sequent, adding SV instantiations, constraints and
      * metavariables as needed. This will fail if the if formulas have already
      * been instantiated.
+     * @param p_goal TODO
      */
     public TacletApp setIfFormulaInstantiations(
 	    ImmutableList<IfFormulaInstantiation> p_list,
-	    Services p_services) {
+	    Goal p_goal, Services p_services) {
 	assert p_list != null && ifInstsCorrectSize(taclet, p_list)
 		&& ifInstantiations == null : "If instantiations list has wrong size or is null "
 		+ "or the if formulas have already been instantiated";
 
-	MatchConditions mc = taclet().getMatcher().matchIf(p_list, matchConditions, p_services);
+	MatchConditions mc = taclet().getMatcher().matchIf(p_list, matchConditions, p_goal, p_services);
 
 	return mc == null ? null : setAllInstantiations(mc, p_list, p_services);
     }
@@ -1056,12 +1060,13 @@ public abstract class TacletApp implements RuleApp {
     /**
      * Find all possible instantiations of the if sequent formulas within the
      * sequent "p_seq".
+     * @param p_goal TODO
      *
      * @return a list of tacletapps with the found if formula instantiations
      */
     public ImmutableList<TacletApp> findIfFormulaInstantiations(
 	    Sequent p_seq,
-	    Services p_services) {
+	    Goal p_goal, Services p_services) {
 
 	Debug.assertTrue(ifInstantiations == null,
 		"The if formulas have already been instantiated");
@@ -1076,7 +1081,7 @@ public abstract class TacletApp implements RuleApp {
 		IfFormulaInstSeq.createList(p_seq, false, p_services), IfFormulaInstSeq
 			.createList(p_seq, true, p_services),
 		ImmutableSLList.<IfFormulaInstantiation>nil(), matchConditions(),
-		p_services);
+		p_goal, p_services);
 
     }
 
@@ -1095,6 +1100,7 @@ public abstract class TacletApp implements RuleApp {
      * @param p_matchCond
      *            match conditions until now, i.e. after matching the first
      *            formulas of the if sequent
+     * @param p_goal TODO
      */
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
 	    ImmutableList<SequentFormula> p_ifSeqTail,
@@ -1102,7 +1108,7 @@ public abstract class TacletApp implements RuleApp {
 	    ImmutableList<IfFormulaInstantiation> p_toMatch,
 	    ImmutableList<IfFormulaInstantiation> p_toMatch2nd,
 	    ImmutableList<IfFormulaInstantiation> p_alreadyMatched,
-	    MatchConditions p_matchCond, Services p_services) {
+	    MatchConditions p_matchCond, Goal p_goal, Services p_services) {
 
 	while (p_ifSeqTail.isEmpty()) {
 	    if (p_ifSeqTail2nd == null) {
@@ -1122,7 +1128,7 @@ public abstract class TacletApp implements RuleApp {
 	}
 
 	// Match the current formula
-	IfMatchResult mr = taclet().getMatcher().matchIf(p_toMatch, p_ifSeqTail.head().formula(), p_matchCond, p_services);
+	IfMatchResult mr = taclet().getMatcher().matchIf(p_toMatch, p_ifSeqTail.head().formula(), p_matchCond, p_goal, p_services);
 
 	// For each matching formula call the method again to match
 	// the remaining terms
@@ -1133,7 +1139,7 @@ public abstract class TacletApp implements RuleApp {
 	while (itCand.hasNext()) {
 	    res = res.prepend(findIfFormulaInstantiationsHelp(p_ifSeqTail,
 		    p_ifSeqTail2nd, p_toMatch, p_toMatch2nd, p_alreadyMatched
-			    .prepend(itCand.next()), itMC.next(), p_services));
+			    .prepend(itCand.next()), itMC.next(), p_goal, p_services));
 	}
 
 	return res;
@@ -1152,7 +1158,7 @@ public abstract class TacletApp implements RuleApp {
      * the position is set to the given PosInOccurrence.
      *
      * <p><b>CAUTION:</b> If you call this method, consider to call
-     * {@link NoPosTacletApp#matchFind(PosInOccurrence, Services)} first (if
+     * {@link NoPosTacletApp#matchFind(PosInOccurrence, Goal, Services)} first (if
      * applicable) as otherwise the TacletApp may become invalid.
      * (This happened sometimes during interactive proofs).
      *

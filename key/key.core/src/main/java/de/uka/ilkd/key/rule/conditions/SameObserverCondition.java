@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -83,7 +84,7 @@ public final class SameObserverCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var,
                                  SVSubstitute instCandidate,
                                  MatchConditions mc,
-                                 Services services) {
+                                 Goal goal, Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         final Term term1 = (Term) svInst.getInstantiation(schema1);
         final Term term2 = (Term) svInst.getInstantiation(schema2);

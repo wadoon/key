@@ -199,7 +199,7 @@ public class TestApplyTaclet extends TestCase{
 		     fma.sub(1));
 	ImmutableList<NoPosTacletApp> nfapp=goals.head().indexOfTaclets().getNoFindTaclet
 	    (new IHTacletFilter ( true, ImmutableSLList.<RuleSet>nil() ),
-	     null);
+	     goal, null);
 	Term aimpb=TacletForTests.parseTerm("A -> B");
 	assertTrue("Cut Rule should be inserted to TacletIndex.", nfapp.size()==1);
 	assertTrue("Inserted cut rule's b should be instantiated to A -> B.",
@@ -235,7 +235,7 @@ public class TestApplyTaclet extends TestCase{
 		    getTacletAppAt(TacletFilter.TRUE, applyPos, null);
 	assertTrue("Too many or zero rule applications.", rApplist.size()==1);
 	RuleApp rApp=rApplist.head();
-	rApp = ((TacletApp)rApp).tryToInstantiate ( TacletForTests.services() );
+	rApp = ((TacletApp)rApp).tryToInstantiate ( goal, TacletForTests.services() );
 	assertTrue("Rule App should be complete", rApp.complete());
 	ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
 	assertTrue("Too many or zero goals for all-right.",goals.size()==1);
@@ -264,7 +264,7 @@ public class TestApplyTaclet extends TestCase{
  	TacletApp rApp=rApplist.head();
 	ImmutableList<TacletApp> appList =
 	    rApp.findIfFormulaInstantiations ( goal.sequent (),
-	                                       TacletForTests.services() );
+	                                       goal, TacletForTests.services() );
 	assertTrue("Match Failed.", !appList.isEmpty());
 	assertTrue("Too many matches.", appList.size()==1);
 	assertTrue("Wrong match found.", appList.head().instantiations()==rApp.instantiations());
@@ -720,7 +720,7 @@ public class TestApplyTaclet extends TestCase{
         for (TacletApp aRApplist : rApplist)
             appList = appList.prepend
                     (aRApplist.findIfFormulaInstantiations
-                            (goal.sequent(), services));
+                            (goal.sequent(), goal, services));
 
 	assertTrue("Expected one match.", appList.size()==1);
 	assertTrue("Rule App should be complete", appList.head().complete());
@@ -755,7 +755,7 @@ public class TestApplyTaclet extends TestCase{
 	while ( appIt.hasNext () )
 	    appList = appList.prepend
 		( appIt.next ().findIfFormulaInstantiations ( goal.sequent (),
-		        services ) );
+		        goal, services ) );
 
 	assertTrue("Did not expect a match.", appList.size()==0);
 
@@ -769,7 +769,7 @@ public class TestApplyTaclet extends TestCase{
 	while ( appIt.hasNext () ) {
 	    TacletApp a =
 		appIt.next ().setIfFormulaInstantiations ( ifInsts,
-							   TacletForTests.services() );
+		        goal, TacletForTests.services() );
 	    if ( a != null )
 		appList = appList.prepend ( a );
 	}

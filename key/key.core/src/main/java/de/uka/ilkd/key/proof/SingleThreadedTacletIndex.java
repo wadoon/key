@@ -14,7 +14,7 @@ import de.uka.ilkd.key.rule.Taclet;
 
 /**
  * The default taclet index implementation. It executes method 
- * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence, Services)}
+ * {@link #matchTaclets(ImmutableList, RuleFilter, PosInOccurrence, Goal, Services)}
  * in a single thread (the thread invoking the method).
  *
  * Do not create this index directly. Use the {@link TacletIndexKit#createTacletIndex()} resp.
@@ -60,7 +60,7 @@ final class SingleThreadedTacletIndex extends TacletIndex {
     @Override
     protected ImmutableList<NoPosTacletApp> matchTaclets(
             ImmutableList<NoPosTacletApp> tacletApps, RuleFilter p_filter,
-            PosInOccurrence pos, Services services) {
+            PosInOccurrence pos, Goal goal, Services services) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
         if (tacletApps == null) {
             return result;
@@ -71,7 +71,7 @@ final class SingleThreadedTacletIndex extends TacletIndex {
                 continue;
             }                    
             final NoPosTacletApp newTacletApp =
-                    tacletApp.matchFind(pos, services);
+                    tacletApp.matchFind(pos, goal, services);
             if (newTacletApp != null) {
                 result = result.prepend(newTacletApp);
             }

@@ -434,7 +434,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                     if (((IfFormulaInstSeq) ifFmlInst.head()).inAntec() ==
                             (ifSequent.succedent().size() == 0)) {
                         app = (PosTacletApp) app.setIfFormulaInstantiations(
-                                ifFmlInst, services);
+                                ifFmlInst, p_goal, services);
                     }
                 }
             }
@@ -485,7 +485,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             if ( app.isInstantiationRequired(missingSV) ) {
                 try {
                     app = (PosTacletApp) app.addCheckedInstantiation(missingSV,
-                            missingSVPIO.subTerm(), services, true);
+                            missingSVPIO.subTerm(), goal, services, true);
                 } catch (IllegalInstantiationException ie) {
                     app = null;
                 }

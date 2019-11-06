@@ -485,7 +485,7 @@ public class IntermediateProofReplayer {
             try {
                 pos = PosInOccurrence.findInSequent(currGoal.sequent(),
                     currFormula, currPosInTerm);
-                ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
+                ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, currGoal, services);
                 ourApp = ourApp.setPosInOccurrence(pos, services);
             } catch (Exception e) {
                 throw (TacletConstructionException)new TacletConstructionException(
@@ -515,10 +515,10 @@ public class IntermediateProofReplayer {
         // TODO: In certain cases, the below method call returns null and
         // induces follow-up NullPointerExceptions. This was encountered
         // in a proof of the TimSort method binarySort with several joins.
-        ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList, services);
+        ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList, currGoal, services);
 
         if (!ourApp.complete()) {
-            ourApp = ourApp.tryToInstantiate(proof.getServices());
+            ourApp = ourApp.tryToInstantiate(currGoal, proof.getServices());
         }
 
         return ourApp;
@@ -903,7 +903,7 @@ public class IntermediateProofReplayer {
             }
             final String value = s.substring(eq + 1, s.length());
             if (sv instanceof VariableSV) {
-                app = parseSV1(app, sv, value, services);
+                app = parseSV1(app, sv, value, currGoal, services);
             }
         }
 
@@ -1004,11 +1004,11 @@ public class IntermediateProofReplayer {
      *         been instantiated by a logic variable of the given name.
      */
     public static TacletApp parseSV1(TacletApp app, SchemaVariable sv,
-            String value, Services services) {
+            String value, Goal goal, Services services) {
         LogicVariable lv = new LogicVariable(new Name(value),
             app.getRealSort(sv, services));
         Term instance = services.getTermFactory().createTerm(lv);
-        return app.addCheckedInstantiation(sv, instance, services, true);
+        return app.addCheckedInstantiation(sv, instance, goal, services, true);
     }
 
     /**
@@ -1027,7 +1027,7 @@ public class IntermediateProofReplayer {
      * @return An instantiated taclet application, where the schema variable has
      *         been instantiated, depending on its type, by a Skolem constant,
      *         program element, or term of the given name.
-     * @see #parseSV1(TacletApp, SchemaVariable, String, Services)
+     * @see #parseSV1(TacletApp, SchemaVariable, String, Goal, Services)
      */
     public static TacletApp parseSV2(TacletApp app, SchemaVariable sv,
             String value, Goal targetGoal) {
@@ -1040,7 +1040,7 @@ public class IntermediateProofReplayer {
         } else if (sv instanceof ProgramSV) {
             final ProgramElement pe = app.getProgramElement(value, sv,
                 services);
-            result = app.addCheckedInstantiation(sv, pe, services, true);
+            result = app.addCheckedInstantiation(sv, pe, targetGoal, services, true);
         } else if (sv instanceof SkolemTermSV) {
             result = app.createSkolemConstant(value, sv, true, services);
         } else {
@@ -1052,7 +1052,7 @@ public class IntermediateProofReplayer {
                     .functions();
             varNS = app.extendVarNamespaceForSV(varNS, sv);
             Term instance = parseTerm(value, p, varNS, prgVarNS, funcNS);
-            result = app.addCheckedInstantiation(sv, instance, services, true);
+            result = app.addCheckedInstantiation(sv, instance, targetGoal, services, true);
         }
         return result;
     }
