@@ -44,6 +44,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -225,7 +226,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 }
                 updateBlockOrLoopContract(statement, contract, newVariables, newPreconditions,
                         newPostconditions, newFreePostconditions, newModifiesClauses, newDeclaresClauses,
-                        newAccessibleClauses, services);
+                        newAccessibleClauses, goal, services);
             }
         }
     }
@@ -552,7 +553,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             final Map<LocationVariable, Term> newFreePostconditions,
             final Map<LocationVariable, Term> newModifiesClauses,
             final Map<LocationVariable, Term> newDeclaresClauses,
-            final Map<LocationVariable, Term> newAccessibleClauses, Services services) {
+            final Map<LocationVariable, Term> newAccessibleClauses, Goal goal, Services services) {
         if (contract instanceof BlockContract) {
             final BlockContract newBlockContract = ((BlockContract) contract).update(
                     (StatementBlock) statement, newPreconditions, newPostconditions,
