@@ -861,6 +861,10 @@ public final class SpecificationRepository {
         mapValueSets(loopContracts, op, services);
         mapValueSets(mergeContracts, op, services);
         mapValueSets(allClassAxiomsCache, op, services);
+        /*
+         * TODO (DS, 2019-11-06): Check if callers also have to call the goal-local
+         * equivalent.
+         */
     }
 
     /**
@@ -872,6 +876,10 @@ public final class SpecificationRepository {
             result = result.union(s);
         }
         return WellDefinednessCheck.isOn() ? result : removeWdChecks(result);
+        /*
+         * TODO (DS, 2019-11-06): Check if callers also have to call the goal-local
+         * equivalent.
+         */
     }
 
     /**
@@ -1943,6 +1951,10 @@ public final class SpecificationRepository {
                         + spec.getClass() + ")";
             }
         }
+        /*
+         * TODO (DS, 2019-11-06): Check if callers also have to call the goal-local
+         * equivalent.
+         */
     }
 
     public Pair<IObserverFunction, ImmutableSet<Taclet>> limitObs(

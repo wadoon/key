@@ -211,7 +211,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                             contract.getModifiesClause(heap, newVariables.self, services));
                 }
                 updateBlockOrLoopContract(statement, contract, newVariables, newPreconditions,
-                        newPostconditions, newModifiesClauses, services);
+                        newPostconditions, newModifiesClauses, goal, services);
             }
         }
     }
@@ -526,7 +526,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             final AuxiliaryContract.Variables newVariables,
             final Map<LocationVariable, Term> newPreconditions,
             final Map<LocationVariable, Term> newPostconditions,
-            final Map<LocationVariable, Term> newModifiesClauses, Services services) {
+            final Map<LocationVariable, Term> newModifiesClauses, Goal goal, Services services) {
         if (contract instanceof BlockContract) {
             final BlockContract newBlockContract
                     = ((BlockContract) contract).update((StatementBlock) statement,
