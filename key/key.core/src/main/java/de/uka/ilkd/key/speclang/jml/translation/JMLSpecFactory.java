@@ -267,7 +267,7 @@ public class JMLSpecFactory {
         public Map<LocationVariable, Term> assignables
                 = new LinkedHashMap<LocationVariable, Term>();
         public Map<LocationVariable, Term> declares = new LinkedHashMap<LocationVariable, Term>();
-        public Map<ProgramVariable, Term> accessibles = new LinkedHashMap<ProgramVariable, Term>();
+        public Map<LocationVariable, Term> accessibles = new LinkedHashMap<LocationVariable, Term>();
         public Map<LocationVariable, Term> ensures = new LinkedHashMap<LocationVariable, Term>();
         public Map<LocationVariable, Term> ensuresFree
                 = new LinkedHashMap<LocationVariable, Term>();
@@ -445,7 +445,7 @@ public class JMLSpecFactory {
     }
 
     private void translateAccessible(IProgramMethod pm, ProgramVariableCollection progVars,
-            LocationVariable heap, ProgramVariable heapAtPre, final LocationVariable savedHeap,
+            LocationVariable heap, LocationVariable heapAtPre, final LocationVariable savedHeap,
             ImmutableList<PositionedString> accessible,
             ImmutableList<PositionedString> accessiblePre, ContractClauses clauses)
             throws SLTranslationException {

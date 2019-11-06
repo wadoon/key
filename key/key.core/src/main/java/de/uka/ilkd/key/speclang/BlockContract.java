@@ -24,7 +24,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
@@ -69,7 +68,7 @@ public interface BlockContract extends AuxiliaryContract {
             final Map<LocationVariable, Term> newFreePostconditions,
             Map<LocationVariable, Term> newModifiesClauses,
             Map<LocationVariable, Term> newDeclaresClauses,
-            Map<ProgramVariable, Term> accessibleClauses,
+            Map<LocationVariable, Term> accessibleClauses,
             final ImmutableList<InfFlowSpec> newInfFlowSpecs, Variables newVariables, Term newMeasuredBy);
 
     /**

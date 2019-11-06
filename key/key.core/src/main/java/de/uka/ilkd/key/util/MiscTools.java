@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -64,10 +63,10 @@ import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
@@ -751,22 +750,20 @@ public final class MiscTools {
 
     /**
      * Dissects a term "x1 op x2 op ... op xn" to its constituents x1, ..., xn.
-     * The result is a set, i.e., in case of double occurrences, later ones are
-     * ignored. The result is sorted (LinkedHashSet):
      *
      * @param s
      *     The term to split.
      * @param splitAt
      *     The <strong>binary</strong> operation op at which to split.
-     * @return The constituents of the given set-like term.
+     * @return The constituents of the given term.
      */
-    public static Set<Term> disasembleSetTerm(Term s, Function splitAt) {
+    public static List<Term> disasembleBinaryOpTerm(Term s, Operator splitAt) {
         assert splitAt.arity() == 2;
-        final Set<Term> result = new LinkedHashSet<Term>();
+        final ArrayList<Term> result = new ArrayList<>();
 
         if (s.op() == splitAt) {
-            result.addAll(disasembleSetTerm(s.sub(0), splitAt));
-            result.addAll(disasembleSetTerm(s.sub(1), splitAt));
+            result.addAll(disasembleBinaryOpTerm(s.sub(0), splitAt));
+            result.addAll(disasembleBinaryOpTerm(s.sub(1), splitAt));
         } else {
             result.add(s);
         }

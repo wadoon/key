@@ -211,7 +211,7 @@ public class AbstractPlaceholderSpecsTypeChecker {
      */
     private static Set<Operator> collectElementsOfLocSetTerm(Term t, Function union,
             Services services) {
-        return MiscTools.disasembleSetTerm(t, union).stream()
+        return MiscTools.disasembleBinaryOpTerm(t, union).stream()
                 .map(locSetElemTermsToOpMapper(services))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }

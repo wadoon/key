@@ -350,6 +350,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param services
      *            services.
      * @return this contract's declares clause on the specified heap.
+     * @deprecated Declares not supported any more.
      */
     public Term getDeclaresClause(LocationVariable heap, Services services);
 

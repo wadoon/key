@@ -122,7 +122,7 @@ public interface LoopContract extends AuxiliaryContract {
             Map<LocationVariable, Term> newFreePostconditions,
             Map<LocationVariable, Term> newModifiesClauses,
             final Map<LocationVariable, Term> declaresClauses,
-            Map<ProgramVariable, Term> accessibleClauses,
+            Map<LocationVariable, Term> accessibleClauses,
             ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
             Term newDecreases);
     
@@ -143,7 +143,7 @@ public interface LoopContract extends AuxiliaryContract {
             Map<LocationVariable, Term> newFreePostconditions,
             Map<LocationVariable, Term> newModifiesClauses,
             final Map<LocationVariable, Term> declaresClauses,
-            final Map<ProgramVariable, Term> accessibleClauses,
+            final Map<LocationVariable, Term> accessibleClauses,
             ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
             Term newDecreases);
 

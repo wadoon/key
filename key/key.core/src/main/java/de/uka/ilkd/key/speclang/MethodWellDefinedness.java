@@ -125,7 +125,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
                  rep.getOrigVars().self == null ?
                          TB.tt() : TB.inv(TB.var(rep.getOrigVars().self)));
-        Map<ProgramVariable,Term> deps = new LinkedHashMap<ProgramVariable, Term>();
+        Map<LocationVariable,Term> deps = new LinkedHashMap<LocationVariable, Term>();
         for(LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             deps.put(heap, TB.allLocs());
         }

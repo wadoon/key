@@ -238,7 +238,7 @@ public class ContractFactory {
             KeYJavaType specifiedIn,
             Map<LocationVariable, Term> requires,
             Term measuredBy,
-            Map<ProgramVariable, Term> accessibles,
+            Map<LocationVariable, Term> accessibles,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars,
@@ -257,7 +257,7 @@ public class ContractFactory {
         Map<LocationVariable, Term> pres = new LinkedHashMap<LocationVariable, Term>();
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
                 selfVar == null ? tb.tt() : tb.inv(tb.var(selfVar)));
-        Map<ProgramVariable, Term> accessibles = new LinkedHashMap<ProgramVariable, Term>();
+        Map<LocationVariable, Term> accessibles = new LinkedHashMap<LocationVariable, Term>();
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             if (heap == targetHeap) {
                 accessibles.put(heap, dep.second);
@@ -276,7 +276,7 @@ public class ContractFactory {
             KeYJavaType specifiedIn,
             Map<LocationVariable, Term> requires,
             Term measuredBy,
-            Map<ProgramVariable, Term> accessibles,
+            Map<LocationVariable, Term> accessibles,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars,
@@ -392,7 +392,7 @@ public class ContractFactory {
                                             Map<LocationVariable, Term> axioms,
                                             Map<LocationVariable, Term> mods,
                                              Map<LocationVariable, Term> declares,
-                                            Map<ProgramVariable, Term> accs,
+                                            Map<LocationVariable, Term> accs,
                                             Map<LocationVariable, Boolean> hasMod,
                                             ProgramVariable selfVar,
                                             ImmutableList<ProgramVariable> paramVars,
@@ -438,7 +438,7 @@ public class ContractFactory {
                                             Map<LocationVariable, Term> axioms,
                                             Map<LocationVariable, Term> mods,
                                              Map<LocationVariable, Term> declares,
-                                            Map<ProgramVariable, Term> accessibles,
+                                            Map<LocationVariable, Term> accessibles,
                                             Map<LocationVariable, Boolean> hasMod,
                                             ProgramVariableCollection pv) {
         return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres,
@@ -477,7 +477,7 @@ public class ContractFactory {
                                             Map<LocationVariable, Term> axioms,
                                             Map<LocationVariable, Term> mods,
                                              Map<LocationVariable, Term> declares,
-                                            Map<ProgramVariable, Term> accessibles,
+                                            Map<LocationVariable, Term> accessibles,
                                             Map<LocationVariable, Boolean> hasMod,
                                             ProgramVariableCollection progVars,
                                             boolean toBeSaved, boolean transaction) {
@@ -553,8 +553,8 @@ public class ContractFactory {
         // Do not modify the data stores in t but make new copies
         Map<LocationVariable, Term> mods =
                 new LinkedHashMap<LocationVariable, Term>(t.originalMods);
-        Map<ProgramVariable, Term> deps =
-                new LinkedHashMap<ProgramVariable, Term>(t.originalDeps);
+        Map<LocationVariable, Term> deps =
+                new LinkedHashMap<LocationVariable, Term>(t.originalDeps);
         Map<LocationVariable,Term> declares = new LinkedHashMap<>(t.originalDeclares);
 
         // keep this to check if every contract has the same mod
@@ -684,9 +684,9 @@ public class ContractFactory {
         }
     }
 
-    private static Map<ProgramVariable, Term>
+    private static Map<LocationVariable, Term>
                joinDependencies(FunctionalOperationContractImpl t,
-                                Map<ProgramVariable, Term> deps,
+                                Map<LocationVariable, Term> deps,
                                 FunctionalOperationContract other,
                                 Services services) {
         final TermBuilder tb = services.getTermBuilder();
@@ -762,7 +762,7 @@ public class ContractFactory {
                                        Map<LocationVariable, Term> freePosts,
                                        Map<LocationVariable, Term> axioms,
                                        Map<LocationVariable, Term> mods,
-                                       Map<ProgramVariable, Term> deps,
+                                       Map<LocationVariable, Term> deps,
                                        Map<LocationVariable, Term> declares,
                                        Modality moda) {
         for (FunctionalOperationContract other : others) {

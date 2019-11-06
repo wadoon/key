@@ -175,7 +175,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, Term> freePostconditions,
             final Map<LocationVariable, Term> modifiesClauses,
             final Map<LocationVariable, Term> declaresClauses,
-            final Map<ProgramVariable, Term> accessibleClauses,
+            final Map<LocationVariable, Term> accessibleClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
             final Term decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
@@ -280,7 +280,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, Term> freePostconditions,
             final Map<LocationVariable, Term> modifiesClauses,
             final Map<LocationVariable, Term> declaresClauses,
-            final Map<ProgramVariable, Term> accessibleClauses,
+            final Map<LocationVariable, Term> accessibleClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
             final Term decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
@@ -803,7 +803,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         Map<LocationVariable, Term> newDeclaresClauses =
                 declaresClauses.entrySet().stream().collect(
                         MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        Map<ProgramVariable, Term> newAccessibleClauses =
+        Map<LocationVariable, Term> newAccessibleClauses =
                 accessibleClauses.entrySet().stream().collect(
                         MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newMeasuredBy = op.apply(measuredBy);
@@ -822,7 +822,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, Term> newFreePostconditions,
             final Map<LocationVariable, Term> newModifiesClauses,
             final Map<LocationVariable, Term> newDeclaresClauses,
-            final Map<ProgramVariable, Term> accessibleClauses,
+            final Map<LocationVariable, Term> accessibleClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             final Term newMeasuredBy, final Term newDecreases) {
         LoopContractImpl result = new LoopContractImpl(baseName, newBlock, labels, method, modality,
@@ -841,7 +841,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, Term> newFreePostconditions,
             final Map<LocationVariable, Term> newModifiesClauses,
             final Map<LocationVariable, Term> newDeclaresClauses,
-            final Map<ProgramVariable, Term> newAccessibleClauses,
+            final Map<LocationVariable, Term> newAccessibleClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             final Term newMeasuredBy, final Term newDecreases) {
         LoopContractImpl result = new LoopContractImpl(baseName, newLoop, labels, method, modality,
@@ -884,7 +884,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, Term> newModifiesClauses
                 = new LinkedHashMap<>();
             final Map<LocationVariable, Term> newDeclaresClauses = new LinkedHashMap<>();
-            final Map<ProgramVariable, Term> newAccessibleClauses = new LinkedHashMap<>();
+            final Map<LocationVariable, Term> newAccessibleClauses = new LinkedHashMap<>();
 
             final Term newMeasuredBy = replacer.replace(measuredBy);
             final Term newDecreases = replacer.replace(decreases);
@@ -1051,7 +1051,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 Map<Label, Term> continues, Term returns, Term signals, Term signalsOnly,
                 Term diverges, Map<LocationVariable, Term> assignables,
                 final Map<LocationVariable, Term> declares,
-                final Map<ProgramVariable, Term> accessibles, Map<LocationVariable, Boolean> hasMod,
+                final Map<LocationVariable, Term> accessibles, Map<LocationVariable, Boolean> hasMod,
                 Term decreases, Services services) {
             super(baseName, block, labels, method, behavior, variables, requires, measuredBy,
                     ensures, freeEnsures, infFlowSpecs, breaks, continues, returns, signals,
@@ -1115,7 +1115,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 Map<Label, Term> continues, Term returns, Term signals, Term signalsOnly,
                 Term diverges, Map<LocationVariable, Term> assignables,
                 final Map<LocationVariable, Term> declares,
-                final Map<ProgramVariable, Term> accessibles, Map<LocationVariable, Boolean> hasMod,
+                final Map<LocationVariable, Term> accessibles, Map<LocationVariable, Boolean> hasMod,
                 Term decreases, Services services) {
             super(baseName, null, labels, method, behavior, variables, requires, measuredBy,
                     ensures, freeEnsures, infFlowSpecs, breaks, continues, returns, signals,
@@ -1132,7 +1132,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 Map<LocationVariable, Term> freePostconditions,
                 Map<LocationVariable, Term> modifiesClauses,
                 Map<LocationVariable, Term> declaresClauses,
-                Map<ProgramVariable, Term> accessibleClauses,
+                Map<LocationVariable, Term> accessibleClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
                 boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod) {
             if (block != null) {

@@ -96,7 +96,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, Term> freePostconditions,
             final Map<LocationVariable, Term> modifiesClauses,
             final Map<LocationVariable, Term> declaresClauses,
-            final Map<ProgramVariable, Term> accessibleClauses,
+            final Map<LocationVariable, Term> accessibleClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
             final ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
@@ -193,7 +193,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         Map<LocationVariable, Term> newDeclaresClauses =
                 declaresClauses.entrySet().stream().collect(
                         MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        Map<ProgramVariable, Term> newAccessibleClauses =
+        Map<LocationVariable, Term> newAccessibleClauses =
                 accessibleClauses.entrySet().stream().collect(
                         MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newMeasuredBy = op.apply(measuredBy);
@@ -210,16 +210,47 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, Term> newPostconditions,
             final Map<LocationVariable, Term> newFreePostconditions,
             final Map<LocationVariable, Term> newModifiesClauses,
-            Map<LocationVariable, Term> newDeclaresClauses,
-            final Map<ProgramVariable, Term> accessibleClauses,
+            final Map<LocationVariable, Term> newDeclaresClauses,
+            final Map<LocationVariable, Term> accessibleClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             Term newMeasuredBy) {
-        BlockContractImpl result = new BlockContractImpl(baseName, newBlock, labels, method,
+        /*
+         * Note: Sometimes, there are more heaps involved like those returned by
+         * getAllHeaps(). We also have to consider those, since otherwise, an unchanged
+         * block contract will be considered changed, and we have too many duplicates,
+         * which breaks things like proof reloading.
+         */
+        
+        transferTermsForUnchangedHeaps(this.preconditions, newPreconditions);
+        transferTermsForUnchangedHeaps(this.preconditions, newPostconditions);
+        transferTermsForUnchangedHeaps(this.freePostconditions, newFreePostconditions);
+        transferTermsForUnchangedHeaps(this.modifiesClauses, newModifiesClauses);
+        transferTermsForUnchangedHeaps(this.declaresClauses, newDeclaresClauses);
+        transferTermsForUnchangedHeaps(this.accessibleClauses, accessibleClauses);
+
+        final BlockContractImpl result = new BlockContractImpl(baseName, newBlock, labels, method,
                 modality, newPreconditions, newMeasuredBy, newPostconditions, newFreePostconditions,
                 newModifiesClauses, newDeclaresClauses, accessibleClauses, newinfFlowSpecs,
                 newVariables, transactionApplicable, hasMod, getFunctionalContracts());
         result.setLoopContract(loopContract);
         return result;
+    }
+    
+    /**
+     * Puts all values for unmapped keys in newMap that are mapped in oldMap into
+     * newMap.
+     * 
+     * @param oldMap The map from which to recover keys that are not explicitly set
+     *               in newMap.
+     * @param newMap The map into which to recover keys that are not explicitly set.
+     */
+    private static void transferTermsForUnchangedHeaps(Map<LocationVariable, Term> oldMap,
+            Map<LocationVariable, Term> newMap) {
+        for (LocationVariable heapVar : oldMap.keySet()) {
+            if (newMap.get(heapVar) == null) {
+                newMap.put(heapVar, oldMap.get(heapVar));
+            }
+        }
     }
 
     @Override
@@ -308,7 +339,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 ImmutableList<InfFlowSpec> infFlowSpecs, Map<Label, Term> breaks,
                 Map<Label, Term> continues, Term returns, Term signals, Term signalsOnly,
                 Term diverges, Map<LocationVariable, Term> assignables,
-                Map<LocationVariable, Term> declares, Map<ProgramVariable, Term> accessibles,
+                Map<LocationVariable, Term> declares, Map<LocationVariable, Term> accessibles,
                 Map<LocationVariable, Boolean> hasMod, Services services) {
             super(baseName, block, labels, method, behavior, variables, requires, measuredBy,
                     ensures, freeEnsures, infFlowSpecs, breaks, continues, returns, signals,
@@ -322,7 +353,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 Map<LocationVariable, Term> freePostconditions,
                 Map<LocationVariable, Term> modifiesClauses,
                 Map<LocationVariable, Term> declaresClauses,
-                Map<ProgramVariable, Term> accessibleClauses,
+                Map<LocationVariable, Term> accessibleClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
                 boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod) {
             return new BlockContractImpl(baseName, block, labels, method, modality, preconditions,

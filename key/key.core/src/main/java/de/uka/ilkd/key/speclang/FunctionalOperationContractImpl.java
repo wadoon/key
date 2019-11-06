@@ -103,7 +103,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      */
     final Map<LocationVariable, Term> originalMods;
     final Map<LocationVariable,Term> originalDeclares;
-    final Map<ProgramVariable, Term> originalDeps;
+    final Map<LocationVariable, Term> originalDeps;
     final ProgramVariable originalSelfVar;
     final ImmutableList<ProgramVariable> originalParamVars;
     final ProgramVariable originalResultVar;
@@ -182,7 +182,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Map<LocationVariable, Term> axioms,
             Map<LocationVariable, Term> mods,
             Map<LocationVariable, Term> declares,
-            Map<ProgramVariable, Term> accessibles,
+            Map<LocationVariable, Term> accessibles,
             Map<LocationVariable, Boolean> hasRealMod,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
@@ -265,7 +265,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newDeclares = originalDeclares.entrySet().stream().collect(
                 MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        Map<ProgramVariable, Term> newAccessibles = originalDeps.entrySet().stream().collect(
+        Map<LocationVariable, Term> newAccessibles = originalDeps.entrySet().stream().collect(
                 MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newGlobalDefs = op.apply(globalDefs);
 

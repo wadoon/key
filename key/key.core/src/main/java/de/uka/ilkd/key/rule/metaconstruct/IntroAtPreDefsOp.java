@@ -201,7 +201,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 final Map<LocationVariable, Term> newModifiesClauses
                         = new LinkedHashMap<LocationVariable, Term>();
                 final Map<LocationVariable, Term> newDeclaresClauses = new LinkedHashMap<LocationVariable, Term>();
-                final Map<ProgramVariable, Term> newAccessibleClauses = new LinkedHashMap<>();
+                final Map<LocationVariable, Term> newAccessibleClauses = new LinkedHashMap<>();
 
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                         .getAllHeaps()) {
@@ -552,7 +552,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             final Map<LocationVariable, Term> newFreePostconditions,
             final Map<LocationVariable, Term> newModifiesClauses,
             final Map<LocationVariable, Term> newDeclaresClauses,
-            final Map<ProgramVariable, Term> newAccessibleClauses, Services services) {
+            final Map<LocationVariable, Term> newAccessibleClauses, Services services) {
         if (contract instanceof BlockContract) {
             final BlockContract newBlockContract = ((BlockContract) contract).update(
                     (StatementBlock) statement, newPreconditions, newPostconditions,

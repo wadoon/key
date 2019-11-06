@@ -47,7 +47,7 @@ public final class DependencyContractImpl implements DependencyContract {
     final KeYJavaType specifiedIn;
     final Map<LocationVariable,Term> originalPres;
     final Term originalMby;
-    final Map<ProgramVariable,Term> originalDeps;
+    final Map<LocationVariable,Term> originalDeps;
     final ProgramVariable originalSelfVar;
     final ImmutableList<ProgramVariable> originalParamVars;
     final Map<LocationVariable, ? extends ProgramVariable> originalAtPreVars;
@@ -66,7 +66,7 @@ public final class DependencyContractImpl implements DependencyContract {
             KeYJavaType specifiedIn,
             Map<LocationVariable,Term> pres,
             Term mby,
-            Map<ProgramVariable,Term> deps,
+            Map<LocationVariable,Term> deps,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars,
@@ -108,7 +108,7 @@ public final class DependencyContractImpl implements DependencyContract {
             KeYJavaType specifiedIn,
             Map<LocationVariable,Term> pres,
             Term mby,
-            Map<ProgramVariable,Term> deps,
+            Map<LocationVariable,Term> deps,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable,? extends ProgramVariable> atPreVars) {
@@ -136,7 +136,7 @@ public final class DependencyContractImpl implements DependencyContract {
         Map<LocationVariable, Term> newPres = originalPres.entrySet().stream().collect(
                 MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newMby = op.apply(originalMby);
-        Map<ProgramVariable, Term> newDeps = originalDeps.entrySet().stream().collect(
+        Map<LocationVariable, Term> newDeps = originalDeps.entrySet().stream().collect(
                 MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
 
         return new DependencyContractImpl(baseName, name, kjt, target, specifiedIn,

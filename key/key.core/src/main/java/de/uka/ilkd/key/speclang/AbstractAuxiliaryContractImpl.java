@@ -22,7 +22,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -32,6 +34,8 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * Abstract base class for all default implementations of the sub-interfaces of
@@ -93,13 +97,14 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     /**
      * @see #getDeclauseClause(LocationVariable, Services)
+     * @deprecated
      */
     protected final Map<LocationVariable, Term> declaresClauses;
 
     /**
      * @see #getAccessibleClause(LocationVariable)
      */
-    protected final Map<ProgramVariable, Term> accessibleClauses;
+    protected final Map<LocationVariable, Term> accessibleClauses;
 
     /**
      * @see #getInfFlowSpecs()
@@ -169,7 +174,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             final Map<LocationVariable, Term> freePostconditions,
             final Map<LocationVariable, Term> modifiesClauses,
             final Map<LocationVariable, Term> declaresClauses,
-            final Map<ProgramVariable, Term> accessibleClauses,
+            final Map<LocationVariable, Term> accessibleClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
             final ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
@@ -1264,7 +1269,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         /**
          * A map from every heap to a accessible term.
          */
-        private final Map<ProgramVariable, Term> accessibles;
+        private final Map<LocationVariable, Term> accessibles;
 
         /**
          * A map from every heap to a accessible term.
@@ -1336,7 +1341,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 final Term signalsOnly, final Term diverges,
                 final Map<LocationVariable, Term> assignables,
                 final Map<LocationVariable, Term> declares,
-                final Map<ProgramVariable, Term> accessibles,
+                final Map<LocationVariable, Term> accessibles,
                 final Map<LocationVariable, Boolean> hasMod, final Services services) {
             super(services.getTermFactory(), services);
             this.baseName = baseName;
@@ -1664,7 +1669,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         /**
          * @return the contract's modifies clauses.
          */
-        private Map<ProgramVariable, Term> buildAccessibleClauses() {
+        private Map<LocationVariable, Term> buildAccessibleClauses() {
             return accessibles;
         }
 
@@ -1693,7 +1698,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 final Map<LocationVariable, Term> freePostconditions,
                 final Map<LocationVariable, Term> modifiesClauses,
                 final Map<LocationVariable, Term> declaresClauses,
-                final Map<ProgramVariable, Term> accessibleClauses,
+                final Map<LocationVariable, Term> accessibleClauses,
                 final ImmutableList<InfFlowSpec> infFlowSpecs) {
             ImmutableSet<T> result = DefaultImmutableSet.nil();
             final boolean transactionApplicable = modifiesClauses
@@ -1747,7 +1752,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 Map<LocationVariable, Term> freePostconditions,
                 Map<LocationVariable, Term> modifiesClauses,
                 Map<LocationVariable, Term> declaresClauses,
-                Map<ProgramVariable, Term> accessibleClauses,
+                Map<LocationVariable, Term> accessibleClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
                 boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod);
 
@@ -1832,7 +1837,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         /**
          * @see BlockSpecificationElement#getAccessibleClause(LocationVariable)
          */
-        protected final Map<ProgramVariable, Term> accessibleClauses;
+        protected final Map<LocationVariable, Term> accessibleClauses;
 
         /**
          *
@@ -1848,7 +1853,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             postconditions = new LinkedHashMap<LocationVariable, Term>();
             freePostconditions = new LinkedHashMap<LocationVariable, Term>();
             modifiesClauses = new LinkedHashMap<LocationVariable, Term>();
-            accessibleClauses = new LinkedHashMap<ProgramVariable, Term>();
+            accessibleClauses = new LinkedHashMap<LocationVariable, Term>();
             declaresClauses = new LinkedHashMap<LocationVariable, Term>();
         }
 
@@ -1986,9 +1991,19 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return the disjunction of the conditions.
          */
         private Term orPossiblyNull(final Term currentCondition, final Term additionalCondition) {
-            if (currentCondition == null) {
+            if (currentCondition == null || currentCondition.equals(additionalCondition)) {
                 return additionalCondition;
             } else {
+                if (MiscTools.disasembleBinaryOpTerm(currentCondition, Junctor.OR)
+                        .contains(additionalCondition)) {
+                    return currentCondition;
+                }
+                
+                if (MiscTools.disasembleBinaryOpTerm(additionalCondition, Junctor.OR)
+                        .contains(currentCondition)) {
+                    return additionalCondition;
+                }
+                
                 return or(currentCondition, additionalCondition);
             }
         }
@@ -2005,6 +2020,16 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             if (currentCondition == null) {
                 return additionalCondition;
             } else {
+                if (MiscTools.disasembleBinaryOpTerm(currentCondition, Junctor.AND)
+                        .contains(additionalCondition)) {
+                    return currentCondition;
+                }
+                
+                if (MiscTools.disasembleBinaryOpTerm(additionalCondition, Junctor.AND)
+                        .contains(currentCondition)) {
+                    return additionalCondition;
+                }
+                
                 return and(currentCondition, additionalCondition);
             }
         }
@@ -2024,6 +2049,18 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             } else if (additionalLocationSet == null) {
                 return currentLocationSet;
             } else {
+                final Function union = services.getTypeConverter().getLocSetLDT().getUnion();
+                
+                if (MiscTools.disasembleBinaryOpTerm(currentLocationSet, union)
+                        .contains(additionalLocationSet)) {
+                    return currentLocationSet;
+                }
+
+                if (MiscTools.disasembleBinaryOpTerm(additionalLocationSet, union)
+                        .contains(currentLocationSet)) {
+                    return additionalLocationSet;
+                }
+                
                 return union(currentLocationSet, additionalLocationSet);
             }
         }

@@ -341,7 +341,7 @@ public final class DLSpecFactory {
 	               null, // TODO no model methods in DL contracts
 	               mods,
 	               Collections.emptyMap(), // TODO (DS, 2019-01-04): Check whether we have to do something else here
-	               new LinkedHashMap<ProgramVariable,Term>(), // TODO strictly pure in DL contracts not supported yet
+	               new LinkedHashMap<LocationVariable,Term>(), // TODO strictly pure in DL contracts not supported yet
 	               hasMod,
 	               selfVar,
 	               paramVars,

@@ -467,77 +467,95 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             final boolean blockChanged) {
         final Map<ProgramVariable, ProgramVariable> replMap = new HashMap<>();
         replMap.putAll(this.replaceMap);
-        final BlockContract.Variables newVariables = replaceBlockContractVariables(
-                oldContract.getPlaceholderVariables());
-        final Map<LocationVariable, Term> newPreconditions =
-                new LinkedHashMap<LocationVariable, Term>();
-        final Map<LocationVariable, Term> newPostconditions =
-                new LinkedHashMap<LocationVariable, Term>();
-        final Map<LocationVariable, Term> newFreePostconditions =
-                new LinkedHashMap<LocationVariable, Term>();
-        final Map<LocationVariable, Term> newModifiesClauses =
-                new LinkedHashMap<LocationVariable, Term>();
-        final Map<LocationVariable, Term> newDeclaresClauses = new LinkedHashMap<LocationVariable, Term>();
-        final Map<ProgramVariable, Term> newAccessibleClauses = new LinkedHashMap<>();
+        
+        final BlockContract.Variables newVariables = //
+                replaceBlockContractVariables(oldContract.getPlaceholderVariables());
+        
+        final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newFreePostconditions = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newModifiesClauses = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newDeclaresClauses = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newAccessibleClauses = new LinkedHashMap<>();
+        
         boolean changed = blockChanged;
-        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                .getAllHeaps()) {
-            final Term oldPrecondition = oldContract.getPrecondition(heap,
-                    services);
-            final Term oldPostcondition = oldContract.getPostcondition(heap,
-                    services);
-            final Term oldFreePostcondition = oldContract.getFreePostcondition(heap,
-                    services);
-            final Term oldModifies = oldContract.getModifiesClause(heap,
-                    services);
+        
+        /*
+         * Note that having one loop with a big body is *not* cheaper than having
+         * several loops with parts of the body, if they're independent. They way
+         * it's below is easier readable.
+         */
+        
+        final ImmutableList<LocationVariable> allHeaps = //
+                services.getTypeConverter().getHeapLDT().getAllHeaps();
 
-            final Term oldDeclares = oldContract.getDeclaresClause(heap,
-                    services);
-            final Term oldAccessible = oldContract.getAccessibleClause(heap,
-                    services);
-            final Term newPrecondition = replaceVariablesInTerm(
-                    oldPrecondition);
-            final Term newPostcondition = replaceVariablesInTerm(
-                    oldPostcondition);
-            final Term newFreePostcondition = replaceVariablesInTerm(
-                    oldFreePostcondition);
-            final Term newModifies = replaceVariablesInTerm(oldModifies);
-            final Term newDeclares = replaceVariablesInTerm(oldDeclares);
-            final Term newAccessible = replaceVariablesInTerm(oldAccessible);
-
-            newPreconditions.put(heap, (newPrecondition != oldPrecondition)
-                    ? newPrecondition : oldPrecondition);
-            newPostconditions.put(heap, (newPostcondition != oldPostcondition)
-                    ? newPostcondition : oldPostcondition);
-            newFreePostconditions.put(heap,
-                    (newFreePostcondition != oldFreePostcondition) ? newFreePostcondition
-                            : oldFreePostcondition);
-            newModifiesClauses.put(heap,
-                    (newModifies != oldModifies) ? newModifies : oldModifies);
-            newDeclaresClauses.put(heap,
-                    (newDeclares != oldDeclares) ? newDeclares
-                            : oldDeclares);
-            newAccessibleClauses.put(heap,
-                    (newAccessible != oldAccessible) ? newAccessible
-                            : oldAccessible);
-
-            changed |= ((newPrecondition != oldPrecondition)
-                    || (newPostcondition != oldPostcondition)
-                    || (newFreePostcondition != oldFreePostcondition)
-                    || (newModifies != oldModifies)
-                    || (newDeclares != oldDeclares)
-                    || (newAccessible != oldAccessible));
+        for (final LocationVariable heap : allHeaps) {
+            final Term oldPrecondition = oldContract.getPrecondition(heap, services);
+            final Term newPrecondition = replaceVariablesInTerm(oldPrecondition);
+            changed |= putChanged(newPreconditions, heap, newPrecondition, oldPrecondition);
         }
-        final ImmutableList<InfFlowSpec> newInfFlowSpecs = replaceVariablesInTermListTriples(
-                oldContract.getInfFlowSpecs());
 
-        OpReplacer replacer = new OpReplacer(
-                replaceMap, services.getTermFactory(), services.getProof());
+        for (final LocationVariable heap : allHeaps) {
+            final Term oldPostcondition = oldContract.getPostcondition(heap, services);
+            final Term newPostcondition = replaceVariablesInTerm(oldPostcondition);
+            changed |= putChanged(newPostconditions, heap, newPostcondition, oldPostcondition);
+        }
 
-        return changed ? oldContract.update(newBlock, newPreconditions, newPostconditions,
-                newFreePostconditions, newModifiesClauses, newDeclaresClauses, newAccessibleClauses,
-                newInfFlowSpecs, newVariables, replacer.replace(oldContract.getMby()))
+        for (final LocationVariable heap : allHeaps) {
+            final Term oldFreePostcond = oldContract.getFreePostcondition(heap, services);
+            final Term newFreePostcond = replaceVariablesInTerm(oldFreePostcond);
+            changed |= putChanged(newFreePostconditions, heap, newFreePostcond, oldFreePostcond);
+        }
+
+        for (final LocationVariable heap : allHeaps) {
+            final Term oldModifies = oldContract.getModifiesClause(heap, services);
+            final Term newModifies = replaceVariablesInTerm(oldModifies);
+            changed |= putChanged(newModifiesClauses, heap, newModifies, oldModifies);
+        }
+
+        for (final LocationVariable heap : allHeaps) {
+            final Term oldDeclares = oldContract.getDeclaresClause(heap, services);
+            final Term newDeclares = replaceVariablesInTerm(oldDeclares);
+            changed |= putChanged(newDeclaresClauses, heap, newDeclares, oldDeclares);
+        }
+
+        for (final LocationVariable heap : allHeaps) {
+            final Term oldAccessible = oldContract.getAccessibleClause(heap, services);
+            final Term newAccessible = replaceVariablesInTerm(oldAccessible);
+            changed |= putChanged(newAccessibleClauses, heap, newAccessible, oldAccessible);
+        }
+        
+        final ImmutableList<InfFlowSpec> newInfFlowSpecs = //
+                replaceVariablesInTermListTriples(oldContract.getInfFlowSpecs());
+
+        final Term newMeasuredBy;
+        {
+            final OpReplacer replacer = //
+                    new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
+            newMeasuredBy = replacer.replace(oldContract.getMby());
+        }
+        
+        return changed
+                ? oldContract.update(newBlock, newPreconditions, newPostconditions,
+                        newFreePostconditions, newModifiesClauses, newDeclaresClauses,
+                        newAccessibleClauses, newInfFlowSpecs, newVariables, newMeasuredBy)
                 : oldContract;
+    }
+    
+    /**
+     * If newVal is different from oldVal, puts newVal into map for key, othewise
+     * oldVal.
+     * 
+     * @param map    The map into which to put a value for key.
+     * @param key    The key.
+     * @param newVal The "new value", taken if newVal != oldVal.
+     * @param oldVal The "old value", taken if newVal == oldVal.
+     * @return true iff newVal != oldVal.
+     */
+    private static <K, V> boolean putChanged(Map<K, V> map, K key, V newVal, V oldVal) {
+        final boolean changed = newVal != oldVal;
+        map.put(key, changed ? newVal : oldVal);
+        return changed;
     }
 
     private LoopContract createNewLoopContract(
@@ -555,7 +573,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newDeclaresClauses =
                 new LinkedHashMap<>();
-        final Map<ProgramVariable, Term> newAccessibleClauses = new LinkedHashMap<>();
+        final Map<LocationVariable, Term> newAccessibleClauses = new LinkedHashMap<>();
         boolean changed = blockChanged;
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {
