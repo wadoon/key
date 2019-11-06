@@ -47,7 +47,7 @@ public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(fin
       // Create new profile which has separate OneStepSimplifier instance
       JavaProfile profile = new JavaProfile();
       // Create new InitConfig
-      final InitConfig initConfig = new InitConfig(source.getServices().copy(profile, false));
+      final InitConfig initConfig = new InitConfig(sourceInitConfig.getInitialLocalSpecRepo(), source.getServices().copy(profile, false));
       // Set modified taclet options in which runtime exceptions are banned.      
       ImmutableSet<Choice> choices = sourceInitConfig.getActivatedChoices();
       for (Choice enabled : enableChoices) {

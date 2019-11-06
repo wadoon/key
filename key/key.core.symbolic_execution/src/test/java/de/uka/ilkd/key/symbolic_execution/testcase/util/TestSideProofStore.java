@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -16,6 +14,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
 import de.uka.ilkd.key.symbolic_execution.util.SideProofStore.Entry;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofUserManager;
+import junit.framework.TestCase;
 
 /**
  * Tests for {@link SideProofStore}
@@ -49,7 +49,7 @@ public class TestSideProofStore extends TestCase {
          SideProofStore.DEFAULT_INSTANCE.addProofStoreListener(listener);
          // Create proofs
          Services services = new Services(AbstractProfile.getDefaultProfile());
-         InitConfig ic = new InitConfig(services);
+         InitConfig ic = new InitConfig(GoalLocalSpecificationRepository.DUMMY_REPO, services);
          ProofEnvironment pe = new ProofEnvironment(ic);
          Proof p1 = new Proof("TestSideProofStore 1", ic.deepCopy());
          p1.setEnv(pe);

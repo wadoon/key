@@ -63,6 +63,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
@@ -131,13 +132,14 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * @param root the ProgramElement where to begin
      * @param outerLabel the ProgramElementName of the outer label
      * @param innerLabel the ProgramElementName of the inner label
+     * @param localSpecRepo TODO
      * @param services services instance
      */
     public WhileLoopTransformation(ProgramElement root,
                                    ProgramElementName outerLabel,
                                    ProgramElementName innerLabel,
-                                   Services services) {
-        super(root, services);
+                                   GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        super(root, localSpecRepo, services);
         breakOuterLabel =
             (outerLabel == null ? null : KeYJavaASTFactory.breakStatement(outerLabel));
         breakInnerLabel =
@@ -149,12 +151,13 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /** creates the  WhileLoopTransformation for the check mode
      * @param root the ProgramElement where to begin
      * @param inst the SVInstantiations if available
+     * @param localSpecRepo TODO
      * @param services services instance
      */
     public WhileLoopTransformation(ProgramElement root,
                                    SVInstantiations inst,
-                                   Services services) {
-        super(root, services);
+                                   GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        super(root, localSpecRepo, services);
         instantiations =
             (inst == null ? SVInstantiations.EMPTY_SVINSTANTIATIONS : inst);
         replaceBreakWithNoLabel = 0;
@@ -346,20 +349,20 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             ProgramElement createNewElement(ExtList changeList) {
                 StatementBlock newBlock = KeYJavaASTFactory.block(changeList);
                 ImmutableSet<BlockContract> bcs =
-                    services.getSpecificationRepository().getBlockContracts(x);
+                    localSpecRepo.getBlockContracts(x);
                 if (bcs != null) {
                     for (BlockContract bc : bcs) {
                         bc = bc.setBlock(newBlock);
-                        services.getSpecificationRepository().addBlockContract(bc);
+                        localSpecRepo.addBlockContract(bc);
                     }
                 }
 
                 ImmutableSet<LoopContract> lcs =
-                    services.getSpecificationRepository().getLoopContracts(x);
+                    localSpecRepo.getLoopContracts(x);
                 if (lcs != null) {
                     for (LoopContract lc : lcs) {
                         lc = lc.setBlock(newBlock);
-                        services.getSpecificationRepository().addLoopContract(lc);
+                        localSpecRepo.addLoopContract(lc);
                     }
                 }
 
@@ -626,7 +629,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         } else if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             For newLoop = KeYJavaASTFactory.forLoop(changeList);
-            services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+            localSpecRepo.copyLoopInvariant(x, newLoop);
             addChild(newLoop);
             changed();
         } else {
@@ -660,7 +663,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 changeList.removeFirst();
                 EnhancedFor newLoop =
                     KeYJavaASTFactory.enhancedForLoop(changeList);
-                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                localSpecRepo.copyLoopInvariant(x, newLoop);
                 addChild(newLoop);
                 changed();
             } else {
@@ -700,7 +703,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 new ProgVarReplaceVisitor(body,
                                           new LinkedHashMap<ProgramVariable, ProgramVariable>(),
                                           true,
-                                          services);
+                                          services, localSpecRepo);
             replacer.start();
             body = (Statement) replacer.result();
 
@@ -735,14 +738,14 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                     (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
                 While newLoop = KeYJavaASTFactory.whileLoop(guard, body,
                                                             x.getPositionInfo());
-                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                localSpecRepo.copyLoopInvariant(x, newLoop);
 
                 ImmutableSet<LoopContract> lcs =
-                    services.getSpecificationRepository().getLoopContracts(x);
+                    localSpecRepo.getLoopContracts(x);
                 if (lcs != null) {
                     for (LoopContract lc : lcs) {
                         lc = lc.setLoop(newLoop);
-                        services.getSpecificationRepository().addLoopContract(lc);
+                        localSpecRepo.addLoopContract(lc);
                     }
                 }
                 addChild(newLoop);
@@ -777,7 +780,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             While newLoop =
                 KeYJavaASTFactory.whileLoop(guard, x.getBody(),
                                             x.getPositionInfo());
-            services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+            localSpecRepo.copyLoopInvariant(x, newLoop);
             StatementBlock block = KeYJavaASTFactory.block(unwindedBody, newLoop);
 
             if (outerLabelNeeded() && breakOuterLabel != null) {
@@ -799,7 +802,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 Expression guard = g == null ? null : g.getExpression();
                 Do newLoop =
                     KeYJavaASTFactory.doLoop(guard, body, x.getPositionInfo());
-                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                localSpecRepo.copyLoopInvariant(x, newLoop);
                 addChild(newLoop);
                 changed();
             } else {

@@ -45,6 +45,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
 import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
@@ -141,7 +142,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     @Override
     protected ImmutableList<StatementBlock> buildOperationBlocks(ImmutableList<LocationVariable> formalParVars,
                                                  ProgramVariable selfVar,
-                                                 ProgramVariable resultVar, Services services) {
+                                                 ProgramVariable resultVar, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final StatementBlock[] result = new StatementBlock[4];
         final ImmutableArray<Expression> formalArray = new ImmutableArray<Expression>(formalParVars.toArray(
              new ProgramVariable[formalParVars.size()]));
@@ -158,15 +159,15 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
 
             // construct what would be produced from rule instanceCreationAssignment
             final Expression init = (Expression) (new CreateObject(n))
-                    .transform(n, services, svInst)[0];
+                    .transform(n, localSpecRepo, services, svInst)[0];
             final Statement assignTmp = declare(selfVar,init,type);
             result[0] = new StatementBlock(assignTmp);
 
             // try block
             final Statement constructorCall = (Statement) (new ConstructorCall(
-                selfVar, n)).transform(n, services, svInst)[0];
+                selfVar, n)).transform(n, localSpecRepo, services, svInst)[0];
             final Statement setInitialized = (Statement) (new PostWork(selfVar))
-                    .transform(selfVar, services, svInst)[0];
+                    .transform(selfVar, localSpecRepo, services, svInst)[0];
             result[1] = new StatementBlock(constructorCall, setInitialized);
         } else {
             final MethodBodyStatement call =

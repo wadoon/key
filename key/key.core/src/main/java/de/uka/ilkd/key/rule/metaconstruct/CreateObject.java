@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.recoderext.CreateObjectBuilder;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -42,8 +43,8 @@ public class CreateObject extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement[] transform(ProgramElement pe, GoalLocalSpecificationRepository localSpecRepo,
+            Services services, SVInstantiations svInst) {
 
         TypeReference classReference = ((New) pe).getTypeReference();
 

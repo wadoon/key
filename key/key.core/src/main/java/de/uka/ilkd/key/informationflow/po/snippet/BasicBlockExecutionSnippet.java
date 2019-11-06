@@ -114,7 +114,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
                 new AuxiliaryContractBuilders.ValidityProgramConstructor(labels, block,
                                                                  variables,
                                                                  exceptionParameter,
-                                                                 d.services).construct();
+                                                                 d.localSpecRepo, d.services).construct();
         final Statement s = new MethodFrame(null, context, sb);
         final JavaBlock result = JavaBlock.createJavaBlock(new StatementBlock(s));
 

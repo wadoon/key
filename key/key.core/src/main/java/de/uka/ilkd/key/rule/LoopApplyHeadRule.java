@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhileTransformation;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
@@ -64,6 +65,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
         assert application instanceof LoopApplyHeadBuiltInRuleApp;
         LoopApplyHeadBuiltInRuleApp ruleApp
                 = (LoopApplyHeadBuiltInRuleApp) application;
+        GoalLocalSpecificationRepository localSpecRepo = goal.getLocalSpecificationRepository();
 
         ImmutableSet<LoopContract> contracts = ruleApp.contracts;
         LoopContract someContract = contracts.iterator().next();
@@ -82,15 +84,15 @@ public class LoopApplyHeadRule implements BuiltInRule {
         JavaBlock newJavaBlock;
         newJavaBlock = JavaBlock.createJavaBlock(
                 (StatementBlock) new ProgramElementReplacer(
-                        target.javaBlock().program(), services)
+                        target.javaBlock().program(), localSpecRepo, services)
                 .replace(instantiation.statement, headAndBlock));
 
         for (LoopContract c : contracts) {
             LoopContract newContract = c.replaceEnhancedForVariables(block, services);
 
-            services.getSpecificationRepository().removeLoopContract(c);
-            services.getSpecificationRepository().addLoopContract(newContract, false);
-            services.getSpecificationRepository().addBlockContract(
+            localSpecRepo.removeLoopContract(c);
+            localSpecRepo.addLoopContract(newContract, false);
+            localSpecRepo.addBlockContract(
                     c.toBlockContract().setBlock(headAndBlock));
         }
 

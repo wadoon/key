@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import junit.framework.TestCase;
@@ -54,8 +55,8 @@ public class TestProgramMetaConstructs extends TestCase {
         DoBreak rmLabel = new DoBreak(labeledBlock);
 
         ProgramElement result = rmLabel.transform(rmLabel.body(),
-            new Services(AbstractProfile.getDefaultProfile()),
-            SVInstantiations.EMPTY_SVINSTANTIATIONS)[0];
+                GoalLocalSpecificationRepository.DUMMY_REPO,
+            new Services(AbstractProfile.getDefaultProfile()), SVInstantiations.EMPTY_SVINSTANTIATIONS)[0];
         assertTrue(result instanceof Break);
     }
 
@@ -72,7 +73,7 @@ public class TestProgramMetaConstructs extends TestCase {
                 .parsePrg("{while(true) {if (true) break; else continue;}}");
         WhileLoopTransformation trans = new WhileLoopTransformation(block2,
             new ProgramElementName("l1"), new ProgramElementName("l2"),
-            new Services(AbstractProfile.getDefaultProfile()));
+            GoalLocalSpecificationRepository.DUMMY_REPO, new Services(AbstractProfile.getDefaultProfile()));
         trans.start();
         System.out.println("Result:" + trans);
     }
@@ -85,8 +86,8 @@ public class TestProgramMetaConstructs extends TestCase {
         Expression expr = (Expression) ((Assignment) block.getStatementAt(2))
                 .getChildAt(1);
         ProgramTransformer typeof = new TypeOf(expr);
-        assertTrue(((TypeRef) typeof.transform(expr, services,
-            SVInstantiations.EMPTY_SVINSTANTIATIONS)[0]).getName()
+        assertTrue(((TypeRef) typeof.transform(expr, GoalLocalSpecificationRepository.DUMMY_REPO,
+            services, SVInstantiations.EMPTY_SVINSTANTIATIONS)[0]).getName()
                     .equals("int"));
     }
 
@@ -103,8 +104,8 @@ public class TestProgramMetaConstructs extends TestCase {
 
         SVInstantiations inst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         try {
-            wlt.transform(l, new Services(AbstractProfile.getDefaultProfile()),
-                inst);
+            wlt.transform(l, GoalLocalSpecificationRepository.DUMMY_REPO,
+                new Services(AbstractProfile.getDefaultProfile()), inst);
         } catch (java.util.NoSuchElementException e) {
             assertTrue(" Problem with empty while-blocks. See Bug #183 ",
                 false);
@@ -144,8 +145,8 @@ public class TestProgramMetaConstructs extends TestCase {
             (LoopInit) coll.getNodes().head());
         final Statement[] stmts = (Statement[]) tf.transform(
             coll.getNodes().head(),
-            new Services(AbstractProfile.getDefaultProfile()),
-            SVInstantiations.EMPTY_SVINSTANTIATIONS);
+            GoalLocalSpecificationRepository.DUMMY_REPO,
+            new Services(AbstractProfile.getDefaultProfile()), SVInstantiations.EMPTY_SVINSTANTIATIONS);
 
         assertEquals(expectedStmts.length, stmts.length);
 

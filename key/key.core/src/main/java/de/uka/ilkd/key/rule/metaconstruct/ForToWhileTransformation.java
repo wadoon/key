@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
@@ -47,8 +48,8 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
     
     public ForToWhileTransformation(ProgramElement root,
             ProgramElementName outerLabel, ProgramElementName innerLabel, 
-            Services services) {
-        super(root, outerLabel, innerLabel, services);
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        super(root, outerLabel, innerLabel, localSpecRepo, services);
     }
 
     /**
@@ -127,10 +128,10 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             
             // copy loop invariant to the created while loop
             LoopSpecification li 
-                = services.getSpecificationRepository().getLoopSpec(x);
+                = localSpecRepo.getLoopSpec(x);
             if (li != null) {
                 li = li.setLoop((While)outerBlockStatements[initSize]);
-                services.getSpecificationRepository().addLoopInvariant(li);
+                localSpecRepo.addLoopInvariant(li);
             }
 
             addChild(outerBlock);

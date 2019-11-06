@@ -47,7 +47,7 @@ public class LoopContractExternalCompletion implements InteractiveRuleApplicatio
                 LoopContractExternalRule.getApplicableContracts(instantiation, goal, services);
         final AuxiliaryContractConfigurator<LoopContract> configurator
             = new AuxiliaryContractConfigurator<>("Loop Contract Configurator",
-                    new LoopContractSelectionPanel(services, true),
+                    new LoopContractSelectionPanel(goal.getLocalSpecificationRepository(), services, true),
                     mainWindow, services, contracts.toArray(new LoopContract[contracts.size()]),
                     "Contracts for Block: " + instantiation.statement);
         if (configurator.wasSuccessful()) {

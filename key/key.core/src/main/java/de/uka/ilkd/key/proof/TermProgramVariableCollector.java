@@ -21,15 +21,18 @@ import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 public class TermProgramVariableCollector extends DefaultVisitor {
 
     private final HashSet<LocationVariable> result = new LinkedHashSet<LocationVariable> ();
     private final Services services;
+    private final GoalLocalSpecificationRepository localSpecRepo;
 
     
-    public TermProgramVariableCollector(Services services) {
+    public TermProgramVariableCollector(GoalLocalSpecificationRepository localSpecRepo, Services services) {
         this.services = services;
+        this.localSpecRepo = localSpecRepo;
     }
         
     
@@ -45,7 +48,7 @@ public class TermProgramVariableCollector extends DefaultVisitor {
 	
 	if ( !t.javaBlock ().isEmpty() ) {
 	    ProgramVariableCollector pvc
-		= new ProgramVariableCollector ( t.javaBlock ().program (), services );
+		= new ProgramVariableCollector ( t.javaBlock ().program (), localSpecRepo, services );
 	    pvc.start();
 	    result.addAll ( pvc.result () );
 	}

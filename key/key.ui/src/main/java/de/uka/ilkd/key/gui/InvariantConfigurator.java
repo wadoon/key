@@ -58,6 +58,7 @@ import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -109,12 +110,14 @@ public class InvariantConfigurator {
      * parser Exception an error-message is shown.
      * 
      * @param loopInv
+     * @param localSpecRepo TODO
      * @param services
      * @return LoopInvariant
      */
-    public LoopSpecification getLoopInvariant (final LoopSpecification loopInv,
-            final Services services, final boolean requiresVariant, final List<LocationVariable> heapContext)
-                    throws RuleAbortException {
+    public LoopSpecification getLoopInvariant(final LoopSpecification loopInv,
+            GoalLocalSpecificationRepository localSpecRepo, final Services services,
+            final boolean requiresVariant, final List<LocationVariable> heapContext)
+            throws RuleAbortException {
         // Check if there is a LoopInvariant
         if (loopInv == null) {
             return null;
@@ -984,7 +987,7 @@ public class InvariantConfigurator {
                 // might throw parserException
 
                 result =  parser.parse(new StringReader(invariants.get(index)[INV_IDX].get(heap.toString())), 
-                        Sort.FORMULA, services, services.getNamespaces(), getAbbrevMap());
+                        Sort.FORMULA, localSpecRepo, services, services.getNamespaces(), getAbbrevMap());
 
                 return result;
             }
@@ -999,7 +1002,7 @@ public class InvariantConfigurator {
                 final Sort locSetSort = services.getTypeConverter().getLocSetLDT().targetSort();
                 result = parser.parse(
                         new StringReader(invariants.get(index)[MOD_IDX].get(heap.toString())), locSetSort,
-                        services, services.getNamespaces(), getAbbrevMap());
+                        localSpecRepo, services, services.getNamespaces(), getAbbrevMap());
                 return result;
             }
             
@@ -1017,15 +1020,15 @@ public class InvariantConfigurator {
                 // TODO: allow more than one term
                 preExps = parser.parse(
                       new StringReader(preExpsAsString), Sort.ANY,
-                      services, services.getNamespaces(), getAbbrevMap());
+                      localSpecRepo, services, services.getNamespaces(), getAbbrevMap());
                 // TODO: allow more than one term
                 postExps = parser.parse(
                       new StringReader(postExpsAsString), Sort.ANY,
-                      services, services.getNamespaces(), getAbbrevMap());
+                      localSpecRepo, services, services.getNamespaces(), getAbbrevMap());
                 // TODO: allow more than one term
                 newObjects = parser.parse(
                       new StringReader(newObjectsAsString), Sort.ANY,
-                      services, services.getNamespaces(), getAbbrevMap());
+                      localSpecRepo, services, services.getNamespaces(), getAbbrevMap());
                 ImmutableList<InfFlowSpec> result =
                     ImmutableSLList.<InfFlowSpec>nil()
                                    .append(new InfFlowSpec
@@ -1041,7 +1044,7 @@ public class InvariantConfigurator {
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
                 result = parser.parse(
                         new StringReader(invariants.get(index)[VAR_IDX].get(DEFAULT)), intSort,
-                        services, services.getNamespaces(), getAbbrevMap());
+                        localSpecRepo, services, services.getNamespaces(), getAbbrevMap());
                 return result;
             }
 

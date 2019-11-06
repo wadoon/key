@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
@@ -316,11 +317,12 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      *            loop.
      * @param loopScopeIdxVar
      *            The variable used as a loop scope index.
+     * @param localSpecRepo TODO
      * @return The new program with the loop scope.
      */
     private ProgramElement newProgram(Services services, final While loop,
-            Optional<Label> loopLabel, Statement stmtToReplace,
-            final JavaBlock origProg, final ProgramVariable loopScopeIdxVar) {
+            Optional<Label> loopLabel, Statement stmtToReplace, final JavaBlock origProg,
+            final ProgramVariable loopScopeIdxVar, GoalLocalSpecificationRepository localSpecRepo) {
         final ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
 
         if (loop.getBody() instanceof StatementBlock) {
@@ -364,7 +366,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                         KeYJavaASTFactory.trueLiteral()), loopScope);
 
         final ProgramElement result = new ProgramElementReplacer(
-                origProg.program(), services).replace(stmtToReplace, newBlock);
+                origProg.program(), localSpecRepo, services).replace(stmtToReplace, newBlock);
 
         return result;
     }
@@ -455,8 +457,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         final ProgramVariable loopScopeIdxVar = loopScopeIdxVar(services);
 
-        final ProgramElement newProg = newProgram(services, loop, loopLabel,
-                stmtToReplace, origJavaBlock, loopScopeIdxVar);
+        final ProgramElement newProg = newProgram(services, loop, loopLabel, stmtToReplace,
+                origJavaBlock, loopScopeIdxVar, presrvAndUCGoal.getLocalSpecificationRepository());
 
         final Term labeledIdxVar = tb.label(tb.var(loopScopeIdxVar),
                 ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL);

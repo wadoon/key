@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.FunctionalLoopContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
@@ -88,6 +89,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
      *            the variables.
      * @param modifiesClauses
      *            the modifies clauses.
+     * @param localSpecRepo TODO
      * @param services
      *            services.
      * @return the updates for the usage branch.
@@ -96,11 +98,13 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
             final List<LocationVariable> heaps,
             final Map<LocationVariable, Function> anonymisationHeaps,
             final LoopContract.Variables variables,
-            final Map<LocationVariable, Term> modifiesClauses, final Services services) {
-        final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
+            final Map<LocationVariable, Term> modifiesClauses,
+            GoalLocalSpecificationRepository localSpecRepo, final Services services) {
+        final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, localSpecRepo,
+                services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
-        final Term anonymisationUpdate
-                = updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses);
+        final Term anonymisationUpdate = updatesBuilder.buildAnonOutUpdate(anonymisationHeaps,
+                modifiesClauses);
         return new Term[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
     }
 
@@ -235,10 +239,10 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
             || !contract.isOnBlock() && contract.getLoop().equals(instantiation.statement);
 
         final List<LocationVariable> heaps = application.getHeapContext();
-        final ImmutableSet<ProgramVariable> localInVariables
-                = MiscTools.getLocalIns(instantiation.statement, services);
-        final ImmutableSet<ProgramVariable> localOutVariables
-                = MiscTools.getLocalOuts(instantiation.statement, services);
+        final ImmutableSet<ProgramVariable> localInVariables = MiscTools.getLocalIns(
+                instantiation.statement, goal.getLocalSpecificationRepository(), services);
+        final ImmutableSet<ProgramVariable> localOutVariables = MiscTools.getLocalOuts(
+                instantiation.statement, goal.getLocalSpecificationRepository(), services);
         final Map<LocationVariable, Function> anonymisationHeaps
                 = createAndRegisterAnonymisationVariables(heaps, contract, services);
         final LoopContract.Variables variables
@@ -256,12 +260,12 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
         final Term[] assumptions = createUsageAssumptions(localOutVariables, anonymisationHeaps,
                 conditionsAndClausesBuilder);
         final Term[] updates = createUpdates(instantiation.update, heaps, anonymisationHeaps,
-                variables, modifiesClauses, services);
+                variables, modifiesClauses, goal.getLocalSpecificationRepository(), services);
 
         final ImmutableList<Goal> result;
         final GoalsConfigurator configurator = new GoalsConfigurator(application,
                 new TermLabelState(), instantiation, contract.getLabels(), variables,
-                application.posInOccurrence(), services, this);
+                application.posInOccurrence(), goal.getLocalSpecificationRepository(), services, this);
 
         result = goal.split(2);
 

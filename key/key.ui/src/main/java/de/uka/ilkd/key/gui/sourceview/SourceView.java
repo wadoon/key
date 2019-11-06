@@ -74,6 +74,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 
@@ -677,6 +678,7 @@ public final class SourceView extends JComponent {
                         if (subtreeRoot.javaBlock() != null) {
                             JavaASTVisitor visitor = new JavaASTVisitor(
                                     subtreeRoot.javaBlock().program(),
+                                    GoalLocalSpecificationRepository.DUMMY_REPO,
                                     mainWindow.getMediator().getServices()) {
 
                                 @Override

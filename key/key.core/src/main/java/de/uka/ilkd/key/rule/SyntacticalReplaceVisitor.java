@@ -188,14 +188,14 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         if (jb.program() instanceof ContextStatementBlock) {
             trans = new ProgramReplaceVisitor
                     (new StatementBlock(((ContextStatementBlock)jb.program()).getBody()), // TODO
-                            services,
-                            svInst);
+                            goal.getLocalSpecificationRepository(),
+                            services, svInst);
             trans.start();
             result = addContext((StatementBlock)trans.result());
         } else {
             trans = new ProgramReplaceVisitor(jb.program(),
-                    services,
-                    svInst);
+                    goal.getLocalSpecificationRepository(),
+                    services, svInst);
             trans.start();
             result = trans.result();
         }
@@ -470,7 +470,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         tacletTermStack.pop();
         if (subtreeRoot.op() instanceof TermTransformer) {
             final TermTransformer mop = (TermTransformer) subtreeRoot.op();
-            final Term newTerm = mop.transform((Term)subStack.pop(),svInst, services);
+            final Term newTerm = mop.transform((Term)subStack.pop(),svInst, goal.getLocalSpecificationRepository(), services);
             final Term labeledTerm = TermLabelManager.label(services,
                     termLabelState,
                     applicationPosInOccurrence,

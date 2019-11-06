@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 /**
  * Utilits class used by
@@ -38,7 +39,7 @@ public class ContainsStatementVisitor extends JavaASTVisitor {
      */
     public ContainsStatementVisitor(ProgramElement root, SourceElement toSearch,
             Services services) {
-        super(root, services);
+        super(root, GoalLocalSpecificationRepository.DUMMY_REPO, services);
         this.toSearch = toSearch;
     }
 

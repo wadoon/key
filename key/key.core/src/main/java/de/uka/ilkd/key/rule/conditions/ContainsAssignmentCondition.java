@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
@@ -88,7 +89,7 @@ public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableCo
 
 
         public ContainsAssignment(ProgramElement root, Services services) {
-            super(root, services);
+            super(root, GoalLocalSpecificationRepository.DUMMY_REPO, services);
         }
 
         @Override

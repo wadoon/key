@@ -69,6 +69,7 @@ options {
 
   import de.uka.ilkd.key.proof.init.*;
   import de.uka.ilkd.key.proof.io.*;
+  import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
   import static de.uka.ilkd.key.proof.io.IProofFileParser.*;
   
   import de.uka.ilkd.key.rule.*;
@@ -198,6 +199,7 @@ options {
    private int stringLiteralLine=0; // HACK!
 
    private Services services;
+   private GoalLocalSpecificationRepository localSpecRepo;
    private JavaReader javaReader;
 
    // if this is used then we can capture parts of the input for later use
@@ -231,7 +233,7 @@ options {
    }
 
    /* Most general constructor, should only be used internally */
-   private KeYParser(TokenStream lexer,
+   private KeYParser(TokenStream lexer, final GoalLocalSpecificationRepository localSpecRepo,
                      Services services,
 		     NamespaceSet nss,
 		     ParserMode mode) {
@@ -239,6 +241,7 @@ options {
         this.lexer = lexer;
         this.parserMode = mode;
  	this.services = services;
+ 	this.localSpecRepo = localSpecRepo;
 	this.nss = nss;
 	this.schemaVariablesNamespace = new Namespace<>();
     if (this.isTacletParser()) {
@@ -254,11 +257,11 @@ options {
     */
    public KeYParser(ParserMode mode,
                     TokenStream lexer,
-                    JavaReader jr,
+                    JavaReader jr, final GoalLocalSpecificationRepository localSpecRepo,
                     Services services,
                     NamespaceSet nss,
                     AbbrevMap scm) {
-        this(lexer, services, nss, mode);
+        this(lexer, localSpecRepo, services, nss, mode);
         this.javaReader = jr;
         this.scm = scm;
    }
@@ -272,12 +275,13 @@ options {
      * will represent bound variables.
      */
     public KeYParser(ParserMode mode, 
-                     TokenStream lexer,
+                     TokenStream lexer, final GoalLocalSpecificationRepository localSpecRepo,
 		     Services services,
 		     NamespaceSet nss) {
         this(mode,
              lexer,
              new SchemaRecoder2KeY(services, nss),
+             localSpecRepo,
              services,
              nss,
              new LinkedHashMap());
@@ -289,10 +293,11 @@ options {
     public KeYParser(ParserMode mode, 
                      TokenStream lexer,
                      SchemaJavaReader jr, 
-                     Services services,  
+                     final GoalLocalSpecificationRepository localSpecRepo,  
+                     Services services, 
                      NamespaceSet nss, 
                      HashMap taclet2Builder) {
-        this(lexer, services, nss, mode);
+        this(lexer, localSpecRepo, services, nss, mode);
         switchToSchemaMode();
         this.scm = new AbbrevMap();
         this.javaReader = jr;
@@ -309,7 +314,7 @@ options {
                      ParserConfig normalConfig, 
                      HashMap taclet2Builder,
                      ImmutableList<Taclet> taclets) { 
-        this(lexer, null, null, mode);
+        this(lexer, null, null, null, mode);
         if (normalConfig!=null)
         scm = new AbbrevMap();
         this.schemaConfig = schemaConfig;
@@ -326,7 +331,7 @@ options {
     }
 
     public KeYParser(ParserMode mode, TokenStream lexer) {
-        this(lexer, null, null, mode);
+        this(lexer, null, null, null, mode);
         scm = new AbbrevMap();
         this.schemaConfig = null;
         this.normalConfig = null;       
@@ -339,12 +344,13 @@ options {
     /**
      * Parses taclet from string.
      */
-    public static Taclet parseTaclet(String s, Services services) {
+    public static Taclet parseTaclet(String s, GoalLocalSpecificationRepository localSpecRepo, Services services) {
    	try {
 	    KeYParserF p =
                 new KeYParserF(ParserMode.TACLET,
                               new KeYLexerF(s,
                                       "No file. KeYParser.parseTaclet(\n" + s + ")\n"),
+                              localSpecRepo,
                               services,
                               services.getNamespaces());
 	    return p.taclet(DefaultImmutableSet.<Choice>nil(), false);
@@ -423,6 +429,12 @@ options {
         if(isProblemParser()) 
           return parserConfig.services();
         return services;
+    }
+
+    public GoalLocalSpecificationRepository getGoalLocalSpecificationRepository() {
+        if(isProblemParser()) 
+          return parserConfig.getGoalLocalSpecificationRepository();
+        return localSpecRepo;
     }
     
      public TermFactory getTermFactory() {
@@ -982,7 +994,7 @@ options {
     private Set progVars(JavaBlock jb) {
 	if(isGlobalDeclTermParser()) {
   	  ProgramVariableCollector pvc
-	      = new ProgramVariableCollector(jb.program(), getServices());
+	      = new ProgramVariableCollector(jb.program(), getGoalLocalSpecificationRepository(), getServices());
           pvc.start();
           return pvc.result();
         }else 
@@ -4528,7 +4540,7 @@ one_contract
      (prog_var_decls)? 
      fma = formula MODIFIES modifiesClause = term
      {
-       DLSpecFactory dsf = new DLSpecFactory(getServices());
+       DLSpecFactory dsf = new DLSpecFactory(getGoalLocalSpecificationRepository(), getServices());
        try {
          contracts = contracts.prepend(dsf.createDLOperationContract(contractName,
        					                         fma, 
@@ -4550,7 +4562,7 @@ one_invariant[ParsableVariable selfVar]
      fma = formula
      (DISPLAYNAME displayName = string_literal)?
      {
-       DLSpecFactory dsf = new DLSpecFactory(getServices());
+       DLSpecFactory dsf = new DLSpecFactory(getGoalLocalSpecificationRepository(), getServices());
        try {
          invs = invs.add(dsf.createDLClassInvariant(invName,
                                                     displayName,

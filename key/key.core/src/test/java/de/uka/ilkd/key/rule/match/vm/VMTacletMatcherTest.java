@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.Taclet;
@@ -56,7 +57,7 @@ public class VMTacletMatcherTest extends TestCase {
         };
          
         for (String fml : matchingFormulas) {
-            Term toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml, GoalLocalSpecificationRepository.DUMMY_REPO);
 
             MatchConditions mc = matcher[0].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, firstOpenGoal, services);
         
@@ -70,7 +71,7 @@ public class VMTacletMatcherTest extends TestCase {
                 "\\forall int x;(x>=0 & A)"
         };
         for (String fml : notMatchingFormulas) {
-            Term toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml, GoalLocalSpecificationRepository.DUMMY_REPO);
             MatchConditions mc = matcher[0].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, firstOpenGoal, services);
 
             assertNull("Expected that " + findTerm + " does not match " + toMatch + " but it did.", mc);
@@ -85,7 +86,7 @@ public class VMTacletMatcherTest extends TestCase {
         final String[] matchingFormulas = {"f(1, 1, 2)", "f(c, c, d)"};
          
         for (String fml : matchingFormulas) {
-            Term toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml, GoalLocalSpecificationRepository.DUMMY_REPO);
 
             MatchConditions mc = matcher[1].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, firstOpenGoal, services);
         
@@ -96,7 +97,7 @@ public class VMTacletMatcherTest extends TestCase {
                 "h(1,1)", "h(1,2)", "c", "z(1,1,1,1)", "f(c,d,c)"
         };
         for (String fml : notMatchingFormulas) {
-            Term toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml, GoalLocalSpecificationRepository.DUMMY_REPO);
             MatchConditions mc = matcher[1].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, firstOpenGoal, services);
 
             assertNull("Expected that " + findTerm + " does not match " + toMatch + " but it did.", mc);
@@ -109,12 +110,12 @@ public class VMTacletMatcherTest extends TestCase {
     public void matchVarBindingTermSingle() throws ParserException {
         Term findTerm = ((FindTaclet)taclet[2]).find();
                 
-        Term toMatch = services.getTermBuilder().parseTerm("\\forall int x; x + 1 > 0");
+        Term toMatch = services.getTermBuilder().parseTerm("\\forall int x; x + 1 > 0", GoalLocalSpecificationRepository.DUMMY_REPO);
 
         MatchConditions mc = matcher[2].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, firstOpenGoal, services);
         assertNotNull("Expected that " + findTerm + " matches " + toMatch + " but did not.", mc);
 
-        toMatch = services.getTermBuilder().parseTerm("\\forall int x; 1 + x > 0");
+        toMatch = services.getTermBuilder().parseTerm("\\forall int x; 1 + x > 0", GoalLocalSpecificationRepository.DUMMY_REPO);
 
         mc = matcher[2].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, firstOpenGoal, services);
         assertNull("Expected that " + findTerm + " does not match " + toMatch + " but it did.", mc);
@@ -128,7 +129,7 @@ public class VMTacletMatcherTest extends TestCase {
         final String[] matchingFormulas = {"\\forall int x; \\forall int y; x + y > 0"};
         
         for (String fml : matchingFormulas) {
-            Term toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml, GoalLocalSpecificationRepository.DUMMY_REPO);
 
             MatchConditions mc = matcher[3].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, firstOpenGoal, services);
         
@@ -139,7 +140,7 @@ public class VMTacletMatcherTest extends TestCase {
                 "\\forall int x; \\forall int x; x + x > 0"
         };
         for (String fml : notMatchingFormulas) {
-            Term toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml, GoalLocalSpecificationRepository.DUMMY_REPO);
             MatchConditions mc = matcher[3].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, firstOpenGoal, services);
 
             assertNull("Expected that " + findTerm + " does not match " + toMatch + " but it did.", mc);
@@ -157,7 +158,7 @@ public class VMTacletMatcherTest extends TestCase {
                 };
         
         for (String fml : matchingFormulas) {
-            Term toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml, GoalLocalSpecificationRepository.DUMMY_REPO);
 
             MatchConditions mc = matcher[4].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, firstOpenGoal, services);
         
@@ -168,7 +169,7 @@ public class VMTacletMatcherTest extends TestCase {
                 "\\forall int x; (x > 0  & \\forall int y; y + x > 0)",
         };
         for (String fml : notMatchingFormulas) {
-            Term toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml, GoalLocalSpecificationRepository.DUMMY_REPO);
             MatchConditions mc = matcher[4].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, firstOpenGoal, services);
 
             assertNull("Expected that " + findTerm + " does not match " + toMatch + " but it did.", mc);
@@ -185,7 +186,7 @@ public class VMTacletMatcherTest extends TestCase {
                 };
         
         for (String fml : matchingFormulas) {
-            Term toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml, GoalLocalSpecificationRepository.DUMMY_REPO);
 
             MatchConditions mc = matcher[5].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, firstOpenGoal, services);
         
@@ -197,7 +198,7 @@ public class VMTacletMatcherTest extends TestCase {
                 "\\forall int x; (x > 0  & \\forall int y; y + x > 0)",
         };
         for (String fml : notMatchingFormulas) {
-            Term toMatch = services.getTermBuilder().parseTerm(fml);
+            Term toMatch = services.getTermBuilder().parseTerm(fml, GoalLocalSpecificationRepository.DUMMY_REPO);
             MatchConditions mc = matcher[5].matchFind(toMatch, MatchConditions.EMPTY_MATCHCONDITIONS, firstOpenGoal, services);
 
             assertNull("Expected that " + findTerm + " does not match " + toMatch + " but it did.", mc);

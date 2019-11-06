@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -41,8 +42,8 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
     InfFlowPOSnippetFactoryImpl(InformationFlowContract contract,
                                 ProofObligationVars vars1,
                                 ProofObligationVars vars2,
-                                Services services) {
-        this.data = new BasicSnippetData(contract, services);
+                                GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        this.data = new BasicSnippetData(contract, localSpecRepo, services);
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
         registerFactoryMethods();
@@ -52,8 +53,8 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
                                 ProofObligationVars vars1,
                                 ProofObligationVars vars2,
                                 ExecutionContext context,
-                                Services services) {
-        this.data = new BasicSnippetData(contract, context, services);
+                                GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        this.data = new BasicSnippetData(contract, context, localSpecRepo, services);
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
         registerFactoryMethods();
@@ -64,8 +65,8 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
                                 ProofObligationVars vars2,
                                 ExecutionContext context,
                                 Term guardTerm,
-                                Services services) {
-        this.data = new BasicSnippetData(invariant, context, guardTerm, services);
+                                GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        this.data = new BasicSnippetData(invariant, context, guardTerm, localSpecRepo, services);
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
         registerFactoryMethods();

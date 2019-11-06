@@ -48,6 +48,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -87,8 +88,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      *            the services instance
      */
     public ProgVarReplaceVisitor(ProgramElement st,
-            Map<ProgramVariable, ProgramVariable> map, Services services) {
-        super(st, true, services);
+            Map<ProgramVariable, ProgramVariable> map, GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        super(st, true, localSpecRepo, services);
         this.replaceMap = map;
         assert services != null;
     }
@@ -108,8 +109,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      */
     public ProgVarReplaceVisitor(ProgramElement st,
             Map<ProgramVariable, ProgramVariable> map, boolean replaceall,
-            Services services) {
-        this(st, map, services);
+            Services services, GoalLocalSpecificationRepository localSpecRepo) {
+        this(st, map, localSpecRepo, services);
         this.replaceallbynew = replaceall;
     }
 
@@ -274,7 +275,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         ImmutableSet<BlockContract> oldContracts = services
                 .getSpecificationRepository().getBlockContracts(oldBlock);
         for (BlockContract oldContract : oldContracts) {
-            services.getSpecificationRepository()
+            localSpecRepo
                     .addBlockContract(createNewBlockContract(oldContract,
                             newBlock, !oldBlock.equals(newBlock)));
         }
@@ -283,10 +284,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     @Override
     public void performActionOnLoopContract(final StatementBlock oldBlock,
                                             final StatementBlock newBlock) {
-        ImmutableSet<LoopContract> oldContracts = services
-                .getSpecificationRepository().getLoopContracts(oldBlock);
+        ImmutableSet<LoopContract> oldContracts = localSpecRepo.getLoopContracts(oldBlock);
         for (LoopContract oldContract : oldContracts) {
-            services.getSpecificationRepository()
+            localSpecRepo
                     .addLoopContract(createNewLoopContract(oldContract,
                             newBlock, !oldBlock.equals(newBlock)));
         }
@@ -295,10 +295,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     @Override
     public void performActionOnLoopContract(final LoopStatement oldLoop,
                                             final LoopStatement newLoop) {
-        ImmutableSet<LoopContract> oldContracts = services
-                .getSpecificationRepository().getLoopContracts(oldLoop);
+        ImmutableSet<LoopContract> oldContracts = localSpecRepo.getLoopContracts(oldLoop);
         for (LoopContract oldContract : oldContracts) {
-            services.getSpecificationRepository()
+            localSpecRepo
                     .addLoopContract(createNewLoopContract(oldContract,
                             newLoop, !oldLoop.equals(newLoop)));
         }
@@ -567,7 +566,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     public void performActionOnLoopInvariant(LoopStatement oldLoop,
             LoopStatement newLoop) {
         final TermBuilder tb = services.getTermBuilder();
-        LoopSpecification inv = services.getSpecificationRepository()
+        LoopSpecification inv = localSpecRepo
                 .getLoopSpec(oldLoop);
         if (inv == null) {
             return;
@@ -624,13 +623,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
 
         ImmutableList<Term> newLocalIns = tb
-                .var(MiscTools.getLocalIns(newLoop, services));
+                .var(MiscTools.getLocalIns(newLoop, localSpecRepo, services));
         ImmutableList<Term> newLocalOuts = tb
-                .var(MiscTools.getLocalOuts(newLoop, services));
+                .var(MiscTools.getLocalOuts(newLoop, localSpecRepo, services));
 
         LoopSpecification newInv = inv.create(newLoop, newInvariants,
                 newFreeInvariants, newMods, newInfFlowSpecs, newVariant,
                 newSelfTerm, newLocalIns, newLocalOuts, atPres);
-        services.getSpecificationRepository().addLoopInvariant(newInv);
+        localSpecRepo.addLoopInvariant(newInv);
     }
 }

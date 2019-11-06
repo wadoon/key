@@ -5,6 +5,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -40,8 +41,8 @@ public class ForInitUnfoldTransformer extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement[] transform(ProgramElement pe, GoalLocalSpecificationRepository localSpecRepo,
+            Services services, SVInstantiations svInst) {
         Debug.assertTrue(pe instanceof LoopInit,
             "ForInitUnfoldTransformer cannot handle ", pe);
 

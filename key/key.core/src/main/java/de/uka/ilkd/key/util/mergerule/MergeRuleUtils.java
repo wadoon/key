@@ -76,6 +76,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -182,19 +183,20 @@ public class MergeRuleUtils {
 
     /**
      * Translates a String into a formula or to null if not applicable.
-     *
+     * @param localSpecRepo TODO
      * @param services
      *            The services object.
      * @param toTranslate
      *            The formula to be translated.
+     *
      * @return The formula represented by the input or null if not applicable.
      */
-    public static Term translateToFormula(final Services services,
-            final String toTranslate) {
+    public static Term translateToFormula(GoalLocalSpecificationRepository localSpecRepo,
+            final Services services, final String toTranslate) {
         try {
             final KeYParserF parser = new KeYParserF(ParserMode.TERM,
-                    new KeYLexerF(new StringReader(toTranslate), ""), services,
-                    services.getNamespaces());
+                    new KeYLexerF(new StringReader(toTranslate), ""), localSpecRepo,
+                    services, services.getNamespaces());
             final Term result = parser.term();
             return result.sort() == Sort.FORMULA ? result : null;
         } catch (Throwable e) {
@@ -259,21 +261,22 @@ public class MergeRuleUtils {
      *
      * @param term
      *            The term to extract program variables from.
+     * @param localSpecRepo TODO
      * @return All program variables of the given term.
      */
     public static ImmutableSet<LocationVariable> getLocationVariables(Term term,
-            Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
 
         if (term.op() instanceof LocationVariable) {
             result = result.add((LocationVariable) term.op());
         } else {
             if (!term.javaBlock().isEmpty()) {
-                result = result.union(getProgramLocations(term, services));
+                result = result.union(getProgramLocations(term, localSpecRepo, services));
             }
 
             for (Term sub : term.subs()) {
-                result = result.union(getLocationVariables(sub, services));
+                result = result.union(getLocationVariables(sub, localSpecRepo, services));
             }
         }
 
@@ -285,14 +288,15 @@ public class MergeRuleUtils {
      *
      * @param sequent
      *            The sequent to extract program variables from.
+     * @param localSpecRepo TODO
      * @return All program variables of the given sequent.
      */
     public static HashSet<LocationVariable> getLocationVariablesHashSet(
-            Sequent sequent, Services services) {
+            Sequent sequent, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         HashSet<LocationVariable> result = new HashSet<LocationVariable>();
 
         for (SequentFormula f : sequent) {
-            result.addAll(getLocationVariablesHashSet(f.formula(), services));
+            result.addAll(getLocationVariablesHashSet(f.formula(), localSpecRepo, services));
         }
 
         return result;
@@ -303,21 +307,22 @@ public class MergeRuleUtils {
      *
      * @param term
      *            The term to extract program variables from.
+     * @param localSpecRepo TODO
      * @return All program variables of the given term.
      */
     public static HashSet<LocationVariable> getLocationVariablesHashSet(
-            Term term, Services services) {
+            Term term, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         HashSet<LocationVariable> result = new HashSet<LocationVariable>();
 
         if (term.op() instanceof LocationVariable) {
             result.add((LocationVariable) term.op());
         } else {
             if (!term.javaBlock().isEmpty()) {
-                result.addAll(getProgramLocationsHashSet(term, services));
+                result.addAll(getProgramLocationsHashSet(term, localSpecRepo, services));
             }
 
             for (Term sub : term.subs()) {
-                result.addAll(getLocationVariablesHashSet(sub, services));
+                result.addAll(getLocationVariablesHashSet(sub, localSpecRepo, services));
             }
         }
 
@@ -970,16 +975,17 @@ public class MergeRuleUtils {
      *            First element to check equality (mod renaming) for.
      * @param se2
      *            Second element to check equality (mod renaming) for.
+     * @param localSpecRepo TODO
+     * @param services
+     *            The Services object.
      * @param goal
      *            The goal of the current branch (for getting branch-unique
      *            names).
-     * @param services
-     *            The Services object.
      * @return true iff source elements can be matched, considering
      *         branch-unique location names.
      */
     public static boolean equalsModBranchUniqueRenaming(SourceElement se1,
-            SourceElement se2, Node node, Services services) {
+            SourceElement se2, Node node, GoalLocalSpecificationRepository localSpecRepo, Services services) {
 
         // Quick short cut for the special case where no program variables
         // have to be renamed.
@@ -991,9 +997,9 @@ public class MergeRuleUtils {
                 DefaultImmutableSet.<LocationVariable> nil());
 
         ProgVarReplaceVisitor replVisitor1 = new ProgVarReplaceVisitor(
-                (ProgramElement) se1, replMap, services);
+                (ProgramElement) se1, replMap, localSpecRepo, services);
         ProgVarReplaceVisitor replVisitor2 = new ProgVarReplaceVisitor(
-                (ProgramElement) se2, replMap, services);
+                (ProgramElement) se2, replMap, localSpecRepo, services);
 
         replVisitor1.start();
         replVisitor2.start();
@@ -1512,20 +1518,21 @@ public class MergeRuleUtils {
      *            The predicate to parse (contains exactly one placeholder).
      * @param localNamespaces
      *            The local {@link NamespaceSet}.
+     * @param localSpecRepo TODO
      * @return The parsed {@link AbstractionPredicate}.
      * @throws ParserException
      *             If there is a syntax error.
      */
     public static AbstractionPredicate parsePredicate(String input,
             ArrayList<Pair<Sort, Name>> registeredPlaceholders,
-            NamespaceSet localNamespaces, Services services)
+            NamespaceSet localNamespaces, GoalLocalSpecificationRepository localSpecRepo, Services services)
             throws ParserException {
         DefaultTermParser parser = new DefaultTermParser();
         Term formula = parser.parse(new StringReader(input), Sort.FORMULA,
-                services, localNamespaces, services.getProof().abbreviations());
+                localSpecRepo, services, localNamespaces, services.getProof().abbreviations());
 
         ImmutableSet<LocationVariable> containedLocVars = MergeRuleUtils
-                .getLocationVariables(formula, services);
+                .getLocationVariables(formula, GoalLocalSpecificationRepository.DUMMY_REPO, services);
 
         int nrContainedPlaceholders = 0;
         LocationVariable usedPlaceholder = null;
@@ -1573,7 +1580,7 @@ public class MergeRuleUtils {
         ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
         ImmutableList<Term> elementaries = ImmutableSLList.nil();
 
-        for (LocationVariable loc : getLocationVariables(term, services)) {
+        for (LocationVariable loc : getLocationVariables(term, GoalLocalSpecificationRepository.DUMMY_REPO, services)) {
             final String newName = tb
                     .newName(stripIndex(loc.name().toString()));
             final LogicVariable newVar = new LogicVariable(new Name(newName),
@@ -1617,14 +1624,15 @@ public class MergeRuleUtils {
      *
      * @param programCounterTerm
      *            The term (program counter) to extract locations from.
+     * @param localSpecRepo TODO
      * @param services
      *            The Services object.
      * @return The set of contained program locations.
      */
     private static ImmutableSet<LocationVariable> getProgramLocations(
-            Term programCounterTerm, Services services) {
+            Term programCounterTerm, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         CollectLocationVariablesVisitor visitor = new CollectLocationVariablesVisitor(
-                programCounterTerm.javaBlock().program(), true, services);
+                programCounterTerm.javaBlock().program(), true, localSpecRepo, services);
 
         ImmutableSet<LocationVariable> progVars = DefaultImmutableSet.nil();
 
@@ -1641,12 +1649,13 @@ public class MergeRuleUtils {
      *
      * @param programCounterTerm
      *            The term (program counter) to extract locations from.
+     * @param localSpecRepo TODO
      * @param services
      *            The Services object.
      * @return The set of contained program locations.
      */
     private static HashSet<LocationVariable> getProgramLocationsHashSet(
-            Term programCounterTerm, Services services) {
+            Term programCounterTerm, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final JavaProgramElement program = programCounterTerm.javaBlock()
                 .program();
         if (program instanceof StatementBlock && (((StatementBlock) program)
@@ -1658,7 +1667,7 @@ public class MergeRuleUtils {
         }
 
         CollectLocationVariablesVisitorHashSet visitor = new CollectLocationVariablesVisitorHashSet(
-                program, true, services);
+                program, true, localSpecRepo, services);
 
         // Collect program variables in Java block
         visitor.start();
@@ -2182,8 +2191,8 @@ public class MergeRuleUtils {
                 .nil();
 
         public CollectLocationVariablesVisitor(ProgramElement root,
-                boolean preservesPos, Services services) {
-            super(root, preservesPos, services);
+                boolean preservesPos, GoalLocalSpecificationRepository localSpecRepo, Services services) {
+            super(root, preservesPos, localSpecRepo, services);
         }
 
         @Override
@@ -2212,8 +2221,8 @@ public class MergeRuleUtils {
         private HashSet<LocationVariable> variables = new HashSet<LocationVariable>();
 
         public CollectLocationVariablesVisitorHashSet(ProgramElement root,
-                boolean preservesPos, Services services) {
-            super(root, preservesPos, services);
+                boolean preservesPos, GoalLocalSpecificationRepository localSpecRepo, Services services) {
+            super(root, preservesPos, localSpecRepo, services);
         }
 
         @Override

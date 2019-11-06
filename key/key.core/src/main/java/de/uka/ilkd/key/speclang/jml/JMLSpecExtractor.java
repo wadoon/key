@@ -56,6 +56,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -106,9 +107,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
     // constructors
     // -------------------------------------------------------------------------
 
-    public JMLSpecExtractor(Services services) {
+    public JMLSpecExtractor(GoalLocalSpecificationRepository localSpecRepo, Services services) {
         this.services = services;
-        this.jsf = new JMLSpecFactory(services);
+        this.jsf = new JMLSpecFactory(localSpecRepo, services);
     }
 
     // -------------------------------------------------------------------------

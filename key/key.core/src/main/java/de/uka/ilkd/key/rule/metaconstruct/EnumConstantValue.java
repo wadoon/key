@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -49,7 +50,7 @@ public final class EnumConstantValue extends AbstractTermTransformer {
      * @throws IllegalArgumentException
      *             if the pv is neither a constant nor ntc.
      */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         term = term.sub(0);
         Operator op = term.op();
 

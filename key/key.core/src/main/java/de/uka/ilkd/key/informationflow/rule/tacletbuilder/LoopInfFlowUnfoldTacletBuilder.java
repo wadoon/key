@@ -7,6 +7,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -20,10 +21,12 @@ public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletB
     private LoopSpecification loopInv;
     private ExecutionContext executionContext;
     private Term guard;
+    private final GoalLocalSpecificationRepository localSpecRepo;
 
 
-    public LoopInfFlowUnfoldTacletBuilder(Services services) {
+    public LoopInfFlowUnfoldTacletBuilder(GoalLocalSpecificationRepository localSpecRepo, Services services) {
         super(services);
+        this.localSpecRepo = localSpecRepo;
     }
 
 
@@ -56,7 +59,7 @@ public class LoopInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletB
                                                    ifVars.c1, ifVars.c2,
                                                    executionContext,
                                                    guard,
-                                                   services);
+                                                   localSpecRepo, services);
         return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
     }
 }

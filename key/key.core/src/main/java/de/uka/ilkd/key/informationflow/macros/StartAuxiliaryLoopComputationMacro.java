@@ -77,7 +77,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro imple
         final InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(loopInv, ifVars.c1,
                                                    ifVars.c2, executionContext,
-                                                   guardTerm, services);
+                                                   guardTerm, goals.head().getLocalSpecificationRepository(), services);
         final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
 

@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.rule;
 
 
+import static org.junit.Assert.fail;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -40,10 +42,10 @@ import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
-import static org.junit.Assert.*;
 
 
 /** 
@@ -370,7 +372,7 @@ public class CreateTacletForTests {
     private KeYParserF stringDeclParser(String s) {
 	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,
 			"No file. CreateTacletForTests.stringDeclParser(" + s + ")"),
-		services, nss);
+	        GoalLocalSpecificationRepository.DUMMY_REPO, services, nss);
     }
 
     public void parseDecls(String s) {
@@ -388,8 +390,8 @@ public class CreateTacletForTests {
     private KeYParserF stringTacletParser(String s) {
 	return new KeYParserF(ParserMode.TACLET, new KeYLexerF(s,
 			"No file. CreateTacletForTests.stringTacletParser(" + s + ")"),
-		services,
-		nss);
+	        GoalLocalSpecificationRepository.DUMMY_REPO,
+		services, nss);
     }
     
     Taclet parseTaclet(String s) {

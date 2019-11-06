@@ -16,8 +16,6 @@ package de.uka.ilkd.key.taclettranslation;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import junit.framework.TestCase;
-
 import org.key_project.util.collection.DefaultImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -30,7 +28,9 @@ import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
+import junit.framework.TestCase;
 
 public class TestTacletTranslator extends TestCase {
 
@@ -69,7 +69,7 @@ public class TestTacletTranslator extends TestCase {
 	KeYParserF p = new KeYParserF(ParserMode.TACLET,
 		new KeYLexerF(s,
 			"No file. parser/TestTacletParser.stringTacletParser(" + s + ")"),
-		services, nss);
+		GoalLocalSpecificationRepository.DUMMY_REPO, services, nss);
         p.setSchemaVariablesNamespace(schemaVariableNS);
         return p;
     }
@@ -79,7 +79,7 @@ public class TestTacletTranslator extends TestCase {
 	    KeYParserF p = new KeYParserF(ParserMode.DECLARATION,
 		    new KeYLexerF(s,
 			    "No file. parser/TestTacletParser.stringDeclParser(" + s + ")"),
-		   services, nss);
+		    GoalLocalSpecificationRepository.DUMMY_REPO, services, nss);
             p.decls();
             schemaVariableNS = p.schemaVariables();
         } catch (Exception e) {

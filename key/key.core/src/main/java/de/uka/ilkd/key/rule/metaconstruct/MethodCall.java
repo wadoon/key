@@ -51,6 +51,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -209,17 +210,17 @@ public class MethodCall extends ProgramTransformer {
 
     /**
      * performs the program transformation needed for symbolic program execution
-     *
      * @param services
      *            the Services with all necessary information about the java
      *            programs
      * @param svInst
      *            the instantiations esp. of the inner and outer label
+     *
      * @return the transformed program
      */
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement[] transform(ProgramElement pe, GoalLocalSpecificationRepository localSpecRepo,
+            Services services, SVInstantiations svInst) {
         Debug.out("method-call: called for ", pe);
         if (resultVar != null) {
             pvar = (ProgramVariable) svInst.getInstantiation(resultVar);

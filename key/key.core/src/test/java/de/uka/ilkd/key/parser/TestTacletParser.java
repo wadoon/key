@@ -16,8 +16,6 @@ package de.uka.ilkd.key.parser;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import junit.framework.TestCase;
-
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -38,6 +36,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -49,6 +48,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import junit.framework.TestCase;
 
 /** class tests the parser for Taclets
 */
@@ -111,7 +111,7 @@ public class TestTacletParser extends TestCase {
 	return new KeYParserF(ParserMode.DECLARATION,
 		new KeYLexerF(s,
 			"No file. parser/TestTacletParser.stringDeclParser(" + s + ")"),
-		services, nss);
+		GoalLocalSpecificationRepository.DUMMY_REPO, services, nss);
     }
 
     private void parseDecls(String s) {
@@ -134,7 +134,7 @@ public class TestTacletParser extends TestCase {
 	return new KeYParserF(ParserMode.TACLET,
 		new KeYLexerF(s,
 			"No file. parser/TestTacletParser.stringTacletParser(" + s + ")"),
-		services, nss);
+		GoalLocalSpecificationRepository.DUMMY_REPO, services, nss);
     }
 
     public Term parseTerm(String s) {

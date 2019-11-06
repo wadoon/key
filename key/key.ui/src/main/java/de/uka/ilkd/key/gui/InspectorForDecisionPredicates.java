@@ -29,20 +29,23 @@ import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 public class InspectorForDecisionPredicates implements CheckedUserInputInspector{
 
     private final Services services;
+    private final GoalLocalSpecificationRepository localSpecRepo;
     private final Node node;
     private final int  cutMode;
     private final List<ApplicationCheck> additionalChecks = new LinkedList<ApplicationCheck>();
     
     
     
-    public InspectorForDecisionPredicates(Services services, Node node, int cutMode,
-    		List<ApplicationCheck> additionalChecks) {
+    public InspectorForDecisionPredicates(GoalLocalSpecificationRepository localSpecRepo, Services services, Node node,
+    		int cutMode, List<ApplicationCheck> additionalChecks) {
         super();
         this.services = services;
+        this.localSpecRepo = localSpecRepo;
         this.node = node;
         this.cutMode = cutMode;
         this.additionalChecks.addAll(additionalChecks);
@@ -55,7 +58,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
         if(toBeChecked.isEmpty()){
             return CheckedUserInputInspector.NO_USER_INPUT;
         }
-        Term term = translate(services,toBeChecked);
+        Term term = translate(localSpecRepo,services, toBeChecked);
         
         Semisequent semisequent = cutMode == DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT ? 
                 node.sequent().antecedent() : node.sequent().succedent();
@@ -84,13 +87,13 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
 
     }
     
-    public static Term translate(Services services, String toBeChecked){
+    public static Term translate(GoalLocalSpecificationRepository localSpecRepo, Services services, String toBeChecked){
         try {
             KeYParserF parser =
                     new KeYParserF (ParserMode.TERM,
                                      new KeYLexerF ( new StringReader ( toBeChecked ), ""),
-                                     services,   // should not be needed
-                                     services.getNamespaces() );
+                                     localSpecRepo,   // should not be needed
+                                     services, services.getNamespaces() );
                 return parser.term();
              } catch (Throwable e) {
                  

@@ -65,6 +65,7 @@ import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
@@ -113,9 +114,10 @@ public class TermBuilder {
      *
      * @param s
      *            the String to parse
+     * @param localSpecRepo TODO
      */
-    public Term parseTerm(String s) throws ParserException {
-        return parseTerm(s, services.getNamespaces());
+    public Term parseTerm(String s, GoalLocalSpecificationRepository localSpecRepo) throws ParserException {
+        return parseTerm(s, services.getNamespaces(), localSpecRepo);
     }
 
     /**
@@ -126,14 +128,15 @@ public class TermBuilder {
      *            the String to parse
      * @param namespaces
      *            the namespaces used for name lookup.
+     * @param localSpecRepo TODO
      * @throws de.uka.ilkd.key.parser.ParserException
      */
-    public Term parseTerm(String s, NamespaceSet namespaces)
+    public Term parseTerm(String s, NamespaceSet namespaces, GoalLocalSpecificationRepository localSpecRepo)
             throws ParserException {
         AbbrevMap abbr = (services.getProof() == null) ? null
                 : services.getProof().abbreviations();
         Term term = new DefaultTermParser().parse(new StringReader(s), null,
-                services, namespaces, abbr);
+                localSpecRepo, services, namespaces, abbr);
         return term;
     }
 

@@ -205,7 +205,7 @@ public class HTMLSyntaxHighlighter {
                     && displayedNode.sequent().size() < NUM_FORMULAE_IN_SEQ_THRESHOLD) {
                 programVariables = MergeRuleUtils
                         .getLocationVariablesHashSet(displayedNode.sequent(),
-                                                     initConfig.getServices());
+                                                     localSpecRepo, initConfig.getServices());
             } else {
                 programVariables = new HashSet<ProgramVariable>();
             }

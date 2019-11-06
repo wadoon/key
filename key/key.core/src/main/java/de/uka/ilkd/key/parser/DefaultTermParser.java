@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.RuleSet;
 import org.antlr.runtime.RecognitionException;
 
@@ -46,6 +47,7 @@ public final class DefaultTermParser {
      * invalid sort. */    
     public Term parse(Reader in, 
 	    	      Sort sort, 
+	    	      GoalLocalSpecificationRepository localSpecRepo,
 	    	      Services services,
                       Namespace<QuantifiableVariable> var_ns,
                       Namespace<Function> func_ns,
@@ -54,7 +56,8 @@ public final class DefaultTermParser {
                       AbbrevMap scm)
         throws ParserException
     {
-	return parse(in , sort, services,
+	return parse(in , sort, localSpecRepo,
+		     services,
 		     new NamespaceSet(var_ns,
 				      func_ns, 
 				      sort_ns, 
@@ -75,6 +78,7 @@ public final class DefaultTermParser {
      * invalid sort. */    
     public Term parse(Reader in, 
 	    	      Sort sort, 
+	    	      GoalLocalSpecificationRepository localSpecRepo,
 	    	      Services services,
                       NamespaceSet nss, 
                       AbbrevMap scm)
@@ -85,9 +89,9 @@ public final class DefaultTermParser {
             parser
                 = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""),
 				new Recoder2KeY (services, nss),
+                                localSpecRepo, 
                                 services, 
-                                nss, 
-                                scm);
+                                nss, scm);
 
             final Term result = parser.termEOF();
             if (sort != null &&  ! result.sort().extendsTrans(sort))
@@ -109,11 +113,11 @@ public final class DefaultTermParser {
      * @throws ParserException The method throws a ParserException, if
      * the input could not be parsed correctly
      */
-    public Sequent parseSeq(Reader in, Services services, NamespaceSet nss, AbbrevMap scm) 
+    public Sequent parseSeq(Reader in, GoalLocalSpecificationRepository localSpecRepo, Services services, NamespaceSet nss, AbbrevMap scm) 
             throws ParserException {
         KeYParserF p = null;
         try {
-            p = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""), new Recoder2KeY(services, nss), services, nss, scm);
+            p = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""), new Recoder2KeY(services, nss), localSpecRepo, services, nss, scm);
             final Sequent seq = p.seqEOF();
                 return seq;
         } catch (RecognitionException re) {

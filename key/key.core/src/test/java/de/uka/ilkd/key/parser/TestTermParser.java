@@ -13,6 +13,11 @@
 
 package de.uka.ilkd.key.parser;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.antlr.runtime.RecognitionException;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -32,8 +37,8 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.TacletForTests;
-import static org.junit.Assert.*;
 
 public class TestTermParser extends AbstractTestTermParser {
 
@@ -135,9 +140,9 @@ public class TestTermParser extends AbstractTestTermParser {
     protected KeYParserF getParser(String s) {
         return new KeYParserF(ParserMode.TERM,getLexer(s),
                 r2k,
+                GoalLocalSpecificationRepository.DUMMY_REPO,
                 services,
-                nss,
-                new AbbrevMap());
+                nss, new AbbrevMap());
     }
 
     @Test

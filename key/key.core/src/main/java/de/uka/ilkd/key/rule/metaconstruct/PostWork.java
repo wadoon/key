@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -58,8 +59,8 @@ public class PostWork extends ProgramTransformer {
      * @return the transformated program
      */
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement[] transform(ProgramElement pe, GoalLocalSpecificationRepository localSpecRepo,
+            Services services, SVInstantiations svInst) {
         final ProgramVariable newObject = schema
                 ? (ProgramVariable) svInst
                         .getInstantiation((SchemaVariable) body())

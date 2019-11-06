@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
@@ -179,6 +180,11 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         final Services services = postInit();
         final TermBuilder tb = services.getTermBuilder();
         final IProgramMethod pm = getProgramMethod();
+        /*
+         * TODO (DS, 2019-11-06): Check whether this initial repository contains the
+         * right contract, or whether we need a special Goal.
+         */
+        final GoalLocalSpecificationRepository initialLocalSpecRepo = proofConfig.getInitialLocalSpecRepo();
 
         contract.replaceEnhancedForVariables(services);
 
@@ -204,7 +210,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         final Term wellFormedHeapsCondition
                 = conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
         final Term[] assumptions = createAssumptions(selfVar, heaps, wellFormedHeapsCondition,
-                services, conditionsAndClausesBuilder);
+                initialLocalSpecRepo, services, conditionsAndClausesBuilder);
         final Map<LocationVariable, Term> modifiesClauses
                 = conditionsAndClausesBuilder.buildModifiesClauses();
         final Term[] postconditionsNext = createPostconditionsNext(selfTerm, heaps, nextVariables,
@@ -214,11 +220,11 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         final Term decreasesCheck = conditionsAndClausesBuilder.buildDecreasesCheck();
 
         final GoalsConfigurator configurator
-                = createGoalConfigurator(selfVar, selfTerm, variables, services, tb);
+                = createGoalConfigurator(selfVar, selfTerm, variables, initialLocalSpecRepo, services, tb);
 
         Term validity = setUpValidityGoal(selfTerm, heaps, anonOutHeaps, variables, nextVariables,
                 modifiesClauses, assumptions, decreasesCheck, postconditions, postconditionsNext,
-                wellFormedHeapsCondition, configurator, conditionsAndClausesBuilder, services, tb);
+                wellFormedHeapsCondition, configurator, conditionsAndClausesBuilder, initialLocalSpecRepo, services, tb);
 
         assignPOTerms(validity);
         collectClassAxioms(getCalleeKeYJavaType(), proofConfig);
@@ -315,6 +321,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      *            the heaps.
      * @param wellFormedHeapsCondition
      *            the condition that all heaps are well-formed.
+     * @param localSpecRepo TODO
      * @param services
      *            services.
      * @param conditionsAndClausesBuilder
@@ -323,12 +330,12 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      */
     private Term[] createAssumptions(final ProgramVariable selfVar,
             final List<LocationVariable> heaps, final Term wellFormedHeapsCondition,
-            final Services services,
-            final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
+            GoalLocalSpecificationRepository localSpecRepo,
+            final Services services, final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final IProgramMethod pm = getProgramMethod();
         final StatementBlock block = getBlock();
         final ImmutableSet<ProgramVariable> localInVariables
-                = MiscTools.getLocalIns(block, services);
+                = MiscTools.getLocalIns(block, localSpecRepo, services);
         final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
         final Term reachableInCondition
                 = conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
@@ -399,6 +406,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      *            the self term.
      * @param variables
      *            the contract's variables.
+     * @param localSpecRepo TODO
      * @param services
      *            services.
      * @param tb
@@ -406,8 +414,8 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @return a goal configurator.
      */
     private GoalsConfigurator createGoalConfigurator(final ProgramVariable selfVar,
-            final Term selfTerm, final BlockContract.Variables variables, final Services services,
-            final TermBuilder tb) {
+            final Term selfTerm, final BlockContract.Variables variables, GoalLocalSpecificationRepository localSpecRepo,
+            final Services services, final TermBuilder tb) {
         final TermLabelState termLabelState = new TermLabelState();
         final KeYJavaType kjt = getCalleeKeYJavaType();
         final TypeRef ref = new TypeRef(new ProgramElementName(kjt.getName()), 0, selfVar, kjt);
@@ -417,7 +425,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
                 selfTerm, getBlock(), ec);
 
         return new GoalsConfigurator(null, termLabelState, inst,
-                contract.getAuxiliaryContract().getLabels(), variables, null, services, null);
+                contract.getAuxiliaryContract().getLabels(), variables, null, localSpecRepo, services, null);
     }
 
     /**
@@ -448,6 +456,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      *            a goal configurator.
      * @param conditionsAndClausesBuilder
      *            a conditions and clauses builder.
+     * @param localSpecRepo TODO
      * @param services
      *            services.
      * @param tb
@@ -460,17 +469,17 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             final Map<LocationVariable, Term> modifiesClauses, final Term[] assumptions,
             final Term decreasesCheck, final Term[] postconditions, final Term[] postconditionsNext,
             final Term wellFormedHeapsCondition, final GoalsConfigurator configurator,
-            final ConditionsAndClausesBuilder conditionsAndClausesBuilder, final Services services,
-            final TermBuilder tb) {
+            final ConditionsAndClausesBuilder conditionsAndClausesBuilder, GoalLocalSpecificationRepository localSpecRepo,
+            final Services services, final TermBuilder tb) {
         final ProgramVariable exceptionParameter = KeYJavaASTFactory.localVariable(
                 services.getVariableNamer().getTemporaryNameProposal("e"),
                 variables.exception.getKeYJavaType());
 
-        final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
+        final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, localSpecRepo, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term outerRemembranceUpdate = updatesBuilder.buildOuterRemembranceUpdate();
         final Term nextRemembranceUpdate
-                = new UpdatesBuilder(nextVariables, services).buildRemembranceUpdate(heaps);
+                = new UpdatesBuilder(nextVariables, localSpecRepo, services).buildRemembranceUpdate(heaps);
 
         Map<LocationVariable, Function> anonInHeaps = createAnonInHeaps(heaps, services, tb);
 

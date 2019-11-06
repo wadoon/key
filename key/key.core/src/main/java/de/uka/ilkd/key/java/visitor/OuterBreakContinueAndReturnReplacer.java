@@ -59,6 +59,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
@@ -83,8 +84,8 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             final Map<Label, ProgramVariable> breakFlags,
             final Map<Label, ProgramVariable> continueFlags, final ProgramVariable returnFlag,
             final ProgramVariable returnValue, final ProgramVariable exception,
-            final Services services) {
-        super(block, services);
+            GoalLocalSpecificationRepository localSpecRepo, final Services services) {
+        super(block, localSpecRepo, services);
         for (Label label : alwaysInnerLabels) {
             this.labels.add(label);
         }
@@ -237,7 +238,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             Expression guard = ((Guard) changeList.removeFirst()).getExpression();
             Statement body = (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
             While newLoop = new While(guard, body, x.getPositionInfo());
-            services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+            localSpecRepo.copyLoopInvariant(x, newLoop);
             addChild(newLoop);
             changed();
         } else {
@@ -251,7 +252,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 For newLoop = new For(changeList);
-                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                localSpecRepo.copyLoopInvariant(x, newLoop);
                 return newLoop;
             }
         };
@@ -264,7 +265,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             @Override
             ProgramElement createNewElement(final ExtList changeList) {
                 EnhancedFor newLoop = new EnhancedFor(changeList);
-                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                localSpecRepo.copyLoopInvariant(x, newLoop);
                 return newLoop;
             }
         };
@@ -280,7 +281,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             Guard g = changeList.removeFirstOccurrence(Guard.class);
             Expression guard = g == null ? null : g.getExpression();
             Do newLoop = new Do(guard, body, x.getPositionInfo());
-            services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+            localSpecRepo.copyLoopInvariant(x, newLoop);
             addChild(newLoop);
             changed();
         } else {

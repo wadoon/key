@@ -128,7 +128,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         	
             ParserConfig pc = new ParserConfig
                 (initConfig.getServices(), 
-                 initConfig.namespaces());
+                 initConfig.namespaces(), initConfig.getInitialLocalSpecRepo());
             problemParser = new KeYParserF
                 (ParserMode.PROBLEM, new KeYLexerF(getNewStream(), file.toString()),
                         pc, pc, null, null);
@@ -181,9 +181,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             KeYLexerF lexer = new KeYLexerF(cinp, file.toString());
 
             final ParserConfig normalConfig 
-                = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
+                = new ParserConfig(initConfig.getServices(), initConfig.namespaces(), initConfig.getInitialLocalSpecRepo());
             final ParserConfig schemaConfig 
-                = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
+                = new ParserConfig(initConfig.getServices(), initConfig.namespaces(), initConfig.getInitialLocalSpecRepo());
             
             problemParser = new KeYParserF(ParserMode.PROBLEM,
                                     lexer,

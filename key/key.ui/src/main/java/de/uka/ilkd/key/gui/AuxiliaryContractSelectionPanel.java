@@ -21,6 +21,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContractImpl;
@@ -33,8 +34,8 @@ import de.uka.ilkd.key.speclang.LoopContractImpl;
  * @param <T>
  * 
  * @see AuxiliaryContractConfigurator
- * @see BlockContractImpl#combine(org.key_project.util.collection.ImmutableSet, Services)
- * @see LoopContractImpl#combine(org.key_project.util.collection.ImmutableSet, Services)
+ * @see BlockContractImpl#combine(org.key_project.util.collection.ImmutableSet, GoalLocalSpecificationRepository, Services)
+ * @see LoopContractImpl#combine(org.key_project.util.collection.ImmutableSet, GoalLocalSpecificationRepository, Services)
  */
 public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContract>
         extends JPanel {
@@ -42,13 +43,15 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
     private static final long serialVersionUID = 129743953718747490L;
     
     protected final Services services;
+    private final GoalLocalSpecificationRepository localSpecRepo;
     protected final JList<T> contractList;
     private final TitledBorder border;
 
     public AuxiliaryContractSelectionPanel(
-            final Services services, final boolean multipleSelection) {
+            GoalLocalSpecificationRepository localSpecRepo, final Services services, final boolean multipleSelection) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.services = services;
+        this.localSpecRepo = localSpecRepo;
 
         //create scroll pane
         JScrollPane scrollPane = new JScrollPane();
@@ -141,8 +144,8 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
 
     public T getContract() {
         final List<T> selection = contractList.getSelectedValuesList();
-        return computeContract(services, selection);
+        return computeContract(localSpecRepo, services, selection);
     }
 
-    public abstract T computeContract(Services services2, List<T> selection);
+    public abstract T computeContract(GoalLocalSpecificationRepository localSpecRepo, Services services2, List<T> selection);
 }

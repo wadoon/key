@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -42,7 +43,7 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
  *  meta construct appears in a positive context wrt. to logical negation, (e.g. in the succedent or negated in the antecedent)
  *  False implies means that the meta construct appears in a negative context. (e.g. in the antecedent or negated in the succedent)
  */
-   public Term transform(Term term, SVInstantiations svInst, Services services) {
+   public Term transform(Term term, SVInstantiations svInst, GoalLocalSpecificationRepository localSpecRepo, Services services) {
     	Term arg1 = term.sub(0);
     	Term arg2 = term.sub(1); //true or false. If true, than the application of the meta construct
     	boolean positiveContext;

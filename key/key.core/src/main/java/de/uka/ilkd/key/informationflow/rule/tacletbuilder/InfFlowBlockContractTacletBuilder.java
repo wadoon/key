@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -34,10 +35,12 @@ public final class InfFlowBlockContractTacletBuilder
 
     private BlockContract blockContract;
     private ExecutionContext executionContext;
+    private final GoalLocalSpecificationRepository localSpecRepo;
 
 
-    public InfFlowBlockContractTacletBuilder(final Services services) {
+    public InfFlowBlockContractTacletBuilder(GoalLocalSpecificationRepository localSpecRepo, final Services services) {
         super(services);
+        this.localSpecRepo = localSpecRepo;
     }
 
 
@@ -61,7 +64,7 @@ public final class InfFlowBlockContractTacletBuilder
                                Services services) {
         BasicPOSnippetFactory fAssumes =
                 POSnippetFactory.getBasicFactory(blockContract, schemaDataAssumes,
-                                                 executionContext, services);
+                                                 executionContext, localSpecRepo, services);
         return fAssumes.create(BasicPOSnippetFactory.Snippet.BLOCK_CALL_RELATION);
     }
 
@@ -71,7 +74,7 @@ public final class InfFlowBlockContractTacletBuilder
                             Services services) {
         BasicPOSnippetFactory fFind =
                 POSnippetFactory.getBasicFactory(blockContract, schemaDataFind,
-                                                 executionContext, services);
+                                                 executionContext, localSpecRepo, services);
         return fFind.create(BasicPOSnippetFactory.Snippet.BLOCK_CALL_RELATION);
     }
 
@@ -80,7 +83,7 @@ public final class InfFlowBlockContractTacletBuilder
     Term getContractApplPred(ProofObligationVars appData) {
         BasicPOSnippetFactory f =
                 POSnippetFactory.getBasicFactory(blockContract, appData,
-                                                 executionContext, services);
+                                                 executionContext, localSpecRepo, services);
         return f.create(BasicPOSnippetFactory.Snippet.BLOCK_CALL_RELATION);
     }
 
@@ -90,7 +93,7 @@ public final class InfFlowBlockContractTacletBuilder
                                    ProofObligationVars contAppData2,
                                    Services services) {
         ImmutableSet<BlockContract> ifContracts =
-                services.getSpecificationRepository().getBlockContracts(blockContract.getBlock());
+                localSpecRepo.getBlockContracts(blockContract.getBlock());
         ifContracts = filterContracts(ifContracts);
         ImmutableList<Term> contractsApplications = ImmutableSLList.<Term>nil();
         for (BlockContract cont : ifContracts) {
@@ -98,7 +101,7 @@ public final class InfFlowBlockContractTacletBuilder
                     POSnippetFactory.getInfFlowFactory(cont, contAppData,
                                                        contAppData2,
                                                        executionContext,
-                                                       services);
+                                                       localSpecRepo, services);
             contractsApplications =
                     contractsApplications.append(
                     f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL));
