@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -31,9 +32,11 @@ public final class InfFlowLoopInvariantTacletBuilder
     private LoopSpecification loopinvariant;    
     private ExecutionContext executionContext;
     private Term guard;
+    private final GoalLocalSpecificationRepository localSpecRepo;
 
-    public InfFlowLoopInvariantTacletBuilder(final Services services) {
+    public InfFlowLoopInvariantTacletBuilder(GoalLocalSpecificationRepository localSpecRepo, final Services services) {
         super(services);
+        this.localSpecRepo = localSpecRepo;
     }
     
     public void setInvariant(LoopSpecification invariant) {
@@ -64,7 +67,7 @@ public final class InfFlowLoopInvariantTacletBuilder
                                                  schemaDataAssumes,
                                                  executionContext,
                                                  guard,
-                                                 services);
+                                                 localSpecRepo, services);
         return fAssumes.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
     }
 
@@ -76,7 +79,7 @@ public final class InfFlowLoopInvariantTacletBuilder
                                                  schemaDataFind,
                                                  executionContext,
                                                  guard,
-                                                 services);
+                                                 localSpecRepo, services);
         return fFind.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
     }
 
@@ -87,7 +90,7 @@ public final class InfFlowLoopInvariantTacletBuilder
                                                  appData,
                                                  executionContext,
                                                  guard,
-                                                 services);
+                                                 localSpecRepo, services);
         return f.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
     }
 
@@ -97,13 +100,13 @@ public final class InfFlowLoopInvariantTacletBuilder
                                    ProofObligationVars contAppData2,
                                    Services services) {
         LoopSpecification ifContract =
-                services.getSpecificationRepository().getLoopSpec(loopinvariant.getLoop());
+                localSpecRepo.getLoopSpec(loopinvariant.getLoop());
 
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(ifContract, contAppData,
                                                    contAppData2,
                                                    executionContext,
-                                                   guard, services);
+                                                   guard, localSpecRepo, services);
         Term contractApplication =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_LOOP_INVARIANT_APPL);
 

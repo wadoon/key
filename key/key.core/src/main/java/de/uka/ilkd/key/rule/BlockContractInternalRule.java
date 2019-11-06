@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
@@ -153,6 +154,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
      *            the variables.
      * @param modifiesClauses
      *            the modified clauses.
+     * @param localSpecRepo TODO
      * @param services
      *            services.
      * @return the updates.
@@ -161,8 +163,8 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
             final List<LocationVariable> heaps,
             final Map<LocationVariable, Function> anonymisationHeaps,
             final BlockContract.Variables variables,
-            final Map<LocationVariable, Term> modifiesClauses, final Services services) {
-        final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
+            final Map<LocationVariable, Term> modifiesClauses, GoalLocalSpecificationRepository localSpecRepo, final Services services) {
+        final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, localSpecRepo, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate
                 = updatesBuilder.buildAnonOutUpdate(anonymisationHeaps, modifiesClauses);
@@ -261,9 +263,9 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
 
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables
-                = MiscTools.getLocalIns(instantiation.statement, services);
+                = MiscTools.getLocalIns(instantiation.statement, goal.getLocalSpecificationRepository(), services);
         final ImmutableSet<ProgramVariable> localOutVariables
-                = MiscTools.getLocalOuts(instantiation.statement, services);
+                = MiscTools.getLocalOuts(instantiation.statement, goal.getLocalSpecificationRepository(), services);
         final Map<LocationVariable, Function> anonymisationHeaps
                 = createAndRegisterAnonymisationVariables(heaps, contract, services);
         final BlockContract.Variables variables
@@ -282,11 +284,11 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
         final Term[] assumptions = createAssumptions(localOutVariables, anonymisationHeaps,
                 conditionsAndClausesBuilder);
         final Term[] updates = createUpdates(instantiation.update, heaps, anonymisationHeaps,
-                variables, modifiesClauses, services);
+                variables, modifiesClauses, goal.getLocalSpecificationRepository(), services);
 
         final GoalsConfigurator configurator = new GoalsConfigurator(application,
                 new TermLabelState(), instantiation, contract.getLabels(), variables,
-                application.posInOccurrence(), services, this);
+                application.posInOccurrence(), goal.getLocalSpecificationRepository(), services, this);
         final ImmutableList<Goal> result
                 = splitIntoGoals(goal, contract, heaps, localInVariables, anonymisationHeaps,
                         updates[0], updates[1], localOutVariables, configurator, services);

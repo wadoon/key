@@ -340,9 +340,9 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
 
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables
-                = MiscTools.getLocalIns(instantiation.statement, services);
+                = MiscTools.getLocalIns(instantiation.statement, goal.getLocalSpecificationRepository(), services);
         final ImmutableSet<ProgramVariable> localOutVariables
-                = MiscTools.getLocalOuts(instantiation.statement, services);
+                = MiscTools.getLocalOuts(instantiation.statement, goal.getLocalSpecificationRepository(), services);
         final Map<LocationVariable, Function> anonOutHeaps
                 = createAndRegisterAnonymisationVariables(heaps, contract, services);
         final LoopContract.Variables[] vars
@@ -362,15 +362,15 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         final Term decreasesCheck = conditionsAndClausesBuilder.buildDecreasesCheck();
         final Term[] postconditionsNext = createPostconditionsNext(instantiation.self, contract,
                 heaps, vars[1], modifiesClauses, services);
-        final UpdatesBuilder updatesBuilder = new UpdatesBuilder(vars[0], services);
+        final UpdatesBuilder updatesBuilder = new UpdatesBuilder(vars[0], goal.getLocalSpecificationRepository(), services);
         final Term[] updates = createUpdates(instantiation, heaps, anonOutHeaps, modifiesClauses,
                 updatesBuilder);
         final Term nextRemembranceUpdate
-                = new UpdatesBuilder(vars[1], services).buildRemembranceUpdate(heaps);
+                = new UpdatesBuilder(vars[1], goal.getLocalSpecificationRepository(), services).buildRemembranceUpdate(heaps);
         final Term context = createContext(heaps, updatesBuilder, instantiation, services);
         final GoalsConfigurator configurator = new GoalsConfigurator(application,
                 new TermLabelState(), instantiation, contract.getLabels(), vars[0],
-                application.posInOccurrence(), services, this);
+                application.posInOccurrence(), goal.getLocalSpecificationRepository(), services, this);
         final ImmutableList<Goal> result = goal.split(3);
         setUpGoals(goal, result, contract, instantiation, anonOutHeaps, vars, modifiesClauses,
                 assumptions, usageAssumptions, decreasesCheck, postconditions, postconditionsNext,

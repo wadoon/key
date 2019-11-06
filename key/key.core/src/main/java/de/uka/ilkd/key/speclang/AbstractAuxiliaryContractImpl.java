@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -1138,6 +1139,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private final Map<LocationVariable, Boolean> hasMod;
 
+        private final GoalLocalSpecificationRepository localSpecRepo;
         /**
          *
          * @param baseName
@@ -1191,7 +1193,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 final Map<Label, Term> continues, final Term returns, final Term signals,
                 final Term signalsOnly, final Term diverges,
                 final Map<LocationVariable, Term> assignables,
-                final Map<LocationVariable, Boolean> hasMod, final Services services) {
+                final Map<LocationVariable, Boolean> hasMod, GoalLocalSpecificationRepository localSpecRepo, final Services services) {
             super(services.getTermFactory(), services);
             this.baseName = baseName;
             this.block = block;
@@ -1212,6 +1214,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             this.assignables = assignables;
             this.heaps = services.getTypeConverter().getHeapLDT().getAllHeaps();
             this.hasMod = hasMod;
+            this.localSpecRepo = localSpecRepo;
         }
 
         /**
@@ -1518,12 +1521,12 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             result = result.add(build(baseName, block, labels, method,
                     diverges.equals(ff()) ? Modality.DIA : Modality.BOX, preconditions, measuredBy,
                     postconditions, modifiesClauses, infFlowSpecs, variables, transactionApplicable,
-                    hasMod));
+                    hasMod, localSpecRepo));
             if (divergesConditionCannotBeExpressedByAModality()) {
                 result = result.add(build(baseName, block, labels, method, Modality.DIA,
                         addNegatedDivergesConditionToPreconditions(preconditions), measuredBy,
                         postconditions, modifiesClauses, infFlowSpecs, variables,
-                        transactionApplicable, hasMod));
+                        transactionApplicable, hasMod, localSpecRepo));
             }
             return result;
         }
@@ -1563,7 +1566,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 Term measuredBy, Map<LocationVariable, Term> postconditions,
                 Map<LocationVariable, Term> modifiesClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
-                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod);
+                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod, GoalLocalSpecificationRepository localSpecRepo);
 
         /**
          *
@@ -1631,6 +1634,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @see AuxiliaryContract#getModifiesClause(LocationVariable, Services)
          */
         protected final Map<LocationVariable, Term> modifiesClauses;
+        
+        protected final GoalLocalSpecificationRepository localSpecRepo;
 
         /**
          *
@@ -1639,12 +1644,13 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param services
          *            services.
          */
-        public Combinator(final T[] contracts, final Services services) {
+        public Combinator(final T[] contracts, GoalLocalSpecificationRepository localSpecRepo, final Services services) {
             super(services.getTermFactory(), services);
             this.contracts = sort(contracts);
             preconditions = new LinkedHashMap<LocationVariable, Term>();
             postconditions = new LinkedHashMap<LocationVariable, Term>();
             modifiesClauses = new LinkedHashMap<LocationVariable, Term>();
+            this.localSpecRepo = localSpecRepo;
         }
 
         /**

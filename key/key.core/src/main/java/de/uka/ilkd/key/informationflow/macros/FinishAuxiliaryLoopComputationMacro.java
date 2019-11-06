@@ -60,7 +60,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
 
         final LoopInvariantBuiltInRuleApp loopInvRuleApp =
                 (LoopInvariantBuiltInRuleApp) initiatingGoal.node().parent().getAppliedRuleApp();
-        LoopSpecification loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
+        LoopSpecification loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(initiatingGoal.getLocalSpecificationRepository());
         loopInv = loopInv != null ? loopInv : loopInvRuleApp.getSpec();
         IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
         ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
@@ -70,7 +70,7 @@ public class FinishAuxiliaryLoopComputationMacro extends
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final LoopInfFlowUnfoldTacletBuilder tacletBuilder =
-                new LoopInfFlowUnfoldTacletBuilder(services);
+                new LoopInfFlowUnfoldTacletBuilder(initiatingGoal.getLocalSpecificationRepository(), services);
         tacletBuilder.setLoopInv(loopInv);
         tacletBuilder.setExecutionContext(loopInvRuleApp.getExecutionContext());
         tacletBuilder.setInfFlowVars(ifVars);

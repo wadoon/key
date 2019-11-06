@@ -66,7 +66,7 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro imp
         final InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(po.getContract(),
                                                    po.getIFVars().c1,
-                                                   po.getIFVars().c2, services);
+                                                   po.getIFVars().c2, goals.head().getLocalSpecificationRepository(), services);
         final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
 

@@ -24,6 +24,7 @@ import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 /**
  * Responsible for estimating decision predicates for a join.
@@ -83,7 +84,9 @@ class StdPredicateEstimator implements PredicateEstimator {
                 branchLabel = branchLabel.substring(CUT_LABEL.length());
             }
 
-            final Term term = translate(branchLabel, proof.getServices());
+            final Term term = translate(branchLabel,
+                    proof.getSubtreeGoals(node).head().getLocalSpecificationRepository(),
+                    proof.getServices());
 
             if (term != null) {
                 return new Result() {
@@ -173,15 +176,16 @@ class StdPredicateEstimator implements PredicateEstimator {
      *
      * @param estimation
      *            The branch label without prefix.
+     * @param localSpecRepo TODO
      * @param services
      *            The services object.
      * @return A term corresponding to the branch label.
      */
-    private Term translate(String estimation, Services services) {
+    private Term translate(String estimation, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         try {
             KeYParserF parser = new KeYParserF(ParserMode.TERM, new KeYLexerF(
-                    estimation, ""), services, // should not be needed
-                    services.getNamespaces());
+                    estimation, ""), localSpecRepo, // should not be needed
+                    services, services.getNamespaces());
             return parser.term();
         }
         catch (Throwable e) {

@@ -1,26 +1,32 @@
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.util.HelperClassForTests;
-import org.antlr.runtime.RecognitionException;
-import org.key_project.util.collection.ImmutableSLList;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import static org.junit.Assert.assertEquals;
+import org.antlr.runtime.RecognitionException;
+import org.key_project.util.collection.ImmutableSLList;
+
+import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 /**
  * Class providing methods for parser tests.
@@ -33,12 +39,14 @@ public class AbstractTestTermParser {
     protected final TermBuilder tb;
     protected final NamespaceSet nss;
     protected final Services services;
+    private final GoalLocalSpecificationRepository localSpecRepo;
 
     AbstractTestTermParser() {
         services = getServices();
         tb = services.getTermBuilder();
         tf = tb.tf();
         nss = services.getNamespaces();
+        localSpecRepo = GoalLocalSpecificationRepository.DUMMY_REPO;
     }
 
     Sort lookup_sort(String name) {
@@ -61,7 +69,7 @@ public class AbstractTestTermParser {
         return new KeYParserF(ParserMode.DECLARATION,
                 new KeYLexerF(s,
                         "No file. Call of parser from " + this.getClass().getSimpleName()),
-                services, nss);
+                localSpecRepo, services, nss);
     }
 
     public void parseDecls(String s) throws RecognitionException {
@@ -77,8 +85,8 @@ public class AbstractTestTermParser {
                     "No file. Call of parser from " + this.getClass().getSimpleName());
             return new KeYParserF(ParserMode.PROBLEM,
                     lexer,
-                    new ParserConfig(services, nss),
-                    new ParserConfig(services, nss),
+                    new ParserConfig(services, nss, localSpecRepo),
+                    new ParserConfig(services, nss, localSpecRepo),
                     null,
                     ImmutableSLList.<Taclet>nil()).problem();
         } catch (Exception e) {
@@ -95,7 +103,7 @@ public class AbstractTestTermParser {
     }
 
     protected KeYParserF getParser(String s) {
-        return new KeYParserF(ParserMode.TERM, getLexer(s), services, nss);
+        return new KeYParserF(ParserMode.TERM, getLexer(s), localSpecRepo, services, nss);
     }
 
     public Term parseTerm(String s) throws Exception {

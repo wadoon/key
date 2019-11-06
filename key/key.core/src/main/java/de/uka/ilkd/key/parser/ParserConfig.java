@@ -19,19 +19,25 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 public class ParserConfig {
 
     private Services services;
+    private final GoalLocalSpecificationRepository localSpecRepo;
     private NamespaceSet nss;
 
     
     public ParserConfig(Services services, 
-			NamespaceSet nss) {
+			NamespaceSet nss, GoalLocalSpecificationRepository localSpecRepo) {
 	this.services = services;
 	this.nss      = nss;
+	this.localSpecRepo = localSpecRepo;
     }
 
+    public GoalLocalSpecificationRepository getGoalLocalSpecificationRepository() {
+        return localSpecRepo;
+    }
 
     public Services services() {
 	return services;

@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 /**
  * <p>
@@ -65,8 +66,9 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
     * @param root The {@link ProgramElement} to collect undeclared variables in.
     * @param services The {@link Services} to use.
     */
-   public UndeclaredProgramVariableCollector(ProgramElement root, Services services) {
-      super(root, services);
+    public UndeclaredProgramVariableCollector(ProgramElement root,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        super(root, localSpecRepo, services);
    }
 
    /**

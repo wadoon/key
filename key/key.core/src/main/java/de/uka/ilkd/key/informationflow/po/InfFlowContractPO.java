@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -82,7 +83,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO
         // create proof obligation
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
-                                                   ifVars.c2, proofServices);
+                                                   ifVars.c2, proofConfig.getInitialLocalSpecRepo(), proofServices);
         final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
         final Term post =
@@ -266,7 +267,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO
                                         ImmutableList<LocationVariable> formalParVars,
                                         ProgramVariable selfVar,
                                         ProgramVariable resultVar,
-                                        Services services) {
+                                        GoalLocalSpecificationRepository localSpecRepo, Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
                  "Please use the POSnippetFactory instead.");
     }

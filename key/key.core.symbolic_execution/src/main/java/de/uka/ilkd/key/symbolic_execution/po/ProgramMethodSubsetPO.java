@@ -45,6 +45,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 /**
  * <p>
@@ -158,7 +159,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
    @Override
    protected ImmutableList<StatementBlock> buildOperationBlocks(ImmutableList<LocationVariable> formalParVars,
                                                 ProgramVariable selfVar,
-                                                ProgramVariable resultVar, Services services) {
+                                                ProgramVariable resultVar, GoalLocalSpecificationRepository localSpecRepo, Services services) {
       // Get program method to execute
       KeYJavaType type = getCalleeKeYJavaType();
       IProgramMethod pm = getProgramMethod();
@@ -172,7 +173,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
                                        blockToExecute);
       StatementBlock result = new StatementBlock(mf);
       // Collect undeclared variables
-      undeclaredVariableCollector = new UndeclaredProgramVariableCollector(result, services);
+      undeclaredVariableCollector = new UndeclaredProgramVariableCollector(result, localSpecRepo, services);
       undeclaredVariableCollector.start();
       // Register undeclared variables
       Set<LocationVariable> undeclaredVariables = undeclaredVariableCollector.result();

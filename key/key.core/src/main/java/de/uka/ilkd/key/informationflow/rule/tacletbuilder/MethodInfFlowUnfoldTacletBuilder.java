@@ -6,6 +6,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -17,10 +18,12 @@ import de.uka.ilkd.key.util.MiscTools;
 public class MethodInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletBuilder {
 
     private InformationFlowContract contract;
+    private final GoalLocalSpecificationRepository localSpecRepo;
 
 
-    public MethodInfFlowUnfoldTacletBuilder(Services services) {
+    public MethodInfFlowUnfoldTacletBuilder(GoalLocalSpecificationRepository localSpecRepo, Services services) {
         super(services);
+        this.localSpecRepo = localSpecRepo;
     }
 
 
@@ -41,7 +44,7 @@ public class MethodInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacle
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract,
                                                    ifVars.c1, ifVars.c2,
-                                                   services);
+                                                   localSpecRepo, services);
         return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
     }
 }

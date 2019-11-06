@@ -64,7 +64,7 @@ public class FinishAuxiliaryMethodComputationMacro
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final MethodInfFlowUnfoldTacletBuilder tacletBuilder =
-                new MethodInfFlowUnfoldTacletBuilder(services);
+                new MethodInfFlowUnfoldTacletBuilder(initiatingGoal.getLocalSpecificationRepository(), services);
         tacletBuilder.setContract(ifContract);
         tacletBuilder.setInfFlowVars(ifVars);
         tacletBuilder.setReplacewith(result);

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
@@ -41,14 +42,15 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
      *
      * @param root
      *            the ProgramElement where to begin
+     * @param localSpecRepo TODO
      * @param services
      *            The Services object.
      * @param svi
      *            Schema Variable Instantiations
      */
-    public ProgramReplaceVisitor(ProgramElement root, Services services,
-            SVInstantiations svi) {
-        super(root, false, services);
+    public ProgramReplaceVisitor(ProgramElement root, GoalLocalSpecificationRepository localSpecRepo,
+            Services services, SVInstantiations svi) {
+        super(root, false, localSpecRepo, services);
         svinsts = svi;
     }
 
@@ -134,7 +136,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
         assert body != null : "A program transformer without program to transform?";
 
         final ProgramElement[] transformResult = //
-                x.transform(body, services, svinsts);
+                x.transform(body, localSpecRepo, services, svinsts);
         if (transformResult == null) {
             /*
              * NOTE (DS, 2018-10-19): This is awkward... But there are

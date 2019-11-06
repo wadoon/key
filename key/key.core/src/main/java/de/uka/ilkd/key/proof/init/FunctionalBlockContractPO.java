@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
@@ -205,14 +206,15 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      *            the heaps.
      * @param anonHeaps
      *            the anonymization heaps.
+     * @param localSpecRepo TODO
      * @param services
      *            services.
      * @return the updates.
      */
     private static Term[] createUpdates(final BlockContract.Variables variables,
             final List<LocationVariable> heaps, Map<LocationVariable, Function> anonHeaps,
-            final Services services) {
-        final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
+            GoalLocalSpecificationRepository localSpecRepo, final Services services) {
+        final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, localSpecRepo, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term outerRemembranceUpdate = updatesBuilder.buildOuterRemembranceUpdate();
         final Term anonInUpdate = updatesBuilder.buildAnonInUpdate(anonHeaps);
@@ -390,6 +392,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         assert proofConfig == null;
         final boolean makeNamesUnique = true;
         final Services services = postInit();
+        final GoalLocalSpecificationRepository localSpecRepo = proofConfig.getInitialLocalSpecRepo();
         final IProgramMethod pm = getProgramMethod();
 
         final StatementBlock block = getBlock();
@@ -399,7 +402,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
         LoopContract innerLoopContract = contract.getAuxiliaryContract().toLoopContract();
         if (innerLoopContract != null) {
-            services.getSpecificationRepository().addLoopContract(
+            localSpecRepo.addLoopContract(
                     innerLoopContract.replaceEnhancedForVariables(
                             innerLoopContract.getBlock(), services),
                     false);
@@ -407,9 +410,9 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
         final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
         final ImmutableSet<ProgramVariable> localInVariables
-                = MiscTools.getLocalIns(block, services);
+                = MiscTools.getLocalIns(block, localSpecRepo, services);
         final ImmutableSet<ProgramVariable> localOutVariables
-                = MiscTools.getLocalOuts(block, services);
+                = MiscTools.getLocalOuts(block, localSpecRepo, services);
 
         Map<LocationVariable, Function> anonOutHeaps
                 = createAnonOutHeaps(heaps, contract, services, tb);
@@ -431,10 +434,10 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
         Map<LocationVariable, Function> anonHeaps = createAnonInHeaps(heaps, services, tb);
 
-        final Term[] updates = createUpdates(variables, heaps, anonHeaps, services);
+        final Term[] updates = createUpdates(variables, heaps, anonHeaps, localSpecRepo, services);
 
         final GoalsConfigurator configurator
-                = setUpGoalConfigurator(block, selfVar, selfTerm, variables, services, tb);
+                = setUpGoalConfigurator(block, selfVar, selfTerm, variables, localSpecRepo, services, tb);
 
         final Term validity = setUpValidityTerm(heaps, anonHeaps, anonOutHeaps, localInVariables,
                 localOutVariables, exceptionParameter, assumptions, postconditions, updates,
@@ -511,6 +514,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      *            the self term.
      * @param variables
      *            the contract's variables.
+     * @param localSpecRepo TODO
      * @param services
      *            services.
      * @param tb
@@ -519,15 +523,15 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      */
     private GoalsConfigurator setUpGoalConfigurator(final StatementBlock block,
             final ProgramVariable selfVar, final Term selfTerm,
-            final BlockContract.Variables variables, final Services services,
-            final TermBuilder tb) {
+            final BlockContract.Variables variables, GoalLocalSpecificationRepository localSpecRepo,
+            final Services services, final TermBuilder tb) {
         final KeYJavaType kjt = getCalleeKeYJavaType();
         final TypeRef typeRef = new TypeRef(new ProgramElementName(kjt.getName()), 0, selfVar, kjt);
         final ExecutionContext ec = new ExecutionContext(typeRef, getProgramMethod(), selfVar);
         final Instantiation inst = new Instantiation(tb.skip(), tb.tt(), contract.getModality(),
                 selfTerm, block, ec);
         return new GoalsConfigurator(null, new TermLabelState(), inst,
-                contract.getAuxiliaryContract().getLabels(), variables, null, services, null);
+                contract.getAuxiliaryContract().getLabels(), variables, null, localSpecRepo, services, null);
     }
 
     /**

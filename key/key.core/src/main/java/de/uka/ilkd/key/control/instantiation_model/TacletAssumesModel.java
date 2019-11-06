@@ -114,7 +114,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
      */
     private KeYParserF stringParser(String s) {
         return new KeYParserF(ParserMode.TERM, new KeYLexerF(s, ""), new Recoder2KeY(services, nss),
-                services, nss, scm);
+                goal.getLocalSpecificationRepository(), services, nss, scm);
     }
 
     /**

@@ -18,6 +18,7 @@ import org.key_project.util.ExtList;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 public class ProgramElementReplacer extends CreatingASTVisitor {
 
@@ -25,9 +26,9 @@ public class ProgramElementReplacer extends CreatingASTVisitor {
     private ProgramElement newElement;
     private boolean done;
 
-    public ProgramElementReplacer(JavaProgramElement program, Services services)
+    public ProgramElementReplacer(JavaProgramElement program, GoalLocalSpecificationRepository localSpecRepo, Services services)
     {
-        super(program, false, services);
+        super(program, false, localSpecRepo, services);
     }
 
     public ProgramElement replace(ProgramElement oldElement, ProgramElement newElement)

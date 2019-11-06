@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
@@ -542,7 +543,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
     /**
      * Parses an abstraction predicate using
-     * {@link MergeRuleUtils#parsePredicate(String, ArrayList, NamespaceSet, Services)}.
+     * {@link MergeRuleUtils#parsePredicate(String, ArrayList, NamespaceSet, GoalLocalSpecificationRepository, Services)}.
      * 
      * @param input
      *            The input to parse.
@@ -555,7 +556,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     private AbstractionPredicate parsePredicate(String input,
             NamespaceSet localNamespaces) throws ParserException {
         return MergeRuleUtils.parsePredicate(input, registeredPlaceholders,
-            localNamespaces, goal.proof().getServices());
+            localNamespaces, goal.getLocalSpecificationRepository(), goal.proof().getServices());
     }
 
     /**

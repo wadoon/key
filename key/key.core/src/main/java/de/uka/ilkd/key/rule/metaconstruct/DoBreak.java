@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -75,15 +76,15 @@ public class DoBreak extends ProgramTransformer {
     /**
      * performs the program transformation needed for symbolic program
      * transformation
-     *
      * @param services
      *            the Services with all necessary information about the java
      *            programs
+     *
      * @return the transformated program
      */
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations insts) {
+    public ProgramElement[] transform(ProgramElement pe, GoalLocalSpecificationRepository localSpecRepo,
+            Services services, SVInstantiations insts) {
         // get label of break
         // ContextInstantiationEntry ctx = insts.getContextInstantiation();
         // Break breakStmnt = (Break) PosInProgram.

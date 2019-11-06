@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -104,9 +105,10 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
      *            services.
      * @return the combination of the specified block contracts.
      */
-    public static BlockContract combine(ImmutableSet<BlockContract> contracts, Services services) {
-        return new Combinator(contracts.toArray(new BlockContract[contracts.size()]), services)
-                .combine();
+    public static BlockContract combine(ImmutableSet<BlockContract> contracts,
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        return new Combinator(contracts.toArray(new BlockContract[contracts.size()]), localSpecRepo,
+                services).combine();
     }
 
     /**
@@ -283,10 +285,10 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 Map<LocationVariable, Term> ensures, ImmutableList<InfFlowSpec> infFlowSpecs,
                 Map<Label, Term> breaks, Map<Label, Term> continues, Term returns, Term signals,
                 Term signalsOnly, Term diverges, Map<LocationVariable, Term> assignables,
-                Map<LocationVariable, Boolean> hasMod, Services services) {
+                Map<LocationVariable, Boolean> hasMod,  GoalLocalSpecificationRepository localSpecRepo, Services services) {
             super(baseName, block, labels, method, behavior, variables, requires, measuredBy,
                     ensures, infFlowSpecs, breaks, continues, returns, signals, signalsOnly,
-                    diverges, assignables, hasMod, services);
+                    diverges, assignables, hasMod, localSpecRepo, services);
         }
 
         @Override
@@ -295,7 +297,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 Term measuredBy, Map<LocationVariable, Term> postconditions,
                 Map<LocationVariable, Term> modifiesClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
-                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod) {
+                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod, GoalLocalSpecificationRepository localSpecRepo) {
             return new BlockContractImpl(baseName, block, labels, method, modality, preconditions,
                     measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
                     transactionApplicable, hasMod, null);
@@ -316,8 +318,9 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
          * @param services
          *            services.
          */
-        public Combinator(BlockContract[] contracts, Services services) {
-            super(contracts, services);
+        public Combinator(BlockContract[] contracts, GoalLocalSpecificationRepository localSpecRepo,
+                Services services) {
+            super(contracts, localSpecRepo, services);
         }
 
         @Override

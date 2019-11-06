@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -630,13 +631,14 @@ public interface AuxiliaryContract extends SpecificationElement {
          *            all labels that belong to the block.
          * @param method
          *            the method containing the block.
+         * @param localSpecRepo TODO
          * @param services
          *            services.
          * @return a new instance.
          */
         public static Variables create(final StatementBlock block, final List<Label> labels,
-                final IProgramMethod method, final Services services) {
-            return new VariablesCreator(block, labels, method, services).create();
+                final IProgramMethod method, GoalLocalSpecificationRepository localSpecRepo, final Services services) {
+            return new VariablesCreator(block, labels, method, localSpecRepo, services).create();
         }
 
         /**
@@ -648,13 +650,14 @@ public interface AuxiliaryContract extends SpecificationElement {
          *            all labels that belong to the block.
          * @param method
          *            the method containing the block.
+         * @param localSpecRepo TODO
          * @param services
          *            services.
          * @return a new instance.
          */
         public static Variables create(final LoopStatement loop, final List<Label> labels,
-                final IProgramMethod method, final Services services) {
-            return new VariablesCreator(loop, labels, method, services).create();
+                final IProgramMethod method, GoalLocalSpecificationRepository localSpecRepo, final Services services) {
+            return new VariablesCreator(loop, labels, method, localSpecRepo, services).create();
         }
 
         /**
@@ -829,7 +832,7 @@ public interface AuxiliaryContract extends SpecificationElement {
     }
 
     /**
-     * @see Variables#create(StatementBlock, List, IProgramMethod, Services)
+     * @see Variables#create(StatementBlock, List, IProgramMethod, GoalLocalSpecificationRepository, Services)
      */
     public static class VariablesCreator extends TermBuilder {
 
@@ -908,6 +911,8 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @see Variables#returnFlag
          */
         private ProgramVariable returnFlag;
+        
+        private final GoalLocalSpecificationRepository localSpecRepo;
 
         /**
          * Constructor.
@@ -918,16 +923,18 @@ public interface AuxiliaryContract extends SpecificationElement {
          *            all labels belonging to the block.
          * @param method
          *            the method containing the block.
+         * @param localSpecRepo TODO
          * @param services
          *            services.
          */
         public VariablesCreator(final JavaStatement statement, final List<Label> labels,
-                final IProgramMethod method, final Services services) {
+                final IProgramMethod method, GoalLocalSpecificationRepository localSpecRepo, final Services services) {
             super(services.getTermFactory(), services);
 
             this.statement = statement;
             this.labels = labels;
             this.method = method;
+            this.localSpecRepo = localSpecRepo;
         }
 
         /**
@@ -1048,7 +1055,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         private Map<LocationVariable, LocationVariable> createRemembranceLocalVariables() {
             ImmutableSet<ProgramVariable> localOutVariables
-                    = MiscTools.getLocalOuts(statement, services);
+                    = MiscTools.getLocalOuts(statement, localSpecRepo, services);
 
             SourceElement first;
             if (statement instanceof LabeledStatement) {
@@ -1067,7 +1074,7 @@ public interface AuxiliaryContract extends SpecificationElement {
             if (first instanceof For) {
                 ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
                 ProgramVariableCollector collector
-                        = new ProgramVariableCollector(new StatementBlock(inits), services);
+                        = new ProgramVariableCollector(new StatementBlock(inits), localSpecRepo, services);
                 collector.start();
 
                 for (LocationVariable var : collector.result()) {
@@ -1104,7 +1111,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         private Map<LocationVariable, LocationVariable> createOuterRemembranceLocalVariables() {
             ImmutableSet<ProgramVariable> localInVariables =
-                    MiscTools.getLocalIns(statement, services);
+                    MiscTools.getLocalIns(statement, localSpecRepo, services);
 
             SourceElement first;
 
@@ -1119,7 +1126,7 @@ public interface AuxiliaryContract extends SpecificationElement {
                 if (first instanceof For) {
                     ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
                     ProgramVariableCollector collector
-                            = new ProgramVariableCollector(new StatementBlock(inits), services);
+                            = new ProgramVariableCollector(new StatementBlock(inits), localSpecRepo, services);
                     collector.start();
 
                     for (LocationVariable var : collector.result()) {

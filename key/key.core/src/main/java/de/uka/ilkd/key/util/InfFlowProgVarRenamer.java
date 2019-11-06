@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.VariableNameProposer;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 
 /**
@@ -39,6 +40,8 @@ public class InfFlowProgVarRenamer extends TermBuilder {
 
     /** Goal on which newly created program variables are registered in. */
     private final Goal goalForVariableRegistration;
+    
+    private final GoalLocalSpecificationRepository localSpecRepo;
 
 
     public InfFlowProgVarRenamer(Term[] terms,
@@ -50,6 +53,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         this.terms = terms;
         this.postfix = postfix;
         this.goalForVariableRegistration = goalForVariableRegistration;
+        this.localSpecRepo = goalForVariableRegistration.getLocalSpecificationRepository();
         if (preInitialisedReplaceMap == null) {
             this.replaceMap = new HashMap<Term, Term>();
         } else {
@@ -215,7 +219,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private JavaBlock renameJavaBlock(Map<ProgramVariable, ProgramVariable> progVarReplaceMap,
                                       Term term, Services services) {
         final ProgVarReplaceVisitor paramRepl =
-                new ProgVarReplaceVisitor(term.javaBlock().program(), progVarReplaceMap, services);
+                new ProgVarReplaceVisitor(term.javaBlock().program(), progVarReplaceMap, localSpecRepo, services);
         paramRepl.start();
         final JavaBlock renamedJavaBlock =
                 JavaBlock.createJavaBlock((StatementBlock) paramRepl.result());

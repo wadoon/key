@@ -40,6 +40,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -146,7 +147,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
    @Override
    protected ImmutableList<StatementBlock> buildOperationBlocks(ImmutableList<LocationVariable> formalParVars,
                                                 ProgramVariable selfVar,
-                                                ProgramVariable resultVar, Services services) {
+                                                ProgramVariable resultVar, GoalLocalSpecificationRepository localSpecRepo, Services services) {
       // Get program method to execute
       IProgramMethod pm = getProgramMethod();
       // Extracts code parts of the method

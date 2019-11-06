@@ -82,7 +82,8 @@ public class FinishAuxiliaryBlockComputationMacro
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final Taclet rwTaclet = buildBlockInfFlowUnfoldTaclet(
-                services, blockRuleApp, contract, ifVars, result);
+                initiatingGoal.getLocalSpecificationRepository(), services, blockRuleApp, contract,
+                ifVars, result);
 
         initiatingProof.addLabeledTotalTerm(result);
         initiatingProof.addLabeledIFSymbol(rwTaclet);
@@ -109,12 +110,13 @@ public class FinishAuxiliaryBlockComputationMacro
      * @return the created taclet
      */
     private Taclet buildBlockInfFlowUnfoldTaclet(
+            GoalLocalSpecificationRepository localSpecRepo,
             final Services services,
             final BlockContractInternalBuiltInRuleApp blockRuleApp,
             final BlockContract contract, IFProofObligationVars ifVars,
             final Term result) {
         final BlockInfFlowUnfoldTacletBuilder tacletBuilder =
-                new BlockInfFlowUnfoldTacletBuilder(services);
+                new BlockInfFlowUnfoldTacletBuilder(localSpecRepo, services);
         tacletBuilder.setContract(contract);
         tacletBuilder.setExecutionContext(blockRuleApp.getExecutionContext());
         tacletBuilder.setInfFlowVars(ifVars);

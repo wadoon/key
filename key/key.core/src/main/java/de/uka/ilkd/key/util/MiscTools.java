@@ -68,6 +68,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -214,8 +215,8 @@ public final class MiscTools {
      *  excluding newly declared variables.
      */
     public static ImmutableSet<ProgramVariable> getLocalIns(ProgramElement pe,
-            Services services) {
-        final ReadPVCollector rpvc = new ReadPVCollector(pe, services);
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        final ReadPVCollector rpvc = new ReadPVCollector(pe, localSpecRepo, services);
         rpvc.start();
         return rpvc.result();
     }
@@ -230,8 +231,8 @@ public final class MiscTools {
      */
     public static ImmutableSet<ProgramVariable> getLocalOuts(
             ProgramElement pe,
-            Services services) {
-        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, services);
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, localSpecRepo, services);
         wpvc.start();
         return wpvc.getWrittenPVs();
     }
@@ -246,8 +247,8 @@ public final class MiscTools {
      */
     public static ImmutableSet<ProgramVariable> getLocalOutsAndDeclared(
             ProgramElement pe,
-            Services services) {
-        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, services);
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, localSpecRepo, services);
         wpvc.start();
         return wpvc.getWrittenPVs().union(wpvc.getDeclaredPVs());
     }
@@ -261,8 +262,8 @@ public final class MiscTools {
      */
     public static ImmutableSet<ProgramVariable> getLocallyDeclaredVars(
             ProgramElement pe,
-            Services services) {
-        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, services);
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, localSpecRepo, services);
         wpvc.start();
         return wpvc.getDeclaredPVs();
     }
@@ -645,8 +646,8 @@ public final class MiscTools {
         private ImmutableSet<ProgramVariable> declaredPVs = DefaultImmutableSet
                 .<ProgramVariable>nil();
 
-        public ReadPVCollector(ProgramElement root, Services services) {
-            super(root, services);
+        public ReadPVCollector(ProgramElement root, GoalLocalSpecificationRepository localSpecRepo, Services services) {
+            super(root, localSpecRepo, services);
         }
 
         @Override
@@ -685,8 +686,8 @@ public final class MiscTools {
         private ImmutableSet<ProgramVariable> declaredPVs =
                 DefaultImmutableSet.<ProgramVariable>nil();
 
-        public WrittenAndDeclaredPVCollector(ProgramElement root, Services services) {
-            super(root, services);
+        public WrittenAndDeclaredPVCollector(ProgramElement root, GoalLocalSpecificationRepository localSpecRepo, Services services) {
+            super(root, localSpecRepo, services);
         }
 
         @Override

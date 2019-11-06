@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 /** 
  * The DeclarationProgramVariableCollector collects all top level
@@ -44,7 +45,7 @@ public class DeclarationProgramVariableCollector extends JavaASTVisitor {
     /** creates a new declaration visitor */
     public DeclarationProgramVariableCollector(ProgramElement root, 
                                                Services services) {
-	super(root, services);
+	super(root, GoalLocalSpecificationRepository.DUMMY_REPO, services);
     }
     
     /** starts the walker*/

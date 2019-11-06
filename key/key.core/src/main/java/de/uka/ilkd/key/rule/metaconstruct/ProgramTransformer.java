@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /** 
@@ -81,13 +82,14 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     /** performs the program transformation needed for symbolic
      * program transformation 
      * @param pe the ProgramElement on which the execution is performed
+     * @param localSpecRepo TODO
      * @param services the Services with all necessary information 
      * about the java programs
      * @param svInst the instantiations of the schemavariables 
      * @return the transformated program
      */
     public abstract ProgramElement[] transform
-	(ProgramElement pe, Services services, SVInstantiations svInst);
+	(ProgramElement pe, GoalLocalSpecificationRepository localSpecRepo, Services services, SVInstantiations svInst);
     
     /** returns the name of the meta construct 
      * @return the name of the meta construct 

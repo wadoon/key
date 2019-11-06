@@ -16,15 +16,15 @@ package de.uka.ilkd.key.parser;
 import java.io.File;
 import java.io.IOException;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.rule.TacletForTests;
-import junit.framework.TestCase;
-
 import org.antlr.runtime.RecognitionException;
 import org.junit.Assert;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
+import de.uka.ilkd.key.rule.TacletForTests;
+import junit.framework.TestCase;
 
 public class TestParser extends TestCase {
     /**
@@ -70,9 +70,9 @@ public class TestParser extends TestCase {
 
 
         Services services = TacletForTests.services();
-        final ParserConfig config = new ParserConfig(services, services.getNamespaces());
+        final ParserConfig config = new ParserConfig(services, services.getNamespaces(), GoalLocalSpecificationRepository.DUMMY_REPO);
 
-        final KeYParserF parser = new KeYParserF(ParserMode.TACLET, lexer, services, services.getNamespaces());
+        final KeYParserF parser = new KeYParserF(ParserMode.TACLET, lexer, GoalLocalSpecificationRepository.DUMMY_REPO, services, services.getNamespaces());
         try {
             parser.parseSorts();
             parser.parseTacletsAndProblem();

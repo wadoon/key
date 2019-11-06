@@ -197,13 +197,14 @@ public class CloseAfterMerge implements BuiltInRule {
 
         ImmutableSet<LocationVariable> allLocs = DefaultImmutableSet.nil();
         allLocs = allLocs.union(getUpdateLeftSideLocations(
-                closeApp.getPartnerSEState().getSymbolicState()));
+                closeApp.getPartnerSEState().getSymbolicState(), services.getTermBuilder()));
         allLocs = allLocs.union(getUpdateLeftSideLocations(
-                closeApp.getMergeState().getSymbolicState()));
-        allLocs = allLocs.union(getLocationVariables(
-                closeApp.getPartnerSEState().getPathCondition(), services));
-        allLocs = allLocs.union(getLocationVariables(
-                closeApp.getMergeState().getPathCondition(), services));
+                closeApp.getMergeState().getSymbolicState(), services.getTermBuilder()));
+        allLocs = allLocs
+                .union(getLocationVariables(closeApp.getPartnerSEState().getPathCondition(),
+                        isWeakeningGoal.getLocalSpecificationRepository(), services));
+        allLocs = allLocs.union(getLocationVariables(closeApp.getMergeState().getPathCondition(),
+                isWeakeningGoal.getLocalSpecificationRepository(), services));
 
         final LinkedList<Term> origQfdVarTerms = new LinkedList<Term>();
 

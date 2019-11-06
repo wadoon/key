@@ -30,6 +30,7 @@ import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.join.JoinProcessor.Listener;
 import de.uka.ilkd.key.proof.join.PredicateEstimator;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 /**
  * The menu item for the "delayed-cut" join rule.
@@ -41,7 +42,7 @@ public class JoinMenuItem extends JMenuItem {
 
     private static final long serialVersionUID = -2602116358650063634L;
 
-    public JoinMenuItem(final List<ProspectivePartner> partner, final Proof proof, final KeYMediator mediator) {
+    public JoinMenuItem(final List<ProspectivePartner> partner, final Proof proof, final KeYMediator mediator, GoalLocalSpecificationRepository localSpecRepo) {
     super();
 
         this.setText(toString());
@@ -53,7 +54,7 @@ public class JoinMenuItem extends JMenuItem {
             public void actionPerformed(ActionEvent e) {
                  mediator.stopInterface(true);
                  JoinDialog dialog = new JoinDialog(partner,
-                		 		proof,PredicateEstimator.STD_ESTIMATOR,proof.getServices());
+                		 		proof,PredicateEstimator.STD_ESTIMATOR,localSpecRepo, proof.getServices());
                  dialog.setVisible(true);
                  if(dialog.okayButtonHasBeenPressed()){
                 	 start(dialog.getSelectedPartner(),proof,mediator);

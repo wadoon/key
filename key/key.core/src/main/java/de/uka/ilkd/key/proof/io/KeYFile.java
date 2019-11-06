@@ -36,6 +36,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -194,8 +195,8 @@ public class KeYFile implements EnvInput {
         return new KeYParserF(ParserMode.DECLARATION,
                              new KeYLexerF(is,
                                           file.toString()),
-                             initConfig.getServices(),
-                             initConfig.namespaces());
+                             initConfig.getInitialLocalSpecRepo(),
+                             initConfig.getServices(), initConfig.namespaces());
     }
 
 
@@ -284,7 +285,7 @@ public class KeYFile implements EnvInput {
             try {
                 ParserConfig pc = new ParserConfig
                 (new Services(getProfile()), 
-                        new NamespaceSet());
+                        new NamespaceSet(), GoalLocalSpecificationRepository.DUMMY_REPO);
                 // FIXME: there is no exception handler here, thus, when parsing errors are ecountered
                 // during collection of includes (it is enough to mispell \include) the error
                 // message is very uninformative - ProofInputException without filename, line and column
@@ -417,9 +418,9 @@ public class KeYFile implements EnvInput {
             Debug.out("Reading KeY file", file);
                    
             final ParserConfig normalConfig 
-                    = new ParserConfig(initConfig.getServices(), initConfig.namespaces());                       
+                    = new ParserConfig(initConfig.getServices(), initConfig.namespaces(), initConfig.getInitialLocalSpecRepo());                       
             final ParserConfig schemaConfig 
-                    = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
+                    = new ParserConfig(initConfig.getServices(), initConfig.namespaces(), initConfig.getInitialLocalSpecRepo());
 
             CountingBufferedReader cinp =
                     new CountingBufferedReader
@@ -513,9 +514,9 @@ public class KeYFile implements EnvInput {
      */
     public void readRulesAndProblem() throws ProofInputException {
         final ParserConfig schemaConfig = 
-	    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
+	    new ParserConfig(initConfig.getServices(), initConfig.namespaces(), initConfig.getInitialLocalSpecRepo());
         final ParserConfig normalConfig = 
-	    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
+	    new ParserConfig(initConfig.getServices(), initConfig.namespaces(), initConfig.getInitialLocalSpecRepo());
         
         KeYParserF problemParser = null;
         try {

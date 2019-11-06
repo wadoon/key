@@ -70,6 +70,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractRule.Instantiation;
 import de.uka.ilkd.key.rule.AbstractBlockContractRule.BlockContractHint;
 import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
@@ -133,6 +134,8 @@ public final class AuxiliaryContractBuilders {
          * Services.
          */
         private final Services services;
+        
+        private final GoalLocalSpecificationRepository localSpecRepo;
 
         /**
          * Statements in the program.
@@ -159,8 +162,8 @@ public final class AuxiliaryContractBuilders {
          */
         public ValidityProgramConstructor(final Iterable<Label> labels, final StatementBlock block,
                 final BlockContract.Variables variables, final ProgramVariable exceptionParameter,
-                final Services services) {
-            this(labels, block, variables, exceptionParameter, services, null);
+                final GoalLocalSpecificationRepository localSpecRepo, final Services services) {
+            this(labels, block, variables, exceptionParameter, localSpecRepo, services, null);
         }
 
         /**
@@ -180,6 +183,7 @@ public final class AuxiliaryContractBuilders {
          */
         public ValidityProgramConstructor(final Iterable<Label> labels, final StatementBlock block,
                 final BlockContract.Variables variables, final ProgramVariable exceptionParameter,
+                final GoalLocalSpecificationRepository localSpecRepo,
                 final Services services, final BlockContract.Variables alreadyDeclared) {
             this.labels = labels;
             this.block = block;
@@ -188,6 +192,7 @@ public final class AuxiliaryContractBuilders {
             this.exceptionParameter = exceptionParameter;
             statements = new LinkedList<Statement>();
             this.alreadyDeclared = alreadyDeclared;
+            this.localSpecRepo = localSpecRepo;
         }
 
         /**
@@ -318,7 +323,7 @@ public final class AuxiliaryContractBuilders {
                 final Label breakOutLabel) {
             return new OuterBreakContinueAndReturnReplacer(block, labels, breakOutLabel,
                     variables.breakFlags, variables.continueFlags, variables.returnFlag,
-                    variables.result, variables.exception, services).replace();
+                    variables.result, variables.exception, localSpecRepo, services).replace();
         }
 
         /**
@@ -572,7 +577,7 @@ public final class AuxiliaryContractBuilders {
                 Map<LocationVariable, LocationVariable> outerRemembranceHeaps,
                 Map<LocationVariable, LocationVariable> outerRemembranceVariables) {
             ImmutableSet<JavaStatement> innerBlocksAndLoops =
-                    new JavaASTVisitor(pe, services) {
+                    new JavaASTVisitor(pe, goal.getLocalSpecificationRepository(), services) {
                 private ImmutableSet<JavaStatement> statements = DefaultImmutableSet.nil();
 
                 @Override
@@ -595,7 +600,7 @@ public final class AuxiliaryContractBuilders {
             atPreVars.putAll(outerRemembranceHeaps);
             atPreVars.putAll(outerRemembranceVariables);
             transformer.updateBlockAndLoopContracts(
-                    innerBlocksAndLoops, atPreVars, outerRemembranceHeaps, services);
+                    innerBlocksAndLoops, atPreVars, outerRemembranceHeaps, goal.getLocalSpecificationRepository(), services);
         }
     }
 
@@ -609,6 +614,8 @@ public final class AuxiliaryContractBuilders {
          * @see AuxiliaryContract#getVariables()
          */
         private final BlockContract.Variables variables;
+        
+        private final GoalLocalSpecificationRepository localSpecRepo;
 
         /**
          *
@@ -617,9 +624,11 @@ public final class AuxiliaryContractBuilders {
          * @param services
          *            services.
          */
-        public UpdatesBuilder(final BlockContract.Variables variables, final Services services) {
+        public UpdatesBuilder(final BlockContract.Variables variables,
+                final GoalLocalSpecificationRepository localSpecRepo, final Services services) {
             super(services.getTermFactory(), services);
             this.variables = variables;
+            this.localSpecRepo = localSpecRepo;
         }
 
         /**
@@ -721,7 +730,7 @@ public final class AuxiliaryContractBuilders {
                 final Map<LocationVariable, Term> modifiesClauses,
                 final String prefix) {
             return buildAnonOutUpdate(
-                    MiscTools.getLocalOuts(el, services).stream()
+                    MiscTools.getLocalOuts(el, localSpecRepo, services).stream()
                         .filter(LocationVariable.class::isInstance)
                         .map(LocationVariable.class::cast)
                         .collect(Collectors.toSet()),
@@ -1195,6 +1204,8 @@ public final class AuxiliaryContractBuilders {
          * Services.
          */
         private final Services services;
+        
+        private final GoalLocalSpecificationRepository localSpecRepo;
 
         /**
          * The rule being applied.
@@ -1223,7 +1234,8 @@ public final class AuxiliaryContractBuilders {
         public GoalsConfigurator(final AbstractAuxiliaryContractBuiltInRuleApp application,
                 final TermLabelState termLabelState, final Instantiation instantiation,
                 final List<Label> labels, final AuxiliaryContract.Variables variables,
-                final PosInOccurrence occurrence, final Services services,
+                final PosInOccurrence occurrence,
+                final GoalLocalSpecificationRepository localSpecRepo, final Services services,
                 final AbstractAuxiliaryContractRule rule) {
             this.application = application;
             this.termLabelState = termLabelState;
@@ -1232,6 +1244,7 @@ public final class AuxiliaryContractBuilders {
             this.variables = variables;
             this.occurrence = occurrence;
             this.services = services;
+            this.localSpecRepo = localSpecRepo;
             this.rule = rule;
         }
 
@@ -1605,7 +1618,7 @@ public final class AuxiliaryContractBuilders {
             final JavaBlock[] javaBlocks = createJavaBlocks(contract, loopVariables[0],
                     exceptionParameter, breakFlags, continueFlags);
 
-            Term anonOut = new UpdatesBuilder(variables, services)
+            Term anonOut = new UpdatesBuilder(variables, goal.getLocalSpecificationRepository(), services)
                     .buildAnonOutUpdate(contract.getLoop(), anonOutHeaps, modifiesClauses);
 
             Map<LocationVariable, Function> anonOutHeaps2 = new HashMap<>();
@@ -1617,7 +1630,7 @@ public final class AuxiliaryContractBuilders {
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 anonOutHeaps2.put(heap, anonymisationFunction);
             }
-            Term anonOut2 = new UpdatesBuilder(variables, services)
+            Term anonOut2 = new UpdatesBuilder(variables, goal.getLocalSpecificationRepository(), services)
                     .buildAnonOutUpdate(
                             contract.getLoop(),
                             anonOutHeaps2,
@@ -1738,19 +1751,19 @@ public final class AuxiliaryContractBuilders {
                     wrapInMethodFrameIfContextIsAvailable(new ValidityProgramConstructor(labels,
                             new StatementBlock(KeYJavaASTFactory.declare(conditionVariable,
                                     contract.getGuard())),
-                            variables, exceptionParameter, services).construct())));
+                            variables, exceptionParameter, localSpecRepo, services).construct())));
 
             JavaBlock body = JavaBlock
                     .createJavaBlock(new StatementBlock(wrapInMethodFrameIfContextIsAvailable(
                             new ValidityProgramConstructor(labels, contract.getBody(),
-                                    bodyVariables, exceptionParameter, services, variables)
+                                    bodyVariables, exceptionParameter, localSpecRepo, services, variables)
                                             .construct())));
 
             JavaBlock tail = JavaBlock
                     .createJavaBlock(new StatementBlock(finishTransactionIfModalityIsTransactional(
                             wrapInMethodFrameIfContextIsAvailable(
                                     new ValidityProgramConstructor(labels, contract.getTail(),
-                                            variables, exceptionParameter, services, variables)
+                                            variables, exceptionParameter, localSpecRepo, services, variables)
                                                     .construct()))));
             return new JavaBlock[] { unfold, body, tail };
         }
@@ -1783,7 +1796,7 @@ public final class AuxiliaryContractBuilders {
 
         private JavaBlock replaceBlock(final JavaBlock java, final JavaStatement oldBlock,
                 final StatementBlock newBlock) {
-            Statement newProgram = (Statement) new ProgramElementReplacer(java.program(), services)
+            Statement newProgram = (Statement) new ProgramElementReplacer(java.program(), localSpecRepo, services)
                     .replace(oldBlock, newBlock);
             return JavaBlock.createJavaBlock(
                     newProgram instanceof StatementBlock ? (StatementBlock) newProgram
@@ -1817,11 +1830,11 @@ public final class AuxiliaryContractBuilders {
             if (instantiation.statement instanceof StatementBlock) {
                 block = new ValidityProgramConstructor(labels,
                         (StatementBlock) instantiation.statement,
-                        variables, exceptionParameter, services).construct();
+                        variables, exceptionParameter, localSpecRepo, services).construct();
             } else {
                 block = new ValidityProgramConstructor(labels,
                         new StatementBlock(instantiation.statement),
-                        variables, exceptionParameter, services).construct();
+                        variables, exceptionParameter, localSpecRepo, services).construct();
             }
 
             Statement wrappedBlock = wrapInMethodFrameIfContextIsAvailable(block);

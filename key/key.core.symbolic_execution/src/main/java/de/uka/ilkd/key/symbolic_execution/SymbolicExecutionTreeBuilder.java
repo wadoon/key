@@ -60,6 +60,7 @@ import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
@@ -324,7 +325,7 @@ public class SymbolicExecutionTreeBuilder {
          JavaBlock javaBlock = modalityTerm.javaBlock();
          final ProgramElement program = javaBlock.program();
          final List<Node> initialStack = new LinkedList<Node>();
-         new JavaASTVisitor(program, services) {
+         new JavaASTVisitor(program, GoalLocalSpecificationRepository.DUMMY_REPO, services) {
             @Override
             protected void doDefaultAction(SourceElement node) {
             }
@@ -1556,7 +1557,7 @@ public class SymbolicExecutionTreeBuilder {
        * @param services The {@link Services} to use.
        */
       public MethodFrameCounterJavaASTVisitor(ProgramElement root, Services services) {
-         super(root, services);
+         super(root, GoalLocalSpecificationRepository.DUMMY_REPO, services);
       }
 
       /**

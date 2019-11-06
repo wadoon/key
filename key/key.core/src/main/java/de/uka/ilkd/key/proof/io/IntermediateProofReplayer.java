@@ -73,6 +73,7 @@ import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -506,8 +507,8 @@ public class IntermediateProofReplayer {
             // MU 2019: #1487. We have to use the right namespaces to not
             // ignore branch-local functions
             NamespaceSet nss = currGoal.getLocalNamespaces();
-            Term term = parseTerm(ifFormulaStr, proof, nss.variables(),
-                    nss.programVariables(), nss.functions());
+            Term term = parseTerm(ifFormulaStr, currGoal.getLocalSpecificationRepository(), proof,
+                    nss.variables(), nss.programVariables(), nss.functions());
             ifFormulaList = ifFormulaList.append(new IfFormulaInstDirect(
                 new SequentFormula(term)));
         }
@@ -715,8 +716,9 @@ public class IntermediateProofReplayer {
             joinAppInterm, currGoal);
         joinApp.setConcreteRule(
             MergeProcedure.getProcedureByName(joinAppInterm.getJoinProc()));
-        joinApp.setDistinguishingFormula(MergeRuleUtils.translateToFormula(
-            services, joinAppInterm.getDistinguishingFormula()));
+        joinApp.setDistinguishingFormula(
+                MergeRuleUtils.translateToFormula(currGoal.getLocalSpecificationRepository(),
+                        services, joinAppInterm.getDistinguishingFormula()));
 
         // Predicate abstraction join rule
         if (joinApp
@@ -732,7 +734,7 @@ public class IntermediateProofReplayer {
                     predicates = AbstractionPredicate.fromString(
                         joinAppInterm.getAbstractionPredicates(), services,
                         services.getProof().getGoal(currNode)
-                                .getLocalNamespaces());
+                                .getLocalNamespaces(), currGoal.getLocalSpecificationRepository());
                 } catch (ParserException e) {
                     errors.add(e);
                 }
@@ -948,6 +950,7 @@ public class IntermediateProofReplayer {
      *
      * @param value
      *            String to parse.
+     * @param localSpecRepo TODO
      * @param proof
      *            Proof object (for namespaces and Services object).
      * @param varNS
@@ -958,14 +961,13 @@ public class IntermediateProofReplayer {
      * @throws ParserException
      *             In case of an error.
      */
-    public static Term parseTerm(String value, Proof proof,
-            Namespace<QuantifiableVariable> varNS,
-            Namespace<IProgramVariable> progVarNS,
-            Namespace<Function> functNS) {
+    public static Term parseTerm(String value, GoalLocalSpecificationRepository localSpecRepo,
+            Proof proof, Namespace<QuantifiableVariable> varNS,
+            Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
         try {
             return new DefaultTermParser().parse(new StringReader(value), null,
-                proof.getServices(), varNS, functNS,
-                proof.getNamespaces().sorts(), progVarNS, new AbbrevMap());
+                localSpecRepo, proof.getServices(), varNS,
+                functNS, proof.getNamespaces().sorts(), progVarNS, new AbbrevMap());
         } catch (ParserException e) {
             throw new RuntimeException("Error while parsing value " + value
                     + "\nVar namespace is: " + varNS + "\n",
@@ -980,12 +982,13 @@ public class IntermediateProofReplayer {
      *            String to parse.
      * @param proof
      *            Proof object (for namespaces and Services object).
+     * @param localSpecRepo TODO
      * @return The parsed term.
      */
-    public static Term parseTerm(String value, Proof proof) {
+    public static Term parseTerm(String value, Proof proof, GoalLocalSpecificationRepository localSpecRepo) {
         NamespaceSet nss = proof.getNamespaces();
-        return parseTerm(value, proof, nss.variables(), nss.programVariables(),
-            nss.functions());
+        return parseTerm(value, localSpecRepo, proof, nss.variables(),
+            nss.programVariables(), nss.functions());
     }
 
     /**
@@ -1051,7 +1054,7 @@ public class IntermediateProofReplayer {
             Namespace<Function> funcNS = targetGoal.getLocalNamespaces()
                     .functions();
             varNS = app.extendVarNamespaceForSV(varNS, sv);
-            Term instance = parseTerm(value, p, varNS, prgVarNS, funcNS);
+            Term instance = parseTerm(value, targetGoal.getLocalSpecificationRepository(), p, varNS, prgVarNS, funcNS);
             result = app.addCheckedInstantiation(sv, instance, targetGoal, services, true);
         }
         return result;

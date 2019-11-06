@@ -399,7 +399,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                     vn.getRenamingMap();
             if (!renamingMap.isEmpty()) {        
                 //execute renaming
-                final ProgVarReplacer pvr = new ProgVarReplacer(vn.getRenamingMap(), services);
+                final ProgVarReplacer pvr = new ProgVarReplacer(vn.getRenamingMap(), goal.getLocalSpecificationRepository(), services);
 
                 //globals
                 // we do not need to do the old assignment

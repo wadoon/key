@@ -53,6 +53,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
@@ -381,7 +382,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends
             private boolean containsBreak = false;
 
             public FindBreakVisitor(ProgramElement root, Services services) {
-                super(root, services);
+                super(root, GoalLocalSpecificationRepository.DUMMY_REPO, services);
             }
 
             /**

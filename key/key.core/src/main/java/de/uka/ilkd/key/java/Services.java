@@ -35,6 +35,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
@@ -95,8 +96,8 @@ public class Services implements TermServices {
     
     private ITermProgramVariableCollectorFactory factory = new ITermProgramVariableCollectorFactory(){
       @Override
-      public TermProgramVariableCollector create(Services services) {
-         return new TermProgramVariableCollector(services);
+      public TermProgramVariableCollector create(GoalLocalSpecificationRepository localSpecRepo, Services services) {
+         return new TermProgramVariableCollector(localSpecRepo, services);
       }};
 
     private final Profile profile;
@@ -372,7 +373,7 @@ public class Services implements TermServices {
     }
 
     public interface ITermProgramVariableCollectorFactory{
-       public TermProgramVariableCollector create(Services services);
+       public TermProgramVariableCollector create(GoalLocalSpecificationRepository localSpecRepo, Services services);
     }
 
     /**

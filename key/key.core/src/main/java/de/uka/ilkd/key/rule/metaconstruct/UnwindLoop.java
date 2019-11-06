@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -55,8 +56,8 @@ public class UnwindLoop extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations svInst) {
+    public ProgramElement[] transform(ProgramElement pe, GoalLocalSpecificationRepository localSpecRepo,
+            Services services, SVInstantiations svInst) {
         if (!(pe instanceof LoopStatement)) {
             return new ProgramElement[] { pe };
         }
@@ -65,7 +66,7 @@ public class UnwindLoop extends ProgramTransformer {
         final WhileLoopTransformation w = new WhileLoopTransformation(
             originalLoop,
             (ProgramElementName) svInst.getInstantiation(outerLabel),
-            (ProgramElementName) svInst.getInstantiation(innerLabel), services);
+            (ProgramElementName) svInst.getInstantiation(innerLabel), localSpecRepo, services);
         w.start();
         return new ProgramElement[] { w.result() };
     }

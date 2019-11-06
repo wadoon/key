@@ -66,10 +66,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
+import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
@@ -300,7 +301,8 @@ public class MergePartnerSelectionDialog extends JDialog {
             @Override
             public void keyReleased(KeyEvent e) {
                 chosenDistForm =
-                        MergeRuleUtils.translateToFormula(services,
+                        MergeRuleUtils.translateToFormula(
+                                GoalLocalSpecificationRepository.DUMMY_REPO, services,
                                 txtDistForm.getText());
 
                 if (chosenDistForm == null || !isSuitableDistFormula()) {

@@ -78,7 +78,7 @@ public abstract class AbstractLoopContractBuiltInRuleApp
                 cons = cons.add(cont);
             }
         }
-        contract = LoopContractImpl.combine(cons, services);
+        contract = LoopContractImpl.combine(cons, goal.getLocalSpecificationRepository(), services);
         heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
         return this;
     }

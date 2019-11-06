@@ -53,6 +53,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -95,20 +96,20 @@ public final class WhileInvariantTransformer {
 
     /**
      * initialises this meta operator
-     * 
-     * @param term
-     *            the instantiated Term passed to the TermTransformer
+     * @param localSpecRepo TODO
      * @param services
      *            the Services providing access to signature and type model
+     * @param term
+     *            the instantiated Term passed to the TermTransformer
      */
     private void init(Term initialPost, Term invariantFramingTermination,
-            Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         root = (JavaNonTerminalProgramElement) initialPost.javaBlock()
                 .program();
         modality = (Modality) initialPost.op();
 
         ReplaceWhileLoop removeWhile = new ReplaceWhileLoop(root, null,
-                services);
+                localSpecRepo, services);
         removeWhile.start();
 
         body = removeWhile.getTheLoop();
@@ -133,7 +134,7 @@ public final class WhileInvariantTransformer {
             Services services) {
 
         // global initialisation
-        init(initialPost, invariantFramingTermination, services);
+        init(initialPost, invariantFramingTermination, goal.getLocalSpecificationRepository(), services);
 
         // local initialisation
         ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
@@ -188,7 +189,7 @@ public final class WhileInvariantTransformer {
                 (ProgramElementName) svInst.getInstantiation(outerLabel),
                 (ProgramElementName) svInst.getInstantiation(innerLabel),
                 contFlag, excFlag, excParam, thrownException, breakFlag,
-                returnFlag, returnExpression, breakList, services);
+                returnFlag, returnExpression, breakList, goal.getLocalSpecificationRepository(), services);
         w.start();
 
         ArrayList<Term> resultSubterms = new ArrayList<Term>();
@@ -351,12 +352,13 @@ public final class WhileInvariantTransformer {
      * continues occur in the loop. Often there will be uninstantiated
      * Schemavariables in the loop that is why the found instantiations have to
      * be given.
+     * @param localSpecRepo TODO
      */
     public ImmutableList<SchemaVariable> neededInstantiations(
-            ProgramElement originalLoop, SVInstantiations svInst) {
+            ProgramElement originalLoop, SVInstantiations svInst, GoalLocalSpecificationRepository localSpecRepo) {
         WhileInvariantTransformation w = new WhileInvariantTransformation(
                 originalLoop, svInst,
-                javaInfo == null ? null : javaInfo.getServices());
+                localSpecRepo, javaInfo == null ? null : javaInfo.getServices());
         w.start();
         instantiations = ImmutableSLList.<SchemaVariable> nil();
         if (w.innerLabelNeeded()) {
@@ -398,7 +400,7 @@ public final class WhileInvariantTransformer {
             RuleApp ruleApp, Goal goal, PosInOccurrence applicationPos,
             Services services) {
         JavaBlock returnJavaBlock = addContext(root, new StatementBlock(
-                KeYJavaASTFactory.returnClause(returnExpression)));
+                KeYJavaASTFactory.returnClause(returnExpression)), goal.getLocalSpecificationRepository());
         Term executeReturn = services.getTermBuilder().prog(modality,
                 returnJavaBlock, post,
                 TermLabelManager.instantiateLabels(termLabelState, services,
@@ -428,7 +430,7 @@ public final class WhileInvariantTransformer {
             Rule rule, RuleApp ruleApp, Goal goal,
             PosInOccurrence applicationPos, Services services) {
         JavaBlock executeJavaBlock = addContext(root, new StatementBlock(
-                breakIfCascade.toArray(new Statement[breakIfCascade.size()])));
+                breakIfCascade.toArray(new Statement[breakIfCascade.size()])), goal.getLocalSpecificationRepository());
         Term executeBreak = services.getTermBuilder().prog(modality,
                 executeJavaBlock, post,
                 TermLabelManager.instantiateLabels(termLabelState, services,
@@ -525,7 +527,7 @@ public final class WhileInvariantTransformer {
             PosInOccurrence applicationPos, Services services) {
         final TermBuilder TB = services.getTermBuilder();
         JavaBlock throwJavaBlock = addContext(root, new StatementBlock(
-                KeYJavaASTFactory.throwClause(thrownException)));
+                KeYJavaASTFactory.throwClause(thrownException)), goal.getLocalSpecificationRepository());
         Term throwException = TB.prog(modality, throwJavaBlock, post,
                 TermLabelManager.instantiateLabels(termLabelState, services,
                         applicationPos, rule, ruleApp, goal,
@@ -539,9 +541,9 @@ public final class WhileInvariantTransformer {
     }
 
     protected JavaBlock addContext(JavaNonTerminalProgramElement root,
-            StatementBlock block) {
+            StatementBlock block, GoalLocalSpecificationRepository localSpecRepo) {
         ReplaceWhileLoop replaceWhile = new ReplaceWhileLoop(root, block,
-                javaInfo.getServices());
+                localSpecRepo, javaInfo.getServices());
         replaceWhile.start();
 
         return JavaBlock
