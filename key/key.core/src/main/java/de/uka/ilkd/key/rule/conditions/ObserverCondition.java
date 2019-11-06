@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -41,7 +42,7 @@ public final class ObserverCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var, 
 	    		  	 SVSubstitute instCandidate, 
 	    		  	 MatchConditions mc, 
-	    		  	 Services services) {
+	    		  	 Goal goal, Services services) {
 	SVInstantiations svInst = mc.getInstantiations();
 	final Term obsInst  = (Term) svInst.getInstantiation(obs);
 	

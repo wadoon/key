@@ -72,7 +72,7 @@ public class InstantiateCommand
         theApp = theApp.addInstantiation(sv, params.with, true /*???*/,
                 state.getProof().getServices());
 
-        theApp = theApp.tryToInstantiate(state.getProof().getServices());
+        theApp = theApp.tryToInstantiate(goal, state.getProof().getServices());
 
         Goal g = state.getFirstOpenAutomaticGoal();
         g.apply(theApp);

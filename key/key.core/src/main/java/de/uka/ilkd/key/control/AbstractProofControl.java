@@ -155,7 +155,7 @@ public abstract class AbstractProofControl implements ProofControl {
                 ImmutableList<TacletApp> ifCandidates
                         = app.findIfFormulaInstantiations(
                               focusedGoal.sequent(),
-                              focusedGoal.proof().getServices());
+                              focusedGoal, focusedGoal.proof().getServices());
                 if (ifCandidates.isEmpty()) {
                     continue; // skip this app
                 }
@@ -203,14 +203,14 @@ public abstract class AbstractProofControl implements ProofControl {
             if (isMinimizeInteraction() && !firstApp.complete()) {
                 ImmutableList<TacletApp> ifSeqCandidates =
                     firstApp.findIfFormulaInstantiations(goal.sequent(),
-              services);
+              goal, services);
 
                 if (ifSeqCandidates.size() == 1) {
                     ifSeqInteraction = false;
                     firstApp = ifSeqCandidates.head();
                 }
                 TacletApp tmpApp =
-                    firstApp.tryToInstantiate(services.getOverlay(goal.getLocalNamespaces()));
+                    firstApp.tryToInstantiate(goal, services.getOverlay(goal.getLocalNamespaces()));
                 if (tmpApp != null) firstApp = tmpApp;
 
             }

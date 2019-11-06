@@ -158,7 +158,7 @@ public class TacletInstantiationModel {
             for (int i = 0; i < size; i++) {
                 ifFma = it.next().formula();
                 ifChoiceModel[i] = new TacletAssumesModel(ifFma, taclet().getMatcher()
-                        .matchIf((i < asize ? antecCand : succCand), ifFma, matchCond, services)
+                        .matchIf((i < asize ? antecCand : succCand), ifFma, matchCond, goal, services)
                         .getFormulas(), app, goal, services, nss, scm);
             }
         } else {
@@ -177,7 +177,7 @@ public class TacletInstantiationModel {
         }
 
         try {
-            tacletApp = tacletApp.setIfFormulaInstantiations(instList, services);
+            tacletApp = tacletApp.setIfFormulaInstantiations(instList, goal, services);
         } catch (SortException e) {
             throw new SortMismatchException("'\\assumes'-sequent", null, 0, 0);
         }

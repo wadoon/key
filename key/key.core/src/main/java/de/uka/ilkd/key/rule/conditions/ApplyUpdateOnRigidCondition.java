@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -56,7 +57,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var, 
 	    		  	 SVSubstitute instCandidate, 
 	    		  	 MatchConditions mc, 
-	    		  	 Services services) {
+	    		  	 Goal goal, Services services) {
 	SVInstantiations svInst = mc.getInstantiations();
 	Term uInst  = (Term) svInst.getInstantiation(u);
 	Term xInst  = (Term) svInst.getInstantiation(x);

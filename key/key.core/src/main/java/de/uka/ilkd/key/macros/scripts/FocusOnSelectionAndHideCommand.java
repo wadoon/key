@@ -238,7 +238,7 @@ public class FocusOnSelectionAndHideCommand
                 .createPosTacletApp((FindTaclet) tac, inst, pio,
                         proof.getServices());
         app = app.addCheckedInstantiation(sv, toHide.formula(),
-                proof.getServices(), true);
+                state.getFirstOpenAutomaticGoal(), proof.getServices(), true);
         g.apply(app);
 
     }
