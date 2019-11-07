@@ -129,7 +129,7 @@ public class TestGoal {
                                                                 proof.getServices()),
                                                 new BuiltInRuleAppIndex(
                                                                 new BuiltInRuleIndex()),
-                                                proof.getServices()));
+                                                proof.getServices()), proof.getInitConfig().getInitialLocalSpecRepo());
                 ImmutableList<Goal> lg = g.split(3);
                 lg.head().addNoPosTacletApp(
                                 TacletForTests.getRules().lookup("imp_right"));

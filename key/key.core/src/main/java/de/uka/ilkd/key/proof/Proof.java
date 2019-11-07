@@ -243,7 +243,7 @@ public class Proof implements Named {
 
         Goal firstGoal = new Goal(rootNode,
                 new RuleAppIndex(new TacletAppIndex(rules, getServices()),
-                        new BuiltInRuleAppIndex(builtInRules), getServices())
+                        new BuiltInRuleAppIndex(builtInRules), getServices()), initConfig.getInitialLocalSpecRepo()
                 );
         openGoals = openGoals.prepend(firstGoal);
         setRoot(rootNode);
