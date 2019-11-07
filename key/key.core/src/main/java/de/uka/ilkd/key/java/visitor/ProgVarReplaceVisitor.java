@@ -88,7 +88,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      *            the statement where the prog vars are replaced
      * @param map
      *            the HashMap with the replacements
-     * @param localSpecRepo TODO
+     * @param localSpecRepo The goal-local specification repository
      * @param services
      *            the services instance
      */
@@ -111,7 +111,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      *            decides if all variables are to be replaced
      * @param services
      *            the services instance
-     * @param localSpecRepo TODO
+     * @param localSpecRepo The goal-local specification repository
      */
     public ProgVarReplaceVisitor(ProgramElement st,
             Map<ProgramVariable, ProgramVariable> map, boolean replaceall,
