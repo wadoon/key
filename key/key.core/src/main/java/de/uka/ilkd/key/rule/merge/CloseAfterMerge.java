@@ -13,10 +13,7 @@
 
 package de.uka.ilkd.key.rule.merge;
 
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateLeftSideLocations;
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.substConstantsByFreshVars;
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,13 +59,13 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
  * should ensure that proofs can only be closed for sound merge rules, i.e.
  * rules producing merge states that are weakenings of the parent states.
  * <p>
- * 
+ *
  * TODO: If a user attempts to prune away a "closed" partner node, he/she should
  * also be asked whether the corresponding merge node should also be pruned.
  * Otherwise, the user might accidentally make it harder to close the whole
  * proof (Add this to the bug tracker after merging the merge branch into
  * master).
- * 
+ *
  * @author Dominic Scheurer
  */
 public class CloseAfterMerge implements BuiltInRule {
@@ -180,13 +177,13 @@ public class CloseAfterMerge implements BuiltInRule {
     /**
      * Constructs the actual syntactic weakening formula \phi(s1, s2) expressing
      * that s2 is a weakening of s1.
-     * 
+     *
      * @param closeApp
      *            The rule application containing the required data.
      * @param isWeakeningGoal
      *            The {@link Proof} {@link Goal} for the logical weakening
      *            formula.
-     * 
+     *
      * @return The syntactic weakening formula for the instantiated
      *         {@link CloseAfterMergeRuleBuiltInRuleApp}.
      */
@@ -197,9 +194,9 @@ public class CloseAfterMerge implements BuiltInRule {
 
         ImmutableSet<LocationVariable> allLocs = DefaultImmutableSet.nil();
         allLocs = allLocs.union(getUpdateLeftSideLocations(
-                closeApp.getPartnerSEState().getSymbolicState(), services.getTermBuilder()));
+                closeApp.getPartnerSEState().getSymbolicState()));
         allLocs = allLocs.union(getUpdateLeftSideLocations(
-                closeApp.getMergeState().getSymbolicState(), services.getTermBuilder()));
+                closeApp.getMergeState().getSymbolicState()));
         allLocs = allLocs
                 .union(getLocationVariables(closeApp.getPartnerSEState().getPathCondition(),
                         isWeakeningGoal.getLocalSpecificationRepository(), services));
@@ -264,7 +261,7 @@ public class CloseAfterMerge implements BuiltInRule {
      * Skolem constants in the term are replaced by fresh logical variables,
      * where multiple occurrences of the same constant are replaced by the same
      * variable.
-     * 
+     *
      * @param term
      *            Term to universally close.
      * @param constsToReplace

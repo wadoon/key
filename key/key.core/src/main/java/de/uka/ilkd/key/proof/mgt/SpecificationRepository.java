@@ -62,30 +62,7 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.ClassWellDefinedness;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.ContractAxiom;
-import de.uka.ilkd.key.speclang.ContractFactory;
-import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.speclang.FunctionalBlockContract;
-import de.uka.ilkd.key.speclang.FunctionalLoopContract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.InitiallyClause;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.MethodWellDefinedness;
-import de.uka.ilkd.key.speclang.PartialInvAxiom;
-import de.uka.ilkd.key.speclang.QueryAxiom;
-import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.speclang.SpecificationElement;
-import de.uka.ilkd.key.speclang.StatementWellDefinedness;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
@@ -2007,6 +1984,14 @@ public final class SpecificationRepository {
             result = obs;
         }
         return result;
+    }
+
+    void addContract(BlockContract blockContract) {
+        addContract(cf.funcBlock(blockContract));
+    }
+
+    void addContract(LoopContract loopContract) {
+        addContract(cf.funcLoop(loopContract));
     }
 
     // Public interface for well-definedness checks

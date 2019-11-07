@@ -37,11 +37,11 @@ public final class JavaTools {
      */
     public static SourceElement getActiveStatement(JavaBlock jb) {
     assert jb.program() != null;
-    
+
         SourceElement result = jb.program().getFirstElement();
-        while((result instanceof ProgramPrefix 
+        while((result instanceof ProgramPrefix
         	 || result instanceof CatchAllStatement)
-              && !(result instanceof StatementBlock 
+              && !(result instanceof StatementBlock
                    && ((StatementBlock)result).isEmpty())) {
             if(result instanceof LabeledStatement) {
                 result = ((LabeledStatement)result).getChildAt(1);
@@ -58,52 +58,55 @@ public final class JavaTools {
     /**
      * Returns the passed java block without its active statement.
      */
-    public static JavaBlock removeActiveStatement(JavaBlock jb, 
+    public static JavaBlock removeActiveStatement(JavaBlock jb,
                               Services services) {
         assert jb.program() != null;
         final SourceElement activeStatement = JavaTools.getActiveStatement(jb);
         Statement newProg = (Statement)
             (new CreatingASTVisitor(jb.program(), false, GoalLocalSpecificationRepository.DUMMY_REPO, services) {
                 private boolean done = false;
-                
+
                 public ProgramElement go() {
                     stack.push(new ExtList());
                     walk(root());
                     ExtList el = stack.peek();
-                    return el.get(ProgramElement.class); 
+                    return el.get(ProgramElement.class);
                 }
-                
+
+                @Override
                 public void doAction(ProgramElement node) {
                     if(!done && node == activeStatement) {
                         done = true;
-                        stack.pop();                    
+                        stack.pop();
                         changed();
                     } else {
                         super.doAction(node);
                     }
                 }
             }).go();
-        
-        StatementBlock newSB = newProg instanceof StatementBlock 
+
+        StatementBlock newSB = newProg instanceof StatementBlock
                                ? (StatementBlock)newProg
-                               : new StatementBlock(newProg);              
+                               : new StatementBlock(newProg);
         return JavaBlock.createJavaBlock(newSB);
     }
 
 
-    
-    
+
+
     /**
      * Returns the innermost method frame of the passed java block
      */
-    public static MethodFrame getInnermostMethodFrame(JavaBlock jb, 
-                                      Services services) { 
+    public static MethodFrame getInnermostMethodFrame(JavaBlock jb,
+                                      Services services) {
         final ProgramElement pe = jb.program();
-        final MethodFrame result = new JavaASTVisitor(pe, new GoalLocalSpecificationRepository(services), services) {
+        final MethodFrame result = new JavaASTVisitor(pe, new GoalLocalSpecificationRepository(), services) {
             private MethodFrame res;
+            @Override
             protected void doAction(ProgramElement node) {
                 node.visit(this);
             }
+            @Override
             protected void doDefaultAction(SourceElement node) {
                 if(node instanceof MethodFrame && res == null) {
                     res = (MethodFrame) node;
@@ -114,18 +117,18 @@ public final class JavaTools {
                 return res;
             }
         }.run();
-                
+
         return result;
     }
-    
+
 
     public static ExecutionContext getInnermostExecutionContext(
-        						JavaBlock jb, 
+        						JavaBlock jb,
         						Services services) {
     final MethodFrame frame = getInnermostMethodFrame(jb, services);
-    return frame == null 
+    return frame == null
                ? null
-           : (ExecutionContext) frame.getExecutionContext();	
+           : (ExecutionContext) frame.getExecutionContext();
     }
-    
+
 }

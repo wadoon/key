@@ -42,7 +42,7 @@ public class AssumeCommand
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
-        app = app.addCheckedInstantiation(sv, parameter.formula,
+        app = app.addCheckedInstantiation(sv, parameter.formula, state.getFirstOpenAutomaticGoal(),
                 state.getProof().getServices(), true);
         state.getFirstOpenAutomaticGoal().apply(app);
     }

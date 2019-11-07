@@ -366,6 +366,7 @@ public final class AuxiliaryContractBuilders {
          */
         private final Services services;
 
+        private final GoalLocalSpecificationRepository localSpecRepo;
         /**
          *
          * @param goal
@@ -376,10 +377,12 @@ public final class AuxiliaryContractBuilders {
          * @param services services.
          */
         public VariablesCreatorAndRegistrar(final Goal goal,
-                final BlockContract.Variables placeholderVariables, final Services services) {
+                final BlockContract.Variables placeholderVariables,
+                final GoalLocalSpecificationRepository localSpecRepo, final Services services) {
             this.goal = goal;
             this.placeholderVariables = placeholderVariables;
             this.services = services;
+            this.localSpecRepo = localSpecRepo;
         }
 
         /**
@@ -577,7 +580,7 @@ public final class AuxiliaryContractBuilders {
                 Map<LocationVariable, LocationVariable> outerRemembranceHeaps,
                 Map<LocationVariable, LocationVariable> outerRemembranceVariables) {
             ImmutableSet<JavaStatement> innerBlocksAndLoops =
-                    new JavaASTVisitor(pe, goal.getLocalSpecificationRepository(), services) {
+                    new JavaASTVisitor(pe, localSpecRepo, services) {
                 private ImmutableSet<JavaStatement> statements = DefaultImmutableSet.nil();
 
                 @Override
@@ -600,7 +603,7 @@ public final class AuxiliaryContractBuilders {
             atPreVars.putAll(outerRemembranceHeaps);
             atPreVars.putAll(outerRemembranceVariables);
             transformer.updateBlockAndLoopContracts(
-                    innerBlocksAndLoops, atPreVars, outerRemembranceHeaps, goal.getLocalSpecificationRepository(), services);
+                    innerBlocksAndLoops, atPreVars, outerRemembranceHeaps, localSpecRepo, services);
         }
     }
 
@@ -1591,7 +1594,7 @@ public final class AuxiliaryContractBuilders {
                 final Term decreasesCheck, final Term[] postconditions,
                 final Term[] postconditionsNext, final ProgramVariable exceptionParameter,
                 final AuxiliaryContract.Terms terms,
-                final AuxiliaryContract.Variables nextVars) {
+                final AuxiliaryContract.Variables nextVars, GoalLocalSpecificationRepository localSpecRepo) {
             final TermBuilder tb = services.getTermBuilder();
             final Modality modality = instantiation.modality;
 
@@ -1618,7 +1621,7 @@ public final class AuxiliaryContractBuilders {
             final JavaBlock[] javaBlocks = createJavaBlocks(contract, loopVariables[0],
                     exceptionParameter, breakFlags, continueFlags);
 
-            Term anonOut = new UpdatesBuilder(variables, goal.getLocalSpecificationRepository(), services)
+            Term anonOut = new UpdatesBuilder(variables, localSpecRepo, services)
                     .buildAnonOutUpdate(contract.getLoop(), anonOutHeaps, modifiesClauses);
 
             Map<LocationVariable, Function> anonOutHeaps2 = new HashMap<>();
@@ -1630,7 +1633,7 @@ public final class AuxiliaryContractBuilders {
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 anonOutHeaps2.put(heap, anonymisationFunction);
             }
-            Term anonOut2 = new UpdatesBuilder(variables, goal.getLocalSpecificationRepository(), services)
+            Term anonOut2 = new UpdatesBuilder(variables, localSpecRepo, services)
                     .buildAnonOutUpdate(
                             contract.getLoop(),
                             anonOutHeaps2,

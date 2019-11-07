@@ -1,21 +1,27 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import static de.uka.ilkd.key.util.UnicodeHelper.*;
 
-import javax.swing.*;
-import javax.swing.text.html.HTMLDocument;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static de.uka.ilkd.key.util.UnicodeHelper.*;
+import javax.swing.JEditorPane;
+import javax.swing.text.html.HTMLDocument;
+
+import org.key_project.util.collection.ImmutableList;
+
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * Performs a simple pattern-based syntax highlighting for KeY sequents by
@@ -197,7 +203,12 @@ public class HTMLSyntaxHighlighter {
             // in the sequent is big.
 
             Iterable<? extends IProgramVariable> programVariables;
+            final Proof proof = displayedNode.proof();
             final InitConfig initConfig = displayedNode.proof().getInitConfig();
+            final ImmutableList<Goal> goalsBelow = proof.getSubtreeGoals(displayedNode);
+            final GoalLocalSpecificationRepository localSpecRepo = goalsBelow.isEmpty()
+                    ? initConfig.getInitialLocalSpecRepo()
+                    : goalsBelow.head().getLocalSpecificationRepository();
 
             if (displayedNode.getLocalProgVars().size() < NUM_PROGVAR_THRESHOLD) {
                 programVariables = displayedNode.getLocalProgVars();

@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaReduxFileCollection;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -202,6 +203,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                                    final KeYJavaType kjt,
                                    final IProgramMethod pm)
                                            throws ProofInputException {
+        final Services services = initConfig.getServices();
         // Loop contracts on loops.
         // For loop contracts on blocks, see addBlockAndLoopContracts.
         final JavaASTCollector collector =
@@ -213,7 +215,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                     specExtractor.extractLoopContracts(pm, (LoopStatement) loop);
 
             for (LoopContract specification : loopContracts) {
-                specRepos.addLoopContract(specification, true);
+                specRepos.addLoopContract(specification, true, services);
             }
         }
     }
@@ -222,6 +224,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                                           final GoalLocalSpecificationRepository specRepos,
                                           final IProgramMethod pm)
                                       throws ProofInputException {
+        final Services services = initConfig.getServices();
         // Block and loop contracts.
         final JavaASTCollector blockCollector =
                 new JavaASTCollector(pm.getBody(), StatementBlock.class);
@@ -231,14 +234,14 @@ public final class SLEnvInput extends AbstractEnvInput {
                     specExtractor.extractBlockContracts(pm, (StatementBlock) block);
 
             for (BlockContract specification : blockContracts) {
-                specRepos.addBlockContract(specification, true);
+                specRepos.addBlockContract(specification, true, services);
             }
 
             final ImmutableSet<LoopContract> loopContracts =
                     specExtractor.extractLoopContracts(pm, (StatementBlock) block);
 
             for (LoopContract specification : loopContracts) {
-                specRepos.addLoopContract(specification, true);
+                specRepos.addLoopContract(specification, true, services);
             }
         }
     }
@@ -269,6 +272,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                                           final GoalLocalSpecificationRepository specRepos,
                                           final IProgramMethod pm)
                                       throws ProofInputException {
+        final Services services = initConfig.getServices();
         final JavaASTCollector labeledCollector =
                 new JavaASTCollector(pm.getBody(), LabeledStatement.class);
         labeledCollector.start();
@@ -276,7 +280,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             final ImmutableSet<BlockContract> blockContracts =
                     specExtractor.extractBlockContracts(pm, (LabeledStatement) labeled);
             for (BlockContract specification : blockContracts) {
-                specRepos.addBlockContract(specification, true);
+                specRepos.addBlockContract(specification, true, services);
             }
         }
     }
@@ -285,6 +289,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                                           final GoalLocalSpecificationRepository specRepos,
                                           final IProgramMethod pm)
                                       throws ProofInputException {
+        final Services services = initConfig.getServices();
         final JavaASTCollector labeledCollector =
                 new JavaASTCollector(pm.getBody(), LabeledStatement.class);
         labeledCollector.start();
@@ -292,7 +297,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             final ImmutableSet<LoopContract> loopContracts =
                     specExtractor.extractLoopContracts(pm, (LabeledStatement) labeled);
             for (LoopContract specification : loopContracts) {
-                specRepos.addLoopContract(specification, true);
+                specRepos.addLoopContract(specification, true, services);
             }
         }
     }
@@ -300,9 +305,10 @@ public final class SLEnvInput extends AbstractEnvInput {
     private ImmutableSet<PositionedString> createSpecs(SpecExtractor specExtractor)
             throws ProofInputException {
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
+        final Services services = initConfig.getServices();
         final SpecificationRepository specRepos =
                 initConfig.getServices().getSpecificationRepository();
-        final GoalLocalSpecificationRepository localSpecRepo = 
+        final GoalLocalSpecificationRepository localSpecRepo =
                 initConfig.getInitialLocalSpecRepo();
 
         //read DL library specs before any other specs
@@ -344,6 +350,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 final ImmutableSet<SpecificationElement> methodSpecs
                     = specExtractor.extractMethodSpecs(pm, staticInvPresent);
                 specRepos.addSpecs(methodSpecs);
+                localSpecRepo.addSpecs(methodSpecs, services);
 
                 addLoopInvariants(specExtractor, localSpecRepo, kjt, pm);
                 addLoopContracts(specExtractor, localSpecRepo, kjt, pm);

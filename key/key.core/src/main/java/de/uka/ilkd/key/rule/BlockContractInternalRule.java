@@ -270,7 +270,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
                 = createAndRegisterAnonymisationVariables(heaps, contract, services);
         final BlockContract.Variables variables
                 = new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(),
-                        services).createAndRegister(instantiation.self, true);
+                        goal.getLocalSpecificationRepository(), services).createAndRegister(instantiation.self, true);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder
                 = new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self,

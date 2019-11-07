@@ -21,30 +21,20 @@ import java.util.function.UnaryOperator;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
-import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.ContractFactory;
-import de.uka.ilkd.key.speclang.FunctionalBlockContract;
-import de.uka.ilkd.key.speclang.FunctionalLoopContract;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.SpecificationElement;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.Pair;
 
 /**
  * Contains specification elements that are local to a {@link Goal}, primarily
  * because they are subject to program variable renaming taking place during
  * proof construction. Examples are block and loop contracts.
- * 
+ *
  * @author Dominic Steinhoefel
  */
 public class GoalLocalSpecificationRepository {
@@ -56,7 +46,6 @@ public class GoalLocalSpecificationRepository {
 
     private final Map<Pair<LoopStatement, Integer>, LoopSpecification> loopInvs;
     private final Map<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>> blockContracts;
-    private final Map<Pair<AbstractProgramElement, Integer>, ImmutableSet<BlockContract>> abstractProgramElementContracts;
     private final Map<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>> loopContracts;
 
     /**
@@ -65,16 +54,13 @@ public class GoalLocalSpecificationRepository {
      */
     private final Map<Pair<LoopStatement, Integer>, ImmutableSet<LoopContract>> loopContractsOnLoops;
 
-    private final Services services;
-    private final ContractFactory cf;
-
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
 
-    public GoalLocalSpecificationRepository(Services services) {
+    public GoalLocalSpecificationRepository() {
         this(new LinkedHashMap<>(), new LinkedHashMap<>(), new LinkedHashMap<>(),
-                new LinkedHashMap<>(), new LinkedHashMap<>(), services);
+                new LinkedHashMap<>());
     }
 
     /**
@@ -137,22 +123,6 @@ public class GoalLocalSpecificationRepository {
         }
     }
 
-    public ImmutableSet<BlockContract> getAbstractProgramElementContracts(
-            AbstractProgramElement ape) {
-        final Pair<AbstractProgramElement, Integer> abstrStmtWithLineNo = new Pair<>(ape,
-                ape.getStartPosition().getLine());
-        final ImmutableSet<BlockContract> contracts = abstractProgramElementContracts
-                .get(abstrStmtWithLineNo);
-        return Optional.ofNullable(contracts).orElseGet(() -> DefaultImmutableSet.nil());
-    }
-
-    public ImmutableSet<BlockContract> getAbstractProgramElementContracts(String apeId) {
-        return abstractProgramElementContracts.keySet().stream()
-                .filter(stmt -> stmt.first.getId().equals(apeId)).findAny()
-                .map(lineStmtPair -> abstractProgramElementContracts.get(lineStmtPair))
-                .orElseGet(() -> DefaultImmutableSet.nil());
-    }
-
     /**
      * Returns all block contracts for the specified block.
      *
@@ -188,10 +158,12 @@ public class GoalLocalSpecificationRepository {
      *
      * @param block    the given block.
      * @param modality the given modality.
+     * @param services The Services object (for adding functional contracts to
+     *                 global repository)
      * @return
      */
     public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block,
-            final Modality modality) {
+            final Modality modality, Services services) {
         ImmutableSet<BlockContract> result = getBlockContracts(block);
         final Modality matchModality = getMatchModality(modality);
         for (BlockContract contract : result) {
@@ -204,7 +176,7 @@ public class GoalLocalSpecificationRepository {
     }
 
     public ImmutableSet<LoopContract> getLoopContracts(final StatementBlock block,
-            final Modality modality) {
+            final Modality modality, Services services) {
         ImmutableSet<LoopContract> result = getLoopContracts(block);
         final Modality matchModality = getMatchModality(modality);
         for (LoopContract contract : result) {
@@ -238,10 +210,12 @@ public class GoalLocalSpecificationRepository {
      *
      * @param loop     the given loop.
      * @param modality the given modality.
+     * @param services The Services object (for adding functional contracts to
+     *                 global repository)
      * @return the set of resulting loop statements.
      */
     public ImmutableSet<LoopContract> getLoopContracts(final LoopStatement loop,
-            final Modality modality) {
+            final Modality modality, Services services) {
         ImmutableSet<LoopContract> result = getLoopContracts(loop);
         final Modality matchModality = getMatchModality(modality);
         for (LoopContract contract : result) {
@@ -258,9 +232,11 @@ public class GoalLocalSpecificationRepository {
      * the repository.
      *
      * @param contract the {@code BlockContract} to add.
+     * @param services The Services object (for adding functional contracts to
+     *                 global repository)
      */
-    public void addBlockContract(final BlockContract contract) {
-        addBlockContract(contract, false);
+    public void addBlockContract(final BlockContract contract, Services services) {
+        addBlockContract(contract, false, services);
     }
 
     /**
@@ -270,17 +246,18 @@ public class GoalLocalSpecificationRepository {
      * @param addFunctionalContract whether or not to add a new
      *                              {@link FunctionalBlockContract} based on
      *                              {@code contract}.
+     * @param services              The Services object (for adding functional
+     *                              contracts to global repository)
      */
-    public void addBlockContract(final BlockContract contract, boolean addFunctionalContract) {
+    public void addBlockContract(final BlockContract contract, boolean addFunctionalContract,
+            Services services) {
         final StatementBlock block = contract.getBlock();
         final Pair<StatementBlock, Integer> b = new Pair<>(block,
                 block.getStartPosition().getLine());
         blockContracts.put(b, getBlockContracts(block).add(contract));
 
-        handleAddForFakeAEBlock(contract, block);
-
         if (addFunctionalContract) {
-            services.getSpecificationRepository().addContract(cf.funcBlock(contract));
+            services.getSpecificationRepository().addContract(contract);
         }
     }
 
@@ -303,8 +280,6 @@ public class GoalLocalSpecificationRepository {
         ImmutableSet<BlockContract> set = blockContracts.get(b);
         final ImmutableSet<BlockContract> newContractSet = set.remove(contract);
         blockContracts.put(b, newContractSet);
-
-        handleRemoveForFakeAEBlock(contract, block);
     }
 
     /**
@@ -312,9 +287,11 @@ public class GoalLocalSpecificationRepository {
      * the repository.
      *
      * @param contract the {@code LoopContract} to add.
+     * @param services The Services object (for adding functional contracts to
+     *                 global repository)
      */
-    public void addLoopContract(final LoopContract contract) {
-        addLoopContract(contract, false);
+    public void addLoopContract(final LoopContract contract, Services services) {
+        addLoopContract(contract, false, services);
     }
 
     /**
@@ -324,8 +301,11 @@ public class GoalLocalSpecificationRepository {
      * @param addFunctionalContract whether or not to add a new
      *                              {@link FunctionalLoopContract} based on
      *                              {@code contract}.
+     * @param services              The Services object (for adding functional
+     *                              contracts to global repository).
      */
-    public void addLoopContract(final LoopContract contract, boolean addFunctionalContract) {
+    public void addLoopContract(final LoopContract contract, boolean addFunctionalContract,
+            Services services) {
         if (contract.isOnBlock()) {
             final StatementBlock block = contract.getBlock();
             final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(block,
@@ -340,10 +320,9 @@ public class GoalLocalSpecificationRepository {
 
         if (addFunctionalContract) {
             if (contract.isInternalOnly()) {
-                services.getSpecificationRepository()
-                        .addContract(cf.funcBlock(contract.toBlockContract()));
+                services.getSpecificationRepository().addContract(contract.toBlockContract());
             } else {
-                services.getSpecificationRepository().addContract(cf.funcLoop(contract));
+                services.getSpecificationRepository().addContract(contract);
             }
         }
     }
@@ -377,14 +356,25 @@ public class GoalLocalSpecificationRepository {
         }
     }
 
-    public void addSpecs(ImmutableSet<SpecificationElement> specs) {
+    public void addSpecs(ImmutableSet<SpecificationElement> specs, Services services) {
         for (SpecificationElement spec : specs) {
             if (spec instanceof LoopSpecification) {
                 addLoopInvariant((LoopSpecification) spec);
             } else if (spec instanceof BlockContract) {
-                addBlockContract((BlockContract) spec);
+                addBlockContract((BlockContract) spec, services);
             } else if (spec instanceof LoopContract) {
-                addLoopContract((LoopContract) spec);
+                addLoopContract((LoopContract) spec, services);
+
+                /*
+                 * For those spec types below, we don't do anything, as they belong to the realm
+                 * of the global SpecificationRepository; we also don't want to raise an
+                 * exception.
+                 */
+            } else if (spec instanceof Contract) {
+            } else if (spec instanceof ClassInvariant) {
+            } else if (spec instanceof InitiallyClause) {
+            } else if (spec instanceof ClassAxiom) {
+            } else if (spec instanceof MergeContract) {
             } else {
                 assert false : "unexpected spec: " + spec + "\n(" + spec.getClass() + ")";
             }
@@ -396,10 +386,8 @@ public class GoalLocalSpecificationRepository {
         return new GoalLocalSpecificationRepository( //
                 new LinkedHashMap<>(this.loopInvs), //
                 new LinkedHashMap<>(blockContracts), //
-                new LinkedHashMap<>(abstractProgramElementContracts), //
                 new LinkedHashMap<>(loopContracts), //
-                new LinkedHashMap<>(loopContractsOnLoops), //
-                services);
+                new LinkedHashMap<>(loopContractsOnLoops));
     }
 
     // -------------------------------------------------------------------------
@@ -409,92 +397,12 @@ public class GoalLocalSpecificationRepository {
     private GoalLocalSpecificationRepository(
             Map<Pair<LoopStatement, Integer>, LoopSpecification> loopInvs,
             Map<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>> blockContracts,
-            Map<Pair<AbstractProgramElement, Integer>, ImmutableSet<BlockContract>> abstractProgramElementContracts,
             Map<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>> loopContracts,
-            Map<Pair<LoopStatement, Integer>, ImmutableSet<LoopContract>> loopContractsOnLoops,
-            Services services) {
+            Map<Pair<LoopStatement, Integer>, ImmutableSet<LoopContract>> loopContractsOnLoops) {
         this.loopInvs = loopInvs;
         this.blockContracts = blockContracts;
-        this.abstractProgramElementContracts = abstractProgramElementContracts;
         this.loopContracts = loopContracts;
         this.loopContractsOnLoops = loopContractsOnLoops;
-        this.services = services;
-        this.cf = new ContractFactory(services);
-    }
-
-    /**
-     * Only for {@link #DUMMY_REPO}.
-     */
-    private GoalLocalSpecificationRepository() {
-        this.loopInvs = new LinkedHashMap<>();
-        this.blockContracts = new LinkedHashMap<>();
-        this.abstractProgramElementContracts = new LinkedHashMap<>();
-        this.loopContracts = new LinkedHashMap<>();
-        this.loopContractsOnLoops = new LinkedHashMap<>();
-        this.services = null;
-        this.cf = null;
-    }
-
-    /**
-     * For Abstract Execution, we hack our way into reusing the existing block
-     * contract architecture by wrapping Abstract Program Elements into artificial
-     * blocks. Here, we check whether it's such an artificial block, and if so,
-     * register the actual contracts in which we're interested.
-     * 
-     * @param contract The contract.
-     * @param block    The block to check.
-     */
-    private void handleAddForFakeAEBlock(final BlockContract contract, final StatementBlock block) {
-        extractAPEFromArtificialBlock(block).ifPresent(ape -> {
-            final Pair<AbstractProgramElement, Integer> abstrStmtWithLineNo = new Pair<>(ape,
-                    ape.getStartPosition().getLine());
-            abstractProgramElementContracts.put(abstrStmtWithLineNo,
-                    getAbstractProgramElementContracts(ape).add(contract));
-        });
-    }
-
-    /**
-     * For Abstract Execution, we hack our way into reusing the existing block
-     * contract architecture by wrapping Abstract Program Elements into artificial
-     * blocks. Here, we check whether it's such an artificial block, and if so,
-     * remove the contract from the APE contracts.
-     * 
-     * @param contract The contract.
-     * @param block    The block to check.
-     */
-    private void handleRemoveForFakeAEBlock(final BlockContract contract,
-            final StatementBlock block) {
-        extractAPEFromArtificialBlock(block).ifPresent(ape -> {
-            final Pair<AbstractProgramElement, Integer> abstrStmtWithLineNo = new Pair<>(ape,
-                    ape.getStartPosition().getLine());
-            abstractProgramElementContracts.put(abstrStmtWithLineNo,
-                    getAbstractProgramElementContracts(ape).remove(contract));
-        });
-    }
-
-    /**
-     * If the given {@link StatementBlock} is an artificial block used in Abstract
-     * Execution (see
-     * {@link #handleAddForFakeAEBlock(BlockContract, StatementBlock)}, returns the
-     * {@link AbstractProgramElement} in the block. Otherwise an empty
-     * {@link Optional}.
-     * 
-     * @param block The block to check.
-     * @return the {@link AbstractProgramElement} in the block, or an empty
-     *         {@link Optional}.
-     */
-    private Optional<AbstractProgramElement> extractAPEFromArtificialBlock(
-            final StatementBlock block) {
-        if (block.getBody().size() == 1 && block.getBody().get(0) instanceof AbstractStatement) {
-            return Optional.of((AbstractProgramElement) block.getBody().get(0));
-        } else if (block.getBody().size() == 1 && block.getBody().get(0) instanceof CopyAssignment
-                && ((CopyAssignment) block.getBody().get(0))
-                        .getLastElement() instanceof AbstractExpression) {
-            return Optional.of((AbstractProgramElement) ((CopyAssignment) block.getBody().get(0))
-                    .getLastElement());
-        } else {
-            return Optional.empty();
-        }
     }
 
     private static Modality getMatchModality(final Modality modality) {

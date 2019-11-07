@@ -47,9 +47,9 @@ import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
@@ -277,7 +277,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         for (BlockContract oldContract : oldContracts) {
             localSpecRepo
                     .addBlockContract(createNewBlockContract(oldContract,
-                            newBlock, !oldBlock.equals(newBlock)));
+                            newBlock, !oldBlock.equals(newBlock)), services);
         }
     }
 
@@ -288,7 +288,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         for (LoopContract oldContract : oldContracts) {
             localSpecRepo
                     .addLoopContract(createNewLoopContract(oldContract,
-                            newBlock, !oldBlock.equals(newBlock)));
+                            newBlock, !oldBlock.equals(newBlock)), services);
         }
     }
 
@@ -299,7 +299,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         for (LoopContract oldContract : oldContracts) {
             localSpecRepo
                     .addLoopContract(createNewLoopContract(oldContract,
-                            newLoop, !oldLoop.equals(newLoop)));
+                            newLoop, !oldLoop.equals(newLoop)), services);
         }
     }
 

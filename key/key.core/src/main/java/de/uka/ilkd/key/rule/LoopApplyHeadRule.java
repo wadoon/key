@@ -91,9 +91,9 @@ public class LoopApplyHeadRule implements BuiltInRule {
             LoopContract newContract = c.replaceEnhancedForVariables(block, services);
 
             localSpecRepo.removeLoopContract(c);
-            localSpecRepo.addLoopContract(newContract, false);
+            localSpecRepo.addLoopContract(newContract, false, services);
             localSpecRepo.addBlockContract(
-                    c.toBlockContract().setBlock(headAndBlock));
+                    c.toBlockContract().setBlock(headAndBlock), services);
         }
 
         Goal result = goal.split(1).head();
