@@ -331,7 +331,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         for (BlockContract oldContract : oldContracts) {
             final BlockContract newContract = //
                     createNewBlockContract(oldContract, newBlock, !oldBlock.equals(newBlock));
-            localSpecRepo.addBlockContract(newContract);
+            localSpecRepo.addBlockContract(newContract, services);
             if (removeOldContract && oldContract != newContract) {
                 localSpecRepo.removeBlockContract(oldContract);
             }
@@ -345,7 +345,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         for (LoopContract oldContract : oldContracts) {
             localSpecRepo
                     .addLoopContract(createNewLoopContract(oldContract,
-                            newBlock, !oldBlock.equals(newBlock)));
+                            newBlock, !oldBlock.equals(newBlock)), services);
         }
     }
 
@@ -356,7 +356,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         for (LoopContract oldContract : oldContracts) {
             localSpecRepo
                     .addLoopContract(createNewLoopContract(oldContract,
-                            newLoop, !oldLoop.equals(newLoop)));
+                            newLoop, !oldLoop.equals(newLoop)), services);
         }
     }
 
@@ -392,7 +392,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
          * matching contract.
          */
         localSpecRepo.addBlockContract(
-                createNewBlockContract(x, x.getBlock(), false));
+                createNewBlockContract(x, x.getBlock(), false), services);
     }
 
     @Override
@@ -406,7 +406,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                         
         for (BlockContract oldContract : oldContracts) {
             localSpecRepo.addBlockContract(
-                    createNewBlockContract(oldContract, block, !oldElem.equals(newElem)));
+                    createNewBlockContract(oldContract, block, !oldElem.equals(newElem)), services);
         }
     }
     

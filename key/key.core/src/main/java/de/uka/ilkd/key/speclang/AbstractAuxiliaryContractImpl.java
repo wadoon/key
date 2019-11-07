@@ -135,7 +135,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      * @see AuxiliaryContract#getFunctionalContracts()
      */
     private ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts;
-
+    
+    
     /**
      *
      * @param baseName

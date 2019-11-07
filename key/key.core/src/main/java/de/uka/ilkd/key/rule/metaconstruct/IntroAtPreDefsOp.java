@@ -273,7 +273,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             collectLoopsBlocksAndMergePointStatements(final ProgramElement pe, Services services) {
         final Quadruple<MethodFrame, ImmutableSet<LoopStatement>, ImmutableSet<StatementBlock>,
                 ImmutableSet<MergePointStatement>> frameAndLoopsAndBlocks
-                        = new JavaASTVisitor(pe, new GoalLocalSpecificationRepository(services), services) {
+                        = new JavaASTVisitor(pe, new GoalLocalSpecificationRepository(), services) {
                             private MethodFrame frame = null;
                             private ImmutableSet<LoopStatement> loops
                                     = DefaultImmutableSet.<LoopStatement>nil();
@@ -563,7 +563,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     contract.getMby(newVariables, services));
 
             localSpecRepo.removeBlockContract((BlockContract) contract);
-            localSpecRepo.addBlockContract(newBlockContract, false);
+            localSpecRepo.addBlockContract(newBlockContract, false, services);
         } else if (contract instanceof LoopContract) {
             final LoopContract newLoopContract;
 
@@ -584,7 +584,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             }
 
             localSpecRepo.removeLoopContract((LoopContract) contract);
-            localSpecRepo.addLoopContract(newLoopContract, false);
+            localSpecRepo.addLoopContract(newLoopContract, false, services);
         }
     }
 }

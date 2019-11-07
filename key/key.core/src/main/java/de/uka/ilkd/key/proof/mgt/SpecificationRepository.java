@@ -61,6 +61,7 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
@@ -72,6 +73,7 @@ import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.MergeContract;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
@@ -553,7 +555,7 @@ public final class SpecificationRepository {
      *            initially clause
      * @param kjt
      *            constructors of this type are added a post-condition
-     * @param localSpecRepo TODO
+     * @param localSpecRepo The goal-local specification repository.
      * @throws SLTranslationException
      *             during contract construction from history constraint
      */
@@ -785,6 +787,14 @@ public final class SpecificationRepository {
         return result;
     }
 
+    void addContract(BlockContract blockContract) {
+        addContract(cf.funcBlock(blockContract));
+    }
+
+    void addContract(LoopContract loopContract) {
+        addContract(cf.funcLoop(loopContract));
+    }
+
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
@@ -806,10 +816,6 @@ public final class SpecificationRepository {
         mapValueSets(initiallyClauses, op, services);
         mapValueSets(mergeContracts, op, services);
         mapValueSets(allClassAxiomsCache, op, services);
-        /*
-         * TODO (DS, 2019-11-06): Check if callers also have to call the goal-local
-         * equivalent.
-         */
     }
 
     /**
@@ -821,10 +827,6 @@ public final class SpecificationRepository {
             result = result.union(s);
         }
         return WellDefinednessCheck.isOn() ? result : removeWdChecks(result);
-        /*
-         * TODO (DS, 2019-11-06): Check if callers also have to call the goal-local
-         * equivalent.
-         */
     }
 
     /**
@@ -1105,7 +1107,7 @@ public final class SpecificationRepository {
     /**
      * Adds postconditions raising from initially clauses to all constructors.
      * <b>Warning</b>: To be called after all contracts have been registered.
-     * @param localSpecRepo TODO
+     * @param localSpecRepo The goal-local specification repository.
      *
      * @throws SLTranslationException
      *             may be thrown during contract extraction
@@ -1599,10 +1601,6 @@ public final class SpecificationRepository {
                         + spec.getClass() + ")";
             }
         }
-        /*
-         * TODO (DS, 2019-11-06): Check if callers also have to call the goal-local
-         * equivalent.
-         */
     }
 
     public Pair<IObserverFunction, ImmutableSet<Taclet>> limitObs(

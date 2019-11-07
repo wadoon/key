@@ -405,7 +405,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             localSpecRepo.addLoopContract(
                     innerLoopContract.replaceEnhancedForVariables(
                             innerLoopContract.getBlock(), services),
-                    false);
+                    false, services);
         }
 
         final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
