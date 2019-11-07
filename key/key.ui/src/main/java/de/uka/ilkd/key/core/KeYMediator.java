@@ -799,9 +799,9 @@ public class KeYMediator {
         if (ensureProofLoaded()) {
             final String result = CheckedUserInput.showAsDialog("Cut Formula",
                 "Please supply a formula:", null, "",
-                new InspectorForDecisionPredicates(getSelectedProof().getServices(), invokedNode,
-                    DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT,
-                    DelayedCutProcessor.getApplicationChecks()),
+                new InspectorForDecisionPredicates(getSelectedGoal().getLocalSpecificationRepository(), getSelectedProof().getServices(),
+                    invokedNode,
+                    DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT, DelayedCutProcessor.getApplicationChecks()),
                 true);
 
             if (result == null) {
@@ -809,7 +809,7 @@ public class KeYMediator {
             }
 
             Term formula = InspectorForDecisionPredicates
-                .translate(getSelectedProof().getServices(), result);
+                .translate(getSelectedGoal().getLocalSpecificationRepository(), getSelectedProof().getServices(), result);
 
             DelayedCutProcessor processor = new DelayedCutProcessor(getSelectedProof(), invokedNode,
                 formula, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);

@@ -281,7 +281,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             List<ProspectivePartner> partner = JoinIsApplicable.INSTANCE
                     .isApplicable(mediator.getSelectedGoal(), getPos().getPosInOccurrence());
             if (!partner.isEmpty()) {
-                JMenuItem item = new JoinMenuItem(partner, mediator.getSelectedProof(), mediator);
+                JMenuItem item = new JoinMenuItem(partner, mediator.getSelectedProof(), mediator, mediator.getSelectedGoal().getLocalSpecificationRepository());
                 add(item);
             }
         }

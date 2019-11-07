@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
@@ -238,6 +239,7 @@ public abstract class AbstractionPredicate
      *            The {@link Services} object.
      * @param localNamespaces
      *            The local {@link NamespaceSet}.
+     * @param localSpecRepo TODO
      * @return The parsed {@link String}.
      * @throws ParserException
      *             If there is a syntax error.
@@ -246,8 +248,8 @@ public abstract class AbstractionPredicate
      * @throws SortNotKnownException
      *             If the given sort is not known to the system.
      */
-    public static List<AbstractionPredicate> fromString(final String s,
-            final Services services, NamespaceSet localNamespaces)
+    public static List<AbstractionPredicate> fromString(final String s, final Services services,
+            NamespaceSet localNamespaces, GoalLocalSpecificationRepository localSpecRepo)
             throws ParserException {
         final ArrayList<AbstractionPredicate> result = new ArrayList<AbstractionPredicate>();
 
@@ -282,7 +284,7 @@ public abstract class AbstractionPredicate
                 // Parse the predicate
                 result.add(MergeRuleUtils.parsePredicate(predStr,
                         MergeRuleUtils.singletonArrayList(ph), localNamespaces,
-                        services));
+                        localSpecRepo, services));
             }
         }
 

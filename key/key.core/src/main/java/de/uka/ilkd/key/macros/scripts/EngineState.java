@@ -194,8 +194,8 @@ public class EngineState {
             throws ParserException, ScriptException {
         StringReader reader = new StringReader(string);
         Services services = proof.getServices();
-        Term formula = PARSER.parse(reader, sort, services,
-                getFirstOpenAutomaticGoal().getLocalNamespaces(), abbrevMap);
+        Term formula = PARSER.parse(reader, sort, getFirstOpenAutomaticGoal().getLocalSpecificationRepository(),
+                services, getFirstOpenAutomaticGoal().getLocalNamespaces(), abbrevMap);
         return formula;
     }
 
@@ -212,9 +212,9 @@ public class EngineState {
         StringReader reader = new StringReader(sequent);
         Services services = proof.getServices();
 
-        Sequent seq = PARSER.parseSeq(reader, services,
-                getFirstOpenAutomaticGoal().getLocalNamespaces(),
-                getAbbreviations());
+        Sequent seq = PARSER.parseSeq(reader, getFirstOpenAutomaticGoal().getLocalSpecificationRepository(),
+                services,
+                getFirstOpenAutomaticGoal().getLocalNamespaces(), getAbbreviations());
         return seq;
     }
 

@@ -6,6 +6,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.AbstractLoopContractBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
@@ -18,14 +19,14 @@ public class LoopContractSelectionPanel extends AuxiliaryContractSelectionPanel<
     
     private static final long serialVersionUID = 5832235501095794321L;
 
-    public LoopContractSelectionPanel(Services services,
-            boolean multipleSelection) {
-        super(services, multipleSelection);
+    public LoopContractSelectionPanel(GoalLocalSpecificationRepository localSpecRepo,
+            Services services, boolean multipleSelection) {
+        super(localSpecRepo, services, multipleSelection);
     }
 
     @Override
-    public LoopContract computeContract(Services services,
-            List<LoopContract> selection) {
+    public LoopContract computeContract(GoalLocalSpecificationRepository localSpecRepo,
+            Services services, List<LoopContract> selection) {
         if (selection.isEmpty()) {
             return null;
         }

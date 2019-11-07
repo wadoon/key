@@ -216,7 +216,7 @@ public class TacletFindModel extends AbstractTableModel {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
-        Term term = new DefaultTermParser().parse(new StringReader(s), null, services, copy, scm);
+        Term term = new DefaultTermParser().parse(new StringReader(s), null, goal.getLocalSpecificationRepository(), services, copy, scm);
         return term;
     }
 
@@ -227,7 +227,7 @@ public class TacletFindModel extends AbstractTableModel {
     private IdDeclaration parseIdDeclaration(String s) throws ParserException {
         KeYParserF parser = null;
         try {
-            parser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s, ""), localSpecRepo, services, nss);
+            parser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s, ""), goal.getLocalSpecificationRepository(), services, nss);
             return parser.id_declaration();
         } catch (RecognitionException re) {
             // parser cannot be null

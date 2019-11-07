@@ -187,15 +187,16 @@ public class MergeRuleUtils {
 
     /**
      * Translates a String into a formula or to null if not applicable.
-     *
+     * @param localSpecRepo TODO
      * @param services
      *            The services object.
      * @param toTranslate
      *            The formula to be translated.
+     *
      * @return The formula represented by the input or null if not applicable.
      */
-    public static Term translateToFormula(final Services services,
-            final String toTranslate) {
+    public static Term translateToFormula(GoalLocalSpecificationRepository localSpecRepo,
+            final Services services, final String toTranslate) {
         try {
             final KeYParserF parser = new KeYParserF(ParserMode.TERM,
                     new KeYLexerF(new StringReader(toTranslate), ""), localSpecRepo,
@@ -1641,17 +1642,18 @@ public class MergeRuleUtils {
      *            The predicate to parse (contains exactly one placeholder).
      * @param localNamespaces
      *            The local {@link NamespaceSet}.
+     * @param localSpecRepo TODO
      * @return The parsed {@link AbstractionPredicate}.
      * @throws ParserException
      *             If there is a syntax error.
      */
     public static AbstractionPredicate parsePredicate(String input,
             ArrayList<Pair<Sort, Name>> registeredPlaceholders,
-            NamespaceSet localNamespaces, Services services)
+            NamespaceSet localNamespaces, GoalLocalSpecificationRepository localSpecRepo, Services services)
             throws ParserException {
         DefaultTermParser parser = new DefaultTermParser();
         Term formula = parser.parse(new StringReader(input), Sort.FORMULA,
-                services, localNamespaces, services.getProof().abbreviations());
+                localSpecRepo, services, localNamespaces, services.getProof().abbreviations());
 
         ImmutableSet<LocationVariable> containedLocVars = MergeRuleUtils
                 .getLocationVariables(formula, GoalLocalSpecificationRepository.DUMMY_REPO, services);

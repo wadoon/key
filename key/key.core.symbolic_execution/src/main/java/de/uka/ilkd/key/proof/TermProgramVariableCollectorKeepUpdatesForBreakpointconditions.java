@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.AbstractConditionalBreakpoint;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
@@ -26,7 +27,7 @@ public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions exte
    private IBreakpointStopCondition breakpointStopCondition;
    
    public TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(Services services, IBreakpointStopCondition breakpointStopCondition) {
-       super(localSpecRepo, services);
+       super(GoalLocalSpecificationRepository.DUMMY_REPO, services);
        this.breakpointStopCondition = breakpointStopCondition;
    }
    

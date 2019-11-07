@@ -346,12 +346,13 @@ options {
     /**
      * Parses taclet from string.
      */
-    public static Taclet parseTaclet(String s, Services services) {
+    public static Taclet parseTaclet(String s, GoalLocalSpecificationRepository localSpecRepo, Services services) {
    	try {
 	    KeYParserF p =
                 new KeYParserF(ParserMode.TACLET,
                               new KeYLexerF(s,
                                       "No file. KeYParser.parseTaclet(\n" + s + ")\n"),
+                              localSpecRepo,
                               services,
                               services.getNamespaces());
 	    return p.taclet(DefaultImmutableSet.<Choice>nil(), false);

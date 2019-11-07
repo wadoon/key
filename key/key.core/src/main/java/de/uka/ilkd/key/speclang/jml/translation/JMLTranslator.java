@@ -61,6 +61,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
@@ -1466,7 +1467,7 @@ public final class JMLTranslator {
 
                 SLExpression result;
                 try {
-                    result = new SLExpression(services.getTermBuilder().parseTerm(text, namespaces));
+                    result = new SLExpression(services.getTermBuilder().parseTerm(text, namespaces, GoalLocalSpecificationRepository.DUMMY_REPO));
                     return result;
                 } catch (ParserException ex) {
                     throw excManager.createException("Cannot parse embedded JavaDL: "

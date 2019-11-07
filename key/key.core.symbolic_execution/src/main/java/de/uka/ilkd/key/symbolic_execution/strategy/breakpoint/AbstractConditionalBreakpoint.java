@@ -52,6 +52,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -304,7 +305,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
          }
          // Collect local variables
          StatementBlock result = getStatementBlock(getPm().getBody());
-         ProgramVariableCollector variableCollector = new ProgramVariableCollector(result, localSpecRepo, getProof().getServices());
+         ProgramVariableCollector variableCollector = new ProgramVariableCollector(result, GoalLocalSpecificationRepository.DUMMY_REPO, getProof().getServices());
          variableCollector.start();
          Set<LocationVariable> undeclaredVariables = variableCollector.result();
          for (LocationVariable x : undeclaredVariables) {

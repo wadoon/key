@@ -19,6 +19,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContractImpl;
@@ -31,8 +32,8 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
 
     private static final long serialVersionUID = 1681443715264203991L;
 
-    public BlockContractSelectionPanel(final Services services, final boolean multipleSelection) {
-        super(services, multipleSelection);
+    public BlockContractSelectionPanel(GoalLocalSpecificationRepository localSpecRepo, final Services services, final boolean multipleSelection) {
+        super(localSpecRepo, services, multipleSelection);
     }
     
     
@@ -44,12 +45,13 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
      * <p>
      * This method is also used by the KeYIDE (Eclipse) to ensure the same behavior.
      * </p>
+     * @param localSpecRepo TODO
      * @param services The {@link Services}
      * @param selection The selected contracts.
      * @return The selected {@link BlockContract} or {@code null} if not available.
      */
     public static BlockContract computeBlockContract(
-            Services services, List<BlockContract> selection) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services, List<BlockContract> selection) {
         if (selection.isEmpty()) {
             return null;
         }
@@ -72,13 +74,13 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
      * <p>
      * This method is also used by the KeYIDE (Eclipse) to ensure the same behavior.
      * </p>
-     * @param services The {@link Services}
      * @param selection The selected contracts.
+     * @param services The {@link Services}
      * @return The selected {@link BlockContract} or {@code null} if not available.
      */
     @Override
     public BlockContract computeContract(
-            Services services, List<BlockContract> selection) {
-      return computeBlockContract(services, selection);
+            GoalLocalSpecificationRepository localSpecRepo, Services services, List<BlockContract> selection) {
+      return computeBlockContract(localSpecRepo, services, selection);
     }
 }

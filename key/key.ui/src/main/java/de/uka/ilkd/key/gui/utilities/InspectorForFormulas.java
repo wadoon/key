@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 /**
  * Inspects whether a given string can be translated into a formula. 
@@ -29,13 +30,15 @@ import de.uka.ilkd.key.parser.ParserMode;
 public class InspectorForFormulas implements CheckedUserInputInspector{
 
     private final Services services;
+    private final GoalLocalSpecificationRepository localSpecRepo;
 
     
     
     
-    public InspectorForFormulas(Services services) {
+    public InspectorForFormulas(GoalLocalSpecificationRepository localSpecRepo, Services services) {
         super();
         this.services = services;
+        this.localSpecRepo = localSpecRepo;
     }
 
 
@@ -45,7 +48,7 @@ public class InspectorForFormulas implements CheckedUserInputInspector{
         if(toBeChecked.isEmpty()){
             return CheckedUserInputInspector.NO_USER_INPUT;
         }
-        Term term = translate(services,toBeChecked);
+        Term term = translate(localSpecRepo,services, toBeChecked);
          
        if(term == null){
            return NO_USER_INPUT;
@@ -58,7 +61,7 @@ public class InspectorForFormulas implements CheckedUserInputInspector{
 
     }
     
-    public static Term translate(Services services, String toBeChecked){
+    public static Term translate(GoalLocalSpecificationRepository localSpecRepo, Services services, String toBeChecked){
         try {
             KeYParserF parser =
                     new KeYParserF (ParserMode.TERM, new KeYLexerF (

@@ -7,6 +7,7 @@ import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.legacy.LegacyTacletMatcher;
@@ -52,14 +53,14 @@ public class Matcher {
         Services copyServices = api.getEnv().getServices().copy(false);
         //services.copy(false);
         //Aufbau der Deklarationen fuer den NameSpace
-        buildNameSpace(assignments ,copyServices);
+        buildNameSpace(assignments, goal.getLocalSpecificationRepository(), copyServices);
         //Zusammenbau des Pseudotaclets
         //Parsen des Taclets
         String patternString = "matchPattern{\\assumes("+pattern+") \\find (==>)  \\add (==>)}";
 
         Taclet t = null;
         try {
-            t = parseTaclet(patternString, copyServices);
+            t = parseTaclet(patternString, goal.getLocalSpecificationRepository(), copyServices);
         } catch (RecognitionException e) {
             e.printStackTrace();
         }
@@ -157,11 +158,12 @@ public class Matcher {
     /**
      * Adds the variables of VariableAssignments to the namespace
      * @param assignments VariabelAssignments containing variable names and types
+     * @param localSpecRepo TODO
      * @param services
      */
-    private void buildNameSpace(VariableAssignments assignments, Services services) {
+    private void buildNameSpace(VariableAssignments assignments, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         String decalarations = buildDecls(assignments);
-        parseDecls(decalarations, services);
+        parseDecls(decalarations, localSpecRepo, services);
 
     }
 
@@ -187,7 +189,7 @@ public class Matcher {
     }
 
 
-    private KeYParserF stringDeclParser(String s, Services services) {
+    private KeYParserF stringDeclParser(String s, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         return new KeYParserF(ParserMode.DECLARATION,
                 new KeYLexerF(s,
                         "No file. parser/TestTacletParser.stringDeclParser(" + s + ")"),
@@ -196,10 +198,11 @@ public class Matcher {
     /**
      * Parse the declaration string for the current pattern and add the variables to the namespace
      * @param s declaration part of a taclet
+     * @param localSpecRepo TODO
      */
-    public void parseDecls(String s, Services services) {
+    public void parseDecls(String s, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         try {
-            KeYParserF p = stringDeclParser(s, services);
+            KeYParserF p = stringDeclParser(s, localSpecRepo, services);
             p.decls();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
@@ -211,15 +214,15 @@ public class Matcher {
 
 
 
-    private KeYParserF stringTacletParser(String s, Services services) {
+    private KeYParserF stringTacletParser(String s, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         return new KeYParserF(ParserMode.TACLET, new KeYLexerF(s,
                 "No file. CreateTacletForTests.stringTacletParser(" + s + ")"),
                 localSpecRepo, services, services.getNamespaces());
     }
 
-    private Taclet parseTaclet(String s, Services services) throws RecognitionException {
+    private Taclet parseTaclet(String s, GoalLocalSpecificationRepository localSpecRepo, Services services) throws RecognitionException {
         try {
-            KeYParserF p = stringTacletParser(s, services);
+            KeYParserF p = stringTacletParser(s, localSpecRepo, services);
 
             return p.taclet(DefaultImmutableSet.<Choice>nil());
         } catch (RecognitionException e) {

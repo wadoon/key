@@ -59,7 +59,7 @@ public class BlockContractInternalCompletion implements InteractiveRuleApplicati
                 BlockContractInternalRule.getApplicableContracts(instantiation, goal, services);
         final AuxiliaryContractConfigurator<BlockContract> configurator
             = new AuxiliaryContractConfigurator<>("Block Contract Configurator",
-                new BlockContractSelectionPanel(services, true),
+                new BlockContractSelectionPanel(goal.getLocalSpecificationRepository(), services, true),
                 mainWindow, services, contracts.toArray(new BlockContract[contracts.size()]),
                 "Contracts for Block: " + instantiation.statement);
         if (configurator.wasSuccessful()) {
