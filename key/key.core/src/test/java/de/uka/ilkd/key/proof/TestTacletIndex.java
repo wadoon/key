@@ -273,12 +273,13 @@ public class TestTacletIndex extends TestCase{
     }
 
     private RuleAppIndex createGoalFor(Sequent seq_p5, TacletIndex ruleIdx) {
+        final InitConfig initConfig = new InitConfig(GoalLocalSpecificationRepository.DUMMY_REPO, new Services(AbstractProfile.getDefaultProfile()));
         final Node node_p5 =
-            new Node (new Proof ("TestTacletIndex", new InitConfig(GoalLocalSpecificationRepository.DUMMY_REPO, new Services(AbstractProfile.getDefaultProfile()))), seq_p5);
+            new Node (new Proof ("TestTacletIndex", initConfig), seq_p5);
         final BuiltInRuleAppIndex builtinIdx =
             new BuiltInRuleAppIndex (new BuiltInRuleIndex ());
         final Goal goal_p5 =
-            new Goal (node_p5, new RuleAppIndex (ruleIdx, builtinIdx, node_p5.proof().getServices()));
+            new Goal (node_p5, new RuleAppIndex (ruleIdx, builtinIdx, node_p5.proof().getServices()), initConfig.getInitialLocalSpecRepo());
 	return goal_p5.ruleAppIndex ();
     }
 
