@@ -228,10 +228,11 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
     private static LoopContract.Variables[] createVars(final Goal goal, final Term selfTerm,
             final LoopContract contract, final Services services) {
         final LoopContract.Variables variables = new VariablesCreatorAndRegistrar(goal,
-                contract.getPlaceholderVariables(), services).createAndRegister(selfTerm, true);
+                contract.getPlaceholderVariables(), goal.getLocalSpecificationRepository(),
+                services).createAndRegister(selfTerm, true);
 
-        final LoopContract.Variables nextVariables
-                = new VariablesCreatorAndRegistrar(goal, variables, services)
+        final LoopContract.Variables nextVariables = new VariablesCreatorAndRegistrar(goal,
+                variables, goal.getLocalSpecificationRepository(), services)
                         .createAndRegisterCopies("_NEXT");
         return new LoopContract.Variables[] { variables, nextVariables };
     }

@@ -366,6 +366,8 @@ public final class AuxiliaryContractBuilders {
          * Services.
          */
         private final Services services;
+        
+        private final GoalLocalSpecificationRepository localSpecRepo;
 
         /**
          *
@@ -377,10 +379,12 @@ public final class AuxiliaryContractBuilders {
          * @param services services.
          */
         public VariablesCreatorAndRegistrar(final Goal goal,
-                final BlockContract.Variables placeholderVariables, final Services services) {
+                final BlockContract.Variables placeholderVariables,
+                final GoalLocalSpecificationRepository localSpecRepo, final Services services) {
             this.goal = goal;
             this.placeholderVariables = placeholderVariables;
             this.services = services;
+            this.localSpecRepo = localSpecRepo;
         }
 
         /**
@@ -578,7 +582,7 @@ public final class AuxiliaryContractBuilders {
                 Map<LocationVariable, LocationVariable> outerRemembranceHeaps,
                 Map<LocationVariable, LocationVariable> outerRemembranceVariables) {
             ImmutableSet<JavaStatement> innerBlocksAndLoops =
-                    new JavaASTVisitor(pe, goal.getLocalSpecificationRepository(), services) {
+                    new JavaASTVisitor(pe, localSpecRepo, services) {
                 private ImmutableSet<JavaStatement> statements = DefaultImmutableSet.nil();
 
                 @Override
@@ -601,7 +605,7 @@ public final class AuxiliaryContractBuilders {
             atPreVars.putAll(outerRemembranceHeaps);
             atPreVars.putAll(outerRemembranceVariables);
             transformer.updateBlockAndLoopContracts(
-                    innerBlocksAndLoops, atPreVars, outerRemembranceHeaps, goal.getLocalSpecificationRepository(), services);
+                    innerBlocksAndLoops, atPreVars, outerRemembranceHeaps, localSpecRepo, services);
         }
     }
 
