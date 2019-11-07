@@ -81,6 +81,9 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
             Goal goal, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final SVInstantiations svInst = mc.getInstantiations();
+        final GoalLocalSpecificationRepository localSpecificationRepository = //
+                Optional.ofNullable(goal).map(Goal::getLocalSpecificationRepository)
+                        .orElse(GoalLocalSpecificationRepository.DUMMY_REPO);
 
         final Term update = (Term) svInst.getInstantiation(uSV);
         final Term target = (Term) svInst.getInstantiation(targetSV);
@@ -98,12 +101,11 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
         if (target.op() instanceof Function && target.arity() == 0 && target.sort() == locSetSort) {
             return null;
         }
-
         final Optional<Term> maybeResult = //
                 dropEffectlessElementaries( //
                         update, //
                         target, //
-                        collectLocations(target, goal.getLocalSpecificationRepository(), services), //
+                        collectLocations(target, localSpecificationRepository, services), //
                         new LinkedHashSet<>(), //
                         services //
                 ).map( //
