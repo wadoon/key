@@ -241,6 +241,22 @@ public class JavaFloatSemanticsHelper extends SemanticsHelper {
         }
     }
 
+    public SLExpression buildModExpression(SLExpression a, SLExpression b)
+            throws SLTranslationException {
+        try {
+            KeYJavaType resultType = getPromotedType(a, b);
+            Function mod;
+            if (isFloat(resultType))
+                mod = floatLDT.getJavaMod();
+            else
+                mod = doubleLDT.getJavaMod();
+            return new SLExpression(tb.func(mod, a.getTerm(), b.getTerm()),
+                    resultType);
+        } catch (RuntimeException e) {
+            raiseError("Error in modulo expression " + a + " / " + b + ".", e);
+            return null; //unreachable
+        }
+    }
 
     public SLExpression buildPromotedUnaryPlusExpression(SLExpression a)
             throws SLTranslationException {

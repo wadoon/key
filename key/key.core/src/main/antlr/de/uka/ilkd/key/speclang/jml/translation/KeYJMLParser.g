@@ -1298,7 +1298,7 @@ multexpr returns [SLExpression ret=null] throws SLTranslationException
 //	    result = intHelper.buildDivExpression(result, e);
 	}
     |
-    MOD e=unaryexpr
+    mod=MOD e=unaryexpr
     {
         if (result.isType()) {
             raiseError("Cannot build multiplicative expression from type " +
@@ -1311,7 +1311,8 @@ multexpr returns [SLExpression ret=null] throws SLTranslationException
         assert result.isTerm();
         assert e.isTerm();
 
-        result = intHelper.buildModExpression(result, e);
+        result = translator.<SLExpression>translate(mod.getText(), SLExpression.class, services, result, e);
+//      result = intHelper.buildModExpression(result, e);
     }
     )*
 ;
@@ -1995,6 +1996,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
         |   fpsub=FP_SUB        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpsub; }
         |   fpmul=FP_MUL        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpmul; }
         |   fpdiv=FP_DIV        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpdiv; }
+        |   fpmod=FP_MOD        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpmod; }
         ) {
             Function f = null;
 
@@ -2034,6 +2036,8 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
                         result = new SLExpression(tb.func(ldt.getJavaMul(), e1.getTerm(), e2.getTerm()), fptype);
                     } else if (tk.getType() == FP_DIV) {
                         result = new SLExpression(tb.func(ldt.getJavaDiv(), e1.getTerm(), e2.getTerm()), fptype);
+                    } else if (tk.getType() == FP_MOD) {
+                        result = new SLExpression(tb.func(ldt.getJavaMod(), e1.getTerm(), e2.getTerm()), fptype);
                     }
                 }
             }

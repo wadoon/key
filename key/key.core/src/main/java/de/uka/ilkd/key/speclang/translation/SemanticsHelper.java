@@ -17,4 +17,6 @@ public abstract class SemanticsHelper {
     public abstract SLExpression buildMultExpression(SLExpression left, SLExpression right) throws SLTranslationException;
 
     public abstract SLExpression buildDivExpression(SLExpression left, SLExpression right) throws SLTranslationException;
+
+    public abstract SLExpression buildModExpression(SLExpression left, SLExpression right) throws SLTranslationException;
 }

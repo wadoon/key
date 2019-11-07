@@ -180,6 +180,7 @@ public final class JMLTranslator {
         SUBTRACT ("-"),
         MULT ("*"),
         DIV ("/"),
+        MOD("%"),
         SHIFT_LEFT ("<<"),
         SHIFT_RIGHT (">>"),
         UNSIGNED_SHIFT_RIGHT (">>>"),
@@ -1305,7 +1306,7 @@ public final class JMLTranslator {
 
             @Override
             protected String opName() {
-                return ("subtract");
+                return ("mult");
             }
 
             @Override
@@ -1320,13 +1321,28 @@ public final class JMLTranslator {
 
             @Override
             protected String opName() {
-                return ("subtract");
+                return ("div");
             }
 
             @Override
             protected SLExpression translate(SemanticsHelper helper, SLExpression left,
                                              SLExpression right) throws SLTranslationException {
                 return helper.buildDivExpression(left, right);
+            }
+
+        });
+
+        translationMethods.put(JMLKeyWord.MOD, new JMLArithmeticOperationTranslationMethod(){
+
+            @Override
+            protected String opName() {
+                return ("mod");
+            }
+
+            @Override
+            protected SLExpression translate(SemanticsHelper helper, SLExpression left,
+                                             SLExpression right) throws SLTranslationException {
+                return helper.buildModExpression(left, right);
             }
 
         });

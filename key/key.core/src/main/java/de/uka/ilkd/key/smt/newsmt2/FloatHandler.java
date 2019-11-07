@@ -50,6 +50,7 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(floatLDT.getSubIEEE(), SMTTermFloatOp.Op.FPSUB);
         fpOperators.put(floatLDT.getMulIEEE(), SMTTermFloatOp.Op.FPMUL);
         fpOperators.put(floatLDT.getDivIEEE(), SMTTermFloatOp.Op.FPDIV);
+        fpOperators.put(floatLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
         fpOperators.put(floatLDT.getJavaUnaryMinus(), SMTTermFloatOp.Op.FPNEG);
         fpOperators.put(floatLDT.getAbs(), SMTTermFloatOp.Op.FPABS);
         fpOperators.put(floatLDT.getJavaMin(), SMTTermFloatOp.Op.FPMIN);
@@ -61,6 +62,7 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(floatLDT.getIsInfinite(), SMTTermFloatOp.Op.FPISINFINITE);
         fpOperators.put(floatLDT.getIsNegative(), SMTTermFloatOp.Op.FPISNEGATIVE);
         fpOperators.put(floatLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
+        fpOperators.put(floatLDT.getJavaMod(), SMTTermFloatOp.Op.FPMOD);
 
         //Double predicates and operations, translated identically to float operations
         fpOperators.put(doubleLDT.getLessThan(), SMTTermFloatOp.Op.FPLT);
@@ -81,6 +83,7 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(doubleLDT.getIsInfinite(), SMTTermFloatOp.Op.FPISINFINITE);
         fpOperators.put(doubleLDT.getIsNegative(), SMTTermFloatOp.Op.FPISNEGATIVE);
         fpOperators.put(doubleLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
+        fpOperators.put(floatLDT.getJavaMod(), SMTTermFloatOp.Op.FPMOD);
 
         mathOperators.put(doubleLDT.getSinDouble(),SMTTermFloatOp.Op.SINDOUBLE);
         mathOperators.put(doubleLDT.getCosDouble(),SMTTermFloatOp.Op.COSDOUBLE);
