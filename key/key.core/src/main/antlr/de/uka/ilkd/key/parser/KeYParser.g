@@ -2992,7 +2992,7 @@ accessterm returns [Term _accessterm = null]
 @init{ int selectNestingDepth = globalSelectNestingDepth; }
 @after { _accessterm = result; }
     :
-      (MINUS ~NUM_LITERAL) => MINUS result = term110
+      (MINUS ~(NUM_LITERAL|FLOAT_LITERAL|DOUBLE_LITERAL)) => MINUS result = term110
         {
             if (result.sort() != Sort.FORMULA) {
 	      if (result.sort().name().equals(FloatLDT.NAME)) {

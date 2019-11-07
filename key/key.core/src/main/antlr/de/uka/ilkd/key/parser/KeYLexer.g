@@ -619,30 +619,30 @@ ML_COMMENT
 
 // A single Digit that is followed by a ( is an ident, otherwise it's a number
 
-DIGIT_DISPATCH
-:
-    (DIGIT (' ' | '\t' | '\r' | '\n')* LPAREN) => DIGIT {$type = IDENT;}
-  | ('0' 'x') => HEX_LITERAL {$type = NUM_LITERAL;}
-  | NUM_LITERAL {$type = NUM_LITERAL;}
-;
-
-FLOAT_DISPATCH
+/*FLOAT_DISPATCH
 :
     FLOAT_LITERAL {$type = FLOAT_LITERAL;}
   | DOUBLE_LITERAL {$type = DOUBLE_LITERAL;}
-;
+;*/
 
-fragment
+//fragment
 FLOAT_LITERAL
 :
     (DIGIT)+ '.' (DIGIT)+ 'f'
 ;
 
-fragment
+//fragment
 DOUBLE_LITERAL
 :
     (DIGIT)+ '.' (DIGIT)+
     | '0' 'x' (DIGIT)+ 'p' (MINUS)? (DIGIT)+
+;
+
+DIGIT_DISPATCH
+:
+    (DIGIT (' ' | '\t' | '\r' | '\n')* LPAREN) => DIGIT {$type = IDENT;}
+  | ('0' 'x') => HEX_LITERAL {$type = NUM_LITERAL;}
+  | NUM_LITERAL {$type = NUM_LITERAL;}
 ;
 
 fragment
