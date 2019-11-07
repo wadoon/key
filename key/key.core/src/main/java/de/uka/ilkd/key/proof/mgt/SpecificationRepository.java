@@ -29,12 +29,10 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -62,30 +60,7 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.ClassWellDefinedness;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.ContractAxiom;
-import de.uka.ilkd.key.speclang.ContractFactory;
-import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.speclang.FunctionalBlockContract;
-import de.uka.ilkd.key.speclang.FunctionalLoopContract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.InitiallyClause;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.MethodWellDefinedness;
-import de.uka.ilkd.key.speclang.PartialInvAxiom;
-import de.uka.ilkd.key.speclang.QueryAxiom;
-import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.speclang.SpecificationElement;
-import de.uka.ilkd.key.speclang.StatementWellDefinedness;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
@@ -137,21 +112,6 @@ public final class SpecificationRepository {
     private final Map<ProofOblInput, ImmutableSet<Proof>>
         proofs =
             new LinkedHashMap<ProofOblInput, ImmutableSet<Proof>>();
-    private final Map<Pair<LoopStatement, Integer>, LoopSpecification>
-        loopInvs =
-            new LinkedHashMap<Pair<LoopStatement, Integer>, LoopSpecification>();
-    private final Map<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>
-        blockContracts =
-            new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>();
-    private final Map<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>
-        loopContracts =
-            new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>();
-    /**
-     * A map which relates each loop statement its starting line number and set of loop contracts.
-     */
-    private final Map<Pair<LoopStatement, Integer>, ImmutableSet<LoopContract>>
-        loopContractsOnLoops =
-            new LinkedHashMap<Pair<LoopStatement, Integer>, ImmutableSet<LoopContract>>();
     private Map<MergePointStatement, ImmutableSet<MergeContract>>
         mergeContracts =
             new LinkedHashMap<MergePointStatement, ImmutableSet<MergeContract>>();
@@ -268,15 +228,6 @@ public final class SpecificationRepository {
         tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
 
         return tacletBuilder.getTaclet();
-    }
-
-    private static Modality getMatchModality(final Modality modality) {
-        if (modality.transaction()) {
-            return modality == Modality.DIA_TRANSACTION ? Modality.DIA
-                    : Modality.BOX;
-        } else {
-            return modality;
-        }
     }
 
     private IObserverFunction getCanonicalFormForKJT(IObserverFunction obs,
@@ -812,38 +763,15 @@ public final class SpecificationRepository {
         }
     }
 
-    /**
-     * Helper for {@link #map(UnaryOperator, Services)}.
-     *
-     * @param map a map.
-     * @param op an operator.
-     * @param services services.
-     */
-    @SuppressWarnings("unchecked")
-    private <K, V extends SpecificationElement> void mapValues(
-            Map<K, V> map,
-            UnaryOperator<Term> op,
-            Services services) {
-        for (Entry<K, V> entry : map.entrySet()) {
-            final K key = entry.getKey();
-            final V oldContract = entry.getValue();
-            final V newContract = (V) oldContract.map(op, services);
-            map.put(key, newContract);
-
-            assert oldContract.getName().equals(newContract.getName());
-            if (oldContract instanceof Contract
-                    && contractsByName.containsKey(oldContract.getName())) {
-                contractsByName.put(oldContract.getName(), (Contract) newContract);
-            }
-        }
-    }
-
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
 
     /**
      * Applies the specified operator to every contract in this repository.
+     *
+     * NOTE: For loop invariants and block contracts, you have to call
+     * {@link GoalLocalSpecificationRepository#map(UnaryOperator, Services)}.
      *
      * @param op an operator.
      * @param services services.
@@ -857,15 +785,8 @@ public final class SpecificationRepository {
         mapValueSets(invs, op, services);
         mapValueSets(axioms, op, services);
         mapValueSets(initiallyClauses, op, services);
-        mapValues(loopInvs, op, services);
-        mapValueSets(blockContracts, op, services);
-        mapValueSets(loopContracts, op, services);
         mapValueSets(mergeContracts, op, services);
         mapValueSets(allClassAxiomsCache, op, services);
-        /*
-         * TODO (DS, 2019-11-06): Check if callers also have to call the goal-local
-         * equivalent.
-         */
     }
 
     /**
@@ -1627,107 +1548,6 @@ public final class SpecificationRepository {
         }
     }
 
-    /**
-     * Returns the registered loop invariant for the passed loop, or null.
-     */
-    public LoopSpecification getLoopSpec(LoopStatement loop) {
-        final int line = loop.getStartPosition().getLine();
-        Pair<LoopStatement, Integer> l = new Pair<LoopStatement, Integer>(loop,
-                line);
-        LoopSpecification inv = loopInvs.get(l);
-        if (inv == null && line != -1) {
-            l = new Pair<LoopStatement, Integer>(loop, -1);
-            inv = loopInvs.get(l);
-        }
-        return inv;
-    }
-
-    /**
-     * Copies a loop invariant from a loop statement to another. If the original
-     * loop does not possess an invariant, none is set to the target. A possibly
-     * existing old registration will be overwritten, a registration for the
-     * original loop remains untouched.
-     *
-     * @param from
-     *            the loop with the original contract
-     * @param loop
-     *            the loop for which the contract is to be copied
-     */
-    public void copyLoopInvariant(LoopStatement from, LoopStatement to) {
-        LoopSpecification inv = getLoopSpec(from);
-        if (inv != null) {
-            inv = inv.setLoop(to);
-            addLoopInvariant(inv);
-        }
-    }
-
-    /**
-     * Registers the passed loop invariant, possibly overwriting an older
-     * registration for the same loop.
-     */
-    public void addLoopInvariant(final LoopSpecification inv) {
-        final LoopStatement loop = inv.getLoop();
-        final int line = loop.getStartPosition().getLine();
-        Pair<LoopStatement, Integer> l = new Pair<LoopStatement, Integer>(loop,
-                line);
-        loopInvs.put(l, inv);
-        if (line != -1) {
-            l = new Pair<LoopStatement, Integer>(loop, -1);
-            loopInvs.put(l, inv);
-        }
-    }
-
-    /**
-     * Returns all block contracts for the specified block.
-     *
-     * @param block a block.
-     * @return all block contracts for the specified block.
-     */
-    public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
-        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                block, block.getStartPosition().getLine());
-        final ImmutableSet<BlockContract> contracts = blockContracts.get(b);
-        if (contracts == null) {
-            return DefaultImmutableSet.<BlockContract> nil();
-        } else {
-            return contracts;
-        }
-    }
-
-    /**
-     * Returns all loop contracts for the specified block.
-     *
-     * @param block a block.
-     * @return all loop contracts for the specified block.
-     */
-    public ImmutableSet<LoopContract> getLoopContracts(StatementBlock block) {
-        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                block, block.getStartPosition().getLine());
-        final ImmutableSet<LoopContract> contracts = loopContracts.get(b);
-        if (contracts == null) {
-            return DefaultImmutableSet.<LoopContract> nil();
-        } else {
-            return contracts;
-        }
-    }
-
-    /**
-     * Returns all loop contracts for the specified loop.
-     *
-     * @param loop a loop.
-     * @return all loop contracts for the specified loop.
-     */
-    public ImmutableSet<LoopContract> getLoopContracts(LoopStatement loop) {
-        final Pair<LoopStatement, Integer> b = new Pair<LoopStatement, Integer>(
-                loop, loop.getStartPosition().getLine());
-        final ImmutableSet<LoopContract> contracts = loopContractsOnLoops.get(b);
-        if (contracts == null) {
-            return DefaultImmutableSet.<LoopContract> nil();
-        } else {
-            return contracts;
-        }
-    }
-
     public ImmutableSet<MergeContract> getMergeContracts(
             MergePointStatement mps) {
         final ImmutableSet<MergeContract> contracts = mergeContracts.get(mps);
@@ -1739,171 +1559,15 @@ public final class SpecificationRepository {
     }
 
     /**
-     * Returns block contracts for according block statement
-     * and modality.
-     *
-     * @param block     the given block.
-     * @param modality the given modality.
-     * @return
-     */
-    public ImmutableSet<BlockContract> getBlockContracts(
-            final StatementBlock block, final Modality modality) {
-        ImmutableSet<BlockContract> result = getBlockContracts(block);
-        final Modality matchModality = getMatchModality(modality);
-        for (BlockContract contract : result) {
-            if (!contract.getModality().equals(matchModality)
-                    || (modality.transaction()
-                            && !contract.isTransactionApplicable()
-                            && !contract.isReadOnly(services))) {
-                result = result.remove(contract);
-            }
-        }
-        return result;
-    }
-
-    public ImmutableSet<LoopContract> getLoopContracts(
-            final StatementBlock block, final Modality modality) {
-        ImmutableSet<LoopContract> result = getLoopContracts(block);
-        final Modality matchModality = getMatchModality(modality);
-        for (LoopContract contract : result) {
-            if (!contract.getModality().equals(matchModality)
-                    || (modality.transaction()
-                            && !contract.isTransactionApplicable()
-                            && !contract.isReadOnly(services))) {
-                result = result.remove(contract);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Returns loop contracts for according loop statement
-     * and modality.
-     *
-     * @param loop     the given loop.
-     * @param modality the given modality.
-     * @return the set of resulting loop statements.
-     */
-    public ImmutableSet<LoopContract> getLoopContracts(
-            final LoopStatement loop, final Modality modality) {
-        ImmutableSet<LoopContract> result = getLoopContracts(loop);
-        final Modality matchModality = getMatchModality(modality);
-        for (LoopContract contract : result) {
-            if (!contract.getModality().equals(matchModality)
-                    || (modality.transaction()
-                            && !contract.isTransactionApplicable()
-                            && !contract.isReadOnly(services))) {
-                result = result.remove(contract);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Adds a new {@code BlockContract} and a new {@link FunctionalBlockContract}
-     * to the repository.
-     *
-     * @param contract the {@code BlockContract} to add.
-     */
-    public void addBlockContract(final BlockContract contract) {
-        addBlockContract(contract, false);
-    }
-
-    /**
-     * Adds a new {@code BlockContract} to the repository.
-     *
-     * @param contract the {@code BlockContract} to add.
-     * @param addFunctionalContract whether or not to add a new {@link FunctionalBlockContract}
-     *  based on {@code contract}.
-     */
-    public void addBlockContract(final BlockContract contract, boolean addFunctionalContract) {
-        final StatementBlock block = contract.getBlock();
-        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                block, block.getStartPosition().getLine());
-        blockContracts.put(b, getBlockContracts(block).add(contract));
-
-        if (addFunctionalContract) {
-            addContract(cf.funcBlock(contract));
-        }
-    }
-
-    /**
-     * <p> Removes a {@code BlockContract} from the repository. </p>
-     *
-     * <p> The associated {@link FunctionalBlockContract} is not removed. </p>
-     *
-     * @param contract the {@code BlockContract} to remove.
-     */
-    public void removeBlockContract(final BlockContract contract) {
-        final StatementBlock block = contract.getBlock();
-        final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                block, block.getStartPosition().getLine());
-
-        ImmutableSet<BlockContract> set = blockContracts.get(b);
-        blockContracts.put(b, set.remove(contract));
-    }
-
-    /**
-     * Adds a new {@code LoopContract} and a new {@link FunctionalLoopContract}
-     * to the repository.
+     * Adds a new functional {@code LoopContract} to the repository.
      *
      * @param contract the {@code LoopContract} to add.
      */
-    public void addLoopContract(final LoopContract contract) {
-        addLoopContract(contract, false);
-    }
-
-    /**
-     * Adds a new {@code LoopContract} to the repository.
-     *
-     * @param contract the {@code LoopContract} to add.
-     * @param addFunctionalContract whether or not to add a new {@link FunctionalLoopContract}
-     *  based on {@code contract}.
-     */
-    public void addLoopContract(final LoopContract contract, boolean addFunctionalContract) {
-        if (contract.isOnBlock()) {
-            final StatementBlock block = contract.getBlock();
-            final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                    block, block.getStartPosition().getLine());
-            loopContracts.put(b, getLoopContracts(block).add(contract));
+    public void addFunctionalLoopContract(final LoopContract contract) {
+        if (contract.isInternalOnly()) {
+            addContract(cf.funcBlock(contract.toBlockContract()));
         } else {
-            final LoopStatement loop = contract.getLoop();
-            final Pair<LoopStatement, Integer> b = new Pair<LoopStatement, Integer>(
-                    loop, loop.getStartPosition().getLine());
-            loopContractsOnLoops.put(b, getLoopContracts(loop).add(contract));
-        }
-
-        if (addFunctionalContract) {
-            if (contract.isInternalOnly()) {
-                addContract(cf.funcBlock(contract.toBlockContract()));
-            } else {
-                addContract(cf.funcLoop(contract));
-            }
-        }
-    }
-
-    /**
-     * <p> Removes a {@code LoopContract} from the repository. </p>
-     *
-     * <p> The associated {@link FunctionalLoopContract} is not removed. </p>
-     *
-     * @param contract the {@code LoopContract} to remove.
-     */
-    public void removeLoopContract(final LoopContract contract) {
-        if (contract.isOnBlock()) {
-            final StatementBlock block = contract.getBlock();
-            final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
-                    block, block.getStartPosition().getLine());
-
-            ImmutableSet<LoopContract> set = loopContracts.get(b);
-            loopContracts.put(b, set.remove(contract));
-        } else {
-            final LoopStatement loop = contract.getLoop();
-            final Pair<LoopStatement, Integer> b = new Pair<LoopStatement, Integer>(
-                    loop, loop.getStartPosition().getLine());
-
-            ImmutableSet<LoopContract> set = loopContractsOnLoops.get(b);
-            loopContractsOnLoops.put(b, set.remove(contract));
+            addContract(cf.funcLoop(contract));
         }
     }
 
@@ -1930,6 +1594,15 @@ public final class SpecificationRepository {
         mergeContracts.put(mps, DefaultImmutableSet.nil());
     }
 
+    /**
+     * Adds the supplied {@link SpecificationElement}s (functional contracts, class
+     * invariants and axioms, initially clauses, and merge contracts) to the
+     * repository. NOTE: Block and loop contracts are locally stored in the
+     * {@link GoalLocalSpecificationRepository}, so they have to be separately
+     * registered!
+     *
+     * @param specs The contracts to register.
+     */
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {
         for (SpecificationElement spec : specs) {
             if (spec instanceof Contract) {
@@ -1940,12 +1613,6 @@ public final class SpecificationRepository {
                 addInitiallyClause((InitiallyClause) spec);
             } else if (spec instanceof ClassAxiom) {
                 addClassAxiom((ClassAxiom) spec);
-            } else if (spec instanceof LoopSpecification) {
-                addLoopInvariant((LoopSpecification) spec);
-            } else if (spec instanceof BlockContract) {
-                addBlockContract((BlockContract) spec);
-            } else if (spec instanceof LoopContract) {
-                addLoopContract((LoopContract) spec);
             } else if (spec instanceof MergeContract) {
                 addMergeContract((MergeContract) spec);
             } else {
@@ -2007,6 +1674,14 @@ public final class SpecificationRepository {
             result = obs;
         }
         return result;
+    }
+
+    void addContract(BlockContract blockContract) {
+        addContract(cf.funcBlock(blockContract));
+    }
+
+    void addContract(LoopContract loopContract) {
+        addContract(cf.funcLoop(loopContract));
     }
 
     // Public interface for well-definedness checks

@@ -66,6 +66,8 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
                 services.getSpecificationRepository().map(
                         term -> OriginTermLabel.removeOriginLabels(term, services),
                         services);
+                proof.openGoals().forEach(g -> g.getLocalSpecificationRepository()
+                        .map(term -> OriginTermLabel.removeOriginLabels(term, services), services));
             }
 
             mainWindow.getMediator().getSelectionModel().fireSelectedNodeChanged();

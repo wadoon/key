@@ -98,14 +98,15 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             final GoalLocalSpecificationRepository specifications = goal.getLocalSpecificationRepository();
             StatementBlock block = (StatementBlock) statement;
 
+            final Services services = goal.proof().getServices();
             ImmutableSet<BlockContract> collectedContracts
-                = specifications.getBlockContracts(block, modality);
+                = specifications.getBlockContracts(block, modality, services);
             if (modality == Modality.BOX) {
                 collectedContracts = collectedContracts
-                        .union(specifications.getBlockContracts(block, Modality.DIA));
+                        .union(specifications.getBlockContracts(block, Modality.DIA, services));
             } else if (modality == Modality.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
-                        .union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
+                        .union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION, services));
             }
             return filterAppliedContracts(collectedContracts, goal);
         } else {

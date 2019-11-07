@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
@@ -26,7 +27,8 @@ public class ReattachLoopInvariant extends ProgramTransformer {
 
     @Override
     public ProgramElement[] transform(ProgramElement pe,
-            Services services, SVInstantiations svInst) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services,
+            SVInstantiations svInst) {
         final ProgramElement context = //
                 svInst.getContextInstantiation().contextProgram();
 
@@ -39,11 +41,11 @@ public class ReattachLoopInvariant extends ProgramTransformer {
 
             final LoopStatement loop = (LoopStatement) activeStmt;
 
-            LoopSpecification li = services.getSpecificationRepository().getLoopSpec(loop);
+            LoopSpecification li = localSpecRepo.getLoopSpec(loop);
 
             if (li != null) {
                 li = li.setLoop((While) pe);
-                services.getSpecificationRepository().addLoopInvariant(li);
+                localSpecRepo.addLoopInvariant(li);
             }
         }
 

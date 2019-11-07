@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -44,7 +45,7 @@ public class IsLabeledCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable sv, SVSubstitute instCandidate,
-            MatchConditions matchCond, Services services) {
+            MatchConditions matchCond, Goal goal, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         final JavaStatement stmt = (JavaStatement) svInst.getInstantiation(stmtSV);

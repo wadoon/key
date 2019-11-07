@@ -353,7 +353,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 if (bcs != null) {
                     for (BlockContract bc : bcs) {
                         bc = bc.setBlock(newBlock);
-                        localSpecRepo.addBlockContract(bc);
+                        localSpecRepo.addBlockContract(bc, services);
                     }
                 }
 
@@ -362,7 +362,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 if (lcs != null) {
                     for (LoopContract lc : lcs) {
                         lc = lc.setBlock(newBlock);
-                        localSpecRepo.addLoopContract(lc);
+                        localSpecRepo.addLoopContract(lc, services);
                     }
                 }
 
@@ -745,7 +745,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 if (lcs != null) {
                     for (LoopContract lc : lcs) {
                         lc = lc.setLoop(newLoop);
-                        localSpecRepo.addLoopContract(lc);
+                        localSpecRepo.addLoopContract(lc, services);
                     }
                 }
                 addChild(newLoop);

@@ -4607,7 +4607,7 @@ one_contract
      (prog_var_decls)? 
      fma = formula MODIFIES modifiesClause = term
      {
-       DLSpecFactory dsf = new DLSpecFactory(getGoalLocalSpecificationRepository(), getServices());
+       DLSpecFactory dsf = new DLSpecFactory(getServices());
        try {
          contracts = contracts.prepend(dsf.createDLOperationContract(contractName,
        					                         fma, 
@@ -4629,7 +4629,7 @@ one_invariant[ParsableVariable selfVar]
      fma = formula
      (DISPLAYNAME displayName = string_literal)?
      {
-       DLSpecFactory dsf = new DLSpecFactory(getGoalLocalSpecificationRepository(), getServices());
+       DLSpecFactory dsf = new DLSpecFactory(getServices());
        try {
          invs = invs.add(dsf.createDLClassInvariant(invName,
                                                     displayName,

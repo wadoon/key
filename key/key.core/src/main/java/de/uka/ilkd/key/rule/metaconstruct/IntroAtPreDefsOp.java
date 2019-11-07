@@ -42,7 +42,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
@@ -213,7 +212,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                             contract.getModifiesClause(heap, newVariables.self, services));
                 }
                 updateBlockOrLoopContract(statement, contract, newVariables, newPreconditions,
-                        newPostconditions, newModifiesClauses, goal, localSpecRepo, services);
+                        newPostconditions, newModifiesClauses, localSpecRepo, services);
             }
         }
     }
@@ -259,7 +258,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             collectLoopsBlocksAndMergePointStatements(final ProgramElement pe, Services services) {
         final Quadruple<MethodFrame, ImmutableSet<LoopStatement>, ImmutableSet<StatementBlock>,
                 ImmutableSet<MergePointStatement>> frameAndLoopsAndBlocks
-                        = new JavaASTVisitor(pe, new GoalLocalSpecificationRepository(services), services) {
+                        = new JavaASTVisitor(pe, new GoalLocalSpecificationRepository(), services) {
                             private MethodFrame frame = null;
                             private ImmutableSet<LoopStatement> loops
                                     = DefaultImmutableSet.<LoopStatement>nil();
@@ -528,7 +527,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             final AuxiliaryContract.Variables newVariables,
             final Map<LocationVariable, Term> newPreconditions,
             final Map<LocationVariable, Term> newPostconditions,
-            final Map<LocationVariable, Term> newModifiesClauses, Goal goal, GoalLocalSpecificationRepository localSpecRepo, Services services) {
+            final Map<LocationVariable, Term> newModifiesClauses, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         if (contract instanceof BlockContract) {
             final BlockContract newBlockContract
                     = ((BlockContract) contract).update((StatementBlock) statement,
@@ -537,7 +536,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                             contract.getMby(newVariables, services));
 
             localSpecRepo.removeBlockContract((BlockContract) contract);
-            localSpecRepo.addBlockContract(newBlockContract, false);
+            localSpecRepo.addBlockContract(newBlockContract, false, services);
         } else if (contract instanceof LoopContract) {
             final LoopContract newLoopContract;
 
@@ -558,7 +557,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             }
 
             localSpecRepo.removeLoopContract((LoopContract) contract);
-            localSpecRepo.addLoopContract(newLoopContract, false);
+            localSpecRepo.addLoopContract(newLoopContract, false, services);
         }
     }
 }

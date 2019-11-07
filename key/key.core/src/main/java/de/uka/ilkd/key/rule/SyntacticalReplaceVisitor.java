@@ -21,6 +21,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Optional;
 import java.util.Stack;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -33,22 +34,18 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.SubstOp;
-import de.uka.ilkd.key.logic.op.TermTransformer;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -64,6 +61,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     protected final PosInOccurrence applicationPosInOccurrence;
     protected final Rule rule;
     protected final Goal goal;
+    protected final GoalLocalSpecificationRepository localSpecRepo;
     protected final RuleApp ruleApp;
 
     protected final TermLabelState termLabelState;
@@ -80,7 +78,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     private final Boolean newMarker = new Boolean(true);
     private final Deque<Term> tacletTermStack = new ArrayDeque<Term>();
 
-    
+
     /**
      * constructs a term visitor replacing any occurrence of a schemavariable found
      * in {@code svInst} by its instantiation
@@ -112,12 +110,14 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         this.ruleApp = ruleApp;
         this.labelHint = labelHint;
         this.goal = goal;
+        this.localSpecRepo = Optional.ofNullable(goal).map(Goal::getLocalSpecificationRepository)
+                .orElse(GoalLocalSpecificationRepository.DUMMY_REPO);
         subStack = new Stack<Object>(); // of Term
         if (labelHint instanceof TacletLabelHint) {
             labelHint.setTacletTermStack(tacletTermStack);
         }
     }
-    
+
     /**
      * constructs a term visitor replacing any occurrence of a schemavariable found
      * in {@code svInst} by its instantiation
@@ -138,8 +138,8 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             Rule rule,
             RuleApp ruleApp,
             Services services) {
-        this(termLabelState, labelHint, applicationPosInOccurrence, svInst, 
-                goal, rule, ruleApp, services, services.getTermBuilder());    
+        this(termLabelState, labelHint, applicationPosInOccurrence, svInst,
+                goal, rule, ruleApp, services, services.getTermBuilder());
     }
 
     public SyntacticalReplaceVisitor(TermLabelState termLabelState,
@@ -188,13 +188,13 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         if (jb.program() instanceof ContextStatementBlock) {
             trans = new ProgramReplaceVisitor
                     (new StatementBlock(((ContextStatementBlock)jb.program()).getBody()), // TODO
-                            goal.getLocalSpecificationRepository(),
+                            localSpecRepo,
                             services, svInst);
             trans.start();
             result = addContext((StatementBlock)trans.result());
         } else {
             trans = new ProgramReplaceVisitor(jb.program(),
-                    goal.getLocalSpecificationRepository(),
+                    localSpecRepo,
                     services, svInst);
             trans.start();
             result = trans.result();
@@ -470,7 +470,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         tacletTermStack.pop();
         if (subtreeRoot.op() instanceof TermTransformer) {
             final TermTransformer mop = (TermTransformer) subtreeRoot.op();
-            final Term newTerm = mop.transform((Term)subStack.pop(),svInst, goal.getLocalSpecificationRepository(), services);
+            final Term newTerm = mop.transform((Term)subStack.pop(),svInst, localSpecRepo, services);
             final Term labeledTerm = TermLabelManager.label(services,
                     termLabelState,
                     applicationPosInOccurrence,

@@ -73,30 +73,31 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
             final GoalLocalSpecificationRepository specifications, final JavaStatement statement,
             final Modality modality, final Goal goal) {
         ImmutableSet<LoopContract> collectedContracts;
+        final Services services = goal.proof().getServices();
 
         if (statement instanceof StatementBlock) {
             StatementBlock block = (StatementBlock) statement;
 
             collectedContracts
-                = specifications.getLoopContracts(block, modality);
+                = specifications.getLoopContracts(block, modality, services);
             if (modality == Modality.BOX) {
                 collectedContracts = collectedContracts
-                        .union(specifications.getLoopContracts(block, Modality.DIA));
+                        .union(specifications.getLoopContracts(block, Modality.DIA, services));
             } else if (modality == Modality.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
-                        .union(specifications.getLoopContracts(block, Modality.DIA_TRANSACTION));
+                        .union(specifications.getLoopContracts(block, Modality.DIA_TRANSACTION, services));
             }
         } else {
             LoopStatement loop = (LoopStatement) statement;
 
             collectedContracts
-                = specifications.getLoopContracts(loop, modality);
+                = specifications.getLoopContracts(loop, modality, services);
             if (modality == Modality.BOX) {
                 collectedContracts = collectedContracts
-                        .union(specifications.getLoopContracts(loop, Modality.DIA));
+                        .union(specifications.getLoopContracts(loop, Modality.DIA, services));
             } else if (modality == Modality.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
-                        .union(specifications.getLoopContracts(loop, Modality.DIA_TRANSACTION));
+                        .union(specifications.getLoopContracts(loop, Modality.DIA_TRANSACTION, services));
             }
         }
 

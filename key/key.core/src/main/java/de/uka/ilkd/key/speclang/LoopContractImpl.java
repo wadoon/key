@@ -1100,7 +1100,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                 return new LoopContractImpl(
                         baseName, block, labels, method, modality, preconditions,
                         measuredBy, postconditions, modifiesClauses, infFlowSpecs, variables,
-                        transactionApplicable, hasMod, decreases, null, localSpecRepo services);
+                        transactionApplicable, hasMod, decreases, null, localSpecRepo, services);
             } else {
                 assert loop != null;
                 return new LoopContractImpl(

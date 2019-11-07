@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -126,7 +127,7 @@ class BasicSnippetData {
 
 
     BasicSnippetData(FunctionalOperationContract contract,
-                     Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         this.hasMby = contract.hasMby();
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -149,7 +150,7 @@ class BasicSnippetData {
     BasicSnippetData(LoopSpecification invariant,
                      ExecutionContext context,
                      Term guardTerm,
-                     Services services) {
+                     GoalLocalSpecificationRepository localSpecRepo, Services services) {
         this.hasMby = false;
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -228,6 +229,7 @@ class BasicSnippetData {
         this.hasMby = false; // Mby of block contracts is not further considered
         this.services = services;
         this.tb = services.getTermBuilder();
+        this.localSpecRepo = localSpecRepo;
 
         contractContents.put(Key.TARGET_METHOD, contract.getTarget());
         contractContents.put(Key.FOR_CLASS, contract.getKJT());

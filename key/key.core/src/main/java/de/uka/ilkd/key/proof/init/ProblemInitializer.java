@@ -502,7 +502,7 @@ public final class ProblemInitializer {
            //the first time, read in standard rules
            Profile profile = services.getProfile();
            if(currentBaseConfig == null || profile != currentBaseConfig.getProfile()) {
-               currentBaseConfig = new InitConfig(new GoalLocalSpecificationRepository(services), services);
+               currentBaseConfig = new InitConfig(new GoalLocalSpecificationRepository(), services);
                RuleSource tacletBase = profile.getStandardRules().getTacletBase();
                if(tacletBase != null) {
                    KeYFile tacletBaseFile

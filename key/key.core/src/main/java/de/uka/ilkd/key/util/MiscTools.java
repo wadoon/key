@@ -109,7 +109,7 @@ public final class MiscTools {
      * loop.
      */
     public static Optional<LoopSpecification>
-            getSpecForTermWithLoopStmt(final Term loopTerm, final Services services) {
+            getSpecForTermWithLoopStmt(final Term loopTerm, final GoalLocalSpecificationRepository localSpecRepo) {
         assert loopTerm.op() instanceof Modality;
         assert loopTerm.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
 
@@ -121,7 +121,7 @@ public final class MiscTools {
         final LoopStatement loop = //
                 (LoopStatement) ((StatementBlock) pe).getFirstElement();
 
-        return Optional.ofNullable(services.getSpecificationRepository().getLoopSpec(loop));
+        return Optional.ofNullable(localSpecRepo.getLoopSpec(loop));
     }
 
     /**

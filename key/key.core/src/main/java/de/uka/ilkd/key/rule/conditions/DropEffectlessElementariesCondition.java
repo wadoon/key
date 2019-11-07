@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Optional;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -25,18 +26,20 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public final class DropEffectlessElementariesCondition 
+public final class DropEffectlessElementariesCondition
 						implements VariableCondition {
     private final UpdateSV u;
     private final SchemaVariable x;
     private final SchemaVariable result;
-    
+
     public DropEffectlessElementariesCondition(UpdateSV u,
 	                               	       SchemaVariable x,
 	                               	       SchemaVariable x2) {
@@ -44,10 +47,10 @@ public final class DropEffectlessElementariesCondition
 	this.x = x;
 	this.result = x2;
     }
-    
-    
+
+
     private static Term dropEffectlessElementariesHelper(
-	    				Term update, 
+	    				Term update,
 	    				Set<LocationVariable> relevantVars, TermServices services) {
 	if(update.op() instanceof ElementaryUpdate) {
 	    ElementaryUpdate eu = (ElementaryUpdate) update.op();
@@ -85,41 +88,46 @@ public final class DropEffectlessElementariesCondition
 	} else {
 	    return null;
 	}
-    }    
-    
-    
-    private static Term dropEffectlessElementaries(Term update, 
+    }
+
+
+    private static Term dropEffectlessElementaries(Term update,
 	    					   Term target,
+	    					   GoalLocalSpecificationRepository localSpecificationRepository,
 	    					   Services services) {
-	TermProgramVariableCollector collector 
-		= services.getFactory().create(services);
+	TermProgramVariableCollector collector
+		= services.getFactory().create(localSpecificationRepository, services);
 	target.execPostOrder(collector);
 	Set<LocationVariable> varsInTarget = collector.result();
-	Term simplifiedUpdate = dropEffectlessElementariesHelper(update, 
-							         varsInTarget, services); 
-	return simplifiedUpdate == null 
-	       ? null 
-	       : services.getTermBuilder().apply(simplifiedUpdate, target, null); 
+	Term simplifiedUpdate = dropEffectlessElementariesHelper(update,
+							         varsInTarget, services);
+	return simplifiedUpdate == null
+	       ? null
+	       : services.getTermBuilder().apply(simplifiedUpdate, target, null);
     }
-    
-    
+
+
 
 
    @Override
-    public MatchConditions check(SchemaVariable var, 
-	    		  	 SVSubstitute instCandidate, 
-	    		  	 MatchConditions mc, 
-	    		  	 Services services) {
+    public MatchConditions check(SchemaVariable var,
+	    		  	 SVSubstitute instCandidate,
+	    		  	 MatchConditions mc,
+	    		  	 Goal goal, Services services) {
 	SVInstantiations svInst = mc.getInstantiations();
+        final GoalLocalSpecificationRepository localSpecificationRepository = //
+                Optional.ofNullable(goal).map(Goal::getLocalSpecificationRepository)
+                        .orElse(GoalLocalSpecificationRepository.DUMMY_REPO);
 	Term uInst      = (Term) svInst.getInstantiation(u);
 	Term xInst      = (Term) svInst.getInstantiation(x);
 	Term resultInst = (Term) svInst.getInstantiation(result);
 	if(uInst == null || xInst == null) {
 	    return mc;
 	}
-	
-	Term properResultInst = dropEffectlessElementaries(uInst, 
-						           xInst, 
+
+	Term properResultInst = dropEffectlessElementaries(uInst,
+						           xInst,
+						           localSpecificationRepository,
 						           services);
 	if(properResultInst == null) {
 	    return null;
@@ -132,11 +140,11 @@ public final class DropEffectlessElementariesCondition
 	    return null;
 	}
     }
-    
-    
+
+
     @Override
     public String toString () {
-        return "\\dropEffectlessElementaries(" 
+        return "\\dropEffectlessElementaries("
                + u + ", " + x + ", " + result + ")";
     }
 }

@@ -323,7 +323,8 @@ public class EnhancedForElimination extends ProgramTransformer {
         loop = KeYJavaASTFactory.forLoop(inits, guard,
                 updates, declArrayElemVar, getNextElement, body);
 
-        setInvariant(enhancedFor, loop, localSpecRepo, services);
+        setInvariant(enhancedFor, loop, indexVariable, Optional.ofNullable(valuesVariable),
+                localSpecRepo, services);
 
         // arr = exp; for(...) body
         StatementBlock composition = KeYJavaASTFactory.block(arrAssignment, loop);
@@ -377,7 +378,8 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         // block
         final StatementBlock outerBlock = KeYJavaASTFactory.block(itinit, valuesInit, loop);
-        setInvariant(enhancedFor, loop, localSpecRepo, services);
+        setInvariant(enhancedFor, loop, indexVariable, Optional.ofNullable(valuesVariable),
+                localSpecRepo, services);
         return outerBlock;
 
     }
@@ -430,7 +432,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         if (li != null) {
             li = li.setLoop(transformed);
             li = instantiateIndexValues(li, loopIdxVar, valuesVar, services);
-            services.getSpecificationRepository().addLoopInvariant(li);
+            localSpecRepo.addLoopInvariant(li);
         }
     }
 

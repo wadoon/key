@@ -38,6 +38,10 @@ public interface VariableCondition {
      * @param matchCond the MatchCondition with the current matching state and in particular 
      *    the SVInstantiations that are already known to be needed 
      * @param goal The current goal (needed for local namespaces and specification repositories, etc.)
+     *             TODO (DS, 2019-11-07): This about replacing this by just the local namespaces and
+     *             specification repositories. It's questionable whether taclets / variable conditions
+     *             should have such a global view. Probably not. If this is needed, a BuiltInRule is
+     *             maybe better.
      * @param services the program information object
      * @return modified match results if the condition can be satisfied,
      * or <code>null</code> otherwise

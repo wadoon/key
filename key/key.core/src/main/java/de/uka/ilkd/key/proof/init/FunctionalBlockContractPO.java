@@ -405,7 +405,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             localSpecRepo.addLoopContract(
                     innerLoopContract.replaceEnhancedForVariables(
                             innerLoopContract.getBlock(), services),
-                    false);
+                    false, services);
         }
 
         final List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
@@ -417,7 +417,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         Map<LocationVariable, Function> anonOutHeaps
                 = createAnonOutHeaps(heaps, contract, services, tb);
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(null,
-                contract.getPlaceholderVariables(), services)
+                contract.getPlaceholderVariables(), localSpecRepo, services)
                 .createAndRegister(selfTerm, false, contract.getBlock());
         final ProgramVariable exceptionParameter = KeYJavaASTFactory.localVariable(
                 services.getVariableNamer().getTemporaryNameProposal("e"),

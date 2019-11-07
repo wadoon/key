@@ -27,16 +27,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.NoFindTaclet;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 
 /**
  * Command that applies a calculus rule All parameters are passed as strings and
@@ -75,7 +66,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         Goal g = state.getFirstOpenAutomaticGoal();
 
         if (theApp instanceof TacletApp) {
-            RuleApp completeApp = ((TacletApp) theApp).tryToInstantiate(g.proof().getServices());
+            RuleApp completeApp = ((TacletApp) theApp).tryToInstantiate(g, g.proof().getServices());
             theApp = completeApp == null ? theApp : completeApp;
         }
         assert theApp != null;
@@ -143,7 +134,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         Services services = proof.getServices();
         ImmutableList<TacletApp> assumesCandidates = theApp
                 .findIfFormulaInstantiations(
-                        state.getFirstOpenAutomaticGoal().sequent(), services);
+                        state.getFirstOpenAutomaticGoal().sequent(), state.getFirstOpenAutomaticGoal(), services);
 
         assumesCandidates = ImmutableList.fromList(filterList(p, assumesCandidates));
 

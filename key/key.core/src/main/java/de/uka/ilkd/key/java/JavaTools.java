@@ -99,11 +99,15 @@ public final class JavaTools {
      */
     public static MethodFrame getInnermostMethodFrame(ProgramElement pe,
                                       Services services) {
-        final MethodFrame result = new JavaASTVisitor(pe, new GoalLocalSpecificationRepository(services), services) {
+        final MethodFrame result = new JavaASTVisitor(pe, new GoalLocalSpecificationRepository(), services) {
             private MethodFrame res;
+
+            @Override
             protected void doAction(ProgramElement node) {
                 node.visit(this);
             }
+
+            @Override
             protected void doDefaultAction(SourceElement node) {
                 if(node instanceof MethodFrame && res == null) {
                     res = (MethodFrame) node;
