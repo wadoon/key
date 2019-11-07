@@ -17,7 +17,6 @@
  */
 package de.uka.ilkd.key.rule;
 
-import junit.framework.TestCase;
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -43,7 +42,9 @@ import de.uka.ilkd.key.proof.SVInstantiationException;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import junit.framework.TestCase;
 
 
 public class TestCollisionResolving extends TestCase {
@@ -74,7 +75,7 @@ public class TestCollisionResolving extends TestCase {
 	BuiltInRuleAppIndex builtInRuleAppIndex = new BuiltInRuleAppIndex(null);
 	RuleAppIndex ruleAppIndex = new RuleAppIndex(tacletIndex,
 						     builtInRuleAppIndex, proof.getServices());
-	goal = new Goal(node, ruleAppIndex);
+	goal = new Goal(node, ruleAppIndex, GoalLocalSpecificationRepository.DUMMY_REPO);
     }
 
     @Override

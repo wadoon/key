@@ -123,7 +123,8 @@ public final class Goal {
                  FormulaTagManager tagManager,
                  AutomatedRuleApplicationManager ruleAppManager,
                  Properties strategyInfos,
-                 NamespaceSet localNamespace, GoalLocalSpecificationRepository localSpecificationRepository) {
+                 NamespaceSet localNamespace, 
+                 GoalLocalSpecificationRepository localSpecificationRepository) {
         this.node = node;
         this.ruleAppIndex = ruleAppIndex;
         this.appliedRuleApps = appliedRuleApps;
@@ -141,7 +142,8 @@ public final class Goal {
                  ImmutableList<RuleApp> appliedRuleApps,
                  AutomatedRuleApplicationManager ruleAppManager,
                  Properties strategyInfos,
-                 NamespaceSet localNamespace, GoalLocalSpecificationRepository localSpecificationRepository) {
+                 NamespaceSet localNamespace, 
+                 GoalLocalSpecificationRepository localSpecificationRepository) {
         this.node = node;
         this.ruleAppIndex = ruleAppIndex;
         this.appliedRuleApps = appliedRuleApps;
@@ -156,10 +158,10 @@ public final class Goal {
 
     /**
      * creates a new goal referencing the given node
-     *
+     * @param localSpecRepo TODO
      * @param namespaceSet
      */
-    public Goal(Node node, RuleAppIndex ruleAppIndex) {
+    public Goal(Node node, RuleAppIndex ruleAppIndex, GoalLocalSpecificationRepository localSpecRepo) {
         this(node,
                 ruleAppIndex,
                 ImmutableSLList.<RuleApp>nil(),
@@ -167,7 +169,7 @@ public final class Goal {
                 new QueueRuleApplicationManager(),
                 new MapProperties(),
                 node.proof().getServices().getNamespaces().copyWithParent().copyWithParent(),
-                new GoalLocalSpecificationRepository(node.proof().getServices()));
+                localSpecRepo);
         tagManager = new FormulaTagManager(this);
     }
 

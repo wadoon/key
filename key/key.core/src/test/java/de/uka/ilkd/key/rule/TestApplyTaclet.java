@@ -15,8 +15,6 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
 
-import junit.framework.TestCase;
-
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -43,8 +41,10 @@ import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import junit.framework.TestCase;
 
 
 /**
@@ -915,7 +915,7 @@ public class TestApplyTaclet extends TestCase{
 	    ( new BuiltInRuleIndex () );
 	final RuleAppIndex ruleAppIndex = new RuleAppIndex
 	    ( tacletIndex, birIndex, n.proof().getServices() );
-	final Goal goal = new Goal ( n, ruleAppIndex );
+	final Goal goal = new Goal ( n, ruleAppIndex, GoalLocalSpecificationRepository.DUMMY_REPO );
 	return goal;
     }
 

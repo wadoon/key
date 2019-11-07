@@ -118,7 +118,7 @@ public class TestVariableNamer extends TestCase {
 	RuleAppIndex ruleAppIndex = new RuleAppIndex(tacletIndex,
 						     builtInRuleAppIndex, proof.getServices());
 
-	return new Goal(node, ruleAppIndex);
+	return new Goal(node, ruleAppIndex, proof.getInitConfig().getInitialLocalSpecRepo());
     }
 
 
