@@ -14,7 +14,9 @@
 /**
  * A model of a variant of the "consolidate duplicate conditional fragments"
  * refactoring by M. Fowler. Note that this refactoring is *not* correct without
- * the additional specifications, since P might access the if guard (AExp e).
+ * the additional specifications, since P might access the if guard (AExp e). This
+ * version is the currently most general of the standard variant; the locations
+ * of interest are abstract, and not the "result" variable.
  * 
  * <p>
  * Additionally, this version allows the guard and the extracted fragment to
