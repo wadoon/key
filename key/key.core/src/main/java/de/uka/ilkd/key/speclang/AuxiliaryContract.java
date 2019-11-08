@@ -13,6 +13,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.LoopInitializer;
 import de.uka.ilkd.key.java.Services;
@@ -1055,6 +1056,19 @@ public interface AuxiliaryContract extends SpecificationElement {
             breakFlags = createFlags(breakLabels, BREAK_FLAG_BASE_NAME);
             continueFlags = createFlags(continueLabels, CONTINUE_FLAG_BASE_NAME);
             returnFlag = returnOccurred ? createFlag(RETURN_FLAG_NAME) : null;
+            
+            if (returnFlag == null && statement instanceof StatementBlock
+                    && ((StatementBlock) statement).isArtificialStatementBlock()) {
+                /*
+                 * NOTE (DS, 2019-11-08): If there is an APE inside, it may always return (or
+                 * break, or...), if the contracts don't prevent it from doing so.
+                 */
+                /*
+                 * TODO (DS, 2019-11-08): We might also have to change something about the
+                 * continue and break flags!
+                 */
+                returnFlag = createFlag(RETURN_FLAG_NAME);
+            }
         }
 
         /**

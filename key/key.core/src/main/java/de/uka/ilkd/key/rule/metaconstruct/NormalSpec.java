@@ -18,14 +18,17 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**
  * Term transformer which relates, in the context of Abstract Execution, the
- * "normal" termination flag of an {@link AbstractStatement} with a
- * potentially existing normal_behavior precondition. More precisely, it creates
- * the formula "(normal <-> PRECONDITION) & (normal -> POSTCONDITION)".
+ * "normal" termination flag of an {@link AbstractStatement} with a potentially
+ * existing normal_behavior precondition. More precisely, it creates the formula
+ * "(normal <-> PRECONDITION) & (normal -> POSTCONDITION)".
  *
+ * @deprecated In AE, an APE completes normally iff it does not complete
+ *             abruptly.
  * @author Dominic Steinhoefel
  */
-public class NormalSpec extends RetrieveAESpecTransformer {
+@Deprecated
+public class NormalSpec extends RetrieveAEPreconditionTransformer {
     public NormalSpec() {
-        super("#normalSpec", Behavior.NORMAL_BEHAVIOR, true);
+        super("#normalSpec", Behavior.NORMAL_BEHAVIOR);
     }
 }

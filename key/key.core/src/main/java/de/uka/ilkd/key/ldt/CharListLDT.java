@@ -16,7 +16,6 @@ package de.uka.ilkd.key.ldt;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.ConvertException;
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -85,10 +84,14 @@ public final class CharListLDT extends LDT {
     //internal methods
     //------------------------------------------------------------------------- 
     
-    private String translateCharTerm(Term t) {
+    private String translateCharTerm(Term t, Function charSymbol) {
 	char charVal = 0;
 	int intVal = 0;
-	String result = printlastfirst(t.sub(0)).toString();
+        Term subterm = t.sub(0);
+        if (subterm.op() == charSymbol) {
+            subterm = subterm.sub(0);
+        }
+	String result = printlastfirst(subterm).toString();
 	try {
 	    intVal = Integer.parseInt(result);
 	    charVal = (char) intVal;
@@ -246,14 +249,17 @@ public final class CharListLDT extends LDT {
 
     
     @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
-	final StringBuffer result = new StringBuffer("");
-	Term term = t;
-	while (term.op().arity() != 0) {
-	    result.append(translateCharTerm(term.sub(0)));
-	    term = term.sub(1);
-	}
-	return new StringLiteral("\"" + result + "\"");
+    public StringLiteral translateTerm(Term t, ExtList children, Services services) {
+        final StringBuffer result = new StringBuffer("");
+        Term term = t;
+        while (term.op().arity() != 0) {
+            result.append(translateCharTerm(term.sub(0), services.getTypeConverter().getIntegerLDT().getCharSymbol()));
+            if (term.subs().size() < 2) {
+                break;
+            }
+            term = term.sub(1);
+        }
+        return new StringLiteral("\"" + result + "\"");
     }
     
     

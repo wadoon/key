@@ -80,40 +80,10 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
         }
 
         final Term t = pio.subTerm();
-        final Services services = goal.proof().getServices();
 
         if (t.op() != UpdateApplication.UPDATE_APPLICATION) {
             return false;
         }
-
-        final Term update = UpdateApplication.getUpdate(t);
-        final Term target = UpdateApplication.getTarget(t);
-
-        final TermAccessibleLocationsCollector targetOpColl = //
-                new TermAccessibleLocationsCollector(goal.getLocalSpecificationRepository(),
-                        services);
-        target.execPostOrder(targetOpColl);
-        final Predicate<? super AbstractUpdateLoc> interestingLoc = AbstractUpdateLoc::isAbstract;
-        if (targetOpColl.locations().stream().anyMatch(interestingLoc)) {
-            return true;
-        }
-
-        final OpCollector updOpColl = new OpCollector();
-        update.execPostOrder(updOpColl);
-
-        if (!updOpColl.ops().stream() //
-                .filter(AbstractUpdate.class::isInstance).map(AbstractUpdate.class::cast) //
-                .anyMatch(upd -> upd.getAllAssignables().stream()
-                        .map(AbstractExecutionUtils::unwrapHasTo) //
-                        .anyMatch(interestingLoc))) {
-            return false;
-        }
-
-        /*
-         * Now the lengthy check... Try to create an app. Note that we could also return
-         * true here, but then the rule will appear in the interactive menu although
-         * it's not applicable
-         */
 
         return createApp(pio, goal.proof().getServices()).tryToInstantiate(goal).complete();
     }

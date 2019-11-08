@@ -18,15 +18,13 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**
  * Term transformer which relates, in the context of Abstract Execution, the
- * exception flag of an {@link AbstractStatement} with a potentially
- * existing exceptional_behavior precondition. More precisely, it creates the
- * formula "(!(exc = null) <-> PRECONDITION) & (!(exc = null) ->
- * POSTCONDITION)".
+ * abstract continues term of an {@link AbstractStatement} with a potentially
+ * existing continues behavior precondition.
  *
  * @author Dominic Steinhoefel
  */
-public class ExcSpec extends RetrieveAESpecTransformer {
-    public ExcSpec() {
-        super("#excSpec", Behavior.EXCEPTIONAL_BEHAVIOR, false);
+public class ContinuesPrecondition extends RetrieveAEPreconditionTransformer {
+    public ContinuesPrecondition() {
+        super("#continuesPrecondition", Behavior.CONTINUE_BEHAVIOR);
     }
 }

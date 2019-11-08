@@ -18,14 +18,13 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**
  * Term transformer which relates, in the context of Abstract Execution, the
- * continues flag of an {@link AbstractStatement} with a potentially
- * existing continues behavior precondition. More precisely, it creates the
- * formula "(continues <-> PRECONDITION) & (continues -> POSTCONDITION)".
+ * abstract breaks term of an {@link AbstractStatement} with a potentially
+ * existing breaks_behavior precondition.
  *
  * @author Dominic Steinhoefel
  */
-public class ContinuesSpec extends RetrieveAESpecTransformer {
-    public ContinuesSpec() {
-        super("#continuesSpec", Behavior.CONTINUE_BEHAVIOR, true);
+public class BreaksPrecondition extends RetrieveAEPreconditionTransformer {
+    public BreaksPrecondition() {
+        super("#breaksPrecondition", Behavior.BREAK_BEHAVIOR);
     }
 }

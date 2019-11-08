@@ -67,8 +67,17 @@ public class AbstractUpdateFactory {
     /**
      * Map from abstract program element (APE) identifiers to function symbols for
      * corresponding abstract path conditions.
+     * 
+     * TODO (DS, 2019-11-07): We might not need abstract path conditions after all,
+     * maybe deprecate this.
      */
     private final Map<String, Function> abstractPathConditionInstances = new LinkedHashMap<>();
+
+    /**
+     * Map from abstract program element (APE) identifiers to completion types to
+     * function symbols for corresponding abstract preconditions.
+     */
+    private final Map<String, Map<PreconditionType, Function>> abstractPreconditionInstances = new LinkedHashMap<>();
 
     /**
      * Map from abstract update names to maps from place numbers in abstract updates
@@ -77,7 +86,48 @@ public class AbstractUpdateFactory {
      */
     private final Map<String, Map<Integer, Function>> abstrUpdCharacteristicFuncInsts = new LinkedHashMap<>();
 
+    /**
+     * Map from precondition types to the corresponding target sorts, since there
+     * are boolean preconditions (those are the "real" preconditions) and some of
+     * Object type specifying result / exception objects.
+     */
+    private final Map<PreconditionType, Sort> targetSortForPreconditionType = new LinkedHashMap<>();
+
     private final Services services;
+
+    /**
+     * Types of abstract preconditions (basically, reasons for completion of a
+     * statement).
+     * 
+     * TODO (DS, 2019-11-07): Extend by some mechanism for labeled breaks /
+     * continues.
+     * 
+     * @author Dominic Steinhoefel
+     */
+    public enum PreconditionType {
+        NORMAL("normal"), //
+        EXC("throwsExc"), //
+        RETURN("returns"), //
+        BREAK("breaks"), //
+        CONT("continues"), //
+        EXC_OBJ("exceptionObject"), //
+        RES_OBJ("resultObject");
+
+        private final String name;
+
+        private PreconditionType(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+        
+        @Override
+        public String toString() {
+            return getName();
+        }
+    };
 
     /**
      * Constructor. NOTE: You should not use this constructor, but instead access
@@ -93,8 +143,8 @@ public class AbstractUpdateFactory {
      * Returns abstract update operator for the passed
      * {@link AbstractProgramElement} and left-hand side.
      *
-     * @param phs              The {@link AbstractProgramElement} for which
-     *                         this {@link AbstractUpdate} should be created.
+     * @param phs              The {@link AbstractProgramElement} for which this
+     *                         {@link AbstractUpdate} should be created.
      * @param lhs              The update's left-hand side. Should be a
      *                         {@link SetLDT} term.
      * @param rhs              The right-hand side for the abstract update; needed
@@ -201,13 +251,15 @@ public class AbstractUpdateFactory {
      * Returns abstract path condition operator for the passed
      * {@link AbstractProgramElement} and argument sorts.
      *
-     * @param phs      The {@link AbstractProgramElement} for which this
-     *                 abstract path condition operator should be created.
+     * @param phs      The {@link AbstractProgramElement} for which this abstract
+     *                 path condition operator should be created.
      * @param argSorts argument sorts for the operator (corresponding to right-hand
      *                 side/accessibles)
      * @return The abstract path condition operator for the passed
      *         {@link AbstractProgramElement} and argument sorts.
+     * @deprecated abstract path conditions are no longer used.
      */
+    @Deprecated
     public Function getAbstractPathConditionInstance(AbstractProgramElement phs,
             final Sort[] argSorts) {
         final String phsID = phs.getId();
@@ -224,22 +276,45 @@ public class AbstractUpdateFactory {
     }
 
     /**
-     * Checks whether the given function symbol is an abstract path condition.
-     * Abstract path conditions are those created via
-     * {@link #getAbstractPathConditionInstance(AbstractProgramElement, Sort[])},
-     * other symbols won't be recognized.
-     * 
-     * @param f The {@link Function} symbol to check.
-     * @return true iff this function symbol is an abstract path condition.
+     * Returns abstract precondition operator for the passed
+     * {@link AbstractProgramElement}, precondition type and argument sorts.
+     *
+     * @param phs              The {@link AbstractProgramElement} for which this
+     *                         abstract precondition operator should be created.
+     * @param preconditionType The {@link PreconditionType} for which to create the
+     *                         precondition.
+     * @param argSorts         argument sorts for the operator (corresponding to
+     *                         right-hand side/accessibles)
+     * @return The abstract precondition operator for the passed
+     *         {@link AbstractProgramElement}, {@link PreconditionType} and argument
+     *         sorts.
      */
-    public boolean isAbstractPathCondition(Function f) {
-        return abstractPathConditionInstances.containsValue(f);
+    public Function getAbstractPreconditionInstance(AbstractProgramElement phs,
+            PreconditionType preconditionType, final Sort[] argSorts) {
+        final String phsID = phs.getId();
+
+        Function result = Optional.ofNullable(abstractPreconditionInstances.get(phsID))
+                .orElseGet(() -> {
+                    abstractPreconditionInstances.put(phsID, new LinkedHashMap<>());
+                    return abstractPreconditionInstances.get(phsID);
+                }).get(preconditionType);
+
+        if (result == null) {
+            final String funName = services.getTermBuilder()
+                    .newName(String.format("%s_%s", preconditionType.getName(), phsID));
+            result = new Function(new Name(funName),
+                    getTargetSortForPrecondtionType(preconditionType), argSorts);
+
+            abstractPreconditionInstances.get(phsID).put(preconditionType, result);
+        }
+
+        return result;
     }
 
     /**
      * Returns a new {@link AbstractUpdate} for the same
-     * {@link AbstractProgramElement}, but with a different assignable set
-     * defined by the supplied substitutions.
+     * {@link AbstractProgramElement}, but with a different assignable set defined
+     * by the supplied substitutions.
      *
      * @param abstrUpd   The original {@link AbstractUpdate}.
      * @param replaceMap The replacement map for assignable locations.
@@ -442,6 +517,35 @@ public class AbstractUpdateFactory {
         return services.getTypeConverter().findThisForSort(
                 executionContext.get().getMethodContext().getContainerType().getSort(),
                 executionContext.get());
+    }
+
+    /**
+     * Returns the target sort for the given precondition type. Initializes the
+     * corresponding map if not yet done.
+     * 
+     * @see #targetSortForPreconditionType
+     * @param preconditionType The {@link PreconditionType} for which to return the
+     *                         target sort.
+     * @return The target sort for the given precondition type.
+     */
+    private Sort getTargetSortForPrecondtionType(PreconditionType preconditionType) {
+        if (targetSortForPreconditionType.get(PreconditionType.NORMAL) == null) {
+            final Sort booleanSort = services.getTypeConverter().getBooleanLDT().targetSort();
+            final Sort objectSort = services.getJavaInfo().getKeYJavaType("java.lang.Object")
+                    .getSort();
+            final Sort throwableSort = //
+                    services.getJavaInfo().getKeYJavaType("java.lang.Throwable").getSort();
+
+            targetSortForPreconditionType.put(PreconditionType.NORMAL, booleanSort);
+            targetSortForPreconditionType.put(PreconditionType.EXC, booleanSort);
+            targetSortForPreconditionType.put(PreconditionType.RETURN, booleanSort);
+            targetSortForPreconditionType.put(PreconditionType.BREAK, booleanSort);
+            targetSortForPreconditionType.put(PreconditionType.CONT, booleanSort);
+            targetSortForPreconditionType.put(PreconditionType.EXC_OBJ, throwableSort);
+            targetSortForPreconditionType.put(PreconditionType.RES_OBJ, objectSort);
+        }
+
+        return targetSortForPreconditionType.get(preconditionType);
     }
 
     // TODO (DS, 2019-10-30): Leaving this code here for now in case that I need it.

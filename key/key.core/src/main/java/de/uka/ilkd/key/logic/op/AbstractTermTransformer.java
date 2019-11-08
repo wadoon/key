@@ -16,6 +16,7 @@ package de.uka.ilkd.key.logic.op;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.abstractexecution.rule.metaconstruct.AbstractPreconditionTransformer;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -24,16 +25,16 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.metaconstruct.AddCast;
 import de.uka.ilkd.key.rule.metaconstruct.ArrayBaseInstanceOf;
-import de.uka.ilkd.key.rule.metaconstruct.BreaksSpec;
+import de.uka.ilkd.key.rule.metaconstruct.BreaksPrecondition;
 import de.uka.ilkd.key.rule.metaconstruct.ConstantValue;
-import de.uka.ilkd.key.rule.metaconstruct.ContinuesSpec;
+import de.uka.ilkd.key.rule.metaconstruct.ContinuesPrecondition;
 import de.uka.ilkd.key.rule.metaconstruct.CreateBeforeLoopUpdate;
 import de.uka.ilkd.key.rule.metaconstruct.CreateFrameCond;
 import de.uka.ilkd.key.rule.metaconstruct.CreateHeapAnonUpdate;
 import de.uka.ilkd.key.rule.metaconstruct.CreateLocalAnonUpdate;
 import de.uka.ilkd.key.rule.metaconstruct.CreateWellformedCond;
 import de.uka.ilkd.key.rule.metaconstruct.EnumConstantValue;
-import de.uka.ilkd.key.rule.metaconstruct.ExcSpec;
+import de.uka.ilkd.key.rule.metaconstruct.ExcPrecondition;
 import de.uka.ilkd.key.rule.metaconstruct.ExpandQueriesMetaConstruct;
 import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
 import de.uka.ilkd.key.rule.metaconstruct.MemberPVToField;
@@ -42,9 +43,10 @@ import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula3;
 import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula4;
 import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula5;
 import de.uka.ilkd.key.rule.metaconstruct.NormalSpec;
-import de.uka.ilkd.key.rule.metaconstruct.ReturnSpec;
-import de.uka.ilkd.key.rule.metaconstruct.SetLastComponentOfAEPredsToFalseTransformer;
 import de.uka.ilkd.key.rule.metaconstruct.ObserverEqualityMetaConstruct;
+import de.uka.ilkd.key.rule.metaconstruct.RetrieveAEPostconditionTransformer;
+import de.uka.ilkd.key.rule.metaconstruct.ReturnPrecondition;
+import de.uka.ilkd.key.rule.metaconstruct.SetLastComponentOfAEPredsToFalseTransformer;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideLCRMonomials;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideMonomials;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaAdd;
@@ -142,10 +144,13 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer MUTUAL_EXCLUSION_FORMULA_5 = new MutualExclusionFormula5();
 
     public static final AbstractTermTransformer NORMAL_SPEC = new NormalSpec();
-    public static final AbstractTermTransformer RETURN_SPEC = new ReturnSpec();
-    public static final AbstractTermTransformer EXC_SPEC = new ExcSpec();
-    public static final AbstractTermTransformer BREAKS_SPEC = new BreaksSpec();
-    public static final AbstractTermTransformer CONTINUES_SPEC = new ContinuesSpec();
+    public static final AbstractTermTransformer RETURN_SPEC = new ReturnPrecondition();
+    public static final AbstractTermTransformer EXC_SPEC = new ExcPrecondition();
+    public static final AbstractTermTransformer BREAKS_SPEC = new BreaksPrecondition();
+    public static final AbstractTermTransformer CONTINUES_SPEC = new ContinuesPrecondition();
+    
+    public static final AbstractTermTransformer ABSTR_PRECOND_TRANSF = new AbstractPreconditionTransformer();
+    public static final RetrieveAEPostconditionTransformer ABSTR_POSTCOND_TRANSF = new RetrieveAEPostconditionTransformer();
 
     public static final AbstractTermTransformer SET_SECOND_COMPONENT_TO = new SetLastComponentOfAEPredsToFalseTransformer();
 

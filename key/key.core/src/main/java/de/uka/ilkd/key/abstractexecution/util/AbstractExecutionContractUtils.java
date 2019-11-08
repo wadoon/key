@@ -34,11 +34,11 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.OpCollector;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.Pair;
@@ -390,7 +390,7 @@ public class AbstractExecutionContractUtils {
      */
     public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> //
             getAccessibleAndAssignableTermsForNoBehaviorContract(
-                    final AbstractProgramElement abstrStmt, final MatchConditions matchCond,
+                    final AbstractProgramElement abstrStmt, final Optional<SequentFormula> maybeSeqFor,
                     GoalLocalSpecificationRepository localSpecRepo, final Services services,
                     Optional<ExecutionContext> executionContext) {
         final Set<LocationVariable> surroundingVars = new LinkedHashSet<>();
@@ -411,7 +411,7 @@ public class AbstractExecutionContractUtils {
 //                        services);
 //        pvc.start();
 //        surroundingVars.addAll(pvc.result());
-        matchCond.getMaybeSeqFor().ifPresent(sf -> {
+        maybeSeqFor.ifPresent(sf -> {
             /*
              * NOTE (DS, 2019-01-30): Here, we just could use a TermProgramVariableCollector
              * and thus also consider PVs in the programs. However, those might arise from

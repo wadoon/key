@@ -18,14 +18,13 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**
  * Term transformer which relates, in the context of Abstract Execution, the
- * breaks flag of an {@link AbstractStatement} with a potentially
- * existing breaks_behavior precondition. More precisely, it creates the formula
- * "(breaks <-> PRECONDITION) & (breaks -> POSTCONDITION)".
+ * abstract exception termof an {@link AbstractStatement} with a potentially
+ * existing exceptional_behavior precondition.
  *
  * @author Dominic Steinhoefel
  */
-public class BreaksSpec extends RetrieveAESpecTransformer {
-    public BreaksSpec() {
-        super("#breaksSpec", Behavior.BREAK_BEHAVIOR, true);
+public class ExcPrecondition extends RetrieveAEPreconditionTransformer {
+    public ExcPrecondition() {
+        super("#excPrecondition", Behavior.EXCEPTIONAL_BEHAVIOR);
     }
 }

@@ -18,14 +18,13 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**
  * Term transformer which relates, in the context of Abstract Execution, the
- * return flag of an {@link AbstractStatement} with a potentially
- * existing return_behavior precondition. More precisely, it creates the formula
- * "(returns <-> PRECONDITION) & (returns -> POSTCONDITION)".
+ * abstract return term of an {@link AbstractStatement} with a potentially
+ * existing return_behavior precondition.
  *
  * @author Dominic Steinhoefel
  */
-public class ReturnSpec extends RetrieveAESpecTransformer {
-    public ReturnSpec() {
-        super("#returnSpec", Behavior.RETURN_BEHAVIOR, true);
+public class ReturnPrecondition extends RetrieveAEPreconditionTransformer {
+    public ReturnPrecondition() {
+        super("#returnPrecondition", Behavior.RETURN_BEHAVIOR);
     }
 }

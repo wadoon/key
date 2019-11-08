@@ -1121,7 +1121,9 @@ options {
 	        }
 	        result = new NullSort(objectSort);
 	        sorts().add(result);
-	    } else {
+	    } else if (name.equals("Formula")) {
+		    result = Sort.FORMULA;
+		} else {
   	    	result = (Sort) sorts().lookup(new Name("java.lang."+name));
   	    }
 	}
