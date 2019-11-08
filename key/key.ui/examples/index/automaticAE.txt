@@ -151,6 +151,7 @@ group aepaper_provable {
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchNoFinallyCorrect/consolidateDuplicateConditionalFragments.key
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrect/consolidateDuplicateConditionalFragments.key
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrectLocalResultVar/consolidateDuplicateConditionalFragments.key
+   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrectMoreGeneral/consolidateDuplicateConditionalFragments.key
 }
 
 group aepaper_notprovable {

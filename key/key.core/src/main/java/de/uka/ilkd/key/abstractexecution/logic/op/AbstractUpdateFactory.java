@@ -290,7 +290,7 @@ public class AbstractUpdateFactory {
      *         sorts.
      */
     public Function getAbstractPreconditionInstance(AbstractProgramElement phs,
-            PreconditionType preconditionType, final Sort[] argSorts) {
+            PreconditionType preconditionType, final int numArgs) {
         final String phsID = phs.getId();
 
         Function result = Optional.ofNullable(abstractPreconditionInstances.get(phsID))
@@ -302,8 +302,12 @@ public class AbstractUpdateFactory {
         if (result == null) {
             final String funName = services.getTermBuilder()
                     .newName(String.format("%s_%s", preconditionType.getName(), phsID));
+            
+            final Sort[] sorts = new Sort[numArgs];
+            Arrays.fill(sorts, Sort.ANY);
+            
             result = new Function(new Name(funName),
-                    getTargetSortForPrecondtionType(preconditionType), argSorts);
+                    getTargetSortForPrecondtionType(preconditionType), sorts);
 
             abstractPreconditionInstances.get(phsID).put(preconditionType, result);
         }

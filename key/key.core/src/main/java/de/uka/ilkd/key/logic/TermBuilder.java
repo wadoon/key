@@ -980,7 +980,7 @@ public class TermBuilder {
      * @return The wrapped {@link Term} (or the original one, if the argument is
      *         already wrapped or not of locSet sort).
      */
-    private Term wrapInValue(Term t) {
+    public Term wrapInValue(Term t) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final Function valueFun = locSetLDT.getValue();
         if (t.op() != valueFun && t.sort() == locSetLDT.targetSort()) {

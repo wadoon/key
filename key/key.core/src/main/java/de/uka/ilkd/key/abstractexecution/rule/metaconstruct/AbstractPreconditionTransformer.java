@@ -15,7 +15,6 @@ package de.uka.ilkd.key.abstractexecution.rule.metaconstruct;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -29,10 +28,10 @@ import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -53,12 +52,13 @@ public class AbstractPreconditionTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(Term term, SVInstantiations svInst,
             GoalLocalSpecificationRepository localSpecRepo, Services services) {
-        final AbstractProgramElement ape = getAPE(term, svInst);
-
+        final TermBuilder tb = services.getTermBuilder();
         final Optional<ExecutionContext> executionContext = Optional
                 .ofNullable(svInst.getExecutionContext());
-
         assert term.subs().size() == 2;
+
+        final AbstractProgramElement ape = getAPE(term, svInst);
+
         final PreconditionType preconditionType = getPreconditionType(term.sub(1), services);
 
         final List<AbstractUpdateLoc> accessibles = //
@@ -66,14 +66,13 @@ public class AbstractPreconditionTransformer extends AbstractTermTransformer {
                         ape, Optional.empty(), localSpecRepo, services, executionContext).first;
 
         final ImmutableArray<Term> accessiblesTerms = accessibles.stream()
-                .map(loc -> loc.toTerm(services)).collect(ImmutableArray.toImmutableArray());
-        final Sort[] accessibleSorts = accessibles.stream().map(AbstractUpdateLoc::sort)
-                .collect(Collectors.toList()).toArray(new Sort[0]);
+                .map(loc -> loc.toTerm(services)).map(tb::wrapInValue)
+                .collect(ImmutableArray.toImmutableArray());
 
         final Function precondFun = services.abstractUpdateFactory()
-                .getAbstractPreconditionInstance(ape, preconditionType, accessibleSorts);
+                .getAbstractPreconditionInstance(ape, preconditionType, accessiblesTerms.size());
 
-        return services.getTermFactory().createTerm(precondFun, accessiblesTerms, null, null);
+        return tb.tf().createTerm(precondFun, accessiblesTerms, null, null);
     }
 
     public static PreconditionType getPreconditionType(Term term, Services services) {
