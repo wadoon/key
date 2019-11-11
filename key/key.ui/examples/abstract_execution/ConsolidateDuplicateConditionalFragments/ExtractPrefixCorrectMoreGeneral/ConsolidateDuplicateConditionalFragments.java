@@ -59,7 +59,6 @@ public class ConsolidateDuplicateConditionalFragments {
             
             //@ assignable \dl_frameQ1;
             //@ accessible \dl_footprintQ1;
-            //@ exceptional_behavior signals (Throwable t) t != null;
             \abstract_statement Q1;
         }
         else {
@@ -72,7 +71,6 @@ public class ConsolidateDuplicateConditionalFragments {
             
             //@ assignable \dl_frameQ2;
             //@ accessible \dl_footprintQ2;
-            //@ exceptional_behavior signals (Throwable t) t != null;
             \abstract_statement Q2;
         }
 
@@ -107,13 +105,11 @@ public class ConsolidateDuplicateConditionalFragments {
         ) {
             //@ assignable \dl_frameQ1;
             //@ accessible \dl_footprintQ1;
-            //@ exceptional_behavior signals (Throwable t) t != null;
             \abstract_statement Q1;
         }
         else {
             //@ assignable \dl_frameQ2;
             //@ accessible \dl_footprintQ2;
-            //@ exceptional_behavior signals (Throwable t) t != null;
             \abstract_statement Q2;
         }
 
