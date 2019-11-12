@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -37,11 +38,16 @@ public class ShowHashcodesExtension implements KeYGuiExtension, KeYGuiExtension.
 
         if (term.op() instanceof ElementaryUpdate) {
             result += "<br><b>LHS Hash:</b> " + ((ElementaryUpdate) term.op()).lhs().hashCode();
+            result += "<br><b>LHS Sort:</b> "
+                    + ((ElementaryUpdate) term.op()).lhs().sort().toString();
         }
 
         if (term.op() instanceof AbstractUpdate) {
             result += "<br><b>LHS Hashes:</b> " + ((AbstractUpdate) term.op()).getAllAssignables()
                     .stream().map(AbstractExecutionUtils::unwrapHasTo).map(Object::hashCode)
+                    .map(i -> "" + i).collect(Collectors.joining(", "));
+            result += "<br><b>LHS Sorts:</b> " + ((AbstractUpdate) term.op()).getAllAssignables()
+                    .stream().map(AbstractExecutionUtils::unwrapHasTo).map(AbstractUpdateLoc::sort)
                     .map(i -> "" + i).collect(Collectors.joining(", "));
         }
 
