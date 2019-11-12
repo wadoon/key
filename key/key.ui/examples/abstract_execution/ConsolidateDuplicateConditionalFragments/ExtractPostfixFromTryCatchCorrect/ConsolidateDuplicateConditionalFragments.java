@@ -19,7 +19,10 @@
  * Discovered: TryProg and CatchProg may not return, since after the
  * refactoring, the finally block will be executed even after the return
  * statement, alternating the behavior. For the same reason, CatchProg may not
- * throw an exception.
+ * throw an exception. Also, Postfix must not throw an exception: In that case,
+ * it would have the chance to be executed twice before the refactoring, and
+ * also CatchProg would be executed, what both wouldn't happen after the
+ * refactoring.
  *
  * @author Dominic Steinhoefel
  */
@@ -39,6 +42,7 @@ public class ConsolidateDuplicateConditionalFragments {
 
             //@ assignable \dl_framePostfixProg;
             //@ accessible \dl_footprintPostfixProg;
+            //@ exceptional_behavior requires false;
             \abstract_statement Postfix;
         }
         catch (Throwable t) {
@@ -55,6 +59,7 @@ public class ConsolidateDuplicateConditionalFragments {
 
             //@ assignable \dl_framePostfixProg;
             //@ accessible \dl_footprintPostfixProg;
+            //@ exceptional_behavior requires false;
             \abstract_statement Postfix;
         }
 
@@ -88,6 +93,7 @@ public class ConsolidateDuplicateConditionalFragments {
         } finally {
             //@ assignable \dl_framePostfixProg;
             //@ accessible \dl_footprintPostfixProg;
+            //@ exceptional_behavior requires false;
             \abstract_statement Postfix;
         }
 
