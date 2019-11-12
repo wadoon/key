@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="Post(value(relevant))">
+    <programOne>/*@ assume \disjoint(\dl_frameE, \dl_footprintP) &amp;&amp;
+  @        \disjoint(\dl_frameP, \dl_footprintE) &amp;&amp;
+  @        \disjoint(\dl_frameP, \dl_frameE) &amp;&amp;
+  @        \disjoint(\dl_frameE, \dl_relevant) &amp;&amp;
+  @        \disjoint(\dl_frameP, \dl_relevant) &amp;&amp;
+  @        \dl_mutex3(\dl_throwsExcE(\dl_value(\dl_footprintE)),
+  @                   \dl_throwsExcP(\dl_value(\dl_footprintP)),
+  @                   \dl_returnsP(\dl_value(\dl_footprintP)));
+  @*/
+{ ; }
+
+if (
+    /*@ assignable \dl_frameE;
+      @ accessible \dl_footprintE;
+      @ exceptional_behavior requires \dl_throwsExcE(\dl_value(\dl_footprintE));
+      @*/
+    \abstract_expression boolean e
+) {
+    /*@ assignable \dl_frameP;
+      @ accessible \dl_footprintP;
+      @ exceptional_behavior requires \dl_throwsExcP(\dl_value(\dl_footprintP));
+      @ return_behavior requires \dl_returnsP(\dl_value(\dl_footprintP));
+      @*/
+    \abstract_statement P;
+    
+    //@ assignable \dl_frameQ1;
+    //@ accessible \dl_footprintQ1;
+    \abstract_statement Q1;
+}
+else {
+    /*@ assignable \dl_frameP;
+      @ accessible \dl_footprintP;
+      @ exceptional_behavior requires \dl_throwsExcP(\dl_value(\dl_footprintP));
+      @ return_behavior requires \dl_returnsP(\dl_value(\dl_footprintP));
+      @*/
+    \abstract_statement P;
+    
+    //@ assignable \dl_frameQ2;
+    //@ accessible \dl_footprintQ2;
+    \abstract_statement Q2;
+}
+
+return result;</programOne>
+    <programTwo>/*@ assume \disjoint(\dl_frameE, \dl_footprintP) &amp;&amp;
+  @        \disjoint(\dl_frameP, \dl_footprintE) &amp;&amp;
+  @        \disjoint(\dl_frameP, \dl_frameE) &amp;&amp;
+  @        \disjoint(\dl_frameE, \dl_relevant) &amp;&amp;
+  @        \disjoint(\dl_frameP, \dl_relevant) &amp;&amp;
+  @        \dl_mutex3(\dl_throwsExcE(\dl_value(\dl_footprintE)),
+  @                   \dl_throwsExcP(\dl_value(\dl_footprintP)),
+  @                   \dl_returnsP(\dl_value(\dl_footprintP)));
+  @*/
+{ ; }
+
+/*@ assignable \dl_frameP;
+  @ accessible \dl_footprintP;
+  @ exceptional_behavior requires \dl_throwsExcP(\dl_value(\dl_footprintP));
+  @ return_behavior requires \dl_returnsP(\dl_value(\dl_footprintP));
+  @*/
+\abstract_statement P;
+
+if (
+    /*@ assignable \dl_frameE;
+      @ accessible \dl_footprintE;
+      @ exceptional_behavior requires \dl_throwsExcE(\dl_value(\dl_footprintE));
+      @*/
+    \abstract_expression boolean e
+) {
+    //@ assignable \dl_frameQ1;
+    //@ accessible \dl_footprintQ1;
+    \abstract_statement Q1;
+}
+else {
+    //@ assignable \dl_frameQ2;
+    //@ accessible \dl_footprintQ2;
+    \abstract_statement Q2;
+}
+
+return result;</programTwo>
+    <locationSets>
+        <locationSet>relevant</locationSet>
+        <locationSet>frameP</locationSet>
+        <locationSet>footprintP</locationSet>
+        <locationSet>frameE</locationSet>
+        <locationSet>footprintE</locationSet>
+        <locationSet>frameQ1</locationSet>
+        <locationSet>footprintQ1</locationSet>
+        <locationSet>frameQ2</locationSet>
+        <locationSet>footprintQ2</locationSet>
+    </locationSets>
+    <predicates>
+        <predicate predName="Post">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="throwsExcP">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="throwsExcE">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="returnsP">
+            <argSort>any</argSort>
+        </predicate>
+    </predicates>
+    <programVariables>
+        <programVariable typeName="Object" varName="result"/>
+    </programVariables>
+</ns2:aeRelationalModel>

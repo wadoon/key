@@ -1,0 +1,123 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2010 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2019 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+package de.uka.ilkd.key.gui.abstractexecution.relational;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import de.uka.ilkd.key.gui.abstractexecution.relational.model.PredicateDeclaration;
+
+/**
+ * @author Dominic Steinhoefel
+ */
+public class PredicateInputDialog extends JDialog {
+    private static final long serialVersionUID = 1L;
+
+    private PredicateDeclaration value;
+    
+    private PredicateInputDialog(final JDialog owner, final PredicateDeclaration value) {
+        super(owner, true);
+        assert value != null;
+
+        this.value = value;
+
+        final PredicateInputDialog instance = this;
+        getContentPane().setLayout(new BorderLayout());
+
+        final JPanel contentPanel = new JPanel();
+        final int borderSize = 5;
+        contentPanel.setBorder(
+                BorderFactory.createEmptyBorder(borderSize, borderSize, borderSize, borderSize));
+        contentPanel.setLayout(new BorderLayout());
+        getContentPane().add(contentPanel, BorderLayout.CENTER);
+
+        setTitle("Please enter a predicate specification.");
+        setResizable(false);
+        
+        final JButton okButton = new JButton("OK");
+
+        final JTextField valueTextField = new JTextField(value.toString());
+        valueTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                final char c = e.getKeyChar();
+
+                if (!(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9'
+                        || c == '_' || c == ',' || c == '(' || c == ')')) {
+                    e.consume();
+                }
+            }
+        });
+        valueTextField.addActionListener(e -> okButton.doClick());
+
+        contentPanel.add(valueTextField, BorderLayout.CENTER);
+
+        final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        okButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    instance.value = PredicateDeclaration.fromString(valueTextField.getText());
+                    instance.setVisible(false);
+                } catch (IllegalArgumentException exc) {
+                    JOptionPane.showMessageDialog(instance,
+                            "There's an error in your syntax, please correct it and try again",
+                            "Syntax error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        final JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                instance.value = null;
+                instance.setVisible(false);
+            }
+        });
+
+        okButton.setPreferredSize(new Dimension(90, okButton.getPreferredSize().height));
+        cancelButton.setPreferredSize(new Dimension(90, cancelButton.getPreferredSize().height));
+
+        buttonPanel.add(okButton);
+        buttonPanel.add(cancelButton);
+        contentPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        setSize(400, 110);
+    }
+    
+    public static PredicateDeclaration showInputDialog(final JDialog owner) {
+        return showInputDialog(owner, PredicateDeclaration.EMPTY_DECL);
+    }
+
+    public static PredicateDeclaration showInputDialog(final JDialog owner,
+            final PredicateDeclaration value) {
+        final PredicateInputDialog dia = new PredicateInputDialog(owner, value);
+        dia.setVisible(true);
+        dia.dispose();
+        return dia.value;
+    }
+
+}

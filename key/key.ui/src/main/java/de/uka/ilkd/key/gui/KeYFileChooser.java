@@ -35,12 +35,13 @@ public class KeYFileChooser {
                             || "java".equals(IOUtil.getFileExtension(f))
                             || "key".equals(IOUtil.getFileExtension(f))
                             || "proof".equals(IOUtil.getFileExtension(f))
+                            || "aer".equals(IOUtil.getFileExtension(f))
                             || f.getName().endsWith(".proof.gz")
                             || f.getName().endsWith(".zproof");
         }
 
         public String getDescription() {
-            return "Java files, (compressed) KeY files, proof packages, and source directories";
+            return "Java files, (compressed) KeY files, proof packages, source directories";
         }
     };
 
@@ -51,6 +52,16 @@ public class KeYFileChooser {
 
         public String getDescription() {
             return "compressed KeY proof files (.proof.gz)";
+        }
+    };
+    
+    private static final FileFilter AE_RELATIONAL_FILTER = new FileFilter() {
+        public boolean accept(File f) {
+            return f.isDirectory() || "aer".equals(IOUtil.getFileExtension(f));
+        }
+
+        public String getDescription() {
+            return "Abstract Execution Relational Verification Models (.aer)";
         }
     };
 
@@ -80,6 +91,7 @@ public class KeYFileChooser {
             }
         };
         fileChooser.addChoosableFileFilter(COMPRESSED_FILTER);
+        fileChooser.addChoosableFileFilter(AE_RELATIONAL_FILTER);
         fileChooser.setFileFilter(FILTER);
     }
 

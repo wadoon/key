@@ -3,6 +3,10 @@ plugins {
     id 'com.github.johnrengelman.shadow' version "5.0.0"
 }
 
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
 dependencies {
     compile project(":key.core")
     compile project(":key.core:rifl")
@@ -21,6 +25,7 @@ dependencies {
     //runtimeOnly project(":keyext.script.ui")
 
     compile 'org.jetbrains:annotations:17.0.0'
+    implementation 'com.github.bobbylight:RSyntaxTextArea:3.0.4'
 }
 
 task createExamplesZip(type: Zip) {
