@@ -9,6 +9,9 @@ import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.Settings;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
 import org.json.simple.JSONObject;
@@ -37,17 +40,16 @@ public class AutoTactic implements Tactic {
         GoalChooser chooser = profile.getSelectedGoalChooserBuilder().create();
         ProverCore prover = new ApplyStrategy(chooser);
 
-        ProofSettings settings = proof.getSettings();
-        String savedProperties = settings.settingsToString();
         Properties properties = new Properties();
         properties.load(new StringReader(DEFAULT_SETTINGS + "\n" + additionalSettings));
-        for (Settings s : settings.getSettings()) {
-            s.readSettings(properties);
-        }
+        StrategyProperties strategyProperties = StrategyProperties.read(properties);
+        Strategy oldStrategy = proof.getActiveStrategy();
+        Strategy newStratgy = proof.getActiveStrategyFactory().create(proof, strategyProperties);
 
+        proof.setActiveStrategy(newStratgy);
         prover.start(proof, goal);
 
         // resetting settings
-        settings.loadSettingsFromString(savedProperties);
+        proof.setActiveStrategy(oldStrategy);
     }
 }
