@@ -1663,6 +1663,11 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
     |
         (OLD | PRE) => result=oldexpression
     |
+        val=VALUE LPAREN ( list=expressionlist )? RPAREN
+        {
+            result = translator.translateMapExpressionToJDL(val,list,services);
+        }
+    |
         (BEFORE) => result=beforeexpression
 
     |   result = transactionUpdated

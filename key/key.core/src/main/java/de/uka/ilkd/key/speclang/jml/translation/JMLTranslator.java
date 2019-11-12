@@ -114,6 +114,7 @@ public final class JMLTranslator {
         tmp.put("\\domain_implies_created", "inDomainImpliesCreated");
         tmp.put("\\is_finite", "isFinite");
         tmp.put("\\map_size", "mapSize");
+        tmp.put("\\value", "value");
         jml2jdl = Collections.unmodifiableMap(tmp);
     }
 

@@ -150,6 +150,7 @@ lexer grammar KeYJMLLexer;
     UNION                : '\\set_union';  //KeY extension, not official JML
     UNIONINF             : '\\infinite_union';  //KeY extension, not official JML
     VALUES               : '\\values';
+    VALUE                : '\\value';  //KeY extension, not official JML
     WORKINGSPACE         : '\\working_space';
     // ONLY_ACCESSED     : '\\only_accessed'; // too many common lexemes
     // ONLY_ASSIGNED     : '\\only_assigned';

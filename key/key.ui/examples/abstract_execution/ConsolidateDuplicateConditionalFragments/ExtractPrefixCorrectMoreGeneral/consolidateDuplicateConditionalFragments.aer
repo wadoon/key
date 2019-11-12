@@ -5,23 +5,23 @@
   @        \disjoint(frameP, frameE) &amp;&amp;
   @        \disjoint(frameE, relevant) &amp;&amp;
   @        \disjoint(frameP, relevant) &amp;&amp;
-  @        \dl_mutex3(throwsExcE(\dl_value(footprintE)),
-  @                   throwsExcP(\dl_value(footprintP)),
-  @                   returnsP(\dl_value(footprintP)));
+  @        \dl_mutex3(throwsExcE(\value(footprintE)),
+  @                   throwsExcP(\value(footprintP)),
+  @                   returnsP(\value(footprintP)));
   @*/
 { ; }
 
 if (
     /*@ assignable frameE;
       @ accessible footprintE;
-      @ exceptional_behavior requires throwsExcE(\dl_value(footprintE));
+      @ exceptional_behavior requires \dl_throwsExcE(\value(footprintE));
       @*/
     \abstract_expression boolean e
 ) {
     /*@ assignable frameP;
       @ accessible footprintP;
-      @ exceptional_behavior requires throwsExcP(\dl_value(footprintP));
-      @ return_behavior requires returnsP(\dl_value(footprintP));
+      @ exceptional_behavior requires throwsExcP(\value(footprintP));
+      @ return_behavior requires returnsP(\value(footprintP));
       @*/
     \abstract_statement P;
     
@@ -32,8 +32,8 @@ if (
 else {
     /*@ assignable frameP;
       @ accessible footprintP;
-      @ exceptional_behavior requires throwsExcP(\dl_value(footprintP));
-      @ return_behavior requires returnsP(\dl_value(footprintP));
+      @ exceptional_behavior requires throwsExcP(\value(footprintP));
+      @ return_behavior requires returnsP(\value(footprintP));
       @*/
     \abstract_statement P;
     
@@ -48,23 +48,23 @@ return result;</programOne>
   @        \disjoint(frameP, frameE) &amp;&amp;
   @        \disjoint(frameE, relevant) &amp;&amp;
   @        \disjoint(frameP, relevant) &amp;&amp;
-  @        \dl_mutex3(throwsExcE(\dl_value(footprintE)),
-  @                   throwsExcP(\dl_value(footprintP)),
-  @                   returnsP(\dl_value(footprintP)));
+  @        \dl_mutex3(throwsExcE(\value(footprintE)),
+  @                   throwsExcP(\value(footprintP)),
+  @                   returnsP(\value(footprintP)));
   @*/
 { ; }
 
 /*@ assignable frameP;
   @ accessible footprintP;
-  @ exceptional_behavior requires throwsExcP(\dl_value(footprintP));
-  @ return_behavior requires returnsP(\dl_value(footprintP));
+  @ exceptional_behavior requires throwsExcP(\value(footprintP));
+  @ return_behavior requires returnsP(\value(footprintP));
   @*/
 \abstract_statement P;
 
 if (
     /*@ assignable frameE;
       @ accessible footprintE;
-      @ exceptional_behavior requires throwsExcE(\dl_value(footprintE));
+      @ exceptional_behavior requires throwsExcE(\value(footprintE));
       @*/
     \abstract_expression boolean e
 ) {
