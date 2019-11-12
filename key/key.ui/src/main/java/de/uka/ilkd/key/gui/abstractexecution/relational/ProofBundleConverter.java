@@ -23,6 +23,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import de.uka.ilkd.key.gui.abstractexecution.relational.model.AERelationalModel;
+import de.uka.ilkd.key.gui.abstractexecution.relational.model.PredicateDeclaration;
 import de.uka.ilkd.key.gui.abstractexecution.relational.model.ProgramVariableDeclaration;
 
 /**
@@ -52,12 +53,27 @@ public class ProofBundleConverter {
         final String paramsDecl = model.getProgramVariableDeclarations().stream()
                 .map(decl -> String.format("%s %s", decl.getTypeName(), decl.getVarName()))
                 .collect(Collectors.joining(","));
+
+        final String programOne = processProgram(model.getProgramOne());
+        final String programTwo = processProgram(model.getProgramTwo());
+
         return javaScaffold.replaceAll(PARAMS, paramsDecl)
-                .replaceAll(BODY1,
-                        Matcher.quoteReplacement(
-                                model.getProgramOne().replaceAll("\n", "\n        ")))
-                .replaceAll(BODY2, Matcher
-                        .quoteReplacement(model.getProgramTwo().replaceAll("\n", "\n        ")));
+                .replaceAll(BODY1, Matcher.quoteReplacement(programOne))
+                .replaceAll(BODY2, Matcher.quoteReplacement(programTwo));
+    }
+
+    private String processProgram(String prog) {
+        for (final String locSet : model.getAbstractLocationSets()) {
+            prog = prog.replaceAll("\\b" + locSet + "\\b",
+                    Matcher.quoteReplacement("\\dl_" + locSet));
+        }
+
+        for (final PredicateDeclaration predDecl : model.getPredicateDeclarations()) {
+            prog = prog.replaceAll("\\b" + predDecl.getPredName() + "\\b",
+                    Matcher.quoteReplacement("\\dl_" + predDecl.getPredName()));
+        }
+
+        return prog.replaceAll("\n", "\n        ");
     }
 
     private String createKeYFile() {

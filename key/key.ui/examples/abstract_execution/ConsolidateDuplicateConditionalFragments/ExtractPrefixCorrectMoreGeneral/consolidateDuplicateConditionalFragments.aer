@@ -1,80 +1,80 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="Post(value(relevant))">
-    <programOne>/*@ assume \disjoint(\dl_frameE, \dl_footprintP) &amp;&amp;
-  @        \disjoint(\dl_frameP, \dl_footprintE) &amp;&amp;
-  @        \disjoint(\dl_frameP, \dl_frameE) &amp;&amp;
-  @        \disjoint(\dl_frameE, \dl_relevant) &amp;&amp;
-  @        \disjoint(\dl_frameP, \dl_relevant) &amp;&amp;
-  @        \dl_mutex3(\dl_throwsExcE(\dl_value(\dl_footprintE)),
-  @                   \dl_throwsExcP(\dl_value(\dl_footprintP)),
-  @                   \dl_returnsP(\dl_value(\dl_footprintP)));
+    <programOne>/*@ assume \disjoint(frameE, footprintP) &amp;&amp;
+  @        \disjoint(frameP, footprintE) &amp;&amp;
+  @        \disjoint(frameP, frameE) &amp;&amp;
+  @        \disjoint(frameE, relevant) &amp;&amp;
+  @        \disjoint(frameP, relevant) &amp;&amp;
+  @        \dl_mutex3(throwsExcE(\dl_value(footprintE)),
+  @                   throwsExcP(\dl_value(footprintP)),
+  @                   returnsP(\dl_value(footprintP)));
   @*/
 { ; }
 
 if (
-    /*@ assignable \dl_frameE;
-      @ accessible \dl_footprintE;
-      @ exceptional_behavior requires \dl_throwsExcE(\dl_value(\dl_footprintE));
+    /*@ assignable frameE;
+      @ accessible footprintE;
+      @ exceptional_behavior requires throwsExcE(\dl_value(footprintE));
       @*/
     \abstract_expression boolean e
 ) {
-    /*@ assignable \dl_frameP;
-      @ accessible \dl_footprintP;
-      @ exceptional_behavior requires \dl_throwsExcP(\dl_value(\dl_footprintP));
-      @ return_behavior requires \dl_returnsP(\dl_value(\dl_footprintP));
+    /*@ assignable frameP;
+      @ accessible footprintP;
+      @ exceptional_behavior requires throwsExcP(\dl_value(footprintP));
+      @ return_behavior requires returnsP(\dl_value(footprintP));
       @*/
     \abstract_statement P;
     
-    //@ assignable \dl_frameQ1;
-    //@ accessible \dl_footprintQ1;
+    //@ assignable frameQ1;
+    //@ accessible footprintQ1;
     \abstract_statement Q1;
 }
 else {
-    /*@ assignable \dl_frameP;
-      @ accessible \dl_footprintP;
-      @ exceptional_behavior requires \dl_throwsExcP(\dl_value(\dl_footprintP));
-      @ return_behavior requires \dl_returnsP(\dl_value(\dl_footprintP));
+    /*@ assignable frameP;
+      @ accessible footprintP;
+      @ exceptional_behavior requires throwsExcP(\dl_value(footprintP));
+      @ return_behavior requires returnsP(\dl_value(footprintP));
       @*/
     \abstract_statement P;
     
-    //@ assignable \dl_frameQ2;
-    //@ accessible \dl_footprintQ2;
+    //@ assignable frameQ2;
+    //@ accessible footprintQ2;
     \abstract_statement Q2;
 }
 
 return result;</programOne>
-    <programTwo>/*@ assume \disjoint(\dl_frameE, \dl_footprintP) &amp;&amp;
-  @        \disjoint(\dl_frameP, \dl_footprintE) &amp;&amp;
-  @        \disjoint(\dl_frameP, \dl_frameE) &amp;&amp;
-  @        \disjoint(\dl_frameE, \dl_relevant) &amp;&amp;
-  @        \disjoint(\dl_frameP, \dl_relevant) &amp;&amp;
-  @        \dl_mutex3(\dl_throwsExcE(\dl_value(\dl_footprintE)),
-  @                   \dl_throwsExcP(\dl_value(\dl_footprintP)),
-  @                   \dl_returnsP(\dl_value(\dl_footprintP)));
+    <programTwo>/*@ assume \disjoint(frameE, footprintP) &amp;&amp;
+  @        \disjoint(frameP, footprintE) &amp;&amp;
+  @        \disjoint(frameP, frameE) &amp;&amp;
+  @        \disjoint(frameE, relevant) &amp;&amp;
+  @        \disjoint(frameP, relevant) &amp;&amp;
+  @        \dl_mutex3(throwsExcE(\dl_value(footprintE)),
+  @                   throwsExcP(\dl_value(footprintP)),
+  @                   returnsP(\dl_value(footprintP)));
   @*/
 { ; }
 
-/*@ assignable \dl_frameP;
-  @ accessible \dl_footprintP;
-  @ exceptional_behavior requires \dl_throwsExcP(\dl_value(\dl_footprintP));
-  @ return_behavior requires \dl_returnsP(\dl_value(\dl_footprintP));
+/*@ assignable frameP;
+  @ accessible footprintP;
+  @ exceptional_behavior requires throwsExcP(\dl_value(footprintP));
+  @ return_behavior requires returnsP(\dl_value(footprintP));
   @*/
 \abstract_statement P;
 
 if (
-    /*@ assignable \dl_frameE;
-      @ accessible \dl_footprintE;
-      @ exceptional_behavior requires \dl_throwsExcE(\dl_value(\dl_footprintE));
+    /*@ assignable frameE;
+      @ accessible footprintE;
+      @ exceptional_behavior requires throwsExcE(\dl_value(footprintE));
       @*/
     \abstract_expression boolean e
 ) {
-    //@ assignable \dl_frameQ1;
-    //@ accessible \dl_footprintQ1;
+    //@ assignable frameQ1;
+    //@ accessible footprintQ1;
     \abstract_statement Q1;
 }
 else {
-    //@ assignable \dl_frameQ2;
-    //@ accessible \dl_footprintQ2;
+    //@ assignable frameQ2;
+    //@ accessible footprintQ2;
     \abstract_statement Q2;
 }
 
