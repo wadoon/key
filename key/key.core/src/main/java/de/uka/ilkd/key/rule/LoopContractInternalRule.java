@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
@@ -271,6 +272,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      *            the update for the validity branch.
      * @param configurator
      *            a configurator.
+     * @param localSpecRepo TODO
      * @param services
      *            services.
      */
@@ -280,7 +282,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
             final Map<LocationVariable, Term> modifiesClauses, final Term[] assumptions,
             final Term[] usageAssumptions, final Term decreasesCheck, final Term[] postconditions,
             final Term[] postconditionsNext, final Term[] updates, final Term nextRemembranceUpdate,
-            final Term context, final GoalsConfigurator configurator, final Services services) {
+            final Term context, final GoalsConfigurator configurator, GoalLocalSpecificationRepository localSpecRepo, final Services services) {
         configurator.setUpPreconditionGoal(result.tail().head(), updates[0], assumptions);
         configurator.setUpUsageGoal(result.head(), updates, usageAssumptions);
         final ProgramVariable exceptionParameter
@@ -288,7 +290,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         configurator.setUpLoopValidityGoal(goal, contract, context, updates[1],
                 nextRemembranceUpdate, anonOutHeaps, modifiesClauses, assumptions, decreasesCheck,
                 postconditions, postconditionsNext, exceptionParameter,
-                vars[0].termify(instantiation.self), vars[1]);
+                vars[0].termify(instantiation.self), vars[1], localSpecRepo);
     }
 
     @Override
@@ -375,7 +377,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         final ImmutableList<Goal> result = goal.split(3);
         setUpGoals(goal, result, contract, instantiation, anonOutHeaps, vars, modifiesClauses,
                 assumptions, usageAssumptions, decreasesCheck, postconditions, postconditionsNext,
-                updates, nextRemembranceUpdate, context, configurator, services);
+                updates, nextRemembranceUpdate, context, configurator, goal.getLocalSpecificationRepository(), services);
         return result;
     }
 }

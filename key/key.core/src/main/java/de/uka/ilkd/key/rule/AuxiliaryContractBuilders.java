@@ -1601,6 +1601,7 @@ public final class AuxiliaryContractBuilders {
          *            the termified variables.
          * @param nextVars
          *            the variables for the next loop iteration.
+         * @param localSpecRepo TODO
          * @return the term for the validity goal in a loop contract rule app.
          */
         public Term setUpLoopValidityGoal(final Goal goal, final LoopContract contract,
@@ -1610,7 +1611,7 @@ public final class AuxiliaryContractBuilders {
                 final Term decreasesCheck, final Term[] postconditions,
                 final Term[] postconditionsNext, final ProgramVariable exceptionParameter,
                 final AuxiliaryContract.Terms terms,
-                final AuxiliaryContract.Variables nextVars) {
+                final AuxiliaryContract.Variables nextVars, GoalLocalSpecificationRepository localSpecRepo) {
             final TermBuilder tb = services.getTermBuilder();
             final Modality modality = instantiation.modality;
 
@@ -1637,7 +1638,7 @@ public final class AuxiliaryContractBuilders {
             final JavaBlock[] javaBlocks = createJavaBlocks(contract, loopVariables[0],
                     exceptionParameter, breakFlags, continueFlags);
 
-            Term anonOut = new UpdatesBuilder(variables, goal.getLocalSpecificationRepository(), services)
+            Term anonOut = new UpdatesBuilder(variables, localSpecRepo, services)
                     .buildAnonOutUpdate(contract.getLoop(), anonOutHeaps, modifiesClauses);
 
             Map<LocationVariable, Function> anonOutHeaps2 = new HashMap<>();
@@ -1649,7 +1650,7 @@ public final class AuxiliaryContractBuilders {
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 anonOutHeaps2.put(heap, anonymisationFunction);
             }
-            Term anonOut2 = new UpdatesBuilder(variables, goal.getLocalSpecificationRepository(), services)
+            Term anonOut2 = new UpdatesBuilder(variables, localSpecRepo, services)
                     .buildAnonOutUpdate(
                             contract.getLoop(),
                             anonOutHeaps2,

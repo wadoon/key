@@ -489,7 +489,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         Term validity = configurator.setUpLoopValidityGoal(null, contract.getAuxiliaryContract(),
                 context, remembranceUpdate, nextRemembranceUpdate, anonOutHeaps, modifiesClauses,
                 assumptions, decreasesCheck, postconditions, postconditionsNext, exceptionParameter,
-                variables.termify(selfTerm), nextVariables);
+                variables.termify(selfTerm), nextVariables, localSpecRepo);
 
         Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
                 .buildWellFormedAnonymisationHeapsCondition(anonInHeaps);
