@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="Post(value(relevant))">
-    <programOne>/*@ assume \disjoint(frameE, footprintP) &amp;&amp;
-  @        \disjoint(frameP, footprintE) &amp;&amp;
-  @        \disjoint(frameP, frameE) &amp;&amp;
-  @        \disjoint(frameE, relevant) &amp;&amp;
-  @        \disjoint(frameP, relevant) &amp;&amp;
-  @        \dl_mutex3(throwsExcE(\value(footprintE)),
-  @                   throwsExcP(\value(footprintP)),
-  @                   returnsP(\value(footprintP)));
+    <programOne>/*@ ae_constraint \disjoint(frameE, footprintP) &amp;&amp;
+  @               \disjoint(frameP, footprintE) &amp;&amp;
+  @               \disjoint(frameP, frameE) &amp;&amp;
+  @               \disjoint(frameE, relevant) &amp;&amp;
+  @               \disjoint(frameP, relevant) &amp;&amp;
+  @               \dl_mutex3(throwsExcE(\value(footprintE)),
+  @                          throwsExcP(\value(footprintP)),
+  @                          returnsP(\value(footprintP)));
   @*/
 { ; }
 
@@ -43,14 +43,14 @@ else {
 }
 
 return result;</programOne>
-    <programTwo>/*@ assume \disjoint(frameE, footprintP) &amp;&amp;
-  @        \disjoint(frameP, footprintE) &amp;&amp;
-  @        \disjoint(frameP, frameE) &amp;&amp;
-  @        \disjoint(frameE, relevant) &amp;&amp;
-  @        \disjoint(frameP, relevant) &amp;&amp;
-  @        \dl_mutex3(throwsExcE(\value(footprintE)),
-  @                   throwsExcP(\value(footprintP)),
-  @                   returnsP(\value(footprintP)));
+    <programTwo>/*@ ae_constraint \disjoint(frameE, footprintP) &amp;&amp;
+  @               \disjoint(frameP, footprintE) &amp;&amp;
+  @               \disjoint(frameP, frameE) &amp;&amp;
+  @               \disjoint(frameE, relevant) &amp;&amp;
+  @               \disjoint(frameP, relevant) &amp;&amp;
+  @               \dl_mutex3(throwsExcE(\value(footprintE)),
+  @                          throwsExcP(\value(footprintP)),
+  @                          returnsP(\value(footprintP)));
   @*/
 { ; }
 

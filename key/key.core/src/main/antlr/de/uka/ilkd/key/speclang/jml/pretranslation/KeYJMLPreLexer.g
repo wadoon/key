@@ -25,6 +25,7 @@ lexer grammar KeYJMLPreLexer;
     ABSTRACT 			: 'abstract';
     ACCESSIBLE                  : 'accessible';
     ACCESSIBLE_REDUNDANTLY      : 'accessible_redundantly';
+    AE_CONSTRAINT 			: 'ae_constraint';
     ALSO 			: 'also';
     ASSERT                      : 'assert';
     ASSERT_REDUNDANTLY          : 'assert_redundantly';

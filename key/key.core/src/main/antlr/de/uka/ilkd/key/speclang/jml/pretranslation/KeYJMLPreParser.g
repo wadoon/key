@@ -1536,6 +1536,7 @@ assume_keyword
 :
 	ASSUME
     |	ASSUME_REDUNDANTLY
+    |   AE_CONSTRAINT
 ;
 
 
