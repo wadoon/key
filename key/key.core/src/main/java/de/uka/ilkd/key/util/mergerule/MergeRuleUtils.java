@@ -1577,8 +1577,8 @@ public class MergeRuleUtils {
      * @throws SortNotKnownException
      *             If the given sort is not known to the system.
      */
-    public static Pair<Sort, Name> parsePlaceholder(String input,
-            Services services) {
+    public static Pair<Sort, Name> parsePlaceholder(String input, Services services)
+            throws NameAlreadyBoundException, SortNotKnownException {
         return parsePlaceholder(input, true, services);
     }
 
@@ -1626,6 +1626,9 @@ public class MergeRuleUtils {
                     + "\" is already known to the system.<br/>\n"
                     + "Plase choose a fresh one.");
         }
+        
+        services.getNamespaces().programVariables().add(new LocationVariable(
+                new ProgramElementName(strName), services.getJavaInfo().getKeYJavaType(sort)));
 
         return new Pair<Sort, Name>(sort, name);
     }
@@ -2410,7 +2413,7 @@ public class MergeRuleUtils {
      * This exception is thrown by methods to indicate that a given KeY sort is
      * not known in the current situation.
      */
-    static class SortNotKnownException extends RuntimeException {
+    public static class SortNotKnownException extends RuntimeException {
         private static final long serialVersionUID = -5728194402773352846L;
 
         public SortNotKnownException(String message) {
@@ -2422,7 +2425,7 @@ public class MergeRuleUtils {
      * This exception is thrown by methods to indicate that a name for which it
      * is requested to register it is already known to the system.
      */
-    static class NameAlreadyBoundException extends RuntimeException {
+    public static class NameAlreadyBoundException extends RuntimeException {
         private static final long serialVersionUID = -2406984399754204833L;
 
         public NameAlreadyBoundException(String message) {

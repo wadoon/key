@@ -25,6 +25,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,13 +44,16 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.xml.bind.JAXBException;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
+import org.key_project.util.helper.FindResources;
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.abstractexecution.relational.ProofBundleConverter.BundleSaveResult;
@@ -57,6 +62,10 @@ import de.uka.ilkd.key.gui.abstractexecution.relational.model.PredicateDeclarati
 import de.uka.ilkd.key.gui.abstractexecution.relational.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
  * 
@@ -65,11 +74,13 @@ import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 public class AERelationalDialog extends JDialog {
     private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/gui/abstractexecution/relational/Problem.java";
     private static final String KEY_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/gui/abstractexecution/relational/problem.key";
+    private static final String DUMMY_KEY_FILE = "/de/uka/ilkd/key/gui/abstractexecution/relational/dummy.key";
 
     private static final long serialVersionUID = 1L;
 
     private AERelationalModel model;
     private MainWindow mainWindow;
+    private Services services = null;
 
     private final DefaultListModel<String> locsetDeclsListModel = new DefaultListModel<>();
     private final DefaultListModel<PredicateDeclaration> predDeclsListModel = new DefaultListModel<>();
@@ -77,6 +88,8 @@ public class AERelationalDialog extends JDialog {
     private final RSyntaxTextArea codeLeft = new RSyntaxTextArea(20, 60);
     private final RSyntaxTextArea codeRight = new RSyntaxTextArea(20, 60);
     private final JTextField postCondTextField = new JTextField();
+    
+    private final List<ServicesLoadedListener> servicesLoadedListeners = new ArrayList<>();
 
     public AERelationalDialog(MainWindow mainWindow, AERelationalModel model) {
         super(mainWindow, false);
@@ -114,6 +127,43 @@ public class AERelationalDialog extends JDialog {
         pack();
 
         loadFromModel();
+        new Thread(() -> {
+            initializeServices();
+        }).start();
+    }
+
+    private void initializeServices() {
+        final URL keyFileUrl = AERelationalDialog.class.getResource(DUMMY_KEY_FILE);
+
+        if (keyFileUrl == null) {
+            SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(AERelationalDialog.this,
+                        "Ooops... Could not load resource file!", "Problem During Initialization",
+                        JOptionPane.ERROR_MESSAGE);
+            });
+            return;
+        }
+
+        KeYEnvironment<?> environment = null;
+        try {
+            final File keyFile = //
+                    FindResources.getResource(DUMMY_KEY_FILE, AERelationalDialog.class).toFile();
+            environment = KeYEnvironment.load( //
+                    JavaProfile.getDefaultInstance(), keyFile, null, null, null, true);
+        } catch (ProblemLoaderException | URISyntaxException | IOException e) {
+            SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(AERelationalDialog.this,
+                        "Ooops... Could not initialize proof services!",
+                        "Problem During Initialization", JOptionPane.ERROR_MESSAGE);
+            });
+            return;
+        }
+
+        final KeYEnvironment<?> env = environment;
+        SwingUtilities.invokeLater(() -> {
+            this.services = env.getLoadedProof().getServices();
+            servicesLoadedListeners.forEach(ServicesLoadedListener::servicesLoaded);
+        });
     }
 
     private void loadFromModel() {
@@ -428,7 +478,7 @@ public class AERelationalDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 final ProgramVariableDeclaration pd = ProgramVariableInputDialog
-                        .showInputDialog(AERelationalDialog.this);
+                        .showInputDialog(AERelationalDialog.this, services);
                 if (pd != null) {
                     progVarDeclsListModel.addElement(pd);
                 }
@@ -444,7 +494,7 @@ public class AERelationalDialog extends JDialog {
                     final ProgramVariableDeclaration selectedElem = predDeclsList
                             .getSelectedValue();
                     final ProgramVariableDeclaration pd = ProgramVariableInputDialog
-                            .showInputDialog(AERelationalDialog.this, selectedElem);
+                            .showInputDialog(AERelationalDialog.this, selectedElem, services);
                     if (pd != null) {
                         progVarDeclsListModel.set(predDeclsList.getSelectedIndex(), pd);
                     }
@@ -458,9 +508,20 @@ public class AERelationalDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (int idx : predDeclsList.getSelectedIndices()) {
-                    progVarDeclsListModel.remove(idx);
+                    final ProgramVariableDeclaration removed = progVarDeclsListModel.remove(idx);
+                    services.getNamespaces().programVariables()
+                            .remove(new Name(removed.getVarName()));
                 }
             }
+        });
+        
+        plusButton.setEnabled(false);
+        minusButton.setEnabled(false);
+        editButton.setEnabled(false);
+        this.servicesLoadedListeners.add(() -> {
+            plusButton.setEnabled(true);
+            minusButton.setEnabled(true);
+            editButton.setEnabled(true);
         });
 
         final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -556,5 +617,10 @@ public class AERelationalDialog extends JDialog {
                 compList.addAll(getAllComponents((Container) comp));
         }
         return compList;
+    }
+    
+    @FunctionalInterface
+    private static interface ServicesLoadedListener {
+        public void servicesLoaded();
     }
 }

@@ -28,6 +28,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import de.uka.ilkd.key.gui.abstractexecution.relational.model.ProgramVariableDeclaration;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils.NameAlreadyBoundException;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils.SortNotKnownException;
 
 /**
  * @author Dominic Steinhoefel
@@ -37,8 +41,8 @@ public class ProgramVariableInputDialog extends JDialog {
 
     private ProgramVariableDeclaration value;
 
-    private ProgramVariableInputDialog(final JDialog owner,
-            final ProgramVariableDeclaration value) {
+    private ProgramVariableInputDialog(final JDialog owner, final ProgramVariableDeclaration value,
+            Services services) {
         super(owner, true);
         assert value != null;
 
@@ -83,10 +87,21 @@ public class ProgramVariableInputDialog extends JDialog {
                 try {
                     instance.value = ProgramVariableDeclaration
                             .fromString(valueTextField.getText());
+                    
+                    MergeRuleUtils.parsePlaceholder(valueTextField.getText(), services);
+                    
                     instance.setVisible(false);
                 } catch (IllegalArgumentException exc) {
                     JOptionPane.showMessageDialog(instance,
                             "There's an error in your syntax, please correct it and try again",
+                            "Syntax error", JOptionPane.ERROR_MESSAGE);
+                } catch (NameAlreadyBoundException exc) {
+                    JOptionPane.showMessageDialog(instance,
+                            "The name you've chosen is already bound. Choose another one.",
+                            "Syntax error", JOptionPane.ERROR_MESSAGE);
+                } catch (SortNotKnownException exc) {
+                    JOptionPane.showMessageDialog(instance,
+                            "The given type/sort is not known. Please choose another one.",
                             "Syntax error", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -110,13 +125,15 @@ public class ProgramVariableInputDialog extends JDialog {
         setSize(400, 110);
     }
 
-    public static ProgramVariableDeclaration showInputDialog(final JDialog owner) {
-        return showInputDialog(owner, ProgramVariableDeclaration.EMPTY_DECL);
+    public static ProgramVariableDeclaration showInputDialog(final JDialog owner,
+            Services services) {
+        return showInputDialog(owner, ProgramVariableDeclaration.EMPTY_DECL, services);
     }
 
     public static ProgramVariableDeclaration showInputDialog(final JDialog owner,
-            final ProgramVariableDeclaration value) {
-        final ProgramVariableInputDialog dia = new ProgramVariableInputDialog(owner, value);
+            final ProgramVariableDeclaration value, Services services) {
+        final ProgramVariableInputDialog dia = new ProgramVariableInputDialog(owner, value,
+                services);
         dia.setVisible(true);
         dia.dispose();
         return dia.value;

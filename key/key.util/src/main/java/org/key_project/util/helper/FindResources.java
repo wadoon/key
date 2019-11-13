@@ -63,7 +63,8 @@ public final class FindResources {
     }
 
     public static <T> Path getResource(String path, Class<T> clazz) throws URISyntaxException, IOException {
-        URL dirURL = clazz.getClassLoader().getResource(path);
+//        URL dirURL = clazz.getClassLoader().getResource(path);
+        URL dirURL = clazz.getResource(path);
         if (dirURL != null && dirURL.getProtocol().equals("file")) {
             return new File(dirURL.toURI()).toPath();
         }

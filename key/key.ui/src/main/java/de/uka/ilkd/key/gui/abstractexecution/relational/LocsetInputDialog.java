@@ -77,6 +77,7 @@ public class LocsetInputDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 instance.value = valueTextField.getText();
+                
                 instance.setVisible(false);
             }
         });
