@@ -21,11 +21,12 @@ dependencies {
     compile files('lib/docking-frames-common.jar',
                 'lib/docking-frames-core.jar')
 
+    compile 'org.jetbrains:annotations:17.0.0'
+    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
+    implementation 'com.github.bobbylight:RSyntaxTextArea:3.0.4'
+    
     runtimeOnly project(":keyext.interactionlog")
     //runtimeOnly project(":keyext.script.ui")
-
-    compile 'org.jetbrains:annotations:17.0.0'
-    implementation 'com.github.bobbylight:RSyntaxTextArea:3.0.4'
 }
 
 task createExamplesZip(type: Zip) {
