@@ -47,6 +47,7 @@ import javax.xml.bind.JAXBException;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
+import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -155,7 +156,7 @@ public class AERelationalDialog extends JDialog {
         model.setFile(file);
     }
 
-    private void loadFromFile() throws IOException, JAXBException {
+    private void loadFromFile() throws IOException, JAXBException, SAXException {
         final KeYFileChooser chooser = KeYFileChooser
                 .getFileChooser("Choose AE-Relational Model File");
 
@@ -199,7 +200,12 @@ public class AERelationalDialog extends JDialog {
                 loadFromFile();
             } catch (IOException | JAXBException exc) {
                 JOptionPane.showMessageDialog(AERelationalDialog.this,
-                        "<html>Could not load model fromfile.<br><br/>Message:<br/>"
+                        "<html>Could not load model from file.<br><br/>Message:<br/>"
+                                + exc.getMessage() + "</html>",
+                        "Problem Loading Model", JOptionPane.ERROR_MESSAGE);
+            } catch (SAXException exc) {
+                JOptionPane.showMessageDialog(AERelationalDialog.this,
+                        "<html>Could not load model from file: XML Schema violated.<br><br/>Message:<br/>"
                                 + exc.getMessage() + "</html>",
                         "Problem Loading Model", JOptionPane.ERROR_MESSAGE);
             }

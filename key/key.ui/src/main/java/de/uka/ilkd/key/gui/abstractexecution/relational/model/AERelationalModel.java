@@ -14,11 +14,14 @@ package de.uka.ilkd.key.gui.abstractexecution.relational.model;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -29,15 +32,22 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+
+import org.xml.sax.SAXException;
 
 /**
  * @author Dominic Steinhoefel
  */
 @XmlRootElement(namespace = "http://www.key-project.org/abstractexecution")
-@XmlType(propOrder = {"programOne", "programTwo", "abstractLocationSets", "predicateDeclarations", "programVariableDeclarations"})
+@XmlType(propOrder = { "programOne", "programTwo", "abstractLocationSets", "predicateDeclarations",
+        "programVariableDeclarations" })
 public class AERelationalModel {
+    private static final String AE_MODEL_FILE_ENDING = ".aer";
     public static final AERelationalModel EMPTY_MODEL = new AERelationalModel();
-    
+    private static final String SCHEMA_PATH = "/de/uka/ilkd/key/gui/abstractexecution/relational/schema1.xsd";
+
     private String programOne = "";
     private String programTwo = "";
     private String postCondition = "";
@@ -48,8 +58,7 @@ public class AERelationalModel {
     private Optional<File> file = Optional.empty();
 
     public AERelationalModel(final String programOne, final String programTwo,
-            final String postCondition,
-            final List<String> abstractLocationSets,
+            final String postCondition, final List<String> abstractLocationSets,
             final List<PredicateDeclaration> predicateDeclarations,
             final List<ProgramVariableDeclaration> programVariableDeclarations) {
         this.programOne = programOne;
@@ -82,19 +91,19 @@ public class AERelationalModel {
         this.postCondition = postCondition;
     }
 
-    @XmlElementWrapper(name="programVariables")
+    @XmlElementWrapper(name = "programVariables")
     @XmlElement(name = "programVariable")
     public List<ProgramVariableDeclaration> getProgramVariableDeclarations() {
         return programVariableDeclarations;
     }
-    
-    @XmlElementWrapper(name="locationSets")
+
+    @XmlElementWrapper(name = "locationSets")
     @XmlElement(name = "locationSet")
     public List<String> getAbstractLocationSets() {
         return abstractLocationSets;
     }
 
-    @XmlElementWrapper(name="predicates")
+    @XmlElementWrapper(name = "predicates")
     @XmlElement(name = "predicate")
     public List<PredicateDeclaration> getPredicateDeclarations() {
         return predicateDeclarations;
@@ -107,7 +116,7 @@ public class AERelationalModel {
     public void setProgramTwo(String programTwo) {
         this.programTwo = programTwo;
     }
-    
+
     public void setAbstractLocationSets(List<String> abstractLocationSets) {
         this.abstractLocationSets = abstractLocationSets;
     }
@@ -124,7 +133,7 @@ public class AERelationalModel {
     public Optional<File> getFile() {
         return file;
     }
-    
+
     public boolean isSaved() {
         return file.isPresent();
     }
@@ -143,10 +152,56 @@ public class AERelationalModel {
         return new String(stream.toByteArray());
     }
 
-    public static AERelationalModel fromXml(String xml) throws JAXBException {
+    /**
+     * Parses an {@link AERelationalModel} from the given XML string.
+     * 
+     * @param xml The XML code.
+     * @return The {@link AERelationalModel}.
+     * @throws JAXBException If a problem occurred while unmarshalling.
+     * @throws SAXException  If there is a validation error (XSD format not met).
+     */
+    public static AERelationalModel fromXml(String xml) throws JAXBException, SAXException {
         final JAXBContext jaxbContext = JAXBContext.newInstance(AERelationalModel.class);
         final Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+        final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        final Schema schema = sf.newSchema(AERelationalModel.class.getResource(SCHEMA_PATH));
+        jaxbUnmarshaller.setSchema(schema);
+
         return (AERelationalModel) jaxbUnmarshaller.unmarshal(new StringReader(xml));
+    }
+
+    /**
+     * Returns true an {@link AERelationalModel} if the given file has the
+     * {@link #AE_MODEL_FILE_ENDING} and can be loaded and parsed as
+     * {@link AERelationalModel} XML file.
+     * 
+     * @param file The file to check.
+     * @return An {@link AERelationalModel} iff the file could be verified to be an
+     *         {@link AERelationalModel} file, otherwise an empty {@link Optional}.
+     */
+    public static Optional<AERelationalModel> isRelationalModelFile(File file) {
+        if (!fileHasAEModelEnding(file)) {
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(fromXml(new String(Files.readAllBytes(file.toPath()))));
+        } catch (SAXException exc) {
+        } catch (IOException e) {
+        } catch (JAXBException e) {
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Checks if the given file has the {@link #AE_MODEL_FILE_ENDING} ending.
+     * 
+     * @param file The file to check.
+     * @return true iff the given file has the {@link #AE_MODEL_FILE_ENDING} ending.
+     */
+    public static boolean fileHasAEModelEnding(File file) {
+        return file.getName().endsWith(AE_MODEL_FILE_ENDING);
     }
 
 }

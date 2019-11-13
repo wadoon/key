@@ -16,10 +16,13 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.*;
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.ProofSelectionDialog;
+import de.uka.ilkd.key.gui.abstractexecution.relational.AERelationalDialog;
+import de.uka.ilkd.key.gui.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -59,6 +62,25 @@ public class OpenFileAction extends MainWindowAction {
                     mainWindow.loadProofFromBundle(file, proofPath.toFile());
                     return;
                 }
+            }
+
+            if (AERelationalModel.fileHasAEModelEnding(file)) {
+                final Optional<AERelationalModel> maybeRelationalModelFile = AERelationalModel
+                        .isRelationalModelFile(file);
+                maybeRelationalModelFile.ifPresent(m -> {
+                    m.setFile(file);
+                    final AERelationalDialog dia = new AERelationalDialog(mainWindow, m);
+                    dia.setVisible(true);
+                });
+                maybeRelationalModelFile.orElseGet(() -> {
+                    JOptionPane.showMessageDialog(mainWindow,
+                            "<hml>The given file could not be verified as a relational model file.<br/>"
+                                    + "Please check whether the file is corrupt.</html>",
+                            "Problem Loading AE Relational Model File", JOptionPane.ERROR_MESSAGE);
+                    return null;
+                });
+
+                return;
             }
 
             if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour() &&
