@@ -16,13 +16,13 @@ dependencies {
     compile project(":key.core.testgen")
     compile project(":key.removegenerics")
 
-    compile 'com.miglayout:miglayout-swing:5.2'
+    implementation 'com.miglayout:miglayout-swing:5.2'
 
-    compile files('lib/docking-frames-common.jar',
-                'lib/docking-frames-core.jar')
+    implementation files('lib/docking-frames-common.jar',
+                         'lib/docking-frames-core.jar')
 
-    compile 'org.jetbrains:annotations:17.0.0'
-    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
+    implementation 'org.jetbrains:annotations:17.0.0'
+    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
     implementation 'com.github.bobbylight:RSyntaxTextArea:3.0.4'
     
     runtimeOnly project(":keyext.interactionlog")
