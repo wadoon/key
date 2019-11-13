@@ -1,3 +1,7 @@
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
 dependencies {
     compile project(":key.ui")
     compile group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.12.1'
