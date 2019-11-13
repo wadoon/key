@@ -5,9 +5,9 @@
   @               \disjoint(frameP, frameE) &amp;&amp;
   @               \disjoint(frameE, relevant) &amp;&amp;
   @               \disjoint(frameP, relevant) &amp;&amp;
-  @               \dl_mutex3(throwsExcE(\value(footprintE)),
-  @                          throwsExcP(\value(footprintP)),
-  @                          returnsP(\value(footprintP)));
+  @               \mutex(throwsExcE(\value(footprintE)),
+  @                      throwsExcP(\value(footprintP)),
+  @                      returnsP(\value(footprintP)));
   @*/
 { ; }
 
@@ -48,9 +48,9 @@ return result;</programOne>
   @               \disjoint(frameP, frameE) &amp;&amp;
   @               \disjoint(frameE, relevant) &amp;&amp;
   @               \disjoint(frameP, relevant) &amp;&amp;
-  @               \dl_mutex3(throwsExcE(\value(footprintE)),
-  @                          throwsExcP(\value(footprintP)),
-  @                          returnsP(\value(footprintP)));
+  @               \mutex(throwsExcE(\value(footprintE)),
+  @                      throwsExcP(\value(footprintP)),
+  @                      returnsP(\value(footprintP)));
   @*/
 { ; }
 

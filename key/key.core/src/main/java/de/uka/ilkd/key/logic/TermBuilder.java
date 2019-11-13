@@ -2542,4 +2542,38 @@ public class TermBuilder {
             return tf.createTerm(Junctor.OR, t1, t2);
         }
     }
+
+    /**
+     * Creates a mutual-exclusion formula from the given argument formulas, which is
+     * true iff at most one of the arguments are true at any time.
+     * 
+     * @param list The list of argument formulas.
+     * @return The mutual exclusion (mutex) term.
+     */
+    public Term mutex(ImmutableArray<Term> list) {
+        Term result = tt();
+        if (list.size() < 2) {
+            return result;
+        }
+        
+        for (int i = 0; i < list.size(); i++) {
+            final Term currPremise = list.get(i);
+            assert currPremise.sort() == Sort.FORMULA;
+            
+            Term negConj = tt();
+            for (int j = 0; j < list.size(); j++) {
+                if (i == j) {
+                    continue;
+                }
+                
+                final Term currSubterm = list.get(j);
+                assert currSubterm.sort() == Sort.FORMULA;
+                negConj = and(negConj, not(currSubterm));
+            }
+            
+            result = and(result, imp(currPremise, negConj));
+        }
+        
+        return result;
+    }
 }

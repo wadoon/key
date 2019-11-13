@@ -1668,6 +1668,11 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
             result = translator.translateMapExpressionToJDL(val,list,services);
         }
     |
+        MUTEX LPAREN ( list=expressionlist )? RPAREN
+        {
+            result = new SLExpression(tb.mutex(list.stream().map(SLExpression::getTerm).collect(ImmutableArray.toImmutableArray())));
+        }
+    |
         (BEFORE) => result=beforeexpression
 
     |   result = transactionUpdated

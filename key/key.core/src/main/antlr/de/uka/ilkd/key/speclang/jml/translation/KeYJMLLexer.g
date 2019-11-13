@@ -106,6 +106,7 @@ lexer grammar KeYJMLLexer;
     MAX                  : '\\max';
     MEASURED_BY          : '\\measured_by';
     MIN                  : '\\min';
+    MUTEX               : '\\mutex';  //KeY extension, not official JML
     NEWELEMSFRESH        : '\\new_elems_fresh';  //KeY extension, not official JML
     NEW_OBJECTS          : '\\new_objects';  //KeY extension, not official JML
     NONNULLELEMENTS      : '\\nonnullelements';
