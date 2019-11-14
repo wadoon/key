@@ -45,6 +45,25 @@ public class ProofBundleConverter {
         this.keyScaffold = keyScaffold;
     }
 
+    public BundleSaveResult save(File file) throws IOException {
+        assert file.getName().endsWith(".zproof");
+
+        final ZipOutputStream zio = new ZipOutputStream(new FileOutputStream(file));
+
+        final String proofFileName = file.getName().replaceAll(".zproof", ".proof");
+        zio.putNextEntry(new ZipEntry(proofFileName));
+        zio.write(createKeYFile().getBytes());
+        zio.closeEntry();
+
+        zio.putNextEntry(new ZipEntry("src" + File.separator + "Problem.java"));
+        zio.write(createJavaFile().getBytes());
+        zio.closeEntry();
+
+        zio.close();
+
+        return new BundleSaveResult(file, FileSystems.getDefault().getPath(proofFileName));
+    }
+
     private String createJavaFile() {
         final String paramsDecl = model.getProgramVariableDeclarations().stream()
                 .map(decl -> String.format("%s %s", decl.getTypeName(), decl.getVarName()))
@@ -106,25 +125,6 @@ public class ProofBundleConverter {
                         initVars.isEmpty() ? "" : ("{" + Matcher.quoteReplacement(initVars) + "}"))
                 .replaceAll(PARAMS, Matcher.quoteReplacement(params))
                 .replaceAll(POST, model.getPostCondition());
-    }
-
-    public BundleSaveResult save(File file) throws IOException {
-        assert file.getName().endsWith(".zproof");
-
-        final ZipOutputStream zio = new ZipOutputStream(new FileOutputStream(file));
-
-        final String proofFileName = file.getName().replaceAll(".zproof", ".proof");
-        zio.putNextEntry(new ZipEntry(proofFileName));
-        zio.write(createKeYFile().getBytes());
-        zio.closeEntry();
-
-        zio.putNextEntry(new ZipEntry("src" + File.separator + "Problem.java"));
-        zio.write(createJavaFile().getBytes());
-        zio.closeEntry();
-
-        zio.close();
-
-        return new BundleSaveResult(file, FileSystems.getDefault().getPath(proofFileName));
     }
 
     public static class BundleSaveResult {
