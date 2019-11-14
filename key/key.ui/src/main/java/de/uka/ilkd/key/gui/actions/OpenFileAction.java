@@ -74,7 +74,7 @@ public class OpenFileAction extends MainWindowAction {
                 });
                 maybeRelationalModelFile.orElseGet(() -> {
                     JOptionPane.showMessageDialog(mainWindow,
-                            "<hml>The given file could not be verified as a relational model file.<br/>"
+                            "<html>The given file could not be verified as a relational model file.<br/>"
                                     + "Please check whether the file is corrupt.</html>",
                             "Problem Loading AE Relational Model File", JOptionPane.ERROR_MESSAGE);
                     return null;
