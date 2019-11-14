@@ -17,8 +17,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Optional;
+
+import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.ProofSelectionDialog;
+import de.uka.ilkd.key.gui.abstractexecution.relational.dialogs.AERelationalDialog;
+import de.uka.ilkd.key.gui.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -60,6 +65,25 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
                     } else {
                         mainWindow.loadProofFromBundle(file, proofPath.toFile());
                     }
+                } else if (AERelationalModel.fileHasAEModelEnding(file)) {
+                    final Optional<AERelationalModel> maybeRelationalModelFile = AERelationalModel
+                            .isRelationalModelFile(file);
+                    maybeRelationalModelFile.ifPresent(m -> {
+                        m.setFile(file);
+                        final AERelationalDialog dia = new AERelationalDialog(
+                                MainWindow.getInstance(), m);
+                        dia.setVisible(true);
+                    });
+                    maybeRelationalModelFile.orElseGet(() -> {
+                        JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                                "<hml>The given file could not be verified as a relational model file.<br/>"
+                                        + "Please check whether the file is corrupt.</html>",
+                                "Problem Loading AE Relational Model File",
+                                JOptionPane.ERROR_MESSAGE);
+                        return null;
+                    });
+
+                    return;
                 } else {
                     mainWindow.loadProblem(file);
                 }

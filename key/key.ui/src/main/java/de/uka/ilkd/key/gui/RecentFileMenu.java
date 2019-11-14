@@ -24,12 +24,16 @@ import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Optional;
 import java.util.Properties;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.abstractexecution.relational.dialogs.AERelationalDialog;
+import de.uka.ilkd.key.gui.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.Debug;
@@ -99,6 +103,25 @@ public class RecentFileMenu {
                         mediator.getUI().loadProofFromBundle(file, proofPath.toFile());
                         return;
                     }
+                } else if (AERelationalModel.fileHasAEModelEnding(file)) {
+                    final Optional<AERelationalModel> maybeRelationalModelFile = AERelationalModel
+                            .isRelationalModelFile(file);
+                    maybeRelationalModelFile.ifPresent(m -> {
+                        m.setFile(file);
+                        final AERelationalDialog dia = new AERelationalDialog(
+                                MainWindow.getInstance(), m);
+                        dia.setVisible(true);
+                    });
+                    maybeRelationalModelFile.orElseGet(() -> {
+                        JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                                "<hml>The given file could not be verified as a relational model file.<br/>"
+                                        + "Please check whether the file is corrupt.</html>",
+                                "Problem Loading AE Relational Model File",
+                                JOptionPane.ERROR_MESSAGE);
+                        return null;
+                    });
+
+                    return;
                 } else {
                     mediator.getUI().loadProblem(file);
                 }
