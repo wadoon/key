@@ -92,26 +92,7 @@ public class PredicateInputDialog extends JDialog {
                     final PredicateDeclaration val = PredicateDeclaration
                             .fromString(valueTextField.getText());
 
-                    final NamespaceSet namespaces = services.getNamespaces();
-                    if (namespaces.functions().lookup(val.getPredName()) != null) {
-                        throw new ParserException(
-                                "The predicate " + val.getPredName()
-                                        + " is already registered, please choose another one.",
-                                null);
-                    }
-
-                    final List<Sort> sorts = val.getArgSorts().stream()
-                            .map(namespaces.sorts()::lookup).collect(Collectors.toList());
-
-                    for (int i = 0; i < sorts.size(); i++) {
-                        if (sorts.get(i) == null) {
-                            throw new ParserException(
-                                    "The sort " + val.getArgSorts().get(i) + " is unknown.", null);
-                        }
-                    }
-
-                    namespaces.functions().add(new Function(new Name(val.getPredName()),
-                            Sort.FORMULA, sorts.toArray(new Sort[0])));
+                    checkAndRegister(val, services);
 
                     instance.value = val;
                     instance.setVisible(false);
@@ -156,6 +137,28 @@ public class PredicateInputDialog extends JDialog {
         dia.setVisible(true);
         dia.dispose();
         return dia.value;
+    }
+
+    public static void checkAndRegister(final PredicateDeclaration val, final Services services)
+            throws ParserException {
+        final NamespaceSet namespaces = services.getNamespaces();
+        if (namespaces.functions().lookup(val.getPredName()) != null) {
+            throw new ParserException("The predicate " + val.getPredName()
+                    + " is already registered, please choose another one.", null);
+        }
+
+        final List<Sort> sorts = val.getArgSorts().stream().map(namespaces.sorts()::lookup)
+                .collect(Collectors.toList());
+
+        for (int i = 0; i < sorts.size(); i++) {
+            if (sorts.get(i) == null) {
+                throw new ParserException("The sort " + val.getArgSorts().get(i) + " is unknown.",
+                        null);
+            }
+        }
+
+        namespaces.functions().add(new Function(new Name(val.getPredName()), Sort.FORMULA,
+                sorts.toArray(new Sort[0])));
     }
 
 }

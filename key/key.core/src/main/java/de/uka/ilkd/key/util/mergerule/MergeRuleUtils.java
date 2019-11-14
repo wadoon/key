@@ -1626,9 +1626,6 @@ public class MergeRuleUtils {
                     + "\" is already known to the system.<br/>\n"
                     + "Plase choose a fresh one.");
         }
-        
-        services.getNamespaces().programVariables().add(new LocationVariable(
-                new ProgramElementName(strName), services.getJavaInfo().getKeYJavaType(sort)));
 
         return new Pair<Sort, Name>(sort, name);
     }

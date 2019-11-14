@@ -85,17 +85,8 @@ public class LocsetInputDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 final String val = valueTextField.getText();
 
-                final NamespaceSet namespaces = services.getNamespaces();
                 try {
-                    if (namespaces.functions().lookup(val) != null) {
-                        throw new ParserException(
-                                "The name " + val
-                                        + " is already registered, please choose another one.",
-                                null);
-                    }
-
-                    namespaces.functions().add(new Function(new Name(val),
-                            services.getTypeConverter().getLocSetLDT().targetSort()));
+                    checkAndRegister(val, services);
 
                     instance.value = val;
                     instance.setVisible(false);
@@ -136,6 +127,18 @@ public class LocsetInputDialog extends JDialog {
         dia.setVisible(true);
         dia.dispose();
         return dia.value;
+    }
+
+    public static void checkAndRegister(final String val, final Services services)
+            throws ParserException {
+        final NamespaceSet namespaces = services.getNamespaces();
+        if (namespaces.functions().lookup(val) != null) {
+            throw new ParserException(
+                    "The name " + val + " is already registered, please choose another one.", null);
+        }
+
+        namespaces.functions().add(new Function(new Name(val),
+                services.getTypeConverter().getLocSetLDT().targetSort()));
     }
 
 }

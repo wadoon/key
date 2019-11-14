@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -67,12 +66,9 @@ import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * 
@@ -144,25 +140,26 @@ public class AERelationalDialog extends JDialog {
         }).start();
 
         servicesLoadedListeners.add(() -> {
-            final NamespaceSet namespaces = services.getNamespaces();
-
             model.getAbstractLocationSets().forEach(loc -> {
-                namespaces.functions().add(new Function(new Name(loc),
-                        services.getTypeConverter().getLocSetLDT().targetSort()));
+                try {
+                    LocsetInputDialog.checkAndRegister(loc, services);
+                } catch (ParserException e) {
+                    // Shouldn't happen! Already saved!
+                    e.printStackTrace();
+                }
             });
 
-            model.getProgramVariableDeclarations().forEach(loc -> {
-                MergeRuleUtils.parsePlaceholder(loc.getTypeName() + " " + loc.getVarName(),
-                        services);
+            model.getProgramVariableDeclarations().forEach(pv -> {
+                ProgramVariableInputDialog.checkAndRegister(pv, services);
             });
 
-            model.getPredicateDeclarations().forEach(val -> {
-                final List<Sort> sorts = //
-                        val.getArgSorts().stream().map(namespaces.sorts()::lookup)
-                                .collect(Collectors.toList());
-                final Function function = new Function( //
-                        new Name(val.getPredName()), Sort.FORMULA, sorts.toArray(new Sort[0]));
-                namespaces.functions().add(function);
+            model.getPredicateDeclarations().forEach(pred -> {
+                try {
+                    PredicateInputDialog.checkAndRegister(pred, services);
+                } catch (ParserException e) {
+                    // Shouldn't happen! Already saved!
+                    e.printStackTrace();
+                }
             });
         });
     }
@@ -180,7 +177,7 @@ public class AERelationalDialog extends JDialog {
                 });
                 return;
             }
-            
+
             final Path tempFilePath = Files.createTempFile("dummy_", ".key");
             final File tempFile = tempFilePath.toFile();
             tempFile.deleteOnExit();

@@ -29,9 +29,10 @@ import javax.swing.JTextField;
 
 import de.uka.ilkd.key.abstractexecution.relational.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils.NameAlreadyBoundException;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils.SortNotKnownException;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * @author Dominic Steinhoefel
@@ -85,22 +86,21 @@ public class ProgramVariableInputDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    MergeRuleUtils.parsePlaceholder(valueTextField.getText(), services);
-
-                    instance.value = ProgramVariableDeclaration
+                    final ProgramVariableDeclaration val = ProgramVariableDeclaration
                             .fromString(valueTextField.getText());
+
+                    checkAndRegister(val, services);
+
+                    instance.value = val;
                     instance.setVisible(false);
                 } catch (IllegalArgumentException exc) {
                     JOptionPane.showMessageDialog(instance,
                             "There's an error in your syntax, please correct it and try again",
                             "Syntax error", JOptionPane.ERROR_MESSAGE);
-                } catch (NameAlreadyBoundException exc) {
+                } catch (RuntimeException exc) {
                     JOptionPane.showMessageDialog(instance,
-                            "The name you've chosen is already bound. Choose another one.",
-                            "Syntax error", JOptionPane.ERROR_MESSAGE);
-                } catch (SortNotKnownException exc) {
-                    JOptionPane.showMessageDialog(instance,
-                            "The given type/sort is not known. Please choose another one.",
+                            "<html>There's an error in your syntax, please correct it and try again<br/><br/>Message:<br/>"
+                                    + exc.getMessage() + "</html>",
                             "Syntax error", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -122,6 +122,26 @@ public class ProgramVariableInputDialog extends JDialog {
         contentPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         setSize(400, 110);
+    }
+
+    public static void checkAndRegister(final ProgramVariableDeclaration val,
+            final Services services) {
+        final Sort sort = services.getNamespaces().sorts().lookup(val.getTypeName());
+
+        if (sort == null) {
+            throw new RuntimeException("Sort \"" + val.getTypeName() + "\" is not known");
+        }
+
+        final Name name = new Name(val.getVarName());
+
+        if (services.getNamespaces().lookup(name) != null) {
+            throw new RuntimeException("The name \"" + val.getVarName()
+                    + "\" is already known to the system.<br/>\n" + "Plase choose a fresh one.");
+        }
+
+        services.getNamespaces().programVariables()
+                .add(new LocationVariable(new ProgramElementName(val.getVarName()),
+                        services.getJavaInfo().getKeYJavaType(sort)));
     }
 
     public static ProgramVariableDeclaration showInputDialog(final JDialog owner,
