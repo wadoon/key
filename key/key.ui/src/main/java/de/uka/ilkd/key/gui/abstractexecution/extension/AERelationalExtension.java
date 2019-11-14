@@ -21,11 +21,11 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 
+import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
+import de.uka.ilkd.key.abstractexecution.relational.model.PredicateDeclaration;
+import de.uka.ilkd.key.abstractexecution.relational.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.abstractexecution.relational.dialogs.AERelationalDialog;
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.AERelationalModel;
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.PredicateDeclaration;
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;

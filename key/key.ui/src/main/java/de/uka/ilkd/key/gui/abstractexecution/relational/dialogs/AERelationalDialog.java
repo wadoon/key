@@ -21,11 +21,9 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -56,15 +54,15 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
+import de.uka.ilkd.key.abstractexecution.relational.model.PredicateDeclaration;
+import de.uka.ilkd.key.abstractexecution.relational.model.ProgramVariableDeclaration;
+import de.uka.ilkd.key.abstractexecution.relational.model.ProofBundleConverter;
+import de.uka.ilkd.key.abstractexecution.relational.model.ProofBundleConverter.BundleSaveResult;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.FormulaInputTextField;
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.AERelationalModel;
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.PredicateDeclaration;
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.ProgramVariableDeclaration;
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.ProofBundleConverter;
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.ProofBundleConverter.BundleSaveResult;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.java.Services;
@@ -81,8 +79,6 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * @author Dominic Steinhoefel
  */
 public class AERelationalDialog extends JDialog {
-    private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/gui/abstractexecution/relational/Problem.java";
-    private static final String KEY_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/gui/abstractexecution/relational/problem.key";
     private static final String DUMMY_KEY_FILE = "/de/uka/ilkd/key/gui/abstractexecution/relational/dummy.key";
 
     private static final long serialVersionUID = 1L;
@@ -172,20 +168,19 @@ public class AERelationalDialog extends JDialog {
     }
 
     private void initializeServices() {
-        final URL keyFileUrl = AERelationalDialog.class.getResource(DUMMY_KEY_FILE);
-
-        if (keyFileUrl == null) {
-            SwingUtilities.invokeLater(() -> {
-                JOptionPane.showMessageDialog(AERelationalDialog.this,
-                        "Ooops... Could not load resource file!", "Problem During Initialization",
-                        JOptionPane.ERROR_MESSAGE);
-            });
-            return;
-        }
-
         KeYEnvironment<?> environment = null;
         try {
             final InputStream is = AERelationalDialog.class.getResourceAsStream(DUMMY_KEY_FILE);
+
+            if (is == null) {
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(AERelationalDialog.this,
+                            "Ooops... Could not load resource file!",
+                            "Problem During Initialization", JOptionPane.ERROR_MESSAGE);
+                });
+                return;
+            }
+            
             final Path tempFilePath = Files.createTempFile("dummy_", ".key");
             final File tempFile = tempFilePath.toFile();
             tempFile.deleteOnExit();
@@ -269,19 +264,6 @@ public class AERelationalDialog extends JDialog {
         }
     }
 
-    private static String inputStreamToString(InputStream is) throws IOException {
-        final StringBuilder sb = new StringBuilder();
-        final BufferedInputStream in = new BufferedInputStream(is);
-        byte[] contents = new byte[1024];
-
-        int bytesRead = 0;
-        while ((bytesRead = in.read(contents)) != -1) {
-            sb.append(new String(contents, 0, bytesRead));
-        }
-
-        return sb.toString();
-    }
-
     private JPanel createControlPanel() {
 
         final JButton loadFromFileBtn = new JButton("Load Model",
@@ -357,36 +339,13 @@ public class AERelationalDialog extends JDialog {
             return;
         }
 
-        final InputStream javaScaffoldIS = AERelationalDialog.class
-                .getResourceAsStream(JAVA_PROBLEM_FILE_SCAFFOLD);
-        final InputStream keyScaffoldIS = AERelationalDialog.class
-                .getResourceAsStream(KEY_PROBLEM_FILE_SCAFFOLD);
-        if (javaScaffoldIS == null || keyScaffoldIS == null) {
-            JOptionPane.showMessageDialog(AERelationalDialog.this,
-                    "Ooops... Could not load resource file!", "Problem Starting Proof",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        String javaScaffold = null;
-        String keyScaffold = null;
         try {
-            javaScaffold = inputStreamToString(javaScaffoldIS);
-            keyScaffold = inputStreamToString(keyScaffoldIS);
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(AERelationalDialog.this,
-                    "Ooops... Could not load resource file!", "Problem Starting Proof",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-
-        try {
-            final ProofBundleConverter pbc = //
-                    new ProofBundleConverter(model, javaScaffold, keyScaffold);
+            final ProofBundleConverter pbc = new ProofBundleConverter(model);
             final BundleSaveResult result = pbc.save(model.getFile()
                     .map(f -> new File(f.getParent(), f.getName().replaceAll(".aer", ".zproof")))
                     .get());
             mainWindow.loadProofFromBundle(result.getFile(), result.getProofPath().toFile());
-        } catch (IOException e) {
+        } catch (IOException | IllegalStateException e) {
             JOptionPane
                     .showMessageDialog(AERelationalDialog.this,
                             "<html>Problem saving proof bundle.<br/><br/>Message:<br/>"

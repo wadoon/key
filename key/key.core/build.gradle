@@ -3,6 +3,9 @@ plugins {
     id("antlr")
 }
 
+repositories {
+    maven { url "https://jitpack.io" }
+}
 
 dependencies {
     compile project(":key.util")
@@ -17,6 +20,9 @@ dependencies {
     //javacc name: 'javacc'
     javacc 'net.java.dev.javacc:javacc:4.0'
     antlr "org.antlr:antlr:3.5.2"   // use ANTLR version 3
+    
+    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
+    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.4.0-b180830.0438'
 }
 
 def javaCCOutputDir = file("${buildDir}/generated-src/javacc")

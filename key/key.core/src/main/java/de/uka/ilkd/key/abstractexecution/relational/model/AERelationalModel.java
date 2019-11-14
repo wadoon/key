@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.gui.abstractexecution.relational.model;
+package de.uka.ilkd.key.abstractexecution.relational.model;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -46,7 +46,7 @@ import org.xml.sax.SAXException;
 public class AERelationalModel {
     private static final String AE_MODEL_FILE_ENDING = ".aer";
     public static final AERelationalModel EMPTY_MODEL = new AERelationalModel();
-    private static final String SCHEMA_PATH = "/de/uka/ilkd/key/gui/abstractexecution/relational/schema1.xsd";
+    private static final String SCHEMA_PATH = "/de/uka/ilkd/key/abstractexecution/relational/schema1.xsd";
 
     private String programOne = "";
     private String programTwo = "";

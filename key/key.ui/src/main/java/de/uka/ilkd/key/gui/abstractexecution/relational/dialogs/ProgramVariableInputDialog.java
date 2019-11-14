@@ -27,7 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.ProgramVariableDeclaration;
+import de.uka.ilkd.key.abstractexecution.relational.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils.NameAlreadyBoundException;

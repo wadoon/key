@@ -37,7 +37,7 @@ class DataRecordingTestFile extends TestFile<ProfilingDirectories> {
     }
 
     @Override
-    protected void reload(boolean verbose, File proofFile, Proof loadedProof, boolean success) {
+    protected void reload(boolean verbose, File keyFile, File proofFile, Proof loadedProof, boolean success) {
         // we skip reloading for these test cases
     }
     

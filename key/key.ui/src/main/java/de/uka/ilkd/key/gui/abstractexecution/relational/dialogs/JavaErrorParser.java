@@ -39,7 +39,7 @@ import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice;
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
 
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.ProgramVariableDeclaration;
+import de.uka.ilkd.key.abstractexecution.relational.model.ProgramVariableDeclaration;
 
 /**
  * @author Dominic Steinhoefel

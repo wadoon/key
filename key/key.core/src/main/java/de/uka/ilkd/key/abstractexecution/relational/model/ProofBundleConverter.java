@@ -10,22 +10,31 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.gui.abstractexecution.relational.model;
+package de.uka.ilkd.key.abstractexecution.relational.model;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
+ * Converts an AE Relational Model to a KeY proof bundle.
+ * 
  * @author Dominic Steinhoefel
  */
 public class ProofBundleConverter {
+    private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/abstractexecution/relational/Problem.java";
+    private static final String KEY_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/abstractexecution/relational/problem.key";
+
     private static final String POST = "<POST>";
     private static final String INIT_VARS = "<INIT_VARS>";
     private static final String PROGRAMVARIABLES = "<PROGRAMVARIABLES>";
@@ -38,13 +47,53 @@ public class ProofBundleConverter {
     private final AERelationalModel model;
     private final String javaScaffold;
     private final String keyScaffold;
+    private final Optional<File> keyFileToUse;
 
-    public ProofBundleConverter(AERelationalModel model, String javaScaffold, String keyScaffold) {
-        this.model = model;
-        this.javaScaffold = javaScaffold;
-        this.keyScaffold = keyScaffold;
+    /**
+     * @param model The model to convert.
+     * @throws IOException           If the resource files are found, but could not
+     *                               be loaded.
+     * @throws IllegalStateException If the required resource files could not be
+     *                               found.
+     */
+    public ProofBundleConverter(AERelationalModel model) throws IOException, IllegalStateException {
+        this(model, null);
     }
 
+    /**
+     * @param model        The model to convert.
+     * @param keyFileToUse If non-null, will use the contents of this file instead
+     *                     of the scaffold file generated from the model. Used
+     *                     primarily for reloading in automated tests.
+     * @throws IOException           If the resource files are found, but could not
+     *                               be loaded.
+     * @throws IllegalStateException If the required resource files could not be
+     *                               found.
+     */
+    public ProofBundleConverter(AERelationalModel model, File keyFileToUse)
+            throws IOException, IllegalStateException {
+        this.model = model;
+        this.keyFileToUse = Optional.ofNullable(keyFileToUse);
+
+        final InputStream javaScaffoldIS = ProofBundleConverter.class
+                .getResourceAsStream(JAVA_PROBLEM_FILE_SCAFFOLD);
+        final InputStream keyScaffoldIS = ProofBundleConverter.class
+                .getResourceAsStream(KEY_PROBLEM_FILE_SCAFFOLD);
+        if (javaScaffoldIS == null || keyScaffoldIS == null) {
+            throw new IllegalStateException("Could not load required resource files.");
+        }
+
+        javaScaffold = inputStreamToString(javaScaffoldIS);
+        keyScaffold = inputStreamToString(keyScaffoldIS);
+    }
+
+    /**
+     * Saves the bundle to the given file.
+     * 
+     * @param file The output file. Has to end in ".zproof".
+     * @return The {@link BundleSaveResult}.
+     * @throws IOException
+     */
     public BundleSaveResult save(File file) throws IOException {
         assert file.getName().endsWith(".zproof");
 
@@ -52,7 +101,17 @@ public class ProofBundleConverter {
 
         final String proofFileName = file.getName().replaceAll(".zproof", ".proof");
         zio.putNextEntry(new ZipEntry(proofFileName));
-        zio.write(createKeYFile().getBytes());
+        if (keyFileToUse.isPresent()) {
+            final FileInputStream fio = new FileInputStream(keyFileToUse.get());
+            byte[] buffer = new byte[8 * 1024];
+            int len;
+            while ((len = fio.read(buffer)) > 0) {
+                zio.write(buffer, 0, len);
+            }
+            fio.close();
+        } else {
+            zio.write(createKeYFile().getBytes());
+        }
         zio.closeEntry();
 
         zio.putNextEntry(new ZipEntry("src" + File.separator + "Problem.java"));
@@ -125,6 +184,19 @@ public class ProofBundleConverter {
                         initVars.isEmpty() ? "" : ("{" + Matcher.quoteReplacement(initVars) + "}"))
                 .replaceAll(PARAMS, Matcher.quoteReplacement(params))
                 .replaceAll(POST, model.getPostCondition());
+    }
+
+    private static String inputStreamToString(InputStream is) throws IOException {
+        final StringBuilder sb = new StringBuilder();
+        final BufferedInputStream in = new BufferedInputStream(is);
+        byte[] contents = new byte[1024];
+
+        int bytesRead = 0;
+        while ((bytesRead = in.read(contents)) != -1) {
+            sb.append(new String(contents, 0, bytesRead));
+        }
+
+        return sb.toString();
     }
 
     public static class BundleSaveResult {

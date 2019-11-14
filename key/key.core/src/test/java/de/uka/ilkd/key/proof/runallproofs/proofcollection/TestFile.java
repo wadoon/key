@@ -1,13 +1,16 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
+import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
+import de.uka.ilkd.key.abstractexecution.relational.model.ProofBundleConverter;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
@@ -166,8 +169,6 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
       if(verbose) {
           System.err.println("Now processing file " + keyFile);
       }
-      // File that the created proof will be saved to.
-      File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
 
       KeYEnvironment<DefaultUserInterfaceControl> env = null;
       Proof loadedProof = null;
@@ -215,7 +216,9 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
           * Testing proof reloading now. Saving and reloading proof only in case
           * it was closed and test property is PROVABLE.
           */
-         reload(verbose, proofFile, loadedProof, success);
+         // File that the created proof will be saved to.
+         File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
+         reload(verbose, keyFile, proofFile, loadedProof, success);
       }
       catch (Throwable t) {
          if(verbose) {
@@ -238,12 +241,28 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
     /**
      * Override this method in order to change reload behaviour.
      */
-    protected void reload(boolean verbose, File proofFile, Proof loadedProof, boolean success)
+    protected void reload(boolean verbose, File keyFile, File proofFile, Proof loadedProof, boolean success)
             throws IOException, Exception {
         if (settings.reloadEnabled() && (testProperty == TestProperty.PROVABLE) && success) {
             // Save the available proof to a temporary file.
             loadedProof.saveToFile(proofFile);
+            
+            if (AERelationalModel.fileHasAEModelEnding(keyFile)) {
+                final Optional<AERelationalModel> maybeModel = AERelationalModel
+                        .isRelationalModelFile(keyFile);
+                
+                if (!maybeModel.isPresent()) {
+                    throw new RuntimeException("Could not re-create AE Relational model from file "
+                            + keyFile.getAbsolutePath());
+                }
+                
+                final ProofBundleConverter pbc = new ProofBundleConverter(maybeModel.get(), proofFile);
+                proofFile = new File(keyFile.getAbsolutePath() + ".zproof");
+                pbc.save(proofFile);
+            }
+            
             reloadProof(proofFile);
+            
             if (verbose) {
                 System.err.println("... success: reloaded.");
             }

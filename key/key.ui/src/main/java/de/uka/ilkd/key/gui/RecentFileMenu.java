@@ -31,9 +31,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.abstractexecution.relational.dialogs.AERelationalDialog;
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.Debug;

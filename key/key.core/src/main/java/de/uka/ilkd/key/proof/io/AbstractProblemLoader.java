@@ -27,6 +27,8 @@ import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
+import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
+import de.uka.ilkd.key.abstractexecution.relational.model.ProofBundleConverter;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.parser.KeYLexer;
@@ -107,7 +109,7 @@ public abstract class AbstractProblemLoader {
 	/**
      * The file or folder to load.
      */
-    private final File file;
+    private File file;
 
     /**
      * The filename of the proof in the zipped file (null if file is not a proof bundle).
@@ -447,6 +449,20 @@ public abstract class AbstractProblemLoader {
             // KeY problem specification or saved proof
             return new KeYUserProblemFile(filename, file, fileRepo, control,
                         profileOfNewProofs, filename.endsWith(".proof.gz"));
+        } else if (AERelationalModel.fileHasAEModelEnding(file)) {
+            final Optional<AERelationalModel> aerModel = AERelationalModel.isRelationalModelFile(file);
+            if (!aerModel.isPresent()) {
+                throw new IllegalArgumentException("Invalid Abstract Execution Relational model.");
+            }
+            
+            final ProofBundleConverter pbc = new ProofBundleConverter(aerModel.get());
+            final File tempFile = Files.createTempFile("AEProofBundle_", ".zproof").toFile();
+            tempFile.deleteOnExit();
+            pbc.save(tempFile);
+            
+            file = tempFile;
+            
+            return createEnvInput(fileRepo);
         } else if (file.isDirectory()) {
             // directory containing java sources, probably enriched
             // by specifications

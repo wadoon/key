@@ -23,8 +23,8 @@ import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.abstractexecution.relational.dialogs.AERelationalDialog;
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 

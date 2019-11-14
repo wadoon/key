@@ -154,6 +154,10 @@ group aepaper_provable {
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrectMoreGeneral/consolidateDuplicateConditionalFragments.key
 }
 
+group aepaper_models_provable {
+   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrectMoreGeneral/consolidateDuplicateConditionalFragments.aer
+}
+
 group aepaper_notprovable {
    notprovable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixIncorrect/consolidateDuplicateConditionalFragments.key
 }

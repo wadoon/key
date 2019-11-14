@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.gui.abstractexecution.relational.model;
+package de.uka.ilkd.key.abstractexecution.relational.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
