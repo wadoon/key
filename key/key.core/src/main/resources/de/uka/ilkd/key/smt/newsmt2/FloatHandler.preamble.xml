@@ -233,7 +233,8 @@
 
         <!-- If the argument is positive infinity, then the result is positive infinity-->
         (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.gt a (fp #b0 #b00000000000
-        #b0000000000000000000000000000000000000000000000000000))) (fp.isInfinite (expDouble a)))))
+        #b0000000000000000000000000000000000000000000000000000))) (and (fp.isInfinite (expDouble a)(gt (expDouble a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000) ))))))
 
         <!-- If the argument is negative infinity, then the result is positive zero.-->
         (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.lt a (fp #b0 #b00000000000

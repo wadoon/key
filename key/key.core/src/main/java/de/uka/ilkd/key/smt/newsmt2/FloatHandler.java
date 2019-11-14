@@ -83,7 +83,7 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(doubleLDT.getIsInfinite(), SMTTermFloatOp.Op.FPISINFINITE);
         fpOperators.put(doubleLDT.getIsNegative(), SMTTermFloatOp.Op.FPISNEGATIVE);
         fpOperators.put(doubleLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
-        fpOperators.put(floatLDT.getJavaMod(), SMTTermFloatOp.Op.FPMOD);
+        fpOperators.put(doubleLDT.getJavaMod(), SMTTermFloatOp.Op.FPMOD);
 
         mathOperators.put(doubleLDT.getSinDouble(),SMTTermFloatOp.Op.SINDOUBLE);
         mathOperators.put(doubleLDT.getCosDouble(),SMTTermFloatOp.Op.COSDOUBLE);
