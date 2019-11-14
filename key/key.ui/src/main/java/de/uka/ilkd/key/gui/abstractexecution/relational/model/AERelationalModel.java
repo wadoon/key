@@ -186,9 +186,9 @@ public class AERelationalModel {
 
         try {
             return Optional.of(fromXml(new String(Files.readAllBytes(file.toPath()))));
-        } catch (SAXException exc) {
-        } catch (IOException e) {
-        } catch (JAXBException e) {
+        } catch (SAXException | JAXBException exc) {
+        } catch (IOException exc) {
+            exc.printStackTrace();
         }
 
         return Optional.empty();

@@ -105,6 +105,6 @@ return result;</programTwo>
         </predicate>
     </predicates>
     <programVariables>
-        <programVariable typeName="Object" varName="result"/>
+        <programVariable typeName="java.lang.Object" varName="result"/>
     </programVariables>
 </ns2:aeRelationalModel>

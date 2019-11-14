@@ -22,8 +22,10 @@ dependencies {
                          'lib/docking-frames-core.jar')
 
     implementation 'org.jetbrains:annotations:17.0.0'
-    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
     api 'com.github.bobbylight:RSyntaxTextArea:3.0.4'
+    
+    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
+    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.4.0-b180830.0438'
     
     runtimeOnly project(":keyext.interactionlog")
     //runtimeOnly project(":keyext.script.ui")

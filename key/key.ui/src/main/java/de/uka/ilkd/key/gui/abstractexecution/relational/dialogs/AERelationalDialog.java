@@ -339,6 +339,13 @@ public class AERelationalDialog extends JDialog {
             return;
         }
 
+        if (JOptionPane.showConfirmDialog(this,
+                "<html>Creating the bundle will save all changes to the model.<br/><br/>"
+                        + "Proceed?</html>",
+                "Save Changes", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+            return;
+        }
+
         try {
             saveModelToFile(model.getFile().get());
         } catch (IOException | JAXBException exc) {
