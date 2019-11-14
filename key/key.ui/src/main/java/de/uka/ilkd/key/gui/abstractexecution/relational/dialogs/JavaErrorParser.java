@@ -117,35 +117,8 @@ public class JavaErrorParser extends AbstractParser {
     }
 
     private String createDocument(final String className, String body) {
-        final Pattern aexpPattern = Pattern
-                .compile("\\\\abstract_expression +([a-zA-Z0-9_.]+) +[a-zA-Z0-9_.]+");
-        final Matcher aexpMatcher = aexpPattern.matcher(body);
-        String newBody = body;
-        while (aexpMatcher.find()) {
-            final String match = aexpMatcher.group();
-
-            final String type = aexpMatcher.group(1);
-            String replacement = "null";
-            if (type.equals("boolean")) {
-                replacement = "true";
-            } else if (type.equals("int") || type.equals("char") || type.equals("long")) {
-                replacement = "0";
-            }
-
-            newBody = newBody.replaceAll(Pattern.quote(match),
-                    String.format("%1$-" + match.length() + "s", replacement));
-        }
-        body = newBody;
-
-        final Pattern asPattern = Pattern.compile("\\\\abstract_statement +[a-zA-Z0-9_.]+ *;");
-        final Matcher asMatcher = asPattern.matcher(body);
-        newBody = body;
-        while (asMatcher.find()) {
-            final String match = asMatcher.group();
-            newBody = newBody.replaceAll(Pattern.quote(match),
-                    String.format("%1$-" + match.length() + "s", ";"));
-        }
-        body = newBody;
+        body = replaceAbstractExpression(body);
+        body = replaceAbstractStatement(body);
 
         final StringBuilder sb = new StringBuilder();
         sb.append("public class ");
@@ -162,6 +135,44 @@ public class JavaErrorParser extends AbstractParser {
         sb.append("}");
         sb.append("}");
         return sb.toString();
+    }
+
+    private String replaceAbstractStatement(final String body) {
+        final Pattern asPattern = Pattern.compile("\\\\abstract_statement +[a-zA-Z0-9_.]+ *;");
+        final Matcher asMatcher = asPattern.matcher(body);
+
+        String newBody = body;
+        while (asMatcher.find()) {
+            final String match = asMatcher.group();
+            newBody = newBody.replaceAll(Pattern.quote(match),
+                    String.format("%1$-" + match.length() + "s", ";"));
+        }
+
+        return newBody;
+    }
+
+    private String replaceAbstractExpression(final String body) {
+        final Pattern aexpPattern = Pattern
+                .compile("\\\\abstract_expression +([a-zA-Z0-9_.]+) +[a-zA-Z0-9_.]+");
+        final Matcher aexpMatcher = aexpPattern.matcher(body);
+
+        String newBody = body;
+        while (aexpMatcher.find()) {
+            final String match = aexpMatcher.group();
+
+            final String type = aexpMatcher.group(1);
+            String replacement = "null";
+            if (type.equals("boolean")) {
+                replacement = "true";
+            } else if (type.equals("int") || type.equals("char") || type.equals("long")) {
+                replacement = "0";
+            }
+
+            newBody = newBody.replaceAll(Pattern.quote(match),
+                    String.format("%1$-" + match.length() + "s", replacement));
+        }
+
+        return newBody;
     }
 
 }
