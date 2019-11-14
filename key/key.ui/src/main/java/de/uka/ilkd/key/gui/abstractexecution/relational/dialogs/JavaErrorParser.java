@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.swing.text.BadLocationException;
@@ -44,9 +46,6 @@ import de.uka.ilkd.key.gui.abstractexecution.relational.model.ProgramVariableDec
  *
  */
 public class JavaErrorParser extends AbstractParser {
-    private static final String AS_KEYWORD = "\\abstract_statement";
-    private static final String AEXP_KEYWORD = "\\abstract_expression";
-
     private final Set<ProgramVariableDeclaration> progVarDecls = new HashSet<>();
 
     public void setProgVarDecls(Collection<ProgramVariableDeclaration> progVarDecls) {
@@ -71,27 +70,6 @@ public class JavaErrorParser extends AbstractParser {
             final int javaDocBoilerplateLineLength = javaDoc.indexOf('\n') + 1;
 
             for (Diagnostic<?> diagnostic : diagnostics) {
-                final int prefixStartPosition = (int) (diagnostic.getStartPosition()
-                        - javaDocBoilerplateLineLength);
-                String prefixText = doc.getText(prefixStartPosition,
-                        (int) Math.min(doc.getLength() - prefixStartPosition, AS_KEYWORD.length()))
-                        .trim();
-
-                if (prefixText.equals(AS_KEYWORD) || prefixText.equals(AS_KEYWORD.substring(1))
-                        || AS_KEYWORD.startsWith(prefixText)) {
-                    continue;
-                }
-
-                prefixText = doc
-                        .getText(prefixStartPosition, (int) Math
-                                .min(doc.getLength() - prefixStartPosition, AEXP_KEYWORD.length()))
-                        .trim();
-
-                if (prefixText.equals(AEXP_KEYWORD) || prefixText.equals(AEXP_KEYWORD.substring(1))
-                        || AEXP_KEYWORD.startsWith(prefixText)) {
-                    continue;
-                }
-
                 final int line = (int) diagnostic.getLineNumber() - 1;
                 int startPos = (int) diagnostic.getStartPosition() - javaDocBoilerplateLineLength;
                 int length = (int) (diagnostic.getEndPosition() - diagnostic.getStartPosition());
@@ -138,7 +116,37 @@ public class JavaErrorParser extends AbstractParser {
         return diagnostics.getDiagnostics();
     }
 
-    private String createDocument(String className, String body) {
+    private String createDocument(final String className, String body) {
+        final Pattern aexpPattern = Pattern
+                .compile("\\\\abstract_expression +([a-zA-Z0-9_.]+) +[a-zA-Z0-9_.]+");
+        final Matcher aexpMatcher = aexpPattern.matcher(body);
+        String newBody = body;
+        while (aexpMatcher.find()) {
+            final String match = aexpMatcher.group();
+
+            final String type = aexpMatcher.group(1);
+            String replacement = "null";
+            if (type.equals("boolean")) {
+                replacement = "true";
+            } else if (type.equals("int") || type.equals("char") || type.equals("long")) {
+                replacement = "0";
+            }
+
+            newBody = newBody.replaceAll(Pattern.quote(match),
+                    String.format("%1$-" + match.length() + "s", replacement));
+        }
+        body = newBody;
+
+        final Pattern asPattern = Pattern.compile("\\\\abstract_statement +[a-zA-Z0-9_.]+ *;");
+        final Matcher asMatcher = asPattern.matcher(body);
+        newBody = body;
+        while (asMatcher.find()) {
+            final String match = asMatcher.group();
+            newBody = newBody.replaceAll(Pattern.quote(match),
+                    String.format("%1$-" + match.length() + "s", ";"));
+        }
+        body = newBody;
+
         final StringBuilder sb = new StringBuilder();
         sb.append("public class ");
         sb.append(className);
