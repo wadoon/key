@@ -25,9 +25,10 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,7 +54,6 @@ import javax.xml.bind.JAXBException;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
-import org.key_project.util.helper.FindResources;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -185,14 +185,18 @@ public class AERelationalDialog extends JDialog {
 
         KeYEnvironment<?> environment = null;
         try {
-            final File keyFile = //
-                    FindResources.getResource(DUMMY_KEY_FILE, AERelationalDialog.class).toFile();
+            final InputStream is = AERelationalDialog.class.getResourceAsStream(DUMMY_KEY_FILE);
+            final Path tempFilePath = Files.createTempFile("dummy_", ".key");
+            final File tempFile = tempFilePath.toFile();
+            tempFile.deleteOnExit();
+            Files.copy(is, tempFilePath, StandardCopyOption.REPLACE_EXISTING);
             environment = KeYEnvironment.load( //
-                    JavaProfile.getDefaultInstance(), keyFile, null, null, null, true);
-        } catch (ProblemLoaderException | URISyntaxException | IOException e) {
+                    JavaProfile.getDefaultInstance(), tempFile, null, null, null, true);
+        } catch (ProblemLoaderException | IOException e) {
             SwingUtilities.invokeLater(() -> {
                 JOptionPane.showMessageDialog(AERelationalDialog.this,
-                        "Ooops... Could not initialize proof services!",
+                        "<html>Ooops... Could not initialize proof services!<br/><br/>Message:<br/>"
+                                + e.getMessage() + "</html>",
                         "Problem During Initialization", JOptionPane.ERROR_MESSAGE);
             });
             return;
