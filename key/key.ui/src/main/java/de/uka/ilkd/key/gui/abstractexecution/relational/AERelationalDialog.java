@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,6 +46,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.xml.bind.JAXBException;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
@@ -88,8 +91,9 @@ public class AERelationalDialog extends JDialog {
     private final RSyntaxTextArea codeLeft = new RSyntaxTextArea(20, 60);
     private final RSyntaxTextArea codeRight = new RSyntaxTextArea(20, 60);
     private final JTextField postCondTextField = new JTextField();
-    
+
     private final List<ServicesLoadedListener> servicesLoadedListeners = new ArrayList<>();
+    private final List<ProgramVariablesChangedListener> programVariablesChangedListeners = new ArrayList<>();
 
     public AERelationalDialog(MainWindow mainWindow, AERelationalModel model) {
         super(mainWindow, false);
@@ -471,6 +475,13 @@ public class AERelationalDialog extends JDialog {
         scrollPane.setViewportView(predDeclsList);
         result.add(scrollPane, BorderLayout.CENTER);
         predDeclsList.setModel(progVarDeclsListModel);
+        progVarDeclsListModel.addListDataListener(new UniformListDataListener() {
+            @Override
+            public void listChanged(ListDataEvent e) {
+                programVariablesChangedListeners.forEach(l -> l.programVariablesChanged(
+                        Collections.list(progVarDeclsListModel.elements())));
+            }
+        });
 
         final JButton plusButton = new JButton(
                 IconFontSwing.buildIcon(FontAwesomeSolid.PLUS, 16, Color.BLACK));
@@ -514,7 +525,7 @@ public class AERelationalDialog extends JDialog {
                 }
             }
         });
-        
+
         plusButton.setEnabled(false);
         minusButton.setEnabled(false);
         editButton.setEnabled(false);
@@ -599,12 +610,22 @@ public class AERelationalDialog extends JDialog {
     private JComponent createJavaEditorViewLeft() {
         codeLeft.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
         codeLeft.setCodeFoldingEnabled(true);
+
+        final JavaErrorParser errorParser = new JavaErrorParser();
+        programVariablesChangedListeners.add(errorParser::setProgVarDecls);
+
+        codeLeft.addParser(errorParser);
         return new RTextScrollPane(codeLeft);
     }
 
     private JComponent createJavaEditorViewRight() {
         codeRight.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
         codeRight.setCodeFoldingEnabled(true);
+
+        final JavaErrorParser errorParser = new JavaErrorParser();
+        programVariablesChangedListeners.add(errorParser::setProgVarDecls);
+
+        codeRight.addParser(errorParser);
         return new RTextScrollPane(codeRight);
     }
 
@@ -618,9 +639,34 @@ public class AERelationalDialog extends JDialog {
         }
         return compList;
     }
-    
+
+    private static abstract class UniformListDataListener implements ListDataListener {
+
+        @Override
+        public void contentsChanged(ListDataEvent e) {
+            listChanged(e);
+        }
+
+        @Override
+        public void intervalAdded(ListDataEvent e) {
+            listChanged(e);
+        }
+
+        @Override
+        public void intervalRemoved(ListDataEvent e) {
+            listChanged(e);
+        }
+
+        public abstract void listChanged(ListDataEvent e);
+    }
+
     @FunctionalInterface
     private static interface ServicesLoadedListener {
         public void servicesLoaded();
+    }
+
+    @FunctionalInterface
+    private static interface ProgramVariablesChangedListener {
+        public void programVariablesChanged(Collection<ProgramVariableDeclaration> newVars);
     }
 }
