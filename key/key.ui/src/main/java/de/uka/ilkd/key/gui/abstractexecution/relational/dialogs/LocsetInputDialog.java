@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.gui.abstractexecution.relational;
+package de.uka.ilkd.key.gui.abstractexecution.relational.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -27,23 +27,27 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.PredicateDeclaration;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.parser.ParserException;
 
 /**
  * @author Dominic Steinhoefel
  */
-public class PredicateInputDialog extends JDialog {
+public class LocsetInputDialog extends JDialog {
     private static final long serialVersionUID = 1L;
 
-    private PredicateDeclaration value;
-    
-    private PredicateInputDialog(final JDialog owner, final PredicateDeclaration value) {
+    private String value;
+
+    private LocsetInputDialog(final JDialog owner, final String value, Services services) {
         super(owner, true);
         assert value != null;
 
         this.value = value;
 
-        final PredicateInputDialog instance = this;
+        final LocsetInputDialog instance = this;
         getContentPane().setLayout(new BorderLayout());
 
         final JPanel contentPanel = new JPanel();
@@ -53,19 +57,19 @@ public class PredicateInputDialog extends JDialog {
         contentPanel.setLayout(new BorderLayout());
         getContentPane().add(contentPanel, BorderLayout.CENTER);
 
-        setTitle("Please enter a predicate specification.");
+        setTitle("Please enter a name for the LocSet constant.");
         setResizable(false);
-        
+
         final JButton okButton = new JButton("OK");
 
-        final JTextField valueTextField = new JTextField(value.toString());
+        final JTextField valueTextField = new JTextField(value);
         valueTextField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
                 final char c = e.getKeyChar();
 
                 if (!(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9'
-                        || c == '_' || c == ',' || c == '(' || c == ')')) {
+                        || c == '_')) {
                     e.consume();
                 }
             }
@@ -79,12 +83,26 @@ public class PredicateInputDialog extends JDialog {
         okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                final String val = valueTextField.getText();
+
+                final NamespaceSet namespaces = services.getNamespaces();
                 try {
-                    instance.value = PredicateDeclaration.fromString(valueTextField.getText());
+                    if (namespaces.functions().lookup(val) != null) {
+                        throw new ParserException(
+                                "The name " + val
+                                        + " is already registered, please choose another one.",
+                                null);
+                    }
+
+                    namespaces.functions().add(new Function(new Name(val),
+                            services.getTypeConverter().getLocSetLDT().targetSort()));
+
+                    instance.value = val;
                     instance.setVisible(false);
-                } catch (IllegalArgumentException exc) {
+                } catch (ParserException exc) {
                     JOptionPane.showMessageDialog(instance,
-                            "There's an error in your syntax, please correct it and try again",
+                            "<html>There's an error in your syntax, please correct it and try again"
+                                    + "<br/><br/>Message:<br/>" + exc.getMessage() + "<html>",
                             "Syntax error", JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -107,14 +125,14 @@ public class PredicateInputDialog extends JDialog {
 
         setSize(400, 110);
     }
-    
-    public static PredicateDeclaration showInputDialog(final JDialog owner) {
-        return showInputDialog(owner, PredicateDeclaration.EMPTY_DECL);
+
+    public static String showInputDialog(final JDialog owner, Services services) {
+        return showInputDialog(owner, "", services);
     }
 
-    public static PredicateDeclaration showInputDialog(final JDialog owner,
-            final PredicateDeclaration value) {
-        final PredicateInputDialog dia = new PredicateInputDialog(owner, value);
+    public static String showInputDialog(final JDialog owner, final String value,
+            Services services) {
+        final LocsetInputDialog dia = new LocsetInputDialog(owner, value, services);
         dia.setVisible(true);
         dia.dispose();
         return dia.value;

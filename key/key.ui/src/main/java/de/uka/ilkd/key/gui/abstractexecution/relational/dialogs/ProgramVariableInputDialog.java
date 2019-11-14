@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.gui.abstractexecution.relational;
+package de.uka.ilkd.key.gui.abstractexecution.relational.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -85,11 +85,10 @@ public class ProgramVariableInputDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
+                    MergeRuleUtils.parsePlaceholder(valueTextField.getText(), services);
+
                     instance.value = ProgramVariableDeclaration
                             .fromString(valueTextField.getText());
-                    
-                    MergeRuleUtils.parsePlaceholder(valueTextField.getText(), services);
-                    
                     instance.setVisible(false);
                 } catch (IllegalArgumentException exc) {
                     JOptionPane.showMessageDialog(instance,

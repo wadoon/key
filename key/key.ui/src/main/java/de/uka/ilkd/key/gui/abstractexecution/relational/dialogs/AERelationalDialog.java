@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.gui.abstractexecution.relational;
+package de.uka.ilkd.key.gui.abstractexecution.relational.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -44,7 +45,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -59,16 +59,22 @@ import org.xml.sax.SAXException;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.abstractexecution.relational.ProofBundleConverter.BundleSaveResult;
+import de.uka.ilkd.key.gui.abstractexecution.relational.components.FormulaInputTextField;
 import de.uka.ilkd.key.gui.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.gui.abstractexecution.relational.model.PredicateDeclaration;
 import de.uka.ilkd.key.gui.abstractexecution.relational.model.ProgramVariableDeclaration;
+import de.uka.ilkd.key.gui.abstractexecution.relational.model.ProofBundleConverter;
+import de.uka.ilkd.key.gui.abstractexecution.relational.model.ProofBundleConverter.BundleSaveResult;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * 
@@ -90,7 +96,7 @@ public class AERelationalDialog extends JDialog {
     private final DefaultListModel<ProgramVariableDeclaration> progVarDeclsListModel = new DefaultListModel<>();
     private final RSyntaxTextArea codeLeft = new RSyntaxTextArea(20, 60);
     private final RSyntaxTextArea codeRight = new RSyntaxTextArea(20, 60);
-    private final JTextField postCondTextField = new JTextField();
+    private final FormulaInputTextField postCondTextField = new FormulaInputTextField();
 
     private final List<ServicesLoadedListener> servicesLoadedListeners = new ArrayList<>();
     private final List<ProgramVariablesChangedListener> programVariablesChangedListeners = new ArrayList<>();
@@ -127,6 +133,12 @@ public class AERelationalDialog extends JDialog {
         final int preferredWidth = programViewContainer.getPreferredSize().width
                 + declarationsContainer.getPreferredSize().width + 10;
 
+        postCondTextField.setEnabled(false);
+        servicesLoadedListeners.add(() -> {
+            postCondTextField.setServices(services);
+            postCondTextField.setEnabled(true);
+        });
+
         setPreferredSize(new Dimension(preferredWidth, 700));
         pack();
 
@@ -134,6 +146,29 @@ public class AERelationalDialog extends JDialog {
         new Thread(() -> {
             initializeServices();
         }).start();
+
+        servicesLoadedListeners.add(() -> {
+            final NamespaceSet namespaces = services.getNamespaces();
+
+            model.getAbstractLocationSets().forEach(loc -> {
+                namespaces.functions().add(new Function(new Name(loc),
+                        services.getTypeConverter().getLocSetLDT().targetSort()));
+            });
+
+            model.getProgramVariableDeclarations().forEach(loc -> {
+                MergeRuleUtils.parsePlaceholder(loc.getTypeName() + " " + loc.getVarName(),
+                        services);
+            });
+
+            model.getPredicateDeclarations().forEach(val -> {
+                final List<Sort> sorts = //
+                        val.getArgSorts().stream().map(namespaces.sorts()::lookup)
+                                .collect(Collectors.toList());
+                final Function function = new Function( //
+                        new Name(val.getPredName()), Sort.FORMULA, sorts.toArray(new Sort[0]));
+                namespaces.functions().add(function);
+            });
+        });
     }
 
     private void initializeServices() {
@@ -419,7 +454,7 @@ public class AERelationalDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 final PredicateDeclaration pd = PredicateInputDialog
-                        .showInputDialog(AERelationalDialog.this);
+                        .showInputDialog(AERelationalDialog.this, services);
                 if (pd != null) {
                     predDeclsListModel.addElement(pd);
                 }
@@ -434,7 +469,7 @@ public class AERelationalDialog extends JDialog {
                 if (predDeclsList.getSelectedIndices().length == 1) {
                     final PredicateDeclaration selectedElem = predDeclsList.getSelectedValue();
                     final PredicateDeclaration pd = PredicateInputDialog
-                            .showInputDialog(AERelationalDialog.this, selectedElem);
+                            .showInputDialog(AERelationalDialog.this, selectedElem, services);
                     if (pd != null) {
                         predDeclsListModel.set(predDeclsList.getSelectedIndex(), pd);
                     }
@@ -451,6 +486,15 @@ public class AERelationalDialog extends JDialog {
                     predDeclsListModel.remove(idx);
                 }
             }
+        });
+
+        plusButton.setEnabled(false);
+        minusButton.setEnabled(false);
+        editButton.setEnabled(false);
+        this.servicesLoadedListeners.add(() -> {
+            plusButton.setEnabled(true);
+            minusButton.setEnabled(true);
+            editButton.setEnabled(true);
         });
 
         final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -564,7 +608,8 @@ public class AERelationalDialog extends JDialog {
         plusButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final String ls = LocsetInputDialog.showInputDialog(AERelationalDialog.this);
+                final String ls = LocsetInputDialog.showInputDialog(AERelationalDialog.this,
+                        services);
                 if (ls != null) {
                     locsetDeclsListModel.addElement(ls);
                 }
@@ -579,7 +624,7 @@ public class AERelationalDialog extends JDialog {
                 if (locsetDeclsList.getSelectedIndices().length == 1) {
                     final String selectedElem = locsetDeclsList.getSelectedValue();
                     final String ls = LocsetInputDialog.showInputDialog( //
-                            AERelationalDialog.this, selectedElem);
+                            AERelationalDialog.this, selectedElem, services);
                     if (ls != null) {
                         locsetDeclsListModel.set(locsetDeclsList.getSelectedIndex(), ls);
                     }
@@ -596,6 +641,15 @@ public class AERelationalDialog extends JDialog {
                     locsetDeclsListModel.remove(idx);
                 }
             }
+        });
+
+        plusButton.setEnabled(false);
+        minusButton.setEnabled(false);
+        editButton.setEnabled(false);
+        this.servicesLoadedListeners.add(() -> {
+            plusButton.setEnabled(true);
+            minusButton.setEnabled(true);
+            editButton.setEnabled(true);
         });
 
         final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));

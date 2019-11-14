@@ -21,7 +21,7 @@ import java.util.Optional;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.ProofSelectionDialog;
-import de.uka.ilkd.key.gui.abstractexecution.relational.AERelationalDialog;
+import de.uka.ilkd.key.gui.abstractexecution.relational.dialogs.AERelationalDialog;
 import de.uka.ilkd.key.gui.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;

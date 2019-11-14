@@ -10,12 +10,13 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.gui.abstractexecution.relational;
+package de.uka.ilkd.key.gui.abstractexecution.relational.dialogs;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -72,13 +73,19 @@ public class JavaErrorParser extends AbstractParser {
             for (Diagnostic<?> diagnostic : diagnostics) {
                 final int prefixStartPosition = (int) (diagnostic.getStartPosition()
                         - javaDocBoilerplateLineLength);
-                final String prefixText = doc.getText(prefixStartPosition, (int) Math
-                        .min(doc.getLength() - prefixStartPosition, AS_KEYWORD.length() - 1));
+                String prefixText = doc.getText(prefixStartPosition,
+                        (int) Math.min(doc.getLength() - prefixStartPosition, AS_KEYWORD.length()))
+                        .trim();
 
                 if (prefixText.equals(AS_KEYWORD) || prefixText.equals(AS_KEYWORD.substring(1))
                         || AS_KEYWORD.startsWith(prefixText)) {
                     continue;
                 }
+
+                prefixText = doc
+                        .getText(prefixStartPosition, (int) Math
+                                .min(doc.getLength() - prefixStartPosition, AEXP_KEYWORD.length()))
+                        .trim();
 
                 if (prefixText.equals(AEXP_KEYWORD) || prefixText.equals(AEXP_KEYWORD.substring(1))
                         || AEXP_KEYWORD.startsWith(prefixText)) {
@@ -86,7 +93,7 @@ public class JavaErrorParser extends AbstractParser {
                 }
 
                 final int line = (int) diagnostic.getLineNumber() - 1;
-                int startPos = (int) diagnostic.getEndPosition() - javaDocBoilerplateLineLength;
+                int startPos = (int) diagnostic.getStartPosition() - javaDocBoilerplateLineLength;
                 int length = (int) (diagnostic.getEndPosition() - diagnostic.getStartPosition());
                 if (length == 0 && startPos > 0) {
                     startPos--;
@@ -113,6 +120,11 @@ public class JavaErrorParser extends AbstractParser {
         Files.write(file, javaClassCode.getBytes());
 
         final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+
+        if (compiler == null) {
+            return Collections.emptyList();
+        }
+
         final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
         final StandardJavaFileManager fileManager = //
                 compiler.getStandardFileManager(diagnostics, null, null);

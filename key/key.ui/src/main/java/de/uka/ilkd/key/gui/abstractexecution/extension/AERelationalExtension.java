@@ -22,7 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JToolBar;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.abstractexecution.relational.AERelationalDialog;
+import de.uka.ilkd.key.gui.abstractexecution.relational.dialogs.AERelationalDialog;
 import de.uka.ilkd.key.gui.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.gui.abstractexecution.relational.model.PredicateDeclaration;
 import de.uka.ilkd.key.gui.abstractexecution.relational.model.ProgramVariableDeclaration;
@@ -60,7 +60,7 @@ public class AERelationalExtension implements KeYGuiExtension, KeYGuiExtension.T
                 final List<PredicateDeclaration> predicateDeclarations = Collections.singletonList(
                         new PredicateDeclaration("Post", Collections.singletonList("any")));
                 final List<ProgramVariableDeclaration> programVariableDeclarations = Collections
-                        .singletonList(new ProgramVariableDeclaration("Object", "result"));
+                        .singletonList(new ProgramVariableDeclaration("java.lang.Object", "result"));
 
                 final AERelationalModel defaultModel = new AERelationalModel(programOne, programTwo,
                         postCondition, abstractLocationSets, predicateDeclarations,

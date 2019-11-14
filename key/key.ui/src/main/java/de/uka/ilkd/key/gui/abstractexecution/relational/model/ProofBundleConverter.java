@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.gui.abstractexecution.relational;
+package de.uka.ilkd.key.gui.abstractexecution.relational.model;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,10 +21,6 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.AERelationalModel;
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.PredicateDeclaration;
-import de.uka.ilkd.key.gui.abstractexecution.relational.model.ProgramVariableDeclaration;
 
 /**
  * @author Dominic Steinhoefel
