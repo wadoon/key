@@ -13,8 +13,10 @@
 
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.java.IOUtil;
+import org.xml.sax.SAXException;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -24,6 +26,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import javax.xml.bind.JAXBException;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -432,6 +436,15 @@ public final class ExampleChooser extends JDialog {
                 final int p = fileAsString.lastIndexOf("\\problem");
                 if (p >= 0) {
                     addTab(fileAsString.substring(p), "Proof Obligation", false);
+                }
+                if (AERelationalModel.fileHasAEModelEnding(example.getObligationFile())) {
+                    try {
+                        final AERelationalModel model = AERelationalModel.fromXml(fileAsString);
+                        addTab(model.getProgramOne(), "First Program Version", false);
+                        addTab(model.getProgramTwo(), "Second Program Version", false);
+                        addTab(model.getPostCondition(), "Post Condition", false);
+                    } catch (JAXBException | SAXException e) {
+                    }
                 }
                 for (File file : example.getAdditionalFiles()) {
                     addTab(fileAsString(file), file.getName(), false);
