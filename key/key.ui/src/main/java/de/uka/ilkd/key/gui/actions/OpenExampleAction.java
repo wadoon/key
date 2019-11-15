@@ -15,12 +15,16 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.Optional;
 
+import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.abstractexecution.relational.dialogs.AERelationalDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 
 /**
  * Opens a file dialog allowing to select the example to be loaded
@@ -45,7 +49,26 @@ public final class OpenExampleAction extends MainWindowAction {
         File file = ExampleChooser.showInstance(Main.getExamplesDir());
         if(file != null) {
             keYFileChooser.selectFile(file);
-            mainWindow.loadProblem(file);
+            
+            if (AERelationalModel.fileHasAEModelEnding(file)) {
+                final Optional<AERelationalModel> maybeModel = //
+                        AERelationalModel.isRelationalModelFile(file);
+                if (!maybeModel.isPresent()) {
+                    final String errorMessage = "Failed to load " + file.getName();
+                    getMediator().notify(new GeneralFailureEvent(errorMessage));
+                    getMediator().getUI().reportStatus(this, errorMessage);
+                    return;
+                }
+                
+                final AERelationalModel model = maybeModel.get();
+                model.setFile(file);
+                final AERelationalDialog dia = new AERelationalDialog(//
+                        MainWindow.getInstance(), model);
+                dia.setReadonly(true);
+                dia.setVisible(true);
+            } else {
+                mainWindow.loadProblem(file);
+            }
         }
     }
 }

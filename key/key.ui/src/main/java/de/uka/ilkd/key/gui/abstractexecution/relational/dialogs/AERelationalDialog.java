@@ -21,6 +21,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -76,12 +78,16 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
  */
 public class AERelationalDialog extends JDialog {
     private static final String DUMMY_KEY_FILE = "/de/uka/ilkd/key/gui/abstractexecution/relational/dummy.key";
+    private static final String TITLE = "Relational Proofs with Abstract Execution";
+    private static final String PROOF_BUNDLE_ENDING = ".zproof";
 
     private static final long serialVersionUID = 1L;
 
     private AERelationalModel model;
     private MainWindow mainWindow;
     private Services services = null;
+    // NOTE: Only access via setReadonly / isReadonly!
+    private boolean readonly = false;
 
     private final DefaultListModel<String> locsetDeclsListModel = new DefaultListModel<>();
     private final DefaultListModel<PredicateDeclaration> predDeclsListModel = new DefaultListModel<>();
@@ -92,6 +98,7 @@ public class AERelationalDialog extends JDialog {
 
     private final List<ServicesLoadedListener> servicesLoadedListeners = new ArrayList<>();
     private final List<ProgramVariablesChangedListener> programVariablesChangedListeners = new ArrayList<>();
+    private final List<ReadonlyListener> readOnlyListeners = new ArrayList<>();
 
     public AERelationalDialog(MainWindow mainWindow, AERelationalModel model) {
         super(mainWindow, false);
@@ -100,9 +107,13 @@ public class AERelationalDialog extends JDialog {
         this.model = model;
         this.mainWindow = mainWindow;
 
-        setTitle("Relational Proofs with Abstract Execution");
+        setTitle(TITLE);
         setIconImage(IconFontSwing.buildImage(FontAwesomeSolid.BALANCE_SCALE, 16, Color.BLACK));
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+        // We want to ask whether model should be saved
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+        postCondTextField.setEnabled(false);
 
         final JPanel contentPanel = new JPanel(new BorderLayout());
         getContentPane().setLayout(new BorderLayout());
@@ -125,20 +136,39 @@ public class AERelationalDialog extends JDialog {
         final int preferredWidth = programViewContainer.getPreferredSize().width
                 + declarationsContainer.getPreferredSize().width + 10;
 
-        postCondTextField.setEnabled(false);
-        servicesLoadedListeners.add(() -> {
-            postCondTextField.setServices(services);
-            postCondTextField.setEnabled(true);
-        });
-
         setPreferredSize(new Dimension(preferredWidth, 700));
         pack();
 
         loadFromModel();
+        installListeners();
+
         new Thread(() -> {
             initializeServices();
         }).start();
 
+    }
+
+    public void installListeners() {
+        servicesLoadedListeners.add(() -> {
+            postCondTextField.setServices(services);
+            if (!isReadonly()) {
+                postCondTextField.setEnabled(true);
+            }
+        });
+        readOnlyListeners.add(ro -> {
+            if (ro) {
+                postCondTextField.setEnabled(false);
+            } else if (services != null) {
+                postCondTextField.setEnabled(true);
+            }
+        });
+        readOnlyListeners.add(ro -> {
+            if (ro) {
+                setTitle(String.format("%s (READ ONLY - Save to edit)", TITLE));
+            } else {
+                setTitle(TITLE);
+            }
+        });
         servicesLoadedListeners.add(() -> {
             model.getAbstractLocationSets().forEach(loc -> {
                 try {
@@ -162,6 +192,48 @@ public class AERelationalDialog extends JDialog {
                 }
             });
         });
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                final int answer = JOptionPane.showConfirmDialog(AERelationalDialog.this,
+                        "Do you want to save your model before closing?", "Save Model",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+                if (answer == JOptionPane.YES_OPTION) {
+                    try {
+                        if (saveModelToFile()) {
+                            setVisible(false);
+                            dispose();
+                        }
+                    } catch (IOException | JAXBException exc) {
+                        JOptionPane.showMessageDialog(AERelationalDialog.this,
+                                "<html>Could not save model to file.<br><br/>Message:<br/>"
+                                        + exc.getMessage() + "</html>",
+                                "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                } else if (answer == JOptionPane.NO_OPTION) {
+                    setVisible(false);
+                    dispose();
+                }
+            }
+        });
+    }
+
+    /**
+     * Prevents changes to the model iff readonly is set to true. Changes are
+     * automatically allowed again when the model is saved to another location.
+     * 
+     * @param readonly The readonly flag.
+     */
+    public void setReadonly(boolean readonly) {
+        this.readonly = readonly;
+        readOnlyListeners.forEach(l -> l.readonlyChanged(readonly));
+    }
+
+    public boolean isReadonly() {
+        return readonly;
     }
 
     private void initializeServices() {
@@ -223,7 +295,7 @@ public class AERelationalDialog extends JDialog {
         model.setProgramVariableDeclarations(Collections.list(progVarDeclsListModel.elements()));
     }
 
-    private void saveModelToFile() throws IOException, JAXBException {
+    private boolean saveModelToFile() throws IOException, JAXBException {
         final KeYFileChooser chooser = KeYFileChooser
                 .getFileChooser("Choose Destination for AE-Relational Model");
 
@@ -231,14 +303,22 @@ public class AERelationalDialog extends JDialog {
                 .map(f -> chooser.showSaveDialog(AERelationalDialog.this, f))
                 .orElseGet(() -> chooser.showSaveDialog(AERelationalDialog.this, null, ".aer"));
         if (saveResult) {
-            saveModelToFile(chooser.getSelectedFile());
+            return saveModelToFile(chooser.getSelectedFile());
+        } else {
+            return false;
         }
     }
 
-    private void saveModelToFile(File file) throws IOException, JAXBException {
+    private boolean saveModelToFile(File file) throws IOException, JAXBException {
         updateModel();
+
+        if (model.getFile().map(oldFile -> !file.equals(oldFile)).orElse(true)) {
+            setReadonly(false);
+        }
+
         Files.write(file.toPath(), model.toXml().getBytes());
         model.setFile(file);
+        return true;
     }
 
     private void loadFromFile() throws IOException, JAXBException, SAXException {
@@ -262,7 +342,6 @@ public class AERelationalDialog extends JDialog {
     }
 
     private JPanel createControlPanel() {
-
         final JButton loadFromFileBtn = new JButton("Load Model",
                 IconFontSwing.buildIcon(FontAwesomeSolid.FILE_UPLOAD, 16, Color.BLACK));
         loadFromFileBtn
@@ -297,11 +376,11 @@ public class AERelationalDialog extends JDialog {
             }
         });
 
-        final JButton saveBundleAndStartBtn = new JButton("Bundle & Start",
+        final JButton saveBundleAndStartBtn = new JButton("Start Proof",
                 IconFontSwing.buildIcon(FontAwesomeSolid.PLAY, 16, Color.BLACK));
         saveBundleAndStartBtn.setPreferredSize(
                 new Dimension(saveBundleAndStartBtn.getPreferredSize().width, 30));
-        saveBundleAndStartBtn.addActionListener(e -> saveAndStartBundle());
+        saveBundleAndStartBtn.addActionListener(e -> createAndLoadBundle());
 
         final JPanel ctrlPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         ctrlPanel.add(loadFromFileBtn);
@@ -311,36 +390,15 @@ public class AERelationalDialog extends JDialog {
         return ctrlPanel;
     }
 
-    private void saveAndStartBundle() {
-        if (!model.isSaved()) {
-            JOptionPane.showMessageDialog(AERelationalDialog.this, "Please first save the model.",
-                    "Problem Starting Proof", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (JOptionPane.showConfirmDialog(this,
-                "<html>Creating the bundle will save all changes to the model.<br/><br/>"
-                        + "Proceed?</html>",
-                "Save Changes", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
-            return;
-        }
+    private void createAndLoadBundle() {
+        updateModel();
 
         try {
-            saveModelToFile(model.getFile().get());
-        } catch (IOException | JAXBException exc) {
-            JOptionPane
-                    .showMessageDialog(AERelationalDialog.this,
-                            "<html>Could not save model to file.<br><br/>Message:<br/>"
-                                    + exc.getMessage() + "</html>",
-                            "Problem Starting Proof", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        try {
-            final ProofBundleConverter pbc = new ProofBundleConverter(model);
-            final BundleSaveResult result = pbc.save(model.getFile()
-                    .map(f -> new File(f.getParent(), f.getName().replaceAll(".aer", ".zproof")))
-                    .get());
+            final String tmpFilePrefix = model.getFile().map(File::getName)
+                    .orElse("AERelationalModel") + "_";
+            final File proofBundleFile = Files.createTempFile( //
+                    tmpFilePrefix, PROOF_BUNDLE_ENDING).toFile();
+            final BundleSaveResult result = new ProofBundleConverter(model).save(proofBundleFile);
             mainWindow.loadProofFromBundle(result.getFile(), result.getProofPath().toFile());
         } catch (IOException | IllegalStateException e) {
             JOptionPane
@@ -458,10 +516,24 @@ public class AERelationalDialog extends JDialog {
         plusButton.setEnabled(false);
         minusButton.setEnabled(false);
         editButton.setEnabled(false);
+
         this.servicesLoadedListeners.add(() -> {
-            plusButton.setEnabled(true);
-            minusButton.setEnabled(true);
-            editButton.setEnabled(true);
+            if (!isReadonly()) {
+                plusButton.setEnabled(true);
+                minusButton.setEnabled(true);
+                editButton.setEnabled(true);
+            }
+        });
+        this.readOnlyListeners.add(ro -> {
+            if (ro) {
+                plusButton.setEnabled(false);
+                minusButton.setEnabled(false);
+                editButton.setEnabled(false);
+            } else if (services != null) {
+                plusButton.setEnabled(true);
+                minusButton.setEnabled(true);
+                editButton.setEnabled(true);
+            }
         });
 
         final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -540,10 +612,24 @@ public class AERelationalDialog extends JDialog {
         plusButton.setEnabled(false);
         minusButton.setEnabled(false);
         editButton.setEnabled(false);
+
         this.servicesLoadedListeners.add(() -> {
-            plusButton.setEnabled(true);
-            minusButton.setEnabled(true);
-            editButton.setEnabled(true);
+            if (!isReadonly()) {
+                plusButton.setEnabled(true);
+                minusButton.setEnabled(true);
+                editButton.setEnabled(true);
+            }
+        });
+        this.readOnlyListeners.add(ro -> {
+            if (ro) {
+                plusButton.setEnabled(false);
+                minusButton.setEnabled(false);
+                editButton.setEnabled(false);
+            } else if (services != null) {
+                plusButton.setEnabled(true);
+                minusButton.setEnabled(true);
+                editButton.setEnabled(true);
+            }
         });
 
         final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -613,10 +699,24 @@ public class AERelationalDialog extends JDialog {
         plusButton.setEnabled(false);
         minusButton.setEnabled(false);
         editButton.setEnabled(false);
+
         this.servicesLoadedListeners.add(() -> {
-            plusButton.setEnabled(true);
-            minusButton.setEnabled(true);
-            editButton.setEnabled(true);
+            if (!isReadonly()) {
+                plusButton.setEnabled(true);
+                minusButton.setEnabled(true);
+                editButton.setEnabled(true);
+            }
+        });
+        this.readOnlyListeners.add(ro -> {
+            if (ro) {
+                plusButton.setEnabled(false);
+                minusButton.setEnabled(false);
+                editButton.setEnabled(false);
+            } else if (services != null) {
+                plusButton.setEnabled(true);
+                minusButton.setEnabled(true);
+                editButton.setEnabled(true);
+            }
         });
 
         final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -629,25 +729,24 @@ public class AERelationalDialog extends JDialog {
     }
 
     private JComponent createJavaEditorViewLeft() {
-        codeLeft.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
-        codeLeft.setCodeFoldingEnabled(true);
-
-        final JavaErrorParser errorParser = new JavaErrorParser();
-        programVariablesChangedListeners.add(errorParser::setProgVarDecls);
-
-        codeLeft.addParser(errorParser);
-        return new RTextScrollPane(codeLeft);
+        return createJavaEditorView(codeLeft);
     }
 
     private JComponent createJavaEditorViewRight() {
-        codeRight.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
-        codeRight.setCodeFoldingEnabled(true);
+        return createJavaEditorView(codeRight);
+    }
+
+    private JComponent createJavaEditorView(RSyntaxTextArea component) {
+        component.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+        component.setCodeFoldingEnabled(true);
 
         final JavaErrorParser errorParser = new JavaErrorParser();
-        programVariablesChangedListeners.add(errorParser::setProgVarDecls);
 
-        codeRight.addParser(errorParser);
-        return new RTextScrollPane(codeRight);
+        programVariablesChangedListeners.add(errorParser::setProgVarDecls);
+        readOnlyListeners.add(ro -> component.setEnabled(!ro));
+
+        component.addParser(errorParser);
+        return new RTextScrollPane(component);
     }
 
     public static List<Component> getAllComponents(final Container c) {
@@ -684,6 +783,11 @@ public class AERelationalDialog extends JDialog {
     @FunctionalInterface
     private static interface ServicesLoadedListener {
         public void servicesLoaded();
+    }
+
+    @FunctionalInterface
+    private static interface ReadonlyListener {
+        public void readonlyChanged(boolean readonly);
     }
 
     @FunctionalInterface
