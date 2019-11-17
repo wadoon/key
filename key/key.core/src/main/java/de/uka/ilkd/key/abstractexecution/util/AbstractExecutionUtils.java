@@ -57,6 +57,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
@@ -312,10 +313,12 @@ public class AbstractExecutionUtils {
             return true;
         }
 
-        final OpCollector opColl = new OpCollector();
+        final TermProgramVariableCollector tpvc = new TermProgramVariableCollector(
+                goal.getLocalSpecificationRepository(), services);
+
         StreamSupport.stream(goal.proof().root().sequent().spliterator(), true)
-                .map(SequentFormula::formula).forEach(term -> term.execPostOrder(opColl));
-        if (opColl.ops().contains(locVar)) {
+                .map(SequentFormula::formula).forEach(term -> term.execPostOrder(tpvc));
+        if (tpvc.result().contains(locVar)) {
             // Location was already present in the root node.
             return false;
         }
@@ -406,7 +409,7 @@ public class AbstractExecutionUtils {
             relevantLocsCopy.removeIf(
                     ploc -> AbstractExecutionUtils.locIsCreatedFresh(ploc, goal, services));
         }
-        
+
         relevantLocsCopy.removeIf(IrrelevantAssignable.class::isInstance);
         relevantLocsCopy.removeIf(EmptyLoc.class::isInstance);
 

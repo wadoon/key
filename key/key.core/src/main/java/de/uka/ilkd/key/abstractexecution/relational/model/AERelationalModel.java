@@ -51,22 +51,29 @@ public class AERelationalModel {
     private String programOne = "";
     private String programTwo = "";
     private String postCondition = "";
-    private List<String> abstractLocationSets = new ArrayList<>();
     private List<PredicateDeclaration> predicateDeclarations = new ArrayList<>();
+    private List<AbstractLocsetDeclaration> abstractLocationSets = new ArrayList<>();
     private List<ProgramVariableDeclaration> programVariableDeclarations = new ArrayList<>();
+    private List<NullarySymbolDeclaration> relevantVarsOne = new ArrayList<>();
+    private List<NullarySymbolDeclaration> relevantVarsTwo = new ArrayList<>();
+
     @XmlTransient
     private Optional<File> file = Optional.empty();
 
     public AERelationalModel(final String programOne, final String programTwo,
-            final String postCondition, final List<String> abstractLocationSets,
+            final String postCondition, final List<AbstractLocsetDeclaration> abstractLocationSets,
             final List<PredicateDeclaration> predicateDeclarations,
-            final List<ProgramVariableDeclaration> programVariableDeclarations) {
+            final List<ProgramVariableDeclaration> programVariableDeclarations,
+            final List<NullarySymbolDeclaration> relevantVarsOne,
+            final List<NullarySymbolDeclaration> relevantVarsTwo) {
         this.programOne = programOne;
         this.programTwo = programTwo;
         this.postCondition = postCondition;
         this.abstractLocationSets = abstractLocationSets;
         this.predicateDeclarations = predicateDeclarations;
         this.programVariableDeclarations = programVariableDeclarations;
+        this.relevantVarsOne = relevantVarsOne;
+        this.relevantVarsTwo = relevantVarsTwo;
     }
 
     AERelationalModel() {
@@ -99,7 +106,7 @@ public class AERelationalModel {
 
     @XmlElementWrapper(name = "locationSets")
     @XmlElement(name = "locationSet")
-    public List<String> getAbstractLocationSets() {
+    public List<AbstractLocsetDeclaration> getAbstractLocationSets() {
         return abstractLocationSets;
     }
 
@@ -117,7 +124,7 @@ public class AERelationalModel {
         this.programTwo = programTwo;
     }
 
-    public void setAbstractLocationSets(List<String> abstractLocationSets) {
+    public void setAbstractLocationSets(List<AbstractLocsetDeclaration> abstractLocationSets) {
         this.abstractLocationSets = abstractLocationSets;
     }
 
@@ -128,6 +135,26 @@ public class AERelationalModel {
     public void setProgramVariableDeclarations(
             List<ProgramVariableDeclaration> programVariableDeclarations) {
         this.programVariableDeclarations = programVariableDeclarations;
+    }
+
+    @XmlElementWrapper(name = "relevantVarsOne")
+    @XmlElement(name = "relevantVar")
+    public List<NullarySymbolDeclaration> getRelevantVarsOne() {
+        return relevantVarsOne;
+    }
+
+    public void setRelevantVarsOne(List<NullarySymbolDeclaration> relevantVarsOne) {
+        this.relevantVarsOne = relevantVarsOne;
+    }
+
+    @XmlElementWrapper(name = "relevantVarsTwo")
+    @XmlElement(name = "relevantVar")
+    public List<NullarySymbolDeclaration> getRelevantVarsTwo() {
+        return relevantVarsTwo;
+    }
+
+    public void setRelevantVarsTwo(List<NullarySymbolDeclaration> relevantVarsTwo) {
+        this.relevantVarsTwo = relevantVarsTwo;
     }
 
     public Optional<File> getFile() {

@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -56,6 +57,8 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
+import de.uka.ilkd.key.abstractexecution.relational.model.AbstractLocsetDeclaration;
+import de.uka.ilkd.key.abstractexecution.relational.model.NullarySymbolDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.ProofBundleConverter;
@@ -63,11 +66,14 @@ import de.uka.ilkd.key.abstractexecution.relational.model.ProofBundleConverter.B
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.abstractexecution.relational.components.FormulaInputTextField;
+import de.uka.ilkd.key.gui.abstractexecution.relational.components.FormulaInputTextArea;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -80,6 +86,11 @@ public class AERelationalDialog extends JDialog {
     private static final String DUMMY_KEY_FILE = "/de/uka/ilkd/key/gui/abstractexecution/relational/dummy.key";
     private static final String TITLE = "Relational Proofs with Abstract Execution";
     private static final String PROOF_BUNDLE_ENDING = ".zproof";
+    private static final String STD_POSTCONDREL_TOOLTIP = "Relation between values of the relevant locations after execution.<br/>"
+            + "You may use the keywords \"\\result_1\" and \"\\result_2\" to access<br/>"
+            + "the respective result arrays.<br/>"
+            + "Access individual values with \"\\result_1[0]\" etc. Use type casts<br/>"
+            + "in non-trivial compound expressions.";
 
     private static final long serialVersionUID = 1L;
 
@@ -89,16 +100,34 @@ public class AERelationalDialog extends JDialog {
     // NOTE: Only access via setReadonly / isReadonly!
     private boolean readonly = false;
 
-    private final DefaultListModel<String> locsetDeclsListModel = new DefaultListModel<>();
+    private final DefaultListModel<AbstractLocsetDeclaration> locsetDeclsListModel = new DefaultListModel<>();
     private final DefaultListModel<PredicateDeclaration> predDeclsListModel = new DefaultListModel<>();
     private final DefaultListModel<ProgramVariableDeclaration> progVarDeclsListModel = new DefaultListModel<>();
+    private final DefaultListModel<NullarySymbolDeclaration> relevantSymbolsOneListModel = new DefaultListModel<>();
+    private final DefaultListModel<NullarySymbolDeclaration> relevantSymbolsTwoListModel = new DefaultListModel<>();
+
     private final RSyntaxTextArea codeLeft = new RSyntaxTextArea(20, 60);
     private final RSyntaxTextArea codeRight = new RSyntaxTextArea(20, 60);
-    private final FormulaInputTextField postCondTextField = new FormulaInputTextField();
+    private final FormulaInputTextArea resultRelationText = new FormulaInputTextArea(
+            STD_POSTCONDREL_TOOLTIP, formula -> {
+                // Replacement of special placeholders for result sequences
+                String result = formula;
+                result = result.replaceAll(Pattern.quote(ProofBundleConverter.RESULT_1),
+                        ProofBundleConverter.RES1);
+                result = result.replaceAll(Pattern.quote(ProofBundleConverter.RESULT_2),
+                        ProofBundleConverter.RES2);
+                return result;
+            });
 
     private final List<ServicesLoadedListener> servicesLoadedListeners = new ArrayList<>();
     private final List<ProgramVariablesChangedListener> programVariablesChangedListeners = new ArrayList<>();
     private final List<ReadonlyListener> readOnlyListeners = new ArrayList<>();
+
+    public static void main(String[] args) {
+        final AERelationalModel model = AERelationalModel.EMPTY_MODEL;
+        final AERelationalDialog dia = new AERelationalDialog(null, model);
+        dia.setVisible(true);
+    }
 
     public AERelationalDialog(MainWindow mainWindow, AERelationalModel model) {
         super(mainWindow, false);
@@ -113,19 +142,24 @@ public class AERelationalDialog extends JDialog {
         // We want to ask whether model should be saved
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
-        postCondTextField.setEnabled(false);
-
         final JPanel contentPanel = new JPanel(new BorderLayout());
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(contentPanel, BorderLayout.CENTER);
 
         final JPanel declarationsContainer = createDeclarationsContainer();
         final JPanel programViewContainer = createProgramViewContainer();
+        final JPanel postconditionContainer = createPostconditionContainer();
 
-        final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                declarationsContainer, programViewContainer);
-        splitPane.setOneTouchExpandable(true);
-        contentPanel.add(splitPane, BorderLayout.CENTER);
+        final JSplitPane splitPane1 = new JSplitPane( //
+                JSplitPane.HORIZONTAL_SPLIT, declarationsContainer, programViewContainer);
+        splitPane1.setResizeWeight(0);
+        splitPane1.setOneTouchExpandable(true);
+
+        final JSplitPane splitPane2 = new JSplitPane(//
+                JSplitPane.HORIZONTAL_SPLIT, splitPane1, postconditionContainer);
+        splitPane2.setResizeWeight(1);
+        splitPane2.setOneTouchExpandable(true);
+        contentPanel.add(splitPane2, BorderLayout.CENTER);
 
         final JPanel ctrlPanel = createControlPanel();
         contentPanel.add(ctrlPanel, BorderLayout.SOUTH);
@@ -134,7 +168,8 @@ public class AERelationalDialog extends JDialog {
                 .map(JButton.class::cast).forEach(btn -> btn.setBackground(Color.WHITE));
 
         final int preferredWidth = programViewContainer.getPreferredSize().width
-                + declarationsContainer.getPreferredSize().width + 10;
+                + declarationsContainer.getPreferredSize().width
+                + postconditionContainer.getPreferredSize().width + 10;
 
         setPreferredSize(new Dimension(preferredWidth, 700));
         pack();
@@ -149,19 +184,6 @@ public class AERelationalDialog extends JDialog {
     }
 
     public void installListeners() {
-        servicesLoadedListeners.add(() -> {
-            postCondTextField.setServices(services);
-            if (!isReadonly()) {
-                postCondTextField.setEnabled(true);
-            }
-        });
-        readOnlyListeners.add(ro -> {
-            if (ro) {
-                postCondTextField.setEnabled(false);
-            } else if (services != null) {
-                postCondTextField.setEnabled(true);
-            }
-        });
         readOnlyListeners.add(ro -> {
             if (ro) {
                 setTitle(String.format("%s (READ ONLY - Save to edit)", TITLE));
@@ -169,6 +191,7 @@ public class AERelationalDialog extends JDialog {
                 setTitle(TITLE);
             }
         });
+
         servicesLoadedListeners.add(() -> {
             model.getAbstractLocationSets().forEach(loc -> {
                 try {
@@ -191,6 +214,14 @@ public class AERelationalDialog extends JDialog {
                     e.printStackTrace();
                 }
             });
+        });
+
+        servicesLoadedListeners.add(() -> {
+            // Add special result symbols
+            final Namespace<Function> functions = services.getNamespaces().functions();
+            final Sort seqSort = services.getTypeConverter().getSeqLDT().targetSort();
+            functions.add(new Function(new Name(ProofBundleConverter.RES1), seqSort));
+            functions.add(new Function(new Name(ProofBundleConverter.RES2), seqSort));
         });
 
         addWindowListener(new WindowAdapter() {
@@ -276,7 +307,7 @@ public class AERelationalDialog extends JDialog {
     private void loadFromModel() {
         codeLeft.setText(model.getProgramOne());
         codeRight.setText(model.getProgramTwo());
-        postCondTextField.setText(model.getPostCondition());
+        resultRelationText.setText(model.getPostCondition());
 
         locsetDeclsListModel.clear();
         model.getAbstractLocationSets().forEach(locsetDeclsListModel::addElement);
@@ -284,15 +315,21 @@ public class AERelationalDialog extends JDialog {
         model.getPredicateDeclarations().forEach(predDeclsListModel::addElement);
         progVarDeclsListModel.clear();
         model.getProgramVariableDeclarations().forEach(progVarDeclsListModel::addElement);
+        relevantSymbolsOneListModel.clear();
+        model.getRelevantVarsOne().forEach(relevantSymbolsOneListModel::addElement);
+        relevantSymbolsTwoListModel.clear();
+        model.getRelevantVarsOne().forEach(relevantSymbolsTwoListModel::addElement);
     }
 
     private void updateModel() {
         model.setProgramOne(codeLeft.getText());
         model.setProgramTwo(codeRight.getText());
-        model.setPostCondition(postCondTextField.getText());
+        model.setPostCondition(resultRelationText.getText());
         model.setAbstractLocationSets(Collections.list(locsetDeclsListModel.elements()));
         model.setPredicateDeclarations(Collections.list(predDeclsListModel.elements()));
         model.setProgramVariableDeclarations(Collections.list(progVarDeclsListModel.elements()));
+        model.setRelevantVarsOne(Collections.list(relevantSymbolsOneListModel.elements()));
+        model.setRelevantVarsTwo(Collections.list(relevantSymbolsTwoListModel.elements()));
     }
 
     private boolean saveModelToFile() throws IOException, JAXBException {
@@ -410,17 +447,109 @@ public class AERelationalDialog extends JDialog {
     }
 
     private JPanel createProgramViewContainer() {
+        final JPanel editorsContainer = new JPanel(new GridLayout(1, 2));
         final JComponent programOneView = createJavaEditorViewLeft();
         final JComponent programTwoView = createJavaEditorViewRight();
-        final JPanel programViewContainer = new JPanel(new GridLayout(1, 2));
-        programViewContainer.add(programOneView);
-        programViewContainer.add(programTwoView);
-        programViewContainer.setMinimumSize(new Dimension(600, 100));
-        return programViewContainer;
+        editorsContainer.add(programOneView);
+        editorsContainer.add(programTwoView);
+        editorsContainer.setMinimumSize(new Dimension(600, 100));
+        return editorsContainer;
+    }
+
+    private JPanel createPostconditionContainer() {
+        final JPanel result = new JPanel(new GridLayout(3, 1));
+        result.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+        result.setPreferredSize(new Dimension(200, 0));
+        result.setMinimumSize(new Dimension(200, 0));
+
+        result.add(createRelevantLocationsOneContainer());
+        result.add(createRelevantLocationsTwoContainer());
+        result.add(createResultRelationView());
+
+        return result;
+    }
+
+    private JPanel createRelevantLocationsOneContainer() {
+        return createRelevantLocationsContainer("Relevant Locations (Left)",
+                relevantSymbolsOneListModel, AERelationalModel::getRelevantVarsOne);
+    }
+
+    private JPanel createRelevantLocationsTwoContainer() {
+        return createRelevantLocationsContainer("Relevant Locations (Right)",
+                relevantSymbolsTwoListModel, AERelationalModel::getRelevantVarsTwo);
+    }
+
+    private JPanel createRelevantLocationsContainer(String labelText,
+            DefaultListModel<NullarySymbolDeclaration> relevantSymbolsModel,
+            java.util.function.Function<AERelationalModel, List<NullarySymbolDeclaration>> chosenRelevantSymbolsGetter) {
+        final JPanel result = new JPanel(new BorderLayout());
+
+        final JLabel titleLabel = new JLabel(labelText);
+        final JPanel titleLabelContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        titleLabelContainer.add(titleLabel);
+        result.add(titleLabelContainer, BorderLayout.NORTH);
+
+        final JList<NullarySymbolDeclaration> relevantSymbolsList = new JList<>();
+        final JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setViewportView(relevantSymbolsList);
+        result.add(scrollPane, BorderLayout.CENTER);
+
+        relevantSymbolsList.setModel(relevantSymbolsModel);
+
+        final JButton plusButton = new JButton(
+                IconFontSwing.buildIcon(FontAwesomeSolid.PLUS, 16, Color.BLACK));
+        plusButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateModel();
+                final List<NullarySymbolDeclaration> allSymbols = new ArrayList<>();
+                allSymbols.addAll(model.getProgramVariableDeclarations());
+                allSymbols.addAll(model.getAbstractLocationSets());
+                allSymbols.removeAll(chosenRelevantSymbolsGetter.apply(model));
+
+                if (!allSymbols.isEmpty()) {
+                    final NullarySymbolDeclaration chosen = (NullarySymbolDeclaration) JOptionPane
+                            .showInputDialog(mainWindow, "Please choose a relevant location to add",
+                                    "Add Relevant Location", JOptionPane.QUESTION_MESSAGE, null,
+                                    allSymbols.toArray(new NullarySymbolDeclaration[0]),
+                                    allSymbols.get(0));
+                    relevantSymbolsModel.addElement(chosen);
+                }
+            }
+        });
+
+        final JButton minusButton = new JButton(
+                IconFontSwing.buildIcon(FontAwesomeSolid.MINUS, 16, Color.BLACK));
+        minusButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for (int idx : relevantSymbolsList.getSelectedIndices()) {
+                    relevantSymbolsModel.remove(idx);
+                }
+            }
+        });
+
+        plusButton.setEnabled(true);
+        minusButton.setEnabled(true);
+
+        this.readOnlyListeners.add(ro -> {
+            plusButton.setEnabled(!ro);
+            minusButton.setEnabled(!ro);
+        });
+
+        final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonsPanel.add(plusButton);
+        buttonsPanel.add(minusButton);
+
+        result.add(buttonsPanel, BorderLayout.SOUTH);
+        return result;
     }
 
     private JPanel createDeclarationsContainer() {
         final JPanel symbolDeclContainer = new JPanel(new GridLayout(3, 1));
+        symbolDeclContainer.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+        symbolDeclContainer.setPreferredSize(new Dimension(200, 0));
+        symbolDeclContainer.setMinimumSize(new Dimension(200, 0));
 
         final JComponent programVariableDeclarations = createProgramVariableDeclarationsView();
         final JComponent locsetsDeclarations = createLocsetsDeclarationsView();
@@ -434,28 +563,38 @@ public class AERelationalDialog extends JDialog {
         symbolDeclContainer.add(locsetsDeclarations);
         symbolDeclContainer.add(formulaDeclarations);
 
-        final JPanel postCond = createPostConditionView();
-        postCond.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
-
-        final JPanel declContainer = new JPanel(new BorderLayout());
-        declContainer.add(symbolDeclContainer, BorderLayout.CENTER);
-        declContainer.add(postCond, BorderLayout.SOUTH);
-        declContainer.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-        declContainer.setPreferredSize(new Dimension(250, 0));
-
-        return declContainer;
+        return symbolDeclContainer;
     }
 
-    private JPanel createPostConditionView() {
+    private JPanel createResultRelationView() {
         final JPanel postCondContainer = new JPanel(new BorderLayout());
+        postCondContainer.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
 
-        final JLabel titleLabel = new JLabel("Post Condition");
+        final JLabel titleLabel = new JLabel("Relation to Verify");
         final JPanel titleLabelContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
         titleLabelContainer.add(titleLabel);
         postCondContainer.add(titleLabelContainer, BorderLayout.NORTH);
 
-        postCondContainer.add(postCondTextField, BorderLayout.CENTER);
+        resultRelationText.setBorder(BorderFactory.createEtchedBorder());
+        resultRelationText.setEnabled(false);
+        resultRelationText.setBorder(BorderFactory.createCompoundBorder(
+                resultRelationText.getBorder(), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
+        servicesLoadedListeners.add(() -> {
+            resultRelationText.setServices(services);
+            if (!isReadonly()) {
+                resultRelationText.setEnabled(true);
+            }
+        });
+        readOnlyListeners.add(ro -> {
+            if (ro) {
+                resultRelationText.setEnabled(false);
+            } else if (services != null) {
+                resultRelationText.setEnabled(true);
+            }
+        });
+
+        postCondContainer.add(resultRelationText, BorderLayout.CENTER);
         return postCondContainer;
     }
 
@@ -649,7 +788,7 @@ public class AERelationalDialog extends JDialog {
         titleLabelContainer.add(titleLabel);
         result.add(titleLabelContainer, BorderLayout.NORTH);
 
-        final JList<String> locsetDeclsList = new JList<>();
+        final JList<AbstractLocsetDeclaration> locsetDeclsList = new JList<>();
         final JScrollPane scrollPane = new JScrollPane();
         scrollPane.setViewportView(locsetDeclsList);
         result.add(scrollPane, BorderLayout.CENTER);
@@ -661,8 +800,8 @@ public class AERelationalDialog extends JDialog {
         plusButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final String ls = LocsetInputDialog.showInputDialog(AERelationalDialog.this,
-                        services);
+                final AbstractLocsetDeclaration ls = LocsetInputDialog.showInputDialog( //
+                        AERelationalDialog.this, services);
                 if (ls != null) {
                     locsetDeclsListModel.addElement(ls);
                 }
@@ -675,8 +814,9 @@ public class AERelationalDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (locsetDeclsList.getSelectedIndices().length == 1) {
-                    final String selectedElem = locsetDeclsList.getSelectedValue();
-                    final String ls = LocsetInputDialog.showInputDialog( //
+                    final AbstractLocsetDeclaration selectedElem = //
+                            locsetDeclsList.getSelectedValue();
+                    final AbstractLocsetDeclaration ls = LocsetInputDialog.showInputDialog( //
                             AERelationalDialog.this, selectedElem, services);
                     if (ls != null) {
                         locsetDeclsListModel.set(locsetDeclsList.getSelectedIndex(), ls);

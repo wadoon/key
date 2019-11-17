@@ -27,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import de.uka.ilkd.key.abstractexecution.relational.model.AbstractLocsetDeclaration;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -39,9 +40,10 @@ import de.uka.ilkd.key.parser.ParserException;
 public class LocsetInputDialog extends JDialog {
     private static final long serialVersionUID = 1L;
 
-    private String value;
+    private AbstractLocsetDeclaration value;
 
-    private LocsetInputDialog(final JDialog owner, final String value, Services services) {
+    private LocsetInputDialog(final JDialog owner, final AbstractLocsetDeclaration value,
+            Services services) {
         super(owner, true);
         assert value != null;
 
@@ -62,7 +64,7 @@ public class LocsetInputDialog extends JDialog {
 
         final JButton okButton = new JButton("OK");
 
-        final JTextField valueTextField = new JTextField(value);
+        final JTextField valueTextField = new JTextField(value.getLocsetName());
         valueTextField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -83,7 +85,8 @@ public class LocsetInputDialog extends JDialog {
         okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final String val = valueTextField.getText();
+                final AbstractLocsetDeclaration val = //
+                        new AbstractLocsetDeclaration(valueTextField.getText());
 
                 try {
                     checkAndRegister(val, services);
@@ -117,27 +120,28 @@ public class LocsetInputDialog extends JDialog {
         setSize(400, 110);
     }
 
-    public static String showInputDialog(final JDialog owner, Services services) {
-        return showInputDialog(owner, "", services);
+    public static AbstractLocsetDeclaration showInputDialog(final JDialog owner,
+            Services services) {
+        return showInputDialog(owner, AbstractLocsetDeclaration.EMPTY_DECL, services);
     }
 
-    public static String showInputDialog(final JDialog owner, final String value,
-            Services services) {
+    public static AbstractLocsetDeclaration showInputDialog(final JDialog owner,
+            final AbstractLocsetDeclaration value, Services services) {
         final LocsetInputDialog dia = new LocsetInputDialog(owner, value, services);
         dia.setVisible(true);
         dia.dispose();
         return dia.value;
     }
 
-    public static void checkAndRegister(final String val, final Services services)
-            throws ParserException {
+    public static void checkAndRegister(final AbstractLocsetDeclaration val,
+            final Services services) throws ParserException {
         final NamespaceSet namespaces = services.getNamespaces();
-        if (namespaces.functions().lookup(val) != null) {
+        if (namespaces.functions().lookup(val.getLocsetName()) != null) {
             throw new ParserException(
                     "The name " + val + " is already registered, please choose another one.", null);
         }
 
-        namespaces.functions().add(new Function(new Name(val),
+        namespaces.functions().add(new Function(new Name(val.getLocsetName()),
                 services.getTypeConverter().getLocSetLDT().targetSort()));
     }
 

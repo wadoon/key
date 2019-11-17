@@ -22,6 +22,8 @@ import javax.swing.JButton;
 import javax.swing.JToolBar;
 
 import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
+import de.uka.ilkd.key.abstractexecution.relational.model.AbstractLocsetDeclaration;
+import de.uka.ilkd.key.abstractexecution.relational.model.NullarySymbolDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -55,16 +57,22 @@ public class AERelationalExtension implements KeYGuiExtension, KeYGuiExtension.T
             public void actionPerformed(ActionEvent e) {
                 final String programOne = "return result;";
                 final String programTwo = "return result;";
-                final String postCondition = "Post(value(relevant))";
-                final List<String> abstractLocationSets = Collections.singletonList("relevant");
+                final String postCondition = "\\result_1=\\result_2";
+                final List<AbstractLocsetDeclaration> abstractLocationSets = Collections
+                        .singletonList(new AbstractLocsetDeclaration("relevant"));
                 final List<PredicateDeclaration> predicateDeclarations = Collections.singletonList(
                         new PredicateDeclaration("Post", Collections.singletonList("any")));
-                final List<ProgramVariableDeclaration> programVariableDeclarations = Collections
-                        .singletonList(new ProgramVariableDeclaration("java.lang.Object", "result"));
+                final List<ProgramVariableDeclaration> programVariableDeclarations = //
+                        Collections.singletonList(
+                                new ProgramVariableDeclaration("java.lang.Object", "result"));
+                final List<NullarySymbolDeclaration> relevantVarsOne = //
+                        Collections.singletonList(abstractLocationSets.get(0));
+                final List<NullarySymbolDeclaration> relevantVarsTwo = //
+                        Collections.singletonList(abstractLocationSets.get(0));
 
                 final AERelationalModel defaultModel = new AERelationalModel(programOne, programTwo,
                         postCondition, abstractLocationSets, predicateDeclarations,
-                        programVariableDeclarations);
+                        programVariableDeclarations, relevantVarsOne, relevantVarsTwo);
 
                 final AERelationalDialog dia = new AERelationalDialog(mainWindow, defaultModel);
                 dia.setVisible(true);

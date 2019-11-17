@@ -23,60 +23,48 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Dominic Steinhoefel
  */
 @XmlRootElement
-public class ProgramVariableDeclaration implements NullarySymbolDeclaration {
-    public static final ProgramVariableDeclaration EMPTY_DECL = //
-            new ProgramVariableDeclaration("", "");
+public class AbstractLocsetDeclaration implements NullarySymbolDeclaration {
+    public static final AbstractLocsetDeclaration EMPTY_DECL = //
+            new AbstractLocsetDeclaration("");
 
-    private String typeName = "";
-    private String varName = "";
+    private String locsetName = "";
 
-    ProgramVariableDeclaration() {
+    AbstractLocsetDeclaration() {
     }
 
-    public ProgramVariableDeclaration(String typeName, String varName) {
-        this.typeName = typeName;
-        this.varName = varName;
-    }
-
-    @XmlAttribute
-    public String getTypeName() {
-        return typeName;
+    public AbstractLocsetDeclaration(String locsetName) {
+        this.locsetName = locsetName;
     }
 
     @XmlAttribute
-    public String getVarName() {
-        return varName;
+    public String getLocsetName() {
+        return locsetName;
     }
 
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
-    }
-
-    public void setVarName(String varName) {
-        this.varName = varName;
+    public void setLocsetName(String typeName) {
+        this.locsetName = typeName;
     }
     
     @Transient
     @Override
     public String getName() {
-        return varName;
+        return locsetName;
     }
 
-    public static ProgramVariableDeclaration fromString(final String str)
+    public static AbstractLocsetDeclaration fromString(final String str)
             throws IllegalArgumentException {
-        final Pattern pattern = Pattern.compile("^([a-zA-Z0-9_.]+) +([a-zA-Z0-9_]+)$");
+        final Pattern pattern = Pattern.compile("^([a-zA-Z0-9_.]+)$");
         final Matcher matcher = pattern.matcher(str.trim());
 
         if (!matcher.matches()) {
             throw new IllegalArgumentException();
         }
 
-        return new ProgramVariableDeclaration(matcher.group(1), matcher.group(2));
+        return new AbstractLocsetDeclaration(matcher.group(1));
     }
 
     @Override
     public String toString() {
-        return typeName.isEmpty() && varName.isEmpty() ? ""
-                : String.format("%s %s", typeName, varName);
+        return locsetName;
     }
 }

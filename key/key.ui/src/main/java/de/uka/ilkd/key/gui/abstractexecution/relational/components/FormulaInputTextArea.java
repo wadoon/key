@@ -15,9 +15,9 @@ package de.uka.ilkd.key.gui.abstractexecution.relational.components;
 import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.function.Function;
 
-import javax.swing.BorderFactory;
-import javax.swing.JTextField;
+import javax.swing.JTextArea;
 
 import org.antlr.runtime.RecognitionException;
 
@@ -30,24 +30,32 @@ import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 /**
  * @author Dominic Steinhoefel
  */
-public class FormulaInputTextField extends JTextField {
+public class FormulaInputTextArea extends JTextArea {
     private static final long serialVersionUID = 1L;
 
     private Services services = null;
+    private Function<String, String> preprocessor = null;
 
-    public FormulaInputTextField() {
+    public FormulaInputTextArea(final String stdToolTip,
+            final Function<String, String> preprocessor) {
+        this.preprocessor = preprocessor;
+        setToolTipText("<html>" + stdToolTip + "</html>");
+
         setBackground(Color.WHITE);
-        setBorder(BorderFactory.createCompoundBorder(getBorder(),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (services != null) {
-                    final FormulaInputTextField textfield = FormulaInputTextField.this;
+                    final FormulaInputTextArea textfield = FormulaInputTextArea.this;
 
-                    final KeYLexerF lexer = new KeYLexerF(
-                            "\\problem { " + textfield.getText() + "}", "No file.");
+                    String textToParse = textfield.getText();
+                    if (FormulaInputTextArea.this.preprocessor != null) {
+                        textToParse = FormulaInputTextArea.this.preprocessor.apply(textToParse);
+                    }
+
+                    final KeYLexerF lexer = new KeYLexerF( //
+                            "\\problem { " + textToParse + "}", "No file.");
 
                     final KeYParserF parser = new KeYParserF(ParserMode.TACLET, lexer,
                             GoalLocalSpecificationRepository.DUMMY_REPO, services,
@@ -56,12 +64,12 @@ public class FormulaInputTextField extends JTextField {
                     try {
                         parser.parseProblem();
                         textfield.setBackground(Color.WHITE);
-                        setToolTipText(null);
+                        setToolTipText("<html>" + stdToolTip + "</html>");
                     } catch (RecognitionException exc) {
                         textfield.setBackground(Color.RED);
                         if (exc.getMessage() != null && !exc.getMessage().isEmpty()) {
                             setToolTipText("<html>" + exc.getMessage().replaceAll("\\n", "<br/>")
-                                    + "</html>");
+                                    + "<br/><br/>" + stdToolTip + "</html>");
                         } else {
                             setToolTipText(exc.toString());
                         }
@@ -69,6 +77,10 @@ public class FormulaInputTextField extends JTextField {
                 }
             }
         });
+    }
+
+    public void setPreprocessor(Function<String, String> preprocessor) {
+        this.preprocessor = preprocessor;
     }
 
     public void setServices(Services services) {

@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -35,7 +37,7 @@ public class ProofBundleConverter {
     private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/abstractexecution/relational/Problem.java";
     private static final String KEY_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/abstractexecution/relational/problem.key";
 
-    private static final String POST = "<POST>";
+    private static final String RELATION = "<RELATION>";
     private static final String INIT_VARS = "<INIT_VARS>";
     private static final String PROGRAMVARIABLES = "<PROGRAMVARIABLES>";
     private static final String PREDICATES = "<PREDICATES>";
@@ -43,6 +45,14 @@ public class ProofBundleConverter {
     private static final String BODY2 = "<BODY2>";
     private static final String BODY1 = "<BODY1>";
     private static final String PARAMS = "<PARAMS>";
+    private static final String RESULT_SEQ_1 = "<RESULT_SEQ_1>";
+    private static final String RESULT_SEQ_2 = "<RESULT_SEQ_2>";
+
+    // Special Keywords
+    public static final String RESULT_1 = "\\result_1";
+    public static final String RESULT_2 = "\\result_2";
+    public static final String RES1 = "_res1";
+    public static final String RES2 = "_res2";
 
     private final AERelationalModel model;
     private final String javaScaffold;
@@ -137,7 +147,7 @@ public class ProofBundleConverter {
     }
 
     private String processProgram(String prog) {
-        for (final String locSet : model.getAbstractLocationSets()) {
+        for (final AbstractLocsetDeclaration locSet : model.getAbstractLocationSets()) {
             prog = prog.replaceAll("\\b" + locSet + "\\b",
                     Matcher.quoteReplacement("\\dl_" + locSet));
         }
@@ -177,13 +187,40 @@ public class ProofBundleConverter {
         final String params = model.getProgramVariableDeclarations().stream()
                 .map(ProgramVariableDeclaration::getVarName).collect(Collectors.joining(","));
 
+        final String postCondRelation = Matcher.quoteReplacement(model.getPostCondition())
+                .replaceAll(Pattern.quote(RESULT_1), RES1)
+                .replaceAll(Pattern.quote(RESULT_2), RES2);
+
         return keyScaffold.replaceAll(FUNCTIONS, Matcher.quoteReplacement(functionsDecl))
                 .replaceAll(PREDICATES, Matcher.quoteReplacement(predicatesDecl))
                 .replaceAll(PROGRAMVARIABLES, Matcher.quoteReplacement(progvarsDecl))
                 .replaceAll(INIT_VARS,
                         initVars.isEmpty() ? "" : ("{" + Matcher.quoteReplacement(initVars) + "}"))
                 .replaceAll(PARAMS, Matcher.quoteReplacement(params))
-                .replaceAll(POST, model.getPostCondition());
+                .replaceAll(RELATION, postCondRelation)
+                .replaceAll(RESULT_SEQ_1, extractResultSeq(model.getRelevantVarsOne()))
+                .replaceAll(RESULT_SEQ_2, extractResultSeq(model.getRelevantVarsTwo()));
+    }
+
+    private String extractResultSeq(List<NullarySymbolDeclaration> relevantSymbols) {
+        String resultSeq = "";
+
+        final List<String> seqElems = relevantSymbols.stream()
+                .map(NullarySymbolDeclaration::getName)
+                .map(str -> String.format("seqSingleton(value(%s))", str))
+                .collect(Collectors.toList());
+        if (seqElems.isEmpty()) {
+            resultSeq = "seqEmpty";
+        } else if (seqElems.size() == 1) {
+            resultSeq = seqElems.get(0);
+        } else {
+            resultSeq = seqElems.get(0);
+            for (int i = 1; i < seqElems.size(); i++) {
+                resultSeq = String.format("seqConcat(%s,%s)", resultSeq, seqElems.get(i));
+            }
+        }
+
+        return resultSeq;
     }
 
     private static String inputStreamToString(InputStream is) throws IOException {

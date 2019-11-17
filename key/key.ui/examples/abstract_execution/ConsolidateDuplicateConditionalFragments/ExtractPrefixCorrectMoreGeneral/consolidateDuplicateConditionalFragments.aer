@@ -14,7 +14,7 @@
 if (
     /*@ assignable frameE;
       @ accessible footprintE;
-      @ exceptional_behavior requires \dl_throwsExcE(\value(footprintE));
+      @ exceptional_behavior requires throwsExcE(\value(footprintE));
       @*/
     \abstract_expression boolean e
 ) {
