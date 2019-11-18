@@ -12,18 +12,19 @@
 //
 package de.uka.ilkd.key.abstractexecution.relational.model;
 
-import java.beans.Transient;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * @author Dominic Steinhoefel
  */
-@XmlRootElement
-public class AbstractLocsetDeclaration implements NullarySymbolDeclaration {
+@XmlRootElement(name="locationSet")
+public class AbstractLocsetDeclaration extends NullarySymbolDeclaration {
     public static final AbstractLocsetDeclaration EMPTY_DECL = //
             new AbstractLocsetDeclaration("");
 
@@ -37,6 +38,7 @@ public class AbstractLocsetDeclaration implements NullarySymbolDeclaration {
     }
 
     @XmlAttribute
+    @XmlID
     public String getLocsetName() {
         return locsetName;
     }
@@ -45,7 +47,7 @@ public class AbstractLocsetDeclaration implements NullarySymbolDeclaration {
         this.locsetName = typeName;
     }
     
-    @Transient
+    @XmlTransient
     @Override
     public String getName() {
         return locsetName;

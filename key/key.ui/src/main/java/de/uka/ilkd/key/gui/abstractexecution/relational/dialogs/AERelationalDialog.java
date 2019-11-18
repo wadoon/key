@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
@@ -318,7 +319,7 @@ public class AERelationalDialog extends JDialog {
         relevantSymbolsOneListModel.clear();
         model.getRelevantVarsOne().forEach(relevantSymbolsOneListModel::addElement);
         relevantSymbolsTwoListModel.clear();
-        model.getRelevantVarsOne().forEach(relevantSymbolsTwoListModel::addElement);
+        model.getRelevantVarsTwo().forEach(relevantSymbolsTwoListModel::addElement);
     }
 
     private void updateModel() {
@@ -386,10 +387,15 @@ public class AERelationalDialog extends JDialog {
         loadFromFileBtn.addActionListener(e -> {
             try {
                 loadFromFile();
-            } catch (IOException | JAXBException exc) {
+            } catch (IOException exc) {
                 JOptionPane.showMessageDialog(AERelationalDialog.this,
                         "<html>Could not load model from file.<br><br/>Message:<br/>"
                                 + exc.getMessage() + "</html>",
+                        "Problem Loading Model", JOptionPane.ERROR_MESSAGE);
+            } catch (JAXBException exc) {
+                JOptionPane.showMessageDialog(AERelationalDialog.this,
+                        "<html>Could not load model from file.<br><br/>Message:<br/>"
+                                + getMessageFromJAXBExc(exc) + "</html>",
                         "Problem Loading Model", JOptionPane.ERROR_MESSAGE);
             } catch (SAXException exc) {
                 JOptionPane.showMessageDialog(AERelationalDialog.this,
@@ -405,10 +411,15 @@ public class AERelationalDialog extends JDialog {
         saveToFileBtn.addActionListener(e -> {
             try {
                 saveModelToFile();
-            } catch (IOException | JAXBException exc) {
+            } catch (IOException exc) {
                 JOptionPane.showMessageDialog(AERelationalDialog.this,
                         "<html>Could not save model to file.<br><br/>Message:<br/>"
                                 + exc.getMessage() + "</html>",
+                        "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
+            } catch (JAXBException exc) {
+                JOptionPane.showMessageDialog(AERelationalDialog.this,
+                        "<html>Could not save model ftorom file.<br><br/>Message:<br/>"
+                                + getMessageFromJAXBExc(exc) + "</html>",
                         "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -425,6 +436,10 @@ public class AERelationalDialog extends JDialog {
         ctrlPanel.add(saveBundleAndStartBtn);
 
         return ctrlPanel;
+    }
+
+    private String getMessageFromJAXBExc(JAXBException exc) {
+        return Optional.ofNullable(exc.getMessage()).orElse(exc.getLinkedException().getMessage());
     }
 
     private void createAndLoadBundle() {

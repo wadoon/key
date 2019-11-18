@@ -20,6 +20,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -54,26 +56,18 @@ public class AERelationalModel {
     private List<PredicateDeclaration> predicateDeclarations = new ArrayList<>();
     private List<AbstractLocsetDeclaration> abstractLocationSets = new ArrayList<>();
     private List<ProgramVariableDeclaration> programVariableDeclarations = new ArrayList<>();
-    private List<NullarySymbolDeclaration> relevantVarsOne = new ArrayList<>();
-    private List<NullarySymbolDeclaration> relevantVarsTwo = new ArrayList<>();
-
-    @XmlTransient
     private Optional<File> file = Optional.empty();
 
     public AERelationalModel(final String programOne, final String programTwo,
             final String postCondition, final List<AbstractLocsetDeclaration> abstractLocationSets,
             final List<PredicateDeclaration> predicateDeclarations,
-            final List<ProgramVariableDeclaration> programVariableDeclarations,
-            final List<NullarySymbolDeclaration> relevantVarsOne,
-            final List<NullarySymbolDeclaration> relevantVarsTwo) {
+            final List<ProgramVariableDeclaration> programVariableDeclarations) {
         this.programOne = programOne;
         this.programTwo = programTwo;
         this.postCondition = postCondition;
         this.abstractLocationSets = abstractLocationSets;
         this.predicateDeclarations = predicateDeclarations;
         this.programVariableDeclarations = programVariableDeclarations;
-        this.relevantVarsOne = relevantVarsOne;
-        this.relevantVarsTwo = relevantVarsTwo;
     }
 
     AERelationalModel() {
@@ -116,6 +110,42 @@ public class AERelationalModel {
         return predicateDeclarations;
     }
 
+    @XmlTransient
+    public List<NullarySymbolDeclaration> getRelevantVarsOne() {
+        return getRelevantVars(NullarySymbolDeclaration::getRelevantOne);
+    }
+
+    @XmlTransient
+    public List<NullarySymbolDeclaration> getRelevantVarsTwo() {
+        return getRelevantVars(NullarySymbolDeclaration::getRelevantTwo);
+    }
+
+    @XmlTransient
+    public List<NullarySymbolDeclaration> getRelevantVars(
+            java.util.function.Function<NullarySymbolDeclaration, Integer> relValGetter) {
+        return Stream
+                .concat(getAbstractLocationSets().stream(),
+                        getProgramVariableDeclarations().stream())
+                .filter(loc -> relValGetter.apply(loc) > -1)
+                .sorted((loc1, loc2) -> relValGetter.apply(loc1) - relValGetter.apply(loc2))
+                .collect(Collectors.toList());
+    }
+
+    @XmlTransient
+    public Optional<File> getFile() {
+        return file;
+    }
+
+    public void setRelevantVarsOne(List<NullarySymbolDeclaration> relevantVarsOne) {
+        getProgramVariableDeclarations().forEach(pv -> pv.setRelevantLeft(relevantVarsOne.indexOf(pv)));
+        getAbstractLocationSets().forEach(pv -> pv.setRelevantLeft(relevantVarsOne.indexOf(pv)));
+    }
+
+    public void setRelevantVarsTwo(List<NullarySymbolDeclaration> relevantVarsTwo) {
+        getProgramVariableDeclarations().forEach(pv -> pv.setRelevantRight(relevantVarsTwo.indexOf(pv)));
+        getAbstractLocationSets().forEach(pv -> pv.setRelevantRight(relevantVarsTwo.indexOf(pv)));
+    }
+
     public void setProgramOne(String programOne) {
         this.programOne = programOne;
     }
@@ -135,30 +165,6 @@ public class AERelationalModel {
     public void setProgramVariableDeclarations(
             List<ProgramVariableDeclaration> programVariableDeclarations) {
         this.programVariableDeclarations = programVariableDeclarations;
-    }
-
-    @XmlElementWrapper(name = "relevantVarsOne")
-    @XmlElement(name = "relevantVar")
-    public List<NullarySymbolDeclaration> getRelevantVarsOne() {
-        return relevantVarsOne;
-    }
-
-    public void setRelevantVarsOne(List<NullarySymbolDeclaration> relevantVarsOne) {
-        this.relevantVarsOne = relevantVarsOne;
-    }
-
-    @XmlElementWrapper(name = "relevantVarsTwo")
-    @XmlElement(name = "relevantVar")
-    public List<NullarySymbolDeclaration> getRelevantVarsTwo() {
-        return relevantVarsTwo;
-    }
-
-    public void setRelevantVarsTwo(List<NullarySymbolDeclaration> relevantVarsTwo) {
-        this.relevantVarsTwo = relevantVarsTwo;
-    }
-
-    public Optional<File> getFile() {
-        return file;
     }
 
     public boolean isSaved() {

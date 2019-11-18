@@ -12,18 +12,19 @@
 //
 package de.uka.ilkd.key.abstractexecution.relational.model;
 
-import java.beans.Transient;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * @author Dominic Steinhoefel
  */
-@XmlRootElement
-public class ProgramVariableDeclaration implements NullarySymbolDeclaration {
+@XmlRootElement(name="programVariable")
+public class ProgramVariableDeclaration extends NullarySymbolDeclaration {
     public static final ProgramVariableDeclaration EMPTY_DECL = //
             new ProgramVariableDeclaration("", "");
 
@@ -44,6 +45,7 @@ public class ProgramVariableDeclaration implements NullarySymbolDeclaration {
     }
 
     @XmlAttribute
+    @XmlID
     public String getVarName() {
         return varName;
     }
@@ -56,7 +58,7 @@ public class ProgramVariableDeclaration implements NullarySymbolDeclaration {
         this.varName = varName;
     }
     
-    @Transient
+    @XmlTransient
     @Override
     public String getName() {
         return varName;

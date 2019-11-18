@@ -72,7 +72,7 @@ public class AERelationalExtension implements KeYGuiExtension, KeYGuiExtension.T
 
                 final AERelationalModel defaultModel = new AERelationalModel(programOne, programTwo,
                         postCondition, abstractLocationSets, predicateDeclarations,
-                        programVariableDeclarations, relevantVarsOne, relevantVarsTwo);
+                        programVariableDeclarations);
 
                 final AERelationalDialog dia = new AERelationalDialog(mainWindow, defaultModel);
                 dia.setVisible(true);
