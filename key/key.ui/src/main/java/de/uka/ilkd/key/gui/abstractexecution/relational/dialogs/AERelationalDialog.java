@@ -98,15 +98,17 @@ public class AERelationalDialog extends JFrame {
     private static final int STATUS_PANEL_TIMEOUT = 2000;
     private static final int STATUS_PANEL_CHANGE_TIME = 30000;
     private static final String STATUS_PANEL_STD_MSG_1 = "Try to use tooltips if feeling unsure about the functionality of an element.";
-    private static final String STATUS_PANEL_STD_MSG_2 = "Recommended Example: File > Load Example > Abstract Execution > Consolidate Duplicate... > Extract Prefix (Most General)";
+    private static final String STATUS_PANEL_STD_MSG_2 = //
+            "Recommended Example: File > Load Example > Abstract Execution > Consolidate Duplicate... > Extract Prefix (Most General)";
 
     private static final String STD_POSTCONDREL_TOOLTIP = "Relation between values of the relevant locations after execution.<br/>"
             + "You may use the keywords \"\\result_1\" and \"\\result_2\" to access<br/>"
             + "the respective result arrays.<br/>"
-            + "Access individual values with \"\\result_1[1]\" etc. Use type casts<br/>"
+            + "Access individual values with \"\\result_1[2]\" etc. Use type casts<br/>"
             + "in non-trivial compound expressions.<br/>"
             + "At position [0], a potentially thrown Exception object will be<br/>"
-            + "accessible which is null if no exception was thrown.";
+            + "accessible which is null if no exception was thrown.<br/>"
+            + "At position [1], a returned value will be accessible";
     private static final String LOCSET_DECL_TOOLTIP = "<html>Abstract location sets for use in dynamic frames and footprints.<br/>"
             + "Syntax: E.g., 'nameForLocSet'.<br/>"
             + "Those locations can be used as 'relevant locations'.</html>";
@@ -125,11 +127,11 @@ public class AERelationalDialog extends JFrame {
     private static final String TOOLTIP_REL_LOCS_RIGHT = "<html>Locations that are part of the result relation (for the<br/>"
             + "right program).<br/>"
             + "The i-th location in this list (i >= 1) is available via<br/>"
-            + "\\result_2[i] in the 'Relation to Verify' text field.</html>";
+            + "\\result_2[i+1] in the 'Relation to Verify' text field.</html>";
     private static final String TOOLTIP_REL_LOCS_LEFT = "<html>Locations that are part of the result relation (for the<br/>"
             + "left program).<br/>"
             + "The i-th location in this list (i >= 1) is available via<br/>"
-            + "\\result_1[i] in the 'Relation to Verify' text field.</html>";
+            + "\\result_1[i+1] in the 'Relation to Verify' text field.</html>";
 
     private static final long serialVersionUID = 1L;
 

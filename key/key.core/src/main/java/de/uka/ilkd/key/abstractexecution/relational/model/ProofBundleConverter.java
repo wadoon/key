@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -47,12 +48,14 @@ public class ProofBundleConverter {
     private static final String PARAMS = "<PARAMS>";
     private static final String RESULT_SEQ_1 = "<RESULT_SEQ_1>";
     private static final String RESULT_SEQ_2 = "<RESULT_SEQ_2>";
+    private static final String ADDITIONAL_PREMISES = "<ADDITIONAL_PREMISES>";
 
     // Special Keywords
     public static final String RESULT_1 = "\\result_1";
     public static final String RESULT_2 = "\\result_2";
     public static final String RES1 = "_res1";
     public static final String RES2 = "_res2";
+    public static final String RESULT = "_result";
     public static final String EXC = "_exc";
 
     private final AERelationalModel model;
@@ -196,17 +199,46 @@ public class ProofBundleConverter {
                 .replaceAll(PREDICATES, Matcher.quoteReplacement(predicatesDecl))
                 .replaceAll(PROGRAMVARIABLES, Matcher.quoteReplacement(progvarsDecl))
                 .replaceAll(INIT_VARS,
-                        initVars.isEmpty() ? "" : (Matcher.quoteReplacement(initVars)))
+                        initVars.isEmpty() ? "" : (Matcher.quoteReplacement("||" + initVars)))
                 .replaceAll(PARAMS, Matcher.quoteReplacement(params))
                 .replaceAll(RELATION, postCondRelation)
                 .replaceAll(RESULT_SEQ_1, extractResultSeq(model.getRelevantVarsOne()))
-                .replaceAll(RESULT_SEQ_2, extractResultSeq(model.getRelevantVarsTwo()));
+                .replaceAll(RESULT_SEQ_2, extractResultSeq(model.getRelevantVarsTwo())) //
+                .replaceAll(ADDITIONAL_PREMISES,
+                        Matcher.quoteReplacement(createAdditionalPremises()));
+    }
+
+    private String createAdditionalPremises() {
+        if (model.getAbstractLocationSets().isEmpty()) {
+            return "";
+        }
+
+        final StringBuilder sb = new StringBuilder();
+
+        for (final AbstractLocsetDeclaration decl : model.getAbstractLocationSets()) {
+            sb.append("\n     &") //
+                    .append("disjoint(singletonPV(") //
+                    .append(RESULT) //
+                    .append("),") //
+                    .append(decl.getLocsetName()) //
+                    .append(")");
+            sb.append("\n     &") //
+                    .append("disjoint(singletonPV(") //
+                    .append(EXC) //
+                    .append("),") //
+                    .append(decl.getLocsetName()) //
+                    .append(")");
+
+        }
+
+        return sb.toString();
     }
 
     private String extractResultSeq(List<NullarySymbolDeclaration> relevantSymbols) {
-        String resultSeq = "seqSingleton(value(singletonPV(_exc)))";
-
-        final List<String> seqElems = relevantSymbols.stream()
+        String resultSeq = String.format("seqSingleton(value(singletonPV(%s)))", RESULT);
+        
+        final List<String> seqElems = Stream.concat( //
+                Stream.of(new ProgramVariableDeclaration("", EXC)), relevantSymbols.stream())
                 .map(NullarySymbolDeclaration::toSeqSingleton).collect(Collectors.toList());
         for (final String seqElem : seqElems) {
             resultSeq = String.format("seqConcat(%s,%s)", resultSeq, seqElem);

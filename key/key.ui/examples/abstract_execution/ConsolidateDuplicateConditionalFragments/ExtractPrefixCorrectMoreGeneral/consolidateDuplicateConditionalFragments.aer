@@ -40,9 +40,7 @@ else {
     //@ assignable frameQ2;
     //@ accessible footprintQ2;
     \abstract_statement Q2;
-}
-
-return result;</programOne>
+}</programOne>
     <programTwo>/*@ ae_constraint \disjoint(frameE, footprintP) &amp;&amp;
   @               \disjoint(frameP, footprintE) &amp;&amp;
   @               \disjoint(frameP, frameE) &amp;&amp;
@@ -76,24 +74,46 @@ else {
     //@ assignable frameQ2;
     //@ accessible footprintQ2;
     \abstract_statement Q2;
-}
-
-return result;</programTwo>
+}</programTwo>
     <locationSets>
-        <locationSet locsetName="relevant"/>
-        <locationSet locsetName="frameP"/>
-        <locationSet locsetName="footprintP"/>
-        <locationSet locsetName="frameE"/>
-        <locationSet locsetName="footprintE"/>
-        <locationSet locsetName="frameQ1"/>
-        <locationSet locsetName="footprintQ1"/>
-        <locationSet locsetName="frameQ2"/>
-        <locationSet locsetName="footprintQ2"/>
+        <locationSet locsetName="relevant">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameE">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintE">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameQ1">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintQ1">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameQ2">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintQ2">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
     </locationSets>
     <predicates>
-        <predicate predName="Post">
-            <argSort>any</argSort>
-        </predicate>
         <predicate predName="throwsExcP">
             <argSort>any</argSort>
         </predicate>
@@ -104,13 +124,4 @@ return result;</programTwo>
             <argSort>any</argSort>
         </predicate>
     </predicates>
-    <programVariables>
-        <programVariable typeName="java.lang.Object" varName="result"/>
-    </programVariables>
-    <relevantVarsOne>
-        <locationSet locsetName="relevant"/>
-    </relevantVarsOne>
-    <relevantVarsTwo>
-        <locationSet locsetName="relevant"/>
-    </relevantVarsTwo>
 </ns2:aeRelationalModel>

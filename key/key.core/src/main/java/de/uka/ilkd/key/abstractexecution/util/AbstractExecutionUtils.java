@@ -57,7 +57,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
@@ -313,12 +312,22 @@ public class AbstractExecutionUtils {
             return true;
         }
 
-        final TermProgramVariableCollector tpvc = new TermProgramVariableCollector(
-                goal.getLocalSpecificationRepository(), services);
+        /*
+         * NOTE (DS, 2019-11-18): If using the TermProgramVariableCollector, also
+         * program variables occurring in the initial JavaBlock will be considered. This
+         * isn't generally a bad idea; however, it's problematic with exception
+         * variables in catch clauses which we anyway consider separately and don't want
+         * to mess up the results for Skolem locset symbols. Everything of interest
+         * (non-fresh) should be initialized in an update or so.
+         */
+        
+//        final TermProgramVariableCollector collector = new TermProgramVariableCollector(
+//                goal.getLocalSpecificationRepository(), services);
+        final OpCollector collector = new OpCollector();
 
         StreamSupport.stream(goal.proof().root().sequent().spliterator(), true)
-                .map(SequentFormula::formula).forEach(term -> term.execPostOrder(tpvc));
-        if (tpvc.result().contains(locVar)) {
+                .map(SequentFormula::formula).forEach(term -> term.execPostOrder(collector));
+        if (collector.ops().contains(locVar)) {
             // Location was already present in the root node.
             return false;
         }
