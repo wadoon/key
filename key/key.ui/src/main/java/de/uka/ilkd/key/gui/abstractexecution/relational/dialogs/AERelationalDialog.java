@@ -72,6 +72,7 @@ import de.uka.ilkd.key.abstractexecution.relational.model.ProofBundleConverter.B
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.abstractexecution.relational.components.AutoResetStatusPanel;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.FormulaInputTextArea;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.JavaErrorParser;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
@@ -91,15 +92,44 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
  */
 public class AERelationalDialog extends JFrame {
     private static final String DUMMY_KEY_FILE = "/de/uka/ilkd/key/gui/abstractexecution/relational/dummy.key";
-    private static final String TITLE = "Relational Proofs with Abstract Execution";
     private static final String PROOF_BUNDLE_ENDING = ".zproof";
+
+    private static final String TITLE = "Relational Proofs with Abstract Execution";
+    private static final int STATUS_PANEL_TIMEOUT = 2000;
+    private static final int STATUS_PANEL_CHANGE_TIME = 30000;
+    private static final String STATUS_PANEL_STD_MSG_1 = "Try to use tooltips if feeling unsure about the functionality of an element.";
+    private static final String STATUS_PANEL_STD_MSG_2 = "Recommended Example: File > Load Example > Abstract Execution > Consolidate Duplicate... > Extract Prefix (Most General)";
+
     private static final String STD_POSTCONDREL_TOOLTIP = "Relation between values of the relevant locations after execution.<br/>"
             + "You may use the keywords \"\\result_1\" and \"\\result_2\" to access<br/>"
             + "the respective result arrays.<br/>"
             + "Access individual values with \"\\result_1[1]\" etc. Use type casts<br/>"
             + "in non-trivial compound expressions.<br/>"
-            + "At position [0], a potentially thrown Exception object will be accessible<br/>"
-            + "which is null if no exception was thrown.";
+            + "At position [0], a potentially thrown Exception object will be<br/>"
+            + "accessible which is null if no exception was thrown.";
+    private static final String LOCSET_DECL_TOOLTIP = "<html>Abstract location sets for use in dynamic frames and footprints.<br/>"
+            + "Syntax: E.g., 'nameForLocSet'.<br/>"
+            + "Those locations can be used as 'relevant locations'.</html>";
+    private static final String PROGVAR_DECL_TOOLTIP = "<html>Program variables available without declaration.<br/>"
+            + "Syntax: E.g., 'int x', or 'java.lang.Object y'.<br/>"
+            + "Those variables can be used as 'relevant locations'.</html>";
+    private static final String PRED_DECL_TOOLTIP = "<html>Abstract predicates that can, e.g., be used to control<br/>"
+            + "abrupt completion of abstract program elements.<br/>"
+            + "Syntax: E.g., 'throwsExcP(any)'.<br/>"
+            + "Can be used, e.g., in 'assumes' clauses in the abstract<br/>"
+            + " program models.</html>";
+    private static final String SAVE_BTN_TOOLTIP = "<html>Creates a standard KeY proof bundle to a temporary<br/>"
+            + "location and starts the proof.<br/>"
+            + "You still have to click the 'play' button in KeY to run<br/>"
+            + "the automatic proof search.</html>";
+    private static final String TOOLTIP_REL_LOCS_RIGHT = "<html>Locations that are part of the result relation (for the<br/>"
+            + "right program).<br/>"
+            + "The i-th location in this list (i >= 1) is available via<br/>"
+            + "\\result_2[i] in the 'Relation to Verify' text field.</html>";
+    private static final String TOOLTIP_REL_LOCS_LEFT = "<html>Locations that are part of the result relation (for the<br/>"
+            + "left program).<br/>"
+            + "The i-th location in this list (i >= 1) is available via<br/>"
+            + "\\result_1[i] in the 'Relation to Verify' text field.</html>";
 
     private static final long serialVersionUID = 1L;
 
@@ -127,6 +157,7 @@ public class AERelationalDialog extends JFrame {
                         ProofBundleConverter.RES2);
                 return result;
             });
+    private AutoResetStatusPanel statusPanel;
 
     private final List<ServicesLoadedListener> servicesLoadedListeners = new ArrayList<>();
     private final List<ProgramVariablesChangedListener> programVariablesChangedListeners = new ArrayList<>();
@@ -154,6 +185,10 @@ public class AERelationalDialog extends JFrame {
         final JPanel contentPanel = new JPanel(new BorderLayout());
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(contentPanel, BorderLayout.CENTER);
+        statusPanel = new AutoResetStatusPanel( //
+                STATUS_PANEL_TIMEOUT, STATUS_PANEL_CHANGE_TIME, STATUS_PANEL_STD_MSG_1,
+                STATUS_PANEL_STD_MSG_2);
+        getContentPane().add(statusPanel, BorderLayout.SOUTH);
 
         final JPanel declarationsContainer = createDeclarationsContainer();
         final JPanel programViewContainer = createProgramViewContainer();
@@ -186,6 +221,7 @@ public class AERelationalDialog extends JFrame {
         loadFromModel();
         installListeners();
 
+        statusPanel.setMessage("Initializing KeY data structures, please wait...");
         new Thread(() -> {
             initializeServices();
         }).start();
@@ -226,6 +262,8 @@ public class AERelationalDialog extends JFrame {
         });
 
         servicesLoadedListeners.add(() -> {
+            statusPanel.setMessage("KeY data structures initialized successfully.");
+
             // Add special result symbols
             final Namespace<Function> functions = services.getNamespaces().functions();
             final Sort seqSort = services.getTypeConverter().getSeqLDT().targetSort();
@@ -274,7 +312,10 @@ public class AERelationalDialog extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (model.isSaved()) {
                     try {
-                        saveModelToFile(model.getFile().get());
+                        if (!saveModelToFile(model.getFile().get())) {
+                            statusPanel.setMessage(
+                                    "ERROR: Problems saving model. Please save using the Save Model button.");
+                        }
                     } catch (IOException exc) {
                         JOptionPane.showMessageDialog(AERelationalDialog.this,
                                 "<html>Could not save model to file.<br><br/>Message:<br/>"
@@ -286,6 +327,8 @@ public class AERelationalDialog extends JFrame {
                                         + getMessageFromJAXBExc(exc) + "</html>",
                                 "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
                     }
+                } else {
+                    statusPanel.setMessage("Please save model first using the Save Model button.");
                 }
             }
         });
@@ -394,6 +437,7 @@ public class AERelationalDialog extends JFrame {
 
         Files.write(file.toPath(), model.toXml().getBytes());
         model.setFile(file);
+        statusPanel.setMessage("Model successfully saved.");
         return true;
     }
 
@@ -484,6 +528,7 @@ public class AERelationalDialog extends JFrame {
 
         final JButton saveBundleAndStartBtn = new JButton("Start Proof",
                 IconFontSwing.buildIcon(FontAwesomeSolid.PLAY, 16, Color.BLACK));
+        saveBundleAndStartBtn.setToolTipText(SAVE_BTN_TOOLTIP);
         saveBundleAndStartBtn.setPreferredSize(
                 new Dimension(saveBundleAndStartBtn.getPreferredSize().width, 30));
         saveBundleAndStartBtn.addActionListener(e -> createAndLoadBundle());
@@ -545,16 +590,17 @@ public class AERelationalDialog extends JFrame {
     }
 
     private JPanel createRelevantLocationsOneContainer() {
-        return createRelevantLocationsContainer("Relevant Locations (Left)",
+        return createRelevantLocationsContainer("Relevant Locations (Left)", TOOLTIP_REL_LOCS_LEFT,
                 relevantSymbolsOneListModel, AERelationalModel::getRelevantVarsOne);
     }
 
     private JPanel createRelevantLocationsTwoContainer() {
         return createRelevantLocationsContainer("Relevant Locations (Right)",
-                relevantSymbolsTwoListModel, AERelationalModel::getRelevantVarsTwo);
+                TOOLTIP_REL_LOCS_RIGHT, relevantSymbolsTwoListModel,
+                AERelationalModel::getRelevantVarsTwo);
     }
 
-    private JPanel createRelevantLocationsContainer(String labelText,
+    private JPanel createRelevantLocationsContainer(String labelText, String toolTipText,
             DefaultListModel<NullarySymbolDeclaration> relevantSymbolsModel,
             java.util.function.Function<AERelationalModel, List<NullarySymbolDeclaration>> chosenRelevantSymbolsGetter) {
         final JPanel result = new JPanel(new BorderLayout());
@@ -565,6 +611,7 @@ public class AERelationalDialog extends JFrame {
         result.add(titleLabelContainer, BorderLayout.NORTH);
 
         final JList<NullarySymbolDeclaration> relevantSymbolsList = new JList<>();
+        relevantSymbolsList.setToolTipText(toolTipText);
         final JScrollPane scrollPane = new JScrollPane();
         scrollPane.setViewportView(relevantSymbolsList);
         result.add(scrollPane, BorderLayout.CENTER);
@@ -684,6 +731,7 @@ public class AERelationalDialog extends JFrame {
         result.add(titleLabelContainer, BorderLayout.NORTH);
 
         final JList<PredicateDeclaration> predDeclsList = new JList<>();
+        predDeclsList.setToolTipText(PRED_DECL_TOOLTIP);
         final JScrollPane scrollPane = new JScrollPane();
         scrollPane.setViewportView(predDeclsList);
         result.add(scrollPane, BorderLayout.CENTER);
@@ -769,11 +817,12 @@ public class AERelationalDialog extends JFrame {
         titleLabelContainer.add(titleLabel);
         result.add(titleLabelContainer, BorderLayout.NORTH);
 
-        final JList<ProgramVariableDeclaration> predDeclsList = new JList<>();
+        final JList<ProgramVariableDeclaration> progVarDeclsList = new JList<>();
+        progVarDeclsList.setToolTipText(PROGVAR_DECL_TOOLTIP);
         final JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setViewportView(predDeclsList);
+        scrollPane.setViewportView(progVarDeclsList);
         result.add(scrollPane, BorderLayout.CENTER);
-        predDeclsList.setModel(progVarDeclsListModel);
+        progVarDeclsList.setModel(progVarDeclsListModel);
         progVarDeclsListModel.addListDataListener(new UniformListDataListener() {
             @Override
             public void listChanged(ListDataEvent e) {
@@ -800,13 +849,13 @@ public class AERelationalDialog extends JFrame {
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (predDeclsList.getSelectedIndices().length == 1) {
-                    final ProgramVariableDeclaration selectedElem = predDeclsList
+                if (progVarDeclsList.getSelectedIndices().length == 1) {
+                    final ProgramVariableDeclaration selectedElem = progVarDeclsList
                             .getSelectedValue();
                     final ProgramVariableDeclaration pd = ProgramVariableInputDialog
                             .showInputDialog(AERelationalDialog.this, selectedElem, services);
                     if (pd != null) {
-                        progVarDeclsListModel.set(predDeclsList.getSelectedIndex(), pd);
+                        progVarDeclsListModel.set(progVarDeclsList.getSelectedIndex(), pd);
                     }
                 }
             }
@@ -817,7 +866,7 @@ public class AERelationalDialog extends JFrame {
         minusButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (int idx : predDeclsList.getSelectedIndices()) {
+                for (int idx : progVarDeclsList.getSelectedIndices()) {
                     final ProgramVariableDeclaration removed = progVarDeclsListModel.remove(idx);
                     services.getNamespaces().programVariables()
                             .remove(new Name(removed.getVarName()));
@@ -866,6 +915,7 @@ public class AERelationalDialog extends JFrame {
         result.add(titleLabelContainer, BorderLayout.NORTH);
 
         final JList<AbstractLocsetDeclaration> locsetDeclsList = new JList<>();
+        locsetDeclsList.setToolTipText(LOCSET_DECL_TOOLTIP);
         final JScrollPane scrollPane = new JScrollPane();
         scrollPane.setViewportView(locsetDeclsList);
         result.add(scrollPane, BorderLayout.CENTER);
