@@ -106,9 +106,9 @@ public class AERelationalDialog extends JFrame {
             + "the respective result arrays.<br/>"
             + "Access individual values with \"\\result_1[2]\" etc. Use type casts<br/>"
             + "in non-trivial compound expressions.<br/>"
-            + "At position [0], a potentially thrown Exception object will be<br/>"
-            + "accessible which is null if no exception was thrown.<br/>"
-            + "At position [1], a returned value will be accessible";
+            + "At position [0], a returned value will be accessible.<br/>"
+            + "At position [1], a potentially thrown Exception object will be<br/>"
+            + "accessible which is null if no exception was thrown.<br/>";
     private static final String LOCSET_DECL_TOOLTIP = "<html>Abstract location sets for use in dynamic frames and footprints.<br/>"
             + "Syntax: E.g., 'nameForLocSet'.<br/>"
             + "Those locations can be used as 'relevant locations'.</html>";
