@@ -528,14 +528,15 @@ public class SolverListener implements SolverLauncherListener {
                 progressModel.setProgress(0, x, y);
                 Color c = new Color(200, 150, 0);
                 progressModel.setTextColor(c, x, y);
-                progressModel.setText("Possible Counter Example" + timeInfo, x, y);
+                progressModel.setText("Counter Example" + timeInfo, x, y);
             }
         }
 
         private void unknownStopped(InternSMTProblem problem, int x, int y) {
+            String timeInfo = " (" + problem.getTimeInSecAsString() + ")";
                 progressModel.setProgress(0,x,y);
                 progressModel.setTextColor(Color.BLUE,x,y);
-                progressModel.setText("Unknown.",x,y);
+                progressModel.setText("Unknown" + timeInfo,x,y);
         }
 
         private void storeInformation() {

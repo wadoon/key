@@ -55,11 +55,10 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
             trans.addKnownSymbol(name);
             if (op instanceof SortedOperator && term.sort() != Sort.FORMULA) {
                 if (op.arity() > 0) {
-                    SExpr axiom = null;
                     if (enableQuantifiers) {
-                        axiom = funTypeAxiomFromTerm(term, name, trans);
+                        SExpr axiom = funTypeAxiomFromTerm(term, name, trans);
+                        trans.addAxiom(axiom);
                     }
-                    trans.addAxiom(axiom);
                 }
                 if (op.arity() == 0) {
                     SortedOperator sop = (SortedOperator) op;
