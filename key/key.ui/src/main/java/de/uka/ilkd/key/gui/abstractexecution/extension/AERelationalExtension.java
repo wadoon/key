@@ -55,16 +55,14 @@ public class AERelationalExtension implements KeYGuiExtension, KeYGuiExtension.T
         openAERelationalWindowButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final String programOne = "return result;";
-                final String programTwo = "return result;";
+                final String programOne = "";
+                final String programTwo = "";
                 final String postCondition = "\\result_1=\\result_2";
                 final List<AbstractLocsetDeclaration> abstractLocationSets = Collections
                         .singletonList(new AbstractLocsetDeclaration("relevant"));
-                final List<PredicateDeclaration> predicateDeclarations = Collections.singletonList(
-                        new PredicateDeclaration("Post", Collections.singletonList("any")));
+                final List<PredicateDeclaration> predicateDeclarations = Collections.emptyList();
                 final List<ProgramVariableDeclaration> programVariableDeclarations = //
-                        Collections.singletonList(
-                                new ProgramVariableDeclaration("java.lang.Object", "result"));
+                        Collections.emptyList();
                 final List<NullarySymbolDeclaration> relevantVarsOne = //
                         Collections.singletonList(abstractLocationSets.get(0));
                 final List<NullarySymbolDeclaration> relevantVarsTwo = //
@@ -72,7 +70,7 @@ public class AERelationalExtension implements KeYGuiExtension, KeYGuiExtension.T
 
                 final AERelationalModel defaultModel = new AERelationalModel(programOne, programTwo,
                         postCondition, abstractLocationSets, predicateDeclarations,
-                        programVariableDeclarations);
+                        programVariableDeclarations, relevantVarsOne, relevantVarsTwo);
 
                 final AERelationalDialog dia = new AERelationalDialog(mainWindow, defaultModel);
                 dia.setVisible(true);

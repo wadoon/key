@@ -21,6 +21,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -36,17 +38,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -68,6 +73,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.FormulaInputTextArea;
+import de.uka.ilkd.key.gui.abstractexecution.relational.components.JavaErrorParser;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.java.Services;
@@ -83,15 +89,17 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
  * 
  * @author Dominic Steinhoefel
  */
-public class AERelationalDialog extends JDialog {
+public class AERelationalDialog extends JFrame {
     private static final String DUMMY_KEY_FILE = "/de/uka/ilkd/key/gui/abstractexecution/relational/dummy.key";
     private static final String TITLE = "Relational Proofs with Abstract Execution";
     private static final String PROOF_BUNDLE_ENDING = ".zproof";
     private static final String STD_POSTCONDREL_TOOLTIP = "Relation between values of the relevant locations after execution.<br/>"
             + "You may use the keywords \"\\result_1\" and \"\\result_2\" to access<br/>"
             + "the respective result arrays.<br/>"
-            + "Access individual values with \"\\result_1[0]\" etc. Use type casts<br/>"
-            + "in non-trivial compound expressions.";
+            + "Access individual values with \"\\result_1[1]\" etc. Use type casts<br/>"
+            + "in non-trivial compound expressions.<br/>"
+            + "At position [0], a potentially thrown Exception object will be accessible<br/>"
+            + "which is null if no exception was thrown.";
 
     private static final long serialVersionUID = 1L;
 
@@ -131,14 +139,14 @@ public class AERelationalDialog extends JDialog {
     }
 
     public AERelationalDialog(MainWindow mainWindow, AERelationalModel model) {
-        super(mainWindow, false);
+        super(TITLE);
 
         assert model != null;
         this.model = model;
         this.mainWindow = mainWindow;
 
-        setTitle(TITLE);
         setIconImage(IconFontSwing.buildImage(FontAwesomeSolid.BALANCE_SCALE, 16, Color.BLACK));
+        setAlwaysOnTop(false);
 
         // We want to ask whether model should be saved
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -221,8 +229,12 @@ public class AERelationalDialog extends JDialog {
             // Add special result symbols
             final Namespace<Function> functions = services.getNamespaces().functions();
             final Sort seqSort = services.getTypeConverter().getSeqLDT().targetSort();
+            final Sort throwableSort = //
+                    services.getJavaInfo().getKeYJavaType("java.lang.Throwable").getSort();
+
             functions.add(new Function(new Name(ProofBundleConverter.RES1), seqSort));
             functions.add(new Function(new Name(ProofBundleConverter.RES2), seqSort));
+            functions.add(new Function(new Name(ProofBundleConverter.EXC), throwableSort));
         });
 
         addWindowListener(new WindowAdapter() {
@@ -248,6 +260,32 @@ public class AERelationalDialog extends JDialog {
                 } else if (answer == JOptionPane.NO_OPTION) {
                     setVisible(false);
                     dispose();
+                }
+            }
+        });
+
+        final KeyStroke controlS = KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK);
+        final JRootPane rootPane = getRootPane();
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(controlS, "saveModel");
+        rootPane.getActionMap().put("saveModel", new AbstractAction() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (model.isSaved()) {
+                    try {
+                        saveModelToFile(model.getFile().get());
+                    } catch (IOException exc) {
+                        JOptionPane.showMessageDialog(AERelationalDialog.this,
+                                "<html>Could not save model to file.<br><br/>Message:<br/>"
+                                        + exc.getMessage() + "</html>",
+                                "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
+                    } catch (JAXBException exc) {
+                        JOptionPane.showMessageDialog(AERelationalDialog.this,
+                                "<html>Could not save model ftorom file.<br><br/>Message:<br/>"
+                                        + getMessageFromJAXBExc(exc) + "</html>",
+                                "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
         });
@@ -360,6 +398,26 @@ public class AERelationalDialog extends JDialog {
     }
 
     private void loadFromFile() throws IOException, JAXBException, SAXException {
+        final int answer = JOptionPane.showConfirmDialog(AERelationalDialog.this,
+                "Do you want to save your model before loading another one?", "Save Model",
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+        if (answer == JOptionPane.YES_OPTION) {
+            try {
+                if (!saveModelToFile()) {
+                    return;
+                }
+            } catch (IOException | JAXBException exc) {
+                JOptionPane.showMessageDialog(AERelationalDialog.this,
+                        "<html>Could not save model to file.<br><br/>Message:<br/>"
+                                + exc.getMessage() + "</html>",
+                        "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } else if (answer != JOptionPane.NO_OPTION) {
+            return;
+        }
+
         final KeYFileChooser chooser = KeYFileChooser
                 .getFileChooser("Choose AE-Relational Model File");
 
@@ -439,7 +497,9 @@ public class AERelationalDialog extends JDialog {
     }
 
     private String getMessageFromJAXBExc(JAXBException exc) {
-        return Optional.ofNullable(exc.getMessage()).orElse(exc.getLinkedException().getMessage());
+        return Optional.ofNullable(exc.getMessage())
+                .orElse(Optional.ofNullable(exc.getLinkedException()).map(e -> e.getMessage())
+                        .orElse(exc.toString()));
     }
 
     private void createAndLoadBundle() {
@@ -524,7 +584,8 @@ public class AERelationalDialog extends JDialog {
 
                 if (!allSymbols.isEmpty()) {
                     final NullarySymbolDeclaration chosen = (NullarySymbolDeclaration) JOptionPane
-                            .showInputDialog(mainWindow, "Please choose a relevant location to add",
+                            .showInputDialog(AERelationalDialog.this,
+                                    "Please choose a relevant location to add",
                                     "Add Relevant Location", JOptionPane.QUESTION_MESSAGE, null,
                                     allSymbols.toArray(new NullarySymbolDeclaration[0]),
                                     allSymbols.get(0));
@@ -594,6 +655,7 @@ public class AERelationalDialog extends JDialog {
         resultRelationText.setEnabled(false);
         resultRelationText.setBorder(BorderFactory.createCompoundBorder(
                 resultRelationText.getBorder(), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        resultRelationText.setLineWrap(true);
 
         servicesLoadedListeners.add(() -> {
             resultRelationText.setServices(services);

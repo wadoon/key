@@ -18,23 +18,25 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author Dominic Steinhoefel
  */
 public abstract class NullarySymbolDeclaration {
-    private int relevantLeft = -1;
-    private int relevantRight = -1;
+    private int relevantOne = -1;
+    private int relevantTwo = -1;
     
     /**
      * @return The name of this {@link NullarySymbolDeclaration} for displaying it
      *         in the GUI.
      */
     @XmlTransient
-    abstract String getName();
+    public abstract String getName();
+    
+    public abstract String toSeqSingleton();
 
     /**
      * @return -1 if this {@link NullarySymbolDeclaration} is not relevant for the
      *         left program or otherwise the position of this symbol within the list
      *         of relevant symbols for the left program.
      */
-    int getRelevantOne() {
-        return relevantLeft;
+    public int getRelevantOne() {
+        return relevantOne;
     }
 
     /**
@@ -42,8 +44,8 @@ public abstract class NullarySymbolDeclaration {
      *            the left program or otherwise the position of this symbol within
      *            the list of relevant symbols for the left program.
      */
-    void setRelevantLeft(int pos) {
-        this.relevantLeft = pos;
+    public void setRelevantOne(int pos) {
+        this.relevantOne = pos;
     }
 
     /**
@@ -51,8 +53,8 @@ public abstract class NullarySymbolDeclaration {
      *         right program or otherwise the position of this symbol within the
      *         list of relevant symbols for the right program.
      */
-    int getRelevantTwo() {
-        return relevantRight;
+    public int getRelevantTwo() {
+        return relevantTwo;
     }
 
     /**
@@ -60,7 +62,7 @@ public abstract class NullarySymbolDeclaration {
      *            the right program or otherwise the position of this symbol within
      *            the list of relevant symbols for the right program.
      */
-    void setRelevantRight(int pos) {
-        this.relevantRight = pos;
+    public void setRelevantTwo(int pos) {
+        this.relevantTwo = pos;
     }
 }

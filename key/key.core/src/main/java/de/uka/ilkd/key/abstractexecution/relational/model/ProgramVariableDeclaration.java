@@ -63,6 +63,11 @@ public class ProgramVariableDeclaration extends NullarySymbolDeclaration {
     public String getName() {
         return varName;
     }
+    
+    @Override
+    public String toSeqSingleton() {
+        return String.format("seqSingleton(value(singletonPV(%s)))", varName);
+    }
 
     public static ProgramVariableDeclaration fromString(final String str)
             throws IllegalArgumentException {

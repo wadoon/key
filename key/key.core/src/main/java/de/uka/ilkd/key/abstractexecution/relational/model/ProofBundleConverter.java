@@ -53,6 +53,7 @@ public class ProofBundleConverter {
     public static final String RESULT_2 = "\\result_2";
     public static final String RES1 = "_res1";
     public static final String RES2 = "_res2";
+    public static final String EXC = "_exc";
 
     private final AERelationalModel model;
     private final String javaScaffold;
@@ -195,7 +196,7 @@ public class ProofBundleConverter {
                 .replaceAll(PREDICATES, Matcher.quoteReplacement(predicatesDecl))
                 .replaceAll(PROGRAMVARIABLES, Matcher.quoteReplacement(progvarsDecl))
                 .replaceAll(INIT_VARS,
-                        initVars.isEmpty() ? "" : ("{" + Matcher.quoteReplacement(initVars) + "}"))
+                        initVars.isEmpty() ? "" : (Matcher.quoteReplacement(initVars)))
                 .replaceAll(PARAMS, Matcher.quoteReplacement(params))
                 .replaceAll(RELATION, postCondRelation)
                 .replaceAll(RESULT_SEQ_1, extractResultSeq(model.getRelevantVarsOne()))
@@ -203,21 +204,12 @@ public class ProofBundleConverter {
     }
 
     private String extractResultSeq(List<NullarySymbolDeclaration> relevantSymbols) {
-        String resultSeq = "";
+        String resultSeq = "seqSingleton(value(singletonPV(_exc)))";
 
         final List<String> seqElems = relevantSymbols.stream()
-                .map(NullarySymbolDeclaration::getName)
-                .map(str -> String.format("seqSingleton(value(%s))", str))
-                .collect(Collectors.toList());
-        if (seqElems.isEmpty()) {
-            resultSeq = "seqEmpty";
-        } else if (seqElems.size() == 1) {
-            resultSeq = seqElems.get(0);
-        } else {
-            resultSeq = seqElems.get(0);
-            for (int i = 1; i < seqElems.size(); i++) {
-                resultSeq = String.format("seqConcat(%s,%s)", resultSeq, seqElems.get(i));
-            }
+                .map(NullarySymbolDeclaration::toSeqSingleton).collect(Collectors.toList());
+        for (final String seqElem : seqElems) {
+            resultSeq = String.format("seqConcat(%s,%s)", resultSeq, seqElem);
         }
 
         return resultSeq;

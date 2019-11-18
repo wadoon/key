@@ -61,13 +61,18 @@ public class AERelationalModel {
     public AERelationalModel(final String programOne, final String programTwo,
             final String postCondition, final List<AbstractLocsetDeclaration> abstractLocationSets,
             final List<PredicateDeclaration> predicateDeclarations,
-            final List<ProgramVariableDeclaration> programVariableDeclarations) {
+            final List<ProgramVariableDeclaration> programVariableDeclarations,
+            final List<NullarySymbolDeclaration> relevantVarsOne,
+            final List<NullarySymbolDeclaration> relevantVarsTwo) {
         this.programOne = programOne;
         this.programTwo = programTwo;
         this.postCondition = postCondition;
         this.abstractLocationSets = abstractLocationSets;
         this.predicateDeclarations = predicateDeclarations;
         this.programVariableDeclarations = programVariableDeclarations;
+
+        setRelevantVarsOne(relevantVarsOne);
+        setRelevantVarsTwo(relevantVarsTwo);
     }
 
     AERelationalModel() {
@@ -120,7 +125,6 @@ public class AERelationalModel {
         return getRelevantVars(NullarySymbolDeclaration::getRelevantTwo);
     }
 
-    @XmlTransient
     public List<NullarySymbolDeclaration> getRelevantVars(
             java.util.function.Function<NullarySymbolDeclaration, Integer> relValGetter) {
         return Stream
@@ -137,13 +141,15 @@ public class AERelationalModel {
     }
 
     public void setRelevantVarsOne(List<NullarySymbolDeclaration> relevantVarsOne) {
-        getProgramVariableDeclarations().forEach(pv -> pv.setRelevantLeft(relevantVarsOne.indexOf(pv)));
-        getAbstractLocationSets().forEach(pv -> pv.setRelevantLeft(relevantVarsOne.indexOf(pv)));
+        getProgramVariableDeclarations()
+                .forEach(pv -> pv.setRelevantOne(relevantVarsOne.indexOf(pv)));
+        getAbstractLocationSets().forEach(pv -> pv.setRelevantOne(relevantVarsOne.indexOf(pv)));
     }
 
     public void setRelevantVarsTwo(List<NullarySymbolDeclaration> relevantVarsTwo) {
-        getProgramVariableDeclarations().forEach(pv -> pv.setRelevantRight(relevantVarsTwo.indexOf(pv)));
-        getAbstractLocationSets().forEach(pv -> pv.setRelevantRight(relevantVarsTwo.indexOf(pv)));
+        getProgramVariableDeclarations()
+                .forEach(pv -> pv.setRelevantTwo(relevantVarsTwo.indexOf(pv)));
+        getAbstractLocationSets().forEach(pv -> pv.setRelevantTwo(relevantVarsTwo.indexOf(pv)));
     }
 
     public void setProgramOne(String programOne) {

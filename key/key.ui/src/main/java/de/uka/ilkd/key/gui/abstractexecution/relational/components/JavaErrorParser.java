@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.gui.abstractexecution.relational.dialogs;
+package de.uka.ilkd.key.gui.abstractexecution.relational.components;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -132,7 +132,7 @@ public class JavaErrorParser extends AbstractParser {
         sb.append("\n");
         sb.append(body);
         sb.append("\n");
-        sb.append("}");
+        sb.append("return null;}");
         sb.append("}");
         return sb.toString();
     }

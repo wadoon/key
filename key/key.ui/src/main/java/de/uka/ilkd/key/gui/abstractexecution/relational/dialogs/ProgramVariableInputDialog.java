@@ -15,6 +15,7 @@ package de.uka.ilkd.key.gui.abstractexecution.relational.dialogs;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -42,9 +43,9 @@ public class ProgramVariableInputDialog extends JDialog {
 
     private ProgramVariableDeclaration value;
 
-    private ProgramVariableInputDialog(final JDialog owner, final ProgramVariableDeclaration value,
+    private ProgramVariableInputDialog(final Window owner, final ProgramVariableDeclaration value,
             Services services) {
-        super(owner, true);
+        super(owner, ModalityType.DOCUMENT_MODAL);
         assert value != null;
 
         this.value = value;
@@ -144,12 +145,12 @@ public class ProgramVariableInputDialog extends JDialog {
                         services.getJavaInfo().getKeYJavaType(sort)));
     }
 
-    public static ProgramVariableDeclaration showInputDialog(final JDialog owner,
+    public static ProgramVariableDeclaration showInputDialog(final Window owner,
             Services services) {
         return showInputDialog(owner, ProgramVariableDeclaration.EMPTY_DECL, services);
     }
 
-    public static ProgramVariableDeclaration showInputDialog(final JDialog owner,
+    public static ProgramVariableDeclaration showInputDialog(final Window owner,
             final ProgramVariableDeclaration value, Services services) {
         final ProgramVariableInputDialog dia = new ProgramVariableInputDialog(owner, value,
                 services);

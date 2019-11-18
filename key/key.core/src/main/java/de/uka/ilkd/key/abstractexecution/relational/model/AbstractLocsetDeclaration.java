@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlTransient;
 /**
  * @author Dominic Steinhoefel
  */
-@XmlRootElement(name="locationSet")
+@XmlRootElement(name = "locationSet")
 public class AbstractLocsetDeclaration extends NullarySymbolDeclaration {
     public static final AbstractLocsetDeclaration EMPTY_DECL = //
             new AbstractLocsetDeclaration("");
@@ -46,11 +46,16 @@ public class AbstractLocsetDeclaration extends NullarySymbolDeclaration {
     public void setLocsetName(String typeName) {
         this.locsetName = typeName;
     }
-    
+
     @XmlTransient
     @Override
     public String getName() {
         return locsetName;
+    }
+
+    @Override
+    public String toSeqSingleton() {
+        return String.format("seqSingleton(value(%s))", locsetName);
     }
 
     public static AbstractLocsetDeclaration fromString(final String str)

@@ -15,6 +15,7 @@ package de.uka.ilkd.key.gui.abstractexecution.relational.dialogs;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -45,9 +46,9 @@ public class PredicateInputDialog extends JDialog {
 
     private PredicateDeclaration value;
 
-    private PredicateInputDialog(final JDialog owner, final PredicateDeclaration value,
+    private PredicateInputDialog(final Window owner, final PredicateDeclaration value,
             Services services) {
-        super(owner, true);
+        super(owner, ModalityType.DOCUMENT_MODAL);
         assert value != null;
 
         this.value = value;
@@ -127,11 +128,11 @@ public class PredicateInputDialog extends JDialog {
         setSize(400, 110);
     }
 
-    public static PredicateDeclaration showInputDialog(final JDialog owner, Services services) {
+    public static PredicateDeclaration showInputDialog(final Window owner, Services services) {
         return showInputDialog(owner, PredicateDeclaration.EMPTY_DECL, services);
     }
 
-    public static PredicateDeclaration showInputDialog(final JDialog owner,
+    public static PredicateDeclaration showInputDialog(final Window owner,
             final PredicateDeclaration value, Services services) {
         final PredicateInputDialog dia = new PredicateInputDialog(owner, value, services);
         dia.setVisible(true);
