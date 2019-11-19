@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlTransient;
 /**
  * @author Dominic Steinhoefel
  */
-@XmlRootElement(name="programVariable")
+@XmlRootElement(name = "programVariable")
 public class ProgramVariableDeclaration extends NullarySymbolDeclaration {
     public static final ProgramVariableDeclaration EMPTY_DECL = //
             new ProgramVariableDeclaration("", "");
@@ -57,13 +57,13 @@ public class ProgramVariableDeclaration extends NullarySymbolDeclaration {
     public void setVarName(String varName) {
         this.varName = varName;
     }
-    
+
     @XmlTransient
     @Override
     public String getName() {
         return varName;
     }
-    
+
     @Override
     public String toSeqSingleton() {
         return String.format("seqSingleton(value(singletonPV(%s)))", varName);
@@ -85,5 +85,12 @@ public class ProgramVariableDeclaration extends NullarySymbolDeclaration {
     public String toString() {
         return typeName.isEmpty() && varName.isEmpty() ? ""
                 : String.format("%s %s", typeName, varName);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof ProgramVariableDeclaration && obj != null
+                && ((ProgramVariableDeclaration) obj).typeName.equals(typeName)
+                && ((ProgramVariableDeclaration) obj).varName.equals(varName);
     }
 }

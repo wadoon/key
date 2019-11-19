@@ -32,7 +32,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -53,8 +52,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import javax.xml.bind.JAXBException;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
@@ -75,6 +74,12 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.AutoResetStatusPanel;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.FormulaInputTextArea;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.JavaErrorParser;
+import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.DirtyListener;
+import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.ProgramVariablesChangedListener;
+import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.ReadonlyListener;
+import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.ServicesLoadedListener;
+import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.UniformDocumentListener;
+import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.UniformListDataListener;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.java.Services;
@@ -140,6 +145,8 @@ public class AERelationalDialog extends JFrame {
     private Services services = null;
     // NOTE: Only access via setReadonly / isReadonly!
     private boolean readonly = false;
+    // NOTE: Only access via setDirty / isDirty!
+    private boolean dirty = false;
 
     private final DefaultListModel<AbstractLocsetDeclaration> locsetDeclsListModel = new DefaultListModel<>();
     private final DefaultListModel<PredicateDeclaration> predDeclsListModel = new DefaultListModel<>();
@@ -164,6 +171,7 @@ public class AERelationalDialog extends JFrame {
     private final List<ServicesLoadedListener> servicesLoadedListeners = new ArrayList<>();
     private final List<ProgramVariablesChangedListener> programVariablesChangedListeners = new ArrayList<>();
     private final List<ReadonlyListener> readOnlyListeners = new ArrayList<>();
+    private final List<DirtyListener> dirtyListeners = new ArrayList<>();
 
     public static void main(String[] args) {
         final AERelationalModel model = AERelationalModel.EMPTY_MODEL;
@@ -228,12 +236,26 @@ public class AERelationalDialog extends JFrame {
             initializeServices();
         }).start();
 
+        /*
+         * At the beginning, the model cannot be dirty. The flag will now be true,
+         * though, since elements, in particular list models, have been populated with
+         * initial content.
+         */
+        setDirty(false);
     }
 
     public void installListeners() {
         readOnlyListeners.add(ro -> {
             if (ro) {
                 setTitle(String.format("%s (READ ONLY - Save to edit)", TITLE));
+            } else {
+                setTitle(TITLE);
+            }
+        });
+
+        dirtyListeners.add(dirty -> {
+            if (dirty) {
+                setTitle(String.format("%s *", TITLE));
             } else {
                 setTitle(TITLE);
             }
@@ -280,24 +302,29 @@ public class AERelationalDialog extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                final int answer = JOptionPane.showConfirmDialog(AERelationalDialog.this,
-                        "Do you want to save your model before closing?", "Save Model",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                if (isDirty()) {
+                    final int answer = JOptionPane.showConfirmDialog(AERelationalDialog.this,
+                            "Do you want to save your model before closing?", "Save Model",
+                            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
-                if (answer == JOptionPane.YES_OPTION) {
-                    try {
-                        if (saveModelToFile()) {
-                            setVisible(false);
-                            dispose();
+                    if (answer == JOptionPane.YES_OPTION) {
+                        try {
+                            if (saveModelToFile()) {
+                                setVisible(false);
+                                dispose();
+                            }
+                        } catch (IOException | JAXBException exc) {
+                            JOptionPane.showMessageDialog(AERelationalDialog.this,
+                                    "<html>Could not save model to file.<br><br/>Message:<br/>"
+                                            + exc.getMessage() + "</html>",
+                                    "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
+                            return;
                         }
-                    } catch (IOException | JAXBException exc) {
-                        JOptionPane.showMessageDialog(AERelationalDialog.this,
-                                "<html>Could not save model to file.<br><br/>Message:<br/>"
-                                        + exc.getMessage() + "</html>",
-                                "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
-                        return;
+                    } else if (answer == JOptionPane.NO_OPTION) {
+                        setVisible(false);
+                        dispose();
                     }
-                } else if (answer == JOptionPane.NO_OPTION) {
+                } else {
                     setVisible(false);
                     dispose();
                 }
@@ -349,6 +376,17 @@ public class AERelationalDialog extends JFrame {
 
     public boolean isReadonly() {
         return readonly;
+    }
+
+    public synchronized void setDirty(boolean dirty) {
+        if (this.dirty != dirty) {
+            this.dirty = dirty;
+            dirtyListeners.forEach(l -> l.dirtyChanged(dirty));
+        }
+    }
+
+    public boolean isDirty() {
+        return dirty;
     }
 
     private void initializeServices() {
@@ -416,6 +454,18 @@ public class AERelationalDialog extends JFrame {
         model.setRelevantVarsTwo(Collections.list(relevantSymbolsTwoListModel.elements()));
     }
 
+    /**
+     * First updates the model, then loads form the model. This is in particular
+     * useful to react to changes in the {@link NullarySymbolDeclaration}s, because
+     * this affects the relevant locations. When removing a
+     * {@link NullarySymbolDeclaration}, potentially a relevant location has to be
+     * removed, too.
+     */
+    private void refresh() {
+        updateModel();
+        loadFromModel();
+    }
+
     private boolean saveModelToFile() throws IOException, JAXBException {
         final KeYFileChooser chooser = KeYFileChooser
                 .getFileChooser("Choose Destination for AE-Relational Model");
@@ -439,29 +489,34 @@ public class AERelationalDialog extends JFrame {
 
         Files.write(file.toPath(), model.toXml().getBytes());
         model.setFile(file);
+
         statusPanel.setMessage("Model successfully saved.");
+        setDirty(false);
+
         return true;
     }
 
     private void loadFromFile() throws IOException, JAXBException, SAXException {
-        final int answer = JOptionPane.showConfirmDialog(AERelationalDialog.this,
-                "Do you want to save your model before loading another one?", "Save Model",
-                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (isDirty()) {
+            final int answer = JOptionPane.showConfirmDialog(AERelationalDialog.this,
+                    "Do you want to save your model before loading another one?", "Save Model",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 
-        if (answer == JOptionPane.YES_OPTION) {
-            try {
-                if (!saveModelToFile()) {
+            if (answer == JOptionPane.YES_OPTION) {
+                try {
+                    if (!saveModelToFile()) {
+                        return;
+                    }
+                } catch (IOException | JAXBException exc) {
+                    JOptionPane.showMessageDialog(AERelationalDialog.this,
+                            "<html>Could not save model to file.<br><br/>Message:<br/>"
+                                    + exc.getMessage() + "</html>",
+                            "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-            } catch (IOException | JAXBException exc) {
-                JOptionPane.showMessageDialog(AERelationalDialog.this,
-                        "<html>Could not save model to file.<br><br/>Message:<br/>"
-                                + exc.getMessage() + "</html>",
-                        "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
+            } else if (answer != JOptionPane.NO_OPTION) {
                 return;
             }
-        } else if (answer != JOptionPane.NO_OPTION) {
-            return;
         }
 
         final KeYFileChooser chooser = KeYFileChooser
@@ -480,6 +535,7 @@ public class AERelationalDialog extends JFrame {
             model = AERelationalModel.fromXml(new String(Files.readAllBytes(file.toPath())));
             model.setFile(file);
             loadFromModel();
+            setDirty(false);
         }
     }
 
@@ -605,6 +661,13 @@ public class AERelationalDialog extends JFrame {
     private JPanel createRelevantLocationsContainer(String labelText, String toolTipText,
             DefaultListModel<NullarySymbolDeclaration> relevantSymbolsModel,
             java.util.function.Function<AERelationalModel, List<NullarySymbolDeclaration>> chosenRelevantSymbolsGetter) {
+        relevantSymbolsModel.addListDataListener(new UniformListDataListener() {
+            @Override
+            public void listChanged(ListDataEvent e) {
+                setDirty(true);
+            }
+        });
+
         final JPanel result = new JPanel(new BorderLayout());
 
         final JLabel titleLabel = new JLabel(labelText);
@@ -706,6 +769,13 @@ public class AERelationalDialog extends JFrame {
                 resultRelationText.getBorder(), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         resultRelationText.setLineWrap(true);
 
+        resultRelationText.getDocument().addDocumentListener(new UniformDocumentListener() {
+            @Override
+            public void documentChanged(DocumentEvent e) {
+                setDirty(true);
+            }
+        });
+
         servicesLoadedListeners.add(() -> {
             resultRelationText.setServices(services);
             if (!isReadonly()) {
@@ -738,6 +808,12 @@ public class AERelationalDialog extends JFrame {
         scrollPane.setViewportView(predDeclsList);
         result.add(scrollPane, BorderLayout.CENTER);
         predDeclsList.setModel(predDeclsListModel);
+        predDeclsListModel.addListDataListener(new UniformListDataListener() {
+            @Override
+            public void listChanged(ListDataEvent e) {
+                setDirty(true);
+            }
+        });
 
         final JButton plusButton = new JButton(
                 IconFontSwing.buildIcon(FontAwesomeSolid.PLUS, 16, Color.BLACK));
@@ -759,10 +835,18 @@ public class AERelationalDialog extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (predDeclsList.getSelectedIndices().length == 1) {
                     final PredicateDeclaration selectedElem = predDeclsList.getSelectedValue();
+                    services.getNamespaces().functions()
+                            .remove(new Name(selectedElem.getPredName()));
                     final PredicateDeclaration pd = PredicateInputDialog
                             .showInputDialog(AERelationalDialog.this, selectedElem, services);
-                    if (pd != null) {
+                    if (pd != null && !pd.equals(selectedElem)) {
                         predDeclsListModel.set(predDeclsList.getSelectedIndex(), pd);
+                    } else {
+                        try {
+                            /* ...because names might be equal, but parameters changed. */
+                            PredicateInputDialog.checkAndRegister(selectedElem, services);
+                        } catch (ParserException exc) {
+                        }
                     }
                 }
             }
@@ -774,7 +858,8 @@ public class AERelationalDialog extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (int idx : predDeclsList.getSelectedIndices()) {
-                    predDeclsListModel.remove(idx);
+                    final PredicateDeclaration removed = predDeclsListModel.remove(idx);
+                    services.getNamespaces().functions().remove(new Name(removed.getPredName()));
                 }
             }
         });
@@ -830,6 +915,7 @@ public class AERelationalDialog extends JFrame {
             public void listChanged(ListDataEvent e) {
                 programVariablesChangedListeners.forEach(l -> l.programVariablesChanged(
                         Collections.list(progVarDeclsListModel.elements())));
+                setDirty(true);
             }
         });
 
@@ -856,8 +942,11 @@ public class AERelationalDialog extends JFrame {
                             .getSelectedValue();
                     final ProgramVariableDeclaration pd = ProgramVariableInputDialog
                             .showInputDialog(AERelationalDialog.this, selectedElem, services);
-                    if (pd != null) {
+                    if (pd != null && !pd.equals(selectedElem)) {
+                        services.getNamespaces().programVariables()
+                                .remove(new Name(selectedElem.getName()));
                         progVarDeclsListModel.set(progVarDeclsList.getSelectedIndex(), pd);
+                        refresh();
                     }
                 }
             }
@@ -872,6 +961,7 @@ public class AERelationalDialog extends JFrame {
                     final ProgramVariableDeclaration removed = progVarDeclsListModel.remove(idx);
                     services.getNamespaces().programVariables()
                             .remove(new Name(removed.getVarName()));
+                    refresh();
                 }
             }
         });
@@ -923,6 +1013,12 @@ public class AERelationalDialog extends JFrame {
         result.add(scrollPane, BorderLayout.CENTER);
 
         locsetDeclsList.setModel(locsetDeclsListModel);
+        locsetDeclsListModel.addListDataListener(new UniformListDataListener() {
+            @Override
+            public void listChanged(ListDataEvent e) {
+                setDirty(true);
+            }
+        });
 
         final JButton plusButton = new JButton(
                 IconFontSwing.buildIcon(FontAwesomeSolid.PLUS, 16, Color.BLACK));
@@ -947,8 +1043,11 @@ public class AERelationalDialog extends JFrame {
                             locsetDeclsList.getSelectedValue();
                     final AbstractLocsetDeclaration ls = LocsetInputDialog.showInputDialog( //
                             AERelationalDialog.this, selectedElem, services);
-                    if (ls != null) {
+                    if (ls != null && !ls.equals(selectedElem)) {
+                        services.getNamespaces().functions()
+                                .remove(new Name(selectedElem.getName()));
                         locsetDeclsListModel.set(locsetDeclsList.getSelectedIndex(), ls);
+                        refresh();
                     }
                 }
             }
@@ -960,7 +1059,9 @@ public class AERelationalDialog extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (int idx : locsetDeclsList.getSelectedIndices()) {
-                    locsetDeclsListModel.remove(idx);
+                    final AbstractLocsetDeclaration removed = locsetDeclsListModel.remove(idx);
+                    services.getNamespaces().functions().remove(new Name(removed.getName()));
+                    refresh();
                 }
             }
         });
@@ -1008,6 +1109,12 @@ public class AERelationalDialog extends JFrame {
     private JComponent createJavaEditorView(RSyntaxTextArea component) {
         component.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
         component.setCodeFoldingEnabled(true);
+        component.getDocument().addDocumentListener(new UniformDocumentListener() {
+            @Override
+            public void documentChanged(DocumentEvent e) {
+                setDirty(true);
+            }
+        });
 
         final JavaErrorParser errorParser = new JavaErrorParser();
 
@@ -1018,7 +1125,7 @@ public class AERelationalDialog extends JFrame {
         return new RTextScrollPane(component);
     }
 
-    public static List<Component> getAllComponents(final Container c) {
+    private static List<Component> getAllComponents(final Container c) {
         Component[] comps = c.getComponents();
         List<Component> compList = new ArrayList<Component>();
         for (Component comp : comps) {
@@ -1027,40 +1134,5 @@ public class AERelationalDialog extends JFrame {
                 compList.addAll(getAllComponents((Container) comp));
         }
         return compList;
-    }
-
-    private static abstract class UniformListDataListener implements ListDataListener {
-
-        @Override
-        public void contentsChanged(ListDataEvent e) {
-            listChanged(e);
-        }
-
-        @Override
-        public void intervalAdded(ListDataEvent e) {
-            listChanged(e);
-        }
-
-        @Override
-        public void intervalRemoved(ListDataEvent e) {
-            listChanged(e);
-        }
-
-        public abstract void listChanged(ListDataEvent e);
-    }
-
-    @FunctionalInterface
-    private static interface ServicesLoadedListener {
-        public void servicesLoaded();
-    }
-
-    @FunctionalInterface
-    private static interface ReadonlyListener {
-        public void readonlyChanged(boolean readonly);
-    }
-
-    @FunctionalInterface
-    private static interface ProgramVariablesChangedListener {
-        public void programVariablesChanged(Collection<ProgramVariableDeclaration> newVars);
     }
 }

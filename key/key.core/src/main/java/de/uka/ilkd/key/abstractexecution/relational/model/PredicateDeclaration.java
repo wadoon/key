@@ -85,4 +85,10 @@ public class PredicateDeclaration {
         return String.format("%s(%s)", predName,
                 argSorts.stream().collect(Collectors.joining(", ")));
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof PredicateDeclaration && obj != null
+                && ((PredicateDeclaration) obj).toString().equals(toString());
+    }
 }

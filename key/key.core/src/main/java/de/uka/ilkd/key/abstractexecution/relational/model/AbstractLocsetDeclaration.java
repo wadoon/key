@@ -74,4 +74,10 @@ public class AbstractLocsetDeclaration extends NullarySymbolDeclaration {
     public String toString() {
         return locsetName;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof AbstractLocsetDeclaration && obj != null
+                && ((AbstractLocsetDeclaration) obj).locsetName.equals(locsetName);
+    }
 }
