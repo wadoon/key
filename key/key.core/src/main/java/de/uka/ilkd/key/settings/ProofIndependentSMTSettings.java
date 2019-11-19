@@ -173,7 +173,8 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                 solverUnions.add(new SolverTypeCollection("CVC4",1,SolverType.CVC4_SOLVER));
                 solverUnions.add(new SolverTypeCollection("CVC4",1,SolverType.CVC4_FP_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Simplify",1,SolverType.SIMPLIFY_SOLVER));
-                solverUnions.add(new SolverTypeCollection("Multiple Solvers",2,SolverType.Z3_SOLVER,
+                solverUnions.add(new SolverTypeCollection("Multiple Solvers",2,
+                                // SolverType.Z3_SOLVER,
                                 SolverType.Z3_NEW_TL_SOLVER,
                                 SolverType.YICES_SOLVER,
                                 SolverType.CVC3_SOLVER,
