@@ -626,19 +626,21 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         setupSystemInvariantSimp(d);
 
-        if (quantifierInstantiatedEnabled()) {
-            setupFormulaNormalisation(d, numbers, locSetLDT);
-        } else {
-            bindRuleSet(d, "negationNormalForm", inftyConst());
-            bindRuleSet(d, "moveQuantToLeft", inftyConst());
-            bindRuleSet(d, "conjNormalForm", inftyConst());
-            bindRuleSet(d, "apply_equations_andOr", inftyConst());
-            bindRuleSet(d, "elimQuantifier", inftyConst());
-            bindRuleSet(d, "distrQuantifier", inftyConst());
-            bindRuleSet(d, "swapQuantifiers", inftyConst());
-            bindRuleSet(d, "pullOutQuantifierAll", inftyConst());
-            bindRuleSet(d, "pullOutQuantifierEx", inftyConst());
-        }
+//        if (quantifierInstantiatedEnabled()) {
+        setupFormulaNormalisation(d, numbers, locSetLDT);
+        // disable for machine learning branch only!!
+
+//        } else {
+//            bindRuleSet(d, "negationNormalForm", inftyConst());
+//            bindRuleSet(d, "moveQuantToLeft", inftyConst());
+//            bindRuleSet(d, "conjNormalForm", inftyConst());
+//            bindRuleSet(d, "apply_equations_andOr", inftyConst());
+//            bindRuleSet(d, "elimQuantifier", inftyConst());
+//            bindRuleSet(d, "distrQuantifier", inftyConst());
+//            bindRuleSet(d, "swapQuantifiers", inftyConst());
+//            bindRuleSet(d, "pullOutQuantifierAll", inftyConst());
+//            bindRuleSet(d, "pullOutQuantifierEx", inftyConst());
+//        }
 
         // For taclets that need instantiation, but where the instantiation is
         // deterministic and does not have to be repeated at a later point, we
