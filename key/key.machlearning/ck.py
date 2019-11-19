@@ -32,7 +32,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect(('localhost', 5533))
     s.sendall(commandStr.encode('utf-8'))
     s.shutdown(1)
-    data = s.recv(32768)
+    data = s.recv(1048576)
 
 print("response: " + data.decode("utf-8"))
 
@@ -53,3 +53,7 @@ if order == "ast":
         for form in response["succedent"]:
             print(" " + ast(form))
 
+if order == "print":
+    response = json.loads(data.decode("utf-8"))
+    if response["response"] == "success":
+        print(response["sequent"])

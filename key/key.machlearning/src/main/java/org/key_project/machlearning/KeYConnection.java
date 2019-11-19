@@ -5,13 +5,19 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.key_project.util.collection.ImmutableArray;
 
 import java.beans.PropertyDescriptor;
 import java.io.File;
@@ -42,6 +48,7 @@ public class KeYConnection {
         commands.put("tactics", this::listTactics);
         commands.put("set", this::setProperty);
         commands.put("quit", c -> { System.exit(0); return null; });
+        commands.put("print", this::printSequent);
     }
 
     private Map<String, Tactic> tactics = new HashMap<>();
@@ -67,7 +74,8 @@ public class KeYConnection {
             throw new IllegalArgumentException("No command set!");
         }
 
-        if (ongoingProof == null && !"load".equals(command) && !"quit".equals(command)) {
+        if (ongoingProof == null && !"load".equals(command) && !"quit".equals(command) &&
+                !"tactics".equals(command)) {
             throw new IllegalStateException("Cannot do anything until a problem has been loaded.");
         }
 
@@ -96,10 +104,13 @@ public class KeYConnection {
             throw new IllegalArgumentException("Unknown/Missing tactic " + tacName);
         }
 
+        uiCtrl.getProofControl().fireAutoModeStarted(new ProofEvent(ongoingProof));
         try {
             tactic.apply(uiCtrl, ongoingProof, goal, jsonObject);
         } catch (Exception e) {
             return Server.error(e);
+        } finally {
+            uiCtrl.getProofControl().fireAutoModeStopped(new ProofEvent(ongoingProof));
         }
 
         /*
@@ -246,6 +257,39 @@ public class KeYConnection {
         result.put("succedent", semiSequentToJSON(sequent.succedent()));
         return result;
     }
+
+    private JSONObject printSequent(JSONObject jsonObject) {
+        int id;
+        try {
+            id = Integer.parseInt(jsonObject.get("id").toString());
+        } catch(Exception ex) {
+            throw new IllegalArgumentException("Missing/Illegal id parameter", ex);
+        }
+
+        Goal goal = findGoal(id);
+        Sequent sequent = goal.sequent();
+
+        NotationInfo ni = new NotationInfo();
+        LogicPrinter p = new LogicPrinter(new ProgramPrinter(null), ni,
+                null, true) {
+            @Override
+            protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t) {
+                return new ImmutableArray<>();
+            }
+        };
+
+        p.setLineWidth(120);
+        p.printSequent(sequent);
+        String printed = p.result().toString();
+
+        JSONObject result = new JSONObject();
+        result.put("response", "success");
+        result.put("id", id);
+        result.put("sequent", printed);
+        return result;
+
+    }
+
 
     private JSONArray semiSequentToJSON(Semisequent semiseq) {
         JSONArray result = new JSONArray();
