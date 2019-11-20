@@ -233,6 +233,20 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder
                 = new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self,
                         services);
+        
+        /**
+         * This flag is true if we could detect that this "contract" is a translation
+         * from a JML assume clause. Yeah, that's one of these hacks,
+         * but using block contracts for everything also is a hack. (DS, 2019-11-20)
+         * 
+         * NOTE (DS, 2019-11-20): There's a similar hack on which this one depends in
+         * AbstractAuxiliaryContractImpl, it prevents creating "standard" preconditions. 
+         */
+        final boolean representsJMLAssumeStmt = (contract.getBlock().isEmpty()
+                || contract.getBlock().toString().replaceAll(" ", "").equals("{;}"))
+                && heaps.stream().map(heap -> contract.getPrecondition(heap, services))
+                        .allMatch(t -> t == null || t.equals(services.getTermBuilder().tt()));
+        
         final Term[] preconditions = createPreconditions(instantiation, contract, heaps,
                 localInVariables, conditionsAndClausesBuilder, services);
         final Term[] assumptions = createAssumptions(localOutVariables, anonymisationHeaps,
@@ -244,8 +258,13 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         final GoalsConfigurator configurator = new GoalsConfigurator(application,
                 new TermLabelState(), instantiation, contract.getLabels(), variables,
                 application.posInOccurrence(), goal.getLocalSpecificationRepository(), services, this);
-        result = goal.split(2);
-        configurator.setUpPreconditionGoal(result.tail().head(), updates[0], preconditions);
+        
+        if (representsJMLAssumeStmt) {
+            result = goal.split(1);
+        } else {
+            result = goal.split(2);
+            configurator.setUpPreconditionGoal(result.tail().head(), updates[0], preconditions);
+        }
         configurator.setUpUsageGoal(result.head(), updates, assumptions);
 
         final ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) goal.proof()

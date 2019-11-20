@@ -57,6 +57,7 @@ public class ProofBundleConverter {
     public static final String RES2 = "_res2";
     public static final String RESULT = "_result";
     public static final String EXC = "_exc";
+    public static final String OUT = "_objUnderTest";
 
     private final AERelationalModel model;
     private final String javaScaffold;
@@ -216,15 +217,21 @@ public class ProofBundleConverter {
         final StringBuilder sb = new StringBuilder();
 
         for (final AbstractLocsetDeclaration decl : model.getAbstractLocationSets()) {
-            sb.append("\n     &") //
+            sb.append("\n     & ") //
                     .append("disjoint(singletonPV(") //
                     .append(RESULT) //
                     .append("),") //
                     .append(decl.getLocsetName()) //
                     .append(")");
-            sb.append("\n     &") //
+            sb.append("\n     & ") //
                     .append("disjoint(singletonPV(") //
                     .append(EXC) //
+                    .append("),") //
+                    .append(decl.getLocsetName()) //
+                    .append(")");
+            sb.append("\n     & ") //
+                    .append("disjoint(singletonPV(") //
+                    .append(OUT) //
                     .append("),") //
                     .append(decl.getLocsetName()) //
                     .append(")");
@@ -236,7 +243,7 @@ public class ProofBundleConverter {
 
     private String extractResultSeq(List<NullarySymbolDeclaration> relevantSymbols) {
         String resultSeq = String.format("seqSingleton(value(singletonPV(%s)))", RESULT);
-        
+
         final List<String> seqElems = Stream.concat( //
                 Stream.of(new ProgramVariableDeclaration("", EXC)), relevantSymbols.stream())
                 .map(NullarySymbolDeclaration::toSeqSingleton).collect(Collectors.toList());

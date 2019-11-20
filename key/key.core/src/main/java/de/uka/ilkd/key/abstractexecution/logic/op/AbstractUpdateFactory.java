@@ -308,6 +308,7 @@ public class AbstractUpdateFactory {
             
             result = new Function(new Name(funName),
                     getTargetSortForPrecondtionType(preconditionType), sorts);
+            services.getNamespaces().functions().add(result);
 
             abstractPreconditionInstances.get(phsID).put(preconditionType, result);
         }

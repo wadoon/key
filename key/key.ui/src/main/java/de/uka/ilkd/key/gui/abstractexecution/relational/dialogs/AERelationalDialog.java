@@ -88,9 +88,11 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.ProverTaskAdapter;
 
@@ -621,12 +623,29 @@ public class AERelationalDialog extends JFrame {
             final ProverTaskAdapter ptl = new ProverTaskAdapter() {
                 @Override
                 public void taskFinished(TaskFinishedInfo info) {
-                    if (info != null && info.getSource() instanceof ProblemLoader) {
+                    if (info == null) {
+                        return;
+                    }
+
+                    if (info.getSource() instanceof ProblemLoader) {
                         if (info.getResult() == null
                                 && !mainWindow.getMediator().getUI().isSaveOnly() && info.getProof()
                                         .getProofFile().getName().startsWith(tmpFilePrefix)) {
                             mainWindow.getAutoModeAction().actionPerformed(null);
                             mainWindow.getUserInterface().removeProverTaskListener(this);
+                            statusPanel.setMessage("Proof started.");
+                        }
+                    } else if (info.getSource() instanceof ProverCore) {
+                        final Proof proof = info.getProof();
+                        if (proof != null
+                                && proof.getProofFile().getName().startsWith(tmpFilePrefix)) {
+                            if (proof.closed()) {
+                                statusPanel.setMessage("<b>Proof closed.</b>");
+                            } else if (proof.closed()) {
+                                statusPanel.setMessage(
+                                        String.format("Prover finished: <b>%d open goals</b>.",
+                                                proof.openGoals().size()));
+                            }
                         }
                     }
                 }

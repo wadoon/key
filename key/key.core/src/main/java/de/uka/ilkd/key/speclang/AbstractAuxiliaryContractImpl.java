@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -1388,11 +1389,32 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return the contract's preconditions.
          */
         protected Map<LocationVariable, Term> buildPreconditions() {
+            final Predicate<? super Term> nonTrivialPostCondTerm = t -> t != null
+                    && t != services.getTermBuilder().tt();
+
+            /**
+             * This flag is true if we could detect that this "contract" is a translation
+             * from a JML assume clause. Those have no postcondition, but rather a free
+             * postcondition only, and a trivial block. Yeah, that's one of these hacks,
+             * but using block contracts for everything also is a hack. (DS, 2019-11-20)
+             */
+            final boolean representsJMLAssumeStmt = (block.isEmpty()
+                    || block.toString().replaceAll(" ", "").equals("{;}"))
+                    && ensures.values().stream().noneMatch(nonTrivialPostCondTerm)
+                    && ensuresFree.values().stream().anyMatch(nonTrivialPostCondTerm);
+            
             final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
             for (LocationVariable heap : heaps) {
+                result.put(heap, services.getTermBuilder().tt());
+                
                 // Add JML precondition to precondition
                 if (requires.get(heap) != null) {
                     result.put(heap, convertToFormula(requires.get(heap)));
+                }
+                
+                // We don't want these preconditions for assume statements, makes 0 sense.
+                if (representsJMLAssumeStmt) {
+                    continue;
                 }
 
                 // Add measured by term to precondition
