@@ -39,8 +39,11 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -63,6 +66,7 @@ import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.abstractexecution.relational.model.AbstractLocsetDeclaration;
+import de.uka.ilkd.key.abstractexecution.relational.model.MethodDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.NullarySymbolDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.ProgramVariableDeclaration;
@@ -75,6 +79,7 @@ import de.uka.ilkd.key.gui.abstractexecution.relational.components.AutoResetStat
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.FormulaInputTextArea;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.JavaErrorParser;
 import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.DirtyListener;
+import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.MethodDeclsChangedListener;
 import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.ProgramVariablesChangedListener;
 import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.ReadonlyListener;
 import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.ServicesLoadedListener;
@@ -158,6 +163,8 @@ public class AERelationalDialog extends JFrame {
     private final DefaultListModel<ProgramVariableDeclaration> progVarDeclsListModel = new DefaultListModel<>();
     private final DefaultListModel<NullarySymbolDeclaration> relevantSymbolsOneListModel = new DefaultListModel<>();
     private final DefaultListModel<NullarySymbolDeclaration> relevantSymbolsTwoListModel = new DefaultListModel<>();
+    private final DefaultComboBoxModel<MethodDeclaration> methodDeclsOneModel = new DefaultComboBoxModel<>();
+    private final DefaultComboBoxModel<MethodDeclaration> methodDeclsTwoModel = new DefaultComboBoxModel<>();
 
     private final RSyntaxTextArea codeLeft = new RSyntaxTextArea(20, 60);
     private final RSyntaxTextArea codeRight = new RSyntaxTextArea(20, 60);
@@ -175,6 +182,8 @@ public class AERelationalDialog extends JFrame {
 
     private final List<ServicesLoadedListener> servicesLoadedListeners = new ArrayList<>();
     private final List<ProgramVariablesChangedListener> programVariablesChangedListeners = new ArrayList<>();
+    private final List<MethodDeclsChangedListener> methodDeclsOneChangedListeners = new ArrayList<>();
+    private final List<MethodDeclsChangedListener> methodDeclsTwoChangedListeners = new ArrayList<>();
     private final List<ReadonlyListener> readOnlyListeners = new ArrayList<>();
     private final List<DirtyListener> dirtyListeners = new ArrayList<>();
 
@@ -631,7 +640,8 @@ public class AERelationalDialog extends JFrame {
                         if (info.getResult() == null
                                 && !mainWindow.getMediator().getUI().isSaveOnly() && info.getProof()
                                         .getProofFile().getName().startsWith(tmpFilePrefix)) {
-                            SwingUtilities.invokeLater(() -> mainWindow.getAutoModeAction().actionPerformed(null));
+                            SwingUtilities.invokeLater(
+                                    () -> mainWindow.getAutoModeAction().actionPerformed(null));
                             mainWindow.getUserInterface().removeProverTaskListener(this);
                             statusPanel.setMessage("Proof started.");
                         }
@@ -663,9 +673,15 @@ public class AERelationalDialog extends JFrame {
     }
 
     private JPanel createProgramViewContainer() {
+        final JComponent programOneView = new JPanel(new BorderLayout());
+        programOneView.add(createJavaEditorView(codeLeft), BorderLayout.CENTER);
+        programOneView.add(createMethodsView("Methods (Left)", methodDeclsOneModel,
+                methodDeclsOneChangedListeners), BorderLayout.SOUTH);
 
-        final JComponent programOneView = createJavaEditorViewLeft();
-        final JComponent programTwoView = createJavaEditorViewRight();
+        final JComponent programTwoView = new JPanel(new BorderLayout());
+        programTwoView.add(createJavaEditorView(codeRight), BorderLayout.CENTER);
+        programTwoView.add(createMethodsView("Methods (Right)", methodDeclsTwoModel,
+                methodDeclsTwoChangedListeners), BorderLayout.SOUTH);
 
         final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true,
                 programOneView, programTwoView);
@@ -675,6 +691,110 @@ public class AERelationalDialog extends JFrame {
         editorsContainer.setMinimumSize(new Dimension(600, 100));
         editorsContainer.add(splitPane, BorderLayout.CENTER);
         return editorsContainer;
+    }
+
+    private Component createMethodsView(final String label,
+            final DefaultComboBoxModel<MethodDeclaration> model,
+            final List<MethodDeclsChangedListener> listenerList) {
+        final JPanel result = new JPanel(new BorderLayout());
+        result.setMinimumSize(new Dimension(290, result.getMinimumSize().height));
+
+        final JComboBox<MethodDeclaration> methodDeclsList = new JComboBox<>();
+        methodDeclsList.setToolTipText(label);
+        final JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setViewportView(methodDeclsList);
+        result.add(scrollPane, BorderLayout.CENTER);
+        methodDeclsList.setModel(model);
+        model.addListDataListener(new UniformListDataListener() {
+            @Override
+            public void listChanged(ListDataEvent e) {
+                listenerList.forEach(l -> l.methodDeclsChanged(elementsOfComboBoxModel(model)));
+                setDirty(true);
+            }
+        });
+
+        final JButton plusButton = new JButton(
+                IconFontSwing.buildIcon(FontAwesomeSolid.PLUS, 16, Color.BLACK));
+        plusButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                final ProgramVariableDeclaration pd = ProgramVariableInputDialog
+//                        .showInputDialog(AERelationalDialog.this, services);
+//                if (pd != null) {
+//                    methodDeclsOneModel.addElement(pd);
+//                }
+            }
+        });
+
+        final JButton editButton = new JButton(
+                IconFontSwing.buildIcon(FontAwesomeSolid.PEN, 16, Color.BLACK));
+        editButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (methodDeclsList.getSelectedIndex() > 0) {
+//                    final ProgramVariableDeclaration selectedElem = methodDeclsList
+//                            .getSelectedValue();
+//                    final ProgramVariableDeclaration pd = ProgramVariableInputDialog
+//                            .showInputDialog(AERelationalDialog.this, selectedElem, services);
+//                    if (pd != null && !pd.equals(selectedElem)) {
+//                        services.getNamespaces().programVariables()
+//                                .remove(new Name(selectedElem.getName()));
+//                        methodDeclsOneModel.set(methodDeclsList.getSelectedIndex(), pd);
+//                    }
+                }
+            }
+        });
+
+        final JButton minusButton = new JButton(
+                IconFontSwing.buildIcon(FontAwesomeSolid.MINUS, 16, Color.BLACK));
+        minusButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (methodDeclsList.getSelectedIndex() > 0) {
+                    model.removeElementAt(methodDeclsList.getSelectedIndex());
+                }
+            }
+        });
+
+        plusButton.setEnabled(false);
+        minusButton.setEnabled(false);
+        editButton.setEnabled(false);
+
+        this.servicesLoadedListeners.add(() -> {
+            if (!isReadonly()) {
+                plusButton.setEnabled(true);
+                minusButton.setEnabled(true);
+                editButton.setEnabled(true);
+            }
+        });
+        this.readOnlyListeners.add(ro -> {
+            if (ro) {
+                plusButton.setEnabled(false);
+                minusButton.setEnabled(false);
+                editButton.setEnabled(false);
+            } else if (services != null) {
+                plusButton.setEnabled(true);
+                minusButton.setEnabled(true);
+                editButton.setEnabled(true);
+            }
+        });
+
+        final JPanel buttonsPanel = new JPanel(new FlowLayout());
+        buttonsPanel.add(plusButton);
+        buttonsPanel.add(editButton);
+        buttonsPanel.add(minusButton);
+
+        result.add(buttonsPanel, BorderLayout.EAST);
+
+        return result;
+    }
+
+    private static <T> List<T> elementsOfComboBoxModel(ComboBoxModel<T> model) {
+        final List<T> result = new ArrayList<>();
+        for (int i = 0; i < model.getSize(); i++) {
+            result.add(model.getElementAt(i));
+        }
+        return result;
     }
 
     private JPanel createPostconditionContainer() {
@@ -1139,14 +1259,6 @@ public class AERelationalDialog extends JFrame {
 
         result.add(buttonsPanel, BorderLayout.SOUTH);
         return result;
-    }
-
-    private JComponent createJavaEditorViewLeft() {
-        return createJavaEditorView(codeLeft);
-    }
-
-    private JComponent createJavaEditorViewRight() {
-        return createJavaEditorView(codeRight);
     }
 
     private JComponent createJavaEditorView(RSyntaxTextArea component) {

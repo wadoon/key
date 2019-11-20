@@ -3,6 +3,8 @@
 
   <xs:element name="locationSet" type="abstractLocsetDeclaration"/>
 
+  <xs:element name="methodDeclaration" type="methodDeclaration"/>
+
   <xs:element name="predicateDeclaration" type="predicateDeclaration"/>
 
   <xs:element name="programVariable" type="programVariableDeclaration"/>
@@ -11,6 +13,20 @@
     <xs:sequence>
       <xs:element name="programOne" type="xs:string" minOccurs="0"/>
       <xs:element name="programTwo" type="xs:string" minOccurs="0"/>
+      <xs:element name="methodDeclsOne" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="methodDecl" type="methodDeclaration" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="methodDeclsTwo" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="methodDecl" type="methodDeclaration" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="locationSets" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
@@ -34,6 +50,13 @@
       </xs:element>
     </xs:sequence>
     <xs:attribute name="postCondition" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="methodDeclaration">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="body" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
   </xs:complexType>
 
   <xs:complexType name="abstractLocsetDeclaration">

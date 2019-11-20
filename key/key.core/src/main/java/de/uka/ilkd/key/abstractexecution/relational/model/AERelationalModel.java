@@ -43,8 +43,8 @@ import org.xml.sax.SAXException;
  * @author Dominic Steinhoefel
  */
 @XmlRootElement(namespace = "http://www.key-project.org/abstractexecution")
-@XmlType(propOrder = { "programOne", "programTwo", "abstractLocationSets", "predicateDeclarations",
-        "programVariableDeclarations" })
+@XmlType(propOrder = { "programOne", "programTwo", "methodDeclsOne", "methodDeclsTwo",
+        "abstractLocationSets", "predicateDeclarations", "programVariableDeclarations" })
 public class AERelationalModel {
     private static final String AE_MODEL_FILE_ENDING = ".aer";
     public static final AERelationalModel EMPTY_MODEL = new AERelationalModel();
@@ -57,6 +57,8 @@ public class AERelationalModel {
     private List<AbstractLocsetDeclaration> abstractLocationSets = new ArrayList<>();
     private List<ProgramVariableDeclaration> programVariableDeclarations = new ArrayList<>();
     private Optional<File> file = Optional.empty();
+    private List<MethodDeclaration> methodDeclarationsOne = new ArrayList<>();
+    private List<MethodDeclaration> methodDeclarationsTwo = new ArrayList<>();
 
     public AERelationalModel(final String programOne, final String programTwo,
             final String postCondition, final List<AbstractLocsetDeclaration> abstractLocationSets,
@@ -125,6 +127,18 @@ public class AERelationalModel {
         return getRelevantVars(NullarySymbolDeclaration::getRelevantTwo);
     }
 
+    @XmlElementWrapper(name = "methodDeclsOne")
+    @XmlElement(name = "methodDecl")
+    public List<MethodDeclaration> getMethodDeclsOne() {
+        return methodDeclarationsOne;
+    }
+
+    @XmlElementWrapper(name = "methodDeclsTwo")
+    @XmlElement(name = "methodDecl")
+    public List<MethodDeclaration> getMethodDeclsTwo() {
+        return methodDeclarationsTwo;
+    }
+
     public List<NullarySymbolDeclaration> getRelevantVars(
             java.util.function.Function<NullarySymbolDeclaration, Integer> relValGetter) {
         return Stream
@@ -171,6 +185,14 @@ public class AERelationalModel {
     public void setProgramVariableDeclarations(
             List<ProgramVariableDeclaration> programVariableDeclarations) {
         this.programVariableDeclarations = programVariableDeclarations;
+    }
+
+    public void setMethodDeclarationsOne(List<MethodDeclaration> methodDeclarationsOne) {
+        this.methodDeclarationsOne = methodDeclarationsOne;
+    }
+
+    public void setMethodDeclarationsTwo(List<MethodDeclaration> methodDeclarationsTwo) {
+        this.methodDeclarationsTwo = methodDeclarationsTwo;
     }
 
     public boolean isSaved() {
