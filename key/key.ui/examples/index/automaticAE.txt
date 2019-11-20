@@ -146,7 +146,6 @@ group abstract_updates {
 }
 
 group aepaper_provable {
-   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfix/consolidateDuplicateConditionalFragmentsPostfix.key
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchCorrect/consolidateDuplicateConditionalFragments.key
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchNoFinallyCorrect/consolidateDuplicateConditionalFragments.key
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrect/consolidateDuplicateConditionalFragments.key
@@ -155,6 +154,7 @@ group aepaper_provable {
 }
 
 group aepaper_models_provable {
+   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfix/consolidateDuplicateConditionalFragments.aer
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrectMoreGeneral/consolidateDuplicateConditionalFragments.aer
    provable ./abstract_execution/SlideStatements/Correct/slideStatements.aer
    provable ./abstract_execution/ReplaceExceptionWithTest/CorrectRollback/replaceExceptionWithTest.aer
@@ -172,15 +172,7 @@ group aepaper_provable {
    provable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.key
    provable ./abstract_execution/ExtractMethod/Heap/extractMethodRefactoring.key
    provable ./abstract_execution/DecomposeConditional/Correct/decomposeConditional.key
-   provable ./abstract_execution/SlideStatements/Correct/slideStatements.key
-   provable ./abstract_execution/ReplaceExceptionWithTest/CorrectRollbackForSinglePV/replaceExceptionWithTest.key
-   provable ./abstract_execution/ReplaceExceptionWithTest/CorrectRollbackForSkolemLocset/replaceExceptionWithTest.key
    provable ./abstract_execution/MoveStatementsToCallers/Correct/moveStatementsToCallers.key
-   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixAsSlideStatementsCorrect/consolidateDuplicateConditionalFragments.key
-   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchNoFinallyCorrect/consolidateDuplicateConditionalFragments.key
-   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchCorrect/consolidateDuplicateConditionalFragments.key
-   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrect/consolidateDuplicateConditionalFragments.key
-   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfix/consolidateDuplicateConditionalFragmentsPostfix.key
    loadable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.proof
 }
 
