@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Insets;
@@ -48,12 +51,14 @@ public abstract class SearchBar extends JPanel {
     private JButton prev;
     private JButton next;
     private JButton close;
-    private final Color ALLERT_COLOR = new Color(255, 178, 178);
+    private final ColorSettings.ColorProperty ALERT_COLOR =
+            ColorSettings.define("[searchBar]alert", "",
+                    new Color(255, 178, 178));
 
     public SearchBar() {
         prev = new JButton(IconFactory.previous(16));
         next = new JButton(IconFactory.next(16));
-        close = new JButton(IconFactory.stop(16));
+        close = new JButton(IconFactory.close(16));
 
         // Initialize the Actionlisteners here:
 
@@ -151,7 +156,7 @@ public abstract class SearchBar extends JPanel {
         if (b) {
             searchField.setBackground(Color.WHITE);
         } else {
-            searchField.setBackground(ALLERT_COLOR);
+            searchField.setBackground(ALERT_COLOR.get());
         }
     }
 

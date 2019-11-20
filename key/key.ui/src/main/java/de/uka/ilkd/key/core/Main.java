@@ -20,9 +20,11 @@ import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import de.uka.ilkd.key.logic.sort.GenericSort;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 import org.xml.sax.SAXException;
@@ -192,6 +194,8 @@ public final class Main {
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
 
     public static void main(final String[] args) {
+        Locale.setDefault(Locale.US);
+
         // this property overrides the default
         if (Boolean.getBoolean("key.verbose-ui")) {
             verbosity = Verbosity.DEBUG;
@@ -289,9 +293,9 @@ public final class Main {
     }
 
     /**
-     * Evaluate the parsed commandline options
+     * Evaluate the commandline options
      *
-     * @param commandline object cl
+     * @param cl parsed command lines, not null
      */
     public static void evaluateOptions(CommandLine cl) {
 
@@ -525,10 +529,6 @@ public final class Main {
             return new ConsoleUserInterfaceControl(verbosity, loadOnly);
         } else {
             updateSplashScreen();
-
-            /* explicitly enable pruning in closed branches for interactive mode
-             * (if not manually disabled) */
-            GeneralSettings.noPruningClosed = cl.isSet(NO_PRUNING_CLOSED) ? true : false;
 
             MainWindow mainWindow = MainWindow.getInstance();
 

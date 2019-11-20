@@ -18,11 +18,14 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -31,6 +34,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
@@ -81,6 +85,9 @@ public class NodeInfo {
     /** Information about changes respective to the parent of this node. */
     private SequentChangeInfo sequentChangeInfo;
 
+    /** @see #getRelevantFiles() */
+    private ImmutableSet<String> relevantFiles = DefaultImmutableSet.nil();
+
     public NodeInfo(Node node) {
         this.node = node;
     }
@@ -103,8 +110,9 @@ public class NodeInfo {
      * taclet worked on a modality
      */
     private void determineFirstAndActiveStatement() {
-        if (determinedFstAndActiveStatement)
+        if (determinedFstAndActiveStatement) {
             return;
+        }
         final RuleApp ruleApp = node.getAppliedRuleApp();
         if (ruleApp instanceof PosTacletApp) {
            firstStatement = computeFirstStatement(ruleApp);
@@ -142,18 +150,20 @@ public class NodeInfo {
      * @return The first statement or {@code null} if no one is provided.
      */
     public static SourceElement computeFirstStatement(RuleApp ruleApp) {
-       SourceElement firstStatement = null;
-       // TODO: unify with MiscTools getActiveStatement
-       if (ruleApp instanceof PosTacletApp) {
-           PosTacletApp pta = (PosTacletApp) ruleApp;
-           if (!isSymbolicExecution(pta.taclet())) return null;
-           Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
-           final ProgramElement pe = t.javaBlock().program();
-           if (pe != null) {
-               firstStatement = pe.getFirstElement();
-           }
-       }
-       return firstStatement;
+        SourceElement firstStatement = null;
+        // TODO: unify with MiscTools getActiveStatement
+        if (ruleApp instanceof PosTacletApp) {
+            PosTacletApp pta = (PosTacletApp) ruleApp;
+            if (!isSymbolicExecution(pta.taclet())) {
+                return null;
+            }
+            Term t = TermBuilder.goBelowUpdates(pta.posInOccurrence().subTerm());
+            final ProgramElement pe = t.javaBlock().program();
+            if (pe != null) {
+                firstStatement = pe.getFirstElement();
+            }
+        }
+        return firstStatement;
     }
 
     /**
@@ -208,22 +218,24 @@ public class NodeInfo {
      */
     public static boolean isSymbolicExecutionRuleApplied(RuleApp app) {
         return app instanceof AbstractAuxiliaryContractBuiltInRuleApp ||
-                app instanceof AbstractContractRuleApp ||
-                app instanceof LoopInvariantBuiltInRuleApp ||
-                app instanceof TacletApp
-                    && NodeInfo.isSymbolicExecution(((TacletApp) app).taclet());
+            app instanceof AbstractContractRuleApp ||
+            app instanceof LoopInvariantBuiltInRuleApp ||
+            app instanceof TacletApp
+            && NodeInfo.isSymbolicExecution(((TacletApp) app).taclet());
     }
 
     public static boolean isSymbolicExecution(Taclet t) {
         ImmutableList<RuleSet> list = t.getRuleSets();
-	RuleSet       rs;
-	while (!list.isEmpty()) {
-	    rs = list.head ();
+        RuleSet       rs;
+        while (!list.isEmpty()) {
+            rs = list.head ();
             Name name = rs.name();
-	    if (symbolicExecNames.contains(name)) return true;
-	    list = list.tail();
-	}
-	return false;
+            if (symbolicExecNames.contains(name)) {
+                return true;
+            }
+            list = list.tail();
+        }
+        return false;
     }
 
     /**
@@ -233,7 +245,7 @@ public class NodeInfo {
      * @return active statement as described above
      */
     public SourceElement getActiveStatement() {
-	determineFirstAndActiveStatement();
+        determineFirstAndActiveStatement();
         return activeStatement;
     }
 
@@ -254,9 +266,10 @@ public class NodeInfo {
      */
     public String getExecStatementParentClass() {
         determineFirstAndActiveStatement();
-        if (activeStatement instanceof JavaSourceElement)
+        if (activeStatement instanceof JavaSourceElement) {
             return activeStatement.getPositionInfo()
                     .getFileName();
+        }
         return "<NONE>";
     }
 
@@ -297,8 +310,9 @@ public class NodeInfo {
      */
     public void setBranchLabel(String s) {
         determineFirstAndActiveStatement();
-        if (s == null)
+        if (s == null) {
             return;
+        }
         if(node.parent() == null){ return;}
         RuleApp ruleApp = node.parent().getAppliedRuleApp();
         if (ruleApp instanceof TacletApp) {
@@ -378,6 +392,55 @@ public class NodeInfo {
      */
     public boolean getScriptRuleApplication() {
         return scriptingApplication;
+    }
+
+    /**
+     * <p> Returns a set containing all files relevant to this node. </p>
+     *
+     * <p> This includes the files contained in the {@link PositionInfo} of all modalities
+     *  as well as the files in the {@link OriginTermLabel}s of all terms in this node's sequent.
+     *  </p>
+     *
+     * @return the set of files relevant to this node.
+     */
+    public ImmutableSet<String> getRelevantFiles() {
+        return relevantFiles;
+    }
+
+    /**
+     * Add a file to the set returned by {@link #getRelevantFiles()}.
+     *
+     * @param relevantFile the file to add.
+     */
+    public void addRelevantFile(String relevantFile) {
+        ImmutableSet<String> oldRelevantFiles = this.relevantFiles;
+
+        this.relevantFiles = this.relevantFiles.add(relevantFile);
+
+        if (oldRelevantFiles != this.relevantFiles) {
+            node.childrenIterator().forEachRemaining(
+                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
+        }
+    }
+
+    /**
+     * Add some files to the set returned by {@link #getRelevantFiles()}.
+     *
+     * @param relevantFiles the files to add.
+     */
+    public void addRelevantFiles(ImmutableSet<String> relevantFiles) {
+        ImmutableSet<String> oldRelevantFiles = this.relevantFiles;
+
+        if (this.relevantFiles.isEmpty() || this.relevantFiles.subset(relevantFiles)) {
+            this.relevantFiles = relevantFiles;
+        } else {
+            this.relevantFiles = this.relevantFiles.union(relevantFiles);
+        }
+
+        if (oldRelevantFiles != this.relevantFiles) {
+            node.childrenIterator().forEachRemaining(
+                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
+        }
     }
 
     /** Add user-provided plain-text annotations.

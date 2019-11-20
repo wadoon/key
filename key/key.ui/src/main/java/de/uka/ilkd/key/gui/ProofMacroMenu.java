@@ -28,7 +28,7 @@ import org.key_project.util.reflection.ClassLoaderUtil;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.ProofScriptAction;
-import de.uka.ilkd.key.gui.utilities.KeyStrokeManager;
+import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Node;
@@ -87,7 +87,7 @@ public class ProofMacroMenu extends JMenu {
      * available.
      */
     public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
-        super("Strategy macros");
+        super("Strategy Macros");
 
         // Macros are group according to their category.
         // Store the submenus in this map.
