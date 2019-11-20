@@ -89,7 +89,10 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.impl.ProverTaskAdapter;
 
 /**
  * 
@@ -105,6 +108,8 @@ public class AERelationalDialog extends JFrame {
     private static final String STATUS_PANEL_STD_MSG_1 = "Try to use tooltips if feeling unsure about the functionality of an element.";
     private static final String STATUS_PANEL_STD_MSG_2 = //
             "Recommended Example: File > Load Example > Abstract Execution > Consolidate Duplicate... > Extract Prefix (Most General)";
+    private static final String STATUS_PANEL_STD_MSG_3 = //
+            "When declaring <tt>ae_constraint</tt>s, you have to put an empty block <tt>{ ; }</tt> after the JML comment.";
 
     private static final String STD_POSTCONDREL_TOOLTIP = "Relation between values of the relevant locations after execution.<br/>"
             + "You may use the keywords \"\\result_1\" and \"\\result_2\" to access<br/>"
@@ -125,10 +130,8 @@ public class AERelationalDialog extends JFrame {
             + "Syntax: E.g., 'throwsExcP(any)'.<br/>"
             + "Can be used, e.g., in 'assumes' clauses in the abstract<br/>"
             + " program models.</html>";
-    private static final String SAVE_BTN_TOOLTIP = "<html>Creates a standard KeY proof bundle to a temporary<br/>"
-            + "location and starts the proof.<br/>"
-            + "You still have to click the 'play' button in KeY to run<br/>"
-            + "the automatic proof search.</html>";
+    private static final String SAVE_BTN_TOOLTIP = "<html>Creates a KeY proof bundle at a temporary<br/>"
+            + "location and starts the proof.</html>";
     private static final String TOOLTIP_REL_LOCS_RIGHT = "<html>Locations that are part of the result relation (for the<br/>"
             + "right program).<br/>"
             + "The i-th location in this list (i >= 1) is available via<br/>"
@@ -197,7 +200,7 @@ public class AERelationalDialog extends JFrame {
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         statusPanel = new AutoResetStatusPanel( //
                 STATUS_PANEL_TIMEOUT, STATUS_PANEL_CHANGE_TIME, STATUS_PANEL_STD_MSG_1,
-                STATUS_PANEL_STD_MSG_2);
+                STATUS_PANEL_STD_MSG_2, STATUS_PANEL_STD_MSG_3);
         getContentPane().add(statusPanel, BorderLayout.SOUTH);
 
         final JPanel declarationsContainer = createDeclarationsContainer();
@@ -413,7 +416,7 @@ public class AERelationalDialog extends JFrame {
             SwingUtilities.invokeLater(() -> {
                 JOptionPane.showMessageDialog(AERelationalDialog.this,
                         "<html>Ooops... Could not initialize proof services!<br/><br/>Message:<br/>"
-                                + e.getMessage() + "</html>",
+                                + e.getMessage(),
                         "Problem During Initialization", JOptionPane.ERROR_MESSAGE);
             });
             return;
@@ -614,7 +617,23 @@ public class AERelationalDialog extends JFrame {
             final File proofBundleFile = Files.createTempFile( //
                     tmpFilePrefix, PROOF_BUNDLE_ENDING).toFile();
             final BundleSaveResult result = new ProofBundleConverter(model).save(proofBundleFile);
+
+            final ProverTaskAdapter ptl = new ProverTaskAdapter() {
+                @Override
+                public void taskFinished(TaskFinishedInfo info) {
+                    if (info != null && info.getSource() instanceof ProblemLoader) {
+                        if (info.getResult() == null
+                                && !mainWindow.getMediator().getUI().isSaveOnly() && info.getProof()
+                                        .getProofFile().getName().startsWith(tmpFilePrefix)) {
+                            mainWindow.getAutoModeAction().actionPerformed(null);
+                            mainWindow.getUserInterface().removeProverTaskListener(this);
+                        }
+                    }
+                }
+            };
+            mainWindow.getUserInterface().addProverTaskListener(ptl);
             mainWindow.loadProofFromBundle(result.getFile(), result.getProofPath().toFile());
+
         } catch (IOException | IllegalStateException e) {
             JOptionPane
                     .showMessageDialog(AERelationalDialog.this,
@@ -625,12 +644,17 @@ public class AERelationalDialog extends JFrame {
     }
 
     private JPanel createProgramViewContainer() {
-        final JPanel editorsContainer = new JPanel(new GridLayout(1, 2));
+
         final JComponent programOneView = createJavaEditorViewLeft();
         final JComponent programTwoView = createJavaEditorViewRight();
-        editorsContainer.add(programOneView);
-        editorsContainer.add(programTwoView);
+
+        final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true,
+                programOneView, programTwoView);
+        splitPane.setResizeWeight(.5);
+
+        final JPanel editorsContainer = new JPanel(new BorderLayout());
         editorsContainer.setMinimumSize(new Dimension(600, 100));
+        editorsContainer.add(splitPane, BorderLayout.CENTER);
         return editorsContainer;
     }
 

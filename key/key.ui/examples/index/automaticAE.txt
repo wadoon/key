@@ -156,6 +156,8 @@ group aepaper_provable {
 
 group aepaper_models_provable {
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrectMoreGeneral/consolidateDuplicateConditionalFragments.aer
+   provable ./abstract_execution/SlideStatements/Correct/slideStatements.aer
+   provable ./abstract_execution/ReplaceExceptionWithTest/CorrectRollback/replaceExceptionWithTest.aer
 }
 
 group aepaper_notprovable {

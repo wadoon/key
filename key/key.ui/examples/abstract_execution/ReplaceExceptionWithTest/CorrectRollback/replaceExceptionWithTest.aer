@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="\result_1=\result_2">
+    <programOne>/*@ ae_constraint
+  @   \disjoint(footprintRollback, frameTry);
+  @*/
+{ ; }
+
+try {
+	/*@ assignable frameTry;
+	  @ accessible footprintTry;
+	  @ exceptional_behavior requires
+	  @   throwsExcTryStmt(\value(footprintTry));
+	  @*/
+	\abstract_statement TryStmt;
+} catch (Throwable t) {
+	/*@ assignable \hasTo(frameTry);
+	  @ accessible footprintRollback;
+	  @*/
+	\abstract_statement Rollback;
+	
+	/*@ assignable frameCatch;
+	  @ accessible footprintCatch;
+	  @*/
+	\abstract_statement CatchProg;
+}</programOne>
+    <programTwo>/*@ ae_constraint
+  @   \disjoint(footprintRollback, frameTry);
+  @*/
+{ ; }
+
+if (
+	/*@ assignable \nothing;
+	  @ accessible footprintTry;
+	  @ normal_behavior
+	  @   ensures (boolean) \result &lt;==&gt; !throwsExcTryStmt(\value(footprintTry));
+	  @ exceptional_behavior requires false;
+	  @*/
+	\abstract_expression boolean e
+) {
+	/*@ assignable frameTry;
+	  @ accessible footprintTry;
+	  @ exceptional_behavior requires
+	  @   throwsExcTryStmt(\value(footprintTry));
+	  @*/
+	\abstract_statement TryStmt;
+} else {
+	/*@ assignable \hasTo(frameTry);
+	  @ accessible footprintRollback;
+	  @*/
+	\abstract_statement Rollback;
+	
+	/*@ assignable frameCatch;
+	  @ accessible footprintCatch;
+	  @*/
+	\abstract_statement CatchProg;
+}</programTwo>
+    <locationSets>
+        <locationSet locsetName="relevant">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameTry">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintTry">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameCatch">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintCatch">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintRollback">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <predicates>
+        <predicate predName="throwsExcTryStmt">
+            <argSort>any</argSort>
+        </predicate>
+    </predicates>
+    <programVariables/>
+</ns2:aeRelationalModel>

@@ -230,7 +230,6 @@ lexer grammar KeYLexer;
     HAS_AE_PREDICATE : '\\hasAEPredicate' ;
     IS_LOCSET_FORMULA : '\\isLocsetFormula' ;
     INITIALIZE_PARAMETRIC_SKOLEM_UPDATE : '\\initializeParametricSkolemUpdate' ;
-    INITIALIZE_PARAMETRIC_SKOLEM_UPDATE_FOR_AEXP : '\\initializeParametricSkolemUpdateForAExp' ;
     INITIALIZE_PARAMETRIC_SKOLEM_PATH_CONDITION : '\\initializeParametricSkolemPathCondition' ;
     PREFIX_CONTAINS_ELEMENT : '\\prefixContainsElement' ;
     INSTANTIATE_VARS_FRESH : '\\instantiateVarsFresh' ;

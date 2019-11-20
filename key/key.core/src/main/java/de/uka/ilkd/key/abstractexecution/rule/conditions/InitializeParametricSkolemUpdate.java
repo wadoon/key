@@ -21,14 +21,11 @@ import org.key_project.util.collection.UniqueArrayList;
 import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -48,20 +45,11 @@ import de.uka.ilkd.key.util.Pair;
  */
 public class InitializeParametricSkolemUpdate implements VariableCondition {
     private final SchemaVariable updateSV;
-    private final Optional<ProgramSV> maybeLhsSV; // for abstract expressions
     private final ProgramSV abstrProgSV;
 
     public InitializeParametricSkolemUpdate(SchemaVariable updateSV, ProgramSV abstrProgSV) {
         this.updateSV = updateSV;
         this.abstrProgSV = abstrProgSV;
-        this.maybeLhsSV = Optional.empty();
-    }
-
-    public InitializeParametricSkolemUpdate(SchemaVariable updateSV, ProgramSV lhsSV,
-            ProgramSV abstrProgSV) {
-        this.updateSV = updateSV;
-        this.abstrProgSV = abstrProgSV;
-        this.maybeLhsSV = Optional.of(lhsSV);
     }
 
     @Override
@@ -83,13 +71,10 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
 
         final Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> accessibleAndAssignableClause = //
                 AbstractExecutionContractUtils.getAccessibleAndAssignableTermsForNoBehaviorContract(
-                        ape, matchCond.getMaybeSeqFor(), goal.getLocalSpecificationRepository(), services,
-                        executionContext);
+                        ape, matchCond.getMaybeSeqFor(), goal.getLocalSpecificationRepository(),
+                        services, executionContext);
 
         final UniqueArrayList<AbstractUpdateLoc> assignables = accessibleAndAssignableClause.second;
-
-        maybeLhsSV.map(svInst::getInstantiation).map(LocationVariable.class::cast).map(PVLoc::new)
-                .map(HasToLoc::new).ifPresent(assignables::add);
 
         final Term update = tb.abstractUpdate(ape, assignables,
                 accessibleAndAssignableClause.first);
@@ -99,11 +84,7 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
 
     @Override
     public String toString() {
-        return maybeLhsSV
-                .map(lhsSv -> String.format(
-                        "\\varcond (\\initializeParametricSkolemUpdate(%s, %s, %s))", this.updateSV,
-                        lhsSv, this.abstrProgSV))
-                .orElse(String.format("\\varcond (\\initializeParametricSkolemUpdate(%s, %s))",
-                        this.updateSV, this.abstrProgSV));
+        return String.format("\\varcond (\\initializeParametricSkolemUpdate(%s, %s))",
+                this.updateSV, this.abstrProgSV);
     }
 }

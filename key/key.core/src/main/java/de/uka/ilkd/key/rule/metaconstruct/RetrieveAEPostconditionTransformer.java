@@ -56,6 +56,7 @@ public class RetrieveAEPostconditionTransformer extends AbstractTermTransformer 
     static {
         BEHAVIOR_TYPES_MAP.put(PreconditionType.RETURN, Behavior.RETURN_BEHAVIOR);
         BEHAVIOR_TYPES_MAP.put(PreconditionType.EXC, Behavior.EXCEPTIONAL_BEHAVIOR);
+        BEHAVIOR_TYPES_MAP.put(PreconditionType.NORMAL, Behavior.NORMAL_BEHAVIOR);
     }
 
     public RetrieveAEPostconditionTransformer() {

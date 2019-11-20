@@ -1348,6 +1348,7 @@ public class JMLSpecFactory {
                 = translateJMLClauses(method, specificationCase, programVariables, behavior);
         if (!block.getBody().isEmpty() && block.getBody()
                 .get(0) instanceof AbstractStatement) {
+            // TODO (DS, 2019-11-19): Update for abstract expressions.
             final AbstractPlaceholderSpecsTypeChecker checker = //
                     new AbstractPlaceholderSpecsTypeChecker(method, block,
                             clauses, services);
