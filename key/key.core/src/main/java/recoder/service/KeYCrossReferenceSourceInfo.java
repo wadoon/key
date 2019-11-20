@@ -66,17 +66,6 @@ import de.uka.ilkd.key.java.recoderext.adt.SeqLength;
 import de.uka.ilkd.key.java.recoderext.adt.SeqReverse;
 import de.uka.ilkd.key.java.recoderext.adt.SeqSingleton;
 import de.uka.ilkd.key.java.recoderext.adt.SeqSub;
-import de.uka.ilkd.key.java.recoderext.adt.OrdAdd;
-import de.uka.ilkd.key.java.recoderext.adt.OrdExp;
-import de.uka.ilkd.key.java.recoderext.adt.OrdLeq;
-import de.uka.ilkd.key.java.recoderext.adt.OrdLess;
-import de.uka.ilkd.key.java.recoderext.adt.OrdLim;
-import de.uka.ilkd.key.java.recoderext.adt.OrdMax;
-import de.uka.ilkd.key.java.recoderext.adt.OrdOmegaLiteral;
-import de.uka.ilkd.key.java.recoderext.adt.OrdOnat;
-import de.uka.ilkd.key.java.recoderext.adt.OrdOneLiteral;
-import de.uka.ilkd.key.java.recoderext.adt.OrdTimes;
-import de.uka.ilkd.key.java.recoderext.adt.OrdZeroLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.SetMinus;
 import de.uka.ilkd.key.java.recoderext.adt.SetUnion;
 import de.uka.ilkd.key.java.recoderext.adt.Singleton;
@@ -117,7 +106,6 @@ public class KeYCrossReferenceSourceInfo
 	
 	// ADTs
 	name2primitiveType.put("\\seq", new PrimitiveType("\\seq", this));
-	name2primitiveType.put("\\ord", new PrimitiveType("\\ord", this));
 	name2primitiveType.put("\\free", new PrimitiveType("\\free", this));
 	name2primitiveType.put("\\map", new PrimitiveType("\\map", this));
 	
@@ -650,15 +638,6 @@ public class KeYCrossReferenceSourceInfo
                   || expr instanceof SeqSub
                   || expr instanceof SeqReverse) {
         return name2primitiveType.get("\\seq");
-       } else if(expr instanceof OrdOneLiteral
-             || expr instanceof OrdZeroLiteral
-	     || expr instanceof OrdOmegaLiteral
-             || expr  instanceof OrdAdd 
-             || expr  instanceof OrdExp
-             || expr  instanceof OrdMax
-             || expr  instanceof OrdOnat
-             || expr  instanceof OrdTimes) {
-       return name2primitiveType.get("\\ord");
 	} else if(expr instanceof EscapeExpression) {
 	    // w/o further resolution, a type cannot be determined.
 	    // but this does not fail.
@@ -672,10 +651,3 @@ public class KeYCrossReferenceSourceInfo
 	}
     }
 }
-
-
-
-
-
-
-
