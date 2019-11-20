@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="\result_1=\result_2">
+    <programOne>// This refactoring is incorrect without the following
+// additional specifications, which have been commented
+// out for demonstration purposes.
+
+/* ae_constraint \disjoint(frameE, footprintP) &amp;&amp;
+  @               \disjoint(frameP, footprintE) &amp;&amp;
+  @               \disjoint(frameP, frameE) &amp;&amp;
+  @               \disjoint(frameE, relevant) &amp;&amp;
+  @               \disjoint(frameP, relevant) &amp;&amp;
+  @               \mutex(throwsExcE(\value(footprintE)),
+  @                      throwsExcP(\value(footprintP)),
+  @                      returnsP(\value(footprintP)));
+  @*/
+{ ; }
+
+if (
+    /*@ assignable frameE;
+      @ accessible footprintE;
+      @ exceptional_behavior requires throwsExcE(\value(footprintE));
+      @*/
+    \abstract_expression boolean e
+) {
+    /*@ assignable frameP;
+      @ accessible footprintP;
+      @ exceptional_behavior requires throwsExcP(\value(footprintP));
+      @ return_behavior requires returnsP(\value(footprintP));
+      @*/
+    \abstract_statement P;
+    
+    //@ assignable frameQ1;
+    //@ accessible footprintQ1;
+    \abstract_statement Q1;
+}
+else {
+    /*@ assignable frameP;
+      @ accessible footprintP;
+      @ exceptional_behavior requires throwsExcP(\value(footprintP));
+      @ return_behavior requires returnsP(\value(footprintP));
+      @*/
+    \abstract_statement P;
+    
+    //@ assignable frameQ2;
+    //@ accessible footprintQ2;
+    \abstract_statement Q2;
+}</programOne>
+    <programTwo>// This refactoring is incorrect without the following
+// additional specifications, which have been commented
+// out for demonstration purposes.
+
+/* ae_constraint \disjoint(frameE, footprintP) &amp;&amp;
+  @               \disjoint(frameP, footprintE) &amp;&amp;
+  @               \disjoint(frameP, frameE) &amp;&amp;
+  @               \disjoint(frameE, relevant) &amp;&amp;
+  @               \disjoint(frameP, relevant) &amp;&amp;
+  @               \mutex(throwsExcE(\value(footprintE)),
+  @                      throwsExcP(\value(footprintP)),
+  @                      returnsP(\value(footprintP)));
+  @*/
+{ ; }
+
+/*@ assignable frameP;
+  @ accessible footprintP;
+  @ exceptional_behavior requires throwsExcP(\value(footprintP));
+  @ return_behavior requires returnsP(\value(footprintP));
+  @*/
+\abstract_statement P;
+
+if (
+    /*@ assignable frameE;
+      @ accessible footprintE;
+      @ exceptional_behavior requires throwsExcE(\value(footprintE));
+      @*/
+    \abstract_expression boolean e
+) {
+    //@ assignable frameQ1;
+    //@ accessible footprintQ1;
+    \abstract_statement Q1;
+}
+else {
+    //@ assignable frameQ2;
+    //@ accessible footprintQ2;
+    \abstract_statement Q2;
+}</programTwo>
+    <locationSets>
+        <locationSet locsetName="relevant">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameE">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintE">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameQ1">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintQ1">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameQ2">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintQ2">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <predicates>
+        <predicate predName="throwsExcP">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="throwsExcE">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="returnsP">
+            <argSort>any</argSort>
+        </predicate>
+    </predicates>
+    <programVariables/>
+</ns2:aeRelationalModel>

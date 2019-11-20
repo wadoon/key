@@ -19,8 +19,6 @@ catch (Throwable t) {
 
     //@ assignable frameCatchProg;
     //@ accessible t, footprintCatchProg;
-    //@ exceptional_behavior requires false;
-    //@ return_behavior requires false;
     \abstract_statement CatchProg;
 
     //@ assignable framePostfixProg;
@@ -42,15 +40,13 @@ catch (Throwable t) {
 
     //@ assignable frameCatchProg;
     //@ accessible t, footprintCatchProg;
-    //@ exceptional_behavior requires false;
-    //@ return_behavior requires false;
     \abstract_statement CatchProg;
-} finally {
-    //@ assignable framePostfixProg;
-    //@ accessible footprintPostfixProg;
-    //@ exceptional_behavior requires false;
-    \abstract_statement Postfix;
 }
+
+//@ assignable framePostfixProg;
+//@ accessible footprintPostfixProg;
+//@ exceptional_behavior requires false;
+\abstract_statement Postfix;
 </programTwo>
     <locationSets>
         <locationSet locsetName="relevant">

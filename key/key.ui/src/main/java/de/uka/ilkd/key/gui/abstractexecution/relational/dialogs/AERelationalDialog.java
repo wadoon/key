@@ -109,7 +109,7 @@ public class AERelationalDialog extends JFrame {
     private static final int STATUS_PANEL_CHANGE_TIME = 30000;
     private static final String STATUS_PANEL_STD_MSG_1 = "Try to use tooltips if feeling unsure about the functionality of an element.";
     private static final String STATUS_PANEL_STD_MSG_2 = //
-            "Recommended Example: File > Load Example > Abstract Execution > Consolidate Duplicate... > Extract Prefix (Most General)";
+            "Recommended Example: File > Load Example > Abstract Execution > Consolidate Duplicate... > Extract Prefix";
     private static final String STATUS_PANEL_STD_MSG_3 = //
             "When declaring <tt>ae_constraint</tt>s, you have to put an empty block <tt>{ ; }</tt> after the JML comment.";
 
@@ -631,7 +631,7 @@ public class AERelationalDialog extends JFrame {
                         if (info.getResult() == null
                                 && !mainWindow.getMediator().getUI().isSaveOnly() && info.getProof()
                                         .getProofFile().getName().startsWith(tmpFilePrefix)) {
-                            mainWindow.getAutoModeAction().actionPerformed(null);
+                            SwingUtilities.invokeLater(() -> mainWindow.getAutoModeAction().actionPerformed(null));
                             mainWindow.getUserInterface().removeProverTaskListener(this);
                             statusPanel.setMessage("Proof started.");
                         }
@@ -641,7 +641,7 @@ public class AERelationalDialog extends JFrame {
                                 && proof.getProofFile().getName().startsWith(tmpFilePrefix)) {
                             if (proof.closed()) {
                                 statusPanel.setMessage("<b>Proof closed.</b>");
-                            } else if (proof.closed()) {
+                            } else {
                                 statusPanel.setMessage(
                                         String.format("Prover finished: <b>%d open goals</b>.",
                                                 proof.openGoals().size()));

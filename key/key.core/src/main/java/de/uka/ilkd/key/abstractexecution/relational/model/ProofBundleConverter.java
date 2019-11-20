@@ -57,7 +57,6 @@ public class ProofBundleConverter {
     public static final String RES2 = "_res2";
     public static final String RESULT = "_result";
     public static final String EXC = "_exc";
-    public static final String OUT = "_objUnderTest";
 
     private final AERelationalModel model;
     private final String javaScaffold;
@@ -226,12 +225,6 @@ public class ProofBundleConverter {
             sb.append("\n     & ") //
                     .append("disjoint(singletonPV(") //
                     .append(EXC) //
-                    .append("),") //
-                    .append(decl.getLocsetName()) //
-                    .append(")");
-            sb.append("\n     & ") //
-                    .append("disjoint(singletonPV(") //
-                    .append(OUT) //
                     .append("),") //
                     .append(decl.getLocsetName()) //
                     .append(")");

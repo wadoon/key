@@ -146,22 +146,16 @@ group abstract_updates {
 }
 
 group aepaper_provable {
-   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchCorrect/consolidateDuplicateConditionalFragments.key
-   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchNoFinallyCorrect/consolidateDuplicateConditionalFragments.key
-   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrect/consolidateDuplicateConditionalFragments.key
-   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrectLocalResultVar/consolidateDuplicateConditionalFragments.key
-   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrectMoreGeneral/consolidateDuplicateConditionalFragments.key
-}
-
-group aepaper_models_provable {
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfix/consolidateDuplicateConditionalFragments.aer
-   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrectMoreGeneral/consolidateDuplicateConditionalFragments.aer
+   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrect/consolidateDuplicateConditionalFragments.aer
+   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchCorrect/consolidateDuplicateConditionalFragments.aer
+   provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchNoFinallyCorrect/consolidateDuplicateConditionalFragments.aer
    provable ./abstract_execution/SlideStatements/Correct/slideStatements.aer
    provable ./abstract_execution/ReplaceExceptionWithTest/CorrectRollback/replaceExceptionWithTest.aer
 }
 
 group aepaper_notprovable {
-   notprovable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixIncorrect/consolidateDuplicateConditionalFragments.key
+   notprovable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixIncorrect/consolidateDuplicateConditionalFragments.aer
 }
 
 // TODO (DS, 2019-10-31): Update Refactoring Examples!
