@@ -157,6 +157,8 @@ group aepaper_provable {
    
    provable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.aer
    provable ./abstract_execution/ExtractMethod/CorrectExceptionAllowed/extractMethodRefactoring.aer
+   
+   provable ./abstract_execution/DecomposeConditional/Correct/decomposeConditional.aer
 }
 
 group aepaper_notprovable {
@@ -172,7 +174,6 @@ group aepaper_notprovable {
 /*
 # Examples used in the Abstract Execution paper submitted to FM 2019
 group aepaper_provable {
-   provable ./abstract_execution/DecomposeConditional/Correct/decomposeConditional.key
    provable ./abstract_execution/MoveStatementsToCallers/Correct/moveStatementsToCallers.key
 }
 
