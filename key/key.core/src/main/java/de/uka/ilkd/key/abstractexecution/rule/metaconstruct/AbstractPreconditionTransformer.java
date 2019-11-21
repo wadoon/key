@@ -13,14 +13,12 @@
 package de.uka.ilkd.key.abstractexecution.rule.metaconstruct;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory.PreconditionType;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -61,13 +59,10 @@ public class AbstractPreconditionTransformer extends AbstractTermTransformer {
 
         final PreconditionType preconditionType = getPreconditionType(term.sub(1), services);
 
-        final List<AbstractUpdateLoc> accessibles = //
-                AbstractExecutionContractUtils.getAccessibleAndAssignableTermsForNoBehaviorContract(
-                        ape, Optional.empty(), localSpecRepo, services, executionContext).first;
-
-        final ImmutableArray<Term> accessiblesTerms = accessibles.stream()
-                .map(loc -> loc.toTerm(services)).map(tb::wrapInValue)
-                .collect(ImmutableArray.toImmutableArray());
+        final ImmutableArray<Term> accessiblesTerms = AbstractExecutionContractUtils
+                .getAccessibleAndAssignableTermsForNoBehaviorContract(ape, Optional.empty(),
+                        localSpecRepo, services, executionContext).first.stream()
+                                .map(tb::wrapInValue).collect(ImmutableArray.toImmutableArray());
 
         final Function precondFun = services.abstractUpdateFactory()
                 .getAbstractPreconditionInstance(ape, preconditionType, accessiblesTerms.size());

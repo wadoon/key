@@ -35,6 +35,7 @@ import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
@@ -63,9 +64,9 @@ public class AbstractExecutionContractUtils {
      * @return The accessible locations for the given
      *         {@link AbstractProgramElement}.
      */
-    public static List<AbstractUpdateLoc> getAccessibleTermsForNoBehaviorContract(
-            AbstractProgramElement aps, ProgramElement context,
-            GoalLocalSpecificationRepository localSpecRepo, Services services) {
+    public static List<Term> getAccessibleTermsForNoBehaviorContract(AbstractProgramElement aps,
+            ProgramElement context, GoalLocalSpecificationRepository localSpecRepo,
+            Services services) {
         return getAccessibleAndAssignableTermsForNoBehaviorContract(aps, context, localSpecRepo,
                 services).first;
     }
@@ -305,7 +306,7 @@ public class AbstractExecutionContractUtils {
      * @return A pair of (1) the accessible and (2) the assignable locations for the
      *         {@link AbstractProgramElement}.
      */
-    public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
+    public static Pair<List<Term>, UniqueArrayList<AbstractUpdateLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractProgramElement abstrStmt, final ProgramElement contextProgram,
             GoalLocalSpecificationRepository localSpecRepo, final Services services) {
         final ProgramVariableCollector pvColl = //
@@ -330,14 +331,14 @@ public class AbstractExecutionContractUtils {
      *                         might be different such terms around).
      * @param localSpecRepo    TODO
      * @param services         The {@link Services} object.
-     * @return A pair of (1) the accessible and (2) the assignable locations for the
-     *         {@link AbstractProgramElement}.
+     * @return A pair of (1) the accessible terms and (2) the assignable locations
+     *         for the {@link AbstractProgramElement}.
      */
-    public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
+    public static Pair<List<Term>, UniqueArrayList<AbstractUpdateLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractProgramElement abstrStmt, final Set<LocationVariable> surroundingVars,
             Optional<ExecutionContext> executionContext,
             GoalLocalSpecificationRepository localSpecRepo, final Services services) {
-        List<AbstractUpdateLoc> accessibleClause;
+        List<Term> accessibleClause;
         UniqueArrayList<AbstractUpdateLoc> assignableClause = null;
 
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
@@ -346,7 +347,7 @@ public class AbstractExecutionContractUtils {
                 getNoBehaviorContracts(abstrStmt, localSpecRepo, services);
 
         if (contracts.isEmpty()) {
-            accessibleClause = Collections.singletonList(new AllLocsLoc(locSetLDT.getAllLocs()));
+            accessibleClause = Collections.singletonList(services.getTermBuilder().allLocs());
             assignableClause = new UniqueArrayList<AbstractUpdateLoc>();
             assignableClause.add(new AllLocsLoc(locSetLDT.getAllLocs()));
         } else {
@@ -355,19 +356,17 @@ public class AbstractExecutionContractUtils {
             final BlockContract contract = findRightContract(contracts, surroundingVars, heap,
                     localSpecRepo, services);
 
-            accessibleClause = AbstractUpdateFactory
-                    .abstrUpdateLocsFromTerm(contract.getAccessibleClause(heap), executionContext,
-                            services)
-                    .stream().map(AbstractUpdateLoc.class::cast).collect(Collectors.toList());
+            accessibleClause = services.getTermBuilder()
+                    .locsetUnionToSet(contract.getAccessibleClause(heap)).stream()
+                    .collect(Collectors.toList());
             assignableClause = AbstractUpdateFactory
-                    .abstrUpdateLocsFromTerm(contract.getAssignable(heap), executionContext,
+                    .abstrUpdateLocsFromUnionTerm(contract.getAssignable(heap), executionContext,
                             services)
                     .stream().map(AbstractUpdateLoc.class::cast)
                     .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
         }
 
-        return new Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>>(
-                accessibleClause, assignableClause);
+        return new Pair<>(accessibleClause, assignableClause);
     }
 
     /**
@@ -388,11 +387,27 @@ public class AbstractExecutionContractUtils {
      * @return A pair of (1) the accessible and (2) the assignable locations for the
      *         {@link AbstractProgramElement}.
      */
-    public static Pair<List<AbstractUpdateLoc>, UniqueArrayList<AbstractUpdateLoc>> //
+    public static Pair<List<Term>, UniqueArrayList<AbstractUpdateLoc>> //
             getAccessibleAndAssignableTermsForNoBehaviorContract(
-                    final AbstractProgramElement abstrStmt, final Optional<SequentFormula> maybeSeqFor,
+                    final AbstractProgramElement abstrStmt,
+                    final Optional<SequentFormula> maybeSeqFor,
                     GoalLocalSpecificationRepository localSpecRepo, final Services services,
                     Optional<ExecutionContext> executionContext) {
+        final Set<LocationVariable> surroundingVars = collectSurroundingVars(maybeSeqFor);
+
+        return getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, surroundingVars,
+                executionContext, localSpecRepo, services);
+    }
+
+    /**
+     * If maybeSeqFor is present, returns the surrounding variables found in the
+     * formula. Otherwise, the empty set.
+     * 
+     * @param maybeSeqFor The formula from which to obtain the variables.
+     * @return The set of variables.
+     */
+    public static Set<LocationVariable> collectSurroundingVars(
+            final Optional<SequentFormula> maybeSeqFor) {
         final Set<LocationVariable> surroundingVars = new LinkedHashSet<>();
         /*
          * NOTE (DS, 2019-11-04): Considering the program proved to be a bad idea, since
@@ -427,9 +442,7 @@ public class AbstractExecutionContractUtils {
 //                    lv1 -> result.stream().anyMatch(lv2 -> lv1.toString().equals(lv2.toString())));
             surroundingVars.addAll(result);
         });
-
-        return getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, surroundingVars,
-                executionContext, localSpecRepo, services);
+        return surroundingVars;
     }
 
     /**
@@ -445,8 +458,8 @@ public class AbstractExecutionContractUtils {
      */
     public static List<BlockContract> getNoBehaviorContracts(final AbstractProgramElement abstrStmt,
             GoalLocalSpecificationRepository localSpecRepo, final Services services) {
-        return localSpecRepo.getAbstractProgramElementContracts(abstrStmt)
-                .stream().filter(contract -> contract.getBaseName().equals("JML block contract"))
+        return localSpecRepo.getAbstractProgramElementContracts(abstrStmt).stream()
+                .filter(contract -> contract.getBaseName().equals("JML block contract"))
                 /*
                  * We exclude return_behavior etc. here, because from those contracts we only
                  * consider the precondition.

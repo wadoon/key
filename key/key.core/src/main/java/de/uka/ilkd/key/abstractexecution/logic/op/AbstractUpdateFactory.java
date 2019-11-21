@@ -27,6 +27,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.IrrelevantAssignable;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.AllFieldsLocLHS;
@@ -93,6 +94,15 @@ public class AbstractUpdateFactory {
      */
     private final Map<PreconditionType, Sort> targetSortForPreconditionType = new LinkedHashMap<>();
 
+    /**
+     * Map from abstract update names to maps from place numbers in abstract updates
+     * to functions an irrelevant assignable. Those are used to unify expressions
+     * like <code>U_P(irrLoc1,var:=...)var</code> with
+     * <code>U_P(irrLoc2,var:=...)var</code> that otherwise would not equal,
+     * although they have the same value.
+     */
+    private final Map<String, Map<Integer, IrrelevantAssignable>> abstrUpdIrrelevantAssignableInsts = new LinkedHashMap<>();
+
     private final Services services;
 
     /**
@@ -122,7 +132,7 @@ public class AbstractUpdateFactory {
         public String getName() {
             return name;
         }
-        
+
         @Override
         public String toString() {
             return getName();
@@ -158,12 +168,13 @@ public class AbstractUpdateFactory {
     public AbstractUpdate getInstance(AbstractProgramElement phs, Term lhs, Term rhs,
             Optional<ExecutionContext> executionContext) {
         final UniqueArrayList<AbstractUpdateLoc> assignables = //
-                abstrUpdateLocsFromTerm(lhs, executionContext, services).stream()
+                abstrUpdateLocsFromUnionTerm(lhs, executionContext, services).stream()
                         .map(AbstractUpdateLoc.class::cast)
                         .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
 
         final int numArgs = //
-                (int) abstrUpdateLocsFromTerm(rhs, executionContext, services).stream().count();
+                (int) abstrUpdateLocsFromUnionTerm(rhs, executionContext, services).stream()
+                        .count();
 
         return getInstance(phs, assignables, numArgs);
     }
@@ -194,6 +205,38 @@ public class AbstractUpdateFactory {
             Arrays.fill(sorts, Sort.ANY);
             result = new AbstractUpdate(phs, assignables, sorts, services);
             abstractUpdateInstances.get(phsID).put(assgnHashCode, result);
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns the irrelevant assignable for the position-th position in abstrUpd.
+     *
+     * @param abstrUpd The {@link AbstractUpdate} for which to create the irrelevant
+     *                 assignable function.
+     * @param position The position for which to create the irrelevant assignable.
+     * @return The created (or cached) assignable.
+     */
+    public IrrelevantAssignable getIrrelevantAssignableForPosition(AbstractUpdate abstrUpd,
+            int position) {
+        final String abstractPHSName = abstrUpd.getAbstractPlaceholderStatement().getId();
+        if (abstrUpdIrrelevantAssignableInsts.get(abstractPHSName) == null) {
+            abstrUpdIrrelevantAssignableInsts.put(abstractPHSName, new LinkedHashMap<>());
+        }
+        IrrelevantAssignable result = //
+                abstrUpdIrrelevantAssignableInsts.get(abstractPHSName).get(position);
+        if (result == null) {
+            final TermBuilder tb = services.getTermBuilder();
+            final String funName = tb.newName("_" + abstractPHSName + position);
+
+            final Function irrAssgnFun = new Function(new Name(funName),
+                    abstrUpd.getAllAssignables().get(position).sort(), true, true, new Sort[0]);
+
+            services.getNamespaces().functions().add(irrAssgnFun);
+            result = new IrrelevantAssignable(tb.irr(tb.func(irrAssgnFun)));
+
+            abstrUpdIrrelevantAssignableInsts.get(abstractPHSName).put(position, result);
         }
 
         return result;
@@ -303,10 +346,10 @@ public class AbstractUpdateFactory {
         if (result == null) {
             final String funName = services.getTermBuilder()
                     .newName(String.format("%s_%s", preconditionType.getName(), phsID));
-            
+
             final Sort[] sorts = new Sort[numArgs];
             Arrays.fill(sorts, Sort.ANY);
-            
+
             result = new Function(new Name(funName),
                     getTargetSortForPrecondtionType(preconditionType), sorts);
             services.getNamespaces().functions().add(result);
@@ -395,9 +438,29 @@ public class AbstractUpdateFactory {
      * @return All {@link AbstractUpdateLoc}s from the given {@link Term} or null if
      *         the {@link Term} does not represent {@link AbstractUpdateLoc}s.
      */
-    public static Set<AbstractUpdateLoc> abstrUpdateLocsFromTerm(Term t,
+    public static Set<AbstractUpdateLoc> abstrUpdateLocsFromUnionTerm(Term t,
             Optional<ExecutionContext> executionContext, Services services) {
-        final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
+        return services.getTermBuilder().locsetUnionToSet(t).stream()
+                .map(sub -> abstrUpdateLocsFromTermHelper(sub, executionContext, services))
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+    }
+
+    /**
+     * Converts the given {@link Term} to the {@link AbstractUpdateLoc}s it is
+     * representing. Throws a {@link RuntimeException} if the given {@link Term} is
+     * not directly representing any locations (i.e., is not a LocSet term).
+     *
+     * @param t                The {@link Term} to extract all
+     *                         {@link AbstractUpdateLoc}s from.
+     * @param executionContext An optional runtime instance {@link LocationVariable}
+     *                         to normalize self terms (because otherwise, there
+     *                         might be different such terms around).
+     * @param services         The {@link Services} object.
+     * @return All {@link AbstractUpdateLoc}s from the given {@link Term} or null if
+     *         the {@link Term} does not represent {@link AbstractUpdateLoc}s.
+     */
+    private static AbstractUpdateLoc abstrUpdateLocsFromTermHelper(Term t,
+            Optional<ExecutionContext> executionContext, Services services) {
         t = MiscTools.simplifyUpdatesInTerm(t, services);
 
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
@@ -405,43 +468,28 @@ public class AbstractUpdateFactory {
 
         final Operator op = t.op();
 
-        if (op instanceof LocationVariable) {
-            result.add(new PVLoc((LocationVariable) op));
+        if (op == locSetLDT.getIrr()) {
+            return new IrrelevantAssignable(t);
+        } else if (op instanceof LocationVariable) {
+            return new PVLoc((LocationVariable) op);
         } else if (t.op() == locSetLDT.getAllLocs()) {
-            result.add(new AllLocsLoc(locSetLDT.getAllLocs()));
+            return new AllLocsLoc(locSetLDT.getAllLocs());
         } else if (t.op() == locSetLDT.getEmpty()) {
-            result.add(new EmptyLoc(locSetLDT.getEmpty()));
+            return new EmptyLoc(locSetLDT.getEmpty());
         } else if (AbstractExecutionUtils.isAbstractSkolemLocationSet(op, services)) {
-            result.add(new SkolemLoc((Function) op));
+            return new SkolemLoc((Function) op);
         } else if (op == locSetLDT.getSingletonPV()) {
-            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTerm(t.sub(0),
-                    executionContext, services);
-
-            result.addAll(subResult);
+            return abstrUpdateLocsFromTermHelper(t.sub(0), executionContext, services);
         } else if (op == locSetLDT.getHasTo()) {
             // There is exactly one location inside a hasTo
-            final AbstractUpdateLoc subResult = //
-                    abstrUpdateLocsFromTerm(t.sub(0), executionContext, services).iterator().next();
-            result.add(new HasToLoc<AbstractUpdateLoc>(subResult));
-        } else if (op == locSetLDT.getUnion()) {
-            final Set<AbstractUpdateLoc> subResult1 = //
-                    abstrUpdateLocsFromTerm(t.sub(0), executionContext, services);
-            final Set<AbstractUpdateLoc> subResult2 = //
-                    abstrUpdateLocsFromTerm(t.sub(1), executionContext, services);
-
-            result.addAll(subResult1);
-            result.addAll(subResult2);
+            return new HasToLoc<AbstractUpdateLoc>(
+                    abstrUpdateLocsFromTermHelper(t.sub(0), executionContext, services));
         } else if (isHeapOp(op, locSetLDT, heapLDT)) {
-            final Set<AbstractUpdateLoc> subResult = //
-                    abstrUpdateAssgnLocsFromHeapTerm(t, executionContext, services);
-
-            result.addAll(subResult);
+            return abstrUpdateAssgnLocsFromHeapTerm(t, executionContext, services);
         } else {
             throw new RuntimeException(
                     String.format("Unsupported term %s, cannot extract locs", t));
         }
-
-        return result;
     }
 
     /**
@@ -461,30 +509,26 @@ public class AbstractUpdateFactory {
      * @param services         The {@link Services} object.
      * @return The contained {@link AbstractUpdateLoc}s.
      */
-    private static Set<AbstractUpdateLoc> abstrUpdateAssgnLocsFromHeapTerm(Term t,
+    private static AbstractUpdateLoc abstrUpdateAssgnLocsFromHeapTerm(Term t,
             Optional<ExecutionContext> executionContext, Services services) {
-        final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
-
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
         final Operator op = t.op();
 
         if (op == locSetLDT.getSingleton() && t.sub(1).op() == heapLDT.getArr()) {
-            result.add(new ArrayLoc(t.sub(0), t.sub(1).sub(0)));
+            return new ArrayLoc(t.sub(0), t.sub(1).sub(0));
         } else if (op == locSetLDT.getSingleton()) {
             final Term obj = normalizeSelfVar(t.sub(0), executionContext, services);
             final Term field = t.sub(1);
-            result.add(new FieldLoc(obj, field, services));
+            return new FieldLoc(obj, field, services);
         } else if (t.op() == locSetLDT.getAllFields() && t.subs().size() == 1) {
-            result.add(new AllFieldsLocLHS(t.sub(0)));
+            return new AllFieldsLocLHS(t.sub(0));
         } else if (t.op() == locSetLDT.getArrayRange()) {
-            result.add(new ArrayRange(t.sub(0), t.sub(1), t.sub(2)));
+            return new ArrayRange(t.sub(0), t.sub(1), t.sub(2));
         } else {
             return null;
         }
-
-        return result;
     }
 
     private static boolean isHeapOp(final Operator op, final LocSetLDT locSetLDT,

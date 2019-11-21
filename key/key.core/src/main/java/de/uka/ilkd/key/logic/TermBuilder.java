@@ -965,11 +965,11 @@ public class TermBuilder {
      * @return The {@link AbstractUpdate} created <em>fresh for</em> phs.
      */
     public Term abstractUpdate(AbstractProgramElement phs,
-            UniqueArrayList<AbstractUpdateLoc> assignables, List<AbstractUpdateLoc> accessibles) {
+            UniqueArrayList<AbstractUpdateLoc> assignables, List<Term> accessibles) {
         final AbstractUpdate au = services.abstractUpdateFactory()
                 .getInstance(phs, assignables, accessibles.size());
-        return tf.createTerm(au, accessibles.stream().map(loc -> loc.toTerm(services))
-                .map(this::wrapInValue).collect(Collectors.toList()).toArray(new Term[0]));
+        return tf.createTerm(au, accessibles.stream().map(this::wrapInValue)
+                .collect(Collectors.toList()).toArray(new Term[0]));
     }
     
     /**
@@ -988,26 +988,6 @@ public class TermBuilder {
         } else {
             return t;
         }
-    }
-
-    /**
-     * Creates an abstract update. <strong>NOTE:</strong> The Term rhs is expected
-     * to be a LocSet union term! This term will be disassembled before it's used as
-     * an argument, and this will fail if it's not a LocSet term. Use
-     * {@link #abstractUpdate(AbstractUpdate, Term[])} if you want to use terms as
-     * they are as arguments for an abstract update.
-     * 
-     * @param abstrUpd The {@link AbstractUpdate} operator.
-     * @param rhs The right-hand side (LocSet union term).
-     * @return The {@link AbstractUpdate} term for the given right-hand side.
-     */
-    public Term abstractUpdate(AbstractUpdate abstrUpd, Term rhs) {
-        final AbstractUpdateLoc[] accessibles = //
-                AbstractUpdateFactory.abstrUpdateLocsFromTerm(rhs, Optional.empty(), services)
-                        .stream().map(AbstractUpdateLoc.class::cast).collect(Collectors.toList())
-                        .toArray(new AbstractUpdateLoc[0]);
-
-        return abstractUpdate(abstrUpd, accessibles);
     }
     
     
@@ -1094,7 +1074,7 @@ public class TermBuilder {
     public Term abstractUpdate(String apsId, List<Term> lhs, List<Term> rhs) {
         final AbstractProgramElement aps = new AbstractStatement(apsId);
         final UniqueArrayList<AbstractUpdateLoc> assignables = lhs.stream()
-                .map(term -> AbstractUpdateFactory.abstrUpdateLocsFromTerm( //
+                .map(term -> AbstractUpdateFactory.abstrUpdateLocsFromUnionTerm( //
                         term, Optional.empty(), services))
                 .map(set -> set.iterator().next())
                 .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
@@ -1604,6 +1584,11 @@ public class TermBuilder {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         assert locSetTerm.sort() == locSetLDT.targetSort();
         return func(locSetLDT.getHasTo(), locSetTerm);
+    }
+
+    public Term irr(Term anyTerm) {
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        return func(locSetLDT.getIrr(), anyTerm);
     }
 
     public Term value(Term locSetTerm) {

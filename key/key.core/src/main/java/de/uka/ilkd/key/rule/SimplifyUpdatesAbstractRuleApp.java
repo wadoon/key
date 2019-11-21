@@ -308,7 +308,9 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
                     overwrittenLocations.add(unwrappedLoc);
                 }
             } else {
-                assgnReplMap.put(assgn, new IrrelevantAssignable(i, assgn.sort()));
+                final IrrelevantAssignable irrAssng = services.abstractUpdateFactory()
+                        .getIrrelevantAssignableForPosition(abstrUpd, i);
+                assgnReplMap.put(assgn, irrAssng);
             }
         }
 

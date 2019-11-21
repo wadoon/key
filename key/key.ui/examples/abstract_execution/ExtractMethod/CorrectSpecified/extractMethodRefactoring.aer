@@ -53,9 +53,9 @@ var = extracted(var);
 	
 	/*@ assignable \hasTo(res), frameQ;
   	  @ accessible footprintQ;
-       @ return_behavior requires false;
-       @ exceptional_behavior requires false;
-       @*/
+      @ return_behavior requires false;
+      @ exceptional_behavior requires false;
+      @*/
      \abstract_statement Q;
      
      return res;

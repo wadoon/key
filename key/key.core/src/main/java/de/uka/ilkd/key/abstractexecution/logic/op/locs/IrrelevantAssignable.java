@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -29,20 +30,23 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * This is to enable unification of two different {@link AbstractUpdate}s of the
  * same type.
  * 
+ * <p>
+ * Only use via
+ * {@link AbstractUpdateFactory#getIrrelevantAssignableForPosition(AbstractUpdate, int)},
+ * do not instantiate directly.
+ * 
  * @author Dominic Steinhoefel
  */
 public class IrrelevantAssignable implements AbstractUpdateLoc {
-    private final int position;
-    private final Sort sort;
+    private final Term t;
 
-    public IrrelevantAssignable(int position, Sort sort) {
-        this.position = position;
-        this.sort = sort;
+    public IrrelevantAssignable(final Term t) {
+        this.t = t;
     }
 
     @Override
     public Sort sort() {
-        return sort;
+        return t.sort();
     }
 
     @Override
@@ -58,23 +62,22 @@ public class IrrelevantAssignable implements AbstractUpdateLoc {
     @Override
     public boolean equals(Object obj) {
         return obj != null && obj instanceof IrrelevantAssignable
-                && position == ((IrrelevantAssignable) obj).position;
+                && t.equals(((IrrelevantAssignable) obj).t);
     }
-    
+
     @Override
     public int hashCode() {
-        return 17 + 3 * Integer.hashCode(position);
+        return 17 + 3 * t.hashCode();
     }
 
     @Override
     public Term toTerm(Services services) {
-        // Just return empty, this always succeeds in disjointness checks.
-        return services.getTermBuilder().empty();
+        return t;
     }
-    
+
     @Override
     public String toString() {
-        return "_";
+        return t.toString();
     }
 
     @Override

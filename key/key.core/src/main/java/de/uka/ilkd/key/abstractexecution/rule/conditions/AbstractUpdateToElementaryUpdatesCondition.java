@@ -96,12 +96,13 @@ public final class AbstractUpdateToElementaryUpdatesCondition implements Variabl
                 final AbstractUpdateLoc unwrappedLoc = //
                         AbstractExecutionUtils.unwrapHasTo(assignable);
 
+                final IrrelevantAssignable irrAssng = abstractUpdateFactory
+                        .getIrrelevantAssignableForPosition(abstrUpd, i);
                 if (unwrappedLoc instanceof PVLoc) {
                     @SuppressWarnings("unchecked")
                     final HasToLoc<PVLoc> castAssignable = (HasToLoc<PVLoc>) assignable;
                     final PVLoc pvLoc = castAssignable.child();
-                    extractedHasTosMap.put(castAssignable,
-                            new IrrelevantAssignable(i, pvLoc.sort()));
+                    extractedHasTosMap.put(castAssignable, irrAssng);
 
                     final Term updateLHS = tb.var(pvLoc.getVar());
                     final Term updateRHS = tb.func(
@@ -113,8 +114,7 @@ public final class AbstractUpdateToElementaryUpdatesCondition implements Variabl
                     @SuppressWarnings("unchecked")
                     final HasToLoc<FieldLoc> castAssignable = (HasToLoc<FieldLoc>) assignable;
                     final FieldLoc fieldLoc = castAssignable.child();
-                    extractedHasTosMap.put(castAssignable,
-                            new IrrelevantAssignable(i, fieldLoc.sort()));
+                    extractedHasTosMap.put(castAssignable, irrAssng);
 
                     final Term updateLHS = tb.getBaseHeap();
                     final Term characteristicFunctionTerm = tb.func(

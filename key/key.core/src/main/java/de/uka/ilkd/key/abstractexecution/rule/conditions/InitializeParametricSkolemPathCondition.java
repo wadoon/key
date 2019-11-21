@@ -69,10 +69,9 @@ public class InitializeParametricSkolemPathCondition implements VariableConditio
                 (AbstractStatement) svInst.getInstantiation(abstrProgSV);
 
         final List<Term> accessibles = AbstractExecutionContractUtils
-                .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, matchCond.getMaybeSeqFor(),
-                        goal.getLocalSpecificationRepository(), services, executionContext).first
-                                .stream().map(loc -> loc.toTerm(services)).map(tb::value)
-                                .collect(Collectors.toList());
+                .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
+                        matchCond.getMaybeSeqFor(), goal.getLocalSpecificationRepository(),
+                        services, executionContext).first;
         final Sort[] accessiblesSorts = accessibles.stream().map(Term::sort)
                 .collect(Collectors.toList()).toArray(new Sort[0]);
 
