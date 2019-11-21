@@ -96,7 +96,7 @@ abstract_execution/ReplaceExceptionWithTest/CorrectRollback/README.txt
 abstract_execution/ReplaceExceptionWithTest/IncorrectMissingRollback/README.txt
 
 abstract_execution/ExtractMethod/CorrectSpecified/README.txt
-abstract_execution/ExtractMethod/Heap/README.txt
+abstract_execution/ExtractMethod/CorrectExceptionAllowed/README.txt
 
 abstract_execution/SlideStatements/Correct/README.txt
 

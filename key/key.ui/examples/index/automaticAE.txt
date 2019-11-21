@@ -150,31 +150,30 @@ group aepaper_provable {
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrect/consolidateDuplicateConditionalFragments.aer
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchCorrect/consolidateDuplicateConditionalFragments.aer
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchNoFinallyCorrect/consolidateDuplicateConditionalFragments.aer
+   
    provable ./abstract_execution/SlideStatements/Correct/slideStatements.aer
+   
    provable ./abstract_execution/ReplaceExceptionWithTest/CorrectRollback/replaceExceptionWithTest.aer
+   
+   provable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.aer
+   provable ./abstract_execution/ExtractMethod/CorrectExceptionAllowed/extractMethodRefactoring.aer
 }
 
 group aepaper_notprovable {
    notprovable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixIncorrect/consolidateDuplicateConditionalFragments.aer
+   
+   notprovable ./abstract_execution/ReplaceExceptionWithTest/IncorrectMissingRollback/replaceExceptionWithTest.key
+   
+   notprovable ./abstract_execution/ExtractMethod/InCorrectQThrowsException/extractMethodRefactoring.aer
 }
 
-// TODO (DS, 2019-10-31): Update Refactoring Examples!
+// TODO (DS, 2019-11-21): Update Remaining Refactoring Examples!
 
 /*
 # Examples used in the Abstract Execution paper submitted to FM 2019
 group aepaper_provable {
-   provable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.key
-   provable ./abstract_execution/ExtractMethod/Heap/extractMethodRefactoring.key
    provable ./abstract_execution/DecomposeConditional/Correct/decomposeConditional.key
    provable ./abstract_execution/MoveStatementsToCallers/Correct/moveStatementsToCallers.key
-   loadable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.proof
-}
-
-group aepaper_notprovable {
-   notprovable ./abstract_execution/ExtractMethod/WithoutReturnSpec/extractMethodRefactoring.key
-   notprovable ./abstract_execution/ExtractMethod/WrongAssignable/extractMethodRefactoring.key
-   notprovable ./abstract_execution/ReplaceExceptionWithTest/IncorrectMissingRollback/replaceExceptionWithTest.key
-   notprovable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixIncorrect/consolidateDuplicateConditionalFragmentsPrefixIncorrect.key
 }
 
 group aepaper_loops {
