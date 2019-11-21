@@ -15,14 +15,10 @@ package de.uka.ilkd.key.gui.abstractexecution.relational.components;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.swing.text.BadLocationException;
 import javax.tools.Diagnostic;
@@ -39,20 +35,10 @@ import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice;
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
 
-import de.uka.ilkd.key.abstractexecution.relational.model.ProgramVariableDeclaration;
-
 /**
  * @author Dominic Steinhoefel
- *
  */
-public class JavaErrorParser extends AbstractParser {
-    private final Set<ProgramVariableDeclaration> progVarDecls = new HashSet<>();
-
-    public void setProgVarDecls(Collection<ProgramVariableDeclaration> progVarDecls) {
-        this.progVarDecls.clear();
-        this.progVarDecls.addAll(progVarDecls);
-    }
-
+public abstract class JavaErrorParser extends AbstractParser {
     @Override
     public ParseResult parse(RSyntaxDocument doc, String style) {
         final DefaultParseResult result = new DefaultParseResult(this);
@@ -116,28 +102,19 @@ public class JavaErrorParser extends AbstractParser {
         return diagnostics.getDiagnostics();
     }
 
-    private String createDocument(final String className, String body) {
-        body = replaceAbstractExpression(body);
-        body = replaceAbstractStatement(body);
+    /**
+     * Create a surrounding document for the given body. The result has to add
+     * exactly one line before and one line after the body (no other constraints on
+     * the length, just needs to be one line), and has to be a class declaration.
+     * 
+     * @param className The name for the created class declaration.
+     * @param body      The body to embed.
+     * @return A valid class declaration, with one line of boilerplate code before
+     *         and after body.
+     */
+    protected abstract String createDocument(final String className, final String body);
 
-        final StringBuilder sb = new StringBuilder();
-        sb.append("public class ");
-        sb.append(className);
-        sb.append("{");
-        sb.append("public Object method(");
-        sb.append(progVarDecls.stream()
-                .map(decl -> String.format("%s %s", decl.getTypeName(), decl.getVarName()))
-                .collect(Collectors.joining(", ")));
-        sb.append(") {");
-        sb.append("\n");
-        sb.append(body);
-        sb.append("\n");
-        sb.append("return null;}");
-        sb.append("}");
-        return sb.toString();
-    }
-
-    private String replaceAbstractStatement(final String body) {
+    public static String replaceAbstractStatement(final String body) {
         final Pattern asPattern = Pattern.compile("\\\\abstract_statement +[a-zA-Z0-9_.]+ *;");
         final Matcher asMatcher = asPattern.matcher(body);
 
@@ -151,7 +128,7 @@ public class JavaErrorParser extends AbstractParser {
         return newBody;
     }
 
-    private String replaceAbstractExpression(final String body) {
+    public static String replaceAbstractExpression(final String body) {
         final Pattern aexpPattern = Pattern
                 .compile("\\\\abstract_expression +([a-zA-Z0-9_.]+) +[a-zA-Z0-9_.]+");
         final Matcher aexpMatcher = aexpPattern.matcher(body);

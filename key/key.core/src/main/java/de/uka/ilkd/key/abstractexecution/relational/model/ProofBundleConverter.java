@@ -43,8 +43,9 @@ public class ProofBundleConverter {
     private static final String PROGRAMVARIABLES = "<PROGRAMVARIABLES>";
     private static final String PREDICATES = "<PREDICATES>";
     private static final String FUNCTIONS = "<FUNCTIONS>";
-    private static final String BODY2 = "<BODY2>";
     private static final String BODY1 = "<BODY1>";
+    private static final String BODY2 = "<BODY2>";
+    private static final String CONTEXT = "<CONTEXT>";
     private static final String PARAMS = "<PARAMS>";
     private static final String RESULT_SEQ_1 = "<RESULT_SEQ_1>";
     private static final String RESULT_SEQ_2 = "<RESULT_SEQ_2>";
@@ -142,15 +143,17 @@ public class ProofBundleConverter {
                 .map(decl -> String.format("%s %s", decl.getTypeName(), decl.getVarName()))
                 .collect(Collectors.joining(","));
 
-        final String programOne = processProgram(model.getProgramOne());
-        final String programTwo = processProgram(model.getProgramTwo());
+        final String programOne = escapeDL(model.getProgramOne()).replaceAll("\n", "\n        ");
+        final String programTwo = escapeDL(model.getProgramTwo()).replaceAll("\n", "\n        ");
+        final String context = escapeDL(model.getMethodLevelContext()).replaceAll("\n", "\n    ");
 
         return javaScaffold.replaceAll(PARAMS, paramsDecl)
                 .replaceAll(BODY1, Matcher.quoteReplacement(programOne))
-                .replaceAll(BODY2, Matcher.quoteReplacement(programTwo));
+                .replaceAll(BODY2, Matcher.quoteReplacement(programTwo))
+                .replaceAll(CONTEXT, Matcher.quoteReplacement(context));
     }
 
-    private String processProgram(String prog) {
+    public String escapeDL(String prog) {
         for (final AbstractLocsetDeclaration locSet : model.getAbstractLocationSets()) {
             prog = prog.replaceAll("\\b" + locSet + "\\b",
                     Matcher.quoteReplacement("\\dl_" + locSet));
@@ -161,7 +164,7 @@ public class ProofBundleConverter {
                     Matcher.quoteReplacement("\\dl_" + predDecl.getPredName()));
         }
 
-        return prog.replaceAll("\n", "\n        ");
+        return prog;
     }
 
     private String createKeYFile() {

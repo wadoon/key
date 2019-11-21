@@ -39,11 +39,8 @@ import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -53,6 +50,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -66,7 +64,6 @@ import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.abstractexecution.relational.model.AbstractLocsetDeclaration;
-import de.uka.ilkd.key.abstractexecution.relational.model.MethodDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.NullarySymbolDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.ProgramVariableDeclaration;
@@ -78,8 +75,10 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.AutoResetStatusPanel;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.FormulaInputTextArea;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.JavaErrorParser;
+import de.uka.ilkd.key.gui.abstractexecution.relational.components.MethodLevelJavaErrorParser;
+import de.uka.ilkd.key.gui.abstractexecution.relational.components.StatementLevelJavaErrorParser;
 import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.DirtyListener;
-import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.MethodDeclsChangedListener;
+import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.MethodContextChangedListener;
 import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.ProgramVariablesChangedListener;
 import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.ReadonlyListener;
 import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.ServicesLoadedListener;
@@ -139,14 +138,29 @@ public class AERelationalDialog extends JFrame {
             + " program models.</html>";
     private static final String SAVE_BTN_TOOLTIP = "<html>Creates a KeY proof bundle at a temporary<br/>"
             + "location and starts the proof.</html>";
-    private static final String TOOLTIP_REL_LOCS_RIGHT = "<html>Locations that are part of the result relation (for the<br/>"
-            + "right program).<br/>"
-            + "The i-th location in this list (i >= 1) is available via<br/>"
-            + "\\result_2[i+1] in the 'Relation to Verify' text field.</html>";
-    private static final String TOOLTIP_REL_LOCS_LEFT = "<html>Locations that are part of the result relation (for the<br/>"
-            + "left program).<br/>"
-            + "The i-th location in this list (i >= 1) is available via<br/>"
-            + "\\result_1[i+1] in the 'Relation to Verify' text field.</html>";
+    private static final String TOOLTIP_REL_LOCS_RIGHT = htmlTooltip(
+            "Locations that are part of the result relation (for the right program).<br/>"
+                    + "The i-th location in this list (i >= 1) is available via "
+                    + "\\result_2[i+1] in the 'Relation to Verify' text field.",
+            180);
+    private static final String TOOLTIP_REL_LOCS_LEFT = htmlTooltip(
+            "Locations that are part of the result relation (for the left program).<br/>"
+                    + "The i-th location in this list (i >= 1) is available via "
+                    + "\\result_1[i+1] in the 'Relation to Verify' text field.",
+            180);
+    private static final String CONTEXT_TOOLTIP = htmlTooltip(
+            "The surrounding context. Method-level, i.e., everything "
+                    + "you could write <em>inside</em> a class, especially field and method "
+                    + "declarations. The specified context is used for <em>both</em> abstract "
+                    + "program fragments.",
+            160);
+    private static final String APF_TOOLTIP = htmlTooltip(
+            "The abstract program fragments for which to prove "
+                    + "the desired relation. Statement-level, i.e, everything you "
+                    + "could write inside a method body. You can use the declared "
+                    + "program variables and, inside JML specifications, the declared "
+                    + "abstract location sets and predicates.",
+            180);
 
     private static final long serialVersionUID = 1L;
 
@@ -163,11 +177,11 @@ public class AERelationalDialog extends JFrame {
     private final DefaultListModel<ProgramVariableDeclaration> progVarDeclsListModel = new DefaultListModel<>();
     private final DefaultListModel<NullarySymbolDeclaration> relevantSymbolsOneListModel = new DefaultListModel<>();
     private final DefaultListModel<NullarySymbolDeclaration> relevantSymbolsTwoListModel = new DefaultListModel<>();
-    private final DefaultComboBoxModel<MethodDeclaration> methodDeclsOneModel = new DefaultComboBoxModel<>();
-    private final DefaultComboBoxModel<MethodDeclaration> methodDeclsTwoModel = new DefaultComboBoxModel<>();
 
     private final RSyntaxTextArea codeLeft = new RSyntaxTextArea(20, 60);
     private final RSyntaxTextArea codeRight = new RSyntaxTextArea(20, 60);
+    private final RSyntaxTextArea codeContext = new RSyntaxTextArea(20, 120);
+
     private final FormulaInputTextArea resultRelationText = new FormulaInputTextArea(
             STD_POSTCONDREL_TOOLTIP, formula -> {
                 // Replacement of special placeholders for result sequences
@@ -178,12 +192,12 @@ public class AERelationalDialog extends JFrame {
                         ProofBundleConverter.RES2);
                 return result;
             });
+
     private AutoResetStatusPanel statusPanel;
 
     private final List<ServicesLoadedListener> servicesLoadedListeners = new ArrayList<>();
     private final List<ProgramVariablesChangedListener> programVariablesChangedListeners = new ArrayList<>();
-    private final List<MethodDeclsChangedListener> methodDeclsOneChangedListeners = new ArrayList<>();
-    private final List<MethodDeclsChangedListener> methodDeclsTwoChangedListeners = new ArrayList<>();
+    private final List<MethodContextChangedListener> methodContextChangedListeners = new ArrayList<>();
     private final List<ReadonlyListener> readOnlyListeners = new ArrayList<>();
     private final List<DirtyListener> dirtyListeners = new ArrayList<>();
 
@@ -443,6 +457,7 @@ public class AERelationalDialog extends JFrame {
     private void loadFromModel() {
         codeLeft.setText(model.getProgramOne());
         codeRight.setText(model.getProgramTwo());
+        codeContext.setText(model.getMethodLevelContext());
         resultRelationText.setText(model.getPostCondition());
 
         locsetDeclsListModel.clear();
@@ -460,6 +475,7 @@ public class AERelationalDialog extends JFrame {
     private void updateModel() {
         model.setProgramOne(codeLeft.getText());
         model.setProgramTwo(codeRight.getText());
+        model.setMethodLevelContext(codeContext.getText());
         model.setPostCondition(resultRelationText.getText());
         model.setAbstractLocationSets(Collections.list(locsetDeclsListModel.elements()));
         model.setPredicateDeclarations(Collections.list(predDeclsListModel.elements()));
@@ -673,128 +689,28 @@ public class AERelationalDialog extends JFrame {
     }
 
     private JPanel createProgramViewContainer() {
-        final JComponent programOneView = new JPanel(new BorderLayout());
-        programOneView.add(createJavaEditorView(codeLeft), BorderLayout.CENTER);
-        programOneView.add(createMethodsView("Methods (Left)", methodDeclsOneModel,
-                methodDeclsOneChangedListeners), BorderLayout.SOUTH);
-
-        final JComponent programTwoView = new JPanel(new BorderLayout());
-        programTwoView.add(createJavaEditorView(codeRight), BorderLayout.CENTER);
-        programTwoView.add(createMethodsView("Methods (Right)", methodDeclsTwoModel,
-                methodDeclsTwoChangedListeners), BorderLayout.SOUTH);
+        final StatementLevelJavaErrorParser stmtLevelErrorParser = new StatementLevelJavaErrorParser();
+        programVariablesChangedListeners.add(stmtLevelErrorParser::setProgVarDecls);
+        methodContextChangedListeners.add(stmtLevelErrorParser::setMethodLevelContext);
 
         final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true,
-                programOneView, programTwoView);
+                createJavaEditorView(codeLeft, stmtLevelErrorParser),
+                createJavaEditorView(codeRight, stmtLevelErrorParser));
         splitPane.setResizeWeight(.5);
+
+        final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.BOTTOM,
+                JTabbedPane.WRAP_TAB_LAYOUT);
+        tabbedPane.add("Abstract Program Fragments", splitPane);
+        tabbedPane.add("Method-Level Context",
+                createJavaEditorView(codeContext, new MethodLevelJavaErrorParser()));
+
+        tabbedPane.setToolTipTextAt(0, APF_TOOLTIP);
+        tabbedPane.setToolTipTextAt(1, CONTEXT_TOOLTIP);
 
         final JPanel editorsContainer = new JPanel(new BorderLayout());
         editorsContainer.setMinimumSize(new Dimension(600, 100));
-        editorsContainer.add(splitPane, BorderLayout.CENTER);
+        editorsContainer.add(tabbedPane, BorderLayout.CENTER);
         return editorsContainer;
-    }
-
-    private Component createMethodsView(final String label,
-            final DefaultComboBoxModel<MethodDeclaration> model,
-            final List<MethodDeclsChangedListener> listenerList) {
-        final JPanel result = new JPanel(new BorderLayout());
-        result.setMinimumSize(new Dimension(290, result.getMinimumSize().height));
-
-        final JComboBox<MethodDeclaration> methodDeclsList = new JComboBox<>();
-        methodDeclsList.setToolTipText(label);
-        final JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setViewportView(methodDeclsList);
-        result.add(scrollPane, BorderLayout.CENTER);
-        methodDeclsList.setModel(model);
-        model.addListDataListener(new UniformListDataListener() {
-            @Override
-            public void listChanged(ListDataEvent e) {
-                listenerList.forEach(l -> l.methodDeclsChanged(elementsOfComboBoxModel(model)));
-                setDirty(true);
-            }
-        });
-
-        final JButton plusButton = new JButton(
-                IconFontSwing.buildIcon(FontAwesomeSolid.PLUS, 16, Color.BLACK));
-        plusButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                final ProgramVariableDeclaration pd = ProgramVariableInputDialog
-//                        .showInputDialog(AERelationalDialog.this, services);
-//                if (pd != null) {
-//                    methodDeclsOneModel.addElement(pd);
-//                }
-            }
-        });
-
-        final JButton editButton = new JButton(
-                IconFontSwing.buildIcon(FontAwesomeSolid.PEN, 16, Color.BLACK));
-        editButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (methodDeclsList.getSelectedIndex() > 0) {
-//                    final ProgramVariableDeclaration selectedElem = methodDeclsList
-//                            .getSelectedValue();
-//                    final ProgramVariableDeclaration pd = ProgramVariableInputDialog
-//                            .showInputDialog(AERelationalDialog.this, selectedElem, services);
-//                    if (pd != null && !pd.equals(selectedElem)) {
-//                        services.getNamespaces().programVariables()
-//                                .remove(new Name(selectedElem.getName()));
-//                        methodDeclsOneModel.set(methodDeclsList.getSelectedIndex(), pd);
-//                    }
-                }
-            }
-        });
-
-        final JButton minusButton = new JButton(
-                IconFontSwing.buildIcon(FontAwesomeSolid.MINUS, 16, Color.BLACK));
-        minusButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (methodDeclsList.getSelectedIndex() > 0) {
-                    model.removeElementAt(methodDeclsList.getSelectedIndex());
-                }
-            }
-        });
-
-        plusButton.setEnabled(false);
-        minusButton.setEnabled(false);
-        editButton.setEnabled(false);
-
-        this.servicesLoadedListeners.add(() -> {
-            if (!isReadonly()) {
-                plusButton.setEnabled(true);
-                minusButton.setEnabled(true);
-                editButton.setEnabled(true);
-            }
-        });
-        this.readOnlyListeners.add(ro -> {
-            if (ro) {
-                plusButton.setEnabled(false);
-                minusButton.setEnabled(false);
-                editButton.setEnabled(false);
-            } else if (services != null) {
-                plusButton.setEnabled(true);
-                minusButton.setEnabled(true);
-                editButton.setEnabled(true);
-            }
-        });
-
-        final JPanel buttonsPanel = new JPanel(new FlowLayout());
-        buttonsPanel.add(plusButton);
-        buttonsPanel.add(editButton);
-        buttonsPanel.add(minusButton);
-
-        result.add(buttonsPanel, BorderLayout.EAST);
-
-        return result;
-    }
-
-    private static <T> List<T> elementsOfComboBoxModel(ComboBoxModel<T> model) {
-        final List<T> result = new ArrayList<>();
-        for (int i = 0; i < model.getSize(); i++) {
-            result.add(model.getElementAt(i));
-        }
-        return result;
     }
 
     private JPanel createPostconditionContainer() {
@@ -1261,7 +1177,9 @@ public class AERelationalDialog extends JFrame {
         return result;
     }
 
-    private JComponent createJavaEditorView(RSyntaxTextArea component) {
+    private JComponent createJavaEditorView(RSyntaxTextArea component,
+            JavaErrorParser errorParser) {
+        component.addParser(errorParser);
         component.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
         component.setCodeFoldingEnabled(true);
         component.getDocument().addDocumentListener(new UniformDocumentListener() {
@@ -1271,12 +1189,8 @@ public class AERelationalDialog extends JFrame {
             }
         });
 
-        final JavaErrorParser errorParser = new JavaErrorParser();
-
-        programVariablesChangedListeners.add(errorParser::setProgVarDecls);
         readOnlyListeners.add(ro -> component.setEnabled(!ro));
 
-        component.addParser(errorParser);
         return new RTextScrollPane(component);
     }
 
@@ -1289,5 +1203,11 @@ public class AERelationalDialog extends JFrame {
                 compList.addAll(getAllComponents((Container) comp));
         }
         return compList;
+    }
+
+    private static String htmlTooltip(String text, int width) {
+        return String.format(
+                "<html><table><td width=\"%dpx\" style=\"text-align:justify;\">%s</td></tr></html>",
+                width, text);
     }
 }

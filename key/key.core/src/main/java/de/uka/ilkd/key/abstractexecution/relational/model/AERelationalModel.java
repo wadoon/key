@@ -28,6 +28,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -43,31 +45,52 @@ import org.xml.sax.SAXException;
  * @author Dominic Steinhoefel
  */
 @XmlRootElement(namespace = "http://www.key-project.org/abstractexecution")
-@XmlType(propOrder = { "programOne", "programTwo", "methodDeclsOne", "methodDeclsTwo",
-        "abstractLocationSets", "predicateDeclarations", "programVariableDeclarations" })
+@XmlType(propOrder = { "programOne", "programTwo", "methodLevelContext", "abstractLocationSets",
+        "predicateDeclarations", "programVariableDeclarations" })
+@XmlAccessorType(value = XmlAccessType.FIELD)
 public class AERelationalModel {
-    private static final String AE_MODEL_FILE_ENDING = ".aer";
     public static final AERelationalModel EMPTY_MODEL = new AERelationalModel();
+
+    private static final String AE_MODEL_FILE_ENDING = ".aer";
     private static final String SCHEMA_PATH = "/de/uka/ilkd/key/abstractexecution/relational/schema1.xsd";
 
+    @XmlElement(name = "programOne")
     private String programOne = "";
+
+    @XmlElement(name = "programTwo")
     private String programTwo = "";
+
+    @XmlElement(name = "methodLevelContext")
+    private String methodLevelContext = "";
+
+    @XmlAttribute(name = "postCondition")
     private String postCondition = "";
+
+    @XmlElementWrapper(name = "predicates")
+    @XmlElement(name = "predicate")
     private List<PredicateDeclaration> predicateDeclarations = new ArrayList<>();
+
+    @XmlElementWrapper(name = "locationSets")
+    @XmlElement(name = "locationSet")
     private List<AbstractLocsetDeclaration> abstractLocationSets = new ArrayList<>();
+
+    @XmlElementWrapper(name = "programVariables")
+    @XmlElement(name = "programVariable")
     private List<ProgramVariableDeclaration> programVariableDeclarations = new ArrayList<>();
+
+    @XmlTransient
     private Optional<File> file = Optional.empty();
-    private List<MethodDeclaration> methodDeclarationsOne = new ArrayList<>();
-    private List<MethodDeclaration> methodDeclarationsTwo = new ArrayList<>();
 
     public AERelationalModel(final String programOne, final String programTwo,
-            final String postCondition, final List<AbstractLocsetDeclaration> abstractLocationSets,
+            String methodLevelContext, final String postCondition,
+            final List<AbstractLocsetDeclaration> abstractLocationSets,
             final List<PredicateDeclaration> predicateDeclarations,
             final List<ProgramVariableDeclaration> programVariableDeclarations,
             final List<NullarySymbolDeclaration> relevantVarsOne,
             final List<NullarySymbolDeclaration> relevantVarsTwo) {
         this.programOne = programOne;
         this.programTwo = programTwo;
+        this.methodLevelContext = methodLevelContext;
         this.postCondition = postCondition;
         this.abstractLocationSets = abstractLocationSets;
         this.predicateDeclarations = predicateDeclarations;
@@ -80,17 +103,14 @@ public class AERelationalModel {
     AERelationalModel() {
     }
 
-    @XmlElement(name = "programOne")
     public String getProgramOne() {
         return programOne;
     }
 
-    @XmlElement(name = "programTwo")
     public String getProgramTwo() {
         return programTwo;
     }
 
-    @XmlAttribute(name = "postCondition")
     public String getPostCondition() {
         return postCondition;
     }
@@ -99,44 +119,24 @@ public class AERelationalModel {
         this.postCondition = postCondition;
     }
 
-    @XmlElementWrapper(name = "programVariables")
-    @XmlElement(name = "programVariable")
     public List<ProgramVariableDeclaration> getProgramVariableDeclarations() {
         return programVariableDeclarations;
     }
 
-    @XmlElementWrapper(name = "locationSets")
-    @XmlElement(name = "locationSet")
     public List<AbstractLocsetDeclaration> getAbstractLocationSets() {
         return abstractLocationSets;
     }
 
-    @XmlElementWrapper(name = "predicates")
-    @XmlElement(name = "predicate")
     public List<PredicateDeclaration> getPredicateDeclarations() {
         return predicateDeclarations;
     }
 
-    @XmlTransient
     public List<NullarySymbolDeclaration> getRelevantVarsOne() {
         return getRelevantVars(NullarySymbolDeclaration::getRelevantOne);
     }
 
-    @XmlTransient
     public List<NullarySymbolDeclaration> getRelevantVarsTwo() {
         return getRelevantVars(NullarySymbolDeclaration::getRelevantTwo);
-    }
-
-    @XmlElementWrapper(name = "methodDeclsOne")
-    @XmlElement(name = "methodDecl")
-    public List<MethodDeclaration> getMethodDeclsOne() {
-        return methodDeclarationsOne;
-    }
-
-    @XmlElementWrapper(name = "methodDeclsTwo")
-    @XmlElement(name = "methodDecl")
-    public List<MethodDeclaration> getMethodDeclsTwo() {
-        return methodDeclarationsTwo;
     }
 
     public List<NullarySymbolDeclaration> getRelevantVars(
@@ -149,9 +149,16 @@ public class AERelationalModel {
                 .collect(Collectors.toList());
     }
 
-    @XmlTransient
     public Optional<File> getFile() {
         return file;
+    }
+
+    public String getMethodLevelContext() {
+        return methodLevelContext;
+    }
+
+    public void setMethodLevelContext(String methodLevelContext) {
+        this.methodLevelContext = methodLevelContext;
     }
 
     public void setRelevantVarsOne(List<NullarySymbolDeclaration> relevantVarsOne) {
@@ -185,14 +192,6 @@ public class AERelationalModel {
     public void setProgramVariableDeclarations(
             List<ProgramVariableDeclaration> programVariableDeclarations) {
         this.programVariableDeclarations = programVariableDeclarations;
-    }
-
-    public void setMethodDeclarationsOne(List<MethodDeclaration> methodDeclarationsOne) {
-        this.methodDeclarationsOne = methodDeclarationsOne;
-    }
-
-    public void setMethodDeclarationsTwo(List<MethodDeclaration> methodDeclarationsTwo) {
-        this.methodDeclarationsTwo = methodDeclarationsTwo;
     }
 
     public boolean isSaved() {

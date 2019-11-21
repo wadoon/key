@@ -69,8 +69,8 @@ public class AERelationalExtension implements KeYGuiExtension, KeYGuiExtension.T
                         Collections.singletonList(abstractLocationSets.get(0));
 
                 final AERelationalModel defaultModel = new AERelationalModel(programOne, programTwo,
-                        postCondition, abstractLocationSets, predicateDeclarations,
-                        programVariableDeclarations, relevantVarsOne, relevantVarsTwo);
+                        "", postCondition, abstractLocationSets,
+                        predicateDeclarations, programVariableDeclarations, relevantVarsOne, relevantVarsTwo);
 
                 final AERelationalDialog dia = new AERelationalDialog(mainWindow, defaultModel);
                 dia.setVisible(true);

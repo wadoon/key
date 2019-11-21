@@ -12,11 +12,7 @@
 //
 package de.uka.ilkd.key.gui.abstractexecution.relational.listeners;
 
-import java.util.Collection;
-
-import de.uka.ilkd.key.abstractexecution.relational.model.MethodDeclaration;
-
 @FunctionalInterface
-public interface MethodDeclsChangedListener {
-    public void methodDeclsChanged(Collection<MethodDeclaration> newVars);
+public interface MethodContextChangedListener {
+    public void methodContextChanged(String newContext);
 }
