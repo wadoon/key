@@ -12,6 +12,8 @@
 //
 package de.uka.ilkd.key.gui.abstractexecution.relational.listeners;
 
+import java.util.function.Consumer;
+
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
@@ -32,4 +34,13 @@ public abstract class UniformListDataListener implements ListDataListener {
     }
 
     public abstract void listChanged(ListDataEvent e);
+
+    public static UniformListDataListener uldl(Consumer<ListDataEvent> f) {
+        return new UniformListDataListener() {
+            @Override
+            public void listChanged(ListDataEvent e) {
+                f.accept(e);
+            }
+        };
+    }
 }

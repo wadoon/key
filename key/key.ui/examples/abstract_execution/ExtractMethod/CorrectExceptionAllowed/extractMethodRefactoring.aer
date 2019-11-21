@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="\result_1=\result_2">
+    <programOne>/*@ ae_constraint
+  @     \disjoint(footprintR, frameQ);
+  @*/
+{ ; }
+
+/*@ assignable frameP;
+  @ accessible footprintP;
+  @*/
+\abstract_statement P;
+
+// If Q throws an exception, it might still before
+// change the value of var. After extraction, this
+// is not possible!
+
+try {
+    /*@ assignable \hasTo(var), frameQ;
+      @ accessible footprintQ;
+      @ return_behavior requires false;
+      @*/
+    \abstract_statement Q;
+} catch (Throwable t) {
+	// Do nothing, just keep changes to var that
+    // have occurred so far!
+
+	/*@ ae_constraint
+	  @     \disjoint(t, relevant) &amp;&amp;
+	  @     \disjoint(t, footprintR);
+	  @*/
+	{ ; }
+}
+
+/*@ assignable frameR;
+  @ accessible var, footprintR;
+  @*/
+\abstract_statement R;</programOne>
+    <programTwo>/*@ ae_constraint
+  @     \disjoint(footprintR, frameQ);
+  @*/
+{ ; }
+
+/*@ assignable frameP;
+  @ accessible footprintP;
+  @*/
+\abstract_statement P;
+
+// Exception thrown by Q is caught before inside the
+// extracted method, so nothing to do here.
+
+var = extracted(var);
+
+/*@ assignable frameR;
+  @ accessible var, footprintR;
+  @*/
+\abstract_statement R;</programTwo>
+    <methodLevelContext>private Object extracted(Object var) {
+	Object res = null;
+
+	/*@ ae_constraint
+	  @   \disjoint(res, relevant) &amp;&amp;
+	  @   \disjoint(res, footprintR) &amp;&amp;
+	  @   \disjoint(res, footprintQ);
+	  @*/
+	{ ; }
+	
+    try {
+        /*@ assignable \hasTo(res), frameQ;
+          @ accessible footprintQ;
+          @ return_behavior requires false;
+          @*/
+        \abstract_statement Q;
+    } catch (Throwable t) {
+        // Do nothing, just keep changes to res that
+        // have occurred so far!
+
+	   /*@ ae_constraint
+	     @     \disjoint(t, relevant) &amp;&amp;
+	     @     \disjoint(t, footprintR);
+	     @*/
+	   { ; }
+    }
+     
+     return res;
+}</methodLevelContext>
+    <locationSets>
+        <locationSet locsetName="relevant">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameQ">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintQ">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameR">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintR">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <predicates/>
+    <programVariables>
+        <programVariable typeName="java.lang.Object" varName="var">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+    </programVariables>
+</ns2:aeRelationalModel>

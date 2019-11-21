@@ -12,11 +12,15 @@
 //
 package de.uka.ilkd.key.gui.abstractexecution.relational.dialogs;
 
+import static de.uka.ilkd.key.gui.abstractexecution.relational.listeners.UniformDocumentListener.udl;
+import static de.uka.ilkd.key.gui.abstractexecution.relational.listeners.UniformListDataListener.uldl;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -40,6 +44,7 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -53,12 +58,16 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.ListDataEvent;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.undo.UndoManager;
 import javax.xml.bind.JAXBException;
 
+import org.fife.ui.rsyntaxtextarea.CodeTemplateManager;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rsyntaxtextarea.templates.CodeTemplate;
+import org.fife.ui.rsyntaxtextarea.templates.StaticCodeTemplate;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.xml.sax.SAXException;
 
@@ -81,9 +90,8 @@ import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.DirtyListener;
 import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.MethodContextChangedListener;
 import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.ProgramVariablesChangedListener;
 import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.ReadonlyListener;
+import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.ResetUndosListener;
 import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.ServicesLoadedListener;
-import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.UniformDocumentListener;
-import de.uka.ilkd.key.gui.abstractexecution.relational.listeners.UniformListDataListener;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.java.Services;
@@ -109,6 +117,7 @@ public class AERelationalDialog extends JFrame {
     private static final String PROOF_BUNDLE_ENDING = ".zproof";
 
     private static final String TITLE = "Relational Proofs with Abstract Execution";
+
     private static final int STATUS_PANEL_TIMEOUT = 2000;
     private static final int STATUS_PANEL_CHANGE_TIME = 30000;
     private static final String STATUS_PANEL_STD_MSG_1 = "Try to use tooltips if feeling unsure about the functionality of an element.";
@@ -116,6 +125,8 @@ public class AERelationalDialog extends JFrame {
             "Recommended Example: File > Load Example > Abstract Execution > Consolidate Duplicate... > Extract Prefix";
     private static final String STATUS_PANEL_STD_MSG_3 = //
             "When declaring <tt>ae_constraint</tt>s, you have to put an empty block <tt>{ ; }</tt> after the JML comment.";
+    private static final String STATUS_PANEL_STD_MSG_4 = //
+            "There are code templates for abstract statements and expressions! Type \"<tt>as</tt>\" or \"<tt>aexp</tt>\" followed by <tt>Ctrl+Shift+Space</tt>.";
 
     private static final String STD_POSTCONDREL_TOOLTIP = "Relation between values of the relevant locations after execution.<br/>"
             + "You may use the keywords \"\\result_1\" and \"\\result_2\" to access<br/>"
@@ -200,6 +211,7 @@ public class AERelationalDialog extends JFrame {
     private final List<MethodContextChangedListener> methodContextChangedListeners = new ArrayList<>();
     private final List<ReadonlyListener> readOnlyListeners = new ArrayList<>();
     private final List<DirtyListener> dirtyListeners = new ArrayList<>();
+    private final List<ResetUndosListener> resetUndosListeners = new ArrayList<>();
 
     public static void main(String[] args) {
         final AERelationalModel model = AERelationalModel.EMPTY_MODEL;
@@ -220,12 +232,14 @@ public class AERelationalDialog extends JFrame {
         // We want to ask whether model should be saved
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
+        installCodeTemplates();
+
         final JPanel contentPanel = new JPanel(new BorderLayout());
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         statusPanel = new AutoResetStatusPanel( //
                 STATUS_PANEL_TIMEOUT, STATUS_PANEL_CHANGE_TIME, STATUS_PANEL_STD_MSG_1,
-                STATUS_PANEL_STD_MSG_2, STATUS_PANEL_STD_MSG_3);
+                STATUS_PANEL_STD_MSG_2, STATUS_PANEL_STD_MSG_3, STATUS_PANEL_STD_MSG_4);
         getContentPane().add(statusPanel, BorderLayout.SOUTH);
 
         final JPanel declarationsContainer = createDeclarationsContainer();
@@ -270,6 +284,40 @@ public class AERelationalDialog extends JFrame {
          * initial content.
          */
         setDirty(false);
+        resetUndosListeners.forEach(ResetUndosListener::resetUndos);
+    }
+
+    private static void installCodeTemplates() {
+        /*
+         * Whether templates are enabled is a global property affecting all
+         * RSyntaxTextAreas, so this method is static.
+         */
+        RSyntaxTextArea.setTemplatesEnabled(true);
+
+        final CodeTemplateManager ctm = RSyntaxTextArea.getCodeTemplateManager();
+
+        final CodeTemplate asTemplate = new StaticCodeTemplate("as", //
+        //@formatter:off
+                "/*@ assignable frameP;\n" + //
+                "  @ accessible footprintP;\n" + //
+                "  @ exceptional_behavior requires false;\n" + //
+                "  @ return_behavior requires false;\n" + //
+                "  @*/\n" + //
+                "\\abstract_statement P;" //
+        //@formatter:on
+                , null);
+        ctm.addTemplate(asTemplate);
+
+        final CodeTemplate aexpTemplate = new StaticCodeTemplate("aexp", //
+        //@formatter:off
+                "/*@ assignable frameE;\n" + //
+                "  @ accessible footprinE;\n" + //
+                "  @ exceptional_behavior requires false;\n" + //
+                "  @*/\n" + //
+                "\\abstract_expression boolean e;" //
+        //@formatter:on
+                , null);
+        ctm.addTemplate(aexpTemplate);
     }
 
     public void installListeners() {
@@ -470,6 +518,9 @@ public class AERelationalDialog extends JFrame {
         model.getRelevantVarsOne().forEach(relevantSymbolsOneListModel::addElement);
         relevantSymbolsTwoListModel.clear();
         model.getRelevantVarsTwo().forEach(relevantSymbolsTwoListModel::addElement);
+
+        methodContextChangedListeners
+                .forEach(l -> l.methodContextChanged(model.getMethodLevelContext()));
     }
 
     private void updateModel() {
@@ -527,28 +578,6 @@ public class AERelationalDialog extends JFrame {
     }
 
     private void loadFromFile() throws IOException, JAXBException, SAXException {
-        if (isDirty()) {
-            final int answer = JOptionPane.showConfirmDialog(AERelationalDialog.this,
-                    "Do you want to save your model before loading another one?", "Save Model",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-
-            if (answer == JOptionPane.YES_OPTION) {
-                try {
-                    if (!saveModelToFile()) {
-                        return;
-                    }
-                } catch (IOException | JAXBException exc) {
-                    JOptionPane.showMessageDialog(AERelationalDialog.this,
-                            "<html>Could not save model to file.<br><br/>Message:<br/>"
-                                    + exc.getMessage() + "</html>",
-                            "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-            } else if (answer != JOptionPane.NO_OPTION) {
-                return;
-            }
-        }
-
         final KeYFileChooser chooser = KeYFileChooser
                 .getFileChooser("Choose AE-Relational Model File");
 
@@ -562,10 +591,19 @@ public class AERelationalDialog extends JFrame {
                 return;
             }
 
-            model = AERelationalModel.fromXml(new String(Files.readAllBytes(file.toPath())));
-            model.setFile(file);
-            loadFromModel();
-            setDirty(false);
+            final AERelationalModel newModel = AERelationalModel
+                    .fromXml(new String(Files.readAllBytes(file.toPath())));
+
+            if (isDirty()) {
+                final AERelationalDialog newDia = new AERelationalDialog(mainWindow, newModel);
+                newDia.setVisible(true);
+            } else {
+                model = newModel;
+                model.setFile(file);
+                loadFromModel();
+                setDirty(false);
+                resetUndosListeners.forEach(ResetUndosListener::resetUndos);
+            }
         }
     }
 
@@ -707,6 +745,16 @@ public class AERelationalDialog extends JFrame {
         tabbedPane.setToolTipTextAt(0, APF_TOOLTIP);
         tabbedPane.setToolTipTextAt(1, CONTEXT_TOOLTIP);
 
+        tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if (tabbedPane.getSelectedIndex() == 0) {
+                    methodContextChangedListeners
+                            .forEach(l -> l.methodContextChanged(codeContext.getText()));
+                }
+            }
+        });
+
         final JPanel editorsContainer = new JPanel(new BorderLayout());
         editorsContainer.setMinimumSize(new Dimension(600, 100));
         editorsContainer.add(tabbedPane, BorderLayout.CENTER);
@@ -740,12 +788,7 @@ public class AERelationalDialog extends JFrame {
     private JPanel createRelevantLocationsContainer(String labelText, String toolTipText,
             DefaultListModel<NullarySymbolDeclaration> relevantSymbolsModel,
             java.util.function.Function<AERelationalModel, List<NullarySymbolDeclaration>> chosenRelevantSymbolsGetter) {
-        relevantSymbolsModel.addListDataListener(new UniformListDataListener() {
-            @Override
-            public void listChanged(ListDataEvent e) {
-                setDirty(true);
-            }
-        });
+        relevantSymbolsModel.addListDataListener(uldl(e -> setDirty(true)));
 
         final JPanel result = new JPanel(new BorderLayout());
 
@@ -848,12 +891,7 @@ public class AERelationalDialog extends JFrame {
                 resultRelationText.getBorder(), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         resultRelationText.setLineWrap(true);
 
-        resultRelationText.getDocument().addDocumentListener(new UniformDocumentListener() {
-            @Override
-            public void documentChanged(DocumentEvent e) {
-                setDirty(true);
-            }
-        });
+        resultRelationText.getDocument().addDocumentListener(udl(e -> setDirty(true)));
 
         servicesLoadedListeners.add(() -> {
             resultRelationText.setServices(services);
@@ -887,12 +925,7 @@ public class AERelationalDialog extends JFrame {
         scrollPane.setViewportView(predDeclsList);
         result.add(scrollPane, BorderLayout.CENTER);
         predDeclsList.setModel(predDeclsListModel);
-        predDeclsListModel.addListDataListener(new UniformListDataListener() {
-            @Override
-            public void listChanged(ListDataEvent e) {
-                setDirty(true);
-            }
-        });
+        predDeclsListModel.addListDataListener(uldl(e -> setDirty(true)));
 
         final JButton plusButton = new JButton(
                 IconFontSwing.buildIcon(FontAwesomeSolid.PLUS, 16, Color.BLACK));
@@ -989,14 +1022,7 @@ public class AERelationalDialog extends JFrame {
         scrollPane.setViewportView(progVarDeclsList);
         result.add(scrollPane, BorderLayout.CENTER);
         progVarDeclsList.setModel(progVarDeclsListModel);
-        progVarDeclsListModel.addListDataListener(new UniformListDataListener() {
-            @Override
-            public void listChanged(ListDataEvent e) {
-                programVariablesChangedListeners.forEach(l -> l.programVariablesChanged(
-                        Collections.list(progVarDeclsListModel.elements())));
-                setDirty(true);
-            }
-        });
+        progVarDeclsListModel.addListDataListener(uldl(e -> setDirty(true)));
 
         final JButton plusButton = new JButton(
                 IconFontSwing.buildIcon(FontAwesomeSolid.PLUS, 16, Color.BLACK));
@@ -1092,12 +1118,7 @@ public class AERelationalDialog extends JFrame {
         result.add(scrollPane, BorderLayout.CENTER);
 
         locsetDeclsList.setModel(locsetDeclsListModel);
-        locsetDeclsListModel.addListDataListener(new UniformListDataListener() {
-            @Override
-            public void listChanged(ListDataEvent e) {
-                setDirty(true);
-            }
-        });
+        locsetDeclsListModel.addListDataListener(uldl(e -> setDirty(true)));
 
         final JButton plusButton = new JButton(
                 IconFontSwing.buildIcon(FontAwesomeSolid.PLUS, 16, Color.BLACK));
@@ -1179,13 +1200,42 @@ public class AERelationalDialog extends JFrame {
 
     private JComponent createJavaEditorView(RSyntaxTextArea component,
             JavaErrorParser errorParser) {
+        // Own UndoManager for each component -- that's on purpose.
+        final UndoManager undoManager = new UndoManager();
+        resetUndosListeners.add(() -> undoManager.discardAllEdits());
+
         component.addParser(errorParser);
         component.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
         component.setCodeFoldingEnabled(true);
-        component.getDocument().addDocumentListener(new UniformDocumentListener() {
+        component.setTabSize(4);
+        component.setTabsEmulated(true);
+
+        component.getDocument().addDocumentListener(udl(e -> setDirty(true)));
+        component.getDocument().addUndoableEditListener(e -> undoManager.addEdit(e.getEdit()));
+
+        final InputMap inputMap = component.getInputMap();
+
+        final KeyStroke undoKey = KeyStroke.getKeyStroke(KeyEvent.VK_Z, Event.CTRL_MASK);
+        inputMap.put(undoKey, new AbstractAction() {
+            private static final long serialVersionUID = 1L;
+
             @Override
-            public void documentChanged(DocumentEvent e) {
-                setDirty(true);
+            public void actionPerformed(ActionEvent e) {
+                if (undoManager.canUndo()) {
+                    undoManager.undo();
+                }
+            }
+        });
+
+        final KeyStroke redoKey = KeyStroke.getKeyStroke(KeyEvent.VK_Y, Event.CTRL_MASK);
+        inputMap.put(redoKey, new AbstractAction() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (undoManager.canRedo()) {
+                    undoManager.redo();
+                }
             }
         });
 

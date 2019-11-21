@@ -12,6 +12,8 @@
 //
 package de.uka.ilkd.key.gui.abstractexecution.relational.listeners;
 
+import java.util.function.Consumer;
+
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -32,4 +34,13 @@ public abstract class UniformDocumentListener implements DocumentListener {
     }
 
     public abstract void documentChanged(DocumentEvent e);
+    
+    public static UniformDocumentListener udl(Consumer<DocumentEvent> f) {
+        return new UniformDocumentListener() {
+            @Override
+            public void documentChanged(DocumentEvent e) {
+                f.accept(e);
+            }
+        };
+    }
 }
