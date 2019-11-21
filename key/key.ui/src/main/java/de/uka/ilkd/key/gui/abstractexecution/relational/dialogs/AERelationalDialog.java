@@ -60,7 +60,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.undo.UndoManager;
 import javax.xml.bind.JAXBException;
 
 import org.fife.ui.rsyntaxtextarea.CodeTemplateManager;
@@ -1200,9 +1199,7 @@ public class AERelationalDialog extends JFrame {
 
     private JComponent createJavaEditorView(RSyntaxTextArea component,
             JavaErrorParser errorParser) {
-        // Own UndoManager for each component -- that's on purpose.
-        final UndoManager undoManager = new UndoManager();
-        resetUndosListeners.add(() -> undoManager.discardAllEdits());
+        resetUndosListeners.add(() -> component.discardAllEdits());
 
         component.addParser(errorParser);
         component.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
@@ -1211,7 +1208,6 @@ public class AERelationalDialog extends JFrame {
         component.setTabsEmulated(true);
 
         component.getDocument().addDocumentListener(udl(e -> setDirty(true)));
-        component.getDocument().addUndoableEditListener(e -> undoManager.addEdit(e.getEdit()));
 
         final InputMap inputMap = component.getInputMap();
 
@@ -1221,8 +1217,8 @@ public class AERelationalDialog extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (undoManager.canUndo()) {
-                    undoManager.undo();
+                if (component.canUndo()) {
+                    component.undoLastAction();
                 }
             }
         });
@@ -1233,8 +1229,8 @@ public class AERelationalDialog extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (undoManager.canRedo()) {
-                    undoManager.redo();
+                if (component.canRedo()) {
+                    component.redoLastAction();
                 }
             }
         });

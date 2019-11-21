@@ -31,7 +31,7 @@ try {
 	{ ; }
 }
 
-/*@ assignable frameR;
+/*@ assignable frameR; 
   @ accessible var, footprintR;
   @*/
 \abstract_statement R;</programOne>
