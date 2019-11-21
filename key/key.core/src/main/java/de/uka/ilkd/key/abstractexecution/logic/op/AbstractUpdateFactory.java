@@ -230,6 +230,7 @@ public class AbstractUpdateFactory {
 
             result = new Function(new Name(funName), relevantAssignable.sort(), true, true,
                     abstrUpd.argSorts().toArray(new Sort[0]));
+            services.getNamespaces().functions().add(result);
 
             abstrUpdCharacteristicFuncInsts.get(abstractUpdName).put(position, result);
         }

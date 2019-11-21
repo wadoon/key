@@ -65,6 +65,7 @@ import javax.xml.bind.JAXBException;
 import org.fife.ui.rsyntaxtextarea.CodeTemplateManager;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rsyntaxtextarea.templates.CodeTemplate;
 import org.fife.ui.rsyntaxtextarea.templates.StaticCodeTemplate;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -1206,6 +1207,15 @@ public class AERelationalDialog extends JFrame {
         component.setCodeFoldingEnabled(true);
         component.setTabSize(4);
         component.setTabsEmulated(true);
+
+        // Set eclipse theme
+        try {
+            final Theme theme = Theme.load(getClass()
+                    .getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/idea.xml"));
+            theme.apply(component);
+        } catch (IOException ioe) {
+            // Shouldn't happen; never mind if it does.
+        }
 
         component.getDocument().addDocumentListener(udl(e -> setDirty(true)));
 
