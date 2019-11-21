@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="\result_1=\result_2">
+    <programOne>/*@ ae_constraint
+  @   \disjoint(var1, frameP) &amp;&amp;
+  @   \disjoint(var2, frameQ);
+  @*/
+{ ; }
+
+if (
+    /*@ assignable \nothing;
+      @ accessible footprintE;
+      @ exceptional_behavior requires false;
+      @ normal_behavior
+      @   ensures (boolean) \result &lt;==&gt; eReturnsTrue(footprintE);
+      @*/
+    \abstract_expression boolean e
+) {
+    /*@ assignable \hasTo(var1), frameP;
+      @ accessible footprintP;
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @*/
+    \abstract_statement P;
+} else {
+    /*@ assignable \hasTo(var2), frameQ;
+      @ accessible footprintQ;
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @*/
+    \abstract_statement Q;
+}</programOne>
+    <programTwo>/*@ ae_constraint
+  @   \disjoint(var1, frameP) &amp;&amp;
+  @   \disjoint(var2, frameQ);
+  @*/
+{ ; }
+
+if (extractedE()) {
+    var1 = extractedP(var1);
+} else {
+    var2 = extractedQ(var2);
+}</programTwo>
+    <methodLevelContext>private boolean extractedE() {
+    boolean res = false;
+
+    /*@ ae_constraint
+      @   \disjoint(res, footprintE) &amp;&amp;
+      @   \disjoint(res, footprintP) &amp;&amp;
+      @   \disjoint(res, footprintQ) &amp;&amp;
+      @   \disjoint(res, relevant);
+      @*/
+    { ; }
+    
+    /*@ assignable \hasTo(res);
+      @ accessible footprintE;
+      @ normal_behavior
+      @   ensures (boolean) res &lt;==&gt; eReturnsTrue(footprintE);
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @*/
+    \abstract_statement StmtE;
+
+    return res;
+}
+
+private Object extractedP(Object var1) {
+    Object res = null;
+
+    /*@ ae_constraint
+      @   \disjoint(res, footprintP) &amp;&amp;
+      @   \disjoint(res, relevant);
+      @*/
+    { ; }
+    
+    /*@ assignable \hasTo(res), frameP;
+      @ accessible footprintP;
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @*/
+    \abstract_statement P;
+
+    return res;
+}
+
+private Object extractedQ(Object var1) {
+    Object res = null;
+
+    /*@ ae_constraint
+      @   \disjoint(res, footprintQ) &amp;&amp;
+      @   \disjoint(res, relevant);
+      @*/
+    { ; }
+    
+    /*@ assignable \hasTo(res), frameQ;
+      @ accessible footprintQ;
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @*/
+    \abstract_statement Q;
+
+    return res;
+}</methodLevelContext>
+    <locationSets>
+        <locationSet locsetName="relevant">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameQ">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintQ">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintE">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <predicates>
+        <predicate predName="eReturnsTrue">
+            <argSort>any</argSort>
+        </predicate>
+    </predicates>
+    <programVariables>
+        <programVariable typeName="java.lang.Object" varName="var1">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="java.lang.Object" varName="var2">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+    </programVariables>
+</ns2:aeRelationalModel>

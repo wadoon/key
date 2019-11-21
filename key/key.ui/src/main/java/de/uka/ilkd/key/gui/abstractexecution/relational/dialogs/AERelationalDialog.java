@@ -112,67 +112,7 @@ import de.uka.ilkd.key.prover.impl.ProverTaskAdapter;
  * 
  * @author Dominic Steinhoefel
  */
-public class AERelationalDialog extends JFrame {
-    private static final String DUMMY_KEY_FILE = "/de/uka/ilkd/key/gui/abstractexecution/relational/dummy.key";
-    private static final String PROOF_BUNDLE_ENDING = ".zproof";
-
-    private static final String TITLE = "Relational Proofs with Abstract Execution";
-
-    private static final int STATUS_PANEL_TIMEOUT = 2000;
-    private static final int STATUS_PANEL_CHANGE_TIME = 30000;
-    private static final String STATUS_PANEL_STD_MSG_1 = "Try to use tooltips if feeling unsure about the functionality of an element.";
-    private static final String STATUS_PANEL_STD_MSG_2 = //
-            "Recommended Example: File > Load Example > Abstract Execution > Consolidate Duplicate... > Extract Prefix";
-    private static final String STATUS_PANEL_STD_MSG_3 = //
-            "When declaring <tt>ae_constraint</tt>s, you have to put an empty block <tt>{ ; }</tt> after the JML comment.";
-    private static final String STATUS_PANEL_STD_MSG_4 = //
-            "There are code templates for abstract statements and expressions! Type \"<tt>as</tt>\" or \"<tt>aexp</tt>\" followed by <tt>Ctrl+Shift+Space</tt>.";
-
-    private static final String STD_POSTCONDREL_TOOLTIP = "Relation between values of the relevant locations after execution.<br/>"
-            + "You may use the keywords \"\\result_1\" and \"\\result_2\" to access<br/>"
-            + "the respective result arrays.<br/>"
-            + "Access individual values with \"\\result_1[2]\" etc. Use type casts<br/>"
-            + "in non-trivial compound expressions.<br/>"
-            + "At position [0], a returned value will be accessible.<br/>"
-            + "At position [1], a potentially thrown Exception object will be<br/>"
-            + "accessible which is null if no exception was thrown.<br/>";
-    private static final String LOCSET_DECL_TOOLTIP = "<html>Abstract location sets for use in dynamic frames and footprints.<br/>"
-            + "Syntax: E.g., 'nameForLocSet'.<br/>"
-            + "Those locations can be used as 'relevant locations'.</html>";
-    private static final String PROGVAR_DECL_TOOLTIP = "<html>Program variables available without declaration.<br/>"
-            + "Syntax: E.g., 'int x', or 'java.lang.Object y'.<br/>"
-            + "Those variables can be used as 'relevant locations'.</html>";
-    private static final String PRED_DECL_TOOLTIP = "<html>Abstract predicates that can, e.g., be used to control<br/>"
-            + "abrupt completion of abstract program elements.<br/>"
-            + "Syntax: E.g., 'throwsExcP(any)'.<br/>"
-            + "Can be used, e.g., in 'assumes' clauses in the abstract<br/>"
-            + " program models.</html>";
-    private static final String SAVE_BTN_TOOLTIP = "<html>Creates a KeY proof bundle at a temporary<br/>"
-            + "location and starts the proof.</html>";
-    private static final String TOOLTIP_REL_LOCS_RIGHT = htmlTooltip(
-            "Locations that are part of the result relation (for the right program).<br/>"
-                    + "The i-th location in this list (i >= 1) is available via "
-                    + "\\result_2[i+1] in the 'Relation to Verify' text field.",
-            180);
-    private static final String TOOLTIP_REL_LOCS_LEFT = htmlTooltip(
-            "Locations that are part of the result relation (for the left program).<br/>"
-                    + "The i-th location in this list (i >= 1) is available via "
-                    + "\\result_1[i+1] in the 'Relation to Verify' text field.",
-            180);
-    private static final String CONTEXT_TOOLTIP = htmlTooltip(
-            "The surrounding context. Method-level, i.e., everything "
-                    + "you could write <em>inside</em> a class, especially field and method "
-                    + "declarations. The specified context is used for <em>both</em> abstract "
-                    + "program fragments.",
-            160);
-    private static final String APF_TOOLTIP = htmlTooltip(
-            "The abstract program fragments for which to prove "
-                    + "the desired relation. Statement-level, i.e, everything you "
-                    + "could write inside a method body. You can use the declared "
-                    + "program variables and, inside JML specifications, the declared "
-                    + "abstract location sets and predicates.",
-            180);
-
+public class AERelationalDialog extends JFrame implements AERelationalDialogConstants {
     private static final long serialVersionUID = 1L;
 
     private AERelationalModel model;
@@ -296,27 +236,12 @@ public class AERelationalDialog extends JFrame {
 
         final CodeTemplateManager ctm = RSyntaxTextArea.getCodeTemplateManager();
 
-        final CodeTemplate asTemplate = new StaticCodeTemplate("as", //
-        //@formatter:off
-                "/*@ assignable frameP;\n" + //
-                "  @ accessible footprintP;\n" + //
-                "  @ exceptional_behavior requires false;\n" + //
-                "  @ return_behavior requires false;\n" + //
-                "  @*/\n" + //
-                "\\abstract_statement P;" //
-        //@formatter:on
-                , null);
+        final CodeTemplate asTemplate = new StaticCodeTemplate(AS_CODE_TEMPLATE_ID,
+                AS_CODE_TEMPLATE, null);
         ctm.addTemplate(asTemplate);
 
-        final CodeTemplate aexpTemplate = new StaticCodeTemplate("aexp", //
-        //@formatter:off
-                "/*@ assignable frameE;\n" + //
-                "  @ accessible footprinE;\n" + //
-                "  @ exceptional_behavior requires false;\n" + //
-                "  @*/\n" + //
-                "\\abstract_expression boolean e;" //
-        //@formatter:on
-                , null);
+        final CodeTemplate aexpTemplate = new StaticCodeTemplate(AEXP_CODE_TEMPLATE_ID,
+                AEXP_CODE_TEMPLATE, null);
         ctm.addTemplate(aexpTemplate);
     }
 
@@ -1210,8 +1135,8 @@ public class AERelationalDialog extends JFrame {
 
         // Set eclipse theme
         try {
-            final Theme theme = Theme.load(getClass()
-                    .getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/idea.xml"));
+            final Theme theme = Theme.load(
+                    getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/idea.xml"));
             theme.apply(component);
         } catch (IOException ioe) {
             // Shouldn't happen; never mind if it does.
@@ -1259,11 +1184,5 @@ public class AERelationalDialog extends JFrame {
                 compList.addAll(getAllComponents((Container) comp));
         }
         return compList;
-    }
-
-    private static String htmlTooltip(String text, int width) {
-        return String.format(
-                "<html><table><td width=\"%dpx\" style=\"text-align:justify;\">%s</td></tr></html>",
-                width, text);
     }
 }

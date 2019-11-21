@@ -1,0 +1,102 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2010 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2019 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+package de.uka.ilkd.key.gui.abstractexecution.relational.dialogs;
+
+/**
+ * @author Dominic Steinhoefel
+ */
+public interface AERelationalDialogConstants {
+    static final String DUMMY_KEY_FILE = "/de/uka/ilkd/key/gui/abstractexecution/relational/dummy.key";
+    static final String PROOF_BUNDLE_ENDING = ".zproof";
+
+    static final String TITLE = "Relational Proofs with Abstract Execution";
+
+    static final int STATUS_PANEL_TIMEOUT = 2000;
+    static final int STATUS_PANEL_CHANGE_TIME = 30000;
+    static final String STATUS_PANEL_STD_MSG_1 = //
+            "Try to use tooltips if feeling unsure about the functionality of an element.";
+    static final String STATUS_PANEL_STD_MSG_2 = //
+            "Recommended Example: File > Load Example > Abstract Execution > Consolidate Duplicate... > Extract Prefix";
+    static final String STATUS_PANEL_STD_MSG_3 = //
+            "When declaring <tt>ae_constraint</tt>s, you have to put an empty block <tt>{ ; }</tt> after the JML comment.";
+    static final String STATUS_PANEL_STD_MSG_4 = //
+            "There are code templates for abstract statements and expressions! Type \"<tt>as</tt>\" or \"<tt>aexp</tt>\" followed by <tt>Ctrl+Shift+Space</tt>.";
+
+    static final String AEXP_CODE_TEMPLATE_ID = "aexp";
+    static final String AEXP_CODE_TEMPLATE = //@formatter:off
+            "/*@ assignable frameE;\n" + //
+            "  @ accessible footprinE;\n" + //
+            "  @ exceptional_behavior requires false;\n" + //
+            "  @*/\n" + //
+            "\\abstract_expression boolean e"; //@formatter:on
+
+    static final String AS_CODE_TEMPLATE_ID = "as";
+    static final String AS_CODE_TEMPLATE = //@formatter:off
+            "/*@ assignable frameP;\n" + //
+            "  @ accessible footprintP;\n" + //
+            "  @ exceptional_behavior requires false;\n" + //
+            "  @ return_behavior requires false;\n" + //
+            "  @*/\n" + //
+            "\\abstract_statement P;"; //@formatter:on
+
+    static final String STD_POSTCONDREL_TOOLTIP = "Relation between values of the relevant locations after execution.<br/>"
+            + "You may use the keywords \"\\result_1\" and \"\\result_2\" to access<br/>"
+            + "the respective result arrays.<br/>"
+            + "Access individual values with \"\\result_1[2]\" etc. Use type casts<br/>"
+            + "in non-trivial compound expressions.<br/>"
+            + "At position [0], a returned value will be accessible.<br/>"
+            + "At position [1], a potentially thrown Exception object will be<br/>"
+            + "accessible which is null if no exception was thrown.<br/>";
+    static final String LOCSET_DECL_TOOLTIP = "<html>Abstract location sets for use in dynamic frames and footprints.<br/>"
+            + "Syntax: E.g., 'nameForLocSet'.<br/>"
+            + "Those locations can be used as 'relevant locations'.</html>";
+    static final String PROGVAR_DECL_TOOLTIP = "<html>Program variables available without declaration.<br/>"
+            + "Syntax: E.g., 'int x', or 'java.lang.Object y'.<br/>"
+            + "Those variables can be used as 'relevant locations'.</html>";
+    static final String PRED_DECL_TOOLTIP = "<html>Abstract predicates that can, e.g., be used to control<br/>"
+            + "abrupt completion of abstract program elements.<br/>"
+            + "Syntax: E.g., 'throwsExcP(any)'.<br/>"
+            + "Can be used, e.g., in 'assumes' clauses in the abstract<br/>"
+            + " program models.</html>";
+    static final String SAVE_BTN_TOOLTIP = "<html>Creates a KeY proof bundle at a temporary<br/>"
+            + "location and starts the proof.</html>";
+    static final String TOOLTIP_REL_LOCS_RIGHT = htmlTooltip(
+            "Locations that are part of the result relation (for the right program).<br/>"
+                    + "The i-th location in this list (i >= 1) is available via "
+                    + "\\result_2[i+1] in the 'Relation to Verify' text field.",
+            180);
+    static final String TOOLTIP_REL_LOCS_LEFT = htmlTooltip(
+            "Locations that are part of the result relation (for the left program).<br/>"
+                    + "The i-th location in this list (i >= 1) is available via "
+                    + "\\result_1[i+1] in the 'Relation to Verify' text field.",
+            180);
+    static final String CONTEXT_TOOLTIP = htmlTooltip(
+            "The surrounding context. Method-level, i.e., everything "
+                    + "you could write <em>inside</em> a class, especially field and method "
+                    + "declarations. The specified context is used for <em>both</em> abstract "
+                    + "program fragments.",
+            160);
+    static final String APF_TOOLTIP = htmlTooltip(
+            "The abstract program fragments for which to prove "
+                    + "the desired relation. Statement-level, i.e, everything you "
+                    + "could write inside a method body. You can use the declared "
+                    + "program variables and, inside JML specifications, the declared "
+                    + "abstract location sets and predicates.",
+            180);
+
+    static String htmlTooltip(String text, int width) {
+        return String.format(
+                "<html><table><td width=\"%dpx\" style=\"text-align:justify;\">%s</td></tr></html>",
+                width, text);
+    }
+}
