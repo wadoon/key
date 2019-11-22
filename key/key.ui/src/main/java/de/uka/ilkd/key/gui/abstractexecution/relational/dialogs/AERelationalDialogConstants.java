@@ -19,7 +19,7 @@ public interface AERelationalDialogConstants {
     static final String DUMMY_KEY_FILE = "/de/uka/ilkd/key/gui/abstractexecution/relational/dummy.key";
     static final String PROOF_BUNDLE_ENDING = ".zproof";
 
-    static final String TITLE = "Relational Proofs with Abstract Execution";
+    static final String TITLE = "REFINITY \u2014 Relational Proofs with Abstract Execution";
 
     static final String AEXP_CODE_TEMPLATE_ID = "aexp";
     static final String AEXP_CODE_TEMPLATE = //@formatter:off

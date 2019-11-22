@@ -111,6 +111,10 @@ import de.uka.ilkd.key.prover.impl.ProverTaskAdapter;
  * @author Dominic Steinhoefel
  */
 public class AERelationalDialog extends JFrame implements AERelationalDialogConstants {
+    private static final String DIRTY_TITLE_PART = " *";
+
+    private static final String READ_ONLY_TITLE_PART = " (READ ONLY - Save to edit)";
+
     private static final long serialVersionUID = 1L;
 
     private AERelationalModel model;
@@ -222,6 +226,7 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
          * initial content.
          */
         setDirty(false);
+        updateTitle();
         resetUndosListeners.forEach(ResetUndosListener::resetUndos);
     }
 
@@ -247,21 +252,19 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         ctm.addTemplate(aconstrTemplate);
     }
 
+    private void updateTitle() {
+        setTitle(String.format("%s [%s%s]%s", TITLE,
+                model.getFile().map(File::getName).orElse("No File"),
+                isDirty() ? DIRTY_TITLE_PART : "", isReadonly() ? READ_ONLY_TITLE_PART : ""));
+    }
+
     public void installListeners() {
         readOnlyListeners.add(ro -> {
-            if (ro) {
-                setTitle(String.format("%s (READ ONLY - Save to edit)", TITLE));
-            } else {
-                setTitle(TITLE);
-            }
+            updateTitle();
         });
 
         dirtyListeners.add(dirty -> {
-            if (dirty) {
-                setTitle(String.format("%s *", TITLE));
-            } else {
-                setTitle(TITLE);
-            }
+            updateTitle();
         });
 
         servicesLoadedListeners.add(() -> {
@@ -500,6 +503,7 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
 
         statusPanel.setMessage("Model successfully saved.");
         setDirty(false);
+        updateTitle();
 
         return true;
     }
@@ -520,6 +524,7 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
 
             final AERelationalModel newModel = AERelationalModel
                     .fromXml(new String(Files.readAllBytes(file.toPath())));
+            newModel.setFile(file);
 
             if (isDirty()) {
                 final AERelationalDialog newDia = new AERelationalDialog(mainWindow, newModel);
@@ -527,6 +532,7 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
             } else {
                 model = newModel;
                 model.setFile(file);
+                updateTitle();
                 loadFromModel();
                 setDirty(false);
                 resetUndosListeners.forEach(ResetUndosListener::resetUndos);
