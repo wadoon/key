@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.abstractexecution.rule;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -38,6 +38,10 @@ import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.TermAccessibleLocationsCollector;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.DefaultBuiltInRuleApp;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.conditions.DropEffectlessElementariesCondition;
 
 /**

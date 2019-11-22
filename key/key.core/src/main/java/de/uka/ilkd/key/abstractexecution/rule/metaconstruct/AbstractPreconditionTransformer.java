@@ -58,10 +58,10 @@ public class AbstractPreconditionTransformer extends AbstractTermTransformer {
         final AbstractProgramElement ape = getAPE(term, svInst);
 
         final PreconditionType preconditionType = getPreconditionType(term.sub(1), services);
+        final Services services1 = services;
 
-        final ImmutableArray<Term> accessiblesTerms = AbstractExecutionContractUtils
-                .getAccessibleAndAssignableTermsForNoBehaviorContract(ape, Optional.empty(),
-                        localSpecRepo, services, executionContext).first.stream()
+        final ImmutableArray<Term> accessiblesTerms = AbstractExecutionContractUtils.getAccessibleAndAssignableLocsForNoBehaviorContract(ape, Optional.empty(),
+        executionContext, localSpecRepo, services1).first.stream()
                                 .map(tb::wrapInValue).collect(ImmutableArray.toImmutableArray());
 
         final Function precondFun = services.abstractUpdateFactory()
@@ -82,7 +82,7 @@ public class AbstractPreconditionTransformer extends AbstractTermTransformer {
                 .filter(pt -> pt.getName().equals(completionType)).findAny().get();
     }
 
-    private AbstractProgramElement getAPE(Term term, SVInstantiations svInst) {
+    static AbstractProgramElement getAPE(Term term, SVInstantiations svInst) {
         assert term.sub(0).op() instanceof ProgramSV;
         final Object apeSVInst = svInst.getInstantiation((ProgramSV) term.sub(0).op());
 

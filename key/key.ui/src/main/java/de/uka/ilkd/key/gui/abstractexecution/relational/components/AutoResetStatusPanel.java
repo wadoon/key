@@ -74,7 +74,7 @@ public class AutoResetStatusPanel extends JPanel {
 
         statusLabel.setIcon(null);
         statusLabel.setText(message);
-        
+
         timeoutThread = new Thread(() -> {
             try {
                 Thread.sleep(timeout);
@@ -90,20 +90,19 @@ public class AutoResetStatusPanel extends JPanel {
 
     private void changeThread() {
         this.changeThread = new Thread(() -> {
-            boolean interrupted = false;
-            while (!interrupted) {
+            while (!Thread.currentThread().isInterrupted()) {
                 SwingUtilities.invokeLater(() -> {
                     statusLabel.setIcon(IconFontSwing.buildIcon( //
                             FontAwesomeSolid.LIGHTBULB, 16, Color.BLACK));
-                    statusLabel.setText(
-                            String.format("<html>%s</html>", standardMessages[currMsg]));
+                    statusLabel
+                            .setText(String.format("<html>%s</html>", standardMessages[currMsg]));
                 });
                 currMsg = (currMsg + 1) % standardMessages.length;
 
                 try {
                     Thread.sleep(changeTime);
                 } catch (InterruptedException e) {
-                    interrupted = true;
+                    return;
                 }
             }
         });

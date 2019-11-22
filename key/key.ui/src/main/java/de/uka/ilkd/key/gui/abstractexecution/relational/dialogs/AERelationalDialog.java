@@ -58,8 +58,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.xml.bind.JAXBException;
 
 import org.fife.ui.rsyntaxtextarea.CodeTemplateManager;
@@ -236,13 +234,17 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
 
         final CodeTemplateManager ctm = RSyntaxTextArea.getCodeTemplateManager();
 
-        final CodeTemplate asTemplate = new StaticCodeTemplate(AS_CODE_TEMPLATE_ID,
-                AS_CODE_TEMPLATE, null);
+        final CodeTemplate asTemplate = new StaticCodeTemplate( //
+                AS_CODE_TEMPLATE_ID, AS_CODE_TEMPLATE, null);
         ctm.addTemplate(asTemplate);
 
-        final CodeTemplate aexpTemplate = new StaticCodeTemplate(AEXP_CODE_TEMPLATE_ID,
-                AEXP_CODE_TEMPLATE, null);
+        final CodeTemplate aexpTemplate = new StaticCodeTemplate( //
+                AEXP_CODE_TEMPLATE_ID, AEXP_CODE_TEMPLATE, null);
         ctm.addTemplate(aexpTemplate);
+
+        final CodeTemplate aconstrTemplate = new StaticCodeTemplate( //
+                AE_CONSTRAINT_CODE_TEMPLATE_ID, AE_CONSTRAINT_CODE_TEMPLATE, null);
+        ctm.addTemplate(aconstrTemplate);
     }
 
     public void installListeners() {
@@ -670,13 +672,10 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         tabbedPane.setToolTipTextAt(0, APF_TOOLTIP);
         tabbedPane.setToolTipTextAt(1, CONTEXT_TOOLTIP);
 
-        tabbedPane.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (tabbedPane.getSelectedIndex() == 0) {
-                    methodContextChangedListeners
-                            .forEach(l -> l.methodContextChanged(codeContext.getText()));
-                }
+        tabbedPane.addChangeListener(e -> {
+            if (tabbedPane.getSelectedIndex() == 0) {
+                methodContextChangedListeners
+                        .forEach(l -> l.methodContextChanged(codeContext.getText()));
             }
         });
 
@@ -947,7 +946,11 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         scrollPane.setViewportView(progVarDeclsList);
         result.add(scrollPane, BorderLayout.CENTER);
         progVarDeclsList.setModel(progVarDeclsListModel);
-        progVarDeclsListModel.addListDataListener(uldl(e -> setDirty(true)));
+        progVarDeclsListModel.addListDataListener(uldl(e -> {
+            setDirty(true);
+            programVariablesChangedListeners.forEach(l -> l.programVariablesChanged( //
+                    Collections.list(progVarDeclsListModel.elements())));
+        }));
 
         final JButton plusButton = new JButton(
                 IconFontSwing.buildIcon(FontAwesomeSolid.PLUS, 16, Color.BLACK));

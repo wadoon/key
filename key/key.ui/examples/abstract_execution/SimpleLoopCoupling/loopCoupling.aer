@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="\result_1=\result_2">
+    <programOne>//@ assume i &gt;= 0;
+{ ; }
+
+//@ ae_constraint \disjoint(frameP, i);
+{ ; }
+
+//@ assume CP1_1(i);
+{ ; }
+
+/*@ loop_invariant i &gt;= -1;
+  @ decreases i + 1;
+  @ assignable frameP;
+  @*/
+while (i &gt;= 0) {
+    //@ ghost int oldI = i;
+    
+    /*@ ae_constraint \disjoint(footprintP, oldI) &amp;&amp;
+      @   \disjoint(frameP, oldI);
+      @*/
+    { ; }
+    
+    /*@ assignable frameP, \hasTo(i);
+      @ accessible footprintP;
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @ normal_behavior ensures 
+      @   i &lt; oldI &amp;&amp; i &gt;= -1;
+      @*/
+    \abstract_statement P;
+}</programOne>
+    <programTwo>//@ assume j &gt;= 0;
+{ ; }
+
+//@ ae_constraint \disjoint(frameP, j);
+{ ; }
+
+//@ assume CP2_1(j);
+{ ; }
+
+/*@ loop_invariant j &gt;= -1;
+  @ decreases j + 1;
+  @ assignable frameP;
+  @*/
+while (j &gt;= 0) {
+    //@ ghost int oldJ = j;
+    
+    /*@ ae_constraint \disjoint(footprintP, oldJ) &amp;&amp;
+      @   \disjoint(frameP, oldJ);
+      @*/
+    { ; }
+    
+    /*@ assignable frameP, \hasTo(i);
+      @ accessible footprintP;
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @ normal_behavior ensures 
+      @   j &lt; oldJ &amp;&amp; j &gt;= -1;
+      @*/
+    \abstract_statement P;
+}</programTwo>
+    <methodLevelContext></methodLevelContext>
+    <locationSets>
+        <locationSet locsetName="relevant">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <predicates>
+        <predicate predName="CP1_1">
+            <argSort>int</argSort>
+        </predicate>
+        <predicate predName="CP2_1">
+            <argSort>int</argSort>
+        </predicate>
+    </predicates>
+    <programVariables>
+        <programVariable typeName="int" varName="i">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="j">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </programVariable>
+    </programVariables>
+</ns2:aeRelationalModel>

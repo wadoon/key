@@ -164,9 +164,9 @@ group aepaper_provable {
 group aepaper_notprovable {
    notprovable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixIncorrect/consolidateDuplicateConditionalFragments.aer
    
-   notprovable ./abstract_execution/ReplaceExceptionWithTest/IncorrectMissingRollback/replaceExceptionWithTest.key
+   notprovable ./abstract_execution/ReplaceExceptionWithTest/IncorrectMissingRollback/replaceExceptionWithTest.aer
    
-   notprovable ./abstract_execution/ExtractMethod/InCorrectQThrowsException/extractMethodRefactoring.aer
+   notprovable ./abstract_execution/ExtractMethod/IncorrectQThrowsException/extractMethodRefactoring.aer
 }
 
 // TODO (DS, 2019-11-21): Update Remaining Refactoring Examples!

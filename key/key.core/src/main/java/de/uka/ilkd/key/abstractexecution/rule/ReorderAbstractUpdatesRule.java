@@ -10,7 +10,10 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.abstractexecution.rule;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -22,6 +25,9 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.RuleAbortException;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
@@ -38,6 +44,7 @@ public class ReorderAbstractUpdatesRule implements BuiltInRule {
     public final static ReorderAbstractUpdatesRule INSTANCE = new ReorderAbstractUpdatesRule();
 
     private final static Name RULE_NAME = new Name("reorderAbstractUpdate");
+    private final static Map<PosInOccurrence, ReorderAbstractUpdatesRuleApp> appCache = new HashMap<>();
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
@@ -75,13 +82,13 @@ public class ReorderAbstractUpdatesRule implements BuiltInRule {
         if (pio.up().subTerm().op() != UpdateJunctor.PARALLEL_UPDATE) {
             return false;
         }
-        
+
         PosInOccurrence parallelUpdPio = pio;
         do {
             parallelUpdPio = parallelUpdPio.up();
         } while (!parallelUpdPio.isTopLevel()
                 && parallelUpdPio.up().subTerm().op() == UpdateJunctor.PARALLEL_UPDATE);
-        
+
         if (!MergeRuleUtils.isUpdateNormalForm(parallelUpdPio.subTerm(), true)) {
             return false;
         }
@@ -92,7 +99,15 @@ public class ReorderAbstractUpdatesRule implements BuiltInRule {
          * it's not applicable
          */
 
-        return createApp(pio, goal.proof().getServices()).tryToInstantiate(goal).complete();
+        final ReorderAbstractUpdatesRuleApp app = //
+                createApp(pio, goal.proof().getServices()).tryToInstantiate(goal);
+        final boolean complete = app.complete();
+
+        if (complete) {
+            appCache.put(pio, app);
+        }
+
+        return complete;
     }
 
     @Override
@@ -117,6 +132,10 @@ public class ReorderAbstractUpdatesRule implements BuiltInRule {
 
     @Override
     public ReorderAbstractUpdatesRuleApp createApp(PosInOccurrence pos, TermServices services) {
+        if (appCache.containsKey(pos)) {
+            return appCache.remove(pos);
+        }
+
         return new ReorderAbstractUpdatesRuleApp(this, pos);
     }
 

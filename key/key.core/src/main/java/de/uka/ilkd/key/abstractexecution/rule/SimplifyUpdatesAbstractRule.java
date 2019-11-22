@@ -10,26 +10,27 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.rule;
+package de.uka.ilkd.key.abstractexecution.rule;
 
-import java.util.function.Predicate;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
-import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.TermAccessibleLocationsCollector;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.RuleAbortException;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.conditions.DropEffectlessElementariesCondition;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -50,6 +51,7 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
     public final static SimplifyUpdatesAbstractRule INSTANCE = new SimplifyUpdatesAbstractRule();
 
     private final static Name RULE_NAME = new Name("simplifyUpdatesAbstract");
+    private final static Map<PosInOccurrence, SimplifyUpdatesAbstractRuleApp> appCache = new HashMap<>();
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
@@ -85,7 +87,15 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
             return false;
         }
 
-        return createApp(pio, goal.proof().getServices()).tryToInstantiate(goal).complete();
+        final SimplifyUpdatesAbstractRuleApp app = //
+                createApp(pio, goal.proof().getServices()).tryToInstantiate(goal);
+        final boolean complete = app.complete();
+
+        if (complete) {
+            appCache.put(pio, app);
+        }
+
+        return complete;
     }
 
     @Override
@@ -110,6 +120,10 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
 
     @Override
     public SimplifyUpdatesAbstractRuleApp createApp(PosInOccurrence pos, TermServices services) {
+        if (appCache.containsKey(pos)) {
+            return appCache.remove(pos);
+        }
+
         return new SimplifyUpdatesAbstractRuleApp(this, pos);
     }
 

@@ -48,6 +48,7 @@ catch (Throwable t) {
 //@ exceptional_behavior requires false;
 \abstract_statement Postfix;
 </programTwo>
+    <methodLevelContext></methodLevelContext>
     <locationSets>
         <locationSet locsetName="relevant">
             <relevantOne>0</relevantOne>

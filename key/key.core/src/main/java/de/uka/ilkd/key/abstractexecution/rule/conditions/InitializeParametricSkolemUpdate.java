@@ -68,11 +68,11 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
                 (AbstractProgramElement) svInst.getInstantiation(this.abstrProgSV);
 
         final TermBuilder tb = services.getTermBuilder();
+        final Services services1 = services;
 
         final Pair<List<Term>, UniqueArrayList<AbstractUpdateLoc>> accessibleAndAssignableClause = //
-                AbstractExecutionContractUtils.getAccessibleAndAssignableTermsForNoBehaviorContract(
-                        ape, matchCond.getMaybeSeqFor(), goal.getLocalSpecificationRepository(),
-                        services, executionContext);
+                AbstractExecutionContractUtils.getAccessibleAndAssignableLocsForNoBehaviorContract(ape, matchCond.getMaybeSeqFor(),
+        executionContext, goal.getLocalSpecificationRepository(), services1);
 
         final Term update = tb.abstractUpdate(ape, accessibleAndAssignableClause.second,
                 accessibleAndAssignableClause.first);

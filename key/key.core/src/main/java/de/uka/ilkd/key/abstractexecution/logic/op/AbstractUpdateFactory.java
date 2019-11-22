@@ -441,14 +441,18 @@ public class AbstractUpdateFactory {
     public static Set<AbstractUpdateLoc> abstrUpdateLocsFromUnionTerm(Term t,
             Optional<ExecutionContext> executionContext, Services services) {
         return services.getTermBuilder().locsetUnionToSet(t).stream()
-                .map(sub -> abstrUpdateLocsFromTermHelper(sub, executionContext, services))
+                .map(sub -> abstrUpdateLocFromTerm(sub, executionContext, services))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
     /**
-     * Converts the given {@link Term} to the {@link AbstractUpdateLoc}s it is
+     * Converts the given {@link Term} to the {@link AbstractUpdateLoc} it is
      * representing. Throws a {@link RuntimeException} if the given {@link Term} is
-     * not directly representing any locations (i.e., is not a LocSet term).
+     * not directly representing any location (i.e., is not a LocSet term).
+     * 
+     * <p>
+     * NOTE: t may not be a union {@link Term}! For this purpose, please use
+     * {@link #abstrUpdateLocsFromUnionTerm(Term, Optional, Services)}.
      *
      * @param t                The {@link Term} to extract all
      *                         {@link AbstractUpdateLoc}s from.
@@ -459,7 +463,7 @@ public class AbstractUpdateFactory {
      * @return All {@link AbstractUpdateLoc}s from the given {@link Term} or null if
      *         the {@link Term} does not represent {@link AbstractUpdateLoc}s.
      */
-    private static AbstractUpdateLoc abstrUpdateLocsFromTermHelper(Term t,
+    public static AbstractUpdateLoc abstrUpdateLocFromTerm(Term t,
             Optional<ExecutionContext> executionContext, Services services) {
         t = MiscTools.simplifyUpdatesInTerm(t, services);
 
@@ -479,11 +483,11 @@ public class AbstractUpdateFactory {
         } else if (AbstractExecutionUtils.isAbstractSkolemLocationSet(op, services)) {
             return new SkolemLoc((Function) op);
         } else if (op == locSetLDT.getSingletonPV()) {
-            return abstrUpdateLocsFromTermHelper(t.sub(0), executionContext, services);
+            return abstrUpdateLocFromTerm(t.sub(0), executionContext, services);
         } else if (op == locSetLDT.getHasTo()) {
             // There is exactly one location inside a hasTo
             return new HasToLoc<AbstractUpdateLoc>(
-                    abstrUpdateLocsFromTermHelper(t.sub(0), executionContext, services));
+                    abstrUpdateLocFromTerm(t.sub(0), executionContext, services));
         } else if (isHeapOp(op, locSetLDT, heapLDT)) {
             return abstrUpdateAssgnLocsFromHeapTerm(t, executionContext, services);
         } else {

@@ -21,17 +21,6 @@ public interface AERelationalDialogConstants {
 
     static final String TITLE = "Relational Proofs with Abstract Execution";
 
-    static final int STATUS_PANEL_TIMEOUT = 2000;
-    static final int STATUS_PANEL_CHANGE_TIME = 30000;
-    static final String STATUS_PANEL_STD_MSG_1 = //
-            "Try to use tooltips if feeling unsure about the functionality of an element.";
-    static final String STATUS_PANEL_STD_MSG_2 = //
-            "Recommended Example: File > Load Example > Abstract Execution > Consolidate Duplicate... > Extract Prefix";
-    static final String STATUS_PANEL_STD_MSG_3 = //
-            "When declaring <tt>ae_constraint</tt>s, you have to put an empty block <tt>{ ; }</tt> after the JML comment.";
-    static final String STATUS_PANEL_STD_MSG_4 = //
-            "There are code templates for abstract statements and expressions! Type \"<tt>as</tt>\" or \"<tt>aexp</tt>\" followed by <tt>Ctrl+Shift+Space</tt>.";
-
     static final String AEXP_CODE_TEMPLATE_ID = "aexp";
     static final String AEXP_CODE_TEMPLATE = //@formatter:off
             "/*@ assignable frameE;\n" + //
@@ -48,6 +37,27 @@ public interface AERelationalDialogConstants {
             "  @ return_behavior requires false;\n" + //
             "  @*/\n" + //
             "\\abstract_statement P;"; //@formatter:on
+
+    static final String AE_CONSTRAINT_CODE_TEMPLATE_ID = "aec";
+    static final String AE_CONSTRAINT_CODE_TEMPLATE = //@formatter:off
+            "/*@ ae_constraint\n" + //
+            "  @   true;\n" + //
+            "  @*/\n" + //
+            "{ ; }"; //@formatter:on
+
+    static final int STATUS_PANEL_TIMEOUT = 2000;
+    static final int STATUS_PANEL_CHANGE_TIME = 30000;
+    static final String STATUS_PANEL_STD_MSG_1 = //
+            "Try to use tooltips if feeling unsure about the functionality of an element.";
+    static final String STATUS_PANEL_STD_MSG_2 = //
+            "Recommended Example: File > Load Example > Abstract Execution > Consolidate Duplicate... > Extract Prefix";
+    static final String STATUS_PANEL_STD_MSG_3 = //
+            "When declaring <tt>ae_constraint</tt>s, you have to put an empty block <tt>{ ; }</tt> after the JML comment.";
+    static final String STATUS_PANEL_STD_MSG_4 = //
+            "There are code templates for abstract statements, expressions, and constraints! Type \"<tt>"
+                    + AEXP_CODE_TEMPLATE_ID + "</tt>\", \"<tt>" + AE_CONSTRAINT_CODE_TEMPLATE_ID
+                    + "</tt>\" or \"<tt>" + AE_CONSTRAINT_CODE_TEMPLATE_ID
+                    + "</tt>\" followed by <tt>Ctrl+Shift+Space</tt>.";
 
     static final String STD_POSTCONDREL_TOOLTIP = "Relation between values of the relevant locations after execution.<br/>"
             + "You may use the keywords \"\\result_1\" and \"\\result_2\" to access<br/>"

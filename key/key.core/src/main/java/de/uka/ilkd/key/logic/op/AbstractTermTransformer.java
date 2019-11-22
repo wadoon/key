@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.abstractexecution.rule.metaconstruct.AbstractPreconditionTransformer;
+import de.uka.ilkd.key.abstractexecution.rule.metaconstruct.GetFrameTransformer;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -42,7 +43,6 @@ import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula2;
 import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula3;
 import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula4;
 import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula5;
-import de.uka.ilkd.key.rule.metaconstruct.NormalSpec;
 import de.uka.ilkd.key.rule.metaconstruct.ObserverEqualityMetaConstruct;
 import de.uka.ilkd.key.rule.metaconstruct.RetrieveAEPostconditionTransformer;
 import de.uka.ilkd.key.rule.metaconstruct.ReturnPrecondition;
@@ -143,14 +143,14 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer MUTUAL_EXCLUSION_FORMULA_4 = new MutualExclusionFormula4();
     public static final AbstractTermTransformer MUTUAL_EXCLUSION_FORMULA_5 = new MutualExclusionFormula5();
 
-    public static final AbstractTermTransformer NORMAL_SPEC = new NormalSpec();
     public static final AbstractTermTransformer RETURN_SPEC = new ReturnPrecondition();
     public static final AbstractTermTransformer EXC_SPEC = new ExcPrecondition();
     public static final AbstractTermTransformer BREAKS_SPEC = new BreaksPrecondition();
     public static final AbstractTermTransformer CONTINUES_SPEC = new ContinuesPrecondition();
     
     public static final AbstractTermTransformer ABSTR_PRECOND_TRANSF = new AbstractPreconditionTransformer();
-    public static final RetrieveAEPostconditionTransformer ABSTR_POSTCOND_TRANSF = new RetrieveAEPostconditionTransformer();
+    public static final AbstractTermTransformer ABSTR_POSTCOND_TRANSF = new RetrieveAEPostconditionTransformer();
+    public static final AbstractTermTransformer GET_FRAME_TRANSFORMER = new GetFrameTransformer();
 
     public static final AbstractTermTransformer SET_SECOND_COMPONENT_TO = new SetLastComponentOfAEPredsToFalseTransformer();
 
