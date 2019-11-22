@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
-import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -44,7 +44,8 @@ public class AbstractUpdateCondition implements VariableCondition {
             MatchConditions matchCond, Goal goal, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
         final Term uInst = (Term) svInst.getInstantiation(u);
-        if (negated ^ AbstractExecutionUtils.containsAbstractUpdate(uInst)) {
+//        if (negated ^ AbstractExecutionUtils.containsAbstractUpdate(uInst)) {
+        if (negated ^ uInst.op() instanceof AbstractUpdate) {
             return matchCond;
         } else {
             return null;

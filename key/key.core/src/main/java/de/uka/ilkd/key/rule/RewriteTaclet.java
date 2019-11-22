@@ -216,20 +216,20 @@ public class RewriteTaclet extends FindTaclet {
 
 	PIOPathIterator it = p_pos.iterator ();
 	Operator        op;
-        boolean inAbstractUpdateScope = false;
+//        boolean inAbstractUpdateScope = false;
 	while ( it.next () != -1 ) {
 	    final Term t = it.getSubTerm ();
 	    op = t.op ();
-            inAbstractUpdateScope |= op instanceof UpdateApplication
-                    && AbstractExecutionUtils.containsAbstractUpdate(
-                            UpdateApplication.getUpdate(t));
+//            inAbstractUpdateScope |= op instanceof UpdateApplication
+//                    && AbstractExecutionUtils.containsAbstractUpdate(
+//                            UpdateApplication.getUpdate(t));
 	    if (op instanceof Transformer) {
 	        return null;
-            }
-            else if (((getApplicationRestriction()
-                    & NOT_IN_ABSTRACT_UPDATE_SCOPE) != 0
-                    && inAbstractUpdateScope)) {
-                return null;
+//            }
+//            else if (((getApplicationRestriction()
+//                    & NOT_IN_ABSTRACT_UPDATE_SCOPE) != 0
+//                    && inAbstractUpdateScope)) {
+//                return null;
             } else if (op instanceof UpdateApplication
                     && it.getChild() == UpdateApplication.targetPos()
                     && getApplicationRestriction() != NONE) {
@@ -251,11 +251,11 @@ public class RewriteTaclet extends FindTaclet {
 	    }
         }
 
-        if (((getApplicationRestriction()
-                    & IN_ABSTRACT_UPDATE_SCOPE) != 0
-                    && !inAbstractUpdateScope)) {
-            return null;
-	}
+//        if (((getApplicationRestriction()
+//                    & IN_ABSTRACT_UPDATE_SCOPE) != 0
+//                    && !inAbstractUpdateScope)) {
+//            return null;
+//	}
 	
 	if (getApplicationRestriction() == NONE)
             return p_mc;

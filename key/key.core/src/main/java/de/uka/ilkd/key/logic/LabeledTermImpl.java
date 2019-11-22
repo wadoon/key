@@ -125,13 +125,8 @@ class LabeledTermImpl extends TermImpl {
     @Override
     public int computeHashCode() {
         int hash = super.computeHashCode();
-        
-        final ImmutableArray<TermLabel> proofRelevantTermLabels = //
-                labels.stream().filter(TermLabel::isProofRelevant)
-                        .collect(ImmutableArray.toImmutableArray());
-        
-        for (int i = 0, sz = proofRelevantTermLabels.size(); i < sz; i++) {
-            hash += 7 * proofRelevantTermLabels.get(i).hashCode();
+        for (int i = 0, sz = labels.size(); i < sz; i++) {
+            hash += 7 * labels.get(i).hashCode();
         }
         return hash;
     }
