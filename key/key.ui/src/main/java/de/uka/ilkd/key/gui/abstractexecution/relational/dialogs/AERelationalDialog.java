@@ -111,10 +111,6 @@ import de.uka.ilkd.key.prover.impl.ProverTaskAdapter;
  * @author Dominic Steinhoefel
  */
 public class AERelationalDialog extends JFrame implements AERelationalDialogConstants {
-    private static final String DIRTY_TITLE_PART = " *";
-
-    private static final String READ_ONLY_TITLE_PART = " (READ ONLY - Save to edit)";
-
     private static final long serialVersionUID = 1L;
 
     private AERelationalModel model;
@@ -255,7 +251,7 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
     private void updateTitle() {
         setTitle(String.format("%s [%s%s]%s", TITLE,
                 model.getFile().map(File::getName).orElse("No File"),
-                isDirty() ? DIRTY_TITLE_PART : "", isReadonly() ? READ_ONLY_TITLE_PART : ""));
+                isDirty() ? AERelationalDialogConstants.DIRTY_TITLE_PART : "", isReadonly() ? AERelationalDialogConstants.READ_ONLY_TITLE_PART : ""));
     }
 
     public void installListeners() {

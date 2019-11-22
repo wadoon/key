@@ -20,6 +20,8 @@ public interface AERelationalDialogConstants {
     static final String PROOF_BUNDLE_ENDING = ".zproof";
 
     static final String TITLE = "REFINITY \u2014 Relational Proofs with Abstract Execution";
+    static final String DIRTY_TITLE_PART = " *";
+    static final String READ_ONLY_TITLE_PART = " (READ ONLY - Save to edit)";
 
     static final String AEXP_CODE_TEMPLATE_ID = "aexp";
     static final String AEXP_CODE_TEMPLATE = //@formatter:off
@@ -109,4 +111,5 @@ public interface AERelationalDialogConstants {
                 "<html><table><td width=\"%dpx\" style=\"text-align:justify;\">%s</td></tr></html>",
                 width, text);
     }
+
 }
