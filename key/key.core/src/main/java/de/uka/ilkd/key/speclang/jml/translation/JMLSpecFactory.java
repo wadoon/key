@@ -73,6 +73,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.ParametricMergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContractImpl;
@@ -851,10 +852,14 @@ public class JMLSpecFactory {
         } else {
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 if (clauses.ensures.get(heap) != null) {
-                    Term excNull = tb.addLabelToAllSubs(
-                            (tb.label(tb.equals(tb.var(progVars.excVar), tb.NULL()),
-                            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)),
-                            new OriginTermLabel(new Origin(SpecType.ENSURES)));
+                    Term excNull = tb.equals(tb.var(progVars.excVar), tb.NULL());
+                    if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                            .getUseOriginLabels()) {
+                        excNull = tb.addLabelToAllSubs(
+                                (tb.label(excNull,
+                                        ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)),
+                                new OriginTermLabel(new Origin(SpecType.ENSURES)));
+                    }
                     Term post1 = (originalBehavior == Behavior.NORMAL_BEHAVIOR
                             ? tb.convertToFormula(clauses.ensures.get(heap))
                             : tb.imp(excNull, tb.convertToFormula(clauses.ensures.get(heap))));

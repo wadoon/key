@@ -66,6 +66,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
@@ -708,8 +709,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
                       selfNotNull, selfCreated, selfExactType,
                       paramsOK, mbyAtPreDef);
 
-        return tb.addLabelToAllSubs(result, new OriginTermLabel(
-                new Origin(SpecType.REQUIRES)));
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()) {
+            return tb.addLabelToAllSubs(result, new OriginTermLabel(new Origin(SpecType.REQUIRES)));
+        } else {
+            return result;
+        }
     }
 
     /**

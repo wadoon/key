@@ -62,6 +62,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
@@ -1837,9 +1838,10 @@ public final class JMLTranslator {
                 term = (Term) castToReturnType(result, resultClass);
             }
 
-            if (specType != null) {
-                return castToReturnType(services.getTermBuilder().addLabelToAllSubs(term,
-                        new OriginTermLabel(
+            if (specType != null && ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                    .getUseOriginLabels()) {
+                return castToReturnType(
+                        services.getTermBuilder().addLabelToAllSubs(term, new OriginTermLabel(
                                 new FileOrigin(specType, expr.fileName, expr.pos.getLine()))),
                         resultClass);
             } else {
@@ -1887,7 +1889,8 @@ public final class JMLTranslator {
                 term = (Term) castToReturnType(result, resultClass);
             }
 
-            if (specType != null) {
+            if (specType != null && ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                    .getUseOriginLabels()) {
                 Origin origin = expr.pos == Position.UNDEFINED
                         ? new Origin(specType)
                         : new FileOrigin(specType, expr.fileName, expr.pos.getLine());

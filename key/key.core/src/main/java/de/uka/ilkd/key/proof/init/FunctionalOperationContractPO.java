@@ -50,6 +50,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
 import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
 import de.uka.ilkd.key.rule.metaconstruct.PostWork;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
@@ -266,8 +267,12 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             }
         }
 
-        return tb.addLabelToAllSubs(frameTerm, new OriginTermLabel(
-                new Origin(SpecType.ASSIGNABLE)));
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()) {
+            return tb.addLabelToAllSubs(frameTerm,
+                    new OriginTermLabel(new Origin(SpecType.ASSIGNABLE)));
+        } else {
+            return frameTerm;
+        }
     }
 
     /**
