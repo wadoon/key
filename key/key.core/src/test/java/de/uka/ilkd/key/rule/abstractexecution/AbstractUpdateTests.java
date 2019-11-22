@@ -115,8 +115,8 @@ public class AbstractUpdateTests extends AbstractTestTermParser {
         final LocationVariable lvY = intVar("y");
         final LocationVariable lvZ = intVar("z");
 
-        final Term u1 = abstractUpdate(aps("P"), new PVLoc(lvW), new PVLoc(lvX));
-        final Term u2 = abstractUpdate(aps("Q"), new PVLoc(lvY), new PVLoc(lvZ));
+        final Term u1 = abstractUpdate(aps("P"), new PVLoc(lvW), TB.var(lvX));
+        final Term u2 = abstractUpdate(aps("Q"), new PVLoc(lvY), TB.var(lvZ));
 
         final Term pred = TB.func(
                 new Function(new Name("p"), Sort.FORMULA, INT_SORT, INT_SORT, INT_SORT, INT_SORT),
@@ -142,9 +142,9 @@ public class AbstractUpdateTests extends AbstractTestTermParser {
         final LocationVariable y = intVar("y");
 
         final Term u1 = abstractUpdate(aps("P"), new HasToLoc<PVLoc>(new PVLoc(y)),
-                new PVLoc[] { new PVLoc(y), new PVLoc(w) });
+                new Term[] { TB.var(y), TB.var(w) });
         final Term u2 = abstractUpdate(aps("P"), new HasToLoc<PVLoc>(new PVLoc(x)),
-                new PVLoc[] { new PVLoc(x), new PVLoc(w) });
+                new Term[] { TB.var(x), TB.var(w) });
 
         final Term pred = TB.func(new Function( //
                 new Name("p"), Sort.FORMULA, INT_SORT, INT_SORT), TB.var(x), TB.var(w));
@@ -247,18 +247,18 @@ public class AbstractUpdateTests extends AbstractTestTermParser {
     }
 
     private Term abstractUpdate(AbstractStatement aps, AbstractUpdateLoc lhs,
-            AbstractUpdateLoc rhs) {
+            Term rhs) {
         return abstractUpdate(aps, new AbstractUpdateLoc[] { lhs },
-                new AbstractUpdateLoc[] { rhs });
+                new Term[] { rhs });
     }
 
     private Term abstractUpdate(AbstractStatement aps, AbstractUpdateLoc lhs,
-            AbstractUpdateLoc[] rhs) {
+            Term[] rhs) {
         return abstractUpdate(aps, new AbstractUpdateLoc[] { lhs }, rhs);
     }
 
     private Term abstractUpdate(AbstractStatement aps, AbstractUpdateLoc[] lhs,
-            AbstractUpdateLoc[] rhs) {
+            Term[] rhs) {
         final TermBuilder tb = DUMMY_SERVICES.getTermBuilder();
 
         final AbstractUpdateFactory abstrUpdF = DUMMY_SERVICES.abstractUpdateFactory();

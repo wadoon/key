@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.abstractexecution.rule.metaconstruct.AbstractPreconditionTransformer;
+import de.uka.ilkd.key.abstractexecution.rule.metaconstruct.CreateAbstractAnonUpdate;
 import de.uka.ilkd.key.abstractexecution.rule.metaconstruct.GetFrameTransformer;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -128,6 +129,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     public static final AbstractTermTransformer CREATE_LOCAL_ANON_UPDATE = new CreateLocalAnonUpdate();
     public static final AbstractTermTransformer CREATE_HEAP_ANON_UPDATE = new CreateHeapAnonUpdate();
+    public static final AbstractTermTransformer CREATE_ABSTRACT_ANON_UPDATE = new CreateAbstractAnonUpdate();
     public static final AbstractTermTransformer CREATE_BEFORE_LOOP_UPDATE = new CreateBeforeLoopUpdate();
     public static final AbstractTermTransformer CREATE_FRAME_COND = new CreateFrameCond();
     public static final AbstractTermTransformer CREATE_WELLFORMED_COND = new CreateWellformedCond();

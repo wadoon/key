@@ -53,7 +53,7 @@ while (j &gt;= 0) {
       @*/
     { ; }
     
-    /*@ assignable frameP, \hasTo(i);
+    /*@ assignable frameP, \hasTo(j);
       @ accessible footprintP;
       @ exceptional_behavior requires false;
       @ return_behavior requires false;

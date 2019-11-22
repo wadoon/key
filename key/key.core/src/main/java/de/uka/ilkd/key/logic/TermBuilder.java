@@ -40,7 +40,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -1048,20 +1047,6 @@ public class TermBuilder {
     }
     
     /**
-     * Creates an AbstractUpdate term for the given {@link AbstractUpdate} operator
-     * and right-hand sides. The right-hand sides are wrapped inside a "value(...)"
-     * application to convert LocSets to the corresponding values.
-     * 
-     * @param abstrUpd    The {@link AbstractUpdate} operator.
-     * @param accessibles The accessible locations (the "footprint").
-     * @return The {@link AbstractUpdate} created <em>fresh for</em> phs.
-     */
-    public Term abstractUpdate(AbstractUpdate abstrUpd, AbstractUpdateLoc... rhs) {
-        return tf.createTerm(abstrUpd, Arrays.stream(rhs).map(loc -> loc.toTerm(services))
-                .map(this::wrapInValue).collect(Collectors.toList()).toArray(new Term[0]));
-    }
-    
-    /**
      * Creates an {@link AbstractUpdate} {@link Term} for the given APS identifier,
      * frame (lhs) and footprint (rhs). The right-hand sides are wrapped inside a
      * "value(...)" application to convert LocSets to the corresponding values.
@@ -1085,25 +1070,6 @@ public class TermBuilder {
                 services.abstractUpdateFactory().getInstance(aps, assignables, rhs.size());
 
         return tf.createTerm(abstrUpd, accessibles, null, null);
-    }
-
-    /**
-     * Creates an {@link AbstractUpdate} term.
-     *
-     * @param phs              The {@link AbstractProgramElement} for which to
-     *                         create an {@link AbstractUpdate}.
-     * @param lhs              The {@link AbstractUpdate}'s left-hand side.
-     * @param rhs              The {@link AbstractUpdate}'s left-hand side.
-     * @param ec An optional {@link ExecutionContext} to normalize
-     *                         self terms (because otherwise, there might be
-     *                         different such terms around).
-     * @return the {@link AbstractUpdate} term.
-     */
-    public Term abstractUpdate(AbstractProgramElement phs, Term lhs, Term rhs,
-            Optional<ExecutionContext> ec) {
-        final AbstractUpdate au = //
-                services.abstractUpdateFactory().getInstance(phs, lhs, rhs, ec);
-        return tf.createTerm(au, rhs);
     }
 
     // -------------------------------------------------------------------------
