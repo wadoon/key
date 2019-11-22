@@ -23,7 +23,7 @@ public class TermLabelSettings implements Settings, Cloneable {
     /**
      * @see {@link #getUseOriginLabels()}
      */
-    private boolean useOriginLabels = true;
+    private boolean useOriginLabels = false;
 
     /**
      * @see #addSettingsListener(SettingsListener)

@@ -57,6 +57,7 @@ public class ProofIndependentSettings {
         addSettings(generalSettings);
         addSettings(viewSettings);
         addSettings(testGenSettings);
+        addSettings(termLabelSettings);
         this.filename = filename;
         loadSettings();
     }
