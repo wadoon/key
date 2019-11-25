@@ -30,40 +30,48 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Dominic Steinhoefel
  */
 @XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
-public class PredicateDeclaration implements FuncOrPredDecl {
-    public static final PredicateDeclaration EMPTY_DECL = //
-            new PredicateDeclaration("", Collections.emptyList());
-
+@XmlAccessorType(value = XmlAccessType.FIELD)
+public class FunctionDeclaration implements FuncOrPredDecl {
     @XmlAttribute
-    private String predName = "";
+    private String funcName = "";
+    @XmlAttribute
+    private String resultSortName = "";
     @XmlElement(name = "argSort")
     private List<String> argSorts = new ArrayList<>();
 
-    PredicateDeclaration() {
+    FunctionDeclaration() {
     }
 
-    public PredicateDeclaration(String predName, List<String> argSorts) {
-        this.predName = predName;
+    public FunctionDeclaration(String funcName, String resultSortName, List<String> argSorts) {
+        this.funcName = funcName;
         this.argSorts = argSorts;
+        this.resultSortName = resultSortName;
     }
-
+    
     @Override
     public boolean isFuncDecl() {
-        return false;
+        return true;
     }
     
     @Override
     public String getName() {
-        return getPredName();
+        return getFuncName();
     }
 
-    public String getPredName() {
-        return predName;
+    public String getResultSortName() {
+        return resultSortName;
     }
 
-    public void setPredName(String predName) {
-        this.predName = predName;
+    public void setResultSortName(String resultSortName) {
+        this.resultSortName = resultSortName;
+    }
+
+    public String getFuncName() {
+        return funcName;
+    }
+
+    public void setFuncName(String funcName) {
+        this.funcName = funcName;
     }
 
     public List<String> getArgSorts() {
@@ -74,34 +82,33 @@ public class PredicateDeclaration implements FuncOrPredDecl {
         this.argSorts = argSorts;
     }
 
-    public static PredicateDeclaration fromString(final String str)
-            throws IllegalArgumentException {
-        final Pattern pattern = Pattern
-                .compile("^([a-zA-Z0-9_]+)(?:\\(([a-zA-Z0-9_.]+(?:,[a-zA-Z0-9_.]+)*)\\))?$");
-        final Matcher matcher = pattern.matcher(str.replaceAll(" ", ""));
+    public static FunctionDeclaration fromString(final String str) throws IllegalArgumentException {
+        final Pattern pattern = Pattern.compile(
+                "^([a-zA-Z0-9_.]+) +([a-zA-Z0-9_]+)(?:\\(([a-zA-Z0-9_.]+(?:,[a-zA-Z0-9_.]+)*)\\))?$");
+        final Matcher matcher = pattern.matcher(str);
 
         if (!matcher.matches()) {
             throw new IllegalArgumentException();
         }
 
-        return new PredicateDeclaration(matcher.group(1),
-                matcher.group(2) == null ? Collections.emptyList()
-                        : Arrays.asList(matcher.group(2).split(",")));
+        return new FunctionDeclaration(matcher.group(2), matcher.group(1),
+                matcher.group(3) == null ? Collections.emptyList()
+                        : Arrays.asList(matcher.group(3).split(",")));
     }
 
     @Override
     public String toString() {
         if (argSorts.isEmpty()) {
-            return predName;
+            return String.format("%s %s", resultSortName, funcName);
         }
 
-        return String.format("%s(%s)", predName,
+        return String.format("%s %s(%s)", resultSortName, funcName,
                 argSorts.stream().collect(Collectors.joining(", ")));
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof PredicateDeclaration && obj != null
-                && ((PredicateDeclaration) obj).toString().equals(toString());
+        return obj instanceof FunctionDeclaration && obj != null
+                && ((FunctionDeclaration) obj).toString().equals(toString());
     }
 }

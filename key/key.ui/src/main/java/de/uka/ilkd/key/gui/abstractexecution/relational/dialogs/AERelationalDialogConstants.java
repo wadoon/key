@@ -19,10 +19,18 @@ public interface AERelationalDialogConstants {
     static final String DUMMY_KEY_FILE = "/de/uka/ilkd/key/gui/abstractexecution/relational/dummy.key";
     static final String PROOF_BUNDLE_ENDING = ".zproof";
 
+    //////////////////////
+    // TITLE COMPONENTS //
+    //////////////////////
+
     static final String TITLE = "REFINITY \u2014 Relational Proofs with Abstract Execution";
     static final String DIRTY_TITLE_PART = " *";
     static final String READ_ONLY_TITLE_PART = " (READ ONLY - Save to edit)";
 
+    ////////////////////
+    // CODE TEMPLATES //
+    ////////////////////
+    
     static final String AEXP_CODE_TEMPLATE_ID = "aexp";
     static final String AEXP_CODE_TEMPLATE = //@formatter:off
             "/*@ assignable frameE;\n" + //
@@ -47,6 +55,10 @@ public interface AERelationalDialogConstants {
             "  @*/\n" + //
             "{ ; }"; //@formatter:on
 
+    //////////////////
+    // STATUS PANEL //
+    //////////////////
+    
     static final int STATUS_PANEL_TIMEOUT = 2000;
     static final int STATUS_PANEL_CHANGE_TIME = 30000;
     static final String STATUS_PANEL_STD_MSG_1 = //
@@ -61,6 +73,10 @@ public interface AERelationalDialogConstants {
                     + "</tt>\" or \"<tt>" + AE_CONSTRAINT_CODE_TEMPLATE_ID
                     + "</tt>\" followed by <tt>Ctrl+Shift+Space</tt>.";
 
+    //////////////
+    // TOOLTIPS //
+    //////////////
+    
     static final String STD_POSTCONDREL_TOOLTIP = "Relation between values of the relevant locations after execution.<br/>"
             + "You may use the keywords \"\\result_1\" and \"\\result_2\" to access<br/>"
             + "the respective result arrays.<br/>"
@@ -75,9 +91,9 @@ public interface AERelationalDialogConstants {
     static final String PROGVAR_DECL_TOOLTIP = "<html>Program variables available without declaration.<br/>"
             + "Syntax: E.g., 'int x', or 'java.lang.Object y'.<br/>"
             + "Those variables can be used as 'relevant locations'.</html>";
-    static final String PRED_DECL_TOOLTIP = "<html>Abstract predicates that can, e.g., be used to control<br/>"
+    static final String FUNC_OR_PRED_DECL_TOOLTIP = "<html>Funcion or predicate symbols that can, e.g., be used to control<br/>"
             + "abrupt completion of abstract program elements.<br/>"
-            + "Syntax: E.g., 'throwsExcP(any)'.<br/>"
+            + "Syntax: E.g., 'throwsExcP(any)' or 'int myFun(java.lang.Object).<br/>"
             + "Can be used, e.g., in 'assumes' clauses in the abstract<br/>"
             + " program models.</html>";
     static final String SAVE_BTN_TOOLTIP = "<html>Creates a KeY proof bundle at a temporary<br/>"

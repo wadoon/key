@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -71,6 +72,8 @@ import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.abstractexecution.relational.model.AbstractLocsetDeclaration;
+import de.uka.ilkd.key.abstractexecution.relational.model.FuncOrPredDecl;
+import de.uka.ilkd.key.abstractexecution.relational.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.NullarySymbolDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.ProgramVariableDeclaration;
@@ -122,7 +125,7 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
     private boolean dirty = false;
 
     private final DefaultListModel<AbstractLocsetDeclaration> locsetDeclsListModel = new DefaultListModel<>();
-    private final DefaultListModel<PredicateDeclaration> predDeclsListModel = new DefaultListModel<>();
+    private final DefaultListModel<FuncOrPredDecl> funcOrPredDeclsListModel = new DefaultListModel<>();
     private final DefaultListModel<ProgramVariableDeclaration> progVarDeclsListModel = new DefaultListModel<>();
     private final DefaultListModel<NullarySymbolDeclaration> relevantSymbolsOneListModel = new DefaultListModel<>();
     private final DefaultListModel<NullarySymbolDeclaration> relevantSymbolsTwoListModel = new DefaultListModel<>();
@@ -251,7 +254,8 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
     private void updateTitle() {
         setTitle(String.format("%s [%s%s]%s", TITLE,
                 model.getFile().map(File::getName).orElse("No File"),
-                isDirty() ? AERelationalDialogConstants.DIRTY_TITLE_PART : "", isReadonly() ? AERelationalDialogConstants.READ_ONLY_TITLE_PART : ""));
+                isDirty() ? AERelationalDialogConstants.DIRTY_TITLE_PART : "",
+                isReadonly() ? AERelationalDialogConstants.READ_ONLY_TITLE_PART : ""));
     }
 
     public void installListeners() {
@@ -279,7 +283,7 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
 
             model.getPredicateDeclarations().forEach(pred -> {
                 try {
-                    PredicateInputDialog.checkAndRegister(pred, services);
+                    FuncAndPredInputDialog.checkAndRegister(pred, services);
                 } catch (ParserException e) {
                     // Shouldn't happen! Already saved!
                     e.printStackTrace();
@@ -436,8 +440,9 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
 
         locsetDeclsListModel.clear();
         model.getAbstractLocationSets().forEach(locsetDeclsListModel::addElement);
-        predDeclsListModel.clear();
-        model.getPredicateDeclarations().forEach(predDeclsListModel::addElement);
+        funcOrPredDeclsListModel.clear();
+        model.getFunctionDeclarations().forEach(funcOrPredDeclsListModel::addElement);
+        model.getPredicateDeclarations().forEach(funcOrPredDeclsListModel::addElement);
         progVarDeclsListModel.clear();
         model.getProgramVariableDeclarations().forEach(progVarDeclsListModel::addElement);
         relevantSymbolsOneListModel.clear();
@@ -455,7 +460,12 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         model.setMethodLevelContext(codeContext.getText());
         model.setPostCondition(resultRelationText.getText());
         model.setAbstractLocationSets(Collections.list(locsetDeclsListModel.elements()));
-        model.setPredicateDeclarations(Collections.list(predDeclsListModel.elements()));
+        model.setFunctionDeclarations(Collections.list(funcOrPredDeclsListModel.elements())
+                .stream().filter(FunctionDeclaration.class::isInstance)
+                .map(FunctionDeclaration.class::cast).collect(Collectors.toList()));
+        model.setPredicateDeclarations(Collections.list(funcOrPredDeclsListModel.elements())
+                .stream().filter(PredicateDeclaration.class::isInstance)
+                .map(PredicateDeclaration.class::cast).collect(Collectors.toList()));
         model.setProgramVariableDeclarations(Collections.list(progVarDeclsListModel.elements()));
         model.setRelevantVarsOne(Collections.list(relevantSymbolsOneListModel.elements()));
         model.setRelevantVarsTwo(Collections.list(relevantSymbolsTwoListModel.elements()));
@@ -840,28 +850,28 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
     private JComponent createPredicatesDeclarationsView() {
         final JPanel result = new JPanel(new BorderLayout());
 
-        final JLabel titleLabel = new JLabel("Abstract Predicates");
+        final JLabel titleLabel = new JLabel("Functions and Predicates");
         final JPanel titleLabelContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
         titleLabelContainer.add(titleLabel);
         result.add(titleLabelContainer, BorderLayout.NORTH);
 
-        final JList<PredicateDeclaration> predDeclsList = new JList<>();
-        predDeclsList.setToolTipText(PRED_DECL_TOOLTIP);
+        final JList<FuncOrPredDecl> predDeclsList = new JList<>();
+        predDeclsList.setToolTipText(FUNC_OR_PRED_DECL_TOOLTIP);
         final JScrollPane scrollPane = new JScrollPane();
         scrollPane.setViewportView(predDeclsList);
         result.add(scrollPane, BorderLayout.CENTER);
-        predDeclsList.setModel(predDeclsListModel);
-        predDeclsListModel.addListDataListener(uldl(e -> setDirty(true)));
+        predDeclsList.setModel(funcOrPredDeclsListModel);
+        funcOrPredDeclsListModel.addListDataListener(uldl(e -> setDirty(true)));
 
         final JButton plusButton = new JButton(
                 IconFontSwing.buildIcon(FontAwesomeSolid.PLUS, 16, Color.BLACK));
         plusButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final PredicateDeclaration pd = PredicateInputDialog
+                final FuncOrPredDecl pd = FuncAndPredInputDialog
                         .showInputDialog(AERelationalDialog.this, services);
                 if (pd != null) {
-                    predDeclsListModel.addElement(pd);
+                    funcOrPredDeclsListModel.addElement(pd);
                 }
             }
         });
@@ -872,17 +882,16 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (predDeclsList.getSelectedIndices().length == 1) {
-                    final PredicateDeclaration selectedElem = predDeclsList.getSelectedValue();
-                    services.getNamespaces().functions()
-                            .remove(new Name(selectedElem.getPredName()));
-                    final PredicateDeclaration pd = PredicateInputDialog
+                    final FuncOrPredDecl selectedElem = predDeclsList.getSelectedValue();
+                    services.getNamespaces().functions().remove(new Name(selectedElem.getName()));
+                    final FuncOrPredDecl pd = FuncAndPredInputDialog
                             .showInputDialog(AERelationalDialog.this, selectedElem, services);
                     if (pd != null && !pd.equals(selectedElem)) {
-                        predDeclsListModel.set(predDeclsList.getSelectedIndex(), pd);
+                        funcOrPredDeclsListModel.set(predDeclsList.getSelectedIndex(), pd);
                     } else {
                         try {
                             /* ...because names might be equal, but parameters changed. */
-                            PredicateInputDialog.checkAndRegister(selectedElem, services);
+                            FuncAndPredInputDialog.checkAndRegister(selectedElem, services);
                         } catch (ParserException exc) {
                         }
                     }
@@ -896,8 +905,8 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (int idx : predDeclsList.getSelectedIndices()) {
-                    final PredicateDeclaration removed = predDeclsListModel.remove(idx);
-                    services.getNamespaces().functions().remove(new Name(removed.getPredName()));
+                    final FuncOrPredDecl removed = funcOrPredDeclsListModel.remove(idx);
+                    services.getNamespaces().functions().remove(new Name(removed.getName()));
                 }
             }
         });

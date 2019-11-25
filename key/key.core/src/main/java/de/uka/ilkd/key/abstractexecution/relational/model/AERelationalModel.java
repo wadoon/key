@@ -70,6 +70,10 @@ public class AERelationalModel {
     @XmlElement(name = "predicate")
     private List<PredicateDeclaration> predicateDeclarations = new ArrayList<>();
 
+    @XmlElementWrapper(name = "functions")
+    @XmlElement(name = "function")
+    private List<FunctionDeclaration> functionDeclarations = new ArrayList<>();
+
     @XmlElementWrapper(name = "locationSets")
     @XmlElement(name = "locationSet")
     private List<AbstractLocsetDeclaration> abstractLocationSets = new ArrayList<>();
@@ -84,6 +88,7 @@ public class AERelationalModel {
     public AERelationalModel(final String programOne, final String programTwo,
             String methodLevelContext, final String postCondition,
             final List<AbstractLocsetDeclaration> abstractLocationSets,
+            final List<FunctionDeclaration> functionDeclarations,
             final List<PredicateDeclaration> predicateDeclarations,
             final List<ProgramVariableDeclaration> programVariableDeclarations,
             final List<NullarySymbolDeclaration> relevantVarsOne,
@@ -93,6 +98,7 @@ public class AERelationalModel {
         this.methodLevelContext = methodLevelContext;
         this.postCondition = postCondition;
         this.abstractLocationSets = abstractLocationSets;
+        this.functionDeclarations = functionDeclarations;
         this.predicateDeclarations = predicateDeclarations;
         this.programVariableDeclarations = programVariableDeclarations;
 
@@ -125,6 +131,14 @@ public class AERelationalModel {
 
     public List<AbstractLocsetDeclaration> getAbstractLocationSets() {
         return abstractLocationSets;
+    }
+
+    public List<FunctionDeclaration> getFunctionDeclarations() {
+        return functionDeclarations;
+    }
+
+    public void setFunctionDeclarations(List<FunctionDeclaration> functionDeclarations) {
+        this.functionDeclarations = functionDeclarations;
     }
 
     public List<PredicateDeclaration> getPredicateDeclarations() {

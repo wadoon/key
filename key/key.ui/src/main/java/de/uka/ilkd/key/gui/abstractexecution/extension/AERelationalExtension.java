@@ -23,6 +23,7 @@ import javax.swing.JToolBar;
 
 import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.abstractexecution.relational.model.AbstractLocsetDeclaration;
+import de.uka.ilkd.key.abstractexecution.relational.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.NullarySymbolDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.ProgramVariableDeclaration;
@@ -60,6 +61,7 @@ public class AERelationalExtension implements KeYGuiExtension, KeYGuiExtension.T
                 final String postCondition = "\\result_1=\\result_2";
                 final List<AbstractLocsetDeclaration> abstractLocationSets = Collections
                         .singletonList(new AbstractLocsetDeclaration("relevant"));
+                final List<FunctionDeclaration> functionDeclarations = Collections.emptyList();
                 final List<PredicateDeclaration> predicateDeclarations = Collections.emptyList();
                 final List<ProgramVariableDeclaration> programVariableDeclarations = //
                         Collections.emptyList();
@@ -69,8 +71,9 @@ public class AERelationalExtension implements KeYGuiExtension, KeYGuiExtension.T
                         Collections.singletonList(abstractLocationSets.get(0));
 
                 final AERelationalModel defaultModel = new AERelationalModel(programOne, programTwo,
-                        "", postCondition, abstractLocationSets,
-                        predicateDeclarations, programVariableDeclarations, relevantVarsOne, relevantVarsTwo);
+                        "", postCondition, abstractLocationSets, functionDeclarations,
+                        predicateDeclarations, programVariableDeclarations, relevantVarsOne,
+                        relevantVarsTwo);
 
                 final AERelationalDialog dia = new AERelationalDialog(mainWindow, defaultModel);
                 dia.setVisible(true);

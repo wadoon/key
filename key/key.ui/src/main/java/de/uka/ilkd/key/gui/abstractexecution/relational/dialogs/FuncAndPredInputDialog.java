@@ -30,6 +30,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import de.uka.ilkd.key.abstractexecution.relational.model.FuncOrPredDecl;
+import de.uka.ilkd.key.abstractexecution.relational.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.PredicateDeclaration;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -41,19 +43,19 @@ import de.uka.ilkd.key.parser.ParserException;
 /**
  * @author Dominic Steinhoefel
  */
-public class PredicateInputDialog extends JDialog {
+public class FuncAndPredInputDialog extends JDialog {
     private static final long serialVersionUID = 1L;
 
-    private PredicateDeclaration value;
+    private FuncOrPredDecl value;
 
-    private PredicateInputDialog(final Window owner, final PredicateDeclaration value,
+    private FuncAndPredInputDialog(final Window owner, final FuncOrPredDecl value,
             Services services) {
         super(owner, ModalityType.DOCUMENT_MODAL);
         assert value != null;
 
         this.value = value;
 
-        final PredicateInputDialog instance = this;
+        final FuncAndPredInputDialog instance = this;
         getContentPane().setLayout(new BorderLayout());
 
         final JPanel contentPanel = new JPanel();
@@ -63,7 +65,7 @@ public class PredicateInputDialog extends JDialog {
         contentPanel.setLayout(new BorderLayout());
         getContentPane().add(contentPanel, BorderLayout.CENTER);
 
-        setTitle("Please enter a predicate specification.");
+        setTitle("Please enter a function or predicate symbol specification.");
         setResizable(false);
 
         final JButton okButton = new JButton("OK");
@@ -75,7 +77,15 @@ public class PredicateInputDialog extends JDialog {
                 final char c = e.getKeyChar();
 
                 if (!(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9'
-                        || c == '_' || c == ',' || c == '(' || c == ')' || c == '.')) {
+                        || c == '_' || c == ',' || c == '(' || c == ')' || c == '.' || c == ' ')) {
+                    e.consume();
+                }
+
+                if (c == ' ' && !valueTextField.getText().matches("^[a-zA-Z0-9_]+$")) {
+                    /*
+                     * Cannot be the result sort of a function declaration. We admit at most one
+                     * space.
+                     */
                     e.consume();
                 }
             }
@@ -90,8 +100,14 @@ public class PredicateInputDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    final PredicateDeclaration val = PredicateDeclaration
-                            .fromString(valueTextField.getText());
+                    final String input = valueTextField.getText();
+
+                    final FuncOrPredDecl val;
+                    if (input.contains(" ")) {
+                        val = FunctionDeclaration.fromString(input);
+                    } else {
+                        val = PredicateDeclaration.fromString(input);
+                    }
 
                     checkAndRegister(val, services);
 
@@ -128,25 +144,21 @@ public class PredicateInputDialog extends JDialog {
         setSize(400, 110);
     }
 
-    public static PredicateDeclaration showInputDialog(final Window owner, Services services) {
+    public static FuncOrPredDecl showInputDialog(final Window owner, Services services) {
         return showInputDialog(owner, PredicateDeclaration.EMPTY_DECL, services);
     }
 
-    public static PredicateDeclaration showInputDialog(final Window owner,
-            final PredicateDeclaration value, Services services) {
-        final PredicateInputDialog dia = new PredicateInputDialog(owner, value, services);
+    public static FuncOrPredDecl showInputDialog(final Window owner,
+            final FuncOrPredDecl value, Services services) {
+        final FuncAndPredInputDialog dia = new FuncAndPredInputDialog(owner, value, services);
         dia.setVisible(true);
         dia.dispose();
         return dia.value;
     }
 
-    public static void checkAndRegister(final PredicateDeclaration val, final Services services)
+    public static void checkAndRegister(final FuncOrPredDecl val, final Services services)
             throws ParserException {
         final NamespaceSet namespaces = services.getNamespaces();
-        if (namespaces.functions().lookup(val.getPredName()) != null) {
-            throw new ParserException("The predicate " + val.getPredName()
-                    + " is already registered, please choose another one.", null);
-        }
 
         final List<Sort> sorts = val.getArgSorts().stream().map(namespaces.sorts()::lookup)
                 .collect(Collectors.toList());
@@ -158,8 +170,33 @@ public class PredicateInputDialog extends JDialog {
             }
         }
 
-        namespaces.functions().add(new Function(new Name(val.getPredName()), Sort.FORMULA,
-                sorts.toArray(new Sort[0])));
+        if (val.isPredDecl()) {
+            final PredicateDeclaration predDecl = val.toPredDecl();
+
+            if (namespaces.functions().lookup(predDecl.getPredName()) != null) {
+                throw new ParserException("The predicate " + predDecl.getPredName()
+                        + " is already registered, please choose another one.", null);
+            }
+
+            namespaces.functions().add(new Function(new Name(predDecl.getPredName()), Sort.FORMULA,
+                    sorts.toArray(new Sort[0])));
+        } else {
+            final FunctionDeclaration funcDecl = val.toFuncDecl();
+
+            if (namespaces.functions().lookup(funcDecl.getFuncName()) != null) {
+                throw new ParserException("The function " + funcDecl.getFuncName()
+                        + " is already registered, please choose another one.", null);
+            }
+
+            final Sort targetSort = namespaces.sorts().lookup(funcDecl.getResultSortName());
+            if (targetSort == null) {
+                throw new ParserException(
+                        "The sort " + funcDecl.getResultSortName() + " is unknown.", null);
+            }
+
+            namespaces.functions().add(new Function(new Name(funcDecl.getFuncName()), targetSort,
+                    sorts.toArray(new Sort[0])));
+        }
     }
 
 }

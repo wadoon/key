@@ -168,13 +168,28 @@ public class ProofBundleConverter {
     }
 
     private String createKeYFile() {
-        final String functionsDecl = model.getAbstractLocationSets().stream()
-                .map(str -> String.format("\\unique LocSet %s;", str))
-                .collect(Collectors.joining("\n  "))
-                + (!model.getProgramVariableDeclarations().isEmpty() ? "\n  " : "")
-                + model.getProgramVariableDeclarations().stream().map(
-                        decl -> String.format("%s _%s;", decl.getTypeName(), decl.getVarName()))
-                        .collect(Collectors.joining("\n  "));
+        final String functionsDecl;
+
+        {
+            final String locSetDecls = model.getAbstractLocationSets().stream()
+                    .map(str -> String.format("\\unique LocSet %s;", str))
+                    .collect(Collectors.joining("\n  "));
+            final String userDefinedFuncDecls = model.getFunctionDeclarations().stream()
+                    .map(decl -> String.format("%s %s%s;", decl.getResultSortName(),
+                            decl.getFuncName(),
+                            decl.getArgSorts().isEmpty() ? ""
+                                    : ("(" + decl.getArgSorts().stream()
+                                            .collect(Collectors.joining(",")) + ")")))
+                    .collect(Collectors.joining("\n  "));
+            final String skolemPVAnonFuncDecls = model.getProgramVariableDeclarations().stream()
+                    .map(decl -> String.format("%s _%s;", decl.getTypeName(), decl.getVarName()))
+                    .collect(Collectors.joining("\n  "));
+
+            functionsDecl = locSetDecls + (!model.getFunctionDeclarations().isEmpty() ? "\n  " : "")
+                    + userDefinedFuncDecls
+                    + (!model.getProgramVariableDeclarations().isEmpty() ? "\n  " : "")
+                    + skolemPVAnonFuncDecls;
+        }
 
         final String predicatesDecl = model.getPredicateDeclarations().stream()
                 .map(decl -> String.format("%s%s;", decl.getPredName(),
