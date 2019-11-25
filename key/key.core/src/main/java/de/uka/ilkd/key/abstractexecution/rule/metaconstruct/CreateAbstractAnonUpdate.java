@@ -76,14 +76,6 @@ public final class CreateAbstractAnonUpdate extends AbstractTermTransformer {
                 services.getTypeConverter().getHeapLDT().getHeap(), loopSpec.getInternalSelfTerm(),
                 atPres, services);
 
-        if (modTerm.sort() != services.getTypeConverter().getLocSetLDT().targetSort()) {
-            /*
-             * NOTE (DS, 2019-11-25): modTerm can obviously be something like "false". In
-             * that case I guess that we don't have to add an abstract updates here.
-             */
-            return tb.skip();
-        }
-
         /*
          * NOTE (DS, 2019-11-25): Actually, we should also consider anonymize in the
          * presence of allLocs, but that was use much in non-AE-KeY for anonymizing the

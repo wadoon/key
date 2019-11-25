@@ -13,6 +13,7 @@
 package de.uka.ilkd.key.abstractexecution.logic.op;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -440,6 +441,11 @@ public class AbstractUpdateFactory {
      */
     public static Set<AbstractUpdateLoc> abstrUpdateLocsFromUnionTerm(Term t,
             Optional<ExecutionContext> executionContext, Services services) {
+        if (t.equalsModIrrelevantTermLabels(services.getTermBuilder().strictlyNothing())) {
+            // strictly_nothing is translated to "false" and not to a locSet element.
+            return Collections.emptySet();
+        }
+
         return services.getTermBuilder().locsetUnionToSet(t).stream()
                 .map(sub -> abstrUpdateLocFromTerm(sub, executionContext, services))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
