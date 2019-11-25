@@ -1803,9 +1803,18 @@ public final class AuxiliaryContractBuilders {
         }
 
         private Term buildUsageFormula(Goal goal) {
+            final StatementBlock replacement;
+            
+            if (application instanceof AbstractBlockContractBuiltInRuleApp
+                    && ((AbstractBlockContractBuiltInRuleApp) application).representsJMLAssumeStmt) {
+                replacement = new StatementBlock();
+            } else {
+                replacement = constructAbruptTerminationIfCascade();
+            }
+            
             return services.getTermBuilder().prog(instantiation.modality,
                     replaceBlock(instantiation.formula.javaBlock(), instantiation.statement,
-                            constructAbruptTerminationIfCascade()),
+                            replacement),
                     instantiation.formula.sub(0),
                     TermLabelManager.instantiateLabels(termLabelState, services, occurrence,
                             application.rule(), application, goal, BlockContractHint.USAGE_BRANCH,

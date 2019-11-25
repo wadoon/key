@@ -27,6 +27,8 @@ public abstract class AbstractBlockContractBuiltInRuleApp
      * @see #getContract()
      */
     protected BlockContract contract;
+    
+    protected boolean representsJMLAssumeStmt = false;
 
     /**
      *
@@ -75,6 +77,20 @@ public abstract class AbstractBlockContractBuiltInRuleApp
         }
         contract = BlockContractImpl.combine(cons, goal.getLocalSpecificationRepository(), services);
         heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
+        
+        /**
+         * This flag is true if we could detect that the "contract" is a translation
+         * from a JML assume clause. Yeah, that's one of these hacks,
+         * but using block contracts for everything also is a hack. (DS, 2019-11-20)
+         * 
+         * NOTE (DS, 2019-11-20): There's a similar hack on which this one depends in
+         * AbstractAuxiliaryContractImpl, it prevents creating "standard" preconditions. 
+         */
+        representsJMLAssumeStmt = (contract.getBlock().isEmpty()
+                || contract.getBlock().toString().replaceAll(" ", "").equals("{;}"))
+                && heaps.stream().map(heap -> contract.getPrecondition(heap, services))
+                        .allMatch(t -> t == null || t.equals(services.getTermBuilder().tt()));
+        
         return this;
     }
 

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="\result_1=\result_2">
+    <programOne>//@ assume i &gt;= 0;
+{ ; }
+
+// Show: \other(k)@otherIdx = k@idx &amp;&amp; otherIdx == idx
+
+idxA = 0;
+
+/*@ assume
+  @   kLeftAt(idxA,k) &amp;&amp; idxLeft(idxA);
+  @*/
+{ ; }
+
+/*@ loop_invariant i &gt;= -1 &amp;&amp; kRightAt(idxA,k) &amp;&amp; idxRight(idxA);
+  @ loop_invariant_free kLeftAt(idxA,k) &amp;&amp; idxLeft(idxA);
+  @ decreases i + 1;
+  @*/
+while (i &gt;= 0) {
+    idxA++;
+    i++;
+    
+    k += 2;
+
+    /*@ ae_constraint
+      @   kLeftAt(idxA,k) &amp;&amp; idxLeft(idxA);
+      @*/
+    { ; }
+}</programOne>
+    <programTwo>//@ assume j &gt;= 0;
+{ ; }
+
+
+
+idxB = 0;
+
+/*@ assume
+  @   kRightAt(idxB,k) &amp;&amp; idxRight(idxB);
+  @*/
+{ ; }
+
+/*@ loop_invariant j &gt;= -1 &amp;&amp; kLeftAt(idxB,k) &amp;&amp; idxLeft(idxB);
+  @ loop_invariant_free kRightAt(idxB,k) &amp;&amp; idxRight(idxB);
+  @ decreases j + 1;
+  @*/
+while (j &gt;= 0) {
+    idxB++;
+    j++;
+    
+    k += 1+1;
+
+    /*@ ae_constraint
+      @   kRightAt(idxB,k) &amp;&amp; idxRight(idxB);
+      @*/
+    { ; }
+}</programTwo>
+    <methodLevelContext></methodLevelContext>
+    <locationSets>
+        <locationSet locsetName="relevant">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <predicates>
+        <predicate predName="kLeftAt">
+            <argSort>int</argSort>
+            <argSort>int</argSort>
+        </predicate>
+        <predicate predName="kRightAt">
+            <argSort>int</argSort>
+            <argSort>int</argSort>
+        </predicate>
+        <predicate predName="idxLeft">
+            <argSort>int</argSort>
+        </predicate>
+        <predicate predName="idxRight">
+            <argSort>int</argSort>
+        </predicate>
+    </predicates>
+    <programVariables>
+        <programVariable typeName="int" varName="i">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="j">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="k">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="idxA">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="idxB">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+    </programVariables>
+</ns2:aeRelationalModel>

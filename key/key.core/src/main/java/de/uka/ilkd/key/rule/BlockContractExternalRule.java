@@ -116,13 +116,19 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
      *            the anonymization heaps.
      * @param conditionsAndClausesBuilder
      *            a ConditionsAndClausesBuilder.
+     * @param representsJMLAssumeStmt Set to true to only generate the free post conditions.
      * @return the postconditions.
      */
     private static Term[] createAssumptions(final ImmutableSet<ProgramVariable> localOutVariables,
             final Map<LocationVariable, Function> anonymisationHeaps,
-            final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
-        final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
+            final ConditionsAndClausesBuilder conditionsAndClausesBuilder, boolean representsJMLAssumeStmt) {
         final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
+        
+        if (representsJMLAssumeStmt) {
+            return new Term[] { freePostcondition };
+        }
+        
+        final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
                 .buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
         final Term reachableOutCondition
@@ -234,23 +240,10 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
                 = new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self,
                         services);
         
-        /**
-         * This flag is true if we could detect that this "contract" is a translation
-         * from a JML assume clause. Yeah, that's one of these hacks,
-         * but using block contracts for everything also is a hack. (DS, 2019-11-20)
-         * 
-         * NOTE (DS, 2019-11-20): There's a similar hack on which this one depends in
-         * AbstractAuxiliaryContractImpl, it prevents creating "standard" preconditions. 
-         */
-        final boolean representsJMLAssumeStmt = (contract.getBlock().isEmpty()
-                || contract.getBlock().toString().replaceAll(" ", "").equals("{;}"))
-                && heaps.stream().map(heap -> contract.getPrecondition(heap, services))
-                        .allMatch(t -> t == null || t.equals(services.getTermBuilder().tt()));
-        
         final Term[] preconditions = createPreconditions(instantiation, contract, heaps,
                 localInVariables, conditionsAndClausesBuilder, services);
         final Term[] assumptions = createAssumptions(localOutVariables, anonymisationHeaps,
-                conditionsAndClausesBuilder);
+                conditionsAndClausesBuilder, application.representsJMLAssumeStmt);
         final Term[] updates = createUpdates(instantiation.update, heaps, anonymisationHeaps,
                 variables, conditionsAndClausesBuilder, goal.getLocalSpecificationRepository(), services);
 
@@ -259,7 +252,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
                 new TermLabelState(), instantiation, contract.getLabels(), variables,
                 application.posInOccurrence(), goal.getLocalSpecificationRepository(), services, this);
         
-        if (representsJMLAssumeStmt) {
+        if (application.representsJMLAssumeStmt) {
             result = goal.split(1);
         } else {
             result = goal.split(2);
