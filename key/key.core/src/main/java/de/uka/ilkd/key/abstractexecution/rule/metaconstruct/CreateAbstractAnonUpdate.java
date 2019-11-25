@@ -23,6 +23,7 @@ import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
@@ -75,9 +76,14 @@ public final class CreateAbstractAnonUpdate extends AbstractTermTransformer {
                 services.getTypeConverter().getHeapLDT().getHeap(), loopSpec.getInternalSelfTerm(),
                 atPres, services);
 
+        /*
+         * NOTE (DS, 2019-11-25): Actually, we should also consider anonymize in the
+         * presence of allLocs, but that was use much in non-AE-KeY for anonymizing the
+         * heap only, therefore it will probably break existing proofs...
+         */
         final UniqueArrayList<AbstractUpdateLoc> locs = AbstractUpdateFactory
                 .abstrUpdateLocsFromUnionTerm(modTerm, Optional.of(ec), services).stream()
-                .filter(loc -> loc.isAbstract())
+                .filter(loc -> loc instanceof SkolemLoc)
                 .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
 
         if (locs.isEmpty()) {
