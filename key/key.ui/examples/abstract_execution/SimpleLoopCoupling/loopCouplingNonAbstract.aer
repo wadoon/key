@@ -7,51 +7,53 @@
 
 idxA = 0;
 
-/*@ assume
-  @   kLeftAt(idxA,k) &amp;&amp; idxLeft(idxA);
-  @*/
+//@ assume kLeftAt(idxA) == k;
 { ; }
 
-/*@ loop_invariant i &gt;= -1 &amp;&amp; kRightAt(idxA,k) &amp;&amp; idxRight(idxA);
-  @ loop_invariant_free kLeftAt(idxA,k) &amp;&amp; idxLeft(idxA);
+//@ ghost int oldI = i;
+
+/*@ loop_invariant i &gt;= -1 &amp;&amp; idxA == oldI-i &amp;&amp; kLeftAt(idxA) == kRightAt(idxA);
+  @ loop_invariant_free kLeftAt(idxA) == k;
   @ decreases i + 1;
   @*/
 while (i &gt;= 0) {
+    //@ assume loopIdx == idxA;
+    { ; }
+    
     idxA++;
-    i++;
+    i--;
     
     k += 2;
 
-    /*@ ae_constraint
-      @   kLeftAt(idxA,k) &amp;&amp; idxLeft(idxA);
-      @*/
+    //@ assume kLeftAt(idxA) == k;
     { ; }
 }</programOne>
-    <programTwo>//@ assume j &gt;= 0;
+    <programTwo>//@ assume i &gt;= 0;
 { ; }
 
 
 
 idxB = 0;
 
-/*@ assume
-  @   kRightAt(idxB,k) &amp;&amp; idxRight(idxB);
-  @*/
+//@ assume kRightAt(idxB) == k;
 { ; }
 
-/*@ loop_invariant j &gt;= -1 &amp;&amp; kLeftAt(idxB,k) &amp;&amp; idxLeft(idxB);
-  @ loop_invariant_free kRightAt(idxB,k) &amp;&amp; idxRight(idxB);
-  @ decreases j + 1;
+//@ ghost int oldI = i;
+
+/*@ loop_invariant i &gt;= -1 &amp;&amp; idxB == oldI-i &amp;&amp; kLeftAt(idxB) == kRightAt(idxB);
+  @ loop_invariant_free kRightAt(idxB) == k;
+  @ decreases i + 1;
   @*/
-while (j &gt;= 0) {
+while (i &gt;= 0) {
+    //@ assume loopIdx == idxA;
+    { ; }
+    
     idxB++;
-    j++;
+    i--;
     
     k += 1+1;
 
-    /*@ ae_constraint
-      @   kRightAt(idxB,k) &amp;&amp; idxRight(idxB);
-      @*/
+    //@ assume kRightAt(idxB) == k;
     { ; }
 }</programTwo>
     <methodLevelContext></methodLevelContext>
@@ -61,28 +63,18 @@ while (j &gt;= 0) {
             <relevantTwo>-1</relevantTwo>
         </locationSet>
     </locationSets>
-    <predicates>
-        <predicate predName="kLeftAt">
+    <functions>
+        <function funcName="kRightAt" resultSortName="int">
             <argSort>int</argSort>
+        </function>
+        <function funcName="kLeftAt" resultSortName="int">
             <argSort>int</argSort>
-        </predicate>
-        <predicate predName="kRightAt">
-            <argSort>int</argSort>
-            <argSort>int</argSort>
-        </predicate>
-        <predicate predName="idxLeft">
-            <argSort>int</argSort>
-        </predicate>
-        <predicate predName="idxRight">
-            <argSort>int</argSort>
-        </predicate>
-    </predicates>
+        </function>
+        <function funcName="loopIdx" resultSortName="int"/>
+    </functions>
+    <predicates/>
     <programVariables>
         <programVariable typeName="int" varName="i">
-            <relevantOne>-1</relevantOne>
-            <relevantTwo>-1</relevantTwo>
-        </programVariable>
-        <programVariable typeName="int" varName="j">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
         </programVariable>

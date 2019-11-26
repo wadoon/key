@@ -208,6 +208,13 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         }
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {
+            Term freepostcondition = x.getFreePostcondition(heap, services);
+            if (freepostcondition != null) {
+                freepostcondition.execPostOrder(collector);
+            }
+        }
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                .getAllHeaps()) {
             Term modifiesClause = x.getModifiesClause(heap, services);
             if (modifiesClause != null) {
                 modifiesClause.execPostOrder(collector);

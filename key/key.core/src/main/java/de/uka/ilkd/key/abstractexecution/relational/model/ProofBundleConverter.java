@@ -164,6 +164,11 @@ public class ProofBundleConverter {
                     Matcher.quoteReplacement("\\dl_" + predDecl.getPredName()));
         }
 
+        for (final FunctionDeclaration funcDecl : model.getFunctionDeclarations()) {
+            prog = prog.replaceAll("\\b" + funcDecl.getFuncName() + "\\b",
+                    Matcher.quoteReplacement("\\dl_" + funcDecl.getFuncName()));
+        }
+
         return prog;
     }
 

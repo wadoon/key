@@ -46,7 +46,7 @@ import org.xml.sax.SAXException;
  */
 @XmlRootElement(namespace = "http://www.key-project.org/abstractexecution")
 @XmlType(propOrder = { "programOne", "programTwo", "methodLevelContext", "abstractLocationSets",
-        "predicateDeclarations", "programVariableDeclarations" })
+        "functionDeclarations", "predicateDeclarations", "programVariableDeclarations" })
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class AERelationalModel {
     public static final AERelationalModel EMPTY_MODEL = new AERelationalModel();

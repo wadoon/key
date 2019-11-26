@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
+  <xs:element name="functionDeclaration" type="functionDeclaration"/>
+
   <xs:element name="locationSet" type="abstractLocsetDeclaration"/>
 
   <xs:element name="predicateDeclaration" type="predicateDeclaration"/>
@@ -16,6 +18,13 @@
         <xs:complexType>
           <xs:sequence>
             <xs:element ref="locationSet" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="functions" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="function" type="functionDeclaration" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -51,6 +60,14 @@
       <xs:element name="relevantOne" type="xs:int"/>
       <xs:element name="relevantTwo" type="xs:int"/>
     </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="functionDeclaration">
+    <xs:sequence>
+      <xs:element name="argSort" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="funcName" type="xs:string"/>
+    <xs:attribute name="resultSortName" type="xs:string"/>
   </xs:complexType>
 
   <xs:complexType name="predicateDeclaration">
