@@ -1398,8 +1398,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
              * postcondition only, and a trivial block. Yeah, that's one of these hacks,
              * but using block contracts for everything also is a hack. (DS, 2019-11-20)
              */
-            final boolean representsJMLAssumeStmt = (block.isEmpty()
-                    || block.toString().replaceAll(" ", "").equals("{;}"))
+            final boolean representsJMLAssumeStmt = block != null // if block is null, it's a loop
+                                                                  // contract
+                    && (block.isEmpty() || block.toString().replaceAll(" ", "").equals("{;}"))
                     && ensures.values().stream().noneMatch(nonTrivialPostCondTerm)
                     && ensuresFree.values().stream().anyMatch(nonTrivialPostCondTerm);
             
