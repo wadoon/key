@@ -158,11 +158,17 @@ public abstract class AbstractFileRepo implements FileRepo {
     protected static boolean isInternalFile(Path path) throws MalformedURLException {
         URL url = path.toUri().toURL();
 
+        //hack for graal
+        if(path.toString().contains("/JavaRedux/") ||path.toString().contains("/rules/")) {
+            return true;
+        }
+        return false;
+
         // TODO: maybe we better should cut off the protocol part first?
-        String urlStr = url.toString();
-        String rulesURLStr = RULES_URL.toString();
-        String reduxURLStr = REDUX_URL.toString();
-        return urlStr.startsWith(rulesURLStr) || urlStr.startsWith(reduxURLStr);
+        //String urlStr = url.toString();
+        //String rulesURLStr = RULES_URL.toString();
+        //String reduxURLStr = REDUX_URL.toString();
+        //return urlStr.startsWith(rulesURLStr) || urlStr.startsWith(reduxURLStr);
     }
 
     protected Path getJavaPath() {

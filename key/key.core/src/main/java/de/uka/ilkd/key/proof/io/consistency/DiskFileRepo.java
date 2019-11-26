@@ -61,6 +61,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
     @Override
     public InputStream getInputStream(URL url) throws IOException {
+        System.out.println(url);
         String protocol = url.getProtocol();
         // currently, we support only two protocols: file and zip/jar
         if (protocol.equals("file")) {
@@ -91,7 +92,8 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
             return entryURL.openStream();
         } else {
-            throw new IllegalArgumentException("This type of URL is not supported!");
+            return url.openStream(); //fallback
+            //throw new IllegalArgumentException("This type of URL is not supported!");
         }
     }
 

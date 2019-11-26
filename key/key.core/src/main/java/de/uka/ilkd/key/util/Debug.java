@@ -424,8 +424,8 @@ public final class Debug implements DebugMBean {
 
     static {
 	try {
-	    ManagementFactory.getPlatformMBeanServer().registerMBean(
-		    new Debug(), new ObjectName("de.uka.ilkd.key:Type=Debug"));
+	    //ManagementFactory.getPlatformMBeanServer().registerMBean(
+		//    new Debug(), new ObjectName("de.uka.ilkd.key:Type=Debug"));
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
