@@ -23,12 +23,16 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.abstractexecution.relational.model.FuncOrPredDecl;
 import de.uka.ilkd.key.abstractexecution.relational.model.FunctionDeclaration;
@@ -140,16 +144,33 @@ public class FuncAndPredInputDialog extends JDialog {
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
         contentPanel.add(buttonPanel, BorderLayout.SOUTH);
+        
+        installEscapeListener();
 
         setSize(400, 110);
+    }
+
+    private void installEscapeListener() {
+        final KeyStroke escape = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        final JRootPane rootPane = getRootPane();
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escape, "cancel");
+        rootPane.getActionMap().put("cancel", new AbstractAction() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                value = null;
+                setVisible(false);
+            }
+        });
     }
 
     public static FuncOrPredDecl showInputDialog(final Window owner, Services services) {
         return showInputDialog(owner, PredicateDeclaration.EMPTY_DECL, services);
     }
 
-    public static FuncOrPredDecl showInputDialog(final Window owner,
-            final FuncOrPredDecl value, Services services) {
+    public static FuncOrPredDecl showInputDialog(final Window owner, final FuncOrPredDecl value,
+            Services services) {
         final FuncAndPredInputDialog dia = new FuncAndPredInputDialog(owner, value, services);
         dia.setVisible(true);
         dia.dispose();
