@@ -60,8 +60,9 @@ public class AbstractPreconditionTransformer extends AbstractTermTransformer {
         final PreconditionType preconditionType = getPreconditionType(term.sub(1), services);
         final Services services1 = services;
 
-        final ImmutableArray<Term> accessiblesTerms = AbstractExecutionContractUtils.getAccessibleAndAssignableLocsForNoBehaviorContract(ape, Optional.empty(),
-        executionContext, localSpecRepo, services1).first.stream()
+        final ImmutableArray<Term> accessiblesTerms = AbstractExecutionContractUtils
+                .getAccessibleAndAssignableLocsForNoBehaviorContract(ape, Optional.empty(),
+                        executionContext, localSpecRepo, services1).first.stream()
                                 .map(tb::wrapInValue).collect(ImmutableArray.toImmutableArray());
 
         final Function precondFun = services.abstractUpdateFactory()
