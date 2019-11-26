@@ -7,25 +7,25 @@
 
 idxA = 0;
 
-//@ assume kLeftAt(idxA) == k;
+//@ assume kLeftAt(0) == k &amp;&amp; iLeftAt(0) == i;
 { ; }
 
 //@ ghost int oldI = i;
 
-/*@ loop_invariant i &gt;= -1 &amp;&amp; idxA == oldI-i &amp;&amp; kLeftAt(idxA) == kRightAt(idxA);
+/*@ loop_invariant i &gt;= -1 &amp;&amp; idxA == oldI-i &amp;&amp; kLeftAt(idxA) == kRightAt(idxA) &amp;&amp; (iRightAt(idxA) &lt; 0 &lt;==&gt; i &lt; 0);
   @ loop_invariant_free kLeftAt(idxA) == k;
   @ decreases i + 1;
   @*/
 while (i &gt;= 0) {
-    //@ assume loopIdx == idxA;
-    { ; }
+    //@ assume idxA == loopIdx;
+    {;}
     
     idxA++;
     i--;
     
     k += 2;
 
-    //@ assume kLeftAt(idxA) == k;
+    //@ assume kLeftAt(idxA) == k &amp;&amp; iLeftAt(idxA) == i;
     { ; }
 }</programOne>
     <programTwo>//@ assume i &gt;= 0;
@@ -35,25 +35,25 @@ while (i &gt;= 0) {
 
 idxB = 0;
 
-//@ assume kRightAt(idxB) == k;
+//@ assume kRightAt(0) == k &amp;&amp; iRightAt(0) == i;
 { ; }
 
 //@ ghost int oldI = i;
 
-/*@ loop_invariant i &gt;= -1 &amp;&amp; idxB == oldI-i &amp;&amp; kLeftAt(idxB) == kRightAt(idxB);
+/*@ loop_invariant i &gt;= -1 &amp;&amp; idxB == oldI-i &amp;&amp; kLeftAt(idxB) == kRightAt(idxB) &amp;&amp; (iLeftAt(idxB) &lt; 0 &lt;==&gt; i &lt; 0);
   @ loop_invariant_free kRightAt(idxB) == k;
   @ decreases i + 1;
   @*/
 while (i &gt;= 0) {
-    //@ assume loopIdx == idxA;
-    { ; }
+    //@ assume idxB == loopIdx;
+    {;}
     
     idxB++;
     i--;
     
     k += 1+1;
 
-    //@ assume kRightAt(idxB) == k;
+    //@ assume kRightAt(idxB) == k &amp;&amp; iRightAt(idxB) == i;
     { ; }
 }</programTwo>
     <methodLevelContext></methodLevelContext>
@@ -71,6 +71,12 @@ while (i &gt;= 0) {
             <argSort>int</argSort>
         </function>
         <function funcName="loopIdx" resultSortName="int"/>
+        <function funcName="iRightAt" resultSortName="int">
+            <argSort>int</argSort>
+        </function>
+        <function funcName="iLeftAt" resultSortName="int">
+            <argSort>int</argSort>
+        </function>
     </functions>
     <predicates/>
     <programVariables>

@@ -769,7 +769,9 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         minusButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (int idx : relevantSymbolsList.getSelectedIndices()) {
+                final int[] indices = relevantSymbolsList.getSelectedIndices();
+                for (int i = indices.length; i --> 0;) {
+                    int idx = indices[i];
                     relevantSymbolsModel.remove(idx);
                 }
             }
@@ -904,7 +906,9 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         minusButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (int idx : predDeclsList.getSelectedIndices()) {
+                final int[] indices = predDeclsList.getSelectedIndices();
+                for (int i = indices.length; i --> 0;) {
+                    int idx = indices[i];
                     final FuncOrPredDecl removed = funcOrPredDeclsListModel.remove(idx);
                     services.getNamespaces().functions().remove(new Name(removed.getName()));
                 }
@@ -1001,7 +1005,9 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         minusButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (int idx : progVarDeclsList.getSelectedIndices()) {
+                final int[] indices = progVarDeclsList.getSelectedIndices();
+                for (int i = indices.length; i --> 0;) {
+                    int idx = indices[i];
                     final ProgramVariableDeclaration removed = progVarDeclsListModel.remove(idx);
                     services.getNamespaces().programVariables()
                             .remove(new Name(removed.getVarName()));
@@ -1097,7 +1103,9 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         minusButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (int idx : locsetDeclsList.getSelectedIndices()) {
+                final int[] indices = locsetDeclsList.getSelectedIndices();
+                for (int i = indices.length; i --> 0;) {
+                    int idx = indices[i];
                     final AbstractLocsetDeclaration removed = locsetDeclsListModel.remove(idx);
                     services.getNamespaces().functions().remove(new Name(removed.getName()));
                     refresh();
