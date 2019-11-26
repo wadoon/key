@@ -1,7 +1,24 @@
 plugins {
     id("ca.coglinc.javacc") version("2.4.0")
     id("antlr")
+    id 'com.github.johnrengelman.shadow' version "5.0.0"
+    id("application")
 }
+
+shadowJar {
+    archiveClassifier = "exe"
+    archiveBaseName = "key"
+}
+
+distZip {
+    archiveBaseName = "key"
+}
+
+application {
+    //dependsOn(createExamplesZip)
+    mainClassName = "org.key_project.Main"
+}
+
 
 
 dependencies {
