@@ -22,7 +22,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -49,14 +48,13 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.xml.bind.JAXBException;
@@ -69,6 +67,10 @@ import org.fife.ui.rsyntaxtextarea.templates.StaticCodeTemplate;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.xml.sax.SAXException;
 
+import bibliothek.gui.dock.common.CContentArea;
+import bibliothek.gui.dock.common.CControl;
+import bibliothek.gui.dock.common.CGrid;
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
 import de.uka.ilkd.key.abstractexecution.relational.model.AbstractLocsetDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.FuncOrPredDecl;
@@ -131,9 +133,9 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
     private final DefaultListModel<NullarySymbolDeclaration> relevantSymbolsOneListModel = new DefaultListModel<>();
     private final DefaultListModel<NullarySymbolDeclaration> relevantSymbolsTwoListModel = new DefaultListModel<>();
 
-    private final RSyntaxTextArea codeLeft = new RSyntaxTextArea(20, 60);
-    private final RSyntaxTextArea codeRight = new RSyntaxTextArea(20, 60);
-    private final RSyntaxTextArea codeContext = new RSyntaxTextArea(20, 120);
+    private final RSyntaxTextArea codeLeft = new RSyntaxTextArea(15, 60);
+    private final RSyntaxTextArea codeRight = new RSyntaxTextArea(15, 60);
+    private final RSyntaxTextArea codeContext = new RSyntaxTextArea(15, 120);
 
     private final FormulaInputTextArea resultRelationText = new FormulaInputTextArea(
             STD_POSTCONDREL_TOOLTIP, formula -> {
@@ -176,49 +178,21 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
 
         installCodeTemplates();
 
-        final JPanel contentPanel = new JPanel(new BorderLayout());
+        final JPanel contentPanel = createContentPanel();
+
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(contentPanel, BorderLayout.CENTER);
-        statusPanel = new AutoResetStatusPanel( //
-                STATUS_PANEL_TIMEOUT, STATUS_PANEL_CHANGE_TIME, STATUS_PANEL_STD_MSG_1,
-                STATUS_PANEL_STD_MSG_2, STATUS_PANEL_STD_MSG_3, STATUS_PANEL_STD_MSG_4);
-        getContentPane().add(statusPanel, BorderLayout.SOUTH);
-
-        final JPanel declarationsContainer = createDeclarationsContainer();
-        final JPanel programViewContainer = createProgramViewContainer();
-        final JPanel postconditionContainer = createPostconditionContainer();
-
-        final JSplitPane splitPane1 = new JSplitPane( //
-                JSplitPane.HORIZONTAL_SPLIT, declarationsContainer, programViewContainer);
-        splitPane1.setResizeWeight(0);
-        splitPane1.setOneTouchExpandable(true);
-
-        final JSplitPane splitPane2 = new JSplitPane(//
-                JSplitPane.HORIZONTAL_SPLIT, splitPane1, postconditionContainer);
-        splitPane2.setResizeWeight(1);
-        splitPane2.setOneTouchExpandable(true);
-        contentPanel.add(splitPane2, BorderLayout.CENTER);
-
-        final JPanel ctrlPanel = createControlPanel();
-        contentPanel.add(ctrlPanel, BorderLayout.SOUTH);
-
         getAllComponents(contentPanel).stream().filter(JButton.class::isInstance)
                 .map(JButton.class::cast).forEach(btn -> btn.setBackground(Color.WHITE));
 
-        final int preferredWidth = programViewContainer.getPreferredSize().width
-                + declarationsContainer.getPreferredSize().width
-                + postconditionContainer.getPreferredSize().width + 10;
-
-        setPreferredSize(new Dimension(preferredWidth, 700));
+        setPreferredSize(new Dimension(1400, 800));
         pack();
 
         loadFromModel();
         installListeners();
 
         statusPanel.setMessage("Initializing KeY data structures, please wait...");
-        new Thread(() -> {
-            initializeServices();
-        }).start();
+        new Thread(() -> initializeServices()).start();
 
         /*
          * At the beginning, the model cannot be dirty. The flag will now be true,
@@ -228,6 +202,69 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         setDirty(false);
         updateTitle();
         resetUndosListeners.forEach(ResetUndosListener::resetUndos);
+    }
+
+    private JPanel createContentPanel() {
+        final JPanel contentPanel = new JPanel(new BorderLayout());
+        statusPanel = new AutoResetStatusPanel( //
+                STATUS_PANEL_TIMEOUT, STATUS_PANEL_CHANGE_TIME, STATUS_PANEL_STD_MSG_1,
+                STATUS_PANEL_STD_MSG_2, STATUS_PANEL_STD_MSG_3, STATUS_PANEL_STD_MSG_4);
+        getContentPane().add(statusPanel, BorderLayout.SOUTH);
+
+        contentPanel.add(createDockingSetup(), BorderLayout.CENTER);
+
+        final JToolBar ctrlPanel = createControlToolbar();
+        contentPanel.add(ctrlPanel, BorderLayout.NORTH);
+        return contentPanel;
+    }
+
+    private CContentArea createDockingSetup() {
+        final CControl control = new CControl(this);
+
+        final JComponent programVariableDeclarations = createProgramVariableDeclarationsView();
+        final JComponent locsetsDeclarations = createLocsetsDeclarationsView();
+        final JComponent formulaDeclarations = createPredicatesDeclarationsView();
+
+        final JComponent programFragmentsComt = createAbstractFragmentViewContainer();
+        final JComponent methodContextComt = createMethodLevelContextViewContainer();
+
+        final JPanel relLocsLeft = createRelevantLocationsOneContainer();
+        final JPanel relLocsRight = createRelevantLocationsTwoContainer();
+        final JPanel postRelation = createResultRelationView();
+
+        final DefaultSingleCDockable pvDockable = new DefaultSingleCDockable(
+                "Free Program Variables", "Free Program Variables", programVariableDeclarations);
+        final DefaultSingleCDockable locsetDockable = new DefaultSingleCDockable(
+                "Abstract Location Sets", "Abstract Location Sets", locsetsDeclarations);
+        final DefaultSingleCDockable formulaDockable = new DefaultSingleCDockable(
+                "Functions and Predicates", "Functions and Predicates", formulaDeclarations);
+        final DefaultSingleCDockable progFragmDockable = new DefaultSingleCDockable(
+                "Abstract Program Fragments", "Abstract Program Fragments", programFragmentsComt);
+        final DefaultSingleCDockable methodContextDockable = new DefaultSingleCDockable(
+                "Method-Level Context", "Method-Level Context", methodContextComt);
+        final DefaultSingleCDockable relLocsLeftDockable = new DefaultSingleCDockable(
+                "Relevant Locations (Left)", "Relevant Locations (Left)", relLocsLeft);
+        final DefaultSingleCDockable relLocsRightDockable = new DefaultSingleCDockable(
+                "Relevant Locations (Right)", "Relevant Locations (Right)", relLocsRight);
+        final DefaultSingleCDockable relationDockable = new DefaultSingleCDockable(
+                "Relation to Verify", "Relation to Verify", postRelation);
+
+        final CGrid grid = new CGrid(control);
+
+        grid.add(0, 0, 1, 3, pvDockable);
+        grid.add(0, 3, 1, 3, locsetDockable);
+        grid.add(0, 6, 1, 3, formulaDockable);
+
+        grid.add(1, 7, 1, 2, relLocsLeftDockable);
+        grid.add(2, 7, 1, 2, relLocsRightDockable);
+        grid.add(3, 7, 2, 2, relationDockable);
+
+        grid.add(1, 0, 4, 7, methodContextDockable);
+        grid.add(1, 0, 4, 7, progFragmDockable);
+
+        final CContentArea dockingContentArea = control.getContentArea();
+        dockingContentArea.deploy(grid);
+        return dockingContentArea;
     }
 
     private static void installCodeTemplates() {
@@ -539,7 +576,7 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         }
     }
 
-    private JPanel createControlPanel() {
+    private JToolBar createControlToolbar() {
         final JButton loadFromFileBtn = new JButton("Load Model",
                 IconFontSwing.buildIcon(FontAwesomeSolid.FILE_UPLOAD, 16, Color.BLACK));
         loadFromFileBtn
@@ -591,28 +628,43 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
                 new Dimension(saveBundleAndStartBtn.getPreferredSize().width, 30));
         saveBundleAndStartBtn.addActionListener(e -> createAndLoadBundle());
 
-        mainWindow.getUserInterface().getProofControl().addAutoModeListener(new AutoModeListener() {
-            @Override
-            public void autoModeStarted(ProofEvent e) {
-                SwingUtilities.invokeLater(() -> saveBundleAndStartBtn.setEnabled(false));
-            }
+        /*
+         * MainWindow might not be there when testing the dialog with local main
+         * function
+         */
+        final Optional<MainWindow> maybeMainWindow = Optional.ofNullable(mainWindow);
+        maybeMainWindow.ifPresent(m -> m.getUserInterface().getProofControl()
+                .addAutoModeListener(new AutoModeListener() {
+                    @Override
+                    public void autoModeStarted(ProofEvent e) {
+                        SwingUtilities.invokeLater(() -> saveBundleAndStartBtn.setEnabled(false));
+                    }
 
-            @Override
-            public void autoModeStopped(ProofEvent e) {
-                try {
-                    Thread.sleep(1500);
-                } catch (InterruptedException exc) {
-                }
-                SwingUtilities.invokeLater(() -> saveBundleAndStartBtn.setEnabled(true));
-            }
-        });
+                    @Override
+                    public void autoModeStopped(ProofEvent e) {
+                        try {
+                            Thread.sleep(1500);
+                        } catch (InterruptedException exc) {
+                        }
+                        SwingUtilities.invokeLater(() -> saveBundleAndStartBtn.setEnabled(true));
+                    }
+                }));
 
-        final JPanel ctrlPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        ctrlPanel.add(loadFromFileBtn);
-        ctrlPanel.add(saveToFileBtn);
-        ctrlPanel.add(saveBundleAndStartBtn);
+        final JToolBar toolBar = new JToolBar();
+        toolBar.setBorder(BorderFactory.createCompoundBorder(toolBar.getBorder(),
+                BorderFactory.createEmptyBorder(4, 0, 2, 0)));
 
-        return ctrlPanel;
+        toolBar.setFloatable(true);
+        toolBar.setRollover(true);
+
+        toolBar.add(loadFromFileBtn);
+        toolBar.addSeparator();
+        toolBar.add(saveToFileBtn);
+        toolBar.addSeparator();
+        toolBar.addSeparator();
+        toolBar.add(saveBundleAndStartBtn);
+
+        return toolBar;
     }
 
     private String getMessageFromJAXBExc(JAXBException exc) {
@@ -675,7 +727,7 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         }
     }
 
-    private JPanel createProgramViewContainer() {
+    private JComponent createAbstractFragmentViewContainer() {
         final StatementLevelJavaErrorParser stmtLevelErrorParser = new StatementLevelJavaErrorParser();
         programVariablesChangedListeners.add(stmtLevelErrorParser::setProgVarDecls);
         methodContextChangedListeners.add(stmtLevelErrorParser::setMethodLevelContext);
@@ -685,63 +737,31 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
                 createJavaEditorView(codeRight, stmtLevelErrorParser));
         splitPane.setResizeWeight(.5);
 
-        final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.BOTTOM,
-                JTabbedPane.WRAP_TAB_LAYOUT);
-        tabbedPane.add("Abstract Program Fragments", splitPane);
-        tabbedPane.add("Method-Level Context",
-                createJavaEditorView(codeContext, new MethodLevelJavaErrorParser()));
-
-        tabbedPane.setToolTipTextAt(0, APF_TOOLTIP);
-        tabbedPane.setToolTipTextAt(1, CONTEXT_TOOLTIP);
-
-        tabbedPane.addChangeListener(e -> {
-            if (tabbedPane.getSelectedIndex() == 0) {
-                methodContextChangedListeners
-                        .forEach(l -> l.methodContextChanged(codeContext.getText()));
-            }
-        });
-
-        final JPanel editorsContainer = new JPanel(new BorderLayout());
-        editorsContainer.setMinimumSize(new Dimension(600, 100));
-        editorsContainer.add(tabbedPane, BorderLayout.CENTER);
-        return editorsContainer;
+        return splitPane;
     }
 
-    private JPanel createPostconditionContainer() {
-        final JPanel result = new JPanel(new GridLayout(3, 1));
-        result.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-        result.setPreferredSize(new Dimension(200, 0));
-        result.setMinimumSize(new Dimension(200, 0));
-
-        result.add(createRelevantLocationsOneContainer());
-        result.add(createRelevantLocationsTwoContainer());
-        result.add(createResultRelationView());
-
-        return result;
+    private JComponent createMethodLevelContextViewContainer() {
+        codeContext.getDocument().addDocumentListener(udl(e -> methodContextChangedListeners
+                .forEach(l -> l.methodContextChanged(e.getDocument().toString()))));
+        return createJavaEditorView(codeContext, new MethodLevelJavaErrorParser());
     }
 
     private JPanel createRelevantLocationsOneContainer() {
-        return createRelevantLocationsContainer("Relevant Locations (Left)", TOOLTIP_REL_LOCS_LEFT,
-                relevantSymbolsOneListModel, AERelationalModel::getRelevantVarsOne);
+        return createRelevantLocationsContainer(TOOLTIP_REL_LOCS_LEFT, relevantSymbolsOneListModel,
+                AERelationalModel::getRelevantVarsOne);
     }
 
     private JPanel createRelevantLocationsTwoContainer() {
-        return createRelevantLocationsContainer("Relevant Locations (Right)",
-                TOOLTIP_REL_LOCS_RIGHT, relevantSymbolsTwoListModel,
+        return createRelevantLocationsContainer(TOOLTIP_REL_LOCS_RIGHT, relevantSymbolsTwoListModel,
                 AERelationalModel::getRelevantVarsTwo);
     }
 
-    private JPanel createRelevantLocationsContainer(String labelText, String toolTipText,
+    private JPanel createRelevantLocationsContainer(String toolTipText,
             DefaultListModel<NullarySymbolDeclaration> relevantSymbolsModel,
             java.util.function.Function<AERelationalModel, List<NullarySymbolDeclaration>> chosenRelevantSymbolsGetter) {
         relevantSymbolsModel.addListDataListener(uldl(e -> setDirty(true)));
 
         final JPanel result = new JPanel(new BorderLayout());
-
-        final JLabel titleLabel = new JLabel(labelText);
-        final JPanel titleLabelContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        titleLabelContainer.add(titleLabel);
-        result.add(titleLabelContainer, BorderLayout.NORTH);
 
         final JList<NullarySymbolDeclaration> relevantSymbolsList = new JList<>();
         relevantSymbolsList.setToolTipText(toolTipText);
@@ -803,35 +823,8 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         return result;
     }
 
-    private JPanel createDeclarationsContainer() {
-        final JPanel symbolDeclContainer = new JPanel(new GridLayout(3, 1));
-        symbolDeclContainer.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-        symbolDeclContainer.setPreferredSize(new Dimension(200, 0));
-        symbolDeclContainer.setMinimumSize(new Dimension(200, 0));
-
-        final JComponent programVariableDeclarations = createProgramVariableDeclarationsView();
-        final JComponent locsetsDeclarations = createLocsetsDeclarationsView();
-        final JComponent formulaDeclarations = createPredicatesDeclarationsView();
-
-        programVariableDeclarations.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-        locsetsDeclarations.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-        formulaDeclarations.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-
-        symbolDeclContainer.add(programVariableDeclarations);
-        symbolDeclContainer.add(locsetsDeclarations);
-        symbolDeclContainer.add(formulaDeclarations);
-
-        return symbolDeclContainer;
-    }
-
     private JPanel createResultRelationView() {
         final JPanel postCondContainer = new JPanel(new BorderLayout());
-        postCondContainer.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
-
-        final JLabel titleLabel = new JLabel("Relation to Verify");
-        final JPanel titleLabelContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        titleLabelContainer.add(titleLabel);
-        postCondContainer.add(titleLabelContainer, BorderLayout.NORTH);
 
         resultRelationText.setBorder(BorderFactory.createEtchedBorder());
         resultRelationText.setEnabled(false);
@@ -861,11 +854,6 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
 
     private JComponent createPredicatesDeclarationsView() {
         final JPanel result = new JPanel(new BorderLayout());
-
-        final JLabel titleLabel = new JLabel("Functions and Predicates");
-        final JPanel titleLabelContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        titleLabelContainer.add(titleLabel);
-        result.add(titleLabelContainer, BorderLayout.NORTH);
 
         final JList<FuncOrPredDecl> predDeclsList = new JList<>();
         predDeclsList.setToolTipText(FUNC_OR_PRED_DECL_TOOLTIP);
@@ -959,11 +947,6 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
 
     private JComponent createProgramVariableDeclarationsView() {
         final JPanel result = new JPanel(new BorderLayout());
-
-        final JLabel titleLabel = new JLabel("Free Program Variables");
-        final JPanel titleLabelContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        titleLabelContainer.add(titleLabel);
-        result.add(titleLabelContainer, BorderLayout.NORTH);
 
         final JList<ProgramVariableDeclaration> progVarDeclsList = new JList<>();
         progVarDeclsList.setToolTipText(PROGVAR_DECL_TOOLTIP);
@@ -1060,11 +1043,6 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
 
     private JComponent createLocsetsDeclarationsView() {
         final JPanel result = new JPanel(new BorderLayout());
-
-        final JLabel titleLabel = new JLabel("Abstract Location Sets");
-        final JPanel titleLabelContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        titleLabelContainer.add(titleLabel);
-        result.add(titleLabelContainer, BorderLayout.NORTH);
 
         final JList<AbstractLocsetDeclaration> locsetDeclsList = new JList<>();
         locsetDeclsList.setToolTipText(LOCSET_DECL_TOOLTIP);
