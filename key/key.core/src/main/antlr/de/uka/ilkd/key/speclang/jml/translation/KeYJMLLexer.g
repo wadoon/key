@@ -35,6 +35,7 @@ lexer grammar KeYJMLLexer;
     VOID : 'void';
 
     /* JML and JML* keywords */
+    ANY             : 'any';
     ACCESSIBLE      : 'accessible';
     ASSIGNABLE      : 'assignable';
     BREAKS          : 'breaks';

@@ -14,8 +14,10 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
@@ -61,14 +63,8 @@ public class TermAccessibleLocationsCollector extends DefaultVisitor {
             result.add(new PVLoc((LocationVariable) t.op()));
         }
 
-        final Function allLocs = services.getTypeConverter().getLocSetLDT().getAllLocs();
-        if (t.op() == allLocs) {
-            result.add(new AllLocsLoc(allLocs));
-        }
-
         if (AbstractExecutionUtils.isAbstractSkolemLocationSetValueTerm(t, services)) {
-            final Function op = (Function) t.sub(0).op();
-            result.add(op == allLocs ? new AllLocsLoc(allLocs) : new SkolemLoc(op));
+            result.addAll(AbstractUpdateFactory.abstrUpdateLocsFromUnionTerm(t.sub(0), Optional.empty(), services));
         }
 
 //        final java.util.function.Function<Term, Set<AbstractUpdateAssgnLoc>> subToLoc = //

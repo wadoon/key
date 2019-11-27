@@ -2169,7 +2169,8 @@ quantifiedvardecls returns [Pair<KeYJavaType,ImmutableList<LogicVariable>> resul
     ImmutableList<LogicVariable> vars = ImmutableSLList.<LogicVariable>nil();
 }
 :
-    t=typespec v=quantifiedvariabledeclarator[t]
+    ( ANY { t = new KeYJavaType(Sort.ANY); } | t=typespec )
+    v=quantifiedvariabledeclarator[t]
 
     { vars = vars.append(v); }
 

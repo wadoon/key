@@ -594,17 +594,13 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         mainWindow.getUserInterface().getProofControl().addAutoModeListener(new AutoModeListener() {
             @Override
             public void autoModeStarted(ProofEvent e) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException exc) {
-                }
                 SwingUtilities.invokeLater(() -> saveBundleAndStartBtn.setEnabled(false));
             }
 
             @Override
             public void autoModeStopped(ProofEvent e) {
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(1500);
                 } catch (InterruptedException exc) {
                 }
                 SwingUtilities.invokeLater(() -> saveBundleAndStartBtn.setEnabled(true));

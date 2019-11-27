@@ -112,11 +112,7 @@ public class AbstractExecutionUtils {
      *         location set.
      */
     public static boolean isAbstractSkolemLocationSetValueTerm(Term t, Services services) {
-        final Function locsetToValueFunction = services.getTypeConverter().getLocSetLDT()
-                .getValue();
-        return t.op() == locsetToValueFunction && //
-                t.sub(0).op() instanceof Function && //
-                t.sub(0).arity() == 0;
+        return t.op() == services.getTypeConverter().getLocSetLDT().getValue();
     }
 
     /**
@@ -320,7 +316,7 @@ public class AbstractExecutionUtils {
          * to mess up the results for Skolem locset symbols. Everything of interest
          * (non-fresh) should be initialized in an update or so.
          */
-        
+
 //        final TermProgramVariableCollector collector = new TermProgramVariableCollector(
 //                goal.getLocalSpecificationRepository(), services);
         final OpCollector collector = new OpCollector();
