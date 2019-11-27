@@ -9,8 +9,7 @@
 { ; }
 
 /*@ ae_constraint
-  @   inv(\value(frameP)) &amp;&amp; i &gt;= 0 &amp;&amp;
-  @   \disjoint(frameP, i) &amp;&amp; \disjoint(footprintP, i);
+  @   inv(\value(frameP)) &amp;&amp; variant &gt;= 0;
   @*/
 { ; }
 
@@ -27,7 +26,7 @@ while (
 ) {
     //@ ghost int oldVariant = variant;
 
-    /*@ ae_constraint
+    /* ae_constraint
       @   \disjoint(frameP, variant) &amp;&amp;
       @   \disjoint(footprintP, variant);
       @*/
@@ -55,8 +54,7 @@ while (
 { ; }
 
 /*@ ae_constraint
-  @   inv(\value(frameP)) &amp;&amp; i &gt;= 0 &amp;&amp;
-  @   \disjoint(frameP, i) &amp;&amp; \disjoint(footprintP, i);
+  @   inv(\value(frameP)) &amp;&amp; variant &gt;= 0;
   @*/
 { ; }
 
@@ -73,7 +71,7 @@ while (
 ) {
     //@ ghost int oldVariant = variant;
 
-    /*@ ae_constraint
+    /* ae_constraint
       @   \disjoint(frameP, variant) &amp;&amp;
       @   \disjoint(footprintP, variant);
       @*/

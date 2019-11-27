@@ -209,12 +209,11 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         statusPanel = new AutoResetStatusPanel( //
                 STATUS_PANEL_TIMEOUT, STATUS_PANEL_CHANGE_TIME, STATUS_PANEL_STD_MSG_1,
                 STATUS_PANEL_STD_MSG_2, STATUS_PANEL_STD_MSG_3, STATUS_PANEL_STD_MSG_4);
-        getContentPane().add(statusPanel, BorderLayout.SOUTH);
 
+        contentPanel.add(createControlToolbar(), BorderLayout.NORTH);
         contentPanel.add(createDockingSetup(), BorderLayout.CENTER);
-
-        final JToolBar ctrlPanel = createControlToolbar();
-        contentPanel.add(ctrlPanel, BorderLayout.NORTH);
+        contentPanel.add(statusPanel, BorderLayout.SOUTH);
+        
         return contentPanel;
     }
 
