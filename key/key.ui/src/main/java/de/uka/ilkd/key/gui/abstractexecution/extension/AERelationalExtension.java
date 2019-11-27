@@ -15,9 +15,15 @@ package de.uka.ilkd.key.gui.abstractexecution.extension;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 
@@ -46,13 +52,50 @@ import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
                 + "Developer: Dominic Steinhofel <steinhoefel@cs.tu-darmstadt.de>", //
         experimental = false)
 public class AERelationalExtension implements KeYGuiExtension, KeYGuiExtension.Toolbar {
+    private static final String REFINITY_LOGO = "/de/uka/ilkd/key/gui/abstractexecution/relational/refinity-logo-w-bg.png";
+
+    private static final String TOOLTIP = "Opens dialog of the Abstract Execution-based relational verification tool REFINITY.";
+    private static final Color BG_COLOR = Color.decode("#23373b");
+    private static final Color FG_COLOR = Color.decode("#FAFAFA");
+    private static final Color HL_COLOR = Color.decode("#EB811B");
 
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         final JToolBar result = new JToolBar("AE-Relational");
 
-        final JButton openAERelationalWindowButton = new JButton("AE-Relational",
+        final JButton openAERelationalWindowButton = new JButton("REFINITY",
                 IconFontSwing.buildIcon(FontAwesomeSolid.BALANCE_SCALE, 16, Color.BLACK));
+        openAERelationalWindowButton.setToolTipText(
+                "<html><table><tr><td width=\"140px\">" + TOOLTIP + "</td></tr></table></html>");
+
+        final URL refinityLogoURL = AERelationalExtension.class.getResource(REFINITY_LOGO);
+        if (refinityLogoURL != null) {
+            final Icon refinityLogo = new ImageIcon(refinityLogoURL);
+            openAERelationalWindowButton.setText("");
+            openAERelationalWindowButton.setIcon(refinityLogo);
+            openAERelationalWindowButton.setBorder(BorderFactory.createLineBorder(BG_COLOR, 1));
+
+            openAERelationalWindowButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    openAERelationalWindowButton
+                            .setBorder(BorderFactory.createLineBorder(FG_COLOR, 1));
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    openAERelationalWindowButton
+                            .setBorder(BorderFactory.createLineBorder(BG_COLOR, 1));
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    openAERelationalWindowButton
+                            .setBorder(BorderFactory.createLineBorder(HL_COLOR, 1));
+                }
+            });
+        }
+
         openAERelationalWindowButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
