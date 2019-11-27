@@ -9,13 +9,13 @@
 { ; }
 
 /*@ ae_constraint
-  @   inv(\value(frameP)) &amp;&amp; variant &gt;= 0;
+  @   inv(\value(frameP)) &amp;&amp; decrExpr(\value(frameP)) &gt;= 0;
   @*/
 { ; }
 
-/*@ loop_invariant variant &gt;= 0 &amp;&amp; inv(\value(frameP));
+/*@ loop_invariant decrExpr(\value(frameP)) &gt;= 0 &amp;&amp; inv(\value(frameP));
   @ assignable frameP;
-  @ decreases variant;
+  @ decreases decrExpr(\value(frameP));
   @*/
 while (
    /*@ assignable \nothing;
@@ -24,20 +24,19 @@ while (
      @*/
    \abstract_expression boolean e 
 ) {
-    //@ ghost int oldVariant = variant;
-
-    /* ae_constraint
-      @   \disjoint(frameP, variant) &amp;&amp;
-      @   \disjoint(footprintP, variant);
-      @*/
+    // The below assumption is a substitute for a ghost initialization,
+    // which we cannot use here because the order KeY uses when
+    // initializing the problem.
+    
+    //@ assume oldVariantLeft == decrExpr(\value(frameP));
     { ; }
     
-    /*@ assignable frameP, variant;
-      @ accessible footprintP, i;
+    /*@ assignable frameP, footprintE;
+      @ accessible footprintP;
       @ normal_behavior ensures
       @   inv(\value(frameP)) &amp;&amp;
-      @   variant &gt;= 0 &amp;&amp;
-      @   variant &lt; oldVariant;
+      @   decrExpr(\value(frameP)) &gt;= 0 &amp;&amp;
+      @   decrExpr(\value(frameP)) &lt; oldVariantLeft;
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior requires false;
@@ -54,13 +53,13 @@ while (
 { ; }
 
 /*@ ae_constraint
-  @   inv(\value(frameP)) &amp;&amp; variant &gt;= 0;
+  @   inv(\value(frameP)) &amp;&amp; decrExpr(\value(frameP)) &gt;= 0;
   @*/
 { ; }
 
-/*@ loop_invariant variant &gt;= 0 &amp;&amp; inv(\value(frameP));
+/*@ loop_invariant decrExpr(\value(frameP)) &gt;= 0 &amp;&amp; inv(\value(frameP));
   @ assignable frameP;
-  @ decreases variant;
+  @ decreases decrExpr(\value(frameP));
   @*/
 while (
    /*@ assignable \nothing;
@@ -69,20 +68,15 @@ while (
      @*/
    \abstract_expression boolean e 
 ) {
-    //@ ghost int oldVariant = variant;
-
-    /* ae_constraint
-      @   \disjoint(frameP, variant) &amp;&amp;
-      @   \disjoint(footprintP, variant);
-      @*/
+    //@ assume oldVariantRight == decrExpr(\value(frameP));
     { ; }
     
-    /*@ assignable frameP, variant;
-      @ accessible footprintP, i;
+    /*@ assignable frameP, footprintE;
+      @ accessible footprintP;
       @ normal_behavior ensures
       @   inv(\value(frameP)) &amp;&amp;
-      @   variant &gt;= 0 &amp;&amp;
-      @   variant &lt; oldVariant;
+      @   decrExpr(\value(frameP)) &gt;= 0 &amp;&amp;
+      @   decrExpr(\value(frameP)) &lt; oldVariantRight;
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior requires false;
@@ -109,7 +103,13 @@ while (
             <relevantTwo>-1</relevantTwo>
         </locationSet>
     </locationSets>
-    <functions/>
+    <functions>
+        <function funcName="decrExpr" resultSortName="int">
+            <argSort>any</argSort>
+        </function>
+        <function funcName="oldVariantLeft" resultSortName="int"/>
+        <function funcName="oldVariantRight" resultSortName="int"/>
+    </functions>
     <predicates>
         <predicate predName="inv">
             <argSort>any</argSort>
@@ -119,14 +119,5 @@ while (
             <argSort>any</argSort>
         </predicate>
     </predicates>
-    <programVariables>
-        <programVariable typeName="int" varName="i">
-            <relevantOne>-1</relevantOne>
-            <relevantTwo>-1</relevantTwo>
-        </programVariable>
-        <programVariable typeName="int" varName="variant">
-            <relevantOne>-1</relevantOne>
-            <relevantTwo>-1</relevantTwo>
-        </programVariable>
-    </programVariables>
+    <programVariables/>
 </ns2:aeRelationalModel>

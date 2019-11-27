@@ -86,6 +86,7 @@ import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.AutoResetStatusPanel;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.FormulaInputTextArea;
+import de.uka.ilkd.key.gui.abstractexecution.relational.components.JSizedButton;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.JavaErrorParser;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.MethodLevelJavaErrorParser;
 import de.uka.ilkd.key.gui.abstractexecution.relational.components.StatementLevelJavaErrorParser;
@@ -213,7 +214,7 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         contentPanel.add(createControlToolbar(), BorderLayout.NORTH);
         contentPanel.add(createDockingSetup(), BorderLayout.CENTER);
         contentPanel.add(statusPanel, BorderLayout.SOUTH);
-        
+
         return contentPanel;
     }
 
@@ -576,10 +577,12 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
     }
 
     private JToolBar createControlToolbar() {
-        final JButton loadFromFileBtn = new JButton("Load Model",
-                IconFontSwing.buildIcon(FontAwesomeSolid.FILE_UPLOAD, 16, Color.BLACK));
-        loadFromFileBtn
-                .setPreferredSize(new Dimension(loadFromFileBtn.getPreferredSize().width, 30));
+        final int btnWidth = 45;
+        final int btnHeight = 30;
+
+        final JButton loadFromFileBtn = new JSizedButton("",
+                IconFontSwing.buildIcon(FontAwesomeSolid.FOLDER_OPEN, 16, Color.BLACK), btnWidth,
+                btnHeight);
         loadFromFileBtn.addActionListener(e -> {
             try {
                 loadFromFile();
@@ -601,9 +604,9 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
             }
         });
 
-        final JButton saveToFileBtn = new JButton("Save Model",
-                IconFontSwing.buildIcon(FontAwesomeSolid.FILE_DOWNLOAD, 16, Color.BLACK));
-        saveToFileBtn.setPreferredSize(new Dimension(saveToFileBtn.getPreferredSize().width, 30));
+        final JButton saveToFileBtn = new JSizedButton(
+                IconFontSwing.buildIcon(FontAwesomeSolid.SAVE, 16, Color.BLACK), btnWidth,
+                btnHeight);
         saveToFileBtn.addActionListener(e -> {
             try {
                 saveModelToFile();
@@ -620,11 +623,10 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
             }
         });
 
-        final JButton saveBundleAndStartBtn = new JButton("Start Proof",
-                IconFontSwing.buildIcon(FontAwesomeSolid.PLAY, 16, Color.BLACK));
+        final JButton saveBundleAndStartBtn = new JSizedButton(
+                IconFontSwing.buildIcon(FontAwesomeSolid.PLAY, 16, Color.BLACK), btnWidth,
+                btnHeight);
         saveBundleAndStartBtn.setToolTipText(SAVE_BTN_TOOLTIP);
-        saveBundleAndStartBtn.setPreferredSize(
-                new Dimension(saveBundleAndStartBtn.getPreferredSize().width, 30));
         saveBundleAndStartBtn.addActionListener(e -> createAndLoadBundle());
 
         /*
@@ -651,15 +653,13 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
 
         final JToolBar toolBar = new JToolBar();
         toolBar.setBorder(BorderFactory.createCompoundBorder(toolBar.getBorder(),
-                BorderFactory.createEmptyBorder(4, 0, 2, 0)));
+                BorderFactory.createEmptyBorder(2, 2, 2, 2)));
 
         toolBar.setFloatable(true);
         toolBar.setRollover(true);
 
         toolBar.add(loadFromFileBtn);
-        toolBar.addSeparator();
         toolBar.add(saveToFileBtn);
-        toolBar.addSeparator();
         toolBar.addSeparator();
         toolBar.add(saveBundleAndStartBtn);
 
