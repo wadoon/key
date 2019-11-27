@@ -23,6 +23,7 @@ import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -83,7 +84,7 @@ public final class CreateAbstractAnonUpdate extends AbstractTermTransformer {
          */
         final UniqueArrayList<AbstractUpdateLoc> locs = AbstractUpdateFactory
                 .abstrUpdateLocsFromUnionTerm(modTerm, Optional.of(ec), services).stream()
-                .filter(loc -> loc instanceof SkolemLoc)
+                .filter(loc -> loc instanceof SkolemLoc).map(HasToLoc::new)
                 .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
 
         if (locs.isEmpty()) {

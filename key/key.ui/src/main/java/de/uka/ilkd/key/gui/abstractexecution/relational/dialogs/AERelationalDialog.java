@@ -65,7 +65,6 @@ import org.fife.ui.rsyntaxtextarea.CodeTemplateManager;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
-import org.fife.ui.rsyntaxtextarea.templates.CodeTemplate;
 import org.fife.ui.rsyntaxtextarea.templates.StaticCodeTemplate;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.xml.sax.SAXException;
@@ -79,6 +78,7 @@ import de.uka.ilkd.key.abstractexecution.relational.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.abstractexecution.relational.model.ProofBundleConverter;
 import de.uka.ilkd.key.abstractexecution.relational.model.ProofBundleConverter.BundleSaveResult;
+import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -102,6 +102,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -238,17 +239,9 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
 
         final CodeTemplateManager ctm = RSyntaxTextArea.getCodeTemplateManager();
 
-        final CodeTemplate asTemplate = new StaticCodeTemplate( //
-                AS_CODE_TEMPLATE_ID, AS_CODE_TEMPLATE, null);
-        ctm.addTemplate(asTemplate);
-
-        final CodeTemplate aexpTemplate = new StaticCodeTemplate( //
-                AEXP_CODE_TEMPLATE_ID, AEXP_CODE_TEMPLATE, null);
-        ctm.addTemplate(aexpTemplate);
-
-        final CodeTemplate aconstrTemplate = new StaticCodeTemplate( //
-                AE_CONSTRAINT_CODE_TEMPLATE_ID, AE_CONSTRAINT_CODE_TEMPLATE, null);
-        ctm.addTemplate(aconstrTemplate);
+        for (String[] codeTemplate : CODE_TEMPLATES) {
+            ctm.addTemplate(new StaticCodeTemplate(codeTemplate[0], codeTemplate[1], null));
+        }
     }
 
     private void updateTitle() {
@@ -460,9 +453,9 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
         model.setMethodLevelContext(codeContext.getText());
         model.setPostCondition(resultRelationText.getText());
         model.setAbstractLocationSets(Collections.list(locsetDeclsListModel.elements()));
-        model.setFunctionDeclarations(Collections.list(funcOrPredDeclsListModel.elements())
-                .stream().filter(FunctionDeclaration.class::isInstance)
-                .map(FunctionDeclaration.class::cast).collect(Collectors.toList()));
+        model.setFunctionDeclarations(Collections.list(funcOrPredDeclsListModel.elements()).stream()
+                .filter(FunctionDeclaration.class::isInstance).map(FunctionDeclaration.class::cast)
+                .collect(Collectors.toList()));
         model.setPredicateDeclarations(Collections.list(funcOrPredDeclsListModel.elements())
                 .stream().filter(PredicateDeclaration.class::isInstance)
                 .map(PredicateDeclaration.class::cast).collect(Collectors.toList()));
@@ -598,6 +591,26 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
                 new Dimension(saveBundleAndStartBtn.getPreferredSize().width, 30));
         saveBundleAndStartBtn.addActionListener(e -> createAndLoadBundle());
 
+        mainWindow.getUserInterface().getProofControl().addAutoModeListener(new AutoModeListener() {
+            @Override
+            public void autoModeStarted(ProofEvent e) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException exc) {
+                }
+                SwingUtilities.invokeLater(() -> saveBundleAndStartBtn.setEnabled(false));
+            }
+
+            @Override
+            public void autoModeStopped(ProofEvent e) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException exc) {
+                }
+                SwingUtilities.invokeLater(() -> saveBundleAndStartBtn.setEnabled(true));
+            }
+        });
+
         final JPanel ctrlPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         ctrlPanel.add(loadFromFileBtn);
         ctrlPanel.add(saveToFileBtn);
@@ -654,7 +667,8 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
                 }
             };
             mainWindow.getUserInterface().addProverTaskListener(ptl);
-            mainWindow.loadProofFromBundle(result.getFile(), result.getProofPath().toFile());
+            SwingUtilities.invokeLater(() -> mainWindow.loadProofFromBundle(result.getFile(),
+                    result.getProofPath().toFile()));
 
         } catch (IOException | IllegalStateException e) {
             JOptionPane
@@ -770,7 +784,7 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
             @Override
             public void actionPerformed(ActionEvent e) {
                 final int[] indices = relevantSymbolsList.getSelectedIndices();
-                for (int i = indices.length; i --> 0;) {
+                for (int i = indices.length; i-- > 0;) {
                     int idx = indices[i];
                     relevantSymbolsModel.remove(idx);
                 }
@@ -907,7 +921,7 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
             @Override
             public void actionPerformed(ActionEvent e) {
                 final int[] indices = predDeclsList.getSelectedIndices();
-                for (int i = indices.length; i --> 0;) {
+                for (int i = indices.length; i-- > 0;) {
                     int idx = indices[i];
                     final FuncOrPredDecl removed = funcOrPredDeclsListModel.remove(idx);
                     services.getNamespaces().functions().remove(new Name(removed.getName()));
@@ -1006,7 +1020,7 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
             @Override
             public void actionPerformed(ActionEvent e) {
                 final int[] indices = progVarDeclsList.getSelectedIndices();
-                for (int i = indices.length; i --> 0;) {
+                for (int i = indices.length; i-- > 0;) {
                     int idx = indices[i];
                     final ProgramVariableDeclaration removed = progVarDeclsListModel.remove(idx);
                     services.getNamespaces().programVariables()
@@ -1104,7 +1118,7 @@ public class AERelationalDialog extends JFrame implements AERelationalDialogCons
             @Override
             public void actionPerformed(ActionEvent e) {
                 final int[] indices = locsetDeclsList.getSelectedIndices();
-                for (int i = indices.length; i --> 0;) {
+                for (int i = indices.length; i-- > 0;) {
                     int idx = indices[i];
                     final AbstractLocsetDeclaration removed = locsetDeclsListModel.remove(idx);
                     services.getNamespaces().functions().remove(new Name(removed.getName()));

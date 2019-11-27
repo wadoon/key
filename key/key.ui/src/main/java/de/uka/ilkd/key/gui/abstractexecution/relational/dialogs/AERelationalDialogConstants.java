@@ -12,10 +12,13 @@
 //
 package de.uka.ilkd.key.gui.abstractexecution.relational.dialogs;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 /**
  * @author Dominic Steinhoefel
  */
-public interface AERelationalDialogConstants {
+public interface AERelationalDialogConstants extends AERelationalDialogCodeTemplates {
     static final String DUMMY_KEY_FILE = "/de/uka/ilkd/key/gui/abstractexecution/relational/dummy.key";
     static final String PROOF_BUNDLE_ENDING = ".zproof";
 
@@ -27,38 +30,10 @@ public interface AERelationalDialogConstants {
     static final String DIRTY_TITLE_PART = " *";
     static final String READ_ONLY_TITLE_PART = " (READ ONLY - Save to edit)";
 
-    ////////////////////
-    // CODE TEMPLATES //
-    ////////////////////
-    
-    static final String AEXP_CODE_TEMPLATE_ID = "aexp";
-    static final String AEXP_CODE_TEMPLATE = //@formatter:off
-            "/*@ assignable frameE;\n" + //
-            "  @ accessible footprinE;\n" + //
-            "  @ exceptional_behavior requires false;\n" + //
-            "  @*/\n" + //
-            "\\abstract_expression boolean e"; //@formatter:on
-
-    static final String AS_CODE_TEMPLATE_ID = "as";
-    static final String AS_CODE_TEMPLATE = //@formatter:off
-            "/*@ assignable frameP;\n" + //
-            "  @ accessible footprintP;\n" + //
-            "  @ exceptional_behavior requires false;\n" + //
-            "  @ return_behavior requires false;\n" + //
-            "  @*/\n" + //
-            "\\abstract_statement P;"; //@formatter:on
-
-    static final String AE_CONSTRAINT_CODE_TEMPLATE_ID = "aec";
-    static final String AE_CONSTRAINT_CODE_TEMPLATE = //@formatter:off
-            "/*@ ae_constraint\n" + //
-            "  @   true;\n" + //
-            "  @*/\n" + //
-            "{ ; }"; //@formatter:on
-
     //////////////////
     // STATUS PANEL //
     //////////////////
-    
+
     static final int STATUS_PANEL_TIMEOUT = 2000;
     static final int STATUS_PANEL_CHANGE_TIME = 30000;
     static final String STATUS_PANEL_STD_MSG_1 = //
@@ -68,15 +43,16 @@ public interface AERelationalDialogConstants {
     static final String STATUS_PANEL_STD_MSG_3 = //
             "When declaring <tt>ae_constraint</tt>s, you have to put an empty block <tt>{ ; }</tt> after the JML comment.";
     static final String STATUS_PANEL_STD_MSG_4 = //
-            "There are code templates for abstract statements, expressions, and constraints! Type \"<tt>"
-                    + AEXP_CODE_TEMPLATE_ID + "</tt>\", \"<tt>" + AE_CONSTRAINT_CODE_TEMPLATE_ID
-                    + "</tt>\" or \"<tt>" + AE_CONSTRAINT_CODE_TEMPLATE_ID
-                    + "</tt>\" followed by <tt>Ctrl+Shift+Space</tt>.";
+            "There are code templates for abstract statements, expressions, and constraints! Type "
+                    + Arrays.stream(CODE_TEMPLATES).map(arr -> arr[0])
+                            .map(templateID -> String.format("\"<tt>%s</tt>\"", templateID))
+                            .collect(Collectors.joining(" / "))
+                    + " followed by <tt>Ctrl+Shift+Space</tt>.";
 
     //////////////
     // TOOLTIPS //
     //////////////
-    
+
     static final String STD_POSTCONDREL_TOOLTIP = "Relation between values of the relevant locations after execution.<br/>"
             + "You may use the keywords \"\\result_1\" and \"\\result_2\" to access<br/>"
             + "the respective result arrays.<br/>"

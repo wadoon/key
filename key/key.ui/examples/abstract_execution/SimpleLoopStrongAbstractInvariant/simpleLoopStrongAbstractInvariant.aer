@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="\result_1=\result_2">
+    <programOne>/*@ ae_constraint
+  @   inv(\value(\set_union(frameP, footprintP)));
+  @*/
+{ ; }
+
+/*@ loop_invariant i &gt;= 0 &amp;&amp; inv(\value(\set_union(frameP, footprintP)));
+  @ assignable frameP;
+  @ decreases i; 
+  @*/
+while (i --&gt; 0) {
+    /*@ ae_constraint
+      @   \disjoint(frameP, i);
+      @*/
+    { ; }
+    
+    /*@ assignable frameP;
+      @ accessible footprintP;
+      @ normal_behavior ensures
+      @   inv(\value(\set_union(frameP, footprintP)));
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement P;
+}
+</programOne>
+    <programTwo>/*@ ae_constraint
+  @   inv(\value(\set_union(frameP, footprintP)));
+  @*/
+{ ; }
+
+/*@ loop_invariant i &gt;= 0 &amp;&amp; inv(\value(\set_union(frameP, footprintP)));
+  @ assignable frameP;
+  @ decreases i; 
+  @*/
+while (i --&gt; 0) {
+    /*@ ae_constraint
+      @   \disjoint(frameP, i);
+      @*/
+    { ; }
+    
+    /*@ assignable frameP;
+      @ accessible footprintP;
+      @ normal_behavior ensures inv(\value(\set_union(frameP, footprintP)));
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement P;
+}
+</programTwo>
+    <methodLevelContext></methodLevelContext>
+    <locationSets>
+        <locationSet locsetName="relevant">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <functions/>
+    <predicates>
+        <predicate predName="inv">
+            <argSort>any</argSort>
+        </predicate>
+    </predicates>
+    <programVariables>
+        <programVariable typeName="int" varName="i">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+    </programVariables>
+</ns2:aeRelationalModel>
