@@ -23,7 +23,7 @@ public interface AERelationalDialogCodeTemplates {
                     "aexp",
                     
                     "/*@ assignable frameE;\n" + //
-                    "  @ accessible footprinE;\n" + //
+                    "  @ accessible footprintE;\n" + //
                     "  @ exceptional_behavior requires false;\n" + //
                     "  @*/\n" + //
                     "\\abstract_expression boolean e"
