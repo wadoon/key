@@ -4,8 +4,8 @@
 // additional specifications, which have been commented
 // out for demonstration purposes.
 
-/* ae_constraint \disjoint(frameE, footprintP) &amp;&amp;
-  @               \disjoint(frameP, footprintE) &amp;&amp;
+/*@ ae_constraint \disjoint(frameE, footprintP) &amp;&amp;
+  @               //\disjoint(frameP, footprintE) &amp;&amp;
   @               \disjoint(frameP, frameE) &amp;&amp;
   @               \disjoint(frameE, relevant) &amp;&amp;
   @               \disjoint(frameP, relevant) &amp;&amp;
@@ -49,8 +49,8 @@ else {
 // additional specifications, which have been commented
 // out for demonstration purposes.
 
-/* ae_constraint \disjoint(frameE, footprintP) &amp;&amp;
-  @               \disjoint(frameP, footprintE) &amp;&amp;
+/*@ ae_constraint \disjoint(frameE, footprintP) &amp;&amp;
+  @               //\disjoint(frameP, footprintE) &amp;&amp;
   @               \disjoint(frameP, frameE) &amp;&amp;
   @               \disjoint(frameE, relevant) &amp;&amp;
   @               \disjoint(frameP, relevant) &amp;&amp;
@@ -83,6 +83,7 @@ else {
     //@ accessible footprintQ2;
     \abstract_statement Q2;
 }</programTwo>
+    <methodLevelContext></methodLevelContext>
     <locationSets>
         <locationSet locsetName="relevant">
             <relevantOne>0</relevantOne>
@@ -121,6 +122,7 @@ else {
             <relevantTwo>-1</relevantTwo>
         </locationSet>
     </locationSets>
+    <functions/>
     <predicates>
         <predicate predName="throwsExcP">
             <argSort>any</argSort>
