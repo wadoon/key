@@ -229,6 +229,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
 
     private CContentArea createDockingSetup() {
         final CControl control = new CControl(this);
+        control.setTheme("flat");
 
         final JComponent programVariableDeclarations = createProgramVariableDeclarationsView();
         final JComponent locsetsDeclarations = createLocsetsDeclarationsView();
