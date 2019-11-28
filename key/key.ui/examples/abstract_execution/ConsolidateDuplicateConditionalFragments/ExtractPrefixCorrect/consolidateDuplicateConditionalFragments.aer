@@ -75,6 +75,7 @@ else {
     //@ accessible footprintQ2;
     \abstract_statement Q2;
 }</programTwo>
+    <methodLevelContext></methodLevelContext>
     <locationSets>
         <locationSet locsetName="relevant">
             <relevantOne>0</relevantOne>
@@ -113,6 +114,7 @@ else {
             <relevantTwo>-1</relevantTwo>
         </locationSet>
     </locationSets>
+    <functions/>
     <predicates>
         <predicate predName="throwsExcP">
             <argSort>any</argSort>
@@ -124,4 +126,5 @@ else {
             <argSort>any</argSort>
         </predicate>
     </predicates>
+    <programVariables/>
 </ns2:aeRelationalModel>

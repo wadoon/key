@@ -71,8 +71,9 @@ public class LocsetInputDialog extends JDialog {
         final JButton okButton = new JButton("OK");
 
         final JTextField valueTextField = new JTextField(value.getLocsetName());
-        valueTextField.setFont(
-                new Font("Monospaced", Font.PLAIN, valueTextField.getFont().getSize()));
+        valueTextField.setToolTipText("<html>Example: \"<tt>myAbstrLocSet</tt>\"</html>");
+        valueTextField
+                .setFont(new Font("Monospaced", Font.PLAIN, valueTextField.getFont().getSize()));
         valueTextField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -124,7 +125,7 @@ public class LocsetInputDialog extends JDialog {
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
         contentPanel.add(buttonPanel, BorderLayout.SOUTH);
-        
+
         installEscapeListener();
 
         setSize(400, 110);
@@ -145,8 +146,7 @@ public class LocsetInputDialog extends JDialog {
         });
     }
 
-    public static AbstractLocsetDeclaration showInputDialog(final Window owner,
-            Services services) {
+    public static AbstractLocsetDeclaration showInputDialog(final Window owner, Services services) {
         return showInputDialog(owner, AbstractLocsetDeclaration.EMPTY_DECL, services);
     }
 

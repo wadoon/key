@@ -135,7 +135,7 @@ public class ProofState implements ProverTaskListener, AutoModeListener, DirtyLi
         NO_PROOF("No Proof"), //
         PROOF_LOADED("Proof loaded"), //
         RUNNING("Running"), //
-        INCONSISTENT("No Proof / Inconsistent"), //
+        INCONSISTENT("No Proof (Model Changed)"), //
         OPEN("Open"), //
         CLOSED("Closed");
 

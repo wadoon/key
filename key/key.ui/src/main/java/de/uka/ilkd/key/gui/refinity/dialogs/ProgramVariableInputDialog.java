@@ -71,8 +71,10 @@ public class ProgramVariableInputDialog extends JDialog {
         final JButton okButton = new JButton("OK");
 
         final JTextField valueTextField = new JTextField(value.toString());
-        valueTextField.setFont(
-                new Font("Monospaced", Font.PLAIN, valueTextField.getFont().getSize()));
+        valueTextField.setToolTipText(
+                "<html>Example: \"<tt>int i</tt>\", \"<tt>java.lang.Object obj</tt>\"</html>");
+        valueTextField
+                .setFont(new Font("Monospaced", Font.PLAIN, valueTextField.getFont().getSize()));
         valueTextField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -128,7 +130,7 @@ public class ProgramVariableInputDialog extends JDialog {
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
         contentPanel.add(buttonPanel, BorderLayout.SOUTH);
-        
+
         installEscapeListener();
 
         setSize(400, 110);
