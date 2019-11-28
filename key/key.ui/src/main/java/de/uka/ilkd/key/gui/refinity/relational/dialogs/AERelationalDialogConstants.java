@@ -53,6 +53,7 @@ public interface AERelationalDialogConstants extends AERelationalDialogCodeTempl
     // TOOLTIPS //
     //////////////
 
+    static final String CLOSE_BUTTON_TOOLTIP = htmlTooltip("Closes the REFINITY and KeY windows and terminates the application.", 100);
     static final String STD_POSTCONDREL_TOOLTIP = "Relation between values of the relevant locations after execution.<br/>"
             + "You may use the keywords \"\\result_1\" and \"\\result_2\" to access<br/>"
             + "the respective result arrays.<br/>"

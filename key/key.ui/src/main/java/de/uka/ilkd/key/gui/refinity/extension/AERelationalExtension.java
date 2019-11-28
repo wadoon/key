@@ -99,33 +99,36 @@ public class AERelationalExtension implements KeYGuiExtension, KeYGuiExtension.T
         openAERelationalWindowButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final String programOne = "";
-                final String programTwo = "";
-                final String postCondition = "\\result_1=\\result_2";
-                final List<AbstractLocsetDeclaration> abstractLocationSets = Collections
-                        .singletonList(new AbstractLocsetDeclaration("relevant"));
-                final List<FunctionDeclaration> functionDeclarations = Collections.emptyList();
-                final List<PredicateDeclaration> predicateDeclarations = Collections.emptyList();
-                final List<ProgramVariableDeclaration> programVariableDeclarations = //
-                        Collections.emptyList();
-                final List<NullarySymbolDeclaration> relevantVarsOne = //
-                        Collections.singletonList(abstractLocationSets.get(0));
-                final List<NullarySymbolDeclaration> relevantVarsTwo = //
-                        Collections.singletonList(abstractLocationSets.get(0));
-
-                final AERelationalModel defaultModel = new AERelationalModel(programOne, programTwo,
-                        "", postCondition, abstractLocationSets, functionDeclarations,
-                        predicateDeclarations, programVariableDeclarations, relevantVarsOne,
-                        relevantVarsTwo);
-
-                final RefinityWindow dia = new RefinityWindow(mainWindow, defaultModel);
-                dia.setVisible(true);
+                openNewDefaultRefinityWindow(mainWindow);
             }
         });
 
         result.add(openAERelationalWindowButton);
 
         return result;
+    }
+
+    public static void openNewDefaultRefinityWindow(MainWindow mainWindow) {
+        final String programOne = "";
+        final String programTwo = "";
+        final String postCondition = "\\result_1=\\result_2";
+        final List<AbstractLocsetDeclaration> abstractLocationSets = Collections
+                .singletonList(new AbstractLocsetDeclaration("relevant"));
+        final List<FunctionDeclaration> functionDeclarations = Collections.emptyList();
+        final List<PredicateDeclaration> predicateDeclarations = Collections.emptyList();
+        final List<ProgramVariableDeclaration> programVariableDeclarations = //
+                Collections.emptyList();
+        final List<NullarySymbolDeclaration> relevantVarsOne = //
+                Collections.singletonList(abstractLocationSets.get(0));
+        final List<NullarySymbolDeclaration> relevantVarsTwo = //
+                Collections.singletonList(abstractLocationSets.get(0));
+
+        final AERelationalModel defaultModel = new AERelationalModel(programOne, programTwo, "",
+                postCondition, abstractLocationSets, functionDeclarations, predicateDeclarations,
+                programVariableDeclarations, relevantVarsOne, relevantVarsTwo);
+
+        final RefinityWindow dia = new RefinityWindow(mainWindow, defaultModel);
+        dia.setVisible(true);
     }
 
 }

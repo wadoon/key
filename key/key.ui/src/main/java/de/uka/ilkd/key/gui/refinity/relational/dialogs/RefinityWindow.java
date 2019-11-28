@@ -86,6 +86,7 @@ import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.refinity.extension.AERelationalExtension;
 import de.uka.ilkd.key.gui.refinity.relational.components.AutoResetStatusPanel;
 import de.uka.ilkd.key.gui.refinity.relational.components.FormulaInputTextArea;
 import de.uka.ilkd.key.gui.refinity.relational.components.JSizedButton;
@@ -338,32 +339,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (isDirty()) {
-                    final int answer = JOptionPane.showConfirmDialog(RefinityWindow.this,
-                            "Do you want to save your model before closing?", "Save Model",
-                            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-
-                    if (answer == JOptionPane.YES_OPTION) {
-                        try {
-                            if (saveModelToFile()) {
-                                setVisible(false);
-                                dispose();
-                            }
-                        } catch (IOException | JAXBException exc) {
-                            JOptionPane.showMessageDialog(RefinityWindow.this,
-                                    "<html>Could not save model to file.<br><br/>Message:<br/>"
-                                            + exc.getMessage() + "</html>",
-                                    "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-                    } else if (answer == JOptionPane.NO_OPTION) {
-                        setVisible(false);
-                        dispose();
-                    }
-                } else {
-                    setVisible(false);
-                    dispose();
-                }
+                attemptCloseWindow();
             }
         });
 
@@ -552,9 +528,8 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
             final File file = chooser.getSelectedFile();
 
             if (!file.getName().endsWith(".aer")) {
-                JOptionPane.showMessageDialog(RefinityWindow.this,
-                        "No AE-Relational File (.aer)", "Problem Loading Model",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(RefinityWindow.this, "No AE-Relational File (.aer)",
+                        "Problem Loading Model", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -579,6 +554,13 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
     private JToolBar createControlToolbar() {
         final int btnWidth = 45;
         final int btnHeight = 30;
+
+        final JButton newBtn = new JSizedButton("",
+                IconFontSwing.buildIcon(FontAwesomeSolid.FILE, 16, Color.BLACK), btnWidth,
+                btnHeight);
+        newBtn.addActionListener(e -> {
+            AERelationalExtension.openNewDefaultRefinityWindow(mainWindow);
+        });
 
         final JButton loadFromFileBtn = new JSizedButton("",
                 IconFontSwing.buildIcon(FontAwesomeSolid.FOLDER_OPEN, 16, Color.BLACK), btnWidth,
@@ -624,10 +606,14 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
         });
 
         final JButton saveBundleAndStartBtn = new JSizedButton(
-                IconFontSwing.buildIcon(FontAwesomeSolid.PLAY, 16, Color.BLACK), btnWidth,
+                IconFontSwing.buildIcon(FontAwesomeSolid.PLAY, 16, Color.BLACK), btnWidth + 15,
                 btnHeight);
         saveBundleAndStartBtn.setToolTipText(SAVE_BTN_TOOLTIP);
         saveBundleAndStartBtn.addActionListener(e -> createAndLoadBundle());
+        
+        if (mainWindow == null) {
+            saveBundleAndStartBtn.setEnabled(false);
+        }
 
         /*
          * MainWindow might not be there when testing the dialog with local main
@@ -651,6 +637,14 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
                     }
                 }));
 
+        final JButton closeBtn = new JSizedButton("",
+                IconFontSwing.buildIcon(FontAwesomeSolid.WINDOW_CLOSE, 16, Color.BLACK), btnWidth,
+                btnHeight);
+        closeBtn.setToolTipText(CLOSE_BUTTON_TOOLTIP);
+        closeBtn.addActionListener(e -> {
+            attemptCloseWindow(true);
+        });
+
         final JToolBar toolBar = new JToolBar();
         toolBar.setBorder(BorderFactory.createCompoundBorder(toolBar.getBorder(),
                 BorderFactory.createEmptyBorder(2, 2, 2, 2)));
@@ -658,10 +652,13 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
         toolBar.setFloatable(true);
         toolBar.setRollover(true);
 
+        toolBar.add(newBtn);
         toolBar.add(loadFromFileBtn);
         toolBar.add(saveToFileBtn);
         toolBar.addSeparator();
         toolBar.add(saveBundleAndStartBtn);
+        toolBar.addSeparator();
+        toolBar.add(closeBtn);
 
         return toolBar;
     }
@@ -718,11 +715,10 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
                     result.getProofPath().toFile()));
 
         } catch (IOException | IllegalStateException e) {
-            JOptionPane
-                    .showMessageDialog(RefinityWindow.this,
-                            "<html>Problem saving proof bundle.<br/><br/>Message:<br/>"
-                                    + e.getMessage() + "</html>",
-                            "Problem Starting Proof", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    RefinityWindow.this, "<html>Problem saving proof bundle.<br/><br/>Message:<br/>"
+                            + e.getMessage() + "</html>",
+                    "Problem Starting Proof", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -1182,6 +1178,46 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
         readOnlyListeners.add(ro -> component.setEnabled(!ro));
 
         return new RTextScrollPane(component);
+    }
+
+    private void attemptCloseWindow() {
+        attemptCloseWindow(false);
+    }
+
+    private void attemptCloseWindow(final boolean shutdown) {
+        if (isDirty()) {
+            final int answer = JOptionPane.showConfirmDialog(RefinityWindow.this,
+                    "Do you want to save your model before closing?", "Save Model",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+            if (answer == JOptionPane.YES_OPTION) {
+                try {
+                    if (saveModelToFile()) {
+                        setVisible(false);
+                        dispose();
+                    }
+                } catch (IOException | JAXBException exc) {
+                    JOptionPane.showMessageDialog(RefinityWindow.this,
+                            "<html>Could not save model to file.<br><br/>Message:<br/>"
+                                    + exc.getMessage() + "</html>",
+                            "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            } else if (answer == JOptionPane.NO_OPTION) {
+                closeWindow(shutdown);
+            }
+        } else {
+            closeWindow(shutdown);
+        }
+    }
+
+    private void closeWindow(final boolean shutdown) {
+        setVisible(false);
+        dispose();
+
+        if (shutdown) {
+            System.exit(0);
+        }
     }
 
     private static List<Component> getAllComponents(final Container c) {
