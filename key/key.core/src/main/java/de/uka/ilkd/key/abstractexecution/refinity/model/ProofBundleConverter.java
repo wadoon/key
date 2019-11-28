@@ -35,8 +35,8 @@ import java.util.zip.ZipOutputStream;
  * @author Dominic Steinhoefel
  */
 public class ProofBundleConverter {
-    private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/abstractexecution/relational/Problem.java";
-    private static final String KEY_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/abstractexecution/relational/problem.key";
+    private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/Problem.java";
+    private static final String KEY_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/problem.key";
 
     private static final String RELATION = "<RELATION>";
     private static final String INIT_VARS = "<INIT_VARS>";

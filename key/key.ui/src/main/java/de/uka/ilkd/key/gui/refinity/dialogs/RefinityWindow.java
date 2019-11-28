@@ -92,7 +92,7 @@ import de.uka.ilkd.key.gui.refinity.components.JSizedButton;
 import de.uka.ilkd.key.gui.refinity.components.JavaErrorParser;
 import de.uka.ilkd.key.gui.refinity.components.MethodLevelJavaErrorParser;
 import de.uka.ilkd.key.gui.refinity.components.StatementLevelJavaErrorParser;
-import de.uka.ilkd.key.gui.refinity.extension.AERelationalExtension;
+import de.uka.ilkd.key.gui.refinity.extension.RefinityExtension;
 import de.uka.ilkd.key.gui.refinity.listeners.DirtyListener;
 import de.uka.ilkd.key.gui.refinity.listeners.MethodContextChangedListener;
 import de.uka.ilkd.key.gui.refinity.listeners.ProgramVariablesChangedListener;
@@ -559,7 +559,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
                 IconFontSwing.buildIcon(FontAwesomeSolid.FILE, 16, Color.BLACK), btnWidth,
                 btnHeight);
         newBtn.addActionListener(e -> {
-            AERelationalExtension.openNewDefaultRefinityWindow(mainWindow);
+            RefinityExtension.openNewDefaultRefinityWindow(mainWindow);
         });
 
         final JButton loadFromFileBtn = new JSizedButton("",

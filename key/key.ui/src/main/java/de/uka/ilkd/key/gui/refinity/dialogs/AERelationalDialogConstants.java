@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * @author Dominic Steinhoefel
  */
 public interface AERelationalDialogConstants extends AERelationalDialogCodeTemplates {
-    static final String DUMMY_KEY_FILE = "/de/uka/ilkd/key/gui/abstractexecution/relational/dummy.key";
+    static final String DUMMY_KEY_FILE = "/de/uka/ilkd/key/gui/refinity/dummy.key";
     static final String PROOF_BUNDLE_ENDING = ".zproof";
 
     //////////////////////

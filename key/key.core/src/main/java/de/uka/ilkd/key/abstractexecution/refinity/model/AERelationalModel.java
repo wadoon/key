@@ -52,7 +52,7 @@ public class AERelationalModel {
     public static final AERelationalModel EMPTY_MODEL = new AERelationalModel();
 
     private static final String AE_MODEL_FILE_ENDING = ".aer";
-    private static final String SCHEMA_PATH = "/de/uka/ilkd/key/abstractexecution/relational/schema1.xsd";
+    private static final String SCHEMA_PATH = "/de/uka/ilkd/key/refinity/schema1.xsd";
 
     @XmlElement(name = "programOne")
     private String programOne = "";

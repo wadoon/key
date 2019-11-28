@@ -48,11 +48,11 @@ import de.uka.ilkd.key.gui.refinity.dialogs.RefinityWindow;
 @KeYGuiExtension.Info( //
         name = "AE-Relational", //
         optional = true, //
-        description = "Adds GUI features for relational proofs based on Abstract Execution.\n" //
+        description = "Adds the REFINITY button for starting the GUI of the relational verification extension REFINITY.\n" //
                 + "Developer: Dominic Steinhofel <steinhoefel@cs.tu-darmstadt.de>", //
         experimental = false)
-public class AERelationalExtension implements KeYGuiExtension, KeYGuiExtension.Toolbar {
-    private static final String REFINITY_LOGO = "/de/uka/ilkd/key/gui/abstractexecution/relational/refinity-logo-w-bg.png";
+public class RefinityExtension implements KeYGuiExtension, KeYGuiExtension.Toolbar {
+    private static final String REFINITY_LOGO = "/de/uka/ilkd/key/gui/refinity/refinity-logo-w-bg.png";
 
     private static final String TOOLTIP = "Opens dialog of the Abstract Execution-based relational verification tool REFINITY.";
     private static final Color BG_COLOR = Color.decode("#23373b");
@@ -68,7 +68,7 @@ public class AERelationalExtension implements KeYGuiExtension, KeYGuiExtension.T
         openAERelationalWindowButton.setToolTipText(
                 "<html><table><tr><td width=\"140px\">" + TOOLTIP + "</td></tr></table></html>");
 
-        final URL refinityLogoURL = AERelationalExtension.class.getResource(REFINITY_LOGO);
+        final URL refinityLogoURL = RefinityExtension.class.getResource(REFINITY_LOGO);
         if (refinityLogoURL != null) {
             final Icon refinityLogo = new ImageIcon(refinityLogoURL);
             openAERelationalWindowButton.setText("");
