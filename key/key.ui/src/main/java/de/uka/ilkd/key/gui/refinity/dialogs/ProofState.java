@@ -118,7 +118,7 @@ public class ProofState implements ProverTaskListener, AutoModeListener, DirtyLi
 
     @Override
     public String toString() {
-        final int openGoals = currProof.openGoals().size();
+        final int openGoals = currProof == null ? -1 : currProof.openGoals().size();
         return state == State.OPEN ? //
                 String.format("%d Open Goal%s", openGoals, openGoals > 1 ? "s" : "") : //
                 state.toString();
