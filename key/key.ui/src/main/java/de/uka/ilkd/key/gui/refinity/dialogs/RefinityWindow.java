@@ -240,7 +240,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
 
         final JPanel relLocsLeft = createRelevantLocationsOneContainer();
         final JPanel relLocsRight = createRelevantLocationsTwoContainer();
-        final JPanel postRelation = createResultRelationView();
+        final JComponent postRelation = createResultRelationView();
 
         final DefaultSingleCDockable pvDockable = new DefaultSingleCDockable(
                 "Free Program Variables", htmlBold("Free Program Variables"),
@@ -878,14 +878,16 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
         return result;
     }
 
-    private JPanel createResultRelationView() {
-        final JPanel postCondContainer = new JPanel(new BorderLayout());
-
-        resultRelationText.setBorder(BorderFactory.createEtchedBorder());
+    private JComponent createResultRelationView() {
         resultRelationText.setEnabled(false);
+        /*
+         * NOTE (DS, 2019-11-28): A bug in the docking system prevents decreasing the
+         * size of the text field if we activate line wrap. No idea, why.
+         */
+//      resultRelationText.setLineWrap(true);
+
         resultRelationText.setBorder(BorderFactory.createCompoundBorder(
-                resultRelationText.getBorder(), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        resultRelationText.setLineWrap(true);
+                BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         resultRelationText.setFont(
                 new Font("Monospaced", Font.PLAIN, resultRelationText.getFont().getSize()));
 
@@ -905,8 +907,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
             }
         });
 
-        postCondContainer.add(resultRelationText, BorderLayout.CENTER);
-        return postCondContainer;
+        return resultRelationText;
     }
 
     private JComponent createPredicatesDeclarationsView() {
