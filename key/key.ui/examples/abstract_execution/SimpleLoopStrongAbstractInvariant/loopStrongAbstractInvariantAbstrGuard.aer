@@ -14,7 +14,7 @@
 { ; }
 
 /*@ loop_invariant decrExpr(\value(frameP)) &gt;= 0 &amp;&amp; inv(\value(frameP));
-  @ assignable frameP;
+  @ assignable frameP, footprintE;
   @ decreases decrExpr(\value(frameP));
   @*/
 while (
@@ -58,7 +58,7 @@ while (
 { ; }
 
 /*@ loop_invariant decrExpr(\value(frameP)) &gt;= 0 &amp;&amp; inv(\value(frameP));
-  @ assignable frameP;
+  @ assignable frameP, footprintE;
   @ decreases decrExpr(\value(frameP));
   @*/
 while (
@@ -68,6 +68,10 @@ while (
      @*/
    \abstract_expression boolean e 
 ) {
+    // The below assumption is a substitute for a ghost initialization,
+    // which we cannot use here because the order KeY uses when
+    // initializing the problem.
+    
     //@ assume oldVariantRight == decrExpr(\value(frameP));
     { ; }
     

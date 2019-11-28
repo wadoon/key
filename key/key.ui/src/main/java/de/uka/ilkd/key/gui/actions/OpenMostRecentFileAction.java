@@ -22,9 +22,9 @@ import java.util.Optional;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.ProofSelectionDialog;
-import de.uka.ilkd.key.gui.abstractexecution.relational.dialogs.AERelationalDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
+import de.uka.ilkd.key.gui.refinity.relational.dialogs.RefinityWindow;
+import de.uka.ilkd.key.abstractexecution.refinity.model.AERelationalModel;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 
@@ -70,7 +70,7 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
                             .isRelationalModelFile(file);
                     maybeRelationalModelFile.ifPresent(m -> {
                         m.setFile(file);
-                        final AERelationalDialog dia = new AERelationalDialog(
+                        final RefinityWindow dia = new RefinityWindow(
                                 MainWindow.getInstance(), m);
                         dia.setVisible(true);
                     });

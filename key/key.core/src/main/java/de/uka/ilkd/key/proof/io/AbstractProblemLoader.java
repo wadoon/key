@@ -27,8 +27,8 @@ import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
-import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
-import de.uka.ilkd.key.abstractexecution.relational.model.ProofBundleConverter;
+import de.uka.ilkd.key.abstractexecution.refinity.model.AERelationalModel;
+import de.uka.ilkd.key.abstractexecution.refinity.model.ProofBundleConverter;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.parser.KeYLexer;

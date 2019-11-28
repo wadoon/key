@@ -17,14 +17,14 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Optional;
 
-import de.uka.ilkd.key.abstractexecution.relational.model.AERelationalModel;
+import de.uka.ilkd.key.abstractexecution.refinity.model.AERelationalModel;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.abstractexecution.relational.dialogs.AERelationalDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.gui.refinity.relational.dialogs.RefinityWindow;
 
 /**
  * Opens a file dialog allowing to select the example to be loaded
@@ -62,7 +62,7 @@ public final class OpenExampleAction extends MainWindowAction {
                 
                 final AERelationalModel model = maybeModel.get();
                 model.setFile(file);
-                final AERelationalDialog dia = new AERelationalDialog(//
+                final RefinityWindow dia = new RefinityWindow(//
                         MainWindow.getInstance(), model);
                 dia.setReadonly(true);
                 dia.setVisible(true);
