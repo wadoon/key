@@ -10,10 +10,10 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.gui.refinity.relational.dialogs;
+package de.uka.ilkd.key.gui.refinity.dialogs;
 
-import static de.uka.ilkd.key.gui.refinity.relational.listeners.UniformDocumentListener.udl;
-import static de.uka.ilkd.key.gui.refinity.relational.listeners.UniformListDataListener.uldl;
+import static de.uka.ilkd.key.gui.refinity.listeners.UniformDocumentListener.udl;
+import static de.uka.ilkd.key.gui.refinity.listeners.UniformListDataListener.uldl;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -86,19 +86,19 @@ import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.refinity.components.AutoResetStatusPanel;
+import de.uka.ilkd.key.gui.refinity.components.FormulaInputTextArea;
+import de.uka.ilkd.key.gui.refinity.components.JSizedButton;
+import de.uka.ilkd.key.gui.refinity.components.JavaErrorParser;
+import de.uka.ilkd.key.gui.refinity.components.MethodLevelJavaErrorParser;
+import de.uka.ilkd.key.gui.refinity.components.StatementLevelJavaErrorParser;
 import de.uka.ilkd.key.gui.refinity.extension.AERelationalExtension;
-import de.uka.ilkd.key.gui.refinity.relational.components.AutoResetStatusPanel;
-import de.uka.ilkd.key.gui.refinity.relational.components.FormulaInputTextArea;
-import de.uka.ilkd.key.gui.refinity.relational.components.JSizedButton;
-import de.uka.ilkd.key.gui.refinity.relational.components.JavaErrorParser;
-import de.uka.ilkd.key.gui.refinity.relational.components.MethodLevelJavaErrorParser;
-import de.uka.ilkd.key.gui.refinity.relational.components.StatementLevelJavaErrorParser;
-import de.uka.ilkd.key.gui.refinity.relational.listeners.DirtyListener;
-import de.uka.ilkd.key.gui.refinity.relational.listeners.MethodContextChangedListener;
-import de.uka.ilkd.key.gui.refinity.relational.listeners.ProgramVariablesChangedListener;
-import de.uka.ilkd.key.gui.refinity.relational.listeners.ReadonlyListener;
-import de.uka.ilkd.key.gui.refinity.relational.listeners.ResetUndosListener;
-import de.uka.ilkd.key.gui.refinity.relational.listeners.ServicesLoadedListener;
+import de.uka.ilkd.key.gui.refinity.listeners.DirtyListener;
+import de.uka.ilkd.key.gui.refinity.listeners.MethodContextChangedListener;
+import de.uka.ilkd.key.gui.refinity.listeners.ProgramVariablesChangedListener;
+import de.uka.ilkd.key.gui.refinity.listeners.ReadonlyListener;
+import de.uka.ilkd.key.gui.refinity.listeners.ResetUndosListener;
+import de.uka.ilkd.key.gui.refinity.listeners.ServicesLoadedListener;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;

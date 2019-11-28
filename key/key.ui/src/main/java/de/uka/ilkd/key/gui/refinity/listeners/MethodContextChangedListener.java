@@ -10,13 +10,9 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.gui.refinity.relational.listeners;
-
-import java.util.Collection;
-
-import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
+package de.uka.ilkd.key.gui.refinity.listeners;
 
 @FunctionalInterface
-public interface ProgramVariablesChangedListener {
-    public void programVariablesChanged(Collection<ProgramVariableDeclaration> newVars);
+public interface MethodContextChangedListener {
+    public void methodContextChanged(String newContext);
 }

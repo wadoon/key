@@ -24,7 +24,7 @@ import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
-import de.uka.ilkd.key.gui.refinity.relational.dialogs.RefinityWindow;
+import de.uka.ilkd.key.gui.refinity.dialogs.RefinityWindow;
 
 /**
  * Opens a file dialog allowing to select the example to be loaded

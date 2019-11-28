@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.gui.refinity.relational.dialogs;
+package de.uka.ilkd.key.gui.refinity.dialogs;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;

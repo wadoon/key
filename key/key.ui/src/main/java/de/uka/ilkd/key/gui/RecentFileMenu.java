@@ -34,7 +34,7 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.abstractexecution.refinity.model.AERelationalModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.refinity.relational.dialogs.RefinityWindow;
+import de.uka.ilkd.key.gui.refinity.dialogs.RefinityWindow;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.Debug;
 

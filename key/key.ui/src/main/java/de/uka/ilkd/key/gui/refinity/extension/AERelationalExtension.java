@@ -37,7 +37,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import de.uka.ilkd.key.gui.refinity.relational.dialogs.RefinityWindow;
+import de.uka.ilkd.key.gui.refinity.dialogs.RefinityWindow;
 
 /**
  * Extension adapter for showing hash codes for adding Abstract Execution-Based

@@ -10,9 +10,27 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.gui.refinity.relational.listeners;
+package de.uka.ilkd.key.gui.refinity.components;
 
-@FunctionalInterface
-public interface ResetUndosListener {
-    public void resetUndos();
+/**
+ * @author Dominic Steinhoefel
+ */
+public class MethodLevelJavaErrorParser extends JavaErrorParser {
+    protected String createDocument(final String className, final String body) {
+        final String newBody = replaceAbstractStatement(replaceAbstractExpression(body));
+
+        final StringBuilder sb = new StringBuilder();
+
+        sb.append("public class ");
+        sb.append(className);
+        sb.append("{\n");
+
+        sb.append(newBody);
+
+        sb.append("\n}");
+
+        return sb.toString();
+
+    }
+
 }

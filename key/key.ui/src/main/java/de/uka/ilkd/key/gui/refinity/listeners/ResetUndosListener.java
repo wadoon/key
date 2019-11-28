@@ -10,9 +10,9 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.gui.refinity.relational.listeners;
+package de.uka.ilkd.key.gui.refinity.listeners;
 
 @FunctionalInterface
-public interface DirtyListener {
-    public void dirtyChanged(boolean dirty);
+public interface ResetUndosListener {
+    public void resetUndos();
 }
