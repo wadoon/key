@@ -55,6 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -630,6 +631,18 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
             }
         });
 
+        final JButton enlargeBtn = new JSizedButton(
+                IconFontSwing.buildIcon(FontAwesomeSolid.SEARCH_PLUS, 16, Color.BLACK), btnWidth,
+                btnHeight);
+        enlargeBtn.addActionListener(evt -> getAllComponents(getContentPane()).stream()
+                .forEach(c -> changeInputSize(c, true)));
+
+        final JButton shrinkBtn = new JSizedButton(
+                IconFontSwing.buildIcon(FontAwesomeSolid.SEARCH_MINUS, 16, Color.BLACK), btnWidth,
+                btnHeight);
+        shrinkBtn.addActionListener(evt -> getAllComponents(getContentPane()).stream()
+                .forEach(c -> changeInputSize(c, false)));
+
         final JButton saveBundleAndStartBtn = new JSizedButton(
                 IconFontSwing.buildIcon(FontAwesomeSolid.PLAY, 16, Color.BLACK), btnWidth + 15,
                 btnHeight);
@@ -681,11 +694,31 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
         toolBar.add(loadFromFileBtn);
         toolBar.add(saveToFileBtn);
         toolBar.addSeparator();
+        toolBar.add(enlargeBtn);
+        toolBar.add(shrinkBtn);
+        toolBar.addSeparator();
         toolBar.add(saveBundleAndStartBtn);
         toolBar.addSeparator();
         toolBar.add(closeBtn);
 
         return toolBar;
+    }
+
+    private void changeInputSize(Component component, boolean increase) {
+        if (!(component instanceof JList) && !(component instanceof JTextArea)) {
+            return;
+        }
+
+        final int newSize = component.getFont().getSize() + (increase ? 1 : -1);
+
+        if (newSize <= 10) {
+            return;
+        }
+
+        final Font newFont = new Font( //
+                component.getFont().getName(), component.getFont().getStyle(), newSize);
+
+        component.setFont(newFont);
     }
 
     private String getMessageFromJAXBExc(JAXBException exc) {
