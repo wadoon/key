@@ -14,6 +14,7 @@ package de.uka.ilkd.key.gui.refinity.components;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -43,6 +44,7 @@ public class AutoResetStatusPanel extends JPanel {
     private int currMsg = 0;
 
     private final JLabel statusLabel;
+    private final JLabel secondaryStatusLabel;
 
     public AutoResetStatusPanel(int timeout, int changeTime, String... standardMessages) {
         super();
@@ -58,12 +60,24 @@ public class AutoResetStatusPanel extends JPanel {
 
         setPreferredSize(new Dimension(getPreferredSize().width, 32));
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+
         statusLabel = new JLabel(standardMessages[0]);
         statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
         add(statusLabel);
+
+        secondaryStatusLabel = new JLabel();
+        secondaryStatusLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        add(secondaryStatusLabel);
+
+        statusLabel.setFont(new Font("Sans", Font.PLAIN, statusLabel.getFont().getSize()));
+        secondaryStatusLabel.setFont(new Font("Sans", Font.PLAIN, statusLabel.getFont().getSize()));
     }
 
     public void setMessage(String message) {
+        setMessage(message, true);
+    }
+
+    public void setMessage(String message, final boolean bold) {
         if (timeoutThread != null) {
             timeoutThread.interrupt();
         }
@@ -73,7 +87,11 @@ public class AutoResetStatusPanel extends JPanel {
         }
 
         statusLabel.setIcon(null);
-        statusLabel.setText(message);
+        if (bold) {
+            statusLabel.setText(String.format("<html><b>%s</b></html>", message));
+        } else {
+            statusLabel.setText(String.format("<html>%s</html>", message));
+        }
 
         timeoutThread = new Thread(() -> {
             try {
@@ -86,6 +104,10 @@ public class AutoResetStatusPanel extends JPanel {
         });
 
         timeoutThread.start();
+    }
+
+    public void setSecondaryMessage(String message) {
+        secondaryStatusLabel.setText(String.format("<html>%s</html>", message));
     }
 
     private void changeThread() {

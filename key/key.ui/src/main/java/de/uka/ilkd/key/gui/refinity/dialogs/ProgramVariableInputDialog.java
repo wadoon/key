@@ -15,6 +15,7 @@ package de.uka.ilkd.key.gui.refinity.dialogs;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -70,6 +71,8 @@ public class ProgramVariableInputDialog extends JDialog {
         final JButton okButton = new JButton("OK");
 
         final JTextField valueTextField = new JTextField(value.toString());
+        valueTextField.setFont(
+                new Font("Monospaced", Font.PLAIN, valueTextField.getFont().getSize()));
         valueTextField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {

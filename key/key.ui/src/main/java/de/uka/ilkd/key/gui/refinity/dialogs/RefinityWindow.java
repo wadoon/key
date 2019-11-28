@@ -22,6 +22,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -124,6 +125,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
     private AERelationalModel model;
     private MainWindow mainWindow;
     private Services services = null;
+    private ProofState proofState = new ProofState();
     // NOTE: Only access via setReadonly / isReadonly!
     private boolean readonly = false;
     // NOTE: Only access via setDirty / isDirty!
@@ -184,8 +186,12 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
 
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(contentPanel, BorderLayout.CENTER);
+
         getAllComponents(contentPanel).stream().filter(JButton.class::isInstance)
                 .map(JButton.class::cast).forEach(btn -> btn.setBackground(Color.WHITE));
+        getAllComponents(contentPanel).stream().filter(JList.class::isInstance)
+                .map(JList.class::cast).forEach(list -> list
+                        .setFont(new Font("Monospaced", Font.PLAIN, list.getFont().getSize())));
 
         setPreferredSize(new Dimension(1400, 800));
         pack();
@@ -194,6 +200,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
         installListeners();
 
         statusPanel.setMessage("Initializing KeY data structures, please wait...");
+        updateStatusPanelProofState();
         new Thread(() -> initializeServices()).start();
 
         /*
@@ -234,21 +241,24 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
         final JPanel postRelation = createResultRelationView();
 
         final DefaultSingleCDockable pvDockable = new DefaultSingleCDockable(
-                "Free Program Variables", "Free Program Variables", programVariableDeclarations);
+                "Free Program Variables", htmlBold("Free Program Variables"),
+                programVariableDeclarations);
         final DefaultSingleCDockable locsetDockable = new DefaultSingleCDockable(
-                "Abstract Location Sets", "Abstract Location Sets", locsetsDeclarations);
+                "Abstract Location Sets", htmlBold("Abstract Location Sets"), locsetsDeclarations);
         final DefaultSingleCDockable formulaDockable = new DefaultSingleCDockable(
-                "Functions and Predicates", "Functions and Predicates", formulaDeclarations);
+                "Functions and Predicates", htmlBold("Functions and Predicates"),
+                formulaDeclarations);
         final DefaultSingleCDockable progFragmDockable = new DefaultSingleCDockable(
-                "Abstract Program Fragments", "Abstract Program Fragments", programFragmentsComt);
+                "Abstract Program Fragments", htmlBold("Abstract Program Fragments"),
+                programFragmentsComt);
         final DefaultSingleCDockable methodContextDockable = new DefaultSingleCDockable(
-                "Method-Level Context", "Method-Level Context", methodContextComt);
+                "Method-Level Context", htmlBold("Method-Level Context"), methodContextComt);
         final DefaultSingleCDockable relLocsLeftDockable = new DefaultSingleCDockable(
-                "Relevant Locations (Left)", "Relevant Locations (Left)", relLocsLeft);
+                "Relevant Locations (Left)", htmlBold("Relevant Locations (Left)"), relLocsLeft);
         final DefaultSingleCDockable relLocsRightDockable = new DefaultSingleCDockable(
-                "Relevant Locations (Right)", "Relevant Locations (Right)", relLocsRight);
+                "Relevant Locations (Right)", htmlBold("Relevant Locations (Right)"), relLocsRight);
         final DefaultSingleCDockable relationDockable = new DefaultSingleCDockable(
-                "Relation to Verify", "Relation to Verify", postRelation);
+                "Relation to Verify", htmlBold("Relation to Verify"), postRelation);
 
         final CGrid grid = new CGrid(control);
 
@@ -266,6 +276,10 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
         final CContentArea dockingContentArea = control.getContentArea();
         dockingContentArea.deploy(grid);
         return dockingContentArea;
+    }
+
+    private static String htmlBold(final String text) {
+        return String.format("<html><b>%s</b></html>", text);
     }
 
     private static void installCodeTemplates() {
@@ -297,6 +311,12 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
         dirtyListeners.add(dirty -> {
             updateTitle();
         });
+
+        dirtyListeners.add(proofState);
+        if (mainWindow != null) {
+            proofState.register(mainWindow.getUserInterface());
+        }
+        proofState.addProofStateChangedListener(state -> updateStatusPanelProofState());
 
         servicesLoadedListeners.add(() -> {
             model.getAbstractLocationSets().forEach(loc -> {
@@ -373,6 +393,11 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
                 }
             }
         });
+    }
+
+    private void updateStatusPanelProofState() {
+        statusPanel.setSecondaryMessage(
+                String.format("<b>Proof State:</b> %s", proofState.toString()));
     }
 
     /**
@@ -610,7 +635,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
                 btnHeight);
         saveBundleAndStartBtn.setToolTipText(SAVE_BTN_TOOLTIP);
         saveBundleAndStartBtn.addActionListener(e -> createAndLoadBundle());
-        
+
         if (mainWindow == null) {
             saveBundleAndStartBtn.setEnabled(false);
         }
@@ -694,6 +719,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
                                     () -> mainWindow.getAutoModeAction().actionPerformed(null));
                             mainWindow.getUserInterface().removeProverTaskListener(this);
                             statusPanel.setMessage("Proof started.");
+                            proofState.setProof(info.getProof());
                         }
                     } else if (info.getSource() instanceof ProverCore) {
                         final Proof proof = info.getProof();
@@ -826,6 +852,8 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
         resultRelationText.setBorder(BorderFactory.createCompoundBorder(
                 resultRelationText.getBorder(), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         resultRelationText.setLineWrap(true);
+        resultRelationText.setFont(
+                new Font("Monospaced", Font.PLAIN, resultRelationText.getFont().getSize()));
 
         resultRelationText.getDocument().addDocumentListener(udl(e -> setDirty(true)));
 
