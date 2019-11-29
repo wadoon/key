@@ -116,6 +116,7 @@ public class JavaDocument extends DefaultStyledDocument {
      * Note that the keywords must not contain any of the characters defined by the DELIM regex.
      */
     private static final String[] KEYWORDS = {
+        "\\abstract_statement", "\\abstract_expression",
         "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class",
         "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally",
         "float", "for", "if", "implements", "import", "instanceof", "int", "interface", "long",
@@ -155,14 +156,15 @@ public class JavaDocument extends DefaultStyledDocument {
         "\\constraint_for", "\\created", "\\disjoint", "\\duration", "\\everything",
         "\\exception", "\\exists", "\\forall", "\\fresh", "\\index", "\\invariant_for",
         "\\is_initialized", "\\itself", "\\lblneg", "\\lblpos", "\\lockset", "\\max",
-        "\\measured_by", "\\min", "\\new_elems_fresh", "\\nonnullelements", "\\not_accessed",
+        "\\measured_by", "\\min", "\\mutex", "\\new_elems_fresh", "\\nonnullelements", "\\not_accessed",
         "\\not_assigned", "\\not_modified", "\\not_specified", "\\nothing", "\\num_of",
         "\\old", "\\only_assigned", "\\only_called", "\\only_captured", "\\pre", "\\product",
         "\\reach", "\\reachLocs", "\\result", "\\same", "\\seq_contains", "\\space",
         "\\static_constraint_for", "\\static_invariant_for", "\\strictly_nothing",
-        "\\subset", "\\sum", "\\type", "\\typeof", "\\working_space", "\\values", "\\inv",
+        "\\subset", "\\sum", "\\type", "\\typeof", "\\working_space", "\\values", "\\value",
+        "\\inv",
         // clause keywords:
-        "accessible", "accessible_redundantly", "assert", "assert_redundantly", "assignable",
+        "accessible", "accessible_redundantly", "ae_constraint", "assert", "assert_redundantly", "assignable",
         "assignable_redundantly", "assume", "assume_redudantly", "breaks", "breaks_redundantly",
         "\\by", "callable", "callable_redundantly", "captures", "captures_redundantly",
         "continues", "continues_redundantly", "debug", "declares", "\\declassifies", "decreases",

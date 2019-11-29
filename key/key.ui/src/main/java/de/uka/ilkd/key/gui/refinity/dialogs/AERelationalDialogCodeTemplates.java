@@ -47,18 +47,10 @@ public interface AERelationalDialogCodeTemplates {
                     "{ ; }"
             }, new String[] {
                     "mut",
-                    
-                    "/*@ ae_constraint\n" + //
-                    "  @   \\mutex(formula1, formula2);\n" + //
-                    "  @*/\n" + //
-                    "{ ; }"
+                    "\\mutex(formula1, formula2);"
             }, new String[] {
                     "disj",
-                    
-                    "/*@ ae_constraint\n" + //
-                    "  @   \\disjoint(locset1, locset2);\n" + //
-                    "  @*/\n" + //
-                    "{ ; }"
+                    "\\disjoint(locset1, locset2);"
             }
     };
     //@formatter:on
