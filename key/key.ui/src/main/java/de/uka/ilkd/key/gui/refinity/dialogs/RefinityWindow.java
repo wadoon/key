@@ -320,29 +320,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
         }
         proofState.addProofStateChangedListener(state -> updateStatusPanelProofState());
 
-        servicesLoadedListeners.add(() -> {
-            model.getAbstractLocationSets().forEach(loc -> {
-                try {
-                    LocsetInputDialog.checkAndRegister(loc, services);
-                } catch (ParserException e) {
-                    // Shouldn't happen! Already saved!
-                    e.printStackTrace();
-                }
-            });
-
-            model.getProgramVariableDeclarations().forEach(pv -> {
-                ProgramVariableInputDialog.checkAndRegister(pv, services);
-            });
-
-            model.getPredicateDeclarations().forEach(pred -> {
-                try {
-                    FuncAndPredInputDialog.checkAndRegister(pred, services);
-                } catch (ParserException e) {
-                    // Shouldn't happen! Already saved!
-                    e.printStackTrace();
-                }
-            });
-        });
+        servicesLoadedListeners.add(() -> fillNamespacesFromModel());
 
         servicesLoadedListeners.add(() -> {
             statusPanel.setMessage("KeY data structures initialized successfully.");
@@ -393,6 +371,30 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
                 } else {
                     statusPanel.setMessage("Please save model first using the Save Model button.");
                 }
+            }
+        });
+    }
+
+    public void fillNamespacesFromModel() {
+        model.getAbstractLocationSets().forEach(loc -> {
+            try {
+                LocsetInputDialog.checkAndRegister(loc, services);
+            } catch (ParserException e) {
+                // Shouldn't happen! Already saved!
+                e.printStackTrace();
+            }
+        });
+
+        model.getProgramVariableDeclarations().forEach(pv -> {
+            ProgramVariableInputDialog.checkAndRegister(pv, services);
+        });
+
+        model.getPredicateDeclarations().forEach(pred -> {
+            try {
+                FuncAndPredInputDialog.checkAndRegister(pred, services);
+            } catch (ParserException e) {
+                // Shouldn't happen! Already saved!
+                e.printStackTrace();
             }
         });
     }
@@ -564,17 +566,19 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
                     .fromXml(new String(Files.readAllBytes(file.toPath())));
             newModel.setFile(file);
 
-            if (isDirty()) {
-                final RefinityWindow newDia = new RefinityWindow(mainWindow, newModel);
-                newDia.setVisible(true);
-            } else {
-                model = newModel;
-                model.setFile(file);
-                updateTitle();
-                loadFromModel();
-                setDirty(false);
-                resetUndosListeners.forEach(ResetUndosListener::resetUndos);
-            }
+            final RefinityWindow newDia = new RefinityWindow(mainWindow, newModel);
+            newDia.setVisible(true);
+//            if (isDirty()) {
+//                final RefinityWindow newDia = new RefinityWindow(mainWindow, newModel);
+//                newDia.setVisible(true);
+//            } else {
+//                model = newModel;
+//                model.setFile(file);
+//                updateTitle();
+//                loadFromModel();
+//                setDirty(false);
+//                resetUndosListeners.forEach(ResetUndosListener::resetUndos);
+//            }
         }
     }
 
