@@ -910,8 +910,12 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
                 resultRelationText.setEnabled(true);
             }
         });
-
-        return resultRelationText;
+        
+        final JScrollPane scrollPane = new JScrollPane(resultRelationText);
+        scrollPane.setAutoscrolls(true);
+        resultRelationText.setLineWrap(true);
+        resultRelationText.setWrapStyleWord(true);
+        return scrollPane;
     }
 
     private JComponent createPredicatesDeclarationsView() {
