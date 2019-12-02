@@ -85,15 +85,16 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(doubleLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
         fpOperators.put(doubleLDT.getJavaMod(), SMTTermFloatOp.Op.FPMOD);
 
-        mathOperators.put(doubleLDT.getSinDouble(),SMTTermFloatOp.Op.SINDOUBLE);
-        mathOperators.put(doubleLDT.getCosDouble(),SMTTermFloatOp.Op.COSDOUBLE);
-        mathOperators.put(doubleLDT.getAcosDouble(),SMTTermFloatOp.Op.ACOSDOUBLE);
-        mathOperators.put(doubleLDT.getAsinDouble(),SMTTermFloatOp.Op.ASINDOUBLE);
-        mathOperators.put(doubleLDT.getTanDouble(),SMTTermFloatOp.Op.TANDOUBLE);
-        mathOperators.put(doubleLDT.getAtan2Double(),SMTTermFloatOp.Op.ATAN2DOUBLE);
-        mathOperators.put(doubleLDT.getSqrtDouble(),SMTTermFloatOp.Op.SQRTDOUBLE);
-        mathOperators.put(doubleLDT.getPowDouble(),SMTTermFloatOp.Op.POWDOUBLE);
-        mathOperators.put(doubleLDT.getExpDouble(),SMTTermFloatOp.Op.EXPDOUBLE);
+        mathOperators.put(doubleLDT.getSinDouble(), SMTTermFloatOp.Op.SINDOUBLE);
+        mathOperators.put(doubleLDT.getCosDouble(), SMTTermFloatOp.Op.COSDOUBLE);
+        mathOperators.put(doubleLDT.getAcosDouble(), SMTTermFloatOp.Op.ACOSDOUBLE);
+        mathOperators.put(doubleLDT.getAsinDouble(), SMTTermFloatOp.Op.ASINDOUBLE);
+        mathOperators.put(doubleLDT.getTanDouble(), SMTTermFloatOp.Op.TANDOUBLE);
+        mathOperators.put(doubleLDT.getAtan2Double(), SMTTermFloatOp.Op.ATAN2DOUBLE);
+        mathOperators.put(doubleLDT.getSqrtDouble(), SMTTermFloatOp.Op.SQRTDOUBLE);
+        mathOperators.put(doubleLDT.getPowDouble(), SMTTermFloatOp.Op.POWDOUBLE);
+        mathOperators.put(doubleLDT.getExpDouble(), SMTTermFloatOp.Op.EXPDOUBLE);
+        mathOperators.put(doubleLDT.getAtanDouble(), SMTTermFloatOp.Op.ATANDOUBLE);
     }
 
     @Override

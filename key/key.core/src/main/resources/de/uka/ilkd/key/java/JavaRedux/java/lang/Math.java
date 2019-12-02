@@ -35,6 +35,7 @@ public class Math {
     public static double sqrt(double d);
     public static double pow(double a , double b);
     public static double exp(double a);
+    public static double atan(double a);
 
 
 

@@ -91,6 +91,7 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
     private final Function sqrtDouble;
     private final Function powDouble;
     private final Function expDouble;
+    private final Function atanDouble;
 
     public DoubleLDT(TermServices services) {
 	super(NAME, services);
@@ -145,6 +146,7 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
   sqrtDouble       = addFunction(services, "sqrtDouble");
   powDouble       = addFunction(services, "powDouble");
   expDouble       = addFunction(services, "expDouble");
+  atanDouble      = addFunction(services, "atanDouble");
     }
 
     @Override
@@ -456,4 +458,6 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
     public Function getPowDouble() { return powDouble; }
 
     public Function getExpDouble() { return expDouble; }
+
+    public Function getAtanDouble() {return atanDouble; }
 }

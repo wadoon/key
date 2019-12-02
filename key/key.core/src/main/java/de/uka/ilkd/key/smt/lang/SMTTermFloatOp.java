@@ -60,6 +60,7 @@ public class SMTTermFloatOp extends SMTTerm{
 		public static final Op FPSQRT = new Op("fp.sqrt RNE", SMTSort.DOUBLE, SMTSort.DOUBLE);
 		public static final Op POWDOUBLE = new Op("powDouble", SMTSort.DOUBLE, SMTSort.DOUBLE, SMTSort.DOUBLE);
 		public static final Op EXPDOUBLE = new Op("expDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
+		public static final Op ATANDOUBLE = new Op("atanDouble" , SMTSort.DOUBLE, SMTSort.DOUBLE);
 		public static final Op FPMOD = new Op("fp.rem", SMTSort.DOUBLE, SMTSort.DOUBLE);
 
 		private static Op unaryFloatPred(String name) {
