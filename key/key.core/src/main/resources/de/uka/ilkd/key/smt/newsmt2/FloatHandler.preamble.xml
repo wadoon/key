@@ -248,5 +248,9 @@
         (declare-fun expDouble (Float64) Float64)
     </entry>
 
+    <entry key="atanDouble.decls">
+        (declare-fun atanDouble (Float64) Float64)
+    </entry>
+
 </properties>
 
