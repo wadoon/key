@@ -280,7 +280,7 @@ public final class StrategyProperties extends Properties {
         sp.put(OSS_OPTIONS_KEY, readSingleOption(p, OSS_OPTIONS_KEY));
         sp.put(QUANTIFIERS_OPTIONS_KEY, readSingleOption(p, QUANTIFIERS_OPTIONS_KEY));
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
-            sp.put(userTacletsOptionsKey(i), readSingleOption(p, userTacletsOptionsKey(i)));
+        	sp.put(userTacletsOptionsKey(i), readSingleOption(p, userTacletsOptionsKey(i)));
         }
         sp.put(INF_FLOW_CHECK_PROPERTY, readSingleOption(p, INF_FLOW_CHECK_PROPERTY));
         sp.put(STOPMODE_OPTIONS_KEY, readSingleOption(p, STOPMODE_OPTIONS_KEY));
@@ -288,9 +288,9 @@ public final class StrategyProperties extends Properties {
         sp.put(CLASS_AXIOM_OPTIONS_KEY, readSingleOption(p, CLASS_AXIOM_OPTIONS_KEY));
         sp.put(AUTO_INDUCTION_OPTIONS_KEY, readSingleOption(p, AUTO_INDUCTION_OPTIONS_KEY));
         sp.put(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
-               readSingleOption(p, SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY));
+        		readSingleOption(p, SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY));
         sp.put(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
-               readSingleOption(p, SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY));
+        		readSingleOption(p, SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY));
         return sp;
     }
 

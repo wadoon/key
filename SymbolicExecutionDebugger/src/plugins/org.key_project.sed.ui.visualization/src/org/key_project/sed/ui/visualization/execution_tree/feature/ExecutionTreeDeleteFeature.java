@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.graphiti.features.ICustomUndoableFeature;
+import org.eclipse.graphiti.features.ICustomUndoRedoFeature;
 import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
@@ -44,13 +44,13 @@ import org.key_project.sed.ui.visualization.util.EditableMultiDeleteInfo;
  * is deleted and removed from the diagram.
  * </p>
  * <p> 
- * This feature is the only one which is used in the wohle execution tree diagram.
+ * This feature is the only one which is used in the whole execution tree diagram.
  * It means that {@link ExecutionTreeFeatureProvider#getDeleteFeature(IDeleteContext)}
  * always returns an instance of this class.
  * </p>
  * @author Martin Hentschel
  */
-public class ExecutionTreeDeleteFeature extends DefaultDeleteFeature implements ICustomUndoableFeature {
+public class ExecutionTreeDeleteFeature extends DefaultDeleteFeature implements ICustomUndoRedoFeature {
    /**
     * Contains information for undo/redo provided by this {@link ICustomUndoableFeature}.
     */
@@ -168,17 +168,25 @@ public class ExecutionTreeDeleteFeature extends DefaultDeleteFeature implements 
       }
    }
 
+   @Override
+   public void preUndo(IContext context) {
+	   
+   }
+   
+   
+   
    /**
     * {@inheritDoc}
     */
    @Override
-   public void undo(IContext context) {
+   public void postUndo(IContext context) {
       // Restore the whole sub tree in the business model.
       for (DeleteUndoRedoContext undoRedoContext : undoRedoContexts) {
          addToParent(undoRedoContext);
       }
    }
    
+ 
    /**
     * Adds the node defined by the given {@link DeleteUndoRedoContext}
     * back to the business model.
@@ -214,11 +222,17 @@ public class ExecutionTreeDeleteFeature extends DefaultDeleteFeature implements 
       return true;
    }
 
+   @Override
+   public void preRedo(IContext context) {
+	   
+   }
+   
+   
    /**
     * {@inheritDoc}
     */
    @Override
-   public void redo(IContext context) {
+   public void postRedo(IContext context) {
       // Delete the whole sub tree in the business model.
       for (DeleteUndoRedoContext undoRedoContext : undoRedoContexts) {
          removeFromParent(undoRedoContext);
