@@ -79,6 +79,7 @@ lexer grammar KeYJMLLexer;
     FORALL               : '\\forall';
     FP_INFINITE          : '\\fp_infinite';
     FP_NAN               : '\\fp_nan';
+    FP_NICE              : '\\fp_nice'; //KeY syntactic sugar
     FP_NORMAL            : '\\fp_normal';
     FP_SUBNORMAL         : '\\fp_subnormal';
     FREE                 : '\\free';  //KeY extension, not official JML

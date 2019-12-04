@@ -64,6 +64,7 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
     private final Function isSubnormal;
     private final Function isNaN;
     private final Function isZero;
+    private final Function isNice;
     private final Function isInfinite;
     private final Function isNegative;
     private final Function isPositive;
@@ -121,6 +122,7 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 	isSubnormal	    = addFunction(services, "doubleIsSubnormal");
 	isNaN		    = addFunction(services, "doubleIsNaN");
 	isZero		    = addFunction(services, "doubleIsZero");
+	isNice		    = addFunction(services, "doubleIsNice");
 	isInfinite	    = addFunction(services, "doubleIsInfinite");
 	isPositive	    = addFunction(services, "doubleIsPositive");
 	isNegative	    = addFunction(services, "doubleIsNegative");
@@ -366,6 +368,11 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 
     public Function getIsZero() {
 	return isZero;
+    }
+
+    @Override
+    public Function getIsNice() {
+        return isNice;
     }
 
     public Function getIsInfinite() {

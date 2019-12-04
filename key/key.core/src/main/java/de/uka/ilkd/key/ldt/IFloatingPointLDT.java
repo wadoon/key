@@ -34,6 +34,7 @@ public interface IFloatingPointLDT {
     public Function getIsSubnormal();
     public Function getIsNaN();
     public Function getIsZero();
+    public Function getIsNice();
     public Function getIsInfinite();
     public Function getIsPositive();
     public Function getIsNegative();

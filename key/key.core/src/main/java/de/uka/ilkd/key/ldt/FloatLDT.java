@@ -76,6 +76,7 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
     private final Function isSubnormal;
     private final Function isNaN;
     private final Function isZero;
+    private final Function isNice;
     private final Function isInfinite;
     private final Function isNegative;
     private final Function isPositive;
@@ -111,6 +112,7 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
 	isSubnormal	    = addFunction(services, "floatIsSubnormal");
 	isNaN		    = addFunction(services, "floatIsNaN");
 	isZero		    = addFunction(services, "floatIsZero");
+	isNice		    = addFunction(services, "floatIsNice");
 	isInfinite	    = addFunction(services, "floatIsInfinite");
 	isPositive	    = addFunction(services, "floatIsPositive");
 	isNegative	    = addFunction(services, "floatIsNegative");
@@ -329,6 +331,11 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
 
     public Function getIsZero() {
 	return isZero;
+    }
+
+    @Override
+    public Function getIsNice() {
+        return isNice;
     }
 
     public Function getIsInfinite() {

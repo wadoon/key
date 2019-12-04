@@ -1991,6 +1991,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
         |   fppos=FP_POSITIVE   LPAREN e1=expression RPAREN { tk = fppos; }
         |   fpneg=FP_NEGATIVE   LPAREN e1=expression RPAREN { tk = fpneg; }
         |   fpabs=FP_ABS        LPAREN e1=expression RPAREN { tk = fpabs; }
+        |   fpnice=FP_NICE      LPAREN e1=expression RPAREN { tk = fpnice; }
         |   fpeq=FP_EQ         LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpeq; }
         |   fpadd=FP_ADD        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpadd; }
         |   fpsub=FP_SUB        LPAREN e1=expression COMMA e2=expression RPAREN { tk = fpsub; }
@@ -2024,6 +2025,8 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
                         f = ldt.getIsPositive();
                     } else if (tk.getType() == FP_NEGATIVE) {
                         f = ldt.getIsNegative();
+                    } else if (tk.getType() == FP_NICE) {
+                        f = ldt.getIsNice();
                     } else if (tk.getType() == FP_ABS) {
                         result = new SLExpression(tb.func(ldt.getAbs(), e1.getTerm()), fptype);
                     } else if (tk.getType() == FP_EQ) {
