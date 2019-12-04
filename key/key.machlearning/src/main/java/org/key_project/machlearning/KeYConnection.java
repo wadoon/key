@@ -51,13 +51,13 @@ public class KeYConnection {
         commands.put("print", this::printSequent);
     }
 
-    private Map<String, Tactic> tactics = new HashMap<>();
-    {
-        tactics.put("AUTO", new AutoTactic(""));
-        tactics.put("AUTO_NOSPLIT", new AutoTactic("[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_OFF"));
-        tactics.put("NOTHING", (a,b,c,d) -> {});
-        tactics.put("SMT", new SMTTactic());
-        FilterTactic.registerTactics(tactics);
+    public static Map<String, Tactic> TACTICS = new HashMap<>();
+    static {
+        TACTICS.put("AUTO", new AutoTactic(""));
+        TACTICS.put("AUTO_NOSPLIT", new AutoTactic("[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_OFF"));
+        TACTICS.put("NOTHING", (a, b, c, d) -> {});
+        TACTICS.put("SMT", new SMTTactic());
+        FilterTactic.registerTactics(TACTICS);
     }
 
     public KeYConnection(int verbosity, boolean interactive) {
@@ -99,7 +99,7 @@ public class KeYConnection {
         Goal goal = findGoal(id);
 
         String tacName = Objects.toString(jsonObject.get("tactic"));
-        Tactic tactic = tactics.get(tacName);
+        Tactic tactic = TACTICS.get(tacName);
         if (tactic == null) {
             throw new IllegalArgumentException("Unknown/Missing tactic " + tacName);
         }
@@ -234,7 +234,7 @@ public class KeYConnection {
 
     private JSONObject listTactics(JSONObject jsonObject) {
         JSONArray array = new JSONArray();
-        array.addAll(tactics.keySet());
+        array.addAll(TACTICS.keySet());
         return Server.success("tactics", array);
     }
 
@@ -291,7 +291,7 @@ public class KeYConnection {
     }
 
 
-    private JSONArray semiSequentToJSON(Semisequent semiseq) {
+    public static JSONArray semiSequentToJSON(Semisequent semiseq) {
         JSONArray result = new JSONArray();
         Iterator<SequentFormula> it = semiseq.iterator();
         while(it.hasNext()) {
@@ -300,7 +300,7 @@ public class KeYConnection {
         return result;
     }
 
-    private JSONObject termToJSON(Term term) {
+    public static JSONObject termToJSON(Term term) {
         Operator op = term.op();
         JSONObject result = new JSONObject();
         result.put("op", op.name().toString());

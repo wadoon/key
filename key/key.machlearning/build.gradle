@@ -9,6 +9,11 @@ dependencies {
     compile project(":key.ui")    
 }
 
+task server(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'org.key_project.machlearning.Server'
+}
+
 application {
-    mainClassName 'org.key_project.machlearning.Server'
+    mainClassName 'org.key_project.machlearning.AIKeYMain'
 }

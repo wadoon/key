@@ -9,14 +9,19 @@ import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.prover.GoalChooser;
+import de.uka.ilkd.key.prover.GoalChooserBuilder;
+import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.ProofStarter;
 import org.key_project.util.collection.ImmutableList;
 
 import javax.swing.*;
+import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -149,11 +154,15 @@ public class MediatorProofControl extends AbstractProofControl {
      * }. The thread itself unfreezes the UI when it is finished.
      * </p>
      */
+
+    public static Class<? extends ProverCore> PROVER_CORE_CLASS =
+            ApplyStrategy.class;
+
     private class AutoModeWorker extends SwingWorker<ApplyStrategyInfo, Object> {
         private final Proof proof;
         private final List<Node> initialGoals;
         private final ImmutableList<Goal> goals;
-        private final ApplyStrategy applyStrategy;
+        private final ProverCore applyStrategy;
         private ApplyStrategyInfo info;
 
         public AutoModeWorker(final Proof proof,
@@ -162,7 +171,12 @@ public class MediatorProofControl extends AbstractProofControl {
             this.proof = proof;
             this.goals = goals;
             this.initialGoals = goals.stream().map(Goal::node).collect(Collectors.toList());
-            this.applyStrategy = new ApplyStrategy(proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
+            try {
+                Constructor<? extends ProverCore> constructor = PROVER_CORE_CLASS.getConstructor(GoalChooser.class);
+                this.applyStrategy = constructor.newInstance(proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
+            } catch(Exception ex) {
+                throw new Error(ex);
+            }
             if (ptl != null) {
                 applyStrategy.addProverTaskObserver(ptl);
             }

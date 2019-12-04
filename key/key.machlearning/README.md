@@ -115,6 +115,14 @@ or <    error(message: str)
 ````
 with `term` the recursive structure `{ "op":"...", "op_class":"...", children:term[] }`.
 
+### Listing all available tactics
+
+````
+   >    tactics
+   <    success(tactics: str[])
+or <    error(message: str)
+````
+
 ### Quitting the server
 
 ````
@@ -128,14 +136,37 @@ The process terminates.
 
 The server can be invoked using
 
-    ../gradlew run
+    ../gradlew server
 
 on unix-like shells and
 
-    ..\gradlew.bat run
+    ..\gradlew.bat server
     
 on Windows. Add `--args=--screen` if you want to have the KeY window
 opened for debugging purposed.
+
+# Invoking the KeY-AI app.
+
+If you start KeY using
+
+    ../gradlew run
+
+the interactive KeY application will be opened with a strategy
+installed that makes calls to a socket to know the tactic to apply.
+
+The server must be listening to port `6767` and react to JSON requests
+of the form
+
+    ["antecedent": term[], "succedent": term[] ]\n
+    
+with term the AST structure described above.
+
+The expected answer of the server is a single word: the name of the
+tactic to apply
+
+     AUTO\n
+     
+ Do not forget the closing `\n`.
 
 # Tactic definitions
 
