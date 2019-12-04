@@ -94,7 +94,6 @@ import de.uka.ilkd.key.gui.refinity.components.JSizedButton;
 import de.uka.ilkd.key.gui.refinity.components.JavaErrorParser;
 import de.uka.ilkd.key.gui.refinity.components.MethodLevelJavaErrorParser;
 import de.uka.ilkd.key.gui.refinity.components.StatementLevelJavaErrorParser;
-import de.uka.ilkd.key.gui.refinity.extension.RefinityExtension;
 import de.uka.ilkd.key.gui.refinity.listeners.DirtyListener;
 import de.uka.ilkd.key.gui.refinity.listeners.MethodContextChangedListener;
 import de.uka.ilkd.key.gui.refinity.listeners.ProgramVariablesChangedListener;
@@ -127,6 +126,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
     private MainWindow mainWindow;
     private Services services = null;
     private ProofState proofState = new ProofState();
+    private boolean isFreshFile = false;
     // NOTE: Only access via setReadonly / isReadonly!
     private boolean readonly = false;
     // NOTE: Only access via setDirty / isDirty!
@@ -163,9 +163,16 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
     private final List<ResetUndosListener> resetUndosListeners = new ArrayList<>();
 
     public static void main(String[] args) {
-        final AERelationalModel model = AERelationalModel.EMPTY_MODEL;
-        final RefinityWindow dia = new RefinityWindow(null, model);
-        dia.setVisible(true);
+        new RefinityWindow().setVisible(true);
+    }
+
+    public RefinityWindow() {
+        this(MainWindow.getInstance());
+    }
+
+    public RefinityWindow(MainWindow mainWindow) {
+        this(mainWindow, AERelationalModel.defaultModel());
+        this.isFreshFile = true;
     }
 
     public RefinityWindow(MainWindow mainWindow, AERelationalModel model) {
@@ -312,6 +319,10 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
 
         dirtyListeners.add(dirty -> {
             updateTitle();
+
+            if (dirty) {
+                this.isFreshFile = false;
+            }
         });
 
         dirtyListeners.add(proofState);
@@ -566,19 +577,17 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
                     .fromXml(new String(Files.readAllBytes(file.toPath())));
             newModel.setFile(file);
 
-            final RefinityWindow newDia = new RefinityWindow(mainWindow, newModel);
-            newDia.setVisible(true);
-//            if (isDirty()) {
-//                final RefinityWindow newDia = new RefinityWindow(mainWindow, newModel);
-//                newDia.setVisible(true);
-//            } else {
-//                model = newModel;
-//                model.setFile(file);
-//                updateTitle();
-//                loadFromModel();
-//                setDirty(false);
-//                resetUndosListeners.forEach(ResetUndosListener::resetUndos);
-//            }
+            if (!isFreshFile) {
+                final RefinityWindow newDia = new RefinityWindow(mainWindow, newModel);
+                newDia.setVisible(true);
+            } else {
+                model = newModel;
+                model.setFile(file);
+                updateTitle();
+                loadFromModel();
+                setDirty(false);
+                resetUndosListeners.forEach(ResetUndosListener::resetUndos);
+            }
         }
     }
 
@@ -590,7 +599,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
                 IconFontSwing.buildIcon(FontAwesomeSolid.FILE, 16, Color.BLACK), btnWidth,
                 btnHeight);
         newBtn.addActionListener(e -> {
-            RefinityExtension.openNewDefaultRefinityWindow(mainWindow);
+            new RefinityWindow(mainWindow).setVisible(true);
         });
 
         final JButton loadFromFileBtn = new JSizedButton("",
@@ -910,7 +919,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
                 resultRelationText.setEnabled(true);
             }
         });
-        
+
         final JScrollPane scrollPane = new JScrollPane(resultRelationText);
         scrollPane.setAutoscrolls(true);
         resultRelationText.setLineWrap(true);

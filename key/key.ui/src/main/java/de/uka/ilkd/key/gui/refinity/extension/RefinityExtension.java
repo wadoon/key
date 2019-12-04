@@ -18,8 +18,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
-import java.util.Collections;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -27,12 +25,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 
-import de.uka.ilkd.key.abstractexecution.refinity.model.AERelationalModel;
-import de.uka.ilkd.key.abstractexecution.refinity.model.AbstractLocsetDeclaration;
-import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
-import de.uka.ilkd.key.abstractexecution.refinity.model.NullarySymbolDeclaration;
-import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
-import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
@@ -109,26 +101,7 @@ public class RefinityExtension implements KeYGuiExtension, KeYGuiExtension.Toolb
     }
 
     public static void openNewDefaultRefinityWindow(MainWindow mainWindow) {
-        final String programOne = "";
-        final String programTwo = "";
-        final String postCondition = "\\result_1=\\result_2";
-        final List<AbstractLocsetDeclaration> abstractLocationSets = Collections
-                .singletonList(new AbstractLocsetDeclaration("relevant"));
-        final List<FunctionDeclaration> functionDeclarations = Collections.emptyList();
-        final List<PredicateDeclaration> predicateDeclarations = Collections.emptyList();
-        final List<ProgramVariableDeclaration> programVariableDeclarations = //
-                Collections.emptyList();
-        final List<NullarySymbolDeclaration> relevantVarsOne = //
-                Collections.singletonList(abstractLocationSets.get(0));
-        final List<NullarySymbolDeclaration> relevantVarsTwo = //
-                Collections.singletonList(abstractLocationSets.get(0));
-
-        final AERelationalModel defaultModel = new AERelationalModel(programOne, programTwo, "",
-                postCondition, abstractLocationSets, functionDeclarations, predicateDeclarations,
-                programVariableDeclarations, relevantVarsOne, relevantVarsTwo);
-
-        final RefinityWindow dia = new RefinityWindow(mainWindow, defaultModel);
-        dia.setVisible(true);
+        new RefinityWindow(mainWindow).setVisible(true);
     }
 
 }

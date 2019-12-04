@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -49,8 +50,6 @@ import org.xml.sax.SAXException;
         "functionDeclarations", "predicateDeclarations", "programVariableDeclarations" })
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class AERelationalModel {
-    public static final AERelationalModel EMPTY_MODEL = new AERelationalModel();
-
     private static final String AE_MODEL_FILE_ENDING = ".aer";
     private static final String SCHEMA_PATH = "/de/uka/ilkd/key/refinity/schema1.xsd";
 
@@ -84,6 +83,20 @@ public class AERelationalModel {
 
     @XmlTransient
     private Optional<File> file = Optional.empty();
+
+    public static AERelationalModel defaultModel() {
+        final String postCondition = "\\result_1=\\result_2";
+        final List<AbstractLocsetDeclaration> abstractLocationSets = Collections
+                .singletonList(new AbstractLocsetDeclaration("relevant"));
+        final List<NullarySymbolDeclaration> relevantVarsOne = //
+                Collections.singletonList(abstractLocationSets.get(0));
+        final List<NullarySymbolDeclaration> relevantVarsTwo = //
+                Collections.singletonList(abstractLocationSets.get(0));
+
+        return new AERelationalModel("", "", "", postCondition, abstractLocationSets,
+                Collections.emptyList(), Collections.emptyList(), Collections.emptyList(),
+                relevantVarsOne, relevantVarsTwo);
+    }
 
     public AERelationalModel(final String programOne, final String programTwo,
             String methodLevelContext, final String postCondition,
@@ -155,12 +168,8 @@ public class AERelationalModel {
 
     public List<NullarySymbolDeclaration> getRelevantVars(
             java.util.function.Function<NullarySymbolDeclaration, Integer> relValGetter) {
-        return Stream
-                .concat(getAbstractLocationSets().stream(),
-                        getProgramVariableDeclarations().stream())
-                .filter(loc -> relValGetter.apply(loc) > -1)
-                .sorted((loc1, loc2) -> relValGetter.apply(loc1) - relValGetter.apply(loc2))
-                .collect(Collectors.toList());
+        return getRelevantVars(relValGetter, getAbstractLocationSets(),
+                getProgramVariableDeclarations());
     }
 
     public Optional<File> getFile() {
@@ -276,6 +285,16 @@ public class AERelationalModel {
      */
     public static boolean fileHasAEModelEnding(File file) {
         return file.getName().endsWith(AE_MODEL_FILE_ENDING);
+    }
+
+    private static List<NullarySymbolDeclaration> getRelevantVars(
+            java.util.function.Function<NullarySymbolDeclaration, Integer> relValGetter,
+            final List<AbstractLocsetDeclaration> abstrLocsets,
+            final List<ProgramVariableDeclaration> abstrPVDecls) {
+        return Stream.concat(abstrLocsets.stream(), abstrPVDecls.stream())
+                .filter(loc -> relValGetter.apply(loc) > -1)
+                .sorted((loc1, loc2) -> relValGetter.apply(loc1) - relValGetter.apply(loc2))
+                .collect(Collectors.toList());
     }
 
 }
