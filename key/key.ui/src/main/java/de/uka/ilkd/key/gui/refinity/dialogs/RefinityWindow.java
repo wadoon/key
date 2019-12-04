@@ -31,14 +31,12 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -82,8 +80,8 @@ import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProofBundleConverter;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProofBundleConverter.BundleSaveResult;
+import de.uka.ilkd.key.abstractexecution.refinity.util.DummyKeYEnvironmentCreator;
 import de.uka.ilkd.key.control.AutoModeListener;
-import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
@@ -101,6 +99,7 @@ import de.uka.ilkd.key.gui.refinity.listeners.ReadonlyListener;
 import de.uka.ilkd.key.gui.refinity.listeners.ResetUndosListener;
 import de.uka.ilkd.key.gui.refinity.listeners.ServicesLoadedListener;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.Function;
@@ -108,7 +107,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.prover.ProverCore;
@@ -125,6 +123,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
     private AERelationalModel model;
     private MainWindow mainWindow;
     private Services services = null;
+    private KeYJavaType dummyClass = null;
     private ProofState proofState = new ProofState();
     private boolean isFreshFile = false;
     // NOTE: Only access via setReadonly / isReadonly!
@@ -147,9 +146,9 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
                 // Replacement of special placeholders for result sequences
                 String result = formula;
                 result = result.replaceAll(Pattern.quote(ProofBundleConverter.RESULT_1),
-                        ProofBundleConverter.RES1);
+                        Matcher.quoteReplacement("\\dl_" + ProofBundleConverter.RES1));
                 result = result.replaceAll(Pattern.quote(ProofBundleConverter.RESULT_2),
-                        ProofBundleConverter.RES2);
+                        Matcher.quoteReplacement("\\dl_" + ProofBundleConverter.RES2));
                 return result;
             });
 
@@ -442,25 +441,10 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
     }
 
     private void initializeServices() {
-        KeYEnvironment<?> environment = null;
+        final DummyKeYEnvironmentCreator envCreator = new DummyKeYEnvironmentCreator();
+
         try {
-            final InputStream is = RefinityWindow.class.getResourceAsStream(DUMMY_KEY_FILE);
-
-            if (is == null) {
-                SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(RefinityWindow.this,
-                            "Ooops... Could not load resource file!",
-                            "Problem During Initialization", JOptionPane.ERROR_MESSAGE);
-                });
-                return;
-            }
-
-            final Path tempFilePath = Files.createTempFile("dummy_", ".key");
-            final File tempFile = tempFilePath.toFile();
-            tempFile.deleteOnExit();
-            Files.copy(is, tempFilePath, StandardCopyOption.REPLACE_EXISTING);
-            environment = KeYEnvironment.load( //
-                    JavaProfile.getDefaultInstance(), tempFile, null, null, null, true);
+            envCreator.initialize();
         } catch (ProblemLoaderException | IOException e) {
             SwingUtilities.invokeLater(() -> {
                 JOptionPane.showMessageDialog(RefinityWindow.this,
@@ -471,9 +455,9 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
             return;
         }
 
-        final KeYEnvironment<?> env = environment;
         SwingUtilities.invokeLater(() -> {
-            this.services = env.getLoadedProof().getServices();
+            this.services = envCreator.getDummyServices().get();
+            this.dummyClass = envCreator.getDummyKjt().get();
             servicesLoadedListeners.forEach(ServicesLoadedListener::servicesLoaded);
         });
     }
@@ -908,6 +892,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
 
         servicesLoadedListeners.add(() -> {
             resultRelationText.setServices(services);
+            resultRelationText.setKeYJavaTypeForJMLParsing(dummyClass);
             if (!isReadonly()) {
                 resultRelationText.setEnabled(true);
             }

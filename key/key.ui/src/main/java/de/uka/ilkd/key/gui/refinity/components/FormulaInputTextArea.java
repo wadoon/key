@@ -19,13 +19,12 @@ import java.util.function.Function;
 
 import javax.swing.JTextArea;
 
-import org.antlr.runtime.RecognitionException;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.parser.KeYLexerF;
-import de.uka.ilkd.key.parser.KeYParserF;
-import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.translation.JMLTranslator;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 /**
  * @author Dominic Steinhoefel
@@ -34,6 +33,7 @@ public class FormulaInputTextArea extends JTextArea {
     private static final long serialVersionUID = 1L;
 
     private Services services = null;
+    private KeYJavaType kjt = null;
     private Function<String, String> preprocessor = null;
 
     public FormulaInputTextArea(final String stdToolTip,
@@ -46,7 +46,7 @@ public class FormulaInputTextArea extends JTextArea {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                if (services != null) {
+                if (services != null && kjt != null) {
                     final FormulaInputTextArea textfield = FormulaInputTextArea.this;
 
                     String textToParse = textfield.getText();
@@ -54,19 +54,13 @@ public class FormulaInputTextArea extends JTextArea {
                         textToParse = FormulaInputTextArea.this.preprocessor.apply(textToParse);
                     }
 
-                    final KeYLexerF lexer = new KeYLexerF( //
-                            "\\problem { " + textToParse + "}", "No file.");
-
-                    final KeYParserF parser = new KeYParserF(ParserMode.TACLET, lexer,
-                            GoalLocalSpecificationRepository.DUMMY_REPO, services,
-                            services.getNamespaces());
-
                     try {
-                        parser.parseProblem();
-                        textfield.setBackground(Color.WHITE);
+                        JMLTranslator.translate(new PositionedString(textToParse), kjt, null, null,
+                                null, null, null, null, Term.class, services);
+                        textfield.setForeground(Color.BLACK);
                         setToolTipText("<html>" + stdToolTip + "</html>");
-                    } catch (RecognitionException exc) {
-                        textfield.setBackground(Color.RED);
+                    } catch (SLTranslationException | RuntimeException exc) {
+                        textfield.setForeground(Color.RED);
                         if (exc.getMessage() != null && !exc.getMessage().isEmpty()) {
                             setToolTipText("<html>" + exc.getMessage().replaceAll("\\n", "<br/>")
                                     + "<br/><br/>" + stdToolTip + "</html>");
@@ -85,6 +79,10 @@ public class FormulaInputTextArea extends JTextArea {
 
     public void setServices(Services services) {
         this.services = services;
+    }
+
+    public void setKeYJavaTypeForJMLParsing(KeYJavaType kjt) {
+        this.kjt = kjt;
     }
 
 }

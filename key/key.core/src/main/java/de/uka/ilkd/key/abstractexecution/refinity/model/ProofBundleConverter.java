@@ -29,6 +29,17 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import de.uka.ilkd.key.abstractexecution.refinity.util.DummyKeYEnvironmentCreator;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.translation.JMLTranslator;
+
 /**
  * Converts an AE Relational Model to a KeY proof bundle.
  * 
@@ -214,9 +225,29 @@ public class ProofBundleConverter {
         final String params = model.getProgramVariableDeclarations().stream()
                 .map(ProgramVariableDeclaration::getVarName).collect(Collectors.joining(","));
 
-        final String postCondRelation = Matcher.quoteReplacement(model.getPostCondition())
-                .replaceAll(Pattern.quote(RESULT_1), RES1)
-                .replaceAll(Pattern.quote(RESULT_2), RES2);
+        final String jmlPostCondRelation = model.getPostCondition()
+                .replaceAll(Pattern.quote(RESULT_1), Matcher.quoteReplacement("\\dl_" + RES1))
+                .replaceAll(Pattern.quote(RESULT_2), Matcher.quoteReplacement("\\dl_" + RES2));
+
+        final DummyKeYEnvironmentCreator envCreator = new DummyKeYEnvironmentCreator();
+        String javaDLPostCondRelation = "false";
+        try {
+            envCreator.initialize();
+            
+            final Services services = envCreator.getDummyServices().get();
+            final Namespace<Function> functions = services.getNamespaces().functions();
+            final Sort seqSort = services.getTypeConverter().getSeqLDT().targetSort();
+            functions.add(new Function(new Name(ProofBundleConverter.RES1), seqSort));
+            functions.add(new Function(new Name(ProofBundleConverter.RES2), seqSort));
+            
+            final Term parsed = JMLTranslator.translate(new PositionedString(jmlPostCondRelation),
+                    envCreator.getDummyKjt().get(), null, null, null, null, null, null, Term.class,
+                    services);
+            javaDLPostCondRelation = LogicPrinter.quickPrintTerm(parsed, services);
+        } catch (Exception e) {
+            System.err.println(getClass().getSimpleName()
+                    + ": Could not parse JML postcondition relation, using default 'false'.");
+        }
 
         return keyScaffold.replaceAll(FUNCTIONS, Matcher.quoteReplacement(functionsDecl))
                 .replaceAll(PREDICATES, Matcher.quoteReplacement(predicatesDecl))
@@ -224,7 +255,7 @@ public class ProofBundleConverter {
                 .replaceAll(INIT_VARS,
                         initVars.isEmpty() ? "" : (Matcher.quoteReplacement("||" + initVars)))
                 .replaceAll(PARAMS, Matcher.quoteReplacement(params))
-                .replaceAll(RELATION, postCondRelation)
+                .replaceAll(RELATION, javaDLPostCondRelation)
                 .replaceAll(RESULT_SEQ_1, extractResultSeq(model.getRelevantVarsOne()))
                 .replaceAll(RESULT_SEQ_2, extractResultSeq(model.getRelevantVarsTwo())) //
                 .replaceAll(ADDITIONAL_PREMISES,
