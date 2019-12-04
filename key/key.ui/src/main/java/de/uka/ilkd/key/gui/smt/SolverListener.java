@@ -73,8 +73,9 @@ public class SolverListener implements SolverLauncherListener {
         private static int FILE_ID = 0;
 
         private static final int RESOLUTION = 1000;
+        private SMTResultOutput out;
 
-        public static class InternSMTProblem {
+    public static class InternSMTProblem {
                 final int problemIndex;
                 final int solverIndex;
                 final SMTSolver solver;
@@ -200,8 +201,7 @@ public class SolverListener implements SolverLauncherListener {
         public void launcherStopped(SolverLauncher launcher,
                         Collection<SMTSolver> problemSolvers) {
                 timer.cancel();
-                
-  
+
                 storeInformation();
                 List<InternSMTProblem> problemsWithException = new LinkedList<InternSMTProblem>();
                 progressModel.setEditable(true);
@@ -222,6 +222,34 @@ public class SolverListener implements SolverLauncherListener {
                                 applyEvent(launcher);
                         }
                 }
+            for (InternSMTProblem p : problems) {
+                String res = "";
+
+                if (p.solver.wasInterrupted()) {
+                    ReasonOfInterruption reason = p.solver.getReasonOfInterruption();
+                    switch (reason) {
+                        case Exception:
+                            res = SMTResultOutput.EXCEPTION;
+                            break;
+                        case Timeout:
+                            res = SMTResultOutput.TIMEOUT;
+                            break;
+                        case User:
+                            res = SMTResultOutput.USER_INTERRUPT;
+                            break;
+                    }
+                } else if (p.solver.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
+                    res = p.getTimeInSecAsString();
+                } else if (p.solver.getFinalResult().isValid() == ThreeValuedTruth.FALSIFIABLE) {
+                    res = SMTResultOutput.COUNTEREXAMPLE;
+                } else {
+                    res = SMTResultOutput.UNKNOWN;
+                }
+                out.appendLine(p.problem.getName() + ","
+                        + p.solver.getType().toString() + ","
+                        + res);
+            }
+                out.close();
         }
         
         public static String createExceptionTitle(InternSMTProblem problem) {
@@ -368,7 +396,7 @@ public class SolverListener implements SolverLauncherListener {
                         final Collection<SolverType> solverTypes,
                         final SolverLauncher launcher) {
                 prepareDialog(smtproblems, solverTypes, launcher);
-               
+                out = new SMTResultOutput();
                 setProgressText(0);
                 timer.schedule(new TimerTask() {
                         @Override
@@ -513,6 +541,7 @@ public class SolverListener implements SolverLauncherListener {
         		}
                 else{
                 	progressModel.setText("Valid" + timeInfo ,x,y);
+
                 }
 
 
