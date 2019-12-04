@@ -34,3 +34,6 @@ bin/
 .settings
 .project
 .classpath
+
+#ignore smt results output file
+/key.ui/smtResults.csv
