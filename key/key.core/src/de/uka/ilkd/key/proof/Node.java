@@ -22,6 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Random;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -51,6 +52,10 @@ public class Node  {
     private static final String CLOSED_GOAL = "Closed goal";
 
     private static final String NODES = "nodes";
+
+    private long creationTime = System.nanoTime();
+    
+    private long ruleApplicationTime = -1;
 
     /** the proof the node belongs to */
     private final Proof               proof;
@@ -91,7 +96,7 @@ public class Node  {
     private ImmutableList<RenamingTable>  renamings;
 
     private String cachedName = null;
-
+    
     /**
      * If the rule base has been extended e.g. by loading a new taclet as
      * lemma or by applying a taclet with an addrule section on this node,
@@ -146,6 +151,17 @@ public class Node  {
 	return seq;
     }
 
+    /** returns the creation time */
+    public long getCreationTime() {
+    	return creationTime;
+    }
+    
+    /** returns the matching time */
+    public long getMatchingTime() {
+    	return Math.abs((long)(Math.random() * 1000)) ;
+    }
+    
+    
     /**
      * the node information object encapsulates non-logical information
      * of the node, e.g.
@@ -714,4 +730,19 @@ public class Node  {
         return childrenIterator();
     }
 
+    /**
+     * sets the time when a rule was applied to this node
+     * @param ruleAppTimeInNano the rule application time in nano seconds
+     */
+	public void setRuleApplicationTime(long ruleAppTimeInNano) {
+		this.ruleApplicationTime = ruleAppTimeInNano;
+	}
+
+    /**
+     * retrieves the time when a rule was applied to this node
+     * @return the rule application time in nano seconds
+     */
+	public long getRuleApplicationTime() {
+		return this.ruleApplicationTime;
+	}
 }

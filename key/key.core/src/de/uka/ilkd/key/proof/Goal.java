@@ -642,7 +642,10 @@ public final class Goal  {
          */
         NamespaceSet originalNamespaces = getLocalNamespaces();
         Services overlayServices = proof.getServices().getOverlay(originalNamespaces);
+
+        long start = System.nanoTime();
         final ImmutableList<Goal> goalList = ruleApp.execute(this, overlayServices);
+        n.setRuleApplicationTime(System.nanoTime()-start);
 
         proof.getServices().saveNameRecorder(n);
 
