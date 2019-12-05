@@ -42,12 +42,15 @@ public interface AERelationalDialogConstants extends AERelationalDialogCodeTempl
             "Recommended Example: File > Load Example > Abstract Execution > Consolidate Duplicate... > Extract Prefix";
     static final String STATUS_PANEL_STD_MSG_3 = //
             "When declaring <tt>ae_constraint</tt>s, you have to put an empty block <tt>{ ; }</tt> after the JML comment.";
-    static final String STATUS_PANEL_STD_MSG_4 = //
-            "There are code templates for abstract statements, expressions, and constraints! Type "
-                    + Arrays.stream(CODE_TEMPLATES).map(arr -> arr[0])
-                            .map(templateID -> String.format("\"<tt>%s</tt>\"", templateID))
-                            .collect(Collectors.joining(" / "))
-                    + " followed by <tt>Ctrl+Shift+Space</tt> (Mac: <tt>Command+Shift+Space</tt>).";
+    static final String STATUS_PANEL_STD_MSG_4 = createCodeTemplateMessage();
+
+    static String createCodeTemplateMessage() {
+        return "There are code templates for abstract statements, expressions, and constraints! Type "
+                + Arrays.stream(CODE_TEMPLATES).map(arr -> arr[0])
+                        .map(templateID -> String.format("\"<tt>%s</tt>\"", templateID))
+                        .collect(Collectors.joining(" / "))
+                + " followed by <tt>Ctrl+Shift+Space</tt> (Mac: <tt>Command+Shift+Space</tt>).";
+    }
 
     //////////////
     // TOOLTIPS //
