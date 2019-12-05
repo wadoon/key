@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="\result_1=\result_2">
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="\result_1==\result_2">
     <programOne>if (
 	//@ assignable frameE;
 	//@ accessible footprintE;
@@ -40,6 +40,7 @@ else {
 //@ assignable frameP;
 //@ accessible footprintP;
 \abstract_statement P;</programTwo>
+    <methodLevelContext></methodLevelContext>
     <locationSets>
         <locationSet locsetName="relevant">
             <relevantOne>0</relevantOne>
@@ -78,6 +79,7 @@ else {
             <relevantTwo>-1</relevantTwo>
         </locationSet>
     </locationSets>
+    <functions/>
     <predicates/>
     <programVariables/>
 </ns2:aeRelationalModel>
