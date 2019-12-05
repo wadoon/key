@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * @author Dominic Steinhoefel
  */
-public interface AERelationalDialogConstants extends AERelationalDialogCodeTemplates {
+public interface RefinityWindowConstants extends RefinityWindowCodeTemplates {
     static final String DUMMY_KEY_FILE = "/de/uka/ilkd/key/gui/refinity/dummy.key";
     static final String PROOF_BUNDLE_ENDING = ".zproof";
 

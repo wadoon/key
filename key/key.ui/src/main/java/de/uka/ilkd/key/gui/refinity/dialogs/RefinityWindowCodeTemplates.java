@@ -15,7 +15,7 @@ package de.uka.ilkd.key.gui.refinity.dialogs;
 /**
  * @author Dominic Steinhoefel
  */
-public interface AERelationalDialogCodeTemplates {
+public interface RefinityWindowCodeTemplates {
 
     //@formatter:off
     static final String[][] CODE_TEMPLATES = new String[][] {
@@ -47,10 +47,10 @@ public interface AERelationalDialogCodeTemplates {
                     "{ ; }"
             }, new String[] {
                     "mut",
-                    "\\mutex(formula1, formula2);"
+                    "\\mutex(formula1, formula2)"
             }, new String[] {
                     "disj",
-                    "\\disjoint(locset1, locset2);"
+                    "\\disjoint(locset1, locset2)"
             }
     };
     //@formatter:on

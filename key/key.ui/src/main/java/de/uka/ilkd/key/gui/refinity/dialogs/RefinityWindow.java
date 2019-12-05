@@ -116,7 +116,7 @@ import de.uka.ilkd.key.prover.impl.ProverTaskAdapter;
  * 
  * @author Dominic Steinhoefel
  */
-public class RefinityWindow extends JFrame implements AERelationalDialogConstants {
+public class RefinityWindow extends JFrame implements RefinityWindowConstants {
     private static final long serialVersionUID = 1L;
 
     private AERelationalModel model;
@@ -311,8 +311,8 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
     private void updateTitle() {
         setTitle(String.format("%s [%s%s]%s", String.format(TITLE, versionNumber),
                 model.getFile().map(File::getName).orElse("No File"),
-                isDirty() ? AERelationalDialogConstants.DIRTY_TITLE_PART : "",
-                isReadonly() ? AERelationalDialogConstants.READ_ONLY_TITLE_PART : ""));
+                isDirty() ? RefinityWindowConstants.DIRTY_TITLE_PART : "",
+                isReadonly() ? RefinityWindowConstants.READ_ONLY_TITLE_PART : ""));
     }
 
     public void installListeners() {

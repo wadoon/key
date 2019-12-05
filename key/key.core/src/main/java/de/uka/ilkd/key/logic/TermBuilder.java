@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.logic;
 
 import java.io.StringReader;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,6 +35,7 @@ import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -965,10 +965,10 @@ public class TermBuilder {
      */
     public Term abstractUpdate(AbstractProgramElement phs,
             UniqueArrayList<AbstractUpdateLoc> assignables, List<Term> accessibles) {
-        final AbstractUpdate au = services.abstractUpdateFactory()
-                .getInstance(phs, assignables, accessibles.size());
-        return tf.createTerm(au, accessibles.stream().map(this::wrapInValue)
-                .collect(Collectors.toList()).toArray(new Term[0]));
+        final AbstractUpdate au = services.abstractUpdateFactory().getInstance(phs, assignables,
+                accessibles.size());
+        return tf.createTerm(au, accessibles.stream().filter(loc -> !(loc instanceof EmptyLoc))
+                .map(this::wrapInValue).collect(Collectors.toList()).toArray(new Term[0]));
     }
     
     /**

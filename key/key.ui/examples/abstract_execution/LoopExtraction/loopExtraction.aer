@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="\result_1[0]==\result_2[0] &amp;&amp;&#10;\result_1[1]==\result_2[1] &amp;&amp;&#10;Post(\result_1[2],\result_2[2])">
+    <programOne>// "Relational Precondition"
+/*@ ae_constraint
+  @   (\forall any val1;
+  @     (\forall any val2; (
+  @       inv(val1) &amp;&amp; inv(val2) ==&gt;
+  @         Post(val1, val2))));
+  @*/
+{ ; }
+
+/*@ ae_constraint
+  @   \disjoint(frameQ, footprintE) &amp;&amp;
+  @   \disjoint(frameQ, frameP);
+  @*/
+{ ; }
+
+/*@ ae_constraint
+  @   inv(\value(frameP)) &amp;&amp; decrExpr(\value(frameP)) &gt;= 0;
+  @*/
+{ ; }
+
+/*@ loop_invariant decrExpr(\value(frameP)) &gt;= 0 &amp;&amp; inv(\value(frameP));
+  @ assignable frameP, footprintE;
+  @ decreases decrExpr(\value(frameP));
+  @*/
+while (
+   /*@ assignable \nothing;
+     @ accessible footprintE;
+     @ exceptional_behavior requires false;
+     @*/
+   \abstract_expression boolean e 
+) {
+    //@ ghost int oldVariantLeft;
+
+    /*@ ae_constraint
+      @   \disjoint(frameP, oldVariantLeft) &amp;&amp;
+      @   \disjoint(footprintE, oldVariantLeft);
+      @*/
+    { ; }
+
+    // Hacky ghost setter
+    /*@ assignable \nothing;
+      @ accessible \nothing;
+      @
+      @ normal_behavior ensures oldVariantLeft == decrExpr(\value(frameP));
+      @
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement VariantHack;
+
+    /*@ assignable frameQ;
+      @ accessible footprintQ;
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement Q;
+    
+    /*@ assignable frameP, footprintE;
+      @ accessible footprintP;
+      @ normal_behavior ensures
+      @   inv(\value(frameP)) &amp;&amp;
+      @   decrExpr(\value(frameP)) &gt;= 0 &amp;&amp;
+      @   decrExpr(\value(frameP)) &lt; oldVariantLeft;
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement P;
+}</programOne>
+    <programTwo>// "Relational Precondition"
+/*@ ae_constraint
+  @   (\forall any val1;
+  @     (\forall any val2; (
+  @       inv(val1) &amp;&amp; inv(val2) ==&gt;
+  @         Post(val1, val2))));
+  @*/
+{ ; }
+
+/*@ ae_constraint
+  @   \disjoint(frameQ, footprintE) &amp;&amp;
+  @   \disjoint(frameQ, frameP);
+  @*/
+{ ; }
+
+if (
+   /*@ assignable \nothing;
+     @ accessible footprintE;
+     @ exceptional_behavior requires false;
+     @*/
+   \abstract_expression boolean e 
+) {
+    /*@ assignable frameQ;
+      @ accessible footprintQ;
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement Q;
+}
+
+/*@ ae_constraint
+  @   inv(\value(frameP)) &amp;&amp; decrExpr(\value(frameP)) &gt;= 0;
+  @*/
+{ ; }
+
+/*@ loop_invariant decrExpr(\value(frameP)) &gt;= 0 &amp;&amp; inv(\value(frameP));
+  @ assignable frameP, footprintE;
+  @ decreases decrExpr(\value(frameP));
+  @*/
+while (
+   /*@ assignable \nothing;
+     @ accessible footprintE;
+     @ exceptional_behavior requires false;
+     @*/
+   \abstract_expression boolean e 
+) {
+    //@ ghost int oldVariantRight;
+
+    /*@ ae_constraint
+      @   \disjoint(frameP, oldVariantRight) &amp;&amp;
+      @   \disjoint(footprintE, oldVariantRight);
+      @*/
+    { ; }
+
+    // Hacky ghost setter
+    /*@ assignable \nothing;
+      @ accessible \nothing;
+      @
+      @ normal_behavior ensures oldVariantRight == decrExpr(\value(frameP));
+      @
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement VariantHack;
+    
+    /*@ assignable frameP, footprintE;
+      @ accessible footprintP;
+      @ normal_behavior ensures
+      @   inv(\value(frameP)) &amp;&amp;
+      @   decrExpr(\value(frameP)) &gt;= 0 &amp;&amp;
+      @   decrExpr(\value(frameP)) &lt; oldVariantRight;
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement P;
+}</programTwo>
+    <methodLevelContext></methodLevelContext>
+    <locationSets>
+        <locationSet locsetName="relevant">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameP">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintE">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameQ">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintQ">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <functions>
+        <function funcName="decrExpr" resultSortName="int">
+            <argSort>any</argSort>
+        </function>
+    </functions>
+    <predicates>
+        <predicate predName="inv">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="Post">
+            <argSort>any</argSort>
+            <argSort>any</argSort>
+        </predicate>
+    </predicates>
+    <programVariables/>
+</ns2:aeRelationalModel>
