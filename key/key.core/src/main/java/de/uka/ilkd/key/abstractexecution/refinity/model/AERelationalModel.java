@@ -85,7 +85,7 @@ public class AERelationalModel {
     private Optional<File> file = Optional.empty();
 
     public static AERelationalModel defaultModel() {
-        final String postCondition = "\\result_1=\\result_2";
+        final String postCondition = "\\result_1==\\result_2";
         final List<AbstractLocsetDeclaration> abstractLocationSets = Collections
                 .singletonList(new AbstractLocsetDeclaration("relevant"));
         final List<NullarySymbolDeclaration> relevantVarsOne = //
