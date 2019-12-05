@@ -35,7 +35,8 @@ while (
 
     /*@ ae_constraint
       @   \disjoint(frameP, oldVariantLeft) &amp;&amp;
-      @   \disjoint(footprintE, oldVariantLeft);
+      @   \disjoint(footprintE, oldVariantLeft) &amp;&amp;
+      @   \disjoint(frameQ, oldVariantLeft);
       @*/
     { ; }
 
@@ -126,7 +127,8 @@ while (
 
     /*@ ae_constraint
       @   \disjoint(frameP, oldVariantRight) &amp;&amp;
-      @   \disjoint(footprintE, oldVariantRight);
+      @   \disjoint(footprintE, oldVariantRight) &amp;&amp;
+      @   \disjoint(frameQ, oldVariantRight);
       @*/
     { ; }
 

@@ -434,7 +434,8 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
 
         if (heapRHS.op() == heapLDT.getHeap()) {
             return heapRHS;
-        } else if (heapRHS.op() == heapLDT.getAnon()) {
+        } else if (heapRHS.op() == heapLDT.getAnon()
+                && !(heapRHS.sub(1).op() instanceof UpdateApplication)) {
             /*
              * If we can show disjointness from the locset in the anon with all relevant
              * (heap) locations, we can remove the anon.
@@ -443,6 +444,10 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
             final ImmutableSet<Term> anonLocs = tb.locsetUnionToSet(heapRHS.sub(1));
 
             for (final Term locTerm : anonLocs) {
+                if (locTerm.op() instanceof UpdateApplication) {
+                    return heapRHS;
+                }
+
                 final AbstractUpdateLoc anonLoc = AbstractUpdateFactory
                         .abstrUpdateLocFromTerm(locTerm, Optional.empty(), services);
                 if (isRelevant(anonLoc,

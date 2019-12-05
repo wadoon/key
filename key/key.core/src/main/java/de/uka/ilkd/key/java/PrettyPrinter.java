@@ -2385,6 +2385,8 @@ public class PrettyPrinter {
         markStart(0, x);
         printHeader(x);
         write("\\abstract_expression ");
+        write(x.getKeYJavaType(null, null).getFullName());
+        write(" ");
         write(x.getId());
         markEnd(0, x);
     }
