@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 public class SMTResultOutput {
     static final String TIMEOUT = "TO";
@@ -12,37 +13,65 @@ public class SMTResultOutput {
     static final String UNKNOWN = "UK";
     static final String EXCEPTION = "EXC";
     static final String USER_INTERRUPT = "USR_IR";
-    static final String TOP_ROW = "GOAL_ID,SOLVER,RESULT";
 
-    private final Path path = Paths.get("smtResults.csv");
     private BufferedWriter buf;
 
+    private ArrayList<String> goalRows;
+    private ArrayList<String> solverColumns;
+    private ArrayList<ArrayList<String>> results;
+
     SMTResultOutput() {
+        Path path = Paths.get("smtResults.csv");
         String s = path.toAbsolutePath().toString();
-        System.out.println("Current relative path is: " + s);
-        System.out.println("Path: " + path);
+        goalRows = new ArrayList<>();
+        solverColumns = new ArrayList<>();
+        results = new ArrayList<>();
         try {
             buf = new BufferedWriter(new FileWriter(path.toFile()));
-            buf.write(TOP_ROW);
-            buf.newLine();
         } catch (IOException e) {
             System.out.println("Could not open file " + path);
         }
     }
 
-    void appendLine(String s) {
+    void addResult(String s) {
+        String[] a = s.split(",");
+        String goalID = a[0];
+        String solverName = a[1];
+        String result = a[2];
+        if (!goalRows.contains(goalID)) {
+            goalRows.add(goalID);
+            results.add(new ArrayList<>());
+        }
+        if (!solverColumns.contains(solverName)) {
+            solverColumns.add(solverName);
+        }
+        results.get(goalRows.indexOf(goalID)).add(result);
+    }
+
+    public void close() {
         try {
-            buf.write(s);
-            buf.newLine();
+            writeColumnHeads();
+            for (int i = 0; i < goalRows.size(); ++i) {
+                buf.write(goalRows.get(i));
+                for (int j = 0; j < solverColumns.size(); ++j) {
+                    buf.write("," + results.get(i).get(j));
+                }
+                buf.newLine();
+            }
+            buf.flush();
+            buf.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void close() {
+    private void writeColumnHeads() {
         try {
-            buf.flush();
-            buf.close();
+            buf.write("Goal ID");
+            for (String s: solverColumns) {
+                buf.write("," + s);
+            }
+            buf.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }

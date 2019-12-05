@@ -245,11 +245,11 @@ public class SolverListener implements SolverLauncherListener {
                 } else {
                     res = SMTResultOutput.UNKNOWN;
                 }
-                out.appendLine(p.problem.getName() + ","
+                out.addResult(p.problem.getName() + ","
                         + p.solver.getType().toString() + ","
                         + res);
             }
-                out.close();
+            out.close();
         }
         
         public static String createExceptionTitle(InternSMTProblem problem) {
