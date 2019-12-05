@@ -31,6 +31,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,6 +66,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.rsyntaxtextarea.templates.StaticCodeTemplate;
 import org.fife.ui.rtextarea.RTextScrollPane;
+import org.key_project.util.java.IOUtil;
 import org.xml.sax.SAXException;
 
 import bibliothek.gui.dock.common.CContentArea;
@@ -126,6 +128,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
     private KeYJavaType dummyClass = null;
     private ProofState proofState = new ProofState();
     private boolean isFreshFile = false;
+    private final String versionNumber;
     // NOTE: Only access via setReadonly / isReadonly!
     private boolean readonly = false;
     // NOTE: Only access via setDirty / isDirty!
@@ -175,7 +178,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
     }
 
     public RefinityWindow(MainWindow mainWindow, AERelationalModel model) {
-        super(TITLE);
+        super();
 
         assert model != null;
         this.model = model;
@@ -216,8 +219,19 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
          * initial content.
          */
         setDirty(false);
+        this.versionNumber = loadRefinityVersionNumber();
         updateTitle();
         resetUndosListeners.forEach(ResetUndosListener::resetUndos);
+    }
+
+    private String loadRefinityVersionNumber() {
+        final InputStream refinityVersionIS = ProofBundleConverter.class
+                .getResourceAsStream("/de/uka/ilkd/key/gui/refinity/REFINITY_VERSION");
+        try {
+            return IOUtil.readFrom(refinityVersionIS);
+        } catch (IOException exc) {
+            return "";
+        }
     }
 
     private JPanel createContentPanel() {
@@ -305,7 +319,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
     }
 
     private void updateTitle() {
-        setTitle(String.format("%s [%s%s]%s", TITLE,
+        setTitle(String.format("%s [%s%s]%s", String.format(TITLE, versionNumber),
                 model.getFile().map(File::getName).orElse("No File"),
                 isDirty() ? AERelationalDialogConstants.DIRTY_TITLE_PART : "",
                 isReadonly() ? AERelationalDialogConstants.READ_ONLY_TITLE_PART : ""));

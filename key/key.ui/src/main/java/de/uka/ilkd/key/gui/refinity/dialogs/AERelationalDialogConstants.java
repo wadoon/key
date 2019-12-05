@@ -26,7 +26,11 @@ public interface AERelationalDialogConstants extends AERelationalDialogCodeTempl
     // TITLE COMPONENTS //
     //////////////////////
 
-    static final String TITLE = "REFINITY \u2014 Relational Proofs with Abstract Execution";
+    /*
+     * Placeholder %s is for version number, which comes with leading space if
+     * successfully read
+     */
+    static final String TITLE = "REFINITY%s \u2014 Relational Proofs with Abstract Execution";
     static final String DIRTY_TITLE_PART = " *";
     static final String READ_ONLY_TITLE_PART = " (READ ONLY - Save to edit)";
 

@@ -12,7 +12,6 @@
 //
 package de.uka.ilkd.key.abstractexecution.refinity.model;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -28,6 +27,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.abstractexecution.refinity.util.DummyKeYEnvironmentCreator;
 import de.uka.ilkd.key.java.Services;
@@ -109,8 +110,8 @@ public class ProofBundleConverter {
             throw new IllegalStateException("Could not load required resource files.");
         }
 
-        javaScaffold = inputStreamToString(javaScaffoldIS);
-        keyScaffold = inputStreamToString(keyScaffoldIS);
+        javaScaffold = IOUtil.readFrom(javaScaffoldIS);
+        keyScaffold = IOUtil.readFrom(keyScaffoldIS);
     }
 
     /**
@@ -299,19 +300,6 @@ public class ProofBundleConverter {
         }
 
         return resultSeq;
-    }
-
-    private static String inputStreamToString(InputStream is) throws IOException {
-        final StringBuilder sb = new StringBuilder();
-        final BufferedInputStream in = new BufferedInputStream(is);
-        byte[] contents = new byte[1024];
-
-        int bytesRead = 0;
-        while ((bytesRead = in.read(contents)) != -1) {
-            sb.append(new String(contents, 0, bytesRead));
-        }
-
-        return sb.toString();
     }
 
     public static class BundleSaveResult {
