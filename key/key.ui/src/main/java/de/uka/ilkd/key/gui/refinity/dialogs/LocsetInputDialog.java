@@ -35,10 +35,6 @@ import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.abstractexecution.refinity.model.AbstractLocsetDeclaration;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.parser.ParserException;
 
 /**
  * @author Dominic Steinhoefel
@@ -98,11 +94,11 @@ public class LocsetInputDialog extends JDialog {
                         new AbstractLocsetDeclaration(valueTextField.getText());
 
                 try {
-                    checkAndRegister(val, services);
+                    val.checkAndRegister(services);
 
                     instance.value = val;
                     instance.setVisible(false);
-                } catch (ParserException exc) {
+                } catch (RuntimeException exc) {
                     JOptionPane.showMessageDialog(instance,
                             "<html>There's an error in your syntax, please correct it and try again"
                                     + "<br/><br/>Message:<br/>" + exc.getMessage() + "<html>",
@@ -156,18 +152,6 @@ public class LocsetInputDialog extends JDialog {
         dia.setVisible(true);
         dia.dispose();
         return dia.value;
-    }
-
-    public static void checkAndRegister(final AbstractLocsetDeclaration val,
-            final Services services) throws ParserException {
-        final NamespaceSet namespaces = services.getNamespaces();
-        if (namespaces.functions().lookup(val.getLocsetName()) != null) {
-            throw new ParserException(
-                    "The name " + val + " is already registered, please choose another one.", null);
-        }
-
-        namespaces.functions().add(new Function(new Name(val.getLocsetName()),
-                services.getTypeConverter().getLocSetLDT().targetSort()));
     }
 
 }

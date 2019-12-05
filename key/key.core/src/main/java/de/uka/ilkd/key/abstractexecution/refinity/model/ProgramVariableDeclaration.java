@@ -20,6 +20,12 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
+
 /**
  * @author Dominic Steinhoefel
  */
@@ -67,6 +73,31 @@ public class ProgramVariableDeclaration extends NullarySymbolDeclaration {
     @Override
     public String toSeqSingleton() {
         return String.format("seqSingleton(value(singletonPV(%s)))", varName);
+    }
+
+    /**
+     * Adds a program variable symbol corresponding to this
+     * {@link ProgramVariableDeclaration} to the {@link Services} object if not
+     * already present.
+     * 
+     * @param services The {@link Services} object whose namespaces to populate.
+     */
+    public void checkAndRegister(final Services services) {
+        final Sort sort = services.getNamespaces().sorts().lookup(getTypeName());
+
+        if (sort == null) {
+            throw new RuntimeException("Sort \"" + getTypeName() + "\" is not known");
+        }
+
+        final Name name = new Name(getVarName());
+
+        if (services.getNamespaces().lookup(name) != null) {
+            throw new RuntimeException("The name \"" + getVarName()
+                    + "\" is already known to the system.<br/>\n" + "Plase choose a fresh one.");
+        }
+
+        services.getNamespaces().programVariables().add(new LocationVariable(
+                new ProgramElementName(getVarName()), services.getJavaInfo().getKeYJavaType(sort)));
     }
 
     public static ProgramVariableDeclaration fromString(final String str)

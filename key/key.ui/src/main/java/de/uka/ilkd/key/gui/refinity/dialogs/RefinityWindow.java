@@ -37,8 +37,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
@@ -106,7 +104,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
@@ -145,15 +142,8 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
     private final RSyntaxTextArea codeContext = new RSyntaxTextArea(15, 120);
 
     private final FormulaInputTextArea resultRelationText = new FormulaInputTextArea(
-            STD_POSTCONDREL_TOOLTIP, formula -> {
-                // Replacement of special placeholders for result sequences
-                String result = formula;
-                result = result.replaceAll(Pattern.quote(ProofBundleConverter.RESULT_1),
-                        Matcher.quoteReplacement("\\dl_" + ProofBundleConverter.RES1));
-                result = result.replaceAll(Pattern.quote(ProofBundleConverter.RESULT_2),
-                        Matcher.quoteReplacement("\\dl_" + ProofBundleConverter.RES2));
-                return result;
-            });
+            STD_POSTCONDREL_TOOLTIP,
+            formula -> ProofBundleConverter.preparedJMLPostCondition(formula, model));
 
     private AutoResetStatusPanel statusPanel;
 
@@ -344,7 +334,7 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
         }
         proofState.addProofStateChangedListener(state -> updateStatusPanelProofState());
 
-        servicesLoadedListeners.add(() -> fillNamespacesFromModel());
+        servicesLoadedListeners.add(() -> model.fillNamespacesFromModel(services));
 
         servicesLoadedListeners.add(() -> {
             statusPanel.setMessage("KeY data structures initialized successfully.");
@@ -395,30 +385,6 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
                 } else {
                     statusPanel.setMessage("Please save model first using the Save Model button.");
                 }
-            }
-        });
-    }
-
-    public void fillNamespacesFromModel() {
-        model.getAbstractLocationSets().forEach(loc -> {
-            try {
-                LocsetInputDialog.checkAndRegister(loc, services);
-            } catch (ParserException e) {
-                // Shouldn't happen! Already saved!
-                e.printStackTrace();
-            }
-        });
-
-        model.getProgramVariableDeclarations().forEach(pv -> {
-            ProgramVariableInputDialog.checkAndRegister(pv, services);
-        });
-
-        model.getPredicateDeclarations().forEach(pred -> {
-            try {
-                FuncAndPredInputDialog.checkAndRegister(pred, services);
-            } catch (ParserException e) {
-                // Shouldn't happen! Already saved!
-                e.printStackTrace();
             }
         });
     }
@@ -965,8 +931,8 @@ public class RefinityWindow extends JFrame implements AERelationalDialogConstant
                     } else {
                         try {
                             /* ...because names might be equal, but parameters changed. */
-                            FuncAndPredInputDialog.checkAndRegister(selectedElem, services);
-                        } catch (ParserException exc) {
+                            selectedElem.checkAndRegister(services);
+                        } catch (RuntimeException exc) {
                         }
                     }
                 }

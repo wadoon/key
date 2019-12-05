@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.abstractexecution.refinity.util.DummyKeYEnvironmentCreator;
@@ -35,6 +36,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -226,29 +228,7 @@ public class ProofBundleConverter {
         final String params = model.getProgramVariableDeclarations().stream()
                 .map(ProgramVariableDeclaration::getVarName).collect(Collectors.joining(","));
 
-        final String jmlPostCondRelation = model.getPostCondition()
-                .replaceAll(Pattern.quote(RESULT_1), Matcher.quoteReplacement("\\dl_" + RES1))
-                .replaceAll(Pattern.quote(RESULT_2), Matcher.quoteReplacement("\\dl_" + RES2));
-
-        final DummyKeYEnvironmentCreator envCreator = new DummyKeYEnvironmentCreator();
-        String javaDLPostCondRelation = "false";
-        try {
-            envCreator.initialize();
-            
-            final Services services = envCreator.getDummyServices().get();
-            final Namespace<Function> functions = services.getNamespaces().functions();
-            final Sort seqSort = services.getTypeConverter().getSeqLDT().targetSort();
-            functions.add(new Function(new Name(ProofBundleConverter.RES1), seqSort));
-            functions.add(new Function(new Name(ProofBundleConverter.RES2), seqSort));
-            
-            final Term parsed = JMLTranslator.translate(new PositionedString(jmlPostCondRelation),
-                    envCreator.getDummyKjt().get(), null, null, null, null, null, null, Term.class,
-                    services);
-            javaDLPostCondRelation = LogicPrinter.quickPrintTerm(parsed, services);
-        } catch (Exception e) {
-            System.err.println(getClass().getSimpleName()
-                    + ": Could not parse JML postcondition relation, using default 'false'.");
-        }
+        String javaDLPostCondRelation = createJavaDLPostCondition();
 
         return keyScaffold.replaceAll(FUNCTIONS, Matcher.quoteReplacement(functionsDecl))
                 .replaceAll(PREDICATES, Matcher.quoteReplacement(predicatesDecl))
@@ -261,6 +241,73 @@ public class ProofBundleConverter {
                 .replaceAll(RESULT_SEQ_2, extractResultSeq(model.getRelevantVarsTwo())) //
                 .replaceAll(ADDITIONAL_PREMISES,
                         Matcher.quoteReplacement(createAdditionalPremises()));
+    }
+
+    private String createJavaDLPostCondition() {
+        String jmlPostCondRelation = preparedJMLPostCondition(model.getPostCondition(), model);
+
+        final DummyKeYEnvironmentCreator envCreator = new DummyKeYEnvironmentCreator();
+        String javaDLPostCondRelation = "false";
+        try {
+            envCreator.initialize();
+
+            final Services services = envCreator.getDummyServices().get();
+            populateNamespaces(model, services);
+
+            Term parsed = JMLTranslator.translate(new PositionedString(jmlPostCondRelation),
+                    envCreator.getDummyKjt().get(), null, null, null, null, null, null, Term.class,
+                    services);
+            parsed = removeLabels(parsed, services);
+            javaDLPostCondRelation = LogicPrinter.quickPrintTerm(parsed, services);
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "Could not parse JML postcondition relation, message: " + e.getMessage(), e);
+        }
+
+        return javaDLPostCondRelation;
+    }
+
+    private static Term removeLabels(final Term term, final Services services) {
+        final TermFactory tf = services.getTermFactory();
+        return tf.createTerm(term.op(),
+                new ImmutableArray<>(term.subs().stream().map(t -> removeLabels(t, services))
+                        .collect(Collectors.toList())),
+                term.boundVars(), term.javaBlock(), new ImmutableArray<>());
+    }
+
+    public static String preparedJMLPostCondition(final String unpreparedJmlPostCondition,
+            final AERelationalModel model) {
+        String result = unpreparedJmlPostCondition
+                .replaceAll(Pattern.quote(RESULT_1), prefixDLforRE(RES1))
+                .replaceAll(Pattern.quote(RESULT_2), prefixDLforRE(RES2));
+
+        for (final FunctionDeclaration decl : model.getFunctionDeclarations()) {
+            result = prefixOccurrencesWithDL(result, decl.getFuncName());
+        }
+
+        for (final PredicateDeclaration decl : model.getPredicateDeclarations()) {
+            result = prefixOccurrencesWithDL(result, decl.getPredName());
+        }
+
+        return result;
+    }
+
+    private static String prefixOccurrencesWithDL(String in, String toPrefix) {
+        return in.replaceAll("\\b" + Pattern.quote(toPrefix) + "\\b", prefixDLforRE(toPrefix));
+    }
+
+    private static String prefixDLforRE(String str) {
+        return Matcher.quoteReplacement(String.format("\\dl_%s", str));
+    }
+
+    private void populateNamespaces(final AERelationalModel model, final Services services) {
+        final Namespace<Function> functions = services.getNamespaces().functions();
+
+        final Sort seqSort = services.getTypeConverter().getSeqLDT().targetSort();
+        functions.add(new Function(new Name(ProofBundleConverter.RES1), seqSort));
+        functions.add(new Function(new Name(ProofBundleConverter.RES2), seqSort));
+
+        model.fillNamespacesFromModel(services);
     }
 
     private String createAdditionalPremises() {

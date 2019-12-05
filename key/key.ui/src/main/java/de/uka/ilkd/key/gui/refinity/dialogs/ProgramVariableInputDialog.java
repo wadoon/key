@@ -35,10 +35,6 @@ import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * @author Dominic Steinhoefel
@@ -99,7 +95,7 @@ public class ProgramVariableInputDialog extends JDialog {
                     final ProgramVariableDeclaration val = ProgramVariableDeclaration
                             .fromString(valueTextField.getText());
 
-                    checkAndRegister(val, services);
+                    val.checkAndRegister(services);
 
                     instance.value = val;
                     instance.setVisible(false);
@@ -149,26 +145,6 @@ public class ProgramVariableInputDialog extends JDialog {
                 setVisible(false);
             }
         });
-    }
-
-    public static void checkAndRegister(final ProgramVariableDeclaration val,
-            final Services services) {
-        final Sort sort = services.getNamespaces().sorts().lookup(val.getTypeName());
-
-        if (sort == null) {
-            throw new RuntimeException("Sort \"" + val.getTypeName() + "\" is not known");
-        }
-
-        final Name name = new Name(val.getVarName());
-
-        if (services.getNamespaces().lookup(name) != null) {
-            throw new RuntimeException("The name \"" + val.getVarName()
-                    + "\" is already known to the system.<br/>\n" + "Plase choose a fresh one.");
-        }
-
-        services.getNamespaces().programVariables()
-                .add(new LocationVariable(new ProgramElementName(val.getVarName()),
-                        services.getJavaInfo().getKeYJavaType(sort)));
     }
 
     public static ProgramVariableDeclaration showInputDialog(final Window owner,

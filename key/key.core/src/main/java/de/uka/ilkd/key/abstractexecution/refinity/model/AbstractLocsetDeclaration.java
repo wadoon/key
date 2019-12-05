@@ -20,6 +20,11 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.op.Function;
+
 /**
  * @author Dominic Steinhoefel
  */
@@ -56,6 +61,26 @@ public class AbstractLocsetDeclaration extends NullarySymbolDeclaration {
     @Override
     public String toSeqSingleton() {
         return String.format("seqSingleton(value(%s))", locsetName);
+    }
+
+    /**
+     * Adds a function symbol corresponding to this
+     * {@link AbstractLocsetDeclaration} to the {@link Services} object if not
+     * already present.
+     * 
+     * @param services The {@link Services} object whose namespaces to populate.
+     * @throws RuntimeException If the name is already present.
+     */
+    public void checkAndRegister(final Services services) {
+        final NamespaceSet namespaces = services.getNamespaces();
+        if (namespaces.functions().lookup(getLocsetName()) != null) {
+            throw new RuntimeException(
+                    "The name " + this + " is already registered, please choose another one.",
+                    null);
+        }
+
+        namespaces.functions().add(new Function(new Name(getLocsetName()),
+                services.getTypeConverter().getLocSetLDT().targetSort()));
     }
 
     public static AbstractLocsetDeclaration fromString(final String str)

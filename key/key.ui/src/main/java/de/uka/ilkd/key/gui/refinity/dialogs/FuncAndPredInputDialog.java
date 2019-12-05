@@ -21,8 +21,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -39,10 +37,6 @@ import de.uka.ilkd.key.abstractexecution.refinity.model.FuncOrPredDecl;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 
 /**
@@ -119,7 +113,7 @@ public class FuncAndPredInputDialog extends JDialog {
                         val = PredicateDeclaration.fromString(input);
                     }
 
-                    checkAndRegister(val, services);
+                    val.checkAndRegister(services);
 
                     instance.value = val;
                     instance.setVisible(false);
@@ -127,7 +121,7 @@ public class FuncAndPredInputDialog extends JDialog {
                     JOptionPane.showMessageDialog(instance,
                             "There's an error in your syntax, please correct it and try again",
                             "Syntax error", JOptionPane.ERROR_MESSAGE);
-                } catch (ParserException exc) {
+                } catch (RuntimeException exc) {
                     JOptionPane.showMessageDialog(instance,
                             "<html>There's an error in your syntax, please correct it and try again"
                                     + "<br/><br/>Message:<br/>" + exc.getMessage() + "<html>",
@@ -181,49 +175,6 @@ public class FuncAndPredInputDialog extends JDialog {
         dia.setVisible(true);
         dia.dispose();
         return dia.value;
-    }
-
-    public static void checkAndRegister(final FuncOrPredDecl val, final Services services)
-            throws ParserException {
-        final NamespaceSet namespaces = services.getNamespaces();
-
-        final List<Sort> sorts = val.getArgSorts().stream().map(namespaces.sorts()::lookup)
-                .collect(Collectors.toList());
-
-        for (int i = 0; i < sorts.size(); i++) {
-            if (sorts.get(i) == null) {
-                throw new ParserException("The sort " + val.getArgSorts().get(i) + " is unknown.",
-                        null);
-            }
-        }
-
-        if (val.isPredDecl()) {
-            final PredicateDeclaration predDecl = val.toPredDecl();
-
-            if (namespaces.functions().lookup(predDecl.getPredName()) != null) {
-                throw new ParserException("The predicate " + predDecl.getPredName()
-                        + " is already registered, please choose another one.", null);
-            }
-
-            namespaces.functions().add(new Function(new Name(predDecl.getPredName()), Sort.FORMULA,
-                    sorts.toArray(new Sort[0])));
-        } else {
-            final FunctionDeclaration funcDecl = val.toFuncDecl();
-
-            if (namespaces.functions().lookup(funcDecl.getFuncName()) != null) {
-                throw new ParserException("The function " + funcDecl.getFuncName()
-                        + " is already registered, please choose another one.", null);
-            }
-
-            final Sort targetSort = namespaces.sorts().lookup(funcDecl.getResultSortName());
-            if (targetSort == null) {
-                throw new ParserException(
-                        "The sort " + funcDecl.getResultSortName() + " is unknown.", null);
-            }
-
-            namespaces.functions().add(new Function(new Name(funcDecl.getFuncName()), targetSort,
-                    sorts.toArray(new Sort[0])));
-        }
     }
 
 }

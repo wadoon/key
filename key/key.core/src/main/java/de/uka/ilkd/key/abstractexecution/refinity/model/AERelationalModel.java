@@ -42,6 +42,8 @@ import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.java.Services;
+
 /**
  * @author Dominic Steinhoefel
  */
@@ -295,6 +297,19 @@ public class AERelationalModel {
                 .filter(loc -> relValGetter.apply(loc) > -1)
                 .sorted((loc1, loc2) -> relValGetter.apply(loc1) - relValGetter.apply(loc2))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Populates the given {@link Services} object with function and program
+     * variable symbols corresponding to the definitions in this model.
+     * 
+     * @param services The {@link Services} object to populate.
+     * @throws RuntimeException If a name is already present, or a sort not known.
+     */
+    public void fillNamespacesFromModel(final Services services) {
+        getAbstractLocationSets().forEach(loc -> loc.checkAndRegister(services));
+        getProgramVariableDeclarations().forEach(pv -> pv.checkAndRegister(services));
+        getPredicateDeclarations().forEach(pred -> pred.checkAndRegister(services));
     }
 
 }
