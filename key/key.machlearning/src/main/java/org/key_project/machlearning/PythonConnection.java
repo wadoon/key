@@ -24,7 +24,7 @@ public class PythonConnection {
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
-    public void close() throws IOException {i
+    public void close() throws IOException {
         writer.close();
         socket.close();
     }
