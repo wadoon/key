@@ -225,12 +225,11 @@ lexer grammar KeYLexer;
         // Keywords used in program variable declarations
 	PROGRAMVARIABLES : '\\programVariables';
 
-        // Keywords for varcond and related stuff
+    // Keywords for varcond and related stuff
 	SAME_OBSERVER : '\\sameObserver';
     HAS_AE_PREDICATE : '\\hasAEPredicate' ;
     IS_LOCSET_FORMULA : '\\isLocsetFormula' ;
     INITIALIZE_PARAMETRIC_SKOLEM_UPDATE : '\\initializeParametricSkolemUpdate' ;
-    INITIALIZE_PARAMETRIC_SKOLEM_PATH_CONDITION : '\\initializeParametricSkolemPathCondition' ;
     PREFIX_CONTAINS_ELEMENT : '\\prefixContainsElement' ;
     INSTANTIATE_VARS_FRESH : '\\instantiateVarsFresh' ;
     NEW_PV : '\\newPV' ;
@@ -253,9 +252,11 @@ lexer grammar KeYLexer;
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
 	APPLY_ON_ABSTRACT_UPDATE : '\\applyOnAbstractUpdate' ;
 	ABSTRACT_UPDATE_TO_ELEMENTARY_UPDATES : '\\abstractUpdateToElementaryUpdates' ;
+	SIMPLIFY_ABSTRACT_UPDATE_IN_SELECT : '\\simplifyAbstractUpdateInSelect' ;
 	DROP_EFFECTLESS_ELEMENTARIES : '\\dropEffectlessElementaries';
 	DROP_EFFECTLESS_STORES : '\\dropEffectlessStores';
 	ABSTRACT_UPDATE : '\\abstractUpdate';
+	CONTAINS_ABSTRACT_UPDATE : '\\containsAbstractUpdate';
 	SIMPLIFY_IF_THEN_ELSE_UPDATE : '\\simplifyIfThenElseUpdate';
 	ENUM_CONST : '\\enumConstant';
         FREELABELIN : '\\freeLabelIn';

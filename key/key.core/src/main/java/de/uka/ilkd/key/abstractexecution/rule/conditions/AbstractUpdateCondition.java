@@ -44,7 +44,6 @@ public class AbstractUpdateCondition implements VariableCondition {
             MatchConditions matchCond, Goal goal, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
         final Term uInst = (Term) svInst.getInstantiation(u);
-//        if (negated ^ AbstractExecutionUtils.containsAbstractUpdate(uInst)) {
         if (negated ^ uInst.op() instanceof AbstractUpdate) {
             return matchCond;
         } else {

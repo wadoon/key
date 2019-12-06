@@ -3927,9 +3927,9 @@ varexp[TacletBuilder b]
     | varcond_getFreeInvariant[b]
     | varcond_getVariant[b]
     | varcond_initializeParametricSkolemUpdate[b]
-    | varcond_initializeParametricSkolemPathCondition[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_applyOnAbstractUpdate[b]
+    | varcond_simplifyAbstractUpdateInSelect[b]
     | varcond_abstractUpdateToElementaryUpdates[b]
     | varcond_instantiateVarsFresh[b]
     | varcond_newPV[b]
@@ -3963,6 +3963,7 @@ varexp[TacletBuilder b]
 	    | varcond_array[b, negated]
         | varcond_isDefined[b, negated]	
         | varcond_abstractUpdate[b, negated]
+        | varcond_containsAbstractUpdate[b, negated]
         | varcond_array_length[b, negated]	
         | varcond_enumtype[b, negated]
         | varcond_freeLabelIn[b,negated]         
@@ -4110,20 +4111,6 @@ varcond_initializeParametricSkolemUpdate[TacletBuilder b]
    }
 ;
 
-varcond_initializeParametricSkolemPathCondition[TacletBuilder b]
-:
-   INITIALIZE_PARAMETRIC_SKOLEM_PATH_CONDITION LPAREN
-     formulaSV=varId COMMA
-     abstrProgramSV=varId
-   RPAREN 
-   {
-      b.addVariableCondition(
-        new InitializeParametricSkolemPathCondition(
-          (SchemaVariable) formulaSV, 
-          (ProgramSV) abstrProgramSV));
-   }
-;
-
 varcond_storeResultVarIn[TacletBuilder b]
 :
    STORE_RESULT_VAR_IN LPAREN sv=varId RPAREN 
@@ -4191,6 +4178,17 @@ varcond_abstractUpdateToElementaryUpdates[TacletBuilder b]
    }
 ;
 
+varcond_simplifyAbstractUpdateInSelect[TacletBuilder b]
+:
+   SIMPLIFY_ABSTRACT_UPDATE_IN_SELECT LPAREN u=varId COMMA o=varId COMMA f=varId COMMA result=varId RPAREN 
+   {
+      b.addVariableCondition(new SimplifyAbstractUpdateInSelectCondition((UpdateSV)u,
+                                                                         (SchemaVariable)o,
+                                                                         (SchemaVariable)f,
+                                                                         (UpdateSV)result));
+   }
+;
+
 varcond_dropEffectlessElementaries[TacletBuilder b]
 :
    DROP_EFFECTLESS_ELEMENTARIES LPAREN u=varId COMMA x=varId COMMA result=varId RPAREN 
@@ -4206,6 +4204,14 @@ varcond_abstractUpdate[TacletBuilder b, boolean negated]
    ABSTRACT_UPDATE LPAREN u=varId RPAREN 
    {
       b.addVariableCondition(new AbstractUpdateCondition((UpdateSV)u, negated));
+   }
+;
+
+varcond_containsAbstractUpdate[TacletBuilder b, boolean negated]
+:
+   CONTAINS_ABSTRACT_UPDATE LPAREN u=varId RPAREN 
+   {
+      b.addVariableCondition(new ContainsAbstractUpdateCondition((UpdateSV)u, negated));
    }
 ;
 

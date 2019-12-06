@@ -21,7 +21,7 @@
 { ; }
 
 /*@ loop_invariant decrExpr(\value(frameP)) &gt;= 0 &amp;&amp; inv(\value(frameP));
-  @ assignable frameP, footprintE;
+  @ assignable frameP, footprintE, frameQ;
   @ decreases decrExpr(\value(frameP));
   @*/
 while (
@@ -113,7 +113,7 @@ if (
 { ; }
 
 /*@ loop_invariant decrExpr(\value(frameP)) &gt;= 0 &amp;&amp; inv(\value(frameP));
-  @ assignable frameP, footprintE;
+  @ assignable frameP, footprintE, frameQ;
   @ decreases decrExpr(\value(frameP));
   @*/
 while (
