@@ -45,7 +45,7 @@ public class AITacticMacro extends AbstractProofMacro {
             return new ProofMacroFinishedInfo(this, proof, true);
         }
 
-        String tacticName = tactics[0];
+        String tacticName = tactics[no];
         Tactic tactic = KeYConnection.TACTICS.get(tacticName);
 
         Goal goal = goals.head();

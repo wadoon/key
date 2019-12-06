@@ -52,4 +52,12 @@ public class AutoTactic implements Tactic {
         // resetting settings
         proof.setActiveStrategy(oldStrategy);
     }
+
+    @Override
+    public String toString() {
+        return "AutoTactic{" +
+                "additionalSettings='" + additionalSettings + '\'' +
+                '}';
+    }
 }
+

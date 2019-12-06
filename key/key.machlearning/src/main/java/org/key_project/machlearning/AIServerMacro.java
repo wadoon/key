@@ -48,19 +48,26 @@ public class AIServerMacro extends AbstractProofMacro {
         try {
             if (pythonConnection == null) {
                 pythonConnection = new PythonConnection();
-                try {
-                    pythonConnection.connect();
-                } catch(IOException ex) {
-                    pythonConnection = null;
-                    throw ex;
-                }
+                pythonConnection.connect();
             }
 
             ImmutableList<Goal> goals = proof.openGoals();
             while (!goals.isEmpty()) {
-                Goal goal = goals.head();
-                Tactic tactic = pythonConnection.queryTactic(goal);
-                tactic.apply(null, proof, goal, null);
+                boolean hit = false;
+                while (!goals.isEmpty()) {
+                    Goal goal = goals.head();
+                    goals = goals.tail();
+                    Tactic tactic = pythonConnection.queryTactic(goal);
+                    System.out.println("Goal " + goal.node().serialNr() + ": " + tactic);
+                    if(tactic != null) {
+                        hit = true;
+                        tactic.apply(null, proof, goal, null);
+                    }
+                }
+                if (!hit) {
+                    break;
+                }
+                goals = proof.openGoals();
             }
 
             return new ProofMacroFinishedInfo(this, proof);
@@ -69,10 +76,26 @@ public class AIServerMacro extends AbstractProofMacro {
             return new ProofMacroFinishedInfo(this, proof, true);
 
         } catch(Exception ex) {
+            if(pythonConnection != null) {
+                try {
+                    pythonConnection.close();
+                    pythonConnection = null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             ex.printStackTrace();
             return new ProofMacroFinishedInfo(this, proof, true);
 
         } finally {
+            if(pythonConnection != null) {
+                try {
+                    pythonConnection.close();
+                    pythonConnection = null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             time = System.currentTimeMillis()-time;
             System.out.println("Strategy stopped.");
             System.out.println("Time elapsed: " + time);

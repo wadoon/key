@@ -24,6 +24,11 @@ public class PythonConnection {
         reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
+    public void close() throws IOException {i
+        writer.close();
+        socket.close();
+    }
+
     public Tactic queryTactic(Goal goal) throws IOException, InterruptedException {
 
         if(Thread.interrupted())
@@ -32,6 +37,7 @@ public class PythonConnection {
         Sequent sequent = goal.sequent();
 
         JSONObject result = new JSONObject();
+        result.put("id", goal.node().serialNr());
         result.put("antecedent", KeYConnection.semiSequentToJSON(sequent.antecedent()));
         result.put("succedent", KeYConnection.semiSequentToJSON(sequent.succedent()));
         String query = result.toJSONString();
@@ -40,6 +46,10 @@ public class PythonConnection {
         writer.flush();
 
         String tacticString = reader.readLine();
+        if (tacticString.equals("-NONE-")) {
+            return null;
+        }
+
         Tactic tactic = KeYConnection.TACTICS.get(tacticString);
 
         if (tactic == null) {

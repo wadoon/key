@@ -112,13 +112,18 @@ public class FilterTactic implements Tactic {
                 Taclet taclet = (Taclet) rule;
                 for (RuleSet ruleSet : taclet.getRuleSets()) {
                     if (rulesets.contains(ruleSet.name().toString())) {
-                        return delegate.computeCost(app, pio, goal);
+                        RuleAppCost cost = delegate.computeCost(app, pio, goal);
+                        // System.out.println("Hit(" + cost + "): " + app.toString());
+                        return cost;
                     }
                 }
                 // System.err.println(taclet.getRuleSets() + " not in " + rulesets);
             }
 
-            return TopRuleAppCost.INSTANCE;
+//            RuleAppCost deleg = delegate.computeCost(app, pio, goal);
+//            System.out.println("Delegate (" + deleg + "): " + app);
+//            return deleg;
+             return TopRuleAppCost.INSTANCE;
         }
 
         @Override
@@ -134,6 +139,10 @@ public class FilterTactic implements Tactic {
 
     }
 
-
-
+    @Override
+    public String toString() {
+        return "FilterTactic{" +
+                "rulesets=" + rulesets +
+                '}';
+    }
 }

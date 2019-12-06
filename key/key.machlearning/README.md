@@ -157,7 +157,7 @@ installed that makes calls to a socket to know the tactic to apply.
 The server must be listening to port `6767` and react to JSON requests
 of the form
 
-    ["antecedent": term[], "succedent": term[] ]\n
+    [ "id": 1234, "antecedent": term[], "succedent": term[] ]\n
     
 with term the AST structure described above.
 
