@@ -4180,11 +4180,12 @@ varcond_abstractUpdateToElementaryUpdates[TacletBuilder b]
 
 varcond_simplifyAbstractUpdateInSelect[TacletBuilder b]
 :
-   SIMPLIFY_ABSTRACT_UPDATE_IN_SELECT LPAREN u=varId COMMA o=varId COMMA f=varId COMMA result=varId RPAREN 
+   SIMPLIFY_ABSTRACT_UPDATE_IN_SELECT LPAREN u=varId COMMA o=varId COMMA f=varId COMMA frame=varId COMMA result=varId RPAREN 
    {
       b.addVariableCondition(new SimplifyAbstractUpdateInSelectCondition((UpdateSV)u,
                                                                          (SchemaVariable)o,
                                                                          (SchemaVariable)f,
+                                                                         (SchemaVariable)frame,
                                                                          (UpdateSV)result));
    }
 ;
