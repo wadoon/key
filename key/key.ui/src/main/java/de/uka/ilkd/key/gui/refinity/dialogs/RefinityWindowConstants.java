@@ -62,7 +62,8 @@ public interface RefinityWindowConstants extends RefinityWindowCodeTemplates {
 
     static final String CLOSE_BUTTON_TOOLTIP = htmlTooltip(
             "Closes the REFINITY and KeY windows and terminates the application.", 100);
-    static final String STD_POSTCONDREL_TOOLTIP = "Relation between values of the relevant locations after execution.<br/>"
+    static final String STD_PRECONDREL_TOOLTIP = "Relational precondition (JML formula).";
+    static final String STD_POSTCONDREL_TOOLTIP = "Relation between values of the relevant locations after execution (JML formula).<br/>"
             + "You may use the keywords \"\\result_1\" and \"\\result_2\" to access<br/>"
             + "the respective result arrays.<br/>"
             + "Access individual values with \"\\result_1[2]\" etc. Use type casts<br/>"

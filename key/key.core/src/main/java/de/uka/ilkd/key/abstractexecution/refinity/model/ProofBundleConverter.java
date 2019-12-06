@@ -33,6 +33,7 @@ import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.abstractexecution.refinity.util.DummyKeYEnvironmentCreator;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
@@ -40,8 +41,10 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.JMLTranslator;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 /**
  * Converts an AE Relational Model to a KeY proof bundle.
@@ -53,6 +56,7 @@ public class ProofBundleConverter {
     private static final String KEY_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/problem.key";
 
     private static final String RELATION = "<RELATION>";
+    private static final String PRECONDITION = "<PRECONDITION>";
     private static final String INIT_VARS = "<INIT_VARS>";
     private static final String PROGRAMVARIABLES = "<PROGRAMVARIABLES>";
     private static final String PREDICATES = "<PREDICATES>";
@@ -228,7 +232,20 @@ public class ProofBundleConverter {
         final String params = model.getProgramVariableDeclarations().stream()
                 .map(ProgramVariableDeclaration::getVarName).collect(Collectors.joining(","));
 
-        String javaDLPostCondRelation = createJavaDLPostCondition();
+        final DummyKeYEnvironmentCreator envCreator = new DummyKeYEnvironmentCreator();
+        try {
+            envCreator.initialize();
+        } catch (ProblemLoaderException | IOException e) {
+            throw new RuntimeException(
+                    "Could not initialize dummy services, message: " + e.getMessage());
+        }
+        final Services services = envCreator.getDummyServices().get();
+        populateNamespaces(model, services);
+
+        final String javaDLPostCondRelation = createJavaDLPostCondition(
+                envCreator.getDummyKjt().get(), services);
+        final String javaDLPreCondRelation = createJavaDLPreCondition(
+                envCreator.getDummyKjt().get(), services);
 
         return keyScaffold.replaceAll(FUNCTIONS, Matcher.quoteReplacement(functionsDecl))
                 .replaceAll(PREDICATES, Matcher.quoteReplacement(predicatesDecl))
@@ -236,35 +253,47 @@ public class ProofBundleConverter {
                 .replaceAll(INIT_VARS,
                         initVars.isEmpty() ? "" : (Matcher.quoteReplacement("||" + initVars)))
                 .replaceAll(PARAMS, Matcher.quoteReplacement(params))
-                .replaceAll(RELATION, javaDLPostCondRelation)
+                .replaceAll(Pattern.quote(RELATION), Matcher.quoteReplacement(javaDLPostCondRelation))
+                .replaceAll(Pattern.quote(PRECONDITION), Matcher.quoteReplacement(javaDLPreCondRelation))
                 .replaceAll(RESULT_SEQ_1, extractResultSeq(model.getRelevantVarsOne()))
                 .replaceAll(RESULT_SEQ_2, extractResultSeq(model.getRelevantVarsTwo())) //
                 .replaceAll(ADDITIONAL_PREMISES,
                         Matcher.quoteReplacement(createAdditionalPremises()));
     }
 
-    private String createJavaDLPostCondition() {
-        String jmlPostCondRelation = preparedJMLPostCondition(model.getPostCondition(), model);
+    private String createJavaDLPostCondition(final KeYJavaType dummyKJT, final Services services) {
+        final String jmlPostCondRelation = preparedJMLPostCondition(model.getPostCondition(),
+                model);
+        return jmlStringToJavaDL(jmlPostCondRelation, dummyKJT, services);
+    }
 
-        final DummyKeYEnvironmentCreator envCreator = new DummyKeYEnvironmentCreator();
-        String javaDLPostCondRelation = "false";
-        try {
-            envCreator.initialize();
-
-            final Services services = envCreator.getDummyServices().get();
-            populateNamespaces(model, services);
-
-            Term parsed = JMLTranslator.translate(new PositionedString(jmlPostCondRelation),
-                    envCreator.getDummyKjt().get(), null, null, null, null, null, null, Term.class,
-                    services);
-            parsed = removeLabels(parsed, services);
-            javaDLPostCondRelation = LogicPrinter.quickPrintTerm(parsed, services);
-        } catch (Exception e) {
-            throw new RuntimeException(
-                    "Could not parse JML postcondition relation, message: " + e.getMessage(), e);
+    private String createJavaDLPreCondition(final KeYJavaType dummyKJT, final Services services) {
+        final String preCondition = model.getPreCondition();
+        if (preCondition.trim().isEmpty()) {
+            // Precondition is optional
+            return "true";
         }
 
-        return javaDLPostCondRelation;
+        final String jmlPreCondRelation = preparedJMLPreCondition(preCondition, model);
+        return jmlStringToJavaDL(jmlPreCondRelation, dummyKJT, services);
+    }
+
+    private static String jmlStringToJavaDL(String jmlString, final KeYJavaType dummyKJT,
+            final Services services) {
+        try {
+            Term parsed = translateJML(jmlString, dummyKJT, services);
+            parsed = removeLabels(parsed, services);
+            return LogicPrinter.quickPrintTerm(parsed, services);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not parse JML formula, message: " + e.getMessage(),
+                    e);
+        }
+    }
+
+    private static Term translateJML(String jmlPostCondRelation, final KeYJavaType dummyKJT,
+            final Services services) throws SLTranslationException {
+        return JMLTranslator.translate(new PositionedString(jmlPostCondRelation), dummyKJT, null,
+                null, null, null, null, null, Term.class, services);
     }
 
     private static Term removeLabels(final Term term, final Services services) {
@@ -281,6 +310,12 @@ public class ProofBundleConverter {
                 .replaceAll(Pattern.quote(RESULT_1), prefixDLforRE(RES1))
                 .replaceAll(Pattern.quote(RESULT_2), prefixDLforRE(RES2));
 
+        return preparedJMLPreCondition(result, model);
+    }
+
+    public static String preparedJMLPreCondition(final String unpreparedJmlPreCondition,
+            final AERelationalModel model) {
+        String result = unpreparedJmlPreCondition;
         for (final FunctionDeclaration decl : model.getFunctionDeclarations()) {
             result = prefixOccurrencesWithDL(result, decl.getFuncName());
         }

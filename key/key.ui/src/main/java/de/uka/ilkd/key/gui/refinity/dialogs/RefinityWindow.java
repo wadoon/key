@@ -141,8 +141,12 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
     private final RSyntaxTextArea codeRight = new RSyntaxTextArea(15, 60);
     private final RSyntaxTextArea codeContext = new RSyntaxTextArea(15, 120);
 
-    private final FormulaInputTextArea resultRelationText = new FormulaInputTextArea(
+    private final FormulaInputTextArea relationalPostconditionText = new FormulaInputTextArea(
             STD_POSTCONDREL_TOOLTIP,
+            formula -> ProofBundleConverter.preparedJMLPostCondition(formula, model));
+
+    private final FormulaInputTextArea relationalPreconditionText = new FormulaInputTextArea(
+            STD_PRECONDREL_TOOLTIP,
             formula -> ProofBundleConverter.preparedJMLPostCondition(formula, model));
 
     private AutoResetStatusPanel statusPanel;
@@ -250,7 +254,8 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
 
         final JPanel relLocsLeft = createRelevantLocationsOneContainer();
         final JPanel relLocsRight = createRelevantLocationsTwoContainer();
-        final JComponent postRelation = createResultRelationView();
+        final JComponent preRelation = createRelationalPreconditionView();
+        final JComponent postRelation = createRelationalPostconditionView();
 
         final DefaultSingleCDockable pvDockable = new DefaultSingleCDockable(
                 "Free Program Variables", htmlBold("Free Program Variables"),
@@ -269,8 +274,10 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                 "Relevant Locations (Left)", htmlBold("Relevant Locations (Left)"), relLocsLeft);
         final DefaultSingleCDockable relLocsRightDockable = new DefaultSingleCDockable(
                 "Relevant Locations (Right)", htmlBold("Relevant Locations (Right)"), relLocsRight);
-        final DefaultSingleCDockable relationDockable = new DefaultSingleCDockable(
-                "Relation to Verify", htmlBold("Relation to Verify"), postRelation);
+        final DefaultSingleCDockable postRelationDockable = new DefaultSingleCDockable(
+                "Relational Postcondition", htmlBold("Relational Postcondition"), postRelation);
+        final DefaultSingleCDockable preRelationDockable = new DefaultSingleCDockable(
+                "Relational Precondition", htmlBold("Relational Precondition"), preRelation);
 
         final CGrid grid = new CGrid(control);
 
@@ -280,7 +287,8 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
 
         grid.add(1, 7, 1, 2, relLocsLeftDockable);
         grid.add(2, 7, 1, 2, relLocsRightDockable);
-        grid.add(3, 7, 2, 2, relationDockable);
+        grid.add(3, 7, 2, 2, preRelationDockable);
+        grid.add(3, 7, 2, 2, postRelationDockable);
 
         grid.add(1, 0, 4, 7, methodContextDockable);
         grid.add(1, 0, 4, 7, progFragmDockable);
@@ -446,7 +454,8 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         codeLeft.setText(model.getProgramOne());
         codeRight.setText(model.getProgramTwo());
         codeContext.setText(model.getMethodLevelContext());
-        resultRelationText.setText(model.getPostCondition());
+        relationalPostconditionText.setText(model.getPostCondition());
+        relationalPreconditionText.setText(model.getPreCondition());
 
         locsetDeclsListModel.clear();
         model.getAbstractLocationSets().forEach(locsetDeclsListModel::addElement);
@@ -468,7 +477,8 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         model.setProgramOne(codeLeft.getText());
         model.setProgramTwo(codeRight.getText());
         model.setMethodLevelContext(codeContext.getText());
-        model.setPostCondition(resultRelationText.getText());
+        model.setPostCondition(relationalPostconditionText.getText());
+        model.setPreCondition(relationalPreconditionText.getText());
         model.setAbstractLocationSets(Collections.list(locsetDeclsListModel.elements()));
         model.setFunctionDeclarations(Collections.list(funcOrPredDeclsListModel.elements()).stream()
                 .filter(FunctionDeclaration.class::isInstance).map(FunctionDeclaration.class::cast)
@@ -855,40 +865,42 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         return result;
     }
 
-    private JComponent createResultRelationView() {
-        resultRelationText.setEnabled(false);
-        /*
-         * NOTE (DS, 2019-11-28): A bug in the docking system prevents decreasing the
-         * size of the text field if we activate line wrap. No idea, why.
-         */
-//      resultRelationText.setLineWrap(true);
+    private JComponent createRelationalPostconditionView() {
+        return createPreOrPostconditionView(relationalPostconditionText);
+    }
 
-        resultRelationText.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        resultRelationText.setFont(
-                new Font("Monospaced", Font.PLAIN, resultRelationText.getFont().getSize()));
+    private JComponent createRelationalPreconditionView() {
+        return createPreOrPostconditionView(relationalPreconditionText);
+    }
 
-        resultRelationText.getDocument().addDocumentListener(udl(e -> setDirty(true)));
+    private JComponent createPreOrPostconditionView(final FormulaInputTextArea area) {
+        area.setEnabled(false);
+        area.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        area.setFont(new Font("Monospaced", Font.PLAIN, area.getFont().getSize()));
+
+        area.getDocument().addDocumentListener(udl(e -> setDirty(true)));
 
         servicesLoadedListeners.add(() -> {
-            resultRelationText.setServices(services);
-            resultRelationText.setKeYJavaTypeForJMLParsing(dummyClass);
+            area.setServices(services);
+            area.setKeYJavaTypeForJMLParsing(dummyClass);
             if (!isReadonly()) {
-                resultRelationText.setEnabled(true);
+                area.setEnabled(true);
             }
         });
         readOnlyListeners.add(ro -> {
             if (ro) {
-                resultRelationText.setEnabled(false);
+                area.setEnabled(false);
             } else if (services != null) {
-                resultRelationText.setEnabled(true);
+                area.setEnabled(true);
             }
         });
 
-        final JScrollPane scrollPane = new JScrollPane(resultRelationText);
+        final JScrollPane scrollPane = new JScrollPane(area);
         scrollPane.setAutoscrolls(true);
-        resultRelationText.setLineWrap(true);
-        resultRelationText.setWrapStyleWord(true);
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+
         return scrollPane;
     }
 

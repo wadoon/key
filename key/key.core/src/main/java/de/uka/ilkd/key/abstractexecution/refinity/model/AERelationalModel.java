@@ -64,6 +64,9 @@ public class AERelationalModel {
     @XmlElement(name = "methodLevelContext")
     private String methodLevelContext = "";
 
+    @XmlAttribute(name = "preCondition")
+    private String preCondition = "";
+
     @XmlAttribute(name = "postCondition")
     private String postCondition = "";
 
@@ -138,6 +141,14 @@ public class AERelationalModel {
 
     public void setPostCondition(String postCondition) {
         this.postCondition = postCondition;
+    }
+
+    public String getPreCondition() {
+        return preCondition;
+    }
+
+    public void setPreCondition(String preCondition) {
+        this.preCondition = preCondition;
     }
 
     public List<ProgramVariableDeclaration> getProgramVariableDeclarations() {
