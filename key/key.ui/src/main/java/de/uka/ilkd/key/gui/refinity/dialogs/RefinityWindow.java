@@ -559,6 +559,13 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                 model.setFile(file);
                 updateTitle();
                 loadFromModel();
+
+                if (services != null) {
+                    model.tryFillNamespacesFromModel(services);
+                } else {
+                    servicesLoadedListeners.add(() -> model.tryFillNamespacesFromModel(services));
+                }
+
                 setDirty(false);
                 resetUndosListeners.forEach(ResetUndosListener::resetUndos);
             }

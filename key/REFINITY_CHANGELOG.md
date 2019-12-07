@@ -5,6 +5,7 @@ REFINITY CHANGES
 
   * Bug fixes in conversion to KeY file
   * Different behavior when pressing Ctrl+S for yet unsaved model: Show dialog instead of status message
+  * Fixed bug in pre- postcondition relation fields about unrecognized symbols which actually have been added
 
 ## 2019-12-06 (v0.9.1) Dominic Steinhoefel <steinhoefel@cs.tu-darmstadt.de>
 

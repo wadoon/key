@@ -43,7 +43,6 @@ import javax.xml.validation.SchemaFactory;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 
 /**
  * @author Dominic Steinhoefel
@@ -325,4 +324,20 @@ public class AERelationalModel {
         getFunctionDeclarations().forEach(pred -> pred.checkAndRegister(services));
     }
 
+    /**
+     * Populates the given {@link Services} object with function and program
+     * variable symbols corresponding to the definitions in this model. Returns
+     * false if an error occurred, true otherwise.
+     * 
+     * @param services The {@link Services} object to populate.
+     * @return false if an error occurred, true otherwise.
+     */
+    public boolean tryFillNamespacesFromModel(final Services services) {
+        try {
+            fillNamespacesFromModel(services);
+            return true;
+        } catch (RuntimeException exc) {
+            return false;
+        }
+    }
 }

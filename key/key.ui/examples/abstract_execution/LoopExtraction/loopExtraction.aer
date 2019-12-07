@@ -42,8 +42,8 @@ while (
     { ; }
 
     // Hacky ghost setter
-    /*@ assignable \nothing;
-      @ accessible \nothing;
+    /*@ assignable \hasTo(oldVariantLeft);
+      @ accessible frameP;
       @ normal_behavior ensures oldVariantLeft == decrExpr(\value(frameP));
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
@@ -127,8 +127,8 @@ while (
     { ; }
 
     // Hacky ghost setter
-    /*@ assignable \nothing;
-      @ accessible \nothing;
+    /*@ assignable \hasTo(oldVariantRight);
+      @ accessible frameP;
       @ normal_behavior ensures oldVariantRight == decrExpr(\value(frameP));
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
