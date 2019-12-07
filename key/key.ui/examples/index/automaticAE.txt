@@ -145,7 +145,7 @@ group abstract_updates {
   provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest15.key
 }
 
-group aepaper_provable {
+group abstract_execution_provable {
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfix/consolidateDuplicateConditionalFragments.aer
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrect/consolidateDuplicateConditionalFragments.aer
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchCorrect/consolidateDuplicateConditionalFragments.aer
@@ -158,9 +158,11 @@ group aepaper_provable {
    provable ./abstract_execution/ExtractMethod/CorrectExceptionAllowed/extractMethodRefactoring.aer
    
    provable ./abstract_execution/DecomposeConditional/Correct/decomposeConditional.aer
+   
+   provable ./abstract_execution/LoopExtraction/Correct/loopExtraction.aer
 }
 
-group aepaper_notprovable {
+group abstract_execution_notprovable {
    notprovable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixIncorrect/consolidateDuplicateConditionalFragments.aer
    
    notprovable ./abstract_execution/ReplaceExceptionWithTest/IncorrectMissingRollback/replaceExceptionWithTest.aer
