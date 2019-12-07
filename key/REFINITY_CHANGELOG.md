@@ -1,6 +1,11 @@
 REFINITY CHANGES
 ================
 
+## 2019-12-06 (v0.9.2) Dominic Steinhoefel <steinhoefel@cs.tu-darmstadt.de>
+
+  * Bug fixes in conversion to KeY file
+  * Different behavior when pressing Ctrl+S for yet unsaved model: Show dialog instead of status message
+
 ## 2019-12-06 (v0.9.1) Dominic Steinhoefel <steinhoefel@cs.tu-darmstadt.de>
 
   * Supporting relational preconditions

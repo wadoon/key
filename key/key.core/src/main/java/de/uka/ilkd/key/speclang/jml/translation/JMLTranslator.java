@@ -2480,9 +2480,10 @@ public final class JMLTranslator {
                         "Illegal Arguments in equality expression.");
                 //"near " + LT(0));
             } catch (TermCreationException e) {
-                throw excManager1.createException("Error in equality-expression\n"
+                throw excManager1.createException("Error in equality-expression\n  "
                                            + a.toString() + " == "
-                                           + b.toString() + ".");
+                                           + b.toString() + ".\n"
+                                                   + "(" + e.getMessage() + ")");
             }
         }
     }

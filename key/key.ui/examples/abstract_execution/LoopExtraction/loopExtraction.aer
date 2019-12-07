@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\forall any val1;&#10;  (\forall any val2; (&#10;    inv(val1) &amp;&amp; inv(val2) ==&gt;&#10;      Post(val1, val2))))" postCondition="\result_1[0]==\result_2[0] &amp;&amp;&#10;\result_1[1]==\result_2[1] &amp;&amp;&#10;Post(\result_1[2],\result_2[2]) &amp;&amp;&#10;\result_1[3] == \result_2[3]">
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\forall any val1;&#10;  (\forall any val2; (&#10;    inv(val1) &amp;&amp; inv(val2) ==&gt;&#10;      Post(val1, val2)))) &amp;&amp;&#10;oldFootprintQ == \value(footprintQ)" postCondition="\result_1[0]==\result_2[0] &amp;&amp;&#10;\result_1[1]==\result_2[1] &amp;&amp;&#10;Post(\result_1[2],\result_2[2]) &amp;&amp;&#10;\result_1[3] == \result_2[3]">
     <programOne>/*@ ae_constraint
   @   \disjoint(frameQ, footprintE) &amp;&amp;
-  @   \disjoint(frameQ, frameP);
+  @   \disjoint(frameQ, frameP) &amp;&amp;
+  @   \disjoint(frameP, footprintQ) &amp;&amp;
+  @   \disjoint(footprintE, footprintQ);
   @*/
+{ ; }
+
+/*@ ae_constraint guardIsTrue(\value(footprintE)); */
 { ; }
 
 /*@ ae_constraint
@@ -11,13 +16,18 @@
   @*/
 { ; }
 
-/*@ loop_invariant decrExpr(\value(frameP)) &gt;= 0 &amp;&amp; inv(\value(frameP));
+/*@ loop_invariant
+  @   decrExpr(\value(frameP)) &gt;= 0 &amp;&amp; 
+  @   inv(\value(frameP)) &amp;&amp;
+  @   (!guardIsTrue(\value(footprintE)) ==&gt; 
+  @     \value(frameQ) == resultQ(oldFootprintQ));
   @ assignable frameP, footprintE, frameQ;
   @ decreases decrExpr(\value(frameP));
   @*/
 while (
    /*@ assignable \nothing;
      @ accessible footprintE;
+     @ normal_behavior ensures (boolean) \result &lt;==&gt; guardIsTrue(\value(footprintE));
      @ exceptional_behavior requires false;
      @*/
    \abstract_expression boolean e 
@@ -34,9 +44,7 @@ while (
     // Hacky ghost setter
     /*@ assignable \nothing;
       @ accessible \nothing;
-      @
       @ normal_behavior ensures oldVariantLeft == decrExpr(\value(frameP));
-      @
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior requires false;
@@ -46,6 +54,7 @@ while (
 
     /*@ assignable frameQ;
       @ accessible footprintQ;
+      @ normal_behavior ensures \value(frameQ) == resultQ(oldFootprintQ);
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior requires false;
@@ -68,39 +77,42 @@ while (
 }</programOne>
     <programTwo>/*@ ae_constraint
   @   \disjoint(frameQ, footprintE) &amp;&amp;
-  @   \disjoint(frameQ, frameP);
+  @   \disjoint(frameQ, frameP) &amp;&amp;
+  @   \disjoint(frameP, footprintQ) &amp;&amp;
+  @   \disjoint(footprintE, footprintQ);
   @*/
 { ; }
 
-if (
-   /*@ assignable \nothing;
-     @ accessible footprintE;
-     @ exceptional_behavior requires false;
-     @*/
-   \abstract_expression boolean e 
-) {
-    /*@ assignable frameQ;
-      @ accessible footprintQ;
-      @ exceptional_behavior requires false;
-      @ return_behavior requires false;
-      @ break_behavior requires false;
-      @ continue_behavior requires false;
-      @*/
-    \abstract_statement Q;
-}
+/*@ ae_constraint guardIsTrue(\value(footprintE)); */
+{ ; }
+
+
+/*@ assignable frameQ;
+  @ accessible footprintQ;
+  @ normal_behavior ensures \value(frameQ) == resultQ(oldFootprintQ);
+  @ exceptional_behavior requires false;
+  @ return_behavior requires false;
+  @ break_behavior requires false;
+  @ continue_behavior requires false;
+  @*/
+\abstract_statement Q;
 
 /*@ ae_constraint
   @   inv(\value(frameP)) &amp;&amp; decrExpr(\value(frameP)) &gt;= 0;
   @*/
 { ; }
 
-/*@ loop_invariant decrExpr(\value(frameP)) &gt;= 0 &amp;&amp; inv(\value(frameP));
+/*@ loop_invariant 
+  @   decrExpr(\value(frameP)) &gt;= 0 &amp;&amp;
+  @   inv(\value(frameP)) &amp;&amp;
+  @   \value(frameQ) == resultQ(oldFootprintQ);
   @ assignable frameP, footprintE;
   @ decreases decrExpr(\value(frameP));
   @*/
 while (
    /*@ assignable \nothing;
      @ accessible footprintE;
+     @ normal_behavior ensures (boolean) \result &lt;==&gt; guardIsTrue(\value(footprintE));
      @ exceptional_behavior requires false;
      @*/
    \abstract_expression boolean e 
@@ -117,9 +129,7 @@ while (
     // Hacky ghost setter
     /*@ assignable \nothing;
       @ accessible \nothing;
-      @
       @ normal_behavior ensures oldVariantRight == decrExpr(\value(frameP));
-      @
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior requires false;
@@ -171,6 +181,10 @@ while (
         <function funcName="decrExpr" resultSortName="int">
             <argSort>any</argSort>
         </function>
+        <function funcName="resultQ" resultSortName="any">
+            <argSort>any</argSort>
+        </function>
+        <function funcName="oldFootprintQ" resultSortName="any"/>
     </functions>
     <predicates>
         <predicate predName="inv">
@@ -178,6 +192,9 @@ while (
         </predicate>
         <predicate predName="Post">
             <argSort>any</argSort>
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="guardIsTrue">
             <argSort>any</argSort>
         </predicate>
     </predicates>

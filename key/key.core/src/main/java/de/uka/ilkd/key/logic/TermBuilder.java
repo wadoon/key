@@ -1686,8 +1686,15 @@ public class TermBuilder {
         if (s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
             return tt();
         } else {
-            return func(ldt.getDisjoint(), s1, s2);
+            return func(ldt.getDisjoint(), wrapInSingletonPV(s1), wrapInSingletonPV(s2));
         }
+    }
+    
+    private Term wrapInSingletonPV(Term s) {
+        if (s.op() instanceof LocationVariable) {
+            s = singletonPV(s);
+        }
+        return s;
     }
 
     public Term createdInHeap(Term s, Term h) {

@@ -316,6 +316,10 @@ public class ProofBundleConverter {
     public static String preparedJMLPreCondition(final String unpreparedJmlPreCondition,
             final AERelationalModel model) {
         String result = unpreparedJmlPreCondition;
+        for (final AbstractLocsetDeclaration decl : model.getAbstractLocationSets()) {
+            result = prefixOccurrencesWithDL(result, decl.getLocsetName());
+        }
+        
         for (final FunctionDeclaration decl : model.getFunctionDeclarations()) {
             result = prefixOccurrencesWithDL(result, decl.getFuncName());
         }

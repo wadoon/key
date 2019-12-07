@@ -43,6 +43,7 @@ import javax.xml.validation.SchemaFactory;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 
 /**
  * @author Dominic Steinhoefel
@@ -321,6 +322,7 @@ public class AERelationalModel {
         getAbstractLocationSets().forEach(loc -> loc.checkAndRegister(services));
         getProgramVariableDeclarations().forEach(pv -> pv.checkAndRegister(services));
         getPredicateDeclarations().forEach(pred -> pred.checkAndRegister(services));
+        getFunctionDeclarations().forEach(pred -> pred.checkAndRegister(services));
     }
 
 }
