@@ -373,25 +373,25 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (model.isSaved()) {
-                    try {
+                try {
+                    if (model.isSaved()) {
                         if (!saveModelToFile(model.getFile().get())) {
                             statusPanel.setMessage(
                                     "ERROR: Problems saving model. Please save using the Save Model button.");
                         }
-                    } catch (IOException exc) {
-                        JOptionPane.showMessageDialog(RefinityWindow.this,
-                                "<html>Could not save model to file.<br><br/>Message:<br/>"
-                                        + exc.getMessage() + "</html>",
-                                "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
-                    } catch (JAXBException exc) {
-                        JOptionPane.showMessageDialog(RefinityWindow.this,
-                                "<html>Could not save model ftorom file.<br><br/>Message:<br/>"
-                                        + getMessageFromJAXBExc(exc) + "</html>",
-                                "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        saveModelToFile();
                     }
-                } else {
-                    statusPanel.setMessage("Please save model first using the Save Model button.");
+                } catch (IOException exc) {
+                    JOptionPane.showMessageDialog(RefinityWindow.this,
+                            "<html>Could not save model to file.<br><br/>Message:<br/>"
+                                    + exc.getMessage() + "</html>",
+                            "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
+                } catch (JAXBException exc) {
+                    JOptionPane.showMessageDialog(RefinityWindow.this,
+                            "<html>Could not save model ftorom file.<br><br/>Message:<br/>"
+                                    + getMessageFromJAXBExc(exc) + "</html>",
+                            "Problem Saving Model", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
