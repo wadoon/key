@@ -1,4 +1,4 @@
-example.name = Remove Control Flag
+example.name = Manually Unrolled Original Program
 example.path = Abstract Execution/Remove Control Flag/
 example.file = removeControlFlag.key
 example.additionalFile.1 = RemoveControlFlag.java
