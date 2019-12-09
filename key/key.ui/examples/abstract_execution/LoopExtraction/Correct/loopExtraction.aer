@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\forall any val1;&#10;  (\forall any val2; (&#10;    inv(val1) &amp;&amp; inv(val2) ==&gt;&#10;      Post(val1, val2)))) &amp;&amp;&#10;oldFootprintQ == \value(footprintQ)" postCondition="\result_1[0]==\result_2[0] &amp;&amp;&#10;\result_1[1]==\result_2[1] &amp;&amp;&#10;Post(\result_1[2],\result_2[2]) &amp;&amp;&#10;\result_1[3] == \result_2[3]">
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\forall any valLeft;&#10;  (\forall any valRight; (&#10;    (loopExitedLeft  &amp;&amp; inv(valLeft) &amp;&amp;&#10;     loopExitedRight &amp;&amp; inv(valRight)) ==&gt;&#10;      Post(valLeft, valRight)))) &amp;&amp;&#10;oldFootprintQ == \value(footprintQ)" postCondition="\result_1[0]==\result_2[0] &amp;&amp;&#10;\result_1[1]==\result_2[1] &amp;&amp;&#10;Post(\result_1[2],\result_2[2]) &amp;&amp;&#10;\result_1[3] == \result_2[3]">
     <programOne>/*@ ae_constraint
   @   \disjoint(frameQ, footprintE) &amp;&amp;
   @   \disjoint(frameQ, frameP) &amp;&amp;
@@ -74,7 +74,10 @@ while (
       @ continue_behavior requires false;
       @*/
     \abstract_statement P;
-}</programOne>
+}
+
+/*@ assume loopExitedLeft == true; */
+{ ; }</programOne>
     <programTwo>/*@ ae_constraint
   @   \disjoint(frameQ, footprintE) &amp;&amp;
   @   \disjoint(frameQ, frameP) &amp;&amp;
@@ -102,7 +105,7 @@ while (
   @*/
 { ; }
 
-/*@ loop_invariant 
+/*@ loop_invariant
   @   decrExpr(\value(frameP)) &gt;= 0 &amp;&amp;
   @   inv(\value(frameP)) &amp;&amp;
   @   \value(frameQ) == resultQ(oldFootprintQ);
@@ -149,13 +152,12 @@ while (
       @ continue_behavior requires false;
       @*/
     \abstract_statement P;
-}</programTwo>
+}
+
+/*@ assume loopExitedRight == true; */
+{ ; }</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
-        <locationSet locsetName="relevant">
-            <relevantOne>-1</relevantOne>
-            <relevantTwo>-1</relevantTwo>
-        </locationSet>
         <locationSet locsetName="frameP">
             <relevantOne>0</relevantOne>
             <relevantTwo>0</relevantTwo>
@@ -185,6 +187,8 @@ while (
             <argSort>any</argSort>
         </function>
         <function funcName="oldFootprintQ" resultSortName="any"/>
+        <function funcName="loopExitedLeft" resultSortName="boolean"/>
+        <function funcName="loopExitedRight" resultSortName="boolean"/>
     </functions>
     <predicates>
         <predicate predName="inv">
