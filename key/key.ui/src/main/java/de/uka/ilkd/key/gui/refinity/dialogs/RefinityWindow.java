@@ -564,12 +564,15 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                  */
 
                 final Point currLoc = getLocationOnScreen();
+                final Dimension currSize = getSize();
+                setVisible(false);
 
                 final RefinityWindow newDia = new RefinityWindow(mainWindow, newModel);
                 newDia.setVisible(true);
+                
                 newDia.setLocation(currLoc);
+                newDia.setSize(currSize);
 
-                setVisible(false);
                 dispose();
             }
         }

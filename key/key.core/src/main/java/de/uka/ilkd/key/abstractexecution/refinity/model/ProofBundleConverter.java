@@ -82,6 +82,9 @@ public class ProofBundleConverter {
     private final String javaScaffold;
     private final String keyScaffold;
     private final Optional<File> keyFileToUse;
+    private static final java.util.function.Function<String, Collector<String, ?, String>> DL_PREFIX_FOLD = //
+            currRes -> Collectors.reducing(currRes,
+                    (res, loc) -> prefixOccurrencesWithDL(res, loc));
 
     /**
      * @param model The model to convert.
@@ -313,25 +316,34 @@ public class ProofBundleConverter {
                 .replaceAll(Pattern.quote(RESULT_1), prefixDLforRE(RES1))
                 .replaceAll(Pattern.quote(RESULT_2), prefixDLforRE(RES2));
 
-        return preparedJMLPreCondition(result, model);
+        result = model.getProgramVariableDeclarations().stream()
+                .map(ProgramVariableDeclaration::getVarName).collect(DL_PREFIX_FOLD.apply(result));
+        result = dlPrefixRigidModelElements(model, result);
+
+        return result;
     }
 
     public static String preparedJMLPreCondition(final String unpreparedJmlPreCondition,
             final AERelationalModel model) {
         String result = unpreparedJmlPreCondition;
 
-        final java.util.function.Function<String, Collector<String, ?, String>> prefixFolder = //
-                currRes -> Collectors.reducing(currRes,
-                        (res, loc) -> prefixOccurrencesWithDL(res, loc));
-
         result = model.getProgramVariableDeclarations().stream()
-                .map(ProgramVariableDeclaration::getVarName).collect(prefixFolder.apply(result));
+                .map(ProgramVariableDeclaration::getVarName).collect(Collectors.reducing(result, //
+                        (res, loc) -> res.replaceAll("\\b" + Pattern.quote(loc) + "\\b",
+                                prefixDLforRE("_" + loc))));
+        result = dlPrefixRigidModelElements(model, result);
+
+        return result;
+    }
+
+    private static String dlPrefixRigidModelElements(final AERelationalModel model, String result) {
         result = model.getAbstractLocationSets().stream()
-                .map(AbstractLocsetDeclaration::getLocsetName).collect(prefixFolder.apply(result));
+                .map(AbstractLocsetDeclaration::getLocsetName)
+                .collect(DL_PREFIX_FOLD.apply(result));
         result = model.getFunctionDeclarations().stream().map(FunctionDeclaration::getFuncName)
-                .collect(prefixFolder.apply(result));
+                .collect(DL_PREFIX_FOLD.apply(result));
         result = model.getPredicateDeclarations().stream().map(PredicateDeclaration::getPredName)
-                .collect(prefixFolder.apply(result));
+                .collect(DL_PREFIX_FOLD.apply(result));
 
         return result;
     }
@@ -350,6 +362,11 @@ public class ProofBundleConverter {
         final Sort seqSort = services.getTypeConverter().getSeqLDT().targetSort();
         functions.add(new Function(new Name(ProofBundleConverter.RES1), seqSort));
         functions.add(new Function(new Name(ProofBundleConverter.RES2), seqSort));
+
+        model.getProgramVariableDeclarations().stream()
+                .map(pvDecl -> new ProgramVariableDeclaration(pvDecl.getTypeName(),
+                        "_" + pvDecl.getVarName()))
+                .forEach(pvDecl -> pvDecl.checkAndRegister(services));
 
         model.fillNamespacesFromModel(services);
     }

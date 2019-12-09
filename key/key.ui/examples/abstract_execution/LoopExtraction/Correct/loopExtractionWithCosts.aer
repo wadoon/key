@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\forall any valLeft;&#10;  (\forall any valRight; (&#10;    (loopExitedLeft  &amp;&amp; inv(valLeft) &amp;&amp;&#10;     loopExitedRight &amp;&amp; inv(valRight)) ==&gt;&#10;       valLeft == valRight))) &amp;&amp;&#10;oldFootprintQ == \value(footprintQ) &amp;&amp;&#10;oldFootprintP == \value(footprintP) &amp;&amp;&#10;threshold &gt; 0 &amp;&amp; cost == 0 &amp;&amp;&#10;(\forall any val; (costQ(val) &gt;= 0 &amp;&amp; costP(val) &gt;= 0))" postCondition="\result_1[0] == \result_2[0] &amp;&amp;&#10;\result_1[1] == \result_2[1] &amp;&amp;&#10;\result_1[2] == \result_2[2] &amp;&amp;&#10;\result_1[3] == \result_2[3] &amp;&amp;&#10;(int) \result_1[4] &gt;= (int) \result_2[4]">
+    <programOne>// Note: To reach the (cost) conclusion of the form
+//   "cost = threshold * (costP + costQ)",
+// the cost for not only Q, but also P has to be static. Otherwise, we would need
+// to formalize it using bounded sum formulas of so, which is possible, but quite
+// difficult to prove. Therefore, we assume static cost here.
+
+// One open goal remains and needs interaction:
+// CUT 1: costQ(oldFootprintQ) * (_threshold - 1) &gt;= 0
+// CUT 2: (\forall int i1; (\forall int i2; ((i1 &gt;= 0 &amp; i2 &gt;= 0) -&gt; i1 * i2 &gt;= 0)))
+// INST:  i1 -&gt; costQ(oldFootprintQ)
+//        i2 -&gt; _threshold - 1
+
+/*@ ae_constraint
+  @   \disjoint(frameQ, frameP) &amp;&amp;
+  @   \disjoint(frameP, footprintQ) &amp;&amp;
+  @
+  @   \disjoint(frameQ, i) &amp;&amp;
+  @   \disjoint(footprintQ, i) &amp;&amp;
+  @   \disjoint(frameP, i) &amp;&amp;
+  @
+  @   \disjoint(frameQ, threshold) &amp;&amp;
+  @   \disjoint(frameP, threshold) &amp;&amp;
+  @
+  @   \disjoint(frameP, cost) &amp;&amp;
+  @   \disjoint(footprintP, cost) &amp;&amp;
+  @   \disjoint(frameQ, cost) &amp;&amp;
+  @   \disjoint(footprintQ, cost);
+  @*/
+{ ; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//@ ae_constraint inv(\value(frameP));
+{ ; }
+
+i = 0;
+
+/*@ loop_invariant
+  @   i &gt;= 0 &amp;&amp; i &lt;= threshold &amp;&amp; 
+  @   inv(\value(frameP)) &amp;&amp;
+  @   (i &gt; 0 ==&gt; \value(frameQ) == resultQ(oldFootprintQ)) &amp;&amp;
+  @   (cost == i * (costP(oldFootprintP) + costQ(oldFootprintQ)));
+  @ assignable frameP, frameQ;
+  @ decreases threshold - i;
+  @*/
+while (i &lt; threshold) {
+    //@ ghost int oldCost = cost;
+    /*@ ae_constraint
+      @   \disjoint(frameP, cost) &amp;&amp;
+      @   \disjoint(footprintP, cost) &amp;&amp;
+      @   \disjoint(frameQ, cost) &amp;&amp;
+      @   \disjoint(footprintQ, cost) &amp;&amp;
+      @
+      @   \disjoint(frameP, oldCost) &amp;&amp;
+      @   \disjoint(frameQ, oldCost) &amp;&amp;
+      @   \disjoint(footprintP, oldCost) &amp;&amp;
+      @   \disjoint(footprintQ, oldCost);
+      @*/
+    { ; }
+    
+    /*@ assignable frameQ, \hasTo(cost);
+      @ accessible footprintQ;
+      @ normal_behavior ensures
+      @   \value(frameQ) == resultQ(oldFootprintQ) &amp;&amp;
+      @   cost == oldCost + costQ(oldFootprintQ);
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement Q;
+
+    //@ set oldCost = cost;
+    
+    /*@ assignable frameP, \hasTo(cost);
+      @ accessible footprintP;
+      @ normal_behavior ensures
+      @   inv(\value(frameP)) &amp;&amp;
+      @   cost == oldCost + costP(oldFootprintP);
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement P;
+
+    i++;
+}
+
+/*@ assume loopExitedLeft == true; */
+{ ; }</programOne>
+    <programTwo>
+
+
+
+
+
+
+
+
+
+
+
+/*@ ae_constraint
+  @   \disjoint(frameQ, frameP) &amp;&amp;
+  @   \disjoint(frameP, footprintQ) &amp;&amp;
+  @
+  @   \disjoint(frameQ, i) &amp;&amp;
+  @   \disjoint(footprintQ, i) &amp;&amp;
+  @   \disjoint(frameP, i) &amp;&amp;
+  @
+  @   \disjoint(frameQ, threshold) &amp;&amp;
+  @   \disjoint(frameP, threshold) &amp;&amp;
+  @
+  @   \disjoint(frameP, cost) &amp;&amp;
+  @   \disjoint(footprintP, cost) &amp;&amp;
+  @   \disjoint(frameQ, cost) &amp;&amp;
+  @   \disjoint(footprintQ, cost);
+  @*/
+{ ; }
+
+//@ ghost int oldCost = cost;
+/*@ ae_constraint
+  @   \disjoint(frameQ, oldCost) &amp;&amp;
+  @   \disjoint(footprintQ, oldCost) &amp;&amp;
+  @   \disjoint(frameP, oldCost) &amp;&amp;
+  @   \disjoint(footprintP, oldCost);
+  @*/
+{ ; }
+
+/*@ assignable frameQ, \hasTo(cost);
+  @ accessible footprintQ;
+  @ normal_behavior ensures
+  @   \value(frameQ) == resultQ(oldFootprintQ) &amp;&amp;
+  @   cost == oldCost + costQ(oldFootprintQ);
+  @ exceptional_behavior requires false;
+  @ return_behavior requires false;
+  @ break_behavior requires false;
+  @ continue_behavior requires false;
+  @*/
+\abstract_statement Q;
+
+/*@ ae_constraint inv(\value(frameP));
+  @*/
+{ ; }
+
+i = 0;
+
+/*@ loop_invariant
+  @   i &gt;= 0 &amp;&amp; i &lt;= threshold &amp;&amp; 
+  @   inv(\value(frameP)) &amp;&amp;
+  @   \value(frameQ) == resultQ(oldFootprintQ) &amp;&amp;
+  @   (cost == costQ(oldFootprintQ) + i * costP(oldFootprintP));
+  @ assignable frameP;
+  @ decreases threshold - i;
+  @*/
+while (i &lt; threshold) {
+    
+    /*@ ae_constraint
+      @   \disjoint(frameP, cost) &amp;&amp;
+      @   \disjoint(footprintP, cost) &amp;&amp;
+      @   \disjoint(frameQ, cost) &amp;&amp;
+      @   \disjoint(footprintQ, cost) &amp;&amp;
+      @
+      @   \disjoint(frameP, oldCost) &amp;&amp;
+      @   \disjoint(frameQ, oldCost) &amp;&amp;
+      @   \disjoint(footprintP, oldCost) &amp;&amp;
+      @   \disjoint(footprintQ, oldCost);
+      @*/
+    { ; }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    //@ set oldCost = cost;
+    
+    /*@ assignable frameP, \hasTo(cost);
+      @ accessible footprintP;
+      @ normal_behavior ensures
+      @   inv(\value(frameP)) &amp;&amp;
+      @   cost == oldCost + costP(oldFootprintP);
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement P;
+
+    i++;
+}
+
+/*@ assume loopExitedRight == true; */
+{ ; }</programTwo>
+    <methodLevelContext></methodLevelContext>
+    <locationSets>
+        <locationSet locsetName="frameP">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameQ">
+            <relevantOne>1</relevantOne>
+            <relevantTwo>1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintQ">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <functions>
+        <function funcName="resultQ" resultSortName="any">
+            <argSort>any</argSort>
+        </function>
+        <function funcName="oldFootprintQ" resultSortName="any"/>
+        <function funcName="loopExitedLeft" resultSortName="boolean"/>
+        <function funcName="loopExitedRight" resultSortName="boolean"/>
+        <function funcName="costQ" resultSortName="int">
+            <argSort>any</argSort>
+        </function>
+        <function funcName="costP" resultSortName="int">
+            <argSort>any</argSort>
+        </function>
+        <function funcName="oldFootprintP" resultSortName="any"/>
+    </functions>
+    <predicates>
+        <predicate predName="inv">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="Post">
+            <argSort>any</argSort>
+            <argSort>any</argSort>
+        </predicate>
+    </predicates>
+    <programVariables>
+        <programVariable typeName="int" varName="i">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="threshold">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="cost">
+            <relevantOne>2</relevantOne>
+            <relevantTwo>2</relevantTwo>
+        </programVariable>
+    </programVariables>
+</ns2:aeRelationalModel>

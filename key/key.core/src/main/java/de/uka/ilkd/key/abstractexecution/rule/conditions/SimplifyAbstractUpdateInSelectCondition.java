@@ -101,9 +101,8 @@ public class SimplifyAbstractUpdateInSelectCondition implements VariableConditio
         Term possibleFrame = null;
         for (final Term elem : elementaries) {
             if (chosenFrame == null && elem.op() instanceof AbstractUpdate) {
-                possibleFrame = ((AbstractUpdate) elem.op()).getAllAssignables().stream()
-                        .map(AbstractExecutionUtils::unwrapHasTo).map(loc -> loc.toTerm(services))
-                        .collect(Collectors.reducing(tb.empty(), (s1, s2) -> tb.union(s1, s2)));
+                final AbstractUpdate abstrUpd = (AbstractUpdate) elem.op();
+                possibleFrame = relevantFrameFromAbstrUpd(abstrUpd, services);
 
                 if (canDropAbstractUpdate(elem, o, f, goal, services)) {
                     chosenFrame = possibleFrame;

@@ -27,7 +27,8 @@
 while (
    /*@ assignable \nothing;
      @ accessible footprintE;
-     @ normal_behavior ensures (boolean) \result &lt;==&gt; guardIsTrue(\value(footprintE));
+     @ normal_behavior ensures (boolean) \result &lt;==&gt;
+     @   guardIsTrue(\value(footprintE));
      @ exceptional_behavior requires false;
      @*/
    \abstract_expression boolean e 
@@ -115,7 +116,8 @@ while (
 while (
    /*@ assignable \nothing;
      @ accessible footprintE;
-     @ normal_behavior ensures (boolean) \result &lt;==&gt; guardIsTrue(\value(footprintE));
+     @ normal_behavior ensures (boolean) \result &lt;==&gt;
+     @   guardIsTrue(\value(footprintE));
      @ exceptional_behavior requires false;
      @*/
    \abstract_expression boolean e 

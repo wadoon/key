@@ -2318,6 +2318,7 @@ public class TermBuilder {
 
     public ImmutableSet<Term> locsetUnionToSet(Term s) {
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+        s = wrapInSingletonPV(s);
         assert s.sort().equals(setLDT.targetSort());
         final Function union = setLDT.getUnion();
         ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();

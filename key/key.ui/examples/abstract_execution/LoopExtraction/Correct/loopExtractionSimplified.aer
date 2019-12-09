@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\forall any valLeft;&#10;  (\forall any valRight; (&#10;    (loopExitedLeft  &amp;&amp; inv(valLeft) &amp;&amp;&#10;     loopExitedRight &amp;&amp; inv(valRight)) ==&gt;&#10;       valLeft == valRight))) &amp;&amp;&#10;oldFootprintQ == \value(footprintQ) &amp;&amp;&#10;threshold &gt; 0" postCondition="\result_1 == \result_2">
+    <programOne>/*@ ae_constraint
+  @   \disjoint(frameQ, frameP) &amp;&amp;
+  @   \disjoint(frameP, footprintQ) &amp;&amp;
+  @
+  @   \disjoint(frameQ, i) &amp;&amp;
+  @   \disjoint(footprintQ, i) &amp;&amp;
+  @   \disjoint(frameP, i) &amp;&amp;
+  @
+  @   \disjoint(frameQ, threshold) &amp;&amp;
+  @   \disjoint(frameP, threshold);
+  @*/
+{ ; }
+
+/*@ ae_constraint inv(\value(frameP));
+  @*/
+{ ; }
+
+i = 0;
+
+/*@ loop_invariant
+  @   i &gt;= 0 &amp;&amp; i &lt;= threshold &amp;&amp; 
+  @   inv(\value(frameP)) &amp;&amp;
+  @   (i &gt; 0 ==&gt; 
+  @     \value(frameQ) == resultQ(oldFootprintQ));
+  @ assignable frameP, frameQ;
+  @ decreases threshold - i;
+  @*/
+while (i &lt; threshold) {
+    /*@ assignable frameQ;
+      @ accessible footprintQ;
+      @ normal_behavior ensures \value(frameQ) == resultQ(oldFootprintQ);
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement Q;
+    
+    /*@ assignable frameP;
+      @ accessible footprintP;
+      @ normal_behavior ensures inv(\value(frameP));
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement P;
+
+    i++;
+}
+
+/*@ assume loopExitedLeft == true; */
+{ ; }</programOne>
+    <programTwo>/*@ ae_constraint
+  @   \disjoint(frameQ, frameP) &amp;&amp;
+  @   \disjoint(frameP, footprintQ) &amp;&amp;
+  @
+  @   \disjoint(frameQ, i) &amp;&amp;
+  @   \disjoint(footprintQ, i) &amp;&amp;
+  @   \disjoint(frameP, i) &amp;&amp;
+  @
+  @   \disjoint(frameQ, threshold) &amp;&amp;
+  @   \disjoint(frameP, threshold);
+  @*/
+{ ; }
+
+/*@ assignable frameQ;
+  @ accessible footprintQ;
+  @ normal_behavior ensures \value(frameQ) == resultQ(oldFootprintQ);
+  @ exceptional_behavior requires false;
+  @ return_behavior requires false;
+  @ break_behavior requires false;
+  @ continue_behavior requires false;
+  @*/
+\abstract_statement Q;
+
+/*@ ae_constraint inv(\value(frameP));
+  @*/
+{ ; }
+
+i = 0;
+
+/*@ loop_invariant
+  @   i &gt;= 0 &amp;&amp; i &lt;= threshold &amp;&amp; 
+  @   inv(\value(frameP)) &amp;&amp;
+  @   \value(frameQ) == resultQ(oldFootprintQ);
+  @ assignable frameP;
+  @ decreases threshold - i;
+  @*/
+while (i &lt; threshold) {
+    /*@ assignable frameP;
+      @ accessible footprintP;
+      @ normal_behavior ensures inv(\value(frameP));
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement P;
+
+    i++;
+}
+
+/*@ assume loopExitedRight == true; */
+{ ; }</programTwo>
+    <methodLevelContext></methodLevelContext>
+    <locationSets>
+        <locationSet locsetName="frameP">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameQ">
+            <relevantOne>1</relevantOne>
+            <relevantTwo>1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintQ">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <functions>
+        <function funcName="resultQ" resultSortName="any">
+            <argSort>any</argSort>
+        </function>
+        <function funcName="oldFootprintQ" resultSortName="any"/>
+        <function funcName="loopExitedLeft" resultSortName="boolean"/>
+        <function funcName="loopExitedRight" resultSortName="boolean"/>
+    </functions>
+    <predicates>
+        <predicate predName="inv">
+            <argSort>any</argSort>
+        </predicate>
+    </predicates>
+    <programVariables>
+        <programVariable typeName="int" varName="i">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="threshold">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+    </programVariables>
+</ns2:aeRelationalModel>
