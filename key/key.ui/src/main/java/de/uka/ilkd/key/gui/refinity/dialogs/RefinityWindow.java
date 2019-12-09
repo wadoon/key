@@ -542,7 +542,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         if (chooser.showOpenDialog(this)) {
             final File file = chooser.getSelectedFile();
 
-            if (!file.getName().endsWith(".aer")) {
+            if (!AERelationalModel.fileHasAEModelEnding(file)) {
                 JOptionPane.showMessageDialog(RefinityWindow.this, "No AE-Relational File (.aer)",
                         "Problem Loading Model", JOptionPane.ERROR_MESSAGE);
                 return;
