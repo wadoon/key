@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -555,19 +556,21 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                 final RefinityWindow newDia = new RefinityWindow(mainWindow, newModel);
                 newDia.setVisible(true);
             } else {
-                model = newModel;
-                model.setFile(file);
-                updateTitle();
-                loadFromModel();
+                /*
+                 * NOTE (DS, 2019-12-09): It turned out to be safer to open a new window and
+                 * dispose the old one. Everything else lead to inconsistencies of model and GUI
+                 * elements, especially in the JML relation editors. This strategy is a quite
+                 * clean fix.
+                 */
 
-                if (services != null) {
-                    model.tryFillNamespacesFromModel(services);
-                } else {
-                    servicesLoadedListeners.add(() -> model.tryFillNamespacesFromModel(services));
-                }
+                final Point currLoc = getLocationOnScreen();
 
-                setDirty(false);
-                resetUndosListeners.forEach(ResetUndosListener::resetUndos);
+                final RefinityWindow newDia = new RefinityWindow(mainWindow, newModel);
+                newDia.setVisible(true);
+                newDia.setLocation(currLoc);
+
+                setVisible(false);
+                dispose();
             }
         }
     }

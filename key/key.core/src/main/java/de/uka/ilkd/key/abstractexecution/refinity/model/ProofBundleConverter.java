@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -253,8 +254,10 @@ public class ProofBundleConverter {
                 .replaceAll(INIT_VARS,
                         initVars.isEmpty() ? "" : (Matcher.quoteReplacement("||" + initVars)))
                 .replaceAll(PARAMS, Matcher.quoteReplacement(params))
-                .replaceAll(Pattern.quote(RELATION), Matcher.quoteReplacement(javaDLPostCondRelation))
-                .replaceAll(Pattern.quote(PRECONDITION), Matcher.quoteReplacement(javaDLPreCondRelation))
+                .replaceAll(Pattern.quote(RELATION),
+                        Matcher.quoteReplacement(javaDLPostCondRelation))
+                .replaceAll(Pattern.quote(PRECONDITION),
+                        Matcher.quoteReplacement(javaDLPreCondRelation))
                 .replaceAll(RESULT_SEQ_1, extractResultSeq(model.getRelevantVarsOne()))
                 .replaceAll(RESULT_SEQ_2, extractResultSeq(model.getRelevantVarsTwo())) //
                 .replaceAll(ADDITIONAL_PREMISES,
@@ -316,17 +319,19 @@ public class ProofBundleConverter {
     public static String preparedJMLPreCondition(final String unpreparedJmlPreCondition,
             final AERelationalModel model) {
         String result = unpreparedJmlPreCondition;
-        for (final AbstractLocsetDeclaration decl : model.getAbstractLocationSets()) {
-            result = prefixOccurrencesWithDL(result, decl.getLocsetName());
-        }
-        
-        for (final FunctionDeclaration decl : model.getFunctionDeclarations()) {
-            result = prefixOccurrencesWithDL(result, decl.getFuncName());
-        }
 
-        for (final PredicateDeclaration decl : model.getPredicateDeclarations()) {
-            result = prefixOccurrencesWithDL(result, decl.getPredName());
-        }
+        final java.util.function.Function<String, Collector<String, ?, String>> prefixFolder = //
+                currRes -> Collectors.reducing(currRes,
+                        (res, loc) -> prefixOccurrencesWithDL(res, loc));
+
+        result = model.getProgramVariableDeclarations().stream()
+                .map(ProgramVariableDeclaration::getVarName).collect(prefixFolder.apply(result));
+        result = model.getAbstractLocationSets().stream()
+                .map(AbstractLocsetDeclaration::getLocsetName).collect(prefixFolder.apply(result));
+        result = model.getFunctionDeclarations().stream().map(FunctionDeclaration::getFuncName)
+                .collect(prefixFolder.apply(result));
+        result = model.getPredicateDeclarations().stream().map(PredicateDeclaration::getPredName)
+                .collect(prefixFolder.apply(result));
 
         return result;
     }
