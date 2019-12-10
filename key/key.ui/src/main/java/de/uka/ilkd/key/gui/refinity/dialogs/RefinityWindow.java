@@ -45,6 +45,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -57,6 +58,7 @@ import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EtchedBorder;
 import javax.xml.bind.JAXBException;
 
 import org.fife.ui.rsyntaxtextarea.CodeTemplateManager;
@@ -98,7 +100,9 @@ import de.uka.ilkd.key.gui.refinity.listeners.MethodContextChangedListener;
 import de.uka.ilkd.key.gui.refinity.listeners.ProgramVariablesChangedListener;
 import de.uka.ilkd.key.gui.refinity.listeners.ReadonlyListener;
 import de.uka.ilkd.key.gui.refinity.listeners.ResetUndosListener;
+import de.uka.ilkd.key.gui.refinity.listeners.ScrollbarSynchronizer;
 import de.uka.ilkd.key.gui.refinity.listeners.ServicesLoadedListener;
+import de.uka.ilkd.key.gui.refinity.listeners.SynchronizeScrollingListener;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
@@ -158,6 +162,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
     private final List<ReadonlyListener> readOnlyListeners = new ArrayList<>();
     private final List<DirtyListener> dirtyListeners = new ArrayList<>();
     private final List<ResetUndosListener> resetUndosListeners = new ArrayList<>();
+    private final List<SynchronizeScrollingListener> synchronizeScrollingListeners = new ArrayList<>();
 
     public static void main(String[] args) {
         new RefinityWindow().setVisible(true);
@@ -565,14 +570,13 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
 
                 final Point currLoc = getLocationOnScreen();
                 final Dimension currSize = getSize();
-                setVisible(false);
-
+                
                 final RefinityWindow newDia = new RefinityWindow(mainWindow, newModel);
                 newDia.setVisible(true);
-                
                 newDia.setLocation(currLoc);
                 newDia.setSize(currSize);
-
+                
+                setVisible(false);
                 dispose();
             }
         }
@@ -676,6 +680,15 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                     }
                 }));
 
+        final JCheckBoxMenuItem cbSyncScrollbars = new JCheckBoxMenuItem("Synchronize Scrolling",
+                true);
+        cbSyncScrollbars.setBackground(Color.WHITE);
+        cbSyncScrollbars.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        cbSyncScrollbars.addItemListener(e -> synchronizeScrollingListeners
+                .forEach(l -> l.synchronizeScrollingChanged(cbSyncScrollbars.isSelected())));
+        cbSyncScrollbars.setMaximumSize(new Dimension(cbSyncScrollbars.getPreferredSize().width,
+                cbSyncScrollbars.getMaximumSize().height));
+
         final JButton closeBtn = new JSizedButton("",
                 IconFontSwing.buildIcon(FontAwesomeSolid.WINDOW_CLOSE, 16, Color.BLACK), btnWidth,
                 btnHeight);
@@ -697,6 +710,8 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         toolBar.addSeparator();
         toolBar.add(enlargeBtn);
         toolBar.add(shrinkBtn);
+        toolBar.addSeparator();
+        toolBar.add(cbSyncScrollbars);
         toolBar.addSeparator();
         toolBar.add(saveBundleAndStartBtn);
         toolBar.addSeparator();
@@ -787,9 +802,31 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         programVariablesChangedListeners.add(stmtLevelErrorParser::setProgVarDecls);
         methodContextChangedListeners.add(stmtLevelErrorParser::setMethodLevelContext);
 
+        final RTextScrollPane leftScrollPane = createJavaEditorView(codeLeft, stmtLevelErrorParser);
+        final RTextScrollPane rightScrollPane = createJavaEditorView( //
+                codeRight, stmtLevelErrorParser);
+
+        ScrollbarSynchronizer.synchronize(leftScrollPane.getVerticalScrollBar(),
+                rightScrollPane.getVerticalScrollBar());
+        ScrollbarSynchronizer.synchronize(leftScrollPane.getHorizontalScrollBar(),
+                rightScrollPane.getHorizontalScrollBar());
+        
+        synchronizeScrollingListeners.add(doSynchronize -> {
+            ScrollbarSynchronizer.unSynchronize(leftScrollPane.getVerticalScrollBar(),
+                    rightScrollPane.getVerticalScrollBar());
+            ScrollbarSynchronizer.unSynchronize(leftScrollPane.getHorizontalScrollBar(),
+                    rightScrollPane.getHorizontalScrollBar());
+
+            if (doSynchronize) {
+                ScrollbarSynchronizer.synchronize(leftScrollPane.getVerticalScrollBar(),
+                        rightScrollPane.getVerticalScrollBar());
+                ScrollbarSynchronizer.synchronize(leftScrollPane.getHorizontalScrollBar(),
+                        rightScrollPane.getHorizontalScrollBar());
+            }
+        });
+
         final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true,
-                createJavaEditorView(codeLeft, stmtLevelErrorParser),
-                createJavaEditorView(codeRight, stmtLevelErrorParser));
+                leftScrollPane, rightScrollPane);
         splitPane.setResizeWeight(.5);
 
         return splitPane;
@@ -1198,7 +1235,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         return result;
     }
 
-    private JComponent createJavaEditorView(RSyntaxTextArea component,
+    private RTextScrollPane createJavaEditorView(RSyntaxTextArea component,
             JavaErrorParser errorParser) {
         resetUndosListeners.add(() -> component.discardAllEdits());
 

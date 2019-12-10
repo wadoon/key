@@ -37,7 +37,6 @@ import de.uka.ilkd.key.abstractexecution.refinity.model.FuncOrPredDecl;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.parser.ParserException;
 
 /**
  * @author Dominic Steinhoefel
