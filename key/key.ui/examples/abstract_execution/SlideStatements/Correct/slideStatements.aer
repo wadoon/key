@@ -1,41 +1,52 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="\result_1==\result_2">
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="" postCondition="(returnsA(\value(footprintA)) || returnsB(\value(footprintB)) ==&gt; \result_1[0] == \result_2[0]) ||&#10;(throwsExcB(\value(footprintA)) || throwsExcB(\value(footprintB)) ==&gt; \result_1[1] == \result_2[1]) ||&#10;\result_1==\result_2">
     <programOne>/*@ ae_constraint
   @   \disjoint(frameA, frameB) &amp;&amp;
   @   \disjoint(frameA, footprintB) &amp;&amp;
-  @   \disjoint(frameB, footprintA);
+  @   \disjoint(frameB, footprintA) &amp;&amp;
+  @
+  @   \mutex(returnsA(\value(footprintA)), returnsB(\value(footprintB))) &amp;&amp;
+  @   \mutex(returnsA(\value(footprintA)), throwsExcB(\value(footprintB))) &amp;&amp;
+  @   \mutex(throwsExcA(\value(footprintA)), throwsExcB(\value(footprintB))) &amp;&amp;
+  @   \mutex(throwsExcA(\value(footprintA)), returnsB(\value(footprintB)));
   @*/
 { ; }
 
 //@ assignable frameA;
 //@ accessible footprintA;
-//@ exceptional_behavior requires false;
-//@ return_behavior requires false;
+//@ exceptional_behavior requires throwsExcA(\value(footprintA));
+//@ return_behavior requires returnsA(\value(footprintA));
 \abstract_statement A;
 
 //@ assignable frameB;
 //@ accessible footprintB;
-//@ exceptional_behavior requires false;
-//@ return_behavior requires false;
+//@ exceptional_behavior requires throwsExcB(\value(footprintB));
+//@ return_behavior requires returnsB(\value(footprintB));
 \abstract_statement B;</programOne>
     <programTwo>/*@ ae_constraint
   @   \disjoint(frameA, frameB) &amp;&amp;
   @   \disjoint(frameA, footprintB) &amp;&amp;
-  @   \disjoint(frameB, footprintA);
+  @   \disjoint(frameB, footprintA) &amp;&amp;
+  @
+  @   \mutex(returnsA(\value(footprintA)), returnsB(\value(footprintB))) &amp;&amp;
+  @   \mutex(returnsA(\value(footprintA)), throwsExcB(\value(footprintB))) &amp;&amp;
+  @   \mutex(throwsExcA(\value(footprintA)), throwsExcB(\value(footprintB))) &amp;&amp;
+  @   \mutex(throwsExcA(\value(footprintA)), returnsB(\value(footprintB)));
   @*/
 { ; }
 
 //@ assignable frameB;
 //@ accessible footprintB;
-//@ exceptional_behavior requires false;
-//@ return_behavior requires false;
+//@ exceptional_behavior requires throwsExcB(\value(footprintB));
+//@ return_behavior requires returnsB(\value(footprintB));
 \abstract_statement B;
 
 //@ assignable frameA;
 //@ accessible footprintA;
-//@ exceptional_behavior requires false;
-//@ return_behavior requires false;
+//@ exceptional_behavior requires throwsExcA(\value(footprintA));
+//@ return_behavior requires returnsA(\value(footprintA));
 \abstract_statement A;</programTwo>
+    <methodLevelContext></methodLevelContext>
     <locationSets>
         <locationSet locsetName="relevant">
             <relevantOne>0</relevantOne>
@@ -58,6 +69,20 @@
             <relevantTwo>-1</relevantTwo>
         </locationSet>
     </locationSets>
-    <predicates/>
+    <functions/>
+    <predicates>
+        <predicate predName="throwsExcA">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="throwsExcB">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="returnsA">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="returnsB">
+            <argSort>any</argSort>
+        </predicate>
+    </predicates>
     <programVariables/>
 </ns2:aeRelationalModel>
