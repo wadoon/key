@@ -1,6 +1,6 @@
 plugins {
-    id("ca.coglinc.javacc") version("2.4.0")
-    id("antlr")
+    id 'ca.coglinc.javacc' version '2.4.0'
+    id 'antlr'
 }
 
 repositories {
@@ -8,18 +8,16 @@ repositories {
 }
 
 dependencies {
-    compile project(":key.util")
+    compile project(':key.util')
     compile name: 'recoderKey'
     //compile name: 'javacc'
     //compile name: 'antlr'
-    compile 'net.java.dev.javacc:javacc:4.0'
-    compile "org.antlr:antlr-runtime:3.5.2"
+    compile group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
+    compile group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
     compile group: 'antlr', name: 'antlr', version: '2.7.7'
 
-    //antlr name: 'antlr'
-    //javacc name: 'javacc'
-    javacc 'net.java.dev.javacc:javacc:4.0'
-    antlr "org.antlr:antlr:3.5.2"   // use ANTLR version 3
+    javacc  group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
+    antlr   group: 'org.antlr', name:'antlr', version:'3.5.2'   // use ANTLR version 3
     
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.4.0-b180830.0438'
@@ -96,15 +94,16 @@ testFast {
 }
 
 // Should actually be named "testProveRules" ... as rules are proved, and not ProofRules tested
-task testProofRules(type: Test) {
+task testProveRules(type: Test) {
+    description 'Proves KeY taclet rules tagged as lemma'
     group "verification"
     filter { includeTestsMatching "ProveRulesTest" }
 }
 
 task testRunAllProofs(type: Test) {
+    description 'Proof/reload all keyfiles tagged for regression testing'
     group "verification"
     filter { 
-        includeTestsMatching "RunAllProofsTestSuite"
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsAbstractExecution"
         includeTestsMatching "RunAllProofsFunctional"
