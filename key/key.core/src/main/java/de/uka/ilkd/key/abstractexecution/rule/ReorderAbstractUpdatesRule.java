@@ -12,9 +12,6 @@
 //
 package de.uka.ilkd.key.abstractexecution.rule;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
@@ -44,7 +41,7 @@ public class ReorderAbstractUpdatesRule implements BuiltInRule {
     public final static ReorderAbstractUpdatesRule INSTANCE = new ReorderAbstractUpdatesRule();
 
     private final static Name RULE_NAME = new Name("reorderAbstractUpdate");
-    private final static Map<PosInOccurrence, ReorderAbstractUpdatesRuleApp> appCache = new HashMap<>();
+//    private final static Map<PosInOccurrence, ReorderAbstractUpdatesRuleApp> appCache = new HashMap<>();
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
@@ -92,22 +89,24 @@ public class ReorderAbstractUpdatesRule implements BuiltInRule {
         if (!MergeRuleUtils.isUpdateNormalForm(parallelUpdPio.subTerm(), true)) {
             return false;
         }
+        
+        return true;
 
-        /*
-         * Now the lengthy check... Try to create an app. Note that we could also return
-         * true here, but then the rule will appear in the interactive menu although
-         * it's not applicable
-         */
-
-        final ReorderAbstractUpdatesRuleApp app = //
-                createApp(pio, goal.proof().getServices()).tryToInstantiate(goal);
-        final boolean complete = app.complete();
-
-        if (complete) {
-            appCache.put(pio, app);
-        }
-
-        return complete;
+//        /*
+//         * Now the lengthy check... Try to create an app. Note that we could also return
+//         * true here, but then the rule will appear in the interactive menu although
+//         * it's not applicable
+//         */
+//
+//        final ReorderAbstractUpdatesRuleApp app = //
+//                createApp(pio, goal.proof().getServices()).tryToInstantiate(goal);
+//        final boolean complete = app.complete();
+//
+//        if (complete) {
+//            appCache.put(pio, app);
+//        }
+//
+//        return complete;
     }
 
     @Override
@@ -132,9 +131,9 @@ public class ReorderAbstractUpdatesRule implements BuiltInRule {
 
     @Override
     public ReorderAbstractUpdatesRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        if (appCache.containsKey(pos)) {
-            return appCache.remove(pos);
-        }
+//        if (appCache.containsKey(pos)) {
+//            return appCache.remove(pos);
+//        }
 
         return new ReorderAbstractUpdatesRuleApp(this, pos);
     }

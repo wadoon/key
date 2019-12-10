@@ -12,9 +12,6 @@
 //
 package de.uka.ilkd.key.abstractexecution.rule;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
@@ -22,10 +19,12 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -51,7 +50,7 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
     public final static SimplifyUpdatesAbstractRule INSTANCE = new SimplifyUpdatesAbstractRule();
 
     private final static Name RULE_NAME = new Name("simplifyUpdatesAbstract");
-    private final static Map<PosInOccurrence, SimplifyUpdatesAbstractRuleApp> appCache = new HashMap<>();
+//    private final static Map<PosInOccurrence, SimplifyUpdatesAbstractRuleApp> appCache = new HashMap<>();
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
@@ -87,15 +86,25 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
             return false;
         }
 
-        final SimplifyUpdatesAbstractRuleApp app = //
-                createApp(pio, goal.proof().getServices()).tryToInstantiate(goal);
-        final boolean complete = app.complete();
+        // Applicable if there's an abstract update or a \value(...) term.
+        final Function valueFunc = //
+                goal.proof().getServices().getTypeConverter().getLocSetLDT().getValue();
 
-        if (complete) {
-            appCache.put(pio, app);
-        }
+        final OpCollector opColl = new OpCollector();
+        t.execPostOrder(opColl);
 
-        return complete;
+        return opColl.ops().stream().anyMatch(AbstractUpdate.class::isInstance)
+                || opColl.ops().stream().anyMatch(op -> op == valueFunc);
+
+//        final SimplifyUpdatesAbstractRuleApp app = //
+//                createApp(pio, goal.proof().getServices()).tryToInstantiate(goal);
+//        final boolean complete = app.complete();
+//
+//        if (complete) {
+//            appCache.put(pio, app);
+//        }
+//
+//        return complete;
     }
 
     @Override
@@ -120,9 +129,9 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
 
     @Override
     public SimplifyUpdatesAbstractRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        if (appCache.containsKey(pos)) {
-            return appCache.remove(pos);
-        }
+//        if (appCache.containsKey(pos)) {
+//            return appCache.remove(pos);
+//        }
 
         return new SimplifyUpdatesAbstractRuleApp(this, pos);
     }

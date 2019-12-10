@@ -29,6 +29,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.IrrelevantAssignable;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -450,7 +451,17 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
 
                 final AbstractUpdateLoc anonLoc = AbstractUpdateFactory
                         .abstrUpdateLocFromTerm(locTerm, Optional.empty(), services);
-                if (isRelevant(anonLoc,
+
+                /*
+                 * NOTE (DS, 2019-12-10): We deactivate this for everything but Skolem
+                 * locations, as there were some problems with non-abstract proofs. Consider,
+                 * for instance, the example "heap/list/ArrayList_concatenate.key". Anon terms
+                 * were dropped when that was not the right thing to do. The reason has to be a
+                 * wrong calculation of non-abstract heap locations (in that example,
+                 * "o_arr.*").
+                 */
+
+                if (!(anonLoc instanceof SkolemLoc) || isRelevant(anonLoc,
                         relevantLocations.stream()
                                 .filter(loc -> !(loc instanceof PVLoc)
                                         || ((PVLoc) loc).getVar() == heapLDT.getHeap())
