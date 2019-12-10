@@ -1,5 +1,5 @@
 example.name = Extract Prefix from Loop
-example.path = Abstract Execution/
+example.path = Abstract Execution/Loop Extraction/
 example.file = loopExtraction.aer
 
 A model of a refactoring extracting a prefix of a loop, such that afterward, that prefix is executed only once (and not multiple times, inside the loop). This is an example of a refactoring that can change a non-functional property of the code: The cost of execution in terms of time and/or memory.
