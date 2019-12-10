@@ -471,7 +471,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                         true,
                         false);
         goal.addTaclet(infData.infFlowApp,
-                       SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+                       SVInstantiations.EMPTY_SVINSTANTIATIONS, true,0,0);
         final InfFlowProof proof = (InfFlowProof) goal.proof();
         proof.addIFSymbol(infData.applPredTerm);
         proof.addIFSymbol(infData.infFlowApp);

@@ -282,7 +282,20 @@ public class IntermediatePresentationProofFileParser
         case MERGE_USER_CHOICES:
             ((BuiltinRuleInformation) ruleInfo).currUserChoices = str;
             break;
-
+        case COST_COMPUTATION_TIME:
+        	try {
+        		ruleInfo.costComputationTime = Long.parseLong(str);
+        	} catch (Exception e) {
+        		e.printStackTrace();
+        	}
+        	break;
+        case MATCHING_TIME:
+        	try {
+        		ruleInfo.matchingTime = Long.parseLong(str);
+        	} catch (Exception e) {
+        		e.printStackTrace();
+        	}
+        	break;
         default:
             break;
         }
@@ -330,7 +343,6 @@ public class IntermediatePresentationProofFileParser
                 new Pair<Integer, PosInTerm>(builtinInfo.currIfInstFormula,
                     builtinInfo.currIfInstPosInTerm));
             break;
-
         default:
             break;
         }
@@ -371,7 +383,8 @@ public class IntermediatePresentationProofFileParser
             new Pair<Integer, PosInTerm>(tacletInfo.currFormula,
                 tacletInfo.currPosInTerm),
             tacletInfo.loadedInsts, tacletInfo.ifSeqFormulaList,
-            tacletInfo.ifDirectFormulaList, tacletInfo.currNewNames);
+            tacletInfo.ifDirectFormulaList, tacletInfo.currNewNames,
+            tacletInfo.costComputationTime,tacletInfo.matchingTime);
     }
 
     /**
@@ -392,19 +405,21 @@ public class IntermediatePresentationProofFileParser
                 builtinInfo.currDistFormula,
                 builtinInfo.currPredAbstraLatticeType,
                 builtinInfo.currAbstractionPredicates,
-                builtinInfo.currUserChoices);
+                builtinInfo.currUserChoices,
+                builtinInfo.costComputationTime,builtinInfo.matchingTime);
         } else if (builtinInfo.currRuleName.equals("CloseAfterMerge")) {
             result = new MergePartnerAppIntermediate(builtinInfo.currRuleName,
                 new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
                     builtinInfo.currPosInTerm),
                 builtinInfo.currCorrespondingMergeNodeId,
-                builtinInfo.currNewNames);
+                builtinInfo.currNewNames,
+                builtinInfo.costComputationTime,builtinInfo.matchingTime);
         } else {
             result = new BuiltInAppIntermediate(builtinInfo.currRuleName,
                 new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
                     builtinInfo.currPosInTerm),
                 builtinInfo.currContract, builtinInfo.builtinIfInsts,
-                builtinInfo.currNewNames);
+                builtinInfo.currNewNames,builtinInfo.costComputationTime,builtinInfo.matchingTime);
         }
 
         return result;
@@ -441,6 +456,8 @@ public class IntermediatePresentationProofFileParser
         protected int currFormula = 0;
         protected PosInTerm currPosInTerm = PosInTerm.getTopLevel();
         protected ImmutableList<Name> currNewNames = null;
+        protected long costComputationTime;
+        protected long matchingTime;
 
         public RuleInformation(String ruleName) {
             this.currRuleName = ruleName.trim();

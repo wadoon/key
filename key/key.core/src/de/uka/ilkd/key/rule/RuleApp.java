@@ -49,4 +49,12 @@ public interface RuleApp {
      */
     boolean complete();
 
+	void setCostComputationTime(long time);
+
+	void setMatchingTime(long time);
+	
+	long getCostComputationTime();
+
+	long getMatchingTime();
+
 }

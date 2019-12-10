@@ -20,8 +20,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.TacletApp;
 
 /**
  * This class wraps the information about the delayed cut. It only wraps data
@@ -39,7 +39,7 @@ public class DelayedCut {
     private final int cutMode;
     private final Term decisionPredicate;
     private final RuleApp firstAppliedRuleApp;
-    private NoPosTacletApp hideApp = null;
+    private TacletApp hideApp = null;
     private ImmutableList<NodeGoalPair> goalsAfterUncovering = null;
     private Goal remainingGoal = null;
 
@@ -78,7 +78,7 @@ public class DelayedCut {
         return proof;
     }
 
-    void setHideApp(NoPosTacletApp hideApp) {
+    void setHideApp(TacletApp hideApp) {
         if (this.hideApp != null) {
             throw new IllegalArgumentException("There already exists an app.");
         }
@@ -106,7 +106,7 @@ public class DelayedCut {
         return goalsAfterUncovering;
     }
 
-    public NoPosTacletApp getHideApp() {
+    public TacletApp getHideApp() {
         return hideApp;
     }
 

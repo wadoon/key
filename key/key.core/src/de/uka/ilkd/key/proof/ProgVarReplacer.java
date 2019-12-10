@@ -128,8 +128,8 @@ public final class ProgVarReplacer {
 	ImmutableList<NoPosTacletApp> noPosTacletApps
 		= tacletIndex.getPartialInstantiatedApps();
 	ImmutableSet<NoPosTacletApp> appsToBeRemoved, appsToBeAdded;
-	appsToBeRemoved = DefaultImmutableSet.<NoPosTacletApp>nil();
-	appsToBeAdded   = DefaultImmutableSet.<NoPosTacletApp>nil();
+	appsToBeRemoved = DefaultImmutableSet.nil();
+	appsToBeAdded   = DefaultImmutableSet.nil();
 
 	Iterator<NoPosTacletApp> it = noPosTacletApps.iterator();
 	while(it.hasNext()) {
@@ -144,6 +144,8 @@ public final class ProgVarReplacer {
 				noPosTacletApp.taclet(),
 		    		newInsts,
 				noPosTacletApp.ifFormulaInstantiations(),
+				noPosTacletApp.getCostComputationTime(),
+				noPosTacletApp.getMatchingTime(),
 				services);
 		appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
 		appsToBeAdded   = appsToBeAdded.add(newNoPosTacletApp);

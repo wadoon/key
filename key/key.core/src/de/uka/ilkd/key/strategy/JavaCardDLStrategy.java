@@ -2784,7 +2784,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      */
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
             Goal goal) {
-        return costComputationF.computeCost(app, pio, goal);
+    	
+    	final long start = System.nanoTime();
+    	
+        final RuleAppCost cost = costComputationF.computeCost(app, pio, goal);
+        
+        app.setCostComputationTime(System.nanoTime()-start);
+        
+        return cost;
     }
 
     /**
@@ -2797,12 +2804,18 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      */
     public final boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
             Goal goal) {
-        return !(approvalF.computeCost(app, pio, goal) instanceof TopRuleAppCost);
+    	final long start = System.nanoTime();
+        boolean result = !(approvalF.computeCost(app, pio, goal) instanceof TopRuleAppCost);
+        app.setCostComputationTime(app.getCostComputationTime() + System.nanoTime()-start);
+        return result;
     }
 
     protected RuleAppCost instantiateApp(RuleApp app,
             PosInOccurrence pio, Goal goal) {
-        return instantiationF.computeCost(app, pio, goal);
+    	final long start = System.nanoTime();
+    	RuleAppCost cost = instantiationF.computeCost(app, pio, goal);
+    	app.setCostComputationTime(app.getCostComputationTime() + System.nanoTime()-start);
+        return cost;
     }
 
     // //////////////////////////////////////////////////////////////////////////

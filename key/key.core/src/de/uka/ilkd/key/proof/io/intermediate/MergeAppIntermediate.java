@@ -65,6 +65,8 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
      * @param abstractionPredicates
      *            The abstraction predicates, if predicate abstraction is used
      *            as a join technique.
+     * @param matchingTime 
+     * @param costComputationTime 
      * @param currAbstractionPredicates
      */
     public MergeAppIntermediate(
@@ -76,8 +78,8 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
             ImmutableList<Name> newNames,
             String distinguishingFormula,
             Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType,
-            String abstractionPredicates, String userChoices) {
-        super(ruleName, pos, null, null, newNames);
+            String abstractionPredicates, String userChoices, long costComputationTime, long matchingTime) {
+        super(ruleName, pos, null, null, newNames,costComputationTime,matchingTime);
 
         String mergeRuleName = MergeRule.INSTANCE.name().toString();
         assert ruleName.equals(mergeRuleName) : "This was somehow unexpected; are there other join rules than " + mergeRuleName + "?";

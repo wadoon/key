@@ -241,7 +241,7 @@ public final class RuleAppIndex  {
     public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter    filter,
 					      PosInOccurrence pos,
 					      TermServices        services) { 
-	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+	ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
 		( interactiveTacletAppIndex.getFindTaclet
@@ -267,7 +267,7 @@ public final class RuleAppIndex  {
      */
     public ImmutableList<NoPosTacletApp> getNoFindTaclet(TacletFilter    filter,
 						Services        services) { 
-	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+	ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
 	if ( !autoMode ) {
 	    result = interactiveTacletAppIndex.getNoFindTaclet(filter, services) ; 
 	}
@@ -292,7 +292,7 @@ public final class RuleAppIndex  {
     public ImmutableList<NoPosTacletApp> getRewriteTaclet (TacletFilter    filter,
 						  PosInOccurrence pos,
 						  TermServices        services) { 
-	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+	ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
 	if ( !autoMode ) {
 	    result = result.prepend 
 		( interactiveTacletAppIndex.getRewriteTaclet

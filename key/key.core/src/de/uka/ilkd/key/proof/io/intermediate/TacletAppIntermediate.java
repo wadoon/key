@@ -34,6 +34,8 @@ public class TacletAppIntermediate extends AppIntermediate {
     private ImmutableList<String> ifSeqFormulaList = null;
     private ImmutableList<String> ifDirectFormulaList = null;
     private ImmutableList<Name> newNames = null;
+	private long costComputationTime;
+	private long matchingTime;
 
     /**
      * Constructs a new intermediate taclet application.
@@ -45,11 +47,13 @@ public class TacletAppIntermediate extends AppIntermediate {
      * @param ifSeqFormulaList
      * @param ifDirectFormulaList
      * @param newNames New names registered during taclet application.
+     * @param matchingTime 
+     * @param costComputationTime 
      */
     public TacletAppIntermediate(String tacletName,
             Pair<Integer, PosInTerm> posInfo, LinkedList<String> insts,
             ImmutableList<String> ifSeqFormulaList, ImmutableList<String> ifDirectFormulaList,
-            ImmutableList<Name> newNames) {
+            ImmutableList<Name> newNames, long costComputationTime, long matchingTime) {
         // Taclet names are internalized later, so we don't waste memory
         this.tacletName = tacletName.intern();
         this.posInfo = posInfo;
@@ -57,6 +61,8 @@ public class TacletAppIntermediate extends AppIntermediate {
         this.ifSeqFormulaList = ifSeqFormulaList;
         this.ifDirectFormulaList = ifDirectFormulaList;
         this.newNames = newNames;
+        this.costComputationTime = costComputationTime;
+        this.matchingTime = matchingTime;
     }
 
     public String getRuleName() {
@@ -86,5 +92,13 @@ public class TacletAppIntermediate extends AppIntermediate {
     public ImmutableList<Name> getNewNames() {
         return newNames;
     }
+
+	public long getCostComputationTime() {
+		return costComputationTime;
+	}
+
+	public long getMatchingTime() {
+		return matchingTime;
+	}
 
 }

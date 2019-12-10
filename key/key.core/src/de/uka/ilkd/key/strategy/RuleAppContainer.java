@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -100,7 +101,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         if (rules.size() == 1) {
             result = result.prepend( createAppContainer(rules.head(), pos, goal));
         } else if (rules.size() > 1) {
-            ImmutableList<NoPosTacletApp> tacletApplications = ImmutableSLList.<NoPosTacletApp>nil();
+            ImmutableList<NoPosTacletApp> tacletApplications = ImmutableSLList.nil();
             ImmutableList<IBuiltInRuleApp> builtInRuleApplications = ImmutableSLList.<IBuiltInRuleApp>nil();
 
             for (RuleApp rule : rules) {

@@ -189,7 +189,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         if(proof != lastProof) {
             shutdownIndices();
             lastProof = proof;
-            appsTakenOver = ImmutableSLList.<NoPosTacletApp>nil();
+            appsTakenOver = ImmutableSLList.nil();
             indices = new TacletIndex[ruleSets.size()];
             notSimplifiableCaches = (Map<Term,Term>[]) new LRUCache[indices.length];
             int i = 0;
@@ -437,7 +437,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                                                             inAntecedent); // It is required to create a new PosInOccurrence because formula and pio.constrainedFormula().formula() are only equals module renamings and term labels
         ImmutableList<IfFormulaInstantiation> ifInst = ImmutableSLList.nil();
         ifInst = ifInst.append(new IfFormulaInstDirect(pio.sequentFormula()));
-        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO, lastProof.getServices());
+        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO, 0, 0, lastProof.getServices());
         return ta;
     }
 

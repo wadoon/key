@@ -93,7 +93,7 @@ public class TermTacletAppIndex {
             RuleFilter      filter,
             Services        services,
             TacletIndex     tacletIndex) {
-        ImmutableList<NoPosTacletApp> tacletInsts = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> tacletInsts = ImmutableSLList.nil();
         if ( pos.isTopLevel () ) {
             if ( pos.isInAntec () ) {
                 tacletInsts =
@@ -737,7 +737,7 @@ public class TermTacletAppIndex {
      */
     public static ImmutableList<NoPosTacletApp> filter (RuleFilter p_filter,
             ImmutableList<NoPosTacletApp> taclets) {
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
 
         for (final NoPosTacletApp app :  taclets) {
             if ( p_filter.filter ( app.taclet () ) ) {

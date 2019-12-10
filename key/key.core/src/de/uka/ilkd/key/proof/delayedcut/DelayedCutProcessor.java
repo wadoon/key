@@ -368,12 +368,12 @@ public class DelayedCutProcessor implements Runnable {
         if (oldRuleApp instanceof PosTacletApp) {
             PosTacletApp app = (PosTacletApp) oldRuleApp;
             return PosTacletApp.createPosTacletApp((FindTaclet) app.taclet(),
-                    app.instantiations(), app.ifFormulaInstantiations(),
-                    newPos, services);
+                    app.instantiations(), app.ifFormulaInstantiations(), newPos,
+                    oldRuleApp.getCostComputationTime(), oldRuleApp.getMatchingTime(), services);
         }
 
         if (oldRuleApp instanceof IBuiltInRuleApp) {
-            IBuiltInRuleApp app = (IBuiltInRuleApp) oldRuleApp;
+            IBuiltInRuleApp app = (IBuiltInRuleApp) oldRuleApp;            
             return app.replacePos(newPos);
         }
 

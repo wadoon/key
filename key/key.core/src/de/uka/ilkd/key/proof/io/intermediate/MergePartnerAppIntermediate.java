@@ -26,11 +26,13 @@ public class MergePartnerAppIntermediate extends BuiltInAppIntermediate {
      * @param pos Position information for the merge rule application (Symbolic State - Program Counter formula).
      * @param mergeNodeId The ID of the corresponding merge node.
      * @param newNames New names registered in the course of partner goal closing.
+     * @param matchingTime 
+     * @param costComputationTime 
      */
     public MergePartnerAppIntermediate(String ruleName,
             Pair<Integer, PosInTerm> pos,
-            int mergeNodeId, ImmutableList<Name> newNames) {
-        super(ruleName, pos, null, null, newNames);
+            int mergeNodeId, ImmutableList<Name> newNames, long costComputationTime, long matchingTime) {
+        super(ruleName, pos, null, null, newNames,costComputationTime,matchingTime);
         
         assert ruleName.equals(CloseAfterMerge.INSTANCE.name().toString()) :
             "Check if something should be changed when implementing a new rule for merge partners.";

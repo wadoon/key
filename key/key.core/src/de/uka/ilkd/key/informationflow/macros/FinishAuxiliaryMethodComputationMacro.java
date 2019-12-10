@@ -69,7 +69,7 @@ public class FinishAuxiliaryMethodComputationMacro
         final Taclet rwTaclet = tacletBuilder.buildTaclet();
         initiatingProof.addLabeledTotalTerm(result);
         initiatingProof.addLabeledIFSymbol(rwTaclet);
-        initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true,0,0);
         addContractApplicationTaclets(initiatingGoal, proof);
         initiatingProof.unionIFSymbols(((InfFlowProof) proof).getIFSymbols());
         initiatingProof.getIFSymbols().useProofSymbols();

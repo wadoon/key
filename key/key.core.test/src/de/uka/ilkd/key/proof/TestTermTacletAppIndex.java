@@ -34,18 +34,19 @@ import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 
 public class TestTermTacletAppIndex extends TestCase{   
 
-    NoPosTacletApp ruleRewriteNonH1H2; 
-    NoPosTacletApp ruleNoFindNonH1H2H3;
-    NoPosTacletApp ruleAntecH1;
-    NoPosTacletApp ruleSucc;
-    NoPosTacletApp ruleMisMatch;
-    NoPosTacletApp notfreeconflict;
+    TacletApp ruleRewriteNonH1H2; 
+    TacletApp ruleNoFindNonH1H2H3;
+    TacletApp ruleAntecH1;
+    TacletApp ruleSucc;
+    TacletApp ruleMisMatch;
+    TacletApp notfreeconflict;
     NoPosTacletApp remove_f;
     NoPosTacletApp remove_ff;
     NoPosTacletApp remove_zero;

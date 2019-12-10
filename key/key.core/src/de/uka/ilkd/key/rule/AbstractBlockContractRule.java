@@ -408,7 +408,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
             InfFlowValidityData infFlowValitidyData, final Term contextUpdate,
             final Term remembranceUpdate, final Term anonymisationUpdate, final TermBuilder tb) {
         usageGoal.addTaclet(infFlowValitidyData.taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
-                true);
+                true, 0, 0);
         final Term uAssumptions
                 = tb.applySequential(new Term[] { contextUpdate, remembranceUpdate },
                         tb.and(infFlowValitidyData.preAssumption,

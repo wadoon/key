@@ -527,7 +527,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                 true,
                 false);
         goal.addTaclet(informationFlowContractApp,
-                SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+                SVInstantiations.EMPTY_SVINSTANTIATIONS, true,0,0);
 
         // information flow proofs might get easier if we add the (proved)
         // method contract precondition as an assumption to the post goal

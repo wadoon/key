@@ -441,10 +441,15 @@ public final class Goal  {
      */
     public void addTaclet(Taclet           rule,
           SVInstantiations insts,
-          boolean          isAxiom) {
+          boolean          isAxiom,
+          long costComputationTime, 
+          long matchingTime
+          ) {
        NoPosTacletApp tacletApp =
              NoPosTacletApp.createFixedNoPosTacletApp(rule,
                    insts,
+                   costComputationTime,
+                   matchingTime,
                    proof().getServices());
        if (tacletApp != null) {
           addNoPosTacletApp(tacletApp);

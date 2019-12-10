@@ -144,6 +144,8 @@ options {
          prooflabel2tag.put("mergeId", ProofElementID.MERGE_ID);
          prooflabel2tag.put("userChoices", ProofElementID.MERGE_USER_CHOICES);
          prooflabel2tag.put("opengoal", ProofElementID.OPEN_GOAL);
+         prooflabel2tag.put("matchingTime", ProofElementID.MATCHING_TIME);
+         prooflabel2tag.put("costComputationTime", ProofElementID.COST_COMPUTATION_TIME);         
    }
 
    private NamespaceSet nss;

@@ -117,6 +117,10 @@ public abstract class TacletApp implements RuleApp {
      */
     protected boolean updateContextFixed = false;
 
+	private long costComputationTime;
+
+	private long matchingTime;
+
     /**
      * constructs a TacletApp for the given taclet, with an empty instantiation
      * map
@@ -945,13 +949,19 @@ public abstract class TacletApp implements RuleApp {
     public TacletApp setIfFormulaInstantiations(
 	    ImmutableList<IfFormulaInstantiation> p_list, 
 	    Services p_services) {
-	assert p_list != null && ifInstsCorrectSize(taclet, p_list)
-		&& ifInstantiations == null : "If instantiations list has wrong size or is null "
-		+ "or the if formulas have already been instantiated";
+    	assert p_list != null && ifInstsCorrectSize(taclet, p_list)
+    			&& ifInstantiations == null : "If instantiations list has wrong size or is null "
+    					+ "or the if formulas have already been instantiated";
 
-	MatchConditions mc = taclet().getMatcher().matchIf(p_list, matchConditions, p_services);
+    	final long start = System.nanoTime();
 
-	return mc == null ? null : setAllInstantiations(mc, p_list, p_services);
+    	MatchConditions mc = taclet().getMatcher().matchIf(p_list, matchConditions, p_services);
+
+    	TacletApp result = mc == null ? null : setAllInstantiations(mc, p_list, p_services);
+    	if (result != null) {
+    		result.setMatchingTime(matchingTime+(System.nanoTime()-start));
+    	}
+    	return result;
     }
 
     /**
@@ -961,23 +971,23 @@ public abstract class TacletApp implements RuleApp {
      * @return a list of tacletapps with the found if formula instantiations
      */
     public ImmutableList<TacletApp> findIfFormulaInstantiations(
-	    Sequent p_seq,
-	    Services p_services) {
+    		Sequent p_seq,
+    		Services p_services) {
 
-	Debug.assertTrue(ifInstantiations == null,
-		"The if formulas have already been instantiated");
+    	Debug.assertTrue(ifInstantiations == null,
+    			"The if formulas have already been instantiated");
 
-	if (taclet().ifSequent().isEmpty())
-	    return ImmutableSLList.<TacletApp>nil().prepend(this);
+    	if (taclet().ifSequent().isEmpty())
+    		return ImmutableSLList.<TacletApp>nil().prepend(this);
 
-	return findIfFormulaInstantiationsHelp(
-		createSemisequentList(taclet().ifSequent() // Matching starting
-			.succedent()), // with the last formula
-		createSemisequentList(taclet().ifSequent().antecedent()),
-		IfFormulaInstSeq.createList(p_seq, false, p_services), IfFormulaInstSeq
-			.createList(p_seq, true, p_services),
-		ImmutableSLList.<IfFormulaInstantiation>nil(), matchConditions(),
-		p_services);
+    	return findIfFormulaInstantiationsHelp(
+    			createSemisequentList(taclet().ifSequent() // Matching starting
+    					.succedent()), // with the last formula
+    			createSemisequentList(taclet().ifSequent().antecedent()),
+    			IfFormulaInstSeq.createList(p_seq, false, p_services), IfFormulaInstSeq
+    			.createList(p_seq, true, p_services),
+    			ImmutableSLList.<IfFormulaInstantiation>nil(), matchConditions(),
+    			p_services);
 
     }
 
@@ -1072,6 +1082,8 @@ public abstract class TacletApp implements RuleApp {
 		instantiations(), 
 		ifFormulaInstantiations(), 
 		pos,
+		this.costComputationTime,
+		this.matchingTime,
 		services);
     }
   
@@ -1295,7 +1307,27 @@ public abstract class TacletApp implements RuleApp {
         return null;
     }
 
-    /**
+    @Override
+	public void setCostComputationTime(long time) {
+		this.costComputationTime = time; 
+	}
+
+	@Override
+	public void setMatchingTime(long time) {
+		this.matchingTime = time; 
+	}
+
+	@Override
+	public long getCostComputationTime() {
+		return costComputationTime;
+	}
+
+	@Override
+	public long getMatchingTime() {
+		return matchingTime;
+	}
+
+	/**
      * checks if the variable conditions of type 'x not free in y' are hold by
      * the found instantiations. The variable conditions is used implicit in the
      * prefix. (Used to calculate the prefix)

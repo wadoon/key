@@ -75,7 +75,7 @@ public class IfInstantiator {
                     ifSequent.succedent().asList().reverse(), //// Matching with the last formula
                     ifSequent.antecedent().asList().reverse(),
                     ImmutableSLList.nil(), tacletAppContainer.getTacletApp().matchConditions(),
-                    false);
+                    false,tacletAppContainer.getRuleApp().getCostComputationTime(),tacletAppContainer.getRuleApp().getMatchingTime());
         }
     }
 
@@ -192,12 +192,12 @@ public class IfInstantiator {
      */
     private void findIfFormulaInstantiationsHelp(ImmutableList<SequentFormula> p_ifSeqTail,
             ImmutableList<SequentFormula> p_ifSeqTail2nd, ImmutableList<IfFormulaInstantiation> p_alreadyMatched,
-            MatchConditions p_matchCond, boolean p_alreadyMatchedNewFor) {
+            MatchConditions p_matchCond, boolean p_alreadyMatchedNewFor, long costComputationTime, long matchingTime) {
 
         while (p_ifSeqTail.isEmpty()) {
             if (p_ifSeqTail2nd == null) {
                 // All formulas have been matched, collect the results
-                addResult(setAllInstantiations(p_matchCond, p_alreadyMatched));
+                addResult(setAllInstantiations(p_matchCond, p_alreadyMatched,costComputationTime, matchingTime));
                 return;
             } else {
                 // Change from succedent to antecedent
@@ -211,6 +211,7 @@ public class IfInstantiator {
         final boolean lastIfFormula = p_ifSeqTail.size() == 1 && (p_ifSeqTail2nd == null || p_ifSeqTail2nd.isEmpty());
         final ImmutableList<IfFormulaInstantiation> formulas = getSequentFormulas(antec,
                 !lastIfFormula || p_alreadyMatchedNewFor);
+        long start = System.nanoTime();
         final IfMatchResult mr = getTaclet().getMatcher().matchIf(formulas, p_ifSeqTail.head().formula(), p_matchCond,
                 getServices());
 
@@ -222,7 +223,7 @@ public class IfInstantiator {
             final boolean nextAlreadyMatchedNewFor = lastIfFormula || p_alreadyMatchedNewFor
                     || isNewFormula((IfFormulaInstSeq) ifInstantiation);
             findIfFormulaInstantiationsHelp(p_ifSeqTail, p_ifSeqTail2nd, p_alreadyMatched.prepend(ifInstantiation),
-                    itMC.next(), nextAlreadyMatchedNewFor);
+                    itMC.next(), nextAlreadyMatchedNewFor, costComputationTime, matchingTime+System.nanoTime()-start);
         }
     }
 
@@ -231,9 +232,9 @@ public class IfInstantiator {
     }
 
     private NoPosTacletApp setAllInstantiations(MatchConditions p_matchCond,
-            ImmutableList<IfFormulaInstantiation> p_alreadyMatched) {
+            ImmutableList<IfFormulaInstantiation> p_alreadyMatched, long costComputationTime, long matchingTime) {
         return NoPosTacletApp.createNoPosTacletApp(getTaclet(), p_matchCond.getInstantiations(), p_alreadyMatched,
-                getServices());
+                costComputationTime,matchingTime,getServices());
     }
 
     /**

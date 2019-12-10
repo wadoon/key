@@ -30,6 +30,10 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 	protected final PosInOccurrence pio;
 	protected ImmutableList<PosInOccurrence> ifInsts;
 
+	private long costComputationTime;
+
+	private long matchingTime;
+
 	protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
 	                                 ImmutableList<PosInOccurrence> ifInsts) {
         this.builtInRule = rule;
@@ -127,6 +131,26 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     public boolean complete() {
     	return true;
     }
+    
+    @Override
+  	public void setCostComputationTime(long time) {
+  		this.costComputationTime = time; 
+  	}
+
+  	@Override
+  	public void setMatchingTime(long time) {
+  		this.matchingTime = time; 
+  	}
+
+  	@Override
+  	public long getCostComputationTime() {
+  		return costComputationTime;
+  	}
+
+  	@Override
+  	public long getMatchingTime() {
+  		return matchingTime;
+  	}
 
 	@Override
     public String toString() {

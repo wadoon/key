@@ -372,7 +372,17 @@ public class OutputStreamProofSaver {
             output.append(ifFormulaInsts(node, l));
         }
         output.append("");
-        userInteraction2Proof(node, output);
+        userInteraction2Proof(node, output);        
+        output.append("");
+        
+        output.append("(costComputationTime \"");
+        output.append(""+appliedRuleApp.getCostComputationTime());
+        output.append("\")");
+
+        output.append("(matchingTime \"");
+        output.append(""+appliedRuleApp.getMatchingTime());
+        output.append("\")");
+
         output.append(")\n");
     }
 

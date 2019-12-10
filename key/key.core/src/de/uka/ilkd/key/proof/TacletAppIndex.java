@@ -303,7 +303,7 @@ public class TacletAppIndex  {
         final Iterator<NoPosTacletApp> it =
             getFindTaclet ( pos, filter, services ).iterator();
 
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
 
         while ( it.hasNext () ) {
             final NoPosTacletApp tacletApp = it.next ();

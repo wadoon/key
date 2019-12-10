@@ -62,11 +62,15 @@ public class PosTacletApp extends TacletApp {
 	createPosTacletApp(FindTaclet       taclet,
 			   SVInstantiations instantiations,
 			   PosInOccurrence  pos,
+			   long costComputationTime,
+			   long matchingTime,
 			   Services services) {
 	return createPosTacletApp ( taclet,
 				    instantiations,
 				    null,
 				    pos,
+				    costComputationTime,
+				    matchingTime,
 				    services);
     }
 
@@ -75,6 +79,8 @@ public class PosTacletApp extends TacletApp {
 			   SVInstantiations             instantiations,
 			   ImmutableList<IfFormulaInstantiation> ifInstantiations,
 			   PosInOccurrence              pos,
+			   long costComputationTime,
+			   long matchingTime,
 			   Services                     services) {
 	Debug.assertTrue ( ifInstsCorrectSize ( taclet, ifInstantiations ),
 			   "If instantiations list has wrong size" );
@@ -85,10 +91,13 @@ public class PosTacletApp extends TacletApp {
 		pos,
 		services);
 	if (checkVarCondNotFreeIn(taclet, instantiations, pos)) {
-	    return new PosTacletApp(taclet,
+	    PosTacletApp app = new PosTacletApp(taclet,
 				    instantiations,
 				    ifInstantiations,
 				    pos);
+	    app.setCostComputationTime(costComputationTime);
+	    app.setMatchingTime(matchingTime);
+	    return app;
 	}
 
 	return null;
@@ -97,11 +106,15 @@ public class PosTacletApp extends TacletApp {
     public static PosTacletApp createPosTacletApp(FindTaclet         taclet,
 						  MatchConditions    matchCond,
 						  PosInOccurrence    pos,
+						  long costComputationTime,
+						  long matchingTime,
 						  Services           services) {
 	return createPosTacletApp ( taclet,
 				    matchCond.getInstantiations   (),
 				    null,
 				    pos,
+				    costComputationTime,
+				    matchingTime,
 				    services);
     }
 
@@ -218,12 +231,16 @@ public class PosTacletApp extends TacletApp {
 				      .addInteresting(sv, term, services),
 				      ifFormulaInstantiations (),
 				      posInOccurrence  (),
+				      this.getCostComputationTime(),
+				      this.getMatchingTime(),
 				      services);
 	else
 	    return createPosTacletApp((FindTaclet)taclet(),
 				      instantiations().add(sv, term, services),
 				      ifFormulaInstantiations (),
 				      posInOccurrence  (),
+				      this.getCostComputationTime(),
+				      this.getMatchingTime(),
 				      services);
     }
 
@@ -243,6 +260,8 @@ public class PosTacletApp extends TacletApp {
 				      .addInteresting(sv, pe, services),
 				      ifFormulaInstantiations (),
 				      posInOccurrence  (),
+				      this.getCostComputationTime(),
+				      this.getMatchingTime(),
 				      services);
 	else
 	    return createPosTacletApp((FindTaclet)taclet(),
@@ -250,6 +269,8 @@ public class PosTacletApp extends TacletApp {
 				      .add(sv, pe, services),
 				      ifFormulaInstantiations (),
 				      posInOccurrence  (),
+				      this.getCostComputationTime(),
+				      this.getMatchingTime(),
 				      services);
     }
 
@@ -265,12 +286,16 @@ public class PosTacletApp extends TacletApp {
 		    		      instantiations().addInterestingList(sv, list, services),
 		    		      ifFormulaInstantiations(),
 		    		      posInOccurrence(),
+		    		      this.getCostComputationTime(),
+					      this.getMatchingTime(),
 		    		      services);
 	} else {
 	    return createPosTacletApp((FindTaclet) taclet(),
 		    		      instantiations().addList(sv, list, services),
 		    		      ifFormulaInstantiations(),
 		    		      posInOccurrence(),
+		    		      this.getCostComputationTime(),
+					      this.getMatchingTime(),
 		    		      services);
 	}
     }
@@ -291,6 +316,8 @@ public class PosTacletApp extends TacletApp {
 				  svi.union(instantiations(), services),
 				  ifFormulaInstantiations (),
 				  posInOccurrence  (),
+				  this.getCostComputationTime(),
+				  this.getMatchingTime(),
 				  services);
     }
 
@@ -310,6 +337,8 @@ public class PosTacletApp extends TacletApp {
 				  svi,
 				  ifFormulaInstantiations (),
 				  posInOccurrence  (),
+				  this.getCostComputationTime(),
+				  this.getMatchingTime(),
 				  services);
     }
 
@@ -326,6 +355,8 @@ public class PosTacletApp extends TacletApp {
 				   mc.getInstantiations   (),
 				   ifFormulaInstantiations (),
 				   posInOccurrence (),
+				   this.getCostComputationTime(),
+				   this.getMatchingTime(),
 				   services);
     }
 
@@ -343,6 +374,8 @@ public class PosTacletApp extends TacletApp {
 				   mc.getInstantiations   (),
 				   ifInstantiations,
 				   posInOccurrence (),
+				   this.getCostComputationTime(),
+				   this.getMatchingTime(),
 				   services);
     }
 

@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -43,7 +43,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
     private final FormulaTag      positionTag;
     private final PosInOccurrence applicationPosition;
 
-    FindTacletAppContainer ( NoPosTacletApp         p_app,
+    FindTacletAppContainer ( TacletApp         p_app,
 			     PosInOccurrence p_pio,
 			     RuleAppCost     p_cost,
 			     Goal            p_goal,

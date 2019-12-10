@@ -44,6 +44,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -74,7 +75,7 @@ public abstract class TacletIndex  {
 
     /** contains NoFind-Taclets */
     protected ImmutableList<NoPosTacletApp> noFindList
-	= ImmutableSLList.<NoPosTacletApp>nil();
+	= ImmutableSLList.nil();
 
     /**
      * keeps track of no pos taclet apps with partial 
@@ -95,7 +96,7 @@ public abstract class TacletIndex  {
         rwList     = new LinkedHashMap<>();
         antecList  = new LinkedHashMap<>();    
         succList   = new LinkedHashMap<>();
-        noFindList = ImmutableSLList.<NoPosTacletApp>nil();
+        noFindList = ImmutableSLList.nil();
         addTaclets(toNoPosTacletApp(tacletSet));
     }
 
@@ -189,7 +190,7 @@ public abstract class TacletIndex  {
     }
 
     public static ImmutableSet<NoPosTacletApp> toNoPosTacletApp(Iterable<Taclet> rule) {
-	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+	ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
 	for (Taclet t : rule) {
 	    result = result.prepend(NoPosTacletApp.createNoPosTacletApp(t));
 	}
@@ -582,7 +583,7 @@ public abstract class TacletIndex  {
      */
     public ImmutableList<NoPosTacletApp> getPartialInstantiatedApps() {
         ImmutableList<NoPosTacletApp> result = 
-            ImmutableSLList.<NoPosTacletApp>nil(); 
+            ImmutableSLList.nil(); 
         final Iterator<NoPosTacletApp> it = partialInstantiatedRuleApps.iterator();
         while (it.hasNext()) {
             result = result.prepend(it.next());
@@ -677,7 +678,7 @@ public abstract class TacletIndex  {
 	 */
 	public ImmutableList<NoPosTacletApp> getList
 	    (HashMap<Object, ImmutableList<NoPosTacletApp>> map) {
-	    ImmutableList<NoPosTacletApp> result=ImmutableSLList.<NoPosTacletApp>nil();
+	    ImmutableList<NoPosTacletApp> result=ImmutableSLList.nil();
 	    for (int i=0; i<PREFIXTYPES; i++) {
 		if (occurred[i]) {
 		    ImmutableList<NoPosTacletApp> inMap=map.get(prefixClasses[i]);

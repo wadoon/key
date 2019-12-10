@@ -117,7 +117,7 @@ public class QueryExpand implements BuiltInRule {
         tb.addRuleSet(new RuleSet(new Name("concrete")));
 
         g.addFormula(new SequentFormula(queryEval.first), true, true);	//move the query call directly to the succedent. Use box instead of diamond?
-        g.addTaclet(tb.getTaclet(), SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        g.addTaclet(tb.getTaclet(), SVInstantiations.EMPTY_SVINSTANTIATIONS, true, ruleApp.getCostComputationTime(), ruleApp.getMatchingTime());
 
         /*  replaces old query
         final Term newFormula = replace(pio.constrainedFormula().formula(),

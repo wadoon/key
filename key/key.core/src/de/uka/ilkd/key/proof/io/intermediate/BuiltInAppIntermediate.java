@@ -21,16 +21,20 @@ public class BuiltInAppIntermediate extends AppIntermediate {
     private String contract = null;
     private ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts = null;
     private ImmutableList<Name> newNames = null;
+	private long matchingTime;
+	private long costComputationTime;
 
     public BuiltInAppIntermediate(String ruleName,
             Pair<Integer, PosInTerm> pos, String contract,
             ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts,
-            ImmutableList<Name> newNames) {
+            ImmutableList<Name> newNames, long costComputationTime, long matchingTime) {
         this.ruleName = ruleName;
         this.posInfo = pos;
         this.contract = contract;
         this.builtInIfInsts = builtInIfInsts;
         this.newNames = newNames;
+        this.costComputationTime = costComputationTime;
+        this.matchingTime = matchingTime;
     }
 
     public String getRuleName() {
@@ -56,5 +60,13 @@ public class BuiltInAppIntermediate extends AppIntermediate {
     public ImmutableList<Name> getNewNames() {
         return newNames;
     }
+
+	public long getMatchingTime() {
+		return matchingTime;
+	}
+
+	public long getCostComputationTime() {
+		return costComputationTime;
+	}
 
 }

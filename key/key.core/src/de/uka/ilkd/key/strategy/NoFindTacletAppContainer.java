@@ -13,14 +13,14 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.TacletApp;
 
 /**
  * Instances of this class are immutable
  */
 public class NoFindTacletAppContainer extends TacletAppContainer {
 
-    NoFindTacletAppContainer(NoPosTacletApp p_app, RuleAppCost p_cost, long p_age) {
+    NoFindTacletAppContainer(TacletApp p_app, RuleAppCost p_cost, long p_age) {
         super(p_app, p_cost, p_age);
     }
 

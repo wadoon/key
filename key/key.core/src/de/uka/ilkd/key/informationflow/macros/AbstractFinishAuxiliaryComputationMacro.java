@@ -113,7 +113,7 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
             for (final NoPosTacletApp ruleApp : ruleApps) {
                 final Taclet t = ruleApp.taclet();
                 if (t.getSurviveSymbExec()) {
-                    initiatingGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+                    initiatingGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, 0,0);
                 }
             }
         }

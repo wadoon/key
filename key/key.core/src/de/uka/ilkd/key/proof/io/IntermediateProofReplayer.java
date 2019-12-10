@@ -515,6 +515,8 @@ public class IntermediateProofReplayer {
             ourApp = ourApp.tryToInstantiate(proof.getServices());
         }
 
+        ourApp.setCostComputationTime(currInterm.getCostComputationTime());
+        ourApp.setMatchingTime(currInterm.getMatchingTime());
         return ourApp;
     }
 
@@ -656,6 +658,9 @@ public class IntermediateProofReplayer {
                 ourApp = ourApp.setIfInsts(builtinIfInsts);
                 builtinIfInsts = null;
             }
+            ourApp.setCostComputationTime(currInterm.getCostComputationTime());
+            ourApp.setMatchingTime(currInterm.getMatchingTime());
+
             return ourApp;
         }
 
@@ -676,6 +681,9 @@ public class IntermediateProofReplayer {
         }
         ourApp = ruleApps.iterator().next();
         builtinIfInsts = null;
+        ourApp.setCostComputationTime(currInterm.getCostComputationTime());
+        ourApp.setMatchingTime(currInterm.getMatchingTime());
+
         return ourApp;
     }
 

@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 
 public class Node  {
@@ -103,7 +104,7 @@ public class Node  {
      * then these taclets are stored in this list
      */
     private ImmutableSet<NoPosTacletApp>  localIntroducedRules =
-            DefaultImmutableSet.<NoPosTacletApp>nil();
+            DefaultImmutableSet.nil();
 
     /**
      * Holds the undo methods for the information added by rules to the
@@ -158,9 +159,16 @@ public class Node  {
     
     /** returns the matching time */
     public long getMatchingTime() {
-    	return Math.abs((long)(Math.random() * 1000)) ;
+		return appliedRuleApp.getMatchingTime();
     }
     
+    /** returns the cost computation time */
+    public long getRuleCostComputationTime() {
+    	if (appliedRuleApp != null) {
+    		return appliedRuleApp.getCostComputationTime();
+    	}
+    	return -1;
+    }
     
     /**
      * the node information object encapsulates non-logical information

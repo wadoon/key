@@ -70,7 +70,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         return instantiator.getResults ();
     }
 
-    protected static TacletAppContainer createContainer(NoPosTacletApp p_app,
+    protected static TacletAppContainer createContainer(TacletApp p_app,
                                                         PosInOccurrence p_pio,
                                                         Goal p_goal,
                                                         boolean p_initial) {
@@ -79,7 +79,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                  p_initial );
     }
 
-    private static TacletAppContainer createContainer(NoPosTacletApp p_app,
+    private static TacletAppContainer createContainer(TacletApp p_app,
                                                       PosInOccurrence p_pio,
                                                       Goal p_goal,
                                                       RuleAppCost p_cost,
@@ -140,7 +140,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * Use the method <code>instantiateApp</code> of the strategy for choosing
      * the values of schema variables that have not been instantiated so far
      */
-    private ImmutableList<RuleAppContainer> instantiateApp(NoPosTacletApp app,
+    private ImmutableList<RuleAppContainer> instantiateApp(TacletApp app,
                                                   ImmutableList<RuleAppContainer> targetList,
                                                   final Goal p_goal) {
         // just for being able to modify the result-list in an
@@ -172,7 +172,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * is <code>sufficientlyComplete</code>, and add the container to
      * <code>targetList</code>
      */
-    private ImmutableList<RuleAppContainer> addContainer(NoPosTacletApp app,
+    private ImmutableList<RuleAppContainer> addContainer(TacletApp app,
                                                 ImmutableList<RuleAppContainer> targetList,
                                                 Goal p_goal) {
         return targetList.prepend ( TacletAppContainer
@@ -230,7 +230,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         
         List<RuleAppCost> costs = new LinkedList<>();
         
-        for (NoPosTacletApp app : p_app) {
+        for (TacletApp app : p_app) {
             costs.add(p_goal.getGoalStrategy().computeCost ( app, p_pio, p_goal ));
         }
         
