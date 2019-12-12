@@ -64,7 +64,9 @@ import javax.xml.bind.JAXBException;
 import org.fife.ui.rsyntaxtextarea.CodeTemplateManager;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 import org.fife.ui.rsyntaxtextarea.Theme;
+import org.fife.ui.rsyntaxtextarea.Token;
 import org.fife.ui.rsyntaxtextarea.templates.StaticCodeTemplate;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.key_project.util.java.IOUtil;
@@ -1245,7 +1247,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         component.setTabSize(4);
         component.setTabsEmulated(true);
 
-        // Set eclipse theme
+        // Set idea theme
         try {
             final Theme theme = Theme.load(
                     getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/idea.xml"));
@@ -1253,6 +1255,10 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         } catch (IOException ioe) {
             // Shouldn't happen; never mind if it does.
         }
+        
+        SyntaxScheme scheme = component.getSyntaxScheme();
+        scheme.getStyle(Token.COMMENT_MULTILINE).foreground = COMMENT_COLOR;
+        scheme.getStyle(Token.COMMENT_EOL).foreground = COMMENT_COLOR;
 
         component.getDocument().addDocumentListener(udl(e -> setDirty(true)));
 

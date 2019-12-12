@@ -12,6 +12,7 @@
 //
 package de.uka.ilkd.key.gui.refinity.dialogs;
 
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -55,6 +56,13 @@ public interface RefinityWindowConstants extends RefinityWindowCodeTemplates {
                         .collect(Collectors.joining(" / "))
                 + " followed by <tt>Ctrl+Shift+Space</tt> (Mac: <tt>Command+Shift+Space</tt>).";
     }
+    
+    ////////////////////
+    // FONTS & COLORS //
+    ////////////////////
+    
+    static final Color COMMENT_COLOR = Color.decode("#373D3F");
+
 
     //////////////
     // TOOLTIPS //
