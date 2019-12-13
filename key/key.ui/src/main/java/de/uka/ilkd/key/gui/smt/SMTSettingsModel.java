@@ -88,11 +88,12 @@ public class SMTSettingsModel extends DefaultTreeModel {
 		solverOptions.add(new SolverOptions(SolverType.Z3_FP_SOLVER, smtSettings.getPiSettings()));
 		solverOptions.add(new SolverOptions(SolverType.Z3_NEW_TL_SOLVER, smtSettings.getPiSettings()));
 		solverOptions.add(new SolverOptions(SolverType.MATHSAT_FP_SOLVER,smtSettings.getPiSettings()));
+		solverOptions.add(new SolverOptions(SolverType.MATHSAT_SOLVER,smtSettings.getPiSettings()));
 		solverOptions.add(new SolverOptions(SolverType.YICES_SOLVER,smtSettings.getPiSettings()));
 		solverOptions.add(new SolverOptions(SolverType.SIMPLIFY_SOLVER,smtSettings.getPiSettings()));
 		solverOptions.add(new SolverOptions(SolverType.CVC3_SOLVER,smtSettings.getPiSettings()));
-        solverOptions.add(new SolverOptions(SolverType.CVC4_SOLVER,smtSettings.getPiSettings()));
-        solverOptions.add(new SolverOptions(SolverType.CVC4_FP_SOLVER,smtSettings.getPiSettings()));
+		solverOptions.add(new SolverOptions(SolverType.CVC4_SOLVER,smtSettings.getPiSettings()));
+		solverOptions.add(new SolverOptions(SolverType.CVC4_FP_SOLVER,smtSettings.getPiSettings()));
 
 
 

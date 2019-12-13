@@ -66,12 +66,15 @@ public abstract class AbstractSolverSocket implements PipeListener<SolverCommuni
 		else if(type == SolverType.CVC3_SOLVER){
 			return new CVC3Socket(name, query);
 		}
-        else if(type == SolverType.CVC4_SOLVER){
-            return new CVC4Socket(name, query);
-        }
-        else if(type == SolverType.CVC4_FP_SOLVER){
-            return new CVC4Socket(name, query);
-        }
+    else if(type == SolverType.CVC4_SOLVER){
+      return new CVC4Socket(name, query);
+    }
+    else if(type == SolverType.CVC4_FP_SOLVER){
+      return new CVC4Socket(name, query);
+    }
+		else if(type == SolverType.MATHSAT_SOLVER){
+			return new MATHSAT_FPSocket(name, query);
+		}
 
 		return null;
 	}

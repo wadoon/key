@@ -159,6 +159,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                 dataOfSolvers.put(SolverType.Z3_CE_SOLVER, new SolverData(SolverType.Z3_CE_SOLVER));
                 dataOfSolvers.put(SolverType.Z3_FP_SOLVER, new SolverData(SolverType.Z3_FP_SOLVER));
                 dataOfSolvers.put(SolverType.MATHSAT_FP_SOLVER, new SolverData(SolverType.MATHSAT_FP_SOLVER));
+                dataOfSolvers.put(SolverType.MATHSAT_SOLVER, new SolverData(SolverType.MATHSAT_SOLVER));
                 dataOfSolvers.put(SolverType.YICES_SOLVER, new SolverData(SolverType.YICES_SOLVER));
                 dataOfSolvers.put(SolverType.SIMPLIFY_SOLVER, new SolverData(SolverType.SIMPLIFY_SOLVER));
                 dataOfSolvers.put(SolverType.CVC3_SOLVER, new SolverData(SolverType.CVC3_SOLVER));
@@ -173,6 +174,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                 solverUnions.add(new SolverTypeCollection("CVC4",1,SolverType.CVC4_SOLVER));
                 solverUnions.add(new SolverTypeCollection("CVC4",1,SolverType.CVC4_FP_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Simplify",1,SolverType.SIMPLIFY_SOLVER));
+                solverUnions.add(new SolverTypeCollection("MathSAT", 1, SolverType.MATHSAT_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Multiple Solvers",2,
                                 // SolverType.Z3_SOLVER,
                                 SolverType.Z3_NEW_TL_SOLVER,
@@ -181,6 +183,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                                 SolverType.CVC4_SOLVER,
                                 SolverType.SIMPLIFY_SOLVER,
                                 SolverType.Z3_FP_SOLVER,
+                                SolverType.MATHSAT_SOLVER,
                                 SolverType.CVC4_FP_SOLVER));
         }
 
