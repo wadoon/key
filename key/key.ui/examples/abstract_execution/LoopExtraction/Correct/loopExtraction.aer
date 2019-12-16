@@ -11,6 +11,17 @@
 /*@ ae_constraint guardIsTrue(\value(footprintE)); */
 { ; }
 
+
+
+
+
+
+
+
+
+
+
+
 /*@ ae_constraint
   @   inv(\value(frameP)) &amp;&amp; decrExpr(\value(frameP)) &gt;= 0;
   @*/
@@ -109,6 +120,7 @@ while (
 /*@ loop_invariant
   @   decrExpr(\value(frameP)) &gt;= 0 &amp;&amp;
   @   inv(\value(frameP)) &amp;&amp;
+  @
   @   \value(frameQ) == resultQ(oldFootprintQ);
   @ assignable frameP, footprintE;
   @ decreases decrExpr(\value(frameP));
@@ -141,6 +153,16 @@ while (
       @ continue_behavior requires false;
       @*/
     \abstract_statement VariantHack;
+
+
+
+
+
+
+
+
+
+
     
     /*@ assignable frameP, footprintE;
       @ accessible footprintP;
