@@ -127,24 +127,6 @@ keySettings = "#Proof-Settings-Config-File
 [Strategy]ActiveStrategy=JavaCardDLStrategy
 "
 
-group abstract_updates {
-  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest01.key
-  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest02.key
-  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest03-INCORR.key
-  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest04.key
-  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest05-INCORR.key
-  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest06.key
-  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest07.key
-  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest08-INCORR.key
-  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest09-INCORR.key
-  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest10.key
-  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest11.key
-  notprovable ./abstract_execution/AbstractUpdateTreatment/simplificationTest12-INCORR.key
-  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest13.key
-  notprovable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest14-INCORR.key
-  provable    ./abstract_execution/AbstractUpdateTreatment/simplificationTest15.key
-}
-
 group abstract_execution_provable {
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfix/consolidateDuplicateConditionalFragments.aer
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrect/consolidateDuplicateConditionalFragments.aer
