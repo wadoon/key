@@ -17,27 +17,21 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.IrrelevantAssignable;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
@@ -364,135 +358,11 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
             return Optional.of(tb.skip());
         }
 
-        if (lhs == services.getTypeConverter().getHeapLDT().getHeap()) {
-            return simplifyElementaryHeapUpdate(update, relevantLocations, overwrittenLocations,
-                    goal, services);
-        }
-
         removeFromLocationSet(lhs, relevantLocations); // SIDE EFFECT!
         addToAssngLocationSet(lhs, overwrittenLocations); // SIDE EFFECT!
 
         /* NOTE: Cannot discard updates of the form x:=x, see bug #1269 (MU, CS) */
         return Optional.empty();
-    }
-
-    /**
-     * Returns either a simplified heap update (currently, removes an anon if the
-     * anonymized locations can be proven to be irrelevant), or otherwise an empty
-     * optional. In any case, as a <strong>side effect</strong>, that variable is
-     * removed from the set of relevant variables and added to the set of
-     * overwritten locations, since it's overwritten.
-     * 
-     * @param update               The elementary update to check.
-     * @param overwrittenLocations A set of locations that are overwritten and
-     *                             therefore definitely irrelevant.
-     * @param goal                 The goal in which the {@link Rule} should be
-     *                             applied.
-     * @param services             The {@link Services} object.
-     * @return The simplified update {@link Term}, or {@link Optional#empty()}.
-     */
-    private Optional<Term> simplifyElementaryHeapUpdate(Term update,
-            Set<AbstractUpdateLoc> relevantLocations, Set<AbstractUpdateLoc> overwrittenLocations,
-            Goal goal, Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-        final ElementaryUpdate eu = (ElementaryUpdate) update.op();
-        final LocationVariable lhs = (LocationVariable) eu.lhs();
-        final Term rhs = update.sub(0);
-
-        removeFromLocationSet(lhs, relevantLocations); // SIDE EFFECT!
-        addToAssngLocationSet(lhs, overwrittenLocations); // SIDE EFFECT!
-
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        if (rhs.op() instanceof Function && heapLDT.containsFunction((Function) rhs.op())) {
-            final Term maybeSimplifiedTerm = simplifyHeapRHS(rhs, relevantLocations,
-                    overwrittenLocations, goal, services);
-
-            if (maybeSimplifiedTerm != rhs) {
-                return Optional.of(tb.elementary(lhs, maybeSimplifiedTerm));
-            }
-        }
-
-        return Optional.empty();
-    }
-
-    /**
-     * Simplifies a heap term (a right-hand side of a heap update). Currently, drops
-     * anon applications if the anonymized locations are not relevant.
-     * 
-     * @param heapRHS              The heap term to simplify.
-     * @param relevantLocations    The relevant locations.
-     * @param overwrittenLocations A set of locations that are overwritten and
-     *                             therefore definitely irrelevant.
-     * @param goal                 The goal in which the {@link Rule} should be
-     *                             applied.
-     * @param services             The {@link Services} object.
-     * @return Either a simplified, or the (referentially) original term.
-     */
-    private Term simplifyHeapRHS(Term heapRHS, Set<AbstractUpdateLoc> relevantLocations,
-            Set<AbstractUpdateLoc> overwrittenLocations, Goal goal, Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-
-        if (heapRHS.op() == heapLDT.getHeap()) {
-            return heapRHS;
-        } else if (heapRHS.op() == heapLDT.getAnon()
-                && !(heapRHS.sub(1).op() instanceof UpdateApplication)) {
-            /*
-             * If we can show disjointness from the locset in the anon with all relevant
-             * (heap) locations, we can remove the anon.
-             */
-
-            final ImmutableSet<Term> anonLocs = tb.locsetUnionToSet(heapRHS.sub(1));
-
-            for (final Term locTerm : anonLocs) {
-                if (locTerm.op() instanceof UpdateApplication) {
-                    return heapRHS;
-                }
-
-                final AbstractUpdateLoc anonLoc = AbstractUpdateFactory
-                        .abstrUpdateLocFromTerm(locTerm, Optional.empty(), services);
-
-                /*
-                 * NOTE (DS, 2019-12-10): We deactivate this for everything but Skolem
-                 * locations, as there were some problems with non-abstract proofs. Consider,
-                 * for instance, the example "heap/list/ArrayList_concatenate.key". Anon terms
-                 * were dropped when that was not the right thing to do. The reason has to be a
-                 * wrong calculation of non-abstract heap locations (in that example,
-                 * "o_arr.*").
-                 */
-
-                if (!(anonLoc instanceof SkolemLoc) || isRelevant(anonLoc,
-                        relevantLocations.stream()
-                                .filter(loc -> !(loc instanceof PVLoc)
-                                        || ((PVLoc) loc).getVar() == heapLDT.getHeap())
-                                .collect(Collectors.toCollection(() -> new LinkedHashSet<>())),
-                        overwrittenLocations, goal, services)) {
-                    return heapRHS;
-                }
-            }
-
-            // success
-            return simplifyHeapRHS(heapRHS.sub(0), relevantLocations, overwrittenLocations, goal,
-                    services);
-        } else if (heapRHS.op() == heapLDT.getStore()) {
-            final Term subHeap = heapRHS.sub(0);
-            final Term subResult = simplifyHeapRHS(subHeap, relevantLocations, overwrittenLocations,
-                    goal, services);
-
-            if (subResult == subHeap) {
-                return heapRHS;
-            } else {
-                return tb.store(subResult, subHeap.sub(1), subHeap.sub(2), subHeap.sub(3));
-            }
-        }
-
-        /*
-         * TODO (DS, 2019-12-05): Support more heap constructors. Actually, it would be
-         * nice if there was a common interface for descending in a heap structure and
-         * replacing things...
-         */
-
-        return heapRHS;
     }
 
     /**

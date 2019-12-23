@@ -37,7 +37,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
- * {@link RuleApp} for the {@link SimplifyUpdatesAbstractRule}.
+ * {@link RuleApp} for the {@link DropAbstractUpdateInSelectRule}.
  * 
  * @author Dominic Steinhoefel
  */
