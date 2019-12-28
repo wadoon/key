@@ -42,7 +42,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * Transforms an {@link AbstractUpdate} like
  * <code>U_P(x!,y!,someloc:=accessibles)</code> to a parallel update
- * <code>U_P(x,y,someloc:=accessibles)||x:=f_P_1(accessibles)||y:=f_P_2(accessibles)</code>.
+ * <code>U_P(_,_,someloc:=accessibles)||x:=f_P_1(accessibles)||y:=f_P_2(accessibles)</code>.
  * Since the update it parallel, it doesn't matter whether x, someloc are in
  * accessibles or not. Note that the {@link HasToLoc}s are converted to normal
  * locations. This is necessary to prevent endless loops of extracting
