@@ -256,14 +256,22 @@ public class MergeRuleUtils {
             final List<Term> targetUpdates = getElementaryUpdates(
                     UpdateApplication.getTarget(u), cleanConflicts, tb);
             for (final Term target : targetUpdates) {
-                assert target.op() instanceof ElementaryUpdate;
+                assert target.op() instanceof ElementaryUpdate
+                        || target.op() instanceof AbstractUpdate;
 
-                final LocationVariable lhs = //
-                        (LocationVariable) ((ElementaryUpdate) target.op())
-                                .lhs();
-                final Term rhs = tb.apply(update, target.sub(0));
+                if (target.op() instanceof AbstractUpdate) {
+                    final ImmutableArray<Term> rhs = target.subs().stream()
+                            .map(sub -> tb.apply(update, sub))
+                            .collect(ImmutableArray.toImmutableArray());
+                    result.add(tb.abstractUpdate((AbstractUpdate) target.op(), rhs));
+                } else if (target.op() instanceof ElementaryUpdate) {
+                    final LocationVariable lhs = //
+                            (LocationVariable) ((ElementaryUpdate) target.op())
+                                    .lhs();
+                    final Term rhs = tb.apply(update, target.sub(0));
 
-                result.add(tb.elementary(tb.var(lhs), rhs));
+                    result.add(tb.elementary(tb.var(lhs), rhs));    
+                }
             }
         } else {
             throw new IllegalArgumentException("Expected an update in normal form!");
