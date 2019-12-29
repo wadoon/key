@@ -1,6 +1,13 @@
 REFINITY CHANGES
 ================
 
+## 2019-12-29 (v0.9.3) Dominic Steinhoefel <steinhoefel@cs.tu-darmstadt.de>
+
+  * Changed AE rules: Initialization of result and exception objects in abstract update scope. Breaks
+    backwards compatibility with existing proofs!
+  * Adapted Strategies: Simplification of abstract updates has now same priority as simplification of
+    concrete update. Leads to a performance boost.
+
 ## 2019-12-06 (v0.9.2) Dominic Steinhoefel <steinhoefel@cs.tu-darmstadt.de>
 
   * Bug fixes in conversion to KeY file

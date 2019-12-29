@@ -50,7 +50,6 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
     public final static SimplifyUpdatesAbstractRule INSTANCE = new SimplifyUpdatesAbstractRule();
 
     private final static Name RULE_NAME = new Name("simplifyUpdatesAbstract");
-//    private final static Map<PosInOccurrence, SimplifyUpdatesAbstractRuleApp> appCache = new HashMap<>();
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
@@ -95,16 +94,6 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
 
         return opColl.ops().stream().anyMatch(AbstractUpdate.class::isInstance)
                 || opColl.ops().stream().anyMatch(op -> op == valueFunc);
-
-//        final SimplifyUpdatesAbstractRuleApp app = //
-//                createApp(pio, goal.proof().getServices()).tryToInstantiate(goal);
-//        final boolean complete = app.complete();
-//
-//        if (complete) {
-//            appCache.put(pio, app);
-//        }
-//
-//        return complete;
     }
 
     @Override
@@ -129,10 +118,6 @@ public class SimplifyUpdatesAbstractRule implements BuiltInRule {
 
     @Override
     public SimplifyUpdatesAbstractRuleApp createApp(PosInOccurrence pos, TermServices services) {
-//        if (appCache.containsKey(pos)) {
-//            return appCache.remove(pos);
-//        }
-
         return new SimplifyUpdatesAbstractRuleApp(this, pos);
     }
 

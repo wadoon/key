@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.abstractexecution.rule.SimplifyUpdatesAbstractRule;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -26,11 +27,13 @@ import de.uka.ilkd.key.strategy.feature.ComprehendedSumFeature;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.ConstFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.FindDepthFeature;
 import de.uka.ilkd.key.strategy.feature.ImplicitCastNecessary;
 import de.uka.ilkd.key.strategy.feature.InstantiatedSVFeature;
 import de.uka.ilkd.key.strategy.feature.LetFeature;
 import de.uka.ilkd.key.strategy.feature.MergeRuleFeature;
 import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.ScaleFeature;
 import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
 import de.uka.ilkd.key.strategy.feature.ShannonFeature;
 import de.uka.ilkd.key.strategy.feature.SortComparisonFeature;
@@ -478,6 +481,20 @@ public abstract class StaticFeatureCollection {
 
     protected static Feature implicitCastNecessary(ProjectionToTerm s1) {
         return ImplicitCastNecessary.create(s1);
+    }
+
+    protected static Feature simplifyUpdateAbstrFeature() {
+        /*
+         * (DS, 2019-12-29) Same cost for abstract update simplification as for
+         * update_elim rule set. This is because we currently cannot add built-in rules
+         * to rule sets (at at least I don't now how).
+         */
+        final SetRuleFilter simplifyUpdAbstrFilter = new SetRuleFilter();
+        simplifyUpdAbstrFilter.addRuleToSet(SimplifyUpdatesAbstractRule.INSTANCE);
+        final Feature simplifyUpdAbstrFeature = ConditionalFeature.createConditional(
+                simplifyUpdAbstrFilter,
+                add(longConst(-8000), ScaleFeature.createScaled(FindDepthFeature.INSTANCE, 10.0)));
+        return simplifyUpdAbstrFeature;
     }
 
 }

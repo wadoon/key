@@ -272,6 +272,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         // final Feature smtF = smtFeature(inftyConst());
 
+        final Feature simplifyUpdAbstrFeature = StaticFeatureCollection
+                .simplifyUpdateAbstrFeature();
+
         return SumFeature.createSum(
                 AutomatedRuleFeature.INSTANCE,
                 NonDuplicateAppFeature.INSTANCE,
@@ -281,7 +284,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 // smtF,
                 methodSpecF, queryF, depSpecF, loopInvF, blockFeature, loopBlockFeature,
                 loopBlockApplyHeadFeature,
-                ifMatchedF, dispatcher);
+                ifMatchedF, dispatcher, simplifyUpdAbstrFeature);
     }
 
     private Feature oneStepSimplificationFeature(Feature cost) {
@@ -354,8 +357,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 "find_term_not_in_assumes",
                 ifZero(MatchedIfFeature.INSTANCE,
                         not(contains(AssumptionProjection.create(0),
-                                FocusProjection.INSTANCE))));
-
+                                FocusProjection.INSTANCE))));        
+        
         bindRuleSet(
                 d,
                 "update_elim",
