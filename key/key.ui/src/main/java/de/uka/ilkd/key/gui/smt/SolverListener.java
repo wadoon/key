@@ -223,31 +223,31 @@ public class SolverListener implements SolverLauncherListener {
                         }
                 }
             for (InternSMTProblem p : problems) {
-                String res = "";
-
+                SMTResultOutput.Result res;
+                String time = p.getTimeInSecAsString();
                 if (p.solver.wasInterrupted()) {
                     ReasonOfInterruption reason = p.solver.getReasonOfInterruption();
                     switch (reason) {
                         case Exception:
-                            res = SMTResultOutput.EXCEPTION;
+                            res = new SMTResultOutput.Result(SMTResultOutput.EXCEPTION);
                             break;
                         case Timeout:
-                            res = SMTResultOutput.TIMEOUT;
+                            res = new SMTResultOutput.Result(SMTResultOutput.TIMEOUT);
                             break;
                         case User:
-                            res = SMTResultOutput.USER_INTERRUPT;
+                            res = new SMTResultOutput.Result(SMTResultOutput.USER_INTERRUPT);
                             break;
+                        default:
+                            res = new SMTResultOutput.Result();
                     }
                 } else if (p.solver.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-                    res = p.getTimeInSecAsString();
+                    res = new SMTResultOutput.Result(SMTResultOutput.VALID, time);
                 } else if (p.solver.getFinalResult().isValid() == ThreeValuedTruth.FALSIFIABLE) {
-                    res = SMTResultOutput.COUNTEREXAMPLE;
+                    res = new SMTResultOutput.Result(SMTResultOutput.COUNTEREXAMPLE, time);
                 } else {
-                    res = SMTResultOutput.UNKNOWN;
+                    res = new SMTResultOutput.Result(SMTResultOutput.UNKNOWN, time);
                 }
-                out.addResult(p.problem.getName() + ","
-                        + p.solver.getType().toString() + ","
-                        + res);
+                out.addResult(p.problem.getName(), p.solver.getType().toString(), res);
             }
             out.close();
         }

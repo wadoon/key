@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class SMTResultOutput {
+    static final String VALID = "VALID";
     static final String TIMEOUT = "TO";
     static final String COUNTEREXAMPLE = "CE";
     static final String UNKNOWN = "UK";
@@ -18,7 +19,7 @@ public class SMTResultOutput {
 
     private ArrayList<String> goalRows;
     private ArrayList<String> solverColumns;
-    private ArrayList<ArrayList<String>> results;
+    private ArrayList<ArrayList<Result>> results;
 
     SMTResultOutput() {
         Path path = Paths.get("smtResults.csv");
@@ -33,11 +34,7 @@ public class SMTResultOutput {
         }
     }
 
-    void addResult(String s) {
-        String[] a = s.split(",");
-        String goalID = a[0];
-        String solverName = a[1];
-        String result = a[2];
+    void addResult(String goalID, String solverName, Result result) {
         if (!goalRows.contains(goalID)) {
             goalRows.add(goalID);
             results.add(new ArrayList<>());
@@ -69,11 +66,37 @@ public class SMTResultOutput {
         try {
             buf.write("Goal ID");
             for (String s: solverColumns) {
-                buf.write("," + s);
+                buf.write("," + s + " (Result)");
+                buf.write("," + s + " (Time)");
             }
             buf.newLine();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    static class Result {
+
+        String result;
+        String time;
+
+        public Result(String result, String time) {
+            this.result = result;
+            this.time = time;
+        }
+
+        public Result(String result) {
+            this.result = result;
+            this.time = "";
+        }
+
+        public Result() {
+            this.result = "";
+            this.time = "";
+        }
+
+        public String toString() {
+            return result + "," + time;
         }
     }
 
