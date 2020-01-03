@@ -22,6 +22,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
+import de.uka.ilkd.key.abstractexecution.proof.TermAccessibleLocationsCollector;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -36,7 +37,6 @@ import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.TermAccessibleLocationsCollector;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -403,6 +403,10 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
         if (relevantLocations.stream().anyMatch(//
                 relLoc -> !(relLoc instanceof PVLoc || relLoc instanceof EmptyLoc))) {
+            /*
+             * If there is any abstract location, i.e., especially a SkolemLoc, we leave the
+             * simplification to the more involved SimplifyUpdatesAbstractRule.
+             */
             return true;
         }
 

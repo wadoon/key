@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.abstractexecution.proof;
 
 import java.util.LinkedHashSet;
 import java.util.Optional;
@@ -19,16 +19,14 @@ import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramLocationsCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 /**
@@ -66,17 +64,6 @@ public class TermAccessibleLocationsCollector extends DefaultVisitor {
         if (AbstractExecutionUtils.isAbstractSkolemLocationSetValueTerm(t, services)) {
             result.addAll(AbstractUpdateFactory.abstrUpdateLocsFromUnionTerm(t.sub(0), Optional.empty(), services));
         }
-
-//        final java.util.function.Function<Term, Set<AbstractUpdateAssgnLoc>> subToLoc = //
-//                sub -> AbstractUpdateFactory.abstrUpdateLocsFromTermSafe( //
-//                        sub, Optional.empty(), services);
-//
-//        if (t.op() instanceof Function
-//                && services.abstractUpdateFactory().isAbstractPathCondition((Function) t.op())) {
-//            t.subs().stream().map(subToLoc).forEach(result::addAll);
-//        } else if (t.op() instanceof AbstractUpdate) {
-//            t.subs().stream().map(subToLoc).forEach(result::addAll);
-//        }
 
         if (!t.javaBlock().isEmpty()) {
             final ProgramLocationsCollector pvc = new ProgramLocationsCollector(
