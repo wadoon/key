@@ -45,7 +45,8 @@ public class TermAccessibleLocationsCollector extends DefaultVisitor {
     private final Services services;
     private final GoalLocalSpecificationRepository localSpecRepo;
 
-    public TermAccessibleLocationsCollector(GoalLocalSpecificationRepository localSpecRepo, final Services services) {
+    public TermAccessibleLocationsCollector(GoalLocalSpecificationRepository localSpecRepo,
+            final Services services) {
         this.services = services;
         this.localSpecRepo = localSpecRepo;
     }
@@ -62,7 +63,8 @@ public class TermAccessibleLocationsCollector extends DefaultVisitor {
         }
 
         if (AbstractExecutionUtils.isAbstractSkolemLocationSetValueTerm(t, services)) {
-            result.addAll(AbstractUpdateFactory.abstrUpdateLocsFromUnionTerm(t.sub(0), Optional.empty(), services));
+            result.addAll(AbstractUpdateFactory.abstrUpdateLocsFromUnionTerm(t.sub(0),
+                    Optional.empty(), services));
         }
 
         if (!t.javaBlock().isEmpty()) {
