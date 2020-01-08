@@ -18,6 +18,7 @@ dependencies {
                 'lib/docking-frames-core.jar')
 
     runtimeOnly project(":keyext.interactionlog")
+    runtimeOnly project(":key.machlearning")
     //runtimeOnly project(":keyext.script.ui")
 
     compile 'org.jetbrains:annotations:17.0.0'
