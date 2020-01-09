@@ -137,8 +137,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         do {
             final RuleAppCost cost = instantiateApp ( app, pio, goal );
             if ( cost instanceof TopRuleAppCost ) continue;
-            final RuleApp res = btManager.getResultingapp ();
-            if ( res == app || res == null ) continue;
+            final RuleApp res = btManager.getResultingapp ();if ( res == app || res == null ) continue;
             collector.collect ( res, cost );
         } while ( btManager.backtrack () );
     }

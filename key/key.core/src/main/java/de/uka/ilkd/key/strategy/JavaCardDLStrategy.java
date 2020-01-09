@@ -136,8 +136,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private final ValueTermFeature vf;
 
 
-    protected JavaCardDLStrategy(Proof proof,
-                                 StrategyProperties strategyProperties) {
+    public JavaCardDLStrategy(Proof proof,
+                              StrategyProperties strategyProperties) {
 
         super(proof);
         heapLDT = getServices().getTypeConverter().getHeapLDT();

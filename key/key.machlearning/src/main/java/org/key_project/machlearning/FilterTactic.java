@@ -12,9 +12,11 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
@@ -60,8 +62,8 @@ public class FilterTactic implements Tactic {
     @Override
     public void apply(AbstractMediatorUserInterfaceControl ui, Proof proof, Goal goal, JSONObject command) throws Exception {
 
-        Strategy oldStrategy = goal.getGoalStrategy();
-        Strategy newStrategy = new FilterStrategy(oldStrategy);
+        Strategy oldStrategy = proof.getActiveStrategy();
+        Strategy newStrategy = new FilterStrategy(new JavaCardDLStrategy(proof, new StrategyProperties()));
 
         final GoalChooser goalChooser = proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
         final ProverCore applyStrategy = new ApplyStrategy(goalChooser);
@@ -90,7 +92,7 @@ public class FilterTactic implements Tactic {
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            return computeCost(app, pio, goal) != TopRuleAppCost.INSTANCE &&
+            return !(computeCost(app, pio, goal) instanceof TopRuleAppCost)
                     // Assumptions are normally not considered by the cost
                     // computation, because they are normally not yet
                     // instantiated when the costs are computed. Because the
@@ -101,11 +103,13 @@ public class FilterTactic implements Tactic {
                     // to reject the application of a rule by calling
                     // isApprovedApp. Otherwise, in particular equalities may
                     // be applied on themselves.
-                    delegate.isApprovedApp(app, pio, goal);
+                      && delegate.isApprovedApp(app, pio, goal);
         }
 
         @Override
         public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+
+//            return delegate.computeCost(app, pio, goal);
 
             Rule rule = app.rule();
             if (rule instanceof Taclet) {
@@ -113,7 +117,7 @@ public class FilterTactic implements Tactic {
                 for (RuleSet ruleSet : taclet.getRuleSets()) {
                     if (rulesets.contains(ruleSet.name().toString())) {
                         RuleAppCost cost = delegate.computeCost(app, pio, goal);
-                        // System.out.println("Hit(" + cost + "): " + app.toString());
+                        System.out.println("Hit(" + cost + "): " + app.toString());
                         return cost;
                     }
                 }
@@ -123,7 +127,8 @@ public class FilterTactic implements Tactic {
 //            RuleAppCost deleg = delegate.computeCost(app, pio, goal);
 //            System.out.println("Delegate (" + deleg + "): " + app);
 //            return deleg;
-             return TopRuleAppCost.INSTANCE;
+            return TopRuleAppCost.INSTANCE;
+
         }
 
         @Override
