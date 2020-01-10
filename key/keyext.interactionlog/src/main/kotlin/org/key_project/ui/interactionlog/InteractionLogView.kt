@@ -462,7 +462,7 @@ internal class MultiLineInputPrompt(private var parent: JComponent?, private val
         box.add(btnCancel)
 
         btnOk.addActionListener { accept(area.text) }
-        btnCancel.addActionListener { evt -> cancel() }
+        btnCancel.addActionListener { cancel() }
         d.defaultCloseOperation = JDialog.HIDE_ON_CLOSE
         d.addWindowListener(object : WindowAdapter() {
             override fun windowClosed(e: WindowEvent?) {
@@ -556,7 +556,9 @@ internal class InteractionCellRenderer : JPanel(), ListCellRenderer<Interaction>
             if (border == null) {
                 border = UIManager.getDefaults().getBorder("List.focusCellHighlightBorder")
             }
-        } else {
+        }
+        if (border != null) {
+            this.border = border
         }
         return this
     }
