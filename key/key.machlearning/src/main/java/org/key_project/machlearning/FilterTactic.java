@@ -92,6 +92,13 @@ public class FilterTactic implements Tactic {
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+            return  delegate.isApprovedApp(app, pio, goal);
+
+
+            /*
+               This does not work for "gamma".
+               Deactivating this for now. Implications not 100% clear.
+
             return !(computeCost(app, pio, goal) instanceof TopRuleAppCost)
                     // Assumptions are normally not considered by the cost
                     // computation, because they are normally not yet
@@ -104,6 +111,7 @@ public class FilterTactic implements Tactic {
                     // isApprovedApp. Otherwise, in particular equalities may
                     // be applied on themselves.
                       && delegate.isApprovedApp(app, pio, goal);
+                      */
         }
 
         @Override
