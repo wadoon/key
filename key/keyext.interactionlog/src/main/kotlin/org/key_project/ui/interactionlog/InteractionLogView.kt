@@ -31,7 +31,6 @@ import java.io.IOException
 import java.io.PrintWriter
 import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
-import java.util.*
 import javax.swing.*
 import javax.swing.border.Border
 
@@ -93,7 +92,9 @@ class InteractionLogView(val interactionLog: InteractionLog, private var mediato
                 val index = l.locationToIndex(e.point)
                 if (index > -1) {
                     val inter = m.getElementAt(index) as Interaction
-                    l.toolTipText = "<html>" + MarkdownExport.getHtml(inter) + "</html>"
+                    // weigl: disabled on my system, the tooltips lead to a crash of the window manager
+                    // l.toolTipText = "<html>" + MarkdownExport.getHtml(inter) + "</html>"
+                    l.toolTipText = "Tooltips are deactivated due to a Swing bug."
                 }
             }
         })
@@ -282,12 +283,12 @@ class InteractionLogView(val interactionLog: InteractionLog, private var mediato
         }
 
         internal fun doAddNote(prefilled: String) {
-            val note = MultiLineInputPrompt(this@InteractionLogView, prefilled).show()
-            if (note.isPresent) {
-                val interaction = UserNoteInteraction(note.get())
-                val interactionLog = interactionLog
-                interactionLog.add(interaction)
-            }
+            MultiLineInputPrompt(this@InteractionLogView, prefilled)
+                    .show()?.let { note ->
+                        val interaction = UserNoteInteraction(note)
+                        val interactionLog = interactionLog
+                        interactionLog.add(interaction)
+                    }
         }
     }
 
@@ -380,7 +381,7 @@ class InteractionLogView(val interactionLog: InteractionLog, private var mediato
 
         override fun save(selectedFile: File) {
             try {
-                FileWriter(selectedFile).use { fw -> MarkdownExport.writeTo(interactionLog, PrintWriter(fw)) }
+                FileWriter(selectedFile).use { fw -> MarkdownExport(interactionLog, PrintWriter(fw)).run() }
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -399,7 +400,7 @@ class InteractionLogView(val interactionLog: InteractionLog, private var mediato
 
         override fun save(selectedFile: File) {
             try {
-                FileWriter(selectedFile).use { fw -> MarkdownExport.writeTo(interactionLog, PrintWriter(fw)) }
+                FileWriter(selectedFile).use { fw -> MarkdownExport(interactionLog, PrintWriter(fw)).run() }
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -474,7 +475,7 @@ internal class MultiLineInputPrompt(private var parent: JComponent?, private val
         root.add(JScrollPane(area), BorderLayout.CENTER)
         d.setSize(300, 200)
         d.setLocationRelativeTo(parent)
-        dialog
+        d
     }
 
     private var acceptedAnswer: String? = null
@@ -489,9 +490,9 @@ internal class MultiLineInputPrompt(private var parent: JComponent?, private val
         dialog.isVisible = false
     }
 
-    fun show(): Optional<String> {
+    fun show(): String? {
         dialog.isVisible = true
-        return Optional.ofNullable(acceptedAnswer)
+        return acceptedAnswer
     }
 }
 

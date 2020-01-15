@@ -24,7 +24,6 @@ import org.key_project.util.RandomName
 import org.key_project.util.collection.ImmutableSLList
 import java.awt.Color
 import java.io.IOException
-import java.io.PrintWriter
 import java.io.Serializable
 import java.io.StringWriter
 import java.lang.ref.WeakReference
@@ -36,15 +35,16 @@ import java.util.*
  * @version 1 (06.12.18)
  */
 class InteractionLog {
-    @JsonIgnore
+    @get:JsonIgnore
+    @set:JsonIgnore
+    @field:JsonIgnore
     var proof: WeakReference<Proof> = WeakReference<Proof>(null)
 
-    @JsonIgnore
+    @get:JsonIgnore
+    @field:JsonIgnore
     val listeners = arrayListOf<() -> Unit>()
 
-
     val name: String
-
     var created = Date()
 
     private val _interactions: MutableList<Interaction> = ArrayList()
@@ -85,10 +85,6 @@ abstract class NodeInteraction(@Transient var serialNr: Int? = null) : Interacti
     fun getNode(proof: Proof): Node {
         return nodeId!!.findNode(proof).orElse(null)
     }
-
-    companion object {
-        private val serialVersionUID = 1L
-    }
 }
 
 
@@ -104,10 +100,16 @@ class MacroInteraction() : NodeInteraction() {
     var openGoalNodeIds: List<NodeIdentifier>? = null
 
     override val markdown: String
-        get() = String.format("## Applied macro %s%n```%n%s%n```", macro, info)
+        get() = """
+        ## Applied macro $macro
+
+        ```
+        $info
+        ```
+        """.trimIndent()
 
     override val proofScriptRepresentation: String
-        get() = String.format("macro %s;%n", macro)
+        get() = "macro $macro;\n"
 
     constructor(node: Node, macro: ProofMacro, posInOcc: PosInOccurrence?, info: ProofMacroFinishedInfo) : this() {
         this.info = info.toString()
@@ -154,19 +156,18 @@ class MacroInteraction() : NodeInteraction() {
  * @version 1 (06.12.18)
  */
 class NodeIdentifier() : Serializable {
-
-    private var list: MutableList<Int> = ArrayList()
+    var treePath: MutableList<Int> = ArrayList()
 
     var branchLabel: String? = null
 
     var serialNr: Int = 0
 
     constructor(seq: List<Int>) : this() {
-        this.list.addAll(seq)
+        this.treePath.addAll(seq)
     }
 
     override fun toString(): String {
-        return list.stream()
+        return treePath.stream()
                 .map { it.toString() }
                 .reduce("") { a, b -> a + b } +
                 " => " + serialNr
@@ -179,7 +180,7 @@ class NodeIdentifier() : Serializable {
 
     fun findNode(node: Node): Optional<Node> {
         var n = node
-        for (child in list) {
+        for (child in treePath) {
             if (child <= n.childrenCount()) {
                 n = n.child(child)
             } else {
@@ -213,7 +214,6 @@ class NodeIdentifier() : Serializable {
     }
 }
 
-
 class PruneInteraction() : NodeInteraction() {
     constructor(node: Node) : this() {
         serialNr = node.serialNr()
@@ -221,12 +221,15 @@ class PruneInteraction() : NodeInteraction() {
     }
 
     override val markdown: String
-        get() = String.format("## Prune%n%n"
-                + "**Date**: %s%n"
-                + "prune to node %s%n", created, nodeId)
+        get() = """
+                ## Prune
+
+                * **Date**: $created
+                * Prune to node: `$nodeId`
+                """
 
     override val proofScriptRepresentation: String
-        get() = String.format("prune %s%n", nodeId)
+        get() = "prune $nodeId\n"
 
     override fun toString(): String {
         return "prune"
@@ -305,13 +308,16 @@ class UserNoteInteraction() : Interaction() {
     var note: String = ""
 
     override val markdown: String
-        get() = String.format("## Note%n" +
-                "**Date**: %s%n" +
-                "```%n%s%n```", created, note)
+        get() = """
+                ## Note
+                
+                **Date**: $created 
+                
+                > ${note.replace("\n", "\n> ")}
+                """.trimIndent()
 
     init {
         graphicalStyle.backgroundColor = Color.red.brighter().brighter().brighter()
-        //TODO graphicalStyle.setIcon();
     }
 
     constructor(note: String) : this() {
@@ -344,7 +350,15 @@ class SettingChangeInteraction() : Interaction() {
                 e.printStackTrace()
             }
 
-            return String.format("Setting changed: %s%n%n```%n%s%n````%n", type?.name, writer)
+            return """
+            # Setting changed: ${type?.name}
+
+            **Date**: $created
+
+            ```
+            $writer
+            ```
+            """.trimIndent()
         }
 
     constructor(settings: Properties, type: InteractionListener.SettingType) : this() {
@@ -375,33 +389,53 @@ class SettingChangeInteraction() : Interaction() {
 
 
 class AutoModeInteraction() : Interaction() {
-    var info: ApplyStrategyInfo? = null
+    // copined from ApplyStrategyInfo info
+    var infoMessage: String? = null
+    var timeInMillis: Long = 0
+    var appliedRuleAppsCount = 0;
+    var errorMessage: String? = null
+    var nrClosedGoals = 0
+
+    //var info: ApplyStrategyInfo? = null
 
     var initialNodeIds: List<NodeIdentifier> = arrayListOf()
     var openGoalNodeIds: List<NodeIdentifier> = arrayListOf()
 
     override val markdown: String
         get() {
-            val sout = StringWriter()
-            val out = PrintWriter(sout)
-            out.write("## Apply auto strategy%n%n")
-            out.write("* Started on:")
-            initialNodeIds.forEach { nr -> out.format("  * %s%n", nr) }
-            if (openGoalNodeIds.isEmpty())
-                out.format("* **Closed all goals**")
-            else {
-                out.format("* finished on:%n")
-                initialNodeIds.forEach { nr -> out.format("  * %s%n", nr) }
-            }
-            out.format("```%n%s%n```", info)
-            return sout.toString()
+            val initialNodes = initialNodeIds.joinToString("\n") { nr -> "  * `$nr`" }
+            val finalNodes = openGoalNodeIds.joinToString("\n") { nr -> "  * `$nr`" }
+
+            return """
+            ## Apply auto strategy
+            
+            **Date**: $created
+    
+            * Started on node:
+            $initialNodes 
+            
+            ${if (openGoalNodeIds.isEmpty()) "* **Closed all goals**"
+            else "* Finished on nodes:"}}
+            $finalNodes
+
+            * Provided Macro info:
+              * Info message: $infoMessage
+              * Time $timeInMillis ms
+              * Applied rules: $appliedRuleAppsCount 
+              * Error message: $errorMessage
+              * Closed goals $nrClosedGoals
+            """.trimIndent()
         }
 
     override val proofScriptRepresentation: String
         get() = "auto;%n"
 
     constructor(initialNodes: List<Node>, info: ApplyStrategyInfo) : this() {
-        this.info = info
+        infoMessage = info.reason()
+        timeInMillis = info.time
+        appliedRuleAppsCount = info.appliedRuleApps;
+        errorMessage = info.exception?.message
+        nrClosedGoals = info.closedGoals
         this.initialNodeIds = initialNodes.map { NodeIdentifier.get(it) }
         val openGoals = info.proof.openGoals()
         this.openGoalNodeIds = openGoals.map { NodeIdentifier.get(it) }
@@ -463,29 +497,35 @@ class RuleInteraction() : NodeInteraction() {
 
     override val markdown: String
         get() {
-            val out = StringBuilder()
-            out.append(String.format("## Rule applied %s%n%n", ruleName))
-            out.append(String.format("* applied on%s%n", posInOccurence))
-            out.append(String.format("* Parameters %n"))
-            arguments.forEach { (key, value) -> out.append(String.format("  * %s : %s%n", key, value)) }
-            out.append('\n')
-            return out.toString()
+            val formula = posInOccurence
+            val parameters =
+                    arguments.map { (key, value) -> "* $key : `$value`" }
+                            .joinToString("\n")
+
+            return """
+            ## Rule `$ruleName` applied
+            
+            **Date**:             $created
+            
+            * Applied on `$formula`
+            * The used parameter for the taclet instantation are 
+            $parameters 
+            
+            """.trimIndent()
         }
 
     override val proofScriptRepresentation: String
         get() {
-            val sout = StringWriter()
-            val out = PrintWriter(sout)
+            val args = arguments.forEach { (k, v) ->
+                "     inst_${firstWord(k)} = \"${v.trim { it <= ' ' }}\"\n"
+            }
 
-            out.format("rule %s%n", ruleName)
-            out.format("\t     on = \"%s\"%n\tformula = \"%s\"%n",
-                    posInOccurence?.term,
-                    posInOccurence?.toplevelTerm
-            )
-
-            arguments.forEach { (k, v) -> out.format("     inst_%s = \"%s\"%n", firstWord(k), v.trim { it <= ' ' }) }
-            out.format(";%n")
-            return sout.toString()
+            return """
+            rule $ruleName
+                 on = ${posInOccurence?.term}
+                 formula = ${posInOccurence?.toplevelTerm}
+                 $args;
+            """.trimIndent()
         }
 
     override fun toString(): String {
