@@ -182,8 +182,11 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public String visitStructDefinition(SolidityParser.StructDefinitionContext ctx) { 
-		return visitChildren(ctx); 
+	@Override public String visitStructDefinition(SolidityParser.StructDefinitionContext ctx) {
+		StringBuffer structDef = new StringBuffer("class "+visit(ctx.identifier()) + "{\n");
+		ctx.variableDeclaration().stream().forEach(v -> structDef.append(visit(v)).append(";\n"));
+		structDef.append("}");
+		return structDef.toString(); 
 	}
 
 	/**
@@ -326,14 +329,24 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public String visitEnumValue(SolidityParser.EnumValueContext ctx) { return visitChildren(ctx); }
+	@Override public String visitEnumValue(SolidityParser.EnumValueContext ctx) { 
+		return visitChildren(ctx); 
+	}
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public String visitEnumDefinition(SolidityParser.EnumDefinitionContext ctx) { return visitChildren(ctx); }
+	@Override public String visitEnumDefinition(SolidityParser.EnumDefinitionContext ctx) { 
+		StringBuffer enumDef = new StringBuffer("enum ");
+		enumDef.append(visit(ctx.identifier()));
+		enumDef.append("{");
+		ctx.enumValue().stream().forEach(v -> enumDef.append(visit(v.identifier())+","));		
+		enumDef.deleteCharAt(enumDef.length()-1);
+		enumDef.append("}");
+		return enumDef.toString(); 
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -724,8 +737,8 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 */
 	@Override public String visitFunctionCallExpression(SolidityParser.FunctionCallExpressionContext ctx) { 
 		String fctName = visit(ctx.expression());
-		StringBuffer arguments = 
-				new StringBuffer("msg,");
+		
+		StringBuffer arguments = new StringBuffer("msg,");
 		if (ctx.functionCallArguments() != null && !ctx.functionCallArguments().isEmpty()) {
 			if (ctx.functionCallArguments().expressionList()!= null && 
 					!ctx.functionCallArguments().expressionList().isEmpty()) {

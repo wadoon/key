@@ -37,7 +37,7 @@ public class Solidity2KeY {
 	
 	public static void main(String[] args) {
 		Solidity2KeY s = 
-				new Solidity2KeY("/Users/bubel/Documents/Work/Development Projects/coreKeY/key/key/key.ui/examples/solidity/sol/auction-single-simple.sol"); 
+				new Solidity2KeY("/Users/bubel/Documents/Work/Development Projects/coreKeY/key/key/key.ui/examples/solidity/auction-single.sol"); 
 				//new Solidity2KeY("/Users/bubel/Documents/Work/Development Projects/coreKeY/key/key/key.core/src/main/java/de/uka/ilkd/key/solidity/contract-single-player-pre-post.sol");
 		try {
 			System.out.println(s.translate());
