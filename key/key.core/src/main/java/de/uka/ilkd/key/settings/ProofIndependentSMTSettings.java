@@ -329,15 +329,19 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
       
       public void fireSettingsChanged() {
               for (SettingsListener aListenerList : listeners) {
-                      aListenerList.settingsChanged(new EventObject(this));
+            	  aListenerList.settingsChanged(new EventObject(this));
               }
- 
+
       }
 
-@Override
-public void addSettingsListener(SettingsListener l) {
-        listeners.add(l);
-        
-  
-}
+      @Override
+      public void addSettingsListener(SettingsListener l) {
+    	  listeners.add(l);
+      }
+      
+      @Override
+      public void removeSettingsListener(SettingsListener l) {
+    	  listeners.remove(l);
+      }
+      
 }

@@ -69,4 +69,8 @@ public class LemmaGeneratorSettings implements de.uka.ilkd.key.settings.Settings
                 
         }
 
+    	@Override
+    	public void removeSettingsListener(SettingsListener l) {
+    		listeners.remove(l);		
+    	}
 }

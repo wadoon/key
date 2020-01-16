@@ -66,6 +66,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.solidity.Solidity2KeY;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
@@ -395,14 +396,19 @@ public class Recoder2KeY implements JavaReader {
                 final CompilationUnit cu;
                 Reader fr = null;
                 try {
-                    if (fileRepo != null) {
+                	if (filename.endsWith(".sol")) {
+                		Solidity2KeY s2k = new Solidity2KeY(filename);
+                		String s = s2k.translate();
+                		System.out.println(s);
+                		fr = new StringReader(s);
+                	} else if (fileRepo != null) {
                         fr = new InputStreamReader(fileRepo.getInputStream(Paths.get(filename)),
                                 StandardCharsets.UTF_8);
                     } else {
                         // fallback if no repo present (e.g. in tests)
                         fr = new FileReader(filename);
                     }
-                    fr = new BufferedReader(fr);
+                    fr = new BufferedReader(fr);                    
                     cu = servConf.getProgramFactory().parseCompilationUnit(fr);
                 } catch (Exception e) {
                     throw new ParseExceptionInFile(filename, e);

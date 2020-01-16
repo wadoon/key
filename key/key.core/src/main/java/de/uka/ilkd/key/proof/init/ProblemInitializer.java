@@ -259,9 +259,9 @@ public final class ProblemInitializer {
                     File n=new File(fullName);
                     if (n.isDirectory()) {
                         v.addAll(getClasses(fullName));
-                    } else if (list[i].endsWith(".java")) {
+                    } else if (list[i].endsWith(".java") || list[i].endsWith(".sol")) {
                         v.add(fullName);
-                    }
+                    } 
                 }
             }
             return v;

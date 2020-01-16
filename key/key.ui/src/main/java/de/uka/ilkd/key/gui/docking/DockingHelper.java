@@ -8,7 +8,6 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 
-import org.jetbrains.annotations.NotNull;
 
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
@@ -138,7 +137,7 @@ public class DockingHelper {
                 p.getPermissions(), a);
     }
 
-    public static @NotNull CAction translateAction(@NotNull Action action) {
+    public static CAction translateAction(Action action) {
         if (action.getValue(Action.SELECTED_KEY) != null) {
             return createCheckBox(action);
 
@@ -147,7 +146,7 @@ public class DockingHelper {
         }
     }
 
-    private static @NotNull CAction createCheckBox(@NotNull Action action) {
+    private static CAction createCheckBox(Action action) {
         CCheckBox button = new CCheckBox(
                 (String) action.getValue(Action.NAME),
                 (Icon) action.getValue(Action.SMALL_ICON)) {

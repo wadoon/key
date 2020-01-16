@@ -149,10 +149,12 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
         @Override
         public void addSettingsListener(SettingsListener l) {
                listeners.add(l);
-                
         }
         
-
+    	@Override
+    	public void removeSettingsListener(SettingsListener l) {
+    		listeners.remove(l);		
+    	}
         
        
 

@@ -23,6 +23,7 @@ import java.util.Stack;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -514,7 +515,9 @@ public class PrettyPrinter {
             }
         }
         indentMap.put(first, indent);
+        
         elem.prettyPrint(this);
+        
     }
 
     protected Position getRelativePosition(SourceElement first) {
@@ -1010,7 +1013,16 @@ public class PrettyPrinter {
         if (isKey) {
            markKeywordStart();
         }
-        write(name);
+        if (name.equals("int") || name.equals("short") 
+              || name.equals("long")) {
+        	write("uint");
+        } else if (name.equals("Address") || name.equals("java.lang.Address")) {
+        	write("address");
+        } else if (name.equals("boolean")) {
+        	write("bool");
+        } else {
+        	write(name);
+        }
         if (isKey) {
            markKeywordEnd();
         }
@@ -1396,7 +1408,9 @@ public class PrettyPrinter {
 	          write(x.getKeYJavaType().getFullName());
 	       }
 	       else {
-	          writeElement(x.getProgramElementName());
+	    	     			  
+	    		  writeElement(x.getProgramElementName());
+	    	  
 	       }
 	    }
             printFooter(x);            
@@ -1656,10 +1670,10 @@ public class PrettyPrinter {
         writeElement((m > 0) ? 1 : 0, x.getTypeReference());
 	write(" ");
         ImmutableArray<VariableSpecification> varSpecs = x.getVariables();
-	boolean wasNoSemicolons = noSemicolons;
-	boolean wasNoLinefeed   = noLinefeed;
-	noSemicolons = true;
-	noLinefeed   = true;
+        boolean wasNoSemicolons = noSemicolons;
+        boolean wasNoLinefeed   = noLinefeed;
+        noSemicolons = true;
+        noLinefeed   = true;
         if (varSpecs != null) {
             writeCommaList(0, 0, 1, varSpecs);
         }

@@ -10,8 +10,6 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JToolBar;
 
-import org.jetbrains.annotations.NotNull;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.GoalList;
 import de.uka.ilkd.key.gui.InfoView;
@@ -100,7 +98,7 @@ public interface KeYGuiExtension {
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @NotNull List<Action> getMainMenuActions(@NotNull MainWindow mainWindow);
+         List<Action> getMainMenuActions( MainWindow mainWindow);
     }
 
     /**
@@ -127,7 +125,7 @@ public interface KeYGuiExtension {
          * @param window   parent of this extension
          * @param mediator the current mediator
          */
-        @NotNull Collection<TabPanel> getPanels(@NotNull MainWindow window, @NotNull KeYMediator mediator);
+         Collection<TabPanel> getPanels( MainWindow window,  KeYMediator mediator);
     }
 
     /**
@@ -150,9 +148,9 @@ public interface KeYGuiExtension {
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @NotNull List<Action> getContextActions(@NotNull KeYMediator mediator,
-                                                @NotNull ContextMenuKind kind,
-                                                @NotNull Object underlyingObject);
+         List<Action> getContextActions( KeYMediator mediator,
+                                                 ContextMenuKind kind,
+                                                 Object underlyingObject);
     }
 
     /**
@@ -167,7 +165,7 @@ public interface KeYGuiExtension {
          * @param mainWindow the parent of the toolbar
          * @return non-null
          */
-        @NotNull JToolBar getToolbar(MainWindow mainWindow);
+         JToolBar getToolbar(MainWindow mainWindow);
     }
 
     /**
@@ -250,7 +248,7 @@ public interface KeYGuiExtension {
          * @param pos        the position of the term whose info shall be shown.
          * @return this extension's term information.
          */
-        @NotNull List<String> getTermInfoStrings(@NotNull MainWindow mainWindow, @NotNull PosInSequent pos);
+         List<String> getTermInfoStrings( MainWindow mainWindow,  PosInSequent pos);
 
         default int getTermLabelPriority() {
             return 0;

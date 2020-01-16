@@ -215,4 +215,10 @@ public class ChoiceSettings implements Settings, Cloneable {
     public void addSettingsListener(SettingsListener l) {
 	listenerList.add(l);
     }
+
+
+	@Override
+	public void removeSettingsListener(SettingsListener l) {
+		listenerList.remove(l);		
+	}
 }
