@@ -383,6 +383,13 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
             SMTTranslator trans = getType().createTranslator(services);
             //instantiateTaclets(trans);
             problemString = indent(trans.translateProblem(term, services, smtSettings).toString());
+
+           if(this.type.equals(SolverType.MATHSAT_SOLVER))
+           {
+             problemString = problemString.replaceAll("\\(declare-fun b2u \n \\(Bool\\) U\\)" ,"");
+             problemString = problemString.replaceAll("\\(assert(\n|\r|.(?!assert))*?b2u true\\)\\)\\)" ,"");
+           }
+
             // TODO: Refactor when looking at taclet translation (MU+JS, 5/2019)
             if (trans instanceof AbstractSMTTranslator) {
                 tacletTranslation = ((AbstractSMTTranslator) trans).getTacletSetTranslation();
