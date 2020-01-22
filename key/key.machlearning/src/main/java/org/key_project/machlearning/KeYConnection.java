@@ -55,6 +55,7 @@ public class KeYConnection {
     static {
         TACTICS.put("AUTO", new AutoTactic(""));
         TACTICS.put("AUTO_NOSPLIT", new AutoTactic("[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_OFF"));
+        TACTICS.put("MODELSEARCH", new AutoTactic("[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_COMPLETION"));
         TACTICS.put("NOTHING", (a, b, c, d) -> {});
         TACTICS.put("SMT", new SMTTactic());
         FilterTactic.registerTactics(TACTICS);
