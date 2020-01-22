@@ -43,4 +43,7 @@
     apply_equations,
     apply_select_eq
   </entry>
+  <entry key="DEPENDENCY">
+    Use Dependency Contract
+  </entry>
 </properties>
