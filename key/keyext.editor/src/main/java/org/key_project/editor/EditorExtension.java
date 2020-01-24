@@ -242,7 +242,7 @@ public class EditorExtension implements KeYGuiExtension,
     class LoadAction extends MainWindowAction {
         public LoadAction(MainWindow mw) {
             super(mw);
-            setName("Load file in editor...");
+            setName("Open script file ...");
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.UPLOAD, ICON_SIZE));
             setMenuPath(EDITOR_MENU);
             lookupAcceleratorKey();
@@ -261,9 +261,9 @@ public class EditorExtension implements KeYGuiExtension,
 
     private class NewAction extends KeyAction {
         public NewAction() {
-            setName("New file");
+            setName("New script file");
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.FILE_MEDICAL, ICON_SIZE));
-            setTooltip("Store script file");
+            setTooltip("New script file");
             setMenuPath(EDITOR_MENU);
             lookupAcceleratorKey();
         }
