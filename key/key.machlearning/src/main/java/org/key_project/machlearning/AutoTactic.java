@@ -15,6 +15,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
 import org.json.simple.JSONObject;
+import org.key_project.util.collection.ImmutableSLList;
 
 import java.io.StringReader;
 import java.util.Properties;
@@ -46,8 +47,11 @@ public class AutoTactic implements Tactic {
         Strategy oldStrategy = proof.getActiveStrategy();
         Strategy newStratgy = proof.getActiveStrategyFactory().create(proof, strategyProperties);
 
+        int maxSteps = Integer.parseInt(properties.getProperty("[Strategy]MaximumNumberOfAutomaticApplications", "10000"));
+
         proof.setActiveStrategy(newStratgy);
-        prover.start(proof, goal);
+        prover.start(proof, ImmutableSLList.<Goal>nil().prepend(goal), maxSteps,
+                -1, false);
 
         // resetting settings
         proof.setActiveStrategy(oldStrategy);
