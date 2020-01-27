@@ -6,7 +6,8 @@ import json
 import sys
 
 PORT = 6767
-TACTICS = ("AUTO", "SMT", "AUTO_NOSPLIT") # , "---unknown---")
+TACTICS = ("AUTO", "AUTO_NOSPLIT", "MODELSEARCH", "NOTHING",
+           "INT", "HEAP", "QUANT", "DEPENDENCY", "EXPAND") # , "---unknown---")
 
 # https://pymotw.com/2/socket/tcp.html
 # Create a TCP/IP socket
@@ -100,7 +101,7 @@ while True:
             else:
                 index = random.randrange(len(TACTICS))
                 tactic = TACTICS[index] + "\n"
-                tactic = "QUANT\n"
+                #tactic = "QUANT\n"
                 print('sending data back to the client', tactic)
                 connection.sendall(tactic.encode())
                 seen_ids.add(response["id"])

@@ -53,6 +53,7 @@ public class PythonConnection {
         Tactic tactic = KeYConnection.TACTICS.get(tacticString);
 
         if (tactic == null) {
+            System.err.println("Known tactics are: " + KeYConnection.TACTICS.keySet());
             throw new IOException("Unknown tactic " + tacticString);
         }
 
