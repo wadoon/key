@@ -316,18 +316,26 @@ public class MergeRuleUtils {
      * @return A conflict-free list of elementary updates cleaned according to
      *         JavaDL's semantics.
      */
-    public static List<Term> cleanConflictingElems(
-            List<Term> elementaryUpdates) {
+    public static List<Term> cleanConflictingElems(List<Term> elementaryUpdates) {
         final LinkedList<Term> elems = new LinkedList<>(elementaryUpdates);
         final ArrayList<Term> updatesToDrop = new ArrayList<>();
 
         for (int i = 0; i < elems.size(); i++) {
+            final Term upd1 = elems.get(i);
+            if (!(upd1.op() instanceof ElementaryUpdate)) {
+                continue;
+            }
+
             for (int j = i + 1; j < elems.size(); j++) {
-                final Term upd1 = elems.get(i);
+                final Term upd2 = elems.get(j);
+                if (!(upd2.op() instanceof ElementaryUpdate)) {
+                    continue;
+                }
+
                 final UpdateableOperator upd1LHS = //
                         ((ElementaryUpdate) upd1.op()).lhs();
                 final UpdateableOperator upd2LHS = //
-                        ((ElementaryUpdate) elems.get(j).op()).lhs();
+                        ((ElementaryUpdate) upd2.op()).lhs();
                 if (upd1LHS.equals(upd2LHS)) {
                     updatesToDrop.add(upd1);
                 }

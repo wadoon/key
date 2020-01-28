@@ -88,9 +88,9 @@ public class AutoResetStatusPanel extends JPanel {
 
         statusLabel.setIcon(null);
         if (bold) {
-            statusLabel.setText(String.format("<html><b>%s</b></html>", message));
+            statusLabel.setText(String.format("<html><nobr><b>%s</b></nobr></html>", message));
         } else {
-            statusLabel.setText(String.format("<html>%s</html>", message));
+            statusLabel.setText(String.format("<html><nobr>%s</nobr></html>", message));
         }
 
         timeoutThread = new Thread(() -> {
@@ -107,7 +107,7 @@ public class AutoResetStatusPanel extends JPanel {
     }
 
     public void setSecondaryMessage(String message) {
-        secondaryStatusLabel.setText(String.format("<html>%s</html>", message));
+        secondaryStatusLabel.setText(String.format("<html><nobr>%s</nobr></html>", message));
     }
 
     private void changeThread() {
@@ -117,7 +117,7 @@ public class AutoResetStatusPanel extends JPanel {
                     statusLabel.setIcon(IconFontSwing.buildIcon( //
                             FontAwesomeSolid.LIGHTBULB, 16, Color.BLACK));
                     statusLabel
-                            .setText(String.format("<html>%s</html>", standardMessages[currMsg]));
+                            .setText(String.format("<html><nobr>%s</nobr></html>", standardMessages[currMsg]));
                 });
                 currMsg = (currMsg + 1) % standardMessages.length;
 

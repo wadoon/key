@@ -18,6 +18,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.rule.DropAbstractUpdateInSelectRule;
+import de.uka.ilkd.key.abstractexecution.rule.DropAnonAbstractRule;
 import de.uka.ilkd.key.abstractexecution.rule.ReorderAbstractUpdatesRule;
 import de.uka.ilkd.key.abstractexecution.rule.SimplifyUpdatesAbstractRule;
 import de.uka.ilkd.key.logic.label.AbstractExecutionTermLabel;
@@ -209,7 +210,8 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(LoopApplyHeadRule.INSTANCE)
                                    .prepend(SimplifyUpdatesAbstractRule.INSTANCE)
                                    .prepend(ReorderAbstractUpdatesRule.INSTANCE)
-                                   .prepend(DropAbstractUpdateInSelectRule.INSTANCE);
+                                   .prepend(DropAbstractUpdateInSelectRule.INSTANCE)
+                                   .prepend(DropAnonAbstractRule.INSTANCE);
 
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact
         // that Contract insertion rule is the FIRST element of this list!
