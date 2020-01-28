@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\forall any pfrval; (\forall any _pfrval; &#10;  (\forall any pfootval; (\forall any _pfootval; &#10;    loopInvP(pfrval, pfootval)   &amp;&amp; loopPExitedLeft &amp;&amp;&#10;    loopInvP(_pfrval, _pfootval) &amp;&amp; loopPExitedRight ==&gt;&#10;      pfrval == _pfrval &amp;&amp; pfootval == _pfootval)))) &amp;&amp;&#10;(\forall any qfrval; (\forall any _qfrval; &#10;  (\forall any qfootval; (\forall any _qfootval; &#10;    loopInvQ(qfrval, qfootval)   &amp;&amp; loopQExitedLeft &amp;&amp;&#10;    loopInvQ(_qfrval, _qfootval) &amp;&amp; loopQExitedRight ==&gt;&#10;      qfrval == _qfrval &amp;&amp; qfootval == _qfootval))))" postCondition="\result_1==\result_2">
+    <programOne>/*@ ae_constraint
+  @   \disjoint(frameP, i) &amp;&amp;
+  @   \disjoint(frameQ, i) &amp;&amp;
+  @   \disjoint(frameP, n) &amp;&amp;
+  @   \disjoint(frameQ, n);
+  @*/
+{ ; }
+
+/*@ ae_constraint
+  @   \disjoint(frameP, frameQ) &amp;&amp;
+  @   \disjoint(frameP, footprintQ) &amp;&amp;
+  @   \disjoint(frameQ, footprintP);
+  @*/
+{ ; }
+
+i = 0;
+
+// Initial assumptions
+/*@ ae_constraint
+  @   i &lt;= n &amp;&amp;
+  @   loopInvP(\value(frameP), \value(footprintP)) &amp;&amp;
+  @   loopInvQ(\value(frameQ), \value(footprintQ));
+  @*/
+{ ; }
+
+/*@ loop_invariant
+  @   i &gt;= 0 &amp;&amp; i &lt;= n &amp;&amp;
+  @   loopInvP(\value(frameP), \value(footprintP)) &amp;&amp;
+  @   loopInvQ(\value(frameQ), \value(footprintQ));
+  @ assignable frameP, frameQ;
+  @ decreases n - i;
+  @*/
+while (i &lt; n) {
+    /*@ ae_constraint
+      @   \disjoint(frameP, i) &amp;&amp;
+      @   \disjoint(frameQ, i) &amp;&amp;
+      @   \disjoint(frameP, n) &amp;&amp;
+      @   \disjoint(frameQ, n);
+      @*/
+    { ; }
+
+    i++;
+    
+    /*@ assignable frameP;
+      @ accessible footprintP;
+      @ normal_behavior ensures
+      @   loopInvP(\value(frameP), \value(footprintP));
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement P;
+
+    /*@ assignable frameQ;
+      @ accessible footprintQ;
+      @ normal_behavior ensures
+      @   loopInvQ(\value(frameQ), \value(footprintQ));
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement Q;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*@ assume loopPExitedLeft == true; */
+{ ; }
+/*@ assume loopQExitedLeft == true; */
+{ ; }</programOne>
+    <programTwo>/*@ ae_constraint
+  @   \disjoint(frameP, i) &amp;&amp;
+  @   \disjoint(frameQ, i) &amp;&amp;
+  @   \disjoint(frameP, n) &amp;&amp;
+  @   \disjoint(frameQ, n);
+  @*/
+{ ; }
+
+/*@ ae_constraint
+  @   \disjoint(frameP, frameQ) &amp;&amp;
+  @   \disjoint(frameP, footprintQ) &amp;&amp;
+  @   \disjoint(frameQ, footprintP);
+  @*/
+{ ; }
+
+i = 0;
+
+// Initial assumptions
+/*@ ae_constraint
+  @   i &lt;= n &amp;&amp;
+  @   loopInvP(\value(frameP), \value(footprintP));
+  @*/
+{ ; }
+
+
+/*@ loop_invariant
+  @   i &gt;= 0 &amp;&amp; i &lt;= n &amp;&amp;
+  @   loopInvP(\value(frameP), \value(footprintP));
+  @
+  @ assignable frameP;
+  @ decreases n - i;
+  @*/
+while (i &lt; n) {
+    /*@ ae_constraint
+      @   \disjoint(frameP, i) &amp;&amp;
+      @   \disjoint(frameQ, i) &amp;&amp;
+      @   \disjoint(frameP, n) &amp;&amp;
+      @   \disjoint(frameQ, n);
+      @*/
+    { ; }
+
+    i++;
+    
+    /*@ assignable frameP;
+      @ accessible footprintP;
+      @ normal_behavior ensures
+      @   loopInvP(\value(frameP), \value(footprintP));
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement P;
+
+
+
+
+
+
+
+
+
+
+
+}
+
+/*@ assume loopPExitedRight == true; */
+{ ; }
+
+i = 0;
+
+// Initial assumptions
+/*@ ae_constraint
+  @   i &lt;= n &amp;&amp;
+  @   loopInvQ(\value(frameQ), \value(footprintQ));
+  @*/
+{ ; }
+
+/*@ loop_invariant
+  @   i &gt;= 0 &amp;&amp; i &lt;= n &amp;&amp;
+  @   loopInvQ(\value(frameQ), \value(footprintQ));
+  @ assignable frameQ;
+  @ decreases n - i;
+  @*/
+while (i &lt; n) {
+    /*@ ae_constraint
+      @   \disjoint(frameP, i) &amp;&amp;
+      @   \disjoint(frameQ, i) &amp;&amp;
+      @   \disjoint(frameP, n) &amp;&amp;
+      @   \disjoint(frameQ, n);
+      @*/
+    { ; }
+
+    i++;
+
+    /*@ assignable frameQ;
+      @ accessible footprintQ;
+      @ normal_behavior ensures
+      @   loopInvQ(\value(frameQ), \value(footprintQ));
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement Q;
+}
+
+/*@ assume loopQExitedRight == true; */
+{ ; }</programTwo>
+    <methodLevelContext></methodLevelContext>
+    <locationSets>
+        <locationSet locsetName="relevant">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameP">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameQ">
+            <relevantOne>1</relevantOne>
+            <relevantTwo>1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintQ">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <functions>
+        <function funcName="loopPExitedLeft" resultSortName="boolean"/>
+        <function funcName="loopPExitedRight" resultSortName="boolean"/>
+        <function funcName="loopQExitedLeft" resultSortName="boolean"/>
+        <function funcName="loopQExitedRight" resultSortName="boolean"/>
+    </functions>
+    <predicates>
+        <predicate predName="loopInvP">
+            <argSort>any</argSort>
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="loopInvQ">
+            <argSort>any</argSort>
+            <argSort>any</argSort>
+        </predicate>
+    </predicates>
+    <programVariables>
+        <programVariable typeName="int" varName="n">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="i">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+    </programVariables>
+</ns2:aeRelationalModel>
