@@ -1,74 +1,82 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\forall any pval; (\forall any _pval; &#10;  (\forall any eval; (\forall any _eval; &#10;    loopInvP(pval, eval)   &amp;&amp; !guardIsTrue(eval) &amp;&amp;&#10;    loopInvP(_pval, _eval) &amp;&amp; !guardIsTrue(_eval) ==&gt;&#10;      pval == _pval)))) &amp;&amp;&#10;(\forall any qval; (\forall any _qval; &#10;  (\forall any eval; (\forall any _eval; &#10;    loopInvQ(qval, eval)   &amp;&amp; !guardIsTrue(eval) &amp;&amp;&#10;    loopInvQ(_qval, _eval) &amp;&amp; !guardIsTrue(_eval) ==&gt;&#10;      qval == _qval))))" postCondition="\result_1==\result_2">
-    <programOne>// "Ghost constraint"
-/*@ ae_constraint
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\forall any pfrval;&#10;  (\forall any _pfrval; &#10;    (\forall any pfootval;&#10;      (\forall any _pfootval;&#10;        (\forall any guardval;&#10;          (\forall any _guardval;&#10;            loopInvP(pfrval,pfootval,guardval)    &amp;&amp; !guardIsTrue(guardval) &amp;&amp;&#10;            loopInvP(_pfrval,_pfootval,_guardval) &amp;&amp; !guardIsTrue(_guardval) ==&gt;&#10;            pfrval == _pfrval &amp;&amp; pfootval == _pfootval &amp;&amp; guardval == _guardval&#10;          )))))) &amp;&amp;&#10;(\forall any qfrval;&#10;  (\forall any _qfrval; &#10;    (\forall any qfootval;&#10;      (\forall any _qfootval;&#10;        (\forall any guardval;&#10;          (\forall any _guardval;&#10;            loopInvQ(qfrval,qfootval,guardval)    &amp;&amp; !guardIsTrue(guardval) &amp;&amp;&#10;            loopInvQ(_qfrval,_qfootval,_guardval) &amp;&amp; !guardIsTrue(_guardval) ==&gt;&#10;            qfrval == _qfrval &amp;&amp; qfootval == _qfootval &amp;&amp; guardval == _guardval&#10;          )))))) &amp;&amp;&#10;(\forall any gfootval;&#10;  (\forall any _gfootval;&#10;    loopInvG(gfootval)  &amp;&amp; !guardIsTrue(gfootval) &amp;&amp;&#10;    loopInvG(_gfootval) &amp;&amp; !guardIsTrue(_gfootval) ==&gt;&#10;    gfootval == _gfootval&#10;  ));" postCondition="\result_1==\result_2">
+    <programOne>/*@ ae_constraint
   @   \disjoint(frameP, oldVariant) &amp;&amp;
-  @   \disjoint(frameQ, oldVariant) &amp;&amp;
-  @   \disjoint(footprintE, oldVariant) &amp;&amp;
   @   \disjoint(footprintP, oldVariant) &amp;&amp;
+  @   \disjoint(frameQ, oldVariant) &amp;&amp;
   @   \disjoint(footprintQ, oldVariant) &amp;&amp;
-  @   \disjoint(decrLocs, oldVariant);
+  @   \disjoint(footprintG, oldVariant);
   @*/
 { ; }
 
 /*@ ae_constraint
-  @   \disjoint(frameP, footprintE) &amp;&amp;
-  @   \disjoint(frameQ, footprintE) &amp;&amp;
-  @   \disjoint(frameQ, frameP) &amp;&amp;
-  @   \disjoint(frameP, decrLocs) &amp;&amp;
-  @   \disjoint(frameQ, decrLocs) &amp;&amp;
-  @   \subset(decrLocs, footprintE);
+  @   \disjoint(footprintG, \dl_heap); // ???
   @*/
 { ; }
 
-/*@ assignable \hasTo(decrLocs);
+/*@ ae_constraint
+  @   \disjoint(frameP, footprintG) &amp;&amp;
+  @   \disjoint(frameQ, footprintG) &amp;&amp;
+  @   \disjoint(footprintP, footprintG) &amp;&amp;
+  @   \disjoint(footprintQ, footprintG);
+  @*/
+{ ; }
+
+/*@ ae_constraint
+  @   \disjoint(frameP, frameQ) &amp;&amp;
+  @   \disjoint(frameP, footprintQ) &amp;&amp;
+  @   \disjoint(frameQ, footprintP);
+  @*/
+{ ; }
+
+/*@ assignable \hasTo(footprintG);
   @ accessible \nothing;
-  @ normal_behavior ensures
-  @   variantTerm(\value(decrLocs)) &gt;= 0 &amp;&amp;
-  @   \value(decrLocs) == decrLocsInitVal;
   @ exceptional_behavior requires false;
   @ return_behavior requires false;
+  @ break_behavior requires false;
+  @ continue_behavior requires false;
   @*/
-\abstract_statement LoopInit;
+\abstract_statement InitLoopCnt;
 
 // Initial assumptions
 /*@ ae_constraint
-  @   variantTerm(\value(decrLocs)) &gt;= 0 &amp;&amp;
-  @   loopInvP(\value(frameP), \value(footprintE)) &amp;&amp;
-  @   loopInvQ(\value(frameQ), \value(footprintE));
+  @   variant(\value(footprintG)) &gt;= 0 &amp;&amp;
+  @   loopInvG(\value(footprintG)) &amp;&amp;
+  @   loopInvP(\value(frameP), \value(footprintP), \value(footprintG)) &amp;&amp;
+  @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG));
   @*/
 { ; }
 
 /*@ loop_invariant
-  @   loopInvP(\value(frameP), \value(footprintE)) &amp;&amp;
-  @   loopInvQ(\value(frameQ), \value(footprintE)) &amp;&amp;
-  @   variantTerm(\value(decrLocs)) &gt;= 0;
-  @ assignable decrLocs, frameP, frameQ;
-  @ decreases variantTerm(\value(decrLocs));
+  @   variant(\value(footprintG)) &gt;= 0 &amp;&amp;
+  @   loopInvP(\value(frameP), \value(footprintP), \value(footprintG)) &amp;&amp;
+  @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG)) &amp;&amp;
+  @   loopInvG(\value(footprintG));
+  @ assignable frameP, frameQ, footprintG;
+  @ decreases variant(\value(footprintG));
   @*/
 while (
     /*@ assignable \nothing;
-      @ accessible footprintE;
+      @ accessible footprintG;
       @ normal_behavior ensures
-      @   \result &lt;==&gt; guardIsTrue(\value(footprintE));
+      @   (boolean) \result &lt;==&gt; guardIsTrue(\value(footprintG));
       @ exceptional_behavior requires false;
       @*/
     \abstract_expression boolean e
 ) {
-    // "Ghost constraint"
     /*@ ae_constraint
       @   \disjoint(frameP, oldVariant) &amp;&amp;
-      @   \disjoint(frameQ, oldVariant) &amp;&amp;
-      @   \disjoint(footprintE, oldVariant) &amp;&amp;
       @   \disjoint(footprintP, oldVariant) &amp;&amp;
+      @   \disjoint(frameQ, oldVariant) &amp;&amp;
       @   \disjoint(footprintQ, oldVariant) &amp;&amp;
-      @   \disjoint(decrLocs, oldVariant);
+      @   \disjoint(footprintG, oldVariant);
       @*/
     { ; }
 
     /*@ assignable \hasTo(oldVariant);
-      @ accessible footprintE;
-      @ normal_behavior ensures oldVariant == variantTerm(\value(decrLocs));
+      @ accessible footprintG;
+      @ normal_behavior ensures
+      @   oldVariant == variant(\value(footprintG));
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior requires false;
@@ -76,11 +84,12 @@ while (
       @*/
     \abstract_statement GhostSetter;
 
-    /*@ assignable decrLocs;
-      @ accessible footprintE;
+    /*@ assignable \hasTo(footprintG);
+      @ accessible \nothing;
       @ normal_behavior ensures
-      @   variantTerm(\value(decrLocs)) &gt;= 0 &amp;&amp;
-      @   variantTerm(\value(decrLocs)) &lt; oldVariant;
+      @   loopInvG(\value(footprintG)) &amp;&amp;
+      @   variant(\value(footprintG)) &gt;= 0 &amp;&amp;
+      @   variant(\value(footprintG)) &lt; oldVariant;
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior requires false;
@@ -89,96 +98,182 @@ while (
     \abstract_statement LoopUpdate;
     
     /*@ assignable frameP;
-      @ accessible footprintP;
+      @ accessible footprintP, footprintG;
       @ normal_behavior ensures
-      @   loopInvP(\value(frameP), \value(footprintE));
+      @   loopInvP(\value(frameP), \value(footprintP), \value(footprintG));
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior requires false;
       @ continue_behavior requires false;
       @*/
     \abstract_statement P;
-    
+
     /*@ assignable frameQ;
-      @ accessible footprintQ;
+      @ accessible footprintQ, footprintG;
       @ normal_behavior ensures
-      @   loopInvQ(\value(frameQ), \value(footprintE));
+      @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG));
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior requires false;
       @ continue_behavior requires false;
       @*/
     \abstract_statement Q;
-}</programOne>
-    <programTwo>// "Ghost constraint"
-/*@ ae_constraint
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</programOne>
+    <programTwo>/*@ ae_constraint
   @   \disjoint(frameP, oldVariant) &amp;&amp;
-  @   \disjoint(frameQ, oldVariant) &amp;&amp;
-  @   \disjoint(footprintE, oldVariant) &amp;&amp;
   @   \disjoint(footprintP, oldVariant) &amp;&amp;
+  @   \disjoint(frameQ, oldVariant) &amp;&amp;
   @   \disjoint(footprintQ, oldVariant) &amp;&amp;
-  @   \disjoint(decrLocs, oldVariant);
+  @   \disjoint(footprintG, oldVariant);
   @*/
 { ; }
 
 /*@ ae_constraint
-  @   \disjoint(frameP, footprintE) &amp;&amp;
-  @   \disjoint(frameQ, footprintE) &amp;&amp;
-  @   \disjoint(frameQ, frameP) &amp;&amp;
-  @   \disjoint(frameP, decrLocs) &amp;&amp;
-  @   \disjoint(frameQ, decrLocs) &amp;&amp;
-  @   \subset(decrLocs, footprintE);
+  @   \disjoint(footprintG, \dl_heap);
   @*/
 { ; }
 
-/*@ assignable \hasTo(decrLocs);
+/*@ ae_constraint
+  @   \disjoint(frameP, footprintG) &amp;&amp;
+  @   \disjoint(frameQ, footprintG) &amp;&amp;
+  @   \disjoint(footprintP, footprintG) &amp;&amp;
+  @   \disjoint(footprintQ, footprintG);
+  @*/
+{ ; }
+
+/*@ ae_constraint
+  @   \disjoint(frameP, frameQ) &amp;&amp;
+  @   \disjoint(frameP, footprintQ) &amp;&amp;
+  @   \disjoint(frameQ, footprintP);
+  @*/
+{ ; }
+
+/*@ assignable \hasTo(footprintG);
   @ accessible \nothing;
-  @ normal_behavior ensures
-  @   variantTerm(\value(decrLocs)) &gt;= 0 &amp;&amp;
-  @   \value(decrLocs) == decrLocsInitVal;
   @ exceptional_behavior requires false;
   @ return_behavior requires false;
+  @ break_behavior requires false;
+  @ continue_behavior requires false;
   @*/
-\abstract_statement LoopInit;
+\abstract_statement InitLoopCnt;
 
 // Initial assumptions
 /*@ ae_constraint
-  @   variantTerm(\value(decrLocs)) &gt;= 0 &amp;&amp;
-  @   loopInvP(\value(frameP), \value(footprintE)) &amp;&amp;
-  @   loopInvQ(\value(frameQ), \value(footprintE));
+  @   variant(\value(footprintG)) &gt;= 0 &amp;&amp;
+  @   loopInvG(\value(footprintG)) &amp;&amp;
+  @   loopInvP(\value(frameP), \value(footprintP), \value(footprintG));
   @*/
 { ; }
 
+
 /*@ loop_invariant
-  @   loopInvP(\value(frameP), \value(footprintE)) &amp;&amp;
-  
-  @   variantTerm(\value(decrLocs)) &gt;= 0;
-  @ assignable decrLocs, frameP;
-  @ decreases variantTerm(\value(decrLocs));
+  @   variant(\value(footprintG)) &gt;= 0 &amp;&amp;
+  @   loopInvP(\value(frameP), \value(footprintP), \value(footprintG)) &amp;&amp;
+  @   loopInvG(\value(footprintG));
+  @
+  @ assignable frameP, footprintG;
+  @ decreases variant(\value(footprintG));
   @*/
 while (
     /*@ assignable \nothing;
-      @ accessible footprintE;
+      @ accessible footprintG;
       @ normal_behavior ensures
-      @   \result &lt;==&gt; guardIsTrue(\value(footprintE));
+      @   (boolean) \result &lt;==&gt; guardIsTrue(\value(footprintG));
       @ exceptional_behavior requires false;
       @*/
     \abstract_expression boolean e
 ) {
-    // "Ghost constraint"
     /*@ ae_constraint
       @   \disjoint(frameP, oldVariant) &amp;&amp;
-      @
-      @   \disjoint(footprintE, oldVariant) &amp;&amp;
       @   \disjoint(footprintP, oldVariant) &amp;&amp;
-      @
-      @   \disjoint(decrLocs, oldVariant);
+      @   \disjoint(footprintG, oldVariant);
       @*/
     { ; }
 
+
+
     /*@ assignable \hasTo(oldVariant);
-      @ accessible footprintE;
-      @ normal_behavior ensures oldVariant == variantTerm(\value(decrLocs));
+      @ accessible footprintG;
+      @ normal_behavior ensures
+      @   oldVariant == variant(\value(footprintG));
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior requires false;
@@ -186,11 +281,12 @@ while (
       @*/
     \abstract_statement GhostSetter;
 
-    /*@ assignable decrLocs;
-      @ accessible footprintE;
+    /*@ assignable \hasTo(footprintG);
+      @ accessible \nothing;
       @ normal_behavior ensures
-      @   variantTerm(\value(decrLocs)) &gt;= 0 &amp;&amp;
-      @   variantTerm(\value(decrLocs)) &lt; oldVariant;
+      @   loopInvG(\value(footprintG)) &amp;&amp;
+      @   variant(\value(footprintG)) &gt;= 0 &amp;&amp;
+      @   variant(\value(footprintG)) &lt; oldVariant;
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior requires false;
@@ -199,54 +295,74 @@ while (
     \abstract_statement LoopUpdate;
     
     /*@ assignable frameP;
-      @ accessible footprintP;
+      @ accessible footprintP, footprintG;
       @ normal_behavior ensures
-      @   loopInvP(\value(frameP), \value(footprintE));
+      @   loopInvP(\value(frameP), \value(footprintP), \value(footprintG));
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior requires false;
       @ continue_behavior requires false;
       @*/
     \abstract_statement P;
+
+
+
+
+
+
+
+
+
+
+
 }
 
-/*@ assignable \hasTo(decrLocs);
+/*@ assignable \hasTo(footprintG);
   @ accessible \nothing;
-  @ normal_behavior ensures
-  @   variantTerm(\value(decrLocs)) &gt;= 0 &amp;&amp;
-  @   \value(decrLocs) == decrLocsInitVal;
   @ exceptional_behavior requires false;
   @ return_behavior requires false;
+  @ break_behavior requires false;
+  @ continue_behavior requires false;
   @*/
-\abstract_statement LoopInit;
+\abstract_statement InitLoopCnt;
+
+// Initial assumptions
+/*@ ae_constraint
+  @   variant(\value(footprintG)) &gt;= 0 &amp;&amp;
+  @   loopInvG(\value(footprintG)) &amp;&amp;
+  @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG));
+  @*/
+{ ; }
+
 
 /*@ loop_invariant
-  @   loopInvQ(\value(frameQ), \value(footprintE)) &amp;&amp;
-  @   variantTerm(\value(decrLocs)) &gt;= 0;
-  @ assignable decrLocs, frameQ;
-  @ decreases variantTerm(\value(decrLocs));
+  @   variant(\value(footprintG)) &gt;= 0 &amp;&amp;
+  @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG)) &amp;&amp;
+  @   loopInvG(\value(footprintG));
+  @
+  @ assignable frameQ, footprintG;
+  @ decreases variant(\value(footprintG));
   @*/
 while (
     /*@ assignable \nothing;
-      @ accessible footprintE;
+      @ accessible footprintG;
       @ normal_behavior ensures
-      @   \result &lt;==&gt; guardIsTrue(\value(footprintE));
+      @   (boolean) \result &lt;==&gt; guardIsTrue(\value(footprintG));
       @ exceptional_behavior requires false;
       @*/
     \abstract_expression boolean e
 ) {
-    // "Ghost constraint"
     /*@ ae_constraint
       @   \disjoint(frameQ, oldVariant) &amp;&amp;
-      @   \disjoint(footprintE, oldVariant) &amp;&amp;
       @   \disjoint(footprintQ, oldVariant) &amp;&amp;
-      @   \disjoint(decrLocs, oldVariant);
+      @   \disjoint(footprintG, oldVariant);
       @*/
     { ; }
 
     /*@ assignable \hasTo(oldVariant);
-      @ accessible footprintE;
-      @ normal_behavior ensures oldVariant == variantTerm(\value(decrLocs));
+      @ accessible footprintG;
+      @ normal_behavior ensures
+      @   oldVariant == variant(\value(footprintG));
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior requires false;
@@ -254,22 +370,23 @@ while (
       @*/
     \abstract_statement GhostSetter;
 
-    /*@ assignable decrLocs;
-      @ accessible footprintE;
+    /*@ assignable \hasTo(footprintG);
+      @ accessible \nothing;
       @ normal_behavior ensures
-      @   variantTerm(\value(decrLocs)) &gt;= 0 &amp;&amp;
-      @   variantTerm(\value(decrLocs)) &lt; oldVariant;
+      @   loopInvG(\value(footprintG)) &amp;&amp;
+      @   variant(\value(footprintG)) &gt;= 0 &amp;&amp;
+      @   variant(\value(footprintG)) &lt; oldVariant;
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior requires false;
       @ continue_behavior requires false;
       @*/
     \abstract_statement LoopUpdate;
-    
+
     /*@ assignable frameQ;
-      @ accessible footprintQ;
+      @ accessible footprintQ, footprintG;
       @ normal_behavior ensures
-      @   loopInvQ(\value(frameQ), \value(footprintE));
+      @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG));
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior requires false;
@@ -279,60 +396,47 @@ while (
 }</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
-        <locationSet locsetName="footprintE">
-            <relevantOne>-1</relevantOne>
-            <relevantTwo>-1</relevantTwo>
-        </locationSet>
         <locationSet locsetName="frameP">
             <relevantOne>0</relevantOne>
             <relevantTwo>0</relevantTwo>
         </locationSet>
         <locationSet locsetName="footprintP">
-            <relevantOne>-1</relevantOne>
-            <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="frameQ">
             <relevantOne>1</relevantOne>
             <relevantTwo>1</relevantTwo>
         </locationSet>
+        <locationSet locsetName="frameQ">
+            <relevantOne>2</relevantOne>
+            <relevantTwo>2</relevantTwo>
+        </locationSet>
         <locationSet locsetName="footprintQ">
-            <relevantOne>-1</relevantOne>
-            <relevantTwo>-1</relevantTwo>
+            <relevantOne>3</relevantOne>
+            <relevantTwo>3</relevantTwo>
         </locationSet>
-        <locationSet locsetName="footprintSetE">
-            <relevantOne>-1</relevantOne>
-            <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="decrLocs">
+        <locationSet locsetName="footprintG">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
         </locationSet>
     </locationSets>
     <functions>
-        <function funcName="variantTerm" resultSortName="int">
+        <function funcName="variant" resultSortName="int">
             <argSort>any</argSort>
         </function>
-        <function funcName="guardIsTrue" resultSortName="boolean">
-            <argSort>any</argSort>
-        </function>
-        <function funcName="decrLocsInitVal" resultSortName="int"/>
     </functions>
     <predicates>
         <predicate predName="loopInvP">
+            <argSort>any</argSort>
             <argSort>any</argSort>
             <argSort>any</argSort>
         </predicate>
         <predicate predName="loopInvQ">
             <argSort>any</argSort>
             <argSort>any</argSort>
-        </predicate>
-        <predicate predName="postLoopP">
             <argSort>any</argSort>
         </predicate>
-        <predicate predName="postLoopQ">
+        <predicate predName="loopInvG">
             <argSort>any</argSort>
         </predicate>
-        <predicate predName="postLoopE">
+        <predicate predName="guardIsTrue">
             <argSort>any</argSort>
         </predicate>
     </predicates>
