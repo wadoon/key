@@ -2,16 +2,13 @@
 <ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="oldFrameBody == \value(frameBody) &amp;&amp;&#10;(\forall boolean g,_g; (\forall any fpE,_fpE,frB,_frB; (\forall int I,_I,t,_t; &#10;  (&#10;    (loopGuardAfterLeft(g)   &amp;&amp; !g  &amp;&amp; I &gt;= 0  &amp;&amp; I &lt; t+1 &amp;&amp;&#10;     loopGuardAfterRight(_g) &amp;&amp; !_g &amp;&amp; _I &gt;= 0 &amp;&amp; _I &lt; _t+1 &amp;&amp;&#10;     (   bodyPost(frB,fpE,I,t) &amp;&amp; bodyPost(_frB,_fpE,_I,_t)&#10;      || unsuccessfulInv(frB,fpE,I,t) &amp;&amp; unsuccessfulInv(_frB,_fpE,_I,_t)))&#10;  ) ==&gt; frB == _frB&#10;)))" postCondition="\result_1==\result_2">
     <programOne>/*@ ae_constraint
   @   \disjoint(frameBody, i) &amp;&amp;
-  @   \disjoint(footprintBody, i) &amp;&amp;
   @   \disjoint(frameBody, done) &amp;&amp;
-  @   \disjoint(footprintBody, done) &amp;&amp;
   @   \disjoint(frameBody, threshold) &amp;&amp;
+  @   \disjoint(footprintBody, i) &amp;&amp;
+  @   \disjoint(footprintBody, done) &amp;&amp;
   @   \disjoint(footprintBody, threshold) &amp;&amp;
-  @   \disjoint(frameE, i) &amp;&amp;
   @   \disjoint(footprintE, i) &amp;&amp;
-  @   \disjoint(frameE, done) &amp;&amp;
   @   \disjoint(footprintE, done) &amp;&amp;
-  @   \disjoint(frameE, threshold) &amp;&amp;
   @   \disjoint(footprintE, threshold);
   @*/
 { ; }
@@ -44,16 +41,13 @@ i = 0;
 while (!done &amp;&amp; i &lt; threshold) {
     /*@ ae_constraint
       @   \disjoint(frameBody, i) &amp;&amp;
-      @   \disjoint(footprintBody, i) &amp;&amp;
       @   \disjoint(frameBody, done) &amp;&amp;
-      @   \disjoint(footprintBody, done) &amp;&amp;
       @   \disjoint(frameBody, threshold) &amp;&amp;
+      @   \disjoint(footprintBody, i) &amp;&amp;
+      @   \disjoint(footprintBody, done) &amp;&amp;
       @   \disjoint(footprintBody, threshold) &amp;&amp;
-      @   \disjoint(frameE, i) &amp;&amp;
       @   \disjoint(footprintE, i) &amp;&amp;
-      @   \disjoint(frameE, done) &amp;&amp;
       @   \disjoint(footprintE, done) &amp;&amp;
-      @   \disjoint(frameE, threshold) &amp;&amp;
       @   \disjoint(footprintE, threshold);
       @*/
     { ; }
@@ -105,16 +99,13 @@ while (!done &amp;&amp; i &lt; threshold) {
 { ; }</programOne>
     <programTwo>/*@ ae_constraint
   @   \disjoint(frameBody, i) &amp;&amp;
-  @   \disjoint(footprintBody, i) &amp;&amp;
   @   \disjoint(frameBody, done) &amp;&amp;
-  @   \disjoint(footprintBody, done) &amp;&amp;
   @   \disjoint(frameBody, threshold) &amp;&amp;
+  @   \disjoint(footprintBody, i) &amp;&amp;
+  @   \disjoint(footprintBody, done) &amp;&amp;
   @   \disjoint(footprintBody, threshold) &amp;&amp;
-  @   \disjoint(frameE, i) &amp;&amp;
   @   \disjoint(footprintE, i) &amp;&amp;
-  @   \disjoint(frameE, done) &amp;&amp;
   @   \disjoint(footprintE, done) &amp;&amp;
-  @   \disjoint(frameE, threshold) &amp;&amp;
   @   \disjoint(footprintE, threshold);
   @*/
 { ; }
@@ -147,16 +138,13 @@ i = 0;
 while (!done &amp;&amp; i &lt; threshold) {
     /*@ ae_constraint
       @   \disjoint(frameBody, i) &amp;&amp;
-      @   \disjoint(footprintBody, i) &amp;&amp;
       @   \disjoint(frameBody, done) &amp;&amp;
-      @   \disjoint(footprintBody, done) &amp;&amp;
       @   \disjoint(frameBody, threshold) &amp;&amp;
+      @   \disjoint(footprintBody, i) &amp;&amp;
+      @   \disjoint(footprintBody, done) &amp;&amp;
       @   \disjoint(footprintBody, threshold) &amp;&amp;
-      @   \disjoint(frameE, i) &amp;&amp;
       @   \disjoint(footprintE, i) &amp;&amp;
-      @   \disjoint(frameE, done) &amp;&amp;
       @   \disjoint(footprintE, done) &amp;&amp;
-      @   \disjoint(frameE, threshold) &amp;&amp;
       @   \disjoint(footprintE, threshold);
       @*/
     { ; }
