@@ -22,7 +22,7 @@ public class RememberRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        return pio != null && pio.isTopLevel();
+        return pio != null && pio.isTopLevel() && findOnOtherSide(goal, pio);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class RememberRule implements BuiltInRule {
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
-        if (!findOnOtherSide(goal, services, ruleApp)) {
+        if (!findOnOtherSide(goal, ruleApp.posInOccurrence())) {
             // throw new RuleAbortException("The formula has not occurred yet!");
             return ImmutableSLList.<Goal>nil().prepend(goal);
         } else {
@@ -45,8 +45,7 @@ public class RememberRule implements BuiltInRule {
         }
     }
 
-    private boolean findOnOtherSide(Goal goal, Services services, RuleApp ruleApp) {
-        PosInOccurrence pio = ruleApp.posInOccurrence();
+    private boolean findOnOtherSide(Goal goal, PosInOccurrence pio) {
         Term formula = pio.sequentFormula().formula();
 
         // select the opposite side
