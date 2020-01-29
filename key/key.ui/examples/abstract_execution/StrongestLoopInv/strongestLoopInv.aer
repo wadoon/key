@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\exists any _fr,_fp;&#10;  (\forall any fr,fp;&#10;    (&#10;      (&#10;        loopInv(fr, fp) &amp;&amp;&#10;        decrTerm(fr, fp) &gt;= 0 &amp;&amp;&#10;        !guardIsTrue(fr, fp)&#10;      ) &lt;==&gt; &#10;      (fr == _fr &amp;&amp; fp == _fp)&#10;    )&#10;  )&#10;)" postCondition="\result_1==\result_2">
+    <programOne>/*@ ae_constraint
+  @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+  @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
+  @*/
+{ ; }
+
+/*@ loop_invariant
+  @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+  @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
+  @ decreases decrTerm(\value(loopFrame), \value(loopFootprint));
+  @ assignable loopFrame;
+  @*/
+while (
+    /*@ assignable \nothing;
+      @ accessible loopFootprint;
+      @ normal_behavior ensures 
+      @   ((boolean) \result &lt;==&gt;
+      @     guardIsTrue(\value(loopFrame), \value(loopFootprint)));
+      @ exceptional_behavior requires false;
+      @*/
+    \abstract_expression boolean e
+) {
+    //@ ghost int oldDecrTerm;
+
+    /*@ ae_constraint
+      @   \disjoint(loopFrame, oldDecrTerm) &amp;&amp;
+      @   \disjoint(loopFootprint, oldDecrTerm);
+      @*/
+    { ; }
+
+    /*@ assignable \hasTo(oldDecrTerm);
+      @ accessible loopFrame, loopFootprint;
+      @ normal_behavior ensures
+      @   oldDecrTerm == decrTerm(\value(loopFrame), \value(loopFootprint));
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement GhostSetter;
+    
+    /*@ assignable loopFrame;
+      @ accessible loopFootprint;
+      @ normal_behavior ensures
+      @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
+      @   decrTerm(\value(loopFrame), \value(loopFootprint)) &lt; oldDecrTerm;
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement P;
+}</programOne>
+    <programTwo>/*@ ae_constraint
+  @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+  @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
+  @*/
+{ ; }
+
+/*@ loop_invariant
+  @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+  @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
+  @ decreases decrTerm(\value(loopFrame), \value(loopFootprint));
+  @ assignable loopFrame;
+  @*/
+while (
+    /*@ assignable \nothing;
+      @ accessible loopFootprint;
+      @ normal_behavior ensures 
+      @   ((boolean) \result &lt;==&gt;
+      @     guardIsTrue(\value(loopFrame), \value(loopFootprint)));
+      @ exceptional_behavior requires false;
+      @*/
+    \abstract_expression boolean e
+) {
+    //@ ghost int oldDecrTerm;
+
+    /*@ ae_constraint
+      @   \disjoint(loopFrame, oldDecrTerm) &amp;&amp;
+      @   \disjoint(loopFootprint, oldDecrTerm);
+      @*/
+    { ; }
+
+    /*@ assignable \hasTo(oldDecrTerm);
+      @ accessible loopFrame, loopFootprint;
+      @ normal_behavior ensures
+      @   oldDecrTerm == decrTerm(\value(loopFrame), \value(loopFootprint));
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement GhostSetter;
+    
+    /*@ assignable loopFrame;
+      @ accessible loopFootprint;
+      @ normal_behavior ensures
+      @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
+      @   decrTerm(\value(loopFrame), \value(loopFootprint)) &lt; oldDecrTerm;
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement P;
+}</programTwo>
+    <methodLevelContext></methodLevelContext>
+    <locationSets>
+        <locationSet locsetName="loopFrame">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="loopFootprint">
+            <relevantOne>1</relevantOne>
+            <relevantTwo>1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <functions>
+        <function funcName="decrTerm" resultSortName="int">
+            <argSort>any</argSort>
+            <argSort>any</argSort>
+        </function>
+    </functions>
+    <predicates>
+        <predicate predName="loopInv">
+            <argSort>any</argSort>
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="guardIsTrue">
+            <argSort>any</argSort>
+            <argSort>any</argSort>
+        </predicate>
+    </predicates>
+    <programVariables/>
+</ns2:aeRelationalModel>

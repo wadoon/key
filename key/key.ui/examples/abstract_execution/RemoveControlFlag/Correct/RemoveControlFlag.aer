@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="oldFrameBody == \value(frameBody) &amp;&amp;&#10;(\forall boolean g,_g; (\forall any fpE,_fpE,frB,_frB,fpG,_fpG; (\forall int I,_I; &#10;  (&#10;    (loopGuardAfterLeft(g)   &amp;&amp; !g  &amp;&amp; I &gt;= 0  &amp;&amp; decrExpr(I) &gt;= 0 &amp;&amp;&#10;     loopGuardAfterRight(_g) &amp;&amp; !_g &amp;&amp; _I &gt;= 0 &amp;&amp; decrExpr(_I) &gt;= 0 &amp;&amp;&#10;     (   bodyPost(frB,fpE,I,fpG) &amp;&amp; bodyPost(_frB,_fpE,_I,_fpG)&#10;      || unsuccessfulInv(frB,fpE,I,fpG) &amp;&amp; unsuccessfulInv(_frB,_fpE,_I,_fpG)))&#10;  ) ==&gt; frB == _frB&#10;)))" postCondition="\result_1==\result_2">
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\exists any _frB, _fpL; (\exists int _I; (\exists boolean _Done;&#10;  (\forall any frB, fpL; (\forall int I; (\forall boolean Done;&#10;     (&#10;          (&#10;             I &gt;= 0 &amp;&amp; decrExpr(fpL, I) &gt;= 0 &amp;&amp;&#10;             ( Done &lt;==&gt; doneCondition(fpL, I)) &amp;&amp;&#10;             ( Done  ==&gt; bodyPost(frB, fpL, I)) &amp;&amp;&#10;             (!Done  ==&gt; unsuccessfulInv(frB, fpL, I)) &amp;&amp;&#10;             !(!Done &amp;&amp; guardVal(fpL, I))&#10;          )&#10;        &lt;==&gt;&#10;          (_frB == frB &amp;&amp; _fpL == fpL &amp;&amp; _I == I &amp;&amp; _Done == Done)&#10;     )&#10;   )))&#10;)))" postCondition="\result_1==\result_2">
     <programOne>/*@ ae_constraint
   @   \disjoint(frameBody, i) &amp;&amp;
   @   \disjoint(frameBody, done) &amp;&amp;
-  @   \disjoint(footprintBody, done) &amp;&amp;
-  @   \disjoint(footprintE, done) &amp;&amp;
-  @   \disjoint(footprintG, done);
+  @   \disjoint(frameBody, oldDecrExpr) &amp;&amp;
+  @   \disjoint(loopFootprint, i) &amp;&amp;
+  @   \disjoint(loopFootprint, done) &amp;&amp;
+  @   \disjoint(loopFootprint, oldDecrExpr);
   @*/
 { ; }
 
 /*@ ae_constraint
-  @   \disjoint(footprintBody, footprintE) &amp;&amp;
-  @   \disjoint(frameBody, footprintG) &amp;&amp;
-  @   \disjoint(frameBody, footprintE) &amp;&amp;
-  @   \disjoint(frameBody, footprintBody);
+  @   \disjoint(frameBody, loopFootprint);
   @*/
 { ; }
 
@@ -21,24 +19,24 @@ done = false;
 i = 0;
 
 /*@ ae_constraint
-  @   decrExpr(0) &gt;= 0 &amp;&amp;
-  @   unsuccessfulInv(\value(frameBody), \value(footprintE), 0, \value(footprintG)) &amp;&amp;
-  @   !doneCondition(\value(footprintE), 0, \value(footprintG));
+  @   decrExpr(\value(loopFootprint), 0) &gt;= 0 &amp;&amp;
+  @   unsuccessfulInv(\value(frameBody), \value(loopFootprint), 0) &amp;&amp;
+  @   !doneCondition(\value(loopFootprint), 0);
   @*/
 { ; }
 
 /*@ loop_invariant
-  @   i &gt;= 0 &amp;&amp; decrExpr(i) &gt;= 0 &amp;&amp;
-  @   (done &lt;==&gt; doneCondition(\value(footprintE), i, \value(footprintG))) &amp;&amp;
-  @   ( done ==&gt; bodyPost(\value(frameBody), \value(footprintE), i, \value(footprintG))) &amp;&amp;
-  @   (!done ==&gt; unsuccessfulInv(\value(frameBody), \value(footprintE), i, \value(footprintG)));
+  @   i &gt;= 0 &amp;&amp; decrExpr(\value(loopFootprint), i) &gt;= 0 &amp;&amp;
+  @   ( done &lt;==&gt; doneCondition(\value(loopFootprint), i)) &amp;&amp;
+  @   ( done  ==&gt; bodyPost(\value(frameBody), \value(loopFootprint), i)) &amp;&amp;
+  @   (!done  ==&gt; unsuccessfulInv(\value(frameBody), \value(loopFootprint), i));
   @ assignable frameBody;
-  @ decreases decrExpr(i);
+  @ decreases decrExpr(\value(loopFootprint), i);
   @*/
 while (!done &amp;&amp; 
     /*@ assignable \nothing;
-      @ accessible footprintG, i;
-      @ normal_behavior ensures (boolean) \result &lt;==&gt; guardVal(\value(footprintG), i);
+      @ accessible loopFootprint, i;
+      @ normal_behavior ensures (boolean) \result &lt;==&gt; guardVal(\value(loopFootprint), i);
       @ exceptional_behavior requires false;
       @*/
     \abstract_expression boolean g
@@ -46,28 +44,45 @@ while (!done &amp;&amp;
     /*@ ae_constraint
       @   \disjoint(frameBody, i) &amp;&amp;
       @   \disjoint(frameBody, done) &amp;&amp;
-      @   \disjoint(footprintBody, done) &amp;&amp;
-      @   \disjoint(footprintE, done) &amp;&amp;
-      @   \disjoint(footprintG, done);
+      @   \disjoint(loopFootprint, i) &amp;&amp;
+      @   \disjoint(loopFootprint, done);
       @*/
     { ; }
+
+    // ghost int oldDecrExpr = decrExpr(\value(loopFootprint), i);
+
+    /*@ ae_constraint
+      @   \disjoint(frameBody, oldDecrExpr) &amp;&amp;
+      @   \disjoint(loopFootprint, oldDecrExpr);
+      @*/
+    { ; }
+
+    /*@ assignable \hasTo(oldDecrExpr);
+      @ accessible loopFootprint, i;
+      @ normal_behavior ensures oldDecrExpr == decrExpr(\value(loopFootprint), i);
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement GhostSetter;
     
     if (
         /*@ assignable \nothing;
-          @ accessible footprintE, i, threshold;
+          @ accessible loopFootprint, i;
           @ normal_behavior ensures 
           @   ((boolean) \result &lt;==&gt;
-          @     doneCondition(\value(footprintE), i+1, \value(footprintG))) &amp;&amp;
+          @     doneCondition(\value(loopFootprint), i+1)) &amp;&amp;
           @   (!((boolean) \result) ==&gt; 
-          @     unsuccessfulInv(\value(frameBody), \value(footprintE), i+1, \value(footprintG)));
+          @     unsuccessfulInv(\value(frameBody), \value(loopFootprint), i+1));
           @ exceptional_behavior requires false;
           @*/
         \abstract_expression boolean e
     ) {
-        /*@ assignable \hasTo(frameBody);
-          @ accessible footprintE, i, threshold;
+        /*@ assignable frameBody;
+          @ accessible loopFootprint, i;
           @ normal_behavior ensures
-          @   bodyPost(\value(frameBody), \value(footprintE), i+1, \value(footprintG));
+          @   bodyPost(\value(frameBody), \value(loopFootprint), i+1);
           @ exceptional_behavior requires false;
           @ return_behavior requires false;
           @ break_behavior requires false;
@@ -81,34 +96,28 @@ while (!done &amp;&amp;
     i++;
 
     /*@ ae_constraint
-      @   decrExpr(i) &gt;= 0 &amp;&amp; decrExpr(i-1) &gt; decrExpr(i);
+      @   decrExpr(\value(loopFootprint), i) &gt;= 0 &amp;&amp;
+      @   oldDecrExpr &gt; decrExpr(\value(loopFootprint), i);
       @*/
     { ; }
 }
 
 /*@ ae_constraint
-  @   done &lt;==&gt; (\exists int i; doneCondition(\value(footprintE), i, \value(footprintG)));
-  @*/
-{ ; }
-
-/*@ ae_constraint
-  @   loopGuardAfterLeft(guardVal(\value(footprintG), i));
+  @   done &lt;==&gt; (\exists int i; doneCondition(\value(loopFootprint), i));
   @*/
 { ; }</programOne>
     <programTwo>/*@ ae_constraint
   @   \disjoint(frameBody, i) &amp;&amp;
   @   \disjoint(frameBody, done) &amp;&amp;
-  @   \disjoint(footprintBody, done) &amp;&amp;
-  @   \disjoint(footprintE, done) &amp;&amp;
-  @   \disjoint(footprintG, done);
+  @   \disjoint(frameBody, oldDecrExpr) &amp;&amp;
+  @   \disjoint(loopFootprint, i) &amp;&amp;
+  @   \disjoint(loopFootprint, done) &amp;&amp;
+  @   \disjoint(loopFootprint, oldDecrExpr);
   @*/
 { ; }
 
 /*@ ae_constraint
-  @   \disjoint(footprintBody, footprintE) &amp;&amp;
-  @   \disjoint(frameBody, footprintG) &amp;&amp;
-  @   \disjoint(frameBody, footprintE) &amp;&amp;
-  @   \disjoint(frameBody, footprintBody);
+  @   \disjoint(frameBody, loopFootprint);
   @*/
 { ; }
 
@@ -116,24 +125,24 @@ done = false;
 i = 0;
 
 /*@ ae_constraint
-  @   decrExpr(0) &gt;= 0 &amp;&amp;
-  @   unsuccessfulInv(\value(frameBody), \value(footprintE), 0, \value(footprintG)) &amp;&amp;
-  @   !doneCondition(\value(footprintE), 0, \value(footprintG));
+  @   decrExpr(\value(loopFootprint), 0) &gt;= 0 &amp;&amp;
+  @   unsuccessfulInv(\value(frameBody), \value(loopFootprint), 0) &amp;&amp;
+  @   !doneCondition(\value(loopFootprint), 0);
   @*/
 { ; }
 
 /*@ loop_invariant
-  @   i &gt;= 0 &amp;&amp; decrExpr(i) &gt;= 0 &amp;&amp;
-  @   (done &lt;==&gt; doneCondition(\value(footprintE), i, \value(footprintG))) &amp;&amp;
-  @   ( done ==&gt; bodyPost(\value(frameBody), \value(footprintE), i, \value(footprintG))) &amp;&amp;
-  @   (!done ==&gt; unsuccessfulInv(\value(frameBody), \value(footprintE), i, \value(footprintG)));
+  @   i &gt;= 0 &amp;&amp; decrExpr(\value(loopFootprint), i) &gt;= 0 &amp;&amp;
+  @   ( done &lt;==&gt; doneCondition(\value(loopFootprint), i)) &amp;&amp;
+  @   ( done  ==&gt; bodyPost(\value(frameBody), \value(loopFootprint), i)) &amp;&amp;
+  @   (!done  ==&gt; unsuccessfulInv(\value(frameBody), \value(loopFootprint), i));
   @ assignable frameBody;
-  @ decreases decrExpr(i);
+  @ decreases decrExpr(\value(loopFootprint), i);
   @*/
 while (!done &amp;&amp; 
     /*@ assignable \nothing;
-      @ accessible footprintG, i;
-      @ normal_behavior ensures (boolean) \result &lt;==&gt; guardVal(\value(footprintG), i);
+      @ accessible loopFootprint, i;
+      @ normal_behavior ensures (boolean) \result &lt;==&gt; guardVal(\value(loopFootprint), i);
       @ exceptional_behavior requires false;
       @*/
     \abstract_expression boolean g
@@ -141,28 +150,45 @@ while (!done &amp;&amp;
     /*@ ae_constraint
       @   \disjoint(frameBody, i) &amp;&amp;
       @   \disjoint(frameBody, done) &amp;&amp;
-      @   \disjoint(footprintBody, done) &amp;&amp;
-      @   \disjoint(footprintE, done) &amp;&amp;
-      @   \disjoint(footprintG, done);
+      @   \disjoint(loopFootprint, i) &amp;&amp;
+      @   \disjoint(loopFootprint, done);
       @*/
     { ; }
+
+    // ghost int oldDecrExpr = decrExpr(\value(loopFootprint), i);
+
+    /*@ ae_constraint
+      @   \disjoint(frameBody, oldDecrExpr) &amp;&amp;
+      @   \disjoint(loopFootprint, oldDecrExpr);
+      @*/
+    { ; }
+
+    /*@ assignable \hasTo(oldDecrExpr);
+      @ accessible loopFootprint, i;
+      @ normal_behavior ensures oldDecrExpr == decrExpr(\value(loopFootprint), i);
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement GhostSetter;
     
     if (
         /*@ assignable \nothing;
-          @ accessible footprintE, i, threshold;
+          @ accessible loopFootprint, i;
           @ normal_behavior ensures 
           @   ((boolean) \result &lt;==&gt;
-          @     doneCondition(\value(footprintE), i+1, \value(footprintG))) &amp;&amp;
+          @     doneCondition(\value(loopFootprint), i+1)) &amp;&amp;
           @   (!((boolean) \result) ==&gt; 
-          @     unsuccessfulInv(\value(frameBody), \value(footprintE), i+1, \value(footprintG)));
+          @     unsuccessfulInv(\value(frameBody), \value(loopFootprint), i+1));
           @ exceptional_behavior requires false;
           @*/
         \abstract_expression boolean e
     ) {
-        /*@ assignable \hasTo(frameBody);
-          @ accessible footprintE, i, threshold;
+        /*@ assignable frameBody;
+          @ accessible loopFootprint, i;
           @ normal_behavior ensures
-          @   bodyPost(\value(frameBody), \value(footprintE), i+1, \value(footprintG));
+          @   bodyPost(\value(frameBody), \value(loopFootprint), i+1);
           @ exceptional_behavior requires false;
           @ return_behavior requires false;
           @ break_behavior requires false;
@@ -176,50 +202,30 @@ while (!done &amp;&amp;
     i++;
 
     /*@ ae_constraint
-      @   decrExpr(i) &gt;= 0 &amp;&amp; decrExpr(i-1) &gt; decrExpr(i);
+      @   decrExpr(\value(loopFootprint), i) &gt;= 0 &amp;&amp;
+      @   oldDecrExpr &gt; decrExpr(\value(loopFootprint), i);
       @*/
     { ; }
 }
 
 /*@ ae_constraint
-  @   done &lt;==&gt; (\exists int i; doneCondition(\value(footprintE), i, \value(footprintG)));
-  @*/
-{ ; }
-
-/*@ ae_constraint
-  @   loopGuardAfterRight(guardVal(\value(footprintG), i));
+  @   done &lt;==&gt; (\exists int i; doneCondition(\value(loopFootprint), i));
   @*/
 { ; }</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
-        <locationSet locsetName="relevant">
-            <relevantOne>-1</relevantOne>
-            <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintBody">
-            <relevantOne>-1</relevantOne>
-            <relevantTwo>-1</relevantTwo>
-        </locationSet>
         <locationSet locsetName="frameBody">
             <relevantOne>0</relevantOne>
             <relevantTwo>0</relevantTwo>
         </locationSet>
-        <locationSet locsetName="frameE">
-            <relevantOne>-1</relevantOne>
-            <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintE">
-            <relevantOne>-1</relevantOne>
-            <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintG">
-            <relevantOne>-1</relevantOne>
-            <relevantTwo>-1</relevantTwo>
+        <locationSet locsetName="loopFootprint">
+            <relevantOne>1</relevantOne>
+            <relevantTwo>1</relevantTwo>
         </locationSet>
     </locationSets>
     <functions>
-        <function funcName="oldFrameBody" resultSortName="any"/>
         <function funcName="decrExpr" resultSortName="int">
+            <argSort>any</argSort>
             <argSort>int</argSort>
         </function>
         <function funcName="guardVal" resultSortName="boolean">
@@ -232,25 +238,15 @@ while (!done &amp;&amp;
             <argSort>any</argSort>
             <argSort>any</argSort>
             <argSort>int</argSort>
-            <argSort>any</argSort>
         </predicate>
         <predicate predName="unsuccessfulInv">
             <argSort>any</argSort>
             <argSort>any</argSort>
             <argSort>int</argSort>
-            <argSort>any</argSort>
-        </predicate>
-        <predicate predName="loopGuardAfterLeft">
-            <argSort>boolean</argSort>
-        </predicate>
-        <predicate predName="loopGuardAfterRight">
-            <argSort>boolean</argSort>
         </predicate>
         <predicate predName="doneCondition">
             <argSort>any</argSort>
             <argSort>int</argSort>
-            <argSort>int</argSort>
-            <argSort>any</argSort>
         </predicate>
     </predicates>
     <programVariables>
@@ -262,7 +258,7 @@ while (!done &amp;&amp;
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
         </programVariable>
-        <programVariable typeName="int" varName="threshold">
+        <programVariable typeName="int" varName="oldDecrExpr">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
         </programVariable>
