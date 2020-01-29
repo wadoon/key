@@ -45,7 +45,7 @@ public class AutoTactic implements Tactic {
         properties.load(new StringReader(DEFAULT_SETTINGS + "\n" + additionalSettings));
         StrategyProperties strategyProperties = StrategyProperties.read(properties);
         Strategy oldStrategy = proof.getActiveStrategy();
-        Strategy newStratgy = proof.getActiveStrategyFactory().create(proof, strategyProperties);
+        Strategy newStratgy = makeStrategy(proof, strategyProperties);
 
         int maxSteps = Integer.parseInt(properties.getProperty("[Strategy]MaximumNumberOfAutomaticApplications", "10000"));
 
@@ -55,6 +55,10 @@ public class AutoTactic implements Tactic {
 
         // resetting settings
         proof.setActiveStrategy(oldStrategy);
+    }
+
+    protected Strategy makeStrategy(Proof proof, StrategyProperties strategyProperties) {
+        return proof.getActiveStrategyFactory().create(proof, strategyProperties);
     }
 
     @Override
