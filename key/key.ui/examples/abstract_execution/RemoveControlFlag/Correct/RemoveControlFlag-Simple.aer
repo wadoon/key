@@ -131,6 +131,7 @@ i = 0;
   @   i &gt;= 0 &amp;&amp; i &lt;= threshold &amp;&amp;
   @   !doneCondition(\value(footprintE), i, threshold) &amp;&amp;
   @   unsuccessfulInv(\value(frameBody), \value(footprintE), i, threshold);
+  @
   @ assignable frameBody;
   @ decreases threshold - i;
   @*/
@@ -153,7 +154,7 @@ while (i &lt; threshold) {
           @ accessible footprintE, i, threshold;
           @ normal_behavior ensures 
           @   ((boolean) \result &lt;==&gt;
-          @     doneCondition(\value(footprintE), i, threshold)) &amp;&amp;
+          @     doneCondition(\value(footprintE), i+1, threshold)) &amp;&amp;
           @   (!((boolean) \result) ==&gt; 
           @     unsuccessfulInv(\value(frameBody), \value(footprintE), i+1, threshold));
           @ exceptional_behavior requires false;
@@ -177,17 +178,18 @@ while (i &lt; threshold) {
     i++;
 }
 
-/* ae_constraint
+/*@ ae_constraint
   @   done &lt;==&gt; (\exists int i; doneCondition(\value(footprintE), i, threshold));
   @*/
 { ; }
 
-//@ ghost boolean guardValRight = i &lt; threshold;
+//@ ghost boolean guardValRight = !done &amp;&amp; (i &lt; threshold);
 
 /*@ ae_constraint
   @   \disjoint(guardValRight, frameBody);
   @*/
 { ; }
+
 /*@ ae_constraint
   @   loopGuardAfterRight(guardValRight);
   @*/
