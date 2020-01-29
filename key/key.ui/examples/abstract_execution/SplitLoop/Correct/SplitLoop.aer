@@ -439,6 +439,10 @@ while (
         <predicate predName="guardIsTrue">
             <argSort>any</argSort>
         </predicate>
+        <predicate predName="returnsP">
+            <argSort>any</argSort>
+            <argSort>any</argSort>
+        </predicate>
     </predicates>
     <programVariables>
         <programVariable typeName="int" varName="oldVariant">
