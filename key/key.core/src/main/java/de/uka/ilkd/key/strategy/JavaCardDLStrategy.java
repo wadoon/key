@@ -30,6 +30,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
+import de.uka.ilkd.key.rule.RememberRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
@@ -276,6 +277,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 // splitF,
                 // strengthenConstraints,
                 AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF,
+                noRememberRuleFeature(),
                 // smtF,
                 methodSpecF, queryF, depSpecF, loopInvF, blockFeature, loopBlockFeature,
                 loopBlockApplyHeadFeature,
@@ -286,6 +288,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(MiscTools.findOneStepSimplifier(getProof()));
         return ConditionalFeature.createConditional(filter, cost);
+    }
+
+    private Feature noRememberRuleFeature() {
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(RememberRule.INSTANCE);
+        return ConditionalFeature.createConditional(filter, StaticFeatureCollection.inftyConst());
     }
 
     // //////////////////////////////////////////////////////////////////////////
