@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\exists any _frB, _fpL; (\exists int _I; (\exists boolean _Done;&#10;  (\forall any frB, fpL; (\forall int I; (\forall boolean Done;&#10;     (&#10;          (&#10;             I &gt;= 0 &amp;&amp; decrExpr(fpL, I) &gt;= 0 &amp;&amp;&#10;             ( Done &lt;==&gt; doneCondition(fpL, I)) &amp;&amp;&#10;             ( Done  ==&gt; bodyPost(frB, fpL, I)) &amp;&amp;&#10;             (!Done  ==&gt; unsuccessfulInv(frB, fpL, I)) &amp;&amp;&#10;             !(!Done &amp;&amp; guardVal(fpL, I))&#10;          )&#10;        &lt;==&gt;&#10;          (_frB == frB &amp;&amp; _fpL == fpL &amp;&amp; _I == I &amp;&amp; _Done == Done)&#10;     )&#10;   )))&#10;)))" postCondition="\result_1==\result_2">
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\exists any _frB, _fpL; (\exists int _I;&#10;  (\forall any frB, fpL; (\forall int I;&#10;     (&#10;          (&#10;             I &gt;= 0 &amp;&amp; decrExpr(fpL, I) &gt;= 0 &amp;&amp;&#10;             ( doneCondition(fpL, I)  ==&gt; bodyPost(frB, fpL, I)) &amp;&amp;&#10;             (!doneCondition(fpL, I)  ==&gt; unsuccessfulInv(frB, fpL, I)) &amp;&amp;&#10;             ( doneCondition(fpL, I) || !guardVal(fpL, I))&#10;          )&#10;        &lt;==&gt;&#10;          (_frB == frB &amp;&amp; _fpL == fpL &amp;&amp; _I == I)&#10;     )&#10;   ))&#10;))" postCondition="\result_1==\result_2">
     <programOne>/*@ ae_constraint
   @   \disjoint(frameBody, i) &amp;&amp;
   @   \disjoint(frameBody, done) &amp;&amp;
-  @   \disjoint(frameBody, oldDecrExpr) &amp;&amp;
   @   \disjoint(loopFootprint, i) &amp;&amp;
-  @   \disjoint(loopFootprint, done) &amp;&amp;
-  @   \disjoint(loopFootprint, oldDecrExpr);
+  @   \disjoint(loopFootprint, done);
   @*/
 { ; }
 
@@ -48,8 +46,8 @@ while (!done &amp;&amp;
       @   \disjoint(loopFootprint, done);
       @*/
     { ; }
-
-    // ghost int oldDecrExpr = decrExpr(\value(loopFootprint), i);
+    
+    //@ ghost int oldDecrExpr; // = decrExpr(\value(loopFootprint), i);
 
     /*@ ae_constraint
       @   \disjoint(frameBody, oldDecrExpr) &amp;&amp;
@@ -100,19 +98,12 @@ while (!done &amp;&amp;
       @   oldDecrExpr &gt; decrExpr(\value(loopFootprint), i);
       @*/
     { ; }
-}
-
-/*@ ae_constraint
-  @   done &lt;==&gt; (\exists int i; doneCondition(\value(loopFootprint), i));
-  @*/
-{ ; }</programOne>
+}</programOne>
     <programTwo>/*@ ae_constraint
   @   \disjoint(frameBody, i) &amp;&amp;
   @   \disjoint(frameBody, done) &amp;&amp;
-  @   \disjoint(frameBody, oldDecrExpr) &amp;&amp;
   @   \disjoint(loopFootprint, i) &amp;&amp;
-  @   \disjoint(loopFootprint, done) &amp;&amp;
-  @   \disjoint(loopFootprint, oldDecrExpr);
+  @   \disjoint(loopFootprint, done);
   @*/
 { ; }
 
@@ -133,9 +124,8 @@ i = 0;
 
 /*@ loop_invariant
   @   i &gt;= 0 &amp;&amp; decrExpr(\value(loopFootprint), i) &gt;= 0 &amp;&amp;
-  @   ( done &lt;==&gt; doneCondition(\value(loopFootprint), i)) &amp;&amp;
-  @   ( done  ==&gt; bodyPost(\value(frameBody), \value(loopFootprint), i)) &amp;&amp;
-  @   (!done  ==&gt; unsuccessfulInv(\value(frameBody), \value(loopFootprint), i));
+  @   !doneCondition(\value(loopFootprint), i) &amp;&amp;
+  @   unsuccessfulInv(\value(frameBody), \value(loopFootprint), i);
   @ assignable frameBody;
   @ decreases decrExpr(\value(loopFootprint), i);
   @*/
@@ -154,8 +144,8 @@ while (!done &amp;&amp;
       @   \disjoint(loopFootprint, done);
       @*/
     { ; }
-
-    // ghost int oldDecrExpr = decrExpr(\value(loopFootprint), i);
+    
+    //@ ghost int oldDecrExpr; // = decrExpr(\value(loopFootprint), i);
 
     /*@ ae_constraint
       @   \disjoint(frameBody, oldDecrExpr) &amp;&amp;
@@ -195,8 +185,16 @@ while (!done &amp;&amp;
           @ continue_behavior requires false;
           @*/
         \abstract_statement Body;
+    
+        i++;
+    
+        /*@ ae_constraint
+          @   decrExpr(\value(loopFootprint), i) &gt;= 0 &amp;&amp;
+          @   oldDecrExpr &gt; decrExpr(\value(loopFootprint), i);
+          @*/
+        { ; }
 
-        done = true;
+        break;
     }
     
     i++;
@@ -206,12 +204,7 @@ while (!done &amp;&amp;
       @   oldDecrExpr &gt; decrExpr(\value(loopFootprint), i);
       @*/
     { ; }
-}
-
-/*@ ae_constraint
-  @   done &lt;==&gt; (\exists int i; doneCondition(\value(loopFootprint), i));
-  @*/
-{ ; }</programTwo>
+}</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
         <locationSet locsetName="frameBody">
@@ -255,10 +248,6 @@ while (!done &amp;&amp;
             <relevantTwo>-1</relevantTwo>
         </programVariable>
         <programVariable typeName="int" varName="i">
-            <relevantOne>-1</relevantOne>
-            <relevantTwo>-1</relevantTwo>
-        </programVariable>
-        <programVariable typeName="int" varName="oldDecrExpr">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
         </programVariable>
