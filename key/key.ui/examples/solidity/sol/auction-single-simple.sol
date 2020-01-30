@@ -20,7 +20,6 @@ contract OneAuction {
         address/* payable */bidder;
         uint value;
     }
-    bool public auctionOpen = true;
 
     uint public currentBid = 0;
     address auctionOwner;
