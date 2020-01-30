@@ -136,7 +136,7 @@ i = 0;
   @ assignable frameBody;
   @ decreases decrExpr(\value(loopFootprint), i);
   @*/
-while (!done &amp;&amp; 
+while (
     /*@ assignable \nothing;
       @ accessible loopFootprint, i;
       @ normal_behavior ensures (boolean) \result &lt;==&gt; guardVal(\value(loopFootprint), i);
