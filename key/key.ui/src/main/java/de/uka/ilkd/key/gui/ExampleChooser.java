@@ -440,9 +440,10 @@ public final class ExampleChooser extends JDialog {
                 if (AERelationalModel.fileHasAEModelEnding(example.getObligationFile())) {
                     try {
                         final AERelationalModel model = AERelationalModel.fromXml(fileAsString);
-                        addTab(model.getProgramOne(), "First Program Version", false);
-                        addTab(model.getProgramTwo(), "Second Program Version", false);
-                        addTab(model.getPostCondition(), "Post Condition", false);
+                        addTab(model.getProgramOne().trim(), "First Program Version", false);
+                        addTab(model.getProgramTwo().trim(), "Second Program Version", false);
+                        addTab(model.getPreCondition().trim(), "Precondition", false);
+                        addTab(model.getPostCondition().trim(), "Postcondition", false);
                     } catch (JAXBException | SAXException e) {
                     }
                 }

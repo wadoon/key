@@ -108,8 +108,7 @@ abstract_execution/LoopExtraction/WithCosts/README.txt
 
 #abstract_execution/MoveStatementsToCallers/Correct/README.txt
 
-#abstract_execution/RemoveControlFlag/Correct/README.txt
-#abstract_execution/RemoveControlFlag/CorrectWithUnrollingInvRule/README.txt
+abstract_execution/RemoveControlFlag/Correct/README.txt
 
-#abstract_execution/SplitLoop/Correct/README.txt
+abstract_execution/SplitLoop/Correct/README.txt
 ### END Abstract Execution ###
