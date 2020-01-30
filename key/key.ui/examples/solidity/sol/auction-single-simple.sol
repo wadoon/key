@@ -27,11 +27,13 @@ contract OneAuction {
     address currentBidder;
     AuctionMode mode = AuctionMode.Open;
     BidInformation bid;
+	mapping(address=>uint) public test;
     
     function closeAuction() public {
+		test[this] = 10;
+        require (mode == AuctionMode.Open);
         require (msg.sender == auctionOwner);
         require (bid.bidder == currentBidder);
-        require (mode == AuctionMode.Open);
         
         uint tmp = currentBid;
         currentBid = 0;

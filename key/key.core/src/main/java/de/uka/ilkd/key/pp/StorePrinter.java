@@ -74,7 +74,7 @@ class StorePrinter extends FieldPrinter {
                 printStoreOnGenericFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
             } else if (isJavaFieldConstant(fieldTerm)) {
                 printStoreOnJavaFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
-            } else if (fieldTerm.op() == heapLDT.getArr()) {
+            } else if (fieldTerm.op() == heapLDT.getArr() || fieldTerm.op() == heapLDT.getAddress()) {
                 printStoreOnArrayElement(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
             } else {
                 lp.printFunctionTerm(t);

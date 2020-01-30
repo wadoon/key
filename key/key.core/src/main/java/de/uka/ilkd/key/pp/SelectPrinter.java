@@ -42,7 +42,7 @@ class SelectPrinter extends FieldPrinter {
             final Term heapTerm = t.sub(0);
             final Term objectTerm = t.sub(1);
             final Term fieldTerm = t.sub(2);
-            if (fieldTerm.op() == heapLDT.getArr()) {
+            if (fieldTerm.op() == heapLDT.getArr() || fieldTerm.op() == heapLDT.getAddress()) {
 				KeYJavaType kjt = lp.services.getJavaInfo().getKeYJavaType(objectTerm.sort());
 				Type jtype = null;
 				if (kjt != null) {

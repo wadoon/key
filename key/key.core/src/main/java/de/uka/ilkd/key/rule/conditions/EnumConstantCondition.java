@@ -21,6 +21,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -63,10 +64,18 @@ public final class EnumConstantCondition extends VariableConditionAdapter {
             } else if (subst instanceof Term
                     && ((Term) subst).op() instanceof ProgramVariable) {
                 progvar = (ProgramVariable) ((Term) subst).op();
+            } else if (subst instanceof Term && 
+            		services.getTypeConverter().getHeapLDT().isSelectOp(((Term)subst).op())) {
+            	
+            	String[] enumClassName = ((Term)subst).sub(2).op().name().toString().split("::\\$");
+            	if (enumClassName == null || enumClassName.length<2) {
+            		return false;
+            	}
+            	progvar = services.getJavaInfo().getAttribute(enumClassName[1],enumClassName[0]);
             } else {
-                return false;
+            	return false;
             }
-
+            
             return EnumClassDeclaration.isEnumConstant(progvar);
 
         }

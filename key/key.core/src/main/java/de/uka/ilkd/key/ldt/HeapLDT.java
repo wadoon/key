@@ -95,6 +95,8 @@ public final class HeapLDT extends LDT {
     
     //heap pv
     private ImmutableList<LocationVariable> heaps;
+
+	private Function address;
     
     
     
@@ -114,6 +116,7 @@ public final class HeapLDT extends LDT {
         anon              = addFunction(services, "anon");
         memset            = addFunction(services, "memset");
         arr               = addFunction(services, "arr");
+        address           = addFunction(services, "address");        
         created           = addFunction(services, "java.lang.Object::<created>");
         initialized       = addFunction(services, "java.lang.Object::<initialized>");
         classPrepared     = addSortDependingFunction(services, "<classPrepared>");
@@ -255,7 +258,11 @@ public final class HeapLDT extends LDT {
     public Function getArr() {
 	return arr;
     }
-    
+
+    public Function getAddress() {
+	return address;
+    }
+
     
     public Function getCreated() {
 	return created;

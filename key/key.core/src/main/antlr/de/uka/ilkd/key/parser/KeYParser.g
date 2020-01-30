@@ -2961,8 +2961,9 @@ accessterm returns [Term _accessterm = null]
          if(s==null) {
            semanticError("Tried to cast to unknown type.");
          } else if (objectSort != null
-                    && !s.extendsTrans(objectSort) 
-                    && result.sort().extendsTrans(objectSort)) {
+                    && !s.extendsTrans(objectSort)
+                    && result.sort().extendsTrans(objectSort) 
+                    && !result.sort().extendsTrans(getServices().getJavaInfo().getTypeByName("java.lang.Address").getSort())) {
                 semanticError("Illegal cast from " + result.sort() + 
                     " to sort " + s +
                     ". Casts between primitive and reference types are not allowed. ");

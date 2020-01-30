@@ -163,6 +163,9 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			typeName = "int";break;
 		case "bool"    : typeName = "boolean";break;
 		case "address" : typeName = "Address";break;
+		case "mapping(address=>uint)": typeName="int[]";break;
+		case "mapping(uint=>uint)": typeName="int[]";break;
+		case "mapping(uint=>address)": typeName="Address[]";break;
 		default: break;		
 		}
 		return typeName;
@@ -276,7 +279,15 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 		// TODO user defined modifiers
 
-		StringBuffer parameters = new StringBuffer("Message msg,");		
+		StringBuffer parameters;
+		
+		switch(fctName) {
+		case "require":case "assert": 
+			parameters = new StringBuffer();
+			break;
+		default: parameters = new StringBuffer("Message msg,");		
+		}
+		
 		ctx.parameterList().parameter().stream().forEach(param -> 
 		parameters.append(visit(param) + ","));
 
@@ -737,8 +748,15 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 */
 	@Override public String visitFunctionCallExpression(SolidityParser.FunctionCallExpressionContext ctx) { 
 		String fctName = visit(ctx.expression());
+
+		StringBuffer arguments;
+		switch(fctName) {
+		case "require":case "assert": 
+			arguments = new StringBuffer();
+			break;
+		default: arguments = new StringBuffer("msg,");		
+		}
 		
-		StringBuffer arguments = new StringBuffer("msg,");
 		if (ctx.functionCallArguments() != null && !ctx.functionCallArguments().isEmpty()) {
 			if (ctx.functionCallArguments().expressionList()!= null && 
 					!ctx.functionCallArguments().expressionList().isEmpty()) {
@@ -757,7 +775,9 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public String visitPrimaryExprExpression(SolidityParser.PrimaryExprExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public String visitPrimaryExprExpression(SolidityParser.PrimaryExprExpressionContext ctx) { 
+		return visitChildren(ctx); 
+	}
 	/**
 	 * {@inheritDoc}
 	 *
@@ -852,7 +872,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public String visitArrayAccessExpression(SolidityParser.ArrayAccessExpressionContext ctx) { 
-		return visit(ctx.expression(0))+"["+visit(ctx.expression(1))+"]"; 
+		return visit(ctx.expression(0))+"[(int)"+visit(ctx.expression(1))+"]";
 	}
 
 	/**
