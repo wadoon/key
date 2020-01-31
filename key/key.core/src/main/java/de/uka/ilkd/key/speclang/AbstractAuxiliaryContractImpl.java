@@ -1509,8 +1509,21 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                     return and(buildNormalTerminationCondition(),
                             convertToFormula(ensures.get(heap)));
                 } else if (behavior == Behavior.BREAK_BEHAVIOR) {
+                    // We also support conventional ensures clauses if there is not breaks clause
+                    if (breakPostcondition.op() == Junctor.TRUE && variables.breakFlags.size() == 1
+                            && variables.breakFlags.containsKey(null)
+                            && ensures.get(heap).op() != Junctor.TRUE) {
+                        return and(buildBreakTerminationCondition(), ensures.get(heap));
+                    }
+                    
                     return and(buildBreakTerminationCondition(), breakPostcondition);
                 } else if (behavior == Behavior.CONTINUE_BEHAVIOR) {
+                    if (continuePostcondition.op() == Junctor.TRUE && variables.continueFlags.size() == 1
+                            && variables.continueFlags.containsKey(null)
+                            && ensures.get(heap).op() != Junctor.TRUE) {
+                        return and(buildContinueTerminationCondition(), ensures.get(heap));
+                    }
+                    
                     return and(buildContinueTerminationCondition(), continuePostcondition);
                 } else if (behavior == Behavior.RETURN_BEHAVIOR) {
                     return and(buildReturnTerminationCondition(), returnPostcondition);

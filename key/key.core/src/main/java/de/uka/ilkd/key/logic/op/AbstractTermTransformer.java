@@ -20,6 +20,7 @@ import de.uka.ilkd.key.abstractexecution.rule.metaconstruct.AbstractPrecondition
 import de.uka.ilkd.key.abstractexecution.rule.metaconstruct.CreateAbstractAnonUpdate;
 import de.uka.ilkd.key.abstractexecution.rule.metaconstruct.GetFrameTransformer;
 import de.uka.ilkd.key.abstractexecution.rule.metaconstruct.RetrieveAEPostconditionTransformer;
+import de.uka.ilkd.key.abstractexecution.rule.metaconstruct.RetrieveAEPostconditionTransformerLoop;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -152,6 +153,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     
     public static final AbstractTermTransformer ABSTR_PRECOND_TRANSF = new AbstractPreconditionTransformer();
     public static final AbstractTermTransformer ABSTR_POSTCOND_TRANSF = new RetrieveAEPostconditionTransformer();
+    public static final AbstractTermTransformer ABSTR_POSTCOND_TRANSF_LOOP = new RetrieveAEPostconditionTransformerLoop();
     public static final AbstractTermTransformer GET_FRAME_TRANSFORMER = new GetFrameTransformer();
 
     public static final AbstractTermTransformer SET_SECOND_COMPONENT_TO = new SetLastComponentOfAEPredsToFalseTransformer();

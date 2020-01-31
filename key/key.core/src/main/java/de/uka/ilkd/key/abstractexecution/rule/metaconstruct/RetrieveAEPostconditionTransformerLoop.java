@@ -23,13 +23,13 @@ import de.uka.ilkd.key.logic.Name;
  * 
  * <p>
  * Syntax:
- * <code>#postCondAE(#absProg, "&lt;COMPLETION_TYPE&gt;", #returns, #result, #exc)</code>
+ * <code>#postCondAE(#absProg, "&lt;COMPLETION_TYPE&gt;", #returns, #result, #exc, #breaks, #returns)</code>
  *
  * @author Dominic Steinhoefel
  */
-public class RetrieveAEPostconditionTransformer extends AbstractRetrieveAEPostconditionTransformer {
-    public RetrieveAEPostconditionTransformer() {
-        super(new Name("#postCondAE"), 5);
+public class RetrieveAEPostconditionTransformerLoop extends AbstractRetrieveAEPostconditionTransformer {
+    public RetrieveAEPostconditionTransformerLoop() {
+        super(new Name("#postCondAELoop"), 7);
     }
 
 }

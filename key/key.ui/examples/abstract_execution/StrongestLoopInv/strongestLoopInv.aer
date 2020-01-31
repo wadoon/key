@@ -47,25 +47,22 @@ while (
       @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
       @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
       @   decrTerm(\value(loopFrame), \value(loopFootprint)) &lt; oldDecrTerm;
-      @ exceptional_behavior requires false;
-      @ //  requires throwsExcP(\value(loopFootprint));
-      @ //  signals (Throwable) throwsExcP(\value(loopFootprint)) &amp;&amp;
-      @ //    loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
-      @ //    decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
-      @ return_behavior requires false;
-      @ //  requires returnsP(\value(loopFootprint));
-      @ //  ensures returnsP(\value(loopFootprint)) &amp;&amp;
-      @ //    loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
-      @ //    decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
-      @ break_behavior
-      @   requires breaksP(\value(loopFootprint));
-      @   breaks () //breaksP(\value(loopFootprint)) &amp;&amp;
-      @     loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
-      @     decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
-      @ continue_behavior requires false;
-      @ //  loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
-      @ //  decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
-      @ //  decrTerm(\value(loopFrame), \value(loopFootprint)) &lt; oldDecrTerm;
+      @ exceptional_behavior signals (Throwable)
+      @   throwsExcP(\value(loopFootprint)) &amp;&amp;
+      @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
+      @ return_behavior ensures
+      @   returnsP(\value(loopFootprint)) &amp;&amp;
+      @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
+      @ break_behavior ensures
+      @   breaksP(\value(loopFootprint)) &amp;&amp;
+      @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
+      @ continue_behavior ensures
+      @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
+      @   decrTerm(\value(loopFrame), \value(loopFootprint)) &lt; oldDecrTerm;
       @*/
     \abstract_statement P;
 }</programOne>
@@ -116,25 +113,22 @@ while (
       @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
       @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
       @   decrTerm(\value(loopFrame), \value(loopFootprint)) &lt; oldDecrTerm;
-      @ exceptional_behavior requires false;
-      @ //  requires throwsExcP(\value(loopFootprint));
-      @ //  signals (Throwable) throwsExcP(\value(loopFootprint)) &amp;&amp;
-      @ //    loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
-      @ //    decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
-      @ return_behavior requires false;
-      @ //  requires returnsP(\value(loopFootprint));
-      @ //  ensures returnsP(\value(loopFootprint)) &amp;&amp;
-      @ //    loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
-      @ //    decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
-      @ break_behavior
-      @   requires breaksP(\value(loopFootprint));
-      @   breaks () //breaksP(\value(loopFootprint)) &amp;&amp;
-      @     loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
-      @     decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
-      @ continue_behavior requires false;
-      @ //  loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
-      @ //  decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
-      @ //  decrTerm(\value(loopFrame), \value(loopFootprint)) &lt; oldDecrTerm;
+      @ exceptional_behavior signals (Throwable)
+      @   throwsExcP(\value(loopFootprint)) &amp;&amp;
+      @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
+      @ return_behavior ensures
+      @   returnsP(\value(loopFootprint)) &amp;&amp;
+      @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
+      @ break_behavior ensures
+      @   breaksP(\value(loopFootprint)) &amp;&amp;
+      @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
+      @ continue_behavior ensures
+      @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
+      @   decrTerm(\value(loopFrame), \value(loopFootprint)) &lt; oldDecrTerm;
       @*/
     \abstract_statement P;
 }</programTwo>
