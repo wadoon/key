@@ -791,7 +791,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
             SwingUtilities.invokeLater(() -> mainWindow.loadProofFromBundle(result.getFile(),
                     result.getProofPath().toFile()));
 
-        } catch (IOException | IllegalStateException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(
                     RefinityWindow.this, "<html>Problem saving proof bundle.<br/><br/>Message:<br/>"
                             + e.getMessage() + "</html>",
