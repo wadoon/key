@@ -6,8 +6,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import lombok.Builder;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -16,8 +16,8 @@ import java.util.List;
 
 @Builder
 public class KeyMatcherFacade {
-    private static Logger logger = LogManager.getLogger(KeyMatcherFacade.class);
-    private static Logger loggerConsole = LogManager.getLogger("console");
+    private static Logger logger = LoggerFactory.getLogger(KeyMatcherFacade.class);
+    private static Logger loggerConsole = LoggerFactory.getLogger("console");
     private final DefaultTermParser dtp = new DefaultTermParser();
     private final Services services;
     private final Sequent sequent;

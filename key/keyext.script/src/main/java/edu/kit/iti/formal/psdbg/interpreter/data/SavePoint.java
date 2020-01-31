@@ -9,6 +9,10 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.File;
 
+/**
+ * A savepoint is a file-persisted state of an interpreter.
+ * @author weigl
+ */
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
@@ -25,10 +29,9 @@ public class SavePoint {
         if (isSaveCommand(call)) {
             Parameters p = call.getParameters();
             name = evalAsText(p, "#2", "not-available");
-            try{
+            try {
                 force = ForceOption.valueOf(evalAsText(p, "force", "yes").toUpperCase());
-            } catch (IllegalArgumentException e){
-
+            } catch (IllegalArgumentException e) {
             }
 
             try {
@@ -101,6 +104,12 @@ public class SavePoint {
         return new File(dir, name + ".psdbgstate.xml");
     }
 
+    /**
+     * Checks whether a call statement belongs to this save point.
+     *
+     * @param statement
+     * @return
+     */
     public boolean isThisStatement(Statement statement) {
         if (isSaveCommand(statement)) {
             CallStatement c = (CallStatement) statement;

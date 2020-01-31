@@ -8,8 +8,8 @@ import edu.kit.iti.formal.psdbg.parser.ast.CallStatement;
 import edu.kit.iti.formal.psdbg.storage.KeyPersistentFacade;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
@@ -22,8 +22,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SaveCommand implements CommandHandler<KeyData> {
     public static final String SAVE_COMMAND_NAME = "#save";
-    private static Logger logger = LogManager.getLogger(SaveCommand.class);
-    private static Logger consoleLogger = LogManager.getLogger("console");
+    private static Logger logger = LoggerFactory.getLogger(SaveCommand.class);
+    private static Logger consoleLogger = LoggerFactory.getLogger("console");
 
     @Getter
     @Setter

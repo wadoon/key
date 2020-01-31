@@ -4,13 +4,13 @@ import com.google.common.collect.Sets;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.*;
 
 public class MutableMatchings implements Matchings {
-    private static final Logger LOGGER = LogManager.getLogger(MutableMatchings.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MutableMatchings.class);
     public Set<Match> inner = new TreeSet<>(new VariableAssignmentComparator());
 
     public static Matchings singleton(String name, MatchPath term) {

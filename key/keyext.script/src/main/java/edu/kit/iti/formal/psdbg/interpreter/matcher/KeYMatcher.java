@@ -22,8 +22,8 @@ import edu.kit.iti.formal.psdbg.parser.data.Value;
 import edu.kit.iti.formal.psdbg.parser.types.SimpleType;
 import edu.kit.iti.formal.psdbg.parser.types.TermType;
 import lombok.Getter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
  * @author S. Grebing
  */
 public class KeYMatcher implements MatcherApi<KeyData> {
-    private static final Logger LOGGER = LogManager.getLogger(KeYMatcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeYMatcher.class);
     private static final Name CUT_TACLET_NAME = new Name("cut");
 
     private List<MatchResult> resultsFromLabelMatch;

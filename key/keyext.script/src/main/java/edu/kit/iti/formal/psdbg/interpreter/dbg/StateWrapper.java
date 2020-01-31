@@ -11,8 +11,8 @@ import edu.kit.iti.formal.psdbg.parser.ast.ProofScript;
 import edu.kit.iti.formal.psdbg.parser.ast.Statements;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,7 +25,7 @@ import java.util.function.Consumer;
  * @version 1 (27.10.17)
  */
 public class StateWrapper<T> implements InterpreterObserver<T> {
-    private static final Logger LOGGER = LogManager.getLogger(StateWrapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StateWrapper.class);
 
     @Getter @Setter
     private Interpreter<T> interpreter;

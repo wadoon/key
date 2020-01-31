@@ -17,8 +17,8 @@ import edu.kit.iti.formal.psdbg.interpreter.data.VariableAssignment;
 import edu.kit.iti.formal.psdbg.parser.ast.CallStatement;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.IOException;
@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  */
 @RequiredArgsConstructor
 public class ProofScriptCommandBuilder implements CommandHandler<KeyData> {
-    protected static Logger LOGGER = LogManager.getLogger(ProofScriptCommandBuilder.class);
+    protected static Logger LOGGER = LoggerFactory.getLogger(ProofScriptCommandBuilder.class);
 
     @Getter
     private final Map<String, ProofScriptCommand> commands;

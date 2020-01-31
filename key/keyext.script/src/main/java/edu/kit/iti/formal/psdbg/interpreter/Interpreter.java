@@ -17,8 +17,8 @@ import edu.kit.iti.formal.psdbg.parser.types.Type;
 import lombok.Getter;
 import lombok.Setter;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -33,7 +33,7 @@ import java.util.stream.Stream;
  */
 public class Interpreter<T> extends DefaultASTVisitor<Object>
         implements ScopeObservable {
-    protected static Logger logger = LogManager.getLogger(Interpreter.class);
+    protected static Logger logger = LoggerFactory.getLogger(Interpreter.class);
 
     @Getter
     public final AtomicBoolean hardStop = new AtomicBoolean(false);

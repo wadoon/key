@@ -3,8 +3,8 @@ package edu.kit.iti.formal.psdbg.interpreter.assignhook;
 import edu.kit.iti.formal.psdbg.interpreter.data.VariableAssignment;
 import edu.kit.iti.formal.psdbg.parser.data.Value;
 import lombok.Getter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.function.BiFunction;
@@ -15,7 +15,7 @@ import java.util.function.Function;
  * @version 1 (21.08.17)
  */
 public abstract class DefaultAssignmentHook<T> implements VariableAssignmentHook<T> {
-    private static Logger logger = LogManager.getLogger(DefaultAssignmentHook.class);
+    private static Logger logger = LoggerFactory.getLogger(DefaultAssignmentHook.class);
 
     @Getter
     private final HashMap<String, Variable> variables = new HashMap<>();

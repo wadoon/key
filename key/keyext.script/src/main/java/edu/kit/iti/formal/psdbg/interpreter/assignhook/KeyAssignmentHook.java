@@ -8,8 +8,8 @@ import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import edu.kit.iti.formal.psdbg.interpreter.data.KeyData;
 import edu.kit.iti.formal.psdbg.parser.data.Value;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import java.math.BigInteger;
 import java.util.function.BiConsumer;
@@ -23,7 +23,7 @@ import static de.uka.ilkd.key.strategy.StrategyProperties.*;
  * @version 1 (21.08.17)
  */
 public class KeyAssignmentHook extends DefaultAssignmentHook<KeyData> {
-    private static Logger logger = LogManager.getLogger(KeyAssignmentHook.class);
+    private static Logger logger = LoggerFactory.getLogger(KeyAssignmentHook.class);
 
     public KeyAssignmentHook() {
         register("__KEY_MAX_STEPS",

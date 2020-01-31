@@ -29,9 +29,9 @@ import edu.kit.iti.formal.psdbg.parser.ast.CallStatement;
 import edu.kit.iti.formal.psdbg.parser.ast.Variable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.key_project.util.collection.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -45,7 +45,7 @@ public class RuleCommandHandler implements CommandHandler<KeyData> {
             "on", "formula"
     };
 
-    private static final Logger LOGGER = LogManager.getLogger(RuleCommandHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RuleCommandHandler.class);
     @Getter
     private final Map<String, Rule> rules;
 
@@ -79,8 +79,8 @@ public class RuleCommandHandler implements CommandHandler<KeyData> {
                 apps.forEach(t -> set.add(t.taclet().name().toString()));
             }
         } catch (NullPointerException e) {
-            LOGGER.catching(e);
-           // e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
+            // e.printStackTrace();
         }
         return set;
     }
@@ -95,8 +95,8 @@ public class RuleCommandHandler implements CommandHandler<KeyData> {
                 return rules.contains(call.getCommand());
             }
         } catch (NullPointerException npe) {
-           // System.out.println("npe = " + npe);
-            LOGGER.catching(npe);
+            // System.out.println("npe = " + npe);
+            LOGGER.error(npe.getMessage(), npe);
             return false;
         }
         return false;

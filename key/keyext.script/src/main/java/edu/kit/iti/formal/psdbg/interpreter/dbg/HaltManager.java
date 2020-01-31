@@ -7,8 +7,8 @@ import edu.kit.iti.formal.psdbg.parser.ast.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @NoArgsConstructor
 public class HaltManager<T> implements InterpreterObserver<T> {
-    private static Logger LOGGER = LogManager.getLogger(HaltManager.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(HaltManager.class);
 
     private final Lock lock = new ReentrantLock();
     private final Condition block = lock.newCondition();
