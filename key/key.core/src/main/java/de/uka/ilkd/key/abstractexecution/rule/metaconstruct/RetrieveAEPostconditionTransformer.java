@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.metaconstruct;
+package de.uka.ilkd.key.abstractexecution.rule.metaconstruct;
 
 import java.util.Map;
 import java.util.Optional;
@@ -20,7 +20,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory.PreconditionType;
-import de.uka.ilkd.key.abstractexecution.rule.metaconstruct.AbstractPreconditionTransformer;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.Name;
@@ -57,6 +56,8 @@ public class RetrieveAEPostconditionTransformer extends AbstractTermTransformer 
         BEHAVIOR_TYPES_MAP.put(PreconditionType.RETURN, Behavior.RETURN_BEHAVIOR);
         BEHAVIOR_TYPES_MAP.put(PreconditionType.EXC, Behavior.EXCEPTIONAL_BEHAVIOR);
         BEHAVIOR_TYPES_MAP.put(PreconditionType.NORMAL, Behavior.NORMAL_BEHAVIOR);
+        BEHAVIOR_TYPES_MAP.put(PreconditionType.BREAK, Behavior.BREAK_BEHAVIOR);
+        BEHAVIOR_TYPES_MAP.put(PreconditionType.CONT, Behavior.CONTINUE_BEHAVIOR);
     }
 
     public RetrieveAEPostconditionTransformer() {

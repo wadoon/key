@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
+import de.uka.ilkd.key.abstractexecution.rule.metaconstruct.RetrieveAEPreconditionTransformer;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**

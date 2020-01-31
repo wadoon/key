@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.speclang;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -1063,11 +1064,9 @@ public interface AuxiliaryContract extends SpecificationElement {
                  * NOTE (DS, 2019-11-08): If there is an APE inside, it may always return (or
                  * break, or...), if the contracts don't prevent it from doing so.
                  */
-                /*
-                 * TODO (DS, 2019-11-08): We might also have to change something about the
-                 * continue and break flags!
-                 */
                 returnFlag = createFlag(RETURN_FLAG_NAME);
+                breakFlags = createFlags(Collections.singleton(null), BREAK_FLAG_BASE_NAME);
+                continueFlags = createFlags(Collections.singleton(null), CONTINUE_FLAG_BASE_NAME);
             }
         }
 

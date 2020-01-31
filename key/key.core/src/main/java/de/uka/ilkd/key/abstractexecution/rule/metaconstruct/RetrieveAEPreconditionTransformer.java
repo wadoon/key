@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.metaconstruct;
+package de.uka.ilkd.key.abstractexecution.rule.metaconstruct;
 
 import java.util.Optional;
 

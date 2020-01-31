@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\exists any _fr,_fp;&#10;  (\forall any fr,fp;&#10;    (&#10;      (&#10;        loopInv(fr, fp) &amp;&amp;&#10;        decrTerm(fr, fp) &gt;= 0 &amp;&amp;&#10;        !guardIsTrue(fr, fp)&#10;      ) &lt;==&gt; &#10;      (fr == _fr &amp;&amp; fp == _fp)&#10;    )&#10;  )&#10;)" postCondition="\result_1==\result_2">
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\exists any _fr,_fp;&#10;  (\forall any fr,fp;&#10;    (&#10;      (&#10;        loopInv(fr, fp) &amp;&amp;&#10;        decrTerm(fr, fp) &gt;= 0 &amp;&amp;&#10;        (!guardIsTrue(fr, fp) || throwsExcP(fp) ||&#10;         returnsP(fp) || breaksP(fp))&#10;      ) &lt;==&gt; &#10;      (fr == _fr &amp;&amp; fp == _fp)&#10;    )&#10;  )&#10;)" postCondition="\result_1==\result_2">
     <programOne>/*@ ae_constraint
   @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
   @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
@@ -14,7 +14,7 @@
   @*/
 while (
     /*@ assignable \nothing;
-      @ accessible loopFootprint;
+      @ accessible loopFrame, loopFootprint;
       @ normal_behavior ensures 
       @   ((boolean) \result &lt;==&gt;
       @     guardIsTrue(\value(loopFrame), \value(loopFootprint)));
@@ -48,9 +48,24 @@ while (
       @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
       @   decrTerm(\value(loopFrame), \value(loopFootprint)) &lt; oldDecrTerm;
       @ exceptional_behavior requires false;
+      @ //  requires throwsExcP(\value(loopFootprint));
+      @ //  signals (Throwable) throwsExcP(\value(loopFootprint)) &amp;&amp;
+      @ //    loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @ //    decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
       @ return_behavior requires false;
-      @ break_behavior requires false;
+      @ //  requires returnsP(\value(loopFootprint));
+      @ //  ensures returnsP(\value(loopFootprint)) &amp;&amp;
+      @ //    loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @ //    decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
+      @ break_behavior
+      @   requires breaksP(\value(loopFootprint));
+      @   breaks () //breaksP(\value(loopFootprint)) &amp;&amp;
+      @     loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @     decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
       @ continue_behavior requires false;
+      @ //  loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @ //  decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
+      @ //  decrTerm(\value(loopFrame), \value(loopFootprint)) &lt; oldDecrTerm;
       @*/
     \abstract_statement P;
 }</programOne>
@@ -68,7 +83,7 @@ while (
   @*/
 while (
     /*@ assignable \nothing;
-      @ accessible loopFootprint;
+      @ accessible loopFrame, loopFootprint;
       @ normal_behavior ensures 
       @   ((boolean) \result &lt;==&gt;
       @     guardIsTrue(\value(loopFrame), \value(loopFootprint)));
@@ -102,9 +117,24 @@ while (
       @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
       @   decrTerm(\value(loopFrame), \value(loopFootprint)) &lt; oldDecrTerm;
       @ exceptional_behavior requires false;
+      @ //  requires throwsExcP(\value(loopFootprint));
+      @ //  signals (Throwable) throwsExcP(\value(loopFootprint)) &amp;&amp;
+      @ //    loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @ //    decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
       @ return_behavior requires false;
-      @ break_behavior requires false;
+      @ //  requires returnsP(\value(loopFootprint));
+      @ //  ensures returnsP(\value(loopFootprint)) &amp;&amp;
+      @ //    loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @ //    decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
+      @ break_behavior
+      @   requires breaksP(\value(loopFootprint));
+      @   breaks () //breaksP(\value(loopFootprint)) &amp;&amp;
+      @     loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @     decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
       @ continue_behavior requires false;
+      @ //  loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @ //  decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
+      @ //  decrTerm(\value(loopFrame), \value(loopFootprint)) &lt; oldDecrTerm;
       @*/
     \abstract_statement P;
 }</programTwo>
@@ -132,6 +162,15 @@ while (
         </predicate>
         <predicate predName="guardIsTrue">
             <argSort>any</argSort>
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="throwsExcP">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="returnsP">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="breaksP">
             <argSort>any</argSort>
         </predicate>
     </predicates>
