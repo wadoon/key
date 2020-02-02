@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="" postCondition="\result_1==\result_2">
+    <programOne>/*  ae_constraint (\forall any fp; 
+  @   (throwsExcP(fp) || returnsP(fp)));
+  @*/
+
+if (
+    /*@ assignable frameE1;
+      @ accessible footprintE1;
+      @*/
+    \abstract_expression boolean e1
+) {
+    if (
+        /*@ assignable frameE2;
+          @ accessible footprintE2;
+          @*/
+        \abstract_expression boolean e2
+    ) {
+        /*@ assignable frameP;
+          @ accessible footprintP;
+          @*/
+        \abstract_statement P;
+    }
+}
+</programOne>
+    <programTwo>/*  ae_constraint (\forall any fp; 
+  @   (throwsExcP(fp) || returnsP(fp)));
+  @*/
+  
+  if (
+    (/*@ assignable frameE1;
+      @ accessible footprintE1;
+      @*/
+    \abstract_expression boolean e1) &amp;&amp;
+    (/*@ assignable frameE2;
+      @ accessible footprintE2;
+      @*/
+    \abstract_expression boolean e2)
+) {
+    /*@ assignable frameP;
+      @ accessible footprintP;
+      @*/
+    \abstract_statement P;
+}
+</programTwo>
+    <methodLevelContext></methodLevelContext>
+    <locationSets>
+        <locationSet locsetName="relevant">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameE1">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintE1">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameE2">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintE2">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <functions/>
+    <predicates/>
+    <programVariables/>
+</ns2:aeRelationalModel>

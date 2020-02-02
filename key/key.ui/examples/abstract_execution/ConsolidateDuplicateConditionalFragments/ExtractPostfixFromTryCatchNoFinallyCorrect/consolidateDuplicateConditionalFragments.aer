@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="\result_1==\result_2">
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="" postCondition="\result_1==\result_2">
     <programOne>try {
     //@ assignable frameTryProg;
     //@ accessible footprintTryProg;
-    //@ return_behavior requires false;
     \abstract_statement TryProg;
 
     //@ assignable framePostfixProg;
@@ -29,7 +28,6 @@ catch (Throwable t) {
     <programTwo>try {
     //@ assignable frameTryProg;
     //@ accessible footprintTryProg;
-    //@ return_behavior requires false;
     \abstract_statement TryProg;
 }
 catch (Throwable t) {

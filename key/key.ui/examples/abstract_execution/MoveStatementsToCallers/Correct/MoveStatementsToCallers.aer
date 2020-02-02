@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\forall any fpB; (returnsB(fpB) || throwsExcB(fpB)))" postCondition="\result_1==\result_2">
+    <programOne>res = mBefore();</programOne>
+    <programTwo>/*@ assignable frameA;
+  @ accessible footprintA;
+  @ return_behavior requires false;
+  @*/
+\abstract_statement A;
+
+res = mAfter();</programTwo>
+    <methodLevelContext>private Object mBefore() {
+    /*@ assignable frameA;
+      @ accessible footprintA;
+      @ return_behavior requires false;
+      @*/
+    \abstract_statement A;
+    
+    /*@ assignable frameB;
+      @ accessible footprintB;
+      @ exceptional_behavior requires throwsExcB(\value(footprintB));
+      @ return_behavior requires returnsB(\value(footprintB));
+      @*/
+    \abstract_statement B;
+}
+
+private Object mAfter() {
+    /*@ assignable frameB;
+      @ accessible footprintB;
+      @ exceptional_behavior requires throwsExcB(\value(footprintB));
+      @ return_behavior requires returnsB(\value(footprintB));
+      @*/
+    \abstract_statement B;
+}</methodLevelContext>
+    <locationSets>
+        <locationSet locsetName="relevant">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameA">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintA">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameB">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintB">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <functions/>
+    <predicates>
+        <predicate predName="returnsA">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="throwsExcA">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="throwsExcB">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="returnsB">
+            <argSort>any</argSort>
+        </predicate>
+    </predicates>
+    <programVariables>
+        <programVariable typeName="java.lang.Object" varName="res">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+    </programVariables>
+</ns2:aeRelationalModel>
