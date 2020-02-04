@@ -133,6 +133,7 @@ while (
       @ exceptional_behavior requires false;
       @ return_behavior requires false;
       @ break_behavior
+      @   requires doneCondition(\value(loopLocs));
       @   ensures
       @     done &amp;&amp; doneCondition(\value(loopLocs)) &amp;&amp;
       @     decrExpr(\value(loopLocs)) &gt;= 0 &amp;&amp;
