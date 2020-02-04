@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\exists any _frL, _fpL; (\exists boolean _Done; (&#10;  (\forall any frL, fpL; (\forall boolean Done; (&#10;     (&#10;          (&#10;             (Done &lt;==&gt; doneCondition(frL, fpL)) &amp;&amp;&#10;             decrExpr(frL, fpL) &gt;= 0 &amp;&amp;&#10;             bodyInv(frL, fpL) &amp;&amp;&#10;             (!guardVal(frL, fpL) || Done)&#10;          )&#10;        &lt;==&gt;&#10;          (_frL == frL &amp;&amp; _fpL == fpL &amp;&amp; _Done == Done)&#10;     )&#10;  )))&#10;)))" postCondition="\result_1==\result_2">
+    <programOne>/*@ ae_constraint
+  @   \disjoint(loopFrame, done) &amp;&amp;
+  @   \disjoint(loopFootprint, done);
+  @*/
+{ ; }
+
+/*@ ae_constraint
+  @   \disjoint(loopFrame, loopFootprint); // ???
+  @*/
+{ ; }
+
+done = false;
+
+/*@ ae_constraint
+  @   decrExpr(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
+  @   (done &lt;==&gt; doneCondition(\value(loopFrame), \value(loopFootprint))) &amp;&amp;
+  @   bodyInv(\value(loopFrame), \value(loopFootprint));
+  @*/
+{ ; }
+
+/*@ loop_invariant
+  @   (done &lt;==&gt; doneCondition(\value(loopFrame), \value(loopFootprint))) &amp;&amp;
+  @   decrExpr(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
+  @   bodyInv(\value(loopFrame), \value(loopFootprint));
+  @ assignable loopFrame;
+  @ decreases decrExpr(\value(loopFrame), \value(loopFootprint));
+  @*/
+while (
+    /*@ assignable \nothing;
+      @ accessible loopFootprint;
+      @ normal_behavior ensures (boolean) \result &lt;==&gt;
+      @   (guardVal(\value(loopFrame), \value(loopFootprint)) &amp;&amp; !done);
+      @ exceptional_behavior requires false;
+      @*/
+    \abstract_expression boolean g
+) {
+    /*@ ae_constraint
+      @   \disjoint(loopFrame, done) &amp;&amp;
+      @   \disjoint(loopFootprint, done);
+      @*/
+    { ; }
+    
+    //@ ghost int oldDecrExpr; // = decrExpr(\value(loopFrame), \value(loopFootprint));
+
+    /*@ ae_constraint
+      @   \disjoint(loopFrame, oldDecrExpr) &amp;&amp;
+      @   \disjoint(loopFootprint, oldDecrExpr);
+      @*/
+    { ; }
+
+    /*@ assignable \hasTo(oldDecrExpr);
+      @ accessible loopFrame, loopFootprint;
+      @ normal_behavior ensures oldDecrExpr == decrExpr(\value(loopFrame), \value(loopFootprint));
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement GhostSetter;
+    
+    /*@ assignable loopFrame, \hasTo(done);
+      @ accessible loopFootprint;
+      @ normal_behavior ensures
+      @   (done &lt;==&gt; doneCondition(\value(loopFrame), \value(loopFootprint))) &amp;&amp;
+      @   decrExpr(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
+      @   bodyInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @   oldDecrExpr &gt; decrExpr(\value(loopFrame), \value(loopFootprint));
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement Body;
+
+
+
+
+    
+}</programOne>
+    <programTwo>/*@ ae_constraint
+  @   \disjoint(loopFrame, done) &amp;&amp;
+  @   \disjoint(loopFootprint, done);
+  @*/
+{ ; }
+
+/*@ ae_constraint
+  @   \disjoint(loopFrame, loopFootprint); // ???
+  @*/
+{ ; }
+
+done = false; // ghost boolean done = false;
+
+/*@ ae_constraint
+  @   decrExpr(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
+  @   (done &lt;==&gt; doneCondition(\value(loopFrame), \value(loopFootprint))) &amp;&amp;
+  @   bodyInv(\value(loopFrame), \value(loopFootprint));
+  @*/
+{ ; }
+
+/*@ loop_invariant
+  @   (done &lt;==&gt; doneCondition(\value(loopFrame), \value(loopFootprint))) &amp;&amp;
+  @   decrExpr(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
+  @   bodyInv(\value(loopFrame), \value(loopFootprint));
+  @ assignable loopFrame;
+  @ decreases decrExpr(\value(loopFrame), \value(loopFootprint));
+  @*/
+while (
+    /*@ assignable \nothing;
+      @ accessible loopFootprint;
+      @ normal_behavior ensures (boolean) \result &lt;==&gt;
+      @   (guardVal(\value(loopFrame), \value(loopFootprint)));
+      @ exceptional_behavior requires false;
+      @*/
+    \abstract_expression boolean g
+) {
+    /*@ ae_constraint
+      @   \disjoint(loopFrame, done) &amp;&amp;
+      @   \disjoint(loopFootprint, done);
+      @*/
+    { ; }
+   
+    //@ ghost int oldDecrExpr; // = decrExpr(\value(loopFrame), \value(loopFootprint));
+
+    /*@ ae_constraint
+      @   \disjoint(loopFrame, oldDecrExpr) &amp;&amp;
+      @   \disjoint(loopFootprint, oldDecrExpr);
+      @*/
+    { ; }
+
+    /*@ assignable \hasTo(oldDecrExpr);
+      @ accessible loopFrame, loopFootprint;
+      @ normal_behavior ensures oldDecrExpr == decrExpr(\value(loopFrame), \value(loopFootprint));
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior requires false;
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement GhostSetter;
+    
+    /*@ assignable loopFrame, \hasTo(done);
+      @ accessible loopFootprint;
+      @ normal_behavior ensures
+      @   !done &amp;&amp; !doneCondition(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @   decrExpr(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
+      @   bodyInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @   oldDecrExpr &gt; decrExpr(\value(loopFrame), \value(loopFootprint));
+      @ exceptional_behavior requires false;
+      @ return_behavior requires false;
+      @ break_behavior
+      @   ensures
+      @     done &amp;&amp; doneCondition(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @     decrExpr(\value(loopFrame), \value(loopFootprint)) &gt;= 0 &amp;&amp;
+      @     bodyInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
+      @     oldDecrExpr &gt; decrExpr(\value(loopFrame), \value(loopFootprint));
+      @ continue_behavior requires false;
+      @*/
+    \abstract_statement Body;
+}</programTwo>
+    <methodLevelContext></methodLevelContext>
+    <locationSets>
+        <locationSet locsetName="loopFrame">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="loopFootprint">
+            <relevantOne>1</relevantOne>
+            <relevantTwo>1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <functions>
+        <function funcName="decrExpr" resultSortName="int">
+            <argSort>any</argSort>
+            <argSort>any</argSort>
+        </function>
+        <function funcName="guardVal" resultSortName="boolean">
+            <argSort>any</argSort>
+            <argSort>any</argSort>
+        </function>
+    </functions>
+    <predicates>
+        <predicate predName="bodyInv">
+            <argSort>any</argSort>
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="doneCondition">
+            <argSort>any</argSort>
+            <argSort>any</argSort>
+        </predicate>
+    </predicates>
+    <programVariables>
+        <programVariable typeName="boolean" varName="done">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+    </programVariables>
+</ns2:aeRelationalModel>

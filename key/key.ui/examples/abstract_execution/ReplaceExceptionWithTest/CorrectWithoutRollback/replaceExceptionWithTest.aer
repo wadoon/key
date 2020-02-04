@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="catchAlwaysCompletesNormally &lt;==&gt;&#10;  (\forall any fp; (!throwsExcCatch(fp) &amp;&amp; !returnsCatch(fp)))" postCondition="\result_1==\result_2">
+    <programOne>/*@ ae_constraint
+  @   (\disjoint(frameTry, footprintCatch) ||
+  @      (\disjoint(frameCatch, relevant) &amp;&amp;
+  @       catchAlwaysCompletesNormally)) &amp;&amp;
+  @   \disjoint(frameTry, relevant);
+  @*/
+{ ; }
+
+try {
+   
+	/*@ assignable frameTry;
+	  @ accessible footprintTry;
+	  @ exceptional_behavior requires
+	  @   throwsExcTryStmt(\value(footprintTry));
+	  @*/
+	\abstract_statement TryStmt;
+} catch (Throwable t) {
+	/*@ assignable frameCatch;
+	  @ accessible footprintCatch;
+      @ exceptional_behavior requires
+      @   throwsExcCatch(\value(footprintCatch));
+      @ return_behavior requires
+      @   returnsCatch(\value(footprintCatch));
+	  @*/
+	\abstract_statement CatchProg;
+}</programOne>
+    <programTwo>/*@ ae_constraint
+  @   (\disjoint(frameTry, footprintCatch) ||
+  @      (\disjoint(frameCatch, relevant) &amp;&amp;
+  @       catchAlwaysCompletesNormally)) &amp;&amp;
+  @   \disjoint(frameTry, relevant);
+  @*/
+{ ; }
+
+if (
+	/*@ assignable \nothing;
+	  @ accessible footprintTry;
+	  @ normal_behavior
+	  @   ensures (boolean) \result &lt;==&gt; !throwsExcTryStmt(\value(footprintTry));
+	  @ exceptional_behavior requires false;
+	  @*/
+	\abstract_expression boolean e
+) {
+    /*@ assignable frameTry;
+	  @ accessible footprintTry;
+	  @ exceptional_behavior requires
+	  @   throwsExcTryStmt(\value(footprintTry));
+	  @*/
+	\abstract_statement TryStmt;
+} else {
+	/*@ assignable frameCatch;
+	  @ accessible footprintCatch;
+      @ exceptional_behavior requires
+      @   throwsExcCatch(\value(footprintCatch));
+      @ return_behavior requires
+      @   returnsCatch(\value(footprintCatch));
+	  @*/
+	\abstract_statement CatchProg;
+}</programTwo>
+    <methodLevelContext></methodLevelContext>
+    <locationSets>
+        <locationSet locsetName="relevant">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameTry">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintTry">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameCatch">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="footprintCatch">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+    </locationSets>
+    <functions/>
+    <predicates>
+        <predicate predName="throwsExcTryStmt">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="throwsExcCatch">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="returnsCatch">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="catchAlwaysCompletesNormally"/>
+    </predicates>
+    <programVariables/>
+</ns2:aeRelationalModel>

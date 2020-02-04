@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\exists any _frP, _fpP, _fpG;&#10;  (\forall any frP, fpP, fpG; (&#10;         (variant(fpG) &gt;= 0 &amp;&amp;&#10;          loopInvP(frP, fpP, fpG) &amp;&amp;&#10;          loopInvG(fpG) &amp;&amp;&#10;          !guardIsTrue(fpG))&#10;    &lt;==&gt; (_frP == frP &amp;&amp; _fpP == fpP &amp;&amp; _fpG == fpG)&#10;))) &amp;&amp;&#10;(\exists any _frQ, _fpQ, _fpG;&#10;  (\forall any frQ, fpQ, fpG; (&#10;         (variant(fpG) &gt;= 0 &amp;&amp;&#10;          loopInvQ(frQ, fpQ, fpG) &amp;&amp;&#10;          loopInvG(fpG) &amp;&amp;&#10;          !guardIsTrue(fpG))&#10;    &lt;==&gt; (_frQ == frQ &amp;&amp; _fpQ == fpQ &amp;&amp; _fpG == fpG)&#10;)))" postCondition="\result_1==\result_2">
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\exists any _frP, _fpP, _fpG;&#10;  (\forall any frP, fpP, fpG; (&#10;         (variant(fpG) &gt;= 0 &amp;&amp;&#10;          loopInvP(frP, fpP, fpG) &amp;&amp;&#10;          loopInvG(fpG) &amp;&amp;&#10;          !guardIsTrue(fpG))&#10;    &lt;==&gt; (_frP == frP &amp;&amp; _fpP == fpP &amp;&amp; _fpG == fpG)&#10;))) &amp;&amp;&#10;(\exists any _frQ, _fpQ, _fpG;&#10;  (\forall any frQ, fpQ, fpG; (&#10;         (variant(fpG) &gt;= 0 &amp;&amp;&#10;          loopInvQ(frQ, fpQ, fpG) &amp;&amp;&#10;          loopInvG(fpG) &amp;&amp;&#10;          (!guardIsTrue(fpG) || returnedQ(fpQ) || threwExcQ(fpQ) || didBreakQ(fpQ)))&#10;    &lt;==&gt; (_frQ == frQ &amp;&amp; _fpQ == fpQ &amp;&amp; _fpG == fpG)&#10;)))" postCondition="\result_1==\result_2">
     <programOne>/*@ ae_constraint
   @   \disjoint(frameP, oldVariant) &amp;&amp;
   @   \disjoint(footprintP, oldVariant) &amp;&amp;
@@ -9,6 +9,10 @@
   @*/
 { ; }
 
+// Following constraint is no real precondition,
+// because it should follow from the invariant;
+// we're currently missing adequate rules of
+// formalizations.
 /*@ ae_constraint
   @   \disjoint(footprintG, \dl_heap); // ???
   @*/
@@ -16,9 +20,7 @@
 
 /*@ ae_constraint
   @   \disjoint(frameP, footprintG) &amp;&amp;
-  @   \disjoint(frameQ, footprintG) &amp;&amp;
-  @   \disjoint(footprintP, footprintG) &amp;&amp;
-  @   \disjoint(footprintQ, footprintG);
+  @   \disjoint(frameQ, footprintG);
   @*/
 { ; }
 
@@ -33,8 +35,6 @@
   @ accessible \nothing;
   @ exceptional_behavior requires false;
   @ return_behavior requires false;
-  @ break_behavior requires false;
-  @ continue_behavior requires false;
   @*/
 \abstract_statement InitLoopCnt;
 
@@ -112,10 +112,17 @@ while (
       @ accessible footprintQ, footprintG;
       @ normal_behavior ensures
       @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG));
-      @ exceptional_behavior requires false;
-      @ return_behavior requires false;
-      @ break_behavior requires false;
-      @ continue_behavior requires false;
+      @ continue_behavior ensures
+      @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG));
+      @ exceptional_behavior signals (Throwable)
+      @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG)) &amp;&amp;
+      @   threwExcQ(\value(footprintQ));
+      @ return_behavior ensures
+      @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG)) &amp;&amp;
+      @   returnedQ(\value(footprintQ));
+      @ break_behavior ensures
+      @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG)) &amp;&amp;
+      @   didBreakQ(\value(footprintQ));
       @*/
     \abstract_statement Q;
 }
@@ -206,6 +213,10 @@ while (
   @*/
 { ; }
 
+
+
+
+
 /*@ ae_constraint
   @   \disjoint(footprintG, \dl_heap);
   @*/
@@ -213,9 +224,7 @@ while (
 
 /*@ ae_constraint
   @   \disjoint(frameP, footprintG) &amp;&amp;
-  @   \disjoint(frameQ, footprintG) &amp;&amp;
-  @   \disjoint(footprintP, footprintG) &amp;&amp;
-  @   \disjoint(footprintQ, footprintG);
+  @   \disjoint(frameQ, footprintG);
   @*/
 { ; }
 
@@ -230,8 +239,6 @@ while (
   @ accessible \nothing;
   @ exceptional_behavior requires false;
   @ return_behavior requires false;
-  @ break_behavior requires false;
-  @ continue_behavior requires false;
   @*/
 \abstract_statement InitLoopCnt;
 
@@ -315,14 +322,16 @@ while (
 
 
 
+
+
+
+
 }
 
 /*@ assignable \hasTo(footprintG);
   @ accessible \nothing;
   @ exceptional_behavior requires false;
   @ return_behavior requires false;
-  @ break_behavior requires false;
-  @ continue_behavior requires false;
   @*/
 \abstract_statement InitLoopCnt;
 
@@ -387,10 +396,17 @@ while (
       @ accessible footprintQ, footprintG;
       @ normal_behavior ensures
       @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG));
-      @ exceptional_behavior requires false;
-      @ return_behavior requires false;
-      @ break_behavior requires false;
-      @ continue_behavior requires false;
+      @ continue_behavior ensures
+      @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG));
+      @ exceptional_behavior signals (Throwable)
+      @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG)) &amp;&amp;
+      @   threwExcQ(\value(footprintQ));
+      @ return_behavior ensures
+      @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG)) &amp;&amp;
+      @   returnedQ(\value(footprintQ));
+      @ break_behavior ensures
+      @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG)) &amp;&amp;
+      @   didBreakQ(\value(footprintQ));
       @*/
     \abstract_statement Q;
 }</programTwo>
@@ -401,16 +417,16 @@ while (
             <relevantTwo>0</relevantTwo>
         </locationSet>
         <locationSet locsetName="footprintP">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </locationSet>
+        <locationSet locsetName="frameQ">
             <relevantOne>1</relevantOne>
             <relevantTwo>1</relevantTwo>
         </locationSet>
-        <locationSet locsetName="frameQ">
-            <relevantOne>2</relevantOne>
-            <relevantTwo>2</relevantTwo>
-        </locationSet>
         <locationSet locsetName="footprintQ">
-            <relevantOne>3</relevantOne>
-            <relevantTwo>3</relevantTwo>
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
         </locationSet>
         <locationSet locsetName="footprintG">
             <relevantOne>-1</relevantOne>
@@ -441,6 +457,15 @@ while (
         </predicate>
         <predicate predName="returnsP">
             <argSort>any</argSort>
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="returnedQ">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="threwExcQ">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="didBreakQ">
             <argSort>any</argSort>
         </predicate>
     </predicates>

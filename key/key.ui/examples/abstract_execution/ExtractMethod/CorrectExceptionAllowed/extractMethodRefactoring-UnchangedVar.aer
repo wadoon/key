@@ -1,62 +1,51 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="" postCondition="\result_1==\result_2">
     <programOne>/*@ ae_constraint
-  @     \disjoint(footprintR, frameQ);
+  @   \disjoint(var, frameP);
   @*/
 { ; }
 
-/*@ assignable frameP;
-  @ accessible footprintP;
+//@ ghost Object oldVar = var;
+/*@ ae_constraint
+  @   \disjoint(oldVar, frameP) &amp;&amp;
+  @   \disjoint(oldVar, footprintP) &amp;&amp;
+  @   \disjoint(oldVar, relevant);
   @*/
-\abstract_statement P;
+{ ; }
 
-// If Q throws an exception, it might still before
-// change the value of var. After extraction, this
-// is not possible!
-
-/*@ assignable \hasTo(var), frameQ;
-  @ accessible footprintQ;
+/*@ assignable \hasTo(var), frameP;
+  @ accessible footprintP;
   @ return_behavior requires false;
-  @ exceptional_behavior requires false;
+  @ exceptional_behavior signals (Throwable)
+  @   var == oldVar;
   @*/
-\abstract_statement Q;
-
-/*@ assignable frameR;
-  @ accessible var, footprintR;
-  @*/
-\abstract_statement R;</programOne>
-    <programTwo>/*@ ae_constraint
-  @     \disjoint(footprintR, frameQ);
-  @*/
-{ ; }
-
-/*@ assignable frameP;
-  @ accessible footprintP;
-  @*/
-\abstract_statement P;
-
-var = extracted(var);
-
-/*@ assignable frameR;
-  @ accessible var, footprintR;
-  @*/
-\abstract_statement R;</programTwo>
+\abstract_statement P;</programOne>
+    <programTwo>var = extracted(var);</programTwo>
     <methodLevelContext>private Object extracted(Object var) {
-	Object res = null;
+	Object res = var;
 
 	/*@ ae_constraint
+      @   \disjoint(res, frameP) &amp;&amp;
 	  @   \disjoint(res, relevant) &amp;&amp;
-	  @   \disjoint(res, footprintR) &amp;&amp;
-	  @   \disjoint(res, footprintQ);
+	  @   \disjoint(res, footprintP);
 	  @*/
 	{ ; }
 	
-	/*@ assignable \hasTo(res), frameQ;
-  	  @ accessible footprintQ;
-      @ return_behavior requires false;
-      @ exceptional_behavior requires false;
+    //@ ghost Object oldVar = var;
+    /*@ ae_constraint
+      @   \disjoint(oldVar, frameP) &amp;&amp;
+      @   \disjoint(oldVar, footprintP) &amp;&amp;
+      @   \disjoint(oldVar, relevant);
       @*/
-     \abstract_statement Q;
+    { ; }
+    
+    /*@ assignable \hasTo(res), frameP;
+      @ accessible footprintP;
+      @ return_behavior requires false;
+      @ exceptional_behavior signals (Throwable)
+      @   var == oldVar;
+      @*/
+    \abstract_statement P;
      
      return res;
 }</methodLevelContext>

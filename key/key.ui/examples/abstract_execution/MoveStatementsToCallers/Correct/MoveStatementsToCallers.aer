@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\forall any fpB; (returnsB(fpB) || throwsExcB(fpB)))" postCondition="\result_1==\result_2">
-    <programOne>res = mBefore();</programOne>
-    <programTwo>/*@ assignable frameA;
+    <programOne>/* ae_constraint (\forall any fpB; 
+  @   (returnsB(fpB) || throwsExcB(fpB)))
+  @*/
+
+res = mBefore();</programOne>
+    <programTwo>/* ae_constraint (\forall any fpB; 
+  @   (returnsB(fpB) || throwsExcB(fpB)))
+  @*/
+
+/*@ assignable frameA;
   @ accessible footprintA;
   @ return_behavior requires false;
   @*/
