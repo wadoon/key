@@ -266,6 +266,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
        mediator.setInteractive(false);
        getProofControl().startAndWaitForAutoMode(proof);
        if (verbosity >= Verbosity.HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
+                                          // NOTE (DS, 2019-02-04): Not true, I just stepped in. Start with --auto mode.
            System.out.println(proof.getStatistics());
        }
    }

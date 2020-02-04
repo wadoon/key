@@ -20,6 +20,7 @@ public final class SideProofStatistics extends Statistics {
      * @param branches amount of branches
      * @param interactiveSteps amount of interactive steps
      * @param symbExApps amount of symbolic execution steps
+     * @param abstrExecutionApps amount of abstract execution applications
      * @param quantifierInstantiations amount of quantifier instantiations
      * @param ossApps amount of one-step-simplifier applications
      * @param mergeRuleApps amount of merge rule applications
@@ -36,6 +37,7 @@ public final class SideProofStatistics extends Statistics {
                                 int branches,
                                 int interactiveSteps,
                                 int symbExApps,
+                                int abstrExecutionApps,
                                 int quantifierInstantiations,
                                 int ossApps,
                                 int mergeRuleApps,
@@ -46,7 +48,7 @@ public final class SideProofStatistics extends Statistics {
                                 int blockLoopContractApps,
                                 int loopInvApps,
                                 long autoModeTime) {
-        super(nodes, branches, interactiveSteps, symbExApps,
+        super(nodes, branches, interactiveSteps, symbExApps, abstrExecutionApps,
               quantifierInstantiations, ossApps, mergeRuleApps, totalRuleApps,
               smtSolverApps, dependencyContractApps, operationContractApps,
               blockLoopContractApps, loopInvApps, autoModeTime,
@@ -68,6 +70,7 @@ public final class SideProofStatistics extends Statistics {
                                        stat.branches,
                                        stat.interactiveSteps,
                                        stat.symbExApps,
+                                       stat.abstrExecutionApps,
                                        stat.quantifierInstantiations,
                                        stat.ossApps,
                                        stat.mergeRuleApps,
@@ -91,6 +94,7 @@ public final class SideProofStatistics extends Statistics {
                                        stat.branches,
                                        stat.interactiveSteps,
                                        stat.symbExApps,
+                                       stat.abstrExecutionApps,
                                        stat.quantifierInstantiations,
                                        stat.ossApps,
                                        stat.mergeRuleApps,
@@ -114,6 +118,7 @@ public final class SideProofStatistics extends Statistics {
                                        this.branches + stat.branches,
                                        this.interactiveSteps + stat.interactiveSteps,
                                        this.symbExApps + stat.symbExApps,
+                                       this.abstrExecutionApps + stat.abstrExecutionApps,
                                        this.quantifierInstantiations
                                            + stat.quantifierInstantiations,
                                        this.ossApps + stat.ossApps,
@@ -137,6 +142,7 @@ public final class SideProofStatistics extends Statistics {
                                        this.branches + stat.branches,
                                        this.interactiveSteps + stat.interactiveSteps,
                                        this.symbExApps + stat.symbExApps,
+                                       this.abstrExecutionApps + stat.abstrExecutionApps,
                                        this.quantifierInstantiations
                                            + stat.quantifierInstantiations,
                                        this.ossApps + stat.ossApps,
@@ -157,7 +163,7 @@ public final class SideProofStatistics extends Statistics {
      */
     public SideProofStatistics setAutoModeTime(long autoTime) {
         return new SideProofStatistics(sideProofs, nodes, branches,
-                                       interactiveSteps, symbExApps,
+                                       interactiveSteps, symbExApps, abstrExecutionApps,
                                        quantifierInstantiations, ossApps,
                                        mergeRuleApps, totalRuleApps,
                                        smtSolverApps, dependencyContractApps,

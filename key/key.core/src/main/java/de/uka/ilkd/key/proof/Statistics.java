@@ -29,6 +29,7 @@ public class Statistics {
     public final int branches;
     public final int interactiveSteps;
     public final int symbExApps;
+    public final int abstrExecutionApps;
     public final int quantifierInstantiations;
     public final int ossApps;
     public final int mergeRuleApps;
@@ -52,6 +53,7 @@ public class Statistics {
                          int branches,
                          int interactiveSteps,
                          int symbExApps,
+                         int abstrExecutionApps,
                          int quantifierInstantiations,
                          int ossApps,
                          int mergeRuleApps,
@@ -68,6 +70,7 @@ public class Statistics {
         this.branches = branches;
         this.interactiveSteps = interactiveSteps;
         this.symbExApps = symbExApps;
+        this.abstrExecutionApps = abstrExecutionApps;
         this.quantifierInstantiations = quantifierInstantiations;
         this.ossApps = ossApps;
         this.mergeRuleApps = mergeRuleApps;
@@ -97,6 +100,7 @@ public class Statistics {
         this.branches = tmp.branches;
         this.interactiveSteps = tmp.interactive;
         this.symbExApps = tmp.symbExApps;
+        this.abstrExecutionApps = tmp.abstrExecutionApps;
         this.quantifierInstantiations = tmp.quant;
         this.ossApps = tmp.oss;
         this.mergeRuleApps = tmp.mergeApps;
@@ -122,6 +126,7 @@ public class Statistics {
                               side.branches,
                               side.interactiveSteps,
                               side.symbExApps,
+                              side.abstrExecutionApps,
                               side.quantifierInstantiations,
                               side.ossApps,
                               side.mergeRuleApps,
@@ -196,6 +201,8 @@ public class Statistics {
                 stat.blockLoopContractApps));
         summaryList.add(new Pair<String, String>("Loop invariant apps", "" +
                         stat.loopInvApps));
+        summaryList.add(new Pair<String, String>("Abstract Execution apps", "" +
+                stat.abstrExecutionApps));
         summaryList.add(new Pair<String, String>("Merge Rule apps", "" +
                 stat.mergeRuleApps));
         summaryList.add(new Pair<String, String>("Total rule apps",
@@ -236,6 +243,7 @@ public class Statistics {
         int branches = 1; // proof branches
         int interactive = 0; // interactive steps
         int symbExApps = 0; // symbolic execution steps
+        int abstrExecutionApps = 0; // abstract execution steps
         int quant = 0; // quantifier instantiations
         int oss = 0; // OSS applications
         int mergeApps = 0; // merge rule applications
@@ -278,6 +286,7 @@ public class Statistics {
                 } else if (ruleApp instanceof MergeRuleBuiltInRuleApp) {
                     mergeApps++;
                 } else if (ruleApp instanceof TacletApp) {
+                    abstrExecutionApps += tmpAbstrExecutionRuleApps(ruleApp);
                     quant += tmpQuantificationRuleApps(ruleApp);
                 }
             }
@@ -334,6 +343,18 @@ public class Statistics {
                 tmpOssCaptured = protocol.size() - 1;
             }
             return tmpOssCaptured;
+        }
+
+        /**
+         * Compute all rule applications of abstract execution rules.
+         * @param ruleApp the considered rule application
+         * @return the number of abstract execution rules
+         */
+        private int tmpAbstrExecutionRuleApps(final RuleApp ruleApp) {
+            return ((TacletApp) ruleApp).taclet().getRuleSets().stream()
+                    .map(rs -> rs.name().toString()).anyMatch(n -> n.equals("abstractExecution"))
+                            ? 1
+                            : 0;
         }
 
         /**
