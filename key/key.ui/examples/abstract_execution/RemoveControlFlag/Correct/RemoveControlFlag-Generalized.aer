@@ -6,11 +6,6 @@
   @*/
 { ; }
 
-/*@ ae_constraint
-  @   \disjoint(loopFrame, loopFootprint); // ???
-  @*/
-{ ; }
-
 done = false;
 
 /*@ ae_constraint
@@ -82,11 +77,6 @@ while (
     <programTwo>/*@ ae_constraint
   @   \disjoint(loopFrame, done) &amp;&amp;
   @   \disjoint(loopFootprint, done);
-  @*/
-{ ; }
-
-/*@ ae_constraint
-  @   \disjoint(loopFrame, loopFootprint); // ???
   @*/
 { ; }
 
