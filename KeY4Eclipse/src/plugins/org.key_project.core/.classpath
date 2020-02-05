@@ -12,5 +12,7 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="key.lib/antlr-4.7.1-complete.jar"/>
+	<classpathentry kind="lib" path="/Volumes/Development/Work/Development Projects/coreKeY/key/key/key.core/lib/annotations-17.0.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -144,10 +144,10 @@ contract OneAuction {
         public
         inMode(AuctionMode.Open) // reasonable assumtion, but makes locking of funds more likely
     {
-        require (
+        /* require (
             msg.sender == auction.owner || 
             msg.sender == bid.bidder
-        );
+        );*/
         require (now > auction.closingTime);
         
         auction.mode = AuctionMode.Closed;
