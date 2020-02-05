@@ -236,7 +236,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		String modName = ctx.identifier() == null ? "fallback" : visit(ctx.identifier());
 		String modifier = "private";
 
-		StringBuffer parameters = new StringBuffer();
+		StringBuffer parameters = new StringBuffer("Message msg,");
 		ctx.parameterList().parameter().stream().forEach(param -> 
 		parameters.append(visit(param) + ","));
 		if (parameters.length() > 0) parameters.deleteCharAt(parameters.length() - 1);
@@ -252,12 +252,11 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 */
 	@Override public String visitModifierInvocation(SolidityParser.ModifierInvocationContext ctx) { 
 		String modName = visit(ctx.identifier());
-		StringBuffer arguments = new StringBuffer();
+		StringBuffer arguments = new StringBuffer("msg");
 
 		if (ctx.expressionList() != null && !ctx.expressionList().isEmpty()) {			
 			ctx.expressionList().expression().stream()
-			.forEach(elt -> arguments.append(visit(elt)+","));
-			arguments.deleteCharAt(arguments.length() - 1);			
+			.forEach(elt -> arguments.append("," + visit(elt)));
 		}
 
 		return modName + "(" + arguments + ")";

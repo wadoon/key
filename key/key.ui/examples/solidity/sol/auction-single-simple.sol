@@ -15,9 +15,10 @@ pragma solidity >=0.5.5;
 
 contract OneAuction {
     enum AuctionMode { NeverStarted, Open, Closed }
+    
     // Handling bid information
     struct BidInformation {
-        address/* payable */bidder;
+        address/* payable */ bidder;
         uint value;
     }
 
@@ -26,10 +27,10 @@ contract OneAuction {
     address currentBidder;
     AuctionMode mode = AuctionMode.Open;
     BidInformation bid;
-	mapping(address=>uint) public test;
+    mapping(address=>uint) public test;
     
     function closeAuction() public {
-		test[this] = 10;
+        test[this] = 10;
         require (mode == AuctionMode.Open);
         require (msg.sender == auctionOwner);
         require (bid.bidder == currentBidder);
