@@ -337,6 +337,17 @@ public class Statistics {
         }
 
         /**
+         * Returns 1 if ruleApp is a loop scope invariant taclet application, and 0
+         * otherwise.
+         * 
+         * @param ruleApp The {@link RuleApp} to check.
+         * @return 1 or 0.
+         */
+        private int tmpLoopScopeInvTacletRuleApps(final RuleApp ruleApp) {
+            return tacletHasRuleSet(ruleApp, "loop_scope_inv_taclet");
+        }
+
+        /**
          * Compute all rule applications regarding quantifiers
          * @param ruleApp the considered rule application
          * @return the number of quantifier rules
