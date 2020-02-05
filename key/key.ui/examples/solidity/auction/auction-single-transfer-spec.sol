@@ -124,14 +124,17 @@ contract OneAuction {
 
 	// Transfer the old bid to the old bidder
 	uint tmp = bid.value;
-        bid.value = 0;
-	bid.bidder.transfer(tmp);
+	address oldBidder = bid.bidder; 
+    // Set the new bid
+    uint val = msg.value;
+    bid.value = val;
+    address sender = msg.sender;
+    bid.bidder = sender;
+	
+	oldBidder.transfer(tmp);
 	// Can this be verified, thanks to notBy(bid.bidder)?
 	// Probably not. If bid.bidder makes msg.sender calling makeBid().value(1).
 	
-        // Set the new bid
-        bid.value = msg.value;
-        bid.bidder = msg.sender;
     }    
     
     /*@ succeeds_only_if
