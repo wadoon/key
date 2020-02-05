@@ -286,6 +286,7 @@ public class Statistics {
                 } else if (ruleApp instanceof MergeRuleBuiltInRuleApp) {
                     mergeApps++;
                 } else if (ruleApp instanceof TacletApp) {
+                    inv += tmpLoopScopeInvTacletRuleApps(ruleApp);
                     abstrExecutionApps += tmpAbstrExecutionRuleApps(ruleApp);
                     quant += tmpQuantificationRuleApps(ruleApp);
                 }
@@ -346,15 +347,36 @@ public class Statistics {
         }
 
         /**
-         * Compute all rule applications of abstract execution rules.
-         * @param ruleApp the considered rule application
-         * @return the number of abstract execution rules
+         * Returns 1 if ruleApp is a loop scope invariant taclet application, and 0
+         * otherwise.
+         * 
+         * @param ruleApp The {@link RuleApp} to check.
+         * @return 1 or 0.
+         */
+        private int tmpLoopScopeInvTacletRuleApps(final RuleApp ruleApp) {
+            return tacletHasRuleSet(ruleApp, "loop_scope_inv_taclet");
+        }
+
+        /**
+         * Returns 1 if ruleApp is an abstract execution taclet application, and 0
+         * otherwise.
+         * 
+         * @param ruleApp The {@link RuleApp} to check.
+         * @return 1 or 0.
          */
         private int tmpAbstrExecutionRuleApps(final RuleApp ruleApp) {
+            return tacletHasRuleSet(ruleApp, "abstractExecution");
+        }
+
+        /**
+         * Returns 1 if ruleApp belongs to the given rule set, and 0 otherwise.
+         * 
+         * @param ruleApp The {@link RuleApp} to check.
+         * @return 1 or 0.
+         */
+        private int tacletHasRuleSet(final RuleApp ruleApp, final String ruleSet) {
             return ((TacletApp) ruleApp).taclet().getRuleSets().stream()
-                    .map(rs -> rs.name().toString()).anyMatch(n -> n.equals("abstractExecution"))
-                            ? 1
-                            : 0;
+                    .map(rs -> rs.name().toString()).anyMatch(n -> n.equals(ruleSet)) ? 1 : 0;
         }
 
         /**
