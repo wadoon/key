@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Wed Jun 26 12:42:17 CEST 2019
+#Mon Feb 10 13:49:14 CET 2020
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
 [SMTSettings]invariantForall=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
@@ -33,7 +33,7 @@
 [StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
 [SMTSettings]maxGenericSorts=2
-[StrategyProperty]OSS_OPTIONS_KEY=OSS_OFF
+[StrategyProperty]OSS_OPTIONS_KEY=OSS_ON
 [StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
 [SMTSettings]integersMinimum=-2147483645
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
@@ -42,264 +42,26 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Wed Jun 26 12:42:17 CEST 2019
+#Mon Feb 10 13:49:14 CET 2020
 name=cardin_union
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
 
 \proof {
 (keyLog "0" (keyUser "niklas" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
-(keyLog "1" (keyUser "niklas" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "0")
+(autoModeTime "72")
 
 (branch "dummy ID"
-(rule "cardin_disjunctive_union" (newnames "f_set,f_set1") (inst "set1=set1") (inst "set=set") (userinteraction))
-(rule "notRight" (formula "2") (userinteraction))
-(rule "impLeft" (formula "1") (userinteraction))
-(branch "Case 1"
-   (rule "eqClose" (formula "2") (userinteraction))
-   (rule "closeTrue" (formula "2") (userinteraction))
-)
-(branch "Case 2"
-   (rule "notLeft" (formula "1") (userinteraction))
-   (rule "instAll" (formula "2") (term "0,0,0") (ifseqformula "1") (userinteraction))
-   (rule "instAll" (formula "3") (term "1,0,0") (ifseqformula "1") (userinteraction))
-   (rule "impLeft" (formula "1") (userinteraction))
-   (branch "Case 1"
-      (rule "cardin_not_negative" (inst "set=set") (userinteraction))
-      (rule "setCombinations" (inst "set1=set1") (inst "set=set") (userinteraction))
-      (rule "instAll" (formula "6") (term "0,0,0") (ifseqformula "1") (userinteraction))
-      (rule "instAll" (formula "7") (term "1,0,0") (ifseqformula "1") (userinteraction))
-      (rule "andLeft" (formula "1") (userinteraction))
-      (rule "applyEqRigid" (formula "9") (term "0,0") (ifseqformula "2") (userinteraction))
-      (rule "instAll" (formula "9") (term "0,0,0") (ifseqformula "7") (userinteraction))
-      (rule "instAll" (formula "10") (term "1,0,0") (ifseqformula "1") (userinteraction))
-      (rule "impLeft" (formula "1") (userinteraction))
-      (branch "Case 1"
-         (rule "setEquality" (inst "el=el") (inst "set1=set1") (inst "set=set") (userinteraction))
-         (rule "instAll" (formula "10") (term "1") (ifseqformula "1") (userinteraction))
-         (rule "instAll" (formula "11") (term "0") (ifseqformula "1") (userinteraction))
-         (rule "equiv_left" (formula "1") (userinteraction))
-         (branch "Case 1"
-            (rule "eqSymm" (formula "1") (userinteraction))
-            (rule "closeAntec" (formula "1") (ifseqformula "13") (userinteraction))
-         )
-         (branch "Case 2"
-            (rule "allRight" (formula "12") (inst "sk=el_0") (userinteraction))
-            (rule "equiv_right" (formula "12") (userinteraction))
-            (branch "Case 1"
-               (rule "element_of_empty" (formula "1") (userinteraction))
-               (rule "closeFalse" (formula "1") (userinteraction))
-            )
-            (branch "Case 2"
-               (rule "element_of_empty" (formula "13") (userinteraction))
-               (rule "false_right" (formula "13") (userinteraction))
-               (rule "eqSymm" (formula "12") (userinteraction))
-               (rule "intersect" (formula "1") (userinteraction))
-               (rule "andLeft" (formula "1") (userinteraction))
-               (rule "union" (formula "1") (userinteraction))
-               (rule "difference" (formula "1") (term "0") (userinteraction))
-               (rule "intersect" (formula "1") (term "1") (userinteraction))
-               (rule "orLeft" (formula "1") (userinteraction))
-               (branch "element(el_0, f_set) & !element(el_0, f_set1)"
-                  (rule "andLeft" (formula "1") (userinteraction))
-                  (rule "notLeft" (formula "2") (userinteraction))
-                  (rule "difference" (formula "2") (userinteraction))
-                  (rule "andLeft" (formula "2") (userinteraction))
-                  (rule "notLeft" (formula "3") (userinteraction))
-                  (rule "closeAntec" (formula "2") (ifseqformula "14") (userinteraction))
-               )
-               (branch "element(el_0, f_set) & element(el_0, f_set1)"
-                  (rule "difference" (formula "2") (userinteraction))
-                  (rule "andLeft" (formula "2") (userinteraction))
-                  (rule "notLeft" (formula "3") (userinteraction))
-                  (rule "andLeft" (formula "1") (userinteraction))
-                  (rule "closeAntec" (formula "1") (ifseqformula "13") (userinteraction))
-               )
-            )
-         )
-      )
-      (branch "Case 2"
-         (rule "applyEqRigid" (formula "11") (term "0") (ifseqformula "1") (userinteraction))
-         (rule "cardin_subset" (inst "set=set") (inst "set1=set1") (userinteraction))
-         (rule "instAll" (formula "12") (term "0,1,0") (ifseqformula "1") (userinteraction))
-         (rule "instAll" (formula "13") (term "0,1,1") (ifseqformula "1") (userinteraction))
-         (rule "impLeft" (formula "1") (userinteraction))
-         (branch "Case 1"
-            (rule "subset" (formula "12") (inst "el=el") (userinteraction))
-            (rule "allRight" (formula "12") (inst "sk=el_0") (userinteraction))
-            (rule "impRight" (formula "12") (userinteraction))
-            (rule "difference" (formula "1") (userinteraction))
-            (rule "andLeft" (formula "1") (userinteraction))
-            (rule "closeAntec" (formula "1") (ifseqformula "14") (userinteraction))
-         )
-         (branch "Case 2"
-            (rule "instAll" (formula "14") (term "0,0,0,0") (ifseqformula "12") (userinteraction))
-            (rule "instAll" (formula "15") (term "1,0,0,0") (ifseqformula "1") (userinteraction))
-            (rule "impLeft" (formula "1") (userinteraction))
-            (branch "Case 1"
-               (rule "setEquality" (inst "set=set") (inst "set1=set1") (inst "el=el") (userinteraction))
-               (rule "instAll" (formula "15") (term "0") (ifseqformula "1") (userinteraction))
-               (rule "instAll" (formula "16") (term "1") (ifseqformula "1") (userinteraction))
-               (rule "equiv_left" (formula "1") (userinteraction))
-               (branch "Case 1"
-                  (rule "closeAntec" (formula "1") (ifseqformula "18") (userinteraction))
-               )
-               (branch "Case 2"
-                  (rule "allRight" (formula "16") (inst "sk=el_0") (userinteraction))
-                  (rule "equiv_right" (formula "16") (userinteraction))
-                  (branch "Case 1"
-                     (rule "intersect" (formula "1") (userinteraction))
-                     (rule "difference" (formula "1") (term "0") (userinteraction))
-                     (rule "andLeft" (formula "1") (userinteraction))
-                     (rule "andLeft" (formula "1") (userinteraction))
-                     (rule "intersect" (formula "3") (userinteraction))
-                     (rule "andLeft" (formula "3") (userinteraction))
-                     (rule "notLeft" (formula "2") (userinteraction))
-                     (rule "closeAntec" (formula "2") (ifseqformula "18") (userinteraction))
-                  )
-                  (branch "Case 2"
-                     (rule "element_of_empty" (formula "1") (userinteraction))
-                     (rule "closeFalse" (formula "1") (userinteraction))
-                  )
-               )
-            )
-            (branch "Case 2"
-               (rule "applyEqRigid" (formula "16") (term "0,0") (ifseqformula "1") (userinteraction))
-               (rule "setCombinations" (inst "set=set") (inst "set1=set1") (userinteraction))
-               (rule "hide_left" (formula "2") (userinteraction))
-               (rule "hide_left" (formula "3") (userinteraction))
-               (rule "hide_left" (formula "3") (userinteraction))
-               (rule "hide_left" (formula "1") (userinteraction))
-               (rule "hide_left" (formula "2") (userinteraction))
-               (rule "hide_left" (formula "2") (userinteraction))
-               (rule "hide_left" (formula "4") (userinteraction))
-               (rule "hide_left" (formula "3") (userinteraction))
-               (rule "hide_left" (formula "3") (userinteraction))
-               (rule "hide_left" (formula "4") (userinteraction))
-               (rule "hide_left" (formula "4") (userinteraction))
-               (rule "setCombinations" (inst "set=set") (inst "set1=set1") (userinteraction))
-               (rule "instAll" (formula "6") (term "0,0,1") (ifseqformula "1") (userinteraction))
-               (rule "instAll" (formula "7") (term "0,1,1") (ifseqformula "1") (userinteraction))
-               (rule "andLeft" (formula "1") (userinteraction))
-               (rule "applyEqRigid" (formula "8") (term "0,0,1") (ifseqformula "5") (userinteraction))
-               (rule "instAll" (formula "8") (term "0,1,1") (ifseqformula "3") (userinteraction))
-               (rule "instAll" (formula "9") (term "0,0,0,0,1") (ifseqformula "1") (userinteraction))
-               (rule "andLeft" (formula "1") (userinteraction))
-               (rule "applyEqRigid" (formula "11") (term "0,1,1") (ifseqformula "1") (userinteraction))
-               (rule "hide_left" (formula "1") (userinteraction))
-               (rule "hide_left" (formula "1") (userinteraction))
-               (rule "hide_left" (formula "1") (userinteraction))
-               (rule "hide_left" (formula "1") (userinteraction))
-               (rule "hide_left" (formula "1") (userinteraction))
-               (rule "hide_left" (formula "1") (userinteraction))
-               (rule "hide_left" (formula "2") (userinteraction))
-               (rule "cardin_disjunctive_union" (inst "set=set") (inst "set1=set1") (userinteraction))
-               (rule "instAll" (formula "5") (term "0,0,0,1") (ifseqformula "1") (userinteraction))
-               (rule "instAll" (formula "6") (term "1,0,0,1") (ifseqformula "1") (userinteraction))
-               (rule "instAll" (formula "7") (term "0,0,1,1") (ifseqformula "3") (userinteraction))
-               (rule "instAll" (formula "8") (term "1,0,1,1") (ifseqformula "1") (userinteraction))
-               (rule "hide_left" (formula "2") (userinteraction))
-               (rule "hide_left" (formula "3") (userinteraction))
-               (rule "hide_left" (formula "3") (userinteraction))
-               (rule "impLeft" (formula "1") (userinteraction))
-               (branch "Case 1"
-                  (rule "setEquality" (inst "set=set") (inst "set1=set1") (inst "el=el") (userinteraction))
-                  (rule "instAll" (formula "5") (term "0") (ifseqformula "1") (userinteraction))
-                  (rule "instAll" (formula "6") (term "1") (ifseqformula "1") (userinteraction))
-                  (rule "equiv_left" (formula "1") (userinteraction))
-                  (branch "Case 1"
-                     (rule "closeAntec" (formula "1") (ifseqformula "8") (userinteraction))
-                  )
-                  (branch "Case 2"
-                     (rule "allRight" (formula "6") (inst "sk=el_0") (userinteraction))
-                     (rule "equiv_right" (formula "6") (userinteraction))
-                     (branch "Case 1"
-                        (rule "intersect" (formula "1") (userinteraction))
-                        (rule "andLeft" (formula "1") (userinteraction))
-                        (rule "difference" (formula "1") (userinteraction))
-                        (rule "intersect" (formula "2") (userinteraction))
-                        (rule "andLeft" (formula "1") (userinteraction))
-                        (rule "andLeft" (formula "3") (userinteraction))
-                        (rule "notLeft" (formula "2") (userinteraction))
-                        (rule "closeAntec" (formula "2") (ifseqformula "8") (userinteraction))
-                     )
-                     (branch "Case 2"
-                        (rule "element_of_empty" (formula "1") (userinteraction))
-                        (rule "closeFalse" (formula "1") (userinteraction))
-                     )
-                  )
-               )
-               (branch "Case 2"
-                  (rule "applyEqRigid" (formula "6") (term "1,1") (ifseqformula "1") (userinteraction))
-                  (rule "add_lesseq" (formula "6") (inst "i1=neg(cardinality(SetDifference(f_set1, f_set)))") (userinteraction))
-                  (rule "rotate_params" (formula "6") (term "0") (userinteraction))
-                  (rule "add_sub_elim_left" (formula "6") (term "1,0") (userinteraction))
-                  (rule "add_zero_right" (formula "6") (term "0") (userinteraction))
-                  (rule "rotate_params" (formula "6") (term "1") (userinteraction))
-                  (rule "polySimp_addAssoc" (formula "6") (term "1,1") (userinteraction))
-                  (rule "add_sub_elim_left" (formula "6") (term "0,1,1") (userinteraction))
-                  (rule "add_zero_left" (formula "6") (term "1,1") (userinteraction))
-                  (rule "hide_left" (formula "1") (userinteraction))
-                  (rule "impLeft" (formula "1") (userinteraction))
-                  (branch "Case 1"
-                     (rule "setEquality" (inst "set=set") (inst "set1=set1") (inst "el=el") (userinteraction))
-                     (rule "instAll" (formula "4") (term "0") (ifseqformula "1") (userinteraction))
-                     (rule "instAll" (formula "5") (term "1") (ifseqformula "1") (userinteraction))
-                     (rule "hide_left" (formula "2") (userinteraction))
-                     (rule "hide_left" (formula "2") (userinteraction))
-                     (rule "equiv_left" (formula "1") (userinteraction))
-                     (branch "Case 1"
-                        (rule "closeAntec" (formula "1") (ifseqformula "5") (userinteraction))
-                     )
-                     (branch "Case 2"
-                        (rule "allRight" (formula "3") (inst "sk=el_0") (userinteraction))
-                        (rule "equiv_right" (formula "3") (userinteraction))
-                        (branch "Case 1"
-                           (rule "intersect" (formula "1") (userinteraction))
-                           (rule "andLeft" (formula "1") (userinteraction))
-                           (rule "difference" (formula "1") (userinteraction))
-                           (rule "intersect" (formula "2") (userinteraction))
-                           (rule "andLeft" (formula "1") (userinteraction))
-                           (rule "andLeft" (formula "3") (userinteraction))
-                           (rule "notLeft" (formula "2") (userinteraction))
-                           (rule "closeAntec" (formula "2") (ifseqformula "5") (userinteraction))
-                        )
-                        (branch "Case 2"
-                           (rule "element_of_empty" (formula "1") (userinteraction))
-                           (rule "closeFalse" (formula "1") (userinteraction))
-                        )
-                     )
-                  )
-                  (branch "Case 2"
-                     (rule "applyEqRigid" (formula "5") (term "0,1") (ifseqformula "1") (userinteraction))
-                     (rule "hide_left" (formula "1") (userinteraction))
-                     (rule "add_lesseq" (formula "4") (inst "i1=neg(add(cardinality(SetDifference(f_set, f_set1)),
-        cardinality(SetIntersection(f_set, f_set1))))") (userinteraction))
-                     (rule "add_sub_elim_left" (formula "4") (term "0") (userinteraction))
-                     (rule "rotate_params" (formula "4") (term "1") (userinteraction))
-                     (rule "polySimp_addAssoc" (formula "4") (term "1") (userinteraction))
-                     (rule "add_sub_elim_right" (formula "4") (term "0,1") (userinteraction))
-                     (rule "add_zero_left" (formula "4") (term "1") (userinteraction))
-                     (rule "instAll" (formula "4") (term "0,1") (ifseqformula "2") (userinteraction))
-                     (rule "geq_to_leq" (formula "1") (userinteraction))
-                     (rule "closeAntec" (formula "1") (ifseqformula "5") (userinteraction))
-                  )
-               )
-            )
-         )
-      )
-   )
-   (branch "Case 2"
-      (rule "eqSymm" (formula "1") (userinteraction))
-      (rule "applyEq" (formula "4") (term "1") (ifseqformula "1") (userinteraction))
-      (rule "leq_to_gt" (formula "4") (userinteraction))
-      (rule "notRight" (formula "4") (userinteraction))
-      (rule "gt_to_lt" (formula "1") (userinteraction))
-      (rule "less_base" (formula "1") (userinteraction))
-      (rule "closeFalse" (formula "1") (userinteraction))
-   )
-)
+(rule "cardin_union_axiom" (newnames "f_set,f_set1") (inst "set=set") (inst "set1=set1") (userinteraction))
+(rule "eqSymm" (formula "2"))
+(rule "eqSymm" (formula "1") (term "0,0"))
+(rule "polySimp_elimSub" (formula "2") (term "0"))
+(rule "eqSymm" (formula "2"))
+(rule "polySimp_elimSub" (formula "1") (term "0,0,0"))
+(rule "eqSymm" (formula "1") (term "0,0"))
+(rule "allLeft" (formula "1") (inst "t=f_set"))
+(rule "allLeft" (formula "1") (inst "t=f_set1"))
+(rule "close" (formula "4") (ifseqformula "1"))
 )
 }

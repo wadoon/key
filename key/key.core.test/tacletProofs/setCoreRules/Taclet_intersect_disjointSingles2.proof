@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Mon Feb 10 13:43:22 CET 2020
+#Mon Feb 10 13:12:20 CET 2020
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
 [SMTSettings]invariantForall=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
@@ -33,7 +33,7 @@
 [StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
 [SMTSettings]maxGenericSorts=2
-[StrategyProperty]OSS_OPTIONS_KEY=OSS_ON
+[StrategyProperty]OSS_OPTIONS_KEY=OSS_OFF
 [StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
 [SMTSettings]integersMinimum=-2147483645
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
@@ -42,44 +42,22 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Mon Feb 10 13:43:22 CET 2020
-name=union_of_empty
+#Mon Feb 10 13:12:20 CET 2020
+name=intersect_disjointSingles2
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
 
 \proof {
 (keyLog "0" (keyUser "niklas" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "245")
+(autoModeTime "24")
 
 (branch "dummy ID"
-(rule "set_equal" (formula "1") (newnames "f_set") (inst "el=el") (userinteraction))
-(rule "allRight" (formula "1") (inst "sk=el_0"))
-(rule "union" (formula "1") (term "0"))
-(rule "commute_or" (formula "1") (term "0"))
-(rule "equiv_right" (formula "1"))
-(branch "Case 1"
-   (rule "replace_known_right" (formula "1") (term "1") (ifseqformula "2"))
-    (builtin "One Step Simplification" (formula "1"))
-   (rule "empty" (inst "set=set") (inst "el=el") (userinteraction))
-   (rule "nnf_notEx" (formula "1") (term "1,0"))
-   (rule "cnf_eqv" (formula "1") (term "0"))
-   (rule "nnf_notAll" (formula "1") (term "1,0,0"))
-    (builtin "One Step Simplification" (formula "1"))
-   (rule "distr_forallAnd" (formula "1"))
-   (rule "andLeft" (formula "1"))
-   (rule "ex_pull_out3" (formula "1") (term "0"))
-   (rule "all_pull_out3" (formula "2") (term "0"))
-   (rule "swapQuantifiersAll" (formula "2"))
-   (rule "commute_or" (formula "2") (term "0,0"))
-    (builtin "One Step Simplification" (formula "2"))
-   (rule "allLeft" (formula "2") (inst "t=el_0"))
-   (rule "notLeft" (formula "2"))
-   (rule "close" (formula "4") (ifseqformula "3"))
-)
-(branch "Case 2"
-   (rule "orRight" (formula "2"))
-   (rule "close" (formula "3") (ifseqformula "1"))
-)
+(rule "impRight" (formula "1") (newnames "f_e1,f_e"))
+(rule "notLeft" (formula "1"))
+(rule "eqSymm" (formula "2"))
+(rule "intersect_disjointSingles1" (formula "1") (term "0") (ifseqformula "2"))
+(rule "eqClose" (formula "1"))
+(rule "closeTrue" (formula "1"))
 )
 }

@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Wed Jul 03 13:12:23 CEST 2019
+#Mon Feb 10 13:49:57 CET 2020
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
 [SMTSettings]invariantForall=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
@@ -33,7 +33,7 @@
 [StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
 [SMTSettings]maxGenericSorts=2
-[StrategyProperty]OSS_OPTIONS_KEY=OSS_OFF
+[StrategyProperty]OSS_OPTIONS_KEY=OSS_ON
 [StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
 [SMTSettings]integersMinimum=-2147483645
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
@@ -42,7 +42,7 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Wed Jul 03 13:12:23 CEST 2019
+#Mon Feb 10 13:49:57 CET 2020
 name=cardin1
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
@@ -50,57 +50,32 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 \proof {
 (keyLog "0" (keyUser "niklas" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "142")
+(autoModeTime "80")
 
 (branch "dummy ID"
-(rule "cardin_of_single" (newnames "f_set,v_x") (inst "set=set") (inst "el=el") (userinteraction))
-(rule "eqSymm" (formula "2") (term "0,1"))
+(rule "impRight" (formula "1") (newnames "v_x,f_set"))
+(rule "notRight" (formula "2"))
+(rule "notLeft" (formula "2"))
+(rule "eqSymm" (formula "2") (term "0"))
+(rule "nnf_ex2all" (formula "2"))
+(rule "cardin_of_single" (inst "set=set") (inst "el=el") (userinteraction))
 (rule "eqSymm" (formula "1") (term "0,1,0"))
-(rule "equiv_right" (formula "2"))
-(branch "Case 1"
-   (rule "nnf_ex2all" (formula "3"))
-   (rule "cnf_eqv" (formula "3") (term "0"))
-   (rule "nnf_notEx" (formula "3") (term "1,0,0"))
-   (rule "distr_forallAnd" (formula "3"))
-   (rule "andLeft" (formula "3"))
-   (rule "ex_pull_out3" (formula "4") (term "0"))
-   (rule "commute_or" (formula "4") (term "0,0"))
-   (rule "all_pull_out3" (formula "3") (term "0"))
-   (rule "swapQuantifiersAll" (formula "3"))
-   (rule "elim_forall5" (formula "3") (term "0"))
-   (rule "cardin_single" (formula "3") (term "0,0"))
-   (rule "eqClose" (formula "3") (term "0"))
-   (rule "all_unused" (formula "3"))
-   (rule "true_left" (formula "3"))
-   (rule "allLeft" (formula "3") (inst "t=f_set"))
-   (rule "exLeft" (formula "3") (inst "sk=el_0"))
-   (rule "replace_known_left" (formula "3") (term "0,1") (ifseqformula "2"))
-   (rule "concrete_not_1" (formula "3") (term "1"))
-   (rule "concrete_or_4" (formula "3"))
-   (rule "allLeft" (formula "1") (inst "t=el_0"))
-   (rule "notLeft" (formula "1"))
-   (rule "close" (formula "5") (ifseqformula "3"))
-)
-(branch "Case 2"
-   (rule "exLeft" (formula "1") (inst "sk=v_x_0"))
-   (rule "cnf_eqv" (formula "2") (term "0"))
-   (rule "nnf_notEx" (formula "2") (term "1,0,0"))
-   (rule "distr_forallAnd" (formula "2"))
-   (rule "andLeft" (formula "2"))
-   (rule "ex_pull_out3" (formula "3") (term "0"))
-   (rule "commute_or" (formula "3") (term "0,0"))
-   (rule "all_pull_out3" (formula "2") (term "0"))
-   (rule "swapQuantifiersAll" (formula "2"))
-   (rule "elim_forall5" (formula "2") (term "0"))
-   (rule "cardin_single" (formula "2") (term "0,0"))
-   (rule "eqClose" (formula "2") (term "0"))
-   (rule "all_unused" (formula "2"))
-   (rule "true_left" (formula "2"))
-   (rule "eqSymm" (formula "1") (userinteraction))
-   (rule "applyEqRigid" (formula "3") (term "0,0") (ifseqformula "1") (userinteraction))
-   (rule "cardin_single" (formula "3") (term "0") (userinteraction))
-   (rule "eqClose" (formula "3"))
-   (rule "closeTrue" (formula "3"))
-)
+(rule "cnf_eqv" (formula "1") (term "0"))
+(rule "nnf_notEx" (formula "1") (term "1,0,0"))
+(rule "distr_forallAnd" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "ex_pull_out3" (formula "2") (term "0"))
+(rule "commute_or" (formula "2") (term "0,0"))
+(rule "all_pull_out3" (formula "1") (term "0"))
+(rule "swapQuantifiersAll" (formula "1"))
+ (builtin "One Step Simplification" (formula "1"))
+(rule "true_left" (formula "1"))
+(rule "allLeft" (formula "1") (inst "t=f_set"))
+(rule "exLeft" (formula "1") (inst "sk=el_0"))
+(rule "replace_known_left" (formula "1") (term "0,1") (ifseqformula "4"))
+ (builtin "One Step Simplification" (formula "1"))
+(rule "allLeft" (formula "3") (inst "t=el_0"))
+(rule "notLeft" (formula "3"))
+(rule "close" (formula "5") (ifseqformula "1"))
 )
 }

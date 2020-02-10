@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Thu Aug 01 05:34:56 CEST 2019
+#Mon Feb 10 13:45:01 CET 2020
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
 [SMTSettings]invariantForall=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
@@ -33,8 +33,8 @@
 [StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
 [SMTSettings]maxGenericSorts=2
-[StrategyProperty]OSS_OPTIONS_KEY=OSS_OFF
-[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_NORMAL
+[StrategyProperty]OSS_OPTIONS_KEY=OSS_ON
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
 [SMTSettings]integersMinimum=-2147483645
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
 [SMTSettings]integersMaximum=2147483645
@@ -42,7 +42,7 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Thu Aug 01 05:34:56 CEST 2019
+#Mon Feb 10 13:45:01 CET 2020
 name=intersect_of_empty
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
@@ -50,135 +50,36 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 \proof {
 (keyLog "0" (keyUser "niklas" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "255")
+(autoModeTime "110")
 
 (branch "dummy ID"
-(rule "setEquality" (newnames "f_set") (inst "set=set") (inst "set1=set1") (inst "el=el") (userinteraction))
-(rule "instAll" (formula "2") (term "0") (ifseqformula "1") (userinteraction))
-(rule "instAll" (formula "3") (term "1") (ifseqformula "1") (userinteraction))
-(rule "eqSymm" (formula "3") (term "0,0,0"))
-(rule "eqSymm" (formula "2") (term "0,0"))
-(rule "replace_known_right" (formula "1") (term "0") (ifseqformula "4"))
-(rule "concrete_eq_2" (formula "1"))
-(rule "notLeft" (formula "1"))
-(rule "allRight" (formula "3") (inst "sk=el_0"))
-(rule "intersect" (formula "1") (term "0,0,1,0"))
-(rule "intersect" (formula "3") (term "0"))
-(rule "commute_and" (formula "3") (term "0"))
-(rule "equiv_right" (formula "3"))
+(rule "set_equal" (formula "1") (newnames "f_set") (inst "el=el") (userinteraction))
+(rule "allRight" (formula "1") (inst "sk=el_0"))
+(rule "intersect" (formula "1") (term "0"))
+(rule "commute_and" (formula "1") (term "0"))
+(rule "equiv_right" (formula "1"))
 (branch "Case 1"
    (rule "andLeft" (formula "1"))
-   (rule "close" (formula "5") (ifseqformula "1"))
+   (rule "close" (formula "3") (ifseqformula "1"))
 )
 (branch "Case 2"
-   (rule "replace_known_left" (formula "4") (term "0") (ifseqformula "1"))
-   (rule "concrete_and_1" (formula "4"))
-   (rule "cnf_eqv" (formula "2") (term "0"))
-   (rule "nnf_notAll" (formula "2") (term "1,0,0"))
-   (rule "nnf_notEqv" (formula "2") (term "0,1,0,0"))
-   (rule "distr_forallAnd" (formula "2"))
-   (rule "andLeft" (formula "2"))
-   (rule "commute_and" (formula "2") (term "0,0,1,0"))
-   (rule "commute_and" (formula "3") (term "0,0,1,0"))
-   (rule "cnf_eqv" (formula "4") (term "0,0"))
-   (rule "nnf_notAll" (formula "4") (term "1,0,0,0"))
-   (rule "nnf_notEqv" (formula "4") (term "0,1,0,0,0"))
-   (rule "distr_forallAnd" (formula "4") (term "0"))
-   (rule "distr_forallAnd" (formula "4"))
-   (rule "andLeft" (formula "4"))
-   (rule "cnf_eqv" (formula "2") (term "0,1,0"))
-   (rule "double_not" (formula "2") (term "1,0,0,1,0"))
-   (rule "nnf_notAnd" (formula "2") (term "0,1,0,1,0"))
-   (rule "commute_or" (formula "2") (term "0,0,1,0"))
-   (rule "cnf_rightDist" (formula "2") (term "0,0,1,0"))
-   (rule "commute_or" (formula "2") (term "0,0,0,1,0"))
-   (rule "cnf_eqv" (formula "3") (term "0,1,0"))
-   (rule "nnf_notAnd" (formula "3") (term "0,1,0,1,0"))
-   (rule "commute_or" (formula "3") (term "0,0,1,0"))
-   (rule "cnf_rightDist" (formula "3") (term "0,0,1,0"))
-   (rule "commute_or" (formula "3") (term "0,0,0,1,0"))
-   (rule "cnf_eqv" (formula "5") (term "0,1,0,0"))
-   (rule "cnf_eqv" (formula "4") (term "0,1,0,0"))
-   (rule "double_not" (formula "4") (term "1,0,0,1,0,0"))
-   (rule "ex_pull_out3" (formula "2") (term "0"))
-   (rule "cnf_rightDist" (formula "2") (term "0,0"))
-   (rule "commute_or_2" (formula "2") (term "1,0,0"))
-   (rule "commute_or_2" (formula "2") (term "0,1,0,0"))
-   (rule "commute_or" (formula "2") (term "0,0,1,0,0"))
-   (rule "cnf_rightDist" (formula "2") (term "0,0,0"))
-   (rule "commute_or_2" (formula "2") (term "1,0,0,0"))
-   (rule "shift_paren_or" (formula "2") (term "0,0,0,0"))
-   (rule "commute_or" (formula "2") (term "0,1,0,0,0"))
-   (rule "ex_pull_out3" (formula "4") (term "0,0"))
-   (rule "cnf_rightDist" (formula "4") (term "0,0,0"))
-   (rule "commute_or_2" (formula "4") (term "1,0,0,0"))
-   (rule "shift_paren_or" (formula "4") (term "0,0,0,0"))
-   (rule "commute_or" (formula "4") (term "0,1,0,0,0"))
-   (rule "all_pull_out3" (formula "3") (term "0"))
-   (rule "cnf_rightDist" (formula "3") (term "0,0"))
-   (rule "distr_forallAnd" (formula "3") (term "0"))
-   (rule "distr_forallAnd" (formula "3"))
-   (rule "andLeft" (formula "3"))
-   (rule "swapQuantifiersAll" (formula "4"))
-   (rule "elim_forall4" (formula "4") (term "0"))
-   (rule "intersect" (formula "4") (term "1,0"))
-   (rule "cnf_rightDist" (formula "4") (term "0"))
-   (rule "neq_or_4" (formula "4") (term "0,0"))
-   (rule "concrete_and_1" (formula "4") (term "0"))
-   (rule "shift_paren_or" (formula "4") (term "0"))
-   (rule "neq_or" (formula "4") (term "0,0"))
-   (rule "concrete_or_1" (formula "4") (term "0"))
-   (rule "all_unused" (formula "4"))
-   (rule "true_left" (formula "4"))
-   (rule "cnf_rightDist" (formula "3") (term "0,0"))
-   (rule "distr_forallAnd" (formula "3") (term "0"))
-   (rule "distr_forallAnd" (formula "3"))
-   (rule "andLeft" (formula "3"))
-   (rule "swapQuantifiersAll" (formula "4"))
-   (rule "elim_forall4" (formula "4") (term "0"))
-   (rule "intersect" (formula "4") (term "0,1,0"))
-   (rule "nnf_notAnd" (formula "4") (term "1,0"))
-   (rule "commute_or" (formula "3") (term "0,0"))
-   (rule "swapQuantifiersAll" (formula "3"))
-   (rule "elim_forall4" (formula "3") (term "0"))
-   (rule "intersect" (formula "3") (term "0,1,0"))
-   (rule "nnf_notAnd" (formula "3") (term "1,0"))
-   (rule "shift_paren_or" (formula "4") (term "0"))
-   (rule "neq_or" (formula "4") (term "0,0"))
-   (rule "concrete_or_1" (formula "4") (term "0"))
-   (rule "all_unused" (formula "4"))
-   (rule "true_left" (formula "4"))
-   (rule "commute_or" (formula "3") (term "1,0"))
-   (rule "shift_paren_or" (formula "3") (term "0"))
-   (rule "neq_or" (formula "3") (term "0,0"))
-   (rule "concrete_or_1" (formula "3") (term "0"))
-   (rule "all_unused" (formula "3"))
-   (rule "true_left" (formula "3"))
-   (rule "all_pull_out3" (formula "4") (term "0,0"))
-   (rule "cnf_rightDist" (formula "4") (term "0,0,0"))
-   (rule "distr_forallAnd" (formula "4") (term "0,0"))
-   (rule "distr_forallAnd" (formula "4") (term "0"))
-   (rule "distr_forallAnd" (formula "4"))
-   (rule "andLeft" (formula "4"))
-   (rule "swapQuantifiersAll" (formula "5") (term "0"))
-   (rule "elim_forall4" (formula "5") (term "0,0"))
-   (rule "neq_or_2" (formula "5") (term "0,0"))
-   (rule "all_unused" (formula "5"))
-   (rule "all_unused" (formula "5"))
-   (rule "true_left" (formula "5"))
-   (rule "commute_or" (formula "4") (term "0,0,0"))
-   (rule "swapQuantifiersAll" (formula "4") (term "0"))
-   (rule "elim_forall4" (formula "4") (term "0,0"))
-   (rule "neq_or" (formula "4") (term "0,0"))
-   (rule "all_unused" (formula "4"))
-   (rule "all_unused" (formula "4"))
-   (rule "true_left" (formula "4"))
-   (rule "empty" (inst "el=el") (userinteraction))
-   (rule "notLeft" (formula "1"))
-   (rule "nnf_ex2all" (formula "4"))
-   (rule "allLeft" (formula "1") (inst "t=el_0"))
-   (rule "notLeft" (formula "1"))
-   (rule "close" (formula "5") (ifseqformula "2"))
+   (rule "replace_known_left" (formula "2") (term "0") (ifseqformula "1"))
+    (builtin "One Step Simplification" (formula "2"))
+   (rule "empty" (inst "set=set") (inst "el=el") (userinteraction))
+   (rule "nnf_notEx" (formula "1") (term "1,0"))
+   (rule "cnf_eqv" (formula "1") (term "0"))
+   (rule "nnf_notAll" (formula "1") (term "1,0,0"))
+    (builtin "One Step Simplification" (formula "1"))
+   (rule "distr_forallAnd" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "ex_pull_out3" (formula "1") (term "0"))
+   (rule "all_pull_out3" (formula "2") (term "0"))
+   (rule "swapQuantifiersAll" (formula "2"))
+   (rule "commute_or" (formula "2") (term "0,0"))
+    (builtin "One Step Simplification" (formula "2"))
+   (rule "allLeft" (formula "2") (inst "t=el_0"))
+   (rule "notLeft" (formula "2"))
+   (rule "close" (formula "4") (ifseqformula "3"))
 )
 )
 }

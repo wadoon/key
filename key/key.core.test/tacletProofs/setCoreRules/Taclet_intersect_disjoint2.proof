@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Wed Jun 26 10:58:15 CEST 2019
+#Mon Feb 10 13:47:52 CET 2020
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
 [SMTSettings]invariantForall=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
@@ -33,7 +33,7 @@
 [StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
 [SMTSettings]maxGenericSorts=2
-[StrategyProperty]OSS_OPTIONS_KEY=OSS_OFF
+[StrategyProperty]OSS_OPTIONS_KEY=OSS_ON
 [StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
 [SMTSettings]integersMinimum=-2147483645
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
@@ -42,78 +42,26 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Wed Jun 26 10:58:15 CEST 2019
-name=intersect_disjunctive1
+#Mon Feb 10 13:47:52 CET 2020
+name=intersect_disjoint2
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
 
 \proof {
 (keyLog "0" (keyUser "niklas" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "147")
+(autoModeTime "39")
 
 (branch "dummy ID"
-(rule "intersect_commutative" (formula "1") (term "1,0") (newnames "f_set,f_set1"))
-(rule "setEquality" (inst "set=set") (inst "set1=set1") (inst "el=el") (userinteraction))
-(rule "eqSymm" (formula "1") (term "0,0,0"))
-(rule "cnf_eqv" (formula "1") (term "0,0"))
-(rule "nnf_notAll" (formula "1") (term "1,0,0,0"))
-(rule "nnf_notEqv" (formula "1") (term "0,1,0,0,0"))
-(rule "distr_forallAnd" (formula "1") (term "0"))
-(rule "distr_forallAnd" (formula "1"))
-(rule "andLeft" (formula "1"))
-(rule "cnf_eqv" (formula "2") (term "0,1,0,0"))
-(rule "cnf_eqv" (formula "1") (term "0,1,0,0"))
-(rule "double_not" (formula "1") (term "1,0,0,1,0,0"))
-(rule "ex_pull_out3" (formula "1") (term "0,0"))
-(rule "cnf_rightDist" (formula "1") (term "0,0,0"))
-(rule "commute_or_2" (formula "1") (term "1,0,0,0"))
-(rule "shift_paren_or" (formula "1") (term "0,0,0,0"))
-(rule "commute_or" (formula "1") (term "0,1,0,0,0"))
-(rule "all_pull_out3" (formula "2") (term "0,0"))
-(rule "cnf_rightDist" (formula "2") (term "0,0,0"))
-(rule "distr_forallAnd" (formula "2") (term "0,0"))
-(rule "distr_forallAnd" (formula "2") (term "0"))
-(rule "distr_forallAnd" (formula "2"))
-(rule "andLeft" (formula "2"))
-(rule "swapQuantifiersAll" (formula "3") (term "0"))
-(rule "elim_forall4" (formula "3") (term "0,0"))
-(rule "neq_or_2" (formula "3") (term "0,0"))
-(rule "all_unused" (formula "3"))
-(rule "all_unused" (formula "3"))
-(rule "true_left" (formula "3"))
-(rule "commute_or" (formula "2") (term "0,0,0"))
-(rule "swapQuantifiersAll" (formula "2") (term "0"))
-(rule "elim_forall4" (formula "2") (term "0,0"))
-(rule "neq_or" (formula "2") (term "0,0"))
-(rule "all_unused" (formula "2"))
-(rule "all_unused" (formula "2"))
-(rule "true_left" (formula "2"))
-(rule "instAll" (formula "2") (term "0") (ifseqformula "1") (userinteraction))
-(rule "instAll" (formula "3") (term "1") (ifseqformula "1") (userinteraction))
-(rule "element_of_empty" (formula "1") (term "1,0,0"))
-(rule "concrete_or_4" (formula "1") (term "0,0"))
-(rule "element_of_empty" (formula "1") (term "0,1,1,0"))
-(rule "concrete_not_2" (formula "1") (term "1,1,0"))
-(rule "concrete_or_3" (formula "1") (term "1,0"))
-(rule "concrete_and_3" (formula "1") (term "0"))
+(rule "empty_right" (formula "1") (newnames "f_set,f_set1") (inst "el=el"))
 (rule "exLeft" (formula "1") (inst "sk=el_0"))
-(rule "eqSymm" (formula "1") (term "0"))
-(rule "replace_known_right" (formula "1") (term "0") (ifseqformula "4"))
-(rule "concrete_or_2" (formula "1"))
-(rule "intersect" (formula "2") (term "1,0,0,0,0"))
-(rule "intersect" (formula "2") (term "0,1,0,1,0,0"))
 (rule "intersect" (formula "1"))
 (rule "andLeft" (formula "1"))
-(rule "difference" (formula "3") (term "0,1,0,0,0,0"))
-(rule "intersect" (formula "3") (term "1,1,0,0,0,0"))
-(rule "difference" (formula "3") (term "0,0,1,0,1,0,0"))
-(rule "intersect" (formula "3") (term "1,0,1,0,1,0,0"))
-(rule "intersect" (formula "2"))
+(rule "difference" (formula "2"))
 (rule "andLeft" (formula "2"))
+(rule "notLeft" (formula "3"))
 (rule "difference" (formula "1"))
 (rule "andLeft" (formula "1"))
-(rule "notLeft" (formula "1"))
-(rule "close" (formula "5") (ifseqformula "1"))
+(rule "close" (formula "4") (ifseqformula "1"))
 )
 }

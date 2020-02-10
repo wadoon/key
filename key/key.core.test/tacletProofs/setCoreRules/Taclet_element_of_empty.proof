@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Wed Jun 26 10:46:16 CEST 2019
+#Mon Feb 10 13:46:41 CET 2020
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
 [SMTSettings]invariantForall=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
@@ -42,7 +42,7 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Wed Jun 26 10:46:16 CEST 2019
+#Mon Feb 10 13:46:41 CET 2020
 name=element_of_empty
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
@@ -50,15 +50,24 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 \proof {
 (keyLog "0" (keyUser "niklas" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "85")
+(autoModeTime "52")
 
 (branch "dummy ID"
-(rule "empty" (newnames "f_e") (inst "el=el") (userinteraction))
+(rule "empty" (newnames "f_e") (inst "set=set") (inst "el=el") (userinteraction))
 (rule "notRight" (formula "2"))
-(rule "notLeft" (formula "2"))
-(rule "nnf_ex2all" (formula "2"))
-(rule "allLeft" (formula "1") (inst "t=f_e"))
-(rule "notLeft" (formula "1"))
-(rule "close" (formula "3") (ifseqformula "2"))
+(rule "nnf_notEx" (formula "2") (term "1,0"))
+(rule "cnf_eqv" (formula "2") (term "0"))
+(rule "nnf_notAll" (formula "2") (term "1,0,0"))
+ (builtin "One Step Simplification" (formula "2"))
+(rule "distr_forallAnd" (formula "2"))
+(rule "andLeft" (formula "2"))
+(rule "ex_pull_out3" (formula "2") (term "0"))
+(rule "all_pull_out3" (formula "3") (term "0"))
+(rule "swapQuantifiersAll" (formula "3"))
+(rule "commute_or" (formula "3") (term "0,0"))
+ (builtin "One Step Simplification" (formula "3"))
+(rule "allLeft" (formula "3") (inst "t=f_e"))
+(rule "notLeft" (formula "3"))
+(rule "close" (formula "4") (ifseqformula "1"))
 )
 }

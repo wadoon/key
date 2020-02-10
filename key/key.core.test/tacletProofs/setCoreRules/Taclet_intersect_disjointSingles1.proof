@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Wed Jun 26 10:48:53 CEST 2019
+#Mon Feb 10 13:11:41 CET 2020
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
 [SMTSettings]invariantForall=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
@@ -24,7 +24,9 @@
 [StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
 [SMTSettings]useConstantsForBigOrSmallIntegers=true
 [StrategyProperty]MPS_OPTIONS_KEY=MPS_MERGE
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
 [Strategy]Timeout=-1
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
 [StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_RESTRICTED
 [SMTSettings]useUninterpretedMultiplication=true
 [StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT_INTERNAL
@@ -40,26 +42,29 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Wed Jun 26 10:48:53 CEST 2019
-name=empty_left
+#Mon Feb 10 13:11:41 CET 2020
+name=intersect_disjointSingles1
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
 
 \proof {
 (keyLog "0" (keyUser "niklas" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "69")
+(autoModeTime "14")
 
 (branch "dummy ID"
-(rule "impRight" (formula "1") (newnames "v_el,f_set") (userinteraction))
-(rule "notRight" (formula "2"))
-(rule "exLeft" (formula "2") (inst "sk=v_el_0"))
-(rule "applyEqRigid" (formula "2") (term "1") (ifseqformula "1"))
-(rule "empty" (inst "el=el") (userinteraction))
+(rule "impRight" (formula "1") (newnames "f_e,f_e1"))
 (rule "notLeft" (formula "1"))
-(rule "nnf_ex2all" (formula "3"))
-(rule "allLeft" (formula "1") (inst "t=v_el_0"))
-(rule "notLeft" (formula "1"))
-(rule "close" (formula "4") (ifseqformula "3"))
+(rule "eqSymm" (formula "2"))
+(rule "empty_right" (formula "1") (inst "el=el"))
+(rule "exLeft" (formula "1") (inst "sk=el_0"))
+(rule "intersect" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "element_of_single" (formula "1"))
+(rule "eqSymm" (formula "1"))
+(rule "element_of_single" (formula "2"))
+(rule "eqSymm" (formula "2"))
+(rule "applyEqRigid" (formula "4") (term "1") (ifseqformula "1"))
+(rule "close" (formula "4") (ifseqformula "2"))
 )
 }

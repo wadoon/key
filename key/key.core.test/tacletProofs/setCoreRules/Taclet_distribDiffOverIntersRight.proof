@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Mon Feb 10 13:43:22 CET 2020
+#Mon Feb 10 13:05:58 CET 2020
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
 [SMTSettings]invariantForall=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
@@ -33,7 +33,7 @@
 [StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
 [SMTSettings]maxGenericSorts=2
-[StrategyProperty]OSS_OPTIONS_KEY=OSS_ON
+[StrategyProperty]OSS_OPTIONS_KEY=OSS_OFF
 [StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
 [SMTSettings]integersMinimum=-2147483645
 [StrategyProperty]VBT_PHASE=VBT_SYM_EX
@@ -42,44 +42,70 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Mon Feb 10 13:43:22 CET 2020
-name=union_of_empty
+#Mon Feb 10 13:05:58 CET 2020
+name=distribDiffOverIntersRight
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
 
 \proof {
 (keyLog "0" (keyUser "niklas" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "245")
+(autoModeTime "63")
 
 (branch "dummy ID"
-(rule "set_equal" (formula "1") (newnames "f_set") (inst "el=el") (userinteraction))
+(rule "set_equal" (formula "1") (newnames "f_set,f_set1,f_set2") (inst "el=el") (userinteraction))
 (rule "allRight" (formula "1") (inst "sk=el_0"))
-(rule "union" (formula "1") (term "0"))
-(rule "commute_or" (formula "1") (term "0"))
+(rule "union" (formula "1") (term "1"))
+(rule "difference" (formula "1") (term "0"))
+(rule "difference" (formula "1") (term "1,1"))
+(rule "difference" (formula "1") (term "0,1"))
+(rule "intersect" (formula "1") (term "0,1,0"))
+(rule "cnf_rightDist" (formula "1") (term "1"))
+(rule "commute_or" (formula "1") (term "0,1"))
+(rule "cnf_rightDist" (formula "1") (term "1,1"))
+(rule "commute_or" (formula "1") (term "0,1,1"))
+(rule "cnf_rightDist" (formula "1") (term "0,1"))
+(rule "eq_or" (formula "1") (term "0,0,1"))
+(rule "commute_or" (formula "1") (term "1,0,1"))
+(rule "shift_paren_and" (formula "1") (term "1"))
 (rule "equiv_right" (formula "1"))
 (branch "Case 1"
-   (rule "replace_known_right" (formula "1") (term "1") (ifseqformula "2"))
-    (builtin "One Step Simplification" (formula "1"))
-   (rule "empty" (inst "set=set") (inst "el=el") (userinteraction))
-   (rule "nnf_notEx" (formula "1") (term "1,0"))
-   (rule "cnf_eqv" (formula "1") (term "0"))
-   (rule "nnf_notAll" (formula "1") (term "1,0,0"))
-    (builtin "One Step Simplification" (formula "1"))
-   (rule "distr_forallAnd" (formula "1"))
    (rule "andLeft" (formula "1"))
-   (rule "ex_pull_out3" (formula "1") (term "0"))
-   (rule "all_pull_out3" (formula "2") (term "0"))
-   (rule "swapQuantifiersAll" (formula "2"))
-   (rule "commute_or" (formula "2") (term "0,0"))
-    (builtin "One Step Simplification" (formula "2"))
-   (rule "allLeft" (formula "2") (inst "t=el_0"))
    (rule "notLeft" (formula "2"))
-   (rule "close" (formula "4") (ifseqformula "3"))
+   (rule "replace_known_left" (formula "3") (term "0,0,0") (ifseqformula "1"))
+   (rule "concrete_and_1" (formula "3") (term "0,0"))
+   (rule "replace_known_left" (formula "3") (term "0,0,0") (ifseqformula "1"))
+   (rule "concrete_or_1" (formula "3") (term "0,0"))
+   (rule "concrete_and_1" (formula "3") (term "0"))
+   (rule "replace_known_left" (formula "3") (term "0,0") (ifseqformula "1"))
+   (rule "concrete_or_1" (formula "3") (term "0"))
+   (rule "concrete_and_1" (formula "3"))
+   (rule "orRight" (formula "3"))
+   (rule "notRight" (formula "4"))
+   (rule "notRight" (formula "4"))
+   (rule "replace_known_left" (formula "4") (term "0") (ifseqformula "1"))
+   (rule "concrete_and_1" (formula "4"))
+   (rule "close" (formula "4") (ifseqformula "2"))
 )
 (branch "Case 2"
-   (rule "orRight" (formula "2"))
-   (rule "close" (formula "3") (ifseqformula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "replace_known_left" (formula "3") (term "0") (ifseqformula "1"))
+   (rule "concrete_or_1" (formula "3"))
+   (rule "true_left" (formula "3"))
+   (rule "replace_known_left" (formula "4") (term "0") (ifseqformula "1"))
+   (rule "concrete_and_1" (formula "4"))
+   (rule "notRight" (formula "4"))
+   (rule "andLeft" (formula "1"))
+   (rule "replace_known_left" (formula "4") (term "0") (ifseqformula "3"))
+   (rule "concrete_or_1" (formula "4"))
+   (rule "true_left" (formula "4"))
+   (rule "replace_known_left" (formula "4") (term "0,1") (ifseqformula "2"))
+   (rule "concrete_not_1" (formula "4") (term "1"))
+   (rule "concrete_or_4" (formula "4"))
+   (rule "notLeft" (formula "4"))
+   (rule "close" (formula "4") (ifseqformula "1"))
 )
 )
 }

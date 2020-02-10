@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Wed Jun 26 12:46:03 CEST 2019
+#Mon Feb 10 14:24:56 CET 2020
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
 [SMTSettings]invariantForall=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
@@ -42,60 +42,21 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Wed Jun 26 12:46:03 CEST 2019
-name=cardin_intersect
+#Mon Feb 10 14:24:56 CET 2020
+name=introduceVennPropertiesInter
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
 
 \proof {
 (keyLog "0" (keyUser "niklas" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "0")
+(autoModeTime "27")
 
 (branch "dummy ID"
-(rule "notRight" (formula "1") (newnames "f_set,f_set1") (userinteraction))
-(rule "impLeft" (formula "1") (userinteraction))
-(branch "Case 1"
-   (rule "eqClose" (formula "1") (userinteraction))
-   (rule "closeTrue" (formula "1") (userinteraction))
-)
-(branch "Case 2"
-   (rule "notLeft" (formula "1") (userinteraction))
-   (rule "andRight" (formula "1") (userinteraction))
-   (branch "Case 1"
-      (rule "cardin_subset" (inst "set=set") (inst "set1=set1") (userinteraction))
-      (rule "instAll" (formula "2") (term "0,0") (ifseqformula "1") (userinteraction))
-      (rule "instAll" (formula "3") (term "0,1") (ifseqformula "1") (userinteraction))
-      (rule "impLeft" (formula "1") (userinteraction))
-      (branch "Case 1"
-         (rule "subset" (formula "3") (inst "el=el") (userinteraction))
-         (rule "allRight" (formula "3") (inst "sk=el_0") (userinteraction))
-         (rule "impRight" (formula "3") (userinteraction))
-         (rule "intersect" (formula "1") (userinteraction))
-         (rule "andLeft" (formula "1") (userinteraction))
-         (rule "closeAntec" (formula "1") (ifseqformula "5") (userinteraction))
-      )
-      (branch "Case 2"
-         (rule "close" (formula "4") (ifseqformula "1") (userinteraction))
-      )
-   )
-   (branch "Case 2"
-      (rule "cardin_subset" (inst "set=set") (inst "set1=set1") (userinteraction))
-      (rule "instAll" (formula "2") (term "0,0") (ifseqformula "1") (userinteraction))
-      (rule "instAll" (formula "3") (term "0,1") (ifseqformula "1") (userinteraction))
-      (rule "impLeft" (formula "1") (userinteraction))
-      (branch "Case 1"
-         (rule "subset" (formula "3") (inst "el=el") (userinteraction))
-         (rule "allRight" (formula "3") (inst "sk=el_0") (userinteraction))
-         (rule "impRight" (formula "3") (userinteraction))
-         (rule "intersect" (formula "1") (userinteraction))
-         (rule "andLeft" (formula "1") (userinteraction))
-         (rule "closeAntec" (formula "2") (ifseqformula "5") (userinteraction))
-      )
-      (branch "Case 2"
-         (rule "close" (formula "4") (ifseqformula "1") (userinteraction))
-      )
-   )
-)
+(rule "introduceVennPropertiesDiff" (formula "1") (term "0,0,1,1,0,0,1,0") (newnames "f_set,f_set1") (userinteraction))
+(rule "eqClose" (formula "2") (term "0,0"))
+(rule "concrete_impl_1" (formula "2") (term "0"))
+(rule "double_not" (formula "2"))
+(rule "close" (formula "2") (ifseqformula "1"))
 )
 }

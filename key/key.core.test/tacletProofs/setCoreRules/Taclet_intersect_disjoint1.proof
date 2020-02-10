@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Wed Jul 03 09:09:39 CEST 2019
+#Mon Feb 10 13:47:24 CET 2020
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
 [SMTSettings]invariantForall=false
 [Strategy]ActiveStrategy=JavaCardDLStrategy
@@ -42,64 +42,27 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Wed Jul 03 09:09:39 CEST 2019
-name=cardin_disjunctive_union
+#Mon Feb 10 13:47:24 CET 2020
+name=intersect_disjoint1
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
 
 \proof {
 (keyLog "0" (keyUser "niklas" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 
-(autoModeTime "599")
+(autoModeTime "47")
 
 (branch "dummy ID"
-(rule "cardin_union_axiom" (newnames "v_set,v_set1") (inst "set=set") (inst "set1=set1") (userinteraction))
-(rule "allRight" (formula "2") (inst "sk=v_set_0"))
-(rule "allRight" (formula "2") (inst "sk=v_set1_0"))
-(rule "impRight" (formula "2"))
-(rule "eqSymm" (formula "2") (term "0,0"))
-(rule "polySimp_elimSub" (formula "2") (term "0,0,0"))
-(rule "eqSymm" (formula "2") (term "0,0"))
-(rule "polySimp_addComm0" (formula "3") (term "1"))
-(rule "allLeft" (formula "2") (inst "t=SetUnion(v_set_0, v_set1_0)"))
-(rule "allLeft" (formula "3") (inst "t=v_set_0"))
-(rule "allLeft" (formula "4") (inst "t=v_set1_0"))
-(rule "allLeft" (formula "2") (inst "t=SetUnion(v_set_0, v_set1_0)"))
-(rule "polySimp_pullOutFactor3" (formula "2") (term "0,1"))
-(rule "allLeft" (formula "3") (inst "t=v_set_0"))
-(rule "polySimp_addComm0" (formula "3") (term "0,1"))
-(rule "allLeft" (formula "4") (inst "t=v_set1_0"))
-(rule "polySimp_addComm0" (formula "4") (term "0,1"))
-(rule "allLeft" (formula "6") (inst "t=SetUnion(v_set_0, v_set1_0)"))
-(rule "allLeft" (formula "7") (inst "t=v_set_0"))
-(rule "polySimp_pullOutFactor3" (formula "7") (term "0,1"))
-(rule "allLeft" (formula "8") (inst "t=v_set1_0"))
-(rule "polySimp_addComm0" (formula "8") (term "0,1"))
-(rule "applyEq" (formula "12") (term "0") (ifseqformula "8"))
-(rule "polySimp_homoEq" (formula "12"))
-(rule "polySimp_mulComm0" (formula "12") (term "1,0"))
-(rule "polySimp_rightDist" (formula "12") (term "1,0"))
-(rule "polySimp_mulLiterals" (formula "12") (term "1,1,0"))
-(rule "polySimp_elimOne" (formula "12") (term "1,1,0"))
-(rule "polySimp_rightDist" (formula "12") (term "0,1,0"))
-(rule "polySimp_mulComm0" (formula "12") (term "0,0,1,0"))
-(rule "polySimp_addAssoc" (formula "12") (term "0"))
-(rule "polySimp_addAssoc" (formula "12") (term "0,0"))
-(rule "polySimp_addComm1" (formula "12") (term "0,0,0"))
-(rule "polySimp_pullOutFactor1b" (formula "12") (term "0,0"))
-(rule "add_literals" (formula "12") (term "1,1,0,0"))
-(rule "times_zero_1" (formula "12") (term "1,0,0"))
-(rule "add_zero_right" (formula "12") (term "0,0"))
-(rule "polySimp_pullOutFactor1" (formula "12") (term "0,0"))
-(rule "add_literals" (formula "12") (term "1,0,0"))
-(rule "times_zero_1" (formula "12") (term "0,0"))
-(rule "add_zero_left" (formula "12") (term "0"))
-(rule "applyEq" (formula "8") (term "0,0,1,1") (ifseqformula "1"))
- (builtin "One Step Simplification" (formula "8"))
-(rule "times_zero_2" (formula "8") (term "1,1"))
-(rule "add_zero_right" (formula "8") (term "1"))
-(rule "applyEq" (formula "12") (term "0,0") (ifseqformula "1"))
- (builtin "One Step Simplification" (formula "12"))
-(rule "closeTrue" (formula "12"))
+(rule "intersect_commutative" (formula "1") (term "0") (newnames "f_set,f_set1"))
+(rule "empty_right" (formula "1") (inst "el=el"))
+(rule "exLeft" (formula "1") (inst "sk=el_0"))
+(rule "intersect" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "intersect" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "difference" (formula "3"))
+(rule "andLeft" (formula "3"))
+(rule "notLeft" (formula "3"))
+(rule "close" (formula "3") (ifseqformula "2"))
 )
 }
