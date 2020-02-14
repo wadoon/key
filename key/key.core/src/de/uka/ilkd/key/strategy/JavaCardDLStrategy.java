@@ -625,6 +625,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupDefOpsPrimaryCategories(d);
 
         setupSystemInvariantSimp(d);
+        
+        setupSetNormalization(d);
 
         if (quantifierInstantiatedEnabled()) {
             setupFormulaNormalisation(d, numbers, locSetLDT);
@@ -2824,5 +2826,17 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return strategyProperties.getProperty(
                 StrategyProperties.STOPMODE_OPTIONS_KEY).equals(
                         StrategyProperties.STOPMODE_NONCLOSE);
+    }
+    
+    
+    
+    public void setupSetNormalization(RuleSetDispatchFeature d) {
+    	
+    	//copied from polySimp_mulAssoc
+    	bindRuleSet(d, "setUnionAssoc", 
+    			SumFeature.createSum(new Feature[] {
+    					applyTF("set", tf.monomial),
+    					applyTF("set1", tf.monomial),
+    					applyTF("set2", tf.atom), longConst(-80) }));//TODO find appropriate const.
     }
 }
