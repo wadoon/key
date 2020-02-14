@@ -367,10 +367,10 @@ public class JMLSpecFactory {
         progVar.paramVars = tb.paramVars(pm, false);
         progVar.resultVar = tb.resultVar(pm, false);
 
-        // MU: Changed the following line since it broke KeY when
-        // MU: a model method is used in a set-statement.
-        // progVar.excVar = pm.isModel() ? null : tb.excVar(pm, false);
-        progVar.excVar = tb.excVar(pm, false);
+        // MU: Tried to change the following line to always produce an exception variable
+        // MU: since it broke KeY when a model method is used in a set-statement.
+        // MU: That broke some test cases. Probably some special casing is needed.
+        progVar.excVar = pm.isModel() ? null : tb.excVar(pm, false);
 
         progVar.atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
         progVar.atPres = new LinkedHashMap<LocationVariable, Term>();
