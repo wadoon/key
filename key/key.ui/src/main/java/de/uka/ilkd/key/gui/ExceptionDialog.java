@@ -13,41 +13,26 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
-
-import org.key_project.util.java.StringUtil;
-
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.util.ExceptionTools;
+import org.key_project.util.java.StringUtil;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Dialog to display error messages.
@@ -175,9 +160,14 @@ public class ExceptionDialog extends JDialog {
         if(loc != null && loc.getFilename() != null && !"".equals(loc.getFilename())
                 && !"no file".equals(loc.getFilename())) {
             try {
-                List<String> lines = Files.readAllLines(
-                        Paths.get(loc.getFilename()), Charset.defaultCharset());
-                String line = lines.get(loc.getLine() - 1);
+                // read the content via URLs openStream() method
+                BufferedReader br = new BufferedReader(new InputStreamReader(
+                        loc.getFileURL().openStream()));
+                List<String> list = br.lines()
+                                      // optimization: read only as far as necessary
+                                      .limit(loc.getLine())
+                                      .collect(Collectors.toList());
+                String line = list.get(loc.getLine() - 1);
                 String pointLine = StringUtil.createLine(" ", loc.getColumn() - 1) + "^";
                 message.append(StringUtil.NEW_LINE).
                     append(StringUtil.NEW_LINE).

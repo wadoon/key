@@ -24,7 +24,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.ExceptionDialog;
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.Sequent;
@@ -42,8 +42,8 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.counterexample.AbstractCounterExampleGenerator;
 import de.uka.ilkd.key.smt.counterexample.AbstractSideProofCounterExampleGenerator;
 
-@SuppressWarnings("serial")
 public class CounterExampleAction extends MainWindowAction {
+    private static final long serialVersionUID = -1931682474791981751L;
 
     private static final String NAME = "Generate Counterexample";
     private static final String TOOLTIP = "Search for a counterexample for the selected goal";
@@ -55,6 +55,7 @@ public class CounterExampleAction extends MainWindowAction {
         Icon icon = IconFactory.counterExample(MainWindow.TOOLBAR_ICON_SIZE);
         putValue(SMALL_ICON, icon);
         init();
+        lookupAcceleratorKey();
     }
 
     /**

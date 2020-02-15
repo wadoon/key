@@ -15,7 +15,7 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 
 /*
@@ -29,7 +29,7 @@ public class SearchInProofTreeAction extends MainWindowAction {
 
     public SearchInProofTreeAction(MainWindow mainWindow) {
         super(mainWindow);
-        setName("Search in proof tree");
+        setName("Search in Proof Tree");
         setIcon(IconFactory.search2(16));
         setTooltip("Search for rule names or node numbers in the proof tree.");
         
