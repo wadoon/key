@@ -8,16 +8,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.JarURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
-import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * This class uses a temporary directory as a store for the proof-relevant files.
@@ -64,13 +63,16 @@ public final class DiskFileRepo extends AbstractFileRepo {
     @Override
     public InputStream getInputStream(URL url) throws IOException {
         String protocol = url.getProtocol();
-
         // currently, we support only two protocols: file and zip/jar
         if (protocol.equals("file")) {
             // url.getPath() may contain escaped characters -> we have to decode it
-            String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8.name());
+            // String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8.name());
 
-            return copyAndOpenInputStream(Paths.get(path));
+            try {
+                return copyAndOpenInputStream(Paths.get(url.toURI()));
+            } catch (URISyntaxException e) {
+                throw new IOException(e);
+            }
         } else if (protocol.equals("jar")) {        // TODO: zip?
             JarURLConnection juc = (JarURLConnection) url.openConnection();
             Path jarPath = Paths.get(juc.getJarFile().getName());
@@ -90,7 +92,9 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
             return entryURL.openStream();
         } else {
-            throw new IllegalArgumentException("This type of URL is not supported!");
+            Debug.out("This type of URL is not supported by the FileRepo!" +
+                " Resource will not be copied to FileRepo!");
+            return url.openStream();    // fallback without a copy
         }
     }
 
