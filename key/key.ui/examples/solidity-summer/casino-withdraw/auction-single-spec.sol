@@ -21,15 +21,37 @@ contract OneAuction {
     // Handling auction information
     struct AuctionInformation {
         AuctionMode mode;
-        address/* payable */owner;
+        address payable owner;
         uint closingTime;
     }
 
     // Handling bid information
     struct BidInformation {
-        address/* payable */bidder;
+        address payable bidder;
         uint value;
     }
+
+    /*@ invariant
+      @   address(this) != auction.owner,
+      @   address(this) != bid.bidder;
+      @*/
+    // I wanted to include bid.bidder != auction.owner, but that is violated by openAuction().
+    // Let's see whether that is a problem.
+
+    /* Recall:
+     * net(addr) := (funds sent from addr to this) - (funds sent from this to addr)
+     */
+    
+    /*@ invariant
+      @   let effective_net(a) be net(a) - withdrawableBalances[a]
+      @     in
+      @     bid.value == effective_net(bid.bidder) + effective_net(auction.owner),
+      @     (\forall address a;
+      @                  (a != auction.owner && a != bid.bidder && a != address(this))
+      @              ==> effective_net(a) == 0),
+      @     effective_net(auction.owner) <= 0,
+      @     auction.mode == Open ==> effective_net(auction.owner) == 0,
+      @*/
 
     // State of auction
     AuctionInformation private auction;
@@ -56,7 +78,7 @@ contract OneAuction {
     }
 
 
-    constructor (address/* payable */_owner) 
+    constructor (address payable _owner) 
         public
     {
         auction.mode = AuctionMode.NeverStarted;
@@ -77,6 +99,18 @@ contract OneAuction {
         bid.bidder = auction.owner;
     }
     
+    /*@ succeeds_only_if
+      @   auction.mode == AuctionMode.Open, // inMode(AuctionMode.Open) 
+      @   msg.sender != auction.owner,      // notBy(auction.owner)
+      @   msg.value > bid.value,
+      @   now <= auction.closingTime;
+      @ after_success
+      @   bid.value > \old(bid.value),
+      @   let effective_net(a) be net(a) - withdrawableBalances[a]
+      @   in
+      @     effective_net(bid.bidder) == msg.value, //even if bid.bidder is \old(bid.bidder)
+      @     \old(bid.bidder) != msg.sender ==> effective_net(\old(bid.bidder)) == 0;
+      @*/
     function makeBid()
         public
         payable
@@ -94,8 +128,17 @@ contract OneAuction {
         bid.bidder = msg.sender;
     }    
     
+    /*@ succeeds_only_if
+      @   msg.sender == auction.owner || msg.sender == bid.bidder,
+      @   now > auction.closingTime;
+      @ after_success
+      @   let effective_net(a) be net(a) - withdrawableBalances[a]
+      @   in
+      @   effective_net(auction.owner) == -net(bid.bidder);
+      @*/
     function closeAuction() 
         public
+        inMode(AuctionMode.Open) // reasonable assumtion, but makes locking of funds more likely
     {
         require (
             msg.sender == auction.owner || 
@@ -107,6 +150,10 @@ contract OneAuction {
         withdrawableBalances[auction.owner] += bid.value;
     }
 
+    /*@ after_success
+      @   withdrawableBalances[msg.sender] == 0,
+      @   net(msg.sender) == \old( net(msg.sender) + withdrawableBalances[msg.sender] );
+      @*/
     function withdraw() 
         public
     {

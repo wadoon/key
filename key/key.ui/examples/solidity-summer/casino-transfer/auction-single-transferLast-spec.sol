@@ -1,7 +1,6 @@
-// Poblem of BUGGY... contract fixed by adding
-// notBy(bid.bidder)
-// to makeBid()
-// Probably still buggy, see makeBid()
+// Q: Having the transfer at the end of makeBid(),
+//    is it OK that we now allow the bidder to bid again?
+// WA: I think yes. We'll ask KeY.
 
 pragma solidity >=0.5.5;
 
@@ -54,8 +53,7 @@ contract OneAuction {
       @                (a != auction.owner && a != bid.bidder && a != address(this))
       @            ==> net(a) == 0),
       @   net(auction.owner) <= 0,
-      @   auction.mode == Open ==> net(auction.owner) == 0,
-      @   net(auction.owner) < 0 ==> bid.value == 0;   // not sure this is needed
+      @   auction.mode == Open ==> net(auction.owner) == 0;
       @*/
     // State of auction
     AuctionInformation private auction;
@@ -100,38 +98,35 @@ contract OneAuction {
         bid.bidder = auction.owner;
     }
 
-    
+    // note that we here allow the bidder to overbid herself
     /*@ succeeds_only_if
       @   auction.mode == AuctionMode.Open, // inMode(AuctionMode.Open) 
       @   msg.sender != auction.owner,      // notBy(auction.owner)
-      @   msg.sender != bid.bidder,         // notBy(bid.bidder)
       @   msg.value > bid.value,
       @   now <= auction.closingTime;
       @ after_success
       @   bid.value > \old(bid.value),
-      @   net(bid.bidder) == msg.value,
-      @   net(\old(bid.bidder)) == 0;
+      @   net(bid.bidder) == msg.value, //even if bid.bidder is \old(bid.bidder)
+      @   \old(bid.bidder) != msg.sender ==> net(\old(bid.bidder)) == 0;
       @*/
     function makeBid()
         public
-        /* payable */
+        payable
         inMode(AuctionMode.Open) 
         notBy(auction.owner)
-        notBy(bid.bidder)
     {
         require (msg.value > bid.value);
         require (now <= auction.closingTime);
-    
-        // Transfer the old bid to the old bidder
-        uint tmp = bid.value;
-        address oldBidder = bid.bidder; 
+
+        // Remember the old bid
+        uint oldBid = bid.value;
+        address oldBidder = bid.bidder;
         // Set the new bid
-        uint val = msg.value;
-        bid.value = val;
-        address sender = msg.sender;
-        bid.bidder = sender;
+        bid.value = msg.value;
+        bid.bidder = msg.sender;
         
-        oldBidder.transfer(tmp);
+        // Transfer the old bid to the old bidder
+        oldBidder.transfer(oldBid);
     }    
     
     /*@ succeeds_only_if
@@ -144,16 +139,16 @@ contract OneAuction {
         public
         inMode(AuctionMode.Open) // reasonable assumtion, but makes locking of funds more likely
     {
-        /* require (
+        require (
             msg.sender == auction.owner || 
             msg.sender == bid.bidder
-        );*/
+        );
         require (now > auction.closingTime);
         
         auction.mode = AuctionMode.Closed;
         // Transfer the bid to the auction.owner
         uint tmp = bid.value;
-        bid.value = 0;    
+        bid.value = 0;        
         auction.owner.transfer(tmp);
     }
 
