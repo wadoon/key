@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\exists any _frL; (\exists int _I; (&#10;  (\forall any frL; (\forall int I; (&#10;     (&#10;       decrExpr(frL) &gt;= 0 &amp;&amp;&#10;       loopInvP(frL) &amp;&amp;&#10;       loopInvQ(frL) &amp;&amp;&#10;       !(!doneCondition(frL, I) &amp;&amp; guardVal(frL))&#10;     ) &lt;==&gt; (_frL == frL &amp;&amp; _I == I)&#10;))))))" postCondition="\result_1==\result_2">
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="(\exists any _frL; (\exists int _I; (&#10;  (\forall any frL; (\forall int I; (&#10;     (&#10;       decrExpr(frL) &gt;= 0 &amp;&amp;&#10;       loopInv(frL) &amp;&amp;&#10;       !(!doneCondition(frL, I) &amp;&amp; guardVal(frL))&#10;     ) &lt;==&gt; (_frL == frL &amp;&amp; _I == I)&#10;))))))" postCondition="\result_1==\result_2">
     <programOne>/*@ ae_constraint
   @   \disjoint(loopLocs, done);
   @*/
@@ -10,8 +10,7 @@ i = 0;
 
 /*@ ae_constraint
   @   decrExpr(\value(loopLocs)) &gt;= 0 &amp;&amp;
-  @   loopInvP(\value(loopLocs)) &amp;&amp;
-  @   loopInvQ(\value(loopLocs)) &amp;&amp;
+  @   loopInv(\value(loopLocs)) &amp;&amp;
   @   !doneCondition(\value(loopLocs), 0);
   @*/
 { ; }
@@ -19,8 +18,7 @@ i = 0;
 /*@ loop_invariant
   @   decrExpr(\value(loopLocs)) &gt;= 0 &amp;&amp;
   @   (done &lt;==&gt; doneCondition(\value(loopLocs), i)) &amp;&amp;
-  @   loopInvP(\value(loopLocs)) &amp;&amp;
-  @   loopInvQ(\value(loopLocs));
+  @   loopInv(\value(loopLocs));
   @ assignable loopLocs;
   @ decreases decrExpr(\value(loopLocs));
   @*/
@@ -66,8 +64,7 @@ while (!done &amp;&amp;
           @ accessible loopLocs;
           @ normal_behavior ensures
           @   done == true &amp;&amp;
-          @   doneCondition(\value(loopLocs), i+1) &amp;&amp;
-          @   loopInvP(\value(loopLocs));
+          @   doneCondition(\value(loopLocs), i+1);
           @ exceptional_behavior requires false;
           @ return_behavior requires false;
           @ break_behavior requires false;
@@ -93,14 +90,12 @@ while (!done &amp;&amp;
 
 
 
-
     
     /*@ assignable loopLocs;
       @ accessible loopLocs;
       @ normal_behavior ensures 
       @   (done &lt;==&gt; doneCondition(\value(loopLocs), i+1)) &amp;&amp;
-      @   loopInvP(\value(loopLocs)) &amp;&amp;
-      @   loopInvQ(\value(loopLocs)) &amp;&amp;
+      @   loopInv(\value(loopLocs)) &amp;&amp;
       @   decrExpr(\value(loopLocs)) &gt;= 0 &amp;&amp;
       @   oldDecrExpr &gt; decrExpr(\value(loopLocs));
       @ exceptional_behavior requires false;
@@ -122,8 +117,7 @@ i = 0;
 
 /*@ ae_constraint
   @   decrExpr(\value(loopLocs)) &gt;= 0 &amp;&amp;
-  @   loopInvP(\value(loopLocs)) &amp;&amp;
-  @   loopInvQ(\value(loopLocs)) &amp;&amp;
+  @   loopInv(\value(loopLocs)) &amp;&amp;
   @   !doneCondition(\value(loopLocs), 0);
   @*/
 { ; }
@@ -131,8 +125,7 @@ i = 0;
 /*@ loop_invariant
   @   decrExpr(\value(loopLocs)) &gt;= 0 &amp;&amp;
   @   !doneCondition(\value(loopLocs), i) &amp;&amp;
-  @   loopInvP(\value(loopLocs)) &amp;&amp;
-  @   loopInvQ(\value(loopLocs));
+  @   loopInv(\value(loopLocs));
   @ assignable loopLocs;
   @ decreases decrExpr(\value(loopLocs));
   @*/
@@ -178,8 +171,7 @@ while (
           @ accessible loopLocs;
           @ normal_behavior ensures
           @
-          @   doneCondition(\value(loopLocs), i+1) &amp;&amp;
-          @   loopInvP(\value(loopLocs));
+          @   doneCondition(\value(loopLocs), i+1);
           @ exceptional_behavior requires false;
           @ return_behavior requires false;
           @ break_behavior requires false;
@@ -197,8 +189,7 @@ while (
           @ ensures
           @   i == oldI + 1 &amp;&amp;
           @   doneCondition(\value(loopLocs), i+1) &amp;&amp;
-          @   loopInvP(\value(loopLocs)) &amp;&amp;
-          @   loopInvQ(\value(loopLocs)) &amp;&amp;
+          @   loopInv(\value(loopLocs)) &amp;&amp;
           @   decrExpr(\value(loopLocs)) &gt;= 0;
           @ exceptional_behavior requires false;
           @ return_behavior requires false;
@@ -211,8 +202,7 @@ while (
       @ accessible loopLocs;
       @ normal_behavior ensures 
       @   !doneCondition(\value(loopLocs), i+1) &amp;&amp;
-      @   loopInvP(\value(loopLocs)) &amp;&amp;
-      @   loopInvQ(\value(loopLocs)) &amp;&amp;
+      @   loopInv(\value(loopLocs)) &amp;&amp;
       @   decrExpr(\value(loopLocs)) &gt;= 0 &amp;&amp;
       @   oldDecrExpr &gt; decrExpr(\value(loopLocs));
       @ exceptional_behavior requires false;
@@ -223,7 +213,8 @@ while (
     \abstract_statement Q;
 
     i++;
-}</programTwo>
+}
+</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
         <locationSet locsetName="relevant">
@@ -241,7 +232,7 @@ while (
         </function>
     </functions>
     <predicates>
-        <predicate predName="loopInvP">
+        <predicate predName="loopInv">
             <argSort>any</argSort>
         </predicate>
         <predicate predName="doneExpr">
@@ -253,9 +244,6 @@ while (
         <predicate predName="doneCondition">
             <argSort>any</argSort>
             <argSort>int</argSort>
-        </predicate>
-        <predicate predName="loopInvQ">
-            <argSort>any</argSort>
         </predicate>
     </predicates>
     <programVariables>
