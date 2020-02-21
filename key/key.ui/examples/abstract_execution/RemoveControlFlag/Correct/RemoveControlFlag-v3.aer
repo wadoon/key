@@ -161,7 +161,7 @@ while (
           @   decrExpr(\value(loopLocs)) &gt;= 0;
           @ continue_behavior requires false;
           @*/
-        \abstract_statement P;
+        \abstract_statement R;
     }
     
     /*@ assignable loopLocs;
