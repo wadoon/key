@@ -95,6 +95,7 @@ while (!done &amp;&amp;
 
 
 
+
         done = true;
     }
     
@@ -119,7 +120,7 @@ while (!done &amp;&amp;
   @*/
 { ; }
 
-done = false;
+
 i = 0;
 
 /*@ ae_constraint
@@ -131,6 +132,7 @@ i = 0;
 
 /*@ loop_invariant
   @   i &gt;= 0 &amp;&amp; decrExpr(\value(loopFootprint), i) &gt;= 0 &amp;&amp;
+  @
   @   !doneCondition(\value(loopFootprint), i) &amp;&amp;
   @   unsuccessfulInv(\value(frameBody), \value(loopFootprint), i);
   @ assignable frameBody;
