@@ -177,7 +177,7 @@ while (
           @ break_behavior requires false;
           @ continue_behavior requires false;
           @*/
-        \abstract_statement P;
+        \abstract_statement R; // P'
 
         //@ ghost int oldI = i;
         //@ ae_constraint \disjoint(loopLocs, oldI);
@@ -195,7 +195,7 @@ while (
           @ return_behavior requires false;
           @ continue_behavior requires false;
           @*/
-        \abstract_statement R; // Q'
+        \abstract_statement S; // Q'
     }
     
     /*@ assignable loopLocs;
