@@ -40,10 +40,7 @@ while (!done &amp;&amp;
     { ; }
     
     //@ ghost int oldDecrExpr; // = decrExpr(\value(loopLocs));
-
-    /*@ ae_constraint
-      @   \disjoint(loopLocs, oldDecrExpr);
-      @*/
+    //@ ae_constraint \disjoint(loopLocs, oldDecrExpr);
     { ; }
 
     /*@ assignable \hasTo(oldDecrExpr);
@@ -71,8 +68,6 @@ while (!done &amp;&amp;
           @   done == true &amp;&amp;
           @   doneCondition(\value(loopLocs), i+1) &amp;&amp;
           @   loopInvP(\value(loopLocs));
-          @
-          @
           @ exceptional_behavior requires false;
           @ return_behavior requires false;
           @ break_behavior requires false;
@@ -80,6 +75,25 @@ while (!done &amp;&amp;
           @*/
         \abstract_statement P;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     /*@ assignable loopLocs;
       @ accessible loopLocs;
@@ -138,10 +152,7 @@ while (
 
     
     //@ ghost int oldDecrExpr; // = decrExpr(\value(loopLocs));
-
-    /*@ ae_constraint
-      @   \disjoint(loopLocs, oldDecrExpr);
-      @*/
+    //@ ae_constraint \disjoint(loopLocs, oldDecrExpr);
     { ; }
 
     /*@ assignable \hasTo(oldDecrExpr);
@@ -163,20 +174,37 @@ while (
           @*/
         \abstract_expression boolean cond
     ) {
-        /*@ assignable loopLocs, i;
+        /*@ assignable loopLocs;
           @ accessible loopLocs;
+          @ normal_behavior ensures
+          @
+          @   doneCondition(\value(loopLocs), i+1) &amp;&amp;
+          @   loopInvP(\value(loopLocs));
           @ exceptional_behavior requires false;
           @ return_behavior requires false;
+          @ break_behavior requires false;
+          @ continue_behavior requires false;
+          @*/
+        \abstract_statement P;
+
+        //@ ghost int oldI = i;
+        //@ ae_constraint \disjoint(loopLocs, oldI);
+        { ; }
+    
+        /*@ assignable loopLocs, i;
+          @ accessible loopLocs;
           @ break_behavior requires true;
           @ ensures
-          @   i == i + 1 &amp;&amp;
+          @   i == oldI + 1 &amp;&amp;
           @   doneCondition(\value(loopLocs), i+1) &amp;&amp;
           @   loopInvP(\value(loopLocs)) &amp;&amp;
           @   loopInvQ(\value(loopLocs)) &amp;&amp;
           @   decrExpr(\value(loopLocs)) &gt;= 0;
+          @ exceptional_behavior requires false;
+          @ return_behavior requires false;
           @ continue_behavior requires false;
           @*/
-        \abstract_statement R;
+        \abstract_statement R; // Q'
     }
     
     /*@ assignable loopLocs;
