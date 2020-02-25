@@ -237,8 +237,10 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		String modifier = "private";
 
 		StringBuffer parameters = new StringBuffer("Message msg,");
-		ctx.parameterList().parameter().stream().forEach(param -> 
-		parameters.append(visit(param) + ","));
+		if (ctx.parameterList() != null) {
+			ctx.parameterList().parameter().stream().forEach(param -> 
+				parameters.append(visit(param) + ","));
+		}
 		if (parameters.length() > 0) parameters.deleteCharAt(parameters.length() - 1);
 		String returnType = ctx.getParent() instanceof ConstructorDefinitionContext ? "" : "void";
 		return modifier + " " + returnType + " " + modName + "(" + parameters + ")" + visit(ctx.block());
