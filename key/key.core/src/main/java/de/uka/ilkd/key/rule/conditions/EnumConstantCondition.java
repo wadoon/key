@@ -72,6 +72,14 @@ public final class EnumConstantCondition extends VariableConditionAdapter {
             		return false;
             	}
             	progvar = services.getJavaInfo().getAttribute(enumClassName[1],enumClassName[0]);
+            } if (subst instanceof Term && 
+            		((Term)subst).sort() == services.getTypeConverter().getHeapLDT().getFieldSort()) {
+            	
+            	String[] enumClassName = ((Term)subst).op().name().toString().split("::\\$");
+            	if (enumClassName == null || enumClassName.length<2) {
+            		return false;
+            	}
+            	progvar = services.getJavaInfo().getAttribute(enumClassName[1],enumClassName[0]);
             } else {
             	return false;
             }
