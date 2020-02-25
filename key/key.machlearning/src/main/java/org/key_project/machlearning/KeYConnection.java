@@ -49,9 +49,11 @@ public class KeYConnection {
         commands.put("set", this::setProperty);
         commands.put("quit", c -> { System.exit(0); return null; });
         commands.put("print", this::printSequent);
+        commands.put("open", this::openGoals);
     }
 
     public static Map<String, Tactic> TACTICS = new HashMap<>();
+
     static {
         TACTICS.put("AUTO", new AutoTactic(""));
         TACTICS.put("AUTO_NOSPLIT", new AutoTactic("[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_OFF"));
@@ -60,7 +62,6 @@ public class KeYConnection {
         TACTICS.put("SMT", new SMTTactic());
         FilterTactic.registerTactics(TACTICS);
     }
-
     public KeYConnection(int verbosity, boolean interactive) {
         if (interactive) {
             uiCtrl = MainWindow.getInstance(true).getUserInterface();
@@ -133,6 +134,10 @@ public class KeYConnection {
         throw new NoSuchElementException("Unknown id " + id + " among the goals.");
     }
 
+    private JSONObject openGoals(JSONObject jsonObject) {
+        return Server.success("ids", filterGoalIds(1));
+    }
+
     private Node findNode(int id) {
         // Recursion may not been an option due to stack overflow
         Deque<Node> todo = new LinkedList<>();
@@ -183,7 +188,7 @@ public class KeYConnection {
         JSONArray ids = new JSONArray();
         for (Goal goal : ongoingProof.openGoals()) {
             if(below == 1 || isBelow(goal.node(), below))
-            ids.add(goal.node().serialNr());
+                ids.add(goal.node().serialNr());
         }
         return ids;
     }
