@@ -17,6 +17,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
+import de.uka.ilkd.key.proof.mgt.RuleJustification;
+import de.uka.ilkd.key.rule.Equm2Equals;
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -228,6 +231,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         String name = name();
         ProofSettings settings = getPreferences();
         initConfig.setSettings(settings);
+        Equm2Equals.register(initConfig);
         return ProofAggregate.createProofAggregate(
                 new Proof(name, 
                           problemTerm, 

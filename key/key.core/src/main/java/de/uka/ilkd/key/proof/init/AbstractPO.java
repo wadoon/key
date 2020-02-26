@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+import de.uka.ilkd.key.rule.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -44,9 +45,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
@@ -581,6 +579,13 @@ public abstract class AbstractPO implements IPersistablePO {
 
     protected void assignPOTerms(Term... poTerms) {
         this.poTerms = poTerms;
+    }
+
+    protected void instantiateDynamicRules(InitConfig proofConfig) {
+        //TODO weigl: replace by an inteface and a ServiceProvider call
+        Equm2Equals.register(proofConfig);
+        //taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
+        //proofConfig.registerRule(t, AxiomJustification.INSTANCE);
     }
 
     /**

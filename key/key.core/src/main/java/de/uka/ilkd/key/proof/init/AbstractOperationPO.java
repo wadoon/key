@@ -26,6 +26,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -527,7 +528,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // for JML annotation statements
         generateWdTaclets(proofConfig);
+
+        // support for dynamic taclets/rules
+        instantiateDynamicRules(proofConfig);
     }
+
 
     /**
      * Checks if an uninterpreted predicate is added to the postcondition or not.
