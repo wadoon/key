@@ -249,7 +249,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     @Override
     public void readProblem() throws ProofInputException {
-        assert proofConfig == null;
+        //assert proofConfig == null;
         
         final Services proofServices = postInit();
         
