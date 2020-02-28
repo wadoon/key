@@ -56,10 +56,14 @@ public final class Location {
         URL url = null;
         if (filename != null) {
             // catch-rethrow to avoid to change the interface too much
-            try {
-                url = new URL("file://" + filename);
+            try{
+                url = new URL(filename);
             } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
+                try {
+                    url = new URL("file://" + filename);
+                } catch (MalformedURLException e1) {
+                    throw new RuntimeException("Could not convert " + filename + " into an URL", e);
+                }
             }
         }
         this.filename = url;
