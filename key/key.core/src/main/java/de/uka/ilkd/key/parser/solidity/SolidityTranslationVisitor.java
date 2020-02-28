@@ -157,17 +157,24 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	}
 
 	private String convertType(String text) {
-		String typeName = text;
+		String typeName = text.replace(" ", "");
 		switch (text) {
 		case "uint": case "uint256": case "bytes32": 
 			typeName = "int";break;
 		case "bool"    : typeName = "boolean";break;
 		case "address" : typeName = "Address";break;
+		case "address[]" : typeName = "Address[]";break;
+		case "uint[]" : typeName = "int[]";break;
+		case "uint256[]" : typeName = "int[]";break;
+		case "bytes32[]" : typeName = "int[]";break;
 		case "mapping(address=>uint)": typeName="int[]";break;
 		case "mapping(uint=>uint)": typeName="int[]";break;
 		case "mapping(uint=>address)": typeName="Address[]";break;
+		case "mapping(address=>bool)": typeName="boolean[]";break;
+		case "mapping(uint=>bool)": typeName="boolean[]";break;
 		default: break;		
 		}
+
 		return typeName;
 	}
 
@@ -547,7 +554,20 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public String visitForStatement(SolidityParser.ForStatementContext ctx) { return visitChildren(ctx); }
+	@Override public String visitForStatement(SolidityParser.ForStatementContext ctx) { 
+		StringBuffer result = new StringBuffer("for (");
+		String decl = visit(ctx.simpleStatement());
+		String guard = visit(ctx.expression(0));
+	
+		String update = visit(ctx.expression(1));
+		String body = visit(ctx.statement());
+		
+		return result.append(decl).
+				append(guard).append(";").
+				append(update).append(")").append("{").
+										   append(body).
+										   append("}").toString(); 
+	}
 	/**
 	 * {@inheritDoc}
 	 *
