@@ -179,7 +179,7 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
         }
 
         long stop = System.currentTimeMillis();
-        System.out.println("JavaJMLTokenFactory.getTokenList : " + (stop - startTime) + " ms");
+        //System.out.println("JavaJMLTokenFactory.getTokenList : " + (stop - startTime) + " ms");
         return firstToken;
     }
 
