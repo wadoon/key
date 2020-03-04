@@ -3,13 +3,12 @@ package de.uka.ilkd.key.strategy.normalization;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import org.jetbrains.annotations.NotNull;
+import de.uka.ilkd.key.util.LinkedHashMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
 public class SimpleFormulaNormalization {
@@ -49,7 +48,7 @@ public class SimpleFormulaNormalization {
         return ret.toTerm(termBuilder);
     }
 
-    private Term replace(Term term, @NotNull HashMap<Term, Term> replaceMap) {
+    private Term replace(Term term, HashMap<Term, Term> replaceMap) {
         if (replaceMap.containsKey(term)) {
             term = replaceMap.get(term);
         }
@@ -98,7 +97,7 @@ public class SimpleFormulaNormalization {
                 HashMap<Term, Term> extReplaceMap = new HashMap<Term, Term>(
                         replaceMap);
                 LinkedHashSet<Term> extBoundVars = new LinkedHashSet<Term>(boundVars);
-                QuantifiableVariable freshQV = freshQV(qv.sort());
+                QuantifiableVariable freshQV = freshQV(qv);
                 extBoundVars.add(termBuilder.var(freshQV));
                 extReplaceMap.put(termBuilder.var(qv), termBuilder.var(freshQV));
                 return new QuantifiedClauseSet(polarity ? quant: invert(quant), freshQV, normalize(a, polarity,
@@ -211,10 +210,17 @@ public class SimpleFormulaNormalization {
 
     private static final String VAR_NAME_PREFIX = "norm_var_";
     private int var_counter = 0;
+    private LinkedHashMap<QuantifiableVariable, QuantifiableVariable> variableLookupMap = new LinkedHashMap<>();
 
-    private QuantifiableVariable freshQV(Sort sort) {
-        return (QuantifiableVariable) (new LogicVariable(
-                new Name(VAR_NAME_PREFIX + var_counter++), sort));
+    public QuantifiableVariable lookup(QuantifiableVariable qv) {
+        return variableLookupMap.get(qv);
+    }
+
+    private QuantifiableVariable freshQV(QuantifiableVariable qv) {
+        QuantifiableVariable fresh = (QuantifiableVariable) (new LogicVariable(
+                new Name(VAR_NAME_PREFIX + var_counter++), qv.sort()));
+        variableLookupMap.put(fresh, qv);
+        return fresh;
     }
 
 

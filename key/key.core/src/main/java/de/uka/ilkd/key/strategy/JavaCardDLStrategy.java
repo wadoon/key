@@ -626,7 +626,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         setupSystemInvariantSimp(d);
 
-        if (quantifierInstantiatedEnabled()) {
+        if (quantifierInstantiatedEnabled() && !formulaNormalizationEnabled()) {
             setupFormulaNormalisation(d, numbers, locSetLDT);
         } else {
             bindRuleSet(d, "negationNormalForm", inftyConst());
@@ -971,6 +971,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private boolean quantifierInstantiatedEnabled() {
         return !StrategyProperties.QUANTIFIERS_NONE.equals(strategyProperties
                 .getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY));
+    }
+
+    private boolean formulaNormalizationEnabled() {
+        // TODO add Property
+        return true;
     }
 
     private boolean classAxiomDelayedApplication() {
@@ -1390,10 +1395,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     new Feature[] {
                         FocusInAntecFeature.INSTANCE,
                         applyTF(FocusProjection.create(0),
-                            add(ff.quantifiedClauseSet,
+                            //add(ff.quantifiedClauseSet,
                                 instQuantifiersWithQueries() ?
                                     longTermConst(0)
-                                    : ff.notContainsExecutable)),
+                                    : ff.notContainsExecutable),
                         forEach(varInst,
                             HeuristicInstantiation.INSTANCE,
                             add(instantiate("t", varInst),
