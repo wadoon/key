@@ -99,6 +99,11 @@ public final class Goal {
      */
     private NamespaceSet localNamespaces;
 
+    /**
+     * The normalized representation of the sequent.
+     */
+    private Term normalizedSequent;
+
     /*
      * creates a new goal referencing the given node.
      */
