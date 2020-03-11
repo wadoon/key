@@ -111,7 +111,7 @@ public final class DefaultTermParser {
         } catch (RecognitionException re) {
             // problemParser cannot be null since exception is thrown during parsing.
             String message = parser.getErrorMessage(re);
-            throw new ParserException(message, new Location(re)).initCause(re);
+            throw new ParserException(message, Location.create(re)).initCause(re);
         } catch (IOException tse) {
             throw new ParserException(tse.getMessage(), null).initCause(tse);
         }
@@ -147,7 +147,7 @@ public final class DefaultTermParser {
         } catch (RecognitionException re) {
             // problemParser cannot be null since exception is thrown during parsing.
             String message = p.getErrorMessage(re);
-            throw new ParserException(message, new Location(re));
+            throw new ParserException(message, Location.create(re));
         } catch (IOException tse) {
             throw new ParserException(tse.getMessage(), null);
         }
