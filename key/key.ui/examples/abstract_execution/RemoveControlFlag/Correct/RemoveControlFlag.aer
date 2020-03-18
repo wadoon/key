@@ -171,7 +171,7 @@ while (
           @ accessible loopLocs;
           @ normal_behavior ensures
           @
-          @   doneCondition(\value(loopLocs), i+1);
+          @ doneCondition(\value(loopLocs), i+1);
           @ exceptional_behavior requires false;
           @ return_behavior requires false;
           @ break_behavior requires false;
