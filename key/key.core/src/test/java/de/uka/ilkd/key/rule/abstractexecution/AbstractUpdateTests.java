@@ -226,6 +226,7 @@ public class AbstractUpdateTests extends AbstractTestTermParser {
         simplificationTests.put("simplificationTest20.key", true);
         simplificationTests.put("simplificationTest21-INCORR.key", false);
         simplificationTests.put("simplificationTest22.key", true);
+        simplificationTests.put("simplificationTest23-INCORR.key", false);
 
         for (final String keyFile : simplificationTests.keySet()) {
             final Proof proof = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX, keyFile);

@@ -14,14 +14,19 @@ package de.uka.ilkd.key.abstractexecution.rule;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.IrrelevantAssignable;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -157,6 +162,21 @@ public class DropAbstractUpdateInSelectRuleApp extends DefaultBuiltInRuleApp {
                 .collect(Collectors.toList());
 
         for (final Term frame : frames) {
+            // Check whether frame is concrete and disjoint from (o,f)
+
+            final Set<AbstractUpdateLoc> frameLocs = AbstractUpdateFactory
+                    .abstrUpdateLocsFromUnionTerm(frame, Optional.empty(), services);
+
+            final boolean triviallyIrrelevant = frameLocs.stream()
+                    .map(AbstractExecutionUtils::unwrapHasTo)
+                    .allMatch(loc -> loc instanceof EmptyLoc || loc instanceof IrrelevantAssignable
+                            || loc instanceof PVLoc || (loc instanceof FieldLoc
+                                    && ((FieldLoc) loc).getFieldTerm().op() != f.op()));
+            
+            if (triviallyIrrelevant) {
+                continue;
+            }
+
             // Look for "==> elementOf(o,f,frame)"
 
             final Term elementOfFor = tb.elementOf(o, f, frame);
