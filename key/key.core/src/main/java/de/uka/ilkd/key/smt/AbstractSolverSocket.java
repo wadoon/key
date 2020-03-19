@@ -334,7 +334,7 @@ class CVC4Socket extends AbstractSolverSocket{
                 sc.setFinalResult(SMTSolverResult.createValidResult(name));
                 sc.setState(FINISH);
                 pipe.close();
-            } else if(message.indexOf(SAT) > -1){
+            } else if(message.equals(SAT)){
                 sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
 								pipe.sendMessage("(get-model)");
 								pipe.sendMessage("(exit)\n");
