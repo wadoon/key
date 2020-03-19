@@ -130,7 +130,11 @@ public class FloatHandler implements SMTHandler {
                 }
             }
             String opName = fpop.getOpName();
-            SExpr.Type exprType = fpop.getImageSort().equals(SMTSort.BOOL) ? SExpr.Type.BOOL : SExpr.Type.FLOAT;
+            SExpr.Type exprType;
+            if (fpop.getImageSort().equals(SMTSort.BOOL)) exprType = SExpr.Type.BOOL;
+            else if (fpop.getImageSort().equals(SMTSort.DOUBLE)) exprType = SExpr.Type.DOUBLE;
+            else exprType = SExpr.Type.FLOAT;
+
             ImmutableArray<Term> subs = term.subs();
             List<SExpr> translatedSubs = new LinkedList<>();
 
