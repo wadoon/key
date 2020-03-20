@@ -78,7 +78,7 @@ public class PredicateDeclaration implements FuncOrPredDecl {
     public static Optional<FuncOrPredDecl> fromString(final String str)
             throws IllegalArgumentException {
         final Pattern pattern = Pattern
-                .compile("^([a-zA-Z0-9_]+)(?:\\(([a-zA-Z0-9_.]+(?:,[a-zA-Z0-9_.]+)*)\\))?$");
+                .compile("^([a-zA-Z0-9_]+)(?:\\(([a-zA-Z0-9_.]+(?:\\[\\])?(?:,[a-zA-Z0-9_.]+(?:\\[\\])?)*)\\))?$");
         final Matcher matcher = pattern.matcher(str.replaceAll(" ", ""));
 
         if (!matcher.matches()) {

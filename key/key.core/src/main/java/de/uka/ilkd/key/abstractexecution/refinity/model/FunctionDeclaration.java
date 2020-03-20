@@ -86,7 +86,7 @@ public class FunctionDeclaration implements FuncOrPredDecl {
     public static Optional<FuncOrPredDecl> fromString(final String str)
             throws IllegalArgumentException {
         final Pattern pattern = Pattern.compile(
-                "^ *([a-zA-Z0-9_.]+) +([a-zA-Z0-9_]+) *(?:\\( *([a-zA-Z0-9_.]+(?: *, *[a-zA-Z0-9_.]+)* *)\\))? *$");
+                "^ *([a-zA-Z0-9_.]+(?: *\\[\\])?) +([a-zA-Z0-9_]+) *(?:\\( *([a-zA-Z0-9_.]+(?: *\\[\\])?(?: *, *[a-zA-Z0-9_.]+(?: *\\[\\])?)* *)\\))? *$");
         final Matcher matcher = pattern.matcher(str);
 
         if (!matcher.matches()) {

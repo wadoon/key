@@ -101,7 +101,7 @@ public class ProgramVariableInputDialog extends JDialog {
                 } catch (RuntimeException exc) {
                     JOptionPane.showMessageDialog(instance,
                             "<html>There's an error in your syntax, please correct it and try again<br/><br/>Message:<br/>"
-                                    + exc.getMessage() + "</html>",
+                                    + exc.getMessage(),
                             "Syntax error", JOptionPane.ERROR_MESSAGE);
                 }
             }

@@ -103,14 +103,14 @@ public class ProgramVariableDeclaration extends NullarySymbolDeclaration {
 
     public static Optional<ProgramVariableDeclaration> fromString(final String str)
             throws IllegalArgumentException {
-        final Pattern pattern = Pattern.compile("^([a-zA-Z0-9_.]+) +([a-zA-Z0-9_]+)$");
+        final Pattern pattern = Pattern.compile("^([a-zA-Z0-9_.]+(?: *\\[\\] *)?) +([a-zA-Z0-9_]+)$");
         final Matcher matcher = pattern.matcher(str.trim());
 
         if (!matcher.matches()) {
             return Optional.empty();
         }
 
-        return Optional.of(new ProgramVariableDeclaration(matcher.group(1), matcher.group(2)));
+        return Optional.of(new ProgramVariableDeclaration(matcher.group(1).replace(" ", ""), matcher.group(2)));
     }
 
     @Override
