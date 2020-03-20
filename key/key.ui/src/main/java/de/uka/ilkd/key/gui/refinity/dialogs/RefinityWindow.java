@@ -1085,6 +1085,8 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                 if (progVarDeclsList.getSelectedIndices().length == 1) {
                     final ProgramVariableDeclaration selectedElem = progVarDeclsList
                             .getSelectedValue();
+                    // to prevent problems when user changes nothing and clicks "ok"
+                    services.getNamespaces().programVariables().remove(new Name(selectedElem.getName()));
                     final ProgramVariableDeclaration pd = ProgramVariableInputDialog
                             .showInputDialog(RefinityWindow.this, selectedElem, services);
                     if (pd != null && !pd.equals(selectedElem)) {
@@ -1092,7 +1094,13 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                                 .remove(new Name(selectedElem.getName()));
                         progVarDeclsListModel.set(progVarDeclsList.getSelectedIndex(), pd);
                         refresh();
-                    }
+                    } else {
+                        // add again
+                        try {
+                            selectedElem.checkAndRegister(services);
+                        } catch (RuntimeException exc) {
+                        }
+                    }                    
                 }
             }
         });
@@ -1178,6 +1186,8 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                 if (locsetDeclsList.getSelectedIndices().length == 1) {
                     final AbstractLocsetDeclaration selectedElem = //
                             locsetDeclsList.getSelectedValue();
+                    // to prevent problems when user changes nothing and clicks "ok"
+                    services.getNamespaces().programVariables().remove(new Name(selectedElem.getName()));
                     final AbstractLocsetDeclaration ls = LocsetInputDialog.showInputDialog( //
                             RefinityWindow.this, selectedElem, services);
                     if (ls != null && !ls.equals(selectedElem)) {
@@ -1185,7 +1195,13 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                                 .remove(new Name(selectedElem.getName()));
                         locsetDeclsListModel.set(locsetDeclsList.getSelectedIndex(), ls);
                         refresh();
-                    }
+                    } else {
+                        // add again
+                        try {
+                            selectedElem.checkAndRegister(services);
+                        } catch (RuntimeException exc) {
+                        }
+                    }        
                 }
             }
         });

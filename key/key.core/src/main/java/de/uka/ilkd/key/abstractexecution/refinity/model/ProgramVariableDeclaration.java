@@ -12,6 +12,7 @@
 //
 package de.uka.ilkd.key.abstractexecution.refinity.model;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -100,16 +101,16 @@ public class ProgramVariableDeclaration extends NullarySymbolDeclaration {
                 new ProgramElementName(getVarName()), services.getJavaInfo().getKeYJavaType(sort)));
     }
 
-    public static ProgramVariableDeclaration fromString(final String str)
+    public static Optional<ProgramVariableDeclaration> fromString(final String str)
             throws IllegalArgumentException {
         final Pattern pattern = Pattern.compile("^([a-zA-Z0-9_.]+) +([a-zA-Z0-9_]+)$");
         final Matcher matcher = pattern.matcher(str.trim());
 
         if (!matcher.matches()) {
-            throw new IllegalArgumentException();
+            return Optional.empty();
         }
 
-        return new ProgramVariableDeclaration(matcher.group(1), matcher.group(2));
+        return Optional.of(new ProgramVariableDeclaration(matcher.group(1), matcher.group(2)));
     }
 
     @Override

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -47,12 +48,12 @@ public class FunctionDeclaration implements FuncOrPredDecl {
         this.argSorts = argSorts;
         this.resultSortName = resultSortName;
     }
-    
+
     @Override
     public boolean isFuncDecl() {
         return true;
     }
-    
+
     @Override
     public String getName() {
         return getFuncName();
@@ -82,18 +83,19 @@ public class FunctionDeclaration implements FuncOrPredDecl {
         this.argSorts = argSorts;
     }
 
-    public static FunctionDeclaration fromString(final String str) throws IllegalArgumentException {
+    public static Optional<FuncOrPredDecl> fromString(final String str)
+            throws IllegalArgumentException {
         final Pattern pattern = Pattern.compile(
-                "^([a-zA-Z0-9_.]+) +([a-zA-Z0-9_]+)(?:\\(([a-zA-Z0-9_.]+(?:,[a-zA-Z0-9_.]+)*)\\))?$");
+                "^ *([a-zA-Z0-9_.]+) +([a-zA-Z0-9_]+) *(?:\\( *([a-zA-Z0-9_.]+(?: *, *[a-zA-Z0-9_.]+)* *)\\))? *$");
         final Matcher matcher = pattern.matcher(str);
 
         if (!matcher.matches()) {
-            throw new IllegalArgumentException();
+            return Optional.empty();
         }
 
-        return new FunctionDeclaration(matcher.group(2), matcher.group(1),
+        return Optional.of(new FunctionDeclaration(matcher.group(2), matcher.group(1),
                 matcher.group(3) == null ? Collections.emptyList()
-                        : Arrays.asList(matcher.group(3).split(",")));
+                        : Arrays.asList(matcher.group(3).replaceAll(" ", "").split(","))));
     }
 
     @Override

@@ -19,8 +19,8 @@ import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -74,25 +74,6 @@ public class FuncAndPredInputDialog extends JDialog {
                         + " \"<tt>int myFun(java.lang.Object)</tt>\"</html>");
         valueTextField
                 .setFont(new Font("Monospaced", Font.PLAIN, valueTextField.getFont().getSize()));
-        valueTextField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                final char c = e.getKeyChar();
-
-                if (!(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9'
-                        || c == '_' || c == ',' || c == '(' || c == ')' || c == '.' || c == ' ')) {
-                    e.consume();
-                }
-
-                if (c == ' ' && !valueTextField.getText().matches("^[a-zA-Z0-9_]+$")) {
-                    /*
-                     * Cannot be the result sort of a function declaration. We admit at most one
-                     * space.
-                     */
-                    e.consume();
-                }
-            }
-        });
         valueTextField.addActionListener(e -> okButton.doClick());
 
         contentPanel.add(valueTextField, BorderLayout.CENTER);
@@ -105,12 +86,17 @@ public class FuncAndPredInputDialog extends JDialog {
                 try {
                     final String input = valueTextField.getText();
 
-                    final FuncOrPredDecl val;
-                    if (input.contains(" ")) {
-                        val = FunctionDeclaration.fromString(input);
-                    } else {
-                        val = PredicateDeclaration.fromString(input);
+                    Optional<FuncOrPredDecl> maybeVal = FunctionDeclaration.fromString(input);
+                    
+                    if (!maybeVal.isPresent()) {
+                        maybeVal = PredicateDeclaration.fromString(input);
                     }
+                    
+                    if (!maybeVal.isPresent()) {
+                        throw new IllegalArgumentException();
+                    }
+                    
+                    final FuncOrPredDecl val = maybeVal.get();
 
                     val.checkAndRegister(services);
 

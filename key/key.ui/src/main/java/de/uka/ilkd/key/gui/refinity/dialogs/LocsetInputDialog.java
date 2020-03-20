@@ -19,7 +19,6 @@ import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractAction;
@@ -70,17 +69,6 @@ public class LocsetInputDialog extends JDialog {
         valueTextField.setToolTipText("<html>Example: \"<tt>myAbstrLocSet</tt>\"</html>");
         valueTextField
                 .setFont(new Font("Monospaced", Font.PLAIN, valueTextField.getFont().getSize()));
-        valueTextField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                final char c = e.getKeyChar();
-
-                if (!(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9'
-                        || c == '_')) {
-                    e.consume();
-                }
-            }
-        });
         valueTextField.addActionListener(e -> okButton.doClick());
 
         contentPanel.add(valueTextField, BorderLayout.CENTER);

@@ -19,8 +19,8 @@ import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -71,17 +71,6 @@ public class ProgramVariableInputDialog extends JDialog {
                 "<html>Example: \"<tt>int i</tt>\", \"<tt>java.lang.Object obj</tt>\"</html>");
         valueTextField
                 .setFont(new Font("Monospaced", Font.PLAIN, valueTextField.getFont().getSize()));
-        valueTextField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                final char c = e.getKeyChar();
-
-                if (!(c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9'
-                        || c == '_' || c == ',' || c == ' ' || c == '.')) {
-                    e.consume();
-                }
-            }
-        });
         valueTextField.addActionListener(e -> okButton.doClick());
 
         contentPanel.add(valueTextField, BorderLayout.CENTER);
@@ -92,8 +81,14 @@ public class ProgramVariableInputDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    final ProgramVariableDeclaration val = ProgramVariableDeclaration
+                    final Optional<ProgramVariableDeclaration> maybeVal = ProgramVariableDeclaration
                             .fromString(valueTextField.getText());
+                    
+                    if (!maybeVal.isPresent()) {
+                        throw new IllegalArgumentException();
+                    }
+                    
+                    final ProgramVariableDeclaration val = maybeVal.get();
 
                     val.checkAndRegister(services);
 
@@ -111,6 +106,7 @@ public class ProgramVariableInputDialog extends JDialog {
                 }
             }
         });
+        
         final JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
             @Override

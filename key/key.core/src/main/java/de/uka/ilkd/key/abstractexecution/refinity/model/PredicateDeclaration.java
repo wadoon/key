@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -52,7 +53,7 @@ public class PredicateDeclaration implements FuncOrPredDecl {
     public boolean isFuncDecl() {
         return false;
     }
-    
+
     @Override
     public String getName() {
         return getPredName();
@@ -74,19 +75,19 @@ public class PredicateDeclaration implements FuncOrPredDecl {
         this.argSorts = argSorts;
     }
 
-    public static PredicateDeclaration fromString(final String str)
+    public static Optional<FuncOrPredDecl> fromString(final String str)
             throws IllegalArgumentException {
         final Pattern pattern = Pattern
                 .compile("^([a-zA-Z0-9_]+)(?:\\(([a-zA-Z0-9_.]+(?:,[a-zA-Z0-9_.]+)*)\\))?$");
         final Matcher matcher = pattern.matcher(str.replaceAll(" ", ""));
 
         if (!matcher.matches()) {
-            throw new IllegalArgumentException();
+            return Optional.empty();
         }
 
-        return new PredicateDeclaration(matcher.group(1),
+        return Optional.of(new PredicateDeclaration(matcher.group(1),
                 matcher.group(2) == null ? Collections.emptyList()
-                        : Arrays.asList(matcher.group(2).split(",")));
+                        : Arrays.asList(matcher.group(2).split(","))));
     }
 
     @Override
