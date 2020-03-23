@@ -15,8 +15,10 @@ package de.uka.ilkd.key.abstractexecution.util;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.key_project.util.ExtList;
@@ -141,6 +143,19 @@ public class AbstractExecutionUtils {
         }
 
         return loc;
+    }
+
+    /**
+     * Unwraps all {@link HasToLoc} of the given {@link AbstractUpdate}, returns
+     * them as a list.
+     * 
+     * @param abstrUpd The {@link AbstractUpdate} for which to return the unwrapped
+     *                 locations.
+     * @return The unwrapped locations.
+     */
+    public static List<AbstractUpdateLoc> unwrapHasTos(AbstractUpdate abstrUpd) {
+        return abstrUpd.getAllAssignables().stream().map(AbstractExecutionUtils::unwrapHasTo)
+                .collect(Collectors.toList());
     }
 
     /**
