@@ -19,8 +19,10 @@ import java.util.Optional;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory.PreconditionType;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -65,6 +67,9 @@ public class AbstractRetrieveAEPostconditionTransformer extends AbstractTermTran
             GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
+        final Optional<ExecutionContext> executionContext = Optional
+                .ofNullable(svInst.getExecutionContext());
+
         final Operator apeSV = term.sub(0).op();
         assert apeSV instanceof ProgramSV;
         final Object apeSVInst = svInst.getInstantiation((ProgramSV) apeSV);
@@ -102,8 +107,10 @@ public class AbstractRetrieveAEPostconditionTransformer extends AbstractTermTran
         for (final BlockContract contract : contracts) {
             if (contract.getBaseName().contains(contractType.toString())) {
                 final Optional<Term> maybePost = Optional.ofNullable(contract.getPost(services))
-                        .map(post -> replaceSpecialVars(post, returnsPV, resultPV, excPV,
-                                maybeBreaksSV, maybeContinuesSV, contract, services))
+                        .map(post -> AbstractUpdateFactory.normalizeSelfVarInTerm(
+                                replaceSpecialVars(post, returnsPV, resultPV, excPV, maybeBreaksSV,
+                                        maybeContinuesSV, contract, services),
+                                executionContext, services))
                         .filter(post -> !post.equals(tb.tt()));
 
                 return maybePost.orElse(tb.tt());

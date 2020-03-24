@@ -31,7 +31,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
-import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -423,11 +422,8 @@ public class AbstractExecutionContractUtils {
 
         List<Term> accessiblesList = termResult.first;
         if (executionContext.isPresent()) {
-            accessiblesList = termResult.first.stream()
-                    .map(term -> GenericTermReplacer.replace(term,
-                            t -> t.op() instanceof ProgramVariable, t -> AbstractUpdateFactory
-                                    .normalizeSelfVar(t, executionContext, services),
-                            services))
+            accessiblesList = termResult.first.stream().map(term -> AbstractUpdateFactory
+                    .normalizeSelfVarInTerm(term, executionContext, services))
                     .collect(Collectors.toList());
         }
 

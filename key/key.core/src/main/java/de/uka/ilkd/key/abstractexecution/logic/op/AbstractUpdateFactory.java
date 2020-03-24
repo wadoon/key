@@ -41,6 +41,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -577,6 +578,29 @@ public class AbstractUpdateFactory {
         return services.getTypeConverter().findThisForSort(
                 executionContext.get().getMethodContext().getContainerType().getSort(),
                 executionContext.get());
+    }
+
+    /**
+     * Replaces {@link ProgramVariable}s named "self" in the given {@link Term} by
+     * the "this" reference supplied in the execution context. If the execution
+     * context does not exist, nothing is replaced.
+     * 
+     * NOTE that all variables named "self" are replaced, there are no other checks
+     * for whether they're just an ordinary variable incidentally named that way. At
+     * the time being, we found no better way. (DS, 2020-03-24)
+     * 
+     * @param term             The {@link Term} in which to replace.
+     * @param executionContext The {@link Optional} {@link ExecutionContext} to
+     *                         retrieve the "this" reference.
+     * @param services         The {@link Services} object.
+     * @return The given {@link Term} with replaced "self" variables, if the
+     *         {@link ExecutionContext} exists.
+     */
+    public static Term normalizeSelfVarInTerm(Term term,
+            Optional<ExecutionContext> executionContext, final Services services) {
+        return GenericTermReplacer.replace(term, t -> t.op() instanceof ProgramVariable,
+                t -> normalizeSelfVar(t, executionContext, services),
+                services);
     }
 
     /**

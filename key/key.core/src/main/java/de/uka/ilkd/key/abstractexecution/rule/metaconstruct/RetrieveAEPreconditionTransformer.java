@@ -18,7 +18,9 @@ import java.util.Optional;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -49,6 +51,9 @@ public class RetrieveAEPreconditionTransformer extends AbstractTermTransformer {
     @Override
     public Term transform(Term term, SVInstantiations svInst,
             GoalLocalSpecificationRepository localSpecRepo, Services services) {
+        final Optional<ExecutionContext> executionContext = Optional
+                .ofNullable(svInst.getExecutionContext());
+
         final TermBuilder tb = services.getTermBuilder();
 
         final AbstractProgramElement ape = (AbstractProgramElement) svInst
@@ -64,6 +69,8 @@ public class RetrieveAEPreconditionTransformer extends AbstractTermTransformer {
                 final Term condition = tb.equals(tb.var(flag), tb.TRUE());
                 final Optional<Term> maybePre = Optional.ofNullable(contract.getPre(services))
                         .filter(pre -> !pre.equals(tb.tt())) //
+                        .map(pre -> AbstractUpdateFactory.normalizeSelfVarInTerm(pre,
+                                executionContext, services))
                         .map(pre -> tb.equals(condition, pre));
 
                 return maybePre.orElse(tb.tt());

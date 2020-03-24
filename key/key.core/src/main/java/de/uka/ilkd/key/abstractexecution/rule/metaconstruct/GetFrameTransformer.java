@@ -15,6 +15,7 @@ package de.uka.ilkd.key.abstractexecution.rule.metaconstruct;
 import java.util.Optional;
 
 import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -44,8 +45,11 @@ public class GetFrameTransformer extends AbstractTermTransformer {
 
         final AbstractProgramElement ape = AbstractPreconditionTransformer.getAPE(term, svInst);
 
-        return AbstractExecutionContractUtils.getAccessibleAndAssignableTermsForNoBehaviorContract(
-                ape, Optional.empty(), localSpecRepo, services).second;
+        final Term frameTerm = AbstractExecutionContractUtils
+                .getAccessibleAndAssignableTermsForNoBehaviorContract(ape, Optional.empty(),
+                        localSpecRepo, services).second;
+
+        return AbstractUpdateFactory.normalizeSelfVarInTerm(frameTerm, executionContext, services);
     }
 
 }
