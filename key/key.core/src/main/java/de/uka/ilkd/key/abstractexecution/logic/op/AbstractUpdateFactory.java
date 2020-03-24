@@ -563,7 +563,7 @@ public class AbstractUpdateFactory {
      *         a "self" term, or the types of the objTerm and the executionContext
      *         are different, or otherwise a {@link Term} with the runtime instance.
      */
-    private static Term normalizeSelfVar(Term objTerm, Optional<ExecutionContext> executionContext,
+    public static Term normalizeSelfVar(Term objTerm, Optional<ExecutionContext> executionContext,
             Services services) {
         // objTerm = MiscTools.simplifyUpdateApplication(objTerm, services);
 

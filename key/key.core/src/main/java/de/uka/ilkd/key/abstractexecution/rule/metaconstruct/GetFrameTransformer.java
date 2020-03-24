@@ -45,7 +45,7 @@ public class GetFrameTransformer extends AbstractTermTransformer {
         final AbstractProgramElement ape = AbstractPreconditionTransformer.getAPE(term, svInst);
 
         return AbstractExecutionContractUtils.getAccessibleAndAssignableTermsForNoBehaviorContract(
-                ape, Optional.empty(), executionContext, localSpecRepo, services).second;
+                ape, Optional.empty(), localSpecRepo, services).second;
     }
 
 }
