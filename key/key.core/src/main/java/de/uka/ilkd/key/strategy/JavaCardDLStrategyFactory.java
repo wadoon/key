@@ -250,6 +250,12 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "Instantiate quantified formulas automatically<br>"
             + "with terms that occur in a sequent, also if this<br>"
             + "might cause proof splitting." + "</html>";
+    public static final String TOOL_TIP_BACKGROUND_NORMALIZATION_DISABLED = "<html>"
+            + "Compute normalization of formulas by rules in foreground."
+            + "</html>";
+    public static final String TOOL_TIP_BACKGROUND_NORMALIZATION_ENABLED = "<html>"
+            + "Compute normalization of formulas by algorithms in background."
+            + "</html>";
     public static final String TOOL_TIP_AUTO_INDUCTION_ON = "<html>"
             + "Create an inductive proof for formulas of the form:<br>"
             + "      ==>  \\forall int i; 0&lt;=i->phi <br>"
@@ -477,6 +483,16 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                                 "Free", TOOL_TIP_QUANTIFIER_FREE, 6, 2));
     }
 
+    private static OneOfStrategyPropertyDefinition getBackgroundNormalization() {
+        return new OneOfStrategyPropertyDefinition(
+                StrategyProperties.BACKGROUND_NORMALIZATION_OPTIONS_KEY, "Background Normalization", 2,
+                new StrategyPropertyValueDefinition(
+                        StrategyProperties.BACKGROUND_NORMALIZATION_DISABLED,
+                        "Disabled", TOOL_TIP_BACKGROUND_NORMALIZATION_DISABLED),
+                new StrategyPropertyValueDefinition(StrategyProperties.BACKGROUND_NORMALIZATION_ENABLED,
+                        "Enabled", TOOL_TIP_BACKGROUND_NORMALIZATION_ENABLED));
+    }
+
     private static OneOfStrategyPropertyDefinition getClassAxiom() {
         return new OneOfStrategyPropertyDefinition(
                         StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
@@ -570,6 +586,7 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
         final OneOfStrategyPropertyDefinition queryTreatment = getQueryTreatment();
         final OneOfStrategyPropertyDefinition arithmeticTreatment = getArithmeticTreatment();
         final OneOfStrategyPropertyDefinition quantifierTreatment = getQuantifierTreatment();
+        final OneOfStrategyPropertyDefinition backgroundNormalization = getBackgroundNormalization();
         final OneOfStrategyPropertyDefinition classAxiom = getClassAxiom();
         final OneOfStrategyPropertyDefinition autoInduction = getAutoInduction();
         final OneOfStrategyPropertyDefinition userOptions = getUserOptions();
@@ -577,7 +594,7 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
         return new StrategySettingsDefinition("Java DL Options", stopAt, ossUsage,
                 proofSplitting, loopTreatment, blockTreatment, methodTreatment,
                 mergePointStatementTreatment, dependencyContracts,
-                queryTreatment, arithmeticTreatment, quantifierTreatment,
+                queryTreatment, arithmeticTreatment, quantifierTreatment, backgroundNormalization,
                 classAxiom, autoInduction, userOptions);
     }
 }
