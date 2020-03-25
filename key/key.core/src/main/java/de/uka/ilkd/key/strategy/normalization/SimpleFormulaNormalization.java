@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.strategy.normalization;
 
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -15,37 +16,49 @@ public class SimpleFormulaNormalization {
 
     private final TermBuilder termBuilder;
     private final TermFactory termFactory;
+    private final boolean skolemizeEx;
+    private final boolean renameFirst;
 
-    private SimpleFormulaNormalization(TermBuilder termBuilder, TermFactory termFactory) {
+    /*
+    FormulaNormalization can by enabled and disabled system wide to allow controlling normalization by Proof Search
+    Strategy.
+     */
+    private static boolean enabled = false;
+
+    public static void enable() {enabled = true;}
+
+    public static void disable() {enabled = false;}
+
+    /**
+     * Creates a new simple formula normalization with the given term builder and factory.
+     *
+     * The normalization can normalize arbitrary formulas by calling {@link SimpleFormulaNormalization::}
+     *
+     * The formula normalization is further configured by deciding the handling of existential quantifiers and the
+     * first quantified variable.
+     *
+     * If <code>skolemizeEX</code> is enabled existential quantified formulas <code>\exists S x: P(a, b, x, c)</code>
+     * will be replaced by a fresh skolem function <code>SK_<n>(a, b, c)</n></code>, otherwise, the existential
+     * quantified formula will be pulled left.
+     *
+     * If <code>renameFist</code> is enabled even the first quantified variable will be renamed, otherwise the first
+     * quantified variable won't be replaced, to allow returning a valid result for instantiations of the AllLeft-Rule.
+     * @param termBuilder the term builder to use
+     * @param termFactory the term factory to use
+     * @param skolemizeEX skolemize existential quantifiers
+     * @param renameFirst rename first quantified variable
+     */
+    public SimpleFormulaNormalization(TermBuilder termBuilder, TermFactory termFactory, boolean skolemizeEX,
+                                      boolean renameFirst) {
         this.termBuilder = termBuilder;
         this.termFactory = termFactory;
+        this.skolemizeEx = skolemizeEX;
+        this.renameFirst = renameFirst;
     }
 
-    public Term skolemize(Term formula) {
-        QuantifiedClauseSet normalized = normalize(formula, true, new HashMap<Term, Term>(), new LinkedHashSet<Term>());
-        LinkedHashSet<Term> boundVars = new LinkedHashSet<Term>();
-        LinkedHashMap<Term, Term> replaceMap = new LinkedHashMap<Term, Term>();
-        ImmutableList<QuantifiedTerm> quantifiers = DefaultImmutableSet.<QuantifiedTerm>nil().toImmutableList();
-        for(QuantifiedTerm qt: normalized.getQuantifiedTerms()) {
-            Term qv = termBuilder.var(qt.getQuantifiedVariable());
-            if (qt.getQuantifier() == Quantifier.ALL) {
-                boundVars.add(qv);
-                quantifiers = quantifiers.append(qt);
-            } else {
-                replaceMap.put(qv, freshSkolemFun(qt.getQuantifiedVariable().sort(), boundVars.toArray(new Term[0])));
-            }
-        }
-        LinkedHashSet<Clause> clauses = new LinkedHashSet<Clause>();
-        for(Clause clause: normalized.getClauseSet().getClauses()) {
-            LinkedHashSet<Literal> literals = new LinkedHashSet<Literal>();
-            for(Literal lit: clause.getLiterals()) {
-                literals.add(new Literal(replace(lit.getAtom(), replaceMap), lit.isPositive()));
-            }
-            clauses.add(new Clause(DefaultImmutableSet.fromSet(literals)));
-        }
-        QuantifiedClauseSet ret = new QuantifiedClauseSet(quantifiers,
-                new ClauseSet(DefaultImmutableSet.fromSet(clauses)));
-        return ret.toTerm(termBuilder);
+    public Term getNormalized(Term formula) {
+        if(!enabled) return formula;
+        return normalize(formula).toTerm(termBuilder);
     }
 
     private Term replace(Term term, HashMap<Term, Term> replaceMap) {
@@ -58,7 +71,7 @@ public class SimpleFormulaNormalization {
         for (int i = 0; i < term.subs().size(); i++) {
             subs[i] = replace(term.sub(i), replaceMap);
         }
-        term = termFactory.createTerm(term.op(), new ImmutableArray<Term>(subs),
+        term = termFactory.createTerm(term.op(), new ImmutableArray<>(subs),
                 term.boundVars(), term.javaBlock(), term.getLabels());
 
         return term;
@@ -68,6 +81,7 @@ public class SimpleFormulaNormalization {
     private int skolem_counter = 0;
 
     private Term freshSkolemFun(Sort sort, Term[] subs) {
+        //throw new RuntimeException("Creating a skolem function. this should never happen");
         Sort[] sorts = new Sort[subs.length];
         for(int i = 0; i < subs.length; i++) {
             sorts[i] = subs[i].sort();
@@ -75,8 +89,12 @@ public class SimpleFormulaNormalization {
         return termBuilder.func(new Function(new Name(SKOLEM_NAME_PREFIX + skolem_counter++), sort, sorts), subs);
     }
 
-    public QuantifiedClauseSet normalize(Term term, boolean polarity,
-                                         HashMap<Term, Term> replaceMap, LinkedHashSet<Term> boundVars) {
+    private QuantifiedClauseSet normalize(Term term) {
+        return normalize(term, true, new HashMap<>(), new LinkedHashSet<>(), !renameFirst);
+    }
+
+    private QuantifiedClauseSet normalize(Term term, boolean polarity,
+                                         HashMap<Term, Term> replaceMap, LinkedHashSet<Term> boundVars, boolean first) {
         int subs = term.subs().size();
         Operator op = term.op();
 
@@ -88,20 +106,52 @@ public class SimpleFormulaNormalization {
 
             if (op == Junctor.NOT) {
                 // n(!a, p) --> n(a, !p)
-                return normalize(a, !polarity, replaceMap, boundVars);
+                return normalize(a, !polarity, replaceMap, boundVars, first);
             }
 
+            /*
+             * Handling of quantifiers:
+             *
+             * ALL:
+             *
+             *  firstQV:
+             *
+             *      FORALL S x; P(...) ~> return QCS(FORALL x, normalized(P(...))
+             *
+             *  else:
+             *
+             *      FORALL S x; P(...) ~> return QCS(FORALL fresh_x, normalized(P(...))
+             *
+             * EX:
+             */
             if (op instanceof Quantifier) {
-                Quantifier quant = (Quantifier) op;
+                // get quantifier
+                Quantifier quantifier = (Quantifier) op;
+                // swap if polarity if negative
+                if(!polarity) quantifier = invert(quantifier);
+                // get quantifiable variable
                 QuantifiableVariable qv = term.varsBoundHere(0).get(0);
-                HashMap<Term, Term> extReplaceMap = new HashMap<Term, Term>(
-                        replaceMap);
-                LinkedHashSet<Term> extBoundVars = new LinkedHashSet<Term>(boundVars);
-                QuantifiableVariable freshQV = freshQV(qv);
+                // create extended replace map
+                HashMap<Term, Term> extReplaceMap = new HashMap<>(replaceMap);
+
+                // skolemize existential quantifier if enabled
+                if(skolemizeEx && (quantifier == Quantifier.EX)) {
+                    // for E S x; add replacement x ~> skolem(<bound vars>)
+                    extReplaceMap.put(termBuilder.var(qv), freshSkolemFun(qv.sort(), boundVars.toArray(new Term[0])));
+                    return normalize(a, polarity, extReplaceMap, boundVars, first);
+                }
+
+                // initialize a freshQV as fresh variable if it is not first
+                QuantifiableVariable freshQV = first ? qv : freshQV(qv);
+
+                // create extended bound vars and add quantified variable
+                LinkedHashSet<Term> extBoundVars = new LinkedHashSet<>(boundVars);
                 extBoundVars.add(termBuilder.var(freshQV));
+
+                // add replace(qv, freshQV) to extended replace map
                 extReplaceMap.put(termBuilder.var(qv), termBuilder.var(freshQV));
-                return new QuantifiedClauseSet(polarity ? quant: invert(quant), freshQV, normalize(a, polarity,
-                        extReplaceMap, extBoundVars));
+                return new QuantifiedClauseSet(quantifier, freshQV, normalize(a, polarity,
+                        extReplaceMap, extBoundVars, false));
             }
         }else if(subs == 2) {
             /*
@@ -113,56 +163,56 @@ public class SimpleFormulaNormalization {
             if (op == Equality.EQV) {
                 if (polarity) {
                     // a <-> b --> (a | !b) & (!a | b)
-                    return normalize(a, true, replaceMap, boundVars)
-                            .or(normalize(b, false, replaceMap, boundVars))
-                            .and(normalize(a, false, replaceMap, boundVars)
-                                    .or(normalize(b, true, replaceMap, boundVars)));
+                    return normalize(a, true, replaceMap, boundVars, first)
+                            .or(normalize(b, false, replaceMap, boundVars, first))
+                            .and(normalize(a, false, replaceMap, boundVars, first)
+                                    .or(normalize(b, true, replaceMap, boundVars, first)));
                 }
                 else {
                     // !(a <-> b) --> (a & !b) | (!a & b)
-                    return normalize(a, true, replaceMap, boundVars)
-                            .and(normalize(b, false, replaceMap, boundVars))
-                            .or(normalize(a, false, replaceMap, boundVars).and(
-                                    normalize(b, true, replaceMap, boundVars)));
+                    return normalize(a, true, replaceMap, boundVars, first)
+                            .and(normalize(b, false, replaceMap, boundVars, first))
+                            .or(normalize(a, false, replaceMap, boundVars, first).and(
+                                    normalize(b, true, replaceMap, boundVars, first)));
                 }
             }
 
             if (op == Junctor.IMP) {
                 if (polarity) {
                     // a->b --> !a | b
-                    return normalize(a, false, replaceMap, boundVars)
-                            .or(normalize(b, true, replaceMap, boundVars));
+                    return normalize(a, false, replaceMap, boundVars, first)
+                            .or(normalize(b, true, replaceMap, boundVars, first));
                 }
                 else {
                     // !(a->b) --> (a & !b)
-                    return normalize(a, true, replaceMap, boundVars)
-                            .and(normalize(b, false, replaceMap, boundVars));
+                    return normalize(a, true, replaceMap, boundVars, first)
+                            .and(normalize(b, false, replaceMap, boundVars, first));
                 }
             }
 
             if (op == Junctor.AND) {
                 if (polarity) {
                     // a & b is fine
-                    return normalize(a, true, replaceMap, boundVars)
-                            .and(normalize(b, true, replaceMap, boundVars));
+                    return normalize(a, true, replaceMap, boundVars, first)
+                            .and(normalize(b, true, replaceMap, boundVars, first));
                 }
                 else {
                     // !(a & b) --> !a | !b
-                    return normalize(a, false, replaceMap, boundVars)
-                            .or(normalize(b, false, replaceMap, boundVars));
+                    return normalize(a, false, replaceMap, boundVars, first)
+                            .or(normalize(b, false, replaceMap, boundVars, first));
                 }
             }
 
             if (op == Junctor.OR) {
                 if (polarity) {
                     // a | b is fine
-                    return normalize(a, true, replaceMap, boundVars)
-                            .or(normalize(b, true, replaceMap, boundVars));
+                    return normalize(a, true, replaceMap, boundVars, first)
+                            .or(normalize(b, true, replaceMap, boundVars, first));
                 }
                 else {
                     // !(a | b) --> !a & !b
-                    return normalize(a, false, replaceMap, boundVars)
-                            .and(normalize(b, false, replaceMap, boundVars));
+                    return normalize(a, false, replaceMap, boundVars, first)
+                            .and(normalize(b, false, replaceMap, boundVars, first));
                 }
             }
         }else if(subs == 3) {
@@ -176,17 +226,17 @@ public class SimpleFormulaNormalization {
             if (op instanceof IfThenElse) {
                 if (polarity) {
                     // a ? b : c --> (!a | b) & (a | c)
-                    return normalize(a, false, replaceMap, boundVars)
-                            .or(normalize(b, true, replaceMap, boundVars))
-                            .and(normalize(a, true, replaceMap, boundVars)
-                                    .or(normalize(c, true, replaceMap, boundVars)));
+                    return normalize(a, false, replaceMap, boundVars, first)
+                            .or(normalize(b, true, replaceMap, boundVars, first))
+                            .and(normalize(a, true, replaceMap, boundVars, first)
+                                    .or(normalize(c, true, replaceMap, boundVars, first)));
                 }
                 else {
                     // ! (a ? b : c) --> (!a | ! b) & (a | !c)
-                    return normalize(a, false, replaceMap, boundVars)
-                            .or(normalize(b, false, replaceMap, boundVars))
-                            .and(normalize(a, true, replaceMap, boundVars).or(
-                                    normalize(c, false, replaceMap, boundVars)));
+                    return normalize(a, false, replaceMap, boundVars, first)
+                            .or(normalize(b, false, replaceMap, boundVars, first))
+                            .and(normalize(a, true, replaceMap, boundVars, first).or(
+                                    normalize(c, false, replaceMap, boundVars, first)));
                 }
             }
         }
@@ -201,11 +251,11 @@ public class SimpleFormulaNormalization {
         return new QuantifiedClauseSet(new Literal(replace(term, replaceMap), polarity));
     }
 
-    private static Quantifier invert(Quantifier quant) {
-        if(quant == Quantifier.ALL) return Quantifier.EX;
-        if(quant == Quantifier.EX) return Quantifier.ALL;
+    private static Quantifier invert(Quantifier quantifier) {
+        if(quantifier == Quantifier.ALL) return Quantifier.EX;
+        if(quantifier == Quantifier.EX) return Quantifier.ALL;
         throw new RuntimeException(
-                "Cannot handle Quantifier" + quant.toString());
+                "Cannot handle Quantifier" + quantifier.toString());
     }
 
     private static final String VAR_NAME_PREFIX = "norm_var_";
@@ -217,11 +267,9 @@ public class SimpleFormulaNormalization {
     }
 
     private QuantifiableVariable freshQV(QuantifiableVariable qv) {
-        QuantifiableVariable fresh = (QuantifiableVariable) (new LogicVariable(
+        QuantifiableVariable fresh = (new LogicVariable(
                 new Name(VAR_NAME_PREFIX + var_counter++), qv.sort()));
         variableLookupMap.put(fresh, qv);
         return fresh;
     }
-
-
 }

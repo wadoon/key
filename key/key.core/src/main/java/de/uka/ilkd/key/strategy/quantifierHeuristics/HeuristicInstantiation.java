@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -23,12 +24,25 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.normalization.SimpleFormulaNormalization;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 
 public class HeuristicInstantiation implements TermGenerator {
 	
     public final static TermGenerator INSTANCE = new HeuristicInstantiation ();
+
+    public static final Iterator<Term> EMPTY = new Iterator<Term>() {
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public Term next() {
+            return null;
+        }
+    };
         
     private HeuristicInstantiation() {}
     
@@ -38,18 +52,29 @@ public class HeuristicInstantiation implements TermGenerator {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Term qf = pos.sequentFormula ().formula ();
-        final Instantiation ia = Instantiation.create ( qf, goal.sequent(), 
+        SimpleFormulaNormalization sfn = new SimpleFormulaNormalization(goal.proof().getServices().getTermBuilder(),
+                goal.proof().getServices().getTermFactory(), false, false);
+
+        Term nf;
+        try {
+            nf = sfn.getNormalized(qf);
+        }catch (Exception e) {
+            System.out.println("Could not normalize: " + e.toString());
+            nf = qf;
+            //return EMPTY;
+        }
+        final Instantiation ia = Instantiation.create ( nf, goal.sequent(),
                 goal.proof().getServices() );
         final QuantifiableVariable var =
-            qf.varsBoundHere ( 0 ).last ();
-        return new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices() );
+                qf.varsBoundHere ( 0 ).last ();
+        System.out.println("Instantiation: " + ia.getSubstitution().stream().map(term -> term.toString()).collect(Collectors.joining(",")));
+        return new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices());
     }
+
 
 
     private class HIIterator implements Iterator<Term> {
         private final Iterator<Term>       instances;
-
-        private final QuantifiableVariable quantifiedVar;
 
         private final Sort                 quantifiedVarSort;
         private final Function             quantifiedVarSortCast;
@@ -61,9 +86,8 @@ public class HeuristicInstantiation implements TermGenerator {
 					 QuantifiableVariable var, 
         	         TermServices services) {
             this.instances = it;
-            this.quantifiedVar = var;
             this.services = services;
-            quantifiedVarSort = quantifiedVar.sort ();
+            quantifiedVarSort = var.sort ();
             quantifiedVarSortCast = quantifiedVarSort.getCastSymbol (services);
             findNextInst ();
         }

@@ -60,4 +60,18 @@ public class QuantifiedClauseSet {
         return qt.getQuantifier() == Quantifier.ALL ? tb.all(qt.getQuantifiedVariable(), toTerm(iterator, term, tb))
                 : tb.ex(qt.getQuantifiedVariable(), toTerm(iterator, term, tb));
     }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("QCS[{");
+        for(QuantifiedTerm qt : quantifiedTerms) {
+            sb.append(qt.getQuantifiedVariable().toString());
+            sb.append(", ");
+        }
+        sb.delete(sb.length() -2, sb.length());
+        sb.append("},");
+        sb.append(clauseSet.toString());
+        sb.append("]");
+        return sb.toString();
+    }
 }

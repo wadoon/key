@@ -75,6 +75,7 @@ import de.uka.ilkd.key.strategy.feature.ThrownExceptionFeature;
 import de.uka.ilkd.key.strategy.feature.TopLevelFindFeature;
 import de.uka.ilkd.key.strategy.feature.TrivialMonomialLCRFeature;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
+import de.uka.ilkd.key.strategy.normalization.SimpleFormulaNormalization;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
@@ -626,7 +627,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         setupSystemInvariantSimp(d);
 
-        if (quantifierInstantiatedEnabled() && !formulaNormalizationEnabled()) {
+        if (quantifierInstantiatedEnabled()) {
             setupFormulaNormalisation(d, numbers, locSetLDT);
         } else {
             bindRuleSet(d, "negationNormalForm", inftyConst());
@@ -638,6 +639,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             bindRuleSet(d, "swapQuantifiers", inftyConst());
             bindRuleSet(d, "pullOutQuantifierAll", inftyConst());
             bindRuleSet(d, "pullOutQuantifierEx", inftyConst());
+        }
+
+        if(formulaNormalizationEnabled()) {
+            SimpleFormulaNormalization.enable();
+            bindRuleSet(d, "notIfNormalization", inftyConst());
+        }else {
+            SimpleFormulaNormalization.disable();
         }
 
         // For taclets that need instantiation, but where the instantiation is
@@ -974,8 +982,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private boolean formulaNormalizationEnabled() {
-        // TODO add Property
-        return true;
+        return StrategyProperties.BACKGROUND_NORMALIZATION_ENABLED.equals(
+                strategyProperties.getProperty(StrategyProperties.BACKGROUND_NORMALIZATION_OPTIONS_KEY));
     }
 
     private boolean classAxiomDelayedApplication() {
@@ -1395,10 +1403,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     new Feature[] {
                         FocusInAntecFeature.INSTANCE,
                         applyTF(FocusProjection.create(0),
-                            //add(ff.quantifiedClauseSet,
+                            add(formulaNormalizationEnabled() ?
+                                            longTermConst(0)
+                                            : ff.quantifiedClauseSet,
                                 instQuantifiersWithQueries() ?
                                     longTermConst(0)
-                                    : ff.notContainsExecutable),
+                                    : ff.notContainsExecutable)),
                         forEach(varInst,
                             HeuristicInstantiation.INSTANCE,
                             add(instantiate("t", varInst),

@@ -16,10 +16,6 @@ public class Literal {
         this.polarity = polarity;
     }
 
-    public Literal complement() {
-        return new Literal(atom, !polarity);
-    }
-
     public boolean isPositive() {
         return this.polarity;
     }
@@ -30,5 +26,9 @@ public class Literal {
 
     public Term toTerm(TermBuilder termBuilder) {
         return polarity ? atom : termBuilder.not(atom);
+    }
+
+    public String toString() {
+        return (polarity ? "" : "!") + atom.toString();
     }
 }

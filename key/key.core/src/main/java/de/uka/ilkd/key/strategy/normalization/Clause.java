@@ -21,8 +21,6 @@ public class Clause {
 
     private final ImmutableSet<Literal> literals;
 
-    public static final Clause EMPTY_CLAUSE = new Clause();
-
     Clause(Literal... literals) {
         this.literals = DefaultImmutableSet.fromSet(Arrays.stream(literals).collect(Collectors.toSet()));
     }
@@ -41,18 +39,38 @@ public class Clause {
 
     public Clause or(Clause clause) {
         Clause  ret = new Clause(literals);
-        clause.literals.forEach(literal -> ret.or(literal));
+        for(Literal literal : clause.literals) {
+            ret = ret.or(literal);
+        }
         return ret;
     }
 
-    public boolean isHornClause() {
+    /*public boolean isHornClause() {
         for(Literal literal: literals) {
             if(literal.isPositive()) {return true;}
         }
         return false;
-    }
+    }*/
 
     public Term toTerm(TermBuilder termBuilder) {
         return termBuilder.or(StreamSupport.stream(literals.spliterator(),false).map(literal -> literal.toTerm(termBuilder)).collect(Collectors.toList()));
+    }
+
+    public String toString() {
+        return "Clause" + print(literals);
+    }
+
+    private String print(ImmutableSet<Literal> literals) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for(Literal literal: literals) {
+            sb.append(literal.toString());
+            sb.append(", ");
+        }
+        if(sb.length() > 1) {
+            sb.delete(sb.length() -2, sb.length());
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }
