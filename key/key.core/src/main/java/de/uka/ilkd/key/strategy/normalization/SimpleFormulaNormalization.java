@@ -56,9 +56,23 @@ public class SimpleFormulaNormalization {
         this.renameFirst = renameFirst;
     }
 
+    private static Term lastFormula;
+    private static Term lastResult;
+    private static Object _LOCK = new Object();
+
     public Term getNormalized(Term formula) {
         if(!enabled) return formula;
-        return normalize(formula).toTerm(termBuilder);
+        synchronized (_LOCK) {
+            if(lastFormula == formula) return lastResult;
+        }
+
+        Term result = normalize(formula).toTerm(termBuilder);
+
+        synchronized (_LOCK) {
+            lastFormula = formula;
+            lastResult = result;
+        }
+        return result;
     }
 
     private Term replace(Term term, HashMap<Term, Term> replaceMap) {
