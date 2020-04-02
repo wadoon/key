@@ -570,6 +570,14 @@ public final class ProblemInitializer {
     }
 
 
+    /** starts a proof for the given proof obligations
+     *
+     * @param initConfig the {@link InitConfig} with all information about the JavaDL signature
+     * @param po the {@link ProofOblInput} which describes the proof obligations
+     * @param header an optional header (might be null) with custom function symbols etc.
+     * @return list of proofs for the proof obligation
+     * @throws ProofInputException in case of an error when generating the proof obligation
+     */
     public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po, String header)
             throws ProofInputException {
         assert initConfig != null;
@@ -600,6 +608,13 @@ public final class ProblemInitializer {
         }
     }
 
+    /** starts a proof for the given proof obligations
+     *
+     * @param initConfig the {@link InitConfig} with all information about the JavaDL signature
+     * @param po the {@link ProofOblInput} which describes the proof obligations
+     * @return list of proofs for the proof obligation
+     * @throws ProofInputException in case of an error when generating the proof obligation
+     */
     public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po)
             throws ProofInputException {
         return startProver(initConfig, po, null);
