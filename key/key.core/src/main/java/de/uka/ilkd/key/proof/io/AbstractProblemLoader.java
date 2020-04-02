@@ -573,9 +573,11 @@ public abstract class AbstractProblemLoader {
      * @throws ProofInputException Occurred Exception.
      */
     protected ProofAggregate createProof(LoadedPOContainer poContainer) throws ProofInputException {
-    	
+
         ProofAggregate proofList = 
-        		problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
+        		problemInitializer.startProver(initConfig, poContainer.getProofOblInput(),
+                        envInput instanceof KeYUserProblemFile ?
+                                ((KeYUserProblemFile)envInput).getProblemHeader() : null);
 
         for (Proof p : proofList.getProofs()) {
             // register proof

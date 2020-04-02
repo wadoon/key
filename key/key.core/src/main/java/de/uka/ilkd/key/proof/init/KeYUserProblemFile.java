@@ -229,7 +229,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         ProofSettings settings = getPreferences();
         initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
-                new Proof(name, 
+                new Proof(name,
                           problemTerm, 
                           problemHeader,
                           initConfig), 
@@ -364,4 +364,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
    public KeYJavaType getContainerType() {
       return null;
    }
+
+    public String getProblemHeader() {
+        return problemHeader;
+    }
 }

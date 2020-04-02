@@ -570,7 +570,7 @@ public final class ProblemInitializer {
     }
 
 
-    public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po)
+    public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po, String header)
             throws ProofInputException {
         assert initConfig != null;
         progressStarted(this);
@@ -581,6 +581,10 @@ public final class ProblemInitializer {
             //read problem
             reportStatus("Loading problem \"" + po.name() + "\"");
             po.readProblem();
+
+            if (header != null && po instanceof AbstractPO) {
+                ((AbstractPO) po).setHeader(header);
+            }
             ProofAggregate pa = po.getPO();
             //final work
             setUpProofHelper(po, pa);
@@ -594,6 +598,11 @@ public final class ProblemInitializer {
         } finally {
             progressStopped(this);
         }
+    }
+
+    public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po)
+            throws ProofInputException {
+        return startProver(initConfig, po, null);
     }
 
     public ProofAggregate startProver(EnvInput envInput, ProofOblInput po)

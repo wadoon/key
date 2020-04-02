@@ -451,6 +451,9 @@ public abstract class AbstractPO implements IPersistablePO {
         return name;
     }
 
+    public void setHeader(String header) {
+        this.header = header;
+    }
 
     /**
      * Creates declarations necessary to save/load proof in textual form
