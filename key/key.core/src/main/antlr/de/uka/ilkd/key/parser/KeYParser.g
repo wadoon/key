@@ -1073,7 +1073,7 @@ options {
         } catch (de.uka.ilkd.key.java.PosConvertException e) {
             lineOffset=e.getLine()-1;
             colOffset=e.getColumn()+1;
-            throw new RecognitionException(input);
+            throwRecognitionException(input, e);
             //throw new JavaParserException(e.getMessage(), t.getText(), 
             //    getSourceName(), t.getLine(), t.getCharPositionInLine(), lineOffset, colOffset);
         } catch (de.uka.ilkd.key.java.ConvertException e) { 
@@ -1084,7 +1084,7 @@ options {
                 colOffset=e.parseException().currentToken.next.beginColumn;
                 e.parseException().currentToken.next.beginLine=getLine()-1;
                 e.parseException().currentToken.next.beginColumn=getColumn();
-                throw new RecognitionException(input);
+                throwRecognitionException(input, e);
                 //throw new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine(), -1, -1);  // row/columns already in text
             }       
             if (e.proofJavaException()!=null
@@ -1094,14 +1094,20 @@ options {
                 colOffset=e.proofJavaException().currentToken.next.beginColumn;
                 e.proofJavaException().currentToken.next.beginLine=getLine();
                 e.proofJavaException().currentToken.next.beginColumn =getColumn();
-                 throw new RecognitionException(input);
+                 throwRecognitionException(input, e);
                  //throw  new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine(), lineOffset, colOffset); 
                             
-            }   
-            throw new RecognitionException(input);
+            }
+            throwRecognitionException(input, e);
             //throw new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine());
         } 
         return sjb;
+    }
+
+    private static void throwRecognitionException(IntStream input, Throwable cause) throws RecognitionException {
+        RecognitionException re = new RecognitionException(input);
+        re.initCause(cause);
+        throw re;
     }
 
     /**
@@ -1180,6 +1186,10 @@ options {
             					         getServices());
                         
             if(sort != null && firstInstance != null) {
+            	if (baseName.startsWith("<$" + "inv" + ">")) {
+					return getJavaInfo().getStaticInv(getJavaInfo().getKeYJavaType(sort));            	
+            	}
+
                 v = firstInstance.getInstanceFor(sort, getServices());
                 if(v != null) {
                     return v;
@@ -2113,7 +2123,9 @@ pred_decl
 	            String baseName = pred_name.substring(separatorIndex + 2);
 		    Sort genSort = lookupSort(sortName);
 		    
-		    if(genSort instanceof GenericSort) {	        	            	
+		    if (baseName.startsWith("<$" + "inv" + ">")) {
+		    	p = (Function) getJavaInfo().getStaticInv(getJavaInfo().getKeYJavaType(genSort));
+		    } else if(genSort instanceof GenericSort) {	        	            	
 		    	p = SortDependingFunction.createFirstInstance(
 		    	    		(GenericSort)genSort,
 		    	    		new Name(baseName),
@@ -2213,7 +2225,9 @@ func_decl
 	            String baseName = func_name.substring(separatorIndex + 2);
 		    Sort genSort = lookupSort(sortName);
 		    
-		    if(genSort instanceof GenericSort) {	        	            	
+		    if (baseName.startsWith("<$" + "inv" + ">")) {
+		    	f = (Function) getJavaInfo().getStaticInv(getJavaInfo().getKeYJavaType(genSort));
+		    } else if(genSort instanceof GenericSort) {	        	            	
 		    	f = SortDependingFunction.createFirstInstance(
 		    	    		(GenericSort)genSort,
 		    	    		new Name(baseName),
@@ -2521,7 +2535,9 @@ id_declaration returns [ IdDeclaration idd = null ]
 
 funcpred_name returns [String result = null]
     :
-     
+    (sort_name DOUBLECOLON LESS) => (prefix = sort_name 
+        DOUBLECOLON LESS name = simple_ident GREATER {result = prefix + "::<" + name + ">";})
+  | 
     (sort_name DOUBLECOLON) => (prefix = sort_name 
         DOUBLECOLON name = simple_ident {result = prefix + "::" + name;})
   | 
@@ -3652,8 +3668,10 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
 	            } else {
 	                op = lookupVarfuncId(varfuncid, args);
 	            }
-
-	            if (op instanceof ParsableVariable) {
+	            
+	            if (op.name().toString().equals("<$" + "inv>")) {
+	            	a = getServices().getTermBuilder().staticInv(getJavaInfo().getKeYJavaType(varfuncid.substring(0, varfuncid.indexOf("::"))));
+	            } else if (op instanceof ParsableVariable) {
 	                a = termForParsedVariable((ParsableVariable)op);
 	            } else {
 	                if (args==null) {

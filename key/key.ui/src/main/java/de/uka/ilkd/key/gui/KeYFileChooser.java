@@ -27,8 +27,8 @@ import de.uka.ilkd.key.core.Main;
 
 public class KeYFileChooser {
 
-    private static final File HOME_DIR = IOUtil.getHomeDirectory();
-    private static final FileFilter FILTER = new FileFilter() {
+    /** The Constant for the default file filter. */
+    public final static FileFilter DEFAULT_FILTER = new FileFilter() {
         public boolean accept(File f) {
             return
                             f.isDirectory()
@@ -41,11 +41,24 @@ public class KeYFileChooser {
         }
 
         public String getDescription() {
-            return "Java files, (compressed) KeY files, proof packages, source directories";
+            return "Java files, (compressed) KeY files, proof packages, and source directories";
         }
     };
 
-    private static final FileFilter COMPRESSED_FILTER = new FileFilter() {
+    /** The Constant for the filter for statistics files. */
+    public final static FileFilter STATISTICS_FILTER = new FileFilter() {
+        public boolean accept(File f) {
+            return f.getName().endsWith(".html") || f.getName().endsWith(".csv")
+                    || f.isDirectory();
+        }
+
+        public String getDescription() {
+            return "proof statistics files (.csv, .html)";
+        }
+    };
+
+    /** The Constant for the filter for compressed files. */
+    public final static FileFilter COMPRESSED_FILTER = new FileFilter() {
         public boolean accept(File f) {
             return f.getName().endsWith(".proof.gz") || f.isDirectory();
         }
@@ -54,7 +67,7 @@ public class KeYFileChooser {
             return "compressed KeY proof files (.proof.gz)";
         }
     };
-    
+
     private static final FileFilter AE_RELATIONAL_FILTER = new FileFilter() {
         public boolean accept(File f) {
             return f.isDirectory() || "aer".equals(IOUtil.getFileExtension(f));
@@ -64,6 +77,9 @@ public class KeYFileChooser {
             return "Abstract Execution Relational Verification Models (.aer)";
         }
     };
+
+    /** The Constant for the home directory. */
+    private final static File HOME_DIR = IOUtil.getHomeDirectory();
 
     private static KeYFileChooser INSTANCE;
 
@@ -90,9 +106,10 @@ public class KeYFileChooser {
                 super.approveSelection();
             }
         };
+        fileChooser.addChoosableFileFilter(STATISTICS_FILTER);
         fileChooser.addChoosableFileFilter(COMPRESSED_FILTER);
         fileChooser.addChoosableFileFilter(AE_RELATIONAL_FILTER);
-        fileChooser.setFileFilter(FILTER);
+        fileChooser.setFileFilter(DEFAULT_FILTER);
     }
 
     public void prepare() {
@@ -104,8 +121,9 @@ public class KeYFileChooser {
             }
         } else if (selFile.isFile()) { // present & not dir.
             String filename = selFile.getAbsolutePath();
-            if (!filename.endsWith(".proof"))
+            if (!filename.endsWith(".proof")) {
                 fileChooser.setSelectedFile(new File(filename+".proof"));
+            }
         } else if (selFile.isDirectory()) {
             fileChooser.setCurrentDirectory(selFile);
         }
@@ -117,6 +135,15 @@ public class KeYFileChooser {
         } else {
             fileChooser.setDialogTitle ("Select file to load");
         }
+    }
+
+    /**
+     * Sets the file filter.
+     *
+     * @param fileFilter the new file filter
+     */
+    public void setFileFilter(FileFilter fileFilter) {
+        fileChooser.setFileFilter(fileFilter);
     }
 
     private void setSaveDialog(boolean b) {

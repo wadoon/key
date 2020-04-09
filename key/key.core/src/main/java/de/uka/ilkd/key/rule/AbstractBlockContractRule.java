@@ -479,7 +479,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
         ifContractBuilder.setProofObligationVars(instantiationVars);
         final Term contractApplTerm = ifContractBuilder.buildContractApplPredTerm();
-        Taclet informationFlowContractApp = ifContractBuilder.buildTaclet();
+        Taclet informationFlowContractApp = ifContractBuilder.buildTaclet(infFlowGoal);
 
         // get infFlowAssumptions
         final Term infFlowPreAssumption = buildInfFlowPreAssumption(instantiationVars, localOuts,

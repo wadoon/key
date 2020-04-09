@@ -16,10 +16,12 @@ package de.uka.ilkd.key.java;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
+import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -191,6 +193,7 @@ import de.uka.ilkd.key.util.Debug;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
+import recoder.io.DataLocation;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTList;
@@ -234,10 +237,10 @@ public class Recoder2KeYConverter {
     }
 
     public CompilationUnit processCompilationUnit(
-            recoder.java.CompilationUnit cu, String context) {
-        currentClass = context;
+            recoder.java.CompilationUnit cu, DataLocation context) {
+        currentClassURI = MiscTools.extractURI(context);
         Object result = process(cu);
-        currentClass = null;
+        currentClassURI = null;
 
         assert result instanceof CompilationUnit : "a compilation unit must result in a compilation unit!";
 
@@ -289,9 +292,9 @@ public class Recoder2KeYConverter {
     protected HashMap<?, ?> locClass2finalVar = null;
 
     /**
-     * stores the class that is currently processed
+     * stores the URI of the class that is currently processed
      */
-    private String currentClass;
+    private URI currentClassURI;
 
     /**
      * flag which is true if currently in a for initialiser or update
@@ -436,9 +439,9 @@ public class Recoder2KeYConverter {
         }
 
         // set the parental class attribute if available
-        if ((currentClass != null) && (result instanceof Statement)
+        if ((currentClassURI != null) && (result instanceof Statement)
                 && !(result instanceof SchemaVariable)) {
-            ((JavaProgramElement) result).setParentClass(currentClass);
+            ((JavaProgramElement) result).setParentClass(currentClassURI);
         }
 
         Debug.assertTrue(result instanceof ProgramElement || result == null,
@@ -551,7 +554,7 @@ public class Recoder2KeYConverter {
         Position endPos = new Position(se.getEndPosition().getLine(), se
                 .getEndPosition().getColumn());
         if ((!inLoopInit))
-            return new PositionInfo(relPos, startPos, endPos, currentClass);
+            return new PositionInfo(relPos, startPos, endPos, currentClassURI);
         else
             return new PositionInfo(relPos, startPos, endPos);
 
@@ -1674,7 +1677,7 @@ public class Recoder2KeYConverter {
             if (method instanceof recoder.java.declaration.MethodDeclaration) {
                 // method reference before method decl, also recursive calls.
                 // do not use:
-                final String oldCurrent = currentClass;
+                final URI oldCurrent = currentClassURI;
 
                 recoder.io.DataLocation loc = null;
                 TypeDeclaration td = ((recoder.java.declaration.MethodDeclaration) method).getMemberParent();
@@ -1684,15 +1687,10 @@ public class Recoder2KeYConverter {
                 }
                 loc = tdc instanceof recoder.java.CompilationUnit ? ((recoder.java.CompilationUnit)tdc).getOriginalDataLocation() : null;
 
-                if (loc instanceof recoder.io.DataFileLocation) {
-                    currentClass = ((recoder.io.DataFileLocation) loc)
-                    .getFile().getAbsolutePath();
-                } else {
-                    currentClass = (loc == null ? null : "" + loc);
-                }
+                currentClassURI = MiscTools.extractURI(loc);
                 pm = convert((recoder.java.declaration.MethodDeclaration) method);
                 // because of cycles when reading recursive programs
-                currentClass = oldCurrent;
+                currentClassURI = oldCurrent;
             } else {
                 // bytecode currently we do nothing
                 pm = null;
