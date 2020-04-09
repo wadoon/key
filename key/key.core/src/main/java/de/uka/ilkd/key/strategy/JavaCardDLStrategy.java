@@ -75,6 +75,7 @@ import de.uka.ilkd.key.strategy.feature.ThrownExceptionFeature;
 import de.uka.ilkd.key.strategy.feature.TopLevelFindFeature;
 import de.uka.ilkd.key.strategy.feature.TrivialMonomialLCRFeature;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
+import de.uka.ilkd.key.strategy.normalization.NormalizedAllFeature;
 import de.uka.ilkd.key.strategy.normalization.SimpleFormulaNormalization;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
