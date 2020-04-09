@@ -21,6 +21,8 @@ public class Clause {
 
     private final ImmutableSet<Literal> literals;
 
+    public static final Clause EMPTY_CLAUSE = new Clause();
+
     Clause(Literal... literals) {
         this.literals = DefaultImmutableSet.fromSet(Arrays.stream(literals).collect(Collectors.toSet()));
     }

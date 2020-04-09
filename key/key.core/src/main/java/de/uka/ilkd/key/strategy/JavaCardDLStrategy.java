@@ -32,7 +32,48 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.strategy.feature.*;
+import de.uka.ilkd.key.strategy.feature.AgeFeature;
+import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
+import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
+import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
+import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
+import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
+import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
+import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
+import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
+import de.uka.ilkd.key.strategy.feature.DeleteMergePointRuleFeature;
+import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
+import de.uka.ilkd.key.strategy.feature.DiffFindAndIfFeature;
+import de.uka.ilkd.key.strategy.feature.DiffFindAndReplacewithFeature;
+import de.uka.ilkd.key.strategy.feature.DirectlyBelowSymbolFeature;
+import de.uka.ilkd.key.strategy.feature.EqNonDuplicateAppFeature;
+import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.FindDepthFeature;
+import de.uka.ilkd.key.strategy.feature.FindRightishFeature;
+import de.uka.ilkd.key.strategy.feature.FocusInAntecFeature;
+import de.uka.ilkd.key.strategy.feature.InEquationMultFeature;
+import de.uka.ilkd.key.strategy.feature.MatchedIfFeature;
+import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.NoSelfApplicationFeature;
+import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
+import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
+import de.uka.ilkd.key.strategy.feature.NotBelowBinderFeature;
+import de.uka.ilkd.key.strategy.feature.NotBelowQuantifierFeature;
+import de.uka.ilkd.key.strategy.feature.NotInScopeOfModalityFeature;
+import de.uka.ilkd.key.strategy.feature.OnlyInScopeOfQuantifiersFeature;
+import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
+import de.uka.ilkd.key.strategy.feature.PurePosDPathFeature;
+import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
+import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
+import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
+import de.uka.ilkd.key.strategy.feature.SVNeedsInstantiation;
+import de.uka.ilkd.key.strategy.feature.ScaleFeature;
+import de.uka.ilkd.key.strategy.feature.SetsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.SumFeature;
+import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.ThrownExceptionFeature;
+import de.uka.ilkd.key.strategy.feature.TopLevelFindFeature;
+import de.uka.ilkd.key.strategy.feature.TrivialMonomialLCRFeature;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
 import de.uka.ilkd.key.strategy.normalization.NormalizedAllFeature;
 import de.uka.ilkd.key.strategy.normalization.SimpleFormulaNormalization;
@@ -1039,7 +1080,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         ProjectionToTerm cutFormula = instOf("cutFormula");
         Feature countOccurrencesInSeq =
                 ScaleFeature.createAffine(countOccurrences(cutFormula), -10, 10);
-        TermBuffer cmplx = new TermBuffer();
         bindRuleSet(
             d,
             "cut_direct",
@@ -1357,31 +1397,23 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     InstantiationCostScalerFeature.create(
                             InstantiationCost.create(varInst),
                             allowQuantifierSplitting());
-            TermBuffer fml = new TermBuffer();
-            Feature countAllQuant = sum(fml, SubtermGenerator.leftTraverse(FocusProjection.create(0),
-                    not(op(Quantifier.ALL))), longConst(100));
-            Feature instantiateFeature = SumFeature.createSum(
-                    new Feature[] {
-                            FocusInAntecFeature.INSTANCE,
-                            formulaNormalizationEnabled() ? countAllQuant : longConst(0),
-                            applyTF(FocusProjection.create(0),
-                                    add(formulaNormalizationEnabled() ?
-                                                    NormalizedAllFeature.getInstance()
-                                                    : ff.quantifiedClauseSet,
-                                            instQuantifiersWithQueries() ?
-                                                    longTermConst(0)
-                                                    : ff.notContainsExecutable)),
-                            forEach(varInst,
-                                    HeuristicInstantiation.INSTANCE,
-                                    add(instantiate("t", varInst),
-                                            branchPrediction,
-                                            longConst(10))),
-                            formulaNormalizationEnabled() ? longConst(0) : longConst(0) });
 
             bindRuleSet(
                 d,
-                "gamma", instantiateFeature
-                );
+                "gamma",
+                SumFeature.createSum(
+                    new Feature[] {
+                        FocusInAntecFeature.INSTANCE,
+                        applyTF(FocusProjection.create(0),
+                            //add(ff.quantifiedClauseSet,
+                                instQuantifiersWithQueries() ?
+                                    longTermConst(0)
+                                    : ff.notContainsExecutable),
+                        forEach(varInst,
+                            HeuristicInstantiation.INSTANCE,
+                            add(instantiate("t", varInst),
+                                branchPrediction,
+                                longConst(10)))}));
             final TermBuffer splitInst = new TermBuffer();
 
             bindRuleSet(
