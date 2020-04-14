@@ -75,7 +75,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         Goal g = state.getFirstOpenAutomaticGoal();
 
         if (theApp instanceof TacletApp) {
-            RuleApp completeApp = ((TacletApp) theApp).tryToInstantiate(g.proof().getServices());
+            RuleApp completeApp = ((TacletApp) theApp).tryToInstantiate(g, g.proof().getServices());
             theApp = completeApp == null ? theApp : completeApp;
         }
         assert theApp != null;
