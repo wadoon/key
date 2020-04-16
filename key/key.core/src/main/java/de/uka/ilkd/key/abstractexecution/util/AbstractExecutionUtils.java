@@ -36,6 +36,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.IrrelevantAssignable;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.HeapLoc;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -399,9 +400,10 @@ public class AbstractExecutionUtils {
          * 
          * 1) l1 is overwritten, or there is no relevant location l2, or
          * 2) l1 is a PVLoc and l2 a different PVLoc, or
-         * 3) l1 is not a PVLoc, and l2 is a fresh auxiliary program variable, or
-         * 4) l1 is a fresh auxiliary program variable and l2 is an abstract location set, or
-         * 5) there is evidence in the proof that l1 and l2 are disjoint.
+         * 3) l1 is a HeapLoc and l2 is a PVLoc which is not the heap program variable
+         * 4) l1 is not a PVLoc, and l2 is a fresh auxiliary program variable, or
+         * 5) l1 is a fresh auxiliary program variable and l2 is an abstract location set, or
+         * 6) there is evidence in the proof that l1 and l2 are disjoint.
          * 
          * In all other cases, l1 is relevant w.r.t. l2. It is relevant w.r.t. a set of
          * locations if it is relevant for any location in the set.
@@ -410,7 +412,6 @@ public class AbstractExecutionUtils {
          * possible instantiations of any abstract location set.
          */
         //@formatter:on
-
         if (loc instanceof IrrelevantAssignable || loc instanceof EmptyLoc
                 || overwrittenLocations.contains(locUnwrapped) || relevantLocations.isEmpty()) {
             // Irrelevant, but no evidence needed
@@ -421,6 +422,10 @@ public class AbstractExecutionUtils {
         if (locUnwrapped instanceof PVLoc) {
             // If loc is a PVLoc, we can safely remove all PVLocs that aren't equal.
             relevantLocsCopy.removeIf(ploc -> ploc instanceof PVLoc && !ploc.equals(locUnwrapped));
+        } else if (locUnwrapped instanceof HeapLoc) {
+         // If loc is a HeapLoc, we can safely remove all PVLocs that aren't the heap variable.
+            relevantLocsCopy.removeIf(ploc -> ploc instanceof PVLoc && ((PVLoc) ploc)
+                    .getVar() != services.getTypeConverter().getHeapLDT().getHeap());
         } else {
             /*
              * Even if loc is allLocs, the "fresh" locations cannot be meant! We remove
