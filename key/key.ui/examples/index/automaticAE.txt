@@ -137,13 +137,20 @@ group abstract_execution_provable {
    provable ./abstract_execution/ReplaceExceptionWithTest/CorrectRollback/replaceExceptionWithTest.aer
    
    provable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.aer
-   provable ./abstract_execution/ExtractMethod/CorrectExceptionAllowed/extractMethodRefactoring.aer
+   provable ./abstract_execution/ExtractMethod/CorrectExceptionAllowed/extractMethodRefactoring-SurroundingTry.aer
+   provable ./abstract_execution/ExtractMethod/CorrectExceptionAllowed/extractMethodRefactoring-UnchangedVar.aer
    
    provable ./abstract_execution/DecomposeConditional/Correct/decomposeConditional.aer
    
    provable ./abstract_execution/LoopExtraction/Correct/loopExtraction.aer
    provable ./abstract_execution/LoopExtraction/Simplified/loopExtraction.aer
    // provable ./abstract_execution/LoopExtraction/WithCosts/loopExtraction.aer // <- requires (simple) interaction
+   
+   provable ./abstract_execution/MoveStatementsToCallers/Correct/MoveStatementsToCallers.aer
+   
+   # Loop examples
+   provable ./abstract_execution/RemoveControlFlag/Correct/removeControlFlag.aer
+   provable ./abstract_execution/SplitLoop/Correct/splitLoopRefactoring.aer
 }
 
 group abstract_execution_notprovable {
@@ -153,24 +160,6 @@ group abstract_execution_notprovable {
    
    notprovable ./abstract_execution/ExtractMethod/IncorrectQThrowsException/extractMethodRefactoring.aer
 }
-
-// TODO (DS, 2019-11-21): Update Remaining Refactoring Examples!
-
-/*
-# Examples used in the Abstract Execution paper submitted to FM 2019
-group aepaper_provable {
-   provable ./abstract_execution/MoveStatementsToCallers/Correct/moveStatementsToCallers.key
-}
-
-group aepaper_loops {
-   # provable ./abstract_execution/SplitLoop/Correct/splitLoopRefactoring.key # takes very long!
-   provable ./abstract_execution/LoopUnrolling/Correct/loopUnrolling.key
-   provable ./abstract_execution/RemoveControlFlag/CorrectWithUnrollingInvRule/removeControlFlag.key
-   provable ./abstract_execution/RemoveControlFlag/Correct/removeControlFlag.key
-   loadable ./abstract_execution/RemoveControlFlag/CorrectWithUnrollingInvRule/removeControlFlag.proof
-   loadable ./abstract_execution/RemoveControlFlag/Correct/removeControlFlag.proof
-}
-*/
 
 # These are the proof files which can be loaded from the examples menu.
 # They must work with the current version.
