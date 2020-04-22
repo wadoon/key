@@ -149,8 +149,8 @@ group abstract_execution_provable {
    provable ./abstract_execution/MoveStatementsToCallers/Correct/MoveStatementsToCallers.aer
    
    # Loop examples
-   provable ./abstract_execution/RemoveControlFlag/Correct/removeControlFlag.aer
-   provable ./abstract_execution/SplitLoop/Correct/splitLoopRefactoring.aer
+   provable ./abstract_execution/RemoveControlFlag/Correct/RemoveControlFlag.aer
+   provable ./abstract_execution/SplitLoop/Correct/SplitLoop.aer
 }
 
 group abstract_execution_notprovable {
