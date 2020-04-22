@@ -15,8 +15,6 @@ package de.uka.ilkd.key.abstractexecution.logic.op.locs.heap;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.OpCollector;
@@ -86,15 +84,6 @@ public class FieldLoc extends HeapLoc {
         objTerm.execPostOrder(opColl);
         fieldTerm.execPostOrder(opColl);
         return opColl.ops();
-    }
-
-    @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        return (otherLoc instanceof PVLoc && ((PVLoc) otherLoc).getVar()
-                .equals(services.getTypeConverter().getHeapLDT().getHeap()))
-                || (otherLoc instanceof FieldLoc
-                        && ((FieldLoc) otherLoc).objTerm.equals(this.objTerm)
-                        && ((FieldLoc) otherLoc).fieldTerm.equals(this.fieldTerm));
     }
 
     /**

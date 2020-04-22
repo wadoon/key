@@ -255,7 +255,7 @@ public class ProofBundleConverter {
                 .replaceAll(PREDICATES, Matcher.quoteReplacement(predicatesDecl))
                 .replaceAll(PROGRAMVARIABLES, Matcher.quoteReplacement(progvarsDecl))
                 .replaceAll(INIT_VARS,
-                        initVars.isEmpty() ? "" : (Matcher.quoteReplacement(initVars)))
+                        initVars.isEmpty() ? "" : (Matcher.quoteReplacement("{" + initVars + "}")))
                 .replaceAll(PARAMS, Matcher.quoteReplacement(params))
                 .replaceAll(Pattern.quote(RELATION),
                         Matcher.quoteReplacement(javaDLPostCondRelation))

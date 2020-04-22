@@ -102,6 +102,7 @@ options {
   
   import de.uka.ilkd.key.ldt.SeqLDT;
   import de.uka.ilkd.key.ldt.IntegerLDT;
+  import de.uka.ilkd.key.ldt.LocSetLDT;
   
   import de.uka.ilkd.key.abstractexecution.rule.conditions.*;
 }
@@ -3652,9 +3653,9 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
         //args.size()==0 indicates open-close-parens ()
                 
         {  
-            if(varfuncid.equals("skip") && args == null) {
-	        a = getTermFactory().createTerm(UpdateJunctor.SKIP);
-	    } else {
+            if (varfuncid.equals("skip") && args == null) {
+	            a = getTermFactory().createTerm(UpdateJunctor.SKIP);
+	        } else {
 	            Operator op;
 	            if(varfuncid.endsWith(LIMIT_SUFFIX)) {
 	                varfuncid = varfuncid.substring(0, varfuncid.length()-5);
@@ -3676,6 +3677,22 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
 	            } else {
 	                if (args==null) {
 	                    args = new Term[0];
+	                }
+	                
+	                final LocSetLDT locSetLDT = getServices().getTypeConverter().getLocSetLDT();
+	                if (varfuncid.equals("singletonPV") && args[0].sort() != locSetLDT.getProgVarSort()) {
+	                    final Operator pv = args[0].op();
+	                    if (!(pv instanceof LocationVariable)) {
+                            semanticError(
+                                    "singletonPV expects either a LocationVariable or a ProgVar location descriptor, given: "
+                                            + pv + " of sort "
+                                            + pv.sort(new ImmutableArray<>()));
+	                    }
+	                    
+                        args[0] = getTermFactory().createTerm(
+                                    locSetLDT.getProgVarSymbolForPV(
+                                            (LocationVariable) pv, getServices()),
+                                    new ImmutableArray<>());
 	                }
 	
 	                if(boundVars == null) {

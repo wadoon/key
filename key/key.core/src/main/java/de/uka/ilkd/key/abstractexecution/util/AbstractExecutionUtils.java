@@ -36,6 +36,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.IrrelevantAssignable;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.HeapLoc;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -51,6 +52,7 @@ import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -308,7 +310,8 @@ public class AbstractExecutionUtils {
             return false;
         }
 
-        final LocationVariable locVar = ((PVLoc) unwrapHasTo(loc)).getVar();
+        final LocationVariable locVar = services.getPvToLocationMapper()
+                .getAssociatedVariable(((PVLoc) unwrapHasTo(loc)).getVar()).get();
 
         /*
          * Location variables that either are already present in the root sequent, or
@@ -423,9 +426,11 @@ public class AbstractExecutionUtils {
             // If loc is a PVLoc, we can safely remove all PVLocs that aren't equal.
             relevantLocsCopy.removeIf(ploc -> ploc instanceof PVLoc && !ploc.equals(locUnwrapped));
         } else if (locUnwrapped instanceof HeapLoc) {
-         // If loc is a HeapLoc, we can safely remove all PVLocs that aren't the heap variable.
-            relevantLocsCopy.removeIf(ploc -> ploc instanceof PVLoc && ((PVLoc) ploc)
-                    .getVar() != services.getTypeConverter().getHeapLDT().getHeap());
+            // If loc is a HeapLoc, we can safely remove all PVLocs that aren't the heap
+            // variable.
+            relevantLocsCopy.removeIf(ploc -> ploc instanceof PVLoc && services
+                    .getPvToLocationMapper().getAssociatedVariable(((PVLoc) ploc).getVar())
+                    .get() != services.getTypeConverter().getHeapLDT().getHeap());
         } else {
             /*
              * Even if loc is allLocs, the "fresh" locations cannot be meant! We remove
@@ -464,8 +469,8 @@ public class AbstractExecutionUtils {
      * Looks in the antecedent of the given {@link Goal} for a premise asserting
      * that loc and relevantLoc are disjoint. The check is done syntactically for
      * performance reasons, but KeY should bring the disjointness assertions to a
-     * normal form of the shape <code>loc1 \cap loc2 = {}</code>, therefore it
-     * should be OK. There are no proofs involved.
+     * normal form of the shape <code>loc1 \cap loc2 = {}</code> or similar,
+     * therefore it should be OK. There are no proofs involved.
      * 
      * <p>
      * Pure method.
@@ -482,16 +487,32 @@ public class AbstractExecutionUtils {
             final AbstractUpdateLoc relevantLoc, final Goal goal, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
-        final Term locsetDisjointTerm1 = tb.equals(
-                tb.intersect(loc.toTerm(services), relevantLoc.toTerm(services)), tb.empty());
-        final Term locsetDisjointTerm2 = tb.equals(
-                tb.intersect(relevantLoc.toTerm(services), loc.toTerm(services)), tb.empty());
+        if (loc instanceof PVLoc) {
+            return lookForEvidence(goal, false,
+                    tb.pvElementOf(loc.toTerm(services).sub(0), relevantLoc.toTerm(services)));
+        } else if (loc instanceof FieldLoc) {
+            final FieldLoc fl = (FieldLoc) loc;
+            return lookForEvidence(goal, false,
+                    tb.elementOf(fl.getObjTerm(), fl.getFieldTerm(), relevantLoc.toTerm(services)));
+        } else {
+            final Term locsetDisjointTerm1 = tb.equals(
+                    tb.intersect(loc.toTerm(services), relevantLoc.toTerm(services)), tb.empty());
+            final Term locsetDisjointTerm2 = tb.equals(
+                    tb.intersect(relevantLoc.toTerm(services), loc.toTerm(services)), tb.empty());
 
-        for (SequentFormula premise : goal.sequent().antecedent()) {
+            return lookForEvidence(goal, true, locsetDisjointTerm1, locsetDisjointTerm2);
+        }
+    }
+
+    private static Optional<PosInOccurrence> lookForEvidence(final Goal goal, final boolean inAntec,
+            final Term... formulas) {
+        final Sequent sequent = goal.sequent();
+        for (SequentFormula premise : inAntec ? sequent.antecedent() : sequent.succedent()) {
             final Term premiseFor = premise.formula();
-            if (premiseFor.equalsModIrrelevantTermLabels(locsetDisjointTerm1)
-                    || premiseFor.equalsModIrrelevantTermLabels(locsetDisjointTerm2)) {
-                return Optional.of(new PosInOccurrence(premise, PosInTerm.getTopLevel(), true));
+            for (Term formula : formulas) {
+                if (premiseFor.equalsModIrrelevantTermLabels(formula)) {
+                    return Optional.of(new PosInOccurrence(premise, PosInTerm.getTopLevel(), true));
+                }
             }
         }
 

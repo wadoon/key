@@ -56,22 +56,6 @@ public class AllFieldsLocLHS extends HeapLoc {
     }
 
     @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        if (otherLoc instanceof ArrayLoc) {
-            return ((ArrayLoc) otherLoc).getArray().equals(this.array);
-        } else if (otherLoc instanceof PVLoc) {
-            return ((PVLoc) otherLoc).getVar()
-                    .equals(services.getTypeConverter().getHeapLDT().getHeap());
-        } else if (otherLoc instanceof ArrayLoc) {
-            return ((AllFieldsLocLHS) otherLoc).getArray().equals(this.array);
-        } else if (otherLoc instanceof ArrayRange) {
-            super.mayAssign(otherLoc, services);
-        }
-
-        return false;
-    }
-
-    @Override
     public String toString() {
         return String.format("%s.*", array);
     }

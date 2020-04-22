@@ -19,6 +19,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -29,38 +30,40 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * @author Dominic Steinhoefel
  */
 public class PVLoc implements AbstractUpdateLoc {
-    private final LocationVariable locVar;
+    private final Function loc;
+    private final Sort sort;
 
-    public PVLoc(LocationVariable locVar) {
-        this.locVar = locVar;
+    public PVLoc(Function loc, Sort sort) {
+        this.loc = loc;
+        this.sort = sort;
+    }
+
+    public PVLoc(LocationVariable loc, Services services) {
+        this.loc = services.getPvToLocationMapper().getAssociatedLocation(loc, services);
+        this.sort = loc.sort();
     }
 
     @Override
     public Term toTerm(Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        return tb.singletonPV(tb.var(locVar));
+        return tb.singletonPV(loc);
     }
 
     @Override
     public Set<Operator> childOps() {
-        return Collections.singleton(locVar);
+        return Collections.singleton(loc);
     }
 
     /**
-     * @return the encapsulated location variable.
+     * @return the encapsulated location.
      */
-    public LocationVariable getVar() {
-        return locVar;
+    public Function getVar() {
+        return loc;
     }
 
     @Override
     public String toString() {
-        return locVar.toString();
-    }
-
-    @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        return otherLoc instanceof PVLoc && otherLoc.equals(this);
+        return loc.toString();
     }
 
     @Override
@@ -70,12 +73,12 @@ public class PVLoc implements AbstractUpdateLoc {
 
     @Override
     public int hashCode() {
-        return 5 + 17 * locVar.hashCode();
+        return 5 + 17 * loc.hashCode();
     }
 
     @Override
     public Sort sort() {
-        return locVar.sort();
+        return sort;
     }
 
     @Override

@@ -174,9 +174,9 @@ public class ReorderAbstractUpdatesRuleApp extends DefaultBuiltInRuleApp {
         }
 
         final List<AbstractUpdateLoc> assignablesLeft = //
-                getAssignablesFromElementaryUpdate(otherUpdTerm);
+                getAssignablesFromElementaryUpdate(otherUpdTerm, services);
         final List<AbstractUpdateLoc> assignablesRight = //
-                getAssignablesFromElementaryUpdate(abstrUpdTerm);
+                getAssignablesFromElementaryUpdate(abstrUpdTerm, services);
 
         for (final AbstractUpdateLoc leftAssignable : assignablesLeft) {
             // Disjointness is commutative, so this direction suffices.
@@ -193,17 +193,18 @@ public class ReorderAbstractUpdatesRuleApp extends DefaultBuiltInRuleApp {
      * elementary concrete update, or abstract update).
      * 
      * @param updateTerm The update {@link Term} from which to extract.
+     * @param services The {@link Services} object.
      * @return The extracted {@link AbstractUpdateLoc}s.
      */
     private static List<AbstractUpdateLoc> //
-            getAssignablesFromElementaryUpdate(final Term updateTerm) {
+            getAssignablesFromElementaryUpdate(final Term updateTerm, Services services) {
         final List<AbstractUpdateLoc> assignables = new ArrayList<>();
 
         if (updateTerm.op() == UpdateJunctor.SKIP) {
             // Don't do anything
         } else if (updateTerm.op() instanceof ElementaryUpdate) {
             assignables.add( //
-                    new PVLoc((LocationVariable) ((ElementaryUpdate) updateTerm.op()).lhs()));
+                    new PVLoc((LocationVariable) ((ElementaryUpdate) updateTerm.op()).lhs(), services));
         } else if (updateTerm.op() instanceof AbstractUpdate) {
             ((AbstractUpdate) updateTerm.op()).getAllAssignables().stream()
                     .map(AbstractExecutionUtils::unwrapHasTo).forEach(assignables::add);

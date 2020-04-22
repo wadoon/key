@@ -47,12 +47,6 @@ public class AllLocsLoc implements AbstractUpdateLoc {
     public String toString() {
         return "allLocs";
     }
-    
-    @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        // allLocs can assign everything.
-        return true;
-    }
 
     @Override
     public boolean equals(Object obj) {

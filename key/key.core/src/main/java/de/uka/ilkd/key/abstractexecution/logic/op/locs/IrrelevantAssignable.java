@@ -55,11 +55,6 @@ public class IrrelevantAssignable implements AbstractUpdateLoc {
     }
 
     @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        return false;
-    }
-
-    @Override
     public boolean equals(Object obj) {
         return obj != null && obj instanceof IrrelevantAssignable
                 && t.equals(((IrrelevantAssignable) obj).t);

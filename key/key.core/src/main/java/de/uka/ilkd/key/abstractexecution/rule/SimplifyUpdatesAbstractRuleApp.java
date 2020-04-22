@@ -358,8 +358,8 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
             return Optional.of(tb.skip());
         }
 
-        removeFromLocationSet(lhs, relevantLocations); // SIDE EFFECT!
-        addToAssngLocationSet(lhs, overwrittenLocations); // SIDE EFFECT!
+        removeFromLocationSet(lhs, relevantLocations, services); // SIDE EFFECT!
+        addToAssngLocationSet(lhs, overwrittenLocations, services); // SIDE EFFECT!
 
         /* NOTE: Cannot discard updates of the form x:=x, see bug #1269 (MU, CS) */
         return Optional.empty();
@@ -390,7 +390,8 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
          * to avoid such hacks in any case.
          */
 
-        return isRelevant(new PVLoc(lv), relevantLocations, overwrittenLocations, goal, services);
+        return isRelevant(new PVLoc(lv, services), relevantLocations, overwrittenLocations, goal,
+                services);
     }
 
     /**
@@ -435,22 +436,24 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
     /**
      * Adds lv to the given set of locations (as a side effect).
      * 
-     * @param lv   The location to add.
-     * @param locs The locations.
+     * @param lv       The location to add.
+     * @param locs     The locations.
+     * @param services The {@link Services} object.
      */
     private static void addToAssngLocationSet(final LocationVariable lv,
-            final Set<AbstractUpdateLoc> locs) {
-        locs.add(new PVLoc(lv));
+            final Set<AbstractUpdateLoc> locs, Services services) {
+        locs.add(new PVLoc(lv, services));
     }
 
     /**
      * Removes lv from the given set of locations (as a side effect).
      * 
-     * @param lv   The location to remove.
-     * @param locs The locations.
+     * @param lv       The location to remove.
+     * @param locs     The locations.
+     * @param services The {@link Services} object.
      */
     private static void removeFromLocationSet(final LocationVariable lv,
-            final Set<AbstractUpdateLoc> locs) {
-        locs.remove(new PVLoc(lv));
+            final Set<AbstractUpdateLoc> locs, Services services) {
+        locs.remove(new PVLoc(lv, services));
     }
 }

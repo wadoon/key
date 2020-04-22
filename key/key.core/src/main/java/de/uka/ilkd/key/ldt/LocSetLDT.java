@@ -31,6 +31,8 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 
 public final class LocSetLDT extends LDT {
@@ -57,6 +59,11 @@ public final class LocSetLDT extends LDT {
     private final Function hasTo;
     private final Function value;
     private final Function irr;
+    private final Function pvElementOf;
+    private final Function PV;
+    
+    //additional sorts
+    private final Sort progVarSort;    
     
     public LocSetLDT(TermServices services) {
 	super(NAME, services);
@@ -75,82 +82,71 @@ public final class LocSetLDT extends LDT {
         subset           = addFunction(services, "subset");
         disjoint         = addFunction(services, "disjoint");
         createdInHeap    = addFunction(services, "createdInHeap");
+        
         singletonPV = addFunction(services, "singletonPV");
         irr = addFunction(services, "irr");
         hasTo = addFunction(services, "hasTo");
         value = addFunction(services, "value");
+        pvElementOf = addFunction(services, "pvElementOf");
+        progVarSort = services.getNamespaces().sorts().lookup("ProgVar");
+        PV = addFunction(services, "PV");
     }
-
 
     public Function getEmpty() {
 	return empty;
     }
 
-
     public Function getAllLocs() {
 	return allLocs;
     }
-
 
     public Function getSingleton() {
 	return singleton;
     }
 
-
     public Function getUnion() {
 	return union;
     }
-
 
     public Function getIntersect() {
 	return intersect;
     }
 
-
     public Function getSetMinus() {
 	return setMinus;
     }
-
 
     public Function getInfiniteUnion() {
 	return infiniteUnion;
     }
 
-
     public Function getAllFields() {
 	return allFields;
     }
-
 
     public Function getAllObjects() {
 	return allObjects;
     }
 
-
     public Function getArrayRange() {
 	return arrayRange;
     }
-
 
     public Function getFreshLocs() {
 	return freshLocs;
     }
 
-
     public Function getElementOf() {
 	return elementOf;
     }
-
 
     public Function getSubset() {
 	return subset;
     }
 
-
     public Function getDisjoint() {
 	return disjoint;
     }
-
 
     public Function getCreatedInHeap() {
 	return createdInHeap;
@@ -166,6 +162,18 @@ public final class LocSetLDT extends LDT {
 
     public Function getHasTo() {
         return hasTo;
+    }
+
+    public Function getPVElementOf() {
+        return pvElementOf;
+    }
+
+    public Function getPV() {
+        return PV;
+    }
+
+    public Sort getProgVarSort() {
+        return progVarSort;
     }
 
     /**
@@ -258,5 +266,15 @@ public final class LocSetLDT extends LDT {
     public final Type getType(Term t) {
 	assert false;
 	return null;
+    }
+
+    /**
+     * Given a program variable, returns the function symbol representing that
+     * "program variable location". In contrast to program variables, those symbols
+     * of sort ProgVar do not carry values, but represent the associated location.
+     */
+    public Function getProgVarSymbolForPV(LocationVariable variable, Services services) {
+        assert !variable.isMember();
+        return services.getPvToLocationMapper().getAssociatedLocation(variable, services);
     }
 }

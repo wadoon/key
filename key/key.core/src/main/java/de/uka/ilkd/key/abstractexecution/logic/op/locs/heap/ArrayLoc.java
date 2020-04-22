@@ -68,24 +68,6 @@ public class ArrayLoc extends HeapLoc {
     }
 
     @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        if (otherLoc instanceof AllFieldsLocLHS) {
-            /*
-             * TODO (DS, 2019-05-22): Check whether that's the intended semantics, since
-             * actually, an a[5] cannot really assign a[*], at least not all positions...
-             */
-            return ((AllFieldsLocLHS) otherLoc).getArray().equals(this.array);
-        } else if (otherLoc instanceof PVLoc) {
-            return ((PVLoc) otherLoc).getVar()
-                    .equals(services.getTypeConverter().getHeapLDT().getHeap());
-        } else if (otherLoc instanceof ArrayLoc || otherLoc instanceof ArrayRange) {
-            return super.mayAssign(otherLoc, services);
-        }
-
-        return false;
-    }
-
-    @Override
     public String toString() {
         return String.format("%s[%s])", array, index);
     }

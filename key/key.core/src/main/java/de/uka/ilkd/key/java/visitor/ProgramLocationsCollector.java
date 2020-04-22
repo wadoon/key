@@ -68,7 +68,7 @@ public class ProgramLocationsCollector extends ProgramVariableCollector {
      * @return The extracted locations.
      */
     public Set<AbstractUpdateLoc> locations() {
-        locations.addAll(result().stream().map(PVLoc::new)
+        locations.addAll(result().stream().map(pv -> new PVLoc(pv, services))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>())));
 
         return locations;

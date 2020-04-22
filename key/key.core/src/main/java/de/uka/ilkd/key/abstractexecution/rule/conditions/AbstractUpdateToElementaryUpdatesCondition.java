@@ -104,7 +104,8 @@ public final class AbstractUpdateToElementaryUpdatesCondition implements Variabl
                     final PVLoc pvLoc = castAssignable.child();
                     extractedHasTosMap.put(castAssignable, irrAssng);
 
-                    final Term updateLHS = tb.var(pvLoc.getVar());
+                    final Term updateLHS = tb.var(services.getPvToLocationMapper()
+                            .getAssociatedVariable(pvLoc.getVar()).get());
                     final Term updateRHS = tb.func(
                             abstractUpdateFactory.getCharacteristicFunctionForPosition(abstrUpd, i),
                             updateTerm.subs().toArray(new Term[0]));

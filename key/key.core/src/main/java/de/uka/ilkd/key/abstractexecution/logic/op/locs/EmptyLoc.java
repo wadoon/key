@@ -49,11 +49,6 @@ public class EmptyLoc implements AbstractUpdateLoc {
     }
 
     @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        return false;
-    }
-
-    @Override
     public boolean equals(Object obj) {
         return obj instanceof EmptyLoc && obj.hashCode() == hashCode();
     }

@@ -59,7 +59,7 @@ public class TermAccessibleLocationsCollector extends DefaultVisitor {
      */
     public void visit(Term t) {
         if (t.op() instanceof LocationVariable) {
-            result.add(new PVLoc((LocationVariable) t.op()));
+            result.add(new PVLoc((LocationVariable) t.op(), services));
         }
 
         if (AbstractExecutionUtils.isAbstractSkolemLocationSetValueTerm(t, services)) {

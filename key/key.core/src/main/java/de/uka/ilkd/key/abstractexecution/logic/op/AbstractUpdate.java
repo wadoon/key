@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.abstractexecution.logic.op;
 
-import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,6 @@ import org.key_project.util.collection.UniqueArrayList;
 
 import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.java.Services;
@@ -170,55 +168,6 @@ public final class AbstractUpdate extends AbstractSortedOperator {
                 .map(HasToLoc::child).map(AbstractUpdateLoc.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
-
-    /**
-     * @return true iff this abstract update assigns allLocs (i.e., all locations).
-     */
-    public boolean assignsAllLocs() {
-        return assignables.stream().anyMatch(AllLocsLoc.class::isInstance);
-    }
-
-    /**
-     * @param loc The {@link AbstractUpdateLoc}s to check.
-     * @return true iff this {@link AbstractUpdate} may assign any of the given
-     *         locations (includes "have-to"s).
-     */
-    public boolean mayAssignAny(Collection<AbstractUpdateLoc> loc) {
-        return loc.stream().anyMatch(this::mayAssign);
-    }
-
-    /**
-     * @param loc The {@link AbstractUpdateLoc} to check.
-     * @return true iff this {@link AbstractUpdate} may assign the given location
-     *         (includes "have-to"s).
-     */
-    public boolean mayAssign(AbstractUpdateLoc loc) {
-        return getMaybeAssignables().stream()
-                .anyMatch(assignable -> assignable.mayAssign(loc, services))
-                || getHasToAssignables().stream()
-                        .anyMatch(assignable -> assignable.mayAssign(loc, services));
-    }
-
-    /**
-     * @param loc The {@link AbstractUpdateLoc}s to check.
-     * @return true iff this {@link AbstractUpdate} has to assign any of the given
-     *         locations (includes "have-to"s).
-     */
-    public boolean hasToAssignAny(Collection<AbstractUpdateLoc> loc) {
-        return loc.stream().anyMatch(this::hasToAssign);
-    }
-
-    /**
-     * True if the given {@link AbstractUpdate} has to assign the given location.
-     *
-     * @param loc
-     * @return
-     */
-    public boolean hasToAssign(AbstractUpdateLoc loc) {
-        return getHasToAssignables().stream()
-                .anyMatch(assignable -> assignable.mayAssign(loc, services));
-    }
-
     /**
      * @return True iff this {@link AbstractUpdate} assigns no location at all.
      */

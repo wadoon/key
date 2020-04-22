@@ -420,8 +420,9 @@ public class AbstractUpdateFactory {
             Map<ProgramVariable, ProgramVariable> replMap) {
         final Map<AbstractUpdateLoc, AbstractUpdateLoc> locReplMap = //
                 replMap.entrySet().stream()
-                        .collect(Collectors.toMap(e -> new PVLoc((LocationVariable) e.getKey()),
-                                e -> new PVLoc((LocationVariable) e.getValue())));
+                        .collect(Collectors.toMap(
+                                e -> new PVLoc((LocationVariable) e.getKey(), services),
+                                e -> new PVLoc((LocationVariable) e.getValue(), services)));
 
         return changeAssignables(abstrUpd, locReplMap);
     }
@@ -482,7 +483,11 @@ public class AbstractUpdateFactory {
         if (op == locSetLDT.getIrr()) {
             return new IrrelevantAssignable(t);
         } else if (op instanceof LocationVariable) {
-            return new PVLoc((LocationVariable) op);
+            return new PVLoc((LocationVariable) op, services);
+        } else if (op instanceof Function && ((Function) op).sort() == locSetLDT.getProgVarSort()) {
+            return new PVLoc(
+                    services.getPvToLocationMapper().getAssociatedVariable((Function) op).get(),
+                    services);
         } else if (t.op() == locSetLDT.getAllLocs()) {
             return new AllLocsLoc(locSetLDT.getAllLocs());
         } else if (t.op() == locSetLDT.getEmpty()) {
@@ -599,8 +604,7 @@ public class AbstractUpdateFactory {
     public static Term normalizeSelfVarInTerm(Term term,
             Optional<ExecutionContext> executionContext, final Services services) {
         return GenericTermReplacer.replace(term, t -> t.op() instanceof ProgramVariable,
-                t -> normalizeSelfVar(t, executionContext, services),
-                services);
+                t -> normalizeSelfVar(t, executionContext, services), services);
     }
 
     /**

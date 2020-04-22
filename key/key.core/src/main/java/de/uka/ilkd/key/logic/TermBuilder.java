@@ -1542,8 +1542,21 @@ public class TermBuilder {
 
     public Term singletonPV(Term pv) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        assert pv.op() instanceof ProgramVariable;
+        assert pv.op() instanceof Function;
+        assert ((Function) pv.op()).sort() == locSetLDT.getProgVarSort();
         return func(locSetLDT.getSingletonPV(), pv);
+    }
+
+    public Term singletonPV(Function pvLoc) {
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        assert pvLoc.sort() == locSetLDT.getProgVarSort();
+        return func(locSetLDT.getSingletonPV(), func(pvLoc));
+    }
+
+    public Term singletonPV(LocationVariable pv) {
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        return func(locSetLDT.getSingletonPV(),
+                func(locSetLDT.getProgVarSymbolForPV(pv, services)));
     }
 
     public Term hasTo(Term locSetTerm) {
@@ -1672,6 +1685,15 @@ public class TermBuilder {
         }
     }
 
+    public Term pvElementOf(Term pv, Term s) {
+        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        if (s.op() == ldt.getEmpty()) {
+            return ff();
+        } else {
+            return func(ldt.getPVElementOf(), pv, s);
+        }
+    }
+
     public Term subset(Term s1, Term s2) {
         final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
         if (s1.op() == ldt.getEmpty()) {
@@ -1691,9 +1713,14 @@ public class TermBuilder {
     }
     
     private Term wrapInSingletonPV(Term s) {
+        final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
         if (s.op() instanceof LocationVariable) {
-            s = singletonPV(s);
+            return singletonPV((LocationVariable) s.op());
+        } else if (s.op() instanceof Function
+                && ((Function) s.op()).sort() == ldt.getProgVarSort()) {
+            return singletonPV((Function) s.op());
         }
+
         return s;
     }
 

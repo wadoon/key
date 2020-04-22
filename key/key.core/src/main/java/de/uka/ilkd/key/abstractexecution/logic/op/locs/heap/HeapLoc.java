@@ -27,29 +27,6 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * @author Dominic Steinhoefel
  */
 public abstract class HeapLoc implements AbstractUpdateLoc {
-    @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        if (otherLoc instanceof PVLoc) {
-            final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-            return ((PVLoc) otherLoc).getVar().equals(baseHeap);
-        }
-
-        /*
-         * TODO (DS, 2019-05-27): We might fail to prove the disjointness condition
-         * although it actually holds; for instance, we might need premises from the
-         * current proof situation, or there is some basic prover incapacity. We have to
-         * check what the implications of such "false negatives" are, and to ensure that
-         * they are not critical for soundness.
-         */
-
-        final TermBuilder tb = services.getTermBuilder();
-
-        final Term disjointTerm = //
-                tb.disjoint(toTerm(services), otherLoc.toTerm(services));
-
-        return MergeRuleUtils.isProvableWithSplitting( //
-                disjointTerm, services, 1000);
-    }
 
     /**
      * Converts this {@link HeapLoc} to a term representation.

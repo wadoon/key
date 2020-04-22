@@ -58,13 +58,6 @@ public class HasToLoc<L extends AbstractUpdateLoc> implements AbstractUpdateLoc 
     }
 
     @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        return child.mayAssign(
-                otherLoc instanceof HasToLoc ? ((HasToLoc<?>) otherLoc).child() : otherLoc,
-                services);
-    }
-
-    @Override
     public boolean equals(Object obj) {
         return obj instanceof HasToLoc && obj.hashCode() == hashCode();
     }

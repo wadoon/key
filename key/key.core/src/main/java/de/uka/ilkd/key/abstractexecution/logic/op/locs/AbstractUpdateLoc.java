@@ -14,8 +14,6 @@ package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import java.util.Set;
 
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.AllFieldsLocLHS;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.Term;
@@ -35,25 +33,6 @@ public interface AbstractUpdateLoc extends Sorted {
      *         container represents.
      */
     Set<Operator> childOps();
-
-    /**
-     * Evaluates whether this {@link AbstractUpdateLoc} may assign otherLoc. This is
-     * the case, for instance, if this {@link AbstractUpdateLoc} is a {@link PVLoc}
-     * assigning the program variable of otherLoc which is also a {@link PVLoc}; but
-     * also, if otherLoc is an {@link ArrayLoc} for array A and this
-     * {@link AbstractUpdateLoc} is an {@link AllFieldsLocLHS} for A.
-     *
-     * XXX (DS, 2019-10-28): Have to make the semantics of this more precise. What
-     * about a program variable that may assign (part of) an abstract Skolem
-     * location set? At the end, it will have to be an overapproximation, i.e., only
-     * return false if it's really sure that this operator does not change the
-     * valuation of the other one. Example would be to PVLocs with different names.
-     * 
-     * @param otherLoc The location for which to evaluate whether we can assign it.
-     * @param services The {@link Services} object.
-     * @return true if this {@link AbstractUpdateLoc} may assign otherLoc.
-     */
-    boolean mayAssign(AbstractUpdateLoc otherLoc, Services services);
 
     /**
      * @param services The {@link Services} object.

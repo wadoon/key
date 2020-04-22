@@ -122,8 +122,8 @@ public class DropAbstractHeapUpdateRule implements BuiltInRule {
 
         final Term innerUpdate = UpdateApplication.getUpdate(heapUpdRHS);
         if (!MergeRuleUtils.isUpdateNormalForm(innerUpdate, true)
-                || MergeRuleUtils.getElementaryUpdates(innerUpdate, services.getTermBuilder()).stream()
-                        .noneMatch(upd -> upd.op() instanceof AbstractUpdate)) {
+                || MergeRuleUtils.getElementaryUpdates(innerUpdate, services.getTermBuilder())
+                        .stream().noneMatch(upd -> upd.op() instanceof AbstractUpdate)) {
             return false;
         }
 
@@ -136,7 +136,9 @@ public class DropAbstractHeapUpdateRule implements BuiltInRule {
         target.execPostOrder(collector);
 
         return !collector.locations().stream().filter(PVLoc.class::isInstance)
-                .map(PVLoc.class::cast).map(PVLoc::getVar).anyMatch(var -> var == heapVar)
+                .map(PVLoc.class::cast).map(PVLoc::getVar)
+                .map(var -> services.getPvToLocationMapper().getAssociatedVariable(var).get())
+                .anyMatch(var -> var == heapVar)
                 && collector.locations().stream().filter(SkolemLoc.class::isInstance)
                         .map(SkolemLoc.class::cast).count() > 0;
     }

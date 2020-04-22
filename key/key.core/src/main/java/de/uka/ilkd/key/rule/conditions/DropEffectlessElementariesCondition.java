@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule.conditions;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
@@ -164,8 +163,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
             return maybeDropElementaryUpdate(update, target, relevantLocations,
                     overwrittenLocations, services);
         } else if (update.op() instanceof AbstractUpdate) {
-            return maybeDropAbstractUpdate(update, target, relevantLocations, overwrittenLocations,
-                    services);
+            // This is now handled by a dedicated rule.
+            return Optional.empty();
         } else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
             return descendInParallelUpdate( //
                     update, target, relevantLocations, overwrittenLocations, services);
@@ -248,67 +247,6 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     }
 
     /**
-     * Returns a SKIP update or an empty optional if dropping the abstract update is
-     * not possible. Abstract updates cannot be "simplified", either they're
-     * relevant or not.
-     * 
-     * Like {@link #dropElementary(Term, Term, Set, Services, TermBuilder)}, but for
-     * the much more complex setting of an abstract update.
-     * 
-     * @param update               The abstract update to check.
-     * @param target               The target formula, for extracting locations.
-     * @param overwrittenLocations A set of locations that are overwritten and
-     *                             therefore definitely irrelevant.
-     * @param services             The {@link Services} object.
-     * @return The simplified update {@link Term}, or {@link Optional#empty()}.
-     */
-    private static Optional<Term> maybeDropAbstractUpdate(final Term update, final Term target,
-            final Set<AbstractUpdateLoc> relevantLocations,
-            final Set<AbstractUpdateLoc> overwrittenLocations, final Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-        final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
-
-        if (abstrUpd.assignsNothing()) {
-            // Rare special case
-            return Optional.of(tb.skip());
-        }
-
-        //@formatter:off
-        /*
-         * Logic:
-         * 
-         * - All locations that *have to* be assigned by an abstract update are no
-         *   longer relevant (and also registered as overwritten).
-         * - An abstract update not assigning relevant locations can be dropped.
-         */
-        //@formatter:on
-
-        final Set<AbstractUpdateLoc> newIrrelevantLocations = relevantLocations.stream()
-                .filter(abstrUpd::hasToAssign)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-        final Set<AbstractUpdateLoc> newOverwrittenLocations = abstrUpd.getHasToAssignables()
-                .stream()
-                .filter(hasToLoc -> newIrrelevantLocations.stream()
-                        .anyMatch(loc -> hasToLoc.mayAssign(loc, services)))
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-
-        Term newAbstractUpdateTerm = null;
-
-        if (abstrUpd.getAllAssignables().stream().noneMatch(
-                loc -> isRelevant(loc, relevantLocations, overwrittenLocations, services))) {
-            /*
-             * We may drop the abstract update, not assigning anything relevant or not
-             * overwritten
-             */
-            newAbstractUpdateTerm = tb.skip();
-        }
-
-        relevantLocations.removeAll(newIrrelevantLocations);
-        overwrittenLocations.addAll(newOverwrittenLocations);
-        return Optional.ofNullable(newAbstractUpdateTerm);
-    }
-
-    /**
      * Returns either a SKIP update if the elementary update <code>update</code> can
      * be dropped (which is the case if it assigns a variable that is not relevant),
      * or an empty optional if it assigns a relevant variable. In that case, as a
@@ -332,8 +270,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
         if (isRelevant(lhs, relevantLocations, overwrittenLocations, services)) {
 
-            removeFromLocationSet(lhs, relevantLocations); // SIDE EFFECT!
-            addToAssngLocationSet(lhs, overwrittenLocations); // SIDE EFFECT!
+            removeFromLocationSet(lhs, relevantLocations, services); // SIDE EFFECT!
+            addToAssngLocationSet(lhs, overwrittenLocations, services); // SIDE EFFECT!
 
             /* NOTE: Cannot discard updates of the form x:=x, see bug #1269 (MU, CS) */
             return Optional.empty();
@@ -365,7 +303,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
          * to avoid such hacks in any case.
          */
 
-        return isRelevant(new PVLoc(lv), relevantLocations, overwrittenLocations, services);
+        return isRelevant(new PVLoc(lv, services), relevantLocations, overwrittenLocations, services);
     }
 
     /**
@@ -421,10 +359,11 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      * 
      * @param lv   The location to add.
      * @param locs The locations.
+     * @param services The service object.
      */
     private static void addToAssngLocationSet(final LocationVariable lv,
-            final Set<AbstractUpdateLoc> locs) {
-        locs.add(new PVLoc(lv));
+            final Set<AbstractUpdateLoc> locs, Services services) {
+        locs.add(new PVLoc(lv, services));
     }
 
     /**
@@ -432,10 +371,11 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      * 
      * @param lv   The location to remove.
      * @param locs The locations.
+     * @param services The service object.
      */
     private static void removeFromLocationSet(final LocationVariable lv,
-            final Set<AbstractUpdateLoc> locs) {
-        locs.remove(new PVLoc(lv));
+            final Set<AbstractUpdateLoc> locs, Services services) {
+        locs.remove(new PVLoc(lv, services));
     }
 
     @Override

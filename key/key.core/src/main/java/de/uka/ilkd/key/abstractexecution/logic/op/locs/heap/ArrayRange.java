@@ -48,20 +48,6 @@ public class ArrayRange extends HeapLoc {
     }
 
     @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        if (otherLoc instanceof AllFieldsLocLHS) {
-            return ((AllFieldsLocLHS) otherLoc).getArray().equals(array);
-        } else if (otherLoc instanceof PVLoc) {
-            return ((PVLoc) otherLoc).getVar()
-                    .equals(services.getTypeConverter().getHeapLDT().getHeap());
-        } else if (otherLoc instanceof ArrayLoc || otherLoc instanceof ArrayRange) {
-            super.mayAssign(otherLoc, services);
-        }
-
-        return false;
-    }
-
-    @Override
     public Term toTerm(Services services) {
         final TermBuilder tb = services.getTermBuilder();
         return tb.arrayRange(array, left, right);

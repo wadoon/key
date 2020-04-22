@@ -32,7 +32,6 @@ import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -115,8 +114,8 @@ public class AbstractUpdateTests extends AbstractTestTermParser {
         final LocationVariable lvY = intVar("y");
         final LocationVariable lvZ = intVar("z");
 
-        final Term u1 = abstractUpdate(aps("P"), new PVLoc(lvW), TB.var(lvX));
-        final Term u2 = abstractUpdate(aps("Q"), new PVLoc(lvY), TB.var(lvZ));
+        final Term u1 = abstractUpdate(aps("P"), new PVLoc(lvW, services), TB.var(lvX));
+        final Term u2 = abstractUpdate(aps("Q"), new PVLoc(lvY, services), TB.var(lvZ));
 
         final Term pred = TB.func(
                 new Function(new Name("p"), Sort.FORMULA, INT_SORT, INT_SORT, INT_SORT, INT_SORT),
@@ -124,35 +123,6 @@ public class AbstractUpdateTests extends AbstractTestTermParser {
 
         final Term equivalence = TB.equals(TB.apply(u1, TB.apply(u2, pred)),
                 TB.apply(u2, TB.apply(u1, pred)));
-
-        final Proof proof = startProofFor(equivalence);
-        assertEquals(true, proof.closed());
-    }
-
-    //@formatter:off
-    //    {y:=x}
-    //      {U_P(y!:=y,w)}
-    //        {x:=y}p(x,w)
-    //<-> {U_P(x!:=x,w)}p(x,w)
-    //@formatter:on
-    @Test
-    public void renamingTest() throws ProofInputException {
-        final LocationVariable w = intVar("w");
-        final LocationVariable x = intVar("x");
-        final LocationVariable y = intVar("y");
-
-        final Term u1 = abstractUpdate(aps("P"), new HasToLoc<PVLoc>(new PVLoc(y)),
-                new Term[] { TB.var(y), TB.var(w) });
-        final Term u2 = abstractUpdate(aps("P"), new HasToLoc<PVLoc>(new PVLoc(x)),
-                new Term[] { TB.var(x), TB.var(w) });
-
-        final Term pred = TB.func(new Function( //
-                new Name("p"), Sort.FORMULA, INT_SORT, INT_SORT), TB.var(x), TB.var(w));
-
-        final Term equivalence = TB.equals(
-                TB.apply(TB.elementary(TB.var(y), TB.var(x)),
-                        TB.apply(u1, TB.apply(TB.elementary(TB.var(x), TB.var(y)), pred))),
-                TB.apply(u2, pred));
 
         final Proof proof = startProofFor(equivalence);
         assertEquals(true, proof.closed());
@@ -194,7 +164,7 @@ public class AbstractUpdateTests extends AbstractTestTermParser {
                         + "arrayRange(arr,0,-1+arr.length)");
         final Proof arrayRangeEquivProof = startProofFor(arrayRangeEquiv);
         assertTrue(arrayRangeEquivProof.closed());
-        
+
         final Term locsetCapEquiv = parseFormula(
                 "{newObject:=arr}(disjoint(locset1,locset2))<->disjoint(locset1,locset2)");
         final Proof locsetCapEquivProof = startProofFor(locsetCapEquiv);
@@ -230,6 +200,7 @@ public class AbstractUpdateTests extends AbstractTestTermParser {
         simplificationTests.put("simplificationTest24.key", true);
         simplificationTests.put("simplificationTest25-INCORR.key", false);
         simplificationTests.put("simplificationTest26-INCORR.key", false);
+        simplificationTests.put("simplificationTest27.key", true);
 
         for (final String keyFile : simplificationTests.keySet()) {
             final Proof proof = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX, keyFile);
@@ -256,19 +227,11 @@ public class AbstractUpdateTests extends AbstractTestTermParser {
         return new AbstractStatement(id);
     }
 
-    private Term abstractUpdate(AbstractStatement aps, AbstractUpdateLoc lhs,
-            Term rhs) {
-        return abstractUpdate(aps, new AbstractUpdateLoc[] { lhs },
-                new Term[] { rhs });
+    private Term abstractUpdate(AbstractStatement aps, AbstractUpdateLoc lhs, Term rhs) {
+        return abstractUpdate(aps, new AbstractUpdateLoc[] { lhs }, new Term[] { rhs });
     }
 
-    private Term abstractUpdate(AbstractStatement aps, AbstractUpdateLoc lhs,
-            Term[] rhs) {
-        return abstractUpdate(aps, new AbstractUpdateLoc[] { lhs }, rhs);
-    }
-
-    private Term abstractUpdate(AbstractStatement aps, AbstractUpdateLoc[] lhs,
-            Term[] rhs) {
+    private Term abstractUpdate(AbstractStatement aps, AbstractUpdateLoc[] lhs, Term[] rhs) {
         final TermBuilder tb = DUMMY_SERVICES.getTermBuilder();
 
         final AbstractUpdateFactory abstrUpdF = DUMMY_SERVICES.abstractUpdateFactory();

@@ -17,8 +17,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import java.util.Optional;
+
+import org.key_project.util.lookup.Lookup;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
@@ -47,7 +48,6 @@ import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
-import org.key_project.util.lookup.Lookup;
 
 /**
  * this is a collection of common services to the KeY prover. Services
@@ -124,6 +124,15 @@ public class Services implements TermServices {
      * discarding the {@link Services} object, this can also be removed from memory.
      */
     private final AbstractUpdateFactory abstractUpdateFactory;
+    
+    /**
+     * Bijective map from location variables to their representation as a location
+     * (i.e., not a value). A location variable has roughly the same relation to its
+     * location representation as a location set (o,f) to the value "o.f". All function
+     * in the map have the special type "ProgVar" which is similar to the "Field" type
+     * and permits, e.g., quantification over program variable locations.
+     */
+    private final ProgramVariableLocationsMapper pvToLocationMapper;
 
     /**
      * Stores associations from SchemaVariable instantiations to SkolemSV
@@ -160,6 +169,7 @@ public class Services implements TermServices {
     	                                             new KeYRecoderExcHandler()), this);
     	nameRecorder = new NameRecorder();
         this.abstractUpdateFactory = new AbstractUpdateFactory(this);
+        this.pvToLocationMapper = new ProgramVariableLocationsMapper();
     }
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping rec2key, 
@@ -180,6 +190,7 @@ public class Services implements TermServices {
     			(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
     	nameRecorder = new NameRecorder();
         this.abstractUpdateFactory = new AbstractUpdateFactory(this);
+        this.pvToLocationMapper = new ProgramVariableLocationsMapper();
     }
 
     private Services(Services s) {
@@ -199,6 +210,7 @@ public class Services implements TermServices {
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.abstractUpdateFactory = s.abstractUpdateFactory;
+        this.pvToLocationMapper = new ProgramVariableLocationsMapper(s.pvToLocationMapper);
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -274,6 +286,14 @@ public class Services implements TermServices {
         return abstractUpdateFactory;
     }
     
+    /**
+     * @return The {@link ProgramVariableLocationsMapper} for getting "static"
+     *         location descriptors for program variables.
+     */
+    public ProgramVariableLocationsMapper getPvToLocationMapper() {
+        return pvToLocationMapper;
+    }
+
     /**
      * creates a new services object containing a copy of the java info of
      * this object and a new TypeConverter (shallow copy)

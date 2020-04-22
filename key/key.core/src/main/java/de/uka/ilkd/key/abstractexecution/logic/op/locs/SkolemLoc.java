@@ -55,13 +55,6 @@ public class SkolemLoc implements AbstractUpdateLoc {
     }
 
     @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        // XXX (DS, 2019-10-28): Only correct if those locsets are disjoint, which is
-        // not clear with the knowledge we have!
-        return otherLoc instanceof SkolemLoc && otherLoc.equals(this);
-    }
-
-    @Override
     public int hashCode() {
         return 5 + 17 * skLoc.hashCode();
     }
