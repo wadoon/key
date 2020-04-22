@@ -1705,16 +1705,16 @@ public final class JMLTranslator {
                                 final Term fieldTerm = t.sub(2);
                                 t = tb.singleton(objTerm, fieldTerm);
                                 singletons = singletons.append(t);
-                            } else if (t.op() instanceof ProgramVariable) {
+                            } else if (t.op() instanceof LocationVariable) {
                                 // this case may happen with local variables
-                                addIgnoreWarning("local variable in assignable clause");
-                                Debug.out("Can't create a locset from local variable "+ t + ".\n" +
-                                        "In this version of KeY, you do not need to put them in assignable clauses.");
+//                                addIgnoreWarning("local variable in assignable clause");
+//                                Debug.out("Can't create a locset from local variable "+ t + ".\n" +
+//                                        "In this version of KeY, you do not need to put them in assignable clauses.");
                                 /*
                                  * XXX (DS, 2018-12-14): This is a hack for AbstractExecution.
                                  * we might want to ignore ProgramVariables not in AE specs...
                                  */
-                                singletons = singletons.append(tb.singletonPV(t));
+                                singletons = singletons.append(tb.singletonPV((LocationVariable) t.op()));
                             } else {
                                 throw excManager.createException("Can't create a locset from "+ t + ".");
                             }
