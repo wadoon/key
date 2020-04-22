@@ -170,9 +170,8 @@ public class DropAbstractUpdateInSelectRuleApp extends DefaultBuiltInRuleApp {
             final boolean triviallyIrrelevant = frameLocs.stream()
                     .map(AbstractExecutionUtils::unwrapHasTo)
                     .allMatch(loc -> loc instanceof EmptyLoc || loc instanceof IrrelevantAssignable
-                            || (loc instanceof PVLoc && services.getPvToLocationMapper()
-                                    .getAssociatedVariable(((PVLoc) loc).getVar())
-                                    .get() != services.getTypeConverter().getHeapLDT().getHeap())
+                            || (loc instanceof PVLoc && ((PVLoc) loc).getVar() != services
+                                    .getTypeConverter().getHeapLDT().getHeap())
                             || (loc instanceof FieldLoc
                                     && ((FieldLoc) loc).getFieldTerm().op() != f.op()));
 

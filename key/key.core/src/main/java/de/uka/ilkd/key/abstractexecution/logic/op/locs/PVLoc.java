@@ -19,7 +19,6 @@ import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -30,17 +29,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * @author Dominic Steinhoefel
  */
 public class PVLoc implements AbstractUpdateLoc {
-    private final Function loc;
-    private final Sort sort;
+    private final LocationVariable loc;
 
-    public PVLoc(Function loc, Sort sort) {
+    public PVLoc(LocationVariable loc) {
         this.loc = loc;
-        this.sort = sort;
-    }
-
-    public PVLoc(LocationVariable loc, Services services) {
-        this.loc = services.getPvToLocationMapper().getAssociatedLocation(loc, services);
-        this.sort = loc.sort();
     }
 
     @Override
@@ -57,7 +49,7 @@ public class PVLoc implements AbstractUpdateLoc {
     /**
      * @return the encapsulated location.
      */
-    public Function getVar() {
+    public LocationVariable getVar() {
         return loc;
     }
 
@@ -78,7 +70,7 @@ public class PVLoc implements AbstractUpdateLoc {
 
     @Override
     public Sort sort() {
-        return sort;
+        return loc.sort();
     }
 
     @Override

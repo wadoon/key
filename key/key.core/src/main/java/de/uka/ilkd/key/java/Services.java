@@ -124,15 +124,6 @@ public class Services implements TermServices {
      * discarding the {@link Services} object, this can also be removed from memory.
      */
     private final AbstractUpdateFactory abstractUpdateFactory;
-    
-    /**
-     * Bijective map from location variables to their representation as a location
-     * (i.e., not a value). A location variable has roughly the same relation to its
-     * location representation as a location set (o,f) to the value "o.f". All function
-     * in the map have the special type "ProgVar" which is similar to the "Field" type
-     * and permits, e.g., quantification over program variable locations.
-     */
-    private final ProgramVariableLocationsMapper pvToLocationMapper;
 
     /**
      * Stores associations from SchemaVariable instantiations to SkolemSV
@@ -169,7 +160,6 @@ public class Services implements TermServices {
     	                                             new KeYRecoderExcHandler()), this);
     	nameRecorder = new NameRecorder();
         this.abstractUpdateFactory = new AbstractUpdateFactory(this);
-        this.pvToLocationMapper = new ProgramVariableLocationsMapper();
     }
 
     private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping rec2key, 
@@ -190,7 +180,6 @@ public class Services implements TermServices {
     			(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
     	nameRecorder = new NameRecorder();
         this.abstractUpdateFactory = new AbstractUpdateFactory(this);
-        this.pvToLocationMapper = new ProgramVariableLocationsMapper();
     }
 
     private Services(Services s) {
@@ -210,7 +199,6 @@ public class Services implements TermServices {
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.abstractUpdateFactory = s.abstractUpdateFactory;
-        this.pvToLocationMapper = new ProgramVariableLocationsMapper(s.pvToLocationMapper);
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -284,14 +272,6 @@ public class Services implements TermServices {
      */
     public AbstractUpdateFactory abstractUpdateFactory() {
         return abstractUpdateFactory;
-    }
-    
-    /**
-     * @return The {@link ProgramVariableLocationsMapper} for getting "static"
-     *         location descriptors for program variables.
-     */
-    public ProgramVariableLocationsMapper getPvToLocationMapper() {
-        return pvToLocationMapper;
     }
 
     /**

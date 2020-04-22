@@ -204,7 +204,7 @@ public class ReorderAbstractUpdatesRuleApp extends DefaultBuiltInRuleApp {
             // Don't do anything
         } else if (updateTerm.op() instanceof ElementaryUpdate) {
             assignables.add( //
-                    new PVLoc((LocationVariable) ((ElementaryUpdate) updateTerm.op()).lhs(), services));
+                    new PVLoc((LocationVariable) ((ElementaryUpdate) updateTerm.op()).lhs()));
         } else if (updateTerm.op() instanceof AbstractUpdate) {
             ((AbstractUpdate) updateTerm.op()).getAllAssignables().stream()
                     .map(AbstractExecutionUtils::unwrapHasTo).forEach(assignables::add);

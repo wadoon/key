@@ -3690,9 +3690,9 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
 	                    }
 	                    
                         args[0] = getTermFactory().createTerm(
-                                    locSetLDT.getProgVarSymbolForPV(
-                                            (LocationVariable) pv, getServices()),
-                                    new ImmutableArray<>());
+                            locSetLDT.getPV(),
+                            getTermFactory().createTerm(pv),
+                            new ImmutableArray<>());
 	                }
 	
 	                if(boundVars == null) {

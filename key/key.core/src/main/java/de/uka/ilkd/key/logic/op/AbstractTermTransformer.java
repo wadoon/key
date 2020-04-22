@@ -47,7 +47,6 @@ import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula3;
 import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula4;
 import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula5;
 import de.uka.ilkd.key.rule.metaconstruct.ObserverEqualityMetaConstruct;
-import de.uka.ilkd.key.rule.metaconstruct.PVLocToPVTransformer;
 import de.uka.ilkd.key.rule.metaconstruct.ReturnPrecondition;
 import de.uka.ilkd.key.rule.metaconstruct.SetLastComponentOfAEPredsToFalseTransformer;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideLCRMonomials;
@@ -158,8 +157,6 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer GET_FRAME_TRANSFORMER = new GetFrameTransformer();
 
     public static final AbstractTermTransformer SET_SECOND_COMPONENT_TO = new SetLastComponentOfAEPredsToFalseTransformer();
-
-    public static final AbstractTermTransformer PV_LOC_TO_PV = new PVLocToPVTransformer();
 
     /** Transformer producing condition for equality of observer terms */
     public static final AbstractTermTransformer OBSERVER_EQUALITY =

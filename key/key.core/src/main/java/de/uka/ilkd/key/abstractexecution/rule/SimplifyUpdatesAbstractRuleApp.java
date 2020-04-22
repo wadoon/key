@@ -390,7 +390,7 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
          * to avoid such hacks in any case.
          */
 
-        return isRelevant(new PVLoc(lv, services), relevantLocations, overwrittenLocations, goal,
+        return isRelevant(new PVLoc(lv), relevantLocations, overwrittenLocations, goal,
                 services);
     }
 
@@ -442,7 +442,7 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
      */
     private static void addToAssngLocationSet(final LocationVariable lv,
             final Set<AbstractUpdateLoc> locs, Services services) {
-        locs.add(new PVLoc(lv, services));
+        locs.add(new PVLoc(lv));
     }
 
     /**
@@ -454,6 +454,6 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
      */
     private static void removeFromLocationSet(final LocationVariable lv,
             final Set<AbstractUpdateLoc> locs, Services services) {
-        locs.remove(new PVLoc(lv, services));
+        locs.remove(new PVLoc(lv));
     }
 }

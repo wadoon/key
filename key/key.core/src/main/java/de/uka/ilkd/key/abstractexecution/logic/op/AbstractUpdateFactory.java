@@ -421,8 +421,8 @@ public class AbstractUpdateFactory {
         final Map<AbstractUpdateLoc, AbstractUpdateLoc> locReplMap = //
                 replMap.entrySet().stream()
                         .collect(Collectors.toMap(
-                                e -> new PVLoc((LocationVariable) e.getKey(), services),
-                                e -> new PVLoc((LocationVariable) e.getValue(), services)));
+                                e -> new PVLoc((LocationVariable) e.getKey()),
+                                e -> new PVLoc((LocationVariable) e.getValue())));
 
         return changeAssignables(abstrUpd, locReplMap);
     }
@@ -483,11 +483,9 @@ public class AbstractUpdateFactory {
         if (op == locSetLDT.getIrr()) {
             return new IrrelevantAssignable(t);
         } else if (op instanceof LocationVariable) {
-            return new PVLoc((LocationVariable) op, services);
-        } else if (op instanceof Function && ((Function) op).sort() == locSetLDT.getProgVarSort()) {
-            return new PVLoc(
-                    services.getPvToLocationMapper().getAssociatedVariable((Function) op).get(),
-                    services);
+            return new PVLoc((LocationVariable) op);
+        } else if (op instanceof Function && (Function) op == locSetLDT.getPV()) {
+            return new PVLoc((LocationVariable) t.sub(0).op());
         } else if (t.op() == locSetLDT.getAllLocs()) {
             return new AllLocsLoc(locSetLDT.getAllLocs());
         } else if (t.op() == locSetLDT.getEmpty()) {

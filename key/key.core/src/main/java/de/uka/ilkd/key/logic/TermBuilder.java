@@ -1543,20 +1543,13 @@ public class TermBuilder {
     public Term singletonPV(Term pv) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         assert pv.op() instanceof Function;
-        assert ((Function) pv.op()).sort() == locSetLDT.getProgVarSort();
+        assert ((Function) pv.op()).sort() == locSetLDT.getPV();
         return func(locSetLDT.getSingletonPV(), pv);
-    }
-
-    public Term singletonPV(Function pvLoc) {
-        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        assert pvLoc.sort() == locSetLDT.getProgVarSort();
-        return func(locSetLDT.getSingletonPV(), func(pvLoc));
     }
 
     public Term singletonPV(LocationVariable pv) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        return func(locSetLDT.getSingletonPV(),
-                func(locSetLDT.getProgVarSymbolForPV(pv, services)));
+        return func(locSetLDT.getSingletonPV(), func(locSetLDT.getPV(), var(pv)));
     }
 
     public Term hasTo(Term locSetTerm) {
@@ -1718,7 +1711,7 @@ public class TermBuilder {
             return singletonPV((LocationVariable) s.op());
         } else if (s.op() instanceof Function
                 && ((Function) s.op()).sort() == ldt.getProgVarSort()) {
-            return singletonPV((Function) s.op());
+            return singletonPV(s);
         }
 
         return s;

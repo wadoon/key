@@ -303,7 +303,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
          * to avoid such hacks in any case.
          */
 
-        return isRelevant(new PVLoc(lv, services), relevantLocations, overwrittenLocations, services);
+        return isRelevant(new PVLoc(lv), relevantLocations, overwrittenLocations, services);
     }
 
     /**
@@ -363,7 +363,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      */
     private static void addToAssngLocationSet(final LocationVariable lv,
             final Set<AbstractUpdateLoc> locs, Services services) {
-        locs.add(new PVLoc(lv, services));
+        locs.add(new PVLoc(lv));
     }
 
     /**
@@ -375,7 +375,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      */
     private static void removeFromLocationSet(final LocationVariable lv,
             final Set<AbstractUpdateLoc> locs, Services services) {
-        locs.remove(new PVLoc(lv, services));
+        locs.remove(new PVLoc(lv));
     }
 
     @Override

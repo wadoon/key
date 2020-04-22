@@ -31,7 +31,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -266,15 +265,5 @@ public final class LocSetLDT extends LDT {
     public final Type getType(Term t) {
 	assert false;
 	return null;
-    }
-
-    /**
-     * Given a program variable, returns the function symbol representing that
-     * "program variable location". In contrast to program variables, those symbols
-     * of sort ProgVar do not carry values, but represent the associated location.
-     */
-    public Function getProgVarSymbolForPV(LocationVariable variable, Services services) {
-        assert !variable.isMember();
-        return services.getPvToLocationMapper().getAssociatedLocation(variable, services);
     }
 }

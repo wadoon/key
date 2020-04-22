@@ -310,8 +310,7 @@ public class AbstractExecutionUtils {
             return false;
         }
 
-        final LocationVariable locVar = services.getPvToLocationMapper()
-                .getAssociatedVariable(((PVLoc) unwrapHasTo(loc)).getVar()).get();
+        final LocationVariable locVar = ((PVLoc) unwrapHasTo(loc)).getVar();
 
         /*
          * Location variables that either are already present in the root sequent, or
@@ -428,9 +427,8 @@ public class AbstractExecutionUtils {
         } else if (locUnwrapped instanceof HeapLoc) {
             // If loc is a HeapLoc, we can safely remove all PVLocs that aren't the heap
             // variable.
-            relevantLocsCopy.removeIf(ploc -> ploc instanceof PVLoc && services
-                    .getPvToLocationMapper().getAssociatedVariable(((PVLoc) ploc).getVar())
-                    .get() != services.getTypeConverter().getHeapLDT().getHeap());
+            relevantLocsCopy.removeIf(ploc -> ploc instanceof PVLoc && ((PVLoc) ploc)
+                    .getVar() != services.getTypeConverter().getHeapLDT().getHeap());
         } else {
             /*
              * Even if loc is allLocs, the "fresh" locations cannot be meant! We remove
@@ -511,7 +509,7 @@ public class AbstractExecutionUtils {
             final Term premiseFor = premise.formula();
             for (Term formula : formulas) {
                 if (premiseFor.equalsModIrrelevantTermLabels(formula)) {
-                    return Optional.of(new PosInOccurrence(premise, PosInTerm.getTopLevel(), true));
+                    return Optional.of(new PosInOccurrence(premise, PosInTerm.getTopLevel(), inAntec));
                 }
             }
         }

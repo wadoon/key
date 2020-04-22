@@ -114,8 +114,8 @@ public class AbstractUpdateTests extends AbstractTestTermParser {
         final LocationVariable lvY = intVar("y");
         final LocationVariable lvZ = intVar("z");
 
-        final Term u1 = abstractUpdate(aps("P"), new PVLoc(lvW, services), TB.var(lvX));
-        final Term u2 = abstractUpdate(aps("Q"), new PVLoc(lvY, services), TB.var(lvZ));
+        final Term u1 = abstractUpdate(aps("P"), new PVLoc(lvW), TB.var(lvX));
+        final Term u2 = abstractUpdate(aps("Q"), new PVLoc(lvY), TB.var(lvZ));
 
         final Term pred = TB.func(
                 new Function(new Name("p"), Sort.FORMULA, INT_SORT, INT_SORT, INT_SORT, INT_SORT),
