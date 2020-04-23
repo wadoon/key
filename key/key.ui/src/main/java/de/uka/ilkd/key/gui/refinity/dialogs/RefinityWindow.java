@@ -118,7 +118,6 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.ProverTaskAdapter;
-import de.uka.ilkd.key.settings.PathConfig;
 
 /**
  * 
@@ -1347,7 +1346,6 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
     }
 
     private void closeWindow(final boolean shutdown) {
-        mainWindow.getRecentFiles().store(PathConfig.getRecentFileStorage());
         setVisible(false);
         dispose();
 
