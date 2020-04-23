@@ -118,6 +118,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.impl.ProverTaskAdapter;
+import de.uka.ilkd.key.settings.PathConfig;
 
 /**
  * 
@@ -185,6 +186,9 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         assert model != null;
         this.model = model;
         this.mainWindow = mainWindow;
+
+        model.getFile().ifPresent(
+                file -> mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath()));
 
         setIconImage(IconFontSwing.buildImage(FontAwesomeSolid.BALANCE_SCALE, 16, Color.BLACK));
         setAlwaysOnTop(false);
@@ -572,12 +576,12 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
 
                 final Point currLoc = getLocationOnScreen();
                 final Dimension currSize = getSize();
-                
+
                 final RefinityWindow newDia = new RefinityWindow(mainWindow, newModel);
                 newDia.setVisible(true);
                 newDia.setLocation(currLoc);
                 newDia.setSize(currSize);
-                
+
                 setVisible(false);
                 dispose();
             }
@@ -812,7 +816,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                 rightScrollPane.getVerticalScrollBar());
         ScrollbarSynchronizer.synchronize(leftScrollPane.getHorizontalScrollBar(),
                 rightScrollPane.getHorizontalScrollBar());
-        
+
         synchronizeScrollingListeners.add(doSynchronize -> {
             ScrollbarSynchronizer.unSynchronize(leftScrollPane.getVerticalScrollBar(),
                     rightScrollPane.getVerticalScrollBar());
@@ -1086,7 +1090,8 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                     final ProgramVariableDeclaration selectedElem = progVarDeclsList
                             .getSelectedValue();
                     // to prevent problems when user changes nothing and clicks "ok"
-                    services.getNamespaces().programVariables().remove(new Name(selectedElem.getName()));
+                    services.getNamespaces().programVariables()
+                            .remove(new Name(selectedElem.getName()));
                     final ProgramVariableDeclaration pd = ProgramVariableInputDialog
                             .showInputDialog(RefinityWindow.this, selectedElem, services);
                     if (pd != null && !pd.equals(selectedElem)) {
@@ -1100,7 +1105,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                             selectedElem.checkAndRegister(services);
                         } catch (RuntimeException exc) {
                         }
-                    }                    
+                    }
                 }
             }
         });
@@ -1187,7 +1192,8 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                     final AbstractLocsetDeclaration selectedElem = //
                             locsetDeclsList.getSelectedValue();
                     // to prevent problems when user changes nothing and clicks "ok"
-                    services.getNamespaces().programVariables().remove(new Name(selectedElem.getName()));
+                    services.getNamespaces().programVariables()
+                            .remove(new Name(selectedElem.getName()));
                     final AbstractLocsetDeclaration ls = LocsetInputDialog.showInputDialog( //
                             RefinityWindow.this, selectedElem, services);
                     if (ls != null && !ls.equals(selectedElem)) {
@@ -1201,7 +1207,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                             selectedElem.checkAndRegister(services);
                         } catch (RuntimeException exc) {
                         }
-                    }        
+                    }
                 }
             }
         });
@@ -1271,7 +1277,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         } catch (IOException ioe) {
             // Shouldn't happen; never mind if it does.
         }
-        
+
         SyntaxScheme scheme = component.getSyntaxScheme();
         scheme.getStyle(Token.COMMENT_MULTILINE).foreground = COMMENT_COLOR;
         scheme.getStyle(Token.COMMENT_EOL).foreground = COMMENT_COLOR;
@@ -1341,11 +1347,12 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
     }
 
     private void closeWindow(final boolean shutdown) {
+        mainWindow.getRecentFiles().store(PathConfig.getRecentFileStorage());
         setVisible(false);
         dispose();
 
         if (shutdown) {
-            System.exit(0);
+            mainWindow.getExitMainAction().exitMainWithoutInteraction();
         }
     }
 
