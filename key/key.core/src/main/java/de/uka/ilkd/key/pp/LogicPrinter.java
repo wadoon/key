@@ -228,15 +228,21 @@ public class LogicPrinter {
     public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting,
             boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
-        if (services != null) {
-            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
-        }
 
         // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
         // because the SequentViewLogicPrinter respects default TermLabel visibility
         // settings.
         LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, services,
                 new TermLabelVisibilityManager());
+        
+        // NOTE (DS, 2020-04-23): We have to refresh after creating the
+        // SequentViewLogicPrinter, as that also refreshes and we'd lose
+        // the information about pretty printing or unicode symbols.
+        // Reason why this was discovered: "pretty" syntax for locset "subset"
+        // function, "x \subset y", cannot be parsed.
+        if (services != null) {
+            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
+        }
 
         try {
             p.printTerm(t);
