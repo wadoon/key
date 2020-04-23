@@ -1542,8 +1542,7 @@ public class TermBuilder {
 
     public Term singletonPV(Term pv) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        assert pv.op() instanceof Function;
-        assert (Function) pv.op() == locSetLDT.getPV();
+        assert pv.sort() == locSetLDT.getProgVarSort();
         return func(locSetLDT.getSingletonPV(), pv);
     }
 

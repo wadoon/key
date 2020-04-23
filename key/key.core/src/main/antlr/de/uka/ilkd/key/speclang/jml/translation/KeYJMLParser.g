@@ -2299,6 +2299,14 @@ builtintype returns [KeYJavaType type = null] throws SLTranslationException
         {
             type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_FREE_ADT);
         }
+    |   FIELD
+        {
+            type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_FIELD);
+        }
+    |   PROGVAR
+        {
+            type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_PROGVAR);
+        }
     )
 
 ;

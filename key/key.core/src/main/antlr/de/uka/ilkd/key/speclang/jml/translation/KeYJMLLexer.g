@@ -78,6 +78,7 @@ lexer grammar KeYJMLLexer;
     EVERYTHING           : '\\everything';
     EXCEPTION            : '\\exception';
     EXISTS               : '\\exists';
+    FIELD                : '\\field';  //KeY extension, not official JML
     FORALL               : '\\forall';
     FREE                 : '\\free';  //KeY extension, not official JML
     FRESH                : '\\fresh';
@@ -120,6 +121,7 @@ lexer grammar KeYJMLLexer;
     PERMISSION           : '\\permission';
     PRE                  : '\\pre';
     PRODUCT              : '\\product';
+    PROGVAR              : '\\progvar';  //KeY extension, not official JML
     REACH                : '\\reach';
     REACHLOCS            : '\\reachLocs';  //KeY extension, not official JML
     REAL                 : '\\real';

@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
@@ -38,6 +39,7 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.ProgVarLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
@@ -1690,8 +1692,32 @@ public final class JMLTranslator {
                 ImmutableList<SLExpression> exprList =
                         (ImmutableList<SLExpression>) params[0];
                 Services services = (Services) params[1];
+                
+                // Declaration of a singleton via \singleton(o,f) instead of
+                // \singleton(myObj.f), used in advanced framing specifications.
+                directSingleton: if (exprList.size() == 2) {
+                    final List<Term> terms = exprList.stream().filter(SLExpression::isTerm)
+                            .map(SLExpression::getTerm).collect(Collectors.toList());
+                    if (terms.size() != 2) {
+                        break directSingleton;
+                    }
+                    
+                    final Term objTerm = terms.get(0);
+                    final Term fieldTerm = terms.get(1);
+                    
+                    final Sort objectSort = services.getNamespaces().sorts().lookup("java.lang.Object");
+                    final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
+                    
+                    if (objTerm.sort() != objectSort || fieldTerm.sort() != fieldSort) {
+                        break directSingleton;
+                    }
+                    
+                    // We have a (o,f) pair, create a singleton
+                    return tb.singleton(objTerm, fieldTerm);
+                }
 
                 ImmutableList<Term> singletons = ImmutableSLList.<Term>nil();
+                
                 for (SLExpression expr : exprList) {
                     if (expr.isTerm()) {
                         Term t = expr.getTerm();
@@ -1715,6 +1741,10 @@ public final class JMLTranslator {
                                  * we might want to ignore ProgramVariables not in AE specs...
                                  */
                                 singletons = singletons.append(tb.singletonPV((LocationVariable) t.op()));
+                            } else if (t.sort() == services.getJavaInfo()
+                                    .getPrimitiveKeYJavaType(PrimitiveType.JAVA_PROGVAR)
+                                    .getSort()) {
+                                singletons = singletons.append(tb.singletonPV(t));
                             } else {
                                 throw excManager.createException("Can't create a locset from "+ t + ".");
                             }

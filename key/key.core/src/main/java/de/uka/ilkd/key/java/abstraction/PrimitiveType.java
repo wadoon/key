@@ -30,11 +30,13 @@ import de.uka.ilkd.key.java.expression.literal.LongLiteral;
 import de.uka.ilkd.key.java.expression.literal.RealLiteral;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.DoubleLDT;
+import de.uka.ilkd.key.ldt.FieldLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.FreeLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.MapLDT;
+import de.uka.ilkd.key.ldt.ProgVarLDT;
 import de.uka.ilkd.key.ldt.RealLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -82,6 +84,10 @@ public final class PrimitiveType implements Type {
             new PrimitiveType("\\free", FreeLiteral.INSTANCE, FreeLDT.NAME);
     public static final PrimitiveType JAVA_MAP =
             new PrimitiveType("\\map", EmptyMapLiteral.INSTANCE, MapLDT.NAME);
+    public static final PrimitiveType JAVA_FIELD =
+            new PrimitiveType("\\field", null, FieldLDT.NAME);
+    public static final PrimitiveType JAVA_PROGVAR =
+            new PrimitiveType("\\progvar", null, ProgVarLDT.NAME);
 
     public static final PrimitiveType PROGRAM_SV = new PrimitiveType("SV", null, null);
 

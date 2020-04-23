@@ -289,7 +289,7 @@ public class ProofBundleConverter {
         try {
             Term parsed = translateJML(jmlString, dummyKJT, services);
             parsed = removeLabels(parsed, services);
-            return LogicPrinter.quickPrintTerm(parsed, services);
+            return LogicPrinter.quickPrintTerm(parsed, services, false, false);
         } catch (Exception e) {
             throw new RuntimeException("Could not parse JML formula, message: " + e.getMessage(),
                     e);

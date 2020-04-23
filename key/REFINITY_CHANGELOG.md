@@ -5,6 +5,8 @@ REFINITY CHANGES
 
   * Supporting postconditions via standard "ensures" for break and continue behavior
   * Stability fixes in the user interface
+  * New \field and \progvar JML types for advanced framing conditions
+  * Saving recently opened REFINITY models
 
 ## 2019-12-29 (v0.9.3) Dominic Steinhoefel <steinhoefel@cs.tu-darmstadt.de>
 
