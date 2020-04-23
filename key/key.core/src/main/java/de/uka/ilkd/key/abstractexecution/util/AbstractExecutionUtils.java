@@ -121,16 +121,19 @@ public class AbstractExecutionUtils {
     }
 
     /**
-     * Abstract Skolem location sets are nullary constants of type LocSet.
+     * Abstract Skolem location sets are built from new functions of type LocSet,
+     * e.g., like "LocSet frame;" or "LocSet subFrame(int);". We distinguish them by
+     * checking whether they are "statically" known to {@link LocSetLDT}.
      * 
      * @param op       The {@link Operator} to check.
      * @param services The {@link Services} object (for the {@link LocSetLDT}).
      * @return true iff the given operator is an abstract Skolem location set.
      */
-    public static boolean isAbstractSkolemLocationSet(final Operator op, final Services services) {
+    public static boolean isAbstractSkolemLocationSet(final Term t, final Services services) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        return op instanceof Function && op.arity() == 0
-                && ((Function) op).sort() == locSetLDT.targetSort();
+        final Operator op = t.op();
+        return op instanceof Function && ((Function) op).sort() == locSetLDT.targetSort()
+                && !locSetLDT.containsFunction((Function) op);
     }
 
     /**
@@ -509,7 +512,8 @@ public class AbstractExecutionUtils {
             final Term premiseFor = premise.formula();
             for (Term formula : formulas) {
                 if (premiseFor.equalsModIrrelevantTermLabels(formula)) {
-                    return Optional.of(new PosInOccurrence(premise, PosInTerm.getTopLevel(), inAntec));
+                    return Optional
+                            .of(new PosInOccurrence(premise, PosInTerm.getTopLevel(), inAntec));
                 }
             }
         }

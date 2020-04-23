@@ -490,14 +490,14 @@ public class AbstractUpdateFactory {
             return new AllLocsLoc(locSetLDT.getAllLocs());
         } else if (t.op() == locSetLDT.getEmpty()) {
             return new EmptyLoc(locSetLDT.getEmpty());
-        } else if (AbstractExecutionUtils.isAbstractSkolemLocationSet(op, services)) {
-            return new SkolemLoc((Function) op);
         } else if (op == locSetLDT.getSingletonPV()) {
             return abstrUpdateLocFromTerm(t.sub(0), executionContext, services);
         } else if (op == locSetLDT.getHasTo()) {
             // There is exactly one location inside a hasTo
             return new HasToLoc<AbstractUpdateLoc>(
                     abstrUpdateLocFromTerm(t.sub(0), executionContext, services));
+        } else if (AbstractExecutionUtils.isAbstractSkolemLocationSet(t, services)) {
+            return new SkolemLoc(t);
         } else if (isHeapOp(op, locSetLDT, heapLDT)) {
             return abstrUpdateAssgnLocsFromHeapTerm(t, executionContext, services);
         } else {

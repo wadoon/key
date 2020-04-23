@@ -12,13 +12,12 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
-import java.util.Collections;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -28,20 +27,22 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * @author Dominic Steinhoefel
  */
 public class SkolemLoc implements AbstractUpdateLoc {
-    private final Function skLoc;
+    private final Term skLoc;
 
-    public SkolemLoc(Function skLoc) {
+    public SkolemLoc(Term skLoc) {
         this.skLoc = skLoc;
     }
 
     @Override
     public Term toTerm(Services services) {
-        return services.getTermBuilder().func(skLoc);
+        return skLoc;
     }
 
     @Override
     public Set<Operator> childOps() {
-        return Collections.singleton(skLoc);
+        final OpCollector opColl = new OpCollector();
+        skLoc.execPostOrder(opColl);
+        return opColl.ops();
     }
 
     @Override
