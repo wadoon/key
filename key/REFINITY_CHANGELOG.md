@@ -1,7 +1,7 @@
 REFINITY CHANGES
 ================
 
-## XXX (v0.9.4) Dominic Steinhoefel <steinhoefel@cs.tu-darmstadt.de>
+## 2020-04-24 (v0.9.4) Dominic Steinhoefel <steinhoefel@cs.tu-darmstadt.de>
 
   * Supporting postconditions via standard "ensures" for break and continue behavior
   * Stability fixes in the user interface
