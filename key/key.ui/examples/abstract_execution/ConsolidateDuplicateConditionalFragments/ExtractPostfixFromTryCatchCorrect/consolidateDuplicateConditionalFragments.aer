@@ -54,34 +54,34 @@ catch (Throwable t) {
 </programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
-        <locationSet locsetName="relevant">
+        <locationSet funcName="relevant">
             <relevantOne>0</relevantOne>
             <relevantTwo>0</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="frameTryProg">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="frameTryProg">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintTryProg">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintTryProg">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="framePostfixProg">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="framePostfixProg">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintPostfixProg">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintPostfixProg">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="frameCatchProg">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="frameCatchProg">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintCatchProg">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintCatchProg">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
+        <resultSortName>LocSet</resultSortName></locationSet>
     </locationSets>
     <functions/>
     <predicates/>

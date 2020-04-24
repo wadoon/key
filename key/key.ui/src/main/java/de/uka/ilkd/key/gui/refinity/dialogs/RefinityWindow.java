@@ -71,6 +71,7 @@ import org.fife.ui.rsyntaxtextarea.templates.StaticCodeTemplate;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.key_project.util.java.IOUtil;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import bibliothek.gui.dock.common.CContentArea;
 import bibliothek.gui.dock.common.CControl;
@@ -742,7 +743,16 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
     }
 
     private String getMessageFromJAXBExc(JAXBException exc) {
+        if (exc.getLinkedException() != null
+                && exc.getLinkedException() instanceof SAXParseException) {
+            final SAXParseException innerExc = (SAXParseException) exc.getLinkedException();
+            return String.format("XML Schema violated at line %d, column %d.<br>%s",
+                    innerExc.getLineNumber(), innerExc.getColumnNumber(), innerExc.getMessage());
+        }
+
         return Optional.ofNullable(exc.getMessage())
+                .map(e -> e + Optional.ofNullable(exc.getLinkedException())
+                        .map(elinked -> "<br>Linked Exception: " + elinked.getMessage()).orElse(""))
                 .orElse(Optional.ofNullable(exc.getLinkedException()).map(e -> e.getMessage())
                         .orElse(exc.toString()));
     }

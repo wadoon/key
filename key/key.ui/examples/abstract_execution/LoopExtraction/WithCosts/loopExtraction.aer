@@ -224,30 +224,45 @@ while (i &lt; threshold) {
 { ; }</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
-        <locationSet locsetName="frameP">
+        <locationSet funcName="frameP">
             <relevantOne>0</relevantOne>
             <relevantTwo>0</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintP">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintP">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="frameQ">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="frameQ">
             <relevantOne>1</relevantOne>
             <relevantTwo>1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintQ">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintQ">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
+        <resultSortName>LocSet</resultSortName></locationSet>
     </locationSets>
     <functions>
-        <function funcName="resultQ" resultSortName="any">
+        <function funcName="resultQ">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>any</resultSortName>
             <argSort>any</argSort>
         </function>
-        <function funcName="oldFootprintQ" resultSortName="any"/>
-        <function funcName="loopExitedLeft" resultSortName="boolean"/>
-        <function funcName="loopExitedRight" resultSortName="boolean"/>
+        <function funcName="oldFootprintQ">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>any</resultSortName>
+        </function>
+        <function funcName="loopExitedLeft">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>boolean</resultSortName>
+        </function>
+        <function funcName="loopExitedRight">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>boolean</resultSortName>
+        </function>
         <function funcName="costQ" resultSortName="int">
             <argSort>any</argSort>
         </function>

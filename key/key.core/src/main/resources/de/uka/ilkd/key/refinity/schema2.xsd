@@ -49,18 +49,18 @@
     <xs:complexContent>
       <xs:extension base="nullarySymbolDeclaration">
         <xs:sequence>
+          <xs:element name="resultSortName" type="xs:string" default="LocSet" minOccurs="0"/>
           <xs:element name="argSort" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="funcName" type="xs:string"/>
-        <xs:attribute name="resultSortName" type="xs:string"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
   <xs:complexType name="nullarySymbolDeclaration" abstract="true">
     <xs:sequence>
-      <xs:element name="relevantOne" type="xs:int"/>
-      <xs:element name="relevantTwo" type="xs:int"/>
+      <xs:element name="relevantOne" type="xs:int" default="-1"/>
+      <xs:element name="relevantTwo" type="xs:int" default="-1"/>
     </xs:sequence>
   </xs:complexType>
 

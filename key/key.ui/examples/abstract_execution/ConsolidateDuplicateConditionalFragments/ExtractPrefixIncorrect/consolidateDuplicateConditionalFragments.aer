@@ -85,42 +85,42 @@ else {
 }</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
-        <locationSet locsetName="relevant">
+        <locationSet funcName="relevant">
             <relevantOne>0</relevantOne>
             <relevantTwo>0</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="frameP">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="frameP">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintP">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintP">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="frameE">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="frameE">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintE">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintE">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="frameQ1">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="frameQ1">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintQ1">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintQ1">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="frameQ2">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="frameQ2">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintQ2">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintQ2">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
+        <resultSortName>LocSet</resultSortName></locationSet>
     </locationSets>
     <functions/>
     <predicates>

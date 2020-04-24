@@ -36,26 +36,26 @@
 }</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
-        <locationSet locsetName="relevant">
+        <locationSet funcName="relevant">
             <relevantOne>0</relevantOne>
             <relevantTwo>0</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="frameTry">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="frameTry">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintTry">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintTry">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="frameCatch">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="frameCatch">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintCatch">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintCatch">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
+        <resultSortName>LocSet</resultSortName></locationSet>
     </locationSets>
     <functions/>
     <predicates>

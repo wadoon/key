@@ -35,8 +35,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class FunctionDeclaration extends NullarySymbolDeclaration implements FuncOrPredDecl {
     @XmlAttribute
     private String funcName = "";
-    @XmlAttribute
+    
+    @XmlElement(required=false, defaultValue="LocSet")
     private String resultSortName = "";
+    
     @XmlElement(name = "argSort")
     private List<String> argSorts = new ArrayList<>();
 

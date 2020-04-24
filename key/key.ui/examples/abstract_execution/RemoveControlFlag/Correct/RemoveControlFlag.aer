@@ -217,17 +217,20 @@ while (
 </programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
-        <locationSet locsetName="relevant">
+        <locationSet funcName="relevant">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="loopLocs">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="loopLocs">
             <relevantOne>0</relevantOne>
             <relevantTwo>0</relevantTwo>
-        </locationSet>
+        <resultSortName>LocSet</resultSortName></locationSet>
     </locationSets>
     <functions>
-        <function funcName="decrExpr" resultSortName="int">
+        <function funcName="decrExpr">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>int</resultSortName>
             <argSort>any</argSort>
         </function>
     </functions>

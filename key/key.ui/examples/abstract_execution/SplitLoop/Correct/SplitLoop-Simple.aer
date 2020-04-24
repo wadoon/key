@@ -220,32 +220,48 @@ while (i &lt; n) {
 { ; }</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
-        <locationSet locsetName="relevant">
+        <locationSet funcName="relevant">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="frameP">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="frameP">
             <relevantOne>0</relevantOne>
             <relevantTwo>0</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintP">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintP">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="frameQ">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="frameQ">
             <relevantOne>1</relevantOne>
             <relevantTwo>1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintQ">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintQ">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
+        <resultSortName>LocSet</resultSortName></locationSet>
     </locationSets>
     <functions>
-        <function funcName="loopPExitedLeft" resultSortName="boolean"/>
-        <function funcName="loopPExitedRight" resultSortName="boolean"/>
-        <function funcName="loopQExitedLeft" resultSortName="boolean"/>
-        <function funcName="loopQExitedRight" resultSortName="boolean"/>
+        <function funcName="loopPExitedLeft">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>boolean</resultSortName>
+        </function>
+        <function funcName="loopPExitedRight">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>boolean</resultSortName>
+        </function>
+        <function funcName="loopQExitedLeft">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>boolean</resultSortName>
+        </function>
+        <function funcName="loopQExitedRight">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>boolean</resultSortName>
+        </function>
     </functions>
     <predicates>
         <predicate predName="loopInvP">

@@ -96,7 +96,7 @@ while (
       @ continue_behavior requires false;
       @*/
     \abstract_statement LoopUpdate;
-    
+
     /*@ assignable frameP;
       @ accessible footprintP, footprintG;
       @ normal_behavior ensures
@@ -126,6 +126,8 @@ while (
       @*/
     \abstract_statement Q;
 }
+
+
 
 
 
@@ -300,7 +302,7 @@ while (
       @ continue_behavior requires false;
       @*/
     \abstract_statement LoopUpdate;
-    
+
     /*@ assignable frameP;
       @ accessible footprintP, footprintG;
       @ normal_behavior ensures
@@ -412,29 +414,37 @@ while (
 }</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
-        <locationSet locsetName="frameP">
+        <locationSet funcName="frameP">
             <relevantOne>0</relevantOne>
             <relevantTwo>0</relevantTwo>
+            <resultSortName>LocSet</resultSortName>
         </locationSet>
-        <locationSet locsetName="footprintP">
+        <locationSet funcName="footprintP">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
+            <resultSortName>LocSet</resultSortName>
         </locationSet>
-        <locationSet locsetName="frameQ">
+        <locationSet funcName="frameQ">
             <relevantOne>1</relevantOne>
             <relevantTwo>1</relevantTwo>
+            <resultSortName>LocSet</resultSortName>
         </locationSet>
-        <locationSet locsetName="footprintQ">
+        <locationSet funcName="footprintQ">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintG">
+            <resultSortName>LocSet</resultSortName>
+       </locationSet>
+        <locationSet funcName="footprintG">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
+            <resultSortName>LocSet</resultSortName>
         </locationSet>
     </locationSets>
     <functions>
-        <function funcName="variant" resultSortName="int">
+        <function funcName="variant">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>int</resultSortName>
             <argSort>any</argSort>
         </function>
     </functions>

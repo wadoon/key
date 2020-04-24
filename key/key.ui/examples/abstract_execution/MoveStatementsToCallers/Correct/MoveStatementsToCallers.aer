@@ -40,34 +40,34 @@ private Object mAfter() {
     \abstract_statement B;
 }</methodLevelContext>
     <locationSets>
-        <locationSet locsetName="relevant">
+        <locationSet funcName="relevant">
             <relevantOne>0</relevantOne>
             <relevantTwo>0</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="frameA">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="frameA">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintA">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintA">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="frameB">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="frameB">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintB">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintB">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="frameP">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="frameP">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
-        <locationSet locsetName="footprintP">
+        <resultSortName>LocSet</resultSortName></locationSet>
+        <locationSet funcName="footprintP">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        </locationSet>
+        <resultSortName>LocSet</resultSortName></locationSet>
     </locationSets>
     <functions/>
     <predicates>

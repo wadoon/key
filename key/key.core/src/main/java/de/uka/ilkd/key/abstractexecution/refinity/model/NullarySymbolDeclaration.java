@@ -12,6 +12,7 @@
 //
 package de.uka.ilkd.key.abstractexecution.refinity.model;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
@@ -35,6 +36,7 @@ public abstract class NullarySymbolDeclaration {
      *         left program or otherwise the position of this symbol within the list
      *         of relevant symbols for the left program.
      */
+    @XmlElement(required=false, defaultValue="-1")
     public int getRelevantOne() {
         return relevantOne;
     }
@@ -53,6 +55,7 @@ public abstract class NullarySymbolDeclaration {
      *         right program or otherwise the position of this symbol within the
      *         list of relevant symbols for the right program.
      */
+    @XmlElement(required=false, defaultValue="-1")
     public int getRelevantTwo() {
         return relevantTwo;
     }
