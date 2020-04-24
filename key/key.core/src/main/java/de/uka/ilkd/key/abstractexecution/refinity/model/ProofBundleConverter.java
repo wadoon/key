@@ -19,8 +19,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
@@ -176,11 +178,10 @@ public class ProofBundleConverter {
     }
 
     public String escapeDL(String prog) {
-        for (final AbstractLocsetDeclaration locSet : model.getAbstractLocationSets()) {
-            prog = prog.replaceAll("\\b" + locSet + "\\b",
-                    Matcher.quoteReplacement("\\dl_" + locSet));
+        for (final FunctionDeclaration locSet : model.getAbstractLocationSets()) {
+            prog = prog.replaceAll("\\b" + locSet.getFuncName() + "\\b",
+                    Matcher.quoteReplacement("\\dl_" + locSet.getFuncName()));
         }
-
         for (final PredicateDeclaration predDecl : model.getPredicateDeclarations()) {
             prog = prog.replaceAll("\\b" + predDecl.getPredName() + "\\b",
                     Matcher.quoteReplacement("\\dl_" + predDecl.getPredName()));
@@ -338,8 +339,7 @@ public class ProofBundleConverter {
 
     private static String dlPrefixRigidModelElements(final AERelationalModel model, String result) {
         result = model.getAbstractLocationSets().stream()
-                .map(AbstractLocsetDeclaration::getLocsetName)
-                .collect(DL_PREFIX_FOLD.apply(result));
+                .map(FunctionDeclaration::getFuncName).collect(DL_PREFIX_FOLD.apply(result));
         result = model.getFunctionDeclarations().stream().map(FunctionDeclaration::getFuncName)
                 .collect(DL_PREFIX_FOLD.apply(result));
         result = model.getPredicateDeclarations().stream().map(PredicateDeclaration::getPredName)
@@ -378,20 +378,43 @@ public class ProofBundleConverter {
 
         final StringBuilder sb = new StringBuilder();
 
-        for (final AbstractLocsetDeclaration decl : model.getAbstractLocationSets()) {
-            sb.append("\n     & ") //
-                    .append("disjoint(singletonPV(") //
-                    .append(RESULT) //
-                    .append("),") //
-                    .append(decl.getLocsetName()) //
-                    .append(")");
-            sb.append("\n     & ") //
-                    .append("disjoint(singletonPV(") //
-                    .append(EXC) //
-                    .append("),") //
-                    .append(decl.getLocsetName()) //
-                    .append(")");
+        for (final FunctionDeclaration decl : model.getAbstractLocationSets()) {
+            final StringBuilder qfrPrefix = new StringBuilder();
+            final List<String> argnames = new ArrayList<>();
+            final StringBuilder postfix = new StringBuilder();
 
+            final String argsParams;
+            if (!decl.getArgSorts().isEmpty()) {
+                int i = 0;
+                for (final String type : decl.getArgSorts()) {
+                    final String argName = "arg_" + i;
+
+                    qfrPrefix.append("(\\forall ").append(type).append(" ").append(argName)
+                            .append("; ");
+                    argnames.add(argName);
+                    postfix.append(")");
+                }
+
+                argsParams = argnames.isEmpty() ? ""
+                        : "(" + argnames.stream().collect(Collectors.joining(",")) + ")";
+            } else {
+                argsParams = "";
+            }
+
+            final Consumer<String> appender = var -> {
+                sb.append("\n     & ")//
+                        .append(qfrPrefix.toString()) //
+                        .append("disjoint(singletonPV(") //
+                        .append(var) //
+                        .append("),") //
+                        .append(decl.getFuncName()) //
+                        .append(argsParams) //
+                        .append(")") //
+                        .append(postfix.toString());
+            };
+
+            appender.accept(RESULT);
+            appender.accept(EXC);
         }
 
         return sb.toString();

@@ -8,6 +8,10 @@ REFINITY CHANGES
   * Saving recently opened REFINITY models
   * New \field and \progvar JML types for advanced framing conditions
   * Support for abstract location sets with parameters (like, e.g., "subFrame(int)")
+    
+    NOTE: This change breaks backwards compatibility of .aer files, as abstract location
+    sets can now be parametrized and are realized as function declarations (what they
+    in fact always were).
 
 ## 2019-12-29 (v0.9.3) Dominic Steinhoefel <steinhoefel@cs.tu-darmstadt.de>
 

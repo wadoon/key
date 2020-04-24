@@ -3,8 +3,6 @@
 
   <xs:element name="functionDeclaration" type="functionDeclaration"/>
 
-  <xs:element name="locationSet" type="abstractLocsetDeclaration"/>
-
   <xs:element name="predicateDeclaration" type="predicateDeclaration"/>
 
   <xs:element name="programVariable" type="programVariableDeclaration"/>
@@ -17,7 +15,7 @@
       <xs:element name="locationSets" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element ref="locationSet" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="locationSet" type="functionDeclaration" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -47,11 +45,14 @@
     <xs:attribute name="postCondition" type="xs:string"/>
   </xs:complexType>
 
-  <xs:complexType name="abstractLocsetDeclaration">
+  <xs:complexType name="functionDeclaration">
     <xs:complexContent>
       <xs:extension base="nullarySymbolDeclaration">
-        <xs:sequence/>
-        <xs:attribute name="locsetName" type="xs:ID"/>
+        <xs:sequence>
+          <xs:element name="argSort" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="funcName" type="xs:string"/>
+        <xs:attribute name="resultSortName" type="xs:string"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -61,14 +62,6 @@
       <xs:element name="relevantOne" type="xs:int"/>
       <xs:element name="relevantTwo" type="xs:int"/>
     </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="functionDeclaration">
-    <xs:sequence>
-      <xs:element name="argSort" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-    </xs:sequence>
-    <xs:attribute name="funcName" type="xs:string"/>
-    <xs:attribute name="resultSortName" type="xs:string"/>
   </xs:complexType>
 
   <xs:complexType name="predicateDeclaration">

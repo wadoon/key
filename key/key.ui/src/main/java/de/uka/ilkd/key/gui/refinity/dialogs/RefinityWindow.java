@@ -77,7 +77,6 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import de.uka.ilkd.key.abstractexecution.refinity.model.AERelationalModel;
-import de.uka.ilkd.key.abstractexecution.refinity.model.AbstractLocsetDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FuncOrPredDecl;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.NullarySymbolDeclaration;
@@ -138,7 +137,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
     // NOTE: Only access via setDirty / isDirty!
     private boolean dirty = false;
 
-    private final DefaultListModel<AbstractLocsetDeclaration> locsetDeclsListModel = new DefaultListModel<>();
+    private final DefaultListModel<FunctionDeclaration> locsetDeclsListModel = new DefaultListModel<>();
     private final DefaultListModel<FuncOrPredDecl> funcOrPredDeclsListModel = new DefaultListModel<>();
     private final DefaultListModel<ProgramVariableDeclaration> progVarDeclsListModel = new DefaultListModel<>();
     private final DefaultListModel<NullarySymbolDeclaration> relevantSymbolsOneListModel = new DefaultListModel<>();
@@ -490,10 +489,11 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         model.setMethodLevelContext(codeContext.getText());
         model.setPostCondition(relationalPostconditionText.getText());
         model.setPreCondition(relationalPreconditionText.getText());
+
         model.setAbstractLocationSets(Collections.list(locsetDeclsListModel.elements()));
         model.setFunctionDeclarations(Collections.list(funcOrPredDeclsListModel.elements()).stream()
                 .filter(FunctionDeclaration.class::isInstance).map(FunctionDeclaration.class::cast)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toCollection(() -> new ArrayList<>())));
         model.setPredicateDeclarations(Collections.list(funcOrPredDeclsListModel.elements())
                 .stream().filter(PredicateDeclaration.class::isInstance)
                 .map(PredicateDeclaration.class::cast).collect(Collectors.toList()));
@@ -504,10 +504,9 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
 
     /**
      * First updates the model, then loads form the model. This is in particular
-     * useful to react to changes in the {@link NullarySymbolDeclaration}s, because
-     * this affects the relevant locations. When removing a
-     * {@link NullarySymbolDeclaration}, potentially a relevant location has to be
-     * removed, too.
+     * useful to react to changes in the {@link RelevantLocation}s, because this
+     * affects the relevant locations. When removing a {@link RelevantLocation},
+     * potentially a relevant location has to be removed, too.
      */
     private void refresh() {
         updateModel();
@@ -876,7 +875,8 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                 updateModel();
                 final List<NullarySymbolDeclaration> allSymbols = new ArrayList<>();
                 allSymbols.addAll(model.getProgramVariableDeclarations());
-                allSymbols.addAll(model.getAbstractLocationSets());
+                model.getAbstractLocationSets().stream().filter(ls -> ls.getArgSorts().isEmpty())
+                        .forEach(allSymbols::add);
                 allSymbols.removeAll(chosenRelevantSymbolsGetter.apply(model));
 
                 if (!allSymbols.isEmpty()) {
@@ -1090,12 +1090,12 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                             .getSelectedValue();
                     // to prevent problems when user changes nothing and clicks "ok"
                     services.getNamespaces().programVariables()
-                            .remove(new Name(selectedElem.getName()));
+                            .remove(new Name(selectedElem.getVarName()));
                     final ProgramVariableDeclaration pd = ProgramVariableInputDialog
                             .showInputDialog(RefinityWindow.this, selectedElem, services);
                     if (pd != null && !pd.equals(selectedElem)) {
                         services.getNamespaces().programVariables()
-                                .remove(new Name(selectedElem.getName()));
+                                .remove(new Name(selectedElem.getVarName()));
                         progVarDeclsListModel.set(progVarDeclsList.getSelectedIndex(), pd);
                         refresh();
                     } else {
@@ -1160,7 +1160,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
     private JComponent createLocsetsDeclarationsView() {
         final JPanel result = new JPanel(new BorderLayout());
 
-        final JList<AbstractLocsetDeclaration> locsetDeclsList = new JList<>();
+        final JList<FunctionDeclaration> locsetDeclsList = new JList<>();
         locsetDeclsList.setToolTipText(LOCSET_DECL_TOOLTIP);
         final JScrollPane scrollPane = new JScrollPane();
         scrollPane.setViewportView(locsetDeclsList);
@@ -1174,7 +1174,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         plusButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                final AbstractLocsetDeclaration ls = LocsetInputDialog.showInputDialog( //
+                final FunctionDeclaration ls = LocsetInputDialog.showInputDialog( //
                         RefinityWindow.this, services);
                 if (ls != null) {
                     locsetDeclsListModel.addElement(ls);
@@ -1188,12 +1188,12 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (locsetDeclsList.getSelectedIndices().length == 1) {
-                    final AbstractLocsetDeclaration selectedElem = //
+                    final FunctionDeclaration selectedElem = //
                             locsetDeclsList.getSelectedValue();
                     // to prevent problems when user changes nothing and clicks "ok"
                     services.getNamespaces().programVariables()
                             .remove(new Name(selectedElem.getName()));
-                    final AbstractLocsetDeclaration ls = LocsetInputDialog.showInputDialog( //
+                    final FunctionDeclaration ls = LocsetInputDialog.showInputDialog( //
                             RefinityWindow.this, selectedElem, services);
                     if (ls != null && !ls.equals(selectedElem)) {
                         services.getNamespaces().functions()
@@ -1219,7 +1219,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                 final int[] indices = locsetDeclsList.getSelectedIndices();
                 for (int i = indices.length; i-- > 0;) {
                     int idx = indices[i];
-                    final AbstractLocsetDeclaration removed = locsetDeclsListModel.remove(idx);
+                    final FunctionDeclaration removed = locsetDeclsListModel.remove(idx);
                     services.getNamespaces().functions().remove(new Name(removed.getName()));
                     refresh();
                 }

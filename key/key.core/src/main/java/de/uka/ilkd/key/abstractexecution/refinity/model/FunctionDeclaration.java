@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @XmlAccessorType(value = XmlAccessType.FIELD)
-public class FunctionDeclaration implements FuncOrPredDecl {
+public class FunctionDeclaration extends NullarySymbolDeclaration implements FuncOrPredDecl {
     @XmlAttribute
     private String funcName = "";
     @XmlAttribute
@@ -49,6 +49,10 @@ public class FunctionDeclaration implements FuncOrPredDecl {
         this.resultSortName = resultSortName;
     }
 
+    public FunctionDeclaration(String funcName, String resultSortName) {
+        this(funcName, resultSortName, Collections.emptyList());
+    }
+
     @Override
     public boolean isFuncDecl() {
         return true;
@@ -57,6 +61,12 @@ public class FunctionDeclaration implements FuncOrPredDecl {
     @Override
     public String getName() {
         return getFuncName();
+    }
+
+    @Override
+    public String toSeqSingleton() {
+        assert argSorts.isEmpty() && resultSortName.equals("LocSet");
+        return String.format("seqSingleton(value(%s))", funcName);
     }
 
     public String getResultSortName() {
@@ -83,11 +93,9 @@ public class FunctionDeclaration implements FuncOrPredDecl {
         this.argSorts = argSorts;
     }
 
-    public static Optional<FuncOrPredDecl> fromString(final String str)
+    public static Optional<FunctionDeclaration> fromString(final String str)
             throws IllegalArgumentException {
-        final Pattern pattern = Pattern.compile(
-                "^ *([a-zA-Z0-9_.]+(?: *\\[\\])?) +([a-zA-Z0-9_]+) *(?:\\( *([a-zA-Z0-9_.]+(?: *\\[\\])?(?: *, *[a-zA-Z0-9_.]+(?: *\\[\\])?)* *)\\))? *$");
-        final Matcher matcher = pattern.matcher(str);
+        final Matcher matcher = getMatcherForStr(str);
 
         if (!matcher.matches()) {
             return Optional.empty();
@@ -96,6 +104,21 @@ public class FunctionDeclaration implements FuncOrPredDecl {
         return Optional.of(new FunctionDeclaration(matcher.group(2), matcher.group(1),
                 matcher.group(3) == null ? Collections.emptyList()
                         : Arrays.asList(matcher.group(3).replaceAll(" ", "").split(","))));
+    }
+
+    /**
+     * Matches function declarations like "int test(java.lang.String, int)".
+     * 
+     * @param str The String that should be matched.
+     * @return A matcher; if it "matches()", the group 1 contains the sort, group 2
+     *         the name, and group 3 is either null or contains a comma-separated
+     *         list of argument types.
+     */
+    protected static Matcher getMatcherForStr(final String str) {
+        final Pattern pattern = Pattern.compile(
+                "^ *([a-zA-Z0-9_.]+(?: *\\[\\])?) +([a-zA-Z0-9_]+) *(?:\\( *([a-zA-Z0-9_.]+(?: *\\[\\])?(?: *, *[a-zA-Z0-9_.]+(?: *\\[\\])?)* *)\\))? *$");
+        final Matcher matcher = pattern.matcher(str);
+        return matcher;
     }
 
     @Override

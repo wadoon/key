@@ -49,7 +49,8 @@ import de.uka.ilkd.key.java.Services;
  */
 @XmlRootElement(namespace = "http://www.key-project.org/abstractexecution")
 @XmlType(propOrder = { "programOne", "programTwo", "methodLevelContext", "abstractLocationSets",
-        "functionDeclarations", "predicateDeclarations", "programVariableDeclarations" })
+        "functionDeclarations",
+        "predicateDeclarations", "programVariableDeclarations" })
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class AERelationalModel {
     private static final String AE_MODEL_FILE_ENDING = ".aer";
@@ -80,7 +81,7 @@ public class AERelationalModel {
 
     @XmlElementWrapper(name = "locationSets")
     @XmlElement(name = "locationSet")
-    private List<AbstractLocsetDeclaration> abstractLocationSets = new ArrayList<>();
+    private List<FunctionDeclaration> abstractLocationSets = new ArrayList<>();
 
     @XmlElementWrapper(name = "programVariables")
     @XmlElement(name = "programVariable")
@@ -91,8 +92,8 @@ public class AERelationalModel {
 
     public static AERelationalModel defaultModel() {
         final String postCondition = "\\result_1==\\result_2";
-        final List<AbstractLocsetDeclaration> abstractLocationSets = Collections
-                .singletonList(new AbstractLocsetDeclaration("relevant"));
+        final List<FunctionDeclaration> abstractLocationSets = Collections
+                .singletonList(new FunctionDeclaration("relevant", "LocSet"));
         final List<NullarySymbolDeclaration> relevantVarsOne = //
                 Collections.singletonList(abstractLocationSets.get(0));
         final List<NullarySymbolDeclaration> relevantVarsTwo = //
@@ -105,7 +106,7 @@ public class AERelationalModel {
 
     public AERelationalModel(final String programOne, final String programTwo,
             String methodLevelContext, final String postCondition,
-            final List<AbstractLocsetDeclaration> abstractLocationSets,
+            final List<FunctionDeclaration> abstractLocationSets,
             final List<FunctionDeclaration> functionDeclarations,
             final List<PredicateDeclaration> predicateDeclarations,
             final List<ProgramVariableDeclaration> programVariableDeclarations,
@@ -119,9 +120,8 @@ public class AERelationalModel {
         this.functionDeclarations = functionDeclarations;
         this.predicateDeclarations = predicateDeclarations;
         this.programVariableDeclarations = programVariableDeclarations;
-
-        setRelevantVarsOne(relevantVarsOne);
-        setRelevantVarsTwo(relevantVarsTwo);
+        setRelevantVarsOne( relevantVarsOne);
+        setRelevantVarsTwo( relevantVarsTwo);
     }
 
     AERelationalModel() {
@@ -155,7 +155,7 @@ public class AERelationalModel {
         return programVariableDeclarations;
     }
 
-    public List<AbstractLocsetDeclaration> getAbstractLocationSets() {
+    public List<FunctionDeclaration> getAbstractLocationSets() {
         return abstractLocationSets;
     }
 
@@ -199,13 +199,13 @@ public class AERelationalModel {
 
     public void setRelevantVarsOne(List<NullarySymbolDeclaration> relevantVarsOne) {
         getProgramVariableDeclarations()
-                .forEach(pv -> pv.setRelevantOne(relevantVarsOne.indexOf(pv)));
+                .forEach(pv -> pv.setRelevantOne( relevantVarsOne.indexOf(pv)));
         getAbstractLocationSets().forEach(pv -> pv.setRelevantOne(relevantVarsOne.indexOf(pv)));
     }
 
     public void setRelevantVarsTwo(List<NullarySymbolDeclaration> relevantVarsTwo) {
         getProgramVariableDeclarations()
-                .forEach(pv -> pv.setRelevantTwo(relevantVarsTwo.indexOf(pv)));
+                .forEach(pv -> pv.setRelevantTwo( relevantVarsTwo.indexOf(pv)));
         getAbstractLocationSets().forEach(pv -> pv.setRelevantTwo(relevantVarsTwo.indexOf(pv)));
     }
 
@@ -217,7 +217,7 @@ public class AERelationalModel {
         this.programTwo = programTwo;
     }
 
-    public void setAbstractLocationSets(List<AbstractLocsetDeclaration> abstractLocationSets) {
+    public void setAbstractLocationSets(List<FunctionDeclaration> abstractLocationSets) {
         this.abstractLocationSets = abstractLocationSets;
     }
 
@@ -302,7 +302,7 @@ public class AERelationalModel {
 
     private static List<NullarySymbolDeclaration> getRelevantVars(
             java.util.function.Function<NullarySymbolDeclaration, Integer> relValGetter,
-            final List<AbstractLocsetDeclaration> abstrLocsets,
+            final List<FunctionDeclaration> abstrLocsets,
             final List<ProgramVariableDeclaration> abstrPVDecls) {
         return Stream.concat(abstrLocsets.stream(), abstrPVDecls.stream())
                 .filter(loc -> relValGetter.apply(loc) > -1)

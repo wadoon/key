@@ -46,7 +46,7 @@ public class FuncAndPredInputDialog extends JDialog {
 
     private FuncOrPredDecl value;
 
-    private FuncAndPredInputDialog(final Window owner, final FuncOrPredDecl value,
+    protected FuncAndPredInputDialog(final Window owner, final FuncOrPredDecl value,
             Services services) {
         super(owner, ModalityType.DOCUMENT_MODAL);
         assert value != null;
@@ -63,15 +63,13 @@ public class FuncAndPredInputDialog extends JDialog {
         contentPanel.setLayout(new BorderLayout());
         getContentPane().add(contentPanel, BorderLayout.CENTER);
 
-        setTitle("Please enter a function or predicate symbol specification.");
+        setTitle(windowTitle());
         setResizable(false);
 
         final JButton okButton = new JButton("OK");
 
-        final JTextField valueTextField = new JTextField(value.toString());
-        valueTextField.setToolTipText(
-                "<html>Example: \"<tt>ThrowsExcP(any)</tt>\", \"<tt>Post(any,int)</tt>\","
-                        + " \"<tt>int myFun(java.lang.Object)</tt>\"</html>");
+        final JTextField valueTextField = new JTextField(renderValue(value));
+        valueTextField.setToolTipText(inputTooltipText());
         valueTextField
                 .setFont(new Font("Monospaced", Font.PLAIN, valueTextField.getFont().getSize()));
         valueTextField.addActionListener(e -> okButton.doClick());
@@ -84,19 +82,7 @@ public class FuncAndPredInputDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    final String input = valueTextField.getText();
-
-                    Optional<FuncOrPredDecl> maybeVal = FunctionDeclaration.fromString(input);
-                    
-                    if (!maybeVal.isPresent()) {
-                        maybeVal = PredicateDeclaration.fromString(input);
-                    }
-                    
-                    if (!maybeVal.isPresent()) {
-                        throw new IllegalArgumentException();
-                    }
-                    
-                    final FuncOrPredDecl val = maybeVal.get();
+                    final FuncOrPredDecl val = parseString(valueTextField.getText());
 
                     val.checkAndRegister(services);
 
@@ -133,6 +119,37 @@ public class FuncAndPredInputDialog extends JDialog {
         installEscapeListener();
 
         setSize(400, 110);
+    }
+
+    protected FuncOrPredDecl getValue() {
+        return value;
+    }
+
+    protected String renderValue(final FuncOrPredDecl value) {
+        return value.toString();
+    }
+
+    protected FuncOrPredDecl parseString(final String input) throws IllegalArgumentException {
+        Optional<? extends FuncOrPredDecl> maybeVal = FunctionDeclaration.fromString(input);
+
+        if (!maybeVal.isPresent()) {
+            maybeVal = PredicateDeclaration.fromString(input);
+        }
+
+        if (!maybeVal.isPresent()) {
+            throw new IllegalArgumentException();
+        }
+
+        return maybeVal.get();
+    }
+
+    protected String inputTooltipText() {
+        return "<html>Example: \"<tt>ThrowsExcP(any)</tt>\", \"<tt>Post(any,int)</tt>\","
+                + " \"<tt>int myFun(java.lang.Object)</tt>\"</html>";
+    }
+
+    protected String windowTitle() {
+        return "Please enter a function or predicate symbol specification.";
     }
 
     private void installEscapeListener() {
