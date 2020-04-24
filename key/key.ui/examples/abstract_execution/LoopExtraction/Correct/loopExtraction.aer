@@ -28,9 +28,9 @@
 { ; }
 
 /*@ loop_invariant
-  @   decrExpr(\value(frameP)) &gt;= 0 &amp;&amp; 
+  @   decrExpr(\value(frameP)) &gt;= 0 &amp;&amp;
   @   inv(\value(frameP)) &amp;&amp;
-  @   (!guardIsTrue(\value(footprintE)) ==&gt; 
+  @   (!guardIsTrue(\value(footprintE)) ==&gt;
   @     \value(frameQ) == resultQ(oldFootprintQ));
   @ assignable frameP, footprintE, frameQ;
   @ decreases decrExpr(\value(frameP));
@@ -42,7 +42,7 @@ while (
      @   guardIsTrue(\value(footprintE));
      @ exceptional_behavior requires false;
      @*/
-   \abstract_expression boolean e 
+   \abstract_expression boolean e
 ) {
     //@ ghost int oldVariantLeft;
 
@@ -73,7 +73,7 @@ while (
       @ continue_behavior requires false;
       @*/
     \abstract_statement Q;
-    
+
     /*@ assignable frameP, footprintE;
       @ accessible footprintP;
       @ normal_behavior ensures
@@ -132,7 +132,7 @@ while (
      @   guardIsTrue(\value(footprintE));
      @ exceptional_behavior requires false;
      @*/
-   \abstract_expression boolean e 
+   \abstract_expression boolean e
 ) {
     //@ ghost int oldVariantRight;
 
@@ -163,7 +163,7 @@ while (
 
 
 
-    
+
     /*@ assignable frameP, footprintE;
       @ accessible footprintP;
       @ normal_behavior ensures
@@ -216,17 +216,17 @@ while (
             <resultSortName>any</resultSortName>
             <argSort>any</argSort>
         </function>
-        <function funcName="oldFootprintQ" resultSortName="any">
+        <function funcName="oldFootprintQ">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
             <resultSortName>any</resultSortName>
         </function>
-        <function funcName="loopExitedLeft" resultSortName="boolean">
+        <function funcName="loopExitedLeft">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
             <resultSortName>boolean</resultSortName>
         </function>
-        <function funcName="loopExitedRight" resultSortName="boolean">
+        <function funcName="loopExitedRight">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
             <resultSortName>boolean</resultSortName>
