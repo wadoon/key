@@ -200,7 +200,7 @@ public class ProofBundleConverter {
 
         {
             final String locSetDecls = model.getAbstractLocationSets().stream()
-                    .map(str -> String.format("\\unique LocSet %s;", str))
+                    .map(str -> String.format("\\unique %s;", str))
                     .collect(Collectors.joining("\n  "));
             final String userDefinedFuncDecls = model.getFunctionDeclarations().stream()
                     .map(decl -> String.format("%s %s%s;", decl.getResultSortName(),
