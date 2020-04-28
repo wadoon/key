@@ -3,7 +3,9 @@ package org.key_project.sed.extract_traces;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.StringUtil;
 
@@ -14,6 +16,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.settings.*;
 import de.uka.ilkd.key.symbolic_execution.*;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.*;
@@ -32,10 +35,29 @@ public class Main {
     * @param args The start parameters.
     */
    public static void main(String[] args) {
-      File location = new File("example"); // Path to the source code folder/file or to a *.proof file
-      List<File> classPaths = null; // Optionally: Additional specifications for API classes
-      File bootClassPath = null; // Optionally: Different default specifications for Java API
-      List<File> includes = null; // Optionally: Additional includes to consider
+      File location = new File("example"); // Path to the source code folder
+      String className = "MaxIntBuggy";
+      String methodName = "contentEqualsMax";
+      String precondition
+         =    "arr.length == 4 && arr[0] == 2 && arr[1] == 1 && arr[2] == 3 && arr[3] == 4"
+         + "|| arr.length == 4 && arr[0] == 2 && arr[1] == 1 && arr[2] == 3 && arr[3] == 2"
+         + "|| arr.length == 3 && arr[0] == 0 && arr[1] == 1 && arr[2] == 3";
+
+      executeProcedure(location, className, methodName, precondition, null, null, null);
+   }
+
+
+   /**
+    * Builds a SED tree for a method with zero arguments
+    * @param location Path to the source code folder
+    * @param className Name of the class containing the method
+    * @param methodName Method name
+    * @param precondition Optionally: JML precondition
+    * @param classPaths Optionally: Additional specifications for API classes
+    * @param bootClassPath Optionally: Different default specifications for Java API
+    * @param includes Optionally: Additional includes to consider
+    */
+   public static void executeProcedure (File location, String className, String methodName, String precondition, List<File> classPaths, File bootClassPath, List<File> includes) {
       try {
          // Ensure that Taclets are parsed
          if (!ProofSettings.isChoiceSettingInitialised()) {
@@ -49,17 +71,14 @@ public class Main {
          newSettings.putAll(MiscTools.getDefaultTacletOptions());
          choiceSettings.setDefaultChoices(newSettings);
          // Load source code
-         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, classPaths, bootClassPath, includes, true); // env.getLoadedProof() returns performed proof if a *.proof file is loaded
+         SymbolicExecutionJavaProfile profile = SymbolicExecutionJavaProfile.getDefaultInstance();
+         KeYEnvironment<DefaultUserInterfaceControl> env =
+               KeYEnvironment.load(profile, location, classPaths, bootClassPath, includes, true);
          try {
             // Find method to symbolically execute
-            KeYJavaType classType = env.getJavaInfo().getKeYJavaType("MaxIntBuggy");
-            IProgramMethod pm = env.getJavaInfo().getProgramMethod(classType, 
-                                                                   "contentEqualsMax", 
-                                                                   ImmutableSLList.<Type>nil(), 
-                                                                   classType);
-            String precondition = "arr.length == 4 && arr[0] == 2 && arr[1] == 1 && arr[2] == 3 && arr[3] == 4"
-                             + "|| arr.length == 4 && arr[0] == 2 && arr[1] == 1 && arr[2] == 3 && arr[3] == 2"
-                             + "|| arr.length == 3 && arr[0] == 0 && arr[1] == 1 && arr[2] == 3;";
+            KeYJavaType classType = env.getJavaInfo().getKeYJavaType(className);
+            ImmutableList<Type> signature = ImmutableSLList.<Type>nil();
+            IProgramMethod pm = env.getJavaInfo().getProgramMethod(classType, methodName, signature, classType);
             // Instantiate proof for symbolic execution of the program method (Java semantics)
             AbstractOperationPO po = new ProgramMethodPO(env.getInitConfig(), 
                                                          "Symbolic Execution of: " + pm, 
@@ -80,7 +99,6 @@ public class Main {
             builder.analyse();
             // Optionally, create an SymbolicExecutionEnvironment which provides access to all relevant objects for symbolic execution
             SymbolicExecutionEnvironment<DefaultUserInterfaceControl> symbolicEnv = new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(env, builder);
-            printSymbolicExecutionTree("Initial State", builder);
             // Configure strategy for full exploration
             SymbolicExecutionUtil.initializeStrategy(builder);
             SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, 
@@ -104,25 +122,52 @@ public class Main {
          e.printStackTrace();
       }
    }
+
    /**
-    * Prints the symbolic execution tree as flat list into the console.
+    * Prints the symbolic execution tree into the console.
     * @param title The title.
     * @param builder The {@link SymbolicExecutionTreeBuilder} providing the root of the symbolic execution tree.
+    * @throws ProofInputException 
     */
-   protected static void printSymbolicExecutionTree(String title, SymbolicExecutionTreeBuilder builder) {
+   protected static void printSymbolicExecutionTree(String title, SymbolicExecutionTreeBuilder builder) throws ProofInputException {
       System.out.println(title);
       System.out.println(StringUtil.createLine("=", title.length()));
-      ExecutionNodePreorderIterator iterator = new ExecutionNodePreorderIterator(builder.getStartNode());
-      while (iterator.hasNext()) {
-         IExecutionNode<?> next = iterator.next();
-         System.out.println(next);
-//         next.getVariables(); // Access the symbolic state.
-//         next.getCallStack(); // Access the call stack.
-//         next.getPathCondition(); // Access the path condition.
-//         next.getFormatedPathCondition(); // Access the formated path condition.
-//         next... // Additional methods provide access to additional information.
-                   // Check also the specific sub types of IExecutionNode like IExecutionTermination.
+      IExecutionStart startNode = builder.getStartNode();
+      printSEDhierarchy(startNode, 0, true);
+   }
+   Pattern p = Pattern.compile("<<.*>>");
+
+   /**
+    * Prints the symbolic execution tree tree to the console
+    * @param node root of the sub tree
+    * @param level start with 0, increment for each branch
+    * @param plus true to print a + for branching
+    * @throws ProofInputException
+    */
+   protected static void printSEDhierarchy (IExecutionNode<?> node, int level, boolean plus) throws ProofInputException {
+      StringBuilder builder = new StringBuilder();
+      for(int i = 0; i < level; i++) {
+         builder.append("|  ");
       }
-      System.out.println();
+      if (plus) {
+         builder.append("+ ");
+         plus = false;
+      } else {
+         builder.append("| ");
+      }
+      String name = node.getName();
+      // removes unnecessary << >> and \n (FIXME better solution)
+      name = name.replaceAll("(<<.*?>>)|\n","");
+      builder.append(name);
+      System.out.println(builder);
+
+      IExecutionNode<?>[] children = node.getChildren();
+      if (children.length != 1) {
+         level++;
+         plus = true;
+      }
+      for (IExecutionNode<?> child : node.getChildren()) {
+         printSEDhierarchy(child, level, plus);
+      }
    }
 }
