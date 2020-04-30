@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.normalization.SimpleFormulaNormalization;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
@@ -49,25 +50,31 @@ public class HeuristicInstantiation implements TermGenerator {
     public Iterator<Term> generate(RuleApp app,
                                    PosInOccurrence pos,
                                    Goal goal) {
+        System.out.println("Create onstances for rule app: " + System.identityHashCode(app));
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Term qf = pos.sequentFormula ().formula ();
-        SimpleFormulaNormalization sfn = new SimpleFormulaNormalization(goal.proof().getServices().getTermBuilder(),
-                goal.proof().getServices().getTermFactory(), false, false);
+        if(app instanceof TacletApp) {
+            SimpleFormulaNormalization sfn =
+                    new SimpleFormulaNormalization((TacletApp) app, goal.proof().getServices().getTermBuilder(),
+                    goal.proof().getServices().getTermFactory(), false, false);
+            Term nf;
+            try {
+                nf = sfn.getNormalized(qf);
+            }catch (Exception e) {
+                System.out.println("Could not normalize: " + e.toString());
+                nf = qf;
+                //return EMPTY;
+            }
 
-        Term nf;
-        try {
-            nf = sfn.getNormalized(qf);
-        }catch (Exception e) {
-            System.out.println("Could not normalize: " + e.toString());
-            nf = qf;
-            //return EMPTY;
+            final Instantiation ia = Instantiation.create ( nf, goal.sequent(),
+                    goal.proof().getServices() );
+            final QuantifiableVariable var =
+                    qf.varsBoundHere ( 0 ).last ();
+            return new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices());
+        }else {
+            throw new RuntimeException("Ruleapp is not a taclet app.");
         }
-        final Instantiation ia = Instantiation.create ( nf, goal.sequent(),
-                goal.proof().getServices() );
-        final QuantifiableVariable var =
-                qf.varsBoundHere ( 0 ).last ();
-        return new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices());
     }
 
 

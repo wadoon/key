@@ -21,6 +21,7 @@ public class NormalizedAllFeature extends BinaryTermFeature {
 
     @Override
     protected boolean filter(Term term, Services services) {
+
         SimpleFormulaNormalization sfp = new SimpleFormulaNormalization(services.getTermBuilder(),
                 services.getTermFactory(), false, false);
         Term normalized = sfp.getNormalized(term);

@@ -94,7 +94,7 @@ public abstract class TacletApp implements RuleApp {
      */
     protected boolean updateContextFixed = false;
 
-    /**
+	/**
      * constructs a TacletApp for the given taclet, with an empty instantiation
      * map
      */
@@ -419,7 +419,8 @@ public abstract class TacletApp implements RuleApp {
 	}
 	registerSkolemConstants(goal.getLocalNamespaces());
 	goal.addAppliedRuleApp(this);
-	return taclet().apply(goal, services, this);
+	ImmutableList<Goal> ret = taclet().apply(goal, services, this);
+	return ret;
     }
 
     /*

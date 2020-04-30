@@ -30,6 +30,7 @@ public class Statistics {
     public final int interactiveSteps;
     public final int symbExApps;
     public final int quantifierInstantiations;
+    public final int normalizations;
     public final int ossApps;
     public final int mergeRuleApps;
     public final int totalRuleApps;
@@ -39,8 +40,12 @@ public class Statistics {
     public final int blockLoopContractApps;
     public final int loopInvApps;
     public final long autoModeTimeInMillis;
+    public final long normalizationTimeInMillis;
     public final long timeInMillis;
     public final float timePerStepInMillis;
+
+    public static int normalizations_buffer;
+    public static long normalizationTime_buffer;
 
     private List<Pair<String, String>> summaryList =
                     new ArrayList<Pair<String, String>>(14);
@@ -53,6 +58,7 @@ public class Statistics {
                          int interactiveSteps,
                          int symbExApps,
                          int quantifierInstantiations,
+                         int normalizations,
                          int ossApps,
                          int mergeRuleApps,
                          int totalRuleApps,
@@ -62,6 +68,7 @@ public class Statistics {
                          int blockLoopContractApps,
                          int loopInvApps,
                          long autoModeTimeInMillis,
+                         long normalizationTimeInMillis,
                          long timeInMillis,
                          float timePerStepInMillis) {
         this.nodes = nodes;
@@ -69,6 +76,7 @@ public class Statistics {
         this.interactiveSteps = interactiveSteps;
         this.symbExApps = symbExApps;
         this.quantifierInstantiations = quantifierInstantiations;
+        this.normalizations = normalizations;
         this.ossApps = ossApps;
         this.mergeRuleApps = mergeRuleApps;
         this.totalRuleApps = totalRuleApps;
@@ -78,6 +86,7 @@ public class Statistics {
         this.blockLoopContractApps = blockLoopContractApps;
         this.loopInvApps = loopInvApps;
         this.autoModeTimeInMillis = autoModeTimeInMillis;
+        this.normalizationTimeInMillis = normalizationTimeInMillis;
         this.timeInMillis = timeInMillis;
         this.timePerStepInMillis = timePerStepInMillis;
     }
@@ -98,6 +107,8 @@ public class Statistics {
         this.interactiveSteps = tmp.interactive;
         this.symbExApps = tmp.symbExApps;
         this.quantifierInstantiations = tmp.quant;
+        this.normalizations = normalizations_buffer;
+        normalizations_buffer = 0;
         this.ossApps = tmp.oss;
         this.mergeRuleApps = tmp.mergeApps;
         this.totalRuleApps = tmp.nodes + tmp.ossCaptured - 1;
@@ -107,6 +118,8 @@ public class Statistics {
         this.blockLoopContractApps = tmp.block;
         this.loopInvApps = tmp.inv;
         this.autoModeTimeInMillis = startNode.proof().getAutoModeTime();
+        this.normalizationTimeInMillis = normalizationTime_buffer;
+        normalizationTime_buffer = 0;
         this.timeInMillis = (System.currentTimeMillis() - startNode.proof().creationTime);
         timePerStepInMillis = nodes <= 1 ? .0f : (autoModeTimeInMillis / (float)(nodes - 1));
 
@@ -123,6 +136,7 @@ public class Statistics {
                               side.interactiveSteps,
                               side.symbExApps,
                               side.quantifierInstantiations,
+                              side.normalizations,
                               side.ossApps,
                               side.mergeRuleApps,
                               side.totalRuleApps,
@@ -132,6 +146,7 @@ public class Statistics {
                               side.blockLoopContractApps,
                               side.loopInvApps,
                               side.autoModeTimeInMillis,
+                              side.normalizationTimeInMillis,
                               System.currentTimeMillis() - creationTime,
                               side.timePerStepInMillis);
     }
@@ -170,6 +185,7 @@ public class Statistics {
         if (time >= 10000L) {
             summaryList.add(new Pair<String, String>("Automode time", time + "ms"));
         }
+        summaryList.add(new Pair<String, String>("Normalization Time", stat.normalizationTimeInMillis + "ms"));
         if (stat.nodes > 0) {
             String avgTime = "" + (stat.timePerStepInMillis);
             // round to 3 digits after point
@@ -184,6 +200,7 @@ public class Statistics {
         summaryList.add(new Pair<String, String>("Rule applications", ""));
         summaryList.add(new Pair<String, String>("Quantifier instantiations",
                                                  "" + stat.quantifierInstantiations));
+        summaryList.add(new Pair<String, String>("Normalizations", "" + stat.normalizations));
         summaryList.add(new Pair<String, String>("One-step Simplifier apps", "" +
                         stat.ossApps));
         summaryList.add(new Pair<String, String>("SMT solver apps", "" +
@@ -354,5 +371,11 @@ public class Statistics {
             }
             return res;
         }
+
+    }
+
+    public static void addNormalizations(int norms, long time) {
+        normalizations_buffer += norms;
+        normalizationTime_buffer += time;
     }
 }

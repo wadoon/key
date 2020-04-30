@@ -64,6 +64,18 @@ public class StatisticsFile implements Serializable {
                return statistics.branches;
             }
 
+         }, new LongColumn("QInst") {
+            @Override
+            long getLongValueFromStatistics(Statistics statistics) { return statistics.quantifierInstantiations;}
+
+         }, new LongColumn("#FNorm") {
+            @Override
+            long getLongValueFromStatistics(Statistics statistics) { return statistics.normalizations;}
+
+         }, new LongColumn("t_FNorm (ms)") {
+            @Override
+            long getLongValueFromStatistics(Statistics statistics) { return statistics.normalizationTimeInMillis;}
+
          }, new LongColumn("Overall time (ms)") {
 
             @Override

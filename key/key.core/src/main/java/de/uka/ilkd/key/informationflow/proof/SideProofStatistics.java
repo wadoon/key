@@ -47,9 +47,10 @@ public final class SideProofStatistics extends Statistics {
                                 int loopInvApps,
                                 long autoModeTime) {
         super(nodes, branches, interactiveSteps, symbExApps,
-              quantifierInstantiations, ossApps, mergeRuleApps, totalRuleApps,
+              quantifierInstantiations, 0, ossApps, mergeRuleApps, totalRuleApps,
               smtSolverApps, dependencyContractApps, operationContractApps,
               blockLoopContractApps, loopInvApps, autoModeTime,
+              0,
               -1,
               nodes <= sideProofs ?
                       .0f
