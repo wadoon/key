@@ -95,6 +95,10 @@ public abstract class AbstractPropertiesSettings implements Settings {
         listenerList.add(l);
     }
 
+    public void removeSettingsListener(SettingsListener l) {
+        listenerList.remove(l);
+    }
+    
     protected void fireSettingsChange() {
         for (SettingsListener listener : listenerList) {
             listener.settingsChanged(new EventObject(this));

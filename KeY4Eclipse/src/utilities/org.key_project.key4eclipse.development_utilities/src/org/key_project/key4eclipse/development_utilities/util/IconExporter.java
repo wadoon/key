@@ -38,7 +38,7 @@ import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.swt.ImageUtil;
 import org.key_project.util.java.IOUtil;
 
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /**
  * <p>
@@ -84,9 +84,9 @@ public class IconExporter extends TestCase {
       
       // KeY IDE
       treatIconsToExport(new IconToExpoert(IconFactory.keyHole(16, 16), -1, -1, "KeYIDE/src/plugins/org.key_project.keyide.ui/icons/ekey-mono16.png"),
-                         new IconToExpoert(new IconFactory.KeYFolderIcon(Color.GRAY), "KeYIDE/src/plugins/org.key_project.keyide.ui/icons/folder16.png"),
-                         new IconToExpoert(IconFactory.provedFolderIcon(), "KeYIDE/src/plugins/org.key_project.keyide.ui/icons/folderproved16.png"),
-                         new IconToExpoert(IconFactory.keyHoleClosed(16, 16), -1, -1, "KeYIDE/src/plugins/org.key_project.keyide.ui/icons/keyproved16.png"),
+                         new IconToExpoert(IconFactory.openKeYFile(16), "KeYIDE/src/plugins/org.key_project.keyide.ui/icons/folder16.png"),
+                         new IconToExpoert(IconFactory.provedFolderIcon(16), "KeYIDE/src/plugins/org.key_project.keyide.ui/icons/folderproved16.png"),
+                         new IconToExpoert(IconFactory.keyHoleClosed(16), -1, -1, "KeYIDE/src/plugins/org.key_project.keyide.ui/icons/keyproved16.png"),
                          new IconToExpoert(IconFactory.interactiveAppLogo(16), "KeYIDE/src/plugins/org.key_project.keyide.ui/icons/interactiveAppLogo16.png"),
                          new IconToExpoert(IconFactory.pruneLogo(16), "KeYIDE/src/plugins/org.key_project.keyide.ui/icons/prune16.png"));
       treatIconsToExport(new IconToExpoert(IconFactory.testGeneration(16), 0, 0, "KeYIDE/src/plugins/org.key_project.keyide.ui/icons/testGeneration.png"));

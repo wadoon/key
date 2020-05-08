@@ -13,6 +13,8 @@
 
 package org.key_project.keyide.ui.util;
 
+import java.awt.Color;
+
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.swt.graphics.RGB;
@@ -24,7 +26,7 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
  * Initializes the preferences of {@link KeYIDEPreferences} when they are
  * accessed the first time. This is managed by extension point
  * {@code org.eclipse.core.runtime.preferences}.
- * @author Marco Drebing, Niklas Bunzel, Christoph Schneider, Stefan Käsdorf
+ * @author Marco Drebing, Niklas Bunzel, Christoph Schneider, Stefan Kï¿½sdorf
  * @see KeYIDEPreferences
  */
 public class KeYIDEPreferencesInitializer extends AbstractPreferenceInitializer {
@@ -34,11 +36,11 @@ public class KeYIDEPreferencesInitializer extends AbstractPreferenceInitializer 
    @Override
    public void initializeDefaultPreferences() {
       KeYIDEPreferences.setDefaultSwitchToKeyPerspective(MessageDialogWithToggle.PROMPT);
-      KeYIDEPreferences.setDefaultClosedGoalColor(ColorUtil.toRGB(ProofTreeView.DARK_GREEN_COLOR));
-      KeYIDEPreferences.setDefaultLinkedGoalColor(ColorUtil.toRGB(ProofTreeView.PINK_COLOR));
+      KeYIDEPreferences.setDefaultClosedGoalColor(ColorUtil.toRGB(new Color(0, 128, 51)));
+      KeYIDEPreferences.setDefaultLinkedGoalColor(ColorUtil.toRGB(new Color(255, 0, 240)));
       KeYIDEPreferences.setDefaultDisabledGoalColor(new RGB(87, 87, 87)); // ColorUtil.toRGB(ProofTreeView.ORANGE_COLOR)
-      KeYIDEPreferences.setDefaultOpenGoalColor(ColorUtil.toRGB(ProofTreeView.DARK_RED_COLOR));
-      KeYIDEPreferences.setDefaultNodeWithNotesColor(ColorUtil.toRGB(ProofTreeView.ORANGE_COLOR));
+      KeYIDEPreferences.setDefaultOpenGoalColor(ColorUtil.toRGB(new Color(191, 0, 0)));
+      KeYIDEPreferences.setDefaultNodeWithNotesColor(ColorUtil.toRGB(new Color(255, 140, 0)));
       KeYIDEPreferences.setDefaultNodeWithActiveStatementColor(new RGB(0, 0, 255)); // ColorUtil.toRGB(ProofTreeView.LIGHT_BLUE_COLOR)
       KeYIDEPreferences.setDefaultFoundNodeColor(new RGB(168, 211, 255)); // Light blue
    }

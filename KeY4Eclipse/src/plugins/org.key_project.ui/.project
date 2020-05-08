@@ -32,6 +32,11 @@
 			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.ui/examples</locationURI>
 		</link>
 		<link>
+			<name>key.lib</name>
+			<type>2</type>
+			<location>/home/lukas/key4eclipse/GIT/key/key/key.ui/lib</location>
+		</link>
+		<link>
 			<name>key.resources</name>
 			<type>2</type>
 			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.ui/src/main/resources</locationURI>
@@ -40,6 +45,11 @@
 			<name>key.src</name>
 			<type>2</type>
 			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.ui/src/main/java</locationURI>
+		</link>
+		<link>
+			<name>keyext.interactionlog</name>
+			<type>2</type>
+			<location>/home/lukas/key4eclipse/GIT/key/key/keyext.interactionlog/src/main/java</location>
 		</link>
 	</linkedResources>
 </projectDescription>
