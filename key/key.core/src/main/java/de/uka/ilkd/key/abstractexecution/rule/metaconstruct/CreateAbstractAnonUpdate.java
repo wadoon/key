@@ -98,8 +98,9 @@ public final class CreateAbstractAnonUpdate extends AbstractTermTransformer {
         final AbstractStatement as = new AbstractStatement(newPhsId);
         final AbstractUpdate abstrUpd = services.abstractUpdateFactory().getInstance(as, locs, 1);
 
-        // TODO (DS. 2019-11-22): Could/should use an accessibles specification here!
-        return tb.abstractUpdate(abstrUpd, new Term[] { tb.allLocs() });
+        // Accessibles for anonymizing update is "empty", since it represents
+        // an assignment of fresh values, independent of what was there before.
+        return tb.abstractUpdate(abstrUpd, new Term[] { tb.empty() });
     }
 
 }
