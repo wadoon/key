@@ -1,0 +1,258 @@
+parser grammar JmlParser;
+
+options { tokenVocab=JmlLexer; }
+
+classlevel_comment: modifiers (classlevel_element modifiers)* EOF;
+classlevel_element
+  : class_invariant | depends_clause | method_specification
+  | field_or_method_declaration | represents_clause
+  | history_constraint | initially_clause | class_axiom
+  | monitors_for_clause | readable_if_clause | writable_if_clause | datagroup_clause | set_statement
+  | assert_statement | assume_statement | nowarn_pragma;
+
+methodlevel_comment: (modifiers methodlevel_element)+ EOF;
+methodlevel_element
+  : field_or_method_declaration | set_statement | merge_point_statement
+  | loop_specification | assert_statement | assume_statement | nowarn_pragma
+  | debug_statement | block_specification | block_loop_specification
+ ;
+
+modifiers: modifier*;
+modifier
+  : ABSTRACT | FINAL | GHOST | HELPER | INSTANCE | MODEL | NON_NULL
+  | NULLABLE | NULLABLE_BY_DEFAULT | PRIVATE | PROTECTED | PUBLIC | PURE
+  | STRICTLY_PURE | SPEC_PROTECTED | SPEC_PUBLIC | STATIC | TWO_STATE
+  | NO_STATE | SPEC_JAVA_MATH | SPEC_SAVE_MATH | SPEC_BIGINT_MATH
+  | CODE_JAVA_MATH | CODE_SAVE_MATH | CODE_BIGINT_MATH
+ ;
+
+class_invariant: INVARIANT expression;
+//axiom_name: AXIOM_NAME_BEGIN IDENT AXIOM_NAME_END;
+class_axiom: AXIOM expression;
+initially_clause: INITIALLY expression;
+method_specification: (also_keyword)* spec_case ((also_keyword)+ spec_case)*;
+also_keyword: (ALSO | FOR_EXAMPLE | IMPLIES_THAT);
+spec_case: lightweight_spec_case | heavyweight_spec_case;
+lightweight_spec_case: generic_spec_case;
+heavyweight_spec_case: (modifier)?
+  (behavior_spec_case | break_behavior_spec_case | continue_behavior_spec_case
+  | exceptional_behavior_spec_case | normal_behavior_spec_case
+  | model_behavior_spec_case | return_behavior_spec_case);
+
+behavior_spec_case: BEHAVIOR generic_spec_case;
+normal_behavior_spec_case: NORMAL_BEHAVIOR generic_spec_case;
+model_behavior_spec_case: MODEL_BEHAVIOUR generic_spec_case;
+exceptional_behavior_spec_case: EXCEPTIONAL_BEHAVIOUR generic_spec_case;
+generic_spec_case: (spec_var_decls)? (spec_header generic_spec_body? | generic_spec_body);
+spec_var_decls: (old_clause | FORALL expression)+;
+spec_header: requires_clause+;
+//requires_clause: REQUIRES expression;
+generic_spec_body: (simple_spec_body | (NEST_START generic_spec_case_seq NEST_END));
+generic_spec_case_seq: generic_spec_case ((also_keyword)+ generic_spec_case)*;
+simple_spec_body: simple_spec_body_clause+;
+simple_spec_body_clause
+  : assignable_clause |accessible_clause | ensures_clause
+  | signals_clause | signals_only_clause | diverges_clause | measured_by_clause
+  | variant_function | name_clause | captures_clause | when_clause
+  | working_space_clause | duration_clause | breaks_clause |continues_clause
+  | returns_clause |separates_clause |determines_clause;
+
+//separates_clause: SEPARATES expression;
+//determines_clause: DETERMINES expression;
+//assignable_clause: ASSIGNABLE expression;
+//accessible_clause: ACCESSIBLE expression;
+measured_by_clause: MEASURED_BY expression;
+//ensures_clause: ENSURES expression;
+//signals_clause: SIGNALS expression;
+//signals_only_clause: SIGNALS_ONLY expression;
+diverges_clause: DIVERGES expression;
+captures_clause: CAPTURES expression;
+name_clause: SPEC_NAME STRING_LITERAL SEMICOLON;
+when_clause: WHEN expression;
+working_space_clause: WORKING_SPACE expression;
+duration_clause: DURATION expression;
+old_clause: OLD modifiers type IDENT INITIALISER;
+field_or_method_declaration:
+   type IDENT (method_declaration|field_declaration);
+field_declaration: (EMPTYBRACKETS)* (initialiser |SEMICOLON);
+method_declaration: param_list (BODY |SEMICOLON);
+param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
+param_decl: ((NON_NULL | NULLABLE))? IDENT ((AXIOM_NAME_BEGIN AXION_NAME_END | EMPTYBRACKETS))* IDENT;
+//represents_clause: REPRESENTS expression;
+//depends_clause: ACCESSIBLE expression;
+history_constraint: CONSTRAINT expression;
+monitors_for_clause: MONITORS_FOR expression;
+readable_if_clause: READABLE expression;
+writable_if_clause: WRITABLE expression;
+datagroup_clause: (in_group_clause | maps_into_clause);
+in_group_clause: IN expression;
+maps_into_clause: MAPS expression;
+nowarn_pragma: NOWARN expression;
+debug_statement: DEBUG expression;
+set_statement: SET expression;
+merge_point_statement: MERGE_POINT (MERGE_PROC (STRING_LITERAL))? (MERGE_PARAMS (BODY))? SEMICOLON;
+loop_specification
+  : loop_invariant
+    ( loop_invariant
+    | loop_separates_clause
+    | loop_determines_clause
+    | assignable_clause
+    | variant_function)*;
+
+loop_invariant: LOOP_INVARIANT expression;
+variant_function: DECREASING expression;
+//loop_separates_clause: SEPARATES expression;
+//loop_determines_clause: DETERMINES expression;
+assume_statement: ASSUME expression;
+initialiser: EQUALITY expression;
+block_specification: method_specification;
+block_loop_specification:
+  (loop_contract_keyword spec_case (also_keyword)+ loop_contract_keyword spec_case)+;
+loop_contract_keyword: LOOP_CONTRACT;
+assert_statement: (ASSERT expression | UNREACHABLE SEMICOLON);
+//breaks_clause: BREAKS expression;
+//continues_clause: CONTINUES expression;
+//returns_clause: RETURNS expression;
+break_behavior_spec_case: BREAK_BEHAVIOR generic_spec_case;
+continue_behavior_spec_case: CONTINUE_BEHAVIOR generic_spec_case;
+return_behavior_spec_case: RETURN_BEHAVIOR generic_spec_case;
+
+//post-parser
+top: mergeparamsspec (SEMI)? EOF;
+accessible_clause: ACCESSIBLE storeRefUnion;
+assignable_clause: ASSIGNABLE (storeRefUnion | STRICTLY_NOTHING);
+depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? SEMI;
+//decreases_clause: DECREASES termexpression (COMMA termexpression)*;
+requires_clause: REQUIRES predornot;
+ensures_clause: ENSURES predornot;
+axioms_clause: MODEL_METHOD_AXIOM termexpression;
+represents_clause
+  : REPRESENTS lhs=expression
+    (((LARROW | EQUAL_SINGLE) (a=expression|b=storeRefUnion))
+    | (SUCH_THAT predicate));
+separates_clause: SEPARATES (NOTHING | sep=infflowspeclist) ((DECLASSIFIES (NOTHING | decl=infflowspeclist)) | (ERASES (NOTHING |erase=infflowspeclist)) | (NEW_OBJECTS (NOTHING |newobj=infflowspeclist)))*;
+loop_separates_clause: LOOP_SEPARATES (NOTHING |sep=infflowspeclist) ((NEW_OBJECTS (NOTHING |newobj=infflowspeclist)))*;
+determines_clause: DETERMINES (NOTHING |infflowspeclist) BY (NOTHING | (ITSELF) |infflowspeclist) ((DECLASSIFIES (NOTHING |infflowspeclist)) | (ERASES (NOTHING |infflowspeclist)) | (NEW_OBJECTS (NOTHING |infflowspeclist)))*;
+loop_determines_clause: LOOP_DETERMINES (NOTHING |infflowspeclist) BY ITSELF ((NEW_OBJECTS (NOTHING |infflowspeclist)))*;
+infflowspeclist: termexpression (COMMA termexpression)*;
+signals_clause: SIGNALS LPAREN referencetype (IDENT)? RPAREN (predornot)?;
+signals_only_clause: SIGNALS_ONLY (NOTHING |referencetype (COMMA referencetype)*);
+mergeparamsspec: MERGE_PARAMS LBRACE (IDENT) COLON LPAREN (typespec) (IDENT) RPAREN RARROW LBRACE (predicate) (COMMA (predicate))* RBRACE RBRACE;
+termexpression: expression;
+breaks_clause: BREAKS LPAREN (IDENT)? RPAREN (predornot)?;
+continues_clause: CONTINUES LPAREN (IDENT)? RPAREN (predornot)?;
+returns_clause: RETURNS predornot?;
+storeRefUnion: list = storeRefList;
+storeRefList: storeref (COMMA storeref)*;
+storeRefIntersect: storeRefList;
+storeref: (NOTHING | EVERYTHING | NOT_SPECIFIED | storeRefExpr);
+createLocset: (LOCSET | SINGLETON) LPAREN exprList RPAREN;
+exprList: expression (COMMA expression)*;
+storeRefExpr: expression;
+specarrayrefexpr: ((expression (DOTDOT expression)?) | MULT);
+predornot: (predicate |NOT_SPECIFIED | SAME);
+predicate: expression;
+
+expression: conditionalexpr;
+conditionalexpr: equivalenceexpr (QUESTIONMARK conditionalexpr COLON conditionalexpr)?;
+equivalenceexpr: impliesexpr (EQV_ANTIV impliesexpr)*;
+impliesexpr: logicalorexpr (IMPLIES impliesforwardexpr | (IMPLIESBACKWARD logicalorexpr)+)?;
+impliesforwardexpr: logicalorexpr (IMPLIES impliesforwardexpr)?;
+logicalorexpr: logicalandexpr (LOGICALOR logicalandexpr)*;
+logicalandexpr: inclusiveorexpr (LOGICALAND inclusiveorexpr)*;
+inclusiveorexpr: exclusiveorexpr (INCLUSIVEOR exclusiveorexpr)*;
+exclusiveorexpr: andexpr (XOR andexpr)*;
+andexpr: equalityexpr (AND equalityexpr)*;
+equalityexpr: relationalexpr (EQ_NEQ relationalexpr)*;
+relationalexpr: shiftexpr (LT shiftexpr (LT shiftexpr)? |GT shiftexpr |LEQ shiftexpr (LT shiftexpr)? |GEQ shiftexpr |LOCKSET_LT postfixexpr |LOCKSET_LEQ postfixexpr |INSTANCEOF typespec |ST shiftexpr)?;
+shiftexpr: additiveexpr (SHIFTRIGHT additiveexpr |SHIFTLEFT additiveexpr |UNSIGNEDSHIFTRIGHT additiveexpr)*;
+additiveexpr: multexpr (PLUS multexpr |MINUS multexpr)*;
+multexpr: unaryexpr (MULT unaryexpr | DIV unaryexpr | MOD unaryexpr)*;
+unaryexpr: (PLUS unaryexpr | MINUS DECLITERAL |MINUS unaryexpr | castexpr | unaryexprnotplusminus);
+castexpr: LPAREN typespec RPAREN unaryexpr;
+unaryexprnotplusminus: (NOT unaryexpr | BITWISENOT unaryexpr | postfixexpr);
+postfixexpr: primaryexpr (primarysuffix)*;
+primaryexpr: (constant |IDENT |INV | TRUE | FALSE | NULL | jmlprimary | THIS | new_expr | array_initializer);
+transactionUpdated: TRANSACTIONUPDATED LPAREN expression RPAREN;
+primarysuffix: (DOT (IDENT |TRANSIENT | THIS | INV | MULT) |LPAREN (expressionlist)? RPAREN |LBRACKET specarrayrefexpr RBRACKET);
+new_expr: NEW type (LPAREN (expressionlist)? RPAREN | array_dimensions (array_initializer)?);
+array_dimensions: array_dimension;
+array_dimension: LBRACKET (expression)? RBRACKET;
+array_initializer: LBRACE expressionlist RBRACE;
+expressionlist: expression (COMMA expression)*;
+constant: javaliteral;
+javaliteral: (integerliteral |STRING_LITERAL |CHAR_LITERAL);
+integerliteral: (HEXLITERAL | DECLITERAL | OCTLITERAL | BINLITERAL);
+jmlprimary
+  : RESULT                                                                            #primaryResult
+  | EXCEPTION                                                                         #primaryException
+  | infinite_union_expr                                                               #pignore1
+  | specquantifiedexpression                                                          #pignore2
+  | bsumterm                                                                          #pignore3
+  | seqdefterm                                                                        #pignore4
+  | oldexpression                                                                     #pignore5
+  | beforeexpression                                                                  #pignore6
+  | transactionUpdated                                                                #pignore7
+  | BACKUP LPAREN expression RPAREN                                                   #primaryBackup
+  | PERMISSION LPAREN expression RPAREN                                               #primaryPermission
+  | NONNULLELEMENTS LPAREN expression RPAREN                                          #primaryNNE
+  | INFORMAL_DESCRIPTION                                                              #primaryInformalDesc
+  | DL_ESCAPE (LPAREN (expressionlist)? RPAREN)?                                      #primaryDLCall
+  | MAPEMPTY                                                                          #primaryMapEmpty
+  | mapExpression LPAREN (expressionlist)? RPAREN                                     #primaryMapExpr
+  | SEQ2MAP LPAREN (expressionlist)? RPAREN                                           #primarySeq2Map
+  | NOT_MODIFIED LPAREN storeRefUnion RPAREN                                          #primaryNotMod
+  | NOT_ASSIGNED LPAREN storeRefUnion RPAREN                                          #primaryNotAssigned
+  | FRESH LPAREN expressionlist RPAREN                                                #primaryFresh
+  | REACH LPAREN storeref COMMA expression COMMA expression (COMMA expression)? RPAREN #primaryReach
+  | REACHLOCS LPAREN storeref COMMA expression (COMMA expression)? RPAREN             #primaryReachLocs
+  | DURATION LPAREN expression RPAREN                                                 #primaryDuration
+  | SPACE LPAREN expression RPAREN                                                    #primarySpace
+  | WORKINGSPACE LPAREN expression RPAREN                                             #primaryWorksingSpace
+  | LPAREN expression RPAREN                                                          #primaryParen
+  | TYPEOF LPAREN expression RPAREN                                                   #primaryTypeOf
+  | ELEMTYPE LPAREN expression RPAREN                                                 #primaryElemtype
+  | TYPE_SMALL LPAREN typespec RPAREN                                                 #primayTypeSpec
+  | LOCKSET                                                                           #primaryLockset
+  | IS_INITIALIZED LPAREN referencetype RPAREN                                        #primaryIsInitialised
+  | INVARIANT_FOR LPAREN expression RPAREN                                            #primaryInvFor
+  | STATIC_INVARIANT_FOR LPAREN referencetype RPAREN                                  #primaryStaticInv
+  | LPAREN LBLNEG IDENT expression RPAREN                                             #primaryLblNeg
+  | LPAREN LBLPOS IDENT expression RPAREN                                             #primaryLblPos
+  | INDEX                                                                             #primaryIndex
+  | VALUES                                                                            #primaryValues
+  | STRING_EQUAL LPAREN expression COMMA expression RPAREN                            #primaryStringEq
+  | EMPTYSET                                                                          #primaryEmptySet
+  | createLocset                                                                      #primaryignor9
+  | (UNION | UNION_2) LPAREN storeRefUnion RPAREN                                     #primaryUnion
+  | INTERSECT LPAREN storeRefIntersect RPAREN                                         #primaryIntersect
+  | SETMINUS LPAREN storeref COMMA storeref RPAREN                                    #primarySetMinux
+  | ALLFIELDS LPAREN expression RPAREN                                                #primaryAllFields
+  | ALLOBJECTS LPAREN storeref RPAREN                                                 #primaryAllObj
+  | UNIONINF LPAREN (boundvarmodifiers)? quantifiedvardecls SEMI (predicate SEMI | SEMI)? storeref RPAREN
+                                                                                     #primaryUnionInf
+  | DISJOINT LPAREN storeRefList RPAREN                                              #primaryDisjoint
+  | SUBSET LPAREN storeref COMMA storeref RPAREN                                     #primarySubset
+  | NEWELEMSFRESH LPAREN storeref RPAREN                                             #primaryNewElemsfrehs
+  | sequence                                                                         #primaryignore10
+  ;
+
+sequence: (SEQEMPTY | seqdefterm | (SEQSINGLETON | SEQ) LPAREN exprList RPAREN | SEQSUB LPAREN expression COMMA expression COMMA expression RPAREN | SEQREVERSE LPAREN expression RPAREN | SEQREPLACE LPAREN expression COMMA expression COMMA expression RPAREN | (SEQCONCAT |SEQGET |INDEXOF) LPAREN expression COMMA expression RPAREN);
+mapExpression: (MAP_GET | MAP_OVERRIDE | MAP_UPDATE | MAP_REMOVE | IN_DOMAIN | DOMAIN_IMPLIES_CREATED | MAP_SIZE | MAP_SINGLETON | IS_FINITE);
+quantifier: FORALL | EXISTS | MIN | MAX | NUM_OF | PRODUCT | SUM;
+infinite_union_expr: LPAREN UNIONINF (boundvarmodifiers)? quantifiedvardecls SEMI (predicate SEMI | SEMI)? storeref RPAREN;
+specquantifiedexpression: LPAREN (quantifier (boundvarmodifiers)? quantifiedvardecls SEMI (predicate SEMI | SEMI)? expression) RPAREN;
+oldexpression: (PRE LPAREN expression RPAREN | OLD LPAREN expression (COMMA IDENT)? RPAREN);
+beforeexpression: (BEFORE LPAREN expression RPAREN);
+bsumterm: LPAREN BSUM quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;
+seqdefterm: LPAREN SEQDEF quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;
+quantifiedvardecls: typespec quantifiedvariabledeclarator (COMMA quantifiedvariabledeclarator)*;
+boundvarmodifiers: (NON_NULL | NULLABLE);
+typespec: type (dims)?;
+dims: (LBRACKET RBRACKET)+;
+type: builtintype | referencetype | TYPE;
+referencetype: name;
+builtintype: BYTE | SHORT | INT | LONG | BOOLEAN | VOID | BIGINT | REAL | LOCSET | SEQ | FREE;
+name: IDENT (DOT IDENT)*;
+quantifiedvariabledeclarator: IDENT dims?;
+

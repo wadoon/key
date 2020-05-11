@@ -32,7 +32,7 @@ import de.uka.ilkd.key.speclang.translation.SLTypeResolver;
 /**
  * Resolver manager for JML.
  */
-final class JMLResolverManager extends SLResolverManager {
+public final class JMLResolverManager extends SLResolverManager {
 
     public JMLResolverManager(JavaInfo javaInfo,
                               KeYJavaType specInClass,
