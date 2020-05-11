@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -93,15 +94,14 @@ public class JavaIntegerSemanticsHelper {
     //public interface
     //-------------------------------------------------------------------------
 
-    public boolean isIntegerTerm(SLExpression a) throws SLTranslationException {
+    public boolean isIntegerTerm(@NotNull SLExpression a)  {
 	assert a.isTerm();
 	return a.getTerm().sort() == integerLDT.targetSort();
     }
 
 
-    public SLExpression buildPromotedOrExpression(SLExpression a, 
-	    				          SLExpression b)
-	    throws SLTranslationException {
+    public SLExpression buildPromotedOrExpression(@NotNull SLExpression a, @NotNull SLExpression b)
+            throws SLTranslationException {
         assert a != null;
         assert b != null;
 	try {

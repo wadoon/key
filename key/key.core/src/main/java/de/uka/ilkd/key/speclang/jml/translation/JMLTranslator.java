@@ -39,6 +39,7 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.*;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
+import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -87,6 +88,7 @@ public final class JMLTranslator {
         tmp.put("\\map_size", "mapSize");
         jml2jdl = Collections.unmodifiableMap(tmp);
     }
+
 
     public static enum JMLKeyWord {
         // general features, not necessarily keywords
@@ -1923,6 +1925,11 @@ public final class JMLTranslator {
         return skolemExprHelper(jmlKeyWord, PrimitiveType.JAVA_LONG, services);
     }
 
+    public SLExpression createSkolemExprLong(String text, Services services) {
+        return skolemExprHelper(text, PrimitiveType.JAVA_LONG, services);
+    }
+
+
     /**
      * Create a skolem term (wrapped in SLExpression) for currently unsupported JML expressions of type \bigint.
      */
@@ -1940,15 +1947,26 @@ public final class JMLTranslator {
         return skolemExprHelper(jmlKeyWord, objType, services);
     }
 
+    public SLExpression createSkolemExprObject(String jmlKeyWord, Services services) {
+        assert services != null;
+        final KeYJavaType objType = services.getJavaInfo().getJavaLangObject();
+        assert objType != null;
+        return skolemExprHelper(jmlKeyWord, objType, services);
+    }
+
     /**
      * Create a nullary predicate (wrapped in SLExpression) for currently unsupported JML expressions of type boolean.
      */
-    SLExpression createSkolemExprBool(Token jmlKeyWord) {
+    public SLExpression createSkolemExprBool(Token jmlKeyWord) {
+        return createSkolemExprBool(jmlKeyWord.getText());
+    }
+
+    public SLExpression createSkolemExprBool(String jmlKeyWord) {
         addUnderspecifiedWarning(jmlKeyWord);
         final Namespace<Function> fns = services.getNamespaces().functions();
-        final String shortName = jmlKeyWord.getText().replace("\\", "");
+        final String shortName = jmlKeyWord.replace("\\", "");
         int x = -1;
-        Name name = null;
+        Name name;
         do {
             name = new Name(shortName + "_" + ++x);
         } while (fns.lookup(name) != null);
@@ -1957,7 +1975,6 @@ public final class JMLTranslator {
         final Term t = tb.func(sk);
         return new SLExpression(t);
     }
-
 
     /**
      * Get non-critical warnings.
@@ -2026,14 +2043,33 @@ public final class JMLTranslator {
         return skolemExprHelper(jmlKeyWord, kjt, services);
     }
 
+    public SLExpression skolemExprHelper(String jmlKeyWord, PrimitiveType type, Services services) {
+        final KeYJavaType kjt = services.getJavaInfo().getPrimitiveKeYJavaType(type);
+        return skolemExprHelper(kjt, services, jmlKeyWord);
+    }
+
     private SLExpression skolemExprHelper(Token jmlKeyWord, KeYJavaType type, TermServices services) {
         addUnderspecifiedWarning(jmlKeyWord);
+        final String shortName = jmlKeyWord.getText();
+        return skolemExprHelper(type, services, shortName);
+    }
+
+    private SLExpression skolemExprHelper(String jmlKeyWord, KeYJavaType type, TermServices services) {
+        addUnderspecifiedWarning(jmlKeyWord);
+        return skolemExprHelper(type, services, jmlKeyWord);
+    }
+
+
+    @NotNull
+    private SLExpression skolemExprHelper(@NotNull KeYJavaType type,
+                                          @NotNull TermServices services,
+                                          @NotNull String shortName) {
         assert services != null;
+        shortName = shortName.replace("\\", "");
         final Namespace<Function> fns = services.getNamespaces().functions();
         final Sort sort = type.getSort();
-        final String shortName = jmlKeyWord.getText().replace("\\", "");
         int x = -1;
-        Name name = null;
+        Name name;
         do {
             name = new Name(shortName + "_" + ++x);
         } while (fns.lookup(name) != null);
@@ -2102,16 +2138,6 @@ public final class JMLTranslator {
         /**
          * Add implicit "non-null" and "created" guards for reference types,
          * "in-bounds" guards for integer types. Then, translateToTerm the quantifier.
-         *
-         * @param quantName
-         * @param declVars
-         * @param expr
-         * @param preTerm
-         * @param bodyTerm
-         * @param nullable
-         * @param services
-         * @return
-         * @throws SLTranslationException
          */
         @SuppressWarnings("unchecked")
         @Override
@@ -2587,17 +2613,102 @@ public final class JMLTranslator {
 
     }
 
+    private static SLExpression translateToJDLTerm(final String functName,
+                                                   Services services,
+                                                   TermBuilder tb,
+                                                   ImmutableList<SLExpression> list,
+                                                   SLTranslationExceptionManager excManager) throws SLTranslationException {
+        Namespace<Function> funcs = services.getNamespaces().functions();
+        Named symbol = funcs.lookup(new Name(functName));
+
+        if (symbol != null) {
+            // Function or predicate symbol found
+
+            assert symbol instanceof Function : "Expecting a function symbol in this namespace";
+            Function function = (Function) symbol;
+
+            Term[] args;
+            if (list == null) {
+                list = ImmutableSLList.<SLExpression>nil();
+            }
+
+            Term heap = tb.getBaseHeap();
+
+            // special casing "implicit heap" arguments:
+            // omitting one argument means first argument is "heap"
+            int i = 0;
+            if (function.arity() == list.size() + 1
+                    && function.argSort(0) == heap.sort()) {
+                args = new Term[list.size() + 1];
+                args[i++] = heap;
+            } else {
+                args = new Term[list.size()];
+            }
+
+            for (SLExpression expr : list) {
+                if (!expr.isTerm()) {
+                    throw new SLTranslationException("Expecting a term here, not: "
+                            + expr);
+                }
+                args[i++] = expr.getTerm();
+            }
+
+            try {
+                Term resultTerm = tb.func(function, args, null);
+                final KeYJavaType type
+                        = services.getTypeConverter().getIntegerLDT().targetSort() == resultTerm.sort()
+                        ? services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT)
+                        : services.getJavaInfo().getKeYJavaType(resultTerm.sort());
+                SLExpression result = type == null ? new SLExpression(resultTerm) : new SLExpression(resultTerm, type);
+                return result;
+            } catch (TermCreationException ex) {
+                throw excManager.createException("Cannot create term " + function.name()
+                        + "(" + MiscTools.join(args, ", ") + ")", ex);
+            }
+
+        }
+
+        assert symbol == null;  // no function symbol found
+
+        Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
+        symbol = progVars.lookup(new Name(functName));
+
+        if (symbol == null) {
+            throw excManager.createException("Unknown escaped symbol " + functName);
+        }
+
+        assert symbol instanceof ProgramVariable : "Expecting a program variable";
+        ProgramVariable pv = (ProgramVariable) symbol;
+        try {
+            Term resultTerm = tb.var(pv);
+            SLExpression result = new SLExpression(resultTerm);
+            return result;
+        } catch (TermCreationException ex) {
+            throw excManager.createException("Cannot create term " + pv.name(), ex);
+        }
+    }
+
+
     /*
      * Translate a term of type \map to JavaDL, if it occurs in a JML
      * expression.
      */
     public SLExpression translateMapExpressionToJDL(Token t, ImmutableList<SLExpression> list,
                                                     Services services) throws SLTranslationException {
-        String functName = jml2jdl.get(t.getText());
-        if (functName == null) {
-            throw excManager.createException("Unknown token: " + t);
+        return translateMapExpressionToJDL(t.getText(), list, services);
+    }
+
+    public SLExpression translateMapExpressionToJDL(String text, ImmutableList<SLExpression> list,
+                                                    Services services) {
+        String functName = jml2jdl.get(text);
+        try {
+            if (functName == null) {
+                throw excManager.createException("Unknown function: " + text);
+            }
+            return translateToJDLTerm(functName, services, tb, list, excManager);
+        } catch (SLTranslationException e) {
+            throw new RuntimeException(e);
         }
-        return translateToJDLTerm(t, functName, services, tb, list, excManager);
     }
 
     /**

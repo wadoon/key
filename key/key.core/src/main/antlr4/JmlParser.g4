@@ -128,12 +128,23 @@ ensures_clause: ENSURES predornot;
 axioms_clause: MODEL_METHOD_AXIOM termexpression;
 represents_clause
   : REPRESENTS lhs=expression
-    (((LARROW | EQUAL_SINGLE) (a=expression|b=storeRefUnion))
+    (((LARROW | EQUAL_SINGLE) (rhs=expression|t=storeRefUnion))
     | (SUCH_THAT predicate));
 separates_clause: SEPARATES (NOTHING | sep=infflowspeclist) ((DECLASSIFIES (NOTHING | decl=infflowspeclist)) | (ERASES (NOTHING |erase=infflowspeclist)) | (NEW_OBJECTS (NOTHING |newobj=infflowspeclist)))*;
 loop_separates_clause: LOOP_SEPARATES (NOTHING |sep=infflowspeclist) ((NEW_OBJECTS (NOTHING |newobj=infflowspeclist)))*;
-determines_clause: DETERMINES (NOTHING |infflowspeclist) BY (NOTHING | (ITSELF) |infflowspeclist) ((DECLASSIFIES (NOTHING |infflowspeclist)) | (ERASES (NOTHING |infflowspeclist)) | (NEW_OBJECTS (NOTHING |infflowspeclist)))*;
-loop_determines_clause: LOOP_DETERMINES (NOTHING |infflowspeclist) BY ITSELF ((NEW_OBJECTS (NOTHING |infflowspeclist)))*;
+determines_clause: DETERMINES
+   (NOTHING|det=infflowspeclist)
+   BY (NOTHING | (ITSELF) | by=infflowspeclist)
+   ( (DECLASSIFIES (NOTHING |decl+=infflowspeclist))
+   | (ERASES (NOTHING |erases+=infflowspeclist))
+   | (NEW_OBJECTS (NOTHING |newObs+=infflowspeclist)))*;
+
+loop_determines_clause
+  : LOOP_DETERMINES
+    (NOTHING |det=infflowspeclist)
+    BY ITSELF ((NEW_OBJECTS (NOTHING |newObs+=infflowspeclist)))*
+  ;
+
 infflowspeclist: termexpression (COMMA termexpression)*;
 signals_clause: SIGNALS LPAREN referencetype (IDENT)? RPAREN (predornot)?;
 signals_only_clause: SIGNALS_ONLY (NOTHING |referencetype (COMMA referencetype)*);
@@ -149,39 +160,88 @@ storeref: (NOTHING | EVERYTHING | NOT_SPECIFIED | storeRefExpr);
 createLocset: (LOCSET | SINGLETON) LPAREN exprList RPAREN;
 exprList: expression (COMMA expression)*;
 storeRefExpr: expression;
-specarrayrefexpr: ((expression (DOTDOT expression)?) | MULT);
 predornot: (predicate |NOT_SPECIFIED | SAME);
 predicate: expression;
 
 expression: conditionalexpr;
 conditionalexpr: equivalenceexpr (QUESTIONMARK conditionalexpr COLON conditionalexpr)?;
 equivalenceexpr: impliesexpr (EQV_ANTIV impliesexpr)*;
-impliesexpr: logicalorexpr (IMPLIES impliesforwardexpr | (IMPLIESBACKWARD logicalorexpr)+)?;
-impliesforwardexpr: logicalorexpr (IMPLIES impliesforwardexpr)?;
+impliesexpr: a=logicalorexpr (IMPLIES b=impliesforwardexpr | (IMPLIESBACKWARD c+=logicalorexpr)+)?;
+impliesforwardexpr: a=logicalorexpr (IMPLIES b=impliesforwardexpr)?;
 logicalorexpr: logicalandexpr (LOGICALOR logicalandexpr)*;
 logicalandexpr: inclusiveorexpr (LOGICALAND inclusiveorexpr)*;
 inclusiveorexpr: exclusiveorexpr (INCLUSIVEOR exclusiveorexpr)*;
 exclusiveorexpr: andexpr (XOR andexpr)*;
 andexpr: equalityexpr (AND equalityexpr)*;
 equalityexpr: relationalexpr (EQ_NEQ relationalexpr)*;
-relationalexpr: shiftexpr (LT shiftexpr (LT shiftexpr)? |GT shiftexpr |LEQ shiftexpr (LT shiftexpr)? |GEQ shiftexpr |LOCKSET_LT postfixexpr |LOCKSET_LEQ postfixexpr |INSTANCEOF typespec |ST shiftexpr)?;
-shiftexpr: additiveexpr (SHIFTRIGHT additiveexpr |SHIFTLEFT additiveexpr |UNSIGNEDSHIFTRIGHT additiveexpr)*;
-additiveexpr: multexpr (PLUS multexpr |MINUS multexpr)*;
-multexpr: unaryexpr (MULT unaryexpr | DIV unaryexpr | MOD unaryexpr)*;
+
+relationalexpr
+  : relational_lockset
+  | relational_chain
+  | instance_of
+  | st_expr
+  | shiftexpr
+  ;
+
+st_expr: shiftexpr ST shiftexpr;
+instance_of: shiftexpr INSTANCEOF typespec;
+
+relational_chain
+  :  shiftexpr ( op+=(LT | GT | LEQ | GEQ) shiftexpr)+
+  ;
+
+relational_lockset
+  : shiftexpr LOCKSET_LT postfixexpr
+  | shiftexpr LOCKSET_LEQ postfixexpr
+  ;
+
+
+shiftexpr: additiveexpr (op+=(SHIFTRIGHT|SHIFTLEFT|UNSIGNEDSHIFTRIGHT) additiveexpr)*;
+additiveexpr: multexpr (op+=(PLUS|MINUS) multexpr)*;
+multexpr: unaryexpr (op+=(MULT|DIV|MOD) unaryexpr)*;
 unaryexpr: (PLUS unaryexpr | MINUS DECLITERAL |MINUS unaryexpr | castexpr | unaryexprnotplusminus);
 castexpr: LPAREN typespec RPAREN unaryexpr;
 unaryexprnotplusminus: (NOT unaryexpr | BITWISENOT unaryexpr | postfixexpr);
 postfixexpr: primaryexpr (primarysuffix)*;
-primaryexpr: (constant |IDENT |INV | TRUE | FALSE | NULL | jmlprimary | THIS | new_expr | array_initializer);
+primaryexpr
+  : constant
+  | ident
+  | inv
+  | true_
+  | false_
+  | null_
+  | jmlprimary
+  | this_
+  | new_expr
+  | array_initializer
+  ;
+this_: THIS;
+ident: IDENT;
+inv:INV;
+true_:TRUE;
+false_:FALSE;
+null_:NULL;
 transactionUpdated: TRANSACTIONUPDATED LPAREN expression RPAREN;
-primarysuffix: (DOT (IDENT |TRANSIENT | THIS | INV | MULT) |LPAREN (expressionlist)? RPAREN |LBRACKET specarrayrefexpr RBRACKET);
+
+primarysuffix
+  : DOT (IDENT |TRANSIENT | THIS | INV | MULT) #primarySuffixAccess
+  | LPAREN (expressionlist)? RPAREN            #primarySuffixCall
+  | LBRACKET (from=expression (DOTDOT to=expression)? | MULT) RBRACKET #primarySuffixArray
+  ;
+
 new_expr: NEW type (LPAREN (expressionlist)? RPAREN | array_dimensions (array_initializer)?);
 array_dimensions: array_dimension;
 array_dimension: LBRACKET (expression)? RBRACKET;
 array_initializer: LBRACE expressionlist RBRACE;
 expressionlist: expression (COMMA expression)*;
 constant: javaliteral;
-javaliteral: (integerliteral |STRING_LITERAL |CHAR_LITERAL);
+javaliteral
+  : integerliteral
+  | stringliteral
+  | charliteral
+  ;
+stringliteral: STRING_LITERAL;
+charliteral: CHAR_LITERAL;
 integerliteral: (HEXLITERAL | DECLITERAL | OCTLITERAL | BINLITERAL);
 jmlprimary
   : RESULT                                                                            #primaryResult
@@ -237,8 +297,17 @@ jmlprimary
   | sequence                                                                         #primaryignore10
   ;
 
-sequence: (SEQEMPTY | seqdefterm | (SEQSINGLETON | SEQ) LPAREN exprList RPAREN | SEQSUB LPAREN expression COMMA expression COMMA expression RPAREN | SEQREVERSE LPAREN expression RPAREN | SEQREPLACE LPAREN expression COMMA expression COMMA expression RPAREN | (SEQCONCAT |SEQGET |INDEXOF) LPAREN expression COMMA expression RPAREN);
-mapExpression: (MAP_GET | MAP_OVERRIDE | MAP_UPDATE | MAP_REMOVE | IN_DOMAIN | DOMAIN_IMPLIES_CREATED | MAP_SIZE | MAP_SINGLETON | IS_FINITE);
+sequence
+  : SEQEMPTY                                                              #sequenceEmpty
+  | seqdefterm                                                            #sequenceIgnore1
+  | (SEQSINGLETON | SEQ) LPAREN exprList RPAREN                           #sequenceCreate
+  | SEQSUB LPAREN expression COMMA expression COMMA expression RPAREN     #sequenceSub
+  | SEQREVERSE LPAREN expression RPAREN                                   #sequenceReverse
+  | SEQREPLACE LPAREN expression COMMA expression COMMA expression RPAREN #sequenceReplace
+  | op=(SEQCONCAT |SEQGET |INDEXOF) LPAREN expression COMMA expression RPAREN #sequenceFuncs
+  ;
+
+mapExpression: MAP_GET | MAP_OVERRIDE | MAP_UPDATE | MAP_REMOVE | IN_DOMAIN | DOMAIN_IMPLIES_CREATED | MAP_SIZE | MAP_SINGLETON | IS_FINITE;
 quantifier: FORALL | EXISTS | MIN | MAX | NUM_OF | PRODUCT | SUM;
 infinite_union_expr: LPAREN UNIONINF (boundvarmodifiers)? quantifiedvardecls SEMI (predicate SEMI | SEMI)? storeref RPAREN;
 specquantifiedexpression: LPAREN (quantifier (boundvarmodifiers)? quantifiedvardecls SEMI (predicate SEMI | SEMI)? expression) RPAREN;
