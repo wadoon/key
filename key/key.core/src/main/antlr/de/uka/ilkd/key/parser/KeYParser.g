@@ -3964,6 +3964,7 @@ varexp[TacletBuilder b]
     | varcond_initializeParametricSkolemUpdate[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_applyOnAbstractUpdate[b]
+    | varcond_applyOnParametricValueTerm[b]
     | varcond_simplifyAbstractUpdateInSelect[b]
     | varcond_abstractUpdateToElementaryUpdates[b]
     | varcond_instantiateVarsFresh[b]
@@ -4201,6 +4202,16 @@ varcond_applyOnAbstractUpdate[TacletBuilder b]
       b.addVariableCondition(new ApplyOnAbstractUpdateCondition((UpdateSV)u1, 
                                                                 (UpdateSV)u2, 
                                                                 (UpdateSV)result));
+   }
+;
+
+varcond_applyOnParametricValueTerm[TacletBuilder b]
+:
+   APPLY_UPDATE_ON_PARAMETRIC_VALUE_TERM LPAREN u=varId COMMA t=varId COMMA result=varId RPAREN 
+   {
+      b.addVariableCondition(new ApplyUpdateOnParametricValueTermCondition((UpdateSV)u, 
+                                                                           (SchemaVariable)t, 
+                                                                           (SchemaVariable)result));
    }
 ;
 

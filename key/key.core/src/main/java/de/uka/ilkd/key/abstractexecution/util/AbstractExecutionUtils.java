@@ -400,6 +400,8 @@ public class AbstractExecutionUtils {
         ImmutableList<PosInOccurrence> result = emptyList;
         final AbstractUpdateLoc locUnwrapped = AbstractExecutionUtils.unwrapHasTo(loc);
 
+        final LocationVariable heapVar = services.getTypeConverter().getHeapLDT().getHeap();
+
         //@formatter:off
         /*
          * A location l1 (set) is *not* relevant w.r.t. another location l2 (set) if:
@@ -429,6 +431,13 @@ public class AbstractExecutionUtils {
             // Relevant, return null
             return null;
         }
+        
+        if (locUnwrapped instanceof HeapLoc
+                && relevantLocations.stream().filter(PVLoc.class::isInstance).map(PVLoc.class::cast)
+                        .map(PVLoc::getVar).anyMatch(pv -> pv == heapVar)) {
+            // Relevant, return null
+            return null;
+        }
 
         final Set<AbstractUpdateLoc> relevantLocsCopy = new LinkedHashSet<>(relevantLocations);
         if (locUnwrapped instanceof PVLoc) {
@@ -438,7 +447,7 @@ public class AbstractExecutionUtils {
             // If loc is a HeapLoc, we can safely remove all PVLocs that aren't the heap
             // variable.
             relevantLocsCopy.removeIf(ploc -> ploc instanceof PVLoc && ((PVLoc) ploc)
-                    .getVar() != services.getTypeConverter().getHeapLDT().getHeap());
+                    .getVar() != heapVar);
         } else {
             /*
              * Even if loc is allLocs, the "fresh" locations cannot be meant! We remove

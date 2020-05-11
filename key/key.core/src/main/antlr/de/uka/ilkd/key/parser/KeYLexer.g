@@ -251,6 +251,7 @@ lexer grammar KeYLexer;
     INITIALIZE_EXPRESSION : '\\initializeExpression';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
 	APPLY_ON_ABSTRACT_UPDATE : '\\applyOnAbstractUpdate' ;
+	APPLY_UPDATE_ON_PARAMETRIC_VALUE_TERM : '\\applyUpdateOnParametricValueTerm' ;
 	ABSTRACT_UPDATE_TO_ELEMENTARY_UPDATES : '\\abstractUpdateToElementaryUpdates' ;
 	SIMPLIFY_ABSTRACT_UPDATE_IN_SELECT : '\\simplifyAbstractUpdateInSelect' ;
 	DROP_EFFECTLESS_ELEMENTARIES : '\\dropEffectlessElementaries';
