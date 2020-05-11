@@ -388,8 +388,9 @@ public class AbstractExecutionUtils {
      * @param goal                 The goal in which the {@link Rule} should be
      *                             applied.
      * @param services             The {@link Services} object.
-     * @return true iff the given location is relevant w.r.t. the given set of
-     *         relevant locations.
+     * @return null iff the given location is relevant w.r.t. the given set of
+     *         relevant locations, a list of positions with evidence for irrelevance
+     *         otherwise.
      */
     public static ImmutableList<PosInOccurrence> isRelevant(final AbstractUpdateLoc loc,
             final Collection<AbstractUpdateLoc> relevantLocations,
@@ -421,6 +422,12 @@ public class AbstractExecutionUtils {
                 || overwrittenLocations.contains(locUnwrapped) || relevantLocations.isEmpty()) {
             // Irrelevant, but no evidence needed
             return emptyList;
+        }
+        
+        // Simple first check: Literal occurrence in relevant locs
+        if (relevantLocations.contains(locUnwrapped)) {
+            // Relevant, return null
+            return null;
         }
 
         final Set<AbstractUpdateLoc> relevantLocsCopy = new LinkedHashSet<>(relevantLocations);
@@ -488,13 +495,41 @@ public class AbstractExecutionUtils {
             final AbstractUpdateLoc relevantLoc, final Goal goal, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
-        if (loc instanceof PVLoc) {
+        if (loc instanceof PVLoc || relevantLoc instanceof PVLoc) {
+            final AbstractUpdateLoc pvloc;
+            final AbstractUpdateLoc otherloc;
+
+            if (loc instanceof PVLoc) {
+                pvloc = loc;
+                otherloc = relevantLoc;
+            } else {
+                pvloc = relevantLoc;
+                otherloc = loc;
+            }
+
+            assert !(otherloc instanceof PVLoc || otherloc instanceof FieldLoc) : //
+            "Unexpected combination of locations in irrelevance check.";
+
             return lookForEvidence(goal, false,
-                    tb.pvElementOf(loc.toTerm(services).sub(0), relevantLoc.toTerm(services)));
-        } else if (loc instanceof FieldLoc) {
-            final FieldLoc fl = (FieldLoc) loc;
+                    tb.pvElementOf(pvloc.toTerm(services).sub(0), otherloc.toTerm(services)));
+        } else if (loc instanceof FieldLoc || relevantLoc instanceof FieldLoc) {
+            final AbstractUpdateLoc fieldloc;
+            final AbstractUpdateLoc otherloc;
+
+            if (loc instanceof FieldLoc) {
+                fieldloc = loc;
+                otherloc = relevantLoc;
+            } else {
+                fieldloc = relevantLoc;
+                otherloc = loc;
+            }
+
+            assert !(otherloc instanceof PVLoc || otherloc instanceof FieldLoc) : //
+            "Unexpected combination of locations in irrelevance check.";
+
+            final FieldLoc fl = (FieldLoc) fieldloc;
             return lookForEvidence(goal, false,
-                    tb.elementOf(fl.getObjTerm(), fl.getFieldTerm(), relevantLoc.toTerm(services)));
+                    tb.elementOf(fl.getObjTerm(), fl.getFieldTerm(), otherloc.toTerm(services)));
         } else {
             final Term locsetDisjointTerm1 = tb.equals(
                     tb.intersect(loc.toTerm(services), relevantLoc.toTerm(services)), tb.empty());
