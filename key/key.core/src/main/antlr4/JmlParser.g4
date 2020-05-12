@@ -10,7 +10,7 @@ classlevel_element
   | monitors_for_clause | readable_if_clause | writable_if_clause | datagroup_clause | set_statement
   | assert_statement | assume_statement | nowarn_pragma;
 
-methodlevel_comment: (modifiers methodlevel_element)+ EOF;
+methodlevel_comment: (modifiers methodlevel_element) EOF;
 methodlevel_element
   : field_or_method_declaration | set_statement | merge_point_statement
   | loop_specification | assert_statement | assume_statement | nowarn_pragma
@@ -32,45 +32,58 @@ class_axiom: AXIOM expression;
 initially_clause: INITIALLY expression;
 method_specification: (also_keyword)* spec_case ((also_keyword)+ spec_case)*;
 also_keyword: (ALSO | FOR_EXAMPLE | IMPLIES_THAT);
-spec_case: lightweight_spec_case | heavyweight_spec_case;
-lightweight_spec_case: generic_spec_case;
-heavyweight_spec_case: (modifier)?
-  (behavior_spec_case | break_behavior_spec_case | continue_behavior_spec_case
-  | exceptional_behavior_spec_case | normal_behavior_spec_case
-  | model_behavior_spec_case | return_behavior_spec_case);
+spec_case:
+  (modifier)?
+  behavior=(BEHAVIOR | NORMAL_BEHAVIOR | MODEL_BEHAVIOR | EXCEPTIONAL_BEHAVIOR
+  | BREAK_BEHAVIOR | CONTINUE_BEHAVIOR | RETURN_BEHAVIOR )?
+  spec_body
+;
 
-behavior_spec_case: BEHAVIOR generic_spec_case;
-normal_behavior_spec_case: NORMAL_BEHAVIOR generic_spec_case;
-model_behavior_spec_case: MODEL_BEHAVIOUR generic_spec_case;
-exceptional_behavior_spec_case: EXCEPTIONAL_BEHAVIOUR generic_spec_case;
-generic_spec_case: (spec_var_decls)? (spec_header generic_spec_body? | generic_spec_body);
-spec_var_decls: (old_clause | FORALL expression)+;
-spec_header: requires_clause+;
-//requires_clause: REQUIRES expression;
-generic_spec_body: (simple_spec_body | (NEST_START generic_spec_case_seq NEST_END));
-generic_spec_case_seq: generic_spec_case ((also_keyword)+ generic_spec_case)*;
-simple_spec_body: simple_spec_body_clause+;
-simple_spec_body_clause
-  : assignable_clause |accessible_clause | ensures_clause
-  | signals_clause | signals_only_clause | diverges_clause | measured_by_clause
-  | variant_function | name_clause | captures_clause | when_clause
-  | working_space_clause | duration_clause | breaks_clause |continues_clause
-  | returns_clause |separates_clause |determines_clause;
+/*spec_var_decls: (old_clause | FORALL expression)+;
+spec_header: requires_clause+;*/
 
-//separates_clause: SEPARATES expression;
-//determines_clause: DETERMINES expression;
-//assignable_clause: ASSIGNABLE expression;
-//accessible_clause: ACCESSIBLE expression;
-measured_by_clause: MEASURED_BY expression;
-//ensures_clause: ENSURES expression;
-//signals_clause: SIGNALS expression;
-//signals_only_clause: SIGNALS_ONLY expression;
-diverges_clause: DIVERGES expression;
-captures_clause: CAPTURES expression;
+spec_body: a=clause+ (NEST_START inner=clause (also_keyword+ spec_body)* NEST_END)?;
+clause
+  : simple_clause    | assignable_clause | accessible_clause
+  | signals_clause   | signals_only_clause
+  | variant_function | name_clause
+  | breaks_clause    | continues_clause
+  | returns_clause   | separates_clause  | determines_clause;
+
+// clauses
+simple_clause: simple_clause_keyword predornot SEMI;
+simple_clause_keyword:
+  MODEL_METHOD_AXIOM | REQUIRES | ENSURES | MEASURED_BY | DIVERGES | CAPTURES | WORKING_SPACE | DURATION | WHEN
+  ;
+accessible_clause: ACCESSIBLE storeRefUnion;
+assignable_clause: ASSIGNABLE (storeRefUnion | STRICTLY_NOTHING);
+depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? SEMI;
+//decreases_clause: DECREASES termexpression (COMMA termexpression)*;
+represents_clause
+  : REPRESENTS lhs=expression
+    (((LARROW | EQUAL_SINGLE) (rhs=expression|t=storeRefUnion))
+    | (SUCH_THAT predicate));
+separates_clause: SEPARATES (NOTHING | sep=infflowspeclist) ((DECLASSIFIES (NOTHING | decl=infflowspeclist)) | (ERASES (NOTHING |erase=infflowspeclist)) | (NEW_OBJECTS (NOTHING |newobj=infflowspeclist)))*;
+loop_separates_clause: LOOP_SEPARATES (NOTHING |sep=infflowspeclist) ((NEW_OBJECTS (NOTHING |newobj=infflowspeclist)))*;
+determines_clause: DETERMINES
+   (NOTHING|det=infflowspeclist)
+   BY (NOTHING | (ITSELF) | by=infflowspeclist)
+   ( (DECLASSIFIES (NOTHING |decl+=infflowspeclist))
+   | (ERASES (NOTHING |erases+=infflowspeclist))
+   | (NEW_OBJECTS (NOTHING |newObs+=infflowspeclist)))*;
+loop_determines_clause
+  : LOOP_DETERMINES
+    (NOTHING |det=infflowspeclist)
+    BY ITSELF ((NEW_OBJECTS (NOTHING |newObs+=infflowspeclist)))*
+  ;
+
+signals_clause: SIGNALS LPAREN referencetype (IDENT)? RPAREN (predornot)?;
+signals_only_clause: SIGNALS_ONLY (NOTHING |referencetype (COMMA referencetype)*);
+breaks_clause: BREAKS LPAREN (IDENT)? RPAREN (predornot)?;
+continues_clause: CONTINUES LPAREN (IDENT)? RPAREN (predornot)?;
+returns_clause: RETURNS predornot?;
+
 name_clause: SPEC_NAME STRING_LITERAL SEMICOLON;
-when_clause: WHEN expression;
-working_space_clause: WORKING_SPACE expression;
-duration_clause: DURATION expression;
 old_clause: OLD modifiers type IDENT INITIALISER;
 field_or_method_declaration:
    type IDENT (method_declaration|field_declaration);
@@ -81,10 +94,10 @@ param_decl: ((NON_NULL | NULLABLE))? IDENT ((AXIOM_NAME_BEGIN AXION_NAME_END | E
 //represents_clause: REPRESENTS expression;
 //depends_clause: ACCESSIBLE expression;
 history_constraint: CONSTRAINT expression;
+datagroup_clause: (in_group_clause | maps_into_clause);
 monitors_for_clause: MONITORS_FOR expression;
 readable_if_clause: READABLE expression;
 writable_if_clause: WRITABLE expression;
-datagroup_clause: (in_group_clause | maps_into_clause);
 in_group_clause: IN expression;
 maps_into_clause: MAPS expression;
 nowarn_pragma: NOWARN expression;
@@ -113,46 +126,16 @@ assert_statement: (ASSERT expression | UNREACHABLE SEMICOLON);
 //breaks_clause: BREAKS expression;
 //continues_clause: CONTINUES expression;
 //returns_clause: RETURNS expression;
-break_behavior_spec_case: BREAK_BEHAVIOR generic_spec_case;
-continue_behavior_spec_case: CONTINUE_BEHAVIOR generic_spec_case;
-return_behavior_spec_case: RETURN_BEHAVIOR generic_spec_case;
 
 //post-parser
 top: mergeparamsspec (SEMI)? EOF;
-accessible_clause: ACCESSIBLE storeRefUnion;
-assignable_clause: ASSIGNABLE (storeRefUnion | STRICTLY_NOTHING);
-depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? SEMI;
-//decreases_clause: DECREASES termexpression (COMMA termexpression)*;
-requires_clause: REQUIRES predornot;
-ensures_clause: ENSURES predornot;
-axioms_clause: MODEL_METHOD_AXIOM termexpression;
-represents_clause
-  : REPRESENTS lhs=expression
-    (((LARROW | EQUAL_SINGLE) (rhs=expression|t=storeRefUnion))
-    | (SUCH_THAT predicate));
-separates_clause: SEPARATES (NOTHING | sep=infflowspeclist) ((DECLASSIFIES (NOTHING | decl=infflowspeclist)) | (ERASES (NOTHING |erase=infflowspeclist)) | (NEW_OBJECTS (NOTHING |newobj=infflowspeclist)))*;
-loop_separates_clause: LOOP_SEPARATES (NOTHING |sep=infflowspeclist) ((NEW_OBJECTS (NOTHING |newobj=infflowspeclist)))*;
-determines_clause: DETERMINES
-   (NOTHING|det=infflowspeclist)
-   BY (NOTHING | (ITSELF) | by=infflowspeclist)
-   ( (DECLASSIFIES (NOTHING |decl+=infflowspeclist))
-   | (ERASES (NOTHING |erases+=infflowspeclist))
-   | (NEW_OBJECTS (NOTHING |newObs+=infflowspeclist)))*;
 
-loop_determines_clause
-  : LOOP_DETERMINES
-    (NOTHING |det=infflowspeclist)
-    BY ITSELF ((NEW_OBJECTS (NOTHING |newObs+=infflowspeclist)))*
-  ;
 
-infflowspeclist: termexpression (COMMA termexpression)*;
-signals_clause: SIGNALS LPAREN referencetype (IDENT)? RPAREN (predornot)?;
-signals_only_clause: SIGNALS_ONLY (NOTHING |referencetype (COMMA referencetype)*);
 mergeparamsspec: MERGE_PARAMS LBRACE (IDENT) COLON LPAREN (typespec) (IDENT) RPAREN RARROW LBRACE (predicate) (COMMA (predicate))* RBRACE RBRACE;
 termexpression: expression;
-breaks_clause: BREAKS LPAREN (IDENT)? RPAREN (predornot)?;
-continues_clause: CONTINUES LPAREN (IDENT)? RPAREN (predornot)?;
-returns_clause: RETURNS predornot?;
+
+infflowspeclist: termexpression (COMMA termexpression)*;
+
 storeRefUnion: list = storeRefList;
 storeRefList: storeref (COMMA storeref)*;
 storeRefIntersect: storeRefList;

@@ -27,25 +27,6 @@ public class JmlFacade {
         return lexer;
     }
 
-    public ImmutableList<TextualJMLConstruct> parseClasslevelComment() throws SLTranslationException {
-        try {
-            return classlevel_comment();
-        } catch(RecognitionException e) {
-            throw excManager.convertException(getErrorMessage(e, KeYJMLPreLexerTokens.getTokennames()), e);
-        }
-    }
-
-
-    public ImmutableList<TextualJMLConstruct> parseMethodlevelComment()
-            throws SLTranslationException {
-        try {
-            return methodlevel_comment();
-        } catch(RecognitionException e) {
-            throw excManager.convertException(getErrorMessage(e, KeYJMLPreLexerTokens.getTokennames()), e);
-        }
-    }
-
-
     private static class OffsetFactory extends CommonTokenFactory {
         int lineOffset;
         int charPositionInLineOffset;

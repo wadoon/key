@@ -335,24 +335,6 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
     } )*;
 */
 
-
-    @Override
-    public Object visitRequires_clause(JmlParser.Requires_clauseContext ctx) {
-        return translator.get(ctx.REQUIRES().getText(), accept(ctx.predornot()), services);
-    }
-
-    @Override
-    public Object visitEnsures_clause(JmlParser.Ensures_clauseContext ctx) {
-        return translator.get(ctx.ENSURES().getText(), accept(ctx.predornot()), services);
-    }
-
-
-    @Override
-    public Term visitAxioms_clause(JmlParser.Axioms_clauseContext ctx) {
-        return translator.get(ctx.MODEL_METHOD_AXIOM().getText(),
-                accept(ctx.termexpression()), services);
-    }
-
     @Override
     public Pair<ObserverFunction, Term> visitRepresents_clause(JmlParser.Represents_clauseContext ctx) {
         //TODO
