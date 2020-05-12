@@ -158,7 +158,7 @@ lexer grammar KeYJMLLexer;
     // ONLY_ASSIGNED     : '\\only_assigned';
     // ONLY_CALLED       : '\\only_called';
     // ONLY_CAPTURED     : '\\only_captured';
-
+    FP_ABS               : '\\fp_abs';
 AND : '&';
 BITWISENOT : '~';
 COLON : ':';
