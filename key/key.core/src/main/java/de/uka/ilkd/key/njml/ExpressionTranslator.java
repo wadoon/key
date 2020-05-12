@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
  * @author Alexander Weigl
  * @version 1 (5/10/20)
  */
-public class Translator extends JmlParserBaseVisitor<Object> {
+public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
     /**
      * maximum valid value of a signed int
      */
@@ -92,14 +92,14 @@ public class Translator extends JmlParserBaseVisitor<Object> {
     private final JMLResolverManager resolverManager;
     private final JavaIntegerSemanticsHelper intHelper;
 
-    private Translator(Services services,
-                       KeYJavaType specInClass,
-                       ProgramVariable self,
-                       ImmutableList<ProgramVariable> paramVars,
-                       ProgramVariable result,
-                       ProgramVariable exc,
-                       Map<LocationVariable, Term> atPres,
-                       Map<LocationVariable, Term> atBefores) {
+    private ExpressionTranslator(Services services,
+                                 KeYJavaType specInClass,
+                                 ProgramVariable self,
+                                 ImmutableList<ProgramVariable> paramVars,
+                                 ProgramVariable result,
+                                 ProgramVariable exc,
+                                 Map<LocationVariable, Term> atPres,
+                                 Map<LocationVariable, Term> atBefores) {
         // save parameters
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -1886,6 +1886,4 @@ public class Translator extends JmlParserBaseVisitor<Object> {
     private void raiseNotSupported(TerminalNode elemtype) {
         throw new RuntimeException(excManager.createWarningException(elemtype.getText() + " not supported"));
     }
-
-
 }

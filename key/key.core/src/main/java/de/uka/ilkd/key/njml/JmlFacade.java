@@ -1,8 +1,11 @@
 package de.uka.ilkd.key.njml;
 
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Pair;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * @author Alexander Weigl
@@ -23,6 +26,25 @@ public class JmlFacade {
         lexer._tokenStartLine = 1 + ps.pos.getLine();
         return lexer;
     }
+
+    public ImmutableList<TextualJMLConstruct> parseClasslevelComment() throws SLTranslationException {
+        try {
+            return classlevel_comment();
+        } catch(RecognitionException e) {
+            throw excManager.convertException(getErrorMessage(e, KeYJMLPreLexerTokens.getTokennames()), e);
+        }
+    }
+
+
+    public ImmutableList<TextualJMLConstruct> parseMethodlevelComment()
+            throws SLTranslationException {
+        try {
+            return methodlevel_comment();
+        } catch(RecognitionException e) {
+            throw excManager.convertException(getErrorMessage(e, KeYJMLPreLexerTokens.getTokennames()), e);
+        }
+    }
+
 
     private static class OffsetFactory extends CommonTokenFactory {
         int lineOffset;

@@ -116,9 +116,9 @@ import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
  */
 public class JMLSpecFactory {
 
-    private final de.uka.ilkd.key.logic.TermBuilder tb;
-    private final de.uka.ilkd.key.java.Services services;
-    private final ContractFactory cf;
+    protected final de.uka.ilkd.key.logic.TermBuilder tb;
+    protected final de.uka.ilkd.key.java.Services services;
+    protected final ContractFactory cf;
     private int invCounter;
     /**
      * Used to check that there is only one represents clause per type and field.
@@ -280,7 +280,7 @@ public class JMLSpecFactory {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private String getDefaultInvName(String name, KeYJavaType kjt) {
+    protected String getDefaultInvName(String name, KeYJavaType kjt) {
         invCounter++;
         if (name == null) {
             return "JML class invariant nr " + (invCounter - 1) + " in " + kjt.getName();
