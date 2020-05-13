@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.lang.*;
+import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import org.key_project.util.collection.ImmutableArray;
 
 import java.io.IOException;
@@ -136,6 +137,15 @@ public class FloatHandler implements SMTHandler {
             else exprType = SExpr.Type.FLOAT;
 
             ImmutableArray<Term> subs = term.subs();
+
+            ///
+            /// DIRTIEST HACK EVER
+            ///
+            // No function from the double family ever returns float.
+            if(exprType == Type.FLOAT && subs.last().sort().name().toString().equals("double")) {
+                exprType = Type.DOUBLE;
+            }
+
             List<SExpr> translatedSubs = new LinkedList<>();
 
             for (Term t : subs) {
