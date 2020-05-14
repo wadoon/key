@@ -42,7 +42,7 @@ public class JavaIntegerSemanticsHelper {
     public JavaIntegerSemanticsHelper(Services services,
 			    SLTranslationExceptionManager excManager) {
 	assert services != null;
-	assert excManager != null;
+	//assert excManager != null;
 
 	this.excManager = excManager;
 	this.tc = services.getTypeConverter();

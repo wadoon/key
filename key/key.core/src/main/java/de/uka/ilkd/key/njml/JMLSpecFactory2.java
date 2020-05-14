@@ -61,7 +61,7 @@ public class JMLSpecFactory2 extends JMLSpecFactory {
 
     private Term parseExpression(ParserRuleContext expr) {
         ExpressionTranslator expressionTranslator
-                = new ExpressionTranslator(services, kjt, self, paramVars, result, exc, atPres, atBefores);
+                = null;// new ExpressionTranslator(services, kjt, self, paramVars, result, exc, atPres, atBefores);
         return (Term) expr.accept(expressionTranslator);
     }
 

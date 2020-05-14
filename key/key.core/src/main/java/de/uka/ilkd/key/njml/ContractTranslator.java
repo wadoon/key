@@ -142,9 +142,8 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
         ImmutableList<TextualJMLConstruct> result = ImmutableSLList.<TextualJMLConstruct>nil();
         this.mods = ImmutableSLList.<String>nil();
         /* there may be some modifiers after the declarations */
-        this.mods = listOf(ctx.modifiers());
+        this.mods = (ImmutableSLList<String>) this.<String>listOf(ctx.modifiers());
         result = listOf(ctx.classlevel_element());
-        ImmutableSLList<String> mods = modifiers;
         this.mods = (ImmutableSLList<String>) mods.prepend(this.mods);
         return result;
     }
@@ -153,7 +152,7 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
     public ImmutableList<TextualJMLConstruct> visitMethodlevel_comment(JmlParser.Methodlevel_commentContext ctx) {
         ImmutableList<TextualJMLConstruct> result = ImmutableSLList.<TextualJMLConstruct>nil();
         mods = ImmutableSLList.<String>nil();
-        return listOf(ctx.methodlevel_element());
+        return null;//listOf(ctx.methodlevel_element());
     }
 
     @Override
@@ -181,7 +180,7 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
         // axiom statements may not be prefixed with any modifiers (see Sect. 8 of the JML reference manual)
         if (!mods.isEmpty())
             raiseNotSupported("modifiers in axiom clause");
-        return factory.createJMLClassAxiom(kjt, mods, ctx.expression());
+        return null;//factory.createJMLClassAxiom(kjt, mods, ctx.expression());
     }
 
     @Override
@@ -190,18 +189,12 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
             if (!(s.equals("public") || s.equals("private") || s.equals("protected")))
                 raiseNotSupported("modifier " + s + " in initially clause");
         }
-        return factory.createJMLInitiallyClause(kjt, mods, ctx.expression());
+        return null;// factory.createJMLInitiallyClause(kjt, mods, ctx.expression());
     }
 
     @Override
     public Object visitMethod_specification(JmlParser.Method_specificationContext ctx) {
         return listOf(ctx.spec_case());
-    }
-
-    @Override
-    public Object visitLightweight_spec_case(JmlParser.Lightweight_spec_caseContext ctx) {
-        currentBehavior = Behavior.NONE;
-        return accept(ctx.generic_spec_case());
     }
 
     private <T> @Nullable T oneOf(ParserRuleContext @Nullable ... contexts) {
@@ -210,129 +203,5 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
             if (t != null) return t;
         }
         return null;
-    }
-
-    @Override
-    public Object visitHeavyweight_spec_case(JmlParser.Heavyweight_spec_caseContext ctx) {
-        mods = accept(ctx.modifier());
-        return oneOf(ctx.behavior_spec_case(), ctx.break_behavior_spec_case(),
-                ctx.continue_behavior_spec_case(), ctx.exceptional_behavior_spec_case(), ctx.normal_behavior_spec_case(),
-                ctx.model_behavior_spec_case(), ctx.return_behavior_spec_case());
-    }
-
-    @Override
-    public Object visitBehavior_spec_case(JmlParser.Behavior_spec_caseContext ctx) {
-        currentBehavior = Behavior.BEHAVIOR;
-        return accept(ctx.generic_spec_case());
-    }
-
-    @Override
-    public Object visitNormal_behavior_spec_case(JmlParser.Normal_behavior_spec_caseContext ctx) {
-        currentBehavior = Behavior.NORMAL_BEHAVIOR;
-        return accept(ctx.generic_spec_case());
-    }
-
-    @Override
-    public Object visitModel_behavior_spec_case(JmlParser.Model_behavior_spec_caseContext ctx) {
-        currentBehavior = Behavior.MODEL_BEHAVIOR;
-        return accept(ctx.generic_spec_case());
-    }
-
-    @Override
-    public Object visitExceptional_behavior_spec_case(JmlParser.Exceptional_behavior_spec_caseContext ctx) {
-        currentBehavior = Behavior.;
-        return accept(ctx.generic_spec_case());
-    }
-
-
-    @Override
-    public Object visitGeneric_spec_case(JmlParser.Generic_spec_caseContext ctx) {
-        @Nullable Object abbrvs = accept(ctx.spec_var_decls());
-        accept(ctx.spec_header());
-        accept(ctx.generic_spec_body());
-        if (result.isEmpty()) {
-            result = result.append(new TextualJMLSpecCase(mods, b));
-        }
-
-        for (Iterator<TextualJMLConstruct> it = result.iterator();
-             it.hasNext(); ) {
-            TextualJMLSpecCase sc = (TextualJMLSpecCase) it.next();
-            if (requires != null) {
-                sc.addRequires(requires);
-            }
-            if (requires_free != null) {
-                sc.addRequiresFree(requires_free);
-            }
-            if (abbrvs != null) {
-                for (PositionedString[] pz : abbrvs) {
-                    sc.addAbbreviation(pz);
-                }
-            }
-        }
-
-    }
-
-    @Override
-    public Object visitSpec_var_decls(JmlParser.Spec_var_declsContext ctx) {
-        if(!ctx.FORALL().isEmpty()) {
-            raiseNotSupported("specification variables");
-        }
-        return listOf(ctx.old_clause());
-    }
-
-    @Override
-    public Object visitSpec_header(JmlParser.Spec_headerContext ctx) {
-        return listOf(ctx.requires_clause());
-    }
-
-    @Override
-    public Object visitRequires_clause(JmlParser.Requires_clauseContext ctx) {
-        return flipHeaps(ctx.REQUIRES().getText(), result);
-    }
-
-    @Override
-    public Object visitGeneric_spec_body(JmlParser.Generic_spec_bodyContext ctx) {
-        result=simple_spec_body[mods,b]
-        result=generic_spec_case_seq[mods,b,specs]
-    }
-
-    @Override
-    public Object visitGeneric_spec_case_seq(JmlParser.Generic_spec_case_seqContext ctx) {
-        for (TextualJMLConstruct tc : result)
-            for (TextualJMLConstruct z : specs) {
-                TextualJMLSpecCase a = (TextualJMLSpecCase) tc;
-                TextualJMLSpecCase c = (TextualJMLSpecCase) z;
-                System.out.println("---Contract A:\n" + a);
-                System.out.println("---Contract B:\n" + c);
-                r.append(a.merge(c));
-            }
-        return listOf(ctx.generic_spec_case());
-    }
-
-    @Override
-    public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
-        if (ctx.UNREACHABLE() != null) {
-            TextualJMLSpecCase.assert2blockContract(mods, new PositionedString("false"));
-        } else {
-            TextualJMLSpecCase.assert2blockContract(mods, ps);
-            Term t = accept(ctx.expression());
-        }
-
-        final TextualJMLSpecCase res = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
-        res.addName(new PositionedString("assert " + assertStm.text, assertStm.fileName, assertStm.pos));
-        res.addEnsures(assertStm);
-        res.addAssignable(new PositionedString("assignable \\strictly_nothing;", assertStm.fileName, assertStm.pos));
-        res.setPosition(assertStm);
-        return res;
-    }
-
-    @Override
-    public Object visitBreaks_clause(JmlParser.Breaks_clauseContext ctx) {
-        return super.visitBreaks_clause(ctx);
-    }
-
-    @Override
-    public Object visitContinues_clause(JmlParser.Continues_clauseContext ctx) {
-        return super.visitContinues_clause(ctx);
     }
 }

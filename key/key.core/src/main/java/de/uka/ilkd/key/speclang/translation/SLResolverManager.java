@@ -65,7 +65,7 @@ public abstract class SLResolverManager {
                                 ParsableVariable selfVar,
                                 boolean useLocalVarsAsImplicitReceivers,
                                 TermBuilder tb) {
-        assert excManager != null;
+        //assert excManager != null;
         this.excManager = excManager;
         this.specInClass = specInClass;
         this.selfVar = selfVar;

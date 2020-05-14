@@ -1,0 +1,4 @@
+\result
+this
+1+1
+\old(\result)

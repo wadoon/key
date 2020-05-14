@@ -1,30 +1,38 @@
 package de.uka.ilkd.key.njml;
 
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Pair;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * @author Alexander Weigl
  * @version 1 (5/10/20)
  */
 public class JmlFacade {
-    public static CharStream createANTLRStringStream(PositionedString ps) {
-        CodePointCharStream result = CharStreams.fromString(ps.text, ps.fileName);
-        //result.setCharPositionInLine(ps.pos.getColumn());
-        //result.setLine(ps.pos.getLine() + 1);
-        return result;
+    public static JmlLexer createLexer(CharStream strea) {
+        JmlLexer lexer = new JmlLexer(strea);
+        return lexer;
     }
 
     public static JmlLexer createLexer(PositionedString ps) {
         CharStream result = CharStreams.fromString(ps.text, ps.fileName);
-        JmlLexer lexer = new JmlLexer(result);
+        JmlLexer lexer = createLexer(result);
         lexer._tokenStartCharPositionInLine = ps.pos.getColumn();
         lexer._tokenStartLine = 1 + ps.pos.getLine();
         return lexer;
+    }
+
+    public static JmlLexer createLexer(String expr) {
+        return createLexer(CharStreams.fromString(expr));
+    }
+
+    public static JmlParser.ExpressionContext parseExpr(String expr) {
+        JmlParser parser = createParser(createLexer(expr));
+        return parser.expression();
+    }
+
+    private static JmlParser createParser(JmlLexer lexer) {
+        return new JmlParser(new CommonTokenStream(lexer));
     }
 
     private static class OffsetFactory extends CommonTokenFactory {

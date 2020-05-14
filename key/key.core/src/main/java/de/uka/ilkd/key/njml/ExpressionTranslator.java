@@ -25,7 +25,10 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.JMLResolverManager;
 import de.uka.ilkd.key.speclang.jml.translation.JMLTranslator;
-import de.uka.ilkd.key.speclang.translation.*;
+import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
+import de.uka.ilkd.key.speclang.translation.SLExpression;
+import de.uka.ilkd.key.speclang.translation.SLParameters;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -36,7 +39,6 @@ import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,39 +50,17 @@ import java.util.stream.Collectors;
  * @version 1 (5/10/20)
  */
 public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
-    /**
-     * maximum valid value of a signed int
-     */
-    private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
-
-    /**
-     * maximum valid value of a signed long
-     */
-    private static final BigInteger MAX_LONG = BigInteger.valueOf(Long.MAX_VALUE);
-
-    /**
-     * maximum valid value if an int was interpreted unsigned
-     */
-    private static final BigInteger MAX_UINT = new BigInteger("4294967295");
-
-    /**
-     * maximum valid value if a long was interpreted unsigned
-     */
-    private static final BigInteger MAX_ULONG = new BigInteger("18446744073709551615");
-
-    private final TermBuilder tb;
     private final Services services;
+    private final TermBuilder tb;
     private final JavaInfo javaInfo;
     private final KeYJavaType containerType;
     private final IntegerLDT intLDT;
     private final HeapLDT heapLDT;
     private final LocSetLDT locSetLDT;
     private final BooleanLDT booleanLDT;
-    private final SLTranslationExceptionManager excManager;
-    private final List<PositionedString> warnings = new java.util.ArrayList<PositionedString>();
-
+    //private final SLTranslationExceptionManager excManager;
+    private final List<PositionedString> warnings = new java.util.ArrayList<>();
     private final JMLTranslator translator;
-
     private final ProgramVariable selfVar;
     private final ImmutableList<ProgramVariable> paramVars;
     private final ProgramVariable resultVar;
@@ -92,14 +72,14 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
     private final JMLResolverManager resolverManager;
     private final JavaIntegerSemanticsHelper intHelper;
 
-    private ExpressionTranslator(Services services,
-                                 KeYJavaType specInClass,
-                                 ProgramVariable self,
-                                 ImmutableList<ProgramVariable> paramVars,
-                                 ProgramVariable result,
-                                 ProgramVariable exc,
-                                 Map<LocationVariable, Term> atPres,
-                                 Map<LocationVariable, Term> atBefores) {
+    ExpressionTranslator(Services services,
+                         KeYJavaType specInClass,
+                         ProgramVariable self,
+                         ImmutableList<ProgramVariable> paramVars,
+                         ProgramVariable result,
+                         ProgramVariable exc,
+                         Map<LocationVariable, Term> atPres,
+                         Map<LocationVariable, Term> atBefores) {
         // save parameters
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -109,11 +89,10 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
         this.heapLDT = services.getTypeConverter().getHeapLDT();
         this.locSetLDT = services.getTypeConverter().getLocSetLDT();
         this.booleanLDT = services.getTypeConverter().getBooleanLDT();
-        this.excManager =
+        /*this.excManager =
                 new SLTranslationExceptionManager(null, "",
-                        new Position(0, 0));
-        this.translator = new JMLTranslator(excManager, "",
-                services);
+                        new Position(0, 0));*/
+        this.translator = new JMLTranslator(null, "", services);
 
         this.selfVar = self;
         this.paramVars = paramVars;
@@ -122,12 +101,11 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
         this.atPres = atPres;
         this.atBefores = atBefores;
 
-        intHelper = new JavaIntegerSemanticsHelper(services, excManager);
+        intHelper = new JavaIntegerSemanticsHelper(services, null);
         // initialize helper objects
         this.resolverManager = new JMLResolverManager(this.javaInfo,
                 specInClass,
-                selfVar,
-                this.excManager);
+                selfVar, null);
 
         // initialize namespaces
         resolverManager.pushLocalVariablesNamespace();
@@ -139,17 +117,12 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
         }
     }
 
-    public SLTranslationExceptionManager getExceptionManager() {
-        return excManager;
-    }
-
-
     private void raiseError(String s, Token symbol) {
         raiseError(s);
     }
 
     private void raiseError(String msg) {
-        throw new RuntimeException(excManager.createException(msg));
+        throw new RuntimeException(msg);
     }
 
     /*private void raiseError(String msg, Token t)
@@ -177,7 +150,7 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
 
     public List<PositionedString> getWarnings() {
         List<PositionedString> res =
-                new ArrayList<PositionedString>(warnings.size());
+                new ArrayList<>(warnings.size());
         res.addAll(translator.getWarnings());
         return res;
     }
@@ -982,7 +955,7 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
                 PrimitiveType literalType = isLong ? PrimitiveType.JAVA_LONG : PrimitiveType.JAVA_INT;
                 return new SLExpression(intLit, javaInfo.getPrimitiveKeYJavaType(literalType));
             } catch (NumberFormatException e) {
-                throw new RuntimeException(getExceptionManager().createException(e.getMessage(), e));
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
         if (ctx.MINUS() != null) {
@@ -1282,7 +1255,7 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
             PrimitiveType literalType = isLong ? PrimitiveType.JAVA_LONG : PrimitiveType.JAVA_INT;
             result = new SLExpression(intLit, javaInfo.getPrimitiveKeYJavaType(literalType));
         } catch (NumberFormatException e) {
-            throw new RuntimeException(getExceptionManager().createException(e.getMessage(), e));
+            throw new RuntimeException(e.getMessage(), e);
         }
         return result;
     }
@@ -1862,10 +1835,10 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     private void raiseNotSupported(String feature) {
-        throw new RuntimeException(excManager.createWarningException(feature + " not supported"));
+        throw new RuntimeException(feature + " not supported");
     }
 
     private void raiseNotSupported(TerminalNode elemtype) {
-        throw new RuntimeException(excManager.createWarningException(elemtype.getText() + " not supported"));
+        throw new RuntimeException(elemtype.getText() + " not supported");
     }
 }
