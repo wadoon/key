@@ -400,8 +400,6 @@ public class AbstractExecutionUtils {
         ImmutableList<PosInOccurrence> result = emptyList;
         final AbstractUpdateLoc locUnwrapped = AbstractExecutionUtils.unwrapHasTo(loc);
 
-        final LocationVariable heapVar = services.getTypeConverter().getHeapLDT().getHeap();
-
         //@formatter:off
         /*
          * A location l1 (set) is *not* relevant w.r.t. another location l2 (set) if:
@@ -420,45 +418,21 @@ public class AbstractExecutionUtils {
          * possible instantiations of any abstract location set.
          */
         //@formatter:on
+
         if (loc instanceof IrrelevantAssignable || loc instanceof EmptyLoc
                 || overwrittenLocations.contains(locUnwrapped) || relevantLocations.isEmpty()) {
             // Irrelevant, but no evidence needed
             return emptyList;
         }
-        
-        // Simple first check: Literal occurrence in relevant locs
-        if (relevantLocations.contains(locUnwrapped)) {
-            // Relevant, return null
-            return null;
-        }
-        
-        if (locUnwrapped instanceof HeapLoc
-                && relevantLocations.stream().filter(PVLoc.class::isInstance).map(PVLoc.class::cast)
-                        .map(PVLoc::getVar).anyMatch(pv -> pv == heapVar)) {
-            // Relevant, return null
+
+        // Simple first checks
+        if (checkRelevantQuick(locUnwrapped, relevantLocations,
+                services.getTypeConverter().getHeapLDT().getHeap())) {
             return null;
         }
 
-        final Set<AbstractUpdateLoc> relevantLocsCopy = new LinkedHashSet<>(relevantLocations);
-        if (locUnwrapped instanceof PVLoc) {
-            // If loc is a PVLoc, we can safely remove all PVLocs that aren't equal.
-            relevantLocsCopy.removeIf(ploc -> ploc instanceof PVLoc && !ploc.equals(locUnwrapped));
-        } else if (locUnwrapped instanceof HeapLoc) {
-            // If loc is a HeapLoc, we can safely remove all PVLocs that aren't the heap
-            // variable.
-            relevantLocsCopy.removeIf(ploc -> ploc instanceof PVLoc && ((PVLoc) ploc)
-                    .getVar() != heapVar);
-        } else {
-            /*
-             * Even if loc is allLocs, the "fresh" locations cannot be meant! We remove
-             * them. They only should play a role if loc is a PVLoc.
-             */
-            relevantLocsCopy.removeIf(
-                    ploc -> AbstractExecutionUtils.locIsCreatedFresh(ploc, goal, services));
-        }
-
-        relevantLocsCopy.removeIf(IrrelevantAssignable.class::isInstance);
-        relevantLocsCopy.removeIf(EmptyLoc.class::isInstance);
+        final Set<AbstractUpdateLoc> relevantLocsCopy = //
+                cleanUpRelevantLocs(locUnwrapped, relevantLocations, goal);
 
         // loc has to be disjoint from *all* relevant locations.
         for (final AbstractUpdateLoc relevantLoc : relevantLocsCopy) {
@@ -480,6 +454,66 @@ public class AbstractExecutionUtils {
 
         // Irrelevant --- return evidence
         return result;
+    }
+
+    /**
+     * Removes locations from the set of relevant ones that we clearly don't need,
+     * e.g., because they have a non-compatible type with locUnwrapped.
+     * 
+     * @param locUnwrapped      The location to check (no hasTo).
+     * @param relevantLocations The relevant locations to clean up. Is not changed.
+     * @param goal              The proof goal.
+     * 
+     * @return A (not necessarily strict) subset of relevantLocations.
+     */
+    private static Set<AbstractUpdateLoc> cleanUpRelevantLocs(final AbstractUpdateLoc locUnwrapped,
+            final Collection<AbstractUpdateLoc> relevantLocations, final Goal goal) {
+        final Services services = goal.proof().getServices();
+        final LocationVariable heapVar = services.getTypeConverter().getHeapLDT().getHeap();
+
+        final Set<AbstractUpdateLoc> result = new LinkedHashSet<>(relevantLocations);
+        if (locUnwrapped instanceof PVLoc) {
+            // If loc is a PVLoc, we can safely remove all PVLocs that aren't equal.
+            result.removeIf(ploc -> ploc instanceof PVLoc && !ploc.equals(locUnwrapped));
+        } else if (locUnwrapped instanceof HeapLoc) {
+            // If loc is a HeapLoc, we can safely remove all PVLocs that aren't the heap
+            // variable.
+            result.removeIf(ploc -> ploc instanceof PVLoc && ((PVLoc) ploc).getVar() != heapVar);
+        } else {
+            /*
+             * Even if loc is allLocs, the "fresh" locations cannot be meant! We remove
+             * them. They only should play a role if loc is a PVLoc.
+             */
+            result.removeIf(ploc -> AbstractExecutionUtils.locIsCreatedFresh(ploc, goal, services));
+        }
+
+        result.removeIf(IrrelevantAssignable.class::isInstance);
+        result.removeIf(EmptyLoc.class::isInstance);
+
+        return result;
+    }
+
+    /**
+     * Quick checks for relevance of locUnwrapped w.r.t. relevantLocations.
+     * 
+     * @param locUnwrapped      An {@link AbstractUpdateLoc} w/o hasTo.
+     * @param relevantLocations The relevant locations.
+     * @param heapVar           The heap PV.
+     * @return true iff locUnwrapped is trivially relevant, otherwise false.
+     */
+    private static boolean checkRelevantQuick(final AbstractUpdateLoc locUnwrapped,
+            final Collection<AbstractUpdateLoc> relevantLocations, final LocationVariable heapVar) {
+        if (relevantLocations.contains(locUnwrapped)) {
+            return true;
+        }
+
+        if (locUnwrapped instanceof HeapLoc
+                && relevantLocations.stream().filter(PVLoc.class::isInstance).map(PVLoc.class::cast)
+                        .map(PVLoc::getVar).anyMatch(pv -> pv == heapVar)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
