@@ -439,7 +439,8 @@ public class NodeInfo {
     public void addRelevantFiles(ImmutableSet<URI> relevantFiles) {
         ImmutableSet<URI> oldRelevantFiles = this.relevantFiles;
 
-        if (this.relevantFiles.isEmpty() || this.relevantFiles.subset(relevantFiles)) {
+        if (this.relevantFiles.isEmpty() || (this.relevantFiles.size() < relevantFiles.size()
+                && this.relevantFiles.subset(relevantFiles))) {
             this.relevantFiles = relevantFiles;
         } else {
             this.relevantFiles = this.relevantFiles.union(relevantFiles);
