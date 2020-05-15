@@ -132,10 +132,10 @@ public final class ApplyOnAbstractUpdateCondition implements VariableCondition {
                      * In many cases, there are other simplification steps which can and should be
                      * applied before applying an abstract update to an abstract update with a
                      * parametric location set. If there are no such further steps possible, then
-                     * the application will most likely (maybe always) be unsound. So we don't
-                     * permit it.
+                     * the application will most likely (maybe always) be unsound. We stop here;
+                     * previous instantiations can be applied, though;
                      */
-                    return Optional.empty();
+                    return Optional.of(result);
                 }
 
                 assert elemUpd.op() instanceof ElementaryUpdate;
