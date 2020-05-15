@@ -15,6 +15,7 @@ package de.uka.ilkd.key.abstractexecution.rule;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.ParametricSkolemLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.abstractexecution.proof.TermAccessibleLocationsCollector;
 import de.uka.ilkd.key.java.Services;
@@ -116,8 +117,9 @@ public class DropAnonAbstractRule implements BuiltInRule {
 
         return !collector.locations().stream().filter(PVLoc.class::isInstance)
                 .map(PVLoc.class::cast).map(PVLoc::getVar).anyMatch(var -> var == heapVar)
-                && collector.locations().stream().filter(SkolemLoc.class::isInstance)
-                        .map(SkolemLoc.class::cast).count() > 0;
+                && collector.locations().stream().filter(
+                        loc -> loc instanceof SkolemLoc || loc instanceof ParametricSkolemLoc)
+                        .count() > 0;
     }
 
     @Override
