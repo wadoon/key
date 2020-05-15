@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.settings.*;
 import de.uka.ilkd.key.symbolic_execution.*;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
@@ -22,6 +23,7 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.*;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
  * Example application which symbolically executes
@@ -37,90 +39,109 @@ public class Main {
    public static void main(String[] args) {
       File location = new File("example"); // Path to the source code folder
       String className = "MaxIntBuggy";
-      String methodName = "contentEqualsMax";
+      String methodName = "max";
+      String[] methodArgTypes = {"int[]"};
       String precondition
-         =    "arr.length == 4 && arr[0] == 2 && arr[1] == 1 && arr[2] == 3 && arr[3] == 4"
+         =   "(arr.length == 4 && arr[0] == 2 && arr[1] == 1 && arr[2] == 3 && arr[3] == 4"
          + "|| arr.length == 4 && arr[0] == 2 && arr[1] == 1 && arr[2] == 3 && arr[3] == 2"
-         + "|| arr.length == 3 && arr[0] == 0 && arr[1] == 1 && arr[2] == 3";
+//         + "|| arr.length == 3 && arr[0] == 0 && arr[1] == 1 && arr[2] == 3"
+//         + "|| arr.length == 3 && arr[0] == 0 && arr[1] == 2 && arr[2] == 6"
+         + "|| arr.length == 3 && arr[0] == 2 && arr[1] == 4 && arr[2] == 3)"
+         + " && arr != null";
+ 
+      SymbolicExecutionTreeBuilder treeBuilder =null;
 
-      executeProcedure(location, className, methodName, precondition, null, null, null);
+      try {
+         treeBuilder = executeMethod(location, className, methodName, methodArgTypes, precondition, null, null, null);
+         System.out.println("Finished building SET");
+         printSymbolicExecutionTree("", treeBuilder);
+      } catch (ProofInputException e) {
+         System.out.println("Exception at '" + location + "':");
+         e.printStackTrace();
+      } catch (ProblemLoaderException e) {
+         System.out.println("Exception at '" + location + "':");
+         e.printStackTrace();
+      }
    }
 
 
    /**
-    * Builds a SED tree for a method with zero arguments
+    * Builds a symbolic execution tree for a given method
     * @param location Path to the source code folder
     * @param className Name of the class containing the method
     * @param methodName Method name
+    * @param methodArgTypes An array of fully qualified names for each argument types,
+    * e.g. "java.lang.String", "int[]" ...
     * @param precondition Optionally: JML precondition
     * @param classPaths Optionally: Additional specifications for API classes
     * @param bootClassPath Optionally: Different default specifications for Java API
     * @param includes Optionally: Additional includes to consider
+    * @returns The symbolic execution tree builder
+    * @throws ProblemLoaderException Exception in loading method
+    * @throws ProofInputException 
     */
-   public static void executeProcedure (File location, String className, String methodName, String precondition, List<File> classPaths, File bootClassPath, List<File> includes) {
-      try {
-         // Ensure that Taclets are parsed
-         if (!ProofSettings.isChoiceSettingInitialised()) {
+   public static SymbolicExecutionTreeBuilder executeMethod (File location, String className, String methodName, String[] methodArgTypes, String precondition, List<File> classPaths, File bootClassPath, List<File> includes) throws ProblemLoaderException, ProofInputException {
+       SymbolicExecutionTreeBuilder builder;
+       // Ensure that Taclets are parsed
+       if (!ProofSettings.isChoiceSettingInitialised()) {
             KeYEnvironment<?> env = KeYEnvironment.load(location, classPaths, bootClassPath, includes);
             env.dispose();
-         }
-         // Set Taclet options
-         ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-         HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
-         HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
-         newSettings.putAll(MiscTools.getDefaultTacletOptions());
-         choiceSettings.setDefaultChoices(newSettings);
-         // Load source code
-         SymbolicExecutionJavaProfile profile = SymbolicExecutionJavaProfile.getDefaultInstance();
-         KeYEnvironment<DefaultUserInterfaceControl> env =
-               KeYEnvironment.load(profile, location, classPaths, bootClassPath, includes, true);
-         try {
-            // Find method to symbolically execute
-            KeYJavaType classType = env.getJavaInfo().getKeYJavaType(className);
-            ImmutableList<Type> signature = ImmutableSLList.<Type>nil();
-            IProgramMethod pm = env.getJavaInfo().getProgramMethod(classType, methodName, signature, classType);
-            // Instantiate proof for symbolic execution of the program method (Java semantics)
-            AbstractOperationPO po = new ProgramMethodPO(env.getInitConfig(), 
-                                                         "Symbolic Execution of: " + pm, 
-                                                         pm, 
-                                                         precondition,
-                                                         true,  // Needs to be true for symbolic execution!
-                                                         true); // Needs to be true for symbolic execution!
-            // po = new ProgramMethodSubsetPO(...); // PO for symbolic execution of some statements within a method (Java semantics)
-            // po = new FunctionalOperationContractPO(...) // PO for verification (JML semantics)
-            Proof proof = env.createProof(po);
-            // Create symbolic execution tree builder
-            SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, 
-                                                                                    false, // Merge branch conditions 
-                                                                                    false, // Use Unicode? 
-                                                                                    true, // Use Pretty Printing? 
-                                                                                    true, // Variables are collected from updates instead of the visible type structure 
-                                                                                    true); // Simplify conditions
-            builder.analyse();
-            // Optionally, create an SymbolicExecutionEnvironment which provides access to all relevant objects for symbolic execution
-            SymbolicExecutionEnvironment<DefaultUserInterfaceControl> symbolicEnv = new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(env, builder);
-            // Configure strategy for full exploration
-            SymbolicExecutionUtil.initializeStrategy(builder);
-            SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, 
-                                                                            100, 
-                                                                            false,  // true to apply method contracts instead of inlining, 
-                                                                            false,  // true to apply loop invariants instead of unrolling, 
-                                                                            false,  // true to apply block contracts instead of expanding.
-                                                                            false,  // true to hide branch conditions caused by symbolic execution within modalities not of interest, 
-                                                                            false); // true to perform alias checks during symbolic execution
-            // Perform strategy which will stop at breakpoint
-            symbolicEnv.getProofControl().startAndWaitForAutoMode(proof);
-            builder.analyse();
-            printSymbolicExecutionTree("Finished Execution", builder);
-         }
-         finally {
-            env.dispose(); // Ensure always that all instances of KeYEnvironment are disposed
-         }
-      }
-      catch (Exception e) {
-         System.out.println("Exception at '" + location + "':");
-         e.printStackTrace();
-      }
+       }
+       // Set Taclet options
+       ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+       HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
+       HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
+       newSettings.putAll(MiscTools.getDefaultTacletOptions());
+       choiceSettings.setDefaultChoices(newSettings);
+       // Load source code
+       SymbolicExecutionJavaProfile profile = SymbolicExecutionJavaProfile.getDefaultInstance();
+       KeYEnvironment<DefaultUserInterfaceControl> env =
+             KeYEnvironment.load(profile, location, classPaths, bootClassPath, includes, true);
+       
+          // Find method to symbolically execute
+          KeYJavaType classType = env.getJavaInfo().getKeYJavaType(className);
+          ImmutableList<Type> signature = ImmutableSLList.<Type>nil();
+          for (String t : methodArgTypes) {
+             KeYJavaType keyType = env.getJavaInfo().getKeYJavaType(t);
+             signature.append(keyType);
+          }
+          IProgramMethod pm = env.getJavaInfo().getProgramMethod(classType, methodName, signature, classType);
+          
+          // Instantiate proof for symbolic execution of the program method (Java semantics)
+          AbstractOperationPO po = new ProgramMethodPO(env.getInitConfig(), 
+                                                       "Symbolic Execution of: " + pm, 
+                                                       pm, 
+                                                       precondition,
+                                                       true,
+                                                       true);
+
+          Proof proof = env.createProof(po);
+          // Create symbolic execution tree builder
+          builder = new SymbolicExecutionTreeBuilder(proof, 
+                                                     false, // Merge branch conditions 
+                                                     false, // Use Unicode? 
+                                                     true, // Use Pretty Printing? 
+                                                     true, // Variables are collected from updates instead of the visible type structure 
+                                                     true); // Simplify conditions
+          builder.analyse();
+          // Optionally, create an SymbolicExecutionEnvironment which provides access to all relevant objects for symbolic execution
+          SymbolicExecutionEnvironment<DefaultUserInterfaceControl> symbolicEnv = new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(env, builder);
+          // Configure strategy for full exploration
+          SymbolicExecutionUtil.initializeStrategy(builder);
+          SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, 
+                                                                          100, 
+                                                                          false,  // true to apply method contracts instead of inlining, 
+                                                                          false,  // true to apply loop invariants instead of unrolling, 
+                                                                          false,  // true to apply block contracts instead of expanding.
+                                                                          false,  // true to hide branch conditions caused by symbolic execution within modalities not of interest, 
+                                                                          false); // true to perform alias checks during symbolic execution
+          // Perform strategy which will stop at breakpoint
+          symbolicEnv.getProofControl().startAndWaitForAutoMode(proof);
+          builder.analyse();
+
+          // FIXME Ensure always that all instances of KeYEnvironment are disposed
+          // env.dispose();
+       return builder;
    }
 
    /**
@@ -135,7 +156,6 @@ public class Main {
       IExecutionStart startNode = builder.getStartNode();
       printSEDhierarchy(startNode, 0, true);
    }
-   Pattern p = Pattern.compile("<<.*>>");
 
    /**
     * Prints the symbolic execution tree tree to the console
@@ -146,6 +166,7 @@ public class Main {
     */
    protected static void printSEDhierarchy (IExecutionNode<?> node, int level, boolean plus) throws ProofInputException {
       StringBuilder builder = new StringBuilder();
+      String name;
       for(int i = 0; i < level; i++) {
          builder.append("|  ");
       }
@@ -155,9 +176,17 @@ public class Main {
       } else {
          builder.append("| ");
       }
-      String name = node.getName();
+      if (node instanceof IExecutionMethodReturn) {
+         name = (((IExecutionMethodReturn) node).isReturnValuesComputed() || !node.isDisposed())
+              ? ((IExecutionMethodReturn) node).getNameIncludingReturnValue()
+              : node.getName();
+      } else {
+         name = node.getName();
+      }
+//      name = node.toString();
       // removes unnecessary << >> and \n (FIXME better solution)
-      name = name.replaceAll("(<<.*?>>)|\n","");
+      name = name.replaceAll("(<<.*?>>)|(«.*?»)","");
+      name = name.replaceAll("[\t ]*\n[\t ]*", " ");
       builder.append(name);
       System.out.println(builder);
 

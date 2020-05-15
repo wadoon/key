@@ -1,4 +1,11 @@
+plugins {
+    id 'application'
+}
+
+
 dependencies {
     compile project(":key.core")
     compile project(":key.core.symbolic_execution")
 }
+
+mainClassName = 'org.key_project.sed.extract_traces.Main'
