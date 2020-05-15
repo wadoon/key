@@ -429,6 +429,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                         numbers)),
                         termSmallerThan("commEqLeft", "commEqRight")),
                         longConst(-5000)));
+        
+        bindRuleSet(
+                d,
+                "cnf_setComm",
+                add(SetsSmallerThanFeature.create(instOf("commRight"),
+                        instOf("commLeft"), locSetLDT),
+                        NotInScopeOfModalityFeature.INSTANCE, longConst(-800)));
 
         bindRuleSet(d, "simplify_literals",
         // ifZero ( ConstraintStrengthenFeatureUC.create(proof),
@@ -1234,16 +1241,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 FindDepthFeature.INSTANCE, 20)), inftyConst()));
 
         bindRuleSet(d, "setEqualityBlastingRight", longConst(-100));
-
-        bindRuleSet(
-                d,
-                "cnf_setComm",
-                add(SetsSmallerThanFeature.create(instOf("commRight"),
-                        instOf("commLeft"), locSetLDT),
-                        NotInScopeOfModalityFeature.INSTANCE, longConst(-800)));
-        bindRuleSet(d, "abstr_upd_commute",
-                add(SetsSmallerThanFeature.create(instOf("uright"),
-                        instOf("uleft"), locSetLDT), longConst(-800)));
 
         bindRuleSet(d, "elimQuantifier", -1000);
         bindRuleSet(d, "elimQuantifierWithCast", 50);
