@@ -35,6 +35,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.IrrelevantAssignable;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.ParametricSkolemLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.HeapLoc;
@@ -121,19 +122,37 @@ public class AbstractExecutionUtils {
     }
 
     /**
-     * Abstract Skolem location sets are built from new functions of type LocSet,
-     * e.g., like "LocSet frame;" or "LocSet subFrame(int);". We distinguish them by
-     * checking whether they are "statically" known to {@link LocSetLDT}.
+     * Nullary abstract Skolem location sets are built from new functions of type
+     * LocSet, e.g., like "LocSet frame;". We distinguish them by checking whether
+     * they are "statically" known to {@link LocSetLDT}.
      * 
      * @param op       The {@link Operator} to check.
      * @param services The {@link Services} object (for the {@link LocSetLDT}).
      * @return true iff the given operator is an abstract Skolem location set.
      */
-    public static boolean isAbstractSkolemLocationSet(final Term t, final Services services) {
+    public static boolean isNullaryAbstractSkolemLocationSet(final Term t,
+            final Services services) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final Operator op = t.op();
         return op instanceof Function && ((Function) op).sort() == locSetLDT.targetSort()
-                && !locSetLDT.containsFunction((Function) op);
+                && op.arity() == 0 && !locSetLDT.containsFunction((Function) op);
+    }
+
+    /**
+     * Parametric abstract Skolem location sets are built from new functions of type
+     * LocSet, e.g., like "LocSet subFrame(int);". We distinguish them by checking
+     * whether they are "statically" known to {@link LocSetLDT}.
+     * 
+     * @param op       The {@link Operator} to check.
+     * @param services The {@link Services} object (for the {@link LocSetLDT}).
+     * @return true iff the given operator is an abstract Skolem location set.
+     */
+    public static boolean isParametricAbstractSkolemLocationSet(final Term t,
+            final Services services) {
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        final Operator op = t.op();
+        return op instanceof Function && ((Function) op).sort() == locSetLDT.targetSort()
+                && op.arity() > 0 && !locSetLDT.containsFunction((Function) op);
     }
 
     /**
@@ -436,7 +455,8 @@ public class AbstractExecutionUtils {
 
         // loc has to be disjoint from *all* relevant locations.
         for (final AbstractUpdateLoc relevantLoc : relevantLocsCopy) {
-            if ((relevantLoc instanceof AllLocsLoc || relevantLoc instanceof SkolemLoc)
+            if ((relevantLoc instanceof AllLocsLoc || relevantLoc instanceof SkolemLoc
+                    || relevantLoc instanceof ParametricSkolemLoc)
                     && AbstractExecutionUtils.locIsCreatedFresh(locUnwrapped, goal, services)) {
                 continue;
             }

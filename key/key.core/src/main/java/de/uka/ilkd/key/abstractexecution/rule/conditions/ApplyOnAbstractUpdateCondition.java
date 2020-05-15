@@ -13,12 +13,25 @@
 
 package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.ParametricSkolemLoc;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateSV;
@@ -26,6 +39,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * Variable condition for applying an update on an abstract update:
@@ -49,6 +63,7 @@ public final class ApplyOnAbstractUpdateCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
             Goal goal, Services services) {
         final SVInstantiations svInst = mc.getInstantiations();
+        final TermBuilder tb = services.getTermBuilder();
 
         final Term u1 = (Term) svInst.getInstantiation(u1SV);
         final Term u2 = (Term) svInst.getInstantiation(u2SV);
@@ -62,13 +77,103 @@ public final class ApplyOnAbstractUpdateCondition implements VariableCondition {
             return mc;
         }
 
-        final TermBuilder tb = services.getTermBuilder();
+        /* non_final */ AbstractUpdate abstrUpd = (AbstractUpdate) u2.op();
 
         final Term[] args = u2.subs().stream().map(sub -> tb.apply(u1, sub))
                 .collect(Collectors.toList()).toArray(new Term[0]);
-        final Term newResult = tb.abstractUpdate((AbstractUpdate) u2.op(), args);
 
-        return mc.setInstantiations(svInst.add(resultSV, newResult, services));
+        // Special case: Abstract update with parametric location set
+
+        final Optional<Map<AbstractUpdateLoc, AbstractUpdateLoc>> changedAssgn = //
+                handleLocSetFamilies(tb, u1, abstrUpd);
+
+        if (!changedAssgn.isPresent()) {
+            return null;
+        }
+
+        if (!changedAssgn.get().isEmpty()) {
+            abstrUpd = services.abstractUpdateFactory().changeAssignables( //
+                    abstrUpd, changedAssgn.get());
+        }
+
+        return mc.setInstantiations(
+                svInst.add(resultSV, tb.abstractUpdate(abstrUpd, args), services));
+    }
+
+    /**
+     * @param tb
+     * @param updToApply
+     * @param abstrUpd
+     * @param changedAssgn
+     */
+    private Optional<Map<AbstractUpdateLoc, AbstractUpdateLoc>> handleLocSetFamilies(
+            final TermBuilder tb, final Term updToApply, AbstractUpdate abstrUpd) {
+        final Map<AbstractUpdateLoc, AbstractUpdateLoc> result = new LinkedHashMap<>();
+        final List<ParametricSkolemLoc> paramLocs = AbstractExecutionUtils.unwrapHasTos(abstrUpd)
+                .stream().filter(ParametricSkolemLoc.class::isInstance) //
+                .map(ParametricSkolemLoc.class::cast) //
+                .filter(loc -> Arrays.stream(loc.getParams()).map(Term::op)
+                        .anyMatch(LocationVariable.class::isInstance))
+                .collect(Collectors.toList());
+        if (!paramLocs.isEmpty()) {
+            // Need an update in PNF for that
+            if (!MergeRuleUtils.isUpdateNormalForm(updToApply, true)) {
+                return Optional.empty();
+            }
+
+            final Set<LocationVariable> processedVars = new HashSet<>();
+
+            final List<Term> elems = MergeRuleUtils.getElementaryUpdates(updToApply, false, tb);
+            for (int i = elems.size() - 1; i >= 0; i--) {
+                final Term elemUpd = elems.get(i);
+
+                if (elemUpd.op() instanceof AbstractUpdate) {
+                    /*
+                     * In many cases, there are other simplification steps which can and should be
+                     * applied before applying an abstract update to an abstract update with a
+                     * parametric location set. If there are no such further steps possible, then
+                     * the application will most likely (maybe always) be unsound. So we don't
+                     * permit it.
+                     */
+                    return Optional.empty();
+                }
+
+                assert elemUpd.op() instanceof ElementaryUpdate;
+
+                final LocationVariable lv = //
+                        (LocationVariable) ((ElementaryUpdate) elemUpd.op()).lhs();
+
+                if (processedVars.contains(lv)) {
+                    continue;
+                }
+
+                for (final ParametricSkolemLoc relevantParamLoc : paramLocs.stream()
+                        .filter(loc -> Arrays.stream(loc.getParams()).anyMatch(t -> t.op() == lv))
+                        .collect(Collectors.toList())) {
+                    processedVars.add(lv);
+
+                    final ParametricSkolemLoc newParametricSkolemLoc = new ParametricSkolemLoc(
+                            relevantParamLoc.getSkFunc(),
+                            Arrays.stream(relevantParamLoc.getParams())
+                                    .map(loc -> loc.op() == lv ? elemUpd.sub(0) : loc)
+                                    .toArray(Term[]::new));
+
+                    final boolean isHasTo = abstrUpd.getHasToAssignables()
+                            .contains(relevantParamLoc);
+
+                    final AbstractUpdateLoc toReplace = isHasTo
+                            ? new HasToLoc<ParametricSkolemLoc>(relevantParamLoc)
+                            : relevantParamLoc;
+                    final AbstractUpdateLoc replaceWith = isHasTo
+                            ? new HasToLoc<ParametricSkolemLoc>(newParametricSkolemLoc)
+                            : newParametricSkolemLoc;
+
+                    result.put(toReplace, replaceWith);
+                }
+            }
+        }
+
+        return Optional.of(result);
     }
 
     @Override

@@ -30,6 +30,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.IrrelevantAssignable;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.ParametricSkolemLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.AllFieldsLocLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayLoc;
@@ -420,8 +421,7 @@ public class AbstractUpdateFactory {
             Map<ProgramVariable, ProgramVariable> replMap) {
         final Map<AbstractUpdateLoc, AbstractUpdateLoc> locReplMap = //
                 replMap.entrySet().stream()
-                        .collect(Collectors.toMap(
-                                e -> new PVLoc((LocationVariable) e.getKey()),
+                        .collect(Collectors.toMap(e -> new PVLoc((LocationVariable) e.getKey()),
                                 e -> new PVLoc((LocationVariable) e.getValue())));
 
         return changeAssignables(abstrUpd, locReplMap);
@@ -496,8 +496,10 @@ public class AbstractUpdateFactory {
             // There is exactly one location inside a hasTo
             return new HasToLoc<AbstractUpdateLoc>(
                     abstrUpdateLocFromTerm(t.sub(0), executionContext, services));
-        } else if (AbstractExecutionUtils.isAbstractSkolemLocationSet(t, services)) {
-            return new SkolemLoc(t);
+        } else if (AbstractExecutionUtils.isNullaryAbstractSkolemLocationSet(t, services)) {
+            return new SkolemLoc((Function) t.op());
+        } else if (AbstractExecutionUtils.isParametricAbstractSkolemLocationSet(t, services)) {
+            return new ParametricSkolemLoc((Function) t.op(), t.subs().toArray(new Term[0]));
         } else if (isHeapOp(op, locSetLDT, heapLDT)) {
             return abstrUpdateAssgnLocsFromHeapTerm(t, executionContext, services);
         } else {

@@ -13,13 +13,16 @@
 
 package de.uka.ilkd.key.abstractexecution.proof;
 
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.ParametricSkolemLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramLocationsCollector;
@@ -65,6 +68,15 @@ public class TermAccessibleLocationsCollector extends DefaultVisitor {
         if (AbstractExecutionUtils.isAbstractSkolemLocationSetValueTerm(t, services)) {
             result.addAll(AbstractUpdateFactory.abstrUpdateLocsFromUnionTerm(t.sub(0),
                     Optional.empty(), services));
+        }
+
+        if (t.op() instanceof AbstractUpdate) {
+            AbstractExecutionUtils.unwrapHasTos((AbstractUpdate) t.op()).stream()
+                    .filter(ParametricSkolemLoc.class::isInstance)
+                    .map(ParametricSkolemLoc.class::cast)
+                    .flatMap(loc -> Arrays.stream(loc.getParams())).map(Term::op)
+                    .filter(LocationVariable.class::isInstance).map(LocationVariable.class::cast)
+                    .map(PVLoc::new).forEach(result::add);
         }
 
         if (!t.javaBlock().isEmpty()) {
