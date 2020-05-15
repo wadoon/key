@@ -77,6 +77,7 @@ lexer grammar KeYJMLLexer;
     EXCEPTION            : '\\exception';
     EXISTS               : '\\exists';
     FORALL               : '\\forall';
+    FP_ABS               : '\\fp_abs';
     FP_INFINITE          : '\\fp_infinite';
     FP_NAN               : '\\fp_nan';
     FP_NICE              : '\\fp_nice'; //KeY syntactic sugar
@@ -158,7 +159,7 @@ lexer grammar KeYJMLLexer;
     // ONLY_ASSIGNED     : '\\only_assigned';
     // ONLY_CALLED       : '\\only_called';
     // ONLY_CAPTURED     : '\\only_captured';
-    FP_ABS               : '\\fp_abs';
+
 AND : '&';
 BITWISENOT : '~';
 COLON : ':';
