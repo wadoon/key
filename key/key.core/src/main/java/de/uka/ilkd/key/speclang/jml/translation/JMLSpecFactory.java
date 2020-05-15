@@ -251,7 +251,6 @@ public class JMLSpecFactory {
     // internal classes
     // -------------------------------------------------------------------------
     private static class ContractClauses {
-
         public ImmutableList<Term> abbreviations = ImmutableSLList.<Term>nil();
         public Map<LocationVariable, Term> requires = new LinkedHashMap<LocationVariable, Term>();
         public Map<LocationVariable, Term> requiresFree
@@ -365,7 +364,7 @@ public class JMLSpecFactory {
      * Create variables for self, parameters, result, exception, and the map for atPre-Functions
      */
 
-    private ProgramVariableCollection createProgramVariables(IProgramMethod pm) {
+    public ProgramVariableCollection createProgramVariables(IProgramMethod pm) {
         ProgramVariableCollection progVar = new ProgramVariableCollection();
         progVar.selfVar = tb.selfVar(pm, pm.getContainerType(), false);
         progVar.paramVars = tb.paramVars(pm, false);
@@ -802,9 +801,13 @@ public class JMLSpecFactory {
         return decreases;
     }
 
-    private String generateName(IProgramMethod pm, TextualJMLSpecCase textualSpecCase,
+    public String generateName(IProgramMethod pm, TextualJMLSpecCase textualSpecCase,
             Behavior originalBehavior) {
         String customName = textualSpecCase.getName();
+        return generateName(pm, originalBehavior, customName);
+    }
+
+    public String generateName(IProgramMethod pm, Behavior originalBehavior, String customName) {
         String name = ((!(customName == null) && customName.length() > 0) ? customName
                 : getContractName(pm, originalBehavior));
         return name;
@@ -878,7 +881,7 @@ public class JMLSpecFactory {
      *            pre-generated post condition
      * @return operation contracts including new functional operation contracts
      */
-    private ImmutableSet<Contract> createFunctionalOperationContracts(String name,
+    public ImmutableSet<Contract> createFunctionalOperationContracts(String name,
             IProgramMethod pm, ProgramVariableCollection progVars, ContractClauses clauses,
             Map<LocationVariable, Term> posts, Map<LocationVariable, Term> axioms) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();

@@ -21,6 +21,7 @@ import org.antlr.runtime.Token;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
+import org.jetbrains.annotations.NotNull;
 
 
 /**
@@ -39,13 +40,19 @@ public class SLTranslationExceptionManager {
     //constructors
     //-------------------------------------------------------------------------
 
-   public SLTranslationExceptionManager(Parser parser, String fileName,
-         Position offsetPos) {
+   public SLTranslationExceptionManager(@NotNull Parser parser, String fileName, Position offsetPos) {
       this.line = parser.input.LT(1).getLine();
       this.column = parser.input.LT(1).getCharPositionInLine();
       this.fileName = fileName;
       this.offsetPos = offsetPos;
    }
+
+    public SLTranslationExceptionManager(String fileName, Position offsetPos, int line, int column) {
+        this.fileName = fileName;
+        this.offsetPos = offsetPos;
+        this.line = line;
+        this.column = column;
+    }
 
     //-------------------------------------------------------------------------
     //internal methods

@@ -25,10 +25,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.JMLResolverManager;
 import de.uka.ilkd.key.speclang.jml.translation.JMLTranslator;
-import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
-import de.uka.ilkd.key.speclang.translation.SLExpression;
-import de.uka.ilkd.key.speclang.translation.SLParameters;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.speclang.translation.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -58,7 +55,7 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
     private final HeapLDT heapLDT;
     private final LocSetLDT locSetLDT;
     private final BooleanLDT booleanLDT;
-    //private final SLTranslationExceptionManager excManager;
+    private final SLTranslationExceptionManager excManager;
     private final List<PositionedString> warnings = new java.util.ArrayList<>();
     private final JMLTranslator translator;
     private final ProgramVariable selfVar;
@@ -89,10 +86,8 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
         this.heapLDT = services.getTypeConverter().getHeapLDT();
         this.locSetLDT = services.getTypeConverter().getLocSetLDT();
         this.booleanLDT = services.getTypeConverter().getBooleanLDT();
-        /*this.excManager =
-                new SLTranslationExceptionManager(null, "",
-                        new Position(0, 0));*/
-        this.translator = new JMLTranslator(null, "", services);
+        this.excManager = new SLTranslationExceptionManager("", new Position(0, 0), 0, 0);
+        this.translator = new JMLTranslator(excManager, "", services);
 
         this.selfVar = self;
         this.paramVars = paramVars;
@@ -101,11 +96,10 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
         this.atPres = atPres;
         this.atBefores = atBefores;
 
-        intHelper = new JavaIntegerSemanticsHelper(services, null);
+        intHelper = new JavaIntegerSemanticsHelper(services, excManager);
         // initialize helper objects
         this.resolverManager = new JMLResolverManager(this.javaInfo,
-                specInClass,
-                selfVar, null);
+                specInClass, selfVar, excManager);
 
         // initialize namespaces
         resolverManager.pushLocalVariablesNamespace();
@@ -230,7 +224,7 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
 
     private Term convertToBackup(Term term) {
         assert atPres != null && atPres.get(getSavedHeap()) != null;
-        Map map = new LinkedHashMap();
+        Map<Term, Term> map = new LinkedHashMap<>();
         map.put(tb.var(getBaseHeap()), tb.var(getSavedHeap()));
         if (atPres.get(getBaseHeap()) != null) {
             map.put(atPres.get(getBaseHeap()), atPres.get(getSavedHeap()));
@@ -280,6 +274,7 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     private <T> @Nullable T accept(@Nullable ParserRuleContext ctx) {
+        if (ctx == null) return null;
         return (T) ctx.accept(this);
     }
 
@@ -625,6 +620,7 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public SLExpression visitConditionalexpr(JmlParser.ConditionalexprContext ctx) {
         SLExpression cond = accept(ctx.equivalenceexpr());
+        if (ctx.conditionalexpr().isEmpty()) return cond;
         SLExpression then = accept(ctx.conditionalexpr(0));
         SLExpression else_ = accept(ctx.conditionalexpr(1));
         return translator.get(JMLTranslator.JMLKeyWord.CONDITIONAL.jmlName(), services, cond, then, else_);
@@ -632,9 +628,14 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitEquivalenceexpr(JmlParser.EquivalenceexprContext ctx) {
-        SLExpression left = accept(ctx.impliesexpr(0));
-        SLExpression right = accept(ctx.impliesexpr(1));
-        return translator.get(ctx.EQV_ANTIV(0).getText(), left, right, services);
+        List<SLExpression> e = mapOf(ctx.impliesexpr());
+        SLExpression result = e.get(0);
+        for (int i = 1; i < e.size(); i++) {
+            String op = ctx.EQV_ANTIV(i - 1).getText();
+            SLExpression expr = e.get(i);
+            result = translator.get(op, services, result, expr);
+        }
+        return result;
     }
 
     /*
@@ -691,6 +692,10 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
         return seq;
     }
 
+    @Override
+    public Object visitRelationalexpr(JmlParser.RelationalexprContext ctx) {
+        return oneOf(ctx.shiftexpr(), ctx.instance_of(), ctx.relational_chain(), ctx.relational_lockset());
+    }
 
     @Override
     public Object visitLogicalandexpr(JmlParser.LogicalandexprContext ctx) {
@@ -725,7 +730,7 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitExclusiveorexpr(JmlParser.ExclusiveorexprContext ctx) {
         List<SLExpression> exprs = mapOf(ctx.andexpr());
         SLExpression result = exprs.get(0);
-        for (int i = 0; i < exprs.size(); i++) {
+        for (int i = 1; i < exprs.size(); i++) {
             SLExpression expr = exprs.get(i);
             if (intHelper.isIntegerTerm(result)) {
                 try {
@@ -747,7 +752,7 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitAndexpr(JmlParser.AndexprContext ctx) {
         List<SLExpression> exprs = mapOf(ctx.equalityexpr());
         SLExpression result = exprs.get(0);
-        for (int i = 0; i < exprs.size(); i++) {
+        for (int i = 1; i < exprs.size(); i++) {
             SLExpression expr = exprs.get(i);
             if (intHelper.isIntegerTerm(result)) {
                 try {
@@ -768,7 +773,7 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
         List<SLExpression> expr = mapOf(ctx.relationalexpr());
         SLExpression result = expr.get(0);
         for (int i = 1; i < expr.size(); i++) {
-            TerminalNode tok = ctx.EQ_NEQ(i);
+            TerminalNode tok = ctx.EQ_NEQ(i-1);
             result = translator.get(tok.getText(), result, expr.get(i), services);
         }
         return result;
@@ -879,8 +884,9 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
         List<SLExpression> e = mapOf(ctx.additiveexpr());
         SLExpression result = e.get(0);
         for (int i = 1; i < e.size(); i++) {
-            String op = ctx.op.get(i).getText();
-            result = translator.get(op, services, result, e);
+            String op = ctx.op.get(i - 1).getText();
+            SLExpression expr = e.get(i);
+            result = translator.get(op, services, result, expr);
         }
         return result;
     }
@@ -890,8 +896,9 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
         List<SLExpression> e = mapOf(ctx.multexpr());
         SLExpression result = e.get(0);
         for (int i = 1; i < e.size(); i++) {
-            String op = ctx.op.get(i).getText();
-            result = translator.get(op, services, result, e);
+            String op = ctx.op.get(i - 1).getText();
+            SLExpression expr = e.get(i);
+            result = translator.get(op, services, result, expr);
         }
         return result;
     }
@@ -901,7 +908,7 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
         List<SLExpression> exprs = mapOf(ctx.unaryexpr());
         SLExpression result = exprs.get(0);
         for (int i = 1; i < exprs.size(); i++) {
-            Token op = ctx.op.get(i);
+            Token op = ctx.op.get(i-1);
             SLExpression e = exprs.get(i);
             if (result.isType()) {
                 raiseError("Cannot build multiplicative expression from type " +
@@ -1022,9 +1029,9 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
         fullyQualifiedName = "";
         SLExpression expr = accept(ctx.primaryexpr());
 
-        if (expr != null && expr.getType() == null) {
+        /* if (expr != null && expr.getType() == null) {
             raiseError("SLExpression without a type: " + expr);
-        }/* else if (expr != null && expr.getType().getJavaType() instanceof PrimitiveType) {
+        } else if (expr != null && expr.getType().getJavaType() instanceof PrimitiveType) {
                 raiseError("Cannot build postfix expression from primitive type.");
             }*/
         //TODO suffixes
@@ -1657,16 +1664,16 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitSpecquantifiedexpression(JmlParser.SpecquantifiedexpressionContext ctx) {
-        Term p = tb.tt();
-        Object nullable = accept(ctx.boundvarmodifiers());
+        Term p;
+        Boolean nullable = Boolean.TRUE == accept(ctx.boundvarmodifiers());
         String q = ctx.quantifier().start.getText();
-        Pair<KeYJavaType, ProgramVariable> declVars = accept(ctx.quantifiedvardecls());
-        {
-            resolverManager.pushLocalVariablesNamespace();
-            resolverManager.putIntoTopLocalVariablesNamespace(declVars.second, declVars.first);
-        }
+        Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars = accept(ctx.quantifiedvardecls());
+        resolverManager.pushLocalVariablesNamespace();
+        resolverManager.putIntoTopLocalVariablesNamespace(declVars.second, declVars.first);
         if (ctx.predicate() != null)
             p = accept(ctx.predicate());
+        else
+            p = tb.tt();
         SLExpression expr = accept(ctx.expression());
         resolverManager.popLocalVariablesNamespace();
         p = tb.convertToFormula(p);
@@ -1744,7 +1751,6 @@ public class ExpressionTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Pair<KeYJavaType, ImmutableList<LogicVariable>> visitQuantifiedvardecls(JmlParser.QuantifiedvardeclsContext ctx) {
-        Pair<KeYJavaType, ImmutableList<LogicVariable>> result = null;
         ImmutableList<LogicVariable> vars = ImmutableSLList.nil();
         KeYJavaType t = accept(ctx.typespec());
         for (JmlParser.QuantifiedvariabledeclaratorContext context : ctx.quantifiedvariabledeclarator()) {

@@ -34,7 +34,7 @@ method_specification: (also_keyword)* spec_case ((also_keyword)+ spec_case)*;
 also_keyword: (ALSO | FOR_EXAMPLE | IMPLIES_THAT);
 spec_case:
   (modifier)?
-  behavior=(BEHAVIOR | NORMAL_BEHAVIOR | MODEL_BEHAVIOR | EXCEPTIONAL_BEHAVIOR
+  behavior=(BEHAVIOR | NORMAL_BEHAVIOR | MODEL_BEHAVIOUR | EXCEPTIONAL_BEHAVIOUR
   | BREAK_BEHAVIOR | CONTINUE_BEHAVIOR | RETURN_BEHAVIOR )?
   spec_body
 ;
@@ -44,47 +44,66 @@ spec_header: requires_clause+;*/
 
 spec_body: a=clause+ (NEST_START inner=clause (also_keyword+ spec_body)* NEST_END)?;
 clause
-  : simple_clause    | assignable_clause | accessible_clause
+  :
+  ( simple_clause    | assignable_clause | accessible_clause
   | signals_clause   | signals_only_clause
   | variant_function | name_clause
   | breaks_clause    | continues_clause
-  | returns_clause   | separates_clause  | determines_clause;
+  | returns_clause   | separates_clause  | determines_clause
+  ) SEMI_TOPLEVEL;
 
 // clauses
-simple_clause: simple_clause_keyword predornot SEMI;
+simple_clause: simple_clause_keyword predornot;
 simple_clause_keyword:
   MODEL_METHOD_AXIOM | REQUIRES | ENSURES | MEASURED_BY | DIVERGES | CAPTURES | WORKING_SPACE | DURATION | WHEN
   ;
-accessible_clause: ACCESSIBLE storeRefUnion;
-assignable_clause: ASSIGNABLE (storeRefUnion | STRICTLY_NOTHING);
-depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? SEMI;
+accessible_clause: ACCESSIBLE storeRefUnion ;
+assignable_clause: ASSIGNABLE (storeRefUnion | STRICTLY_NOTHING) ;
+depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? ;
 //decreases_clause: DECREASES termexpression (COMMA termexpression)*;
 represents_clause
   : REPRESENTS lhs=expression
     (((LARROW | EQUAL_SINGLE) (rhs=expression|t=storeRefUnion))
-    | (SUCH_THAT predicate));
-separates_clause: SEPARATES (NOTHING | sep=infflowspeclist) ((DECLASSIFIES (NOTHING | decl=infflowspeclist)) | (ERASES (NOTHING |erase=infflowspeclist)) | (NEW_OBJECTS (NOTHING |newobj=infflowspeclist)))*;
-loop_separates_clause: LOOP_SEPARATES (NOTHING |sep=infflowspeclist) ((NEW_OBJECTS (NOTHING |newobj=infflowspeclist)))*;
-determines_clause: DETERMINES
-   (NOTHING|det=infflowspeclist)
-   BY (NOTHING | (ITSELF) | by=infflowspeclist)
-   ( (DECLASSIFIES (NOTHING |decl+=infflowspeclist))
-   | (ERASES (NOTHING |erases+=infflowspeclist))
-   | (NEW_OBJECTS (NOTHING |newObs+=infflowspeclist)))*;
+    | (SUCH_THAT predicate))
+
+  ;
+separates_clause
+  : SEPARATES (NOTHING | sep=infflowspeclist)
+    ((DECLASSIFIES (NOTHING | decl=infflowspeclist))
+     | (ERASES (NOTHING |erase=infflowspeclist)) | (NEW_OBJECTS (NOTHING |newobj=infflowspeclist)))*
+
+  ;
+loop_separates_clause
+  : LOOP_SEPARATES (NOTHING | sep=infflowspeclist)
+    (NEW_OBJECTS (NOTHING | newobj=infflowspeclist))*
+
+  ;
+
+determines_clause
+  : DETERMINES
+    (NOTHING|det=infflowspeclist)
+    BY (NOTHING | (ITSELF) | by=infflowspeclist)
+    ( (DECLASSIFIES (NOTHING |decl+=infflowspeclist))
+    | (ERASES (NOTHING |erases+=infflowspeclist))
+    | (NEW_OBJECTS (NOTHING |newObs+=infflowspeclist)))*
+
+   ;
+
 loop_determines_clause
   : LOOP_DETERMINES
     (NOTHING |det=infflowspeclist)
     BY ITSELF ((NEW_OBJECTS (NOTHING |newObs+=infflowspeclist)))*
+
   ;
 
-signals_clause: SIGNALS LPAREN referencetype (IDENT)? RPAREN (predornot)?;
-signals_only_clause: SIGNALS_ONLY (NOTHING |referencetype (COMMA referencetype)*);
-breaks_clause: BREAKS LPAREN (IDENT)? RPAREN (predornot)?;
-continues_clause: CONTINUES LPAREN (IDENT)? RPAREN (predornot)?;
-returns_clause: RETURNS predornot?;
+signals_clause: SIGNALS LPAREN referencetype (IDENT)? RPAREN (predornot)? ;
+signals_only_clause: SIGNALS_ONLY (NOTHING |referencetype (COMMA referencetype)*) ;
+breaks_clause: BREAKS LPAREN (IDENT)? RPAREN (predornot)? ;
+continues_clause: CONTINUES LPAREN (IDENT)? RPAREN (predornot)? ;
+returns_clause: RETURNS predornot? ;
 
-name_clause: SPEC_NAME STRING_LITERAL SEMICOLON;
-old_clause: OLD modifiers type IDENT INITIALISER;
+name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
+old_clause: OLD modifiers type IDENT INITIALISER ;
 field_or_method_declaration:
    type IDENT (method_declaration|field_declaration);
 field_declaration: (EMPTYBRACKETS)* (initialiser |SEMICOLON);

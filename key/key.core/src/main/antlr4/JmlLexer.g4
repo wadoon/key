@@ -17,7 +17,7 @@ lexer grammar JmlLexer;
    private void incrBracket() { bracketLevel++;}
    private void decrBracket() { bracketLevel--;}
 
-   private boolean semicolonOnToplevel() { return bracketLevel==0 && bracesLevel == 0 && parenthesisLevel==0; }
+   boolean semicolonOnToplevel() { return bracketLevel==0 && bracesLevel == 0 && parenthesisLevel==0; }
 }
 
 tokens {COMMENT}
@@ -305,7 +305,6 @@ NOT: '!';
 PLUS: '+';
 QUESTIONMARK: '?';
 RARROW: '->';
-SEMI: ';';
 SHIFTLEFT: '<<';
 SHIFTRIGHT: '>>';
 ST: '<:';
@@ -315,14 +314,14 @@ GT: '>';
 LT: '<';
 
 
-LPAREN:             '(' {incrParen();};
-RPAREN:             ')' {decrParen();};
-LBRACE:             '{' {incrBrace();};
-RBRACE:             '}' {decrBrace();};
-LBRACK:             '[' {incrBracket();};
-RBRACK:             ']' {decrBracket();};
-E_SEMI:               ';' { ! semicolonOnToplevel()}? -> type(SEMI);
-E_SEMI_TOPLEVEL:      ';' {   semicolonOnToplevel()}? -> popMode, type(SEMI); //jump back to contract mode
+LPAREN:               '(' {incrParen();};
+RPAREN:               ')' {decrParen();};
+LBRACE:               '{' {incrBrace();};
+RBRACE:               '}' {decrBrace();};
+LBRACKET:             '[' {incrBracket();};
+RBRACKET:             ']' {decrBracket();};
+SEMI_TOPLEVEL:        {   semicolonOnToplevel()}? ';' -> popMode; //jump back to contract mode
+SEMI:               { ! semicolonOnToplevel()}? ';';
 
 fragment LETTER: 'a'..'z' | 'A'..'Z' | '_' | '$';
 

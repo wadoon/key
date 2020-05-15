@@ -5,10 +5,10 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -19,9 +19,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -37,10 +35,14 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
     private final KeYJavaType kjt;
     private Object currentBehavior;
 
-    private ContractTranslator(String fileName, Position offsetPos, JMLSpecFactory2 factory, KeYJavaType kjt) throws SLTranslationException {
+    private Map<String, List<Contract>> contractClauses = new LinkedHashMap<>();
+    private List<Term> abbreviations = new ArrayList<>(64);
+
+
+    public ContractTranslator(String fileName, Position offsetPos, JMLSpecFactory2 factory, KeYJavaType kjt) throws SLTranslationException {
         this.factory = factory;
         this.kjt = kjt;
-        this.excManager = new SLTranslationExceptionManager(null, fileName, offsetPos);
+        this.excManager = new SLTranslationExceptionManager(fileName, offsetPos, 0, 0);
     }
 
     private PositionedString createPositionedString(String text, Token t) {
@@ -121,6 +123,7 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
 
 
     private <T> @Nullable T accept(@Nullable ParserRuleContext ctx) {
+        if (ctx == null) return null;
         return (T) ctx.accept(this);
     }
 
@@ -203,5 +206,259 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
             if (t != null) return t;
         }
         return null;
+    }
+
+    @Override
+    public Object visitClasslevel_element(JmlParser.Classlevel_elementContext ctx) {
+        return super.visitClasslevel_element(ctx);
+    }
+
+    @Override
+    public Object visitMethodlevel_element(JmlParser.Methodlevel_elementContext ctx) {
+        return super.visitMethodlevel_element(ctx);
+    }
+
+    @Override
+    public Object visitAlso_keyword(JmlParser.Also_keywordContext ctx) {
+        return super.visitAlso_keyword(ctx);
+    }
+
+    //TODO init
+    IProgramMethod pm = null;
+
+    @Override
+    public Contract visitSpec_case(JmlParser.Spec_caseContext ctx) {
+        this.mods = accept(ctx.modifier());
+        Behavior behavior = getBehavior(ctx.behavior, pm);
+        String name = factory.generateName(pm, behavior, "name");
+        contractClauses.clear();
+        accept(ctx.spec_body());
+        //factory.createFunctionalOperationContracts();
+        return null;
+    }
+
+    private Behavior getBehavior(Token behavior, IProgramMethod pm) {
+        //TODO missing model behavior
+        if (behavior == null) return Behavior.BEHAVIOR;
+        return Behavior.valueOf(behavior.getText());
+    }
+
+    @Override
+    public Object visitSpec_body(JmlParser.Spec_bodyContext ctx) {
+        listOf(ctx.clause());
+        listOf(ctx.spec_body());
+        return super.visitSpec_body(ctx);
+    }
+
+    @Override
+    public Object visitSimple_clause(JmlParser.Simple_clauseContext ctx) {
+        String type = ctx.simple_clause_keyword().getText();
+        Term t = factory.parseExpress(ctx.predornot());
+        return super.visitSimple_clause(ctx);
+    }
+
+    @Override
+    public Object visitSimple_clause_keyword(JmlParser.Simple_clause_keywordContext ctx) {
+        return super.visitSimple_clause_keyword(ctx);
+    }
+
+    @Override
+    public Object visitAccessible_clause(JmlParser.Accessible_clauseContext ctx) {
+        return super.visitAccessible_clause(ctx);
+    }
+
+    @Override
+    public Object visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
+        return super.visitAssignable_clause(ctx);
+    }
+
+    @Override
+    public Object visitDepends_clause(JmlParser.Depends_clauseContext ctx) {
+        return super.visitDepends_clause(ctx);
+    }
+
+    @Override
+    public Object visitRepresents_clause(JmlParser.Represents_clauseContext ctx) {
+        return super.visitRepresents_clause(ctx);
+    }
+
+    @Override
+    public Object visitSeparates_clause(JmlParser.Separates_clauseContext ctx) {
+        return super.visitSeparates_clause(ctx);
+    }
+
+    @Override
+    public Object visitLoop_separates_clause(JmlParser.Loop_separates_clauseContext ctx) {
+        return super.visitLoop_separates_clause(ctx);
+    }
+
+    @Override
+    public Object visitDetermines_clause(JmlParser.Determines_clauseContext ctx) {
+        return super.visitDetermines_clause(ctx);
+    }
+
+    @Override
+    public Object visitLoop_determines_clause(JmlParser.Loop_determines_clauseContext ctx) {
+        return super.visitLoop_determines_clause(ctx);
+    }
+
+    @Override
+    public Object visitSignals_clause(JmlParser.Signals_clauseContext ctx) {
+        return super.visitSignals_clause(ctx);
+    }
+
+    @Override
+    public Object visitSignals_only_clause(JmlParser.Signals_only_clauseContext ctx) {
+        return super.visitSignals_only_clause(ctx);
+    }
+
+    @Override
+    public Object visitBreaks_clause(JmlParser.Breaks_clauseContext ctx) {
+        return super.visitBreaks_clause(ctx);
+    }
+
+    @Override
+    public Object visitContinues_clause(JmlParser.Continues_clauseContext ctx) {
+        return super.visitContinues_clause(ctx);
+    }
+
+    @Override
+    public Object visitReturns_clause(JmlParser.Returns_clauseContext ctx) {
+        return super.visitReturns_clause(ctx);
+    }
+
+    @Override
+    public Object visitName_clause(JmlParser.Name_clauseContext ctx) {
+        return super.visitName_clause(ctx);
+    }
+
+    @Override
+    public Object visitOld_clause(JmlParser.Old_clauseContext ctx) {
+        return super.visitOld_clause(ctx);
+    }
+
+    @Override
+    public Object visitField_or_method_declaration(JmlParser.Field_or_method_declarationContext ctx) {
+        return super.visitField_or_method_declaration(ctx);
+    }
+
+    @Override
+    public Object visitField_declaration(JmlParser.Field_declarationContext ctx) {
+        return super.visitField_declaration(ctx);
+    }
+
+    @Override
+    public Object visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
+        return super.visitMethod_declaration(ctx);
+    }
+
+    @Override
+    public Object visitParam_list(JmlParser.Param_listContext ctx) {
+        return super.visitParam_list(ctx);
+    }
+
+    @Override
+    public Object visitParam_decl(JmlParser.Param_declContext ctx) {
+        return super.visitParam_decl(ctx);
+    }
+
+    @Override
+    public Object visitHistory_constraint(JmlParser.History_constraintContext ctx) {
+        return super.visitHistory_constraint(ctx);
+    }
+
+    @Override
+    public Object visitDatagroup_clause(JmlParser.Datagroup_clauseContext ctx) {
+        return super.visitDatagroup_clause(ctx);
+    }
+
+    @Override
+    public Object visitMonitors_for_clause(JmlParser.Monitors_for_clauseContext ctx) {
+        return super.visitMonitors_for_clause(ctx);
+    }
+
+    @Override
+    public Object visitReadable_if_clause(JmlParser.Readable_if_clauseContext ctx) {
+        return super.visitReadable_if_clause(ctx);
+    }
+
+    @Override
+    public Object visitWritable_if_clause(JmlParser.Writable_if_clauseContext ctx) {
+        return super.visitWritable_if_clause(ctx);
+    }
+
+    @Override
+    public Object visitIn_group_clause(JmlParser.In_group_clauseContext ctx) {
+        return super.visitIn_group_clause(ctx);
+    }
+
+    @Override
+    public Object visitMaps_into_clause(JmlParser.Maps_into_clauseContext ctx) {
+        return super.visitMaps_into_clause(ctx);
+    }
+
+    @Override
+    public Object visitNowarn_pragma(JmlParser.Nowarn_pragmaContext ctx) {
+        return super.visitNowarn_pragma(ctx);
+    }
+
+    @Override
+    public Object visitDebug_statement(JmlParser.Debug_statementContext ctx) {
+        return super.visitDebug_statement(ctx);
+    }
+
+    @Override
+    public Object visitSet_statement(JmlParser.Set_statementContext ctx) {
+        return super.visitSet_statement(ctx);
+    }
+
+    @Override
+    public Object visitMerge_point_statement(JmlParser.Merge_point_statementContext ctx) {
+        return super.visitMerge_point_statement(ctx);
+    }
+
+    @Override
+    public Object visitLoop_specification(JmlParser.Loop_specificationContext ctx) {
+        return super.visitLoop_specification(ctx);
+    }
+
+    @Override
+    public Object visitLoop_invariant(JmlParser.Loop_invariantContext ctx) {
+        return super.visitLoop_invariant(ctx);
+    }
+
+    @Override
+    public Object visitVariant_function(JmlParser.Variant_functionContext ctx) {
+        return super.visitVariant_function(ctx);
+    }
+
+    @Override
+    public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
+        return super.visitAssume_statement(ctx);
+    }
+
+    @Override
+    public Object visitInitialiser(JmlParser.InitialiserContext ctx) {
+        return super.visitInitialiser(ctx);
+    }
+
+    @Override
+    public Object visitBlock_specification(JmlParser.Block_specificationContext ctx) {
+        return super.visitBlock_specification(ctx);
+    }
+
+    @Override
+    public Object visitBlock_loop_specification(JmlParser.Block_loop_specificationContext ctx) {
+        return super.visitBlock_loop_specification(ctx);
+    }
+
+    @Override
+    public Object visitLoop_contract_keyword(JmlParser.Loop_contract_keywordContext ctx) {
+        return super.visitLoop_contract_keyword(ctx);
+    }
+
+    @Override
+    public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
+        return super.visitAssert_statement(ctx);
     }
 }

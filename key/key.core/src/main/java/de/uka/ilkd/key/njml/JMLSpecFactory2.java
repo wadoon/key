@@ -32,7 +32,7 @@ import org.key_project.util.collection.ImmutableList;
  * This is the public interface to the jml.translation package.
  */
 public class JMLSpecFactory2 extends JMLSpecFactory {
-    public JMLSpecFactory2(Services services) {
+    public JMLSpecFactory2(Services services, ExpressionTranslator et) {
         super(services);
     }
 
