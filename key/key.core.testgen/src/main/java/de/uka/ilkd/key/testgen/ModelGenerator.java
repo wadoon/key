@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.smt.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -21,13 +22,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
-import de.uka.ilkd.key.smt.SMTObjTranslator;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.SMTSolverResult;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverLauncherListener;
-import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.model.Model;
 
@@ -60,7 +54,7 @@ public class ModelGenerator implements SolverLauncherListener{
 	public void launch(){
 		System.out.println("Launch "+count++);
 		SolverLauncher launcher = prepareLauncher();
-		SolverType solver = SolverType.Z3_CE_SOLVER;
+		SolverType solver = SolverTypes.Z3_CE_SOLVER;
 		SMTProblem problem = new SMTProblem(goal);
 		launcher.addListener(this);
 		launcher.launch(problem, services, solver);		

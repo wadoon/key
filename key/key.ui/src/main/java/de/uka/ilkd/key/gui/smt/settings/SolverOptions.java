@@ -2,8 +2,8 @@ package de.uka.ilkd.key.gui.smt.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.smt.SolverType;
 
@@ -44,18 +44,21 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     private final SolverType solverType;
     private final JTextField solverCommand;
     private final JTextField solverParameters;
+    private final JTextField solverSupported;
+    private final JTextField solverName;
+    private final JTextField solverInstalled;
     private ProofIndependentSMTSettings settings;
 
     public SolverOptions(SolverType solverType) {
         this.setName(solverType.getName());
         this.solverType = solverType;
-        setHeaderText("SMT Solver: "+getDescription());
+        setHeaderText("SMT Solver: " + getDescription());
 
-        JTextField solverName = createSolverName();
-        JTextField solverInstalled = createSolverInstalled();
+        solverName = createSolverName();
+        solverInstalled = createSolverInstalled();
         solverCommand = createSolverCommand();
         solverParameters = createSolverParameters();
-        JTextField solverSupported = createSolverSupported();
+        solverSupported = createSolverSupported();
         JButton toDefaultButton = createButtons();
     }
 
@@ -93,7 +96,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         String result = versions.length > 1 ? "The following versions are supported: " :
                 "The following version is supported: ";
         for (int i = 0; i < versions.length; i++) {
-            result  += versions[i];
+            result += versions[i];
             result += i < versions.length - 1 ? ", " : "";
         }
         return result;
@@ -135,14 +138,14 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
             info = info + (versionString.startsWith("version") ? " (" : " (version ") + versionString + ")";
         }
         JTextField txt = addTextField("Installed", info, "", null);
-        txt.setBackground(this.getBackground());
+        //txt.setBackground(this.getBackground());
         txt.setEditable(false);
         return txt;
     }
 
     protected JTextField createSolverName() {
         JTextField txt = addTextField("Name", solverType.getName(), infoSolverName, null);
-        txt.setBackground(this.getBackground());
+        //txt.setBackground(this.getBackground());
         txt.setEditable(false);
         return txt;
     }
@@ -154,12 +157,26 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     @Override
     public JComponent getPanel(MainWindow window) {
-        settings = SettingsManager.getSmtPiSettings().clone();
+        setSmtSettings(SettingsManager.getSmtPiSettings().clone());
         return this;
+    }
+
+    private void setSmtSettings(ProofIndependentSMTSettings clone) {
+        settings = clone;
+        solverCommand.setText(solverType.getSolverCommand());
+        solverParameters.setText(solverType.getSolverParameters());
+        solverName.setText(solverType.getName());
+        final boolean installed = solverType.isInstalled(true);
+        String info = installed ? "yes" : "no";
+        if (installed) {
+            final String versionString = solverType.getRawVersion();
+            info = info + (versionString.startsWith("version") ? " (" : " (version ") + versionString + ")";
+        }
+        solverInstalled.setText(info);
     }
 
     @Override
     public void applySettings(MainWindow window) {
-
+        setSmtSettings(SettingsManager.getSmtPiSettings().clone());
     }
 }

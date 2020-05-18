@@ -6,6 +6,7 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.SolverTypes;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         getChildren().add(new TacletTranslationOptions());
         //getChildren().add(new DefaultSettingsProvider("Selection",
         //        new TacletTranslationSelection(smtSettings).getSelectionTree()));
-        for (SolverType options : SolverType.ALL_SOLVERS) {
+        for (SolverType options : SolverTypes.ALL_SOLVERS) {
             getChildren().add(new SolverOptions(options));
         }
     }
@@ -110,6 +111,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
         ProofIndependentSMTSettings pi = SettingsManager.getSmtPiSettings();
         pi.copy(settings);
         pi.fireSettingsChanged();
+        setSmtSettings(pi.clone());
     }
 
     private JSpinner createLocSetBoundField() {

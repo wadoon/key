@@ -344,7 +344,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
     private String[] translateToCommand(Term term)
                 throws IllegalFormulaException, IOException {
-        if (getType() == SolverType.Z3_CE_SOLVER) {
+        if (getType() == SolverTypes.Z3_CE_SOLVER) {
             Proof proof = problem.getGoal().proof();
             SpecificationRepository specrep = proof.getServices().getSpecificationRepository();
 

@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.smt.test;
 
 import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.SolverTypes;
 import org.junit.Ignore;
 
 
@@ -48,7 +49,7 @@ public class TestYices extends TestSMTSolver {
 
     @Override
     public SolverType getSolverType() {
-       SolverType type = SolverType.YICES_SOLVER;
+       SolverType type = SolverTypes.YICES_SOLVER;
        String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
        if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
           type.setSolverCommand(solverPathProperty);

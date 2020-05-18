@@ -22,7 +22,7 @@ public class SMTCommand
     private static Map<String, SolverType> computeSolverMap() {
         Map<String, SolverType> result = new HashMap<String, SolverType>();
 
-        for (SolverType type : SolverType.ALL_SOLVERS) {
+        for (SolverType type : SolverTypes.ALL_SOLVERS) {
             result.put(type.getName(), type);
         }
 

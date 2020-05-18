@@ -15,7 +15,7 @@ package de.uka.ilkd.key.smt.test;
 
 
 import de.uka.ilkd.key.smt.SolverType;
-
+import de.uka.ilkd.key.smt.SolverTypes;
 
 
 public class TestSimplify extends TestSMTSolver {
@@ -46,7 +46,7 @@ public class TestSimplify extends TestSMTSolver {
     
     @Override
     public SolverType getSolverType() {
-       SolverType type = SolverType.SIMPLIFY_SOLVER;
+       SolverType type = SolverTypes.SIMPLIFY_SOLVER;
        String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
        if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
           type.setSolverCommand(solverPathProperty);

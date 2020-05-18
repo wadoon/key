@@ -24,6 +24,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+import de.uka.ilkd.key.smt.SolverTypes;
 
 public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Settings, Cloneable {
 	
@@ -154,22 +155,22 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         }
 
         private ProofIndependentSMTSettings() {
-                dataOfSolvers.put(SolverType.Z3_SOLVER, new SolverData(SolverType.Z3_SOLVER));
-                dataOfSolvers.put(SolverType.Z3_CE_SOLVER, new SolverData(SolverType.Z3_CE_SOLVER));
-                dataOfSolvers.put(SolverType.YICES_SOLVER, new SolverData(SolverType.YICES_SOLVER));
-                dataOfSolvers.put(SolverType.SIMPLIFY_SOLVER, new SolverData(SolverType.SIMPLIFY_SOLVER));
-                dataOfSolvers.put(SolverType.CVC3_SOLVER, new SolverData(SolverType.CVC3_SOLVER));
-                dataOfSolvers.put(SolverType.CVC4_SOLVER, new SolverData(SolverType.CVC4_SOLVER));
-                solverUnions.add(new SolverTypeCollection("Z3",1,SolverType.Z3_SOLVER));
-                solverUnions.add(new SolverTypeCollection("Yices",1,SolverType.YICES_SOLVER));
-                solverUnions.add(new SolverTypeCollection("CVC3",1,SolverType.CVC3_SOLVER));
-                solverUnions.add(new SolverTypeCollection("CVC4",1,SolverType.CVC4_SOLVER));
-                solverUnions.add(new SolverTypeCollection("Simplify",1,SolverType.SIMPLIFY_SOLVER));
-                solverUnions.add(new SolverTypeCollection("Multiple Solvers",2,SolverType.Z3_SOLVER,
-                                SolverType.YICES_SOLVER,
-                                SolverType.CVC3_SOLVER,
-                                SolverType.CVC4_SOLVER,
-                                SolverType.SIMPLIFY_SOLVER));
+                dataOfSolvers.put(SolverTypes.Z3_SOLVER, new SolverData(SolverTypes.Z3_SOLVER));
+                dataOfSolvers.put(SolverTypes.Z3_CE_SOLVER, new SolverData(SolverTypes.Z3_CE_SOLVER));
+                dataOfSolvers.put(SolverTypes.YICES_SOLVER, new SolverData(SolverTypes.YICES_SOLVER));
+                dataOfSolvers.put(SolverTypes.SIMPLIFY_SOLVER, new SolverData(SolverTypes.SIMPLIFY_SOLVER));
+                dataOfSolvers.put(SolverTypes.CVC3_SOLVER, new SolverData(SolverTypes.CVC3_SOLVER));
+                dataOfSolvers.put(SolverTypes.CVC4_SOLVER, new SolverData(SolverTypes.CVC4_SOLVER));
+                solverUnions.add(new SolverTypeCollection("Z3",1, SolverTypes.Z3_SOLVER));
+                solverUnions.add(new SolverTypeCollection("Yices",1, SolverTypes.YICES_SOLVER));
+                solverUnions.add(new SolverTypeCollection("CVC3",1, SolverTypes.CVC3_SOLVER));
+                solverUnions.add(new SolverTypeCollection("CVC4",1, SolverTypes.CVC4_SOLVER));
+                solverUnions.add(new SolverTypeCollection("Simplify",1, SolverTypes.SIMPLIFY_SOLVER));
+                solverUnions.add(new SolverTypeCollection("Multiple Solvers",2, SolverTypes.Z3_SOLVER,
+                                SolverTypes.YICES_SOLVER,
+                                SolverTypes.CVC3_SOLVER,
+                                SolverTypes.CVC4_SOLVER,
+                                SolverTypes.SIMPLIFY_SOLVER));
         }
 
 
