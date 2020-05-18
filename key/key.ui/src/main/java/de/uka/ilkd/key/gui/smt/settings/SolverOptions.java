@@ -9,36 +9,24 @@ import de.uka.ilkd.key.smt.SolverType;
 
 import javax.swing.*;
 
+import static de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider.BUNDLE;
+
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
 class SolverOptions extends SettingsPanel implements SettingsProvider {
-    private static final long serialVersionUID = 4425059748947494605L;
-    private static final String infoSolverName =
-            "There are two ways to make supported provers applicable for KeY:\n"
-                    + "1. Specify the absolute path of the prover in the field 'Command'.\n"
-                    + "2. Change the environment variable $PATH of your system, so that it "
-                    + "refers to the installed prover. In that case you must specify the name of the solver in 'Command'";
-    private static final String infoSolverParameters = "In this field you can specify which parameters are passed to the " +
-            "solver when the solver is started. Note that the default parameters are crucial for a stable run of the" +
-            "solver.";
-    private static final String infoSolverCommand = "The command for the solver.\n\n" +
-            "Either you specify the absolute path of your solver or just the command for starting it.\n" +
-            "In the latter case you have to modify the PATH-variable of your system.\n" +
-            "Please note that you also have to specify the filename extension\n" +
-            "For example: z3.exe";
-    private static final String infoSolverSupport = "For the KeY system only some particular versions of this solver " +
-            "have been tested. It is highly recommended to use those versions, because otherwise it is not guaranteed that " +
-            "the connection to this solver is stable.\n\n" +
-            "If you want to check whether the installed solver is supported, please click on the button below.\n\n";
-    private static final String solverSupportText[] = {"Version of solver is supported.",
-            "Version of solver may not be supported.",
-            "Support has not been checked, yet."};
+    private static final String infoSolverName = "infoSolverName";
+    private static final String infoSolverParameters = "infoSolverParameters";
+    private static final String infoSolverCommand = "infoSolverCommand";
+    private static final String infoSolverSupport = "infoSolverSupport";
+    private static final String[] solverSupportText = {
+            BUNDLE.getString("SOLVER_SUPPORTED"),
+            BUNDLE.getString("SOLVER_MAY_SUPPORTED"),
+            BUNDLE.getString("SOLVER_UNSUPPORTED")};
+
     private static final int SOLVER_SUPPORTED = 0;
 
-
-    //private JButton    checkForSupportButton;
     private static final int SOLVER_NOT_SUPPOTED = 1;
     private static final int SOLVER_SUPPORT_NOT_CHECKED = 2;
     private final SolverType solverType;
@@ -47,6 +35,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     private final JTextField solverSupported;
     private final JTextField solverName;
     private final JTextField solverInstalled;
+
     private ProofIndependentSMTSettings settings;
 
     public SolverOptions(SolverType solverType) {
@@ -60,11 +49,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         solverParameters = createSolverParameters();
         solverSupported = createSolverSupported();
         JButton toDefaultButton = createButtons();
+        createCheckSupportButton();
     }
-
-    /*protected void setSmtSettings() {
-        createSolverInstalled().setText(Boolean.toString(solverType.isInstalled(true)));
-    }*/
 
     protected JButton createButtons() {
         JButton toDefaultButton = new JButton("Set parameters to default.");
@@ -75,20 +61,6 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         });
         addRowWithHelp(null, new JLabel(), toDefaultButton);
         return toDefaultButton;
-//		checkForSupportButton = new JButton("Check for support.");
-//		checkForSupportButton.addActionListener(new ActionListener() {
-//
-//			@Override
-//			public void actionPerformed(ActionEvent arg0) {
-//				solverType.checkForSupport();
-//				createSolverSupported().setText(getSolverSupportText());
-//			}
-//		});
-//		checkForSupportButton.setEnabled(solverType.isInstalled(false));
-
-//		Box box  = addRowWithHelp(null,toDefaultButton,checkForSupportButton);
-//        Box box = addRowWithHelp(null, toDefaultButton);
-//      box.add(Box.createHorizontalGlue());
     }
 
     private String createSupportedVersionText() {
@@ -111,22 +83,33 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     protected JTextField createSolverSupported() {
+
         JTextField txt = addTextField("Support", getSolverSupportText(),
-                infoSolverSupport + createSupportedVersionText(), null);
+                BUNDLE.getString(infoSolverSupport) + createSupportedVersionText(), null);
         txt.setEditable(false);
         return txt;
     }
 
+    protected JButton createCheckSupportButton() {
+        JButton checkForSupportButton = new JButton("Check for support.");
+        checkForSupportButton.setEnabled(solverType.isInstalled(false));
+        checkForSupportButton.addActionListener(arg0 -> {
+            solverType.checkForSupport();
+            solverSupported.setText(getSolverSupportText());
+        });
+        addRowWithHelp(null, new JLabel(), checkForSupportButton);
+        return checkForSupportButton;
+    }
 
     protected JTextField createSolverParameters() {
-        return addTextField("Parameters", solverType.getSolverParameters(), infoSolverParameters,
+        return addTextField("Parameters", solverType.getSolverParameters(), BUNDLE.getString(infoSolverParameters),
                 e -> settings.setParameters(solverType, solverParameters.getText()));
     }
 
     public JTextField createSolverCommand() {
         return addTextField("Command",
                 solverType.getSolverCommand(),
-                infoSolverCommand, e -> settings.setCommand(solverType, solverCommand.getText()));
+                BUNDLE.getString(infoSolverCommand), e -> settings.setCommand(solverType, solverCommand.getText()));
     }
 
 
@@ -144,7 +127,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     protected JTextField createSolverName() {
-        JTextField txt = addTextField("Name", solverType.getName(), infoSolverName, null);
+        JTextField txt = addTextField("Name", solverType.getName(), BUNDLE.getString(infoSolverName), null);
         //txt.setBackground(this.getBackground());
         txt.setEditable(false);
         return txt;
@@ -163,8 +146,9 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     private void setSmtSettings(ProofIndependentSMTSettings clone) {
         settings = clone;
-        solverCommand.setText(solverType.getSolverCommand());
-        solverParameters.setText(solverType.getSolverParameters());
+        solverCommand.setText(settings.getCommand(solverType));
+        solverParameters.setText(settings.getParameters(solverType));
+
         solverName.setText(solverType.getName());
         final boolean installed = solverType.isInstalled(true);
         String info = installed ? "yes" : "no";
@@ -177,6 +161,9 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     @Override
     public void applySettings(MainWindow window) {
+        solverType.setSolverCommand(settings.getCommand(solverType));
+        solverType.setSolverParameters(settings.getParameters(solverType));
+        SettingsManager.getSmtPiSettings().copy(settings);
         setSmtSettings(SettingsManager.getSmtPiSettings().clone());
     }
 }

@@ -13,13 +13,7 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
 
 
 /**
