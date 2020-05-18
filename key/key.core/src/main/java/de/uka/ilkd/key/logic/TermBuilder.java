@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -2346,7 +2347,7 @@ public class TermBuilder {
             Term f = workingList.head();
             workingList = workingList.tail();
             if (f.op() == union) {
-                workingList = workingList.prepend(f.sub(1)).prepend(f.sub(0));
+                workingList = workingList.prepend(f.sub(0)).prepend(f.sub(1));
             } else {
                 result = result.add(f);
             }

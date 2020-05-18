@@ -20,6 +20,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.antlr.runtime.RecognitionException;
@@ -93,6 +95,7 @@ public class AbstractUpdateTests extends AbstractTestTermParser {
                 + "\\functions {" //
                 + "\\unique LocSet locset1;" //
                 + "\\unique LocSet locset2;" //
+                + "\\unique LocSet locset3;" //
                 + "}");
     }
 
@@ -172,6 +175,18 @@ public class AbstractUpdateTests extends AbstractTestTermParser {
     }
 
     @Test
+    public void extractedLocsFromUnionTermAreOrdered() throws Exception {
+        final Term unionTerm = parseTerm("union(locset1,union(locset2,locset3))");
+        final Set<AbstractUpdateLoc> locs = AbstractUpdateFactory.abstrUpdateLocsFromUnionTerm( //
+                unionTerm, Optional.empty(), services);
+        final AbstractUpdateLoc[] arr = locs.toArray(new AbstractUpdateLoc[0]);
+
+        assertEquals("locset1", arr[0].toString());
+        assertEquals("locset2", arr[1].toString());
+        assertEquals("locset3", arr[2].toString());
+    }
+
+    @Test
     public void simplificationTests() {
         final Map<String, Boolean> simplificationTests = new LinkedHashMap<>();
         simplificationTests.put("simplificationTest01.key", true);
@@ -202,8 +217,9 @@ public class AbstractUpdateTests extends AbstractTestTermParser {
         simplificationTests.put("simplificationTest26-INCORR.key", false);
         simplificationTests.put("simplificationTest27.key", true);
         simplificationTests.put("simplificationTest28.key", true);
-        // simplificationTests.put("simplificationTest29.key", true); // Provable, but not automatically!
-        
+        // simplificationTests.put("simplificationTest29.key", true); // Provable, but
+        // not automatically!
+
         simplificationTests.put("simplificationTest30.key", true);
         simplificationTests.put("simplificationTest31-INCORR.key", false);
         simplificationTests.put("simplificationTest32.key", true);
