@@ -391,24 +391,7 @@ public class AbstractExecutionContractUtils {
             GoalLocalSpecificationRepository localSpecRepo, final Services services) {
         final AEFrameSpecsInterm termResult = getAccessibleAndAssignableTermsForNoBehaviorContract(
                 abstrStmt, maybeSeqFor, localSpecRepo, services);
-
-        final UniqueArrayList<AbstractUpdateLoc> assignableLocs = services.getTermBuilder()
-                .locsetUnionToSet(termResult.getAssignables()).stream()
-                .map(t -> AbstractUpdateFactory.abstrUpdateLocFromTerm(t, executionContext,
-                        services))
-                .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
-        final List<Term> accessibleClause = services.getTermBuilder()
-                .locsetUnionToSet(termResult.getAccesibles()).stream().collect(Collectors.toList());
-
-        List<Term> accessiblesList = accessibleClause;
-        if (executionContext.isPresent()) {
-            accessiblesList = accessibleClause.stream().map(term -> AbstractUpdateFactory
-                    .normalizeSelfVarInTerm(term, executionContext, services))
-                    .collect(Collectors.toList());
-        }
-
-        return new AEFrameSpecs(accessiblesList, assignableLocs, termResult.determines,
-                executionContext, services);
+        return new AEFrameSpecs(termResult, executionContext, services);
     }
 
     /**
@@ -425,12 +408,6 @@ public class AbstractExecutionContractUtils {
          * NOTE (DS, 2019-11-04): Considering the program proved to be a bad idea, since
          * then, all block contracts (also the "wrong" ones) of APSs will be considered,
          * leading to a wrong result. The sequent is more reliable.
-         */
-        /*
-         * NOTE (DS, 2019-11-04): We could circumvent all these hacks with Goal-local
-         * contracts, which is not possible though currently, since, e.g., in
-         * VariableConditions, the Goal is not available, and AE rules are implemented
-         * as Taclets.
          */
 //        final ProgramVariableCollector pvc = //
 //                new ProgramVariableCollector(
@@ -484,19 +461,62 @@ public class AbstractExecutionContractUtils {
         private final List<Term> accesibles;
         private final Map<List<AbstractUpdateLoc>, List<Term>> determines;
 
-        public AEFrameSpecs(List<Term> accesibles, UniqueArrayList<AbstractUpdateLoc> assignables,
-                Map<List<AbstractUpdateLoc>, List<Term>> determines) {
-            this.assignables = assignables;
-            this.accesibles = accesibles;
+        public AEFrameSpecs(AEFrameSpecsInterm intermSpecs, Optional<ExecutionContext> ec,
+                final Services services) {
+            final List<Term> accessiblesList = processAccessibles(intermSpecs, ec, services);
+            final UniqueArrayList<AbstractUpdateLoc> assignablesList = processAssignables(
+                    intermSpecs, ec, services);
+            final Map<List<AbstractUpdateLoc>, List<Term>> determines = processIFSpecs(
+                    intermSpecs.getDetermines(), assignablesList, accessiblesList, ec, services);
+
+            this.assignables = assignablesList;
+            this.accesibles = accessiblesList;
             this.determines = determines;
         }
 
-        public AEFrameSpecs(List<Term> accesibles, UniqueArrayList<AbstractUpdateLoc> assignables,
-                ImmutableList<InfFlowSpec> infFlowSpecs, Optional<ExecutionContext> ec,
+        public List<Term> getAccesibles() {
+            return accesibles;
+        }
+
+        public UniqueArrayList<AbstractUpdateLoc> getAssignables() {
+            return assignables;
+        }
+
+        public Map<List<AbstractUpdateLoc>, List<Term>> getDetermines() {
+            return determines;
+        }
+
+        private static UniqueArrayList<AbstractUpdateLoc> processAssignables(
+                AEFrameSpecsInterm intermSpecs, Optional<ExecutionContext> ec,
                 final Services services) {
-            this.assignables = assignables;
-            this.accesibles = accesibles;
-            this.determines = new LinkedHashMap<>();
+            return services.getTermBuilder()
+                    .locsetUnionToSet(intermSpecs.getAssignables()).stream()
+                    .map(t -> AbstractUpdateFactory.abstrUpdateLocFromTerm(t, ec, services))
+                    .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
+        }
+
+        private static List<Term> processAccessibles(AEFrameSpecsInterm intermSpecs,
+                Optional<ExecutionContext> ec, final Services services) {
+            final List<Term> accessibleClause = services.getTermBuilder()
+                    .locsetUnionToSet(intermSpecs.getAccesibles()).stream()
+                    .collect(Collectors.toList());
+
+            List<Term> accessiblesList = accessibleClause;
+            if (ec.isPresent()) {
+                accessiblesList = accessibleClause.stream().map(
+                        term -> AbstractUpdateFactory.normalizeSelfVarInTerm(term, ec, services))
+                        .collect(Collectors.toList());
+            }
+            
+            return accessiblesList;
+        }
+
+        private static Map<List<AbstractUpdateLoc>, List<Term>> processIFSpecs(
+                ImmutableList<InfFlowSpec> infFlowSpecs,
+                UniqueArrayList<AbstractUpdateLoc> assignables, List<Term> accesibles,
+                Optional<ExecutionContext> ec, final Services services)
+                throws IllegalArgumentException {
+            final Map<List<AbstractUpdateLoc>, List<Term>> result = new LinkedHashMap<>();
 
             for (final InfFlowSpec ifspec : infFlowSpecs) {
                 final List<AbstractUpdateLoc> detlist = new ArrayList<>();
@@ -525,7 +545,7 @@ public class AbstractExecutionContractUtils {
                 }
 
                 // Assert that determined locations are disjoint
-                for (final List<AbstractUpdateLoc> previousDetLocs : determines.keySet()) {
+                for (final List<AbstractUpdateLoc> previousDetLocs : result.keySet()) {
                     if (!Collections.disjoint(previousDetLocs, detlist)) {
                         throw new IllegalArgumentException(String.format(
                                 "Locations on right-hand side of \\by specification "
@@ -534,18 +554,8 @@ public class AbstractExecutionContractUtils {
                     }
                 }
             }
-        }
 
-        public List<Term> getAccesibles() {
-            return accesibles;
-        }
-
-        public UniqueArrayList<AbstractUpdateLoc> getAssignables() {
-            return assignables;
-        }
-
-        public Map<List<AbstractUpdateLoc>, List<Term>> getDetermines() {
-            return determines;
+            return result;
         }
     }
 
