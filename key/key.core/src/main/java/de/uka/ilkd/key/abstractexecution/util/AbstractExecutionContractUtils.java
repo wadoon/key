@@ -362,8 +362,8 @@ public class AbstractExecutionContractUtils {
                     findRightContract(contracts, collectSurroundingVars(maybeSeqFor), heap,
                             localSpecRepo, services);
 
-            return new AEFrameSpecsInterm(contract.getAccessibleClause(heap),
-                    contract.getAssignable(heap), contract.getInfFlowSpecs());
+            return new AEFrameSpecsInterm(contract.getAssignable(heap),
+                    contract.getAccessibleClause(heap), contract.getInfFlowSpecs());
         }
     }
 
@@ -463,9 +463,9 @@ public class AbstractExecutionContractUtils {
 
         public AEFrameSpecs(AEFrameSpecsInterm intermSpecs, Optional<ExecutionContext> ec,
                 final Services services) {
-            final List<Term> accessiblesList = processAccessibles(intermSpecs, ec, services);
             final UniqueArrayList<AbstractUpdateLoc> assignablesList = processAssignables(
                     intermSpecs, ec, services);
+            final List<Term> accessiblesList = processAccessibles(intermSpecs, ec, services);
             final Map<List<AbstractUpdateLoc>, List<Term>> determines = processIFSpecs(
                     intermSpecs.getDetermines(), assignablesList, accessiblesList, ec, services);
 
@@ -489,8 +489,7 @@ public class AbstractExecutionContractUtils {
         private static UniqueArrayList<AbstractUpdateLoc> processAssignables(
                 AEFrameSpecsInterm intermSpecs, Optional<ExecutionContext> ec,
                 final Services services) {
-            return services.getTermBuilder()
-                    .locsetUnionToSet(intermSpecs.getAssignables()).stream()
+            return services.getTermBuilder().locsetUnionToSet(intermSpecs.getAssignables()).stream()
                     .map(t -> AbstractUpdateFactory.abstrUpdateLocFromTerm(t, ec, services))
                     .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
         }
@@ -507,7 +506,7 @@ public class AbstractExecutionContractUtils {
                         term -> AbstractUpdateFactory.normalizeSelfVarInTerm(term, ec, services))
                         .collect(Collectors.toList());
             }
-            
+
             return accessiblesList;
         }
 
