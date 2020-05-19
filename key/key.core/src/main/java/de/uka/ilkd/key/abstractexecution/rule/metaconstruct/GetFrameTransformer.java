@@ -47,7 +47,8 @@ public class GetFrameTransformer extends AbstractTermTransformer {
 
         final Term frameTerm = AbstractExecutionContractUtils
                 .getAccessibleAndAssignableTermsForNoBehaviorContract(ape, Optional.empty(),
-                        localSpecRepo, services).second;
+                        localSpecRepo, services)
+                .getAssignables();
 
         return AbstractUpdateFactory.normalizeSelfVarInTerm(frameTerm, executionContext, services);
     }

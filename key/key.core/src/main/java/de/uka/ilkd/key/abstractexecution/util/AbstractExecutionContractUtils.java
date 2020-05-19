@@ -12,14 +12,19 @@
 //
 package de.uka.ilkd.key.abstractexecution.util;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.UniqueArrayList;
 
 import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
@@ -44,7 +49,8 @@ import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
  * Utility methods for finding abstract execution contracts and retrieving
@@ -70,7 +76,7 @@ public class AbstractExecutionContractUtils {
             ProgramElement context, GoalLocalSpecificationRepository localSpecRepo,
             Services services) {
         return getAccessibleAndAssignableTermsForNoBehaviorContract(aps, context, localSpecRepo,
-                services).first;
+                services).getAccesibles();
     }
 
     /**
@@ -109,7 +115,7 @@ public class AbstractExecutionContractUtils {
             AbstractProgramElement aps, ProgramElement context,
             GoalLocalSpecificationRepository localSpecRepo, Services services) {
         return getAccessibleAndAssignableTermsForNoBehaviorContract(aps, context, localSpecRepo,
-                services).second;
+                services).getAssignables();
     }
 
     /**
@@ -308,7 +314,7 @@ public class AbstractExecutionContractUtils {
      * @return A pair of (1) the accessible and (2) the assignable locations for the
      *         {@link AbstractProgramElement}.
      */
-    public static Pair<List<Term>, UniqueArrayList<AbstractUpdateLoc>> getAccessibleAndAssignableTermsForNoBehaviorContract(
+    public static AEFrameSpecs getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractProgramElement abstrStmt, final ProgramElement contextProgram,
             GoalLocalSpecificationRepository localSpecRepo, final Services services) {
         final ProgramVariableCollector pvColl = //
@@ -341,14 +347,14 @@ public class AbstractExecutionContractUtils {
      * @return A pair of (1) the accessible terms and (2) the assignable locations
      *         for the {@link AbstractProgramElement}.
      */
-    public static Pair<Term, Term> getAccessibleAndAssignableTermsForNoBehaviorContract(
+    public static AEFrameSpecsInterm getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractProgramElement abstrStmt, final Optional<SequentFormula> maybeSeqFor,
             GoalLocalSpecificationRepository localSpecRepo, final Services services) {
         final List<BlockContract> contracts = //
                 getNoBehaviorContracts(abstrStmt, localSpecRepo, services);
 
         if (contracts.isEmpty()) {
-            return new Pair<>(services.getTermBuilder().allLocs(),
+            return new AEFrameSpecsInterm(services.getTermBuilder().allLocs(),
                     services.getTermBuilder().allLocs());
         } else {
             final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
@@ -356,38 +362,9 @@ public class AbstractExecutionContractUtils {
                     findRightContract(contracts, collectSurroundingVars(maybeSeqFor), heap,
                             localSpecRepo, services);
 
-            return new Pair<>(contract.getAccessibleClause(heap), contract.getAssignable(heap));
+            return new AEFrameSpecsInterm(contract.getAccessibleClause(heap),
+                    contract.getAssignable(heap), contract.getInfFlowSpecs());
         }
-    }
-
-    /**
-     * Extracts the accessible and assignable locations for the given
-     * {@link AbstractProgramElement} based on the current context from the
-     * {@link SpecificationRepository}. The default for both is allLocs (everything
-     * assignable and accessible).
-     *
-     * @param abstrStmt       The {@link AbstractProgramElement} for which to
-     *                        extract the accessible and assignable clause.
-     * @param localSpecRepo   TODO
-     * @param services        The {@link Services} object.
-     * @param surroundingVars {@link LocationVariable}s in the context to
-     *                        distinguish several contracts.
-     * @return A pair of (1) the accessible terms and (2) the assignable locations
-     *         for the {@link AbstractProgramElement}.
-     */
-    public static Pair<List<Term>, UniqueArrayList<Term>> getAccessibleAndAssignableTermListsForNoBehaviorContract(
-            final AbstractProgramElement abstrStmt, final Optional<SequentFormula> maybeSeqFor,
-            GoalLocalSpecificationRepository localSpecRepo, final Services services) {
-        final Pair<Term, Term> accAndAssgnTerms = getAccessibleAndAssignableTermsForNoBehaviorContract(
-                abstrStmt, maybeSeqFor, localSpecRepo, services);
-
-        List<Term> accessibleClause = services.getTermBuilder()
-                .locsetUnionToSet(accAndAssgnTerms.first).stream().collect(Collectors.toList());
-        UniqueArrayList<Term> assignableClause = services.getTermBuilder()
-                .locsetUnionToSet(accAndAssgnTerms.second).stream()
-                .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
-
-        return new Pair<>(accessibleClause, assignableClause);
     }
 
     /**
@@ -408,27 +385,30 @@ public class AbstractExecutionContractUtils {
      * @return A pair of (1) the accessible terms and (2) the assignable locations
      *         for the {@link AbstractProgramElement}.
      */
-    public static Pair<List<Term>, UniqueArrayList<AbstractUpdateLoc>> getAccessibleAndAssignableLocsForNoBehaviorContract(
+    public static AEFrameSpecs getAccessibleAndAssignableLocsForNoBehaviorContract(
             final AbstractProgramElement abstrStmt, final Optional<SequentFormula> maybeSeqFor,
             Optional<ExecutionContext> executionContext,
             GoalLocalSpecificationRepository localSpecRepo, final Services services) {
-        final Pair<List<Term>, UniqueArrayList<Term>> termResult = //
-                getAccessibleAndAssignableTermListsForNoBehaviorContract(abstrStmt, maybeSeqFor,
-                        localSpecRepo, services);
+        final AEFrameSpecsInterm termResult = getAccessibleAndAssignableTermsForNoBehaviorContract(
+                abstrStmt, maybeSeqFor, localSpecRepo, services);
 
-        final UniqueArrayList<AbstractUpdateLoc> assignableLocs = termResult.second.stream().map(
-                t -> AbstractUpdateFactory.abstrUpdateLocFromTerm(t, executionContext, services))
+        final UniqueArrayList<AbstractUpdateLoc> assignableLocs = services.getTermBuilder()
+                .locsetUnionToSet(termResult.getAssignables()).stream()
+                .map(t -> AbstractUpdateFactory.abstrUpdateLocFromTerm(t, executionContext,
+                        services))
                 .collect(Collectors.toCollection(() -> new UniqueArrayList<>()));
+        final List<Term> accessibleClause = services.getTermBuilder()
+                .locsetUnionToSet(termResult.getAccesibles()).stream().collect(Collectors.toList());
 
-        List<Term> accessiblesList = termResult.first;
+        List<Term> accessiblesList = accessibleClause;
         if (executionContext.isPresent()) {
-            accessiblesList = termResult.first.stream().map(term -> AbstractUpdateFactory
+            accessiblesList = accessibleClause.stream().map(term -> AbstractUpdateFactory
                     .normalizeSelfVarInTerm(term, executionContext, services))
                     .collect(Collectors.toList());
         }
 
-        return new Pair<List<Term>, UniqueArrayList<AbstractUpdateLoc>>(accessiblesList,
-                assignableLocs);
+        return new AEFrameSpecs(accessiblesList, assignableLocs, termResult.determines,
+                executionContext, services);
     }
 
     /**
@@ -497,6 +477,107 @@ public class AbstractExecutionContractUtils {
                  * consider the precondition.
                  */
                 .collect(Collectors.toList());
+    }
+
+    public static class AEFrameSpecs {
+        private final UniqueArrayList<AbstractUpdateLoc> assignables;
+        private final List<Term> accesibles;
+        private final Map<List<AbstractUpdateLoc>, List<Term>> determines;
+
+        public AEFrameSpecs(List<Term> accesibles, UniqueArrayList<AbstractUpdateLoc> assignables,
+                Map<List<AbstractUpdateLoc>, List<Term>> determines) {
+            this.assignables = assignables;
+            this.accesibles = accesibles;
+            this.determines = determines;
+        }
+
+        public AEFrameSpecs(List<Term> accesibles, UniqueArrayList<AbstractUpdateLoc> assignables,
+                ImmutableList<InfFlowSpec> infFlowSpecs, Optional<ExecutionContext> ec,
+                final Services services) {
+            this.assignables = assignables;
+            this.accesibles = accesibles;
+            this.determines = new LinkedHashMap<>();
+
+            for (final InfFlowSpec ifspec : infFlowSpecs) {
+                final List<AbstractUpdateLoc> detlist = new ArrayList<>();
+                final List<Term> bylist = new ArrayList<>();
+
+                for (final AbstractUpdateLoc detloc : ifspec.postExpressions.stream()
+                        .map(t -> AbstractUpdateFactory.abstrUpdateLocFromTerm(t, ec, services))
+                        .collect(Collectors.toList())) {
+                    if (!assignables.contains(detloc)) {
+                        throw new IllegalArgumentException(String.format(
+                                "Location %s of determines clause not contained in assignables list",
+                                detloc));
+                    }
+
+                    detlist.add(detloc);
+                }
+
+                for (final Term byloc : ifspec.preExpressions) {
+                    if (!accesibles.contains(byloc)) {
+                        throw new IllegalArgumentException(String.format(
+                                "Location %s of determines (\\by) clause not contained in assignables list",
+                                byloc));
+                    }
+
+                    bylist.add(byloc);
+                }
+
+                // Assert that determined locations are disjoint
+                for (final List<AbstractUpdateLoc> previousDetLocs : determines.keySet()) {
+                    if (!Collections.disjoint(previousDetLocs, detlist)) {
+                        throw new IllegalArgumentException(String.format(
+                                "Locations on right-hand side of \\by specification "
+                                        + "in determines clause have to be disjoint in AE, given: %s and %s",
+                                previousDetLocs.toString(), detlist.toString()));
+                    }
+                }
+            }
+        }
+
+        public List<Term> getAccesibles() {
+            return accesibles;
+        }
+
+        public UniqueArrayList<AbstractUpdateLoc> getAssignables() {
+            return assignables;
+        }
+
+        public Map<List<AbstractUpdateLoc>, List<Term>> getDetermines() {
+            return determines;
+        }
+    }
+
+    public static class AEFrameSpecsInterm {
+        private final Term assignables;
+        private final Term accesibles;
+        private final ImmutableList<InfFlowSpec> determines;
+
+        public AEFrameSpecsInterm(Term assignables, Term accesibles) {
+            this.assignables = assignables;
+            this.accesibles = accesibles;
+            this.determines = ImmutableSLList.<InfFlowSpec>nil();
+        }
+
+        public AEFrameSpecsInterm(Term assignables, Term accesibles,
+                ImmutableList<InfFlowSpec> determines) {
+            this.assignables = assignables;
+            this.accesibles = accesibles;
+            this.determines = determines;
+        }
+
+        public Term getAssignables() {
+            return assignables;
+        }
+
+        public Term getAccesibles() {
+            return accesibles;
+        }
+
+        public ImmutableList<InfFlowSpec> getDetermines() {
+            return determines;
+        }
     }
 
 }

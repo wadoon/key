@@ -13,15 +13,12 @@
 
 package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
-import java.util.List;
 import java.util.Optional;
-
-import org.key_project.util.collection.UniqueArrayList;
 
 import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils.AEFrameSpecs;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
@@ -33,7 +30,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * Instantiates a parametric skolem update for abstract execution. The update
@@ -70,13 +66,15 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
         final TermBuilder tb = services.getTermBuilder();
         final Services services1 = services;
 
-        final Pair<List<Term>, UniqueArrayList<AbstractUpdateLoc>> accessibleAndAssignableClause = //
+        final AEFrameSpecs accessibleAndAssignableClause = //
                 AbstractExecutionContractUtils.getAccessibleAndAssignableLocsForNoBehaviorContract(
                         ape, matchCond.getMaybeSeqFor(), executionContext,
                         goal.getLocalSpecificationRepository(), services1);
 
-        final Term update = tb.abstractUpdate(ape, accessibleAndAssignableClause.second,
-                accessibleAndAssignableClause.first);
+        final Term update = tb.abstractUpdate(ape, accessibleAndAssignableClause.getAssignables(),
+                accessibleAndAssignableClause.getAccesibles());
+        
+        // TODO (DS, 2020-05-18): Create different updates depending on flow specs 
 
         return matchCond.setInstantiations(svInst.add(this.updateSV, update, services));
     }
