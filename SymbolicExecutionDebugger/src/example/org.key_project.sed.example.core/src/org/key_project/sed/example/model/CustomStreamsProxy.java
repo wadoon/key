@@ -3,6 +3,8 @@ package org.key_project.sed.example.model;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.debug.core.model.IStreamsProxy;
@@ -16,7 +18,7 @@ public class CustomStreamsProxy implements IStreamsProxy, IStreamsProxy2 {
    /**
     * The encoding used by default.
     */
-   public static final String DEFAULT_ENCODING = "UTF-8";
+   public static final Charset DEFAULT_ENCODING = StandardCharsets.UTF_8;
    
    /**
     * The used {@link IStreamMonitor} for the error stream.

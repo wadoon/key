@@ -95,13 +95,8 @@ public class ExampleLaunchConfigurationDelegate extends LaunchConfigurationDeleg
        launch.addDebugTarget(target);
        
        // Add a process to make the console available. If no console is needed, just add no process.
-       try {
-          InputStream outContent = new ByteArrayInputStream("Hello SED Example!".getBytes(CustomStreamsProxy.DEFAULT_ENCODING));
-          launch.addProcess(new SameJVMProcess(launch, "Current JVM Wrapper", outContent, null, null));
-       }
-       catch (UnsupportedEncodingException e) {
-          throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage(), e));
-       }
+       InputStream outContent = new ByteArrayInputStream("Hello SED Example!".getBytes(CustomStreamsProxy.DEFAULT_ENCODING));
+       launch.addProcess(new SameJVMProcess(launch, "Current JVM Wrapper", outContent, null, null));
     }
     
     /**

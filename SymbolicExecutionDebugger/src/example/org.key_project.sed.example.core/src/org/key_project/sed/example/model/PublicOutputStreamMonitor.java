@@ -1,6 +1,7 @@
 package org.key_project.sed.example.model;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import org.eclipse.debug.internal.core.OutputStreamMonitor;
 
@@ -15,7 +16,7 @@ public class PublicOutputStreamMonitor extends OutputStreamMonitor {
     * @param stream The Input stream to read from
     * @param encoding The Stream encoding or {@code null} for system default.
     */
-   public PublicOutputStreamMonitor(InputStream stream, String encoding) {
+   public PublicOutputStreamMonitor(InputStream stream, Charset encoding) {
       super(stream, encoding);
    }
 
