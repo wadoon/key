@@ -15,6 +15,7 @@ package de.uka.ilkd.key.abstractexecution.rule;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -29,7 +30,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
@@ -48,7 +49,6 @@ public class ReorderAbstractUpdatesRuleApp extends DefaultBuiltInRuleApp {
     private ImmutableList<PosInOccurrence> ifInsts = ImmutableSLList.<PosInOccurrence>nil();
     private boolean complete = false;
     private Optional<Term> simplifiedTerm = Optional.empty();
-    private PosInOccurrence pioToReplace = null;
 
     // ///////////////////////////////////////////////// //
     // //////////////// PUBLIC INTERFACE /////////////// //
@@ -91,92 +91,83 @@ public class ReorderAbstractUpdatesRuleApp extends DefaultBuiltInRuleApp {
         final Services services = goal.proof().getServices();
         final TermBuilder tb = services.getTermBuilder();
 
-        PosInOccurrence parallelUpdPio = posInOccurrence();
-        do {
-            parallelUpdPio = parallelUpdPio.up();
-        } while (!parallelUpdPio.isTopLevel()
-                && parallelUpdPio.up().subTerm().op() == UpdateJunctor.PARALLEL_UPDATE);
+        final List<Term> elementaries = MergeRuleUtils.getElementaryUpdates(
+                UpdateApplication.getUpdate(posInOccurrence().subTerm()), false, tb);
 
-        pioToReplace = parallelUpdPio;
+        List<Term> sorted = new ArrayList<>(elementaries);
 
-        final List<Term> elementaries = MergeRuleUtils
-                .getElementaryUpdates(parallelUpdPio.subTerm(), false, tb);
+        for (final Term abstrUpdTerm : elementaries.stream()
+                .filter(t -> t.op() instanceof AbstractUpdate).collect(Collectors.toList())) {
+            // Elements before the abstract update:
+            // - dependent ones which did not originally occur later
+            // - independent ones dominated by another update
+            // - independent ASs that are lexicographically smaller
+            final List<Term> beforeList = new ArrayList<>();
 
-        int abstrUpdPos = elementaries.lastIndexOf(posInOccurrence().subTerm());
-        assert abstrUpdPos != -1;
+            // Elements before the abstract update:
+            // - independent ones
+            // - dependent ones that originally occurred later
+            final List<Term> afterList = new ArrayList<>();
 
-        while (abstrUpdPos > 0) {
-            if (canSwap( //
-                    elementaries.get(abstrUpdPos - 1), //
-                    elementaries.get(abstrUpdPos), //
-                    goal, services)) {
-                final Term tmp = elementaries.get(abstrUpdPos - 1);
-                elementaries.set(abstrUpdPos - 1, elementaries.get(abstrUpdPos));
-                elementaries.set(abstrUpdPos, tmp);
-                abstrUpdPos--;
-                complete = true;
-            } else {
-                break;
+            final int abstrUpdTermIdx = sorted.indexOf(abstrUpdTerm);
+
+            Outer: for (int i = 0; i < abstrUpdTermIdx; i++) {
+                final Term otherUpdTerm = sorted.get(i);
+
+                if (independent(abstrUpdTerm, otherUpdTerm, goal, services)) {
+                    if (otherUpdTerm.op() instanceof AbstractUpdate
+                            && ((AbstractUpdate) otherUpdTerm.op())
+                                    .getAbstractPlaceholderStatement().getId()
+                                    .compareTo(((AbstractUpdate) abstrUpdTerm.op())
+                                            .getAbstractPlaceholderStatement().getId()) <= 0) {
+                        beforeList.add(otherUpdTerm);
+                    } else {
+                        // Check domination by other update
+                        for (int j = i + 1; j < abstrUpdTermIdx; j++) {
+                            if (!independent(otherUpdTerm, sorted.get(j), goal, services)) {
+                                beforeList.add(otherUpdTerm);
+                                continue Outer;
+                            }
+                        }
+                        
+                        afterList.add(otherUpdTerm);
+                    }
+                } else {
+                    beforeList.add(otherUpdTerm);
+                }
             }
+
+            for (int i = abstrUpdTermIdx + 1; i < sorted.size(); i++) {
+                afterList.add(sorted.get(i));
+            }
+
+            sorted = new ArrayList<>(beforeList);
+            sorted.add(abstrUpdTerm);
+            sorted.addAll(afterList);
         }
 
-        if (!complete) {
+        if (sorted.equals(elementaries)) {
             ifInsts = ImmutableSLList.<PosInOccurrence>nil();
         } else {
-            simplifiedTerm = Optional.of(
-                    tb.parallel(elementaries.stream().collect(ImmutableSLList.toImmutableList())));
+            complete = true;
+            simplifiedTerm = Optional.of(tb.apply(
+                    tb.parallel(sorted.stream().collect(ImmutableSLList.toImmutableList())),
+                    UpdateApplication.getTarget(posInOccurrence().subTerm())));
         }
 
         return this;
-    }
-
-    /**
-     * @return the pioToReplace
-     */
-    public PosInOccurrence getPioToReplace() {
-        return pioToReplace;
     }
 
     // ///////////////////////////////////////////////// //
     // //////////////// PRIVATE METHODS //////////////// //
     // ///////////////////////////////////////////////// //
 
-    /**
-     * Decides whether the two updates can be swapped. Only possible if
-     * lexicographic order of updates is not violated, and the assignables don't
-     * interfere (there are no conflicts). As a side effect, {@link #ifInsts} is
-     * adapted with used premises in case the updates can be swapped.
-     * 
-     * @param otherUpdTerm The other update term.
-     * @param abstrUpdTerm The abstract update term.
-     * @param goal         The context {@link Goal}.
-     * @param services     The {@link Services} object.
-     * @return true iff the updates can be safely swapped.
-     */
-    private boolean canSwap(final Term otherUpdTerm, final Term abstrUpdTerm, final Goal goal,
+    protected boolean independent(final Term upd1, final Term upd2, final Goal goal,
             final Services services) {
-        assert abstrUpdTerm.op() instanceof AbstractUpdate;
-
-        /*
-         * Can swap if (1) otherUpdTerm is *not* an abstract update with a lexically
-         * smaller identifier, and (2) the assignables of the two updates are
-         * independent. Note that the "accessibles" are irrelevant, since the update is
-         * parallel, so neither update influences the right-hand side of the other.
-         */
-
-        final AbstractUpdate abstrUpd = (AbstractUpdate) abstrUpdTerm.op();
-        final Operator otherOp = otherUpdTerm.op();
-
-        if (otherOp instanceof AbstractUpdate && //
-                ((AbstractUpdate) otherOp).getUpdateName()
-                        .compareTo(abstrUpd.getUpdateName()) < 0) {
-            return false;
-        }
-
         final List<AbstractUpdateLoc> assignablesLeft = //
-                getAssignablesFromElementaryUpdate(otherUpdTerm, services);
+                getAssignablesFromElementaryUpdate(upd2, services);
         final List<AbstractUpdateLoc> assignablesRight = //
-                getAssignablesFromElementaryUpdate(abstrUpdTerm, services);
+                getAssignablesFromElementaryUpdate(upd1, services);
 
         for (final AbstractUpdateLoc leftAssignable : assignablesLeft) {
             // Disjointness is commutative, so this direction suffices.
@@ -193,7 +184,7 @@ public class ReorderAbstractUpdatesRuleApp extends DefaultBuiltInRuleApp {
      * elementary concrete update, or abstract update).
      * 
      * @param updateTerm The update {@link Term} from which to extract.
-     * @param services The {@link Services} object.
+     * @param services   The {@link Services} object.
      * @return The extracted {@link AbstractUpdateLoc}s.
      */
     private static List<AbstractUpdateLoc> //

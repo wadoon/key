@@ -1253,7 +1253,7 @@ public final class MiscTools {
 
     /**
      * Replaces in the given {@link Term}
-     * <code>term> the position indicated by the <code>index</code>-th suffix in
+     * <code>term</code> the position indicated by the <code>index</code>-th suffix in
      * <code>pit</code> by <code>replacement</code>. The first <code>index</code>
      * entries in pit are ignored, in other words.
      * 

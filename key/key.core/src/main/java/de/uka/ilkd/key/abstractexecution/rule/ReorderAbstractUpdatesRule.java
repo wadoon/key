@@ -19,8 +19,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleAbortException;
@@ -58,9 +59,9 @@ public class ReorderAbstractUpdatesRule implements BuiltInRule {
         final SequentFormula oldSeqFor = app.posInOccurrence().sequentFormula();
         final SequentFormula newSeqFor = new SequentFormula(
                 MiscTools.replaceInTerm(oldSeqFor.formula(), app.getSimplifiedTerm().get(), 0,
-                        app.getPioToReplace().posInTerm(), services));
+                        app.posInOccurrence().posInTerm(), services));
 
-        newGoals.head().changeFormula(newSeqFor, app.getPioToReplace());
+        newGoals.head().changeFormula(newSeqFor, app.posInOccurrence());
 
         return newGoals;
     }
@@ -71,26 +72,21 @@ public class ReorderAbstractUpdatesRule implements BuiltInRule {
             return false;
         }
 
-        // Selection has to be an abstract update inside a parallel update
-        if (!(pio.subTerm().op() instanceof AbstractUpdate)) {
+        // Selection has to be an update application of a parallel update including an
+        // abstract update
+        if (!(pio.subTerm().op() instanceof UpdateApplication)) {
             return false;
         }
 
-        if (pio.up().subTerm().op() != UpdateJunctor.PARALLEL_UPDATE) {
+        final Term update = UpdateApplication.getUpdate(pio.subTerm());
+
+        if (!MergeRuleUtils.isUpdateNormalForm(update, true)) {
             return false;
         }
 
-        PosInOccurrence parallelUpdPio = pio;
-        do {
-            parallelUpdPio = parallelUpdPio.up();
-        } while (!parallelUpdPio.isTopLevel()
-                && parallelUpdPio.up().subTerm().op() == UpdateJunctor.PARALLEL_UPDATE);
-
-        if (!MergeRuleUtils.isUpdateNormalForm(parallelUpdPio.subTerm(), true)) {
-            return false;
-        }
-        
-        return true;
+        return MergeRuleUtils
+                .getElementaryUpdates(update, false, goal.proof().getServices().getTermBuilder())
+                .stream().map(Term::op).anyMatch(AbstractUpdate.class::isInstance);
 
 //        /*
 //         * Now the lengthy check... Try to create an app. Note that we could also return
