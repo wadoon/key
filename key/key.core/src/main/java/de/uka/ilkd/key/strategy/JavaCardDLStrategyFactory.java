@@ -256,6 +256,15 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
     public static final String TOOL_TIP_BACKGROUND_NORMALIZATION_ENABLED = "<html>"
             + "Compute normalization of formulas by algorithms in background."
             + "</html>";
+    public static final String TOOL_TIP_NORMALIZATION_RULES_ENABLED = "<html>"
+            + "Enable formula normalization rules with default cost."
+            + "</html>";
+    public static final String TOOL_TIP_NORMALIZATION_RULES_DISABLED = "<html>"
+            + "Disable formula normalization rules."
+            + "</html>";
+    public static final String TOOL_TIP_NORMALIZATION_RULES_EXPENSIVE = "<html>"
+            + "Enable formula normalization rules with expensive cost."
+            + "</html>";
     public static final String TOOL_TIP_AUTO_INDUCTION_ON = "<html>"
             + "Create an inductive proof for formulas of the form:<br>"
             + "      ==>  \\forall int i; 0&lt;=i->phi <br>"
@@ -493,6 +502,20 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         "Enabled", TOOL_TIP_BACKGROUND_NORMALIZATION_ENABLED));
     }
 
+    private static OneOfStrategyPropertyDefinition getNormalizationRules() {
+        return new OneOfStrategyPropertyDefinition(
+                StrategyProperties.NORMALIZATION_RULES_OPTIONS_KEY, "Normalization Rules", 2,
+                new StrategyPropertyValueDefinition(
+                        StrategyProperties.NORMALIZATION_RULES_DISABLED,
+                        "Disabled", TOOL_TIP_NORMALIZATION_RULES_DISABLED),
+                new StrategyPropertyValueDefinition(
+                        StrategyProperties.NORMALIZATION_RULES_ENABLED,
+                        "Enabled", TOOL_TIP_NORMALIZATION_RULES_ENABLED),
+                new StrategyPropertyValueDefinition(
+                        StrategyProperties.NORMALIZATION_RULES_EXPENSIVE,
+                        "Expensive", TOOL_TIP_NORMALIZATION_RULES_EXPENSIVE));
+    }
+
     private static OneOfStrategyPropertyDefinition getClassAxiom() {
         return new OneOfStrategyPropertyDefinition(
                         StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
@@ -587,6 +610,7 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
         final OneOfStrategyPropertyDefinition arithmeticTreatment = getArithmeticTreatment();
         final OneOfStrategyPropertyDefinition quantifierTreatment = getQuantifierTreatment();
         final OneOfStrategyPropertyDefinition backgroundNormalization = getBackgroundNormalization();
+        final OneOfStrategyPropertyDefinition normalizationRules = getNormalizationRules();
         final OneOfStrategyPropertyDefinition classAxiom = getClassAxiom();
         final OneOfStrategyPropertyDefinition autoInduction = getAutoInduction();
         final OneOfStrategyPropertyDefinition userOptions = getUserOptions();
@@ -595,6 +619,6 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                 proofSplitting, loopTreatment, blockTreatment, methodTreatment,
                 mergePointStatementTreatment, dependencyContracts,
                 queryTreatment, arithmeticTreatment, quantifierTreatment, backgroundNormalization,
-                classAxiom, autoInduction, userOptions);
+                normalizationRules, classAxiom, autoInduction, userOptions);
     }
 }

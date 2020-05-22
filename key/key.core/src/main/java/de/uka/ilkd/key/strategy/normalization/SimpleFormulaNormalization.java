@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.LinkedHashMap;
@@ -16,7 +17,7 @@ import java.util.LinkedHashSet;
 
 public class SimpleFormulaNormalization {
 
-    private final TacletApp app;
+    private final Node node;
     private final TermBuilder termBuilder;
     private final TermFactory termFactory;
     private final boolean skolemizeEx;
@@ -51,10 +52,10 @@ public class SimpleFormulaNormalization {
      * @param skolemizeEX skolemize existential quantifiers
      * @param renameFirst rename first quantified variable
      */
-    public SimpleFormulaNormalization(TacletApp app, TermBuilder termBuilder, TermFactory termFactory,
+    public SimpleFormulaNormalization(Node node, TermBuilder termBuilder, TermFactory termFactory,
                                       boolean skolemizeEX,
                                       boolean renameFirst) {
-        this.app = app;
+        this.node = node;
         this.termBuilder = termBuilder;
         this.termFactory = termFactory;
         this.skolemizeEx = skolemizeEX;
@@ -69,20 +70,14 @@ public class SimpleFormulaNormalization {
 
     private static Term lastFormula;
     private static Term lastResult;
-    private static int bufferedNormalizations = 0;
-    private static long bufferedNormalizationTime = 0;
     private static Object _LOCK = new Object();
 
     public Term getNormalized(Term formula) {
         if(!enabled) return formula;
         synchronized (_LOCK) {
             if(lastFormula == formula)  {
-                if(app != null) {
-                    System.out.println("Adding " +bufferedNormalizations + ", " + bufferedNormalizationTime + " to " +
-                            "ruleApp: " + System.identityHashCode(app));
-                    Statistics.addNormalizations(bufferedNormalizations, bufferedNormalizationTime);
-                    bufferedNormalizations = 0;
-                    bufferedNormalizationTime = 0;
+                if(node != null) {
+                    node.getNodeInfo().incNormCall();
                 }
                 return lastResult;
             }
@@ -92,13 +87,10 @@ public class SimpleFormulaNormalization {
         ts = System.currentTimeMillis() - ts;
 
         synchronized (_LOCK) {
-            if(app != null) {
-                Statistics.addNormalizations(bufferedNormalizations + 1, (ts) + bufferedNormalizationTime);
-                bufferedNormalizationTime = 0;
-                bufferedNormalizations = 0;
-            }else {
-                bufferedNormalizations += 1;
-                bufferedNormalizationTime += ts;
+            if(node != null) {
+                node.getNodeInfo().incNormCall();
+                node.getNodeInfo().incNormExec();
+                node.getNodeInfo().addNormTime(ts);
             }
             lastFormula = formula;
             lastResult = result;

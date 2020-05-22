@@ -1,19 +1,11 @@
 package de.uka.ilkd.key.proof;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.SideProofStatistics;
-import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.ContractRuleApp;
-import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.util.EnhancedStringBuffer;
 import de.uka.ilkd.key.util.Pair;
@@ -30,7 +22,11 @@ public class Statistics {
     public final int interactiveSteps;
     public final int symbExApps;
     public final int quantifierInstantiations;
-    public final int normalizations;
+    public final int heur_call;
+    public final long heur_ms;
+    public final int bg_norm_calls;
+    public final int bg_norm_execs;
+    public final int normRuleApps;
     public final int ossApps;
     public final int mergeRuleApps;
     public final int totalRuleApps;
@@ -39,13 +35,13 @@ public class Statistics {
     public final int operationContractApps;
     public final int blockLoopContractApps;
     public final int loopInvApps;
+    public final long normTimeInMillis;
     public final long autoModeTimeInMillis;
-    public final long normalizationTimeInMillis;
     public final long timeInMillis;
     public final float timePerStepInMillis;
 
-    public static int normalizations_buffer;
-    public static long normalizationTime_buffer;
+
+
 
     private List<Pair<String, String>> summaryList =
                     new ArrayList<Pair<String, String>>(14);
@@ -58,7 +54,11 @@ public class Statistics {
                          int interactiveSteps,
                          int symbExApps,
                          int quantifierInstantiations,
-                         int normalizations,
+                         int heur_call,
+                         long heur_ms,
+                         int bg_norm_calls,
+                         int bg_norm_execs,
+                         int normRuleApps,
                          int ossApps,
                          int mergeRuleApps,
                          int totalRuleApps,
@@ -67,8 +67,8 @@ public class Statistics {
                          int operationContractApps,
                          int blockLoopContractApps,
                          int loopInvApps,
+                         long normTimeInMillis,
                          long autoModeTimeInMillis,
-                         long normalizationTimeInMillis,
                          long timeInMillis,
                          float timePerStepInMillis) {
         this.nodes = nodes;
@@ -76,7 +76,11 @@ public class Statistics {
         this.interactiveSteps = interactiveSteps;
         this.symbExApps = symbExApps;
         this.quantifierInstantiations = quantifierInstantiations;
-        this.normalizations = normalizations;
+        this.heur_call = heur_call;
+        this.heur_ms = heur_ms;
+        this.bg_norm_calls = bg_norm_calls;
+        this.bg_norm_execs = bg_norm_execs;
+        this.normRuleApps = normRuleApps;
         this.ossApps = ossApps;
         this.mergeRuleApps = mergeRuleApps;
         this.totalRuleApps = totalRuleApps;
@@ -85,8 +89,8 @@ public class Statistics {
         this.operationContractApps = operationContractApps;
         this.blockLoopContractApps = blockLoopContractApps;
         this.loopInvApps = loopInvApps;
+        this.normTimeInMillis = normTimeInMillis;
         this.autoModeTimeInMillis = autoModeTimeInMillis;
-        this.normalizationTimeInMillis = normalizationTimeInMillis;
         this.timeInMillis = timeInMillis;
         this.timePerStepInMillis = timePerStepInMillis;
     }
@@ -107,19 +111,21 @@ public class Statistics {
         this.interactiveSteps = tmp.interactive;
         this.symbExApps = tmp.symbExApps;
         this.quantifierInstantiations = tmp.quant;
-        this.normalizations = normalizations_buffer;
-        normalizations_buffer = 0;
+        this.heur_call = tmp.heur_call;
+        this.heur_ms = tmp.heur_ms;
         this.ossApps = tmp.oss;
         this.mergeRuleApps = tmp.mergeApps;
+        this.normRuleApps = tmp.norm;
         this.totalRuleApps = tmp.nodes + tmp.ossCaptured - 1;
         this.smtSolverApps = tmp.smt;
         this.dependencyContractApps = tmp.dep;
         this.operationContractApps = tmp.contr;
         this.blockLoopContractApps = tmp.block;
         this.loopInvApps = tmp.inv;
+        this.bg_norm_calls = tmp.bg_norm_calls;
+        this.bg_norm_execs = tmp.bg_norm_execs;
+        this.normTimeInMillis = tmp.bg_norm_exec_ms;
         this.autoModeTimeInMillis = startNode.proof().getAutoModeTime();
-        this.normalizationTimeInMillis = normalizationTime_buffer;
-        normalizationTime_buffer = 0;
         this.timeInMillis = (System.currentTimeMillis() - startNode.proof().creationTime);
         timePerStepInMillis = nodes <= 1 ? .0f : (autoModeTimeInMillis / (float)(nodes - 1));
 
@@ -136,7 +142,11 @@ public class Statistics {
                               side.interactiveSteps,
                               side.symbExApps,
                               side.quantifierInstantiations,
-                              side.normalizations,
+                              side.heur_call,
+                              side.heur_ms,
+                              side.bg_norm_calls,
+                              side.bg_norm_execs,
+                              side.normRuleApps,
                               side.ossApps,
                               side.mergeRuleApps,
                               side.totalRuleApps,
@@ -146,7 +156,7 @@ public class Statistics {
                               side.blockLoopContractApps,
                               side.loopInvApps,
                               side.autoModeTimeInMillis,
-                              side.normalizationTimeInMillis,
+                              side.normTimeInMillis,
                               System.currentTimeMillis() - creationTime,
                               side.timePerStepInMillis);
     }
@@ -185,7 +195,7 @@ public class Statistics {
         if (time >= 10000L) {
             summaryList.add(new Pair<String, String>("Automode time", time + "ms"));
         }
-        summaryList.add(new Pair<String, String>("Normalization Time", stat.normalizationTimeInMillis + "ms"));
+        summaryList.add(new Pair<String, String>("Normalization Time", stat.normTimeInMillis + "ms"));
         if (stat.nodes > 0) {
             String avgTime = "" + (stat.timePerStepInMillis);
             // round to 3 digits after point
@@ -200,7 +210,9 @@ public class Statistics {
         summaryList.add(new Pair<String, String>("Rule applications", ""));
         summaryList.add(new Pair<String, String>("Quantifier instantiations",
                                                  "" + stat.quantifierInstantiations));
-        summaryList.add(new Pair<String, String>("Normalizations", "" + stat.normalizations));
+        summaryList.add(new Pair<String, String>("Norm Calls", "" + stat.bg_norm_calls));
+        summaryList.add(new Pair<String, String>("Norm Execs", "" + stat.bg_norm_execs));
+        summaryList.add(new Pair<String, String>("Norm Rule Apps", "" + stat.normRuleApps));
         summaryList.add(new Pair<String, String>("One-step Simplifier apps", "" +
                         stat.ossApps));
         summaryList.add(new Pair<String, String>("SMT solver apps", "" +
@@ -244,6 +256,38 @@ public class Statistics {
         return sb.toString();
     }
 
+    private static final HashSet<String> NORMALIZATION_RULE_NAMES = new HashSet<String>() {
+        {
+            add("nnf_ex2all");
+            add("nnf_imp2or");
+            // NNF
+            add("nnf_notAll");
+            add("nnf_notEx");
+            add("nnf_notOr");
+            add("nnf_notAnd");
+            add("nnf_notEqv");
+            add("shift_parent_and");
+            add("shift_parent_or");
+            add("commute_and");
+            add("commute_and_2");
+            add("commute_or");
+            add("commute_or_2");
+            add("cnf_rightDist");
+            add("cnf_eqv");
+            add("ifthenelse_to_or_left");
+            add("ifthenelse_to_or_left2");
+            add("ifthenelese_to_or_right");
+            add("ifthenelse_to_or_right2");
+            add("ifthenelse_to_or_for");
+            add("ifthenelse_to_or_for2");
+            for(int i = 0; i < 5; i++) add("all_pull_out" + i);
+            for(int i = 0; i < 5; i++) add("ex_pull_out" + i);
+
+
+
+        }
+    };
+
     /**
      * Helper class to add up all rule applications for some nodes
      * @author Michael Kirsten
@@ -254,6 +298,11 @@ public class Statistics {
         int interactive = 0; // interactive steps
         int symbExApps = 0; // symbolic execution steps
         int quant = 0; // quantifier instantiations
+        int heur_call = 0;
+        int heur_ms = 0;
+        int norm = 0; // normalization rule applications
+        int bg_norm_calls = 0; // background normalization calls
+        int bg_norm_execs = 0; // background normalization executes
         int oss = 0; // OSS applications
         int mergeApps = 0; // merge rule applications
         int ossCaptured = 0; // rules apps in OSS protocol
@@ -262,6 +311,7 @@ public class Statistics {
         int contr = 0; // functional contract apps
         int block = 0; // block and loop contract apps
         int inv = 0; // loop invariants
+        int bg_norm_exec_ms = 0; // ms of bg norm execution
 
         /**
          * Increment numbers of rule applications according to given node
@@ -276,6 +326,13 @@ public class Statistics {
             branches += childBranches(node);
             interactive += interactiveRuleApps(node, interactiveAppsDetails);
             symbExApps += NodeInfo.isSymbolicExecutionRuleApplied(node) ? 1 : 0;
+
+            NodeInfo info = node.getNodeInfo();
+            bg_norm_calls += info.bg_norm_calls;
+            bg_norm_execs += info.bg_norm_execs;
+            bg_norm_exec_ms += info.bg_norm_ms;
+            heur_call += info.heur_call;
+            heur_ms += info.heur_inst_ms;
 
             final RuleApp ruleApp = node.getAppliedRuleApp();
             if (ruleApp != null) {
@@ -295,7 +352,9 @@ public class Statistics {
                 } else if (ruleApp instanceof MergeRuleBuiltInRuleApp) {
                     mergeApps++;
                 } else if (ruleApp instanceof TacletApp) {
-                    quant += tmpQuantificationRuleApps(ruleApp);
+                    TacletApp tacApp = (TacletApp) ruleApp;
+                    norm += tmpNormalizationRuleApps(tacApp);
+                    quant += tmpQuantificationRuleApps(tacApp);
                 }
             }
         }
@@ -355,13 +414,13 @@ public class Statistics {
 
         /**
          * Compute all rule applications regarding quantifiers
-         * @param ruleApp the considered rule application
+         * @param tacApp the considered rule application
          * @return the number of quantifier rules
          */
-        private int tmpQuantificationRuleApps(final RuleApp ruleApp) {
+        private int tmpQuantificationRuleApps(final TacletApp tacApp) {
             final int res;
             final String tName =
-                    ((TacletApp)ruleApp).taclet().name().toString();
+                    tacApp.taclet().name().toString();
             if (tName.startsWith("allLeft")
                     || tName.startsWith("exRight")
                     || tName.startsWith("inst")) {
@@ -372,10 +431,19 @@ public class Statistics {
             return res;
         }
 
-    }
+        /**
+         * Compute all rule applications regarding formula normalization steps
+         * @param tacApp the considered rule application
+         * @return the number of normalization steps
+         */
+        private int tmpNormalizationRuleApps(final TacletApp tacApp) {
+            final String tName = tacApp.taclet().name().toString();
+            //tacApp.taclet().ruleSets().forEachRemaining(rule -> rule.n);
+            if(NORMALIZATION_RULE_NAMES.contains(tName)) {
+                return 1;
+            }
+            return 0;
+        }
 
-    public static void addNormalizations(int norms, long time) {
-        normalizations_buffer += norms;
-        normalizationTime_buffer += time;
     }
 }

@@ -628,8 +628,21 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         setupSystemInvariantSimp(d);
 
-        if (quantifierInstantiatedEnabled()) {
-            setupFormulaNormalisation(d, numbers, locSetLDT);
+        // distinguish cases:
+        // DEFAULT:
+        //   QuantInst ? default setup : infty
+        // DEACTIVATE:
+        //   infty
+        // INCREASED COST:
+        //   default setup + fixed bias
+        //
+        //
+
+        if (quantifierInstantiatedEnabled() && normalizationRulesEnabled()) {
+                setupFormulaNormalisation(d, numbers, locSetLDT);
+                if(normalizationRulesExpensive()) { // TODO  change to delayed
+                    raiseNormalizationCost(d, numbers, locSetLDT);
+                }
         } else {
             bindRuleSet(d, "negationNormalForm", inftyConst());
             bindRuleSet(d, "moveQuantToLeft", inftyConst());
@@ -645,7 +658,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         if(formulaNormalizationEnabled()) {
             SimpleFormulaNormalization.enable();
             // bindRuleSet(d, "notIfNormalization", ifZero(isBelow(ff.quantifiedFor), inftyConst(), longConst(-500)));
-            bindRuleSet(d, "notIfNormalization", inftyConst());
+            // TODO not reset cost where cost made expensive
+            // TODO reset cost where cost made infty
+            //clearRuleSetBindings(d, "notIfNor");
+            // bindRuleSet(d, "notIfNormalization", inftyConst()); is now distinct from bg fn
         }else {
             SimpleFormulaNormalization.disable();
         }
@@ -981,6 +997,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private boolean quantifierInstantiatedEnabled() {
         return !StrategyProperties.QUANTIFIERS_NONE.equals(strategyProperties
                 .getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY));
+    }
+
+    private boolean normalizationRulesEnabled() {
+        return !StrategyProperties.NORMALIZATION_RULES_DISABLED.equals(strategyProperties
+                .getProperty(StrategyProperties.NORMALIZATION_RULES_OPTIONS_KEY));
+    }
+
+    private boolean normalizationRulesExpensive() {
+        return StrategyProperties.NORMALIZATION_RULES_EXPENSIVE.equals(strategyProperties
+                .getProperty(StrategyProperties.NORMALIZATION_RULES_OPTIONS_KEY));
     }
 
     private boolean formulaNormalizationEnabled() {
@@ -1374,6 +1400,32 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 add(pullOutQuantifierAllowed,
                         ifZero(FocusInAntecFeature.INSTANCE, longConst(-40),
                                 longConst(-20))));
+    }
+
+    private void raiseNormalizationCost(RuleSetDispatchFeature d, IntegerLDT numbers, LocSetLDT locSetLDT) {
+        //Feature costRaiser = inftyConst();
+        Feature costRaiser = longConst(5000);
+
+        bindRuleSet(d,"negationNormalForm", costRaiser);
+        bindRuleSet(d,"moveQuantToLeft", costRaiser);
+        bindRuleSet(d,"conjNormalForm", costRaiser);
+        bindRuleSet(d, "setEqualityBlastingRight", costRaiser);
+        bindRuleSet(d,"cnf_setComm", costRaiser);
+        bindRuleSet(d, "elimQuantifier", costRaiser);
+        bindRuleSet(d, "elimQuantifierWithCast", costRaiser);
+        bindRuleSet(d, "apply_equations_andOr", costRaiser);
+        bindRuleSet(d, "distrQuantifier", costRaiser);
+        bindRuleSet(d, "swapQuantifiers", costRaiser);
+        // category "conjunctive normal form"
+        bindRuleSet(d, "cnf_orComm",  costRaiser);
+        bindRuleSet(d, "cnf_orAssoc", costRaiser);
+        bindRuleSet(d, "cnf_andComm",  costRaiser);
+        bindRuleSet(d, "cnf_andAssoc", costRaiser);
+        bindRuleSet(d, "cnf_dist",  costRaiser);
+        bindRuleSet(d, "cnf_expandIfThenElse", costRaiser);
+        bindRuleSet(d, "pullOutQuantifierUnifying", costRaiser);
+        bindRuleSet(d, "pullOutQuantifierAll", costRaiser);
+        bindRuleSet(d, "pullOutQuantifierEx", costRaiser);
     }
 
     private Feature clausesSmallerThan(String smaller, String bigger,

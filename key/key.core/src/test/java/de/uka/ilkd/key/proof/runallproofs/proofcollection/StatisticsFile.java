@@ -68,13 +68,29 @@ public class StatisticsFile implements Serializable {
             @Override
             long getLongValueFromStatistics(Statistics statistics) { return statistics.quantifierInstantiations;}
 
-         }, new LongColumn("#FNorm") {
+         }, new LongColumn("NormRuleApp") {
             @Override
-            long getLongValueFromStatistics(Statistics statistics) { return statistics.normalizations;}
+            long getLongValueFromStatistics(Statistics statistics) { return statistics.normRuleApps;}
+
+         }, new LongColumn("#FNorm (call)") {
+            @Override
+            long getLongValueFromStatistics(Statistics statistics) { return statistics.bg_norm_calls;}
+
+         }, new LongColumn("#FNorm (exec)") {
+            @Override
+            long getLongValueFromStatistics(Statistics statistics) { return statistics.bg_norm_execs;}
 
          }, new LongColumn("t_FNorm (ms)") {
             @Override
-            long getLongValueFromStatistics(Statistics statistics) { return statistics.normalizationTimeInMillis;}
+            long getLongValueFromStatistics(Statistics statistics) { return statistics.normTimeInMillis;}
+
+         }, new LongColumn("H_inst (call)") {
+            @Override
+            long getLongValueFromStatistics(Statistics statistics) { return statistics.heur_call;}
+
+         }, new LongColumn("H_inst (ms)") {
+            @Override
+            long getLongValueFromStatistics(Statistics statistics) { return statistics.heur_ms;}
 
          }, new LongColumn("Overall time (ms)") {
 

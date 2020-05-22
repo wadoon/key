@@ -56,7 +56,7 @@ public class HeuristicInstantiation implements TermGenerator {
         final Term qf = pos.sequentFormula ().formula ();
         if(app instanceof TacletApp) {
             SimpleFormulaNormalization sfn =
-                    new SimpleFormulaNormalization((TacletApp) app, goal.proof().getServices().getTermBuilder(),
+                    new SimpleFormulaNormalization(goal.node(), goal.proof().getServices().getTermBuilder(),
                     goal.proof().getServices().getTermFactory(), false, false);
             Term nf;
             try {
@@ -67,8 +67,7 @@ public class HeuristicInstantiation implements TermGenerator {
                 //return EMPTY;
             }
 
-            final Instantiation ia = Instantiation.create ( nf, goal.sequent(),
-                    goal.proof().getServices() );
+            final Instantiation ia = Instantiation.create ( nf, goal );
             final QuantifiableVariable var =
                     qf.varsBoundHere ( 0 ).last ();
             return new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices());

@@ -90,6 +90,11 @@ public final class StrategyProperties extends Properties {
     public static final String BACKGROUND_NORMALIZATION_ENABLED = "BACKGROUND_NORMALIZATION_ENABLED";
     public static final String BACKGROUND_NORMALIZATION_DISABLED = "BACKGROUND_NORMALIZATION_DISABLED";
 
+    public static final String NORMALIZATION_RULES_OPTIONS_KEY = "NORMALIZATION_RULES_OPTIONS_KEY";
+    public static final String NORMALIZATION_RULES_ENABLED = "NORMALIZATION_RULES_ENABLED";
+    public static final String NORMALIZATION_RULES_EXPENSIVE = "NORMALIZATION_RULES_EXPENSIVE";
+    public static final String NORMALIZATION_RULES_DISABLED = "NORMALIZATION_RULES_DISABLED";
+
     public static final String VBT_PHASE = "VBT_PHASE"; //Used for verification-based testing
     public static final String VBT_SYM_EX = "VBT_SYM_EX";
     public static final String VBT_QUAN_INST = "VBT_QUAN_INST";
@@ -193,6 +198,8 @@ public final class StrategyProperties extends Properties {
         QUANTIFIERS_OPTIONS_KEY, QUANTIFIERS_NONE, QUANTIFIERS_NON_SPLITTING,
         QUANTIFIERS_NON_SPLITTING_WITH_PROGS, QUANTIFIERS_INSTANTIATE,
         BACKGROUND_NORMALIZATION_OPTIONS_KEY, BACKGROUND_NORMALIZATION_ENABLED,  BACKGROUND_NORMALIZATION_DISABLED,
+        NORMALIZATION_RULES_OPTIONS_KEY, NORMALIZATION_RULES_ENABLED, NORMALIZATION_RULES_DISABLED,
+        NORMALIZATION_RULES_EXPENSIVE,
         VBT_PHASE, VBT_SYM_EX, VBT_QUAN_INST, VBT_MODEL_GEN,
         CLASS_AXIOM_OFF, CLASS_AXIOM_DELAYED, CLASS_AXIOM_FREE,
         AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF,
@@ -226,6 +233,7 @@ public final class StrategyProperties extends Properties {
                                QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
         DEFAULT_MAP.setProperty(BACKGROUND_NORMALIZATION_OPTIONS_KEY,
                                 BACKGROUND_NORMALIZATION_DISABLED);
+        DEFAULT_MAP.setProperty(NORMALIZATION_RULES_OPTIONS_KEY, NORMALIZATION_RULES_ENABLED);
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
             DEFAULT_MAP.setProperty(userTacletsOptionsKey(i),
                                    USER_TACLETS_OFF);
@@ -255,6 +263,7 @@ public final class StrategyProperties extends Properties {
         put(OSS_OPTIONS_KEY, DEFAULT_MAP.get(OSS_OPTIONS_KEY));
         put(QUANTIFIERS_OPTIONS_KEY, DEFAULT_MAP.get(QUANTIFIERS_OPTIONS_KEY));
         put(BACKGROUND_NORMALIZATION_OPTIONS_KEY, DEFAULT_MAP.get(BACKGROUND_NORMALIZATION_OPTIONS_KEY));
+        put(NORMALIZATION_RULES_OPTIONS_KEY, DEFAULT_MAP.get(NORMALIZATION_RULES_OPTIONS_KEY));
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
             put(userTacletsOptionsKey(i), DEFAULT_MAP.get(userTacletsOptionsKey(i)));
         }
@@ -288,6 +297,7 @@ public final class StrategyProperties extends Properties {
         sp.put(OSS_OPTIONS_KEY, readSingleOption(p, OSS_OPTIONS_KEY));
         sp.put(QUANTIFIERS_OPTIONS_KEY, readSingleOption(p, QUANTIFIERS_OPTIONS_KEY));
         sp.put(BACKGROUND_NORMALIZATION_OPTIONS_KEY, readSingleOption(p, BACKGROUND_NORMALIZATION_OPTIONS_KEY));
+        sp.put(NORMALIZATION_RULES_OPTIONS_KEY, readSingleOption(p, NORMALIZATION_RULES_OPTIONS_KEY));
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
             sp.put(userTacletsOptionsKey(i), readSingleOption(p, userTacletsOptionsKey(i)));
         }
@@ -365,6 +375,8 @@ public final class StrategyProperties extends Properties {
                            : StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
         sp.setProperty(StrategyProperties.BACKGROUND_NORMALIZATION_OPTIONS_KEY,
                         StrategyProperties.BACKGROUND_NORMALIZATION_DISABLED);
+        sp.setProperty(StrategyProperties.NORMALIZATION_RULES_OPTIONS_KEY,
+                        StrategyProperties.NORMALIZATION_RULES_ENABLED);
         sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
                        aliasChecks ?
                            StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY
@@ -453,6 +465,7 @@ public final class StrategyProperties extends Properties {
               get(QUANTIFIERS_OPTIONS_KEY));
         p.put(STRATEGY_PROPERTY + BACKGROUND_NORMALIZATION_OPTIONS_KEY,
                 get(BACKGROUND_NORMALIZATION_OPTIONS_KEY));
+        p.put(STRATEGY_PROPERTY + NORMALIZATION_RULES_OPTIONS_KEY, get(NORMALIZATION_RULES_OPTIONS_KEY));
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
             p.put(STRATEGY_PROPERTY + userTacletsOptionsKey(i),
                   get(userTacletsOptionsKey(i)));

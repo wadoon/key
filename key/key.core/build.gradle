@@ -104,7 +104,7 @@ task testRunAllProofs(type: Test) {
     group "verification"
     filter { 
         // TODO does not exist any more: includeTestsMatching "RunAllProofsTestSuite"
-        includeTestsMatching "RunAllProofsInfFlow"
+        // includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"
     }
 }

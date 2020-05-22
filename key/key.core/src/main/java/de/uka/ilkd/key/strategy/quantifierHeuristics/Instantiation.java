@@ -16,6 +16,8 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Statistics;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -58,7 +60,9 @@ class Instantiation {
    /** the <code>TriggersSet</code> of this <code>allTerm</code> */
    private final TriggersSet triggersSet;
 
-   private Instantiation(Term allterm, Sequent seq, Services services) {
+   private Instantiation(Term allterm, Goal goal) {
+      Sequent seq = goal.sequent();
+      Services services = goal.proof().getServices();
       firstVar = allterm.varsBoundHere(0).get(0);
       matrix = TriggerUtils.discardQuantifiers(allterm);
       /* Terms bound in every formula on <code>goal</code> */
@@ -71,15 +75,19 @@ class Instantiation {
    private static Sequent lastSequent = null;
    private static Instantiation lastResult = null;
 
-   static Instantiation create(Term qf, Sequent seq, Services services) {	
+   static Instantiation create(Term qf, Goal goal) {
       synchronized(Instantiation.class) {
-         if (qf == lastQuantifiedFormula && seq == lastSequent)
+         if (qf == lastQuantifiedFormula && goal.sequent() == lastSequent) {
             return lastResult;
+         }
       }
-      final Instantiation result = new Instantiation(qf, seq, services);
+      long ts = System.currentTimeMillis();
+      final Instantiation result = new Instantiation(qf, goal);
+      ts = System.currentTimeMillis() - ts;
+      goal.node().getNodeInfo().addHeurInst(ts);
       synchronized(Instantiation.class) {
          lastQuantifiedFormula = qf;
-         lastSequent = seq;
+         lastSequent = goal.sequent();
          lastResult = result;
       }
       return result;
@@ -182,9 +190,8 @@ class Instantiation {
     * Try to find the cost of an instance(inst) according its quantified
     * formula and current goal.
     */
-   static RuleAppCost computeCost(Term inst, Term form, Sequent seq,
-         Services services) {
-      return Instantiation.create(form, seq, services).computeCostHelp(inst);
+   static RuleAppCost computeCost(Term inst, Term form, Goal goal) {
+      return Instantiation.create(form, goal).computeCostHelp(inst);
    }
 
    private RuleAppCost computeCostHelp(Term inst) {
