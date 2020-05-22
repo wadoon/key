@@ -77,6 +77,7 @@ lexer grammar KeYJMLLexer;
     EXCEPTION            : '\\exception';
     EXISTS               : '\\exists';
     FORALL               : '\\forall';
+    FP_ABS               : '\\fp_abs';
     FP_INFINITE          : '\\fp_infinite';
     FP_NAN               : '\\fp_nan';
     FP_NICE              : '\\fp_nice'; //KeY syntactic sugar
