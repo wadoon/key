@@ -30,7 +30,7 @@ public class JavaIntegerSemanticsHelper {
 
     private final TermBuilder tb; 
 
-    private final SLTranslationExceptionManager excManager;
+    private final SLExceptionFactory excManager;
     private final TypeConverter tc;
     private final IntegerLDT integerLDT;
 
@@ -40,7 +40,7 @@ public class JavaIntegerSemanticsHelper {
     //-------------------------------------------------------------------------
 
     public JavaIntegerSemanticsHelper(Services services,
-			    SLTranslationExceptionManager excManager) {
+			    SLExceptionFactory excManager) {
 	assert services != null;
 	//assert excManager != null;
 

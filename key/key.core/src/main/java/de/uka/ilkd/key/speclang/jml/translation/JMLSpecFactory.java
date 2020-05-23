@@ -250,7 +250,7 @@ public class JMLSpecFactory {
     // -------------------------------------------------------------------------
     // internal classes
     // -------------------------------------------------------------------------
-    private static class ContractClauses {
+    public static class ContractClauses {
         public ImmutableList<Term> abbreviations = ImmutableSLList.<Term>nil();
         public Map<LocationVariable, Term> requires = new LinkedHashMap<LocationVariable, Term>();
         public Map<LocationVariable, Term> requiresFree
@@ -273,6 +273,10 @@ public class JMLSpecFactory {
         public Map<LocationVariable, Boolean> hasMod
                 = new LinkedHashMap<LocationVariable, Boolean>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
+
+        public void clear() {
+
+        }
     }
 
     // -------------------------------------------------------------------------

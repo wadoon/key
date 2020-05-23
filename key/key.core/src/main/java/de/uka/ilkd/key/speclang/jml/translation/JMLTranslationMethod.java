@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
+import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
 
 
 /**
@@ -23,7 +23,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
  */
 public interface JMLTranslationMethod {
 
-    public Object translate(SLTranslationExceptionManager excManager,
+    public Object translate(SLExceptionFactory excManager,
                             Object... params)
             throws SLTranslationException;
 }

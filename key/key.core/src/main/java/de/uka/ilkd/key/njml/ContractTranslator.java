@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.njml;
 
+import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -9,8 +10,9 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
+import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.Nullable;
@@ -28,46 +30,20 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("all")
 public class ContractTranslator extends JmlParserBaseVisitor<Object> {
-    private SLTranslationExceptionManager excManager;
+    private SLExceptionFactory exc;
     private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.<PositionedString>nil();
     private ImmutableSLList<String> mods;
     final JMLSpecFactory2 factory;
     private final KeYJavaType kjt;
     private Object currentBehavior;
 
-    private Map<String, List<Contract>> contractClauses = new LinkedHashMap<>();
+    private JMLSpecFactory.ContractClauses contractClauses = new JMLSpecFactory.ContractClauses();
     private List<Term> abbreviations = new ArrayList<>(64);
-
 
     public ContractTranslator(String fileName, Position offsetPos, JMLSpecFactory2 factory, KeYJavaType kjt) throws SLTranslationException {
         this.factory = factory;
         this.kjt = kjt;
-        this.excManager = new SLTranslationExceptionManager(fileName, offsetPos, 0, 0);
-    }
-
-    private PositionedString createPositionedString(String text, Token t) {
-        return excManager.createPositionedString(text, new Position(t.getLine(), t.getCharPositionInLine()));
-    }
-
-    private PositionedString createPositionedString(final String text,
-                                                    final Position pos) {
-        return excManager.createPositionedString(text, pos);
-    }
-
-
-    private void raiseError(String msg) throws SLTranslationException {
-        throw excManager.createException(msg);
-    }
-
-
-    private void raiseNotSupported(String feature) {
-        PositionedString warning = excManager.createPositionedString(feature + " not supported");
-        warnings = warnings.add(warning);
-    }
-
-
-    public ImmutableSet<PositionedString> getWarnings() {
-        return warnings;
+        this.exc = new SLExceptionFactory(fileName, offsetPos, 0, 0);
     }
 
     private PositionedString flipHeaps(String declString, PositionedString result) {
@@ -182,7 +158,7 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
     public ClassAxiom visitClass_axiom(JmlParser.Class_axiomContext ctx) {
         // axiom statements may not be prefixed with any modifiers (see Sect. 8 of the JML reference manual)
         if (!mods.isEmpty())
-            raiseNotSupported("modifiers in axiom clause");
+            exc.raiseNotSupported("modifiers in axiom clause");
         return null;//factory.createJMLClassAxiom(kjt, mods, ctx.expression());
     }
 
@@ -190,7 +166,7 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitInitially_clause(JmlParser.Initially_clauseContext ctx) {
         for (String s : mods) {
             if (!(s.equals("public") || s.equals("private") || s.equals("protected")))
-                raiseNotSupported("modifier " + s + " in initially clause");
+                exc.raiseNotSupported("modifier " + s + " in initially clause");
         }
         return null;// factory.createJMLInitiallyClause(kjt, mods, ctx.expression());
     }
@@ -216,11 +192,6 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitMethodlevel_element(JmlParser.Methodlevel_elementContext ctx) {
         return super.visitMethodlevel_element(ctx);
-    }
-
-    @Override
-    public Object visitAlso_keyword(JmlParser.Also_keywordContext ctx) {
-        return super.visitAlso_keyword(ctx);
     }
 
     //TODO init
@@ -254,7 +225,11 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitSimple_clause(JmlParser.Simple_clauseContext ctx) {
         String type = ctx.simple_clause_keyword().getText();
         Term t = factory.parseExpress(ctx.predornot());
-        return super.visitSimple_clause(ctx);
+        String clause = ctx.simple_clause_keyword().getText();
+        Term term = accept(ctx.predornot());
+        contractClauses.put(clause, term);
+
+        translator.translate(ens.getText(), Term.class, result, services);
     }
 
     @Override
@@ -304,27 +279,57 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitSignals_clause(JmlParser.Signals_clauseContext ctx) {
-        return super.visitSignals_clause(ctx);
+        @init {
+            Term pred = null;
+            String vName = null;
+            LogicVariable eVar = null;
+        }
+        @after{ret=result;}
+:
+        sig=SIGNALS LPAREN excType=referencetype (id=IDENT { vName = id.getText(); })? RPAREN
+        {
+            if (vName != null) {
+                eVar = new LogicVariable(new Name(vName), excType.getSort());
+                resolverManager.pushLocalVariablesNamespace();
+                resolverManager.putIntoTopLocalVariablesNamespace(eVar, excType);
+            }
+        }
+        (result = predornot)?
+                {
+        if (vName != null) {
+            resolverManager.popLocalVariablesNamespace();
+        }
+        result = translator.translate(sig.getText(), Term.class, result, eVar, excVar, excType, services);
+    }
+        ;
+
     }
 
     @Override
     public Object visitSignals_only_clause(JmlParser.Signals_only_clauseContext ctx) {
-        return super.visitSignals_only_clause(ctx);
+        List<Object> types = mapOf(ctx.referencetype());
+        translator.translate(sigo.getText(), Term.class, typeList, this.excVar, services);
+        return null;
     }
 
     @Override
     public Object visitBreaks_clause(JmlParser.Breaks_clauseContext ctx) {
-        return super.visitBreaks_clause(ctx);
+        Label id = accept(ctx.IDENT());
+        Term pred = accept(ctx.predornot());
+        translator.translate(breaks.getText(), Pair.class, pred, label, services);
     }
 
     @Override
     public Object visitContinues_clause(JmlParser.Continues_clauseContext ctx) {
-        return super.visitContinues_clause(ctx);
+        continues=CONTINUES LPAREN (id=IDENT { label = id.getText(); })? RPAREN
+                (pred = predornot)?
+                        result = translator.translate(continues.getText(), Pair.class, pred, label, services);
     }
 
     @Override
     public Object visitReturns_clause(JmlParser.Returns_clauseContext ctx) {
-        return super.visitReturns_clause(ctx);
+        return factory.get(rtrns.getText(), Term.class, result, services);
+
     }
 
     @Override
@@ -402,6 +407,7 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
         return super.visitNowarn_pragma(ctx);
     }
 
+
     @Override
     public Object visitDebug_statement(JmlParser.Debug_statementContext ctx) {
         return super.visitDebug_statement(ctx);
@@ -433,11 +439,6 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
-        return super.visitAssume_statement(ctx);
-    }
-
-    @Override
     public Object visitInitialiser(JmlParser.InitialiserContext ctx) {
         return super.visitInitialiser(ctx);
     }
@@ -461,4 +462,10 @@ public class ContractTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
         return super.visitAssert_statement(ctx);
     }
+
+    @Override
+    public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
+        return super.visitAssume_statement(ctx);
+    }
+
 }

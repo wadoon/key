@@ -23,7 +23,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
-import de.uka.ilkd.key.speclang.jml.translation.JMLTranslator;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
 
@@ -76,5 +75,9 @@ public class JMLSpecFactory2 extends JMLSpecFactory {
             }
         }
         return null;
+    }
+
+    public Term parseExpress(JmlParser.PredornotContext predornot) {
+        return predornot.accept(et);
     }
 }

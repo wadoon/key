@@ -41,7 +41,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  */
 public abstract class SLResolverManager {
     
-    public final SLTranslationExceptionManager excManager;
+    public final SLExceptionFactory excManager;
 
     private ImmutableList<SLExpressionResolver> resolvers 
     	= ImmutableSLList.<SLExpressionResolver>nil();
@@ -60,7 +60,7 @@ public abstract class SLResolverManager {
     //constructors
     //------------------------------------------------------------------------- 
     
-    protected SLResolverManager(SLTranslationExceptionManager excManager, 
+    protected SLResolverManager(SLExceptionFactory excManager,
                                 KeYJavaType specInClass,
                                 ParsableVariable selfVar,
                                 boolean useLocalVarsAsImplicitReceivers,
