@@ -14,13 +14,14 @@ import java.util.Map;
  * @version 1 (5/14/20)
  */
 public class InterpretJml {
-    private ExpressionTranslator exprVisitor;
+    /*
+    private Translator exprVisitor;
 
     public InterpretJml(Services services, KeYJavaType specInClass,
                         ProgramVariable self, ImmutableList<ProgramVariable> paramVars,
                         ProgramVariable result, ProgramVariable exc, Map<LocationVariable, Term> atPres,
                         Map<LocationVariable, Term> atBefores) {
-        exprVisitor = new ExpressionTranslator(
+        exprVisitor = new Translator(
                 services, specInClass, self, paramVars,
                 result, exc, atPres, atBefores);
 
@@ -28,5 +29,5 @@ public class InterpretJml {
 
     public Term parseExpr(String expr) {
         return (Term) JmlFacade.parseExpr(expr).accept(exprVisitor);
-    }
+    }*/
 }

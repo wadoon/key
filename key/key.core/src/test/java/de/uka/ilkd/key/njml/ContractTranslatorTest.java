@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.njml;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -17,14 +16,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.key_project.util.collection.ImmutableSLList;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -85,11 +82,11 @@ public class ContractTranslatorTest {
         if (parser.getNumberOfSyntaxErrors() != 0)
             debugLexer();
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
-        ExpressionTranslator et = new ExpressionTranslator(services, kjt, self, ImmutableSLList.nil(), result, exc,
-                new HashMap<>(), new HashMap<>());
-        JMLSpecFactory2 factory = new JMLSpecFactory2(services, et);
-        ContractTranslator ct = new ContractTranslator("", new Position(0,0), factory, kjt);
-        System.out.println(ctx.accept(ct));
+        //Translator et = new Translator(services, kjt, self, ImmutableSLList.nil(), result, exc,
+        //        new HashMap<>(), new HashMap<>());
+        JmlSpecFactory factory = new JmlSpecFactory(services);
+        //ContractTranslator ct = new ContractTranslator("", new Position(0,0), factory, kjt);
+        //System.out.println(ctx.accept(ct));
     }
 
     private void debugLexer() {

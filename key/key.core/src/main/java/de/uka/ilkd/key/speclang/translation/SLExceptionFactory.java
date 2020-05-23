@@ -67,7 +67,7 @@ public class SLExceptionFactory {
         return updatePosition(context.start);
     }
 
-    private SLExceptionFactory updatePosition(org.antlr.v4.runtime.Token start) {
+    public SLExceptionFactory updatePosition(org.antlr.v4.runtime.Token start) {
         index = start.getStartIndex();
         line = start.getLine();
         column = start.getCharPositionInLine();

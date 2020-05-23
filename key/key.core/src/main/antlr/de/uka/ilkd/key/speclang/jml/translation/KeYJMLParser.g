@@ -72,7 +72,7 @@ options {
     private HeapLDT heapLDT;
     private LocSetLDT locSetLDT;
     private BooleanLDT booleanLDT;
-    private SLTranslationExceptionManager excManager;
+    private SLExceptionFactory excManager;
     private List<PositionedString> warnings = new java.util.ArrayList<PositionedString>();
 
     private JMLTranslator translator;
@@ -110,7 +110,7 @@ options {
         this.locSetLDT      = services.getTypeConverter().getLocSetLDT();
         this.booleanLDT     = services.getTypeConverter().getBooleanLDT();
         this.excManager     =
-            new SLTranslationExceptionManager(this, fileName,
+            new SLExceptionFactory(this, fileName,
                                               new Position(0,0));
         this.translator     = new JMLTranslator(excManager, fileName,
                                                 services);
@@ -189,7 +189,7 @@ options {
     }
 
 
-    public SLTranslationExceptionManager getExceptionManager() {
+    public SLExceptionFactory getExceptionManager() {
         return excManager;
     }
 

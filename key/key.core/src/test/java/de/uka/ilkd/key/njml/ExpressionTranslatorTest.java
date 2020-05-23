@@ -7,9 +7,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import de.uka.ilkd.key.rule.TacletForTests;
-import de.uka.ilkd.key.util.HelperClassForTests;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Assert;
 import org.junit.Before;
@@ -63,15 +61,15 @@ public class ExpressionTranslatorTest {
     @Test
     public void parseAndInterpret() {
         KeYJavaType kjt = new KeYJavaType(Sort.ANY);
-        ProgramVariable self = new LocationVariable(new ProgramElementName("self"), kjt);
-        ProgramVariable result = new LocationVariable(new ProgramElementName("result"), kjt);
-        ProgramVariable exc = new LocationVariable(new ProgramElementName("exc"), kjt);
+        LocationVariable self = new LocationVariable(new ProgramElementName("self"), kjt);
+        LocationVariable result = new LocationVariable(new ProgramElementName("result"), kjt);
+        LocationVariable exc = new LocationVariable(new ProgramElementName("exc"), kjt);
         JmlLexer lexer = JmlFacade.createLexer(expr);
         lexer._mode = JmlLexer.expr;
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
         JmlParser.ExpressionContext ctx = parser.expression();
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
-        ExpressionTranslator et = new ExpressionTranslator(services, kjt, self, ImmutableSLList.nil(), result, exc,
+        Translator et = new Translator(services, kjt, self, ImmutableSLList.nil(), result, exc,
                 new HashMap<>(), new HashMap<>());
         System.out.println(ctx.accept(et));
     }

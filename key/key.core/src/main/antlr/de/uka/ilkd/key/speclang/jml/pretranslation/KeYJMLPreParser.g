@@ -56,7 +56,7 @@ options {
 
 @members {
     private KeYJMLPreLexer lexer;
-    private SLTranslationExceptionManager excManager;
+    private SLExceptionFactory excManager;
     private ImmutableSet<PositionedString> warnings
 	= DefaultImmutableSet.<PositionedString>nil();
 
@@ -66,7 +66,7 @@ options {
                             Position offsetPos) {
 	this(new CommonTokenStream(lexer));
 	this.lexer      = lexer;
-	this.excManager = new SLTranslationExceptionManager(this,
+	this.excManager = new SLExceptionFactory(this,
 							    fileName,
 							    offsetPos);
     }

@@ -45,27 +45,32 @@ spec_header: requires_clause+;*/
 spec_body: a=clause+ (NEST_START inner=clause (also_keyword+ spec_body)* NEST_END)?;
 clause
   :
-  ( simple_clause    | assignable_clause | accessible_clause
-  | signals_clause   | signals_only_clause
-  | variant_function | name_clause
-  | breaks_clause    | continues_clause
-  | returns_clause   | separates_clause  | determines_clause
+  ( ensures_clause   | requires_clause     | measured_by_clause
+  | caputures_clause | diverges_clause     | working_space_clause
+  | duration_clause  | when_clause         | assignable_clause | accessible_clause
+  | signals_clause   | signals_only_clause | variant_function  | name_clause
+  | breaks_clause    | continues_clause    | returns_clause    | separates_clause
+  | determines_clause
   ) SEMI_TOPLEVEL;
 
 // clauses
-simple_clause: simple_clause_keyword predornot;
-simple_clause_keyword:
-  MODEL_METHOD_AXIOM | REQUIRES | ENSURES | MEASURED_BY | DIVERGES | CAPTURES | WORKING_SPACE | DURATION | WHEN
-  ;
-accessible_clause: ACCESSIBLE storeRefUnion ;
-assignable_clause: ASSIGNABLE (storeRefUnion | STRICTLY_NOTHING) ;
+targetHeap : LT ident GT;
+ensures_clause: ENSURES targetHeap? predornot;
+requires_clause: REQUIRES targetHeap? predornot;
+measured_by_clause: MEASURED_BY predornot;
+caputures_clause: CAPTURES predornot;
+diverges_clause: DIVERGES predornot;
+working_space_clause: WORKING_SPACE predornot;
+duration_clause: DURATION predornot;
+when_clause: WHEN predornot;
+accessible_clause: ACCESSIBLE targetHeap? storeRefUnion ;
+assignable_clause: ASSIGNABLE targetHeap? (storeRefUnion | STRICTLY_NOTHING) ;
 depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? ;
 //decreases_clause: DECREASES termexpression (COMMA termexpression)*;
 represents_clause
   : REPRESENTS lhs=expression
     (((LARROW | EQUAL_SINGLE) (rhs=expression|t=storeRefUnion))
     | (SUCH_THAT predicate))
-
   ;
 separates_clause
   : SEPARATES (NOTHING | sep=infflowspeclist)
@@ -86,7 +91,6 @@ determines_clause
     ( (DECLASSIFIES (NOTHING |decl+=infflowspeclist))
     | (ERASES (NOTHING |erases+=infflowspeclist))
     | (NEW_OBJECTS (NOTHING |newObs+=infflowspeclist)))*
-
    ;
 
 loop_determines_clause

@@ -30,13 +30,13 @@ import org.key_project.util.collection.ImmutableList;
  * A factory for creating class invariants and operation contracts from textual JML specifications.
  * This is the public interface to the jml.translation package.
  */
-public class JMLSpecFactory2 extends JMLSpecFactory {
-    public JMLSpecFactory2(Services services, ExpressionTranslator et) {
+public class JmlSpecFactory extends JMLSpecFactory {
+    public JmlSpecFactory(Services services) {
         super(services);
     }
 
     public ClassInvariantImpl createJMLClassInvariant(
-            KeYJavaType kjt, ImmutableList<String> mods, String name, ParserRuleContext expr) {
+            KeYJavaType kjt, ImmutableList<String> mods, String name, Term inv) {
         final boolean isStatic = (mods.contains("static") || // modifier
                 // "static"
                 // in an interface "static" is the default (see Sect. 2.5 of the
@@ -50,8 +50,6 @@ public class JMLSpecFactory2 extends JMLSpecFactory {
         //Term inv = tb.convertToFormula(JMLTranslator.translate(textualInv.getInv(), kjt, selfVar,
         //        null, null, null, null, null, Term.class, services));
 
-        Term inv = parseExpression(expr);
-
         // create invariant
         name = getDefaultInvName(null, kjt);
         String display = getDefaultInvName(name, kjt);
@@ -59,7 +57,7 @@ public class JMLSpecFactory2 extends JMLSpecFactory {
     }
 
     private Term parseExpression(ParserRuleContext expr) {
-        ExpressionTranslator expressionTranslator
+        Translator expressionTranslator
                 = null;// new ExpressionTranslator(services, kjt, self, paramVars, result, exc, atPres, atBefores);
         return (Term) expr.accept(expressionTranslator);
     }
@@ -75,9 +73,5 @@ public class JMLSpecFactory2 extends JMLSpecFactory {
             }
         }
         return null;
-    }
-
-    public Term parseExpress(JmlParser.PredornotContext predornot) {
-        return predornot.accept(et);
     }
 }
