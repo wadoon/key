@@ -84,7 +84,8 @@ public class ApplyUpdateOnParametricValueTermCondition implements VariableCondit
         paramSkLs.sub(0).execPostOrder(opColl);
 
         List<Term> newElemUpdates = new LinkedList<>(elemUpdates);
-        Term newParamSkLsTerm = null;
+        Term newParamSkLsTerm = paramSkLs;
+        boolean success = false;
 
         for (final LocationVariable argVar : opColl.ops().stream()
                 .filter(LocationVariable.class::isInstance).map(LocationVariable.class::cast)
@@ -94,10 +95,11 @@ public class ApplyUpdateOnParametricValueTermCondition implements VariableCondit
             for (int i = newElemUpdates.size() - 1; i >= 0; i--) {
                 final Term elem = newElemUpdates.get(i);
 
-                if (newParamSkLsTerm == null && elem.op() instanceof ElementaryUpdate
+                if (elem.op() instanceof ElementaryUpdate
                         && ((ElementaryUpdate) elem.op()).lhs() == argVar) {
-                    newParamSkLsTerm = GenericTermReplacer.replace(paramSkLs, t -> t.op() == argVar,
-                            t -> elem.sub(0), services);
+                    newParamSkLsTerm = GenericTermReplacer.replace(newParamSkLsTerm,
+                            t -> t.op() == argVar, t -> elem.sub(0), services);
+                    success = true;
                     continue;
                 }
 
@@ -107,7 +109,7 @@ public class ApplyUpdateOnParametricValueTermCondition implements VariableCondit
             newElemUpdates = tmpElemUpdates;
         }
 
-        if (newParamSkLsTerm == null) {
+        if (!success) {
             return null;
         }
 
