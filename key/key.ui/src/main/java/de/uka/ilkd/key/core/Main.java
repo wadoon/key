@@ -191,7 +191,7 @@ public final class Main {
      * directory without show in the chooser on startup.
      * </p>
      */
-    public static boolean showExampleChooserIfExamplesDirIsDefined = true;
+    public static boolean showExampleChooserIfExamplesDirIsDefined = false;
 
     public static void main(final String[] args) {
         Locale.setDefault(Locale.US);

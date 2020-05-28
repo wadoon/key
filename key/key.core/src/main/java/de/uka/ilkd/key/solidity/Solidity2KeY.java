@@ -32,7 +32,7 @@ public class Solidity2KeY {
 		SolidityTranslationVisitor visitor = new SolidityTranslationVisitor();
 		SourceUnitContext solidityAST = parser.sourceUnit();
 		visitor.visit(solidityAST);
-		System.out.println(visitor.getOutput());
+		//System.out.println(visitor.getOutput());
 		return visitor.getOutput();
 	}
 	

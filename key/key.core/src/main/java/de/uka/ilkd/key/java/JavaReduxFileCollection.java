@@ -219,7 +219,7 @@ public class JavaReduxFileCollection implements FileCollection {
             currentURL = KeYResourceManager.getManager().getResourceFile(
                     Recoder2KeY.class, resourceLocation + "/" + currentFileName);
             
-            System.out.println(resourceLocation + "/" + currentFileName);
+            //System.out.println(resourceLocation + "/" + currentFileName);
             
             return true;
         }

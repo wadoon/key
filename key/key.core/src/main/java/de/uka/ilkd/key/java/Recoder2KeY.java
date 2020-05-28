@@ -399,7 +399,6 @@ public class Recoder2KeY implements JavaReader {
                 	if (filename.endsWith(".sol")) {
                 		Solidity2KeY s2k = new Solidity2KeY(filename);
                 		String s = s2k.translate();
-                		System.out.println(s);
                 		fr = new StringReader(s);
                 	} else if (fileRepo != null) {
                         fr = new InputStreamReader(fileRepo.getInputStream(Paths.get(filename)),
