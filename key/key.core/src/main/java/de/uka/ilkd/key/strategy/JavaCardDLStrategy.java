@@ -616,6 +616,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "cut", not(isInstantiated("cutFormula")));
 
+        bindRuleSet(d, "insertClassInvariant", 10000);
         setupUserTaclets(d);
 
         setupArithPrimaryCategories(d);
