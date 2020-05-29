@@ -46,12 +46,16 @@ public class ProofBundleSaver extends ProofSaver {
         /* create a filename for the actual proof file in the FileRepo:
          * We always use the contract name here (preparation for proof bundle
          * -> saving multiple proofs). */
-        String proofFileName = MiscTools.toValidFileName(proof.name().toString() + ".proof");
+        String proofFileName = MiscTools.toValidFileName(ensureEnding(proof.name().toString(), ".proof"));
 
         // save the proof file to the FileRepo (stream is closed by the save method!)
         save(repo.createOutputStream(Paths.get(proofFileName)));
 
         // save proof bundle with the help of the FileRepo
         ((AbstractFileRepo)repo).saveProof(file.toPath());
+    }
+    
+    private static String ensureEnding(final String fileName, final String ending) {
+        return fileName.endsWith(ending) ? fileName : fileName + ending;
     }
 }
