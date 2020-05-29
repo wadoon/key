@@ -6,8 +6,8 @@ public class Functional {
     public int irrelevantAS() {
         int x = 1;
         
-        /*@ assume \dl_disjoint(\dl_frameP, \dl_singletonPV(x)) &&
-          @        \dl_disjoint(\dl_frameP, \dl_singletonPV(\dl_heap)); // Needed for class invariant 
+        /*@ assume \disjoint(\dl_frameP, \dl_singletonPV(\dl_PV(x))) &&
+          @        \disjoint(\dl_frameP, \dl_singletonPV(\dl_PV(\dl_heap))); // Needed for class invariant 
           @*/
         { ; }
         
@@ -17,7 +17,7 @@ public class Functional {
           @ return_behavior requires false;
           @ exceptional_behavior requires false;
           @*/
-        { \abstract_statement P; }
+        \abstract_statement P;
         
         return x;
     }
@@ -29,8 +29,8 @@ public class Functional {
     public int relevantAS() {
         int x = 1;
               
-        /*@ assume //\dl_disjoint(\dl_frameP, \dl_singletonPV(x)) && // <-- Crucial
-          @        \dl_disjoint(\dl_frameP, \dl_singletonPV(\dl_heap)); // Needed for class invariant 
+        /*@ assume //\dl_disjoint(\dl_frameP, \dl_singletonPV(\dl_PV(x))) && // <-- Crucial
+          @        \dl_disjoint(\dl_frameP, \dl_singletonPV(\dl_PV(\dl_heap))); // Needed for class invariant 
           @*/
         { ; }
       
@@ -40,7 +40,7 @@ public class Functional {
           @ return_behavior requires false;
           @ exceptional_behavior requires false;
           @*/
-        { \abstract_statement P; }
+        \abstract_statement P;
       
         return x;
     }
