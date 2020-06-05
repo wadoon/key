@@ -13,7 +13,6 @@
   @   (throwsExcA(\value(footprintA)) || returnsA(\value(footprintA)) ==&gt; \disjoint(frameB, relevant)) &amp;&amp;
   @   (throwsExcB(\value(footprintB)) || returnsB(\value(footprintB)) ==&gt; \disjoint(frameA, relevant));
   @*/
-{ ; }
 
 //@ assignable frameA;
 //@ accessible footprintA;
@@ -39,7 +38,6 @@
   @   (throwsExcA(\value(footprintA)) || returnsA(\value(footprintA)) ==&gt; \disjoint(frameB, relevant)) &amp;&amp;
   @   (throwsExcB(\value(footprintB)) || returnsB(\value(footprintB)) ==&gt; \disjoint(frameA, relevant));
   @*/
-{ ; }
 
 //@ assignable frameA;
 //@ accessible footprintA;

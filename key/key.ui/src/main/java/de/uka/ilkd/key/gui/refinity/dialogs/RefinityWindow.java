@@ -77,14 +77,14 @@ import bibliothek.gui.dock.common.CContentArea;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import de.uka.ilkd.key.abstractexecution.refinity.ProofBundleConverter;
+import de.uka.ilkd.key.abstractexecution.refinity.ProofBundleConverter.BundleSaveResult;
 import de.uka.ilkd.key.abstractexecution.refinity.model.AERelationalModel;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FuncOrPredDecl;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.NullarySymbolDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
-import de.uka.ilkd.key.abstractexecution.refinity.model.ProofBundleConverter;
-import de.uka.ilkd.key.abstractexecution.refinity.model.ProofBundleConverter.BundleSaveResult;
 import de.uka.ilkd.key.abstractexecution.refinity.util.DummyKeYEnvironmentCreator;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYFileChooser;
@@ -243,7 +243,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         final JPanel contentPanel = new JPanel(new BorderLayout());
         statusPanel = new AutoResetStatusPanel( //
                 STATUS_PANEL_TIMEOUT, STATUS_PANEL_CHANGE_TIME, STATUS_PANEL_STD_MSG_1,
-                STATUS_PANEL_STD_MSG_2, STATUS_PANEL_STD_MSG_3, STATUS_PANEL_STD_MSG_4);
+                STATUS_PANEL_STD_MSG_2, STATUS_PANEL_STD_MSG_3);
 
         contentPanel.add(createControlToolbar(), BorderLayout.NORTH);
         contentPanel.add(createDockingSetup(), BorderLayout.CENTER);

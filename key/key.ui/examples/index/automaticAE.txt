@@ -144,7 +144,6 @@ group abstract_execution_provable {
    
    provable ./abstract_execution/LoopExtraction/Correct/loopExtraction.aer
    provable ./abstract_execution/LoopExtraction/Simplified/loopExtraction.aer
-   // provable ./abstract_execution/LoopExtraction/WithCosts/loopExtraction.aer // <- requires (simple) interaction
    
    provable ./abstract_execution/MoveStatementsToCallers/Correct/MoveStatementsToCallers.aer
    

@@ -45,9 +45,7 @@ public interface RefinityWindowConstants extends RefinityWindowCodeTemplates {
             "Try to use tooltips if feeling unsure about the functionality of an element.";
     static final String STATUS_PANEL_STD_MSG_2 = //
             "Recommended Example: File > Load Example > Abstract Execution > Consolidate Duplicate... > Extract Prefix";
-    static final String STATUS_PANEL_STD_MSG_3 = //
-            "When declaring <tt>ae_constraint</tt>s, you have to put an empty block <tt>{ ; }</tt> after the JML comment.";
-    static final String STATUS_PANEL_STD_MSG_4 = createCodeTemplateMessage();
+    static final String STATUS_PANEL_STD_MSG_3 = createCodeTemplateMessage();
 
     static String createCodeTemplateMessage() {
         return "There are code templates for abstract statements, expressions, and constraints! Type "

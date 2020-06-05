@@ -1,6 +1,11 @@
 REFINITY CHANGES
 ================
 
+## 2020-06-05 (v0.9.5) Dominic Steinhoefel <steinhoefel@cs.tu-darmstadt.de>
+
+  * Automatic addition of empty block { ; } after ae_constraint. Manual addition of empty block
+    therefore no longer necessary.
+
 ## 2020-04-24 (v0.9.4) Dominic Steinhoefel <steinhoefel@cs.tu-darmstadt.de>
 
   * Supporting postconditions via standard "ensures" for break and continue behavior

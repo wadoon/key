@@ -9,8 +9,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
+import de.uka.ilkd.key.abstractexecution.refinity.ProofBundleConverter;
 import de.uka.ilkd.key.abstractexecution.refinity.model.AERelationalModel;
-import de.uka.ilkd.key.abstractexecution.refinity.model.ProofBundleConverter;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;

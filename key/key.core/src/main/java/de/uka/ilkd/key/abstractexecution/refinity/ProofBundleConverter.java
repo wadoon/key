@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.refinity.model;
+package de.uka.ilkd.key.abstractexecution.refinity;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,6 +34,11 @@ import java.util.zip.ZipOutputStream;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.IOUtil;
 
+import de.uka.ilkd.key.abstractexecution.refinity.model.AERelationalModel;
+import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
+import de.uka.ilkd.key.abstractexecution.refinity.model.NullarySymbolDeclaration;
+import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
+import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.util.DummyKeYEnvironmentCreator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -72,12 +77,16 @@ public class ProofBundleConverter {
     private static final String RESULT_SEQ_2 = "<RESULT_SEQ_2>";
     private static final String ADDITIONAL_PREMISES = "<ADDITIONAL_PREMISES>";
 
+    // AE Keywords
+    private static final String AE_CONSTRAINT = "ae_constraint";
+
     // Special Keywords
-    public static final String RESULT_1 = "\\result_1";
-    public static final String RESULT_2 = "\\result_2";
+    private static final String RESULT_1 = "\\result_1";
+    private static final String RESULT_2 = "\\result_2";
+    private static final String RESULT = "_result";
+
     public static final String RES1 = "_res1";
     public static final String RES2 = "_res2";
-    public static final String RESULT = "_result";
     public static final String EXC = "_exc";
 
     private final AERelationalModel model;
@@ -167,14 +176,40 @@ public class ProofBundleConverter {
                 .map(decl -> String.format("%s %s", decl.getTypeName(), decl.getVarName()))
                 .collect(Collectors.joining(","));
 
-        final String programOne = escapeDL(model.getProgramOne()).replaceAll("\n", "\n        ");
-        final String programTwo = escapeDL(model.getProgramTwo()).replaceAll("\n", "\n        ");
-        final String context = escapeDL(model.getMethodLevelContext()).replaceAll("\n", "\n    ");
+        final String programOne = preprocessJavaCode(model.getProgramOne());
+        final String programTwo = preprocessJavaCode(model.getProgramTwo());
+        final String context = preprocessJavaCode(model.getMethodLevelContext());
 
         return javaScaffold.replaceAll(PARAMS, paramsDecl)
                 .replaceAll(BODY1, Matcher.quoteReplacement(programOne))
                 .replaceAll(BODY2, Matcher.quoteReplacement(programTwo))
                 .replaceAll(CONTEXT, Matcher.quoteReplacement(context));
+    }
+
+    private String preprocessJavaCode(final String javaCode) {
+        /* non_final */ String result = javaCode;
+
+        result = addBlocksAfterConstraints(result);
+        result = escapeDL(result);
+        result = result.replaceAll("\n", "\n        ");
+
+        return result;
+    }
+
+    private String addBlocksAfterConstraints(final String javaCode) {
+        /* non_final */ String result = javaCode;
+
+        final Pattern aeConstrPattern = Pattern.compile("/\\*@\\s*?" + AE_CONSTRAINT
+                + "(.|[\\r\\n])*?\\*/|//@\\s*?" + AE_CONSTRAINT + ".*$");
+        final Matcher m = aeConstrPattern.matcher(javaCode);
+
+        while (m.find()) {
+            final String match = m.group();
+            result = result.replaceAll(Pattern.quote(match),
+                    Matcher.quoteReplacement(match + "\n{ ; }"));
+        }
+
+        return result;
     }
 
     public String escapeDL(String prog) {
@@ -200,9 +235,8 @@ public class ProofBundleConverter {
 
         {
             final String locSetDecls = model.getAbstractLocationSets().stream()
-                    //.map(str -> String.format("\\unique %s;", str))
-                    .map(str -> String.format("%s;", str))
-                    .collect(Collectors.joining("\n  "));
+                    // .map(str -> String.format("\\unique %s;", str))
+                    .map(str -> String.format("%s;", str)).collect(Collectors.joining("\n  "));
             final String userDefinedFuncDecls = model.getFunctionDeclarations().stream()
                     .map(decl -> String.format("%s %s%s;", decl.getResultSortName(),
                             decl.getFuncName(),
@@ -339,8 +373,8 @@ public class ProofBundleConverter {
     }
 
     private static String dlPrefixRigidModelElements(final AERelationalModel model, String result) {
-        result = model.getAbstractLocationSets().stream()
-                .map(FunctionDeclaration::getFuncName).collect(DL_PREFIX_FOLD.apply(result));
+        result = model.getAbstractLocationSets().stream().map(FunctionDeclaration::getFuncName)
+                .collect(DL_PREFIX_FOLD.apply(result));
         result = model.getFunctionDeclarations().stream().map(FunctionDeclaration::getFuncName)
                 .collect(DL_PREFIX_FOLD.apply(result));
         result = model.getPredicateDeclarations().stream().map(PredicateDeclaration::getPredName)
