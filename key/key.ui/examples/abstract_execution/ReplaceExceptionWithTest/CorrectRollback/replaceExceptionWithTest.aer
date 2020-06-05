@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" postCondition="\result_1==\result_2">
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="" postCondition="\result_1==\result_2">
     <programOne>/*@ ae_constraint
   @   \disjoint(footprintRollback, frameTry);
   @*/
 
 try {
+
+
+
+
+
+
+
+    
 	/*@ assignable frameTry;
 	  @ accessible footprintTry;
 	  @ exceptional_behavior requires
@@ -20,7 +28,7 @@ try {
 	/*@ assignable frameCatch;
 	  @ accessible footprintCatch;
 	  @*/
-	\abstract_statement CatchProg;
+	\abstract_statement CatchStmt;
 }</programOne>
     <programTwo>/*@ ae_constraint
   @   \disjoint(footprintRollback, frameTry);
@@ -50,34 +58,40 @@ if (
 	/*@ assignable frameCatch;
 	  @ accessible footprintCatch;
 	  @*/
-	\abstract_statement CatchProg;
+	\abstract_statement CatchStmt;
 }</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
         <locationSet funcName="relevant">
             <relevantOne>0</relevantOne>
             <relevantTwo>0</relevantTwo>
-        <resultSortName>LocSet</resultSortName></locationSet>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
         <locationSet funcName="frameTry">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        <resultSortName>LocSet</resultSortName></locationSet>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
         <locationSet funcName="footprintTry">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        <resultSortName>LocSet</resultSortName></locationSet>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
         <locationSet funcName="frameCatch">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        <resultSortName>LocSet</resultSortName></locationSet>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
         <locationSet funcName="footprintCatch">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        <resultSortName>LocSet</resultSortName></locationSet>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
         <locationSet funcName="footprintRollback">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        <resultSortName>LocSet</resultSortName></locationSet>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
     </locationSets>
     <functions/>
     <predicates>
