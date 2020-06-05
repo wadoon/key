@@ -12,7 +12,6 @@
   @   \disjoint(var1, footprintP) &amp;&amp;
   @   \disjoint(var2, footprintP);
   @*/
-{ ; }
 
 /*@ ae_constraint
   @   \disjoint(var1, frameP) &amp;&amp;
@@ -20,7 +19,6 @@
   @   \disjoint(var2, frameP) &amp;&amp;
   @   \disjoint(var2, frameQ);
   @*/
-{ ; }
 
 if (
     /*@ assignable \nothing;
@@ -34,7 +32,6 @@ if (
       @   \disjoint(oldVar, footprintP) &amp;&amp;
       @   \disjoint(oldVar, relevant);
       @*/
-    { ; }
     
     /*@ assignable \hasTo(var1), frameP;
       @ accessible var1, footprintP;
@@ -50,7 +47,6 @@ if (
       @   \disjoint(oldVar, footprintQ) &amp;&amp;
       @   \disjoint(oldVar, relevant);
       @*/
-    { ; }
     
     /*@ assignable \hasTo(var2), frameQ;
       @ accessible footprintQ;
@@ -72,7 +68,6 @@ if (
   @   \disjoint(var1, footprintP) &amp;&amp;
   @   \disjoint(var2, footprintP);
   @*/
-{ ; }
 
 /*@ ae_constraint
   @   \disjoint(var1, frameP) &amp;&amp;
@@ -80,7 +75,6 @@ if (
   @   \disjoint(var2, frameP) &amp;&amp;
   @   \disjoint(var2, frameQ);
   @*/
-{ ; }
 
 if (extractedE()) {
     var1 = extractedP(var1);
@@ -102,7 +96,6 @@ private Object extractedP(Object var1) {
       @   \disjoint(res, footprintP) &amp;&amp;
       @   \disjoint(res, relevant);
       @*/
-    { ; }
     
     //@ ghost Object oldVar = var1;
     /*@ ae_constraint
@@ -110,7 +103,6 @@ private Object extractedP(Object var1) {
       @   \disjoint(oldVar, footprintP) &amp;&amp;
       @   \disjoint(oldVar, relevant);
       @*/
-    { ; }
     
     /*@ assignable \hasTo(res), frameP;
       @ accessible var1, footprintP;
@@ -130,7 +122,6 @@ private Object extractedQ(Object var2) {
       @   \disjoint(res, footprintQ) &amp;&amp;
       @   \disjoint(res, relevant);
       @*/
-    { ; }
     
     //@ ghost Object oldVar = var2;
     /*@ ae_constraint
@@ -138,7 +129,6 @@ private Object extractedQ(Object var2) {
       @   \disjoint(oldVar, footprintQ) &amp;&amp;
       @   \disjoint(oldVar, relevant);
       @*/
-    { ; }
     
     /*@ assignable \hasTo(res), frameQ;
       @ accessible footprintQ;

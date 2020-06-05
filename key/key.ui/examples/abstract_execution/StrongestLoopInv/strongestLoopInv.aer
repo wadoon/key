@@ -4,7 +4,6 @@
   @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
   @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
   @*/
-{ ; }
 
 /*@ loop_invariant
   @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
@@ -28,7 +27,6 @@ while (
       @   \disjoint(loopFrame, oldDecrTerm) &amp;&amp;
       @   \disjoint(loopFootprint, oldDecrTerm);
       @*/
-    { ; }
 
     /*@ assignable \hasTo(oldDecrTerm);
       @ accessible loopFrame, loopFootprint;
@@ -70,7 +68,6 @@ while (
   @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
   @   decrTerm(\value(loopFrame), \value(loopFootprint)) &gt;= 0;
   @*/
-{ ; }
 
 /*@ loop_invariant
   @   loopInv(\value(loopFrame), \value(loopFootprint)) &amp;&amp;
@@ -94,7 +91,6 @@ while (
       @   \disjoint(loopFrame, oldDecrTerm) &amp;&amp;
       @   \disjoint(loopFootprint, oldDecrTerm);
       @*/
-    { ; }
 
     /*@ assignable \hasTo(oldDecrTerm);
       @ accessible loopFrame, loopFootprint;

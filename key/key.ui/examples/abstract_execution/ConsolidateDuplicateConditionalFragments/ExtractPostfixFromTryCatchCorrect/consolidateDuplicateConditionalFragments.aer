@@ -15,7 +15,6 @@ catch (Throwable t) {
     /*@ ae_constraint \disjoint(t, footprintCatchProg) &amp;&amp;
       @               \disjoint(t, footprintPostfixProg);
       @*/
-    { ; }
 
     //@ assignable frameCatchProg;
     //@ accessible t, footprintCatchProg;
@@ -38,7 +37,6 @@ catch (Throwable t) {
     /*@ ae_constraint \disjoint(t, footprintCatchProg) &amp;&amp;
       @               \disjoint(t, footprintPostfixProg);
       @*/
-    { ; }
 
     //@ assignable frameCatchProg;
     //@ accessible t, footprintCatchProg;

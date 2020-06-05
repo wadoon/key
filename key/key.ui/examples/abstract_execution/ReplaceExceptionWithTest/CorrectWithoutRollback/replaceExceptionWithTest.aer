@@ -6,7 +6,6 @@
   @       catchAlwaysCompletesNormally)) &amp;&amp;
   @   \disjoint(frameTry, relevant);
   @*/
-{ ; }
 
 try {
    
@@ -32,7 +31,6 @@ try {
   @       catchAlwaysCompletesNormally)) &amp;&amp;
   @   \disjoint(frameTry, relevant);
   @*/
-{ ; }
 
 if (
 	/*@ assignable \nothing;

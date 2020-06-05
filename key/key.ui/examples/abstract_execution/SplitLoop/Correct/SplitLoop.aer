@@ -7,7 +7,6 @@
   @   \disjoint(footprintQ, oldVariant) &amp;&amp;
   @   \disjoint(footprintG, oldVariant);
   @*/
-{ ; }
 
 // Following constraint is no real precondition,
 // because it should follow from the invariant;
@@ -16,20 +15,17 @@
 /*@ ae_constraint
   @   \disjoint(footprintG, \dl_heap); // ???
   @*/
-{ ; }
 
 /*@ ae_constraint
   @   \disjoint(frameP, footprintG) &amp;&amp;
   @   \disjoint(frameQ, footprintG);
   @*/
-{ ; }
 
 /*@ ae_constraint
   @   \disjoint(frameP, frameQ) &amp;&amp;
   @   \disjoint(frameP, footprintQ) &amp;&amp;
   @   \disjoint(frameQ, footprintP);
   @*/
-{ ; }
 
 /*@ assignable \hasTo(footprintG);
   @ accessible \nothing;
@@ -45,7 +41,6 @@
   @   loopInvP(\value(frameP), \value(footprintP), \value(footprintG)) &amp;&amp;
   @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG));
   @*/
-{ ; }
 
 /*@ loop_invariant
   @   variant(\value(footprintG)) &gt;= 0 &amp;&amp;
@@ -71,7 +66,6 @@ while (
       @   \disjoint(footprintQ, oldVariant) &amp;&amp;
       @   \disjoint(footprintG, oldVariant);
       @*/
-    { ; }
 
     /*@ assignable \hasTo(oldVariant);
       @ accessible footprintG;
@@ -213,7 +207,6 @@ while (
   @   \disjoint(footprintQ, oldVariant) &amp;&amp;
   @   \disjoint(footprintG, oldVariant);
   @*/
-{ ; }
 
 
 
@@ -222,20 +215,17 @@ while (
 /*@ ae_constraint
   @   \disjoint(footprintG, \dl_heap);
   @*/
-{ ; }
 
 /*@ ae_constraint
   @   \disjoint(frameP, footprintG) &amp;&amp;
   @   \disjoint(frameQ, footprintG);
   @*/
-{ ; }
 
 /*@ ae_constraint
   @   \disjoint(frameP, frameQ) &amp;&amp;
   @   \disjoint(frameP, footprintQ) &amp;&amp;
   @   \disjoint(frameQ, footprintP);
   @*/
-{ ; }
 
 /*@ assignable \hasTo(footprintG);
   @ accessible \nothing;
@@ -250,7 +240,6 @@ while (
   @   loopInvG(\value(footprintG)) &amp;&amp;
   @   loopInvP(\value(frameP), \value(footprintP), \value(footprintG));
   @*/
-{ ; }
 
 
 /*@ loop_invariant
@@ -275,7 +264,6 @@ while (
       @   \disjoint(footprintP, oldVariant) &amp;&amp;
       @   \disjoint(footprintG, oldVariant);
       @*/
-    { ; }
 
 
 
@@ -343,7 +331,6 @@ while (
   @   loopInvG(\value(footprintG)) &amp;&amp;
   @   loopInvQ(\value(frameQ), \value(footprintQ), \value(footprintG));
   @*/
-{ ; }
 
 
 /*@ loop_invariant
@@ -368,7 +355,6 @@ while (
       @   \disjoint(footprintQ, oldVariant) &amp;&amp;
       @   \disjoint(footprintG, oldVariant);
       @*/
-    { ; }
 
     /*@ assignable \hasTo(oldVariant);
       @ accessible footprintG;

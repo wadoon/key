@@ -3,7 +3,6 @@
     <programOne>/*@ ae_constraint
   @     \disjoint(footprintR, frameQ);
   @*/
-{ ; }
 
 /*@ assignable frameP;
   @ accessible footprintP;
@@ -28,7 +27,6 @@ try {
 	  @     \disjoint(t, relevant) &amp;&amp;
 	  @     \disjoint(t, footprintR);
 	  @*/
-	{ ; }
 }
 
 /*@ assignable frameR; 
@@ -38,7 +36,6 @@ try {
     <programTwo>/*@ ae_constraint
   @     \disjoint(footprintR, frameQ);
   @*/
-{ ; }
 
 /*@ assignable frameP;
   @ accessible footprintP;
@@ -62,7 +59,6 @@ var = extracted(var);
 	  @   \disjoint(res, footprintR) &amp;&amp;
 	  @   \disjoint(res, footprintQ);
 	  @*/
-	{ ; }
 	
     try {
         /*@ assignable \hasTo(res), frameQ;
@@ -78,7 +74,6 @@ var = extracted(var);
 	     @     \disjoint(t, relevant) &amp;&amp;
 	     @     \disjoint(t, footprintR);
 	     @*/
-	   { ; }
     }
      
      return res;

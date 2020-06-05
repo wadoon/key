@@ -6,14 +6,12 @@
   @   \disjoint(frameP, n) &amp;&amp;
   @   \disjoint(frameQ, n);
   @*/
-{ ; }
 
 /*@ ae_constraint
   @   \disjoint(frameP, frameQ) &amp;&amp;
   @   \disjoint(frameP, footprintQ) &amp;&amp;
   @   \disjoint(frameQ, footprintP);
   @*/
-{ ; }
 
 i = 0;
 
@@ -23,7 +21,6 @@ i = 0;
   @   loopInvP(\value(frameP), \value(footprintP)) &amp;&amp;
   @   loopInvQ(\value(frameQ), \value(footprintQ));
   @*/
-{ ; }
 
 /*@ loop_invariant
   @   i &gt;= 0 &amp;&amp; i &lt;= n &amp;&amp;
@@ -39,7 +36,6 @@ while (i &lt; n) {
       @   \disjoint(frameP, n) &amp;&amp;
       @   \disjoint(frameQ, n);
       @*/
-    { ; }
 
     i++;
     
@@ -106,23 +102,19 @@ while (i &lt; n) {
 
 
 /*@ assume loopPExitedLeft == true; */
-{ ; }
-/*@ assume loopQExitedLeft == true; */
-{ ; }</programOne>
+/*@ assume loopQExitedLeft == true; */</programOne>
     <programTwo>/*@ ae_constraint
   @   \disjoint(frameP, i) &amp;&amp;
   @   \disjoint(frameQ, i) &amp;&amp;
   @   \disjoint(frameP, n) &amp;&amp;
   @   \disjoint(frameQ, n);
   @*/
-{ ; }
 
 /*@ ae_constraint
   @   \disjoint(frameP, frameQ) &amp;&amp;
   @   \disjoint(frameP, footprintQ) &amp;&amp;
   @   \disjoint(frameQ, footprintP);
   @*/
-{ ; }
 
 i = 0;
 
@@ -131,7 +123,6 @@ i = 0;
   @   i &lt;= n &amp;&amp;
   @   loopInvP(\value(frameP), \value(footprintP));
   @*/
-{ ; }
 
 
 /*@ loop_invariant
@@ -148,7 +139,6 @@ while (i &lt; n) {
       @   \disjoint(frameP, n) &amp;&amp;
       @   \disjoint(frameQ, n);
       @*/
-    { ; }
 
     i++;
     
@@ -176,7 +166,6 @@ while (i &lt; n) {
 }
 
 /*@ assume loopPExitedRight == true; */
-{ ; }
 
 i = 0;
 
@@ -185,7 +174,6 @@ i = 0;
   @   i &lt;= n &amp;&amp;
   @   loopInvQ(\value(frameQ), \value(footprintQ));
   @*/
-{ ; }
 
 /*@ loop_invariant
   @   i &gt;= 0 &amp;&amp; i &lt;= n &amp;&amp;
@@ -200,7 +188,6 @@ while (i &lt; n) {
       @   \disjoint(frameP, n) &amp;&amp;
       @   \disjoint(frameQ, n);
       @*/
-    { ; }
 
     i++;
 
@@ -216,8 +203,7 @@ while (i &lt; n) {
     \abstract_statement Q;
 }
 
-/*@ assume loopQExitedRight == true; */
-{ ; }</programTwo>
+/*@ assume loopQExitedRight == true; */</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
         <locationSet funcName="relevant">

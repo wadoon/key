@@ -9,7 +9,6 @@
   @                      throwsExcP(\value(footprintP)),
   @                      returnsP(\value(footprintP)));
   @*/
-{ ; }
 
 
 
@@ -57,7 +56,6 @@ else {
   @                      throwsExcP(\value(footprintP)),
   @                      returnsP(\value(footprintP)));
   @*/
-{ ; }
 
 /*@ assignable frameP;
   @ accessible footprintP;

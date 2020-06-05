@@ -3,7 +3,6 @@
     <programOne>/*@ ae_constraint
   @   \disjoint(frameTry, footprintCatch);
   @*/
-{ ; }
 
 try {
 	/*@ assignable frameTry;
@@ -21,7 +20,6 @@ try {
     <programTwo>/*@ ae_constraint
   @   \disjoint(frameTry, footprintCatch);
   @*/
-{ ; }
 
 if (
 	/*@ assignable \nothing;

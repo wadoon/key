@@ -6,10 +6,8 @@
   @   \disjoint(frameP, footprintQ) &amp;&amp;
   @   \disjoint(footprintE, footprintQ);
   @*/
-{ ; }
 
 /*@ ae_constraint guardIsTrue(\value(footprintE)); */
-{ ; }
 
 
 
@@ -25,7 +23,6 @@
 /*@ ae_constraint
   @   inv(\value(frameP)) &amp;&amp; decrExpr(\value(frameP)) &gt;= 0;
   @*/
-{ ; }
 
 /*@ loop_invariant
   @   decrExpr(\value(frameP)) &gt;= 0 &amp;&amp;
@@ -51,7 +48,6 @@ while (
       @   \disjoint(footprintE, oldVariantLeft) &amp;&amp;
       @   \disjoint(frameQ, oldVariantLeft);
       @*/
-    { ; }
 
     // Hacky ghost setter
     /*@ assignable \hasTo(oldVariantLeft);
@@ -88,18 +84,15 @@ while (
     \abstract_statement P;
 }
 
-/*@ assume loopExitedLeft == true; */
-{ ; }</programOne>
+/*@ assume loopExitedLeft == true; */</programOne>
     <programTwo>/*@ ae_constraint
   @   \disjoint(frameQ, footprintE) &amp;&amp;
   @   \disjoint(frameQ, frameP) &amp;&amp;
   @   \disjoint(frameP, footprintQ) &amp;&amp;
   @   \disjoint(footprintE, footprintQ);
   @*/
-{ ; }
 
 /*@ ae_constraint guardIsTrue(\value(footprintE)); */
-{ ; }
 
 
 /*@ assignable frameQ;
@@ -115,7 +108,6 @@ while (
 /*@ ae_constraint
   @   inv(\value(frameP)) &amp;&amp; decrExpr(\value(frameP)) &gt;= 0;
   @*/
-{ ; }
 
 /*@ loop_invariant
   @   decrExpr(\value(frameP)) &gt;= 0 &amp;&amp;
@@ -141,7 +133,6 @@ while (
       @   \disjoint(footprintE, oldVariantRight) &amp;&amp;
       @   \disjoint(frameQ, oldVariantRight);
       @*/
-    { ; }
 
     // Hacky ghost setter
     /*@ assignable \hasTo(oldVariantRight);
@@ -178,8 +169,7 @@ while (
     \abstract_statement P;
 }
 
-/*@ assume loopExitedRight == true; */
-{ ; }</programTwo>
+/*@ assume loopExitedRight == true; */</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
         <locationSet funcName="frameP">

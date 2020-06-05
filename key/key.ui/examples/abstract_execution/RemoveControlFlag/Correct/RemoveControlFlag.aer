@@ -3,7 +3,6 @@
     <programOne>/*@ ae_constraint
   @   \disjoint(loopLocs, done);
   @*/
-{ ; }
 
 done = false;
 i = 0;
@@ -13,7 +12,6 @@ i = 0;
   @   loopInv(\value(loopLocs)) &amp;&amp;
   @   !doneCondition(\value(loopLocs), 0);
   @*/
-{ ; }
 
 /*@ loop_invariant
   @   decrExpr(\value(loopLocs)) &gt;= 0 &amp;&amp;
@@ -35,11 +33,9 @@ while (!done &amp;&amp;
       @   \disjoint(loopLocs, done) &amp;&amp;
       @   \disjoint(loopLocs, i);
       @*/
-    { ; }
     
     //@ ghost int oldDecrExpr; // = decrExpr(\value(loopLocs));
     //@ ae_constraint \disjoint(loopLocs, oldDecrExpr);
-    { ; }
 
     /*@ assignable \hasTo(oldDecrExpr);
       @ accessible loopLocs;
@@ -120,7 +116,6 @@ i = 0;
   @   loopInv(\value(loopLocs)) &amp;&amp;
   @   !doneCondition(\value(loopLocs), 0);
   @*/
-{ ; }
 
 /*@ loop_invariant
   @   decrExpr(\value(loopLocs)) &gt;= 0 &amp;&amp;
@@ -141,12 +136,10 @@ while (
     /*@ ae_constraint
       @   \disjoint(loopLocs, i);
       @*/
-    { ; }
 
     
     //@ ghost int oldDecrExpr; // = decrExpr(\value(loopLocs));
     //@ ae_constraint \disjoint(loopLocs, oldDecrExpr);
-    { ; }
 
     /*@ assignable \hasTo(oldDecrExpr);
       @ accessible loopLocs;
@@ -181,7 +174,6 @@ while (
 
         //@ ghost int oldI = i;
         //@ ae_constraint \disjoint(loopLocs, oldI);
-        { ; }
     
         /*@ assignable loopLocs, i;
           @ accessible loopLocs;

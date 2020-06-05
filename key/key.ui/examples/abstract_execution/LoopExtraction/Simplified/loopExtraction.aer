@@ -11,11 +11,9 @@
   @   \disjoint(frameQ, threshold) &amp;&amp;
   @   \disjoint(frameP, threshold);
   @*/
-{ ; }
 
 /*@ ae_constraint inv(\value(frameP));
   @*/
-{ ; }
 
 i = 0;
 
@@ -51,8 +49,7 @@ while (i &lt; threshold) {
     i++;
 }
 
-/*@ assume loopExitedLeft == true; */
-{ ; }</programOne>
+/*@ assume loopExitedLeft == true; */</programOne>
     <programTwo>/*@ ae_constraint
   @   \disjoint(frameQ, frameP) &amp;&amp;
   @   \disjoint(frameP, footprintQ) &amp;&amp;
@@ -64,7 +61,6 @@ while (i &lt; threshold) {
   @   \disjoint(frameQ, threshold) &amp;&amp;
   @   \disjoint(frameP, threshold);
   @*/
-{ ; }
 
 /*@ assignable frameQ;
   @ accessible footprintQ;
@@ -78,7 +74,6 @@ while (i &lt; threshold) {
 
 /*@ ae_constraint inv(\value(frameP));
   @*/
-{ ; }
 
 i = 0;
 
@@ -103,8 +98,7 @@ while (i &lt; threshold) {
     i++;
 }
 
-/*@ assume loopExitedRight == true; */
-{ ; }</programTwo>
+/*@ assume loopExitedRight == true; */</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
         <locationSet funcName="frameP">

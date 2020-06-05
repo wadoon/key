@@ -10,7 +10,6 @@
   @   \mutex(throwsExcA(\value(footprintA)), throwsExcB(\value(footprintB))) &amp;&amp;
   @   \mutex(throwsExcA(\value(footprintA)), returnsB(\value(footprintB)));
   @*/
-{ ; }
 
 //@ assignable frameA;
 //@ accessible footprintA;
@@ -33,7 +32,6 @@
   @   \mutex(throwsExcA(\value(footprintA)), throwsExcB(\value(footprintB))) &amp;&amp;
   @   \mutex(throwsExcA(\value(footprintA)), returnsB(\value(footprintB)));
   @*/
-{ ; }
 
 //@ assignable frameB;
 //@ accessible footprintB;

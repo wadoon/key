@@ -3,7 +3,6 @@
     <programOne>/*@ ae_constraint
   @   \disjoint(var, frameP);
   @*/
-{ ; }
 
 //@ ghost Object oldVar = var;
 /*@ ae_constraint
@@ -11,7 +10,6 @@
   @   \disjoint(oldVar, footprintP) &amp;&amp;
   @   \disjoint(oldVar, relevant);
   @*/
-{ ; }
 
 /*@ assignable \hasTo(var), frameP;
   @ accessible footprintP;
@@ -29,7 +27,6 @@
 	  @   \disjoint(res, relevant) &amp;&amp;
 	  @   \disjoint(res, footprintP);
 	  @*/
-	{ ; }
 	
     //@ ghost Object oldVar = var;
     /*@ ae_constraint
@@ -37,7 +34,6 @@
       @   \disjoint(oldVar, footprintP) &amp;&amp;
       @   \disjoint(oldVar, relevant);
       @*/
-    { ; }
     
     /*@ assignable \hasTo(res), frameP;
       @ accessible footprintP;
