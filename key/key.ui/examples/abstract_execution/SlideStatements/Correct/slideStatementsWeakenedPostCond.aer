@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="" postCondition="\result_1==\result_2">
+<ns2:aeRelationalModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="" postCondition="((returnsA(\value(footprintA))   || returnsB(\value(footprintB)))   &amp;&amp; \result_1[0] == \result_2[0]) ||&#10;((throwsExcA(\value(footprintA)) || throwsExcB(\value(footprintB))) &amp;&amp; \result_1[1] == \result_2[1]) ||&#10;\result_1==\result_2">
     <programOne>/*@ ae_constraint
   @   \disjoint(frameA, frameB) &amp;&amp;
   @   \disjoint(frameA, footprintB) &amp;&amp;
@@ -8,10 +8,7 @@
   @   \mutex(returnsA(\value(footprintA)), returnsB(\value(footprintB))) &amp;&amp;
   @   \mutex(returnsA(\value(footprintA)), throwsExcB(\value(footprintB))) &amp;&amp;
   @   \mutex(throwsExcA(\value(footprintA)), throwsExcB(\value(footprintB))) &amp;&amp;
-  @   \mutex(throwsExcA(\value(footprintA)), returnsB(\value(footprintB))) &amp;&amp;
-  @
-  @   (throwsExcA(\value(footprintA)) || returnsA(\value(footprintA)) ==&gt; \disjoint(frameB, relevant)) &amp;&amp;
-  @   (throwsExcB(\value(footprintB)) || returnsB(\value(footprintB)) ==&gt; \disjoint(frameA, relevant));
+  @   \mutex(throwsExcA(\value(footprintA)), returnsB(\value(footprintB)));
   @*/
 { ; }
 
@@ -34,51 +31,43 @@
   @   \mutex(returnsA(\value(footprintA)), returnsB(\value(footprintB))) &amp;&amp;
   @   \mutex(returnsA(\value(footprintA)), throwsExcB(\value(footprintB))) &amp;&amp;
   @   \mutex(throwsExcA(\value(footprintA)), throwsExcB(\value(footprintB))) &amp;&amp;
-  @   \mutex(throwsExcA(\value(footprintA)), returnsB(\value(footprintB))) &amp;&amp;
-  @
-  @   (throwsExcA(\value(footprintA)) || returnsA(\value(footprintA)) ==&gt; \disjoint(frameB, relevant)) &amp;&amp;
-  @   (throwsExcB(\value(footprintB)) || returnsB(\value(footprintB)) ==&gt; \disjoint(frameA, relevant));
+  @   \mutex(throwsExcA(\value(footprintA)), returnsB(\value(footprintB)));
   @*/
 { ; }
-
-//@ assignable frameA;
-//@ accessible footprintA;
-//@ exceptional_behavior requires throwsExcA(\value(footprintA));
-//@ return_behavior requires returnsA(\value(footprintA));
-\abstract_statement A;
 
 //@ assignable frameB;
 //@ accessible footprintB;
 //@ exceptional_behavior requires throwsExcB(\value(footprintB));
 //@ return_behavior requires returnsB(\value(footprintB));
-\abstract_statement B;</programTwo>
+\abstract_statement B;
+
+//@ assignable frameA;
+//@ accessible footprintA;
+//@ exceptional_behavior requires throwsExcA(\value(footprintA));
+//@ return_behavior requires returnsA(\value(footprintA));
+\abstract_statement A;</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
         <locationSet funcName="relevant">
             <relevantOne>0</relevantOne>
             <relevantTwo>0</relevantTwo>
-            <resultSortName>LocSet</resultSortName>
-        </locationSet>
+        <resultSortName>LocSet</resultSortName></locationSet>
         <locationSet funcName="frameA">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-            <resultSortName>LocSet</resultSortName>
-        </locationSet>
+        <resultSortName>LocSet</resultSortName></locationSet>
         <locationSet funcName="footprintA">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-            <resultSortName>LocSet</resultSortName>
-        </locationSet>
+        <resultSortName>LocSet</resultSortName></locationSet>
         <locationSet funcName="frameB">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-            <resultSortName>LocSet</resultSortName>
-        </locationSet>
+        <resultSortName>LocSet</resultSortName></locationSet>
         <locationSet funcName="footprintB">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-            <resultSortName>LocSet</resultSortName>
-        </locationSet>
+        <resultSortName>LocSet</resultSortName></locationSet>
     </locationSets>
     <functions/>
     <predicates>
