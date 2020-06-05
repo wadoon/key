@@ -84,7 +84,7 @@ while (
     \abstract_statement P;
 }
 
-/*@ assume loopExitedLeft == true; */</programOne>
+/*@ ae_constraint loopExitedLeft == true; */</programOne>
     <programTwo>/*@ ae_constraint
   @   \disjoint(frameQ, footprintE) &amp;&amp;
   @   \disjoint(frameQ, frameP) &amp;&amp;
@@ -169,29 +169,34 @@ while (
     \abstract_statement P;
 }
 
-/*@ assume loopExitedRight == true; */</programTwo>
+/*@ ae_constraint loopExitedRight == true; */</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
         <locationSet funcName="frameP">
             <relevantOne>0</relevantOne>
             <relevantTwo>0</relevantTwo>
-        <resultSortName>LocSet</resultSortName></locationSet>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
         <locationSet funcName="footprintP">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        <resultSortName>LocSet</resultSortName></locationSet>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
         <locationSet funcName="footprintE">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        <resultSortName>LocSet</resultSortName></locationSet>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
         <locationSet funcName="frameQ">
             <relevantOne>1</relevantOne>
             <relevantTwo>1</relevantTwo>
-        <resultSortName>LocSet</resultSortName></locationSet>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
         <locationSet funcName="footprintQ">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
-        <resultSortName>LocSet</resultSortName></locationSet>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
     </locationSets>
     <functions>
         <function funcName="decrExpr">

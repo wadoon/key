@@ -43,8 +43,7 @@ public interface RefinityWindowCodeTemplates {
                     
                     "/*@ ae_constraint\n" + //
                     "  @   true;\n" + //
-                    "  @*/\n" + //
-                    "{ ; }"
+                    "  @*/"
             }, new String[] {
                     "mut",
                     "\\mutex(formula1, formula2)"

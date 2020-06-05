@@ -200,7 +200,7 @@ public class ProofBundleConverter {
         /* non_final */ String result = javaCode;
 
         final Pattern aeConstrPattern = Pattern.compile("/\\*@\\s*?" + AE_CONSTRAINT
-                + "(.|[\\r\\n])*?\\*/|//@\\s*?" + AE_CONSTRAINT + ".*$");
+                + "(.|[\\r\\n])*?\\*/|//@\\s*?" + AE_CONSTRAINT + ".*");
         final Matcher m = aeConstrPattern.matcher(javaCode);
 
         while (m.find()) {

@@ -49,7 +49,7 @@ while (i &lt; threshold) {
     i++;
 }
 
-/*@ assume loopExitedLeft == true; */</programOne>
+/*@ ae_constraint loopExitedLeft == true; */</programOne>
     <programTwo>/*@ ae_constraint
   @   \disjoint(frameQ, frameP) &amp;&amp;
   @   \disjoint(frameP, footprintQ) &amp;&amp;
@@ -98,7 +98,7 @@ while (i &lt; threshold) {
     i++;
 }
 
-/*@ assume loopExitedRight == true; */</programTwo>
+/*@ ae_constraint loopExitedRight == true; */</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
         <locationSet funcName="frameP">
