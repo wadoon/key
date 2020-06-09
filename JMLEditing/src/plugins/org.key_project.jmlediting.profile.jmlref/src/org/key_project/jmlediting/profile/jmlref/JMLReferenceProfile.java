@@ -59,6 +59,7 @@ import org.key_project.jmlediting.profile.jmlref.quantifier.SumQuantifierKeyword
 import org.key_project.jmlediting.profile.jmlref.resolver.Resolver;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AccessibleKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AssignableKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.assume.AssumeKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.AxiomKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.DivergesKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.EnsuresKeyword;
@@ -121,6 +122,7 @@ IJMLExpressionProfile {
       this.getSupportedKeywordsInternal().addAll(
             Arrays.asList(new EnsuresKeyword(), new AssignableKeyword(),
                   new AccessibleKeyword(), new RequiresKeyword(),
+                  new AssumeKeyword(),
                   new BehaviorKeyword(lang), new ExceptionalBehaviorKeyword(
                         lang), new NormalBehaviorKeyword(lang),
                         new AlsoKeyword(), new HelperKeyword(), new PureKeyword(),
