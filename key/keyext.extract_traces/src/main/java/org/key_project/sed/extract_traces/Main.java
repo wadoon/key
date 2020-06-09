@@ -42,12 +42,19 @@ public class Main {
       String methodName = "max";
       String[] methodArgTypes = {"int[]"};
       String precondition
-         =   "(arr.length == 4 && arr[0] == 2 && arr[1] == 1 && arr[2] == 3 && arr[3] == 4"
-         + "|| arr.length == 4 && arr[0] == 2 && arr[1] == 1 && arr[2] == 3 && arr[3] == 2"
-//         + "|| arr.length == 3 && arr[0] == 0 && arr[1] == 1 && arr[2] == 3"
-//         + "|| arr.length == 3 && arr[0] == 0 && arr[1] == 2 && arr[2] == 6"
-         + "|| arr.length == 3 && arr[0] == 2 && arr[1] == 4 && arr[2] == 3)"
-         + " && arr != null";
+         =    "(tc1 ==> arr.length == 4 && arr[0] == 2 && arr[1] == 1 && arr[2] == 3 && arr[3] == 4)"
+         + "&& (tc2 ==> arr.length == 4 && arr[0] == 2 && arr[1] == 1 && arr[2] == 3 && arr[3] == 2)"
+         + "&& (tc3 ==> arr.length == 3 && arr[0] == 0 && arr[1] == 1 && arr[2] == 3)"
+         + "&& (tc4 ==> arr.length == 3 && arr[0] == 0 && arr[1] == 2 && arr[2] == 6)"
+         + "&& (tc5 ==> arr.length == 3 && arr[0] == 2 && arr[1] == 4 && arr[2] == 3)"
+         + "&& (tc6 ==> arr.length == 3 && arr[0] == 4 && arr[1] == 8 && arr[2] == 6)"
+         + "&& (tc7 ==> arr.length == 3 && arr[0] == 200 && arr[1] == 400 && arr[2] == 300)"
+         + "&& (tc8 ==> arr.length == 3 && arr[0] == 4 && arr[1] == 3 && arr[2] == 2)"
+         + "&& (tc9 ==> arr.length == 3 && arr[0] == 550 && arr[1] == 4470 && arr[2] == 10)"
+         + "&& (tc0 ==> arr.length == 3 && arr[0] == 200 && arr[1] == 400 && arr[2] == 200)"
+         + "&& (tc1 || tc2 || tc3 || tc4 || tc5 || tc6 || tc7 || tc8 || tc9 || tc0)"
+//         + "&& (!tc1 || !tc2) && (!tc1 || !tc3) && (!tc1 || !tc4) && (!tc1 || !tc5) && (!tc2 || !tc3) && (!tc2 || !tc4) && (!tc2 || !tc5) && (!tc3 || !tc4) && (!tc3 || !tc5) && (!tc4 || !tc5)"
+         + "&& arr != null";
  
       SymbolicExecutionTreeBuilder treeBuilder =null;
 
@@ -138,7 +145,7 @@ public class Main {
           // Perform strategy which will stop at breakpoint
           symbolicEnv.getProofControl().startAndWaitForAutoMode(proof);
           builder.analyse();
-
+          
           // FIXME Ensure always that all instances of KeYEnvironment are disposed
           // env.dispose();
        return builder;
