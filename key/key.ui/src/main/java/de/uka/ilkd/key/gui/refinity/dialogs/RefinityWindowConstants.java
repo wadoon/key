@@ -54,13 +54,12 @@ public interface RefinityWindowConstants extends RefinityWindowCodeTemplates {
                         .collect(Collectors.joining(" / "))
                 + " followed by <tt>Ctrl+Shift+Space</tt> (Mac: <tt>Command+Shift+Space</tt>).";
     }
-    
+
     ////////////////////
     // FONTS & COLORS //
     ////////////////////
-    
-    static final Color COMMENT_COLOR = Color.decode("#373D3F");
 
+    static final Color COMMENT_COLOR = Color.decode("#373D3F");
 
     //////////////
     // TOOLTIPS //
@@ -90,6 +89,8 @@ public interface RefinityWindowConstants extends RefinityWindowCodeTemplates {
             + " program models.</html>";
     static final String SAVE_BTN_TOOLTIP = "<html>Creates a KeY proof bundle at a temporary<br/>"
             + "location and starts the proof.</html>";
+    static final String CHECK_PROOF_BTN_TOOLTIP = "<html>Loads a proof file and attempts to certify<br/>"
+            + "that it is a proof of this model.</html>";
     static final String TOOLTIP_REL_LOCS_RIGHT = htmlTooltip(
             "Locations that are part of the result relation (for the right program).<br/>"
                     + "The i-th location in this list (i >= 1) is available via "

@@ -70,9 +70,9 @@ public class ProofState implements ProverTaskListener, AutoModeListener, DirtyLi
             return;
         }
 
-        if (info.getSource() instanceof ProblemLoader) {
+        if (info.getSource() instanceof ProblemLoader && !proof.closed()) {
             setState(State.PROOF_LOADED);
-        } else if (info.getSource() instanceof ProverCore) {
+        } else if (info.getSource() instanceof ProverCore || proof.closed()) {
             setState(proof.closed() ? State.CLOSED : State.OPEN);
         }
     };

@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,15 +31,20 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -89,6 +95,7 @@ import de.uka.ilkd.key.abstractexecution.refinity.util.DummyKeYEnvironmentCreato
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.refinity.components.AutoResetStatusPanel;
@@ -659,8 +666,15 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         saveBundleAndStartBtn.setToolTipText(SAVE_BTN_TOOLTIP);
         saveBundleAndStartBtn.addActionListener(e -> createAndLoadBundle());
 
+        final JButton checkProofButton = new JSizedButton(
+                IconFontSwing.buildIcon(FontAwesomeSolid.CERTIFICATE, 16, Color.BLACK),
+                btnWidth + 15, btnHeight);
+        checkProofButton.setToolTipText(CHECK_PROOF_BTN_TOOLTIP);
+        checkProofButton.addActionListener(e -> checkProof());
+
         if (mainWindow == null) {
             saveBundleAndStartBtn.setEnabled(false);
+            checkProofButton.setEnabled(false);
         }
 
         /*
@@ -673,6 +687,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                     @Override
                     public void autoModeStarted(ProofEvent e) {
                         SwingUtilities.invokeLater(() -> saveBundleAndStartBtn.setEnabled(false));
+                        SwingUtilities.invokeLater(() -> checkProofButton.setEnabled(false));
                     }
 
                     @Override
@@ -682,6 +697,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                         } catch (InterruptedException exc) {
                         }
                         SwingUtilities.invokeLater(() -> saveBundleAndStartBtn.setEnabled(true));
+                        SwingUtilities.invokeLater(() -> checkProofButton.setEnabled(true));
                     }
                 }));
 
@@ -719,6 +735,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         toolBar.add(cbSyncScrollbars);
         toolBar.addSeparator();
         toolBar.add(saveBundleAndStartBtn);
+        toolBar.add(checkProofButton);
         toolBar.addSeparator();
         toolBar.add(closeBtn);
 
@@ -763,9 +780,6 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         try {
             final String tmpFilePrefix = model.getFile().map(File::getName)
                     .orElse("AERelationalModel") + "_";
-            final File proofBundleFile = Files.createTempFile( //
-                    tmpFilePrefix, PROOF_BUNDLE_ENDING).toFile();
-            final BundleSaveResult result = new ProofBundleConverter(model).save(proofBundleFile);
 
             final ProverTaskAdapter ptl = new ProverTaskAdapter() {
                 @Override
@@ -799,16 +813,149 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                     }
                 }
             };
-            mainWindow.getUserInterface().addProverTaskListener(ptl);
-            SwingUtilities.invokeLater(() -> mainWindow.loadProofFromBundle(result.getFile(),
-                    result.getProofPath().toFile()));
 
+            createBundleAndRun(null, tmpFilePrefix, ptl);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(
                     RefinityWindow.this, "<html>Problem saving proof bundle.<br/><br/>Message:<br/>"
                             + e.getMessage() + "</html>",
                     "Problem Starting Proof", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void checkProof() {
+        final KeYFileChooser keYFileChooser = KeYFileChooser
+                .getFileChooser("Select file to load proof or problem");
+
+        if (!keYFileChooser.showOpenDialog(mainWindow)) {
+            return;
+        }
+
+        final File file = keYFileChooser.getSelectedFile();
+
+        if (!ProofSelectionDialog.isProofBundle(file.toPath())) {
+            JOptionPane.showMessageDialog(RefinityWindow.this,
+                    "<html>Selected file is not a proof bundle.</html>", "Problem Loading Proof",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        final String proofString = loadProofFromBundleFile(file).orElse(null);
+        if (proofString == null) {
+            return;
+        }
+
+        try {
+            final String tmpFilePrefix = model.getFile().map(File::getName)
+                    .orElse("AERelationalModel") + "_";
+            final ProverTaskAdapter ptl = new ProverTaskAdapter() {
+                @Override
+                public void taskFinished(TaskFinishedInfo info) {
+                    if (info == null) {
+                        return;
+                    }
+
+                    if (info.getSource() instanceof ProblemLoader) {
+                        final Proof proof = info.getProof();
+                        proofState.setProof(proof);
+                        proofState.taskFinished(info);
+
+                        if (proof != null
+                                && proof.getProofFile().getName().startsWith(tmpFilePrefix)) {
+                            if (proof.closed()) {
+                                JOptionPane.showMessageDialog(RefinityWindow.this,
+                                        "<html><b>Certificate is valid (Proof closed).</b></html>",
+                                        "Proof Validated", JOptionPane.INFORMATION_MESSAGE);
+                            } else {
+                                JOptionPane.showMessageDialog(RefinityWindow.this,
+                                        "<html><b>Invalid certificate!<b> (%d open goals)</html>",
+                                        "Proof Validation Faild", JOptionPane.ERROR_MESSAGE);
+                            }
+
+                            mainWindow.getUserInterface().removeProverTaskListener(this);
+                        }
+                    }
+                }
+            };
+
+            createBundleAndRun(proofString, tmpFilePrefix, ptl);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(
+                    RefinityWindow.this, "<html>Problem saving proof bundle.<br/><br/>Message:<br/>"
+                            + e.getMessage() + "</html>",
+                    "Problem Starting Proof", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    protected void createBundleAndRun(final String proofString, final String tmpFilePrefix,
+            final ProverTaskAdapter ptl) throws IOException, IllegalStateException {
+        final File proofBundleFile = Files.createTempFile( //
+                tmpFilePrefix, PROOF_BUNDLE_ENDING).toFile();
+        final BundleSaveResult newProofBundle = //
+                new ProofBundleConverter(model, proofString).save(proofBundleFile);
+
+        mainWindow.getUserInterface().addProverTaskListener(ptl);
+        SwingUtilities.invokeLater(() -> mainWindow.loadProofFromBundle(newProofBundle.getFile(),
+                newProofBundle.getProofPath().toFile()));
+    }
+
+    protected Optional<String> loadProofFromBundleFile(final File file) throws HeadlessException {
+        try (final ZipFile bundle = new ZipFile(file)) {
+            final List<Path> proofs = bundle.stream().filter(e -> !e.isDirectory())
+                    .filter(e -> e.getName().endsWith(".proof")).map(e -> Paths.get(e.getName()))
+                    .collect(Collectors.toList());
+
+            final Path proofFile;
+
+            if (!proofs.isEmpty()) {
+                // load first proof found in file
+                proofFile = proofs.get(proofs.size() - 1);
+            } else {
+                JOptionPane.showMessageDialog(RefinityWindow.this,
+                        "<html>No proof was found in the selected bundle.</html>",
+                        "Problem Loading Proof", JOptionPane.ERROR_MESSAGE);
+                return Optional.empty();
+            }
+
+            final String proofStr = readProofStringFromKeYFile(
+                    unzipProofFromBundle(proofFile, file));
+
+            return Optional.of(proofStr);
+        } catch (IOException ioe) {
+            JOptionPane.showMessageDialog(
+                    RefinityWindow.this, "<html>Problem loading proof bundle, message:<br>"
+                            + ioe.getMessage() + ".</html>",
+                    "Problem Loading Proof", JOptionPane.ERROR_MESSAGE);
+            return Optional.empty();
+        }
+    }
+
+    protected Path unzipProofFromBundle(final Path pathInBundle, final File bundleFile)
+            throws IOException, ZipException {
+        final Path tmpDir = Files.createTempDirectory("KeYunzip");
+        tmpDir.toFile().deleteOnExit();
+        IOUtil.extractZip(bundleFile.toPath(), tmpDir);
+        final Path unzippedProof = tmpDir.resolve(pathInBundle);
+        return unzippedProof;
+    }
+
+    protected String readProofStringFromKeYFile(final Path unzippedProof) throws IOException {
+        final BufferedReader br = Files.newBufferedReader(unzippedProof);
+        boolean ignore = true;
+        final StringBuilder proofSb = new StringBuilder();
+
+        String line;
+        while ((line = br.readLine()) != null) {
+            if (line.startsWith("\\proof")) {
+                ignore = false;
+            }
+
+            if (!ignore) {
+                proofSb.append(line).append("\n");
+            }
+        }
+
+        return proofSb.toString();
     }
 
     private JComponent createAbstractFragmentViewContainer() {

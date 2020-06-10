@@ -399,18 +399,20 @@ public abstract class AbstractProblemLoader {
              */
             if (proofFilename == null) {    // no proof to load given -> try to determine one
                 // create a list of all *.proof files (only top level in bundle)
-                ZipFile bundle = new ZipFile(file);
-                List<Path> proofs = bundle.stream()
-                    .filter(e -> !e.isDirectory())
-                    .filter(e -> e.getName().endsWith(".proof"))
-                    .map(e -> Paths.get(e.getName()))
-                    .collect(Collectors.toList());
-                if (!proofs.isEmpty()) {
-                    // load first proof found in file
-                    proofFilename = proofs.get(0).toFile();
-                } else {
-                    // no proof found in bundle!
-                    throw new IOException("The bundle contains no proof to load!");
+                try (final ZipFile bundle = new ZipFile(file)) {
+                    List<Path> proofs = bundle.stream()
+                        .filter(e -> !e.isDirectory())
+                        .filter(e -> e.getName().endsWith(".proof"))
+                        .map(e -> Paths.get(e.getName()))
+                        .collect(Collectors.toList());
+                
+                    if (!proofs.isEmpty()) {
+                        // load first proof found in file
+                        proofFilename = proofs.get(0).toFile();
+                    } else {
+                        // no proof found in bundle!
+                        throw new IOException("The bundle contains no proof to load!");
+                    }
                 }
             }
 

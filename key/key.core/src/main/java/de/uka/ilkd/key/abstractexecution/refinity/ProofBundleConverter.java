@@ -76,6 +76,7 @@ public class ProofBundleConverter {
     private static final String RESULT_SEQ_1 = "<RESULT_SEQ_1>";
     private static final String RESULT_SEQ_2 = "<RESULT_SEQ_2>";
     private static final String ADDITIONAL_PREMISES = "<ADDITIONAL_PREMISES>";
+    private static final String PROOF = "<PROOF>";
 
     // AE Keywords
     private static final String AE_CONSTRAINT = "ae_constraint";
@@ -90,6 +91,7 @@ public class ProofBundleConverter {
     public static final String EXC = "_exc";
 
     private final AERelationalModel model;
+    private final Optional<String> proofString;
     private final String javaScaffold;
     private final String keyScaffold;
     private final Optional<File> keyFileToUse;
@@ -105,7 +107,21 @@ public class ProofBundleConverter {
      *                               found.
      */
     public ProofBundleConverter(AERelationalModel model) throws IOException, IllegalStateException {
-        this(model, null);
+        this(model, null, null);
+    }
+
+    /**
+     * @param model        The model to convert.
+     * @param proofString  If non-null, the given string will be appended to the
+     *                     generated KeY file. For certificate checking.
+     * @throws IOException           If the resource files are found, but could not
+     *                               be loaded.
+     * @throws IllegalStateException If the required resource files could not be
+     *                               found.
+     */
+    public ProofBundleConverter(AERelationalModel model, String proofString)
+            throws IOException, IllegalStateException {
+        this(model, proofString, null);
     }
 
     /**
@@ -120,7 +136,25 @@ public class ProofBundleConverter {
      */
     public ProofBundleConverter(AERelationalModel model, File keyFileToUse)
             throws IOException, IllegalStateException {
+        this(model, null, keyFileToUse);
+    }
+
+    /**
+     * @param model        The model to convert.
+     * @param proofString  If non-null, the given string will be appended to the
+     *                     generated KeY file. For certificate checking.
+     * @param keyFileToUse If non-null, will use the contents of this file instead
+     *                     of the scaffold file generated from the model. Used
+     *                     primarily for reloading in automated tests.
+     * @throws IOException           If the resource files are found, but could not
+     *                               be loaded.
+     * @throws IllegalStateException If the required resource files could not be
+     *                               found.
+     */
+    public ProofBundleConverter(AERelationalModel model, String proofString, File keyFileToUse)
+            throws IOException, IllegalStateException {
         this.model = model;
+        this.proofString = Optional.ofNullable(proofString);
         this.keyFileToUse = Optional.ofNullable(keyFileToUse);
 
         final InputStream javaScaffoldIS = ProofBundleConverter.class
@@ -300,7 +334,8 @@ public class ProofBundleConverter {
                 .replaceAll(RESULT_SEQ_1, extractResultSeq(model.getRelevantVarsOne()))
                 .replaceAll(RESULT_SEQ_2, extractResultSeq(model.getRelevantVarsTwo())) //
                 .replaceAll(ADDITIONAL_PREMISES,
-                        Matcher.quoteReplacement(createAdditionalPremises()));
+                        Matcher.quoteReplacement(createAdditionalPremises()))
+                .replaceAll(PROOF, Matcher.quoteReplacement(proofString.orElse("")));
     }
 
     private String createJavaDLPostCondition(final KeYJavaType dummyKJT, final Services services) {

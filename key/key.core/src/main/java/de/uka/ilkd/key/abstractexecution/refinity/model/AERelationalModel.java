@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,8 +50,7 @@ import de.uka.ilkd.key.java.Services;
  */
 @XmlRootElement(namespace = "http://www.key-project.org/abstractexecution")
 @XmlType(propOrder = { "programOne", "programTwo", "methodLevelContext", "abstractLocationSets",
-        "functionDeclarations",
-        "predicateDeclarations", "programVariableDeclarations" })
+        "functionDeclarations", "predicateDeclarations", "programVariableDeclarations" })
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class AERelationalModel {
     private static final String AE_MODEL_FILE_ENDING = ".aer";
@@ -120,8 +120,8 @@ public class AERelationalModel {
         this.functionDeclarations = functionDeclarations;
         this.predicateDeclarations = predicateDeclarations;
         this.programVariableDeclarations = programVariableDeclarations;
-        setRelevantVarsOne( relevantVarsOne);
-        setRelevantVarsTwo( relevantVarsTwo);
+        setRelevantVarsOne(relevantVarsOne);
+        setRelevantVarsTwo(relevantVarsTwo);
     }
 
     AERelationalModel() {
@@ -199,13 +199,13 @@ public class AERelationalModel {
 
     public void setRelevantVarsOne(List<NullarySymbolDeclaration> relevantVarsOne) {
         getProgramVariableDeclarations()
-                .forEach(pv -> pv.setRelevantOne( relevantVarsOne.indexOf(pv)));
+                .forEach(pv -> pv.setRelevantOne(relevantVarsOne.indexOf(pv)));
         getAbstractLocationSets().forEach(pv -> pv.setRelevantOne(relevantVarsOne.indexOf(pv)));
     }
 
     public void setRelevantVarsTwo(List<NullarySymbolDeclaration> relevantVarsTwo) {
         getProgramVariableDeclarations()
-                .forEach(pv -> pv.setRelevantTwo( relevantVarsTwo.indexOf(pv)));
+                .forEach(pv -> pv.setRelevantTwo(relevantVarsTwo.indexOf(pv)));
         getAbstractLocationSets().forEach(pv -> pv.setRelevantTwo(relevantVarsTwo.indexOf(pv)));
     }
 
@@ -339,5 +339,18 @@ public class AERelationalModel {
         } catch (RuntimeException exc) {
             return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(programOne, programTwo, methodLevelContext, preCondition, postCondition,
+                predicateDeclarations, functionDeclarations, abstractLocationSets,
+                programVariableDeclarations);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj instanceof AERelationalModel
+                && ((AERelationalModel) obj).hashCode() == this.hashCode();
     }
 }
