@@ -867,9 +867,10 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                                         "<html><b>Certificate is valid (Proof closed).</b></html>",
                                         "Proof Validated", JOptionPane.INFORMATION_MESSAGE);
                             } else {
-                                JOptionPane.showMessageDialog(RefinityWindow.this,
-                                        "<html><b>Invalid certificate!<b> (%d open goals)</html>",
-                                        "Proof Validation Faild", JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(RefinityWindow.this, String.format(
+                                        "<html><b>Invalid certificate!<b> (%d open goal(s))</html>",
+                                        proof.openGoals().size()), "Proof Validation Faild",
+                                        JOptionPane.ERROR_MESSAGE);
                             }
 
                             mainWindow.getUserInterface().removeProverTaskListener(this);
@@ -905,11 +906,19 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                     .filter(e -> e.getName().endsWith(".proof")).map(e -> Paths.get(e.getName()))
                     .collect(Collectors.toList());
 
-            final Path proofFile;
+            final Path proofFilePath;
 
             if (!proofs.isEmpty()) {
-                // load first proof found in file
-                proofFile = proofs.get(proofs.size() - 1);
+                if (proofs.size() == 1) {
+                    // load first proof found in file
+                    proofFilePath = proofs.get(0);
+                } else {
+                    proofFilePath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
+                    if (proofFilePath == null) {
+                        // canceled by user!
+                        return Optional.empty();
+                    }
+                }
             } else {
                 JOptionPane.showMessageDialog(RefinityWindow.this,
                         "<html>No proof was found in the selected bundle.</html>",
@@ -918,7 +927,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
             }
 
             final String proofStr = readProofStringFromKeYFile(
-                    unzipProofFromBundle(proofFile, file));
+                    unzipProofFromBundle(proofFilePath, file));
 
             return Optional.of(proofStr);
         } catch (IOException ioe) {

@@ -1,6 +1,10 @@
 REFINITY CHANGES
 ================
 
+## 2020-06-12 (v0.9.6) Dominic Steinhoefel <steinhoefel@cs.tu-darmstadt.de>
+
+  * Added certificate checking: Validate a saved proof bundle for a model.
+
 ## 2020-06-05 (v0.9.5) Dominic Steinhoefel <steinhoefel@cs.tu-darmstadt.de>
 
   * Automatic addition of empty block { ; } after ae_constraint. Manual addition of empty block
