@@ -50,7 +50,7 @@ public class HeuristicInstantiation implements TermGenerator {
     public Iterator<Term> generate(RuleApp app,
                                    PosInOccurrence pos,
                                    Goal goal) {
-        System.out.println("Create onstances for rule app: " + System.identityHashCode(app));
+        //System.out.println("Create onstances for rule app: " + System.identityHashCode(app));
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Term qf = pos.sequentFormula ().formula ();

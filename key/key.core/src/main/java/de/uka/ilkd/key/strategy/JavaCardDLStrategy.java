@@ -32,48 +32,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.strategy.feature.AgeFeature;
-import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
-import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
-import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
-import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
-import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
-import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
-import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
-import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
-import de.uka.ilkd.key.strategy.feature.DeleteMergePointRuleFeature;
-import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
-import de.uka.ilkd.key.strategy.feature.DiffFindAndIfFeature;
-import de.uka.ilkd.key.strategy.feature.DiffFindAndReplacewithFeature;
-import de.uka.ilkd.key.strategy.feature.DirectlyBelowSymbolFeature;
-import de.uka.ilkd.key.strategy.feature.EqNonDuplicateAppFeature;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.FindDepthFeature;
-import de.uka.ilkd.key.strategy.feature.FindRightishFeature;
-import de.uka.ilkd.key.strategy.feature.FocusInAntecFeature;
-import de.uka.ilkd.key.strategy.feature.InEquationMultFeature;
-import de.uka.ilkd.key.strategy.feature.MatchedIfFeature;
-import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.NoSelfApplicationFeature;
-import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
-import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
-import de.uka.ilkd.key.strategy.feature.NotBelowBinderFeature;
-import de.uka.ilkd.key.strategy.feature.NotBelowQuantifierFeature;
-import de.uka.ilkd.key.strategy.feature.NotInScopeOfModalityFeature;
-import de.uka.ilkd.key.strategy.feature.OnlyInScopeOfQuantifiersFeature;
-import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
-import de.uka.ilkd.key.strategy.feature.PurePosDPathFeature;
-import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
-import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
-import de.uka.ilkd.key.strategy.feature.SVNeedsInstantiation;
-import de.uka.ilkd.key.strategy.feature.ScaleFeature;
-import de.uka.ilkd.key.strategy.feature.SetsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.SumFeature;
-import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.ThrownExceptionFeature;
-import de.uka.ilkd.key.strategy.feature.TopLevelFindFeature;
-import de.uka.ilkd.key.strategy.feature.TrivialMonomialLCRFeature;
+import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
 import de.uka.ilkd.key.strategy.normalization.NormalizedAllFeature;
 import de.uka.ilkd.key.strategy.normalization.SimpleFormulaNormalization;
@@ -1130,6 +1089,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                               rec(any(), not(AnonHeapTermFeature.INSTANCE))),
                                           longConst(0), longConst(1000)),
                                    countOccurrencesInSeq, // standard costs
+                                       //FindDepthFeature.INSTANCE,
                                    longConst(100)),
                                SumFeature // check for cuts below quantifiers
                                    .createSum(
@@ -1403,29 +1363,30 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private void raiseNormalizationCost(RuleSetDispatchFeature d, IntegerLDT numbers, LocSetLDT locSetLDT) {
-        //Feature costRaiser = inftyConst();
-        Feature costRaiser = longConst(5000);
+        //Feature raised = inftyConst();
+        Feature raised = longConst(400);
+        Feature normal = longConst(0);
 
-        bindRuleSet(d,"negationNormalForm", costRaiser);
-        bindRuleSet(d,"moveQuantToLeft", costRaiser);
-        bindRuleSet(d,"conjNormalForm", costRaiser);
-        bindRuleSet(d, "setEqualityBlastingRight", costRaiser);
-        bindRuleSet(d,"cnf_setComm", costRaiser);
-        bindRuleSet(d, "elimQuantifier", costRaiser);
-        bindRuleSet(d, "elimQuantifierWithCast", costRaiser);
-        bindRuleSet(d, "apply_equations_andOr", costRaiser);
-        bindRuleSet(d, "distrQuantifier", costRaiser);
-        bindRuleSet(d, "swapQuantifiers", costRaiser);
+        bindRuleSet(d,"negationNormalForm", longConst(700));
+        bindRuleSet(d,"moveQuantToLeft", raised);
+        bindRuleSet(d,"conjNormalForm", raised);
+        bindRuleSet(d, "setEqualityBlastingRight", raised);
+        bindRuleSet(d,"cnf_setComm", raised);
+        bindRuleSet(d, "elimQuantifier", normal); // niedriger
+        bindRuleSet(d, "elimQuantifierWithCast", raised);
+        bindRuleSet(d, "apply_equations_andOr", raised);
+        bindRuleSet(d, "distrQuantifier", raised);
+        bindRuleSet(d, "swapQuantifiers", raised);
         // category "conjunctive normal form"
-        bindRuleSet(d, "cnf_orComm",  costRaiser);
-        bindRuleSet(d, "cnf_orAssoc", costRaiser);
-        bindRuleSet(d, "cnf_andComm",  costRaiser);
-        bindRuleSet(d, "cnf_andAssoc", costRaiser);
-        bindRuleSet(d, "cnf_dist",  costRaiser);
-        bindRuleSet(d, "cnf_expandIfThenElse", costRaiser);
-        bindRuleSet(d, "pullOutQuantifierUnifying", costRaiser);
-        bindRuleSet(d, "pullOutQuantifierAll", costRaiser);
-        bindRuleSet(d, "pullOutQuantifierEx", costRaiser);
+        bindRuleSet(d, "cnf_orComm",  raised);
+        bindRuleSet(d, "cnf_orAssoc", raised);
+        bindRuleSet(d, "cnf_andComm",  raised);
+        bindRuleSet(d, "cnf_andAssoc", raised);
+        bindRuleSet(d, "cnf_dist",  raised);
+        bindRuleSet(d, "cnf_expandIfThenElse", raised);
+        bindRuleSet(d, "pullOutQuantifierUnifying", raised);
+        bindRuleSet(d, "pullOutQuantifierAll", raised);
+        bindRuleSet(d, "pullOutQuantifierEx", raised);
     }
 
     private Feature clausesSmallerThan(String smaller, String bigger,
@@ -1450,10 +1411,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             InstantiationCost.create(varInst),
                             allowQuantifierSplitting());
             TermBuffer fml = new TermBuffer();
-            Feature countAllQuant = sum(fml, SubtermGenerator.leftTraverse(FocusProjection.create(0),
-                    not(op(Quantifier.ALL))), longConst(100));
-            Feature instantiateFeature = SumFeature.createSum(
+            // Adding 100 for depth of quantifier
+            Feature countAllQuant = add(sum(fml, SubtermGenerator.leftTraverse(FocusProjection.create(0),
+                    op(Quantifier.ALL)), longConst(100)), longConst(-100));
+            Feature instantiateFeature = new PrintFeature(SumFeature.createSum(
                     new Feature[] {
+                            // infty cost if pos not in antec
                             FocusInAntecFeature.INSTANCE,
                             formulaNormalizationEnabled() ? countAllQuant : longConst(0),
                             applyTF(FocusProjection.create(0),
@@ -1467,8 +1430,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                     HeuristicInstantiation.INSTANCE,
                                     add(instantiate("t", varInst),
                                             branchPrediction,
-                                            longConst(10))),
-                            formulaNormalizationEnabled() ? longConst(0) : longConst(0) });
+                                            longConst(10)))}));
 
             bindRuleSet(
                 d,

@@ -95,6 +95,7 @@ public class SimpleFormulaNormalization {
             lastFormula = formula;
             lastResult = result;
         }
+        System.out.println("Normalized: " + formula.toString() + "\tto: : " + result.toString());
         return result;
     }
 

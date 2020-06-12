@@ -133,6 +133,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
                                        PosInOccurrence      pio,
                                        Goal                 goal,
                                        RuleAppCostCollector collector ) {
+        // TODO instantiate anzeigen
         btManager.setup ( app );
         do {
             final RuleAppCost cost = instantiateApp ( app, pio, goal );
