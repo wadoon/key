@@ -26,6 +26,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.speclang.AbstractContractDefinition;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -528,6 +531,21 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // for JML annotation statements
         generateWdTaclets(proofConfig);
+    }
+
+    protected void collectAbstractContractDefinitions() {
+        for (KeYJavaType type : environmentServices.getJavaInfo().getAllKeYJavaTypes()) {
+            final ImmutableSet<AbstractContractDefinition> defs =
+                    specRepos.getAbstractContractDefinitions(type);
+            if (defs != null && !defs.isEmpty()){
+                for (AbstractContractDefinition def : defs) {
+                    Taclet defTaclet = def.toTaclet(environmentServices);
+                    // TODO only include if choices are applicable
+                    taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(defTaclet));
+                    proofConfig.registerRule(defTaclet, AxiomJustification.INSTANCE);
+                }
+            }
+        }
     }
 
     /**

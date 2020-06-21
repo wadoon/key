@@ -563,6 +563,7 @@ requiresabsclause returns [Term result = null] throws SLTranslationException
 				result = translator.translate(req.getText(), Term.class, id.getText(), paramVars, selfVar, services);
 
 			} else{
+			// TODO: maybe don't raise this error, so we can refer to other method's abstract symbols (which is useful for explicit contract refinement)?
 				raiseError("The name " + id.getText() + " already exists in this namespace");
 			}
 		}

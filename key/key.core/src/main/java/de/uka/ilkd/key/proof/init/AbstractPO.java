@@ -165,22 +165,6 @@ public abstract class AbstractPO implements IPersistablePO {
         registerClassAxiomTaclets(selfKJT, proofConfig);
     }
 
-    protected void collectAbstractContractDefinitions() {
-
-        for (KeYJavaType type : environmentServices.getJavaInfo().getAllKeYJavaTypes()) {
-            final ImmutableSet<AbstractContractDefinition> defs =
-                    specRepos.getAbstractContractDefinitions(type);
-            if (defs != null && !defs.isEmpty()){
-                for (AbstractContractDefinition def : defs) {
-                    Taclet defTaclet = def.toTaclet(environmentServices);
-                    // TODO only include if choices are applicable
-                    taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(defTaclet));
-                    environmentConfig.registerRule(defTaclet, AxiomJustification.INSTANCE);
-                }
-            }
-        }
-    }
-
     /** Check whether a taclet conforms with the currently active choices.
      * I.e., whether the taclet's given choices is a subset of <code>choices</code>.
      */
