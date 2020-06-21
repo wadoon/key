@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.UnaryOperator;
 
+import de.uka.ilkd.key.speclang.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -62,30 +63,6 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.ClassWellDefinedness;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.ContractAxiom;
-import de.uka.ilkd.key.speclang.ContractFactory;
-import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.speclang.FunctionalBlockContract;
-import de.uka.ilkd.key.speclang.FunctionalLoopContract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.InitiallyClause;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.MethodWellDefinedness;
-import de.uka.ilkd.key.speclang.PartialInvAxiom;
-import de.uka.ilkd.key.speclang.QueryAxiom;
-import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.speclang.SpecificationElement;
-import de.uka.ilkd.key.speclang.StatementWellDefinedness;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
@@ -164,6 +141,8 @@ public final class SpecificationRepository {
     private final Map<IObserverFunction, ImmutableSet<Taclet>>
         unlimitedToLimitTaclets =
             new LinkedHashMap<IObserverFunction, ImmutableSet<Taclet>>();
+    private final Map<KeYJavaType,ImmutableSet<AbstractContractDefinition>> defs =
+            new LinkedHashMap<KeYJavaType, ImmutableSet<AbstractContractDefinition>>();
 
     /**
      * <p>
@@ -1450,6 +1429,37 @@ public final class SpecificationRepository {
     }
 
     /**
+     * Returns all abstract contract definitions of this class
+     */
+    public ImmutableSet<AbstractContractDefinition> getAbstractContractDefinitions(KeYJavaType selfKjt) {
+        //TODO: definitions from superclasses?
+        return defs.get(selfKjt);
+    }
+
+    /**
+     * Registers the passed abstract contract definition.
+     */
+    public void addAbstractContractDefinition(AbstractContractDefinition def) {
+        KeYJavaType kjt = def.getKJT();
+        ImmutableSet<AbstractContractDefinition> currentDefinitions = defs.get(kjt);
+        if(currentDefinitions == null) {
+            currentDefinitions = DefaultImmutableSet.<AbstractContractDefinition>nil();
+        }
+        defs.put(kjt, currentDefinitions.add(def));
+
+    }
+
+    /**
+     * Registers the passed abstract contract definitions.
+     */
+    private void addAbstractContractDefinitions(ImmutableSet<AbstractContractDefinition> toAdd) {
+        for(AbstractContractDefinition def : toAdd) {
+            addAbstractContractDefinition(def);
+        }
+
+    }
+
+    /**
      * Returns all proofs registered for the passed PO (or stronger POs).
      */
     public ImmutableSet<Proof> getProofs(ProofOblInput po) {
@@ -1934,6 +1944,8 @@ public final class SpecificationRepository {
                 addLoopInvariant((LoopSpecification) spec);
             } else if (spec instanceof BlockContract) {
                 addBlockContract((BlockContract) spec);
+            } else if (spec instanceof AbstractContractDefinition) {
+                addAbstractContractDefinition((AbstractContractDefinition)spec);
             } else if (spec instanceof LoopContract) {
                 addLoopContract((LoopContract) spec);
             } else if (spec instanceof MergeContract) {

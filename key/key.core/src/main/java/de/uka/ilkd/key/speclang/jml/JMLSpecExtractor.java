@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.speclang.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -56,18 +57,6 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.InitiallyClause;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.SpecExtractor;
-import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassAxiom;
@@ -471,6 +460,11 @@ public final class JMLSpecExtractor implements SpecExtractor {
         for (int i = startPos; i >= 0
                 && constructsArray[i] instanceof TextualJMLSpecCase; i--) {
             TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructsArray[i];
+
+            // save it here, because here it represents how contract was defined by the user (in JML comments)
+            // later prepended "ensures" and "requires" do not change the fact, that a contract is abstract
+            boolean oldIsAbstract = specCase.isAbstract();
+
             if (modelMethodDecl != null
                     && modelMethodDecl.getMethodDefinition() != null) {
                 specCase.addAxioms(modelMethodDecl.getMethodDefinition());
@@ -563,12 +557,21 @@ public final class JMLSpecExtractor implements SpecExtractor {
                         new PositionedString(getDefaultSignalsOnly(pm)));
             }
 
+            //return old value
+            specCase.setIsAbstract(oldIsAbstract);
+
             // translate contract
             try {
                 ImmutableSet<Contract> contracts = jsf
                         .createJMLOperationContracts(pm, specCase);
                 for (Contract contract : contracts) {
                     result = result.add(contract);
+                }
+                // translate abstract contract definitions of given pm (@def)
+                ImmutableSet<AbstractContractDefinition> defs
+                        = jsf.createJMLAbstractContractDefinition(pm, specCase);
+                for(AbstractContractDefinition def : defs) {
+                    result = result.add(def);
                 }
             } catch (SLWarningException e) {
                 warnings = warnings.add(e.getWarning());

@@ -1,0 +1,40 @@
+\documentclass{report}
+
+\usepackage{keyjavadl}
+\usepackage{multirow,booktabs} % for result tables
+\usepackage{xspace}
+\begin{document}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{l@{\quad}c@{\quad}c@{\quad}c@{\quad}ccc}
+\toprule
+Version & \multicolumn{3}{c}{Completely abstract} & Concrete\\ \midrule
+ 	 		 & Partial 		& Full 			& Savings 	& Full \\ 
+   			 & proof 		& proof 			&   				& proof \\ \midrule
+v1	 		 & 1583 (58) 	& 4489 (111)  	& 35\%     		& 2569 (86)		\\ \midrule
+v2			 & 1583 (58) & 4003 (106) 	& 39\%   		& 2197 (79) 		\\ \midrule
+v3    		 & 1583 (58) & 4454 (114)  	& 36\%    		& 2568 (83)		\\ \bottomrule
+\end{tabular}
+\end{center}
+\caption{Results for {AccountLog} example}\label{tbl:account-savings}
+
+\label{tbl:accountlog-se-ratio}
+\end{table}
+
+
+\begin{table}\centering
+\begin{center}
+\begin{tabular}{c@{\quad}c@{\quad}c@{\quad}c@{\quad}c@{\quad}cc}
+\toprule
+Version	& Symbolic execution	& Full proof 	& Ratio 		\\ \midrule
+v1			& 1206 (56) 						& 2692 (86)  	& 45\%    		\\ \midrule
+v2			& 1115 (56)     				     & 2141 (79)  & 52\%    		\\ \midrule
+v3    		& 1118 (56)                  	     & 2666 (91)  & 42\%    		\\ \bottomrule 
+\end{tabular}
+\end{center}
+\caption{Analysis of the {AccountLog} example (specified with concrete contracts)}
+\label{tbl:accountlog-se-ratio}
+\end{table}
+
+\end{document}

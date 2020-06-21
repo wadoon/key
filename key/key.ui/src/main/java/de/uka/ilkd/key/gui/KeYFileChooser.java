@@ -100,6 +100,38 @@ public class KeYFileChooser {
         fileChooser.setFileFilter(DEFAULT_FILTER);
     }
 
+    // File chooser mode used to load reusable proofs (M)
+    public void setProofFileFilter() {
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+            public boolean accept(File f) {
+                return (f.toString().endsWith(".proof") || f.isDirectory());
+            }
+
+            public String getDescription() {
+                return "Proof files";
+            }
+        });
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    }
+
+    // File chooser mode used to load reusable proofs (M)
+    public void setDefaultFileFilter() {
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+            public boolean accept(File f) {
+                return
+                        f.isDirectory()
+                                || f.toString().endsWith(".java")
+                                || f.toString().endsWith(".key")
+                                || f.toString().endsWith(".proof");
+            }
+
+            public String getDescription() {
+                return "Java files, KeY files and Source Directories";
+            }
+        });
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+    }
+
     public void prepare() {
         File selFile = fileChooser.getSelectedFile();
 

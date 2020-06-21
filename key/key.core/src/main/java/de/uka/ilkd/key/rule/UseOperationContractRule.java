@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -88,7 +89,7 @@ import de.uka.ilkd.key.util.Pair;
 /**
  * Implements the rule which inserts operation contracts for a method call.
  */
-public final class UseOperationContractRule implements BuiltInRule {
+public class UseOperationContractRule implements BuiltInRule {
     /**
      * Hint to refactor the final pre term.
      */
@@ -108,7 +109,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     // constructors
     // -------------------------------------------------------------------------
 
-    private UseOperationContractRule() {
+    protected UseOperationContractRule() {
     }
 
     // -------------------------------------------------------------------------
@@ -619,11 +620,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
 
         // there must be applicable contracts for the operation
-        final ImmutableSet<FunctionalOperationContract> contracts = getApplicableContracts(
-                goal.proof().getServices(),
-                inst.pm,
-                inst.staticType,
-                inst.mod);
+        final ImmutableSet<FunctionalOperationContract> contracts = getApplicableContracts(inst, goal.proof().getServices());
         if (contracts.isEmpty()) {
             return false;
         }
@@ -725,7 +722,39 @@ public final class UseOperationContractRule implements BuiltInRule {
                 atPres,
                 services);
         originalFreePost = originalFreePost != null ? originalFreePost : tb.tt();
-        final Term post = globalDefs == null ? originalPost : tb.apply(globalDefs, originalPost);
+        Term post = tb.tt();
+        if (contractResult != null) {
+            StringBuilder name = new StringBuilder("resultOf" + inst.pm.getFullName());
+            for (ParameterDeclaration pd : inst.pm.getParameters()) {
+                name.append("_").append(pd.getTypeReference().getName());
+            }
+            Name resultFctName = new Name(name.toString());
+            Function resultFct = services.getNamespaces().functions().lookup(resultFctName);
+            if (resultFct == null) {
+                Sort[] params = new Sort[inst.pm.arity()];
+                int i = 0;
+                for(Sort paramSort : inst.pm.argSorts()) {
+                    params[i++] = paramSort;
+                }
+                resultFct = new Function(resultFctName, resultVar.sort(), params);
+                services.getNamespaces().functions().add(resultFct);
+            }
+
+            Term[] subs = new Term[resultFct.arity()];
+            int i = 0;
+            for(LocationVariable h : heapContext) {
+                subs[i++] = atPres.get(h);
+            }
+            if (contractSelf != null) {
+                subs[i++] = contractSelf;
+            }
+            for(Term param : contractParams) {
+                subs[i++] = param;
+            }
+
+            post = tb.and(post, tb.equals(contractResult, tb.func(resultFct, subs)));
+        }
+        post = tb.and(globalDefs==null? originalPost: tb.apply(globalDefs, originalPost), post);
         final Term freeSpecPost = globalDefs == null ? originalFreePost
                 : tb.apply(globalDefs, originalFreePost);
         final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();

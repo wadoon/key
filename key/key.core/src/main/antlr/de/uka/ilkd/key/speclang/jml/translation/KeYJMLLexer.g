@@ -37,13 +37,16 @@ lexer grammar KeYJMLLexer;
     /* JML and JML* keywords */
     ACCESSIBLE      : 'accessible';
     ASSIGNABLE      : 'assignable';
+    ASSIGNABLE_ABS  : 'assignable_abs';
     BREAKS          : 'breaks';
     CONTINUES       : 'continues';
     DECREASES       : 'decreases'; // internal translation for 'measured_by'
+    DEF             : 'def';
     DEPENDS         : 'depends';  // internal translation for 'accessible' on model fields
     DETERMINES      : 'determines';  //KeY extension, not official JML
     ENSURES         : 'ensures';
     ENSURES_FREE    : 'ensures_free';
+    ENSURES_ABS     : 'ensures_abs';
     LOOP_DETERMINES : 'loop_determines';  // internal translation for 'determines' in loop invariants
     LOOP_SEPARATES  : 'loop_separates';  //KeY extension, deprecated
     MODEL_METHOD_AXIOM    : 'model_method_axiom';  //KeY extension, not official JML
@@ -53,6 +56,7 @@ lexer grammar KeYJMLLexer;
     REPRESENTS      : 'represents';
     REQUIRES        : 'requires';
     REQUIRES_FREE   : 'requires_free';
+    REQUIRES_ABS    : 'requires_abs';
     RETURNS         : 'returns';  //KeY extension, not official JML
     SEPARATES       : 'separates';  //KeY extension, not official JML
     SIGNALS         : 'signals';

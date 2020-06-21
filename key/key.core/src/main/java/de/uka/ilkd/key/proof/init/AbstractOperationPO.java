@@ -524,6 +524,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // add axioms
         collectClassAxioms(getCalleeKeYJavaType(), proofConfig);
+        collectAbstractContractDefinitions();
 
         // for JML annotation statements
         generateWdTaclets(proofConfig);

@@ -73,58 +73,7 @@ import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
-import de.uka.ilkd.key.gui.actions.AboutAction;
-import de.uka.ilkd.key.gui.actions.AutoModeAction;
-import de.uka.ilkd.key.gui.actions.AutoSave;
-import de.uka.ilkd.key.gui.actions.CounterExampleAction;
-import de.uka.ilkd.key.gui.actions.DecreaseFontSizeAction;
-import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.EnsureSourceConsistencyToggleAction;
-import de.uka.ilkd.key.gui.actions.ExitMainAction;
-import de.uka.ilkd.key.gui.actions.GoalBackAction;
-import de.uka.ilkd.key.gui.actions.GoalSelectAboveAction;
-import de.uka.ilkd.key.gui.actions.GoalSelectBelowAction;
-import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
-import de.uka.ilkd.key.gui.actions.IncreaseFontSizeAction;
-import de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
-import de.uka.ilkd.key.gui.actions.LicenseAction;
-import de.uka.ilkd.key.gui.actions.MacroKeyBinding;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.actions.MenuSendFeedackAction;
-import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
-import de.uka.ilkd.key.gui.actions.OpenExampleAction;
-import de.uka.ilkd.key.gui.actions.OpenFileAction;
-import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
-import de.uka.ilkd.key.gui.actions.ProofManagementAction;
-import de.uka.ilkd.key.gui.actions.PruneProofAction;
-import de.uka.ilkd.key.gui.actions.QuickLoadAction;
-import de.uka.ilkd.key.gui.actions.QuickSaveAction;
-import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
-import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
-import de.uka.ilkd.key.gui.actions.SaveBundleAction;
-import de.uka.ilkd.key.gui.actions.SaveFileAction;
-import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
-import de.uka.ilkd.key.gui.actions.SearchInSequentAction;
-import de.uka.ilkd.key.gui.actions.SearchModeChangeAction;
-import de.uka.ilkd.key.gui.actions.SearchNextAction;
-import de.uka.ilkd.key.gui.actions.SearchPreviousAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
-import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
-import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
-import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
-import de.uka.ilkd.key.gui.actions.SyntaxHighlightingToggleAction;
-import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
-import de.uka.ilkd.key.gui.actions.TermLabelMenu;
-import de.uka.ilkd.key.gui.actions.TestGenerationAction;
-import de.uka.ilkd.key.gui.actions.ToggleConfirmExitAction;
-import de.uka.ilkd.key.gui.actions.ToggleSequentViewTooltipAction;
-import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
-import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
+import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -281,6 +230,8 @@ public final class MainWindow extends JFrame {
      * action for saving a proof (attempt)
      */
     private SaveFileAction saveFileAction;
+    /** action for loading an abstract cached part of the proof (M)*/
+    private LoadCachedProofAction loadCachedProofAction;
     /**
      * action for saving a proof as a bundle
      */
@@ -497,6 +448,7 @@ public final class MainWindow extends JFrame {
         openMostRecentFileAction = new OpenMostRecentFileAction(this);
         editMostRecentFileAction = new EditMostRecentFileAction(this);
         saveFileAction = new SaveFileAction(this);
+        loadCachedProofAction = new LoadCachedProofAction(this); //(M)
         saveBundleAction = new SaveBundleAction(this);
         quickSaveAction = new QuickSaveAction(this);
         quickLoadAction = new QuickLoadAction(this);
@@ -795,6 +747,7 @@ public final class MainWindow extends JFrame {
         fileMenu.add(saveBundleAction);
         fileMenu.add(quickSaveAction);
         fileMenu.add(quickLoadAction);
+        fileMenu.add(loadCachedProofAction); //(M)
         fileMenu.addSeparator();
         fileMenu.add(proofManagementAction);
 
@@ -1278,6 +1231,11 @@ public final class MainWindow extends JFrame {
 
     public void loadProblem(File file) {
         getUserInterface().loadProblem(file);
+    }
+
+    // (M) load cached Proof (reuse its rules on the selected proof)
+    public void reuseProof(File file) {
+        getUserInterface().reuseProof(file, getMediator());
     }
 
     public void loadProblem(File file, List<File> classPath, File bootClassPath, List<File> includes) {

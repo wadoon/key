@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+import de.uka.ilkd.key.speclang.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -47,11 +48,6 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassWellDefinedness;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.MethodWellDefinedness;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -167,6 +163,22 @@ public abstract class AbstractPO implements IPersistablePO {
 
     protected void collectClassAxioms(KeYJavaType selfKJT, InitConfig proofConfig) {
         registerClassAxiomTaclets(selfKJT, proofConfig);
+    }
+
+    protected void collectAbstractContractDefinitions() {
+
+        for (KeYJavaType type : environmentServices.getJavaInfo().getAllKeYJavaTypes()) {
+            final ImmutableSet<AbstractContractDefinition> defs =
+                    specRepos.getAbstractContractDefinitions(type);
+            if (defs != null && !defs.isEmpty()){
+                for (AbstractContractDefinition def : defs) {
+                    Taclet defTaclet = def.toTaclet(environmentServices);
+                    // TODO only include if choices are applicable
+                    taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(defTaclet));
+                    environmentConfig.registerRule(defTaclet, AxiomJustification.INSTANCE);
+                }
+            }
+        }
     }
 
     /** Check whether a taclet conforms with the currently active choices.

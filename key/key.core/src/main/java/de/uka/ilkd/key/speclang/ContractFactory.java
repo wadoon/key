@@ -134,7 +134,9 @@ public class ContractFactory {
                 foci.globalDefs,
                 foci.id,
                 foci.toBeSaved,
-                foci.transaction, services);
+                foci.transaction,
+                foci.isAbstract,
+                services);
     }
 
     /** Add the specification contained in InitiallyClause as a postcondition.
@@ -204,6 +206,7 @@ public class ContractFactory {
                 foci.originalMods
                         .get(services.getTypeConverter()
                                 .getHeapLDT().getSavedHeap()) != null,
+                foci.isAbstract,
                 services);
     }
 
@@ -227,7 +230,7 @@ public class ContractFactory {
                 foci.originalSelfVar, foci.originalParamVars,
                 foci.originalResultVar, foci.originalExcVar,
                 foci.originalAtPreVars, globalDefs, foci.id,
-                foci.toBeSaved, foci.transaction, services);
+                foci.toBeSaved, foci.transaction, foci.isAbstract, services);
     }
 
     public DependencyContract dep(KeYJavaType containerType,
@@ -404,6 +407,7 @@ public class ContractFactory {
                 Contract.INVALID_ID, toBeSaved,
                 mods.get(services.getTypeConverter().getHeapLDT()
                         .getSavedHeap()) != null,
+                false,
                 services);
     }
 
@@ -436,11 +440,12 @@ public class ContractFactory {
                                             Map<LocationVariable, Term> mods,
                                             Map<ProgramVariable, Term> accessibles,
                                             Map<LocationVariable, Boolean> hasMod,
-                                            ProgramVariableCollection pv) {
+                                            ProgramVariableCollection pv,
+                                            boolean isAbstract) {
         return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres,
                 freePres, mby, posts, freePosts, axioms,
                 mods, accessibles, hasMod, pv, false, mods.get(
-                        services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
+                        services.getTypeConverter().getHeapLDT().getSavedHeap()) != null, isAbstract);
     }
 
     /**
@@ -475,7 +480,7 @@ public class ContractFactory {
                                             Map<ProgramVariable, Term> accessibles,
                                             Map<LocationVariable, Boolean> hasMod,
                                             ProgramVariableCollection progVars,
-                                            boolean toBeSaved, boolean transaction) {
+                                            boolean toBeSaved, boolean transaction, boolean isAbstract) {
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
                 pm.getContainerType(), modality, pres, freePres,
                 mby, posts, freePosts,
@@ -483,7 +488,7 @@ public class ContractFactory {
                 progVars.selfVar, progVars.paramVars,
                 progVars.resultVar, progVars.excVar,
                 progVars.atPreVars, null,
-                Contract.INVALID_ID, toBeSaved, transaction, services);
+                Contract.INVALID_ID, toBeSaved, transaction, isAbstract, services);
     }
 
     private static Modality combineModalities(Modality moda,
@@ -641,8 +646,10 @@ public class ContractFactory {
                                        Map<LocationVariable, Term> mods,
                                        Map<ProgramVariable, Term> deps,
                                        Modality moda) {
+        boolean isAbstract = t.isAbstract;
         for (FunctionalOperationContract other : others) {
             moda = combineModalities(moda, other.getModality());
+            isAbstract = isAbstract && other.isAbstract();
             Term otherMby = other.hasMby()
                     ? other.getMby(t.originalSelfVar, t.originalParamVars, services)
                     : null;
@@ -711,7 +718,7 @@ public class ContractFactory {
                 t.originalResultVar, t.originalExcVar,
                 t.originalAtPreVars, t.globalDefs,
                 Contract.INVALID_ID, t.toBeSaved,
-                t.transaction, services);
+                t.transaction, isAbstract, services);
     }
 
     /**

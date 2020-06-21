@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import de.uka.ilkd.key.speclang.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -67,29 +68,6 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.ParametricMergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
-import de.uka.ilkd.key.speclang.AuxiliaryContract;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockContractImpl;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassAxiomImpl;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.ContractFactory;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
-import de.uka.ilkd.key.speclang.InitiallyClause;
-import de.uka.ilkd.key.speclang.InitiallyClauseImpl;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.LoopContractImpl;
-import de.uka.ilkd.key.speclang.LoopSpecImpl;
-import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
-import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -463,6 +441,28 @@ public class JMLSpecFactory {
         }
     }
 
+    private ImmutableList<AbstractContractDefinition> translateDefs(IProgramMethod pm,
+                                                                    ProgramVariable selfVar,
+                                                                    ImmutableList<ProgramVariable> paramVars,
+                                                                    ProgramVariable resultVar,
+                                                                    ProgramVariable excVar,
+                                                                    Map<LocationVariable,Term> atPres,
+                                                                    ImmutableList<PositionedString> originalClauses)
+            throws SLTranslationException {
+        //System.out.println("number of defs " + originalClauses.size());
+        ImmutableList<AbstractContractDefinition> defs = ImmutableSLList.<AbstractContractDefinition>nil();
+        for (PositionedString def: originalClauses) {
+            AbstractContractDefinition acDef = JMLTranslator.translate(def,
+                    pm.getContainerType(),
+                    selfVar, paramVars,
+                    resultVar, excVar,
+                    atPres,  null, AbstractContractDefinition.class, services);
+            acDef.setKJT(pm.getContainerType());
+            defs = defs.prepend(acDef);
+        }
+        return defs.reverse();
+    }
+
     private void translateEnsures(IProgramMethod pm, ProgramVariableCollection progVars,
             LocationVariable heap, final LocationVariable savedHeap,
             ImmutableList<PositionedString> ensures, ImmutableList<PositionedString> ensuresFree,
@@ -752,12 +752,19 @@ public class JMLSpecFactory {
             ImmutableList<PositionedString> assignableClauses) throws SLTranslationException {
 
         for (PositionedString expr : assignableClauses) {
-            Term translated = JMLTranslator.translate(expr, pm.getContainerType(), selfVar,
-                    paramVars, null, null, null, null, Term.class, services);
+            // abstract assignable allows no strictlyNothing
+            if (!expr.text.startsWith("assignable_abs")) {
+                Term translated =
+                        JMLTranslator.translate(expr, pm.getContainerType(),
+                                selfVar,
+                                paramVars, null, null, null, null,
+                                Term.class,
+                                services);
 
-            // less than nothing is marked by some special term;
-            if (translated.equalsModIrrelevantTermLabels(tb.strictlyNothing())) {
-                return true;
+                // less than nothing is marked by some special term;
+                if(translated == tb.strictlyNothing()) {
+                    return true;
+                }
             }
         }
 
@@ -880,7 +887,7 @@ public class JMLSpecFactory {
      */
     private ImmutableSet<Contract> createFunctionalOperationContracts(String name,
             IProgramMethod pm, ProgramVariableCollection progVars, ContractClauses clauses,
-            Map<LocationVariable, Term> posts, Map<LocationVariable, Term> axioms) {
+            Map<LocationVariable, Term> posts, Map<LocationVariable, Term> axioms, boolean isAbstract) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
 
         Term abbrvLhs = null;
@@ -906,14 +913,14 @@ public class JMLSpecFactory {
             // create diamond modality contract
             FunctionalOperationContract contract = cf.func(name, pm, true, pres,
                     clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                    clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                    clauses.assignables, clauses.accessibles, clauses.hasMod, progVars, isAbstract);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else if (clauses.diverges.equals(tb.tt())) {
             // create box modality contract
             FunctionalOperationContract contract = cf.func(name, pm, false, pres,
                     clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                    clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                    clauses.assignables, clauses.accessibles, clauses.hasMod, progVars, isAbstract);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         } else {
@@ -927,11 +934,11 @@ public class JMLSpecFactory {
             }
             FunctionalOperationContract contract1 = cf.func(name, pm, true, pres,
                     clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                    clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                    clauses.assignables, clauses.accessibles, clauses.hasMod, progVars, isAbstract);
             contract1 = cf.addGlobalDefs(contract1, abbrvLhs);
             FunctionalOperationContract contract2 = cf.func(name, pm, false, clauses.requires,
                     clauses.requiresFree, clauses.measuredBy, posts, clauses.ensuresFree, axioms,
-                    clauses.assignables, clauses.accessibles, clauses.hasMod, progVars);
+                    clauses.assignables, clauses.accessibles, clauses.hasMod, progVars, isAbstract);
             contract2 = cf.addGlobalDefs(contract2, abbrvLhs);
             result = result.add(contract1).add(contract2);
         }
@@ -1210,9 +1217,46 @@ public class JMLSpecFactory {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
         result = result.union(createInformationFlowContracts(clauses, pm, progVars));
         result = result.union(
-                createFunctionalOperationContracts(name, pm, progVars, clauses, posts, axioms));
+                createFunctionalOperationContracts(name, pm, progVars, clauses, posts, axioms, textualSpecCase.isAbstract()));
         result = result.union(createDependencyOperationContract(pm, progVars, clauses));
 
+        return result;
+    }
+
+    public ImmutableSet<AbstractContractDefinition> createJMLAbstractContractDefinition (IProgramMethod pm,
+                                                                                         TextualJMLSpecCase textualSpecCase) throws SLTranslationException {
+        assert pm != null;
+        assert textualSpecCase != null;
+
+        ProgramVariableCollection progVars = createProgramVariables(pm);
+        // TODO maybe change list to set?
+        Map<LocationVariable,ImmutableList<AbstractContractDefinition>> defs =
+                new LinkedHashMap<LocationVariable,ImmutableList<AbstractContractDefinition>>();
+        final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
+
+        //translate definitions
+        //definitions stored by heaps (might be useful later)
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            if(heap == savedHeap && textualSpecCase.getDefs(heap.name().toString()).isEmpty()) {
+                defs.put(heap, null);
+            }else{
+                defs.put(heap, translateDefs(pm, progVars.selfVar, progVars.paramVars,
+                        progVars.resultVar, progVars.excVar,
+                        progVars.atPres,
+                        textualSpecCase.getDefs(heap.name().toString())));}
+        }
+
+        //create definition
+        ImmutableSet<AbstractContractDefinition> result = DefaultImmutableSet.<AbstractContractDefinition>nil();
+        //ignore heaps, put everything into one set
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            // tedious conversion from list to set
+            if (!(defs.get(heap) == null)) {
+                for (AbstractContractDefinition def : defs.get(heap)){
+                    result = result.add(def);
+                }
+            }
+        }
         return result;
     }
 

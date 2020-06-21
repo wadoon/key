@@ -22,11 +22,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
-import de.uka.ilkd.key.speclang.translation.SLAttributeResolver;
-import de.uka.ilkd.key.speclang.translation.SLMethodResolver;
-import de.uka.ilkd.key.speclang.translation.SLResolverManager;
-import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
-import de.uka.ilkd.key.speclang.translation.SLTypeResolver;
+import de.uka.ilkd.key.speclang.translation.*;
 
 
 /**
@@ -40,7 +36,8 @@ final class JMLResolverManager extends SLResolverManager {
                               SLTranslationExceptionManager eManager) {
         super(eManager, specInClass, selfVar, false, javaInfo.getServices().getTermBuilder());
         addResolver(new JMLBuiltInPropertyResolver(javaInfo, this, specInClass));
-        addResolver(new SLAttributeResolver(javaInfo, this, specInClass));        
+        addResolver(new SLAbstractPlaceholderResolver(javaInfo, this, specInClass));
+        addResolver(new SLAttributeResolver(javaInfo, this, specInClass));
         addResolver(new SLMethodResolver(javaInfo, this, specInClass));
         addResolver(new SLTypeResolver(javaInfo, this, specInClass));
     }

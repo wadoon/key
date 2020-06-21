@@ -642,6 +642,8 @@ requires_clause
 @after { r = result; }
 :
     requires_keyword result=expression { result = flipHeaps("requires", result); }
+    |
+    REQUIRES_ABS result=expression {result = flipHeaps("requires_abs", result); }
 ;
 
 
@@ -733,9 +735,12 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 :
     (
 	    ps=assignable_clause     { sc.addAssignable(ps); }
+	|   ps=assignable_abs_clause { sc.addAssignable(ps); }
 	|   ps=accessible_clause     { sc.addAccessible(ps); }
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|   ps=ensures_free_clause   { sc.addEnsuresFree(ps); }
+	|	ps=ensures_abs_clause	 { sc.addEnsures(ps); }
+	|	ps=def_clause			 { sc.addDef(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
@@ -838,6 +843,14 @@ assignable_keyword
     |   MODIFIES_RED
 ;
 
+assignable_abs_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    ASSIGNABLE_ABS result=expression { result = flipHeaps("assignable_abs", result); }
+;
 
 accessible_clause
 	returns [PositionedString r = null]
@@ -889,6 +902,23 @@ ensures_keyword
 	ENSURES | ENSURES_RED | POST | POST_RED
 ;
 
+ensures_abs_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+	ENSURES_ABS result=expression {result = flipHeaps("ensures_abs", result); }
+;
+
+def_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+	DEF result=expression {result = flipHeaps("def", result); }
+;
 
 ensures_free_clause
 	returns [PositionedString r = null]

@@ -177,7 +177,12 @@ public abstract class AbstractProblemLoader {
      * The instantiate proof or {@code null} if no proof was instantiated during loading process.
      */
     private Proof proof;
-    
+
+    /**
+     * A proof whose current java source should be reused
+     */
+    private Proof sourceProof;
+
     /**
      * The {@link ReplayResult} if available or {@code null} otherwise.
      */
@@ -234,6 +239,29 @@ public abstract class AbstractProblemLoader {
         this.includes = includes;
     }
 
+    // (M) alternative loader, for when the .proof is loaded to be reused
+    public AbstractProblemLoader(File file,
+                                List<File> classPath,
+                                File bootClassPath,
+                                List<File> includes,
+                                Profile profileOfNewProofs,
+                                boolean forceNewProfileOfNewProofs,
+                                ProblemLoaderControl control,
+                                boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
+                                Properties poPropertiesToForce,
+                                Proof sourceProof) {
+        this.file = file;
+        this.classPath = classPath;
+        this.bootClassPath = bootClassPath;
+        this.control = control;
+        this.profileOfNewProofs = profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile();
+        this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
+        this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile = askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
+        this.poPropertiesToForce = poPropertiesToForce;
+        this.includes = includes;
+        this.sourceProof = sourceProof;
+    }
+
     /**
      * Executes the loading process and tries to instantiate a proof
      * and to re-apply rules on it if possible.
@@ -248,6 +276,11 @@ public abstract class AbstractProblemLoader {
 
         // Read environment
         envInput = createEnvInput(fileRepo);
+        // (M)
+        if (this.sourceProof != null && envInput != null) {
+            String modelDir = sourceProof.getServices().getJavaModel().getModelDir();
+            envInput.setJavaPath(modelDir);
+        }
         problemInitializer = createProblemInitializer(fileRepo);
         initConfig = createInitConfig();
         initConfig.setFileRepo(fileRepo);

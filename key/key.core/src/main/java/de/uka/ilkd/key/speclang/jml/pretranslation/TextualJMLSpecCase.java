@@ -79,6 +79,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private Map<String, ImmutableList<PositionedString>>
       axioms = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
+    private Map<String, ImmutableList<PositionedString>>
+            defs = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+
+    //tells, whether all requires, ensures, assignable are declared abstractly
+    //determined while adding requires, ensures, assignable
+    private boolean isAbstract = true;
+
     public TextualJMLSpecCase(ImmutableList<String> mods,
                               Behavior behavior) {
         super(mods);
@@ -93,6 +100,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
           accessibles.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
           accessibles.put(hName.toString()+"AtPre", ImmutableSLList.<PositionedString>nil());
           axioms.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+          defs.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
         }
     }
 
@@ -164,6 +172,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public void addRequires(PositionedString ps) {
+        if (!ps.text.startsWith("requires_abs")) {
+            isAbstract = false;
+        }
         addGeneric(requires, ps);
     }
 
@@ -181,6 +192,17 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public void addRequiresFree(ImmutableList<PositionedString> l) {
         for(PositionedString ps : l) {
            addRequiresFree(ps);
+        }
+    }
+
+    public void addDef(PositionedString ps) {
+        addGeneric(defs, ps);
+    }
+
+
+    public void addDef(ImmutableList<PositionedString> l) {
+        for(PositionedString ps : l) {
+            addDef(ps);
         }
     }
 
@@ -205,6 +227,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public void addAssignable(PositionedString ps) {
+        if (!ps.text.startsWith("assignable_abs")) {
+            isAbstract = false;
+        }
         addGeneric(assignables, ps);
     }
     
@@ -225,6 +250,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public void addEnsures(PositionedString ps) {
+        if (!ps.text.startsWith("ensures_abs")) {
+            isAbstract = false;
+        }
         addGeneric(ensures, ps);
     }
 
@@ -356,6 +384,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public ImmutableList<PositionedString> getRequires() {
         return requires.get(HeapLDT.BASE_HEAP_NAME.toString());
+    }
+
+    public ImmutableList<PositionedString> getDefs() {
+        return defs.get(HeapLDT.BASE_HEAP_NAME.toString());
+    }
+
+    public ImmutableList<PositionedString> getDefs(String hName) {
+        return defs.get(hName);
     }
 
     public ImmutableList<PositionedString> getRequires(String hName) {
@@ -502,6 +538,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             }
           }
         for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+            it = defs.get(h.toString()).iterator();
+            while(it.hasNext()) {
+                sb.append("def<"+h+">: " + it.next() + "\n");
+            }
+        }
+        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
           it = assignables.get(h.toString()).iterator();
           while(it.hasNext()) {
             sb.append("assignable<"+h+">: " + it.next() + "\n");
@@ -582,6 +624,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && abbreviations.equals(sc.abbreviations)
                && requires.equals(sc.requires)
                && requiresFree.equals(sc.requiresFree)
+               && defs.equals(sc.defs)
                && assignables.equals(sc.assignables)
                && accessibles.equals(sc.accessibles)
                && axioms.equals(sc.axioms)
@@ -605,6 +648,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + abbreviations.hashCode()
                + requires.hashCode()
                + requiresFree.hashCode()
+               + defs.hashCode()
                + assignables.hashCode()
                + accessibles.hashCode()
                + axioms.hashCode()
@@ -618,5 +662,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + continues.hashCode()
                + returns.hashCode()
                + infFlowSpecs.hashCode();
+    }
+
+    // contract is considered abstract, if only requires_abs, ensures_abs and assignable_abs are used
+    public boolean isAbstract() {
+        return isAbstract;
+    }
+
+    public void setIsAbstract(boolean isAbstract) {
+        this.isAbstract = isAbstract;
+
     }
 }

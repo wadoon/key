@@ -28,6 +28,7 @@ options {
     import de.uka.ilkd.key.proof.OpReplacer;
     import de.uka.ilkd.key.speclang.HeapContext;
     import de.uka.ilkd.key.speclang.PositionedString;
+    import de.uka.ilkd.key.speclang.AbstractContractDefinition;
     import de.uka.ilkd.key.speclang.translation.*;
     import de.uka.ilkd.key.util.Pair;
     import de.uka.ilkd.key.util.Triple;
@@ -468,15 +469,19 @@ top returns [Object ret = null] throws  SLTranslationException
 :
     (   accessibleclause { ret = $accessibleclause.ret; }
     |   assignableclause { ret = $assignableclause.ret; }
+    |   assignableabsclause { ret = $assignableabsclause.result; }
     |   breaksclause { ret = $breaksclause.result; }
     |   continuesclause { ret = $continuesclause.result; }
     |   dependsclause { ret = $dependsclause.result; }
+    |   defclause { ret = $defclause.result; }
     |   ensuresclause { ret = $ensuresclause.ret; }
     |   ensuresfreeclause { ret = $ensuresfreeclause.ret; }
+    |   ensuresabsclause { ret = $ensuresabsclause.result; }
     |   representsclause { ret = $representsclause.result; }
     |   axiomsclause { ret = $axiomsclause.ret; }
     |   requiresclause { ret = $requiresclause.ret; }
     |   requiresfreeclause { ret = $requiresfreeclause.ret; }
+    |   requiresabsclause { ret = $requiresabsclause.result; }
     |   decreasesclause { ret = $decreasesclause.ret; }
     |   separatesclause { ret = $separatesclause.result; } // old information flow syntax
     |   determinesclause { ret = $determinesclause.result; } // new information flow syntax
@@ -510,6 +515,18 @@ assignableclause returns [Term ret = null] throws SLTranslationException
     )
     ;
 
+assignableabsclause returns [Term result = null] throws SLTranslationException
+:
+	ass=ASSIGNABLE_ABS id=IDENT
+		{	Named n = javaInfo.getServices().getNamespaces().functions().lookup(id.getText());
+			if (n == null){
+				result = translator.translate(ass.getText(), Term.class, id.getText(),
+													paramVars, selfVar, services);
+			} else{
+				raiseError("The name " + id.getText() + " already exists in this namespace");
+			}
+		}
+	;
 
 dependsclause returns [Triple<ObserverFunction,Term,Term> result=null] throws SLTranslationException
 :
@@ -539,6 +556,18 @@ requiresfreeclause returns [Term ret = null] throws SLTranslationException
             { ret = translator.translate(req.getText(), Term.class, result, services); }
     ;
 
+requiresabsclause returns [Term result = null] throws SLTranslationException
+:
+	req=REQUIRES_ABS id=IDENT
+		{	if (javaInfo.getServices().getNamespaces().functions().lookup(id.getText()) == null){
+				result = translator.translate(req.getText(), Term.class, id.getText(), paramVars, selfVar, services);
+
+			} else{
+				raiseError("The name " + id.getText() + " already exists in this namespace");
+			}
+		}
+	;
+
 ensuresclause returns [Term ret = null] throws SLTranslationException
 :
     ens=ENSURES result=predornot
@@ -550,6 +579,54 @@ ensuresfreeclause returns [Term ret = null] throws SLTranslationException
     ens=ENSURES_FREE result=predornot
             { ret = translator.translate(ens.getText(), Term.class, result, services); }
     ;
+
+ensuresabsclause returns [Term result = null] throws SLTranslationException
+:
+	req=ENSURES_ABS id=IDENT
+		{	if (javaInfo.getServices().getNamespaces().functions().lookup(id.getText()) == null){
+				result = translator.translate(req.getText(), Term.class, id.getText(),
+													paramVars, selfVar, resultVar, services, atPres);
+			} else{
+				raiseError("The name " + id.getText() + " already exists in this namespace");
+			}
+		}
+	;
+
+defclause returns [AbstractContractDefinition result = null] throws SLTranslationException
+@init {
+    Function f = null;
+}
+:
+	def=DEF id=IDENT
+	{
+			f = (Function)javaInfo.getServices().getNamespaces().functions().lookup(id.getText());
+			if (f == null) {
+				raiseError("Undeclared " + id.getText() + " appeared in def clause");
+			}
+	}
+	(
+		{ // TODO: move code out of the parser!
+          f.sort() == Sort.FORMULA}?
+          (
+          	EQUAL_SINGLE pr = predornot {
+          		result = translator.translate(def.getText(), AbstractContractDefinition.class,
+												f, pr,
+												paramVars, selfVar, resultVar, services, atPres);
+          	}
+          )
+          |
+        { // TODO: move code out of the parser!
+          f.sort() == services.getTypeConverter().getLocSetLDT().targetSort()}?
+          (
+          	EQUAL_SINGLE un = storeRefUnion {
+          		result = translator.translate(def.getText(), AbstractContractDefinition.class,
+												f, un,
+												paramVars, selfVar, resultVar, services, atPres);
+          	}
+          )
+	)
+
+	;
 
 axiomsclause returns [Term ret = null] throws SLTranslationException
 :

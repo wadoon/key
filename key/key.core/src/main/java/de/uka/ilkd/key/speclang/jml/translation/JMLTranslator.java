@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.speclang.AbstractContractDefinition;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.key_project.util.collection.ImmutableList;
@@ -38,15 +40,6 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
@@ -129,13 +122,17 @@ public final class JMLTranslator {
         // clauses
         ACCESSIBLE ("accessible"),
         ASSIGNABLE ("assignable"),
+        ASSIGNABLE_ABS ("assignable_abs"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
         ENSURES_FREE ("ensures_free"),
+        ENSURES_ABS ("ensures_abs"),
         MODEL_METHOD_AXIOM ("model_method_axiom"),
         REPRESENTS ("represents"),
         REQUIRES ("requires"),
         REQUIRES_FREE ("requires_free"),
+        REQUIRES_ABS ("requires_abs"),
+        DEF ("def"),
         SIGNALS ("signals"),
         SIGNALS_ONLY ("signals_only"),
         MERGE_PROC ("merge_proc"),
@@ -293,6 +290,63 @@ public final class JMLTranslator {
                 }
             }
         });
+        translationMethods.put(JMLKeyWord.ASSIGNABLE_ABS,
+                new JMLTranslationMethod() {
+
+                    @Override
+                    public Term translate(SLTranslationExceptionManager excManager,
+                                          Object... params)
+                            throws SLTranslationException {
+                        checkParameters(params, String.class, ImmutableList.class,
+                                ProgramVariable.class, Services.class);
+                        String name = (String) params[0];
+                        ImmutableList<ProgramVariable> paramVars = (ImmutableList<ProgramVariable>) params[1];
+                        ProgramVariable selfVar = (ProgramVariable) params[2];
+                        Services services = (Services) params[3];
+
+                        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+                        JavaInfo javaInfo = services.getJavaInfo();
+
+                        //creating a function
+                        List<Sort> sorts = new ArrayList<Sort>();
+
+                        //depends on heap
+                        sorts.add(heapLDT.targetSort());
+                        //selfVar
+                        if (selfVar != null) {
+                            sorts.add(selfVar.getKeYJavaType().getSort());
+                        }
+                        // sorts of all method parameters
+                        for (ProgramVariable param: paramVars) {
+                            sorts.add(param.getKeYJavaType().getSort());
+                        }
+
+                        // create function of sort LocSetLDT
+                        Placeholder p = new Placeholder(name, Placeholder.ASSIGNABLE);
+                        Function f = new Function(p, services.getTypeConverter().getLocSetLDT().targetSort(),
+                                sorts.toArray(new Sort[sorts.size()]));
+
+                        javaInfo.getServices().getNamespaces().functions().add(f);
+
+                        // Creating a Term
+                        List<Term> subterms = new ArrayList<Term>();
+
+                        // add heap
+                        subterms.add(tb.var(heapLDT.getHeap()));
+
+                        // add selfVar, resultVar, parameters
+                        if (selfVar != null) {
+                            subterms.add(tb.var(selfVar));
+                        }
+
+                        // add parameters
+                        for (ProgramVariable param: paramVars) {
+                            subterms.add(tb.var(param));
+                        }
+
+                        return tb.func(f, subterms.toArray(new Term[subterms.size()]), null);
+                    }
+                });
         translationMethods.put(JMLKeyWord.DEPENDS,
                                new JMLTranslationMethod() {
 
@@ -336,6 +390,148 @@ public final class JMLTranslator {
         };
         translationMethods.put(JMLKeyWord.ENSURES, termTranslationMethod);
         translationMethods.put(JMLKeyWord.ENSURES_FREE, termTranslationMethod);
+        translationMethods.put(JMLKeyWord.ENSURES_ABS, new JMLTranslationMethod() {
+
+            @Override
+            public Term translate(SLTranslationExceptionManager excManager,
+                                  Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, String.class, ImmutableList.class, ProgramVariable.class, ProgramVariable.class, Services.class, Map.class);
+                String name = (String) params[0];
+                ImmutableList<ProgramVariable> paramVars = (ImmutableList<ProgramVariable>) params[1];
+                ProgramVariable selfVar = (ProgramVariable) params[2];
+                ProgramVariable resultVar = (ProgramVariable) params[3];
+                Services services = (Services) params[4];
+                Map<LocationVariable, Term> atPres = (Map) params[5];
+
+
+                HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+                JavaInfo javaInfo = services.getJavaInfo();
+
+
+                //creating a function
+                List<Sort> sorts = new ArrayList<Sort>();
+                // twice the heap sort (for heap and atPreHeap)
+                sorts.add(heapLDT.targetSort());
+                sorts.add(heapLDT.targetSort());
+                //sort of selfVar
+                if (selfVar != null) {
+                    sorts.add(selfVar.getKeYJavaType().getSort());
+                }
+                // sort of resultVar
+                if (resultVar != null) {
+                    sorts.add(resultVar.getKeYJavaType().getSort());
+                }
+                // sorts of all method parameters
+                for (ProgramVariable param: paramVars) {
+                    sorts.add(param.getKeYJavaType().getSort());
+                }
+
+                Placeholder p = new Placeholder(name, Placeholder.ENSURES);
+                Function f = new Function(p, Sort.FORMULA,
+                        sorts.toArray(new Sort[sorts.size()]));
+                javaInfo.getServices().getNamespaces().functions().add(f);
+
+
+                //Creating a term
+                List<Term> subterms = new ArrayList<Term>();
+
+                // add heap
+                subterms.add(tb.var(heapLDT.getHeap()));
+                // add corresponding atPreHeap
+                if (atPres != null) {
+                    subterms.add(atPres.get(heapLDT.getHeap()));
+                }
+                // add selfVar, resultVar, parameters
+                if (selfVar != null) {
+                    subterms.add(tb.var(selfVar));
+                }
+                if (resultVar != null) {
+                    subterms.add(tb.var(resultVar));
+                }
+                for (ProgramVariable param: paramVars) {
+                    subterms.add(tb.var(param));
+                }
+                return tb.func(f, subterms.toArray(new Term[subterms.size()]), null);
+            }
+        });
+        translationMethods.put(JMLKeyWord.DEF, new JMLTranslationMethod() {
+            // gets the function (placeholder) and the corresponding Term (its value), builds a Definition
+            @Override
+            public AbstractContractDefinition translate(SLTranslationExceptionManager excManager,
+                                                        Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, Function.class, Term.class, ImmutableList.class, ProgramVariable.class, ProgramVariable.class, Services.class, Map.class);
+                Function function = (Function) params[0];
+                Term value = (Term) params[1];
+                ImmutableList<ProgramVariable> paramVars = (ImmutableList<ProgramVariable>) params[2];
+                ProgramVariable selfVar = (ProgramVariable) params[3];
+                ProgramVariable resultVar = (ProgramVariable) params[4];
+                Services services = (Services) params[5];
+                Map<LocationVariable, Term> atPres = (Map) params[6];
+
+
+                HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+
+                // Build term for a function
+                List<Term> subterms = new ArrayList<Term>();
+
+                assert function.name() instanceof Placeholder;
+                Placeholder p = (Placeholder)function.name();
+                if(p.getType() == Placeholder.ENSURES || p.getType() == Placeholder.REQUIRES) {
+                    // heap goes for requires and ensures
+                    subterms.add(tb.var(heapLDT.getHeap()));
+
+                    // heapAtPre only for ensures
+
+                    if(p.getType() == Placeholder.ENSURES && atPres != null) {
+                        subterms.add(atPres.get(heapLDT.getHeap()));
+                    }
+
+                    // both ensures and requires depend on selfVar when it exists
+
+                    if (selfVar != null) {
+                        subterms.add(tb.var(selfVar));
+                    }
+
+                    // resultVar only for ensures (ensures has 1 more sort than result)
+                    if(p.getType() == Placeholder.ENSURES && resultVar != null) {
+                        subterms.add(tb.var(resultVar));
+                    }
+
+                    // parameters for ensures and requires
+                    for (ProgramVariable param: paramVars) {
+                        subterms.add(tb.var(param));
+                    }
+                    return new AbstractContractDefinition(tb.func(function, subterms.toArray(new Term[subterms.size()]), null),
+                            tb.convertToFormula(value));
+                }
+                else if (p.getType() == Placeholder.ASSIGNABLE) {
+                    // Build term for a function
+
+                    // add heap
+                    subterms.add(tb.var(heapLDT.getHeap()));
+
+                    // self
+                    if (selfVar != null) {
+                        subterms.add(tb.var(selfVar));
+                    }
+
+                    // parameters
+                    for (ProgramVariable param: paramVars) {
+                        subterms.add(tb.var(param));
+                    }
+
+                    return new AbstractContractDefinition(tb.func(function, subterms.toArray(new Term[subterms.size()]), null),
+                            value);
+                }
+                else throw excManager.createException("Placeholder "+ function.name() + "doesn't match its definition");
+
+
+
+
+            }
+        });
         translationMethods.put(JMLKeyWord.MODEL_METHOD_AXIOM, termTranslationMethod);
        translationMethods.put(JMLKeyWord.REPRESENTS,
                                new JMLTranslationMethod() {
@@ -356,6 +552,48 @@ public final class JMLTranslator {
         });
         translationMethods.put(JMLKeyWord.REQUIRES, termTranslationMethod);
         translationMethods.put(JMLKeyWord.REQUIRES_FREE, termTranslationMethod);
+        translationMethods.put(JMLKeyWord.REQUIRES_ABS, new JMLTranslationMethod() {
+
+            @Override
+            public Term translate(SLTranslationExceptionManager excManager,
+                                  Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, String.class, ImmutableList.class, ProgramVariable.class, Services.class);
+                String name = (String) params[0];
+                ImmutableList<ProgramVariable> paramVars = (ImmutableList<ProgramVariable>) params[1];
+                ProgramVariable selfVar = (ProgramVariable) params[2];
+                Services services = (Services) params[3];
+
+                HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+                JavaInfo javaInfo = services.getJavaInfo();
+
+                List<Sort> sorts = new ArrayList<Sort>();
+                sorts.add(heapLDT.targetSort());
+                if (selfVar != null) {
+                    sorts.add(selfVar.getKeYJavaType().getSort());
+                }
+                for (ProgramVariable param: paramVars) {
+                    sorts.add(param.getKeYJavaType().getSort());
+                }
+
+                Placeholder p = new Placeholder(name, Placeholder.REQUIRES);
+                Function f = new Function(p, Sort.FORMULA,
+                        sorts.toArray(new Sort[sorts.size()]));
+                javaInfo.getServices().getNamespaces().functions().add(f);
+
+                List<Term> subterms = new ArrayList<Term>();
+                subterms.add(tb.var(heapLDT.getHeap()));
+                if (selfVar != null) {
+                    subterms.add(tb.var(selfVar));
+                }
+                for (ProgramVariable param: paramVars) {
+                    subterms.add(tb.var(param));
+                }
+
+                return tb.func(f, subterms.toArray(new Term[subterms.size()]), null);
+            }
+        });
+
         translationMethods.put(JMLKeyWord.MERGE_PROC, new JMLTranslationMethod() {
 
             @Override
