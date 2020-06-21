@@ -20,7 +20,6 @@ import javax.swing.SwingWorker;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
@@ -54,23 +53,6 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
                          ProverTaskListener ptl) {
         super(file, classPath, bootClassPath, includes, profileOfNewProofs, forceNewProfileOfNewProofs, mediator.getUI(),
                 askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
-        this.mediator = mediator;
-        this.ptl = ptl;
-    }
-
-    public ProblemLoader(File file,
-                         List<File> classPath,
-                         File bootClassPath,
-                         List<File> includes,
-                         Profile profileOfNewProofs,
-                         boolean forceNewProfileOfNewProofs,
-                         KeYMediator mediator,
-                         boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
-                         Properties poPropertiesToForce,
-                         ProverTaskListener ptl,
-                         Proof sourceProof) {
-        super(file, classPath, bootClassPath, includes, profileOfNewProofs, forceNewProfileOfNewProofs, mediator.getUI(),
-                askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce, sourceProof);
         this.mediator = mediator;
         this.ptl = ptl;
     }

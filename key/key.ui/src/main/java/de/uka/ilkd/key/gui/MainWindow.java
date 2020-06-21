@@ -230,8 +230,6 @@ public final class MainWindow extends JFrame {
      * action for saving a proof (attempt)
      */
     private SaveFileAction saveFileAction;
-    /** action for loading an abstract cached part of the proof (M)*/
-    private LoadCachedProofAction loadCachedProofAction;
     /**
      * action for saving a proof as a bundle
      */
@@ -448,7 +446,6 @@ public final class MainWindow extends JFrame {
         openMostRecentFileAction = new OpenMostRecentFileAction(this);
         editMostRecentFileAction = new EditMostRecentFileAction(this);
         saveFileAction = new SaveFileAction(this);
-        loadCachedProofAction = new LoadCachedProofAction(this); //(M)
         saveBundleAction = new SaveBundleAction(this);
         quickSaveAction = new QuickSaveAction(this);
         quickLoadAction = new QuickLoadAction(this);
@@ -747,7 +744,6 @@ public final class MainWindow extends JFrame {
         fileMenu.add(saveBundleAction);
         fileMenu.add(quickSaveAction);
         fileMenu.add(quickLoadAction);
-        fileMenu.add(loadCachedProofAction); //(M)
         fileMenu.addSeparator();
         fileMenu.add(proofManagementAction);
 
@@ -1231,11 +1227,6 @@ public final class MainWindow extends JFrame {
 
     public void loadProblem(File file) {
         getUserInterface().loadProblem(file);
-    }
-
-    // (M) load cached Proof (reuse its rules on the selected proof)
-    public void reuseProof(File file) {
-        getUserInterface().reuseProof(file, getMediator());
     }
 
     public void loadProblem(File file, List<File> classPath, File bootClassPath, List<File> includes) {

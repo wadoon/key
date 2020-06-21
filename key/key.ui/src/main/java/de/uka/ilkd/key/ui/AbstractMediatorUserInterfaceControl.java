@@ -102,26 +102,13 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
     public abstract void loadProofFromBundle(File proofBundle, File proofFilename);
 
     protected ProblemLoader getProblemLoader(File file, List<File> classPath,
-                                             File bootClassPath, List<File> includes,KeYMediator mediator, Proof sourceProof) {
+                                             File bootClassPath, List<File> includes,KeYMediator mediator) {
         final ProblemLoader pl =
                 new ProblemLoader(file, classPath, bootClassPath, includes,
-                        AbstractProfile.getDefaultProfile(), false, mediator, true, null, this, sourceProof);
+                        AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
         return pl;
     }
-
-    protected ProblemLoader getProblemLoader(File file, List<File> classPath,
-                                             File bootClassPath, List<File> includes,KeYMediator mediator) {
-        return getProblemLoader(file, classPath, bootClassPath, includes, mediator, null);
-    }
-
-    // (M) load cached Proof (reuse its rules on the selected proof)
-    public void reuseProof(File file, KeYMediator mediator) {
-        // problem: we load proof file for some other problem, but want to apply it on the current problem
-        // their source pathes may be different.
-        // trick: load .proof file using \javaSource of the current proof, not the one from .proof file
-        getProblemLoader(file, null, null, null, getMediator(), getMediator().getSelectedProof()).runAsynchronously();
-    }
-
+    
     public boolean applyMacro() {
       assert macroChosen();
       final ProofMacro macro = getMacro();
