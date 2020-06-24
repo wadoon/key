@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -13,6 +12,9 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FinishAbstractProofMacro extends StrategyProofMacro {
 	@Override
@@ -34,6 +36,33 @@ public class FinishAbstractProofMacro extends StrategyProofMacro {
     protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new FinishAbstractProofStrategy(proof.getActiveStrategy());
     }
+
+    public static List<String> forbiddenRuleSets = new ArrayList<>();
+    public static List<String> forbiddenRules = new ArrayList<>();
+    public static boolean firstOrderGoalsForbidden = false;
+
+    static {
+        // default rule sets and rules which may not be applied within an abstract proof
+        forbiddenRuleSets.add("expand_def");
+        forbiddenRuleSets.add("classAxiom");
+        forbiddenRuleSets.add("partialInvAxiom");
+    }
+
+    private static boolean isInForbiddenRuleSet(RuleApp ruleApp, String ruleSetName) {
+        return ((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name(ruleSetName)));
+    }
+
+    private static boolean isInForbiddenRuleSet(RuleApp ruleApp) {
+        return forbiddenRuleSets.stream().anyMatch(ruleSetName -> isInForbiddenRuleSet(ruleApp, ruleSetName));
+    }
+
+    private static boolean isForbiddenRule(RuleApp ruleApp, String ruleName) {
+        return ruleApp.rule().name().toString().equalsIgnoreCase(ruleName);
+    }
+
+    private static boolean isForbiddenRule(RuleApp ruleApp) {
+        return forbiddenRules.stream().anyMatch(ruleName -> isForbiddenRule(ruleApp, ruleName));
+    }
     
     private static class FinishAbstractProofStrategy implements Strategy {
     	
@@ -44,6 +73,37 @@ public class FinishAbstractProofMacro extends StrategyProofMacro {
             this.delegate = delegate;
         }
 
+        /*
+         * find a modality term in a node
+         */
+        private static boolean hasModality(Node node) {
+            Sequent sequent = node.sequent();
+            for (SequentFormula sequentFormula : sequent) {
+                if(hasModality(sequentFormula.formula())) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /*
+         * recursively descent into the term to detect a modality.
+         */
+        private static boolean hasModality(Term term) {
+            if(term.op() instanceof Modality) {
+                return true;
+            }
+
+            for (Term sub : term.subs()) {
+                if(hasModality(sub)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         @Override
         public Name name() {
             return NAME;
@@ -51,17 +111,13 @@ public class FinishAbstractProofMacro extends StrategyProofMacro {
 
         @Override
         public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
-            // TODO: review optimization strategy in b26e24d9c54379533b988dbbee41cb51b08055fa
             if (ruleApp instanceof TacletApp &&
-                    (	((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("expand_def"))) ||
-                        ((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("classAxiom")))   ||
-                        ((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name("partialInvAxiom")))
-                    )) {
-                    return TopRuleAppCost.INSTANCE;
-                    }
-            else {
+                    (isInForbiddenRuleSet(ruleApp) ||
+                            (firstOrderGoalsForbidden && !hasModality(goal.node())) ||
+                            isForbiddenRule(ruleApp)))
+                return TopRuleAppCost.INSTANCE;
+            else
                 return delegate.computeCost(ruleApp, pio, goal);
-            }
         }
 
         @Override
