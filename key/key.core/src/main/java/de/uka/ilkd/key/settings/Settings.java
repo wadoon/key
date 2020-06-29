@@ -36,4 +36,5 @@ public interface Settings {
      * @param l the listener
      */
     void addSettingsListener(SettingsListener l);
+
 }

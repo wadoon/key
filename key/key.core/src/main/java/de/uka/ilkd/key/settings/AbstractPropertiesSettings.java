@@ -95,10 +95,14 @@ public abstract class AbstractPropertiesSettings implements Settings {
         listenerList.add(l);
     }
 
+    // FIXME should be @Override
+    /** removes a listener from the settings object
+     * @param l the listener
+     */
     public void removeSettingsListener(SettingsListener l) {
         listenerList.remove(l);
     }
-    
+
     protected void fireSettingsChange() {
         for (SettingsListener listener : listenerList) {
             listener.settingsChanged(new EventObject(this));
