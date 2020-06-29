@@ -25,6 +25,11 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
+
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.Name;
+
 /**
  * Example application which symbolically executes
  * {@code example/MaxIntBuggy}
@@ -41,26 +46,40 @@ public class Main {
       String className = "MaxIntBuggy";
       String methodName = "max";
       String[] methodArgTypes = {"int[]"};
-      String precondition
-         =    "(tc1 ==> arr.length == 4 && arr[0] == 2 && arr[1] == 1 && arr[2] == 3 && arr[3] == 4)"
-         + "&& (tc2 ==> arr.length == 4 && arr[0] == 2 && arr[1] == 1 && arr[2] == 3 && arr[3] == 2)"
-         + "&& (tc3 ==> arr.length == 3 && arr[0] == 0 && arr[1] == 1 && arr[2] == 3)"
-         + "&& (tc4 ==> arr.length == 3 && arr[0] == 0 && arr[1] == 2 && arr[2] == 6)"
-         + "&& (tc5 ==> arr.length == 3 && arr[0] == 2 && arr[1] == 4 && arr[2] == 3)"
-         + "&& (tc6 ==> arr.length == 3 && arr[0] == 4 && arr[1] == 8 && arr[2] == 6)"
+      String preconditionGhostVar
+         =    "(tc1 ==> arr.length == 4 && arr[0] == 2   && arr[1] == 1   && arr[2] == 3 && arr[3] == 4)"
+         + "&& (tc2 ==> arr.length == 4 && arr[0] == 2   && arr[1] == 1   && arr[2] == 3 && arr[3] == 2)"
+         + "&& (tc3 ==> arr.length == 3 && arr[0] == 0   && arr[1] == 1   && arr[2] == 3)"
+         + "&& (tc4 ==> arr.length == 3 && arr[0] == 0   && arr[1] == 2   && arr[2] == 6)"
+         + "&& (tc5 ==> arr.length == 3 && arr[0] == 2   && arr[1] == 4   && arr[2] == 3)"
+         + "&& (tc6 ==> arr.length == 3 && arr[0] == 4   && arr[1] == 8   && arr[2] == 6)"
          + "&& (tc7 ==> arr.length == 3 && arr[0] == 200 && arr[1] == 400 && arr[2] == 300)"
-         + "&& (tc8 ==> arr.length == 3 && arr[0] == 4 && arr[1] == 3 && arr[2] == 2)"
-         + "&& (tc9 ==> arr.length == 3 && arr[0] == 550 && arr[1] == 4470 && arr[2] == 10)"
-         + "&& (tc0 ==> arr.length == 3 && arr[0] == 200 && arr[1] == 400 && arr[2] == 200)"
+         + "&& (tc8 ==> arr.length == 3 && arr[0] == 4   && arr[1] == 3   && arr[2] == 2)"
+         + "&& (tc9 ==> arr.length == 3 && arr[0] == 550 && arr[1] == 4470&& arr[2] == 10)"
+         + "&& (tc0 ==> arr.length == 3 && arr[0] == 200 >= arr[1] && arr[0] == arr[2])"
          + "&& (tc1 || tc2 || tc3 || tc4 || tc5 || tc6 || tc7 || tc8 || tc9 || tc0)"
 //         + "&& (!tc1 || !tc2) && (!tc1 || !tc3) && (!tc1 || !tc4) && (!tc1 || !tc5) && (!tc2 || !tc3) && (!tc2 || !tc4) && (!tc2 || !tc5) && (!tc3 || !tc4) && (!tc3 || !tc5) && (!tc4 || !tc5)"
          + "&& arr != null";
- 
+      String preconditionQuantified
+      =  "( \\exists int tc; 0 <= tc && tc <= 9;"
+      +        "(tc == 1 ==> arr.length == 4 && arr[0] == 2   && arr[1] == 1   && arr[2] == 3 && arr[3] == 4)"
+      +     "&& (tc == 2 ==> arr.length == 4                  && arr[1] == 1   && arr[2] == 3 && arr[3] == 2)"
+      +     "&& (tc == 3 ==> arr.length == 3 && arr[0] == 0   && arr[1] == 1   && arr[2] == 3)"
+      +     "&& (tc == 4 ==> arr.length == 3 && arr[0] == 0   && arr[1] == 2   && arr[2] == 6)"
+      +     "&& (tc == 5 ==> arr.length == 3 && arr[0] == 2   && arr[1] == 4   && arr[2] == 3)"
+      +     "&& (tc == 6 ==> arr.length == 3 && arr[0] == 4   && arr[1] == 8   && arr[2] == 6)"
+      +     "&& (tc == 7 ==> arr.length == 3 && arr[0] == 200 && arr[1] == 400 && arr[2] == 300)"
+      +     "&& (tc == 8 ==> arr.length == 3 && arr[0] == 4   && arr[1] == 3   && arr[2] == 2)"
+      +     "&& (tc == 9 ==> arr.length == 3 && arr[0] == 550 && arr[1] == 4470&& arr[2] == 10)"
+      +     "&& (tc == 0 ==> arr.length == 3 && arr[0] == 200 >= arr[1] && arr[0] == arr[2])"
+      +  ")"
+      + "&& arr != null";
+
       SymbolicExecutionTreeBuilder treeBuilder =null;
 
       try {
-         treeBuilder = executeMethod(location, className, methodName, methodArgTypes, precondition, null, null, null);
-         System.out.println("Finished building SET");
+         treeBuilder = executeMethod(location, className, methodName, methodArgTypes, preconditionQuantified, null, null, null);
+         System.out.println("Finished building SE tree");
          printSymbolicExecutionTree("", treeBuilder);
       } catch (ProofInputException e) {
          System.out.println("Exception at '" + location + "':");
