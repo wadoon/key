@@ -955,6 +955,8 @@ public class TermBuilder {
 
             final Term fullRhs = store(heapTerm, objectTerm, fieldTerm, rhs);
             return elementary(heapLDT.getHeap(), fullRhs);
+        } else if (lhs.op() == UpdateApplication.UPDATE_APPLICATION) {
+            return apply(lhs.sub(0), elementary(lhs.sub(1), rhs));
         } else {
             throw new TermCreationException("Not a legal lhs: " + lhs);
         }
