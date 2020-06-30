@@ -24,12 +24,13 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
     }
 
     // TODO rosa/fahia
-    /* preconditions have the form
+    /** @param preconditions have the form
             floatVar cmp floatLiteral (where cmp is <, <=, >=, or >)
-
-       lets have the form
+       @param lets have the form
             floatVar = expr
         they can be translated as let-expressions in scala.
+       @param floatExpr the expression for which bounds are to be computed
+       @return a lower and upper bound for the floating point expression
      */
     private Pair<Float, Float> daisyComputeBounds(List<Term> preconditions, List<Term> lets, Term floatExpr) {
         return null;
