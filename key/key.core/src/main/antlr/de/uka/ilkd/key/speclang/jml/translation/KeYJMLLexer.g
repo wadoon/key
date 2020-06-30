@@ -80,9 +80,12 @@ lexer grammar KeYJMLLexer;
     FP_ABS               : '\\fp_abs';
     FP_INFINITE          : '\\fp_infinite';
     FP_NAN               : '\\fp_nan';
+    FP_NEGATIVE          : '\\fp_negative';
     FP_NICE              : '\\fp_nice'; //KeY syntactic sugar
     FP_NORMAL            : '\\fp_normal';
+    FP_POSITIVE          : '\\fp_positive';
     FP_SUBNORMAL         : '\\fp_subnormal';
+    FP_ZERO              : '\\fp_zero';
     FREE                 : '\\free';  //KeY extension, not official JML
     FRESH                : '\\fresh';
     INDEX                : '\\index';
