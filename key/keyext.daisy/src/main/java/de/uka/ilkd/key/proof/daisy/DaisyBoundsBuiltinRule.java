@@ -3,16 +3,37 @@ package de.uka.ilkd.key.proof.daisy;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
+
+import java.util.List;
 
 public class DaisyBoundsBuiltinRule implements BuiltInRule {
     public static final DaisyBoundsBuiltinRule INSTANCE = new DaisyBoundsBuiltinRule();
+
+    // TODO js
+    private List<Term> gatherPreconditions() {
+        return null;
+    }
+
+    // TODO rosa/fahia
+    /* preconditions have the form
+            floatVar cmp floatLiteral (where cmp is <, <=, >=, or >)
+
+       lets have the form
+            floatVar = expr
+        they can be translated as let-expressions in scala.
+     */
+    private Pair<Float, Float> daisyComputeBounds(List<Term> preconditions, List<Term> lets, Term floatExpr) {
+        return null;
+    }
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
