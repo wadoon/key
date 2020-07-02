@@ -48,14 +48,14 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         solverCommand = createSolverCommand();
         solverParameters = createSolverParameters();
         solverSupported = createSolverSupported();
-        JButton toDefaultButton = createButtons();
+        createDefaultButton();
         createCheckSupportButton();
     }
 
-    protected JButton createButtons() {
+    protected JButton createDefaultButton() {
         JButton toDefaultButton = new JButton("Set parameters to default.");
         toDefaultButton.addActionListener(arg0 -> {
-            createSolverParameters().setText(solverType.getDefaultSolverParameters());
+            solverParameters.setText(solverType.getDefaultSolverParameters());
             settings.setParameters(solverType, solverParameters.getText());
 
         });
