@@ -419,6 +419,7 @@ public final class SolverTypes {
             Collections.unmodifiableList(Arrays.asList(
                     Z3_SOLVER,
                     CVC3_SOLVER,
+                    CVC4_SOLVER,
                     SIMPLIFY_SOLVER,
                     YICES_SOLVER
             ));
