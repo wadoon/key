@@ -13,56 +13,43 @@
 
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import static org.junit.Assert.*;
 
 
-
-public class TestJMLTranslator extends TestCase {
-
+public class TestJMLTranslator {
     public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY
-                                          + File.separator + "speclang"
-                                          + File.separator + "testFile.key";
+            + File.separator + "speclang"
+            + File.separator + "testFile.key";
     private static TermBuilder TB;
     private static JavaInfo javaInfo;
     private static Services services;
     private static KeYJavaType testClassType;
-    private static Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
+    private static final Map<LocationVariable, Term> atPres = new LinkedHashMap<>();
 
 
-    @Override
-    protected synchronized void setUp() {
+    @Before
+    public synchronized void setUp() {
         if (javaInfo == null) {
             javaInfo = new HelperClassForTests().parse(
                     new File(testFile)).getFirstProof().getJavaInfo();
@@ -75,16 +62,9 @@ public class TestJMLTranslator extends TestCase {
         }
     }
 
-
-    @Override
-    protected void tearDown() {
-    }
-
-
     protected ProgramVariable buildSelfVarAsProgVar() {
         ProgramElementName classPEN = new ProgramElementName("self");
-        ProgramVariable result = new LocationVariable(classPEN, testClassType);
-        return result;
+        return new LocationVariable(classPEN, testClassType);
     }
 
 
@@ -97,9 +77,8 @@ public class TestJMLTranslator extends TestCase {
 
     protected ProgramVariable buildResultVar(IProgramMethod pm) {
         ProgramElementName resPEN = new ProgramElementName("result");
-        ProgramVariable result = new LocationVariable(resPEN,
-                                                      pm.getReturnType());
-        return result;
+        return new LocationVariable(resPEN,
+                pm.getReturnType());
     }
 
 
@@ -133,23 +112,25 @@ public class TestJMLTranslator extends TestCase {
     }
 
 
+    @Test
     public void testTrueTerm() {
         Term result = null;
 
         try {
             result = JMLTranslator.translate(new PositionedString("true"),
-                                             testClassType, null, null, null,
-                                             null, null, null, Term.class,
-                                             services);
+                    testClassType, null, null, null,
+                    null, null, null, Term.class,
+                    services);
         } catch (SLTranslationException e) {
-            assertTrue(false);
+            fail();
         }
 
-        assertTrue(result != null);
-        assertTrue(result.equals(TB.tt()));
+        assertNotNull(result);
+        assertEquals(result, TB.tt());
     }
 
 
+    @Test
     public void testSelfVar() {
         Term result = null;
 
@@ -157,18 +138,19 @@ public class TestJMLTranslator extends TestCase {
 
         try {
             result = JMLTranslator.translate(new PositionedString("this"),
-                                             testClassType, selfVar, null, null,
-                                             null, null, null, Term.class,
-                                             services);
+                    testClassType, selfVar, null, null,
+                    null, null, null, Term.class,
+                    services);
         } catch (SLTranslationException e) {
-            assertTrue(false);
+            fail();
         }
 
-        assertTrue(result != null);
-        assertTrue(result.equals(TB.var(selfVar)));
+        assertNotNull(result);
+        assertEquals(result, TB.var(selfVar));
     }
 
 
+    @Test
     public void testLogicalExpression() {
         Term result = null;
 
@@ -176,17 +158,17 @@ public class TestJMLTranslator extends TestCase {
 
         try {
             result = JMLTranslator.translate(new PositionedString(
-                    "(b <= s &&  i > 5) ==> this != instance"), testClassType,
-                                                    selfVar, null, null, null,
-                                                    null, null, Term.class, services);
+                            "(b <= s &&  i > 5) ==> this != instance"), testClassType,
+                    selfVar, null, null, null,
+                    null, null, Term.class, services);
         } catch (SLTranslationException e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
 
-        assertTrue(result != null);
-        assertTrue(result.op().equals(Junctor.IMP));
-        assertTrue(result.sub(0).op().equals(Junctor.AND));
+        assertNotNull(result);
+        assertEquals(result.op(), Junctor.IMP);
+        assertEquals(result.sub(0).op(), Junctor.AND);
         assertTrue(termContains(result, TB.zTerm("5")));
         assertTrue(termContains(result, selfVar));
     }
@@ -194,25 +176,27 @@ public class TestJMLTranslator extends TestCase {
     // There is a problem with spaces here.
     // Adding spaces around "j < i" solves the problem.
     // see bug MT-1548
+    @Test
     public void testSumParsing() throws SLTranslationException {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         JMLTranslator.translate(new PositionedString(
-                "0 == ((\\sum int j; 0<=j && j<i; j))"),
+                        "0 == ((\\sum int j; 0<=j && j<i; j))"),
                 testClassType, selfVar, null, null, null, null, null, Term.class, services);
     }
 
     // see bug #1528
+    @Test
     public void testParenExpression() throws SLTranslationException {
         ProgramElementName classPEN = new ProgramElementName("o");
         ProgramVariable var = new LocationVariable(classPEN, testClassType);
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         JMLTranslator.translate(new PositionedString(
-                "(o.i)"),
+                        "(o.i)"),
                 testClassType, selfVar, ImmutableSLList.<ProgramVariable>nil().prepend(var),
                 null, null, null, null, Term.class, services);
     }
 
-
+    @Test
     public void testPrimitiveField() {
         Term result = null;
 
@@ -221,228 +205,230 @@ public class TestJMLTranslator extends TestCase {
 
         try {
             result = JMLTranslator.translate(new PositionedString(
-                    "this.i"), testClassType,
-                                             selfVar, null, null, null,
-                                             null, null, Term.class, services);
+                            "this.i"), testClassType,
+                    selfVar, null, null, null,
+                    null, null, Term.class, services);
         } catch (SLTranslationException e) {
-            assertTrue(false);
+            fail();
         }
 
-        assertTrue(result != null);
+        assertNotNull(result);
         //assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(i) ));
         assertTrue(termContains(result, selfVar));
     }
 
-
+    @Test
     public void testSimpleQuery() {
         Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         IProgramMethod getOne = javaInfo.getProgramMethod(testClassType,
-                                                         "getOne",
-                                                         ImmutableSLList.<KeYJavaType>nil(),
-                                                         testClassType);
+                "getOne",
+                ImmutableSLList.<KeYJavaType>nil(),
+                testClassType);
 
         try {
             result = JMLTranslator.translate(new PositionedString("this.getOne()"),
-                                             testClassType, selfVar, null,
-                                             null, null, null, null, Term.class,
-                                             services);
+                    testClassType, selfVar, null,
+                    null, null, null, null, Term.class,
+                    services);
         } catch (SLTranslationException e) {
-            assertTrue(false);
+            fail();
         }
 
-        assertTrue(result != null);
+        assertNotNull(result);
         assertTrue(termContains(result, selfVar));
         assertTrue(termContains(result, getOne));
     }
 
 
+    @Test
     public void testForAll() {
         Term result = null;
 
         try {
             result = JMLTranslator.translate(
                     new PositionedString(
-                    "(\\forall int i; (0 <= i && i <= 2147483647) )"),
+                            "(\\forall int i; (0 <= i && i <= 2147483647) )"),
                     testClassType, null, null, null, null,
                     null, null, Term.class, services);
         } catch (SLTranslationException e) {
-            assertTrue(e.getMessage(), false);
+            fail(e.getMessage());
         }
 
-        assertTrue(result != null);
-        assertTrue(result.op().equals(Quantifier.ALL));
+        assertNotNull(result);
+        assertEquals(result.op(), Quantifier.ALL);
         assertTrue(termContains(result, TB.zTerm("2147483647")));
         assertTrue(termContains(result, Junctor.AND));
         LogicVariable i =
                 new LogicVariable(new Name("i"),
-                                  services.getNamespaces().sorts().lookup(new Name(
-                "int")));
+                        services.getNamespaces().sorts().lookup(new Name(
+                                "int")));
         Term expected =
                 TB.all(i,
-                       TB.imp(TB.inInt(TB.var(i)),
-                              TB.and(TB.leq(TB.zTerm("0"),
-                                            TB.var(i)),
-                                     TB.leq(TB.var(i),
-                                            TB.zTerm("2147483647")))));
+                        TB.imp(TB.inInt(TB.var(i)),
+                                TB.and(TB.leq(TB.zTerm("0"),
+                                        TB.var(i)),
+                                        TB.leq(TB.var(i),
+                                                TB.zTerm("2147483647")))));
         assertTrue("Result was: " + result + "; \nExpected was: " + expected,
-                   result.equalsModRenaming(expected));
+                result.equalsModRenaming(expected));
     }
 
 
-    public void testForEx() {
+    @Test public void testForEx() {
         Term result = null;
 
         try {
             result = JMLTranslator.translate(
                     new PositionedString(
-                    "(\\exists int i; (0 <= i && i <= 2147483647) )"),
+                            "(\\exists int i; (0 <= i && i <= 2147483647) )"),
                     testClassType, null, null, null, null,
                     null, null, Term.class, services);
         } catch (SLTranslationException e) {
-            assertTrue(e.getMessage(), false);
+            fail(e.getMessage());
         }
 
-        assertTrue(result != null);
-        assertTrue(result.op().equals(Quantifier.EX));
+        assertNotNull(result);
+        assertEquals(result.op(), Quantifier.EX);
         assertTrue(termContains(result, TB.zTerm("2147483647")));
         assertTrue(termContains(result, Junctor.AND));
         LogicVariable i =
                 new LogicVariable(new Name("i"),
-                                  services.getNamespaces().sorts().lookup(new Name(
-                "int")));
+                        services.getNamespaces().sorts().lookup(new Name(
+                                "int")));
         Term expected =
                 TB.ex(i,
-                      TB.and(TB.inInt(TB.var(i)),
-                             TB.and(TB.leq(TB.zTerm("0"),
-                                           TB.var(i)),
-                                    TB.leq(TB.var(i),
-                                           TB.zTerm("2147483647")))));
+                        TB.and(TB.inInt(TB.var(i)),
+                                TB.and(TB.leq(TB.zTerm("0"),
+                                        TB.var(i)),
+                                        TB.leq(TB.var(i),
+                                                TB.zTerm("2147483647")))));
         assertTrue("Result was: " + result + "; \nExpected was: " + expected,
-                   result.equalsModRenaming(expected));
+                result.equalsModRenaming(expected));
     }
 
 
-    public void testBsumInt() {
+    @Test public void testBsumInt() {
         Term result = null;
 
         try {
             result = JMLTranslator.translate(
                     new PositionedString(
-                    "(\\bsum int i; 0; 2147483647; i)"),
+                            "(\\bsum int i; 0; 2147483647; i)"),
                     testClassType, null, null, null, null,
                     null, null, Term.class, services);
         } catch (SLTranslationException e) {
-            assertTrue(e.getMessage(), false);
+            fail(e.getMessage());
         }
 
         NamespaceSet nss = services.getNamespaces();
         Function q = nss.functions().lookup(new Name("bsum"));
         LogicVariable i =
                 new LogicVariable(new Name("i"),
-                                  nss.sorts().lookup(new Name("int")));
+                        nss.sorts().lookup(new Name("int")));
         Term expected =
                 TB.func(services.getTypeConverter().getIntegerLDT().getJavaCastInt(),
-                TB.bsum(i,
-                        TB.zTerm("0"),
-                        TB.zTerm("2147483647"),
-                        TB.var(i)));
-        assertTrue(result != null);
+                        TB.bsum(i,
+                                TB.zTerm("0"),
+                                TB.zTerm("2147483647"),
+                                TB.var(i)));
+        assertNotNull(result);
         assertSame(q, result.sub(0).op());
         assertTrue("Result was: " + result + "; \nExpected was: " + expected,
-                   result.equalsModRenaming(expected));
+                result.equalsModRenaming(expected));
     }
 
 
-    public void testBsumBigInt() {
+    @Test public void testBsumBigInt() {
         Term result = null;
 
         try {
             result = JMLTranslator.translate(
                     new PositionedString(
-                    "(\\bsum \\bigint i; 0; 2147483647; i)"),
+                            "(\\bsum \\bigint i; 0; 2147483647; i)"),
                     testClassType, null, null, null, null,
                     null, null, Term.class, services);
         } catch (SLTranslationException e) {
-            assertTrue(e.getMessage(), false);
+            fail(e.getMessage());
         }
 
         NamespaceSet nss = services.getNamespaces();
         Function q = nss.functions().lookup(new Name("bsum"));
         LogicVariable i =
                 new LogicVariable(new Name("i"),
-                                  nss.sorts().lookup(new Name("int")));
+                        nss.sorts().lookup(new Name("int")));
         Term expected =
                 TB.bsum(i,
                         TB.zTerm("0"),
                         TB.zTerm("2147483647"),
                         TB.var(i));
-        assertTrue(result != null);
+        assertNotNull(result);
         assertSame(q, result.op());
         assertTrue("Result was: " + result + "; \nExpected was: " + expected,
-                   result.equalsModRenaming(expected));
+                result.equalsModRenaming(expected));
     }
 
-    public void testInfiniteUnion() {
+    @Test public void testInfiniteUnion() {
         Term result = null;
         final String input = "\\infinite_union(Object o; \\empty)";
         try {
             result = JMLTranslator.translate(input, testClassType, Term.class, services);
         } catch (SLTranslationException e) {
-            fail(""+e);
+            fail("" + e);
         }
         assertNotNull(result);
         Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
-                        new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
+                new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
         assertSame(unionOp, result.op());
-        Term guard = TB.and( TB.convertToFormula(TB.created(TB.var(o))), TB.not(TB.equals(TB.var(o), TB.NULL())));
+        Term guard = TB.and(TB.convertToFormula(TB.created(TB.var(o))), TB.not(TB.equals(TB.var(o), TB.NULL())));
         Term expected = TB.infiniteUnion(new QuantifiableVariable[]{o}, TB.ife(guard, TB.empty(), TB.empty()));
         assertTrue("Result was: " + result + "; \nExpected was: " + expected,
-                        result.equalsModRenaming(expected));
+                result.equalsModRenaming(expected));
     }
 
-    public void testInfiniteUnion2() {
+    @Test public void testInfiniteUnion2() {
         Term result = null;
         final String input = "\\infinite_union(nullable Object o; \\empty)";
         try {
             result = JMLTranslator.translate(input, testClassType, Term.class, services);
         } catch (SLTranslationException e) {
-            fail(""+e);
+            fail("" + e);
         }
         assertNotNull(result);
         Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
-                        new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
+                new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
         assertSame(unionOp, result.op());
-        Term guard = TB.or( TB.convertToFormula(TB.created(TB.var(o))), TB.equals(TB.var(o), TB.NULL()));
+        Term guard = TB.or(TB.convertToFormula(TB.created(TB.var(o))), TB.equals(TB.var(o), TB.NULL()));
         Term expected = TB.infiniteUnion(new QuantifiableVariable[]{o}, TB.ife(guard, TB.empty(), TB.empty()));
         assertTrue("Result was: " + result + "; \nExpected was: " + expected,
-                        result.equalsModRenaming(expected));
+                result.equalsModRenaming(expected));
     }
 
 
+    @Test
     public void testComplexExists() {
         Term result = null;
 
         try {
             result = JMLTranslator.translate(
                     new PositionedString(
-                    "(\\exists TestClass t; t != null; t.i == 0)"),
+                            "(\\exists TestClass t; t != null; t.i == 0)"),
                     testClassType, null, null, null, null,
                     null, null, Term.class, services);
         } catch (SLTranslationException e) {
-            assertTrue("Error Message: " + e, false);
+            fail("Error Message: " + e);
         }
 
-        assertTrue(result != null);
-        assertTrue(result.op().equals(Quantifier.EX));
-        assertTrue(result.sub(0).op().equals(Junctor.AND));
+        assertNotNull(result);
+        assertEquals(result.op(), Quantifier.EX);
+        assertEquals(result.sub(0).op(), Junctor.AND);
         assertTrue(termContains(result, TB.NULL()));
     }
 
-
+    @Test
     public void testOld() {
         Term result = null;
 
@@ -453,24 +439,25 @@ public class TestJMLTranslator extends TestCase {
 
         try {
             result = JMLTranslator.translate(new PositionedString(
-                    "this.i == \\old(this.i)"),
-                                                    testClassType, selfVar, null,
-                                                    null, excVar, atPres,
-                                                    null, Term.class, services);
+                            "this.i == \\old(this.i)"),
+                    testClassType, selfVar, null,
+                    null, excVar, atPres,
+                    null, Term.class, services);
         } catch (SLTranslationException e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
 
-        assertTrue(result != null);
-        assertTrue(result.op().equals(Equality.EQUALS));
+        assertNotNull(result);
+        assertEquals(result.op(), Equality.EQUALS);
         assertTrue(
                 termContains(result,
-                             services.getTypeConverter().getHeapLDT().getHeap()));
+                        services.getTypeConverter().getHeapLDT().getHeap()));
         assertTrue(termContains(result, atPres.get(services.getTypeConverter().getHeapLDT().getHeap()).op()));
     }
 
 
+    @Test
     public void testResultVar() {
         Term result = null;
 
@@ -478,30 +465,31 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable excVar = buildExcVar();
 
         ImmutableList<KeYJavaType> signature =
-                ImmutableSLList.<KeYJavaType>nil();
+                ImmutableSLList.nil();
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "getOne",
-                                                     signature, testClassType);
+                signature, testClassType);
 
         ProgramVariable resultVar = buildResultVar(pm);
 
         try {
             result = JMLTranslator.translate(new PositionedString(
-                    "\\result == 1"),
-                                                    testClassType, selfVar, null,
-                                                    resultVar, excVar, atPres,
-                                                    null, Term.class, services);
+                            "\\result == 1"),
+                    testClassType, selfVar, null,
+                    resultVar, excVar, atPres,
+                    null, Term.class, services);
         } catch (SLTranslationException e) {
-            assertTrue(false);
+            fail();
         }
 
-        assertTrue(result != null);
-        assertTrue(result.op().equals(Equality.EQUALS));
+        assertNotNull(result);
+        assertEquals(result.op(), Equality.EQUALS);
         assertTrue(termContains(result, resultVar));
 
     }
 
 
+    @Test
     public void testNonNullElements() {
         Term result = null;
 
@@ -511,24 +499,25 @@ public class TestJMLTranslator extends TestCase {
 
         try {
             result = JMLTranslator.translate(new PositionedString(
-                    "\\nonnullelements(this.array)"),
-                                                    testClassType,
-                                                    selfVar,
-                                                    null,
-                                                    null,
-                                                    null,
-                                                    atPres, null, Term.class,
-                                                    services);
+                            "\\nonnullelements(this.array)"),
+                    testClassType,
+                    selfVar,
+                    null,
+                    null,
+                    null,
+                    atPres, null, Term.class,
+                    services);
         } catch (SLTranslationException e) {
-            assertTrue(false);
+            fail();
         }
 
-        assertTrue(result != null);
+        assertNotNull(result);
         //assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(array)));
         assertTrue(termContains(result, TB.NULL()));
     }
 
 
+    @Test
     public void testIsInitialized() {
 
         Term result = null;
@@ -537,27 +526,27 @@ public class TestJMLTranslator extends TestCase {
 
         try {
             result = JMLTranslator.translate(new PositionedString(
-                    "\\is_initialized(testPackage.TestClass)"),
-                                                    testClassType,
-                                                    selfVar,
-                                                    null,
-                                                    null,
-                                                    null,
-                                                    atPres, null, Term.class,
-                                                    services);
+                            "\\is_initialized(testPackage.TestClass)"),
+                    testClassType,
+                    selfVar,
+                    null,
+                    null,
+                    null,
+                    atPres, null, Term.class,
+                    services);
         } catch (SLTranslationException e) {
-            assertTrue(false);
+            fail();
         }
 
-        assertTrue(result != null);
-        assertTrue(result.op().equals(Equality.EQUALS));
+        assertNotNull(result);
+        assertEquals(result.op(), Equality.EQUALS);
         assertTrue(termContains(result, TB.var(
                 javaInfo.getAttribute(
-                ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED,
-                                      testClassType))));
+                        ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED,
+                        testClassType))));
     }
 
-
+    @Test
     public void testHexLiteral() {
         Term result = null;
 
@@ -568,27 +557,28 @@ public class TestJMLTranslator extends TestCase {
                     new PositionedString(" i == 0x12 "),
                     testClassType, selfVar, null, null, null, null, null, Term.class, services);
         } catch (SLTranslationException e) {
-            assertTrue(false);
+            fail();
         }
 
-        assertTrue(result != null);
-        assertTrue(result.op().equals(Equality.EQUALS));
+        assertNotNull(result);
+        assertEquals(result.op(), Equality.EQUALS);
         assertTrue(termContains(result, TB.zTerm("18")));
     }
 
 
+    @Test
     public void testComplexQueryResolving1() {
         Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         ImmutableList<KeYJavaType> signature =
-                ImmutableSLList.<KeYJavaType>nil();
+                ImmutableSLList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(
                 PrimitiveType.JAVA_INT));
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m",
-                                                     signature, testClassType);
+                signature, testClassType);
 
         try {
             result = JMLTranslator.translate(
@@ -597,27 +587,28 @@ public class TestJMLTranslator extends TestCase {
                     selfVar, null, null, null, null, null, Term.class, services);
         } catch (SLTranslationException e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
 
-        assertTrue(result != null);
-        assertTrue(result.sub(0).op().equals(pm));
-        assertTrue(result.sub(1).op().equals(pm));
+        assertNotNull(result);
+        assertEquals(result.sub(0).op(), pm);
+        assertEquals(result.sub(1).op(), pm);
     }
 
 
+    @Test
     public void testComplexQueryResolving2() {
         Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         ImmutableList<KeYJavaType> signature =
-                ImmutableSLList.<KeYJavaType>nil();
+                ImmutableSLList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(
                 PrimitiveType.JAVA_LONG));
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m",
-                                                     signature, testClassType);
+                signature, testClassType);
 
         try {
             result = JMLTranslator.translate(
@@ -626,27 +617,28 @@ public class TestJMLTranslator extends TestCase {
                     null, null, null, null, null, Term.class, services);
         } catch (SLTranslationException e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
 
-        assertTrue(result != null);
-        assertTrue(result.sub(0).op().equals(pm));
-        assertTrue(result.sub(1).op().equals(pm));
+        assertNotNull(result);
+        assertEquals(result.sub(0).op(), pm);
+        assertEquals(result.sub(1).op(), pm);
     }
 
 
+    @Test
     public void testComplexQueryResolving3() {
         Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         ImmutableList<KeYJavaType> signature =
-                ImmutableSLList.<KeYJavaType>nil();
+                ImmutableSLList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(
                 PrimitiveType.JAVA_INT));
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m",
-                                                     signature, testClassType);
+                signature, testClassType);
 
         try {
             result = JMLTranslator.translate(
@@ -655,43 +647,45 @@ public class TestJMLTranslator extends TestCase {
                     null, null, null, null, null, Term.class, services);
         } catch (SLTranslationException e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
 
-        assertTrue(result != null);
-        assertTrue(result.sub(0).op().equals(pm));
-        assertTrue(result.sub(1).op().equals(pm));
+        assertNotNull(result);
+        assertEquals(result.sub(0).op(), pm);
+        assertEquals(result.sub(1).op(), pm);
     }
 
 
+    @Test
     public void testStaticQueryResolving() {
         Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         ImmutableList<KeYJavaType> signature =
-                ImmutableSLList.<KeYJavaType>nil();
+                ImmutableSLList.nil();
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType,
-                                                     "staticMethod", signature,
-                                                     testClassType);
+                "staticMethod", signature,
+                testClassType);
 
         try {
             result = JMLTranslator.translate(
                     new PositionedString(
-                    "testPackage.TestClass.staticMethod() == 4"), testClassType,
+                            "testPackage.TestClass.staticMethod() == 4"), testClassType,
                     selfVar,
                     null, null, null, null, null, Term.class, services);
         } catch (SLTranslationException e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
 
-        assertTrue(result != null);
-        assertTrue(result.sub(0).op().equals(pm));
+        assertNotNull(result);
+        assertEquals(result.sub(0).op(), pm);
     }
 
 
+    @Test
     public void testSubtypeExpression() {
         Term result = null;
 
@@ -700,15 +694,15 @@ public class TestJMLTranslator extends TestCase {
         try {
             result = JMLTranslator.translate(
                     new PositionedString(
-                    "( \\exists TestClass t; t != null; \\typeof(t) <: \\type(java.lang.Object) )"),
+                            "( \\exists TestClass t; t != null; \\typeof(t) <: \\type(java.lang.Object) )"),
                     testClassType, selfVar,
                     null, null, null, null, null, Term.class, services);
         } catch (SLTranslationException e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
 
-        assertTrue(result != null);
+        assertNotNull(result);
 
         Sort sds = javaInfo.objectSort();
         Function ioFunc = sds.getInstanceofSymbol(services);
@@ -716,6 +710,7 @@ public class TestJMLTranslator extends TestCase {
     }
 
 
+    @Test
     public void testCorrectImplicitThisResolution() {
         Term result = null;
 
@@ -725,41 +720,41 @@ public class TestJMLTranslator extends TestCase {
 
         try {
             result = JMLTranslator.translate(new PositionedString(
-                    "(\\forall TestClass a;a.array == array; a == this)"),
-                                                    testClassType,
-                                                    selfVar,
-                                                    null,
-                                                    null,
-                                                    null,
-                                                    null,
-                                                    null,
-                                                    Term.class,
-                                                    services);
+                            "(\\forall TestClass a;a.array == array; a == this)"),
+                    testClassType,
+                    selfVar,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    Term.class,
+                    services);
         } catch (SLTranslationException e) {
-            assertTrue("Parsing Error: " + e, false);
+            fail("Parsing Error: " + e);
         }
 
-        assertTrue(result != null);
+        assertNotNull(result);
         final LogicVariable qv =
                 new LogicVariable(new Name("a"), selfVar.sort());
         final Function fieldSymbol = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
                 array, services);
         Term expected = TB.all(qv,
-                               TB.imp(
-                TB.and(TB.and(TB.equals(TB.dot(array.sort(),
-                                               TB.var(qv),
-                                               fieldSymbol),
-                                        TB.dot(array.sort(),
-                                               TB.var(selfVar),
-                                               fieldSymbol)),
-                              TB.reachableValue(TB.var(qv),
-                                                selfVar.getKeYJavaType())),
-                       TB.not(TB.equals(TB.var(qv),
+                TB.imp(
+                        TB.and(TB.and(TB.equals(TB.dot(array.sort(),
+                                TB.var(qv),
+                                fieldSymbol),
+                                TB.dot(array.sort(),
+                                        TB.var(selfVar),
+                                        fieldSymbol)),
+                                TB.reachableValue(TB.var(qv),
+                                        selfVar.getKeYJavaType())),
+                                TB.not(TB.equals(TB.var(qv),
                                         TB.NULL()))), // implicit non null
-                                      TB.equals(TB.var(qv), TB.var(selfVar))));
+                        TB.equals(TB.var(qv), TB.var(selfVar))));
 
         assertTrue("Expected:" + ProofSaver.printTerm(expected, services)
-                   + "\n Was:" + ProofSaver.printTerm(result, services),
-                   result.equalsModRenaming(expected));
+                        + "\n Was:" + ProofSaver.printTerm(result, services),
+                result.equalsModRenaming(expected));
     }
 }

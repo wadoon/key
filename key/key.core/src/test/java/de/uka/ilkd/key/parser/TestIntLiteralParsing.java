@@ -3,8 +3,8 @@ package de.uka.ilkd.key.parser;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.njml.JmlIO;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
@@ -140,9 +140,8 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
         KeYJavaType containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
         ProgramVariable self =
                 services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
-        KeYJMLParser parser = new KeYJMLParser(p, getServices(), containerType, self,
-                null, null, null, null);
-        return parser.termexpression();
+        JmlIO io = new JmlIO(getServices(), containerType, self, null, null, null, null);
+        return io.parseExpression(p);
     }
 
     public void createTestCases(String[] testData) throws RecognitionException {

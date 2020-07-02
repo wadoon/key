@@ -13,153 +13,152 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import junit.framework.TestCase;
-
+import de.uka.ilkd.key.njml.JmlParsingFacade;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import org.junit.Test;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertSame;
+import static org.junit.Assert.*;
 
 
-public class TestJMLPreTranslator extends TestCase {
-    
-    private ImmutableList<TextualJMLConstruct> parseMethodSpec(String ms) 
-            throws SLTranslationException {
-        KeYJMLPreParser preParser 
-                = new KeYJMLPreParser(ms, "no file", Position.UNDEFINED);
-        return preParser.parseClasslevelComment();
+public class TestJMLPreTranslator {
+    private ImmutableList<TextualJMLConstruct> parseMethodSpec(String ms) throws SLTranslationException {
+        return JmlParsingFacade.parseClasslevel(ms);
     }
 
-    
+    @Test
     public void testSimpleSpec() throws SLTranslationException {
         ImmutableList<TextualJMLConstruct> constructs
-            = parseMethodSpec(  "/*@ normal_behavior\n"
-                              + "     requires true;\n"
-                              + "  */");
+                = parseMethodSpec("/*@ normal_behavior\n"
+                + "     requires true;\n"
+                + "  */");
 
-        assertTrue(constructs != null);
-        assertTrue(constructs.size() == 1);
+        assertNotNull(constructs);
+        assertEquals(1, constructs.size());
         assertTrue(constructs.head() instanceof TextualJMLSpecCase);
         TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructs.head();
-        
-        assertTrue(specCase.getBehavior() == Behavior.NORMAL_BEHAVIOR);
-        assertTrue(specCase.getRequires().size() == 1);
-        assertTrue(specCase.getAssignable().size() == 0);
-        assertTrue(specCase.getEnsures().size() == 0);
-        assertTrue(specCase.getSignals().size() == 0);
-        assertTrue(specCase.getSignalsOnly().size() == 0);
-        
-        assertTrue(specCase.getRequires().head().text.trim().equals("requires true;"));
-    }
-    
 
+        assertSame(specCase.getBehavior(), Behavior.NORMAL_BEHAVIOR);
+        assertEquals(1, specCase.getRequires().size());
+        assertEquals(0, specCase.getAssignable().size());
+        assertEquals(0, specCase.getEnsures().size());
+        assertEquals(0, specCase.getSignals().size());
+        assertEquals(0, specCase.getSignalsOnly().size());
+
+        assertEquals("requires true;", specCase.getRequires().head().text.trim());
+    }
+
+
+    @Test
     public void testComplexSpec() throws SLTranslationException {
         ImmutableList<TextualJMLConstruct> constructs
-            = parseMethodSpec(  "/*@ behaviour\n"
-                              + "  @  requires true;\n"
-                              + "  @  requires ((;;(;););(););\n" 
-                              + "  @  ensures false;\n"
-                              + "  @  signals exception;\n"
-                              + "  @  signals_only onlythis;\n"
-                              + "  @  assignable \\nothing;\n"
-                              + "  @*/");
+                = parseMethodSpec("/*@ behaviour\n"
+                + "  @  requires true;\n"
+                + "  @  requires ((;;(;););(););\n"
+                + "  @  ensures false;\n"
+                + "  @  signals exception;\n"
+                + "  @  signals_only onlythis;\n"
+                + "  @  assignable \\nothing;\n"
+                + "  @*/");
 
-        assertTrue(constructs != null);
-        assertTrue(constructs.size() == 1);
+        assertNotNull(constructs);
+        assertEquals(1, constructs.size());
         assertTrue(constructs.head() instanceof TextualJMLSpecCase);
         TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructs.head();
-                
-        assertTrue(specCase.getBehavior() == Behavior.BEHAVIOR);
-        assertTrue(specCase.getRequires().size() == 2);
-        assertTrue(specCase.getAssignable().size() == 1);
-        assertTrue(specCase.getEnsures().size() == 1);
-        assertTrue(specCase.getSignals().size() == 1);
-        assertTrue(specCase.getSignalsOnly().size() == 1);
 
-        assertTrue(specCase.getEnsures().head().text.trim().equals("ensures false;"));
-        assertTrue(specCase.getAssignable().head().text.trim().equals(
-                "assignable \\nothing;"));
+        assertSame(specCase.getBehavior(), Behavior.BEHAVIOR);
+        assertEquals(2, specCase.getRequires().size());
+        assertEquals(1, specCase.getAssignable().size());
+        assertEquals(1, specCase.getEnsures().size());
+        assertEquals(1, specCase.getSignals().size());
+        assertEquals(1, specCase.getSignalsOnly().size());
+
+        assertEquals("ensures false;", specCase.getEnsures().head().text.trim());
+        assertEquals("assignable \\nothing;", specCase.getAssignable().head().text.trim());
     }
 
-    
-    public void testMultipleSpecs() throws SLTranslationException {
-        ImmutableList<TextualJMLConstruct> constructs 
-            = parseMethodSpec(  "//@ normal_behaviour\n"
-                              + "//@  ensures false\n"
-                              + "//@          || true;\n"
-                              + "//@  assignable \\nothing;\n"
-                              + "//@ also exceptional_behaviour\n"
-                              + "//@  requires o == null;\n"
-                              + "//@  signals Exception;\n");
-        
-        assertTrue(constructs != null);
-        assertTrue(constructs.size() == 2);
+
+    @Test public void testMultipleSpecs() throws SLTranslationException {
+        ImmutableList<TextualJMLConstruct> constructs
+                = parseMethodSpec("//@ normal_behaviour\n"
+                + "//@  ensures false\n"
+                + "//@          || true;\n"
+                + "//@  assignable \\nothing;\n"
+                + "//@ also exceptional_behaviour\n"
+                + "//@  requires o == null;\n"
+                + "//@  signals Exception;\n");
+
+        assertNotNull(constructs);
+        assertEquals(2, constructs.size());
         assertTrue(constructs.head() instanceof TextualJMLSpecCase);
         assertTrue(constructs.tail().head() instanceof TextualJMLSpecCase);
         TextualJMLSpecCase specCase1 = (TextualJMLSpecCase) constructs.head();
         TextualJMLSpecCase specCase2 = (TextualJMLSpecCase) constructs.tail().head();
 
-        assertTrue(specCase1.getBehavior() == Behavior.NORMAL_BEHAVIOR);
-        assertTrue(specCase1.getRequires().size() == 0);
-        assertTrue(specCase1.getAssignable().size() == 1);
-        assertTrue(specCase1.getEnsures().size() == 1);
-        assertTrue(specCase1.getSignals().size() == 0);
-        assertTrue(specCase1.getSignalsOnly().size() == 0);
-        
-        assertTrue(specCase2.getBehavior() == Behavior.EXCEPTIONAL_BEHAVIOR);
-        assertTrue(specCase2.getRequires().size() == 1);
-        assertTrue(specCase2.getAssignable().size() == 0);
-        assertTrue(specCase2.getEnsures().size() == 0);
-        assertTrue(specCase2.getSignals().size() == 1);
-        assertTrue(specCase2.getSignalsOnly().size() == 0);
+        assertSame(specCase1.getBehavior(), Behavior.NORMAL_BEHAVIOR);
+        assertEquals(0, specCase1.getRequires().size());
+        assertEquals(1, specCase1.getAssignable().size());
+        assertEquals(1, specCase1.getEnsures().size());
+        assertEquals(0, specCase1.getSignals().size());
+        assertEquals(0, specCase1.getSignalsOnly().size());
+
+        assertSame(specCase2.getBehavior(), Behavior.EXCEPTIONAL_BEHAVIOR);
+        assertEquals(1, specCase2.getRequires().size());
+        assertEquals(0, specCase2.getAssignable().size());
+        assertEquals(0, specCase2.getEnsures().size());
+        assertEquals(1, specCase2.getSignals().size());
+        assertEquals(0, specCase2.getSignalsOnly().size());
     }
 
-    public void testAtInModelmethod() throws SLTranslationException {
+    @Test public void testAtInModelmethod() throws SLTranslationException {
         parseMethodSpec(
                 "/*@ model_behaviour\n" +
-                "  @   requires true;\n" +
-                "  @ model int f(int x) {\n" +
-                "  @   return x+1;\n" +
-                "  @ }\n" +
-                "  @*/");
+                        "  @   requires true;\n" +
+                        "  @ model int f(int x) {\n" +
+                        "  @   return x+1;\n" +
+                        "  @ }\n" +
+                        "  @*/");
     }
 
     // used to be accepted
-    public void disabled_testMLCommentEndInSLComment() throws Exception {
+    @Test public void disabled_testMLCommentEndInSLComment() throws Exception {
         try {
             parseMethodSpec(
-                "//@ requires @*/ true;");
+                    "//@ requires @*/ true;");
             fail("Characters '@*/' should not be parsed");
-        } catch(SLTranslationException ex) {
+        } catch (SLTranslationException ex) {
             // anticipated
         }
 
         try {
             parseMethodSpec(
-                "//@ requires */ true;");
+                    "//@ requires */ true;");
             fail("Characters '*/' should not be parsed");
-        } catch(SLTranslationException ex) {
+        } catch (SLTranslationException ex) {
             // anticipated
         }
 
     }
-    
+
+    @Test
     public void testFailure() {
         try {
             parseMethodSpec("/*@ normal_behaviour \n @ signals ohoh;" + "  @*/");
-            assertTrue(false);
+            fail();
         } catch (SLTranslationException e) {
             //fine
         }
     }
-    
-    
+
+    @Test
     public void testFailure2() {
         try {
-            parseMethodSpec(  "/*@ behaviour\n"
-                            + "  @  requires (;((;;);();();(();;;(;)));\n"
-                            + "  @*/");
-            assertTrue(false);
+            parseMethodSpec("/*@ behaviour\n"
+                    + "  @  requires (;((;;);();();(();;;(;)));\n"
+                    + "  @*/");
+            fail();
         } catch (SLTranslationException e) {
             //fine
         }

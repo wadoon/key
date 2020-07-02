@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.njml.JmlIO;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -69,7 +70,6 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SpecExtractor;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassAxiom;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
@@ -99,8 +99,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             + ", " + RUNTIME_EXCEPTION + ";";
     private final Services services;
     private final JMLSpecFactory jsf;
-    private ImmutableSet<PositionedString> warnings = DefaultImmutableSet
-            .<PositionedString> nil();
+    private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -341,24 +340,22 @@ public final class JMLSpecExtractor implements SpecExtractor {
             Position pos = comments[0].getStartPosition();
 
             // call preparser
-            KeYJMLPreParser preParser = new KeYJMLPreParser(concatenatedComment,
-                    fileName, pos);
-            ImmutableList<TextualJMLConstruct> constructs = preParser
-                    .parseClasslevelComment();
-            warnings = warnings.union(preParser.getWarnings());
+            JmlIO jmlIO = new JmlIO();
+            ImmutableList<TextualJMLConstruct> constructs
+                    = jmlIO.parseClassLevel(concatenatedComment, fileName, pos);
+
+            warnings = warnings.union(jmlIO.getWarnings());
 
             // create class invs out of textual constructs, add them to result
             for (TextualJMLConstruct c : constructs) {
                 try {
                     if (c instanceof TextualJMLClassInv) {
                         TextualJMLClassInv textualInv = (TextualJMLClassInv) c;
-                        ClassInvariant inv = jsf.createJMLClassInvariant(kjt,
-                                textualInv);
+                        ClassInvariant inv = jsf.createJMLClassInvariant(kjt, textualInv);
                         result = result.add(inv);
                     } else if (c instanceof TextualJMLInitially) {
                         TextualJMLInitially textualRep = (TextualJMLInitially) c;
-                        InitiallyClause inc = jsf.createJMLInitiallyClause(kjt,
-                                textualRep);
+                        InitiallyClause inc = jsf.createJMLInitiallyClause(kjt, textualRep);
                         result = result.add(inc);
                     } else if (c instanceof TextualJMLRepresents) {
                         TextualJMLRepresents textualRep = (TextualJMLRepresents) c;
@@ -371,8 +368,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                                 .createJMLDependencyContract(kjt, textualDep);
                         result = result.add(depContract);
                     } else if (c instanceof TextualJMLClassAxiom) {
-                        ClassAxiom ax = jsf.createJMLClassAxiom(kjt,
-                                (TextualJMLClassAxiom) c);
+                        ClassAxiom ax = jsf.createJMLClassAxiom(kjt, (TextualJMLClassAxiom) c);
                         result = result.add(ax);
                     } else {
                         // DO NOTHING
@@ -407,12 +403,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
     public ImmutableSet<SpecificationElement> extractMethodSpecs(
             IProgramMethod pm, boolean addInvariant)
             throws SLTranslationException {
-        ImmutableSet<SpecificationElement> result = DefaultImmutableSet
-                .<SpecificationElement> nil();
+        ImmutableSet<SpecificationElement> result = DefaultImmutableSet.nil();
 
         // get type declaration, file name
-        TypeDeclaration td = (TypeDeclaration) pm.getContainerType()
-                .getJavaType();
+        TypeDeclaration td = (TypeDeclaration) pm.getContainerType().getJavaType();
         String fileName = td.getPositionInfo().getFileName();
 
         // determine purity
@@ -429,10 +423,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
             Position pos = comments[0].getStartPosition();
 
             // call preparser
-            KeYJMLPreParser preParser = new KeYJMLPreParser(concatenatedComment,
-                    fileName, pos);
-            constructs = preParser.parseClasslevelComment();
-            warnings = warnings.union(preParser.getWarnings());
+            JmlIO io = new JmlIO();
+            constructs = io.parseClassLevel(concatenatedComment, fileName, pos);
+            warnings = warnings.union(io.getWarnings());
         } else {
             constructs = ImmutableSLList.<TextualJMLConstruct> nil();
         }
@@ -744,11 +737,11 @@ public final class JMLSpecExtractor implements SpecExtractor {
         }
         final String concatenatedComment = concatenate(comments);
         final Position position = comments[0].getStartPosition();
-        final KeYJMLPreParser preParser = new KeYJMLPreParser(
-                concatenatedComment, fileName, position);
-        final ImmutableList<TextualJMLConstruct> constructs = preParser
-                .parseMethodlevelComment();
-        warnings = warnings.union(preParser.getWarnings());
+        final JmlIO io = new JmlIO();
+
+        final ImmutableList<TextualJMLConstruct> constructs =
+                io.parseMethodlevel(concatenatedComment, fileName, position);
+        warnings = warnings.union(io.getWarnings());
         return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
     }
 
@@ -779,11 +772,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
         Position pos = comments[0].getStartPosition();
 
         // call preparser
-        KeYJMLPreParser preParser = new KeYJMLPreParser(concatenatedComment,
-                fileName, pos);
-        ImmutableList<TextualJMLConstruct> constructs = preParser
-                .parseMethodlevelComment();
-        warnings = warnings.union(preParser.getWarnings());
+        JmlIO io = new JmlIO();
+        ImmutableList<TextualJMLConstruct> constructs =
+                io.parseMethodlevel(concatenatedComment, fileName, pos);
+        warnings = warnings.union(io.getWarnings());
 
         // create JML loop invariant out of last construct
         if (constructs.size() == 0) {

@@ -3,14 +3,14 @@ package de.uka.ilkd.key.parser;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.njml.JmlIO;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 /**
- * Test behaviour of {@link KeYJMLParser} for inputs in which braces are
+ * Test behaviour of for inputs in which braces are
  * omitted.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
@@ -26,9 +26,9 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
          */
         KeYJavaType containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
         ProgramVariable self = services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
-        KeYJMLParser parser = new KeYJMLParser(p, getServices(), containerType, self,
+        JmlIO io = new JmlIO(getServices(), containerType, self,
                 null, null, null, null);
-        return parser.termexpression();
+        return io.parseExpression(p);
     }
 
     /*
