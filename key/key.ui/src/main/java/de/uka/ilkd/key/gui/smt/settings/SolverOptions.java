@@ -53,7 +53,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
         JTextField solverName = createSolverName();
         JTextField solverInstalled = createSolverInstalled();
-        solverCommand = createSolverInstalled();
+        solverCommand = createSolverCommand();
         solverParameters = createSolverParameters();
         JTextField solverSupported = createSolverSupported();
         JButton toDefaultButton = createButtons();
