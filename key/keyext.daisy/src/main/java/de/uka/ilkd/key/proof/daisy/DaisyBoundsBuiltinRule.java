@@ -33,7 +33,8 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
        @return a lower and upper bound for the floating point expression
      */
     private Pair<Float, Float> daisyComputeBounds(List<Term> preconditions, List<Term> lets, Term floatExpr) {
-        return null;
+
+        return DaisyAPI.computeRange(preconditions,floatExpr,lets);
     }
 
     @Override
