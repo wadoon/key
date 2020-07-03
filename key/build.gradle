@@ -312,6 +312,15 @@ project(":key.core") {
     //check.dependsOn << testProofRules << testRunAllProofs
 }
 
+project("keyext.daisy") {
+
+    apply plugin: 'scala'
+    dependencies {
+        compile project(":key.core")
+        compile files("$rootDir/keyext.daisy/lib/fatDaisy_2.11-0.1.jar")
+    }
+}
+
 project(":key.core.example") {
     dependencies {
         compile project(":key.core")
