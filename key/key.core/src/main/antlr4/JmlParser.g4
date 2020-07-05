@@ -7,7 +7,8 @@ classlevel_element
   : class_invariant | depends_clause | method_specification
   | field_or_method_declaration | represents_clause
   | history_constraint | initially_clause | class_axiom
-  | monitors_for_clause | readable_if_clause | writable_if_clause | datagroup_clause | set_statement
+  | monitors_for_clause | readable_if_clause | writable_if_clause
+  | datagroup_clause | set_statement
   | assert_statement | assume_statement | nowarn_pragma;
 
 methodlevel_comment: (modifiers methodlevel_element) EOF;
@@ -26,7 +27,7 @@ modifier
   | CODE_JAVA_MATH | CODE_SAVE_MATH | CODE_BIGINT_MATH
  ;
 
-class_invariant: INVARIANT expression;
+class_invariant: INVARIANT expression SEMI_TOPLEVEL;
 //axiom_name: AXIOM_NAME_BEGIN IDENT AXIOM_NAME_END;
 class_axiom: AXIOM expression;
 initially_clause: INITIALLY expression;
@@ -108,8 +109,10 @@ returns_clause: RETURNS predornot? ;
 
 name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
 old_clause: OLD modifiers type IDENT INITIALISER ;
+
 field_or_method_declaration:
-   type IDENT (method_declaration|field_declaration);
+   type IDENT (method_declaration|field_declaration)? SEMI_TOPLEVEL;
+
 field_declaration: (EMPTYBRACKETS)* (initialiser |SEMICOLON);
 method_declaration: param_list (BODY |SEMICOLON);
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
@@ -151,7 +154,7 @@ assert_statement: (ASSERT expression | UNREACHABLE SEMICOLON);
 //returns_clause: RETURNS expression;
 
 //post-parser
-top: mergeparamsspec (SEMI)? EOF;
+//TODO top: mergeparamsspec (SEMI)? EOF;
 
 
 mergeparamsspec: MERGE_PARAMS LBRACE (IDENT) COLON LPAREN (typespec) (IDENT) RPAREN RARROW LBRACE (predicate) (COMMA (predicate))* RBRACE RBRACE;
@@ -169,6 +172,7 @@ storeRefExpr: expression;
 predornot: (predicate |NOT_SPECIFIED | SAME);
 predicate: expression;
 
+expressionEOF: expression EOF;
 expression: conditionalexpr;
 conditionalexpr: equivalenceexpr (QUESTIONMARK conditionalexpr COLON conditionalexpr)?;
 equivalenceexpr: impliesexpr (EQV_ANTIV impliesexpr)*;
@@ -205,7 +209,7 @@ relational_lockset
 shiftexpr: additiveexpr (op+=(SHIFTRIGHT|SHIFTLEFT|UNSIGNEDSHIFTRIGHT) additiveexpr)*;
 additiveexpr: multexpr (op+=(PLUS|MINUS) multexpr)*;
 multexpr: unaryexpr (op+=(MULT|DIV|MOD) unaryexpr)*;
-unaryexpr: (PLUS unaryexpr | MINUS DECLITERAL |MINUS unaryexpr | castexpr | unaryexprnotplusminus);
+unaryexpr: (PLUS unaryexpr | MINUS DECLITERAL | MINUS unaryexpr | castexpr | unaryexprnotplusminus);
 castexpr: LPAREN typespec RPAREN unaryexpr;
 unaryexprnotplusminus: (NOT unaryexpr | BITWISENOT unaryexpr | postfixexpr);
 postfixexpr: primaryexpr (primarysuffix)*;
@@ -222,7 +226,7 @@ primaryexpr
   | array_initializer
   ;
 this_: THIS;
-ident: IDENT;
+ident: IDENT | JML_IDENT;
 inv:INV;
 true_:TRUE;
 false_:FALSE;
@@ -230,7 +234,7 @@ null_:NULL;
 transactionUpdated: TRANSACTIONUPDATED LPAREN expression RPAREN;
 
 primarysuffix
-  : DOT (IDENT |TRANSIENT | THIS | INV | MULT) #primarySuffixAccess
+  : DOT (IDENT | TRANSIENT | THIS | INV | MULT) #primarySuffixAccess
   | LPAREN (expressionlist)? RPAREN            #primarySuffixCall
   | LBRACKET (from=expression (DOTDOT to=expression)? | MULT) RBRACKET #primarySuffixArray
   ;
@@ -263,7 +267,7 @@ jmlprimary
   | PERMISSION LPAREN expression RPAREN                                               #primaryPermission
   | NONNULLELEMENTS LPAREN expression RPAREN                                          #primaryNNE
   | INFORMAL_DESCRIPTION                                                              #primaryInformalDesc
-  | DL_ESCAPE (LPAREN (expressionlist)? RPAREN)?                                      #primaryDLCall
+  //| JML_IDENT (LPAREN (expressionlist)? RPAREN)?                                      #primaryDLCall
   | MAPEMPTY                                                                          #primaryMapEmpty
   | mapExpression LPAREN (expressionlist)? RPAREN                                     #primaryMapExpr
   | SEQ2MAP LPAREN (expressionlist)? RPAREN                                           #primarySeq2Map
@@ -316,7 +320,7 @@ sequence
 mapExpression: MAP_GET | MAP_OVERRIDE | MAP_UPDATE | MAP_REMOVE | IN_DOMAIN | DOMAIN_IMPLIES_CREATED | MAP_SIZE | MAP_SINGLETON | IS_FINITE;
 quantifier: FORALL | EXISTS | MIN | MAX | NUM_OF | PRODUCT | SUM;
 infinite_union_expr: LPAREN UNIONINF (boundvarmodifiers)? quantifiedvardecls SEMI (predicate SEMI | SEMI)? storeref RPAREN;
-specquantifiedexpression: LPAREN (quantifier (boundvarmodifiers)? quantifiedvardecls SEMI (predicate SEMI | SEMI)? expression) RPAREN;
+specquantifiedexpression: LPAREN quantifier (boundvarmodifiers)? quantifiedvardecls SEMI (expression SEMI)* expression RPAREN;
 oldexpression: (PRE LPAREN expression RPAREN | OLD LPAREN expression (COMMA IDENT)? RPAREN);
 beforeexpression: (BEFORE LPAREN expression RPAREN);
 bsumterm: LPAREN BSUM quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;
@@ -328,6 +332,6 @@ dims: (LBRACKET RBRACKET)+;
 type: builtintype | referencetype | TYPE;
 referencetype: name;
 builtintype: BYTE | SHORT | INT | LONG | BOOLEAN | VOID | BIGINT | REAL | LOCSET | SEQ | FREE;
-name: IDENT (DOT IDENT)*;
+name: ident (DOT ident)*;
 quantifiedvariabledeclarator: IDENT dims?;
 

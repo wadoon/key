@@ -1,3 +1,4 @@
+
 lexer grammar JmlLexer;
 
 @header {
@@ -49,6 +50,7 @@ SPEC_BIGINT_MATH: 'spec_bigint_math';
 SPEC_JAVA_MATH: 'spec_java_math';
 SPEC_PROTECTED: 'spec_protected';
 SPEC_PUBLIC: 'spec_public';
+GHOST: 'ghost' -> pushMode(expr);
 SPEC_NAME: 'name'; // ???
 SPEC_SAFE_MATH: 'spec_safe_math';
 STATIC: 'static';
@@ -94,12 +96,11 @@ DIVERGES: 'diverges' Pred -> pushMode(expr);
 ENSURES: ('ensures' (Pfree|Pred) | 'post' Pred )-> pushMode(expr);
 FOR_EXAMPLE: 'for_example' -> pushMode(expr);
 //FORALL: 'forall' -> pushMode(expr); //?
-GHOST: 'ghost' -> pushMode(expr);
 HELPER: 'helper' -> pushMode(expr);
 IMPLIES_THAT: 'implies_that' -> pushMode(expr);
 IN: 'in' Pred -> pushMode(expr);
 INITIALLY: 'initially' -> pushMode(expr);
-INSTANCE: 'instance' -> pushMode(expr);
+INSTANCE: 'instance';
 INVARIANT: 'invariant' Pred -> pushMode(expr);
 LOOP_CONTRACT: 'loop_contract' -> pushMode(expr);
 LOOP_INVARIANT: ('loop_invariant' (Pfree|Pred) | 'maintaining' Pred) -> pushMode(expr);
@@ -130,7 +131,8 @@ WHEN: 'when' Pred -> pushMode(expr);
 WORKING_SPACE: 'working_space' Pred -> pushMode(expr);
 WRITABLE: 'writable' -> pushMode(expr);
 
-SL_COMMENT: '//' ~('\n')* '\n'; // maybe handle by mode
+JML_SL_START: '//@' -> channel(HIDDEN);
+SL_COMMENT: '//' ~'@' ~('\n'|'\r')* -> channel(HIDDEN);
 ML_COMMENT: '/*' -> pushMode(mlComment);
 
 //fragment LETTER:  'a'..'z' |   'A'..'Z' | '_' | '$' | '\\';
@@ -378,7 +380,7 @@ fragment OCT_CHAR:
 STRING_LITERAL: '"' -> mode(string),more;
 E_WS: [ \t\n\r\u000c@]+ -> channel(HIDDEN), type(WS);
 INFORMAL_DESCRIPTION: '(*'  ( '*' ~')' | ~'*' )* '*)';
-E_SL_COMMENT: '//' ~('\n'|'\r')* '\r'? '\n' -> channel(HIDDEN), type(COMMENT);
+E_SL_COMMENT: '//' ~('\n'|'\r')* -> channel(HIDDEN), type(SL_COMMENT);
 DOC_COMMENT: '/**' -> pushMode(mlComment);
 fragment PRAGMA: '\\nowarn';
 

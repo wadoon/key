@@ -27,15 +27,15 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.njml.JmlInterpret;
+import de.uka.ilkd.key.njml.JmlIO;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
+import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.*;
 import org.antlr.runtime.Token;
@@ -1542,48 +1542,50 @@ public final class JMLTranslator {
         });
     }
 
-    public static Term translate(PositionedString expr,
-                                 KeYJavaType specInClass,
-                                 ProgramVariable selfVar,
-                                 ImmutableList<ProgramVariable> paramVars,
-                                 ProgramVariable resultVar,
-                                 ProgramVariable excVar,
-                                 Map<LocationVariable, Term> atPres,
-                                 OriginTermLabel.SpecType specType,
-                                 Services services)
+    public static <T> T translate(PositionedString expr,
+                                  KeYJavaType specInClass,
+                                  ProgramVariable selfVar,
+                                  ImmutableList<ProgramVariable> paramVars,
+                                  ProgramVariable resultVar,
+                                  ProgramVariable excVar,
+                                  Map<LocationVariable, Term> atPres,
+                                  OriginTermLabel.SpecType specType,
+                                  Class<T> resultClass,
+                                  Services services)
             throws SLTranslationException {
-        JmlInterpret parser = new JmlInterpret(expr, services,
-                specInClass, selfVar,
-                paramVars, resultVar,
-                excVar, atPres);
-        Term result = null;
-        /*try {
-            result = parser.top();
-        } catch (RecognitionException e) {
-            throw e;
-        }*/
-        Term term;
 
-        if (expr.hasLabels()) {
-            Term o = result; //castToReturnType(result);
-            assert o instanceof Term;
-            Term t = (Term) o;
-            t = services.getTermBuilder().label(
-                    result, //(Term) castToReturnType(result, resultClass),
-                    expr.getLabels());
-            term = t; //(Term) castToReturnType(t, resultClass);
-        } else {
-            term = (Term) result; //castToReturnType(result, resultClass);
-        }
+        JmlIO io = new JmlIO(services, specInClass, selfVar, paramVars, resultVar, excVar, atPres);
+        Object result;
+        if (resultClass.equals(Term.class))
+            result = io.parseExpression(expr);
+        else
+            result = io.parse(expr);
 
-        if (specType != null) {
-            return services.getTermBuilder().addLabelToAllSubs(term,
-                    new OriginTermLabel(
-                            new FileOrigin(specType, expr.fileName, expr.pos.getLine())));
-        } else {
-            return result; //castToReturnType(result, resultClass);
+        if (resultClass.equals(Term.class)) {
+            Term term;
+
+            if (expr.hasLabels()) {
+                T o = castToReturnType(result, resultClass);
+                assert o instanceof Term;
+                Term t = (Term) o;
+                t = services.getTermBuilder().label(
+                        (Term) castToReturnType(result, resultClass),
+                        expr.getLabels());
+                term = (Term) castToReturnType(t, resultClass);
+            } else {
+                term = (Term) castToReturnType(result, resultClass);
+            }
+
+            if (specType != null) {
+                return castToReturnType(services.getTermBuilder().addLabelToAllSubs(term,
+                        new OriginTermLabel(
+                                new FileOrigin(specType, expr.fileName, expr.pos.getLine()))),
+                        resultClass);
+            } else {
+                return castToReturnType(result, resultClass);
+            }
         }
-        //castToReturnType(result, resultClass);
+        return castToReturnType(result, resultClass);
     }
 
     public static <T> T translate(PositionedString expr,
@@ -1599,18 +1601,9 @@ public final class JMLTranslator {
                                   Services services)
             throws SLTranslationException {
 
-        final JmlInterpret parser = new JmlInterpret(expr, services,
-                specInClass, selfVar,
-                paramVars, resultVar,
-                excVar, atPres, atBefores);
+        JmlIO io = new JmlIO(services, specInClass, selfVar, paramVars, resultVar, excVar, atPres, atBefores);
         Object result = null;
-        /*try {
-            result = parser.top();
-            // maybe return pair<T, Warnings>?
-            //List<PositionedString> warnings = parser.getWarnings();
-        } catch (RecognitionException e) {
-            throw parser.getExceptionManager().convertException(e);
-        }*/
+        result = io.parse(expr);
         if (resultClass.equals(Term.class)) {
             Term term;
 
@@ -1643,9 +1636,10 @@ public final class JMLTranslator {
     /**
      * For testing only.
      */
-    static Term translate(String jmlExpr, KeYJavaType specInClass, Services services) throws SLTranslationException {
+    static <T> T translate(String jmlExpr, KeYJavaType specInClass, Class<T> resultClass, Services services) throws
+            SLTranslationException {
         return translate(new PositionedString(jmlExpr), specInClass,
-                null, null, null, null, null, null, services);
+                null, null, null, null, null, null, resultClass, services);
     }
 
 
@@ -2509,7 +2503,8 @@ public final class JMLTranslator {
      * Note that these restrictions only apply to the JML to DL translation.
      * See also {@link TermBuilder#reachableValue(Term, KeYJavaType)}.
      */
-    protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<? extends QuantifiableVariable> qvs, Services services) {
+    protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<? extends
+            QuantifiableVariable> qvs, Services services) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
         Term res = tb.tt();

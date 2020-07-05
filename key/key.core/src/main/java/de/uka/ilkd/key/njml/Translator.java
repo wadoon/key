@@ -65,9 +65,9 @@ public class Translator extends JmlParserBaseVisitor<Object> {
     private final BooleanLDT booleanLDT;
     private final SLExceptionFactory exc;
     private final JmlTermFactory translator;
-    private final LocationVariable selfVar;
-    private final ImmutableList<LocationVariable> paramVars;
-    private final LocationVariable resultVar;
+    private final ProgramVariable selfVar;
+    private final ImmutableList<ProgramVariable> paramVars;
+    private final ProgramVariable resultVar;
     private final ProgramVariable excVar;
     private final Map<LocationVariable, Term> atPres;
     private final Map<LocationVariable, Term> atBefores;
@@ -78,10 +78,10 @@ public class Translator extends JmlParserBaseVisitor<Object> {
 
     Translator(Services services,
                KeYJavaType specInClass,
-               LocationVariable self,
-               ImmutableList<LocationVariable> paramVars,
-               LocationVariable result,
-               LocationVariable exc,
+               ProgramVariable self,
+               ImmutableList<ProgramVariable> paramVars,
+               ProgramVariable result,
+               ProgramVariable exc,
                Map<LocationVariable, Term> atPres,
                Map<LocationVariable, Term> atBefores) {
         // save parameters
@@ -618,7 +618,7 @@ public class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression result = expr.get(0);
         for (int i = 1; i < expr.size(); i++) {
             TerminalNode tok = ctx.EQ_NEQ(i - 1);
-            if (tok.getText().equals("="))
+            if (tok.getText().equals("=="))
                 result = translator.eq(result, expr.get(i));
             else
                 result = translator.neq(result, expr.get(i));
@@ -886,29 +886,25 @@ public class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitPostfixexpr(JmlParser.PostfixexprContext ctx) {
+        String oldFqName = fullyQualifiedName;
         fullyQualifiedName = "";
         SLExpression expr = accept(ctx.primaryexpr());
 
-        /* if (expr != null && expr.getType() == null) {
-            raiseError("SLExpression without a type: " + expr);
-        } else if (expr != null && expr.getType().getJavaType() instanceof PrimitiveType) {
-                raiseError("Cannot build postfix expression from primitive type.");
-            }*/
-        //TODO suffixes
         for (JmlParser.PrimarysuffixContext c : ctx.primarysuffix()) {
             receiver = expr;
             expr = accept(c);
-            //fullyQualifiedName += "." + input.LT(-1).getText();
         }
         if (expr == null) {
             raiseError("Expression " + fullyQualifiedName + " cannot be resolved.");
         }
+        fullyQualifiedName = oldFqName;
         return expr;
     }
 
     @Override
     public Object visitIdent(JmlParser.IdentContext ctx) {
-        return lookupIdentifier(ctx.IDENT().getText(), null, null, ctx.IDENT().getSymbol());
+        fullyQualifiedName = ctx.getText();
+        return lookupIdentifier(ctx.getText(), null, null, ctx.start);
     }
 
     @Override
@@ -980,7 +976,7 @@ public class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitPrimarySuffixAccess(JmlParser.PrimarySuffixAccessContext ctx) {
-        String lookupName = fullyQualifiedName;
+        String lookupName;
         if (ctx.IDENT() != null) {
             String id = ctx.IDENT().getText();
             if (receiver == null) {
@@ -989,10 +985,11 @@ public class Translator extends JmlParserBaseVisitor<Object> {
             } else {
                 lookupName = id;
             }
+            fullyQualifiedName = fullyQualifiedName + "." + id;
             try {
                 return lookupIdentifier(lookupName, receiver, null, ctx.IDENT().getSymbol());
             } catch (Exception e) {
-                return lookupIdentifier(fullyQualifiedName + "." + lookupName, null, null,
+                return lookupIdentifier(fullyQualifiedName, null, null,
                         ctx.IDENT().getSymbol());
             }
         }
@@ -1022,6 +1019,11 @@ public class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitPrimarySuffixCall(JmlParser.PrimarySuffixCallContext ctx) {
         String lookupName = fullyQualifiedName;
         ImmutableList<SLExpression> params = accept(ctx.expressionlist());
+
+        if (fullyQualifiedName.startsWith("\\dl_")) {
+            return translator.dlKeyword(fullyQualifiedName, params);
+        }
+
         ImmutableList<SLExpression> preHeapParams = ImmutableSLList.nil();
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             Term p;
@@ -1034,6 +1036,7 @@ public class Translator extends JmlParserBaseVisitor<Object> {
         }
         params = (params == null) ? preHeapParams : params.prepend(preHeapParams);
         lookupName = lookupName.substring(lookupName.lastIndexOf('.') + 1);
+
         SLExpression result = lookupIdentifier(lookupName, receiver, new SLParameters(params), ctx.LPAREN().getSymbol());
         if (result == null) {
             raiseError("Method " + lookupName + "("
@@ -1186,12 +1189,13 @@ public class Translator extends JmlParserBaseVisitor<Object> {
                 selfVar, resultVar, paramVars, atPres == null ? null : atPres.get(getBaseHeap()));
     }
 
-    @Override
+/*    @Override
     public Object visitPrimaryDLCall(JmlParser.PrimaryDLCallContext ctx) {
-        String escape = ctx.DL_ESCAPE().getText();
+        String escape = ctx.JML_IDENT().getText();
         ImmutableList<SLExpression> list = accept(ctx.expressionlist());
         return translator.dlKeyword(escape, list);
     }
+*/
 
     @Override
     public Object visitPrimaryMapEmpty(JmlParser.PrimaryMapEmptyContext ctx) {
@@ -1553,11 +1557,11 @@ public class Translator extends JmlParserBaseVisitor<Object> {
         resolverManager.pushLocalVariablesNamespace();
         assert declVars != null;
         resolverManager.putIntoTopLocalVariablesNamespace(declVars.second, declVars.first);
-        if (ctx.predicate() != null)
-            guard = accept(ctx.predicate());
+        if (ctx.expression(0) != null)
+            guard = accept(ctx.expression(0));
         else
             guard = tb.tt();
-        SLExpression expr = accept(ctx.expression());
+        SLExpression expr = accept(ctx.expression(1));
         resolverManager.popLocalVariablesNamespace();
         assert guard != null;
         guard = tb.convertToFormula(guard);

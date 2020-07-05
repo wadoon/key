@@ -582,8 +582,8 @@ public final class JmlTermFactory {
     }
 
     public SLExpression commentary(String desc,
-                                   LocationVariable selfVar, LocationVariable resultVar,
-                                   ImmutableList<LocationVariable> paramVars, Term heapAtPre) {
+                                   ProgramVariable selfVar, ProgramVariable resultVar,
+                                   ImmutableList<ProgramVariable> paramVars, Term heapAtPre) {
         // strip leading and trailing (* ... *)
         String text = desc;
         text = text.substring(2, text.length() - 2);
@@ -1395,8 +1395,7 @@ public final class JmlTermFactory {
                         : services.getJavaInfo().getKeYJavaType(resultTerm.sort());
                 return type == null ? new SLExpression(resultTerm) : new SLExpression(resultTerm, type);
             } catch (TermCreationException ex) {
-                throw exc.createException0("Cannot create term " + function.name()
-                        + "(" + MiscTools.join(args, ", ") + ")", ex);
+                throw exc.createException0(String.format("Cannot create term %s(%s)", function.name(), MiscTools.join(args, ", ")), ex);
             }
 
         }

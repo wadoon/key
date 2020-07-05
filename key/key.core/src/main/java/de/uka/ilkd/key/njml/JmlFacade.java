@@ -26,13 +26,27 @@ public class JmlFacade {
         return createLexer(CharStreams.fromString(expr));
     }
 
-    public static JmlParser.ExpressionContext parseExpr(String expr) {
-        JmlParser parser = createParser(createLexer(expr));
-        return parser.expression();
+    public static JmlParser.ExpressionContext parseExpr(PositionedString expr) {
+        final JmlLexer lexer = createLexer(expr);
+        lexer._mode = JmlLexer.expr;
+        JmlParser parser = createParser(lexer);
+        return parser.expressionEOF().expression();
     }
 
-    private static JmlParser createParser(JmlLexer lexer) {
+    public static JmlParser.ExpressionContext parseExpr(String expr) {
+        final JmlLexer lexer = createLexer(expr);
+        lexer._mode = JmlLexer.expr;
+        JmlParser parser = createParser(lexer);
+        return parser.expressionEOF().expression();
+    }
+
+    static JmlParser createParser(JmlLexer lexer) {
         return new JmlParser(new CommonTokenStream(lexer));
+    }
+
+    public static ParserRuleContext parseTop(PositionedString expr) {
+        JmlParser p = createParser(createLexer(expr));
+        return p.classlevel_comment();
     }
 
     private static class OffsetFactory extends CommonTokenFactory {
