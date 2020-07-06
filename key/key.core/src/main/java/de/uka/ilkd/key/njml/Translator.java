@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.njml;
 
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -512,6 +513,7 @@ public class Translator extends JmlParserBaseVisitor<Object> {
                         tb.convertToFormula(result.getTerm())));
             }
         }
+        assert result != null;
         return result;
     }
 
@@ -530,6 +532,8 @@ public class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitLogicalorexpr(JmlParser.LogicalorexprContext ctx) {
+        if (ctx.logicalandexpr().size() == 1) return accept(ctx.logicalandexpr(0));
+
         List<SLExpression> seq = mapOf(ctx.logicalandexpr());
         return seq.stream().reduce((a, b) ->
                 new SLExpression(tb.orSC(tb.convertToFormula(a.getTerm()),
@@ -538,11 +542,14 @@ public class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitRelationalexpr(JmlParser.RelationalexprContext ctx) {
-        return oneOf(ctx.shiftexpr(), ctx.instance_of(), ctx.relational_chain(), ctx.relational_lockset());
+        return oneOf(ctx.shiftexpr(), ctx.instance_of(), ctx.relational_chain(), ctx.relational_lockset(), ctx.st_expr());
     }
 
     @Override
     public Object visitLogicalandexpr(JmlParser.LogicalandexprContext ctx) {
+        if (ctx.inclusiveorexpr().size() == 1)
+            return accept(ctx.inclusiveorexpr(0));
+
         List<SLExpression> seq = mapOf(ctx.inclusiveorexpr());
         return seq.stream().reduce((a, b) ->
                 new SLExpression(tb.andSC(tb.convertToFormula(a.getTerm()),
@@ -551,6 +558,8 @@ public class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitInclusiveorexpr(JmlParser.InclusiveorexprContext ctx) {
+        if (ctx.exclusiveorexpr().size() == 1) return accept(ctx.exclusiveorexpr(0));
+
         List<SLExpression> seq = mapOf(ctx.exclusiveorexpr());
         SLExpression result = seq.get(0);
         for (int i = 1; i < seq.size(); i++) {
@@ -572,6 +581,8 @@ public class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitExclusiveorexpr(JmlParser.ExclusiveorexprContext ctx) {
+        if (ctx.andexpr().size() == 1) return accept(ctx.andexpr(0));
+
         List<SLExpression> exprs = mapOf(ctx.andexpr());
         SLExpression result = exprs.get(0);
         for (int i = 1; i < exprs.size(); i++) {
@@ -594,6 +605,9 @@ public class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitAndexpr(JmlParser.AndexprContext ctx) {
+        if (ctx.equalityexpr().size() == 1)
+            return accept(ctx.equalityexpr(0));
+
         List<SLExpression> exprs = mapOf(ctx.equalityexpr());
         SLExpression result = exprs.get(0);
         for (int i = 1; i < exprs.size(); i++) {
@@ -699,9 +713,9 @@ public class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitRelational_chain(JmlParser.Relational_chainContext ctx) {
         List<SLExpression> expressions = mapOf(ctx.shiftexpr());
         SLExpression result = null;
-        for (int i = 1; i < expressions.size() - 1; i++) {
+        for (int i = 1; i < expressions.size(); i++) {
             Function f = null;
-            Token op = ctx.op.get(i);
+            Token op = ctx.op.get(i - 1);
             switch (op.getType()) {
                 case JmlLexer.LT:
                     f = intLDT.getLessThan();
@@ -709,18 +723,16 @@ public class Translator extends JmlParserBaseVisitor<Object> {
                 case JmlLexer.GT:
                     f = intLDT.getGreaterThan();
                     break;
-
                 case JmlLexer.GEQ:
                     f = intLDT.getGreaterOrEquals();
                     break;
                 case JmlLexer.LEQ:
                     f = intLDT.getLessOrEquals();
                     break;
-
             }
 
-            SLExpression left = expressions.get(i);
-            SLExpression right = expressions.get(i + 1);
+            SLExpression left = expressions.get(i-1);
+            SLExpression right = expressions.get(i);
             SLExpression rel = new SLExpression(tb.func(f, left.getTerm(), right.getTerm()));
             if (result == null) {
                 result = rel;
@@ -728,6 +740,7 @@ public class Translator extends JmlParserBaseVisitor<Object> {
                 result = new SLExpression(tb.and(result.getTerm(), rel.getTerm()));
             }
         }
+        assert result!=null;
         return result;
     }
 
@@ -1546,22 +1559,27 @@ public class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitInfinite_union_expr(JmlParser.Infinite_union_exprContext ctx) {
-        return createInfiniteUnion(ctx.boundvarmodifiers(), ctx.quantifiedvardecls(), ctx.predicate(), ctx.storeref());
+        return createInfiniteUnion(ctx.boundvarmodifiers(), ctx.quantifiedvardecls(), ctx.predicate(0), ctx.storeref());
     }
 
     @Override
     public SLExpression visitSpecquantifiedexpression(JmlParser.SpecquantifiedexpressionContext ctx) {
-        Term guard;
         boolean nullable = Boolean.TRUE == accept(ctx.boundvarmodifiers());
         Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars = accept(ctx.quantifiedvardecls());
         resolverManager.pushLocalVariablesNamespace();
         assert declVars != null;
         resolverManager.putIntoTopLocalVariablesNamespace(declVars.second, declVars.first);
-        if (ctx.expression(0) != null)
-            guard = accept(ctx.expression(0));
-        else
-            guard = tb.tt();
-        SLExpression expr = accept(ctx.expression(1));
+
+        Term guard = tb.tt();
+        if (ctx.expression().size() == 2) {
+            SLExpression a = accept(ctx.expression(0));
+            guard = a.getTerm();
+        }
+        SLExpression expr =
+                ctx.expression().size() == 2
+                        ? accept(ctx.expression(1))
+                        : accept(ctx.expression(0));
+
         resolverManager.popLocalVariablesNamespace();
         assert guard != null;
         guard = tb.convertToFormula(guard);

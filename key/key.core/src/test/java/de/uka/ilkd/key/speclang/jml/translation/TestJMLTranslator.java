@@ -390,7 +390,8 @@ public class TestJMLTranslator {
 
     @Test public void testInfiniteUnion2() {
         Term result = null;
-        final String input = "\\infinite_union(nullable Object o; \\empty)";
+        //weigl: adapt to new syntax
+        final String input = "(\\infinite_union nullable Object o; \\empty)";
         try {
             result = JMLTranslator.translate(input, testClassType, Term.class, services);
         } catch (SLTranslationException e) {

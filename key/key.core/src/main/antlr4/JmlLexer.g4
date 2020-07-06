@@ -162,6 +162,9 @@ THIS: 'this';
 TRUE: 'true';
 VOID: 'void';
 
+E_NULLABLE: 'nullable'->type(NULLABLE);
+E_NONNULL: 'non_null' -> type(NON_NULL);
+
 /* JML and JML* keywords */
 /*ACCESSIBLE: 'accessible';
 ASSIGNABLE: 'assignable';
