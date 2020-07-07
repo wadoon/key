@@ -504,7 +504,7 @@ public class AbstractUpdateFactory {
             return abstrUpdateAssgnLocsFromHeapTerm(t, executionContext, services);
         } else {
             throw new RuntimeException(
-                    String.format("Unsupported term %s, cannot extract locs", t));
+                    String.format("Unsupported term %s, cannot convert into Abstract Update AST", t));
         }
     }
 
