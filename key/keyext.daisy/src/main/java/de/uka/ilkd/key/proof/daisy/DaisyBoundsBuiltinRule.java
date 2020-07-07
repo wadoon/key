@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.proof.daisy;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -19,7 +16,12 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
     public static final DaisyBoundsBuiltinRule INSTANCE = new DaisyBoundsBuiltinRule();
 
     // TODO js
-    private List<Term> gatherPreconditions() {
+    private List<Term> gatherPreconditions(Sequent sequent) {
+        return null;
+    }
+
+    // TODO js
+    private List<Term> gatherLetExprs(Sequent sequent) {
         return null;
     }
 
@@ -38,6 +40,7 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
     }
 
     @Override
+    // must return false if some bounds are not specified
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         return false;
     }
@@ -48,12 +51,16 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        return null;
+    public DaisyBoundsRuleApp createApp(PosInOccurrence pos, TermServices services) {
+        return new DaisyBoundsRuleApp(this, pos);
     }
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
+        Sequent seq = goal.sequent();
+        List<Term> precs = gatherPreconditions(seq);
+        List<Term> letExprs = gatherLetExprs(seq);
+        Pair<Float, Float> bounds = daisyComputeBounds(precs, letExprs, ruleApp.expr);
         return null;
     }
 
