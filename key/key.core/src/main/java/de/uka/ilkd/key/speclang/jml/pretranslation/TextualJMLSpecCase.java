@@ -97,6 +97,24 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     /**
+     * Produce a (textual) block contract from a JML assume statement. The
+     * resulting contract has an empty precondition, the assert expression as a
+     * free postcondition, and strictly_nothing as frame.
+     */
+    public static TextualJMLSpecCase assume2blockContract(
+            ImmutableList<String> mods, PositionedString assumeStmt) {
+        final TextualJMLSpecCase res = new TextualJMLSpecCase(mods,
+                Behavior.NORMAL_BEHAVIOR);
+        res.addName(new PositionedString("assume " + assumeStmt.text,
+                assumeStmt.fileName, assumeStmt.pos));
+        res.addEnsures(assumeStmt);
+        res.addAssignable(new PositionedString("assignable \\strictly_nothing;",
+                assumeStmt.fileName, assumeStmt.pos));
+        res.setPosition(assumeStmt);
+        return res;
+    }
+
+    /**
      * Produce a (textual) block contract from a JML assert statement.
      * The resulting contract has an empty precondition, the assert expression
      * as a postcondition, and strictly_nothing as frame.

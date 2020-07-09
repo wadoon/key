@@ -990,6 +990,21 @@ public final class AuxiliaryContractBuilders {
 
         /**
          *
+         * @return the contract's postcondition.
+         */
+        public Term buildFreePostcondition() {
+            Term result = tt();
+            for (LocationVariable heap : heaps) {
+                Term local = contract.getFreePostcondition(heap, getBaseHeap(), terms, services);
+                if (local != null) {
+                    result = and(result, local);
+                }
+            }
+            return result;
+        }
+
+        /**
+         *
          * @param modifiesClauses
          *            the contract's modifies clauses
          * @return the contract's framing condition.

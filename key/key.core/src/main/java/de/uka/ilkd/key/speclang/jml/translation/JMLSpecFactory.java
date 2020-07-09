@@ -1319,7 +1319,8 @@ public class JMLSpecFactory {
         final ContractClauses clauses
                 = translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new BlockContractImpl.Creator("JML " + behavior + "block contract", block, labels,
-                method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
+                method, behavior, variables, clauses.requires, clauses.measuredBy,
+                clauses.ensures, clauses.ensuresFree,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
                 clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
                 clauses.hasMod, services).create();
@@ -1354,7 +1355,8 @@ public class JMLSpecFactory {
         final ContractClauses clauses
                 = translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new LoopContractImpl.Creator("JML " + behavior + "loop contract", loop, labels,
-                method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
+                method, behavior, variables, clauses.requires, clauses.measuredBy,
+                clauses.ensures, clauses.ensuresFree,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
                 clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
                 clauses.hasMod, clauses.decreases, services).create();
@@ -1389,7 +1391,8 @@ public class JMLSpecFactory {
         final ContractClauses clauses
                 = translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new LoopContractImpl.Creator("JML " + behavior + "loop contract", block, labels,
-                method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
+                method, behavior, variables, clauses.requires, clauses.measuredBy,
+                clauses.ensures, clauses.ensuresFree,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
                 clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
                 clauses.hasMod, clauses.decreases, services).create();

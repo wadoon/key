@@ -1829,7 +1829,7 @@ public final class SpecificationRepository {
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
 
-        ImmutableSet<BlockContract> set = blockContracts.get(b);
+        ImmutableSet<BlockContract> set = getBlockContracts(block);
         blockContracts.put(b, set.remove(contract));
     }
 

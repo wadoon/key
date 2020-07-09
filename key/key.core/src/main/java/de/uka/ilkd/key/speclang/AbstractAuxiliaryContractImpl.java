@@ -82,6 +82,11 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     protected final Map<LocationVariable, Term> postconditions;
 
     /**
+     * @see #getPostcondition(LocationVariable, Services)
+     */
+    protected final Map<LocationVariable, Term> freePostconditions;
+
+    /**
      * @see #getModifiesClause(LocationVariable, Services)
      */
     protected final Map<LocationVariable, Term> modifiesClauses;
@@ -151,6 +156,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             final List<Label> labels, final IProgramMethod method, final Modality modality,
             final Map<LocationVariable, Term> preconditions, final Term measuredBy,
             final Map<LocationVariable, Term> postconditions,
+            final Map<LocationVariable, Term> freePostconditions,
             final Map<LocationVariable, Term> modifiesClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
@@ -161,6 +167,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         assert modality != null;
         assert preconditions != null;
         assert postconditions != null;
+        assert freePostconditions != null;
         assert modifiesClauses != null;
         assert variables.breakFlags != null;
         assert variables.continueFlags != null;
@@ -175,6 +182,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         this.preconditions = preconditions;
         this.measuredBy = measuredBy;
         this.postconditions = postconditions;
+        this.freePostconditions = freePostconditions;
         this.modifiesClauses = modifiesClauses;
         this.infFlowSpecs = infFlowSpecs;
         this.variables = variables;
@@ -376,6 +384,23 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     @Override
     public Term getPostcondition(final LocationVariable heap, final Services services) {
         return getPostcondition(heap, variables, services);
+    }
+
+    @Override
+    public Term getFreePostcondition(final LocationVariable heap, final Variables variables,
+            final Services services) {
+        return getTerm(freePostconditions.get(heap), variables, services);
+    }
+
+    @Override
+    public Term getFreePostcondition(final LocationVariable heapVariable, final Term heap,
+            final Terms terms, final Services services) {
+        return getTerm(freePostconditions.get(heapVariable), heap, terms, services);
+    }
+
+    @Override
+    public Term getFreePostcondition(LocationVariable heap, Services services) {
+        return getFreePostcondition(heap, variables, services);
     }
 
     @Override
@@ -1089,6 +1114,11 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         private final Map<LocationVariable, Term> ensures;
 
         /**
+         * Postcondition for normal termination.
+         */
+        private final Map<LocationVariable, Term> ensuresFree;
+
+        /**
          * @see AuxiliaryContract#getInfFlowSpecs()
          */
         private final ImmutableList<InfFlowSpec> infFlowSpecs;
@@ -1187,6 +1217,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 final IProgramMethod method, final Behavior behavior, final Variables variables,
                 final Map<LocationVariable, Term> requires, final Term measuredBy,
                 final Map<LocationVariable, Term> ensures,
+                final Map<LocationVariable, Term> ensuresFree,
                 final ImmutableList<InfFlowSpec> infFlowSpecs, final Map<Label, Term> breaks,
                 final Map<Label, Term> continues, final Term returns, final Term signals,
                 final Term signalsOnly, final Term diverges,
@@ -1202,6 +1233,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             this.requires = requires;
             this.measuredBy = measuredBy;
             this.ensures = ensures;
+            this.ensuresFree = ensuresFree;
             this.infFlowSpecs = infFlowSpecs;
             this.breaks = breaks;
             this.continues = continues;
@@ -1219,7 +1251,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return a new contract.
          */
         public ImmutableSet<T> create() {
-            return create(buildPreconditions(), buildPostconditions(), buildModifiesClauses(),
+            return create(buildPreconditions(), buildPostconditions(), buildFreePostconditions(),
+                    buildModifiesClauses(),
                     infFlowSpecs);
         }
 
@@ -1286,6 +1319,22 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             for (LocationVariable heap : heaps) {
                 if (ensures.get(heap) != null) {
                     postconditions.put(heap, buildPostcondition(heap));
+                }
+            }
+            return postconditions;
+        }
+
+        /**
+         *
+         * @return the contract's free postconditions. Free postconditions don't have to
+         * be proved, so they're assumptions/axioms.
+         */
+        protected Map<LocationVariable, Term> buildFreePostconditions() {
+            final Map<LocationVariable, Term> postconditions
+                    = new LinkedHashMap<LocationVariable, Term>();
+            for (LocationVariable heap : heaps) {
+                if (ensures.get(heap) != null) {
+                    postconditions.put(heap, convertToFormula(ensuresFree.get(heap)));
                 }
             }
             return postconditions;
@@ -1510,6 +1559,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private ImmutableSet<T> create(final Map<LocationVariable, Term> preconditions,
                 final Map<LocationVariable, Term> postconditions,
+                final Map<LocationVariable, Term> freePostconditions,
                 final Map<LocationVariable, Term> modifiesClauses,
                 final ImmutableList<InfFlowSpec> infFlowSpecs) {
             ImmutableSet<T> result = DefaultImmutableSet.nil();
@@ -1517,12 +1567,14 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                     .get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null;
             result = result.add(build(baseName, block, labels, method,
                     diverges.equals(ff()) ? Modality.DIA : Modality.BOX, preconditions, measuredBy,
-                    postconditions, modifiesClauses, infFlowSpecs, variables, transactionApplicable,
+                    postconditions, freePostconditions,
+                    modifiesClauses, infFlowSpecs, variables, transactionApplicable,
                     hasMod));
             if (divergesConditionCannotBeExpressedByAModality()) {
                 result = result.add(build(baseName, block, labels, method, Modality.DIA,
                         addNegatedDivergesConditionToPreconditions(preconditions), measuredBy,
-                        postconditions, modifiesClauses, infFlowSpecs, variables,
+                        postconditions, freePostconditions,
+                        modifiesClauses, infFlowSpecs, variables,
                         transactionApplicable, hasMod));
             }
             return result;
@@ -1561,6 +1613,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         protected abstract T build(String baseName, StatementBlock block, List<Label> labels,
                 IProgramMethod method, Modality modality, Map<LocationVariable, Term> preconditions,
                 Term measuredBy, Map<LocationVariable, Term> postconditions,
+                Map<LocationVariable, Term> freePostconditions,
                 Map<LocationVariable, Term> modifiesClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
                 boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod);
@@ -1628,6 +1681,11 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         protected final Map<LocationVariable, Term> postconditions;
 
         /**
+         * @see AuxiliaryContract#getFreePostcondition(LocationVariable, Services)
+         */
+        protected final Map<LocationVariable, Term> freePostconditions;
+
+        /**
          * @see AuxiliaryContract#getModifiesClause(LocationVariable, Services)
          */
         protected final Map<LocationVariable, Term> modifiesClauses;
@@ -1644,6 +1702,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             this.contracts = sort(contracts);
             preconditions = new LinkedHashMap<LocationVariable, Term>();
             postconditions = new LinkedHashMap<LocationVariable, Term>();
+            freePostconditions = new LinkedHashMap<LocationVariable, Term>();
             modifiesClauses = new LinkedHashMap<LocationVariable, Term>();
         }
 
@@ -1717,6 +1776,27 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 final Term conditionalPostcondition
                         = imp(preify(postcondition), unconditionalPostcondition);
                 postconditions.put(heap,
+                        andPossiblyNull(postconditions.get(heap), conditionalPostcondition));
+            }
+        }
+
+        /**
+         *
+         * @param freePostcondition
+         *            the postcondition to add.
+         * @param contract
+         *            the contract the postcondition belongs to.
+         * @param heap
+         *            the heap to use.
+         */
+        private void addFreePostconditionFrom(final Term freePostcondition, final T contract,
+                final LocationVariable heap) {
+            final Term unconditionalPostcondition
+                    = contract.getFreePostcondition(heap, placeholderVariables, services);
+            if (unconditionalPostcondition != null) {
+                final Term conditionalPostcondition
+                        = imp(preify(freePostcondition), unconditionalPostcondition);
+                freePostconditions.put(heap,
                         andPossiblyNull(postconditions.get(heap), conditionalPostcondition));
             }
         }
