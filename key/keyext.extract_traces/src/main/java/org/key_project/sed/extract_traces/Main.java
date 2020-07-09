@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.settings.*;
 import de.uka.ilkd.key.symbolic_execution.*;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
@@ -24,11 +25,6 @@ import de.uka.ilkd.key.symbolic_execution.util.*;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-
-
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.Name;
 
 /**
  * Example application which symbolically executes
@@ -46,6 +42,21 @@ public class Main {
         String className = "MaxIntBuggy";
         String methodName = "max";
         String[] methodArgTypes = {"int[]"};
+        String preconditionOld
+            = "(  (arr.length == 4 && arr[0] == 2   && arr[1] == 1 "
+            +                     "&& arr[2] == 3   && arr[3] == 4)"
+            + "|| (arr.length == 4 && arr[0] == 2   && arr[1] == 1 "
+            +                     "&& arr[2] == 3   && arr[3] == 2)"
+            + "|| (arr.length == 3 && arr[0] == 0   && arr[1] == 1   && arr[2] == 3)"
+            + "|| (arr.length == 3 && arr[0] == 0   && arr[1] == 2   && arr[2] == 6)"
+            + "|| (arr.length == 3 && arr[0] == 2   && arr[1] == 4   && arr[2] == 3)"
+            + "|| (arr.length == 3 && arr[0] == 4   && arr[1] == 8   && arr[2] == 6)"
+            + "|| (arr.length == 3 && arr[0] == 200 && arr[1] == 400 && arr[2] == 300)"
+            + "|| (arr.length == 3 && arr[0] == 4   && arr[1] == 3   && arr[2] == 2)"
+            + "|| (arr.length == 3 && arr[0] == 550 && arr[1] == 4470&& arr[2] == 10)"
+            + "|| (arr.length == 3 && arr[0] > arr[1] && arr[0] == arr[2]))"
+            + "&& arr != null";
+
         String preconditionGhostVar
             =    "(tc1 ==> arr.length == 4 && arr[0] == 2   && arr[1] == 1 "
             +                             "&& arr[2] == 3   && arr[3] == 4)"
@@ -58,7 +69,7 @@ public class Main {
             + "&& (tc7 ==> arr.length == 3 && arr[0] == 200 && arr[1] == 400 && arr[2] == 300)"
             + "&& (tc8 ==> arr.length == 3 && arr[0] == 4   && arr[1] == 3   && arr[2] == 2)"
             + "&& (tc9 ==> arr.length == 3 && arr[0] == 550 && arr[1] == 4470&& arr[2] == 10)"
-            + "&& (tc0 ==> arr.length == 3 && arr[0] == 200 >= arr[1] && arr[0] == arr[2])"
+            + "&& (tc0 ==> arr.length == 3 && arr[0] > arr[1] && arr[0] == arr[2])"
             + "&& (tc1 || tc2 || tc3 || tc4 || tc5 || tc6 || tc7 || tc8 || tc9 || tc0)"
             + "&& arr != null";
         String preconditionQuantified
@@ -89,7 +100,7 @@ public class Main {
 
         try {
             treeBuilder = executeMethod(location, className, methodName, methodArgTypes,
-                                        preconditionQuantified, null, null, null);
+            		preconditionQuantified, null, null, null);
             System.out.println("Finished building SE tree");
             printSymbolicExecutionTree("", treeBuilder);
         } catch (ProofInputException e) {
@@ -239,6 +250,13 @@ public class Main {
             name = (mrNode.isReturnValuesComputed() || !node.isDisposed())
                  ? mrNode.getNameIncludingReturnValue()
                  : node.getName();
+            //builder.append( node.getPathCondition());
+
+            //for (IExecutionConstraint constr : node.getConstraints()) {
+            //    builder.append(constr);
+            //    builder.append("\n");
+            //}
+
         } else {
             name = node.getName();
         }
