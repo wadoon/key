@@ -1128,13 +1128,14 @@ public class SymbolicExecutionTreeBuilder {
                initNewLoopBodyMethodCallStack(node);
             }
          }
-         else if (SymbolicExecutionUtil.isBlockSpecificationElement(node, node.getAppliedRuleApp())) {
-            if (isNotInImplicitMethod(node)) {
-               result = new ExecutionAuxiliaryContract(settings, node);
-               // Initialize new call stack of the validity branch
-               initNewValidiityMethodCallStack(node);
-            }
-         }
+         // FIXME null pointer exception
+//         else if (SymbolicExecutionUtil.isBlockSpecificationElement(node, node.getAppliedRuleApp())) {
+//            if (isNotInImplicitMethod(node)) {
+//               result = new ExecutionAuxiliaryContract(settings, node);
+//               // Initialize new call stack of the validity branch
+//               initNewValidiityMethodCallStack(node);
+//            }
+//         }
          else if (SymbolicExecutionUtil.isCloseAfterJoin(node.getAppliedRuleApp())) {
             result = new ExecutionJoin(settings, node);
          }
