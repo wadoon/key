@@ -162,5 +162,7 @@ group abstract_execution_notprovable {
 
 # These are the proof files which can be loaded from the examples menu.
 # They must work with the current version.
-#group reload_examples {
-#}
+group reload_examples {
+   loadable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrect/consolidateDuplicateConditionalFragments.aer.zproof
+   loadable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.aer.zproof
+}
