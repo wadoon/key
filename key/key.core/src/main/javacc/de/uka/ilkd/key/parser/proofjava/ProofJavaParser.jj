@@ -4629,7 +4629,7 @@ Exec ExecStatement() :
         
     // TODO: Catch break, continue, labels
 
-    /*[
+    [
         LOOKAHEAD("ccatch" "("  "\\Return" ")")
         "ccatch"
         {
@@ -4645,7 +4645,7 @@ Exec ExecStatement() :
             cat.setBody(block);
             branches.add(cat);
         }
-    ]*/
+    ]
     
     ( 
         LOOKAHEAD("ccatch" "("  param = FormalParameter() ")")
