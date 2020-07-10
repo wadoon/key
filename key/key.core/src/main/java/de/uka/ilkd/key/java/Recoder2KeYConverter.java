@@ -1955,6 +1955,10 @@ public class Recoder2KeYConverter {
         return new CcatchReturnParameterDeclaration(collectChildrenAndComments(arg));
     }
 
+    public CcatchReturnValParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchReturnValParameterDeclaration arg) {
+        return new CcatchReturnValParameterDeclaration(collectChildrenAndComments(arg));
+    }
+
     public Finally convert(recoder.java.statement.Finally arg) {
         return new Finally(collectChildrenAndComments(arg));
     }
