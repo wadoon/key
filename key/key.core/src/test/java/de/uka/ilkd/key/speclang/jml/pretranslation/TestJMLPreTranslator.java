@@ -30,10 +30,10 @@ public class TestJMLPreTranslator {
 
     @Test
     public void testSimpleSpec() throws SLTranslationException {
-        ImmutableList<TextualJMLConstruct> constructs
-                = parseMethodSpec("/*@ normal_behavior\n"
-                + "     requires true;\n"
-                + "  */");
+        ImmutableList<TextualJMLConstruct> constructs = parseMethodSpec(
+                "/*@ normal_behavior\n"
+                        + "     requires true;\n"
+                        + "  */");
 
         assertNotNull(constructs);
         assertEquals(1, constructs.size());
@@ -46,8 +46,7 @@ public class TestJMLPreTranslator {
         assertEquals(0, specCase.getEnsures().size());
         assertEquals(0, specCase.getSignals().size());
         assertEquals(0, specCase.getSignalsOnly().size());
-
-        assertEquals("requires true;", specCase.getRequires().head().text.trim());
+        assertEquals("requirestrue", specCase.getRequires().head().getText().trim());
     }
 
 
@@ -56,9 +55,9 @@ public class TestJMLPreTranslator {
         ImmutableList<TextualJMLConstruct> constructs
                 = parseMethodSpec("/*@ behaviour\n"
                 + "  @  requires true;\n"
-                + "  @  requires ((;;(;););(););\n"
+                + "  @  requires a!=null && (\\forall int i; 0 <= i && i <= 2; \\dl_f(i) );\n"
                 + "  @  ensures false;\n"
-                + "  @  signals exception;\n"
+                + "  @  signals (Exception) e;\n"
                 + "  @  signals_only onlythis;\n"
                 + "  @  assignable \\nothing;\n"
                 + "  @*/");
@@ -75,12 +74,18 @@ public class TestJMLPreTranslator {
         assertEquals(1, specCase.getSignals().size());
         assertEquals(1, specCase.getSignalsOnly().size());
 
-        assertEquals("ensures false;", specCase.getEnsures().head().text.trim());
-        assertEquals("assignable \\nothing;", specCase.getAssignable().head().text.trim());
+        System.out.println(specCase);
+
+        assertEquals("ensuresfalse", specCase.getEnsures().head().getText().trim());
+        assertEquals("assignable\\nothing", specCase.getAssignable().head().getText().trim());
+        assertEquals("signals(Exception)e", specCase.getSignals().head().getText().trim());
+        assertEquals("signals_onlyonlythis", specCase.getSignalsOnly().head().getText().trim());
+        assertEquals("requirestrue", specCase.getRequires().head().getText().trim());
     }
 
 
-    @Test public void testMultipleSpecs() throws SLTranslationException {
+    @Test
+    public void testMultipleSpecs() throws SLTranslationException {
         ImmutableList<TextualJMLConstruct> constructs
                 = parseMethodSpec("//@ normal_behaviour\n"
                 + "//@  ensures false\n"
@@ -88,7 +93,7 @@ public class TestJMLPreTranslator {
                 + "//@  assignable \\nothing;\n"
                 + "//@ also exceptional_behaviour\n"
                 + "//@  requires o == null;\n"
-                + "//@  signals Exception;\n");
+                + "//@  signals (Exception) e;\n");
 
         assertNotNull(constructs);
         assertEquals(2, constructs.size());
@@ -112,7 +117,8 @@ public class TestJMLPreTranslator {
         assertEquals(0, specCase2.getSignalsOnly().size());
     }
 
-    @Test public void testAtInModelmethod() throws SLTranslationException {
+    @Test
+    public void testAtInModelmethod() throws SLTranslationException {
         parseMethodSpec(
                 "/*@ model_behaviour\n" +
                         "  @   requires true;\n" +
@@ -122,45 +128,27 @@ public class TestJMLPreTranslator {
                         "  @*/");
     }
 
-    // used to be accepted
-    @Test public void disabled_testMLCommentEndInSLComment() throws Exception {
-        try {
-            parseMethodSpec(
-                    "//@ requires @*/ true;");
-            fail("Characters '@*/' should not be parsed");
-        } catch (SLTranslationException ex) {
-            // anticipated
-        }
-
-        try {
-            parseMethodSpec(
-                    "//@ requires */ true;");
-            fail("Characters '*/' should not be parsed");
-        } catch (SLTranslationException ex) {
-            // anticipated
-        }
-
+    @Test(expected = Exception.class)
+    public void disabled_testMLCommentEndInSLComment1() throws SLTranslationException {
+        parseMethodSpec("//@ requires @*/ true;");
+        fail("Characters '@*/' should not be parsed");
     }
 
-    @Test
-    public void testFailure() {
-        try {
-            parseMethodSpec("/*@ normal_behaviour \n @ signals ohoh;" + "  @*/");
-            fail();
-        } catch (SLTranslationException e) {
-            //fine
-        }
+    @Test(expected = Exception.class)
+    public void disabled_testMLCommentEndInSLComment2() throws SLTranslationException {
+        parseMethodSpec("//@ requires */ true;");
     }
 
-    @Test
-    public void testFailure2() {
-        try {
-            parseMethodSpec("/*@ behaviour\n"
-                    + "  @  requires (;((;;);();();(();;;(;)));\n"
-                    + "  @*/");
-            fail();
-        } catch (SLTranslationException e) {
-            //fine
-        }
+    @Test(expected = Exception.class)
+    public void testFailure() throws SLTranslationException {
+        parseMethodSpec("/*@ normal_behaviour \n @ signals ohoh;" + "  @*/");
+        fail();
+    }
+
+    @Test(expected = Exception.class)
+    public void testFailure2() throws SLTranslationException {
+        parseMethodSpec("/*@ behaviour\n"
+                + "  @  requires (;((;;);();();(();;;(;)));\n"
+                + "  @*/");
     }
 }

@@ -21,9 +21,8 @@ import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.njml.JmlIO;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +45,7 @@ public class TestJMLTranslator {
     private static Services services;
     private static KeYJavaType testClassType;
     private static final Map<LocationVariable, Term> atPres = new LinkedHashMap<>();
+    private JmlIO jmlIO;
 
 
     @Before
@@ -58,8 +58,8 @@ public class TestJMLTranslator {
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
             atPres.put(services.getTypeConverter().getHeapLDT().getHeap(), TB.var(TB.heapAtPreVar("heapAtPre", services.getTypeConverter().getHeapLDT().getHeap().sort(),
                     false)));
-
         }
+        jmlIO = new JmlIO().services(services).classType(testClassType).selfVar(buildSelfVarAsProgVar());
     }
 
     protected ProgramVariable buildSelfVarAsProgVar() {
@@ -111,20 +111,9 @@ public class TestJMLTranslator {
         return false;
     }
 
-
     @Test
     public void testTrueTerm() {
-        Term result = null;
-
-        try {
-            result = JMLTranslator.translate(new PositionedString("true"),
-                    testClassType, null, null, null,
-                    null, null, null, Term.class,
-                    services);
-        } catch (SLTranslationException e) {
-            fail();
-        }
-
+        Term result = jmlIO.parseExpression("true");
         assertNotNull(result);
         assertEquals(result, TB.tt());
     }
@@ -132,19 +121,10 @@ public class TestJMLTranslator {
 
     @Test
     public void testSelfVar() {
-        Term result = null;
-
         ProgramVariable selfVar = buildSelfVarAsProgVar();
-
-        try {
-            result = JMLTranslator.translate(new PositionedString("this"),
-                    testClassType, selfVar, null, null,
-                    null, null, null, Term.class,
-                    services);
-        } catch (SLTranslationException e) {
-            fail();
-        }
-
+        Term result = jmlIO
+                .selfVar(selfVar)
+                .parseExpression("this");
         assertNotNull(result);
         assertEquals(result, TB.var(selfVar));
     }
@@ -152,20 +132,8 @@ public class TestJMLTranslator {
 
     @Test
     public void testLogicalExpression() {
-        Term result = null;
-
         ProgramVariable selfVar = buildSelfVarAsProgVar();
-
-        try {
-            result = JMLTranslator.translate(new PositionedString(
-                            "(b <= s &&  i > 5) ==> this != instance"), testClassType,
-                    selfVar, null, null, null,
-                    null, null, Term.class, services);
-        } catch (SLTranslationException e) {
-            e.printStackTrace();
-            fail();
-        }
-
+        Term result = jmlIO.parseExpression("(b <= s &&  i > 5) ==> this != instance");
         assertNotNull(result);
         assertEquals(result.op(), Junctor.IMP);
         assertEquals(result.sub(0).op(), Junctor.AND);
@@ -177,41 +145,24 @@ public class TestJMLTranslator {
     // Adding spaces around "j < i" solves the problem.
     // see bug MT-1548
     @Test
-    public void testSumParsing() throws SLTranslationException {
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
-        JMLTranslator.translate(new PositionedString(
-                        "0 == ((\\sum int j; 0<=j && j<i; j))"),
-                testClassType, selfVar, null, null, null, null, null, Term.class, services);
+    public void testSumParsing() {
+        jmlIO.parseExpression("0 == ((\\sum int j; 0<=j && j<i; j))");
     }
 
     // see bug #1528
     @Test
-    public void testParenExpression() throws SLTranslationException {
+    public void testParenExpression() {
         ProgramElementName classPEN = new ProgramElementName("o");
         ProgramVariable var = new LocationVariable(classPEN, testClassType);
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
-        JMLTranslator.translate(new PositionedString(
-                        "(o.i)"),
-                testClassType, selfVar, ImmutableSLList.<ProgramVariable>nil().prepend(var),
-                null, null, null, null, Term.class, services);
+        jmlIO.parameters(ImmutableSLList.singleton(var))
+                .parseExpression("(o.i)");
     }
 
     @Test
     public void testPrimitiveField() {
-        Term result = null;
-
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         ProgramVariable i = javaInfo.getAttribute("testPackage.TestClass::i");
-
-        try {
-            result = JMLTranslator.translate(new PositionedString(
-                            "this.i"), testClassType,
-                    selfVar, null, null, null,
-                    null, null, Term.class, services);
-        } catch (SLTranslationException e) {
-            fail();
-        }
-
+        Term result = jmlIO.parseExpression("this.i");
         assertNotNull(result);
         //assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(i) ));
         assertTrue(termContains(result, selfVar));
@@ -219,23 +170,13 @@ public class TestJMLTranslator {
 
     @Test
     public void testSimpleQuery() {
-        Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         IProgramMethod getOne = javaInfo.getProgramMethod(testClassType,
                 "getOne",
                 ImmutableSLList.<KeYJavaType>nil(),
                 testClassType);
-
-        try {
-            result = JMLTranslator.translate(new PositionedString("this.getOne()"),
-                    testClassType, selfVar, null,
-                    null, null, null, null, Term.class,
-                    services);
-        } catch (SLTranslationException e) {
-            fail();
-        }
-
+        Term result = jmlIO.parseExpression("this.getOne()");
         assertNotNull(result);
         assertTrue(termContains(result, selfVar));
         assertTrue(termContains(result, getOne));
@@ -244,17 +185,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testForAll() {
-        Term result = null;
-
-        try {
-            result = JMLTranslator.translate(
-                    new PositionedString(
-                            "(\\forall int i; (0 <= i && i <= 2147483647) )"),
-                    testClassType, null, null, null, null,
-                    null, null, Term.class, services);
-        } catch (SLTranslationException e) {
-            fail(e.getMessage());
-        }
+        Term result = jmlIO.parseExpression("(\\forall int i; (0 <= i && i <= 2147483647) )");
 
         assertNotNull(result);
         assertEquals(result.op(), Quantifier.ALL);
@@ -276,19 +207,9 @@ public class TestJMLTranslator {
     }
 
 
-    @Test public void testForEx() {
-        Term result = null;
-
-        try {
-            result = JMLTranslator.translate(
-                    new PositionedString(
-                            "(\\exists int i; (0 <= i && i <= 2147483647) )"),
-                    testClassType, null, null, null, null,
-                    null, null, Term.class, services);
-        } catch (SLTranslationException e) {
-            fail(e.getMessage());
-        }
-
+    @Test
+    public void testForEx() {
+        Term result = jmlIO.parseExpression("(\\exists int i; (0 <= i && i <= 2147483647) )");
         assertNotNull(result);
         assertEquals(result.op(), Quantifier.EX);
         assertTrue(termContains(result, TB.zTerm("2147483647")));
@@ -309,19 +230,9 @@ public class TestJMLTranslator {
     }
 
 
-    @Test public void testBsumInt() {
-        Term result = null;
-
-        try {
-            result = JMLTranslator.translate(
-                    new PositionedString(
-                            "(\\bsum int i; 0; 2147483647; i)"),
-                    testClassType, null, null, null, null,
-                    null, null, Term.class, services);
-        } catch (SLTranslationException e) {
-            fail(e.getMessage());
-        }
-
+    @Test
+    public void testBsumInt() {
+        Term result = jmlIO.parseExpression("(\\bsum int i; 0; 2147483647; i)");
         NamespaceSet nss = services.getNamespaces();
         Function q = nss.functions().lookup(new Name("bsum"));
         LogicVariable i =
@@ -340,19 +251,9 @@ public class TestJMLTranslator {
     }
 
 
-    @Test public void testBsumBigInt() {
-        Term result = null;
-
-        try {
-            result = JMLTranslator.translate(
-                    new PositionedString(
-                            "(\\bsum \\bigint i; 0; 2147483647; i)"),
-                    testClassType, null, null, null, null,
-                    null, null, Term.class, services);
-        } catch (SLTranslationException e) {
-            fail(e.getMessage());
-        }
-
+    @Test
+    public void testBsumBigInt() {
+        Term result = jmlIO.parseExpression("(\\bsum \\bigint i; 0; 2147483647; i)");
         NamespaceSet nss = services.getNamespaces();
         Function q = nss.functions().lookup(new Name("bsum"));
         LogicVariable i =
@@ -369,14 +270,10 @@ public class TestJMLTranslator {
                 result.equalsModRenaming(expected));
     }
 
-    @Test public void testInfiniteUnion() {
-        Term result = null;
+    @Test
+    public void testInfiniteUnion() {
         final String input = "\\infinite_union(Object o; \\empty)";
-        try {
-            result = JMLTranslator.translate(input, testClassType, Term.class, services);
-        } catch (SLTranslationException e) {
-            fail("" + e);
-        }
+        Term result = jmlIO.parseExpression(input);
         assertNotNull(result);
         Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
@@ -388,15 +285,11 @@ public class TestJMLTranslator {
                 result.equalsModRenaming(expected));
     }
 
-    @Test public void testInfiniteUnion2() {
-        Term result = null;
+    @Test
+    public void testInfiniteUnion2() {
         //weigl: adapt to new syntax
         final String input = "(\\infinite_union nullable Object o; \\empty)";
-        try {
-            result = JMLTranslator.translate(input, testClassType, Term.class, services);
-        } catch (SLTranslationException e) {
-            fail("" + e);
-        }
+        Term result = jmlIO.parseExpression(input);
         assertNotNull(result);
         Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
         LogicVariable o =
@@ -411,18 +304,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testComplexExists() {
-        Term result = null;
-
-        try {
-            result = JMLTranslator.translate(
-                    new PositionedString(
-                            "(\\exists TestClass t; t != null; t.i == 0)"),
-                    testClassType, null, null, null, null,
-                    null, null, Term.class, services);
-        } catch (SLTranslationException e) {
-            fail("Error Message: " + e);
-        }
-
+        Term result = jmlIO.parseExpression("(\\exists TestClass t; t != null; t.i == 0)");
         assertNotNull(result);
         assertEquals(result.op(), Quantifier.EX);
         assertEquals(result.sub(0).op(), Junctor.AND);
@@ -431,23 +313,13 @@ public class TestJMLTranslator {
 
     @Test
     public void testOld() {
-        Term result = null;
-
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
         ProgramVariable excVar = buildExcVar();
         ProgramVariable i = javaInfo.getAttribute("testPackage.TestClass::i");
 
-
-        try {
-            result = JMLTranslator.translate(new PositionedString(
-                            "this.i == \\old(this.i)"),
-                    testClassType, selfVar, null,
-                    null, excVar, atPres,
-                    null, Term.class, services);
-        } catch (SLTranslationException e) {
-            e.printStackTrace();
-            fail();
-        }
+        Term result = jmlIO
+                .exceptionVariable(excVar)
+                .atPres(atPres)
+                .parseExpression("this.i == \\old(this.i)");
 
         assertNotNull(result);
         assertEquals(result.op(), Equality.EQUALS);
@@ -457,31 +329,22 @@ public class TestJMLTranslator {
         assertTrue(termContains(result, atPres.get(services.getTypeConverter().getHeapLDT().getHeap()).op()));
     }
 
-
     @Test
     public void testResultVar() {
-        Term result = null;
-
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
         ProgramVariable excVar = buildExcVar();
 
-        ImmutableList<KeYJavaType> signature =
-                ImmutableSLList.nil();
+        ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "getOne",
                 signature, testClassType);
 
         ProgramVariable resultVar = buildResultVar(pm);
 
-        try {
-            result = JMLTranslator.translate(new PositionedString(
-                            "\\result == 1"),
-                    testClassType, selfVar, null,
-                    resultVar, excVar, atPres,
-                    null, Term.class, services);
-        } catch (SLTranslationException e) {
-            fail();
-        }
+        Term result = jmlIO
+                .atPres(atPres)
+                .resultVariable(resultVar)
+                .exceptionVariable(excVar)
+                .parseExpression("\\result == 1");
 
         assertNotNull(result);
         assertEquals(result.op(), Equality.EQUALS);
@@ -492,25 +355,14 @@ public class TestJMLTranslator {
 
     @Test
     public void testNonNullElements() {
-        Term result = null;
 
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
         ProgramVariable array = javaInfo.getAttribute(
                 "testPackage.TestClass::array");
 
-        try {
-            result = JMLTranslator.translate(new PositionedString(
-                            "\\nonnullelements(this.array)"),
-                    testClassType,
-                    selfVar,
-                    null,
-                    null,
-                    null,
-                    atPres, null, Term.class,
-                    services);
-        } catch (SLTranslationException e) {
-            fail();
-        }
+        Term result = jmlIO
+                .atPres(atPres)
+                .parseExpression(
+                        "\\nonnullelements(this.array)");
 
         assertNotNull(result);
         //assertTrue(termContains(result.getFormula(), AttributeOp.getAttributeOp(array)));
@@ -520,25 +372,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testIsInitialized() {
-
-        Term result = null;
-
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
-
-        try {
-            result = JMLTranslator.translate(new PositionedString(
-                            "\\is_initialized(testPackage.TestClass)"),
-                    testClassType,
-                    selfVar,
-                    null,
-                    null,
-                    null,
-                    atPres, null, Term.class,
-                    services);
-        } catch (SLTranslationException e) {
-            fail();
-        }
-
+        Term result = jmlIO.atPres(atPres).parseExpression("\\is_initialized(testPackage.TestClass)");
         assertNotNull(result);
         assertEquals(result.op(), Equality.EQUALS);
         assertTrue(termContains(result, TB.var(
@@ -549,18 +383,7 @@ public class TestJMLTranslator {
 
     @Test
     public void testHexLiteral() {
-        Term result = null;
-
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
-
-        try {
-            result = JMLTranslator.translate(
-                    new PositionedString(" i == 0x12 "),
-                    testClassType, selfVar, null, null, null, null, null, Term.class, services);
-        } catch (SLTranslationException e) {
-            fail();
-        }
-
+        Term result = jmlIO.parseExpression(" i == 0x12 ");
         assertNotNull(result);
         assertEquals(result.op(), Equality.EQUALS);
         assertTrue(termContains(result, TB.zTerm("18")));
@@ -569,10 +392,6 @@ public class TestJMLTranslator {
 
     @Test
     public void testComplexQueryResolving1() {
-        Term result = null;
-
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
-
         ImmutableList<KeYJavaType> signature =
                 ImmutableSLList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(
@@ -581,15 +400,7 @@ public class TestJMLTranslator {
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m",
                 signature, testClassType);
 
-        try {
-            result = JMLTranslator.translate(
-                    new PositionedString("this.m((int)4 + 2) == this.m(i)"),
-                    testClassType,
-                    selfVar, null, null, null, null, null, Term.class, services);
-        } catch (SLTranslationException e) {
-            e.printStackTrace();
-            fail();
-        }
+        Term result = jmlIO.parseExpression("this.m((int)4 + 2) == this.m(i)");
 
         assertNotNull(result);
         assertEquals(result.sub(0).op(), pm);
@@ -599,27 +410,14 @@ public class TestJMLTranslator {
 
     @Test
     public void testComplexQueryResolving2() {
-        Term result = null;
-
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
-
-        ImmutableList<KeYJavaType> signature =
-                ImmutableSLList.nil();
-        signature = signature.append(javaInfo.getKeYJavaType(
-                PrimitiveType.JAVA_LONG));
+        ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
+        signature = signature.append(
+                javaInfo.getKeYJavaType(PrimitiveType.JAVA_LONG));
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m",
                 signature, testClassType);
 
-        try {
-            result = JMLTranslator.translate(
-                    new PositionedString("this.m(l) == this.m((long)i + 3)"),
-                    testClassType, selfVar,
-                    null, null, null, null, null, Term.class, services);
-        } catch (SLTranslationException e) {
-            e.printStackTrace();
-            fail();
-        }
+        Term result = jmlIO.parseExpression("this.m(l) == this.m((long)i + 3)");
 
         assertNotNull(result);
         assertEquals(result.sub(0).op(), pm);
@@ -629,27 +427,14 @@ public class TestJMLTranslator {
 
     @Test
     public void testComplexQueryResolving3() {
-        Term result = null;
-
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
-
-        ImmutableList<KeYJavaType> signature =
-                ImmutableSLList.nil();
-        signature = signature.append(javaInfo.getKeYJavaType(
-                PrimitiveType.JAVA_INT));
+        ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
+        signature = signature.append(
+                javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m",
                 signature, testClassType);
 
-        try {
-            result = JMLTranslator.translate(
-                    new PositionedString("this.m(s + 4) == this.m(+b)"),
-                    testClassType, selfVar,
-                    null, null, null, null, null, Term.class, services);
-        } catch (SLTranslationException e) {
-            e.printStackTrace();
-            fail();
-        }
+        Term result = jmlIO.parseExpression("this.m(s + 4) == this.m(+b)");
 
         assertNotNull(result);
         assertEquals(result.sub(0).op(), pm);
@@ -659,27 +444,11 @@ public class TestJMLTranslator {
 
     @Test
     public void testStaticQueryResolving() {
-        Term result = null;
+        ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
 
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
+        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "staticMethod", signature, testClassType);
 
-        ImmutableList<KeYJavaType> signature =
-                ImmutableSLList.nil();
-
-        IProgramMethod pm = javaInfo.getProgramMethod(testClassType,
-                "staticMethod", signature,
-                testClassType);
-
-        try {
-            result = JMLTranslator.translate(
-                    new PositionedString(
-                            "testPackage.TestClass.staticMethod() == 4"), testClassType,
-                    selfVar,
-                    null, null, null, null, null, Term.class, services);
-        } catch (SLTranslationException e) {
-            e.printStackTrace();
-            fail();
-        }
+        Term result = jmlIO.parseExpression("testPackage.TestClass.staticMethod() == 4");
 
         assertNotNull(result);
         assertEquals(result.sub(0).op(), pm);
@@ -688,20 +457,8 @@ public class TestJMLTranslator {
 
     @Test
     public void testSubtypeExpression() {
-        Term result = null;
-
-        ProgramVariable selfVar = buildSelfVarAsProgVar();
-
-        try {
-            result = JMLTranslator.translate(
-                    new PositionedString(
-                            "( \\exists TestClass t; t != null; \\typeof(t) <: \\type(java.lang.Object) )"),
-                    testClassType, selfVar,
-                    null, null, null, null, null, Term.class, services);
-        } catch (SLTranslationException e) {
-            e.printStackTrace();
-            fail();
-        }
+        Term result = jmlIO.parseExpression(
+                "( \\exists TestClass t; t != null; \\typeof(t) <: \\type(java.lang.Object) )");
 
         assertNotNull(result);
 
@@ -713,27 +470,12 @@ public class TestJMLTranslator {
 
     @Test
     public void testCorrectImplicitThisResolution() {
-        Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         LocationVariable array = (LocationVariable) javaInfo.getAttribute(
                 "testPackage.TestClass::array");
 
-        try {
-            result = JMLTranslator.translate(new PositionedString(
-                            "(\\forall TestClass a;a.array == array; a == this)"),
-                    testClassType,
-                    selfVar,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    Term.class,
-                    services);
-        } catch (SLTranslationException e) {
-            fail("Parsing Error: " + e);
-        }
+        Term result = jmlIO.parseExpression("(\\forall TestClass a;a.array == array; a == this)");
 
         assertNotNull(result);
         final LogicVariable qv =

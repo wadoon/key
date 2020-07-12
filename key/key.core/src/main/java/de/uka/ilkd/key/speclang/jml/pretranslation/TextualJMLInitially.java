@@ -13,9 +13,8 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.speclang.PositionedString;
 
 
 /**
@@ -24,18 +23,17 @@ import de.uka.ilkd.key.speclang.PositionedString;
  */
 public final class TextualJMLInitially extends TextualJMLConstruct {
     
-    private final PositionedString inv;
+    private final ParserRuleContext inv;
     
     
-    public TextualJMLInitially(ImmutableList<String> mods, 
-	                      PositionedString inv) {
+    public TextualJMLInitially(ImmutableList<String> mods, ParserRuleContext inv) {
         super(mods);
         assert inv != null;
         this.inv = inv;
         setPosition(inv);
     }
     
-    public PositionedString getInv() {
+    public ParserRuleContext getInv() {
         return inv;
     }
     

@@ -13,24 +13,23 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.speclang.PositionedString;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * A JML model method declaration in textual form.
  */
 public final class TextualJMLMethodDecl extends TextualJMLConstruct {
-    
-    private final PositionedString decl;
     private final String methodName;
-    private final PositionedString methodDefinition;
+    private final PositionedString decl;
+    private final ParserRuleContext methodDefinition;
     
     
-    public TextualJMLMethodDecl(ImmutableList<String> mods, 
-                                PositionedString decl, 
+    public TextualJMLMethodDecl(ImmutableList<String> mods,
+                                PositionedString decl,
                                 String methodName,
-                                PositionedString methodDefinition) {
+                                ParserRuleContext methodDefinition) {
         super(mods);
         assert decl != null;
         this.decl = decl;
@@ -49,7 +48,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
         return methodName;
     }
 
-    public PositionedString getMethodDefinition() {
+    public ParserRuleContext getMethodDefinition() {
     	return methodDefinition;
     }
     

@@ -1,14 +1,21 @@
 package de.uka.ilkd.key.njml;
 
+import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
+import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -54,6 +61,42 @@ public class JmlIO {
         this.atPres = atPres;
     }
 
+    public static Term translateTerm(ParserRuleContext expr, KeYJavaType containerType, ProgramVariable selfVar, ImmutableList<ProgramVariable> allVars, Object o, Object o1, Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atPres1, OriginTermLabel.SpecType assignable, Class<Term> termClass, Services services) {
+        return null;
+    }
+
+    public static InfFlowSpec translateInformation(ParserRuleContext expr,
+                                                   KeYJavaType containerType, ProgramVariable selfVar,
+                                                   ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
+                                                   ProgramVariable excVar, Object o, Object o1,
+                                                   Class<InfFlowSpec> infFlowSpecClass, Services services) {
+        return null;
+    }
+
+    public static Pair<IObserverFunction, Term> translateRepresents(ParserRuleContext clause, KeYJavaType kjt, ProgramVariable selfVar, Object o, Object o1, Object o2, Object o3, Object o4, Class<Pair> pairClass, Services services) {
+        return null;
+    }
+
+    public static boolean isKnownFunction(String functionName) {
+        return false;//TODO java2jdl
+    }
+
+    public static Term translateTerm(ParserRuleContext expr, KeYJavaType containerType, ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Object o, Object o1, Object o2, Object o3, Class<Term> termClass, Services services) {
+        return null;
+    }
+
+    public static Pair<Label, Term> translateLabeledClause(ParserRuleContext parserRuleContext, KeYJavaType containerType, ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar, ProgramVariable excVar, Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores, OriginTermLabel.SpecType breaks, Services services) {
+        return null;
+    }
+
+    public static MergeParamsSpec translateMergeParams(ParserRuleContext mergeParamsParseStr, KeYJavaType kjt, ProgramVariable selfVar, ImmutableList<ProgramVariable> append, ProgramVariable resultVar, ProgramVariable excVar, Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atPres1, Object o, Class<MergeParamsSpec> mergeParamsSpecClass, Services services) {
+        return null;
+    }
+
+    public static Triple<IObserverFunction, Term, Term> translateDependencyContract(ParserRuleContext originalDep, KeYJavaType kjt, ProgramVariable selfVar, Object o, Object o1, Object o2, Object o3, Object o4, Services services) {
+        return null;
+    }
+
     public ImmutableList<TextualJMLConstruct> parseClassLevel(String concatenatedComment, String fileName, Position pos) {
         return parseClassLevel(new PositionedString(concatenatedComment, fileName, pos));
     }
@@ -84,9 +127,52 @@ public class JmlIO {
         return expr.getTerm();
     }
 
+    public Term parseExpression(String input) {
+        ParserRuleContext ctx = JmlFacade.parseExpr(input);
+        SLExpression expr = (SLExpression) ctx.accept(new Translator(services, specInClass, selfVar, paramVars, resultVar,
+                excVar, atPres, atBefores));
+        return expr.getTerm();
+    }
+
     public Object parse(PositionedString expr) {
         ParserRuleContext ctx = JmlFacade.parseTop(expr);
         return ctx.accept(new Translator(services, specInClass, selfVar, paramVars, resultVar,
                 excVar, atPres, atBefores));
+    }
+
+
+    public JmlIO selfVar(ProgramVariable selfVar) {
+        this.selfVar = selfVar;
+        return this;
+    }
+
+    public JmlIO parameters(ImmutableList<ProgramVariable> params) {
+        this.paramVars = params;
+        return this;
+    }
+
+    public JmlIO exceptionVariable(ProgramVariable excVar) {
+        this.excVar = excVar;
+        return this;
+    }
+
+    public JmlIO atPres(Map<LocationVariable, Term> atPres) {
+        this.atPres = atPres;
+        return this;
+    }
+
+    public JmlIO resultVariable(ProgramVariable resultVar) {
+        this.resultVar = resultVar;
+        return this;
+    }
+
+    public JmlIO services(Services services) {
+        this.services = services;
+        return this;
+    }
+
+    public JmlIO classType(KeYJavaType classType) {
+        this.specInClass = classType;
+        return this;
     }
 }

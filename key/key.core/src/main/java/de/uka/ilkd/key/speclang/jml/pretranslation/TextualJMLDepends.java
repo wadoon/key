@@ -13,15 +13,15 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.Name;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.speclang.PositionedString;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 /**
@@ -29,44 +29,40 @@ import de.uka.ilkd.key.speclang.PositionedString;
  * Note that such clauses for *methods* are part of TextualJMLSpecCase.
  */
 public final class TextualJMLDepends extends TextualJMLConstruct {
-    
-    private Map<String, ImmutableList<PositionedString>> depends = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+    private Map<String, ImmutableList<ParserRuleContext>> depends = new LinkedHashMap<>();
 
-    
-    public TextualJMLDepends(ImmutableList<String> mods,
-	                     PositionedString depends) {
+    public TextualJMLDepends(ImmutableList<String> mods, @NotNull ParserRuleContext depends) {
         super(mods);
-        assert depends != null;
-        for(Name hName : HeapLDT.VALID_HEAP_NAMES) {
-            this.depends.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+        for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
+            this.depends.put(hName.toString(), ImmutableSLList.nil());
         }
         addGeneric(this.depends, depends);
     }
-    
-    public ImmutableList<PositionedString> getDepends() {
+
+    public ImmutableList<ParserRuleContext> getDepends() {
         return depends.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
-    
-    public ImmutableList<PositionedString> getDepends(String hName) {
+
+    public ImmutableList<ParserRuleContext> getDepends(String hName) {
         return depends.get(hName);
     }
-    
+
     @Override
     public String toString() {
         return depends.toString();
     }
-    
-    
+
+
     @Override
     public boolean equals(Object o) {
-        if(!(o instanceof TextualJMLDepends)) {
+        if (!(o instanceof TextualJMLDepends)) {
             return false;
         }
         TextualJMLDepends a = (TextualJMLDepends) o;
         return mods.equals(a.mods) && depends.equals(a.depends);
     }
-    
-    
+
+
     @Override
     public int hashCode() {
         return mods.hashCode() + depends.hashCode();

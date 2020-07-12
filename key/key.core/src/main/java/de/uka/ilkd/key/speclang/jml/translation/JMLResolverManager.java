@@ -22,11 +22,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
-import de.uka.ilkd.key.speclang.translation.SLAttributeResolver;
-import de.uka.ilkd.key.speclang.translation.SLMethodResolver;
-import de.uka.ilkd.key.speclang.translation.SLResolverManager;
-import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
-import de.uka.ilkd.key.speclang.translation.SLTypeResolver;
+import de.uka.ilkd.key.speclang.translation.*;
 
 
 /**
@@ -40,22 +36,22 @@ public final class JMLResolverManager extends SLResolverManager {
                               SLExceptionFactory eManager) {
         super(eManager, specInClass, selfVar, false, javaInfo.getServices().getTermBuilder());
         addResolver(new JMLBuiltInPropertyResolver(javaInfo, this, specInClass));
-        addResolver(new SLAttributeResolver(javaInfo, this, specInClass));        
+        addResolver(new SLAttributeResolver(javaInfo, this, specInClass));
         addResolver(new SLMethodResolver(javaInfo, this, specInClass));
         addResolver(new SLTypeResolver(javaInfo, this, specInClass));
     }
-    
-    
+
+
     @Override
     public VisibilityModifier getSpecVisibility(MemberDeclaration md) {
-	if(JMLInfoExtractor.hasJMLModifier((FieldDeclaration)md, 
-		                           "spec_public")) {
-	    return new Public();
-	} else if(JMLInfoExtractor.hasJMLModifier((FieldDeclaration)md, 
-		                                  "spec_protected")) {
-	    return new Protected();
-	} else {
-	    return null;
-	}
-    }    
+        if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md,
+                "spec_public")) {
+            return new Public();
+        } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md,
+                "spec_protected")) {
+            return new Protected();
+        } else {
+            return null;
+        }
+    }
 }

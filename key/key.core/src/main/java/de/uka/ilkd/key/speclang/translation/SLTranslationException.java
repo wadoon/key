@@ -15,6 +15,7 @@ package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 public class SLTranslationException extends ProofInputException {
 
@@ -54,7 +55,11 @@ public class SLTranslationException extends ProofInputException {
       this(message);
    }
 
-   public String getFileName() {
+    public SLTranslationException(String message, ParserRuleContext expr) {
+        this(message, expr.start.getTokenSource().getSourceName(), new Position(expr.start.getLine(), expr.start.getCharPositionInLine()));
+    }
+
+    public String getFileName() {
       return fileName;
    }
 

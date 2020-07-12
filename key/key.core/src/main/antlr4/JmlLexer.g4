@@ -132,6 +132,8 @@ WORKING_SPACE: 'working_space' Pred -> pushMode(expr);
 WRITABLE: 'writable' -> pushMode(expr);
 
 JML_SL_START: '//@' -> channel(HIDDEN);
+JML_ML_START: '/*@' -> channel(HIDDEN);
+JML_ML_END: '*/' -> channel(HIDDEN);
 SL_COMMENT: '//' ~'@' ~('\n'|'\r')* -> channel(HIDDEN);
 ML_COMMENT: '/*' -> pushMode(mlComment);
 

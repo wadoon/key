@@ -349,8 +349,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         assert originalComments.length > 0;
 
         // prepend Java modifiers
-        PositionedString declWithMods = prependJavaMods(decl.getMods(),
-                decl.getDecl());
+        PositionedString declWithMods = prependJavaMods(decl.getMods(), decl.getDecl());
 
         // only handle model methods
         if (!decl.getMods().contains("model")) {

@@ -3,6 +3,7 @@ package de.uka.ilkd.key.njml;
 import de.uka.ilkd.key.speclang.PositionedString;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Pair;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * @author Alexander Weigl
@@ -47,6 +48,19 @@ public class JmlFacade {
     public static ParserRuleContext parseTop(PositionedString expr) {
         JmlParser p = createParser(createLexer(expr));
         return p.classlevel_comment();
+    }
+
+    public static ParserRuleContext parseClause(String s) {
+        JmlParser p = createParser(createLexer(s));
+        return p.clause();//TODO EOF
+    }
+
+    public static ParserRuleContext parseClause(ImmutableSet<PositionedString> nonNullPositionedString) {
+        StringBuilder s = new StringBuilder();
+        for (PositionedString string : nonNullPositionedString) {
+            s.append(string).append("\n");
+        }
+        return parseClause(s.toString());
     }
 
     private static class OffsetFactory extends CommonTokenFactory {

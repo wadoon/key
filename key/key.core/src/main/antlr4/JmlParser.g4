@@ -43,7 +43,7 @@ spec_case:
 /*spec_var_decls: (old_clause | FORALL expression)+;
 spec_header: requires_clause+;*/
 
-spec_body: a=clause+ (NEST_START inner=clause (also_keyword+ spec_body)* NEST_END)?;
+spec_body: a+=clause+ (NEST_START inner+=clause* (also_keyword+ spec_body)* NEST_END)?;
 clause
   :
   ( ensures_clause   | requires_clause     | measured_by_clause
@@ -98,7 +98,6 @@ loop_determines_clause
   : LOOP_DETERMINES
     (NOTHING |det=infflowspeclist)
     BY ITSELF ((NEW_OBJECTS (NOTHING |newObs+=infflowspeclist)))*
-
   ;
 
 signals_clause: SIGNALS LPAREN referencetype (IDENT)? RPAREN (predornot)? ;

@@ -13,57 +13,56 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.speclang.PositionedString;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * A JML represents clause in textual form.
  */
 public final class TextualJMLRepresents extends TextualJMLConstruct {
-    
-    private final PositionedString represents;
-    
-    
-    public TextualJMLRepresents(ImmutableList<String> mods,
-	                        PositionedString represents) {
+
+    private final ParserRuleContext represents;
+
+
+    public TextualJMLRepresents(ImmutableList<String> mods, ParserRuleContext represents) {
         super(mods);
         assert represents != null;
         this.represents = represents;
         setPosition(represents);
     }
-    
-    public TextualJMLRepresents (ImmutableList<String> mods, PositionedString represents, String name){
-        this(mods,represents);
+
+    public TextualJMLRepresents(ImmutableList<String> mods, ParserRuleContext represents, String name) {
+        this(mods, represents);
         this.name = name;
     }
-    
-    public PositionedString getRepresents() {
+
+    public ParserRuleContext getRepresents() {
         return represents;
     }
-    
+
     @Override
     public String toString() {
         return represents.toString();
     }
-    
-    
+
+
     @Override
     public boolean equals(Object o) {
-        if(!(o instanceof TextualJMLRepresents)) {
+        if (!(o instanceof TextualJMLRepresents)) {
             return false;
         }
         TextualJMLRepresents r = (TextualJMLRepresents) o;
         return mods.equals(r.mods) && represents.equals(r.represents);
     }
-    
-    
+
+
     @Override
     public int hashCode() {
         return mods.hashCode() + represents.hashCode();
     }
-    
-    public String getName(){
+
+    public String getName() {
         return name;
     }
 }

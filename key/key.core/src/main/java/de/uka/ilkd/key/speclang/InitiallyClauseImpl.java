@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 
 /**
@@ -62,7 +63,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     /**
      * The original specification.
      */
-    private final PositionedString originalSpec;
+    private final ParserRuleContext originalSpec;
 
 
     //-------------------------------------------------------------------------
@@ -75,16 +76,17 @@ public final class InitiallyClauseImpl implements InitiallyClause {
      * @param displayName the displayed name of the invariant
      * @param kjt the KeYJavaType to which the invariant belongs
      * @param visibility the visibility of the invariant
-     *        (null for default visibility)
+*        (null for default visibility)
      * @param inv the invariant formula itself
      * @param selfVar the variable used for the receiver object
+     * @param originalSpec
      */
     public InitiallyClauseImpl(String name,
-                              String displayName,
-                              KeYJavaType kjt,
-                              VisibilityModifier visibility,
-                              Term inv,
-                              ParsableVariable selfVar, PositionedString originalSpec) {
+                               String displayName,
+                               KeYJavaType kjt,
+                               VisibilityModifier visibility,
+                               Term inv,
+                               ParsableVariable selfVar, ParserRuleContext originalSpec) {
         assert name != null && !name.equals("");
         assert displayName != null && !displayName.equals("");
         assert kjt != null;
@@ -158,7 +160,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     }
 
     @Override
-    public PositionedString getOriginalSpec(){
+    public ParserRuleContext getOriginalSpec(){
         return originalSpec;
     }
 
