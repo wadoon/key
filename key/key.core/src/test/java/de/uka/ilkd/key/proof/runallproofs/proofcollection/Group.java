@@ -7,21 +7,21 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 
 /**
  * Parser {@link ProofCollectionParser} splits a file into several
- * {@link ProofCollectionUnit}s during parsing. The created
- * {@link ProofCollectionUnit}s are combined into a {@link ProofCollection} by
- * the parser. See implementations {@link GroupedProofCollectionUnit} and
- * {@link SingletonProofCollectionUnit} for further details.
+ * {@link Group}s during parsing. The created
+ * {@link Group}s are combined into a {@link ProofCollection} by
+ * the parser. See implementations {@link GroupedGroup} and
+ * {@link SingletonGroup} for further details.
  * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public abstract class ProofCollectionUnit implements Serializable {
+public abstract class Group implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
 /**
     * 
     * Creates a {@link RunAllProofsTestUnit} from this
-    * {@link ProofCollectionUnit}.
+    * {@link Group}.
     * 
     * @param parentSettings
     *           Settings used during execution of returned
@@ -31,11 +31,11 @@ public abstract class ProofCollectionUnit implements Serializable {
          String testName) throws IOException;
 
    /**
-    * Name of a {@link ProofCollectionUnit}, which is used as prefix for name of
+    * Name of a {@link Group}, which is used as prefix for name of
     * {@link RunAllProofsTestUnit} that can be created with method
     * {@link #retrieveTestMethod(ProofCollectionSettings, String)}.
     * 
-    * @return Name of this {@link ProofCollectionUnit}.
+    * @return Name of this {@link Group}.
     */
    abstract String getName() throws IOException;
 

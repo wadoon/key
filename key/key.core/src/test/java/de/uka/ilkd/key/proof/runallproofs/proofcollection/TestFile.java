@@ -84,8 +84,8 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
       return ret;
    }
 
-    protected TestFile(TestProperty testProperty, String path,
-            ProofCollectionSettings settings, Directories directories) {
+    public TestFile(TestProperty testProperty, String path,
+                    ProofCollectionSettings settings, Directories directories) {
         this.path = path;
         this.testProperty = testProperty;
         this.settings = settings;

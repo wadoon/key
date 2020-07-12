@@ -3,19 +3,13 @@ package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbsoluteFile;
 import de.uka.ilkd.key.util.LinkedHashMap;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Immutable settings type for proof collections. Specifies settings used during
@@ -25,9 +19,6 @@ import de.uka.ilkd.key.util.LinkedHashMap;
  *
  */
 public class ProofCollectionSettings implements Serializable {
-
-   private static final long serialVersionUID = 8098789985911604781L;
-
    /*
     * Known constants for entries that may occur in field settingsMap.
     */
@@ -54,7 +45,7 @@ public class ProofCollectionSettings implements Serializable {
    /**
     * String {@link Map} containing all settings entries.
     */
-   private final Map<String, String> immutableSettingsMap;
+   private final Map<String, String> immutableSettingsMap = new HashMap<>();
 
    /**
     * File in which statistics are written.
@@ -91,6 +82,10 @@ public class ProofCollectionSettings implements Serializable {
       SYSTEM_PROPERTIES_ENTRIES = Collections.unmodifiableList(tmp);
    }
 
+   public ProofCollectionSettings() {
+
+   }
+
    /**
     * Converts a list of map entries to an unmodifiable map containing the
     * specified entries and additionally default entries specified in
@@ -123,49 +118,13 @@ public class ProofCollectionSettings implements Serializable {
       return unmodifiableMap;
    }
 
-   /**
-    * Creates a {@link ProofCollectionSettings} object from the specified
-    * parameters with no parent settings.
-    */
-   ProofCollectionSettings(String proofCollectionFileLocation,
-         List<Entry<String, String>> entries, Date runStart) {
-      this.runStart = runStart;
-
-      /*
-       * Determine source proof collection file from string location.
-       */
-      assert proofCollectionFileLocation != null : "Unexpected nullpointer detected - "
-            + "no proof collection source file specified.";
-      sourceProofCollectionFile = new File(proofCollectionFileLocation)
-            .getParentFile();
-      assert sourceProofCollectionFile.isAbsolute() : "Expecting location of source proof collection "
-            + "file to be given as absolute path.";
-      assert sourceProofCollectionFile.exists() : "Given source proof collection file does not exist.";
-
-      /*
-       * Compute immutable map containing settings entries.
-       */
-      immutableSettingsMap = createUnmodifiableMapContainingDefaults(entries);
-
-      /*
-       * Compute location of statistics file.
-       */
-      String statisticsFileName = get(STATISTICS_FILE);
-      if (statisticsFileName == null) {
-         statisticsFile = null;
-      }
-      else {
-         statisticsFile = new StatisticsFile(getAbsoluteFile(
-               getBaseDirectory(), statisticsFileName));
-      }
-   }
 
    /**
     * Creates a {@link ProofCollectionSettings} object that overrides an
     * existing {@link ProofCollectionSettings} object.
     */
-   public ProofCollectionSettings(ProofCollectionSettings parentSettings,
-         List<Entry<String, String>> entries) {
+   public ProofCollectionSettings(@Nullable ProofCollectionSettings parentSettings) {
+      this();
       this.runStart = parentSettings.runStart;
 
       /*
@@ -174,27 +133,9 @@ public class ProofCollectionSettings implements Serializable {
       this.sourceProofCollectionFile = parentSettings.sourceProofCollectionFile;
 
       /*
-       * Create new list of entries containing parent entries and local entries.
-       * Entries from parent ProofCollectionSettings are by local entries.
-       */
-      Set<String> localKeys = new LinkedHashSet<>();
-      for (Entry<String, String> entry : entries) {
-         String key = entry.getKey();
-         localKeys.add(key);
-      }
-      List<Entry<String, String>> mergedEntries = new LinkedList<>(entries);
-      for (Entry<String, String> entry : parentSettings.immutableSettingsMap
-            .entrySet()) {
-         if (!localKeys.contains(entry.getKey())) {
-            mergedEntries.add(entry);
-         }
-      }
-      mergedEntries.addAll(entries);
-
-      /*
        * Compute immutable map containing settings entries.
        */
-      immutableSettingsMap = createUnmodifiableMapContainingDefaults(mergedEntries);
+      //immutableSettingsMap = createUnmodifiableMapContainingDefaults(mergedEntries);
 
       /*
        * Inherit statistics file from parent settings.
@@ -414,5 +355,4 @@ public class ProofCollectionSettings implements Serializable {
          return getBaseDirectory();
       }
    }
-
 }

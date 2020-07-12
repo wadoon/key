@@ -6,19 +6,19 @@ import java.util.Arrays;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 
 /**
- * A {@link ProofCollectionUnit} that is created from a single {@link TestFile}
+ * A {@link Group} that is created from a single {@link TestFile}
  * that is not declared as part of a group.
  * 
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class SingletonProofCollectionUnit extends ProofCollectionUnit {
+public class SingletonGroup extends Group {
 
    private static final long serialVersionUID = 1L;
    private final TestFile file;
    private final ProofCollectionSettings settings;
 
-   public SingletonProofCollectionUnit(TestFile testFile,
-         ProofCollectionSettings settings) {
+   public SingletonGroup(TestFile testFile,
+                         ProofCollectionSettings settings) {
       this.file = testFile;
       this.settings = settings;
    }
