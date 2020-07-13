@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.Arrays;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

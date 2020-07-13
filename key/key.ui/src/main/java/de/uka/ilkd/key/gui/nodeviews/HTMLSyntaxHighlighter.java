@@ -214,7 +214,6 @@ public class HTMLSyntaxHighlighter {
                     : goalsBelow.head().getLocalSpecificationRepository();
 
             Iterable<? extends IProgramVariable> programVariables;
-            final InitConfig initConfig = displayedNode.proof().getInitConfig();
 
             if (displayedNode.getLocalProgVars().size() < NUM_PROGVAR_THRESHOLD) {
                 programVariables = displayedNode.getLocalProgVars();
