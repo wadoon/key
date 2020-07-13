@@ -73,6 +73,8 @@ public class JMLSpecFactory {
      * Used to check that there is only one represents clause per type and field.
      */
     private final Set<Pair<KeYJavaType, IObserverFunction>> modelFields;
+    private JmlIO jmlIo = new JmlIO();
+
 
     // -------------------------------------------------------------------------
     // constructors
@@ -82,7 +84,8 @@ public class JMLSpecFactory {
         this.services = services;
         this.tb = services.getTermBuilder();
         cf = new ContractFactory(services);
-        modelFields = new LinkedHashSet<Pair<KeYJavaType, IObserverFunction>>();
+        modelFields = new LinkedHashSet<>();
+        jmlIo.services(services);
     }
 
     private static Map<LocationVariable, Term> createAtPres(
@@ -117,7 +120,7 @@ public class JMLSpecFactory {
                 for (ParserRuleContext expr : originalInvariant) {
                     Term translated = JmlIO.translateTerm(expr, pm.getContainerType(), selfVar,
                             allVars, null, null, atPres, atPres,
-                            SpecType.LOOP_INVARIANT, Term.class, services);
+                            SpecType.LOOP_INVARIANT, services);
                     invariant = tb.andSC(invariant, tb.convertToFormula(translated));
                 }
             }
@@ -144,7 +147,7 @@ public class JMLSpecFactory {
                 for (ParserRuleContext expr : originalFreeInvariant) {
                     Term translated = JmlIO.translateTerm(expr, pm.getContainerType(), selfVar,
                             allVars, null, null, atPres, atPres,
-                            SpecType.LOOP_INVARIANT_FREE, Term.class, services);
+                            SpecType.LOOP_INVARIANT_FREE, services);
                     freeInvariant = tb.andSC(freeInvariant, tb.convertToFormula(translated));
                 }
             }
@@ -218,7 +221,9 @@ public class JMLSpecFactory {
         public Term returns;
         public Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
-        public void clear() {}
+
+        public void clear() {
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -496,7 +501,7 @@ public class JMLSpecFactory {
             final Term rhs = JmlIO.translateTerm(
                     abbrv.third, inClass, progVars.selfVar,
                     progVars.paramVars, progVars.resultVar, progVars.excVar, progVars.atPres,
-                    progVars.atBefores, null, Term.class, services);
+                    progVars.atBefores, null, services);
             clauses.abbreviations
                     = clauses.abbreviations.append(tb.elementary(tb.var(abbrVar), rhs));
         }
@@ -540,7 +545,7 @@ public class JMLSpecFactory {
         for (int i = array.length - 1; i >= 0; i--) {
             Term translated = JmlIO.translateTerm(array[i], pm.getContainerType(), selfVar,
                     paramVars, resultVar, excVar, atPres, atBefores,
-                    specType, Term.class, services);
+                    specType, services);
             Term translatedFormula = tb.convertToFormula(translated);
             result = tb.andSC(translatedFormula, result);
         }
@@ -552,8 +557,10 @@ public class JMLSpecFactory {
                                     ImmutableList<ParserRuleContext> originalClauses) throws SLTranslationException {
         Term result = tb.ff();
         for (ParserRuleContext expr : originalClauses) {
-            Term translated = JmlIO.translateTerm(expr, pm.getContainerType(), selfVar,
-                    paramVars, null, null, null, null, Term.class, services);
+            Term translated = jmlIo.classType(pm.getContainerType())
+                    .selfVar(selfVar)
+                    .parameters(paramVars)
+                    .translateTerm(expr);
             result = tb.orSC(result, tb.convertToFormula(translated));
         }
         return result;
@@ -567,7 +574,7 @@ public class JMLSpecFactory {
         Term result = tb.empty();
         for (ParserRuleContext expr : originalClauses) {
             Term translated = JmlIO.translateTerm(expr, pm.getContainerType(), selfVar,
-                    paramVars, null, null, atPres, atBefores, specType, Term.class, services);
+                    paramVars, null, null, atPres, atBefores, specType, services);
 
             // less than nothing is marked by some special term;
             if (translated.equalsModIrrelevantTermLabels(tb.strictlyNothing())) {
@@ -700,8 +707,11 @@ public class JMLSpecFactory {
                                           ImmutableList<ParserRuleContext> assignableClauses) throws SLTranslationException {
 
         for (ParserRuleContext expr : assignableClauses) {
-            Term translated = JmlIO.translateTerm(expr, pm.getContainerType(), selfVar,
-                    paramVars, null, null, null, null, Term.class, services);
+            Term translated = jmlIo
+                    .classType(pm.getContainerType())
+                    .selfVar(selfVar)
+                    .parameters(paramVars)
+                    .translateTerm(expr);
 
             // less than nothing is marked by some special term;
             if (translated.equalsModIrrelevantTermLabels(tb.strictlyNothing())) {
@@ -718,8 +728,11 @@ public class JMLSpecFactory {
         Term measuredBy = null;
         if (!originalMeasuredBy.isEmpty()) {
             for (ParserRuleContext expr : originalMeasuredBy) {
-                Term translated = JmlIO.translateTerm(expr, pm.getContainerType(), selfVar,
-                        paramVars, null, null, null, null, Term.class, services);
+                Term translated = jmlIo
+                        .classType(pm.getContainerType())
+                        .selfVar(selfVar)
+                        .parameters(paramVars)
+                        .translateTerm(expr);
                 if (measuredBy == null) {
                     measuredBy = translated;
                 } else {
@@ -739,7 +752,7 @@ public class JMLSpecFactory {
             for (ParserRuleContext expr : originalDecreases) {
                 Term translated = JmlIO.translateTerm(expr, pm.getContainerType(), selfVar,
                         paramVars, null, null, atPres, atBefores,
-                        SpecType.DECREASES, Term.class, services);
+                        SpecType.DECREASES, services);
                 if (decreases == null) {
                     decreases = translated;
                 } else {
@@ -939,8 +952,9 @@ public class JMLSpecFactory {
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
-    public ClassInvariant createJMLClassInvariant(KeYJavaType kjt, VisibilityModifier visibility,
-                                                  boolean isStatic, ParserRuleContext originalInv) throws SLTranslationException {
+    public ClassInvariant createJMLClassInvariant(
+            @NotNull KeYJavaType kjt, VisibilityModifier visibility,
+            boolean isStatic, @NotNull ParserRuleContext originalInv) throws SLTranslationException {
         assert kjt != null;
         assert originalInv != null;
 
@@ -948,9 +962,11 @@ public class JMLSpecFactory {
         ProgramVariable selfVar = isStatic ? null : tb.selfVar(kjt, false);
 
         // translateToTerm expression
-        Term inv = tb.convertToFormula(JmlIO.translateTerm(originalInv, kjt, selfVar, null,
-                null, null, null, null, Term.class, services));
-
+        final Term inv0 = jmlIo
+                .classType(kjt)
+                .selfVar(selfVar)
+                .translateTerm(originalInv);
+        Term inv = tb.convertToFormula(inv0);
         // create invariant
         String name = getDefaultInvName(null, kjt);
         return new ClassInvariantImpl(name, name, kjt, visibility, inv, selfVar);
@@ -970,8 +986,11 @@ public class JMLSpecFactory {
         ProgramVariable selfVar = isStatic ? null : tb.selfVar(kjt, false);
 
         // translateToTerm expression
-        Term inv = tb.convertToFormula(JmlIO.translateTerm(textualInv.getInv(), kjt, selfVar,
-                null, null, null, null, null, Term.class, services));
+        final Term inv0 = jmlIo
+                .classType(kjt)
+                .selfVar(selfVar)
+                .translateTerm(textualInv.getInv());
+        Term inv = tb.convertToFormula(inv0);
         // create invariant
         String name = getDefaultInvName(null, kjt);
         String display = getDefaultInvName(textualInv.getName(), kjt);
@@ -987,8 +1006,12 @@ public class JMLSpecFactory {
         ProgramVariable selfVar = tb.selfVar(kjt, false);
 
         // translateToTerm expression
-        Term inv = tb.convertToFormula(JmlIO.translateTerm(original, kjt, selfVar, null, null,
-                null, null, null, Term.class, services));
+        final Term inv0 = jmlIo
+                .classType(kjt)
+                .selfVar(selfVar)
+                .translateTerm(original);
+
+        Term inv = tb.convertToFormula(inv0);
 
         // create invariant
         String name = getInicName();
@@ -1075,8 +1098,11 @@ public class JMLSpecFactory {
         final ProgramVariable selfVar = tb.selfVar(kjt, false);
 
         // translate expression
-        final Term ax = tb.convertToFormula(JmlIO.translateTerm(originalRep, kjt, selfVar, null,
-                null, null, null, null, Term.class, services));
+        final Term inv0 = jmlIo
+                .classType(kjt)
+                .selfVar(selfVar)
+                .translateTerm(originalRep);
+        final Term ax = tb.convertToFormula(inv0);
 
         // create class axiom
         String name = "class axiom in " + kjt.getFullName();
@@ -1085,7 +1111,6 @@ public class JMLSpecFactory {
         return new ClassAxiomImpl(name, displayName, kjt, new Public(), ax, selfVar);
     }
 
-    @SuppressWarnings("unchecked")
     public Contract createJMLDependencyContract(KeYJavaType kjt, LocationVariable targetHeap,
                                                 ParserRuleContext originalDep) throws SLTranslationException {
         assert kjt != null;
@@ -1487,7 +1512,7 @@ public class JMLSpecFactory {
         } else {
             Term translated = JmlIO.translateTerm(originalVariant, pm.getContainerType(),
                     selfVar, allVars, null, null, atPres, atPres,
-                    SpecType.DECREASES, Term.class, services);
+                    SpecType.DECREASES, services);
             variant = translated;
         }
         return variant;
@@ -1536,7 +1561,7 @@ public class JMLSpecFactory {
                     Term translated = JmlIO.translateTerm(
                             expr, pm.getContainerType(), selfVar,
                             allVars, null, null, atPres, atPres,
-                            SpecType.ASSIGNABLE, Term.class, services);
+                            SpecType.ASSIGNABLE, services);
                     a = tb.union(a, translated);
                 }
             }
@@ -1601,13 +1626,12 @@ public class JMLSpecFactory {
         // TODO: add static invariant
         for (ParameterDeclaration p : pm.getMethodDeclaration().getParameters()) {
             if (!JMLInfoExtractor.parameterIsNullable(pm, p)) {
-                final ImmutableSet<PositionedString> nonNullPositionedString = JMLSpecExtractor.createNonNullPositionedString(
+                final ImmutableSet<ParserRuleContext> nonNullPositionedString = JMLSpecExtractor.createNonNullPositionedString(
                         p.getVariableSpecification().getName(),
                         p.getVariableSpecification().getProgramVariable().getKeYJavaType(), false,
                         originalSpec.start.getTokenSource().getSourceName(),
                         new Position(originalSpec.start.getLine(), originalSpec.start.getCharPositionInLine()), services);
-                ParserRuleContext ctx = JmlFacade.parseClause(nonNullPositionedString);
-                res = res.append(ctx);
+                res = res.append(nonNullPositionedString);
             }
         }
         return res;

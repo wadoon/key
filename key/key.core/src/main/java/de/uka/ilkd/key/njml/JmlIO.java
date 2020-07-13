@@ -61,10 +61,6 @@ public class JmlIO {
         this.atPres = atPres;
     }
 
-    public static Term translateTerm(ParserRuleContext expr, KeYJavaType containerType, ProgramVariable selfVar, ImmutableList<ProgramVariable> allVars, Object o, Object o1, Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atPres1, OriginTermLabel.SpecType assignable, Class<Term> termClass, Services services) {
-        return null;
-    }
-
     public static InfFlowSpec translateInformation(ParserRuleContext expr,
                                                    KeYJavaType containerType, ProgramVariable selfVar,
                                                    ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
@@ -81,9 +77,20 @@ public class JmlIO {
         return false;//TODO java2jdl
     }
 
-    public static Term translateTerm(ParserRuleContext expr, KeYJavaType containerType, ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Object o, Object o1, Object o2, Object o3, Class<Term> termClass, Services services) {
-        return null;
+    public static Term translateTerm(ParserRuleContext expr,
+                                     KeYJavaType containerType,
+                                     ProgramVariable self,
+                                     ImmutableList<ProgramVariable> o, ProgramVariable o1, ProgramVariable o2, Map<LocationVariable, Term> o3, Services services) {
+        JmlIO io = new JmlIO(services, containerType, self, o, o1, o2, o3);
+        return (Term) io.interpret(expr);
     }
+
+    public static Term translateTerm(ParserRuleContext expr, KeYJavaType containerType, ProgramVariable selfVar, ImmutableList<ProgramVariable> allVars,
+                                     ProgramVariable o, ProgramVariable o1, Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atPres1, OriginTermLabel.SpecType type, Services services) {
+        JmlIO io = new JmlIO(services, containerType, selfVar, allVars, o, o1,atPres, atPres1 );
+        return (Term) io.interpret(expr);
+    }
+
 
     public static Pair<Label, Term> translateLabeledClause(ParserRuleContext parserRuleContext, KeYJavaType containerType, ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar, ProgramVariable excVar, Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores, OriginTermLabel.SpecType breaks, Services services) {
         return null;
@@ -122,15 +129,22 @@ public class JmlIO {
 
     public Term parseExpression(PositionedString p) {
         ParserRuleContext ctx = JmlFacade.parseExpr(p);
-        SLExpression expr = (SLExpression) ctx.accept(new Translator(services, specInClass, selfVar, paramVars, resultVar,
-                excVar, atPres, atBefores));
+        SLExpression expr = (SLExpression) interpret(ctx);
         return expr.getTerm();
+    }
+
+    private Object interpret(ParserRuleContext ctx) {
+        return ctx.accept(new Translator(services, specInClass, selfVar, paramVars, resultVar,
+                excVar, atPres, atBefores));
+    }
+
+    public Term translateTerm(ParserRuleContext expr) {
+        return ((SLExpression) interpret(expr)).getTerm();
     }
 
     public Term parseExpression(String input) {
         ParserRuleContext ctx = JmlFacade.parseExpr(input);
-        SLExpression expr = (SLExpression) ctx.accept(new Translator(services, specInClass, selfVar, paramVars, resultVar,
-                excVar, atPres, atBefores));
+        SLExpression expr = (SLExpression) interpret(ctx);
         return expr.getTerm();
     }
 
@@ -175,4 +189,5 @@ public class JmlIO {
         this.specInClass = classType;
         return this;
     }
+
 }

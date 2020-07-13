@@ -11,10 +11,14 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.speclang.jml.pretranslation;
+package de.uka.ilkd.key.speclang.jml;
 
 import de.uka.ilkd.key.njml.JmlParsingFacade;
+import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import junit.framework.TestCase;
 import org.junit.Test;
 import org.key_project.util.collection.ImmutableList;
 
@@ -40,7 +44,7 @@ public class TestJMLPreTranslator {
         assertTrue(constructs.head() instanceof TextualJMLSpecCase);
         TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructs.head();
 
-        assertSame(specCase.getBehavior(), Behavior.NORMAL_BEHAVIOR);
+        TestCase.assertSame(specCase.getBehavior(), Behavior.NORMAL_BEHAVIOR);
         assertEquals(1, specCase.getRequires().size());
         assertEquals(0, specCase.getAssignable().size());
         assertEquals(0, specCase.getEnsures().size());

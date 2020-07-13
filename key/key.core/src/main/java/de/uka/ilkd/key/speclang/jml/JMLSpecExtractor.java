@@ -32,18 +32,20 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.njml.JmlFacade;
 import de.uka.ilkd.key.njml.JmlIO;
+import de.uka.ilkd.key.njml.JmlParser;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ASSIGNABLE;
-import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.AXIOMS;
+import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
+import static java.lang.String.format;
 
 /**
  * Extracts JML class invariants and operation contracts from JML comments. This
@@ -163,10 +165,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * @param pos           the Position where to place this implicit specification
      * @return set of formulas specifying non-nullity for field/variables
      */
-    public static ImmutableSet<PositionedString> createNonNullPositionedString(
+    public static ImmutableSet<ParserRuleContext> createNonNullPositionedString(
             String varName, KeYJavaType kjt, boolean isImplicitVar,
             String fileName, Position pos, Services services) {
-        ImmutableSet<PositionedString> result = DefaultImmutableSet.nil();
+        ImmutableSet<ParserRuleContext> result = DefaultImmutableSet.nil();
         final Type varType = kjt.getJavaType();
 
         final TypeConverter typeConverter = services.getTypeConverter();
@@ -176,12 +178,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
             // use special "deep" non null predicate (see bug #1392)
             // ... looks a bit like a hack with those DL escapes ...
             final String nonNullString = arrayDepth > 0
-                    ? "\\dl_nonNull(\\dl_heap()," + varName + "," + arrayDepth
-                    + ")"
-                    : varName + " != null";
-            PositionedString ps = new PositionedString(nonNullString, fileName,
-                    pos).label(
-                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
+                    ? format("\\dl_nonNull(\\dl_heap(),%s,%d)", varName, arrayDepth)
+                    : format("%s != null", varName);
+            JmlParser.ExpressionContext ps = JmlFacade.parseExpr(nonNullString);
+            //TODO label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
             result = result.add(ps);
         }
         return result;
@@ -250,15 +250,16 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     // and not for implicit fields.
                     if (!JMLInfoExtractor.isNullable(field.getProgramName(),
                             kjt)) {
-                        ImmutableSet<PositionedString> nonNullInvs = createNonNullPositionedString(
+                        ImmutableSet<ParserRuleContext> nonNullInvs = createNonNullPositionedString(
                                 field.getProgramName(),
                                 field.getProgramVariable().getKeYJavaType(),
                                 field instanceof ImplicitFieldSpecification,
                                 fileName, member.getEndPosition(), services);
-                        for (PositionedString classInv : nonNullInvs) {
+                        for (ParserRuleContext classInv : nonNullInvs) {
                             result = result.add(jsf.createJMLClassInvariant(kjt,
                                     visibility, isStatic,
-                                    null /*TODO classInv.label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)*/));
+                                    classInv
+                                    /*TODO classInv.label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)*/));
                         }
                     }
                 }
@@ -441,13 +442,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 // the internal symbol
                 final String invString = pm.isStatic() ? "\\inv" : "<inv>";
                 if (!pm.isConstructor()) {
-                    specCase.addRequires(new PositionedString(invString).label(
-                            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                    specCase.addClause(REQUIRES, JmlFacade.parseExpr(invString));
+                    //TODO ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
-                    specCase.addRequires(new PositionedString(
-                            "" + pm.getName() + ".\\inv").label(
-                            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                    specCase.addClause(REQUIRES, JmlFacade.parseExpr(format("%s.\\inv", pm.getName())));
+                    //ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
                 if (specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                     specCase.addEnsures(
@@ -470,13 +470,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 if (!JMLInfoExtractor.parameterIsNullable(pm, j)) {
                     // no additional precondition for primitive types!
                     // createNonNullPos... takes care of that
-                    final ImmutableSet<PositionedString> nonNullParams = createNonNullPositionedString(
+                    final ImmutableSet<ParserRuleContext> nonNullParams = createNonNullPositionedString(
                             paramDecl.getName(),
                             paramDecl.getProgramVariable().getKeYJavaType(),
                             false, fileName, pm.getStartPosition(), services);
-                    for (PositionedString nonNull : nonNullParams) {
-                        specCase.addRequires(nonNull.label(
-                                ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                    for (ParserRuleContext nonNull : nonNullParams) {
+                        specCase.addRequires(nonNull);
                     }
                 }
             }
@@ -487,12 +486,11 @@ public final class JMLSpecExtractor implements SpecExtractor {
             if (!pm.isVoid() && !pm.isConstructor()
                     && !JMLInfoExtractor.resultIsNullable(pm) && specCase
                     .getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-                final ImmutableSet<PositionedString> resultNonNull = createNonNullPositionedString(
+                final ImmutableSet<ParserRuleContext> resultNonNull = createNonNullPositionedString(
                         "\\result", resultType, false, fileName,
                         pm.getStartPosition(), services);
-                for (PositionedString nonNull : resultNonNull) {
-                    specCase.addEnsures(nonNull.prepend("ensures ").label(
-                            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                for (ParserRuleContext nonNull : resultNonNull) {
+                    specCase.addClause(ENSURES, nonNull);
                 }
             }
 
@@ -506,8 +504,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
             // translate contract
             try {
-                ImmutableSet<Contract> contracts = jsf
-                        .createJMLOperationContracts(pm, specCase);
+                ImmutableSet<Contract> contracts = jsf.createJMLOperationContracts(pm, specCase);
                 for (Contract contract : contracts) {
                     result = result.add(contract);
                 }

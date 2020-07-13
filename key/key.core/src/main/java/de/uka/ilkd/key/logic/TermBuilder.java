@@ -35,6 +35,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.*;
 
 import java.io.StringReader;
@@ -871,8 +872,11 @@ public class TermBuilder {
     /**
      * If a is a boolean literal, the method returns the literal as a Formula.
      */
-    public Term convertToFormula(Term a) {
+    public Term convertToFormula(@NotNull Term a) {
         BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
+        if(booleanLDT==null) throw new IllegalStateException("boolean ldt is not set in services");
+        if(a == null)
+            throw new NullPointerException();
         if (a.sort() == Sort.FORMULA) {
             return a;
         } else if (a.sort() == booleanLDT.targetSort()) {

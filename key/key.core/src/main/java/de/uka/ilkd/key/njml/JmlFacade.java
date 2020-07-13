@@ -55,14 +55,6 @@ public class JmlFacade {
         return p.clause();//TODO EOF
     }
 
-    public static ParserRuleContext parseClause(ImmutableSet<PositionedString> nonNullPositionedString) {
-        StringBuilder s = new StringBuilder();
-        for (PositionedString string : nonNullPositionedString) {
-            s.append(string).append("\n");
-        }
-        return parseClause(s.toString());
-    }
-
     private static class OffsetFactory extends CommonTokenFactory {
         int lineOffset;
         int charPositionInLineOffset;

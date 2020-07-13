@@ -55,7 +55,7 @@ public class JmlParsingFacade {
         public Object visitSpec_case(JmlParser.Spec_caseContext ctx) {
             Behavior behaviour = getBehavior(ctx.behavior);
             methodContract = new TextualJMLSpecCase(mods, behaviour);
-            constructs = constructs.prepend(methodContract);
+            constructs = constructs.append(methodContract);
             return super.visitSpec_case(ctx);
         }
 
@@ -90,13 +90,13 @@ public class JmlParsingFacade {
                 final TextualJMLSpecCase base = methodContract;
                 if (ctx.inner != null) {
                     methodContract = base.clone();
-                    constructs = constructs.prepend(methodContract);
+                    constructs = constructs.append(methodContract);
                     acceptAll(ctx.inner);
                 }
 
                 for (JmlParser.Spec_bodyContext it : ctx.spec_body()) {
                     methodContract = base.clone();
-                    constructs = constructs.prepend(methodContract);
+                    constructs = constructs.append(methodContract);
                     accept(it);
                 }
             }

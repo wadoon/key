@@ -303,7 +303,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public void addAssignable(ParserRuleContext positionedString) {
     }
 
-    public void addRequires(PositionedLabeledString label) {
+    public void addRequires(ParserRuleContext label) {
+        addClause(REQUIRES, label);
     }
 
     public void addSignals(PositionedLabeledString label) {
