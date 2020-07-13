@@ -44,29 +44,10 @@ import de.uka.ilkd.key.java.expression.operator.Intersect;
 import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
-import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
-import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
-import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
-import de.uka.ilkd.key.java.reference.ConstructorReference;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.MetaClassReference;
-import de.uka.ilkd.key.java.reference.MethodName;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SpecialConstructorReference;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.expression.operator.adt.*;
+import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.Ccatch;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.ForUpdates;
 import de.uka.ilkd.key.java.statement.Guard;
@@ -141,6 +122,8 @@ public abstract class ProgramSVSort extends AbstractSort {
     public static final ProgramSVSort STATEMENT = new StatementSort();
 
     public static final ProgramSVSort CATCH = new CatchSort();
+
+    public static final ProgramSVSort CCATCH = new CcatchSort();
 
     public static final ProgramSVSort METHODBODY = new MethodBodySort();
 
@@ -336,6 +319,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
     public static final ProgramSVSort VARIABLEINIT =
             new ProgramSVSort(new Name("VariableInitializer")) {
+        @Override
         public boolean canStandFor(ProgramElement pe,
                                    Services services) {
             return true;
@@ -401,10 +385,12 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(name);
         }
 
+        @Override
         public boolean canStandFor(Term t) {
             return t.op() instanceof ProgramVariable;
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe,
                                       Services services) {
             if (pe instanceof ProgramVariable
@@ -445,10 +431,12 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("Variable"));
         }
 
+        @Override
         public boolean canStandFor(Term t) {
             return t.op() instanceof ProgramVariable;
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe,
                                       Services services) {
             ProgramVariable accessedField = null;
@@ -475,11 +463,13 @@ public abstract class ProgramSVSort extends AbstractSort {
             super (new Name("StaticVariable"));
         }
 
+        @Override
         public boolean canStandFor(Term t) {
             return t.op() instanceof ProgramVariable
                     && ((ProgramVariable)t.op()).isStatic();
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe,
                                       Services services) {
             ProgramVariable accessedField = null;
@@ -505,11 +495,13 @@ public abstract class ProgramSVSort extends AbstractSort {
             super (new Name("LocalVariable"));
         }
 
+        @Override
         public boolean canStandFor(Term t) {
             return t.op() instanceof ProgramVariable &&
             !((ProgramVariable)t.op()).isStatic();
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe,
                 Services services) {
             return pe instanceof ProgramVariable && !((ProgramVariable) pe).isStatic();
@@ -537,10 +529,12 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(n);
         }
 
+        @Override
         public boolean canStandFor(Term t) {
             return true;
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe,
                                       Services services) {
             if (pe instanceof Negative) {
@@ -601,6 +595,7 @@ public abstract class ProgramSVSort extends AbstractSort {
         }
 
         /* Will not match on MetaClassReference variables */
+        @Override
         public boolean canStandFor(ProgramElement check,
                                    Services services) {
             if (!super.canStandFor(check, services)
@@ -627,6 +622,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(n);
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement check,
                                       Services services) {
             if (!(check instanceof Expression)
@@ -651,6 +647,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(n);
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
             return (pe instanceof Expression);
         }
@@ -671,10 +668,12 @@ public abstract class ProgramSVSort extends AbstractSort {
         }
 
         // do not match a term
+        @Override
         public boolean canStandFor(Term t) {
             return false;
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe,
                                       Services services) {
             return (pe instanceof StringLiteral);
@@ -696,10 +695,12 @@ public abstract class ProgramSVSort extends AbstractSort {
         }
 
         // not designed to match on terms
+        @Override
         public boolean canStandFor(Term t) {
             return false;
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe,
                                       Services services) {
             return (pe instanceof Literal
@@ -753,6 +754,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("SimpleInstanceCreation"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement check,
                                       Services services) {
             if (!(check instanceof New)) {
@@ -779,6 +781,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("NonSimpleInstanceCreation"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement check,
                                       Services services) {
             if (!(check instanceof New)) {
@@ -802,6 +805,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("ArrayCreation"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement check,
                                       Services services) {
             return (check instanceof NewArray);
@@ -818,6 +822,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("ArrayInitializer"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement check,
                                       Services services) {
             return (check instanceof ArrayInitializer);
@@ -835,11 +840,13 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("SpecialConstructorReference"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe,
                                       Services services) {
             return (pe instanceof SpecialConstructorReference);
         }
 
+        @Override
         public boolean canStandFor(Term t) {
             return (t.op() instanceof IProgramMethod
                     && !((IProgramMethod) t.op()).isModel());
@@ -859,6 +866,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("Statement"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
             return (pe instanceof Statement);
         }
@@ -874,8 +882,25 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("Catch"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
             return (pe instanceof Catch);
+        }
+    }
+
+    /**
+     * This sort represents a type of program schema variables that
+     * match only on ccatch branches of exec blocks
+     */
+    private static final class CcatchSort extends ProgramSVSort {
+
+        public CcatchSort() {
+            super(new Name("Ccatch"));
+        }
+
+        @Override
+        protected boolean canStandFor(ProgramElement pe, Services services) {
+            return (pe instanceof Ccatch);
         }
     }
 
@@ -888,6 +913,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("MethodBody"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
             return (check instanceof MethodBodyStatement);
         }
@@ -904,6 +930,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("NonModelMethodBody"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
             if (!(pe instanceof MethodBodyStatement)) {
                 return false;
@@ -934,6 +961,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("NonSimpleMethodReference"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe,
                 Services services) {
             if (pe instanceof MethodReference) {
@@ -962,6 +990,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             return false;
         }
 
+        @Override
         public boolean canStandFor(Term t) {
             return (t.op() instanceof IProgramMethod);
         }
@@ -977,7 +1006,8 @@ public abstract class ProgramSVSort extends AbstractSort {
        super(new Name("ProgramMethod"));
    }
 
-   protected boolean canStandFor(ProgramElement check, Services services) {
+   @Override
+protected boolean canStandFor(ProgramElement check, Services services) {
        return (check instanceof IProgramMethod);
    }
     }
@@ -993,6 +1023,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("Type"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
             return (check instanceof TypeReference);
         }
@@ -1016,6 +1047,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             this.matchName = name;
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
             if (!(check instanceof TypeReference)) {
                 return false;
@@ -1032,6 +1064,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             return true;
         }
 
+        @Override
         public ProgramSVSort createInstance(String parameter) {
             return new TypeReferenceNotPrimitiveSort(parameter);
         }
@@ -1047,6 +1080,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("ClassReference"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
             return (check instanceof MetaClassReference);
         }
@@ -1075,6 +1109,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             this.methodName = name;
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe,
                                       Services services) {
             if (pe instanceof MethodName) {
@@ -1083,10 +1118,12 @@ public abstract class ProgramSVSort extends AbstractSort {
             return false;
         }
 
+        @Override
         public ProgramSVSort createInstance(String parameter) {
             return new MethodNameSort(new ProgramElementName(parameter));
         }
 
+        @Override
         public String declarationString() {
             return name().toString();
         }
@@ -1102,6 +1139,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("Label"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe,
                                       Services services) {
             return (pe instanceof Label);
@@ -1119,6 +1157,7 @@ public abstract class ProgramSVSort extends AbstractSort {
         }
 
         /* Will only match on String variables */
+        @Override
         public boolean canStandFor(ProgramElement check,
                                    ExecutionContext ec,
                                    Services services) {
@@ -1146,6 +1185,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name(name));
         }
 
+        @Override
         public boolean canStandFor(ProgramElement check,
                                    ExecutionContext ec,
                                    Services services) {
@@ -1181,6 +1221,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             this.allowedPrimitiveTypes = allowedTypes;
         }
 
+        @Override
         public boolean canStandFor(ProgramElement check,
                                    ExecutionContext ec,
                                    Services services) {
@@ -1213,6 +1254,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             this.allowedPrimitiveTypes = allowedTypes;
         }
 
+        @Override
         public boolean canStandFor(ProgramElement check,
                                    ExecutionContext ec,
                                    Services services) {
@@ -1243,6 +1285,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("LoopInit"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
             return (check instanceof LoopInit);
         }
@@ -1253,6 +1296,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("Guard"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
             return (check instanceof Guard);
         }
@@ -1262,6 +1306,7 @@ public abstract class ProgramSVSort extends AbstractSort {
         public ForUpdatesSort() {
             super(new Name("ForUpdates"));
         }
+        @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
             return (check instanceof ForUpdates);
 
@@ -1274,6 +1319,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("ForLoop"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement check, Services services) {
             return (check instanceof For);
         }
@@ -1285,6 +1331,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("Switch"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe,
                                       Services services) {
             return (pe instanceof Switch);
@@ -1297,6 +1344,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("MultipleVariableDeclaration"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe,
                                       Services services) {
             return pe instanceof VariableDeclaration
@@ -1310,6 +1358,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("ArrayPostDeclaration"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe,
                                       Services services) {
             return pe instanceof VariableDeclaration
@@ -1335,11 +1384,13 @@ public abstract class ProgramSVSort extends AbstractSort {
             isString = string;
         }
 
+        @Override
         public boolean canStandFor(Term t) {
             return t.op () instanceof ProgramConstant
                     && isString == t.sort().name().equals(type);
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement pe,
                                       Services services) {
             return false;
@@ -1352,6 +1403,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("ArrayLength"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement check,
                 Services services) {
             if (check instanceof ProgramVariable) {
@@ -1367,6 +1419,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             super(new Name("ExecutionContext"));
         }
 
+        @Override
         protected boolean canStandFor(ProgramElement check,
                                       Services services) {
             return (check instanceof ExecutionContext);

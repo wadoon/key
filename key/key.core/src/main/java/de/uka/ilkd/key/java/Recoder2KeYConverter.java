@@ -31,149 +31,19 @@ import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.ClassInitializer;
-import de.uka.ilkd.key.java.declaration.ConstructorDeclaration;
-import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
-import de.uka.ilkd.key.java.declaration.Extends;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.Implements;
-import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.Throws;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.declaration.modifier.Abstract;
-import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
-import de.uka.ilkd.key.java.declaration.modifier.Final;
-import de.uka.ilkd.key.java.declaration.modifier.Ghost;
-import de.uka.ilkd.key.java.declaration.modifier.Model;
-import de.uka.ilkd.key.java.declaration.modifier.NoState;
-import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.declaration.modifier.Public;
-import de.uka.ilkd.key.java.declaration.modifier.Static;
-import de.uka.ilkd.key.java.declaration.modifier.StrictFp;
-import de.uka.ilkd.key.java.declaration.modifier.TwoState;
+import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.declaration.modifier.*;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
-import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.literal.CharLiteral;
-import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
-import de.uka.ilkd.key.java.expression.literal.EmptyMapLiteral;
-import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
-import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.literal.LongLiteral;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
-import de.uka.ilkd.key.java.expression.operator.BinaryAndAssignment;
-import de.uka.ilkd.key.java.expression.operator.BinaryNot;
-import de.uka.ilkd.key.java.expression.operator.BinaryOr;
-import de.uka.ilkd.key.java.expression.operator.BinaryOrAssignment;
-import de.uka.ilkd.key.java.expression.operator.BinaryXOr;
-import de.uka.ilkd.key.java.expression.operator.BinaryXOrAssignment;
-import de.uka.ilkd.key.java.expression.operator.Conditional;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.DLEmbeddedExpression;
-import de.uka.ilkd.key.java.expression.operator.Divide;
-import de.uka.ilkd.key.java.expression.operator.DivideAssignment;
-import de.uka.ilkd.key.java.expression.operator.Equals;
-import de.uka.ilkd.key.java.expression.operator.GreaterOrEquals;
-import de.uka.ilkd.key.java.expression.operator.GreaterThan;
-import de.uka.ilkd.key.java.expression.operator.Instanceof;
-import de.uka.ilkd.key.java.expression.operator.Intersect;
-import de.uka.ilkd.key.java.expression.operator.LessOrEquals;
-import de.uka.ilkd.key.java.expression.operator.LessThan;
-import de.uka.ilkd.key.java.expression.operator.LogicalAnd;
-import de.uka.ilkd.key.java.expression.operator.LogicalNot;
-import de.uka.ilkd.key.java.expression.operator.LogicalOr;
-import de.uka.ilkd.key.java.expression.operator.Minus;
-import de.uka.ilkd.key.java.expression.operator.MinusAssignment;
-import de.uka.ilkd.key.java.expression.operator.Modulo;
-import de.uka.ilkd.key.java.expression.operator.ModuloAssignment;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.expression.operator.NotEquals;
-import de.uka.ilkd.key.java.expression.operator.Plus;
-import de.uka.ilkd.key.java.expression.operator.PlusAssignment;
-import de.uka.ilkd.key.java.expression.operator.Positive;
-import de.uka.ilkd.key.java.expression.operator.PostDecrement;
-import de.uka.ilkd.key.java.expression.operator.PostIncrement;
-import de.uka.ilkd.key.java.expression.operator.PreDecrement;
-import de.uka.ilkd.key.java.expression.operator.PreIncrement;
-import de.uka.ilkd.key.java.expression.operator.ShiftLeft;
-import de.uka.ilkd.key.java.expression.operator.ShiftLeftAssignment;
-import de.uka.ilkd.key.java.expression.operator.ShiftRight;
-import de.uka.ilkd.key.java.expression.operator.ShiftRightAssignment;
-import de.uka.ilkd.key.java.expression.operator.Times;
-import de.uka.ilkd.key.java.expression.operator.TimesAssignment;
-import de.uka.ilkd.key.java.expression.operator.TypeCast;
-import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
-import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRightAssignment;
-import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
-import de.uka.ilkd.key.java.expression.operator.adt.AllObjects;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
-import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
-import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
-import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.expression.literal.*;
+import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
-import de.uka.ilkd.key.java.reference.ArrayReference;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.PackageReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.SuperConstructorReference;
-import de.uka.ilkd.key.java.reference.SuperReference;
-import de.uka.ilkd.key.java.reference.ThisConstructorReference;
-import de.uka.ilkd.key.java.reference.ThisReference;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.Assert;
-import de.uka.ilkd.key.java.statement.Break;
-import de.uka.ilkd.key.java.statement.Case;
-import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.CatchAllStatement;
-import de.uka.ilkd.key.java.statement.Do;
-import de.uka.ilkd.key.java.statement.Else;
-import de.uka.ilkd.key.java.statement.EmptyStatement;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.Finally;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.ForUpdates;
-import de.uka.ilkd.key.java.statement.Guard;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopInit;
-import de.uka.ilkd.key.java.statement.LoopScopeBlock;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Return;
-import de.uka.ilkd.key.java.statement.SynchronizedBlock;
-import de.uka.ilkd.key.java.statement.Then;
-import de.uka.ilkd.key.java.statement.Throw;
-import de.uka.ilkd.key.java.statement.TransactionStatement;
-import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
@@ -265,7 +135,7 @@ public class Recoder2KeYConverter {
      * caches constructor access for reflection. It is a HashMap<Class,
      * Constructor>
      */
-    private final HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>> constructorCache = 
+    private final HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>> constructorCache =
 	new LinkedHashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>>(400);
 
     /**
@@ -274,7 +144,7 @@ public class Recoder2KeYConverter {
      * when converting initializers. Access to this map is performed via the
      * method <code>getProgramVariableForFieldSpecification</code>
      */
-    private HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable> fieldSpecificationMapping = 
+    private HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable> fieldSpecificationMapping =
 	new LinkedHashMap<recoder.java.declaration.FieldSpecification, ProgramVariable>();
 
     /**
@@ -282,7 +152,7 @@ public class Recoder2KeYConverter {
      * have been started to convert but are not yet finished. The mapped value
      * is the reference to the later completed IProgramMethod.
      */
-    private HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod> methodsDeclaring = 
+    private HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod> methodsDeclaring =
 	new LinkedHashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod>();
 
     /**
@@ -861,7 +731,7 @@ public class Recoder2KeYConverter {
     }
 
     public AllObjects convert(de.uka.ilkd.key.java.recoderext.adt.AllObjects e) {
-        ExtList children = collectChildren(e);	
+        ExtList children = collectChildren(e);
 	return new AllObjects(children);
     }
 
@@ -896,7 +766,7 @@ public class Recoder2KeYConverter {
         ExtList children = collectChildren(e);
 	return new SeqReverse(children);
     }
-    
+
     public EmptyMapLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral e) {
         return EmptyMapLiteral.INSTANCE;
     }
@@ -918,10 +788,10 @@ public class Recoder2KeYConverter {
 
 	        Function f = (Function) named;
         DLEmbeddedExpression expression = new DLEmbeddedExpression(f, children);
-        
+
         expression.check(services, getKeYJavaType(getServiceConfiguration().getCrossReferenceSourceInfo()
 						  .getContainingClassType(e)));
-        
+
         return expression;
     }
 
@@ -1058,13 +928,13 @@ public class Recoder2KeYConverter {
         de.uka.ilkd.key.java.recoderext.MergePointStatement mps) {
         final LocationVariable locVar = new LocationVariable(
                 services.getVariableNamer().getTemporaryNameProposal("x"),
-                (Sort) services.getNamespaces().sorts().lookup("boolean"));
-        
+                services.getNamespaces().sorts().lookup("boolean"));
+
         final Comment[] comments = new Comment[mps.getComments().size()];
         for (int i = 0; i < mps.getComments().size(); i++) {
             comments[i] = convert(mps.getComments().get(i));
         }
-        
+
         return new MergePointStatement(locVar, comments);
     }
 
@@ -1102,7 +972,6 @@ public class Recoder2KeYConverter {
         return new AbstractExpression(aps.getId(),
                 (TypeReference) callConvert(aps.getTypeReference()), comments, pi);
     }
-    
     public CatchAllStatement convert(
 	    	de.uka.ilkd.key.java.recoderext.CatchAllStatement cas) {
         return new CatchAllStatement
@@ -2080,7 +1949,7 @@ public class Recoder2KeYConverter {
     }
 
     public ArrayInitializer convert(recoder.java.expression.ArrayInitializer arg) {
-        return new ArrayInitializer(collectChildrenAndComments(arg), 
+        return new ArrayInitializer(collectChildrenAndComments(arg),
                 getKeYJavaType(getServiceConfiguration().getSourceInfo().getType(arg.getASTParent())));
     }
 
@@ -2114,6 +1983,46 @@ public class Recoder2KeYConverter {
 
     public Catch convert(recoder.java.statement.Catch arg) {
         return new Catch(collectChildrenAndComments(arg));
+    }
+
+    public Exec convert(de.uka.ilkd.key.java.recoderext.Exec arg) {
+        return new Exec(collectChildrenAndComments(arg));
+    }
+
+    public Ccatch convert(de.uka.ilkd.key.java.recoderext.Ccatch arg) {
+        return new Ccatch(collectChildrenAndComments(arg));
+    }
+
+    public CcatchReturnParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchReturnParameterDeclaration arg) {
+        return new CcatchReturnParameterDeclaration(collectChildrenAndComments(arg));
+    }
+
+    public CcatchBreakParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchBreakParameterDeclaration arg) {
+        return new CcatchBreakParameterDeclaration(collectChildrenAndComments(arg));
+    }
+
+    public CcatchBreakWildcardParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchBreakWildcardParameterDeclaration arg) {
+        return new CcatchBreakWildcardParameterDeclaration(collectChildrenAndComments(arg));
+    }
+
+    public CcatchBreakLabelParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchBreakLabelParameterDeclaration arg) {
+        return new CcatchBreakLabelParameterDeclaration(collectChildrenAndComments(arg));
+    }
+
+    public CcatchContinueParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchContinueParameterDeclaration arg) {
+        return new CcatchContinueParameterDeclaration(collectChildrenAndComments(arg));
+    }
+
+    public CcatchContinueWildcardParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchContinueWildcardParameterDeclaration arg) {
+        return new CcatchContinueWildcardParameterDeclaration(collectChildrenAndComments(arg));
+    }
+
+    public CcatchContinueLabelParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchContinueLabelParameterDeclaration arg) {
+        return new CcatchContinueLabelParameterDeclaration(collectChildrenAndComments(arg));
+    }
+
+    public CcatchReturnValParameterDeclaration convert(de.uka.ilkd.key.java.recoderext.CcatchReturnValParameterDeclaration arg) {
+        return new CcatchReturnValParameterDeclaration(collectChildrenAndComments(arg));
     }
 
     public Finally convert(recoder.java.statement.Finally arg) {
@@ -2302,14 +2211,14 @@ public class Recoder2KeYConverter {
 
     public EmptyStatement convert(recoder.java.statement.EmptyStatement m) {
         return new EmptyStatement(collectChildrenAndComments(m));
-    }   
-    
+    }
+
     //modifiers
-    
+
     public Abstract convert(recoder.java.declaration.modifier.Abstract m) {
         return new Abstract(collectChildrenAndComments(m));
     }
-    
+
     public Public convert(recoder.java.declaration.modifier.Public m) {
         return new Public(collectChildrenAndComments(m));
     }
@@ -2329,7 +2238,7 @@ public class Recoder2KeYConverter {
     public Final convert(recoder.java.declaration.modifier.Final m) {
         return new Final(collectChildrenAndComments(m));
     }
-    
+
     public StrictFp convert(recoder.java.declaration.modifier.StrictFp m) {
         return new StrictFp(collectChildrenAndComments(m));
     }
