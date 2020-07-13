@@ -257,14 +257,15 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         } else {
             result = goal.split(2);
             configurator.setUpPreconditionGoal(result.tail().head(), updates[0], preconditions);
-        }
-        configurator.setUpUsageGoal(result.head(), updates, assumptions);
 
-        final ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) goal.proof()
-                .getInitConfig().getJustifInfo().getJustification(this);
-        for (Contract c : contract.getFunctionalContracts()) {
-            cjust.add(application, new RuleJustificationBySpec(c));
+            final ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) goal.proof()
+                    .getInitConfig().getJustifInfo().getJustification(this);
+            for (Contract c : contract.getFunctionalContracts()) {
+                cjust.add(application, new RuleJustificationBySpec(c));
+            }
         }
+        
+        configurator.setUpUsageGoal(result.head(), updates, assumptions);
 
         return result;
     }
