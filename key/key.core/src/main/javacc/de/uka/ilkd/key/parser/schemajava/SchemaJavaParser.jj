@@ -5027,7 +5027,7 @@ Exec ExecStatement() :
             ]
             
             [
-                LOOKAHEAD(5)
+                LOOKAHEAD(6)
                 "ccat"
                 (
                     {
@@ -5045,7 +5045,7 @@ Exec ExecStatement() :
             ]
             
             (
-                LOOKAHEAD(5)
+                LOOKAHEAD(6)
                 "ccat"
                 (
                     {
@@ -5083,7 +5083,25 @@ Exec ExecStatement() :
             )*
             
             [
-                LOOKAHEAD(5)
+                LOOKAHEAD(6)
+                "ccat"
+                (
+                    {
+                        cat = factory.createCcatch();
+                        setPrefixInfo(cat);
+                    }
+                    "(" <BREAKTYPE> "*" ")"
+                    block = Block()
+                    {
+                        cat.setNonStdParameterDeclaration(factory.createCcatchBreakWildcardParameterDeclaration());
+                        cat.setBody(block);
+                        branches.add(cat);
+                    } 
+                )
+            ]
+            
+            [
+                LOOKAHEAD(6)
                 "ccat"
                 (
                     {
@@ -5101,7 +5119,7 @@ Exec ExecStatement() :
             ]
             
             (
-                LOOKAHEAD(5)
+                LOOKAHEAD(6)
                 "ccat"
                 (
                     {
@@ -5137,6 +5155,24 @@ Exec ExecStatement() :
                     } 
                 )
             )*
+            
+            [
+                LOOKAHEAD(6)
+                "ccat"
+                (
+                    {
+                        cat = factory.createCcatch();
+                        setPrefixInfo(cat);
+                    }
+                    "(" <CONTINUETYPE> "*" ")"
+                    block = Block()
+                    {
+                        cat.setNonStdParameterDeclaration(factory.createCcatchContinueWildcardParameterDeclaration());
+                        cat.setBody(block);
+                        branches.add(cat);
+                    } 
+                )
+            ]
             
             (
                 LOOKAHEAD(4)
