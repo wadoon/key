@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.refinity;
+package de.uka.ilkd.key.abstractexecution.refinity.conversion;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -59,7 +59,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  * 
  * @author Dominic Steinhoefel
  */
-public class ProofBundleConverter {
+public class RelationalProofBundleConverter {
     private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/Problem.java";
     private static final String KEY_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/problem.key";
 
@@ -106,7 +106,7 @@ public class ProofBundleConverter {
      * @throws IllegalStateException If the required resource files could not be
      *                               found.
      */
-    public ProofBundleConverter(AERelationalModel model) throws IOException, IllegalStateException {
+    public RelationalProofBundleConverter(AERelationalModel model) throws IOException, IllegalStateException {
         this(model, null, null);
     }
 
@@ -119,7 +119,7 @@ public class ProofBundleConverter {
      * @throws IllegalStateException If the required resource files could not be
      *                               found.
      */
-    public ProofBundleConverter(AERelationalModel model, String proofString)
+    public RelationalProofBundleConverter(AERelationalModel model, String proofString)
             throws IOException, IllegalStateException {
         this(model, proofString, null);
     }
@@ -134,7 +134,7 @@ public class ProofBundleConverter {
      * @throws IllegalStateException If the required resource files could not be
      *                               found.
      */
-    public ProofBundleConverter(AERelationalModel model, File keyFileToUse)
+    public RelationalProofBundleConverter(AERelationalModel model, File keyFileToUse)
             throws IOException, IllegalStateException {
         this(model, null, keyFileToUse);
     }
@@ -151,15 +151,15 @@ public class ProofBundleConverter {
      * @throws IllegalStateException If the required resource files could not be
      *                               found.
      */
-    public ProofBundleConverter(AERelationalModel model, String proofString, File keyFileToUse)
+    public RelationalProofBundleConverter(AERelationalModel model, String proofString, File keyFileToUse)
             throws IOException, IllegalStateException {
         this.model = model;
         this.proofString = Optional.ofNullable(proofString);
         this.keyFileToUse = Optional.ofNullable(keyFileToUse);
 
-        final InputStream javaScaffoldIS = ProofBundleConverter.class
+        final InputStream javaScaffoldIS = RelationalProofBundleConverter.class
                 .getResourceAsStream(JAVA_PROBLEM_FILE_SCAFFOLD);
-        final InputStream keyScaffoldIS = ProofBundleConverter.class
+        final InputStream keyScaffoldIS = RelationalProofBundleConverter.class
                 .getResourceAsStream(KEY_PROBLEM_FILE_SCAFFOLD);
         if (javaScaffoldIS == null || keyScaffoldIS == null) {
             throw new IllegalStateException("Could not load required resource files.");
@@ -430,8 +430,8 @@ public class ProofBundleConverter {
         final Namespace<Function> functions = services.getNamespaces().functions();
 
         final Sort seqSort = services.getTypeConverter().getSeqLDT().targetSort();
-        functions.add(new Function(new Name(ProofBundleConverter.RES1), seqSort));
-        functions.add(new Function(new Name(ProofBundleConverter.RES2), seqSort));
+        functions.add(new Function(new Name(RelationalProofBundleConverter.RES1), seqSort));
+        functions.add(new Function(new Name(RelationalProofBundleConverter.RES2), seqSort));
 
         model.getProgramVariableDeclarations().stream()
                 .map(pvDecl -> new ProgramVariableDeclaration(pvDecl.getTypeName(),

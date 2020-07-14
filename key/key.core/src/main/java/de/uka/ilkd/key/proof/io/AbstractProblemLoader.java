@@ -29,7 +29,7 @@ import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
-import de.uka.ilkd.key.abstractexecution.refinity.ProofBundleConverter;
+import de.uka.ilkd.key.abstractexecution.refinity.conversion.RelationalProofBundleConverter;
 import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
@@ -470,7 +470,7 @@ public abstract class AbstractProblemLoader {
                 throw new IllegalArgumentException("Invalid Abstract Execution Relational model.");
             }
             
-            final ProofBundleConverter pbc = new ProofBundleConverter(aerModel.get());
+            final RelationalProofBundleConverter pbc = new RelationalProofBundleConverter(aerModel.get());
             final File tempFile = Files.createTempFile("AEProofBundle_", ".zproof").toFile();
             tempFile.deleteOnExit();
             pbc.save(tempFile);

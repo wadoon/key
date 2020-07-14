@@ -32,7 +32,7 @@ public class PredicateInstantiation {
     private PredicateDeclaration declaration;
     @XmlElement(name = "instantiation")
     private String instantiation;
-    
+
     public PredicateInstantiation() {
     }
 
@@ -62,15 +62,19 @@ public class PredicateInstantiation {
     public String toString() {
         assert declaration != null;
         assert instantiation != null;
-        
-        final String paramDecl = IntStream.range(1, declaration.getArgSorts().size()).mapToObj(
+
+        final String qfdParamDecl = IntStream.range(1, declaration.getArgSorts().size()).mapToObj(
                 i -> String.format("(\\forall %s _p%d; ", declaration.getArgSorts().get(i - 1), i))
                 .collect(Collectors.joining());
+
+        final String paramList = IntStream.range(1, declaration.getArgSorts().size())
+                .mapToObj(i -> String.format("_p%d", i)).collect(Collectors.joining(", "));
 
         final String closingParens = IntStream.range(1, declaration.getArgSorts().size())
                 .mapToObj(i -> ")").collect(Collectors.joining());
 
-        return paramDecl + instantiation + closingParens;
+        return qfdParamDecl + String.format("(%s(%s) <==> (%s))", declaration.getPredName(),
+                paramList, instantiation) + closingParens;
     }
 
     @Override

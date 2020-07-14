@@ -83,8 +83,8 @@ import bibliothek.gui.dock.common.CContentArea;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
-import de.uka.ilkd.key.abstractexecution.refinity.ProofBundleConverter;
-import de.uka.ilkd.key.abstractexecution.refinity.ProofBundleConverter.BundleSaveResult;
+import de.uka.ilkd.key.abstractexecution.refinity.conversion.RelationalProofBundleConverter;
+import de.uka.ilkd.key.abstractexecution.refinity.conversion.RelationalProofBundleConverter.BundleSaveResult;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FuncOrPredDecl;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.NullarySymbolDeclaration;
@@ -157,11 +157,11 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
 
     private final FormulaInputTextArea relationalPostconditionText = new FormulaInputTextArea(
             STD_POSTCONDREL_TOOLTIP,
-            formula -> ProofBundleConverter.preparedJMLPostCondition(formula, model));
+            formula -> RelationalProofBundleConverter.preparedJMLPostCondition(formula, model));
 
     private final FormulaInputTextArea relationalPreconditionText = new FormulaInputTextArea(
             STD_PRECONDREL_TOOLTIP,
-            formula -> ProofBundleConverter.preparedJMLPostCondition(formula, model));
+            formula -> RelationalProofBundleConverter.preparedJMLPostCondition(formula, model));
 
     private AutoResetStatusPanel statusPanel;
 
@@ -237,7 +237,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
     }
 
     private String loadRefinityVersionNumber() {
-        final InputStream refinityVersionIS = ProofBundleConverter.class
+        final InputStream refinityVersionIS = RelationalProofBundleConverter.class
                 .getResourceAsStream("/de/uka/ilkd/key/gui/refinity/REFINITY_VERSION");
         try {
             return IOUtil.readFrom(refinityVersionIS);
@@ -371,9 +371,9 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
             final Sort throwableSort = //
                     services.getJavaInfo().getKeYJavaType("java.lang.Throwable").getSort();
 
-            functions.add(new Function(new Name(ProofBundleConverter.RES1), seqSort));
-            functions.add(new Function(new Name(ProofBundleConverter.RES2), seqSort));
-            functions.add(new Function(new Name(ProofBundleConverter.EXC), throwableSort));
+            functions.add(new Function(new Name(RelationalProofBundleConverter.RES1), seqSort));
+            functions.add(new Function(new Name(RelationalProofBundleConverter.RES2), seqSort));
+            functions.add(new Function(new Name(RelationalProofBundleConverter.EXC), throwableSort));
         });
 
         addWindowListener(new WindowAdapter() {
@@ -893,7 +893,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         final File proofBundleFile = Files.createTempFile( //
                 tmpFilePrefix, PROOF_BUNDLE_ENDING).toFile();
         final BundleSaveResult newProofBundle = //
-                new ProofBundleConverter(model, proofString).save(proofBundleFile);
+                new RelationalProofBundleConverter(model, proofString).save(proofBundleFile);
 
         mainWindow.getUserInterface().addProverTaskListener(ptl);
         SwingUtilities.invokeLater(() -> mainWindow.loadProofFromBundle(newProofBundle.getFile(),
