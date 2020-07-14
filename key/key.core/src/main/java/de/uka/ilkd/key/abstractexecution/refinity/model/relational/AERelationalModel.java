@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.refinity.model;
+package de.uka.ilkd.key.abstractexecution.refinity.model.relational;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -43,6 +43,10 @@ import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
+import de.uka.ilkd.key.abstractexecution.refinity.model.NullarySymbolDeclaration;
+import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
+import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.java.Services;
 
 /**
