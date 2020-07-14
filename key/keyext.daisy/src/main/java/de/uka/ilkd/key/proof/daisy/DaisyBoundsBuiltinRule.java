@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.daisy;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
 import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -83,13 +84,23 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
         List<Term> letExprs = gatherLetExprs(seq, services);
         Term expr = ((DaisyBoundsRuleApp) ra).getExpr();
         Pair<Float, Float> bounds = daisyComputeBounds(precs, letExprs, expr);
+        Float lower = bounds.first;
+        FloatLiteral lowerLit = new FloatLiteral(lower);
+        Float upper = bounds.second;
+        FloatLiteral upperLit = new FloatLiteral(upper);
+        FloatLDT floatLDT = new FloatLDT(services);
+        Term lowerTerm = floatLDT.translateLiteral(lowerLit, services);
+        Term upperTerm = floatLDT.translateLiteral(upperLit, services);
 
         final ImmutableList<Goal> result = goal.split(1);
         final Goal resultGoal = result.head();
+        TermFactory tf = new TermFactory();
+        TermBuilder tb = new TermBuilder(tf, services);
 
-        // TODO js: build the terms (using term builder, probably)
-        resultGoal.addFormula(expr < bounds.second, ra.posInOccurrence());
-        resultGoal.addFormula(expr > bounds.first, ra.posInOccurrence());
+        Term resLower = tb.func(floatLDT.getGreaterOrEquals(), expr, lowerTerm);
+        Term resUpper = tb.func(floatLDT.getGreaterOrEquals(), expr, upperTerm);
+        resultGoal.addFormula((SequentFormula) resLower, ra.posInOccurrence());
+        resultGoal.addFormula((SequentFormula) resUpper, ra.posInOccurrence());
 
         return result;
     }
