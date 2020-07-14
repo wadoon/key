@@ -20,33 +20,33 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
+import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 
 /**
  * @author Dominic Steinhoefel
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class PredicateInstantiation {
+public class FunctionInstantiation {
     @XmlElement(name = "declaration")
-    private PredicateDeclaration declaration;
+    private FunctionDeclaration declaration;
     @XmlElement(name = "instantiation")
     private String instantiation;
 
-    public PredicateInstantiation() {
+    public FunctionInstantiation() {
     }
 
-    public PredicateInstantiation(final PredicateDeclaration declaration,
+    public FunctionInstantiation(final FunctionDeclaration declaration,
             final String instantiation) {
         this.declaration = declaration;
         this.instantiation = instantiation;
     }
 
-    public PredicateDeclaration getDeclaration() {
+    public FunctionDeclaration getDeclaration() {
         return declaration;
     }
 
-    public void setDeclaration(PredicateDeclaration declaration) {
+    public void setDeclaration(FunctionDeclaration declaration) {
         this.declaration = declaration;
     }
 
@@ -73,16 +73,16 @@ public class PredicateInstantiation {
         final String closingParens = IntStream.range(1, declaration.getArgSorts().size())
                 .mapToObj(i -> ")").collect(Collectors.joining());
 
-        return qfdParamDecl + String.format("(%s%s <==> %s)", declaration.getPredName(),
+        return qfdParamDecl + String.format("(%s%s == %s)", declaration.getFuncName(),
                 declaration.getArgSorts().size() == 0 ? "" : "(" + paramList + ")", instantiation)
                 + closingParens;
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj != null && (obj instanceof PredicateInstantiation)
-                && ((PredicateInstantiation) obj).declaration.equals(this.declaration)
-                && ((PredicateInstantiation) obj).instantiation.equals(this.instantiation);
+        return obj != null && (obj instanceof FunctionInstantiation)
+                && ((FunctionInstantiation) obj).declaration.equals(this.declaration)
+                && ((FunctionInstantiation) obj).instantiation.equals(this.instantiation);
     }
 
 }

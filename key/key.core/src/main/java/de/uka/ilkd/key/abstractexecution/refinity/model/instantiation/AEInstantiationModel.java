@@ -52,7 +52,7 @@ import de.uka.ilkd.key.java.Services;
 @XmlRootElement(namespace = "http://www.key-project.org/abstractexecution")
 @XmlType(propOrder = { "program", "methodLevelContext", "abstractLocationSets",
         "functionDeclarations", "predicateDeclarations", "programVariableDeclarations",
-        "predicateInstantiations" })
+        "predicateInstantiations", "functionInstantiations" })
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class AEInstantiationModel {
     private static final String AE_INSTANTIATION_FILE_ENDING = ".aei";
@@ -91,6 +91,10 @@ public class AEInstantiationModel {
     @XmlElement(name = "predicateInst")
     private List<PredicateInstantiation> predicateInstantiations = new ArrayList<>();
 
+    @XmlElementWrapper(name = "functionInstantiations")
+    @XmlElement(name = "functionInst")
+    private List<FunctionInstantiation> functionInstantiations = new ArrayList<>();
+
     @XmlTransient
     private Optional<File> file = Optional.empty();
 
@@ -101,7 +105,7 @@ public class AEInstantiationModel {
 
         return new AEInstantiationModel("", "", postCondition, abstractLocationSets,
                 Collections.emptyList(), Collections.emptyList(), Collections.emptyList(),
-                Collections.emptyList());
+                Collections.emptyList(), Collections.emptyList());
     }
 
     public AEInstantiationModel(final String program, String methodLevelContext,
@@ -109,7 +113,8 @@ public class AEInstantiationModel {
             final List<FunctionDeclaration> functionDeclarations,
             final List<PredicateDeclaration> predicateDeclarations,
             final List<ProgramVariableDeclaration> programVariableDeclarations,
-            final List<PredicateInstantiation> predicateInstantiations) {
+            final List<PredicateInstantiation> predicateInstantiations,
+            final List<FunctionInstantiation> functionInstantiations) {
         this.program = program;
         this.methodLevelContext = methodLevelContext;
         this.postCondition = postCondition;
@@ -119,6 +124,7 @@ public class AEInstantiationModel {
         this.programVariableDeclarations = programVariableDeclarations;
 
         this.predicateInstantiations = predicateInstantiations;
+        this.functionInstantiations = functionInstantiations;
     }
 
     AEInstantiationModel() {
@@ -199,6 +205,14 @@ public class AEInstantiationModel {
 
     public void setPredicateInstantiations(List<PredicateInstantiation> predicateInstantiations) {
         this.predicateInstantiations = predicateInstantiations;
+    }
+
+    public List<FunctionInstantiation> getFunctionInstantiations() {
+        return functionInstantiations;
+    }
+
+    public void setFunctionInstantiations(List<FunctionInstantiation> functionInstantiations) {
+        this.functionInstantiations = functionInstantiations;
     }
 
     public boolean isSaved() {
@@ -309,7 +323,7 @@ public class AEInstantiationModel {
     public int hashCode() {
         return Objects.hash(program, methodLevelContext, preCondition, postCondition,
                 predicateDeclarations, functionDeclarations, abstractLocationSets,
-                programVariableDeclarations, predicateInstantiations);
+                programVariableDeclarations, predicateInstantiations, functionInstantiations);
     }
 
     @Override

@@ -3,6 +3,8 @@
 
   <xs:element name="functionDeclaration" type="functionDeclaration"/>
 
+  <xs:element name="functionInstantiation" type="functionInstantiation"/>
+
   <xs:element name="predicateDeclaration" type="predicateDeclaration"/>
 
   <xs:element name="predicateInstantiation" type="predicateInstantiation"/>
@@ -45,6 +47,13 @@
         <xs:complexType>
           <xs:sequence>
             <xs:element name="predicateInst" type="predicateInstantiation" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="functionInstantiations" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="functionInst" type="functionInstantiation" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -92,6 +101,13 @@
   <xs:complexType name="predicateInstantiation">
     <xs:sequence>
       <xs:element name="declaration" type="predicateDeclaration" minOccurs="0"/>
+      <xs:element name="instantiation" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="functionInstantiation">
+    <xs:sequence>
+      <xs:element name="declaration" type="functionDeclaration" minOccurs="0"/>
       <xs:element name="instantiation" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
