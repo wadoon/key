@@ -43,6 +43,8 @@ import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistrar;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.BlockContractImpl;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -346,13 +348,34 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
             return false;
         }
         
-        final ImmutableSet<BlockContract> contracts
-                = getApplicableContracts(instantiation, goal, goal.proof().getServices());
+        final ImmutableSet<BlockContract> contracts = //
+                getApplicableContracts(instantiation, goal, goal.proof().getServices());
 
-        // If we are using internal rules, we can apply the respective loop contract directly,
-        // without first applying this block contract.
-        return !contracts.isEmpty()
-                && contracts.stream().allMatch(c -> c.toLoopContract() == null);
+        if (contracts == null || contracts.isEmpty()
+                || !contracts.stream().allMatch(c -> c.toLoopContract() == null)) {
+            // If we are using internal rules, we can apply the respective loop contract
+            // directly,
+            // without first applying this block contract.
+            return false;
+        }
+
+        // Last check: Does the block & annotation represent a JML assume statement?
+        // If yes, it's a case for the BlockContractExternalRule.
+        // See also AbstractBlockContractBuiltInRuleApp#tryToInstantiate(...)
+        
+        final BlockContract contract = //
+                BlockContractImpl.combine(contracts, goal.getLocalSpecificationRepository(),
+                        goal.proof().getServices());
+        final Services services = goal.proof().getServices();
+        final List<LocationVariable> heaps = HeapContext.getModHeaps(services,
+                instantiation.isTransactional());
+
+        final boolean representsJMLAssumeStmt = (!contract.getBlock().isEmpty()
+                && !contract.getBlock().toString().replaceAll(" ", "").equals("{;}"))
+                || !heaps.stream().map(heap -> contract.getPrecondition(heap, services))
+                        .allMatch(t -> t == null || t.equals(services.getTermBuilder().tt()));
+        
+        return representsJMLAssumeStmt;
     }
 
     /**

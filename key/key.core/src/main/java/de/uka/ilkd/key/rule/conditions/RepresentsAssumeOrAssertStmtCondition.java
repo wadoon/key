@@ -13,8 +13,12 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
+import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
+import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -25,8 +29,15 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
+import de.uka.ilkd.key.rule.AbstractBlockContractRule;
+import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -36,6 +47,11 @@ import de.uka.ilkd.key.speclang.BlockContractImpl;
  * Checks whether the current statement represents a JML assume or assert
  * statement. This currently cannot be cleanly checked; instead, we return a
  * positive result if the annotated block is empty, but has a contract.
+ * 
+ * This condition has a lot clown-and-own code from
+ * {@link AbstractBlockContractRule} to obtain and filter contracts. Otherwise,
+ * a non-trivial (although not overly ambitious) refactoring would have been
+ * required.
  *
  * @author Dominic Steinhoefel
  */
@@ -147,9 +163,72 @@ public class RepresentsAssumeOrAssertStmtCondition implements VariableCondition 
                 collectedContracts = collectedContracts.union(specifications
                         .getBlockContracts(block, Modality.DIA_TRANSACTION, services));
             }
-            return collectedContracts;
+            return filterAppliedContracts(collectedContracts, goal);
         } else {
             return null;
+        }
+    }
+
+    /**
+     *
+     * @param collectedContracts a set of block contracts.
+     * @param goal               the current goal.
+     * @return the set with all non-applicable contracts filtered out.
+     */
+    protected static ImmutableSet<BlockContract> filterAppliedContracts(
+            final ImmutableSet<BlockContract> collectedContracts, final Goal goal) {
+        ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
+        for (BlockContract contract : collectedContracts) {
+            if (!contractApplied(contract, goal) || InfFlowCheckInfo.isInfFlow(goal)) {
+                result = result.add(contract);
+            }
+        }
+        return result;
+    }
+
+    /**
+     *
+     * @param contract a block contract.
+     * @param goal     the current goal.
+     * @return {@code true} if the contract has already been applied.
+     */
+    protected static boolean contractApplied(final BlockContract contract, final Goal goal) {
+        Node selfOrParentNode = goal.node();
+        Node previousNode = null;
+        while (selfOrParentNode != null) {
+            RuleApp app = selfOrParentNode.getAppliedRuleApp();
+            if (app instanceof BlockContractInternalBuiltInRuleApp) {
+                BlockContractInternalBuiltInRuleApp blockRuleApp = (BlockContractInternalBuiltInRuleApp) app;
+                if (blockRuleApp.getStatement().equals(contract.getBlock())
+                        && selfOrParentNode.getChildNr(previousNode) == 0) {
+                    // prevent application of contract in its own check validity branch
+                    // but not in other branches, e.g., do-while
+                    // loops might need to apply the same contract
+                    // twice in its usage branch
+                    return true;
+                }
+            }
+            previousNode = selfOrParentNode;
+            selfOrParentNode = selfOrParentNode.parent();
+        }
+
+        Services services = goal.proof().getServices();
+        Proof proof = goal.proof();
+        ProofOblInput po = services.getSpecificationRepository().getProofOblInput(proof);
+
+        if (po instanceof FunctionalBlockContractPO
+                && contract.getBlock().equals(((FunctionalBlockContractPO) po).getBlock())) {
+            return true;
+        }
+
+        if (po instanceof SymbolicExecutionPO) {
+            Goal initiatingGoal = ((SymbolicExecutionPO) po).getInitiatingGoal();
+            return contractApplied(contract, initiatingGoal);
+        } else if (po instanceof BlockExecutionPO) {
+            Goal initiatingGoal = ((BlockExecutionPO) po).getInitiatingGoal();
+            return contractApplied(contract, initiatingGoal);
+        } else {
+            return false;
         }
     }
 
