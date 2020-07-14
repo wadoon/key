@@ -19,6 +19,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import junit.framework.TestCase;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.key_project.util.collection.ImmutableList;
 
@@ -133,19 +134,21 @@ public class TestJMLPreTranslator {
     }
 
     @Test(expected = Exception.class)
+    @Ignore
     public void disabled_testMLCommentEndInSLComment1() throws SLTranslationException {
         parseMethodSpec("//@ requires @*/ true;");
         fail("Characters '@*/' should not be parsed");
     }
 
     @Test(expected = Exception.class)
+    @Ignore
     public void disabled_testMLCommentEndInSLComment2() throws SLTranslationException {
         parseMethodSpec("//@ requires */ true;");
     }
 
     @Test(expected = Exception.class)
     public void testFailure() throws SLTranslationException {
-        parseMethodSpec("/*@ normal_behaviour \n @ signals ohoh;" + "  @*/");
+        parseMethodSpec("/*@ normal_behaviour \n @ signals ohoh;  @*/");
         fail();
     }
 
