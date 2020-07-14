@@ -32,6 +32,9 @@ public class PredicateInstantiation {
     private PredicateDeclaration declaration;
     @XmlElement(name = "instantiation")
     private String instantiation;
+    
+    public PredicateInstantiation() {
+    }
 
     public PredicateInstantiation(final PredicateDeclaration declaration,
             final String instantiation) {

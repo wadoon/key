@@ -52,7 +52,7 @@ import de.uka.ilkd.key.java.Services;
 @XmlRootElement(namespace = "http://www.key-project.org/abstractexecution")
 @XmlType(propOrder = { "program", "methodLevelContext", "abstractLocationSets",
         "functionDeclarations", "predicateDeclarations", "programVariableDeclarations",
-        "predicateInsts" })
+        "predicateInstantiations" })
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class AEInstantiationModel {
     private static final String AE_INSTANTIATION_FILE_ENDING = ".aei";
@@ -87,7 +87,7 @@ public class AEInstantiationModel {
     @XmlElement(name = "programVariable")
     private List<ProgramVariableDeclaration> programVariableDeclarations = new ArrayList<>();
 
-    @XmlElementWrapper(name = "predicateInsts")
+    @XmlElementWrapper(name = "predicateInstantiations")
     @XmlElement(name = "predicateInst")
     private List<PredicateInstantiation> predicateInstantiations = new ArrayList<>();
 

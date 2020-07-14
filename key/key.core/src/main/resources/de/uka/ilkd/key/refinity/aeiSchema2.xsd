@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="functionDeclaration" type="functionDeclaration"/>
+
+  <xs:element name="predicateDeclaration" type="predicateDeclaration"/>
+
+  <xs:element name="predicateInstantiation" type="predicateInstantiation"/>
+
+  <xs:element name="programVariable" type="programVariableDeclaration"/>
+
+  <xs:complexType name="aeInstantiationModel">
+    <xs:sequence>
+      <xs:element name="program" type="xs:string" minOccurs="0"/>
+      <xs:element name="methodLevelContext" type="xs:string" minOccurs="0"/>
+      <xs:element name="locationSets" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="locationSet" type="functionDeclaration" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="functions" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="function" type="functionDeclaration" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="predicates" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="predicate" type="predicateDeclaration" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="programVariables" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element ref="programVariable" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="predicateInstantiations" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="predicateInst" type="predicateInstantiation" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="preCondition" type="xs:string"/>
+    <xs:attribute name="postCondition" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="functionDeclaration">
+    <xs:complexContent>
+      <xs:extension base="nullarySymbolDeclaration">
+        <xs:sequence>
+          <xs:element name="resultSortName" type="xs:string" default="LocSet" minOccurs="0"/>
+          <xs:element name="argSort" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="funcName" type="xs:string"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="nullarySymbolDeclaration" abstract="true">
+    <xs:sequence>
+      <xs:element name="relevantOne" type="xs:int" default="-1"/>
+      <xs:element name="relevantTwo" type="xs:int" default="-1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="predicateDeclaration">
+    <xs:sequence>
+      <xs:element name="argSort" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="predName" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="programVariableDeclaration">
+    <xs:complexContent>
+      <xs:extension base="nullarySymbolDeclaration">
+        <xs:sequence/>
+        <xs:attribute name="typeName" type="xs:string"/>
+        <xs:attribute name="varName" type="xs:ID"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="predicateInstantiation">
+    <xs:sequence>
+      <xs:element name="declaration" type="predicateDeclaration" minOccurs="0"/>
+      <xs:element name="instantiation" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+
