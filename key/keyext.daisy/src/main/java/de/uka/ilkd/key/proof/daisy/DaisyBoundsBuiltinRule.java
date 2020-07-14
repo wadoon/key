@@ -1,28 +1,49 @@
 package de.uka.ilkd.key.proof.daisy;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DaisyBoundsBuiltinRule implements BuiltInRule {
     public static final DaisyBoundsBuiltinRule INSTANCE = new DaisyBoundsBuiltinRule();
 
-    // TODO js
-    private List<Term> gatherPreconditions(Sequent sequent) {
-        return null;
+    private List<Term> gatherPreconditions(Sequent sequent, Services services) {
+        List<Term> res = new ArrayList<>();
+        FloatLDT floatLDT = new FloatLDT(services);
+        ImmutableList<SequentFormula> anteFormulas = sequent.antecedent().asList();
+        for (SequentFormula sf : anteFormulas) {
+            Operator op = sf.formula().op();
+            if (op == floatLDT.getGreaterThan()
+                || op == floatLDT.getGreaterOrEquals()
+                || op == floatLDT.getLessThan()
+                || op == floatLDT.getLessOrEquals()) {
+                res.add(sf.formula());
+            }
+        }
+        return res;
     }
 
-    // TODO js
-    private List<Term> gatherLetExprs(Sequent sequent) {
-        return null;
+    private List<Term> gatherLetExprs(Sequent sequent, Services services) {
+        List<Term> res = new ArrayList<>();
+        FloatLDT floatLDT = new FloatLDT(services);
+        ImmutableList<SequentFormula> anteFormulas = sequent.antecedent().asList();
+        for (SequentFormula sf : anteFormulas) {
+            Operator op = sf.formula().op();
+            if (op == floatLDT.getEquals()) {
+                res.add(sf.formula());
+            }
+        }
+        return res;
     }
 
     // TODO rosa/fahia
@@ -56,12 +77,21 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ra) throws RuleAbortException {
         Sequent seq = goal.sequent();
-        List<Term> precs = gatherPreconditions(seq);
-        List<Term> letExprs = gatherLetExprs(seq);
-        Pair<Float, Float> bounds = daisyComputeBounds(precs, letExprs, ruleApp.expr);
-        return null;
+        List<Term> precs = gatherPreconditions(seq, services);
+        List<Term> letExprs = gatherLetExprs(seq, services);
+        Term expr = ((DaisyBoundsRuleApp) ra).getExpr();
+        Pair<Float, Float> bounds = daisyComputeBounds(precs, letExprs, expr);
+
+        final ImmutableList<Goal> result = goal.split(1);
+        final Goal resultGoal = result.head();
+
+        // TODO js: build the terms (using term builder, probably)
+        resultGoal.addFormula(expr < bounds.second, ra.posInOccurrence());
+        resultGoal.addFormula(expr > bounds.first, ra.posInOccurrence());
+
+        return result;
     }
 
     @Override
