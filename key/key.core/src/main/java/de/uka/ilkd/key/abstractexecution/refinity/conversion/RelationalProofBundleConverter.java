@@ -60,8 +60,8 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  * @author Dominic Steinhoefel
  */
 public class RelationalProofBundleConverter {
-    private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/Problem.java";
-    private static final String KEY_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/problem.key";
+    private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/RefinityRelationalProblem.java";
+    private static final String KEY_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/refinityRelationalproblem.key";
 
     private static final String RELATION = "<RELATION>";
     private static final String PRECONDITION = "<PRECONDITION>";

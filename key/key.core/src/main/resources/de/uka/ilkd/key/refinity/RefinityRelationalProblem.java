@@ -1,4 +1,4 @@
-public class Problem {
+public class RefinityRelationalProblem {
     public Object left(<PARAMS>) {
         <BODY1>
         return null;
