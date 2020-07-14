@@ -54,7 +54,7 @@ import de.uka.ilkd.key.java.Services;
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class AERelationalModel {
     private static final String AE_MODEL_FILE_ENDING = ".aer";
-    private static final String SCHEMA_PATH = "/de/uka/ilkd/key/refinity/schema1.xsd";
+    private static final String SCHEMA_PATH = "/de/uka/ilkd/key/refinity/aerSchema1.xsd";
 
     @XmlElement(name = "programOne")
     private String programOne = "";
