@@ -245,6 +245,7 @@ lexer grammar KeYLexer;
 	GET_INVARIANT : '\\getInvariant';
 	GET_FREE_INVARIANT : '\\getFreeInvariant';
 	GET_VARIANT : '\\getVariant';
+	REPRESENTS_ASSUME_OR_ASSERT_STMT : '\\representsAssumeOrAssertStmt' ;
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
         DEPENDINGON : '\\dependingOn';
     FRESHFOR : '\\freshFor';

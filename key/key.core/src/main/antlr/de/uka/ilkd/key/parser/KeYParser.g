@@ -4000,6 +4000,7 @@ varexp[TacletBuilder b]
 	    | varcond_array[b, negated]
         | varcond_isDefined[b, negated]	
         | varcond_abstractUpdate[b, negated]
+        | varcond_representsAssumeOrAssertStmt[b, negated]
         | varcond_containsAbstractUpdate[b, negated]
         | varcond_array_length[b, negated]	
         | varcond_enumtype[b, negated]
@@ -4268,6 +4269,14 @@ varcond_prefixContainsElement[TacletBuilder b, boolean negated]
    PREFIX_CONTAINS_ELEMENT LPAREN className=string_literal RPAREN 
    {
       b.addVariableCondition(new PrefixContainsElementCondition(className, negated));
+   }
+;
+
+varcond_representsAssumeOrAssertStmt[TacletBuilder b, boolean negated]
+:
+   REPRESENTS_ASSUME_OR_ASSERT_STMT
+   {
+      b.addVariableCondition(new RepresentsAssumeOrAssertStmtCondition(negated));
    }
 ;
 
