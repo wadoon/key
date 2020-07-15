@@ -984,7 +984,7 @@ public final class AuxiliaryContractBuilders {
             }
 
             Term oldDecreases = new OpReplacer(variables.combineRemembranceVariables(),
-                    services.getTermFactory(), services.getProof()).replace(decreases);
+                    services.getTermFactory()).replace(decreases);
 
             // The condition (decreases >= 0) is part of the precondition
             // and does not need to be repeated here.

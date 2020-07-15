@@ -30,11 +30,10 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
      * @param <S> the type of the elements to replace.
      * @param <T> the type of the replacements.
      * @param tf a term factory.
-     * @param proof the currently loaded proof, or {@code null} if no proof is loaded.
      * @return a new replacement map.
      */
     public static <S extends SVSubstitute, T>
-        ReplacementMap<S, T> create(TermFactory tf, Proof proof) {
+        ReplacementMap<S, T> create(TermFactory tf) {
         if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()) {
             return new NoIrrelevantLabelsReplacementMap<S, T>(tf);
         } else {
@@ -48,13 +47,12 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
      * @param <S> the type of the elements to replace.
      * @param <T> the type of the replacements.
      * @param tf a term factory.
-     * @param proof the currently loaded proof, or {@code null} if no proof is loaded.
      * @param initialMappings a map whose mapping should be added to the new replacement map.
      * @return a new replacement map.
      */
     public static <S extends SVSubstitute, T>
-        ReplacementMap<S, T> create(TermFactory tf, Proof proof, Map<S, T> initialMappings) {
-        ReplacementMap<S, T> result = create(tf, proof);
+        ReplacementMap<S, T> create(TermFactory tf, Map<S, T> initialMappings) {
+        ReplacementMap<S, T> result = create(tf);
         result.putAll(initialMappings);
         return result;
     }

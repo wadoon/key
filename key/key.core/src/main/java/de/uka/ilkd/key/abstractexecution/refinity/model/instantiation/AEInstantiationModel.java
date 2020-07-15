@@ -44,6 +44,7 @@ import org.xml.sax.SAXException;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
+import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
 import de.uka.ilkd.key.java.Services;
 
 /**
@@ -56,7 +57,7 @@ import de.uka.ilkd.key.java.Services;
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class AEInstantiationModel {
     private static final String AE_INSTANTIATION_FILE_ENDING = ".aei";
-    private static final String SCHEMA_PATH = "/de/uka/ilkd/key/refinity/aeiSchema1.xsd";
+    private static final String SCHEMA_PATH = "/de/uka/ilkd/key/refinity/instantiation/schema1.xsd";
 
     @XmlElement(name = "program")
     private String program = "";
@@ -317,6 +318,26 @@ public class AEInstantiationModel {
         } catch (RuntimeException exc) {
             return false;
         }
+    }
+
+    /**
+     * Creates an {@link AEInstantiationModel} from the given
+     * {@link AERelationalModel}, either taking the left or right program as
+     * starting point. Instantiations are initially empty.
+     * 
+     * @param relModel     The {@link AERelationalModel} to convert.
+     * @param firstProgram true iff the <em>left</em> program should be taken.
+     * @return An {@link AEInstantiationModel} for the given
+     *         {@link AERelationalModel}.
+     */
+    public static AEInstantiationModel fromRelationalModel(final AERelationalModel relModel,
+            final boolean firstProgram) {
+        return new AEInstantiationModel(
+                firstProgram ? relModel.getProgramOne() : relModel.getProgramTwo(),
+                relModel.getMethodLevelContext(), relModel.getPostCondition(),
+                relModel.getAbstractLocationSets(), relModel.getFunctionDeclarations(),
+                relModel.getPredicateDeclarations(), relModel.getProgramVariableDeclarations(),
+                Collections.emptyList(), Collections.emptyList());
     }
 
     @Override

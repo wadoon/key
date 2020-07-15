@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2010 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2019 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -105,14 +105,20 @@ public class ProgramVariableDeclaration extends NullarySymbolDeclaration {
 
     public static Optional<ProgramVariableDeclaration> fromString(final String str)
             throws IllegalArgumentException {
-        final Pattern pattern = Pattern.compile("^([a-zA-Z0-9_.]+(?: *\\[\\] *)?) +([a-zA-Z0-9_]+)$");
+        final Pattern pattern = Pattern
+                .compile("^([a-zA-Z0-9_.]+(?: *\\[\\] *)?) +([a-zA-Z0-9_]+)$");
         final Matcher matcher = pattern.matcher(str.trim());
 
         if (!matcher.matches()) {
             return Optional.empty();
         }
 
-        return Optional.of(new ProgramVariableDeclaration(matcher.group(1).replace(" ", ""), matcher.group(2)));
+        return Optional.of(new ProgramVariableDeclaration(matcher.group(1).replace(" ", ""),
+                matcher.group(2)));
+    }
+
+    public String toKeYFileDecl() {
+        return String.format("%s %s;", getTypeName(), getVarName());
     }
 
     @Override

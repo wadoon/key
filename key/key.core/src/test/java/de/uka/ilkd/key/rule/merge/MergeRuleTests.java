@@ -271,8 +271,8 @@ public class MergeRuleTests extends TestCase {
     public static void startAutomaticStrategy(final Proof proof,
             final int maxRuleApps) {
         ProofStarter starter = new ProofStarter(false);
-        starter.setMaxRuleApplications(maxRuleApps);
         starter.init(proof);
+        starter.setMaxRuleApplications(maxRuleApps);
         starter.start();
     }
 

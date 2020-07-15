@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2010 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2019 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -35,10 +35,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class FunctionDeclaration extends NullarySymbolDeclaration implements FuncOrPredDecl {
     @XmlAttribute
     private String funcName = "";
-    
-    @XmlElement(required=false, defaultValue="LocSet")
+
+    @XmlElement(required = false, defaultValue = "LocSet")
     private String resultSortName = "";
-    
+
     @XmlElement(name = "argSort")
     private List<String> argSorts = new ArrayList<>();
 
@@ -121,6 +121,12 @@ public class FunctionDeclaration extends NullarySymbolDeclaration implements Fun
                 "^ *([a-zA-Z0-9_.]+(?: *\\[\\])?) +([a-zA-Z0-9_]+) *(?:\\( *([a-zA-Z0-9_.]+(?: *\\[\\])?(?: *, *[a-zA-Z0-9_.]+(?: *\\[\\])?)* *)\\))? *$");
         final Matcher matcher = pattern.matcher(str);
         return matcher;
+    }
+
+    public String toKeYFileDecl() {
+        return String.format("%s %s%s;", getResultSortName(), getFuncName(),
+                getArgSorts().isEmpty() ? ""
+                        : ("(" + getArgSorts().stream().collect(Collectors.joining(",")) + ")"));
     }
 
     @Override

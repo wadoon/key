@@ -250,7 +250,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         quantifiableVarsToSchemaVars
                 .putAll(collectQuantifiableVariables(replaceWithTerm, services));
         final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars,
-                services.getTermFactory(), services.getProof());
+                services.getTermFactory());
         schemaFind = or.replace(schemaFind);
         schemaAssumes = or.replace(schemaAssumes);
         replaceWithTerm = or.replace(replaceWithTerm);

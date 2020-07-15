@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2010 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2019 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -19,19 +19,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
@@ -39,20 +35,13 @@ import de.uka.ilkd.key.abstractexecution.refinity.model.NullarySymbolDeclaration
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
-import de.uka.ilkd.key.abstractexecution.refinity.util.DummyKeYEnvironmentCreator;
+import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.translation.JMLTranslator;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 /**
  * Converts an AE Relational Model to a KeY proof bundle.
@@ -60,8 +49,8 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  * @author Dominic Steinhoefel
  */
 public class RelationalProofBundleConverter {
-    private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/RefinityRelationalProblem.java";
-    private static final String KEY_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/refinityRelationalproblem.key";
+    private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/relational/Problem.java";
+    private static final String KEY_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/relational/refinityRelationalProblem.key";
 
     private static final String RELATION = "<RELATION>";
     private static final String PRECONDITION = "<PRECONDITION>";
@@ -78,9 +67,6 @@ public class RelationalProofBundleConverter {
     private static final String ADDITIONAL_PREMISES = "<ADDITIONAL_PREMISES>";
     private static final String PROOF = "<PROOF>";
 
-    // AE Keywords
-    private static final String AE_CONSTRAINT = "ae_constraint";
-
     // Special Keywords
     private static final String RESULT_1 = "\\result_1";
     private static final String RESULT_2 = "\\result_2";
@@ -95,9 +81,6 @@ public class RelationalProofBundleConverter {
     private final String javaScaffold;
     private final String keyScaffold;
     private final Optional<File> keyFileToUse;
-    private static final java.util.function.Function<String, Collector<String, ?, String>> DL_PREFIX_FOLD = //
-            currRes -> Collectors.reducing(currRes,
-                    (res, loc) -> prefixOccurrencesWithDL(res, loc));
 
     /**
      * @param model The model to convert.
@@ -106,14 +89,15 @@ public class RelationalProofBundleConverter {
      * @throws IllegalStateException If the required resource files could not be
      *                               found.
      */
-    public RelationalProofBundleConverter(AERelationalModel model) throws IOException, IllegalStateException {
+    public RelationalProofBundleConverter(AERelationalModel model)
+            throws IOException, IllegalStateException {
         this(model, null, null);
     }
 
     /**
-     * @param model        The model to convert.
-     * @param proofString  If non-null, the given string will be appended to the
-     *                     generated KeY file. For certificate checking.
+     * @param model       The model to convert.
+     * @param proofString If non-null, the given string will be appended to the
+     *                    generated KeY file. For certificate checking.
      * @throws IOException           If the resource files are found, but could not
      *                               be loaded.
      * @throws IllegalStateException If the required resource files could not be
@@ -151,8 +135,8 @@ public class RelationalProofBundleConverter {
      * @throws IllegalStateException If the required resource files could not be
      *                               found.
      */
-    public RelationalProofBundleConverter(AERelationalModel model, String proofString, File keyFileToUse)
-            throws IOException, IllegalStateException {
+    public RelationalProofBundleConverter(AERelationalModel model, String proofString,
+            File keyFileToUse) throws IOException, IllegalStateException {
         this.model = model;
         this.proofString = Optional.ofNullable(proofString);
         this.keyFileToUse = Optional.ofNullable(keyFileToUse);
@@ -176,8 +160,12 @@ public class RelationalProofBundleConverter {
      * @return The {@link BundleSaveResult}.
      * @throws IOException
      */
-    public BundleSaveResult save(File file) throws IOException {
+    public BundleSaveResult save(final File file) throws IOException {
         assert file.getName().endsWith(".zproof");
+
+        // NOTE (DS, 2020-06-15): Keep this name for the resource file,
+        // since otherwise, it'd be difficult passing this name as a parameter.
+        final String javaFileName = "Problem.java";
 
         final ZipOutputStream zio = new ZipOutputStream(new FileOutputStream(file));
 
@@ -196,7 +184,7 @@ public class RelationalProofBundleConverter {
         }
         zio.closeEntry();
 
-        zio.putNextEntry(new ZipEntry("src" + File.separator + "Problem.java"));
+        zio.putNextEntry(new ZipEntry("src" + File.separator + javaFileName));
         zio.write(createJavaFile().getBytes());
         zio.closeEntry();
 
@@ -210,9 +198,15 @@ public class RelationalProofBundleConverter {
                 .map(decl -> String.format("%s %s", decl.getTypeName(), decl.getVarName()))
                 .collect(Collectors.joining(","));
 
-        final String programOne = preprocessJavaCode(model.getProgramOne());
-        final String programTwo = preprocessJavaCode(model.getProgramTwo());
-        final String context = preprocessJavaCode(model.getMethodLevelContext());
+        final String programOne = KeyBridgeUtils.preprocessJavaCode(model.getProgramOne(),
+                model.getAbstractLocationSets(), model.getPredicateDeclarations(),
+                model.getFunctionDeclarations());
+        final String programTwo = KeyBridgeUtils.preprocessJavaCode(model.getProgramTwo(),
+                model.getAbstractLocationSets(), model.getPredicateDeclarations(),
+                model.getFunctionDeclarations());
+        final String context = KeyBridgeUtils.preprocessJavaCode(model.getMethodLevelContext(),
+                model.getAbstractLocationSets(), model.getPredicateDeclarations(),
+                model.getFunctionDeclarations());
 
         return javaScaffold.replaceAll(PARAMS, paramsDecl)
                 .replaceAll(BODY1, Matcher.quoteReplacement(programOne))
@@ -220,64 +214,16 @@ public class RelationalProofBundleConverter {
                 .replaceAll(CONTEXT, Matcher.quoteReplacement(context));
     }
 
-    private String preprocessJavaCode(final String javaCode) {
-        /* non_final */ String result = javaCode;
-
-        result = addBlocksAfterConstraints(result);
-        result = escapeDL(result);
-        result = result.replaceAll("\n", "\n        ");
-
-        return result;
-    }
-
-    private String addBlocksAfterConstraints(final String javaCode) {
-        /* non_final */ String result = javaCode;
-
-        final Pattern aeConstrPattern = Pattern.compile("/\\*@\\s*?" + AE_CONSTRAINT
-                + "(.|[\\r\\n])*?\\*/|//@\\s*?" + AE_CONSTRAINT + ".*");
-        final Matcher m = aeConstrPattern.matcher(javaCode);
-
-        while (m.find()) {
-            final String match = m.group();
-            result = result.replaceAll(Pattern.quote(match),
-                    Matcher.quoteReplacement(match + "\n{ ; }"));
-        }
-
-        return result;
-    }
-
-    public String escapeDL(String prog) {
-        for (final FunctionDeclaration locSet : model.getAbstractLocationSets()) {
-            prog = prog.replaceAll("\\b" + locSet.getFuncName() + "\\b",
-                    Matcher.quoteReplacement("\\dl_" + locSet.getFuncName()));
-        }
-        for (final PredicateDeclaration predDecl : model.getPredicateDeclarations()) {
-            prog = prog.replaceAll("\\b" + predDecl.getPredName() + "\\b",
-                    Matcher.quoteReplacement("\\dl_" + predDecl.getPredName()));
-        }
-
-        for (final FunctionDeclaration funcDecl : model.getFunctionDeclarations()) {
-            prog = prog.replaceAll("\\b" + funcDecl.getFuncName() + "\\b",
-                    Matcher.quoteReplacement("\\dl_" + funcDecl.getFuncName()));
-        }
-
-        return prog;
-    }
-
     private String createKeYFile() {
         final String functionsDecl;
 
         {
             final String locSetDecls = model.getAbstractLocationSets().stream()
-                    // .map(str -> String.format("\\unique %s;", str))
-                    .map(str -> String.format("%s;", str)).collect(Collectors.joining("\n  "));
+                    .map(FunctionDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
+
             final String userDefinedFuncDecls = model.getFunctionDeclarations().stream()
-                    .map(decl -> String.format("%s %s%s;", decl.getResultSortName(),
-                            decl.getFuncName(),
-                            decl.getArgSorts().isEmpty() ? ""
-                                    : ("(" + decl.getArgSorts().stream()
-                                            .collect(Collectors.joining(",")) + ")")))
-                    .collect(Collectors.joining("\n  "));
+                    .map(FunctionDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
+
             final String skolemPVAnonFuncDecls = model.getProgramVariableDeclarations().stream()
                     .map(decl -> String.format("%s _%s;", decl.getTypeName(), decl.getVarName()))
                     .collect(Collectors.joining("\n  "));
@@ -289,15 +235,10 @@ public class RelationalProofBundleConverter {
         }
 
         final String predicatesDecl = model.getPredicateDeclarations().stream()
-                .map(decl -> String.format("%s%s;", decl.getPredName(),
-                        decl.getArgSorts().isEmpty() ? ""
-                                : ("(" + decl.getArgSorts().stream()
-                                        .collect(Collectors.joining(",")) + ")")))
-                .collect(Collectors.joining("\n  "));
+                .map(PredicateDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
 
         final String progvarsDecl = model.getProgramVariableDeclarations().stream()
-                .map(decl -> String.format("%s %s;", decl.getTypeName(), decl.getVarName()))
-                .collect(Collectors.joining("\n  "));
+                .map(ProgramVariableDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
 
         final String initVars = model.getProgramVariableDeclarations().stream()
                 .map(ProgramVariableDeclaration::getVarName)
@@ -306,20 +247,15 @@ public class RelationalProofBundleConverter {
         final String params = model.getProgramVariableDeclarations().stream()
                 .map(ProgramVariableDeclaration::getVarName).collect(Collectors.joining(","));
 
-        final DummyKeYEnvironmentCreator envCreator = new DummyKeYEnvironmentCreator();
-        try {
-            envCreator.initialize();
-        } catch (ProblemLoaderException | IOException e) {
-            throw new RuntimeException(
-                    "Could not initialize dummy services, message: " + e.getMessage());
-        }
-        final Services services = envCreator.getDummyServices().get();
+        final Services services = KeyBridgeUtils.dummyServices();
         populateNamespaces(model, services);
 
-        final String javaDLPostCondRelation = createJavaDLPostCondition(
-                envCreator.getDummyKjt().get(), services);
-        final String javaDLPreCondRelation = createJavaDLPreCondition(
-                envCreator.getDummyKjt().get(), services);
+        final String javaDLPostCondRelation = createJavaDLPostCondition(KeyBridgeUtils.dummyKJT(),
+                services);
+        final String javaDLPreCondRelation = KeyBridgeUtils.createJavaDLPreCondition(
+                model.getPreCondition(), model.getProgramVariableDeclarations(),
+                model.getAbstractLocationSets(), model.getPredicateDeclarations(),
+                model.getFunctionDeclarations(), KeyBridgeUtils.dummyKJT(), services);
 
         return keyScaffold.replaceAll(FUNCTIONS, Matcher.quoteReplacement(functionsDecl))
                 .replaceAll(PREDICATES, Matcher.quoteReplacement(predicatesDecl))
@@ -334,96 +270,30 @@ public class RelationalProofBundleConverter {
                 .replaceAll(RESULT_SEQ_1, extractResultSeq(model.getRelevantVarsOne()))
                 .replaceAll(RESULT_SEQ_2, extractResultSeq(model.getRelevantVarsTwo())) //
                 .replaceAll(ADDITIONAL_PREMISES,
-                        Matcher.quoteReplacement(createAdditionalPremises()))
+                        Matcher.quoteReplacement(KeyBridgeUtils
+                                .createAdditionalPremises(model.getAbstractLocationSets())))
                 .replaceAll(PROOF, Matcher.quoteReplacement(proofString.orElse("")));
     }
 
     private String createJavaDLPostCondition(final KeYJavaType dummyKJT, final Services services) {
         final String jmlPostCondRelation = preparedJMLPostCondition(model.getPostCondition(),
                 model);
-        return jmlStringToJavaDL(jmlPostCondRelation, dummyKJT, services);
-    }
-
-    private String createJavaDLPreCondition(final KeYJavaType dummyKJT, final Services services) {
-        final String preCondition = model.getPreCondition();
-        if (preCondition.trim().isEmpty()) {
-            // Precondition is optional
-            return "true";
-        }
-
-        final String jmlPreCondRelation = preparedJMLPreCondition(preCondition, model);
-        return jmlStringToJavaDL(jmlPreCondRelation, dummyKJT, services);
-    }
-
-    private static String jmlStringToJavaDL(String jmlString, final KeYJavaType dummyKJT,
-            final Services services) {
-        try {
-            Term parsed = translateJML(jmlString, dummyKJT, services);
-            parsed = removeLabels(parsed, services);
-            return LogicPrinter.quickPrintTerm(parsed, services, false, false);
-        } catch (Exception e) {
-            throw new RuntimeException("Could not parse JML formula, message: " + e.getMessage(),
-                    e);
-        }
-    }
-
-    private static Term translateJML(String jmlPostCondRelation, final KeYJavaType dummyKJT,
-            final Services services) throws SLTranslationException {
-        return JMLTranslator.translate(new PositionedString(jmlPostCondRelation), dummyKJT, null,
-                null, null, null, null, null, Term.class, services);
-    }
-
-    private static Term removeLabels(final Term term, final Services services) {
-        final TermFactory tf = services.getTermFactory();
-        return tf.createTerm(term.op(),
-                new ImmutableArray<>(term.subs().stream().map(t -> removeLabels(t, services))
-                        .collect(Collectors.toList())),
-                term.boundVars(), term.javaBlock(), new ImmutableArray<>());
+        return KeyBridgeUtils.jmlStringToJavaDL(jmlPostCondRelation, dummyKJT, services);
     }
 
     public static String preparedJMLPostCondition(final String unpreparedJmlPostCondition,
             final AERelationalModel model) {
         String result = unpreparedJmlPostCondition
-                .replaceAll(Pattern.quote(RESULT_1), prefixDLforRE(RES1))
-                .replaceAll(Pattern.quote(RESULT_2), prefixDLforRE(RES2));
+                .replaceAll(Pattern.quote(RESULT_1), KeyBridgeUtils.prefixDLforRE(RES1))
+                .replaceAll(Pattern.quote(RESULT_2), KeyBridgeUtils.prefixDLforRE(RES2));
 
         result = model.getProgramVariableDeclarations().stream()
-                .map(ProgramVariableDeclaration::getVarName).collect(DL_PREFIX_FOLD.apply(result));
-        result = dlPrefixRigidModelElements(model, result);
+                .map(ProgramVariableDeclaration::getVarName)
+                .collect(KeyBridgeUtils.DL_PREFIX_FOLD.apply(result));
+        result = KeyBridgeUtils.dlPrefixRigidModelElements(model.getAbstractLocationSets(),
+                model.getPredicateDeclarations(), model.getFunctionDeclarations(), result);
 
         return result;
-    }
-
-    public static String preparedJMLPreCondition(final String unpreparedJmlPreCondition,
-            final AERelationalModel model) {
-        String result = unpreparedJmlPreCondition;
-
-        result = model.getProgramVariableDeclarations().stream()
-                .map(ProgramVariableDeclaration::getVarName).collect(Collectors.reducing(result, //
-                        (res, loc) -> res.replaceAll("\\b" + Pattern.quote(loc) + "\\b",
-                                prefixDLforRE("_" + loc))));
-        result = dlPrefixRigidModelElements(model, result);
-
-        return result;
-    }
-
-    private static String dlPrefixRigidModelElements(final AERelationalModel model, String result) {
-        result = model.getAbstractLocationSets().stream().map(FunctionDeclaration::getFuncName)
-                .collect(DL_PREFIX_FOLD.apply(result));
-        result = model.getFunctionDeclarations().stream().map(FunctionDeclaration::getFuncName)
-                .collect(DL_PREFIX_FOLD.apply(result));
-        result = model.getPredicateDeclarations().stream().map(PredicateDeclaration::getPredName)
-                .collect(DL_PREFIX_FOLD.apply(result));
-
-        return result;
-    }
-
-    private static String prefixOccurrencesWithDL(String in, String toPrefix) {
-        return in.replaceAll("\\b" + Pattern.quote(toPrefix) + "\\b", prefixDLforRE(toPrefix));
-    }
-
-    private static String prefixDLforRE(String str) {
-        return Matcher.quoteReplacement(String.format("\\dl_%s", str));
     }
 
     private void populateNamespaces(final AERelationalModel model, final Services services) {
@@ -439,55 +309,6 @@ public class RelationalProofBundleConverter {
                 .forEach(pvDecl -> pvDecl.checkAndRegister(services));
 
         model.fillNamespacesFromModel(services);
-    }
-
-    private String createAdditionalPremises() {
-        if (model.getAbstractLocationSets().isEmpty()) {
-            return "";
-        }
-
-        final StringBuilder sb = new StringBuilder();
-
-        for (final FunctionDeclaration decl : model.getAbstractLocationSets()) {
-            final StringBuilder qfrPrefix = new StringBuilder();
-            final List<String> argnames = new ArrayList<>();
-            final StringBuilder postfix = new StringBuilder();
-
-            final String argsParams;
-            if (!decl.getArgSorts().isEmpty()) {
-                int i = 0;
-                for (final String type : decl.getArgSorts()) {
-                    final String argName = "arg_" + i;
-
-                    qfrPrefix.append("(\\forall ").append(type).append(" ").append(argName)
-                            .append("; ");
-                    argnames.add(argName);
-                    postfix.append(")");
-                }
-
-                argsParams = argnames.isEmpty() ? ""
-                        : "(" + argnames.stream().collect(Collectors.joining(",")) + ")";
-            } else {
-                argsParams = "";
-            }
-
-            final Consumer<String> appender = var -> {
-                sb.append("\n     & ")//
-                        .append(qfrPrefix.toString()) //
-                        .append("disjoint(singletonPV(") //
-                        .append(var) //
-                        .append("),") //
-                        .append(decl.getFuncName()) //
-                        .append(argsParams) //
-                        .append(")") //
-                        .append(postfix.toString());
-            };
-
-            appender.accept(RESULT);
-            appender.accept(EXC);
-        }
-
-        return sb.toString();
     }
 
     private String extractResultSeq(List<NullarySymbolDeclaration> relevantSymbols) {

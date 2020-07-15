@@ -757,7 +757,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         final Map<Term, Term> replacementMap = createReplacementMap(heap,
                 new Terms(self, null, null, null, null, null, null, null, null, null), services);
         final OpReplacer replacer = new OpReplacer(
-                replacementMap, services.getTermFactory(), services.getProof());
+                replacementMap, services.getTermFactory());
         return replacer.replace(decreases);
     }
 
@@ -765,7 +765,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
     public Term getDecreases(Variables variables, Services services) {
         Map<ProgramVariable, ProgramVariable> map = createReplacementMap(variables, services);
         return new OpReplacer(
-                map, services.getTermFactory(), services.getProof()).replace(decreases);
+                map, services.getTermFactory()).replace(decreases);
     }
 
     @Override
