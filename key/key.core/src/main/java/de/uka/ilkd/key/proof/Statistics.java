@@ -136,7 +136,7 @@ public class Statistics {
                               side.timePerStepInMillis);
     }
 
-    private void generateSummary(Proof proof) {
+    public void generateSummary(Proof proof) {
         Statistics stat = this;
 
         boolean sideProofs = false;
@@ -147,18 +147,18 @@ public class Statistics {
                         + ((InfFlowProof)proof).getSideProofStatistics().autoModeTimeInMillis;
                 final SideProofStatistics side =
                         ((InfFlowProof) proof).getSideProofStatistics()
-                                    .add(this).setAutoModeTime(autoTime);
+                                .add(this).setAutoModeTime(autoTime);
                 stat = Statistics.create(side, proof.creationTime);
             }
         }
 
         final String nodeString =
-                        EnhancedStringBuffer.format(stat.nodes).toString();
+                EnhancedStringBuffer.format(stat.nodes).toString();
         summaryList.add(new Pair<String, String>("Nodes", nodeString));
         summaryList.add(new Pair<String, String>("Branches",
-                        EnhancedStringBuffer.format(stat.branches).toString()));
+                EnhancedStringBuffer.format(stat.branches).toString()));
         summaryList.add(new Pair<String, String>("Interactive steps", "" +
-                        stat.interactiveSteps));
+                stat.interactiveSteps));
         summaryList.add(new Pair<String, String>("Symbolic execution steps", "" +
                 stat.symbExApps));
 
@@ -166,7 +166,7 @@ public class Statistics {
         final long time = sideProofs ? stat.autoModeTimeInMillis : proof.getAutoModeTime();
 
         summaryList.add(new Pair<String, String>("Automode time",
-                        EnhancedStringBuffer.formatTime(time).toString()));
+                EnhancedStringBuffer.formatTime(time).toString()));
         if (time >= 10000L) {
             summaryList.add(new Pair<String, String>("Automode time", time + "ms"));
         }
@@ -183,27 +183,75 @@ public class Statistics {
 
         summaryList.add(new Pair<String, String>("Rule applications", ""));
         summaryList.add(new Pair<String, String>("Quantifier instantiations",
-                                                 "" + stat.quantifierInstantiations));
+                "" + stat.quantifierInstantiations));
         summaryList.add(new Pair<String, String>("One-step Simplifier apps", "" +
-                        stat.ossApps));
+                stat.ossApps));
         summaryList.add(new Pair<String, String>("SMT solver apps", "" +
-                        stat.smtSolverApps));
+                stat.smtSolverApps));
         summaryList.add(new Pair<String, String>("Dependency Contract apps", "" +
-                        stat.dependencyContractApps));
+                stat.dependencyContractApps));
         summaryList.add(new Pair<String, String>("Operation Contract apps", "" +
-                        stat.operationContractApps));
+                stat.operationContractApps));
         summaryList.add(new Pair<String, String>("Block/Loop Contract apps", "" +
                 stat.blockLoopContractApps));
         summaryList.add(new Pair<String, String>("Loop invariant apps", "" +
-                        stat.loopInvApps));
+                stat.loopInvApps));
         summaryList.add(new Pair<String, String>("Merge Rule apps", "" +
                 stat.mergeRuleApps));
         summaryList.add(new Pair<String, String>("Total rule apps",
-                        EnhancedStringBuffer.format(stat.totalRuleApps).toString()));
+                EnhancedStringBuffer.format(stat.totalRuleApps).toString()));
     }
 
+    public void generateSummary() {
+        final String nodeString =
+                EnhancedStringBuffer.format(nodes).toString();
+        summaryList.add(new Pair<String, String>("Nodes", nodeString));
+        summaryList.add(new Pair<String, String>("Branches",
+                EnhancedStringBuffer.format(branches).toString()));
+        summaryList.add(new Pair<String, String>("Interactive steps", "" +
+                interactiveSteps));
+        summaryList.add(new Pair<String, String>("Symbolic execution steps", "" +
+                symbExApps));
+        summaryList.add(new Pair<String, String>("Automode time",
+                EnhancedStringBuffer.formatTime(autoModeTimeInMillis).toString()));
+        if (autoModeTimeInMillis >= 10000L) {
+            summaryList.add(new Pair<String, String>("Automode time", autoModeTimeInMillis + "ms"));
+        }
+        if (nodes > 0) {
+            String avgTime = "" + timePerStepInMillis;
+            // round to 3 digits after point
+            int i = avgTime.indexOf('.') + 4;
+            if (i > avgTime.length()) {
+                i = avgTime.length();
+            }
+            avgTime = avgTime.substring(0, i);
+            summaryList.add(new Pair<String, String>("Avg. time per step", "" + avgTime + "ms"));
+        }
+
+        summaryList.add(new Pair<String, String>("Rule applications", ""));
+        summaryList.add(new Pair<String, String>("Quantifier instantiations",
+                "" + quantifierInstantiations));
+        summaryList.add(new Pair<String, String>("One-step Simplifier apps", "" +
+                ossApps));
+        summaryList.add(new Pair<String, String>("SMT solver apps", "" +
+                smtSolverApps));
+        summaryList.add(new Pair<String, String>("Dependency Contract apps", "" +
+                dependencyContractApps));
+        summaryList.add(new Pair<String, String>("Operation Contract apps", "" +
+                operationContractApps));
+        summaryList.add(new Pair<String, String>("Block/Loop Contract apps", "" +
+                blockLoopContractApps));
+        summaryList.add(new Pair<String, String>("Loop invariant apps", "" +
+                loopInvApps));
+        summaryList.add(new Pair<String, String>("Merge Rule apps", "" +
+                mergeRuleApps));
+        summaryList.add(new Pair<String, String>("Total rule apps",
+                EnhancedStringBuffer.format(totalRuleApps).toString()));
+    }
 
     public List<Pair<String, String>> getSummary() {
+        if (summaryList.isEmpty())
+            generateSummary();
         return summaryList;
     }
 
@@ -213,6 +261,8 @@ public class Statistics {
 
     @Override
     public String toString() {
+        if (summaryList.isEmpty())
+            generateSummary();
         StringBuffer sb = new StringBuffer("Proof Statistics:\n");
         for (Pair<String, String> p: summaryList) {
             final String c = p.first;
