@@ -13,7 +13,10 @@
 package de.uka.ilkd.key.abstractexecution.refinity.util;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -24,19 +27,29 @@ import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.InstantiationChecker;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.InstantiationChecker.UnsuccessfulAPERetrievalException;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
+import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.JMLTranslator;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.ProofStarter;
+import de.uka.ilkd.key.util.Triple;
+import recoder.ModelException;
 
 /**
  * Static utilities for interaction with KeY, primarily via .key and .java
@@ -65,7 +78,7 @@ public class KeyBridgeUtils {
     }
 
     public static Services dummyServices() {
-        return getDummyKJTAndServices().second;
+        return getDummyKJTAndServices().second.copyPreservesLDTInformation();
     }
 
     public static String jmlStringToJavaDL(String jmlString, final KeYJavaType dummyKJT,
@@ -306,6 +319,113 @@ public class KeyBridgeUtils {
         result = dlPrefixRigidModelElements(locsets, preds, funcs, result);
 
         return result;
+    }
+
+    /**
+     * Tries to parse the loaded {@link AEInstantiationModel} and returns
+     * information about the first found JML/Java error: Message, line, and column
+     * number.
+     * 
+     * @return Information about the first found JML/Java-Error or an empty
+     * {@link Optional}.
+     */
+    public static Optional<Triple<String, Integer, Integer>> getFirstKeYJMLParserErrorMessage(final AEInstantiationModel model) {
+        try {
+            new InstantiationChecker(model).createRetrievalProof(0);
+        } catch (InstantiationChecker.UnsuccessfulAPERetrievalException exc) {
+            if (exc.getCause() instanceof ModelException) {
+                final ModelException mexc = (ModelException) exc.getCause();
+    
+                final Pattern p = Pattern.compile("@([0-9]+)/([0-9]+)");
+                final Matcher m = p.matcher(mexc.getMessage());
+    
+                if (!m.matches()) {
+                    return Optional.empty();
+                }
+    
+                return Optional.of(new Triple<>(mexc.getMessage(), Integer.parseInt(m.group(1)) - 3,
+                        Integer.parseInt(m.group(2)) - 8));
+            } else if (exc.getCause() instanceof SLTranslationException) {
+                final SLTranslationException slte = (SLTranslationException) exc.getCause();
+                return Optional.of(new Triple<>(slte.getMessage(), slte.getPosition().getLine() - 3,
+                        slte.getPosition().getColumn() - 8));
+            }
+        } catch (IOException e) {
+            // Some problem occurred... never mind, only for syntax checking
+        }
+    
+        return Optional.empty();
+    }
+
+    /**
+     * Creates a .key and .java file in a temporary directory based on the supplied
+     * contents and initiates a proof. The proof is saved in the temporary directory
+     * to a file with the given name.
+     * 
+     * @param keyFileName Name of the .key file.
+     * @param javaSrcDirName Name of the source directory for the Java file (e.g.,
+     * "src")
+     * @param javaFileName Name of the Java file
+     * @param proofFileName Name of the .proof file
+     * @param keyFileContent Content of the .key file
+     * @param javaFileContent Content of the .java file
+     * @param maxRuleApps Number of steps to run. If 0, proof is not started (only
+     * root is created), if -1, there is no bound, if > 0, this is the maximum
+     * number of rules applied.
+     * @return The created proof file.
+     * @throws InstantiationChecker.UnsuccessfulAPERetrievalException
+     */
+    public static Proof createProofAndRun(final String keyFileName, final String javaSrcDirName,
+            final String javaFileName, final String proofFileName, final String keyFileContent,
+            final String javaFileContent, int maxRuleApps)
+            throws InstantiationChecker.UnsuccessfulAPERetrievalException {
+        Path tmpDir;
+        try {
+            tmpDir = Files.createTempDirectory("AEInstCheckerTmp_");
+        } catch (IOException e) {
+            throw new InstantiationChecker.UnsuccessfulAPERetrievalException("Could not create temporary directory", e);
+        }
+    
+        final Path keyFile = tmpDir.resolve(keyFileName);
+        final Path javaSrcDir = tmpDir.resolve(javaSrcDirName);
+    
+        try {
+            Files.write(keyFile, keyFileContent.getBytes());
+            Files.createDirectory(javaSrcDir);
+            Files.write(javaSrcDir.resolve(javaFileName), javaFileContent.getBytes());
+        } catch (IOException e) {
+            throw new InstantiationChecker.UnsuccessfulAPERetrievalException(
+                    "Could not write KeY problem file for retrieval", e);
+        }
+    
+        KeYEnvironment<?> env;
+        try {
+            env = KeYEnvironment.load(JavaProfile.getDefaultInstance(), keyFile.toFile(),
+                    Collections.emptyList(), null, Collections.emptyList(), false);
+        } catch (ProblemLoaderException e) {
+            throw new InstantiationChecker.UnsuccessfulAPERetrievalException("Could not load KeY problem",
+                    MiscTools.findExceptionCauseOfClass(SLTranslationException.class, e)
+                            .map(Throwable.class::cast)
+                            .orElse(MiscTools.findExceptionCauseOfClass(ModelException.class, e)
+                                    .map(Throwable.class::cast).orElse(e)));
+        }
+    
+        final Proof proof = env.getLoadedProof();
+    
+        if (maxRuleApps != 0) {
+            final ProofStarter starter = new ProofStarter(false);
+            starter.init(proof);
+            starter.setMaxRuleApplications(maxRuleApps);
+            starter.start();
+        }
+    
+        try {
+            proof.saveToFile(tmpDir.resolve(proofFileName).toFile());
+        } catch (IOException e) {
+            throw new InstantiationChecker.UnsuccessfulAPERetrievalException("Could not save proof", e);
+        }
+    
+        return proof;
     }
 
 }

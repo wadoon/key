@@ -12,7 +12,6 @@
 //
 package de.uka.ilkd.key.gui.refinity.components;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
@@ -21,9 +20,9 @@ import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice;
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
 
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.InstantiationChecker;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
 import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
+import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;
 
 /**
  * @author Dominic Steinhoefel
@@ -61,15 +60,7 @@ public class KeYJMLErrorParser extends AbstractParser {
             return result;
         }
 
-        InstantiationChecker instChecker;
-
-        try {
-            instChecker = new InstantiationChecker(instModel);
-        } catch (IOException e) {
-            return result;
-        }
-
-        instChecker.getFirstKeYJMLParserErrorMessage().ifPresent(t -> {
+        KeyBridgeUtils.getFirstKeYJMLParserErrorMessage(instModel).ifPresent(t -> {
             notice = Optional.of(new DefaultParserNotice( //
                     this, t.first, t.second - 1, -1, 2));
         });

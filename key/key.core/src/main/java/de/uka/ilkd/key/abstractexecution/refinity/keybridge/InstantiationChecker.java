@@ -19,13 +19,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.swing.plaf.synth.SynthSeparatorUI;
 import javax.xml.bind.JAXBException;
 
 import org.key_project.util.collection.ImmutableList;
@@ -38,10 +38,10 @@ import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.APEInstantiation;
+import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.FunctionInstantiation;
+import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.PredicateInstantiation;
 import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
-import de.uka.ilkd.key.abstractexecution.refinity.util.DummyKeYEnvironmentCreator;
 import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;
-import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -53,24 +53,25 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.ProofStarter;
-import de.uka.ilkd.key.util.Triple;
 import recoder.ModelException;
-import recoder.service.UnresolvedReferenceException;
 
 /**
  * @author Dominic Steinhoefel
  */
 public class InstantiationChecker {
     private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/Problem.java";
+
     private static final String APE_RETRIEVAL_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/apeRetrievalProblem.key";
+
+    private static final String FRAME_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/frameProblem.key";
 
     private static final String PRECONDITION = "<PRECONDITION>";
     private static final String INIT_VARS = "<INIT_VARS>";
@@ -82,13 +83,23 @@ public class InstantiationChecker {
     private static final String PARAMS = "<PARAMS>";
     private static final String ADDITIONAL_PREMISES = "<ADDITIONAL_PREMISES>";
     private static final String PROOF = "<PROOF>";
+    private static final String SYMINSTS = "<SYMINSTS>";
+    private static final String ASSIGNABLES = "<ASSIGNABLES>";
+    private static final String PV_AT_PRE_POSTS = "<PV_AT_PRE_POSTS>";
 
     private final String javaScaffold;
-    private final String keyScaffold;
+
+    private final String keyRetrieveAPEsScaffold;
+
+    private final String keyProveFrameScaffold;
+
 //    private final Optional<File> keyFileToUse;
     private final Optional<String> proofString;
 
     private final AEInstantiationModel model;
+
+    /** A cached list of APEs in the model to save time. */
+    private Optional<List<APERetrievalResult>> apes = Optional.empty();
 
     public InstantiationChecker(final AEInstantiationModel instModel) throws IOException {
         this.model = instModel;
@@ -105,16 +116,16 @@ public class InstantiationChecker {
         }
 
         javaScaffold = IOUtil.readFrom(javaScaffoldIS);
-        keyScaffold = IOUtil.readFrom(keyScaffoldIS);
-    }
+        keyRetrieveAPEsScaffold = IOUtil.readFrom(keyScaffoldIS);
 
-    // TODO:
-    // 1) Parse abstract program
-    // 2) Get list of APEs
-    // 3) Create proof obligations for APE insts (first, frame & footprint)
-    // (need symbol declarations of original model)
-    //
-    // APE inst: number of occ. -> program
+        final InputStream keyFrameProblemIS = RelationalProofBundleConverter.class
+                .getResourceAsStream(FRAME_PROBLEM_FILE_SCAFFOLD);
+        if (keyFrameProblemIS == null) {
+            throw new IllegalStateException("Could not load required resource files.");
+        }
+
+        keyProveFrameScaffold = IOUtil.readFrom(keyFrameProblemIS);
+    }
 
     /**
      * Returns a list of APEs from the {@link AEInstantiationModel}.
@@ -128,49 +139,11 @@ public class InstantiationChecker {
      * the {@link ModelException}.
      */
     public List<APERetrievalResult> retrieveAPEs() {
-        Path tmpDir;
-        try {
-            tmpDir = Files.createTempDirectory("AEInstCheckerTmp_");
-        } catch (IOException e) {
-            throw new UnsuccessfulAPERetrievalException("Could not create temporary directory", e);
-        }
-        tmpDir.toFile().deleteOnExit();
-
-        final String keyFileName = "problem.key";
-        final String javaSrcDirName = "src";
-        final String javaFileName = "Problem.java";
-
-        final Path keyFile = tmpDir.resolve(keyFileName);
-        final Path javaSrcDir = tmpDir.resolve(javaSrcDirName);
-
-        try {
-            Files.write(keyFile, createKeYFile().getBytes());
-            Files.createDirectory(javaSrcDir);
-            Files.write(javaSrcDir.resolve(javaFileName), createJavaFile().getBytes());
-        } catch (IOException e) {
-            throw new UnsuccessfulAPERetrievalException(
-                    "Could not write KeY problem file for retrieval", e);
+        if (apes.isPresent()) {
+            return apes.get();
         }
 
-        KeYEnvironment<?> env;
-        try {
-            env = KeYEnvironment.load(JavaProfile.getDefaultInstance(), keyFile.toFile(),
-                    Collections.emptyList(), null, Collections.emptyList(), false);
-        } catch (ProblemLoaderException e) {
-            throw new UnsuccessfulAPERetrievalException("Could not load KeY problem",
-                    MiscTools.findExceptionCauseOfClass(SLTranslationException.class, e)
-                            .map(Throwable.class::cast)
-                            .orElse(MiscTools.findExceptionCauseOfClass(ModelException.class, e)
-                                    .map(Throwable.class::cast).orElse(e)));
-        }
-
-        final int maxRuleApps = 80;
-        final Proof proof = env.getLoadedProof();
-
-        final ProofStarter starter = new ProofStarter(false);
-        starter.init(proof);
-        starter.setMaxRuleApplications(maxRuleApps);
-        starter.start();
+        final Proof proof = createRetrievalProof(80);
 
         if (proof.closed()) {
             // Proof should still be open: Otherwise, we cannot retrieve the
@@ -206,41 +179,36 @@ public class InstantiationChecker {
                 proof.openGoals().head().getLocalSpecificationRepository(), proof.getServices());
         visitor.start();
 
-        return visitor.getResult();
+        final List<APERetrievalResult> result = visitor.getResult();
+
+        this.apes = Optional.of(result);
+
+        return result;
     }
 
     /**
-     * Tries to parse the loaded {@link AEInstantiationModel} and returns
-     * information about the first found JML/Java error: Message, line, and column
-     * number.
+     * Creates the proof used to retrieve APEs from the code body.
      * 
-     * @return Information about the first found JML/Java-Error or an empty
-     * {@link Optional}.
+     * @param maxNumSteps Maximum number of applied steps.
+     * @return The created proof.
+     * @throws UnsuccessfulAPERetrievalException if something went wrong. If the
+     * reason is an {@link SLTranslationException} (i.e., problem in the JML specs),
+     * the cause of the thrown exception object is the
+     * {@link SLTranslationException}. If the reason is an {@link ModelException}
+     * (i.e., problem in the Java code), the cause of the thrown exception object is
+     * the {@link ModelException}.
      */
-    public Optional<Triple<String, Integer, Integer>> getFirstKeYJMLParserErrorMessage() {
-        try {
-            retrieveAPEs();
-        } catch (UnsuccessfulAPERetrievalException exc) {
-            if (exc.getCause() instanceof ModelException) {
-                final ModelException mexc = (ModelException) exc.getCause();
+    public Proof createRetrievalProof(int maxNumSteps) throws UnsuccessfulAPERetrievalException {
+        final String keyFileName = "problem.key";
+        final String javaSrcDirName = "src";
+        final String javaFileName = "Problem.java";
+        final String proofFileName = "problem.proof";
 
-                final Pattern p = Pattern.compile("@([0-9]+)/([0-9]+)");
-                final Matcher m = p.matcher(mexc.getMessage());
+        final String keyFileContent = createRetrieveAPEsKeYFile();
+        final String javaFileContent = createJavaFile(model.getProgram());
 
-                if (!m.matches()) {
-                    return Optional.empty();
-                }
-
-                return Optional.of(new Triple<>(mexc.getMessage(), Integer.parseInt(m.group(1)) - 3,
-                        Integer.parseInt(m.group(2)) - 8));
-            } else if (exc.getCause() instanceof SLTranslationException) {
-                final SLTranslationException slte = (SLTranslationException) exc.getCause();
-                return Optional.of(new Triple<>(slte.getMessage(), slte.getPosition().getLine() - 3,
-                        slte.getPosition().getColumn() - 8));
-            }
-        }
-
-        return Optional.empty();
+        return KeyBridgeUtils.createProofAndRun(keyFileName, javaSrcDirName, javaFileName,
+                proofFileName, keyFileContent, javaFileContent, maxNumSteps);
     }
 
     /**
@@ -263,12 +231,95 @@ public class InstantiationChecker {
         }
     }
 
-    private String createJavaFile() {
+    /**
+     * TODO
+     * 
+     * @return
+     */
+    private List<ProofResult> proveFrameInsts() {
+        return model.getApeInstantiations().stream().map(this::proveFrameInst)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * TODO
+     * 
+     * @param inst
+     * @return
+     */
+    private ProofResult proveFrameInst(APEInstantiation inst) {
+        final String keyFileName = "problem.key";
+        final String javaSrcDirName = "src";
+        final String javaFileName = "Problem.java";
+        final String proofFileName = "problem.proof";
+
+        final String keyFileContent = createProveFrameKeYFile(inst);
+//        final String javaFileContent = createJavaFile(inst.getInstantiation());
+
+//        final Proof proof = KeyBridgeUtils.createProofAndRun(keyFileName, javaSrcDirName,
+//                javaFileName, proofFileName, keyFileContent, javaFileContent, 10000);
+
+        // TODO
+
+        return null;
+    }
+
+    private String createProveFrameKeYFile(APEInstantiation inst) {
+        final Services services = KeyBridgeUtils.dummyServices();
+        populateNamespaces(model, services);
+
+        final String javaDLPreCondRelation = KeyBridgeUtils.createJavaDLPreCondition(
+                model.getPreCondition(), model.getProgramVariableDeclarations(),
+                model.getAbstractLocationSets(), model.getPredicateDeclarations(),
+                model.getFunctionDeclarations(), KeyBridgeUtils.dummyKJT(), services);
+
+        // SYMINSTS, AT_PRES, ASSIGNABLES, PV_AT_PRE_POSTS
+
+        String symInsts = model.getFunctionInstantiations().stream()
+                .map(FunctionInstantiation::toString).collect(Collectors.joining(" &\n  "));
+        symInsts += model.getPredicateInstantiations().stream()
+                .map(PredicateInstantiation::toString).collect(Collectors.joining(" &\n  "));
+        symInsts = symInsts.trim().isEmpty() ? "true" : symInsts;
+
+        final String jmlAssignableTerm = getAssignableTerm(retrieveAPEs().stream()
+                .filter(r -> r.getLine() == inst.getApeLineNumber()).findFirst()
+                .orElseThrow(() -> new UnsuccessfulAPERetrievalException(
+                        "Expected to find APE with line no. " + inst.getApeLineNumber()
+                                + ", but did not.")));
+
+        // TODO 1: Get all program variables in instantiation...
+        // TODO 2: Translate assignable term of APE to JavaDL
+        // TODO 3: Use those for remaining scaffold elements
+
+        return keyProveFrameScaffold
+                .replaceAll(FUNCTIONS, Matcher.quoteReplacement(createFuncDecls()))
+                .replaceAll(PREDICATES, Matcher.quoteReplacement(createPredDecls()))
+                .replaceAll(PROGRAMVARIABLES, Matcher.quoteReplacement(createProgvarDecls()))
+                .replaceAll(PARAMS, Matcher.quoteReplacement(createParams()))
+                .replaceAll(SYMINSTS, Matcher.quoteReplacement(symInsts))
+                .replaceAll(Pattern.quote(PRECONDITION),
+                        Matcher.quoteReplacement(javaDLPreCondRelation))
+                .replaceAll(ADDITIONAL_PREMISES, Matcher.quoteReplacement(
+                        KeyBridgeUtils.createAdditionalPremises(model.getAbstractLocationSets())));
+    }
+
+    private String getAssignableTerm(final APERetrievalResult ape) {
+        return ape.jmlConstructs.stream()
+                .filter(TextualJMLSpecCase.class::isInstance).map(TextualJMLSpecCase.class::cast)
+                .filter(c -> c.getBehavior() == Behavior.NONE)
+                .filter(c -> c.getAssignable() != null).map(TextualJMLSpecCase::getAssignable)
+                .map(ImmutableList::head).findAny().map(str -> str.text)
+                .map(str -> str.replaceAll("assignable ", ""))
+                .map(str -> str.replaceAll(Pattern.quote("\\dl_"), ""))
+                .map(str -> str.replaceAll(";", "")).orElse("\\everything");
+    }
+
+    private String createJavaFile(String bodyReplacement) {
         final String paramsDecl = model.getProgramVariableDeclarations().stream()
                 .map(decl -> String.format("%s %s", decl.getTypeName(), decl.getVarName()))
                 .collect(Collectors.joining(","));
 
-        final String program = KeyBridgeUtils.preprocessJavaCode(model.getProgram(),
+        final String program = KeyBridgeUtils.preprocessJavaCode(bodyReplacement,
                 model.getAbstractLocationSets(), model.getPredicateDeclarations(),
                 model.getFunctionDeclarations());
         final String context = KeyBridgeUtils.preprocessJavaCode(model.getMethodLevelContext(),
@@ -280,7 +331,53 @@ public class InstantiationChecker {
                 .replaceAll(CONTEXT, Matcher.quoteReplacement(context));
     }
 
-    private String createKeYFile() {
+    private String createRetrieveAPEsKeYFile() {
+        final String initVars = model.getProgramVariableDeclarations().stream()
+                .map(ProgramVariableDeclaration::getVarName)
+                .map(pv -> String.format("%s:=_%s", pv, pv)).collect(Collectors.joining("||"));
+
+        final Services services = KeyBridgeUtils.dummyServices();
+        populateNamespaces(model, services);
+
+        final String javaDLPreCondRelation = KeyBridgeUtils.createJavaDLPreCondition(
+                model.getPreCondition(), model.getProgramVariableDeclarations(),
+                model.getAbstractLocationSets(), model.getPredicateDeclarations(),
+                model.getFunctionDeclarations(), KeyBridgeUtils.dummyKJT(), services);
+
+        return keyRetrieveAPEsScaffold
+                .replaceAll(FUNCTIONS, Matcher.quoteReplacement(createFuncDecls()))
+                .replaceAll(PREDICATES, Matcher.quoteReplacement(createPredDecls()))
+                .replaceAll(PROGRAMVARIABLES, Matcher.quoteReplacement(createProgvarDecls()))
+                .replaceAll(INIT_VARS,
+                        initVars.isEmpty() ? "" : (Matcher.quoteReplacement("{" + initVars + "}")))
+                .replaceAll(PARAMS, Matcher.quoteReplacement(createParams()))
+                .replaceAll(Pattern.quote(PRECONDITION),
+                        Matcher.quoteReplacement(javaDLPreCondRelation))
+                .replaceAll(ADDITIONAL_PREMISES,
+                        Matcher.quoteReplacement(KeyBridgeUtils
+                                .createAdditionalPremises(model.getAbstractLocationSets())))
+                .replaceAll(PROOF, Matcher.quoteReplacement(proofString.orElse("")));
+    }
+
+    private String createParams() {
+        final String params = model.getProgramVariableDeclarations().stream()
+                .map(ProgramVariableDeclaration::getVarName).collect(Collectors.joining(","));
+        return params;
+    }
+
+    private String createProgvarDecls() {
+        final String progvarsDecl = model.getProgramVariableDeclarations().stream()
+                .map(ProgramVariableDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
+        return progvarsDecl;
+    }
+
+    private String createPredDecls() {
+        final String predicatesDecl = model.getPredicateDeclarations().stream()
+                .map(PredicateDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
+        return predicatesDecl;
+    }
+
+    private String createFuncDecls() {
         final String functionsDecl;
 
         {
@@ -299,47 +396,7 @@ public class InstantiationChecker {
                     + (!model.getProgramVariableDeclarations().isEmpty() ? "\n  " : "")
                     + skolemPVAnonFuncDecls;
         }
-
-        final String predicatesDecl = model.getPredicateDeclarations().stream()
-                .map(PredicateDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
-
-        final String progvarsDecl = model.getProgramVariableDeclarations().stream()
-                .map(ProgramVariableDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
-
-        final String initVars = model.getProgramVariableDeclarations().stream()
-                .map(ProgramVariableDeclaration::getVarName)
-                .map(pv -> String.format("%s:=_%s", pv, pv)).collect(Collectors.joining("||"));
-
-        final String params = model.getProgramVariableDeclarations().stream()
-                .map(ProgramVariableDeclaration::getVarName).collect(Collectors.joining(","));
-
-        final DummyKeYEnvironmentCreator envCreator = new DummyKeYEnvironmentCreator();
-        try {
-            envCreator.initialize();
-        } catch (ProblemLoaderException | IOException e) {
-            throw new RuntimeException(
-                    "Could not initialize dummy services, message: " + e.getMessage());
-        }
-        final Services services = envCreator.getDummyServices().get();
-        populateNamespaces(model, services);
-
-        final String javaDLPreCondRelation = KeyBridgeUtils.createJavaDLPreCondition(
-                model.getPreCondition(), model.getProgramVariableDeclarations(),
-                model.getAbstractLocationSets(), model.getPredicateDeclarations(),
-                model.getFunctionDeclarations(), KeyBridgeUtils.dummyKJT(), services);
-
-        return keyScaffold.replaceAll(FUNCTIONS, Matcher.quoteReplacement(functionsDecl))
-                .replaceAll(PREDICATES, Matcher.quoteReplacement(predicatesDecl))
-                .replaceAll(PROGRAMVARIABLES, Matcher.quoteReplacement(progvarsDecl))
-                .replaceAll(INIT_VARS,
-                        initVars.isEmpty() ? "" : (Matcher.quoteReplacement("{" + initVars + "}")))
-                .replaceAll(PARAMS, Matcher.quoteReplacement(params))
-                .replaceAll(Pattern.quote(PRECONDITION),
-                        Matcher.quoteReplacement(javaDLPreCondRelation))
-                .replaceAll(ADDITIONAL_PREMISES,
-                        Matcher.quoteReplacement(KeyBridgeUtils
-                                .createAdditionalPremises(model.getAbstractLocationSets())))
-                .replaceAll(PROOF, Matcher.quoteReplacement(proofString.orElse("")));
+        return functionsDecl;
     }
 
     private void populateNamespaces(final AEInstantiationModel model, final Services services) {
@@ -391,15 +448,14 @@ public class InstantiationChecker {
         final String concatenatedComment = Arrays.stream(comments).map(Comment::toSource)
                 .collect(Collectors.joining("\n"));
         final Position position = comments[0].getStartPosition();
-        final KeYJMLPreParser preParser = new KeYJMLPreParser(concatenatedComment, fileName,
-                position);
+        final KeYJMLPreParser preParser = //
+                new KeYJMLPreParser(concatenatedComment, fileName, position);
         final ImmutableList<TextualJMLConstruct> constructs = preParser.parseMethodlevelComment();
         //        warnings = warnings.union(preParser.getWarnings());
         return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
     }
 
-    @SuppressWarnings("unused")
-    private static class APERetrievalResult {
+    public static class APERetrievalResult {
         private final int line;
         private final AbstractProgramElement ape;
         private final List<TextualJMLConstruct> jmlConstructs;
@@ -425,8 +481,7 @@ public class InstantiationChecker {
         }
     }
 
-    @SuppressWarnings("unused")
-    private static class UnsuccessfulAPERetrievalException extends RuntimeException {
+    public static class UnsuccessfulAPERetrievalException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
         private final static String MESSAGE_PREFIX = "Could not retrieve APEs from program";
@@ -455,6 +510,30 @@ public class InstantiationChecker {
         }
     }
 
+    public static class ProofResult {
+        private final boolean success;
+        private final Proof proof;
+        private final Path proofPath;
+
+        public ProofResult(boolean success, Proof proof, Path proofPath) {
+            this.success = success;
+            this.proof = proof;
+            this.proofPath = proofPath;
+        }
+
+        public Proof getProof() {
+            return proof;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public Path getProofPath() {
+            return proofPath;
+        }
+    }
+
     /////////////////// Test Code ///////////////////
 
     public static void main(String[] args) throws JAXBException, SAXException, IOException,
@@ -466,20 +545,11 @@ public class InstantiationChecker {
                         Files.readAllLines(testFile).stream().collect(Collectors.joining("\n")));
 
         // There are ASs at lines 19 and 25
-        final AEInstantiationModel instModel = AEInstantiationModel.fromRelationalModel(relModel,
-                true);
-
+        final AEInstantiationModel instModel = //
+                AEInstantiationModel.fromRelationalModel(relModel, true);
         instModel.addApeInstantiation(new APEInstantiation(19, "x = y++; z = w;"));
 
-        int i = 1;
-        for (final APERetrievalResult result : new InstantiationChecker(instModel).retrieveAPEs()) {
-            System.out.printf("APE %d (line %d):%n", i++, result.getLine());
-            //            System.out.println(Arrays.stream(result.ape.getComments()).map(Comment::toSource)
-            //                    .collect(Collectors.joining("\n")));
-            System.out.println(Arrays.toString(
-                    parseMethodLevelComments(result.ape.getComments(), "DummyProblemFile")));
-            System.out.println(result.ape.toString());
-            System.out.println();
-        }
+        final InstantiationChecker checker = new InstantiationChecker(instModel);
+        checker.proveFrameInsts();
     }
 }
