@@ -39,17 +39,17 @@
   @   (throwsExcB(\value(footprintB)) || returnsB(\value(footprintB)) ==&gt; \disjoint(frameA, relevant));
   @*/
 
-//@ assignable frameA;
-//@ accessible footprintA;
-//@ exceptional_behavior requires throwsExcA(\value(footprintA));
-//@ return_behavior requires returnsA(\value(footprintA));
-\abstract_statement A;
-
 //@ assignable frameB;
 //@ accessible footprintB;
 //@ exceptional_behavior requires throwsExcB(\value(footprintB));
 //@ return_behavior requires returnsB(\value(footprintB));
-\abstract_statement B;</programTwo>
+\abstract_statement B;
+
+//@ assignable frameA;
+//@ accessible footprintA;
+//@ exceptional_behavior requires throwsExcA(\value(footprintA));
+//@ return_behavior requires returnsA(\value(footprintA));
+\abstract_statement A;</programTwo>
     <methodLevelContext></methodLevelContext>
     <locationSets>
         <locationSet funcName="relevant">

@@ -12,7 +12,6 @@
 //
 package de.uka.ilkd.key.abstractexecution.refinity.keybridge;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -29,6 +28,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.IOUtil;
 import org.xml.sax.SAXException;
 
@@ -42,6 +42,7 @@ import de.uka.ilkd.key.abstractexecution.refinity.util.DummyKeYEnvironmentCreato
 import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -54,7 +55,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
-import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.ProofStarter;
 
 /**
@@ -77,7 +80,7 @@ public class InstantiationChecker {
 
     private final String javaScaffold;
     private final String keyScaffold;
-    private final Optional<File> keyFileToUse;
+//    private final Optional<File> keyFileToUse;
     private final Optional<String> proofString;
 
     private final AEInstantiationModel model;
@@ -86,7 +89,7 @@ public class InstantiationChecker {
         this.model = instModel;
 
         this.proofString = Optional.empty();
-        this.keyFileToUse = Optional.empty();
+//        this.keyFileToUse = Optional.empty();
 
         final InputStream javaScaffoldIS = RelationalProofBundleConverter.class
                 .getResourceAsStream(JAVA_PROBLEM_FILE_SCAFFOLD);
@@ -109,10 +112,10 @@ public class InstantiationChecker {
     // APE inst: number of occ. -> program
 
     /**
+     * Returns a list of APEs from the {@link AEInstantiationModel}.
      * 
      * @return List of retrieved APEs.
-     * @throws IOException
-     * @throws ProblemLoaderException
+     * @throws UnsuccessfulAPERetrievalException if something went wrong.
      */
     public List<APERetrievalResult> retrieveAPEs() {
         Path tmpDir;
@@ -192,23 +195,23 @@ public class InstantiationChecker {
         return visitor.getResult();
     }
 
-    public static void main(String[] args)
-            throws JAXBException, SAXException, IOException, ProblemLoaderException {
-        final Path testFile = Paths.get(
-                "/home/dscheurer/key-workspace/GIT/key/key/key.ui/examples/abstract_execution/SlideStatements/Correct/slideStatements.aer");
-        final AERelationalModel relModel = //
-                AERelationalModel.fromXml(
-                        Files.readAllLines(testFile).stream().collect(Collectors.joining("\n")));
-        final AEInstantiationModel instModel = AEInstantiationModel.fromRelationalModel(relModel,
-                true);
-        final InstantiationChecker checker = new InstantiationChecker(instModel);
-
-        int i = 1;
-        for (final APERetrievalResult result : checker.retrieveAPEs()) {
-            System.out.printf("APE %d (line %d):%n", i++, result.ape.getStartPosition().getLine());
-            System.out.println(result.comments);
-            System.out.println(result.ape.toString());
-            System.out.println();
+    /**
+     * Returns a list of APEs from either the first or second program of an
+     * {@link AERelationalModel}.
+     * 
+     * @param relModel The {@link AERelationalModel} from which to return the APEs.
+     * @param firstProgram True iff APEs should be retrieved from the first program.
+     * @return A list of APEs.
+     * @throws UnsuccessfulAPERetrievalException if something went wrong.
+     */
+    public static List<APERetrievalResult> retrieveAPEs(final AERelationalModel relModel,
+            boolean firstProgram) {
+        try {
+            return new InstantiationChecker(
+                    AEInstantiationModel.fromRelationalModel(relModel, firstProgram))
+                            .retrieveAPEs();
+        } catch (IOException e) {
+            throw new UnsuccessfulAPERetrievalException(e);
         }
     }
 
@@ -312,11 +315,17 @@ public class InstantiationChecker {
         protected void doDefaultAction(SourceElement node) {
             if (node instanceof AbstractProgramElement) {
                 final AbstractProgramElement ape = (AbstractProgramElement) node;
-                final List<BlockContract> contracts = localSpecRepo
-                        .getAbstractProgramElementContracts(ape).stream()
-                        .collect(Collectors.toList());
 
-                result.add(new APERetrievalResult(ape, contracts));
+                List<TextualJMLConstruct> jmlConstructs;
+                try {
+                    jmlConstructs = Arrays
+                            .stream(parseMethodLevelComments(ape.getComments(), "DummyProblemFile"))
+                            .collect(Collectors.toList());
+                } catch (SLTranslationException e) {
+                    throw new RuntimeException("Could not parse APE comments", e);
+                }
+
+                result.add(new APERetrievalResult(ape, jmlConstructs));
             }
         }
 
@@ -325,29 +334,46 @@ public class InstantiationChecker {
         }
     }
 
+    // Copied from JMLSpecFactory
+    private static TextualJMLConstruct[] parseMethodLevelComments(final Comment[] comments,
+            final String fileName) throws SLTranslationException {
+        if (comments.length == 0) {
+            return new TextualJMLConstruct[0];
+        }
+        final String concatenatedComment = Arrays.stream(comments).map(Comment::toSource)
+                .collect(Collectors.joining("\n"));
+        final Position position = comments[0].getStartPosition();
+        final KeYJMLPreParser preParser = new KeYJMLPreParser(concatenatedComment, fileName,
+                position);
+        final ImmutableList<TextualJMLConstruct> constructs = preParser.parseMethodlevelComment();
+        //        warnings = warnings.union(preParser.getWarnings());
+        return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
+    }
+
     @SuppressWarnings("unused")
     private static class APERetrievalResult {
+        private final int line;
         private final AbstractProgramElement ape;
-        private final List<BlockContract> contracts;
-        private final String comments;
+        private final List<TextualJMLConstruct> jmlConstructs;
 
-        public APERetrievalResult(AbstractProgramElement ape, List<BlockContract> contracts) {
+        public APERetrievalResult(final AbstractProgramElement ape,
+                final List<TextualJMLConstruct> jmlConstructs) {
             this.ape = ape;
-            this.contracts = contracts;
-            this.comments = Arrays.stream(ape.getComments()).map(Comment::toSource)
-                    .collect(Collectors.joining("\n"));
+            this.jmlConstructs = jmlConstructs;
+            // There's a shift of 3 lines in the dummy Java file.
+            this.line = ape.getStartPosition().getLine() - 3;
         }
 
         public AbstractProgramElement getApe() {
             return ape;
         }
 
-        public List<BlockContract> getContracts() {
-            return contracts;
+        public List<TextualJMLConstruct> getJMLConstructs() {
+            return jmlConstructs;
         }
 
-        public String getComments() {
-            return comments;
+        public int getLine() {
+            return line;
         }
     }
 
@@ -378,6 +404,28 @@ public class InstantiationChecker {
 
         public UnsuccessfulAPERetrievalException(Throwable cause) {
             super(MESSAGE_PREFIX, cause);
+        }
+    }
+
+    /////////////////// Test Code ///////////////////
+
+    public static void main(String[] args) throws JAXBException, SAXException, IOException,
+            ProblemLoaderException, SLTranslationException {
+        final Path testFile = Paths.get(
+                "/home/dscheurer/key-workspace/GIT/key/key/key.ui/examples/abstract_execution/SlideStatements/Correct/slideStatements.aer");
+        final AERelationalModel relModel = //
+                AERelationalModel.fromXml(
+                        Files.readAllLines(testFile).stream().collect(Collectors.joining("\n")));
+
+        int i = 1;
+        for (final APERetrievalResult result : InstantiationChecker.retrieveAPEs(relModel, false)) {
+            System.out.printf("APE %d (line %d):%n", i++, result.getLine());
+            //            System.out.println(Arrays.stream(result.ape.getComments()).map(Comment::toSource)
+            //                    .collect(Collectors.joining("\n")));
+            System.out.println(Arrays.toString(
+                    parseMethodLevelComments(result.ape.getComments(), "DummyProblemFile")));
+            System.out.println(result.ape.toString());
+            System.out.println();
         }
     }
 }
