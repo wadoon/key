@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2010 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2019 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -53,7 +53,7 @@ import de.uka.ilkd.key.java.Services;
 @XmlRootElement(namespace = "http://www.key-project.org/abstractexecution")
 @XmlType(propOrder = { "program", "methodLevelContext", "abstractLocationSets",
         "functionDeclarations", "predicateDeclarations", "programVariableDeclarations",
-        "predicateInstantiations", "functionInstantiations" })
+        "predicateInstantiations", "functionInstantiations", "apeInstantiations" })
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class AEInstantiationModel {
     private static final String AE_INSTANTIATION_FILE_ENDING = ".aei";
@@ -95,6 +95,10 @@ public class AEInstantiationModel {
     @XmlElementWrapper(name = "functionInstantiations")
     @XmlElement(name = "functionInst")
     private List<FunctionInstantiation> functionInstantiations = new ArrayList<>();
+
+    @XmlElementWrapper(name = "apeInstantiations")
+    @XmlElement(name = "apeInst")
+    private List<APEInstantiation> apeInstantiations = new ArrayList<>();
 
     @XmlTransient
     private Optional<File> file = Optional.empty();
@@ -216,6 +220,18 @@ public class AEInstantiationModel {
         this.functionInstantiations = functionInstantiations;
     }
 
+    public List<APEInstantiation> getApeInstantiations() {
+        return apeInstantiations;
+    }
+
+    public void setApeInstantiations(List<APEInstantiation> apeInstantiations) {
+        this.apeInstantiations = apeInstantiations;
+    }
+
+    public void addApeInstantiation(APEInstantiation apeInstantiation) {
+        this.apeInstantiations.add(apeInstantiation);
+    }
+
     public boolean isSaved() {
         return file.isPresent();
     }
@@ -240,7 +256,7 @@ public class AEInstantiationModel {
      * @param xml The XML code.
      * @return The {@link AEInstantiationModel}.
      * @throws JAXBException If a problem occurred while unmarshalling.
-     * @throws SAXException  If there is a validation error (XSD format not met).
+     * @throws SAXException If there is a validation error (XSD format not met).
      */
     public static AEInstantiationModel fromXml(String xml) throws JAXBException, SAXException {
         final JAXBContext jaxbContext = JAXBContext.newInstance(AEInstantiationModel.class);
@@ -259,8 +275,7 @@ public class AEInstantiationModel {
      * 
      * @param file The file to check.
      * @return An {@link AEInstantiationModel} iff the file could be verified to be
-     *         an {@link AEInstantiationModel} file, otherwise an empty
-     *         {@link Optional}.
+     * an {@link AEInstantiationModel} file, otherwise an empty {@link Optional}.
      */
     public static Optional<AEInstantiationModel> isRelationalModelFile(File file) {
         if (!fileHasAEModelEnding(file)) {
@@ -283,7 +298,7 @@ public class AEInstantiationModel {
      * 
      * @param file The file to check.
      * @return true iff the given file has the {@link #AE_INSTANTIATION_FILE_ENDING}
-     *         ending.
+     * ending.
      */
     public static boolean fileHasAEModelEnding(File file) {
         return file.getName().endsWith(AE_INSTANTIATION_FILE_ENDING);
@@ -325,10 +340,10 @@ public class AEInstantiationModel {
      * {@link AERelationalModel}, either taking the left or right program as
      * starting point. Instantiations are initially empty.
      * 
-     * @param relModel     The {@link AERelationalModel} to convert.
+     * @param relModel The {@link AERelationalModel} to convert.
      * @param firstProgram true iff the <em>left</em> program should be taken.
      * @return An {@link AEInstantiationModel} for the given
-     *         {@link AERelationalModel}.
+     * {@link AERelationalModel}.
      */
     public static AEInstantiationModel fromRelationalModel(final AERelationalModel relModel,
             final boolean firstProgram) {

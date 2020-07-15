@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2010 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2019 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -90,6 +90,7 @@ import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.NullarySymbolDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
+import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
 import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
 import de.uka.ilkd.key.abstractexecution.refinity.util.DummyKeYEnvironmentCreator;
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -102,6 +103,7 @@ import de.uka.ilkd.key.gui.refinity.components.AutoResetStatusPanel;
 import de.uka.ilkd.key.gui.refinity.components.FormulaInputTextArea;
 import de.uka.ilkd.key.gui.refinity.components.JSizedButton;
 import de.uka.ilkd.key.gui.refinity.components.JavaErrorParser;
+import de.uka.ilkd.key.gui.refinity.components.KeYJMLErrorParser;
 import de.uka.ilkd.key.gui.refinity.components.MethodLevelJavaErrorParser;
 import de.uka.ilkd.key.gui.refinity.components.StatementLevelJavaErrorParser;
 import de.uka.ilkd.key.gui.refinity.listeners.DirtyListener;
@@ -373,7 +375,8 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
 
             functions.add(new Function(new Name(RelationalProofBundleConverter.RES1), seqSort));
             functions.add(new Function(new Name(RelationalProofBundleConverter.RES2), seqSort));
-            functions.add(new Function(new Name(RelationalProofBundleConverter.EXC), throwableSort));
+            functions
+                    .add(new Function(new Name(RelationalProofBundleConverter.EXC), throwableSort));
         });
 
         addWindowListener(new WindowAdapter() {
@@ -710,6 +713,14 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         cbSyncScrollbars.setMaximumSize(new Dimension(cbSyncScrollbars.getPreferredSize().width,
                 cbSyncScrollbars.getMaximumSize().height));
 
+        final JButton checkSyntaxBtn = new JSizedButton("",
+                IconFontSwing.buildIcon(FontAwesomeSolid.CHECK, 16, Color.BLACK), btnWidth,
+                btnHeight);
+        checkSyntaxBtn.setToolTipText(CHECK_SYNTAX_TOOLTIP);
+        checkSyntaxBtn.addActionListener(e -> {
+            checkKeYSyntax();
+        });
+
         final JButton closeBtn = new JSizedButton("",
                 IconFontSwing.buildIcon(FontAwesomeSolid.WINDOW_CLOSE, 16, Color.BLACK), btnWidth,
                 btnHeight);
@@ -733,6 +744,8 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
         toolBar.add(shrinkBtn);
         toolBar.addSeparator();
         toolBar.add(cbSyncScrollbars);
+        toolBar.addSeparator();
+        toolBar.add(checkSyntaxBtn);
         toolBar.addSeparator();
         toolBar.add(saveBundleAndStartBtn);
         toolBar.add(checkProofButton);
@@ -1482,6 +1495,38 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
 
     private void attemptCloseWindow() {
         attemptCloseWindow(false);
+    }
+
+    private void checkKeYSyntax() {
+        final KeYJMLErrorParser leftErrorParser = new KeYJMLErrorParser(model, true);
+        final KeYJMLErrorParser rightErrorParser = new KeYJMLErrorParser(model, false);
+        
+        final AEInstantiationModel contextModel = AEInstantiationModel.fromRelationalModel(model, true);
+        contextModel.setProgram(codeContext.getText());
+        
+        final KeYJMLErrorParser contextErrorParser = new KeYJMLErrorParser(contextModel);
+        
+        for (int i = 0; i < codeLeft.getParserCount(); i++) {
+            if (codeLeft.getParser(i) instanceof KeYJMLErrorParser) {
+                codeLeft.removeParser(codeLeft.getParser(i));
+            }
+        }
+        
+        for (int i = 0; i < codeRight.getParserCount(); i++) {
+            if (codeRight.getParser(i) instanceof KeYJMLErrorParser) {
+                codeRight.removeParser(codeRight.getParser(i));
+            }
+        }
+        
+        for (int i = 0; i < codeContext.getParserCount(); i++) {
+            if (codeContext.getParser(i) instanceof KeYJMLErrorParser) {
+                codeContext.removeParser(codeContext.getParser(i));
+            }
+        }
+        
+        codeLeft.addParser(leftErrorParser);
+        codeRight.addParser(rightErrorParser);
+        codeContext.addParser(contextErrorParser);
     }
 
     private void attemptCloseWindow(final boolean shutdown) {

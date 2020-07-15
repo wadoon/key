@@ -37,6 +37,7 @@ import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
+import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.APEInstantiation;
 import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
 import de.uka.ilkd.key.abstractexecution.refinity.util.DummyKeYEnvironmentCreator;
 import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;
@@ -58,14 +59,18 @@ import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProofStarter;
+import de.uka.ilkd.key.util.Triple;
+import recoder.ModelException;
+import recoder.service.UnresolvedReferenceException;
 
 /**
  * @author Dominic Steinhoefel
  */
 public class InstantiationChecker {
     private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/Problem.java";
-    private static final String KEY_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/refinityInstantiationProblem.key";
+    private static final String APE_RETRIEVAL_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/apeRetrievalProblem.key";
 
     private static final String PRECONDITION = "<PRECONDITION>";
     private static final String INIT_VARS = "<INIT_VARS>";
@@ -94,7 +99,7 @@ public class InstantiationChecker {
         final InputStream javaScaffoldIS = RelationalProofBundleConverter.class
                 .getResourceAsStream(JAVA_PROBLEM_FILE_SCAFFOLD);
         final InputStream keyScaffoldIS = RelationalProofBundleConverter.class
-                .getResourceAsStream(KEY_PROBLEM_FILE_SCAFFOLD);
+                .getResourceAsStream(APE_RETRIEVAL_PROBLEM_FILE_SCAFFOLD);
         if (javaScaffoldIS == null || keyScaffoldIS == null) {
             throw new IllegalStateException("Could not load required resource files.");
         }
@@ -115,7 +120,12 @@ public class InstantiationChecker {
      * Returns a list of APEs from the {@link AEInstantiationModel}.
      * 
      * @return List of retrieved APEs.
-     * @throws UnsuccessfulAPERetrievalException if something went wrong.
+     * @throws UnsuccessfulAPERetrievalException if something went wrong. If the
+     * reason is an {@link SLTranslationException} (i.e., problem in the JML specs),
+     * the cause of the thrown exception object is the
+     * {@link SLTranslationException}. If the reason is an {@link ModelException}
+     * (i.e., problem in the Java code), the cause of the thrown exception object is
+     * the {@link ModelException}.
      */
     public List<APERetrievalResult> retrieveAPEs() {
         Path tmpDir;
@@ -147,7 +157,11 @@ public class InstantiationChecker {
             env = KeYEnvironment.load(JavaProfile.getDefaultInstance(), keyFile.toFile(),
                     Collections.emptyList(), null, Collections.emptyList(), false);
         } catch (ProblemLoaderException e) {
-            throw new UnsuccessfulAPERetrievalException("Could not load KeY problem", e);
+            throw new UnsuccessfulAPERetrievalException("Could not load KeY problem",
+                    MiscTools.findExceptionCauseOfClass(SLTranslationException.class, e)
+                            .map(Throwable.class::cast)
+                            .orElse(MiscTools.findExceptionCauseOfClass(ModelException.class, e)
+                                    .map(Throwable.class::cast).orElse(e)));
         }
 
         final int maxRuleApps = 80;
@@ -193,6 +207,40 @@ public class InstantiationChecker {
         visitor.start();
 
         return visitor.getResult();
+    }
+
+    /**
+     * Tries to parse the loaded {@link AEInstantiationModel} and returns
+     * information about the first found JML/Java error: Message, line, and column
+     * number.
+     * 
+     * @return Information about the first found JML/Java-Error or an empty
+     * {@link Optional}.
+     */
+    public Optional<Triple<String, Integer, Integer>> getFirstKeYJMLParserErrorMessage() {
+        try {
+            retrieveAPEs();
+        } catch (UnsuccessfulAPERetrievalException exc) {
+            if (exc.getCause() instanceof ModelException) {
+                final ModelException mexc = (ModelException) exc.getCause();
+
+                final Pattern p = Pattern.compile("@([0-9]+)/([0-9]+)");
+                final Matcher m = p.matcher(mexc.getMessage());
+
+                if (!m.matches()) {
+                    return Optional.empty();
+                }
+
+                return Optional.of(new Triple<>(mexc.getMessage(), Integer.parseInt(m.group(1)) - 3,
+                        Integer.parseInt(m.group(2)) - 8));
+            } else if (exc.getCause() instanceof SLTranslationException) {
+                final SLTranslationException slte = (SLTranslationException) exc.getCause();
+                return Optional.of(new Triple<>(slte.getMessage(), slte.getPosition().getLine() - 3,
+                        slte.getPosition().getColumn() - 8));
+            }
+        }
+
+        return Optional.empty();
     }
 
     /**
@@ -417,8 +465,14 @@ public class InstantiationChecker {
                 AERelationalModel.fromXml(
                         Files.readAllLines(testFile).stream().collect(Collectors.joining("\n")));
 
+        // There are ASs at lines 19 and 25
+        final AEInstantiationModel instModel = AEInstantiationModel.fromRelationalModel(relModel,
+                true);
+
+        instModel.addApeInstantiation(new APEInstantiation(19, "x = y++; z = w;"));
+
         int i = 1;
-        for (final APERetrievalResult result : InstantiationChecker.retrieveAPEs(relModel, false)) {
+        for (final APERetrievalResult result : new InstantiationChecker(instModel).retrieveAPEs()) {
             System.out.printf("APE %d (line %d):%n", i++, result.getLine());
             //            System.out.println(Arrays.stream(result.ape.getComments()).map(Comment::toSource)
             //                    .collect(Collectors.joining("\n")));
