@@ -8,13 +8,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCostCollector;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FinishAbstractProofMacro extends StrategyProofMacro {
 	@Override
@@ -34,43 +33,31 @@ public class FinishAbstractProofMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
-        return new FinishAbstractProofStrategy(proof.getActiveStrategy());
-    }
-
-    public static List<String> forbiddenRuleSets = new ArrayList<>();
-    public static List<String> forbiddenRules = new ArrayList<>();
-    public static boolean firstOrderGoalsForbidden = false;
-
-    static {
-        // default rule sets and rules which may not be applied within an abstract proof
-        forbiddenRuleSets.add("expand_def");
-        forbiddenRuleSets.add("classAxiom");
-        forbiddenRuleSets.add("partialInvAxiom");
-    }
-
-    private static boolean isInForbiddenRuleSet(RuleApp ruleApp, String ruleSetName) {
-        return ((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name(ruleSetName)));
-    }
-
-    private static boolean isInForbiddenRuleSet(RuleApp ruleApp) {
-        return forbiddenRuleSets.stream().anyMatch(ruleSetName -> isInForbiddenRuleSet(ruleApp, ruleSetName));
-    }
-
-    private static boolean isForbiddenRule(RuleApp ruleApp, String ruleName) {
-        return ruleApp.rule().name().toString().equalsIgnoreCase(ruleName);
-    }
-
-    private static boolean isForbiddenRule(RuleApp ruleApp) {
-        return forbiddenRules.stream().anyMatch(ruleName -> isForbiddenRule(ruleApp, ruleName));
+        return new FinishAbstractProofStrategy(proof.getActiveStrategy(), proof.getSettings().getStrategySettings().getActiveStrategyProperties());
     }
     
     private static class FinishAbstractProofStrategy implements Strategy {
     	
     	private final Strategy delegate;
         private static final Name NAME = new Name(FinishAbstractProofStrategy.class.getSimpleName());
-        
-        public FinishAbstractProofStrategy(Strategy delegate) {
+
+        public List<String> forbiddenRuleSets;
+        public List<String> forbiddenRules;
+        public boolean firstOrderGoalsForbidden;
+
+        public FinishAbstractProofStrategy(Strategy delegate, StrategyProperties strategyProperties) {
             this.delegate = delegate;
+            this.forbiddenRuleSets = Arrays.stream(strategyProperties.getProperty(StrategyProperties.ABSTRACT_PROOF_FORBIDDEN_RULE_SETS)
+                    .split(","))
+                    .map(String::trim)
+                    .filter(str -> !str.isEmpty())
+                    .collect(Collectors.toList());
+            this.forbiddenRules = Arrays.stream(strategyProperties.getProperty(StrategyProperties.ABSTRACT_PROOF_FORBIDDEN_RULES)
+                    .split(","))
+                    .map(String::trim)
+                    .filter(str -> !str.isEmpty())
+                    .collect(Collectors.toList());
+            this.firstOrderGoalsForbidden = strategyProperties.getProperty(StrategyProperties.ABSTRACT_PROOF_FIRST_ORDER_GOALS_FORBIDDEN).equals("true");
         }
 
         /*
@@ -107,6 +94,22 @@ public class FinishAbstractProofMacro extends StrategyProofMacro {
         @Override
         public Name name() {
             return NAME;
+        }
+
+        private boolean isInForbiddenRuleSet(RuleApp ruleApp, String ruleSetName) {
+            return ((TacletApp)ruleApp).taclet().getRuleSets().contains(new RuleSet(new Name(ruleSetName)));
+        }
+
+        private boolean isInForbiddenRuleSet(RuleApp ruleApp) {
+            return forbiddenRuleSets.stream().anyMatch(ruleSetName -> isInForbiddenRuleSet(ruleApp, ruleSetName));
+        }
+
+        private boolean isForbiddenRule(RuleApp ruleApp, String ruleName) {
+            return ruleApp.rule().name().toString().toLowerCase().startsWith(ruleName.toLowerCase());
+        }
+
+        private boolean isForbiddenRule(RuleApp ruleApp) {
+            return forbiddenRules.stream().anyMatch(ruleName -> isForbiddenRule(ruleApp, ruleName));
         }
 
         @Override
