@@ -48,7 +48,7 @@ public class Statistics {
     private final HashMap<String, Integer> interactiveAppsDetails =
             new HashMap<String, Integer>();
 
-    protected Statistics(int nodes,
+    public Statistics(int nodes,
                          int branches,
                          int interactiveSteps,
                          int symbExApps,
@@ -82,7 +82,7 @@ public class Statistics {
         this.timePerStepInMillis = timePerStepInMillis;
     }
 
-    Statistics(Node startNode) {
+    public Statistics(Node startNode) {
         final Iterator<Node> it = startNode.subtreeIterator();
 
         TemporaryStatistics tmp = new TemporaryStatistics();
@@ -113,11 +113,11 @@ public class Statistics {
         generateSummary(startNode.proof());
     }
 
-    Statistics(Proof proof) {
+    public Statistics(Proof proof) {
         this(proof.root());
     }
 
-    static Statistics create(Statistics side, long creationTime) {
+    public static Statistics create(Statistics side, long creationTime) {
         return new Statistics(side.nodes,
                               side.branches,
                               side.interactiveSteps,
