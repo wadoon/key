@@ -37,9 +37,7 @@ public class JmlIO {
         this(services, containerType, self, o, o1, o2, o3, new HashMap<>());
     }
 
-    public JmlIO() {
-        System.out.println("JmlIO.JmlIO");
-    }
+    public JmlIO() {}
 
     private Services services;
     private KeYJavaType specInClass;
@@ -66,14 +64,17 @@ public class JmlIO {
                                                    ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
                                                    ProgramVariable excVar, Object o, Object o1,
                                                    Class<InfFlowSpec> infFlowSpecClass, Services services) {
+        System.out.println("JmlIO.translateInformation");
         return null;
     }
 
     public static Pair<IObserverFunction, Term> translateRepresents(ParserRuleContext clause, KeYJavaType kjt, ProgramVariable selfVar, Object o, Object o1, Object o2, Object o3, Object o4, Class<Pair> pairClass, Services services) {
+        System.out.println("JmlIO.translateRepresents");
         return null;
     }
 
     public static boolean isKnownFunction(String functionName) {
+        System.out.println("JmlIO.isKnownFunction");
         return false;//TODO java2jdl
     }
 
@@ -93,14 +94,17 @@ public class JmlIO {
 
 
     public static Pair<Label, Term> translateLabeledClause(ParserRuleContext parserRuleContext, KeYJavaType containerType, ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar, ProgramVariable excVar, Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores, OriginTermLabel.SpecType breaks, Services services) {
+        System.out.println("JmlIO.translateLabeledClause");
         return null;
     }
 
     public static MergeParamsSpec translateMergeParams(ParserRuleContext mergeParamsParseStr, KeYJavaType kjt, ProgramVariable selfVar, ImmutableList<ProgramVariable> append, ProgramVariable resultVar, ProgramVariable excVar, Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atPres1, Object o, Class<MergeParamsSpec> mergeParamsSpecClass, Services services) {
+        System.out.println("JmlIO.translateMergeParams");
         return null;
     }
 
     public static Triple<IObserverFunction, Term, Term> translateDependencyContract(ParserRuleContext originalDep, KeYJavaType kjt, ProgramVariable selfVar, Object o, Object o1, Object o2, Object o3, Object o4, Services services) {
+        System.out.println("JmlIO.translateDependencyContract");
         return null;
     }
 
@@ -109,10 +113,9 @@ public class JmlIO {
     }
 
     private ImmutableList<TextualJMLConstruct> parseClassLevel(PositionedString positionedString) {
+        System.out.println("--- Contract ---");
         System.out.println(positionedString.text);
-        JmlParser p = JmlFacade.createParser(JmlFacade.createLexer(positionedString));
-        //JmlParser.TopContext ctx = p.top();
-        return ImmutableSLList.nil();
+        return JmlFacade.parseClasslevel(positionedString);
     }
 
     public ImmutableSet<? extends PositionedString> getWarnings() {

@@ -21,9 +21,7 @@ lexer grammar JmlLexer;
    boolean semicolonOnToplevel() { return bracketLevel==0 && bracesLevel == 0 && parenthesisLevel==0; }
 }
 
-tokens {COMMENT}
-
-//@annotateclass{ @SuppressWarnings("all") }
+tokens {BODY, COMMENT}
 
 /*modifiers*/
 MODEL_BEHAVIOUR: 'model_' BEHAVIOR ;
@@ -134,18 +132,16 @@ WRITABLE: 'writable' -> pushMode(expr);
 JML_SL_START: '//@' -> channel(HIDDEN);
 JML_ML_START: '/*@' -> channel(HIDDEN);
 JML_ML_END: '*/' -> channel(HIDDEN);
-SL_COMMENT: '//' ~'@'? ~('\n'|'\r')* -> channel(HIDDEN);
-ML_COMMENT: '/*' -> pushMode(mlComment);
-
-//fragment LETTER:  'a'..'z' |   'A'..'Z' | '_' | '$' | '\\';
-//fragment DIGIT: '0'..'9' ;
-
+SL_COMMENT: '//' ~'@' ~('\n'|'\r')* -> channel(HIDDEN);
 WS: (' ' | '\t' | '\n' | '\r' | '@')+ -> channel(HIDDEN);
 
-//IDENT: LETTER (LETTER|DIGIT)*;
+ML_COMMENT: '/*' -> pushMode(mlComment);
+
 NEST_START: '{|' ;
 NEST_END: '|}' ;
 SEMICOLON : ';';
+BODY_START: '{' -> more, pushMode(body);
+ERROR_CHAR: .;
 
 mode expr;
 
@@ -353,6 +349,7 @@ LETTERORDIGIT: LETTER | DIGIT;
 
 IDENT: LETTER (LETTERORDIGIT)*;
 JML_IDENT: '\\' IDENT ;
+
 //DL_ESCAPE: '\\dl_'  LETTER  ( LETTERORDIGIT )*  ;
 
 /*
@@ -393,10 +390,22 @@ E_SL_COMMENT: '//' ~[@] ~('\n'|'\r')* -> channel(HIDDEN), type(SL_COMMENT);
 DOC_COMMENT: '/**' -> pushMode(mlComment);
 fragment PRAGMA: '\\nowarn';
 
+E_BODY_START: '{' -> more, pushMode(body);
+E_ERROR_CHAR: . -> type(ERROR_CHAR);
+
+mode body;
+BRACE: '{' ->  more, pushMode(body);
+END_BODY: {_modeStack.peek() != body}? '}' -> popMode, type(BODY);
+END_BRACE: '}' -> more, popMode;
+//S: '"' ~('"') '"' -> more; //TODO refine
+//not working, IGNORE: '@' -> skip, more;
+ANY_CHAR: . -> more;
+
 mode mlComment;
 ML_COMMENT_END: '*/' -> type(COMMENT), channel(HIDDEN), popMode;
 ML_ANY: . -> more;
 
 mode string;
+S_ESC: '\\"' -> more;
 S_END: '"' -> type(STRING_LITERAL), popMode;
 S_ANY: . -> more;
