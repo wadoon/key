@@ -73,7 +73,7 @@ public class FunctionInstantiation {
         final String closingParens = IntStream.range(1, declaration.getArgSorts().size())
                 .mapToObj(i -> ")").collect(Collectors.joining());
 
-        return qfdParamDecl + String.format("(%s%s == %s)", declaration.getFuncName(),
+        return qfdParamDecl + String.format("(%s%s = %s)", declaration.getFuncName(),
                 declaration.getArgSorts().size() == 0 ? "" : "(" + paramList + ")", instantiation)
                 + closingParens;
     }

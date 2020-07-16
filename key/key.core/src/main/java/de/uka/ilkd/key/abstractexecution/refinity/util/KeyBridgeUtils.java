@@ -12,6 +12,7 @@
 //
 package de.uka.ilkd.key.abstractexecution.refinity.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,11 +29,13 @@ import java.util.stream.Collectors;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.InstantiationChecker;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.InstantiationChecker.APERetrievalResult;
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.InstantiationChecker.UnsuccessfulAPERetrievalException;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
+import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -72,7 +75,7 @@ public class KeyBridgeUtils {
     private static Optional<Pair<KeYJavaType, Services>> DUMMY_KJT_AND_SERVICES = Optional.empty();
 
     /////////////// PUBLIC METHODS ///////////////
-    
+
     public static KeYJavaType dummyKJT() {
         return getDummyKJTAndServices().first;
     }
@@ -115,9 +118,9 @@ public class KeyBridgeUtils {
      * predicates, and adds some indentation.
      * 
      * @param javaCode The code to preprocess.
-     * @param locsets  Abstract locations sets to escape.
-     * @param preds    Abstract predicates to escape.
-     * @param funcs    Abstract functions to escape.
+     * @param locsets Abstract locations sets to escape.
+     * @param preds Abstract predicates to escape.
+     * @param funcs Abstract functions to escape.
      * @return The preprocessed Java code.
      */
     public static String preprocessJavaCode(final String javaCode,
@@ -194,7 +197,7 @@ public class KeyBridgeUtils {
      * to JavaDL elements. Returns "true" for empty precondition.
      * 
      * @param unpreparedJmlPreCondition A JML precondition as input by the user into
-     *                                  REFINITY.
+     * REFINITY.
      * @param vars
      * @param locsets
      * @param preds
@@ -212,8 +215,8 @@ public class KeyBridgeUtils {
             return "true";
         }
 
-        final String jmlPreCondRelation = preparedJMLPreCondition(unpreparedJmlPreCondition, vars,
-                locsets, preds, funcs);
+        final String jmlPreCondRelation = //
+                preparedJMLPreCondition(unpreparedJmlPreCondition, vars, locsets, preds, funcs);
         return jmlStringToJavaDL(jmlPreCondRelation, dummyKJT, services);
     }
 
@@ -329,20 +332,21 @@ public class KeyBridgeUtils {
      * @return Information about the first found JML/Java-Error or an empty
      * {@link Optional}.
      */
-    public static Optional<Triple<String, Integer, Integer>> getFirstKeYJMLParserErrorMessage(final AEInstantiationModel model) {
+    public static Optional<Triple<String, Integer, Integer>> getFirstKeYJMLParserErrorMessage(
+            final AEInstantiationModel model) {
         try {
-            new InstantiationChecker(model).createRetrievalProof(0);
+            new InstantiationChecker(model).createRetrievalProof(0, model.getProgram());
         } catch (InstantiationChecker.UnsuccessfulAPERetrievalException exc) {
             if (exc.getCause() instanceof ModelException) {
                 final ModelException mexc = (ModelException) exc.getCause();
-    
+
                 final Pattern p = Pattern.compile("@([0-9]+)/([0-9]+)");
                 final Matcher m = p.matcher(mexc.getMessage());
-    
+
                 if (!m.matches()) {
                     return Optional.empty();
                 }
-    
+
                 return Optional.of(new Triple<>(mexc.getMessage(), Integer.parseInt(m.group(1)) - 3,
                         Integer.parseInt(m.group(2)) - 8));
             } else if (exc.getCause() instanceof SLTranslationException) {
@@ -353,7 +357,7 @@ public class KeyBridgeUtils {
         } catch (IOException e) {
             // Some problem occurred... never mind, only for syntax checking
         }
-    
+
         return Optional.empty();
     }
 
@@ -375,20 +379,24 @@ public class KeyBridgeUtils {
      * @return The created proof file.
      * @throws InstantiationChecker.UnsuccessfulAPERetrievalException
      */
-    public static Proof createProofAndRun(final String keyFileName, final String javaSrcDirName,
-            final String javaFileName, final String proofFileName, final String keyFileContent,
-            final String javaFileContent, int maxRuleApps)
-            throws InstantiationChecker.UnsuccessfulAPERetrievalException {
+    public static Proof createProofAndRun(final String keyFileContent, final String javaFileContent,
+            int maxRuleApps) throws InstantiationChecker.UnsuccessfulAPERetrievalException {
+        final String keyFileName = "problem.key";
+        final String javaSrcDirName = "src";
+        final String javaFileName = "Problem.java";
+        final String proofFileName = "problem.proof";
+
         Path tmpDir;
         try {
             tmpDir = Files.createTempDirectory("AEInstCheckerTmp_");
         } catch (IOException e) {
-            throw new InstantiationChecker.UnsuccessfulAPERetrievalException("Could not create temporary directory", e);
+            throw new InstantiationChecker.UnsuccessfulAPERetrievalException(
+                    "Could not create temporary directory", e);
         }
-    
+
         final Path keyFile = tmpDir.resolve(keyFileName);
         final Path javaSrcDir = tmpDir.resolve(javaSrcDirName);
-    
+
         try {
             Files.write(keyFile, keyFileContent.getBytes());
             Files.createDirectory(javaSrcDir);
@@ -397,35 +405,59 @@ public class KeyBridgeUtils {
             throw new InstantiationChecker.UnsuccessfulAPERetrievalException(
                     "Could not write KeY problem file for retrieval", e);
         }
-    
+
         KeYEnvironment<?> env;
         try {
             env = KeYEnvironment.load(JavaProfile.getDefaultInstance(), keyFile.toFile(),
                     Collections.emptyList(), null, Collections.emptyList(), false);
         } catch (ProblemLoaderException e) {
-            throw new InstantiationChecker.UnsuccessfulAPERetrievalException("Could not load KeY problem",
+            throw new InstantiationChecker.UnsuccessfulAPERetrievalException(
+                    "Could not load KeY problem",
                     MiscTools.findExceptionCauseOfClass(SLTranslationException.class, e)
                             .map(Throwable.class::cast)
                             .orElse(MiscTools.findExceptionCauseOfClass(ModelException.class, e)
                                     .map(Throwable.class::cast).orElse(e)));
         }
-    
+
         final Proof proof = env.getLoadedProof();
-    
+
         if (maxRuleApps != 0) {
             final ProofStarter starter = new ProofStarter(false);
             starter.init(proof);
             starter.setMaxRuleApplications(maxRuleApps);
             starter.start();
         }
-    
+
         try {
-            proof.saveToFile(tmpDir.resolve(proofFileName).toFile());
+            final File proofFile = tmpDir.resolve(proofFileName).toFile();
+            proof.setProofFile(proofFile);
+            proof.saveToFile(proofFile);
         } catch (IOException e) {
-            throw new InstantiationChecker.UnsuccessfulAPERetrievalException("Could not save proof", e);
+            throw new InstantiationChecker.UnsuccessfulAPERetrievalException("Could not save proof",
+                    e);
         }
-    
+
         return proof;
+    }
+
+    /**
+     * Returns a list of APEs from either the first or second program of an
+     * {@link AERelationalModel}.
+     * 
+     * @param relModel The {@link AERelationalModel} from which to return the APEs.
+     * @param firstProgram True iff APEs should be retrieved from the first program.
+     * @return A list of APEs.
+     * @throws InstantiationChecker.UnsuccessfulAPERetrievalException if something went wrong.
+     */
+    public static List<InstantiationChecker.APERetrievalResult> retrieveAPEs(final AERelationalModel relModel,
+            boolean firstProgram) {
+        try {
+            return new InstantiationChecker(
+                    AEInstantiationModel.fromRelationalModel(relModel, firstProgram))
+                            .retrieveAPEs();
+        } catch (IOException e) {
+            throw new InstantiationChecker.UnsuccessfulAPERetrievalException(e);
+        }
     }
 
 }

@@ -211,6 +211,10 @@ public class AEInstantiationModel {
     public void setPredicateInstantiations(List<PredicateInstantiation> predicateInstantiations) {
         this.predicateInstantiations = predicateInstantiations;
     }
+    
+    public void addPredicateInstantiation(PredicateInstantiation predicateInstantiation) {
+        getPredicateInstantiations().add(predicateInstantiation);
+    }
 
     public List<FunctionInstantiation> getFunctionInstantiations() {
         return functionInstantiations;
@@ -218,6 +222,11 @@ public class AEInstantiationModel {
 
     public void setFunctionInstantiations(List<FunctionInstantiation> functionInstantiations) {
         this.functionInstantiations = functionInstantiations;
+    }
+    
+    public void addFunctionInstantiation(FunctionInstantiation functionInstantiation) {
+        this.functionInstantiations = new ArrayList<>(getFunctionInstantiations());
+        this.functionInstantiations.add(functionInstantiation);
     }
 
     public List<APEInstantiation> getApeInstantiations() {
@@ -229,6 +238,7 @@ public class AEInstantiationModel {
     }
 
     public void addApeInstantiation(APEInstantiation apeInstantiation) {
+        this.apeInstantiations = new ArrayList<>(getApeInstantiations());
         this.apeInstantiations.add(apeInstantiation);
     }
 

@@ -19,13 +19,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
 import javax.xml.bind.JAXBException;
 
 import org.key_project.util.collection.ImmutableList;
@@ -43,19 +43,21 @@ import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.PredicateI
 import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
 import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;
 import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
-import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
@@ -69,7 +71,7 @@ import recoder.ModelException;
 public class InstantiationChecker {
     private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/Problem.java";
 
-    private static final String APE_RETRIEVAL_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/apeRetrievalProblem.key";
+    private static final String APE_RETRIEVAL_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/programRetrievalProblem.key";
 
     private static final String FRAME_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/frameProblem.key";
 
@@ -85,6 +87,7 @@ public class InstantiationChecker {
     private static final String PROOF = "<PROOF>";
     private static final String SYMINSTS = "<SYMINSTS>";
     private static final String ASSIGNABLES = "<ASSIGNABLES>";
+    private static final String AT_PRES = "<AT_PRES>";
     private static final String PV_AT_PRE_POSTS = "<PV_AT_PRE_POSTS>";
 
     private final String javaScaffold;
@@ -126,6 +129,10 @@ public class InstantiationChecker {
 
         keyProveFrameScaffold = IOUtil.readFrom(keyFrameProblemIS);
     }
+    
+    ////////////// Public Static Functions ////////////// 
+    
+    ////////////// Public Member Functions //////////////
 
     /**
      * Returns a list of APEs from the {@link AEInstantiationModel}.
@@ -143,13 +150,59 @@ public class InstantiationChecker {
             return apes.get();
         }
 
-        final Proof proof = createRetrievalProof(80);
+        final RetrieveProgramResult retrProgRes = retrieveProgram(model.getProgram());
 
-        if (proof.closed()) {
-            // Proof should still be open: Otherwise, we cannot retrieve the
-            // goal-local specification repository.
-            throw new UnsuccessfulAPERetrievalException("Proof should be open, but is closed.");
-        }
+        final CollectAPEVisitor visitor = new CollectAPEVisitor(retrProgRes.getProgram(),
+                retrProgRes.getLocalSpecRepo(), retrProgRes.getServices());
+        visitor.start();
+
+        final List<APERetrievalResult> result = visitor.getResult();
+
+        // Cache result 
+        this.apes = Optional.of(result);
+
+        return result;
+    }
+
+    /**
+     * Creates the proof used to retrieve APEs from the code body.
+     * 
+     * @param maxNumSteps Maximum number of applied steps.
+     * @param program The code of the program which to parse / analyze.
+     * @return The created proof.
+     * @throws UnsuccessfulAPERetrievalException if something went wrong. If the
+     * reason is an {@link SLTranslationException} (i.e., problem in the JML specs),
+     * the cause of the thrown exception object is the
+     * {@link SLTranslationException}. If the reason is an {@link ModelException}
+     * (i.e., problem in the Java code), the cause of the thrown exception object is
+     * the {@link ModelException}.
+     */
+    public Proof createRetrievalProof(final int maxNumSteps, final String program)
+            throws UnsuccessfulAPERetrievalException {
+        final String keyFileContent = createRetrievalKeYFile();
+        final String javaFileContent = createJavaFile(program);
+
+        final Proof proof = //
+                KeyBridgeUtils.createProofAndRun(keyFileContent, javaFileContent, maxNumSteps);
+        assert !proof.closed();
+        return proof;
+    }
+    
+    ////////////// Private Member Functions //////////////
+
+    /**
+     * Returns a list of APEs from the {@link AEInstantiationModel}.
+     * 
+     * @return List of retrieved APEs.
+     * @throws UnsuccessfulAPERetrievalException if something went wrong. If the
+     * reason is an {@link SLTranslationException} (i.e., problem in the JML specs),
+     * the cause of the thrown exception object is the
+     * {@link SLTranslationException}. If the reason is an {@link ModelException}
+     * (i.e., problem in the Java code), the cause of the thrown exception object is
+     * the {@link ModelException}.
+     */
+    private RetrieveProgramResult retrieveProgram(final String code) {
+        final Proof proof = createRetrievalProof(80, code);
 
         Node currNode = proof.root();
         while (currNode.getAppliedRuleApp() != null
@@ -175,66 +228,13 @@ public class InstantiationChecker {
                     "Found an empty JavaBlock, probably wrong assumptions about proof structure");
         }
 
-        final CollectAPEVisitor visitor = new CollectAPEVisitor(javaBlock.program(),
-                proof.openGoals().head().getLocalSpecificationRepository(), proof.getServices());
-        visitor.start();
-
-        final List<APERetrievalResult> result = visitor.getResult();
-
-        this.apes = Optional.of(result);
-
-        return result;
+        return new RetrieveProgramResult(javaBlock.program(), proof);
     }
 
     /**
-     * Creates the proof used to retrieve APEs from the code body.
+     * Proves the frame conditions for all instantiated APEs.
      * 
-     * @param maxNumSteps Maximum number of applied steps.
-     * @return The created proof.
-     * @throws UnsuccessfulAPERetrievalException if something went wrong. If the
-     * reason is an {@link SLTranslationException} (i.e., problem in the JML specs),
-     * the cause of the thrown exception object is the
-     * {@link SLTranslationException}. If the reason is an {@link ModelException}
-     * (i.e., problem in the Java code), the cause of the thrown exception object is
-     * the {@link ModelException}.
-     */
-    public Proof createRetrievalProof(int maxNumSteps) throws UnsuccessfulAPERetrievalException {
-        final String keyFileName = "problem.key";
-        final String javaSrcDirName = "src";
-        final String javaFileName = "Problem.java";
-        final String proofFileName = "problem.proof";
-
-        final String keyFileContent = createRetrieveAPEsKeYFile();
-        final String javaFileContent = createJavaFile(model.getProgram());
-
-        return KeyBridgeUtils.createProofAndRun(keyFileName, javaSrcDirName, javaFileName,
-                proofFileName, keyFileContent, javaFileContent, maxNumSteps);
-    }
-
-    /**
-     * Returns a list of APEs from either the first or second program of an
-     * {@link AERelationalModel}.
-     * 
-     * @param relModel The {@link AERelationalModel} from which to return the APEs.
-     * @param firstProgram True iff APEs should be retrieved from the first program.
-     * @return A list of APEs.
-     * @throws UnsuccessfulAPERetrievalException if something went wrong.
-     */
-    public static List<APERetrievalResult> retrieveAPEs(final AERelationalModel relModel,
-            boolean firstProgram) {
-        try {
-            return new InstantiationChecker(
-                    AEInstantiationModel.fromRelationalModel(relModel, firstProgram))
-                            .retrieveAPEs();
-        } catch (IOException e) {
-            throw new UnsuccessfulAPERetrievalException(e);
-        }
-    }
-
-    /**
-     * TODO
-     * 
-     * @return
+     * @return The proof result.
      */
     private List<ProofResult> proveFrameInsts() {
         return model.getApeInstantiations().stream().map(this::proveFrameInst)
@@ -242,61 +242,122 @@ public class InstantiationChecker {
     }
 
     /**
-     * TODO
+     * Attempts to prove that the given instantiation satisfies the frame condition
+     * of the APE to instantiate.
      * 
-     * @param inst
-     * @return
+     * @param inst The {@link APEInstantiation}
+     * @return A {@link ProofResult} for the frame problem.
      */
     private ProofResult proveFrameInst(APEInstantiation inst) {
-        final String keyFileName = "problem.key";
-        final String javaSrcDirName = "src";
-        final String javaFileName = "Problem.java";
-        final String proofFileName = "problem.proof";
-
         final String keyFileContent = createProveFrameKeYFile(inst);
-//        final String javaFileContent = createJavaFile(inst.getInstantiation());
+        final String javaFileContent = createJavaFile(inst.getInstantiation());
 
-//        final Proof proof = KeyBridgeUtils.createProofAndRun(keyFileName, javaSrcDirName,
-//                javaFileName, proofFileName, keyFileContent, javaFileContent, 10000);
+        final Proof proof = //
+                KeyBridgeUtils.createProofAndRun(keyFileContent, javaFileContent, 10000);
 
-        // TODO
-
-        return null;
+        return new ProofResult(proof.closed(), proof.getProofFile().toPath(), proof);
     }
 
     private String createProveFrameKeYFile(APEInstantiation inst) {
         final Services services = KeyBridgeUtils.dummyServices();
         populateNamespaces(model, services);
 
+        //////////
+
         final String javaDLPreCondRelation = KeyBridgeUtils.createJavaDLPreCondition(
                 model.getPreCondition(), model.getProgramVariableDeclarations(),
                 model.getAbstractLocationSets(), model.getPredicateDeclarations(),
                 model.getFunctionDeclarations(), KeyBridgeUtils.dummyKJT(), services);
 
-        // SYMINSTS, AT_PRES, ASSIGNABLES, PV_AT_PRE_POSTS
+        //////////
 
-        String symInsts = model.getFunctionInstantiations().stream()
-                .map(FunctionInstantiation::toString).collect(Collectors.joining(" &\n  "));
-        symInsts += model.getPredicateInstantiations().stream()
-                .map(PredicateInstantiation::toString).collect(Collectors.joining(" &\n  "));
-        symInsts = symInsts.trim().isEmpty() ? "true" : symInsts;
+        final String symInsts;
 
-        final String jmlAssignableTerm = getAssignableTerm(retrieveAPEs().stream()
-                .filter(r -> r.getLine() == inst.getApeLineNumber()).findFirst()
-                .orElseThrow(() -> new UnsuccessfulAPERetrievalException(
-                        "Expected to find APE with line no. " + inst.getApeLineNumber()
-                                + ", but did not.")));
+        {
+            String tmpSymInsts = model.getFunctionInstantiations().stream()
+                    .map(FunctionInstantiation::toString).collect(Collectors.joining(" &\n  "));
+            tmpSymInsts += model.getPredicateInstantiations().stream()
+                    .map(PredicateInstantiation::toString).collect(Collectors.joining(" &\n  "));
+            symInsts = tmpSymInsts.trim().isEmpty() ? "true" : tmpSymInsts;
+        }
 
-        // TODO 1: Get all program variables in instantiation...
-        // TODO 2: Translate assignable term of APE to JavaDL
-        // TODO 3: Use those for remaining scaffold elements
+        //////////
+
+        final String atPres;
+        final LinkedHashSet<LocationVariable> instProgVars;
+
+        {
+            final RetrieveProgramResult retrProgRes = retrieveProgram(inst.getInstantiation());
+            final ProgramVariableCollector progVarCol = new ProgramVariableCollector(
+                    retrProgRes.getProgram(), retrProgRes.getLocalSpecRepo(),
+                    retrProgRes.getServices());
+            progVarCol.start();
+
+            final List<String> ignPVs = Arrays
+                    .asList(new String[] { "_result", "_exc", "_objUnderTest" });
+
+            instProgVars = progVarCol.result().stream()
+                    .filter(lv -> !ignPVs.contains(lv.name().toString()))
+                    .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+            atPres = instProgVars.stream().map(pv -> String.format("%1$s_AtPre:=%1$s", pv))
+                    .collect(Collectors.joining("||"));
+        }
+
+        //////////
+
+        final String javaDlAssignableTerm;
+
+        {
+            final String jmlAssignableTerm = getAssignableTerm(retrieveAPEs().stream()
+                    .filter(r -> r.getLine() == inst.getApeLineNumber()).findFirst()
+                    .orElseThrow(() -> new UnsuccessfulAPERetrievalException(
+                            "Expected to find APE with line no. " + inst.getApeLineNumber()
+                                    + ", but did not.")));
+            javaDlAssignableTerm = KeyBridgeUtils.jmlStringToJavaDL( //
+                    jmlAssignableTerm, KeyBridgeUtils.dummyKJT(), services);
+        }
+
+        //////////
+
+        final String pvAtPrePosts;
+
+        {
+            pvAtPrePosts = instProgVars.stream().map(LocationVariable::toString)
+                    .map(v -> String.format("(%1$s=%1$s_AtPre | pvElementOf(PV(%1$s), %2$s))", v,
+                            javaDlAssignableTerm))
+                    .collect(Collectors.joining("\n              & "));
+        }
+
+        //////////
+
+        final String newVars;
+
+        {
+            final String newInstVars = instProgVars.stream()
+                    .filter(lv -> !model.getProgramVariableDeclarations().stream()
+                            .anyMatch(pvd -> pvd.getName().equals(lv.name().toString())))
+                    .map(lv -> String.format("%s %s;",
+                            lv.getKeYJavaType().getSort().name().toString(), lv.name().toString()))
+                    .collect(Collectors.joining("\n  "));
+
+            final String atPreVars = instProgVars.stream()
+                    .map(lv -> String.format("%s %s_AtPre;",
+                            lv.getKeYJavaType().getSort().name().toString(), lv.name().toString()))
+                    .collect(Collectors.joining("\n  "));
+
+            newVars = "\n  " + newInstVars + "\n  " + atPreVars;
+        }
 
         return keyProveFrameScaffold
                 .replaceAll(FUNCTIONS, Matcher.quoteReplacement(createFuncDecls()))
                 .replaceAll(PREDICATES, Matcher.quoteReplacement(createPredDecls()))
-                .replaceAll(PROGRAMVARIABLES, Matcher.quoteReplacement(createProgvarDecls()))
+                .replaceAll(PROGRAMVARIABLES,
+                        Matcher.quoteReplacement(createProgvarDecls() + newVars))
                 .replaceAll(PARAMS, Matcher.quoteReplacement(createParams()))
                 .replaceAll(SYMINSTS, Matcher.quoteReplacement(symInsts))
+                .replaceAll(AT_PRES, Matcher.quoteReplacement(atPres))
+                .replaceAll(ASSIGNABLES, Matcher.quoteReplacement(javaDlAssignableTerm))
+                .replaceAll(PV_AT_PRE_POSTS, pvAtPrePosts)
                 .replaceAll(Pattern.quote(PRECONDITION),
                         Matcher.quoteReplacement(javaDLPreCondRelation))
                 .replaceAll(ADDITIONAL_PREMISES, Matcher.quoteReplacement(
@@ -304,14 +365,12 @@ public class InstantiationChecker {
     }
 
     private String getAssignableTerm(final APERetrievalResult ape) {
-        return ape.jmlConstructs.stream()
-                .filter(TextualJMLSpecCase.class::isInstance).map(TextualJMLSpecCase.class::cast)
-                .filter(c -> c.getBehavior() == Behavior.NONE)
+        return ape.jmlConstructs.stream().filter(TextualJMLSpecCase.class::isInstance)
+                .map(TextualJMLSpecCase.class::cast).filter(c -> c.getBehavior() == Behavior.NONE)
                 .filter(c -> c.getAssignable() != null).map(TextualJMLSpecCase::getAssignable)
                 .map(ImmutableList::head).findAny().map(str -> str.text)
-                .map(str -> str.replaceAll("assignable ", ""))
-                .map(str -> str.replaceAll(Pattern.quote("\\dl_"), ""))
-                .map(str -> str.replaceAll(";", "")).orElse("\\everything");
+                .map(str -> str.replaceAll("assignable ", "")).map(str -> str.replaceAll(";", ""))
+                .orElse("\\everything");
     }
 
     private String createJavaFile(String bodyReplacement) {
@@ -331,7 +390,7 @@ public class InstantiationChecker {
                 .replaceAll(CONTEXT, Matcher.quoteReplacement(context));
     }
 
-    private String createRetrieveAPEsKeYFile() {
+    private String createRetrievalKeYFile() {
         final String initVars = model.getProgramVariableDeclarations().stream()
                 .map(ProgramVariableDeclaration::getVarName)
                 .map(pv -> String.format("%s:=_%s", pv, pv)).collect(Collectors.joining("||"));
@@ -408,6 +467,8 @@ public class InstantiationChecker {
         model.fillNamespacesFromModel(services);
     }
 
+    ////////////// Private Static Functions //////////////
+
     private static class CollectAPEVisitor extends JavaASTVisitor {
         private final List<APERetrievalResult> result = new ArrayList<>();
 
@@ -454,6 +515,8 @@ public class InstantiationChecker {
         //        warnings = warnings.union(preParser.getWarnings());
         return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
     }
+    
+    ////////////// Inner Classes //////////////
 
     public static class APERetrievalResult {
         private final int line;
@@ -515,7 +578,7 @@ public class InstantiationChecker {
         private final Proof proof;
         private final Path proofPath;
 
-        public ProofResult(boolean success, Proof proof, Path proofPath) {
+        public ProofResult(boolean success, Path proofPath, Proof proof) {
             this.success = success;
             this.proof = proof;
             this.proofPath = proofPath;
@@ -534,6 +597,32 @@ public class InstantiationChecker {
         }
     }
 
+    public static class RetrieveProgramResult {
+        private final Proof proof;
+        private final JavaProgramElement program;
+
+        public RetrieveProgramResult(JavaProgramElement program, Proof proof) {
+            this.proof = proof;
+            this.program = program;
+        }
+
+        public Proof getProof() {
+            return proof;
+        }
+
+        public JavaProgramElement getProgram() {
+            return program;
+        }
+
+        public Services getServices() {
+            return proof.getServices();
+        }
+
+        public GoalLocalSpecificationRepository getLocalSpecRepo() {
+            return proof.openGoals().head().getLocalSpecificationRepository();
+        }
+    }
+
     /////////////////// Test Code ///////////////////
 
     public static void main(String[] args) throws JAXBException, SAXException, IOException,
@@ -547,9 +636,36 @@ public class InstantiationChecker {
         // There are ASs at lines 19 and 25
         final AEInstantiationModel instModel = //
                 AEInstantiationModel.fromRelationalModel(relModel, true);
+
+        for (final String newPV : new String[] { "w", "x", "y", "z" }) {
+            instModel.getProgramVariableDeclarations()
+                    .add(new ProgramVariableDeclaration("int", newPV));
+        }
+
+        instModel.addFunctionInstantiation(new FunctionInstantiation(
+                instModel.getAbstractLocationSets().stream()
+                        .filter(decl -> decl.getFuncName().equals("frameA")).findAny().get(),
+                "union(singletonPV(PV(x)), union(singletonPV(PV(y)), singletonPV(PV(z))))"));
+
+        instModel.addFunctionInstantiation(new FunctionInstantiation(
+                instModel.getAbstractLocationSets().stream()
+                        .filter(decl -> decl.getFuncName().equals("footprintA")).findAny().get(),
+                "union(singletonPV(PV(y)), singletonPV(PV(w)))"));
+
         instModel.addApeInstantiation(new APEInstantiation(19, "x = y++; z = w;"));
 
         final InstantiationChecker checker = new InstantiationChecker(instModel);
-        checker.proveFrameInsts();
+        final List<ProofResult> frameProofResults = checker.proveFrameInsts();
+
+        if (frameProofResults.stream().noneMatch(r -> !r.isSuccess())) {
+            System.out.println("Success: Frame condition proven.");
+            System.out.println("Proof Files:");
+            frameProofResults.stream().map(ProofResult::getProofPath).map(Path::toString)
+                    .forEach(System.out::println);
+        } else {
+            System.out.println("Failed Proofs:");
+            frameProofResults.stream().filter(r -> !r.isSuccess()).map(ProofResult::getProofPath)
+                    .map(Path::toString).forEach(System.out::println);
+        }
     }
 }
