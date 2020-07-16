@@ -12,6 +12,7 @@
 //
 package de.uka.ilkd.key.abstractexecution.refinity.keybridge;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -19,11 +20,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
@@ -129,10 +132,57 @@ public class InstantiationChecker {
 
         keyProveFrameScaffold = IOUtil.readFrom(keyFrameProblemIS);
     }
-    
+
     ////////////// Public Static Functions ////////////// 
-    
+
     ////////////// Public Member Functions //////////////
+
+    public ProofResult proveInstantiation(final boolean printOutput) {
+        this.printOutput = printOutput;
+        /* non-final */ ProofResult result = ProofResult.EMPTY;
+
+        ///////// Frame Condition
+        println("Proving Frame Condition(s)...");
+
+        final ProofResult frameProofResults = proveFrameInsts();
+
+        if (printOutput) {
+            if (frameProofResults.isSuccess()) {
+                println("Success.");
+            } else {
+                println("Could not prove frame condition(s).");
+                println("Failed proof(s):");
+                frameProofResults.getProofs().stream().filter(p -> !p.closed())
+                        .map(Proof::getProofFile).map(File::toString).forEach(this::println);
+            }
+        }
+
+        result = result.merge(frameProofResults);
+
+        ///////// Has-To?
+
+        ///////// Footprint Specification
+
+        ///////// Termination
+
+        ///////// Normal Completion Spec
+
+        ///////// Completion Due to Return Spec
+
+        ///////// Completion Due to Thrown Exception Spec
+
+        ///////// Completion Due to Break Spec
+
+        ///////// Completion Due to Continue Spec
+
+        ///////// NOTE (DS, 2020-07-16): Labeled continue / break omitted, spec case not yet supported.
+        
+        ///////// Constraints (assumptions) satisfied
+        
+        ///////// Consistent instantiations of APEs w/ same IDs
+
+        return result;
+    }
 
     /**
      * Returns a list of APEs from the {@link AEInstantiationModel}.
@@ -187,8 +237,35 @@ public class InstantiationChecker {
         assert !proof.closed();
         return proof;
     }
-    
+
     ////////////// Private Member Functions //////////////
+
+    /**
+     * Proves the frame conditions for all instantiated APEs.
+     * 
+     * @return The proof result.
+     */
+    private ProofResult proveFrameInsts() {
+        return model.getApeInstantiations().stream().map(this::proveFrameInst)
+                .collect(ProofResult.REDUCER);
+    }
+
+    /**
+     * Attempts to prove that the given instantiation satisfies the frame condition
+     * of the APE to instantiate.
+     * 
+     * @param inst The {@link APEInstantiation}
+     * @return A {@link ProofResult} for the frame problem.
+     */
+    private ProofResult proveFrameInst(APEInstantiation inst) {
+        final String keyFileContent = createProveFrameKeYFile(inst);
+        final String javaFileContent = createJavaFile(inst.getInstantiation());
+
+        final Proof proof = //
+                KeyBridgeUtils.createProofAndRun(keyFileContent, javaFileContent, 10000);
+
+        return new ProofResult(proof.closed(), proof);
+    }
 
     /**
      * Returns a list of APEs from the {@link AEInstantiationModel}.
@@ -229,33 +306,6 @@ public class InstantiationChecker {
         }
 
         return new RetrieveProgramResult(javaBlock.program(), proof);
-    }
-
-    /**
-     * Proves the frame conditions for all instantiated APEs.
-     * 
-     * @return The proof result.
-     */
-    private List<ProofResult> proveFrameInsts() {
-        return model.getApeInstantiations().stream().map(this::proveFrameInst)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Attempts to prove that the given instantiation satisfies the frame condition
-     * of the APE to instantiate.
-     * 
-     * @param inst The {@link APEInstantiation}
-     * @return A {@link ProofResult} for the frame problem.
-     */
-    private ProofResult proveFrameInst(APEInstantiation inst) {
-        final String keyFileContent = createProveFrameKeYFile(inst);
-        final String javaFileContent = createJavaFile(inst.getInstantiation());
-
-        final Proof proof = //
-                KeyBridgeUtils.createProofAndRun(keyFileContent, javaFileContent, 10000);
-
-        return new ProofResult(proof.closed(), proof.getProofFile().toPath(), proof);
     }
 
     private String createProveFrameKeYFile(APEInstantiation inst) {
@@ -467,6 +517,20 @@ public class InstantiationChecker {
         model.fillNamespacesFromModel(services);
     }
 
+    private boolean printOutput = true;
+
+    /**
+     * Prints the given string to System.out (w/ newline) if the field
+     * {@link #printOutput} is set to true.
+     * 
+     * @param str The string to (conditionally) print.
+     */
+    private void println(final String str) {
+        if (printOutput) {
+            System.out.println(str);
+        }
+    }
+
     ////////////// Private Static Functions //////////////
 
     private static class CollectAPEVisitor extends JavaASTVisitor {
@@ -515,7 +579,7 @@ public class InstantiationChecker {
         //        warnings = warnings.union(preParser.getWarnings());
         return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
     }
-    
+
     ////////////// Inner Classes //////////////
 
     public static class APERetrievalResult {
@@ -574,26 +638,42 @@ public class InstantiationChecker {
     }
 
     public static class ProofResult {
-        private final boolean success;
-        private final Proof proof;
-        private final Path proofPath;
+        public static final ProofResult EMPTY = new ProofResult(true, Collections.emptyList());
+        public static final Collector<ProofResult, ?, ProofResult> REDUCER = Collectors
+                .reducing(EMPTY, (r1, r2) -> r1.merge(r2));
 
-        public ProofResult(boolean success, Path proofPath, Proof proof) {
+        private final boolean success;
+        private final List<Proof> proofs;
+
+        public ProofResult(boolean success, Proof proof) {
             this.success = success;
-            this.proof = proof;
-            this.proofPath = proofPath;
+            this.proofs = new ArrayList<>();
+            this.proofs.add(proof);
+        }
+
+        public ProofResult(boolean success, List<Proof> proofs) {
+            this.success = success;
+            this.proofs = proofs;
         }
 
         public Proof getProof() {
-            return proof;
+            return proofs.get(0);
+        }
+
+        public List<Proof> getProofs() {
+            return proofs;
+        }
+
+        public ProofResult merge(ProofResult other) {
+            final boolean success = this.success && other.success;
+            final List<Proof> proofs = new ArrayList<>();
+            proofs.addAll(this.proofs);
+            proofs.addAll(other.proofs);
+            return new ProofResult(success, proofs);
         }
 
         public boolean isSuccess() {
             return success;
-        }
-
-        public Path getProofPath() {
-            return proofPath;
         }
     }
 
@@ -655,17 +735,6 @@ public class InstantiationChecker {
         instModel.addApeInstantiation(new APEInstantiation(19, "x = y++; z = w;"));
 
         final InstantiationChecker checker = new InstantiationChecker(instModel);
-        final List<ProofResult> frameProofResults = checker.proveFrameInsts();
-
-        if (frameProofResults.stream().noneMatch(r -> !r.isSuccess())) {
-            System.out.println("Success: Frame condition proven.");
-            System.out.println("Proof Files:");
-            frameProofResults.stream().map(ProofResult::getProofPath).map(Path::toString)
-                    .forEach(System.out::println);
-        } else {
-            System.out.println("Failed Proofs:");
-            frameProofResults.stream().filter(r -> !r.isSuccess()).map(ProofResult::getProofPath)
-                    .map(Path::toString).forEach(System.out::println);
-        }
+        checker.proveInstantiation(true);
     }
 }
