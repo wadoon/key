@@ -5,6 +5,10 @@
   @   \disjoint(frameA, footprintB) &amp;&amp;
   @   \disjoint(frameB, footprintA) &amp;&amp;
   @
+  @   \disjoint(frameB, hasToFrameB) &amp;&amp;
+  @   \disjoint(frameA, hasToFrameB) &amp;&amp;
+  @   \disjoint(footprintA, hasToFrameB) &amp;&amp;
+  @
   @   \mutex(returnsA(\value(footprintA)), returnsB(\value(footprintB))) &amp;&amp;
   @   \mutex(returnsA(\value(footprintA)), throwsExcB(\value(footprintB))) &amp;&amp;
   @   \mutex(throwsExcA(\value(footprintA)), throwsExcB(\value(footprintB))) &amp;&amp;
@@ -20,7 +24,7 @@
 //@ return_behavior requires returnsA(\value(footprintA));
 \abstract_statement A;
 
-//@ assignable frameB;
+//@ assignable frameB, \hasTo(hasToFrameB);
 //@ accessible footprintB;
 //@ exceptional_behavior requires throwsExcB(\value(footprintB));
 //@ return_behavior requires returnsB(\value(footprintB));
@@ -43,6 +47,11 @@
             <resultSortName>LocSet</resultSortName>
         </locationSet>
         <locationSet funcName="frameB">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
+        <locationSet funcName="hasToFrameB">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
             <resultSortName>LocSet</resultSortName>
@@ -116,12 +125,36 @@
             </declaration>
             <instantiation>union(singletonPV(PV(y)), singletonPV(PV(w)))</instantiation>
         </functionInst>
+        <functionInst>
+            <declaration funcName="frameB">
+                <relevantOne>-1</relevantOne>
+                <relevantTwo>-1</relevantTwo>
+                <resultSortName>LocSet</resultSortName>
+            </declaration>
+            <instantiation>empty</instantiation>
+        </functionInst>
+        <functionInst>
+            <declaration funcName="hasToFrameB">
+                <relevantOne>-1</relevantOne>
+                <relevantTwo>-1</relevantTwo>
+                <resultSortName>LocSet</resultSortName>
+            </declaration>
+            <instantiation>singletonPV(PV(a))</instantiation>
+        </functionInst>
+        <functionInst>
+            <declaration funcName="footprintB">
+                <relevantOne>-1</relevantOne>
+                <relevantTwo>-1</relevantTwo>
+                <resultSortName>LocSet</resultSortName>
+            </declaration>
+            <instantiation>union(singletonPV(PV(b)), union(singletonPV(PV(d)), singletonPV(PV(a))))</instantiation>
+        </functionInst>
     </functionInstantiations>
     <apeInstantiations>
-        <apeInst apeLineNumber="19">
+        <apeInst apeLineNumber="23">
             <instantiation>x = y++; z = w;</instantiation>
         </apeInst>
-        <apeInst apeLineNumber="25">
+        <apeInst apeLineNumber="29">
             <instantiation>a = b + 17; int c = 2*d+a;</instantiation>
         </apeInst>
     </apeInstantiations>

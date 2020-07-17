@@ -17,11 +17,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -211,7 +213,7 @@ public class AEInstantiationModel {
     public void setPredicateInstantiations(List<PredicateInstantiation> predicateInstantiations) {
         this.predicateInstantiations = predicateInstantiations;
     }
-    
+
     public void addPredicateInstantiation(PredicateInstantiation predicateInstantiation) {
         getPredicateInstantiations().add(predicateInstantiation);
     }
@@ -223,7 +225,7 @@ public class AEInstantiationModel {
     public void setFunctionInstantiations(List<FunctionInstantiation> functionInstantiations) {
         this.functionInstantiations = functionInstantiations;
     }
-    
+
     public void addFunctionInstantiation(FunctionInstantiation functionInstantiation) {
         this.functionInstantiations = new ArrayList<>(getFunctionInstantiations());
         this.functionInstantiations.add(functionInstantiation);
@@ -281,6 +283,20 @@ public class AEInstantiationModel {
         jaxbUnmarshaller.setSchema(schema);
 
         return (AEInstantiationModel) jaxbUnmarshaller.unmarshal(new StringReader(xml));
+    }
+
+    /**
+     * Reads an {@link AEInstantiationModel} form the given path.
+     * 
+     * @param path The path from which to read.
+     * @return The parsed {@link AEInstantiationModel}.
+     * @throws JAXBException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public static AEInstantiationModel fromPath(final Path path)
+            throws JAXBException, SAXException, IOException {
+        return fromXml(Files.readAllLines(path).stream().collect(Collectors.joining("\n")));
     }
 
     /**

@@ -46,9 +46,12 @@ import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.JMLTranslator;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -449,12 +452,30 @@ public class KeyBridgeUtils {
     /**
      * @param proof The proof to run.
      * @param maxRuleApps The maximum number of rule applications to apply.
+     * @throws ProofInputException
      */
-    public static void runProof(final Proof proof, int maxRuleApps) {
+    public static Proof prove(final Term t, final String header, final int maxRuleApps,
+            final Services services) throws ProofInputException {
+        final InitConfig initConfig = services.getProof().getInitConfig()
+                .copyWithServices(services.copy(false));
+        final Proof proof = new Proof( //
+                "AE Instantiation Checking Side Proof", t, header, initConfig);
+        runProof(proof, maxRuleApps);
+        return proof;
+
+    }
+
+    /**
+     * @param proof The proof to run.
+     * @param maxRuleApps The maximum number of rule applications to apply.
+     * @return The final result of the strategy application.
+     */
+    public static ApplyStrategyInfo runProof(final Proof proof, int maxRuleApps) {
         final ProofStarter starter = new ProofStarter(false);
         starter.init(proof);
         starter.setMaxRuleApplications(maxRuleApps);
-        starter.start();
+        final ApplyStrategyInfo info = starter.start();
+        return info;
     }
 
     /**

@@ -15,7 +15,6 @@ package de.uka.ilkd.key.abstractexecution.refinity.keybridge;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -48,7 +47,6 @@ import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstanti
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.APEInstantiation;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.FunctionInstantiation;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.PredicateInstantiation;
-import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
 import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Position;
@@ -65,6 +63,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -82,6 +81,7 @@ public class InstantiationChecker {
     private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/Problem.java";
 
     private static final String APE_RETRIEVAL_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/programRetrievalProblem.key";
+    private static final String KEY_HEADER_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/header.key";
 
     private static final String FRAME_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/frameProblem.key";
 
@@ -103,6 +103,7 @@ public class InstantiationChecker {
     private final String javaScaffold;
 
     private final String keyRetrieveAPEsScaffold;
+    private final String keyHeaderScaffold;
 
     private final String keyProveFrameScaffold;
 
@@ -129,12 +130,15 @@ public class InstantiationChecker {
                 .getResourceAsStream(JAVA_PROBLEM_FILE_SCAFFOLD);
         final InputStream keyScaffoldIS = RelationalProofBundleConverter.class
                 .getResourceAsStream(APE_RETRIEVAL_PROBLEM_FILE_SCAFFOLD);
-        if (javaScaffoldIS == null || keyScaffoldIS == null) {
+        final InputStream keyHeaderScaffoldIS = RelationalProofBundleConverter.class
+                .getResourceAsStream(KEY_HEADER_SCAFFOLD);
+        if (javaScaffoldIS == null || keyScaffoldIS == null || keyHeaderScaffoldIS == null) {
             throw new IllegalStateException("Could not load required resource files.");
         }
 
         javaScaffold = IOUtil.readFrom(javaScaffoldIS);
         keyRetrieveAPEsScaffold = IOUtil.readFrom(keyScaffoldIS);
+        keyHeaderScaffold = IOUtil.readFrom(keyHeaderScaffoldIS);
 
         final InputStream keyFrameProblemIS = RelationalProofBundleConverter.class
                 .getResourceAsStream(FRAME_PROBLEM_FILE_SCAFFOLD);
@@ -158,7 +162,7 @@ public class InstantiationChecker {
         {
             println("Proving Frame Condition(s)...");
             final ProofResult frameProofResults = proveFrameInsts();
-            printIndividualProofResultStats(frameProofResults);
+            printIndividualProofResultStats(frameProofResults, "frame condition(s)");
             result = result.merge(frameProofResults);
         }
 
@@ -167,7 +171,7 @@ public class InstantiationChecker {
         {
             println("Proving hasTo Condition(s)...");
             final ProofResult hasToProofResults = proveHasToInsts();
-            printIndividualProofResultStats(hasToProofResults);
+            printIndividualProofResultStats(hasToProofResults, "hasTo condition(s)");
             result = result.merge(hasToProofResults);
         }
 
@@ -254,12 +258,13 @@ public class InstantiationChecker {
 
     ////////////// Private Member Functions //////////////
 
-    private void printIndividualProofResultStats(final ProofResult proofResult) {
+    private void printIndividualProofResultStats(final ProofResult proofResult,
+            String proofObjective) {
         if (printOutput) {
             if (proofResult.isSuccess()) {
                 println("Success.");
             } else {
-                println("Could not prove frame condition(s).");
+                println("Could not prove " + proofObjective + ".");
                 println("Failed proof(s):");
                 proofResult.getProofs().stream().filter(p -> !p.closed()).map(Proof::getProofFile)
                         .map(File::toString).forEach(this::println);
@@ -295,14 +300,16 @@ public class InstantiationChecker {
      * @return A {@link ProofResult} for the frame problem.
      */
     private ProofResult proveHasToInst(APEInstantiation inst) {
-        final TermBuilder tb = services.getTermBuilder();
-        final Collector<Term, ?, Term> unionReducer = Collectors.reducing(tb.empty(),
-                (ls1, ls2) -> tb.union(ls1, ls2));
-
         final RetrieveProgramResult retrProgRes = //
                 retrieveProgram(inst.getInstantiation());
 
+        final TermBuilder tb = retrProgRes.getServices().getTermBuilder();
+
+        final Collector<Term, ?, Term> unionReducer = Collectors.reducing(tb.empty(),
+                (ls1, ls2) -> tb.union(ls1, ls2));
+
         final GoalLocalSpecificationRepository localSpecRepo = retrProgRes.getLocalSpecRepo();
+
         final ImmutableSet<ProgramVariable> outVars = MiscTools
                 .getLocalOuts(retrProgRes.getProgram(), localSpecRepo, retrProgRes.getServices());
 
@@ -314,7 +321,8 @@ public class InstantiationChecker {
                 .map(tb::singletonPV).collect(unionReducer);
 
         final Set<AbstractUpdateLoc> hasToLocs = AbstractUpdateFactory
-                .abstrUpdateLocsFromUnionTerm(getAssignableTerm(inst), Optional.empty(), services)
+                .abstrUpdateLocsFromUnionTerm(getAssignableTerm(inst, retrProgRes.getServices()),
+                        Optional.empty(), retrProgRes.getServices())
                 .stream().filter(HasToLoc.class::isInstance).map(HasToLoc.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
@@ -322,14 +330,14 @@ public class InstantiationChecker {
             return ProofResult.EMPTY;
         }
 
-        final Term hasToLocsTerm = hasToLocs.stream().map(loc -> loc.toTerm(services))
-                .collect(unionReducer);
+        final Term hasToLocsTerm = hasToLocs.stream()
+                .map(loc -> loc.toTerm(retrProgRes.getServices())).collect(unionReducer);
 
         final Term assumptionTerm;
         {
             try {
                 assumptionTerm = KeyBridgeUtils.parseTerm(//
-                        createSymInsts(), localSpecRepo, services);
+                        createSymInsts(), localSpecRepo, retrProgRes.getServices());
             } catch (RecognitionException re) {
                 throw new InvalidSyntaxException(re.getMessage(), re.getCause());
             }
@@ -337,13 +345,19 @@ public class InstantiationChecker {
 
         final Term proofTerm = tb.imp(assumptionTerm, tb.subset(hasToLocsTerm, writtenVarsTerm));
 
-        final Proof proof = new Proof("HasTo_Proof", proofTerm, keyFileHeader(inst),
-                services.getProof().getInitConfig());
-
-        KeyBridgeUtils.runProof(proof, 10000);
+        Proof proof;
+        try {
+            proof = KeyBridgeUtils.prove(proofTerm, keyFileHeader(inst), 10000,
+                    retrProgRes.getServices());
+        } catch (ProofInputException e) {
+            throw new InvalidSyntaxException("Problems while proving hasTo condition", e);
+        }
 
         try {
-            proof.saveToFile(KeyBridgeUtils.createTmpDir().resolve("hasToProof.proof").toFile());
+            final File file = KeyBridgeUtils.createTmpDir().resolve("hasToProof.proof").toFile();
+            proof.setProofFile(null);
+            proof.saveToFile(file);
+            proof.setProofFile(file);
         } catch (IOException e) {
             throw new RuntimeException("Could not save KeY proof", e);
         }
@@ -511,57 +525,6 @@ public class InstantiationChecker {
     }
 
     /**
-     * Returns a header for a KeY proof, including declarations of variables in the
-     * instantiation.
-     * 
-     * @param inst The instantiation (for declaring free variables).
-     * @return The header.
-     */
-    private String keyFileHeader(final APEInstantiation inst) {
-        final LinkedHashSet<LocationVariable> instProgVars;
-
-        {
-            final RetrieveProgramResult retrProgRes = retrieveProgram(inst.getInstantiation());
-            final ProgramVariableCollector progVarCol = new ProgramVariableCollector(
-                    retrProgRes.getProgram(), retrProgRes.getLocalSpecRepo(),
-                    retrProgRes.getServices());
-            progVarCol.start();
-
-            final List<String> ignPVs = Arrays
-                    .asList(new String[] { "_result", "_exc", "_objUnderTest" });
-
-            instProgVars = progVarCol.result().stream()
-                    .filter(lv -> !ignPVs.contains(lv.name().toString()))
-                    .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-        }
-
-        //////////
-
-        final String newVars;
-
-        {
-            final String newInstVars = instProgVars.stream()
-                    .filter(lv -> !model.getProgramVariableDeclarations().stream()
-                            .anyMatch(pvd -> pvd.getName().equals(lv.name().toString())))
-                    .map(lv -> String.format("%s %s;",
-                            lv.getKeYJavaType().getSort().name().toString(), lv.name().toString()))
-                    .collect(Collectors.joining("\n  "));
-
-            final String atPreVars = instProgVars.stream()
-                    .map(lv -> String.format("%s %s_AtPre;",
-                            lv.getKeYJavaType().getSort().name().toString(), lv.name().toString()))
-                    .collect(Collectors.joining("\n  "));
-
-            newVars = "\n  " + newInstVars + "\n  " + atPreVars;
-        }
-
-        return keyProveFrameScaffold
-                .replaceAll(FUNCTIONS, Matcher.quoteReplacement(createFuncDecls()))
-                .replaceAll(PREDICATES, Matcher.quoteReplacement(createPredDecls())).replaceAll(
-                        PROGRAMVARIABLES, Matcher.quoteReplacement(createProgvarDecls() + newVars));
-    }
-
-    /**
      * Returns a String representation of the assignable term of the given
      * {@link APEInstantiation}.
      * 
@@ -571,22 +534,31 @@ public class InstantiationChecker {
      */
     private String getAssignableTermString(APEInstantiation inst)
             throws UnsuccessfulAPERetrievalException {
-        return LogicPrinter.quickPrintTerm(getAssignableTerm(inst), services, false, false);
+        return LogicPrinter.quickPrintTerm(getAssignableTerm(inst, services), services, false,
+                false);
     }
 
     /**
      * Returns the assignable term of the given {@link APEInstantiation}.
      * 
      * @param inst
+     * @param services TODO
      * @return
      * @throws UnsuccessfulAPERetrievalException
      */
-    private Term getAssignableTerm(APEInstantiation inst) throws UnsuccessfulAPERetrievalException {
-        final String jmlAssignableTerm = getAssignableTerm(retrieveAPEs().stream()
+    private Term getAssignableTerm(final APEInstantiation inst, Services services)
+            throws UnsuccessfulAPERetrievalException {
+        final String jmlAssignableTermList = getAssignableTerm(retrieveAPEs().stream()
                 .filter(r -> r.getLine() == inst.getApeLineNumber()).findFirst()
                 .orElseThrow(() -> new UnsuccessfulAPERetrievalException(
                         "Expected to find APE with line no. " + inst.getApeLineNumber()
                                 + ", but did not.")));
+
+        // Translate comma-separated list into \set_union term
+        final String jmlAssignableTerm = Arrays.stream(jmlAssignableTermList.split(","))
+                .map(String::trim).collect(Collectors.reducing("\\empty",
+                        (a1, a2) -> String.format("\\set_union(%s, %s)", a1, a2)));
+
         return KeyBridgeUtils.jmlStringToJavaDLTerm( //
                 jmlAssignableTerm, KeyBridgeUtils.dummyKJT(), services);
     }
@@ -708,6 +680,56 @@ public class InstantiationChecker {
         }
     }
 
+    /**
+     * Returns a header for a KeY proof, including declarations of variables in the
+     * instantiation.
+     * 
+     * @param inst The instantiation (for declaring free variables).
+     * @return The header.
+     */
+    private String keyFileHeader(final APEInstantiation inst) {
+        final LinkedHashSet<LocationVariable> instProgVars;
+
+        {
+            final RetrieveProgramResult retrProgRes = retrieveProgram(inst.getInstantiation());
+            final ProgramVariableCollector progVarCol = new ProgramVariableCollector(
+                    retrProgRes.getProgram(), retrProgRes.getLocalSpecRepo(),
+                    retrProgRes.getServices());
+            progVarCol.start();
+
+            final List<String> ignPVs = Arrays
+                    .asList(new String[] { "_result", "_exc", "_objUnderTest" });
+
+            instProgVars = progVarCol.result().stream()
+                    .filter(lv -> !ignPVs.contains(lv.name().toString()))
+                    .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+        }
+
+        //////////
+
+        final String newVars;
+
+        {
+            final String newInstVars = instProgVars.stream()
+                    .filter(lv -> !model.getProgramVariableDeclarations().stream()
+                            .anyMatch(pvd -> pvd.getName().equals(lv.name().toString())))
+                    .map(lv -> String.format("%s %s;",
+                            lv.getKeYJavaType().getSort().name().toString(), lv.name().toString()))
+                    .collect(Collectors.joining("\n  "));
+
+            final String atPreVars = instProgVars.stream()
+                    .map(lv -> String.format("%s %s_AtPre;",
+                            lv.getKeYJavaType().getSort().name().toString(), lv.name().toString()))
+                    .collect(Collectors.joining("\n  "));
+
+            newVars = "\n  " + newInstVars + "\n  " + atPreVars;
+        }
+
+        return keyHeaderScaffold.replaceAll(FUNCTIONS, Matcher.quoteReplacement(createFuncDecls()))
+                .replaceAll(PREDICATES, Matcher.quoteReplacement(createPredDecls())).replaceAll(
+                        PROGRAMVARIABLES, Matcher.quoteReplacement(createProgvarDecls() + newVars));
+    }
+
     ////////////// Private Static Functions //////////////
 
     private static class CollectAPEVisitor extends JavaASTVisitor {
@@ -789,38 +811,39 @@ public class InstantiationChecker {
 
     public static void main(String[] args) throws JAXBException, SAXException, IOException,
             ProblemLoaderException, SLTranslationException {
-        final Path testFile = Paths.get(
-                "/home/dscheurer/key-workspace/GIT/key/key/key.ui/examples/abstract_execution/SlideStatements/Correct/slideStatements.aer");
-        final AERelationalModel relModel = //
-                AERelationalModel.fromXml(
-                        Files.readAllLines(testFile).stream().collect(Collectors.joining("\n")));
+//        final Path testFile = Paths.get(
+//                "/home/dscheurer/key-workspace/GIT/key/key/key.ui/examples/abstract_execution/SlideStatements/Correct/slideStatements.aer");
+//        final AERelationalModel relModel = //
+//                AERelationalModel.fromXml(
+//                        Files.readAllLines(testFile).stream().collect(Collectors.joining("\n")));
+//
+//        // There are ASs at lines 19 and 25
+//        final AEInstantiationModel instModel = //
+//                AEInstantiationModel.fromRelationalModel(relModel, true);
+//
+//        for (final String newPV : new String[] { "a", "b", "d", "w", "x", "y", "z" }) {
+//            instModel.getProgramVariableDeclarations()
+//                    .add(new ProgramVariableDeclaration("int", newPV));
+//        }
+//
+//        instModel.addFunctionInstantiation(new FunctionInstantiation(
+//                instModel.getAbstractLocationSets().stream()
+//                        .filter(decl -> decl.getFuncName().equals("frameA")).findAny().get(),
+//                "union(singletonPV(PV(x)), union(singletonPV(PV(y)), singletonPV(PV(z))))"));
+//
+//        instModel.addFunctionInstantiation(new FunctionInstantiation(
+//                instModel.getAbstractLocationSets().stream()
+//                        .filter(decl -> decl.getFuncName().equals("footprintA")).findAny().get(),
+//                "union(singletonPV(PV(y)), singletonPV(PV(w)))"));
+//
+//        instModel.addApeInstantiation(new APEInstantiation(19, "x = y++; z = w;"));
+//        instModel.addApeInstantiation(new APEInstantiation(25, "a = b + 17; int c = 2*d+a;"));
 
-        // There are ASs at lines 19 and 25
-        final AEInstantiationModel instModel = //
-                AEInstantiationModel.fromRelationalModel(relModel, true);
+        final Path testFile = Paths.get("/home/dscheurer/key-workspace/GIT/key/key/key.ui/examples/"
+                + "abstract_execution/instantiation_checking/SlideStatements/slideStatementsInstP1.aei");
+        final AEInstantiationModel instModel = AEInstantiationModel.fromPath(testFile);
 
-        for (final String newPV : new String[] { "a", "b", "d", "w", "x", "y", "z" }) {
-            instModel.getProgramVariableDeclarations()
-                    .add(new ProgramVariableDeclaration("int", newPV));
-        }
-
-        instModel.addFunctionInstantiation(new FunctionInstantiation(
-                instModel.getAbstractLocationSets().stream()
-                        .filter(decl -> decl.getFuncName().equals("frameA")).findAny().get(),
-                "union(singletonPV(PV(x)), union(singletonPV(PV(y)), singletonPV(PV(z))))"));
-
-        instModel.addFunctionInstantiation(new FunctionInstantiation(
-                instModel.getAbstractLocationSets().stream()
-                        .filter(decl -> decl.getFuncName().equals("footprintA")).findAny().get(),
-                "union(singletonPV(PV(y)), singletonPV(PV(w)))"));
-
-        instModel.addApeInstantiation(new APEInstantiation(19, "x = y++; z = w;"));
-        instModel.addApeInstantiation(new APEInstantiation(25, "a = b + 17; int c = 2*d+a;"));
-        
-        instModel.saveToFile(Paths.get(
-                "/home/dscheurer/key-workspace/GIT/key/key/key.ui/examples/abstract_execution/instantiation_checking/SlideStatements/slideStatementsInstP1.aei").toFile());
-
-//        final InstantiationChecker checker = new InstantiationChecker(instModel);
-//        checker.proveInstantiation(true);
+        final InstantiationChecker checker = new InstantiationChecker(instModel);
+        checker.proveInstantiation(true);
     }
 }
