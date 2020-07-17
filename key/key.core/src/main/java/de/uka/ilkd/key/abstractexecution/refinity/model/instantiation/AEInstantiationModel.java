@@ -260,6 +260,11 @@ public class AEInstantiationModel {
         return new String(stream.toByteArray());
     }
 
+    public void saveToFile(File file) throws IOException, JAXBException {
+        Files.write(file.toPath(), toXml().getBytes());
+        setFile(file);
+    }
+
     /**
      * Parses an {@link AEInstantiationModel} from the given XML string.
      * 

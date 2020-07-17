@@ -799,7 +799,7 @@ public class InstantiationChecker {
         final AEInstantiationModel instModel = //
                 AEInstantiationModel.fromRelationalModel(relModel, true);
 
-        for (final String newPV : new String[] { "w", "x", "y", "z" }) {
+        for (final String newPV : new String[] { "a", "b", "d", "w", "x", "y", "z" }) {
             instModel.getProgramVariableDeclarations()
                     .add(new ProgramVariableDeclaration("int", newPV));
         }
@@ -815,8 +815,12 @@ public class InstantiationChecker {
                 "union(singletonPV(PV(y)), singletonPV(PV(w)))"));
 
         instModel.addApeInstantiation(new APEInstantiation(19, "x = y++; z = w;"));
+        instModel.addApeInstantiation(new APEInstantiation(25, "a = b + 17; int c = 2*d+a;"));
+        
+        instModel.saveToFile(Paths.get(
+                "/home/dscheurer/key-workspace/GIT/key/key/key.ui/examples/abstract_execution/instantiation_checking/SlideStatements/slideStatementsInstP1.aei").toFile());
 
-        final InstantiationChecker checker = new InstantiationChecker(instModel);
-        checker.proveInstantiation(true);
+//        final InstantiationChecker checker = new InstantiationChecker(instModel);
+//        checker.proveInstantiation(true);
     }
 }

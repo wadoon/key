@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2010 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2019 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -252,13 +252,18 @@ public class AERelationalModel {
         return new String(stream.toByteArray());
     }
 
+    public void saveToFile(File file) throws IOException, JAXBException {
+        Files.write(file.toPath(), toXml().getBytes());
+        setFile(file);
+    }
+
     /**
      * Parses an {@link AERelationalModel} from the given XML string.
      * 
      * @param xml The XML code.
      * @return The {@link AERelationalModel}.
      * @throws JAXBException If a problem occurred while unmarshalling.
-     * @throws SAXException  If there is a validation error (XSD format not met).
+     * @throws SAXException If there is a validation error (XSD format not met).
      */
     public static AERelationalModel fromXml(String xml) throws JAXBException, SAXException {
         final JAXBContext jaxbContext = JAXBContext.newInstance(AERelationalModel.class);
@@ -277,7 +282,7 @@ public class AERelationalModel {
      * 
      * @param file The file to check.
      * @return An {@link AERelationalModel} iff the file could be verified to be an
-     *         {@link AERelationalModel} file, otherwise an empty {@link Optional}.
+     * {@link AERelationalModel} file, otherwise an empty {@link Optional}.
      */
     public static Optional<AERelationalModel> isRelationalModelFile(File file) {
         if (!fileHasAEModelEnding(file)) {
