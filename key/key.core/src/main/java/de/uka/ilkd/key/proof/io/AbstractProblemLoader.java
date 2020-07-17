@@ -29,7 +29,7 @@ import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.RelationalProofBundleConverter;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.relational.RelationalProofBundleConverter;
 import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;

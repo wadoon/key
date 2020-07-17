@@ -14,6 +14,7 @@ package de.uka.ilkd.key.abstractexecution.refinity.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -28,14 +29,15 @@ import java.util.stream.Collectors;
 
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.java.IOUtil;
 
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.InstantiationChecker;
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.UnsuccessfulAPERetrievalException;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.InstantiationAspectProverHelper;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.relational.RelationalProofBundleConverter;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
-import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -357,7 +359,8 @@ public class KeyBridgeUtils {
     public static Optional<Triple<String, Integer, Integer>> getFirstKeYJMLParserErrorMessage(
             final AEInstantiationModel model) {
         try {
-            new InstantiationChecker(model).createRetrievalProof(0, model.getProgram());
+            InstantiationAspectProverHelper.INSTANCE.createRetrievalProof(model, 0,
+                    model.getProgram());
         } catch (UnsuccessfulAPERetrievalException exc) {
             if (exc.getCause() instanceof ModelException) {
                 final ModelException mexc = (ModelException) exc.getCause();
@@ -376,8 +379,6 @@ public class KeyBridgeUtils {
                 return Optional.of(new Triple<>(slte.getMessage(), slte.getPosition().getLine() - 3,
                         slte.getPosition().getColumn() - 8));
             }
-        } catch (IOException e) {
-            // Some problem occurred... never mind, only for syntax checking
         }
 
         return Optional.empty();
@@ -492,23 +493,18 @@ public class KeyBridgeUtils {
         return tmpDir;
     }
 
-    /**
-     * Returns a list of APEs from either the first or second program of an
-     * {@link AERelationalModel}.
-     * 
-     * @param relModel The {@link AERelationalModel} from which to return the APEs.
-     * @param firstProgram True iff APEs should be retrieved from the first program.
-     * @return A list of APEs.
-     * @throws UnsuccessfulAPERetrievalException if something went wrong.
-     */
-    public static List<InstantiationChecker.APERetrievalResult> retrieveAPEs(
-            final AERelationalModel relModel, boolean firstProgram) {
+    public static String readResource(final String path) {
+        final String message = "Could not load required resource files.";
+        final InputStream result = RelationalProofBundleConverter.class.getResourceAsStream(path);
+
+        if (result == null) {
+            throw new IllegalStateException(message);
+        }
+
         try {
-            return new InstantiationChecker(
-                    AEInstantiationModel.fromRelationalModel(relModel, firstProgram))
-                            .retrieveAPEs();
+            return IOUtil.readFrom(result);
         } catch (IOException e) {
-            throw new UnsuccessfulAPERetrievalException(e);
+            throw new IllegalStateException(message, e);
         }
     }
 

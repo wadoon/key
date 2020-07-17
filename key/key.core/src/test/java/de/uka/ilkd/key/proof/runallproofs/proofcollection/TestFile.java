@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.RelationalProofBundleConverter;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.relational.RelationalProofBundleConverter;
 import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
