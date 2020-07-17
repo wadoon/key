@@ -112,6 +112,14 @@ public class InstantiationChecker {
 
     private final AEInstantiationModel model;
 
+    /**
+     * A "dummy" {@link Services} object with no associated proof, but with
+     * namespaces populated according to the definitions in the instantiation model.
+     * USE WITH CAUTION! When mixing this with other services from newly parsed key
+     * files etc., it can easily lead to terms with inconsistent variable names. It
+     * should be safe when only converting logic elements to text for writing in a
+     * key file, but it shouldn't be used when compiling a {@link Term} object.
+     */
     final Services services;
 
     /** A cached list of APEs in the model to save time. */
@@ -303,7 +311,9 @@ public class InstantiationChecker {
         final RetrieveProgramResult retrProgRes = //
                 retrieveProgram(inst.getInstantiation());
 
-        final TermBuilder tb = retrProgRes.getServices().getTermBuilder();
+        final Services services = retrProgRes.getServices();
+
+        final TermBuilder tb = services.getTermBuilder();
 
         final Collector<Term, ?, Term> unionReducer = Collectors.reducing(tb.empty(),
                 (ls1, ls2) -> tb.union(ls1, ls2));
@@ -311,7 +321,7 @@ public class InstantiationChecker {
         final GoalLocalSpecificationRepository localSpecRepo = retrProgRes.getLocalSpecRepo();
 
         final ImmutableSet<ProgramVariable> outVars = MiscTools
-                .getLocalOuts(retrProgRes.getProgram(), localSpecRepo, retrProgRes.getServices());
+                .getLocalOuts(retrProgRes.getProgram(), localSpecRepo, services);
 
         if (outVars.isEmpty()) {
             return ProofResult.EMPTY;
@@ -321,8 +331,8 @@ public class InstantiationChecker {
                 .map(tb::singletonPV).collect(unionReducer);
 
         final Set<AbstractUpdateLoc> hasToLocs = AbstractUpdateFactory
-                .abstrUpdateLocsFromUnionTerm(getAssignableTerm(inst, retrProgRes.getServices()),
-                        Optional.empty(), retrProgRes.getServices())
+                .abstrUpdateLocsFromUnionTerm(getAssignableTerm(inst, services), Optional.empty(),
+                        services)
                 .stream().filter(HasToLoc.class::isInstance).map(HasToLoc.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
@@ -330,14 +340,14 @@ public class InstantiationChecker {
             return ProofResult.EMPTY;
         }
 
-        final Term hasToLocsTerm = hasToLocs.stream()
-                .map(loc -> loc.toTerm(retrProgRes.getServices())).collect(unionReducer);
+        final Term hasToLocsTerm = hasToLocs.stream().map(loc -> loc.toTerm(services))
+                .collect(unionReducer);
 
         final Term assumptionTerm;
         {
             try {
                 assumptionTerm = KeyBridgeUtils.parseTerm(//
-                        createSymInsts(), localSpecRepo, retrProgRes.getServices());
+                        createSymInsts(), localSpecRepo, services);
             } catch (RecognitionException re) {
                 throw new InvalidSyntaxException(re.getMessage(), re.getCause());
             }
@@ -347,8 +357,7 @@ public class InstantiationChecker {
 
         Proof proof;
         try {
-            proof = KeyBridgeUtils.prove(proofTerm, keyFileHeader(inst), 10000,
-                    retrProgRes.getServices());
+            proof = KeyBridgeUtils.prove(proofTerm, keyFileHeader(inst), 10000, services);
         } catch (ProofInputException e) {
             throw new InvalidSyntaxException("Problems while proving hasTo condition", e);
         }
