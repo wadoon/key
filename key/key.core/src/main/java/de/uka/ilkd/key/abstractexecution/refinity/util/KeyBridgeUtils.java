@@ -26,11 +26,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.InstantiationChecker;
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.InstantiationChecker.APERetrievalResult;
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.InstantiationChecker.UnsuccessfulAPERetrievalException;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.UnsuccessfulAPERetrievalException;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
@@ -41,10 +41,14 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
+import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.JMLTranslator;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -76,6 +80,15 @@ public class KeyBridgeUtils {
 
     /////////////// PUBLIC METHODS ///////////////
 
+    public static Term parseTerm(final String toParse,
+            final GoalLocalSpecificationRepository localSpecRepo, final Services services)
+            throws RecognitionException {
+        KeYParserF parser = new KeYParserF(ParserMode.TERM, new KeYLexerF(toParse, ""),
+                localSpecRepo, // should not be needed
+                services, services.getNamespaces());
+        return parser.term();
+    }
+
     public static KeYJavaType dummyKJT() {
         return getDummyKJTAndServices().first;
     }
@@ -84,12 +97,18 @@ public class KeyBridgeUtils {
         return getDummyKJTAndServices().second.copyPreservesLDTInformation();
     }
 
-    public static String jmlStringToJavaDL(String jmlString, final KeYJavaType dummyKJT,
+    public static String jmlStringToJavaDLString(String jmlString, final KeYJavaType dummyKJT,
+            final Services services) {
+        return LogicPrinter.quickPrintTerm(jmlStringToJavaDLTerm(jmlString, dummyKJT, services),
+                services, false, false);
+    }
+
+    public static Term jmlStringToJavaDLTerm(String jmlString, final KeYJavaType dummyKJT,
             final Services services) {
         try {
             Term parsed = KeyBridgeUtils.translateJML(jmlString, dummyKJT, services);
             parsed = KeyBridgeUtils.removeLabels(parsed, services);
-            return LogicPrinter.quickPrintTerm(parsed, services, false, false);
+            return parsed;
         } catch (Exception e) {
             throw new RuntimeException("Could not parse JML formula, message: " + e.getMessage(),
                     e);
@@ -217,7 +236,7 @@ public class KeyBridgeUtils {
 
         final String jmlPreCondRelation = //
                 preparedJMLPreCondition(unpreparedJmlPreCondition, vars, locsets, preds, funcs);
-        return jmlStringToJavaDL(jmlPreCondRelation, dummyKJT, services);
+        return jmlStringToJavaDLString(jmlPreCondRelation, dummyKJT, services);
     }
 
     /////////////// PRIVATE METHODS ///////////////
@@ -336,7 +355,7 @@ public class KeyBridgeUtils {
             final AEInstantiationModel model) {
         try {
             new InstantiationChecker(model).createRetrievalProof(0, model.getProgram());
-        } catch (InstantiationChecker.UnsuccessfulAPERetrievalException exc) {
+        } catch (UnsuccessfulAPERetrievalException exc) {
             if (exc.getCause() instanceof ModelException) {
                 final ModelException mexc = (ModelException) exc.getCause();
 
@@ -377,23 +396,16 @@ public class KeyBridgeUtils {
      * root is created), if -1, there is no bound, if > 0, this is the maximum
      * number of rules applied.
      * @return The created proof file.
-     * @throws InstantiationChecker.UnsuccessfulAPERetrievalException
+     * @throws RuntimeException
      */
     public static Proof createProofAndRun(final String keyFileContent, final String javaFileContent,
-            int maxRuleApps) throws InstantiationChecker.UnsuccessfulAPERetrievalException {
+            int maxRuleApps) throws RuntimeException {
         final String keyFileName = "problem.key";
         final String javaSrcDirName = "src";
         final String javaFileName = "Problem.java";
         final String proofFileName = "problem.proof";
 
-        Path tmpDir;
-        try {
-            tmpDir = Files.createTempDirectory("AEInstCheckerTmp_");
-        } catch (IOException e) {
-            throw new InstantiationChecker.UnsuccessfulAPERetrievalException(
-                    "Could not create temporary directory", e);
-        }
-
+        final Path tmpDir = createTmpDir();
         final Path keyFile = tmpDir.resolve(keyFileName);
         final Path javaSrcDir = tmpDir.resolve(javaSrcDirName);
 
@@ -402,8 +414,7 @@ public class KeyBridgeUtils {
             Files.createDirectory(javaSrcDir);
             Files.write(javaSrcDir.resolve(javaFileName), javaFileContent.getBytes());
         } catch (IOException e) {
-            throw new InstantiationChecker.UnsuccessfulAPERetrievalException(
-                    "Could not write KeY problem file for retrieval", e);
+            throw new RuntimeException("Could not write KeY problem file for retrieval", e);
         }
 
         KeYEnvironment<?> env;
@@ -411,8 +422,7 @@ public class KeyBridgeUtils {
             env = KeYEnvironment.load(JavaProfile.getDefaultInstance(), keyFile.toFile(),
                     Collections.emptyList(), null, Collections.emptyList(), false);
         } catch (ProblemLoaderException e) {
-            throw new InstantiationChecker.UnsuccessfulAPERetrievalException(
-                    "Could not load KeY problem",
+            throw new RuntimeException("Could not load KeY problem",
                     MiscTools.findExceptionCauseOfClass(SLTranslationException.class, e)
                             .map(Throwable.class::cast)
                             .orElse(MiscTools.findExceptionCauseOfClass(ModelException.class, e)
@@ -422,10 +432,7 @@ public class KeyBridgeUtils {
         final Proof proof = env.getLoadedProof();
 
         if (maxRuleApps != 0) {
-            final ProofStarter starter = new ProofStarter(false);
-            starter.init(proof);
-            starter.setMaxRuleApplications(maxRuleApps);
-            starter.start();
+            runProof(proof, maxRuleApps);
         }
 
         try {
@@ -433,11 +440,35 @@ public class KeyBridgeUtils {
             proof.setProofFile(proofFile);
             proof.saveToFile(proofFile);
         } catch (IOException e) {
-            throw new InstantiationChecker.UnsuccessfulAPERetrievalException("Could not save proof",
-                    e);
+            throw new RuntimeException("Could not save proof", e);
         }
 
         return proof;
+    }
+
+    /**
+     * @param proof The proof to run.
+     * @param maxRuleApps The maximum number of rule applications to apply.
+     */
+    public static void runProof(final Proof proof, int maxRuleApps) {
+        final ProofStarter starter = new ProofStarter(false);
+        starter.init(proof);
+        starter.setMaxRuleApplications(maxRuleApps);
+        starter.start();
+    }
+
+    /**
+     * @return
+     * @throws RuntimeException
+     */
+    public static Path createTmpDir() throws RuntimeException {
+        Path tmpDir;
+        try {
+            tmpDir = Files.createTempDirectory("AEInstCheckerTmp_");
+        } catch (IOException e) {
+            throw new RuntimeException("Could not create temporary directory", e);
+        }
+        return tmpDir;
     }
 
     /**
@@ -447,16 +478,16 @@ public class KeyBridgeUtils {
      * @param relModel The {@link AERelationalModel} from which to return the APEs.
      * @param firstProgram True iff APEs should be retrieved from the first program.
      * @return A list of APEs.
-     * @throws InstantiationChecker.UnsuccessfulAPERetrievalException if something went wrong.
+     * @throws UnsuccessfulAPERetrievalException if something went wrong.
      */
-    public static List<InstantiationChecker.APERetrievalResult> retrieveAPEs(final AERelationalModel relModel,
-            boolean firstProgram) {
+    public static List<InstantiationChecker.APERetrievalResult> retrieveAPEs(
+            final AERelationalModel relModel, boolean firstProgram) {
         try {
             return new InstantiationChecker(
                     AEInstantiationModel.fromRelationalModel(relModel, firstProgram))
                             .retrieveAPEs();
         } catch (IOException e) {
-            throw new InstantiationChecker.UnsuccessfulAPERetrievalException(e);
+            throw new UnsuccessfulAPERetrievalException(e);
         }
     }
 
