@@ -35,7 +35,7 @@ import de.uka.ilkd.key.proof.Proof;
  * @author Dominic Steinhoefel
  *
  */
-public class FrameConditionChecker implements InstantiationAspectProver {
+public class FrameConditionProver implements InstantiationAspectProver {
     private static final String FRAME_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/frameProblem.key";
 
     private static final String PRECONDITION = "<PRECONDITION>";
@@ -53,7 +53,7 @@ public class FrameConditionChecker implements InstantiationAspectProver {
 
     private final String keyProveFrameScaffold;
 
-    public FrameConditionChecker() {
+    public FrameConditionProver() {
         keyProveFrameScaffold = KeyBridgeUtils.readResource(FRAME_PROBLEM_FILE_SCAFFOLD);
     }
 

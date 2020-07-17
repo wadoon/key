@@ -51,7 +51,7 @@ import de.uka.ilkd.key.util.MiscTools;
  * 
  * @author Dominic Steinhoefel
  */
-public class HasToConditionChecker implements InstantiationAspectProver {
+public class HasToConditionProver implements InstantiationAspectProver {
     private static final String KEY_HEADER_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/header.key";
 
     private static final String PROGRAMVARIABLES = "<PROGRAMVARIABLES>";
@@ -62,7 +62,7 @@ public class HasToConditionChecker implements InstantiationAspectProver {
 
     private final InstantiationAspectProverHelper helper = InstantiationAspectProverHelper.INSTANCE;
 
-    public HasToConditionChecker() {
+    public HasToConditionProver() {
         keyHeaderScaffold = KeyBridgeUtils.readResource(KEY_HEADER_SCAFFOLD);
     }
 
