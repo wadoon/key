@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import de.uka.ilkd.key.njml.JmlParser;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -25,7 +26,7 @@ public final class TextualJMLFieldDecl extends TextualJMLConstruct {
     private final PositionedString decl;
     
     
-    public TextualJMLFieldDecl(ImmutableList<String> mods, PositionedString decl) {
+    public TextualJMLFieldDecl(ImmutableList<String> mods, JmlParser.Field_declarationContext decl) {
         super(mods);
         assert decl != null;
         this.decl = decl;

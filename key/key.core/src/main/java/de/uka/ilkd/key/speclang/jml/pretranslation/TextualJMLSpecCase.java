@@ -100,7 +100,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         REQUIRES,
         REQUIRES_FREE,
         ENSURES,
-        ENSURES_FREE, AXIOMS
+        ENSURES_FREE,
+        AXIOMS,
+        INVARIANT,
+        INVARIANT_FREE
     }
     //private ImmutableList<Triple<PositionedString, PositionedString, PositionedString>> abbreviations = ImmutableSLList.nil();
 

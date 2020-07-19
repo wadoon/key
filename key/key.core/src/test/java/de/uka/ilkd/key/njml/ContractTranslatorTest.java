@@ -34,7 +34,7 @@ public class ContractTranslatorTest {
     @Parameterized.Parameter(value = 0)
     public String expr = "";
 
-    @Parameterized.Parameters(name = "{0}")
+    @Parameterized.Parameters()
     public static Collection<Object[]> getFiles() throws IOException {
         List<Object[]> seq = new LinkedList<>();
         try (InputStream s = ExpressionTranslatorTest.class.getResourceAsStream("contracts.txt");
@@ -42,12 +42,12 @@ public class ContractTranslatorTest {
             String l;
             StringBuilder content = new StringBuilder();
             while ((l = reader.readLine()) != null) {
-                System.out.println(l);
                 if (l.trim().isEmpty() || l.startsWith("#"))
                     continue;
                 content.append(l).append('\n');
             }
-            final String[] split = content.toString().split("---Contract---");
+            final String[] split = content.toString().split("---\\s*Contract\\s*---\n");
+            System.out.println("cases: " + split.length);
             for (String value : split) {
                 value = value.trim();
                 if (!value.isEmpty())
@@ -78,13 +78,13 @@ public class ContractTranslatorTest {
         ProgramVariable exc = new LocationVariable(new ProgramElementName("exc"), kjt);
         JmlLexer lexer = JmlFacade.createLexer(expr);
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
-        JmlParser.Method_specificationContext ctx = parser.method_specification();
+        JmlParser.Classlevel_commentContext ctx = parser.classlevel_comment();
         if (parser.getNumberOfSyntaxErrors() != 0)
             debugLexer();
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
         //Translator et = new Translator(services, kjt, self, ImmutableSLList.nil(), result, exc,
         //        new HashMap<>(), new HashMap<>());
-        JmlSpecFactory factory = new JmlSpecFactory(services);
+        //JmlSpecFactory factory = new JmlSpecFactory(services);
         //ContractTranslator ct = new ContractTranslator("", new Position(0,0), factory, kjt);
         //System.out.println(ctx.accept(ct));
     }

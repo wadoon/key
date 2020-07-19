@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
+import de.uka.ilkd.key.njml.JmlFacade;
 import de.uka.ilkd.key.njml.JmlParsingFacade;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
@@ -30,7 +31,7 @@ import static org.junit.Assert.*;
 
 public class TestJMLPreTranslator {
     private ImmutableList<TextualJMLConstruct> parseMethodSpec(String ms) throws SLTranslationException {
-        return JmlParsingFacade.parseClasslevel(ms);
+        return JmlFacade.parseClasslevel(ms);
     }
 
     @Test

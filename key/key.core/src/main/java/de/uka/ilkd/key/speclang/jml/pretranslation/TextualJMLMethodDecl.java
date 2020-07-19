@@ -27,8 +27,6 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     
     
     public TextualJMLMethodDecl(ImmutableList<String> mods,
-                                PositionedString decl,
-                                String methodName,
                                 ParserRuleContext methodDefinition) {
         super(mods);
         assert decl != null;

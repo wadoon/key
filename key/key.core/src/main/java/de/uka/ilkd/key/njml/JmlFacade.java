@@ -2,11 +2,7 @@ package de.uka.ilkd.key.njml;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -83,6 +79,22 @@ public class JmlFacade {
 
     public static ImmutableList<TextualJMLConstruct> parseClasslevel(PositionedString positionedString) {
         return parseClasslevel(createLexer(positionedString));
+    }
+
+    public static ImmutableList<TextualJMLConstruct> parseClasslevel(String string) {
+        return parseClasslevel(createLexer(string));
+    }
+
+    public static ImmutableList<TextualJMLConstruct> parseMethodlevel(PositionedString positionedString) {
+        return parseMethodlevel(createLexer(positionedString));
+    }
+
+    private static ImmutableList<TextualJMLConstruct> parseMethodlevel(JmlLexer lexer) {
+        @NotNull JmlParser p = createParser(lexer);
+        JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
+        TextualTranslator translator = new TextualTranslator();
+        ctx.accept(translator);
+        return translator.constructs;
     }
 
     static class TextualTranslator extends JmlParserBaseVisitor<Object> {
@@ -321,44 +333,61 @@ public class JmlFacade {
 
         @Override
         public Object visitClass_axiom(JmlParser.Class_axiomContext ctx) {
-            return super.visitClass_axiom(ctx);
-        }
-    }
-
-
-    private static class OffsetFactory extends CommonTokenFactory {
-        int lineOffset;
-        int charPositionInLineOffset;
-        int charOffset;
-
-        public OffsetFactory(boolean copyText) {
-            super(copyText);
+            TextualJMLClassAxiom inv = new TextualJMLClassAxiom(mods, ctx);
+            constructs = constructs.append(inv);
+            return null;
         }
 
-        public OffsetFactory() {
-            super();
+
+        @Override
+        public Object visitField_declaration(JmlParser.Field_declarationContext ctx) {
+            TextualJMLFieldDecl inv = new TextualJMLFieldDecl(mods, ctx);
+            constructs = constructs.append(inv);
+            return null;
         }
 
         @Override
-        public CommonToken create(Pair<TokenSource, CharStream> source, int type, String text, int channel, int start, int stop, int line, int charPositionInLine) {
-            CommonToken ct = super.create(source, type, text, channel, start, stop, line, charPositionInLine);
-            return ct;
+        public Object visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
+            TextualJMLMethodDecl inv = new TextualJMLMethodDecl(mods, ctx);
+            constructs = constructs.append(inv);
+            return null;
         }
 
         @Override
-        public CommonToken create(int type, String text) {
-            CommonToken ct = super.create(type, text);
-            applyOffset(ct);
-            return ct;
-
+        public Object visitSet_statement(JmlParser.Set_statementContext ctx) {
+            TextualJMLSetStatement inv = new TextualJMLSetStatement(mods, ctx);
+            constructs = constructs.append(inv);
+            return null;
         }
 
-        private void applyOffset(CommonToken ct) {
-            ct.setCharPositionInLine(ct.getCharPositionInLine() + charPositionInLineOffset);
-            ct.setLine(ct.getLine() + lineOffset);
-            ct.setStartIndex(ct.getStartIndex() + charOffset);
-            ct.setStopIndex(ct.getStopIndex() + charOffset);
+        @Override
+        public Object visitLoop_specification(JmlParser.Loop_specificationContext ctx) {
+            methodContract = new TextualJMLLoopSpec(mods);
+            constructs = constructs.append(methodContract);
+            return null;
+        }
 
+        @Override
+        public Object visitLoop_invariant(JmlParser.Loop_invariantContext ctx) {
+            methodContract.addClause(
+                    ctx.LOOP_INVARIANT().getText().endsWith("_free") ? INVARIANT_FREE : INVARIANT
+                    ctx);
+            return null;
+        }
+
+        @Override
+        public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
+            return null;
+        }
+
+        @Override
+        public Object visitBlock_specification(JmlParser.Block_specificationContext ctx) {
+            return super.visitBlock_specification(ctx);
+        }
+
+        @Override
+        public Object visitBlock_loop_specification(JmlParser.Block_loop_specificationContext ctx) {
+            return super.visitBlock_loop_specification(ctx);
         }
     }
 }

@@ -113,8 +113,6 @@ public class JmlIO {
     }
 
     private ImmutableList<TextualJMLConstruct> parseClassLevel(PositionedString positionedString) {
-        System.out.println("--- Contract ---");
-        System.out.println(positionedString.text);
         return JmlFacade.parseClasslevel(positionedString);
     }
 
@@ -127,7 +125,8 @@ public class JmlIO {
     }
 
     public ImmutableList<TextualJMLConstruct> parseMethodlevel(String concatenatedComment, String fileName, Position position) {
-        return ImmutableSLList.nil();
+        return JmlFacade.parseMethodlevel(new PositionedString(concatenatedComment, fileName, position));
+
     }
 
     public Term parseExpression(PositionedString p) {

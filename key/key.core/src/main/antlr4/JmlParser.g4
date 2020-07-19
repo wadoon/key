@@ -109,11 +109,9 @@ returns_clause: RETURNS predornot? ;
 name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
 old_clause: OLD modifiers type IDENT INITIALISER ;
 
-field_or_method_declaration:
-   type IDENT (method_declaration|field_declaration)? SEMI_TOPLEVEL;
-
-field_declaration: (EMPTYBRACKETS)* (initialiser |SEMICOLON);
-method_declaration: param_list (BODY |SEMICOLON);
+field_or_method_declaration: (method_declaration | field_declaration) SEMI_TOPLEVEL;
+field_declaration: type IDENT (EMPTYBRACKETS)* initialiser?;
+method_declaration: type IDENT param_list BODY;
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
 param_decl: ((NON_NULL | NULLABLE))? IDENT ((AXIOM_NAME_BEGIN AXION_NAME_END | EMPTYBRACKETS))* IDENT;
 //represents_clause: REPRESENTS expression;
@@ -142,7 +140,7 @@ variant_function: DECREASING expression;
 //loop_separates_clause: SEPARATES expression;
 //loop_determines_clause: DETERMINES expression;
 assume_statement: ASSUME expression;
-initialiser: EQUALITY expression;
+initialiser: EQUAL_SINGLE expression;
 block_specification: method_specification;
 block_loop_specification:
   (loop_contract_keyword spec_case (also_keyword)+ loop_contract_keyword spec_case)+;

@@ -28,21 +28,11 @@ import java.util.Map;
  * A JML loop specification (invariant, assignable clause, decreases
  * clause, ...) in textual form.
  */
-public final class TextualJMLLoopSpec extends TextualJMLConstruct {
+public final class TextualJMLLoopSpec extends TextualJMLSpecCase {
     private ParserRuleContext variant = null;
-    private Map<String, ImmutableList<ParserRuleContext>> assignables = new LinkedHashMap<>();
-    private ImmutableList<ParserRuleContext> infFlowSpecs = ImmutableSLList.nil();
-    private Map<String, ImmutableList<ParserRuleContext>> invariants = new LinkedHashMap<>();
-    private Map<String, ImmutableList<ParserRuleContext>> freeInvariants = new LinkedHashMap<>();
-
 
     public TextualJMLLoopSpec(ImmutableList<String> mods) {
-        super(mods);
-        for (Name heap : HeapLDT.VALID_HEAP_NAMES) {
-            assignables.put(heap.toString(), ImmutableSLList.nil());
-            invariants.put(heap.toString(), ImmutableSLList.nil());
-            freeInvariants.put(heap.toString(), ImmutableSLList.nil());
-        }
+        super(mods, Behavior.BEHAVIOR);
     }
 
 
@@ -71,22 +61,6 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         variant = ps;
         setPosition(ps);
     }
-
-//    public ImmutableList<ParserRuleContext> getInvariant(String hName) {
-//        return invariants.get(hName);
-//    }
-//    
-//    public ImmutableList<ParserRuleContext> getFreeInvariant(String hName) {
-//        return freeInvariants.get(hName);
-//    }
-
-//    public ImmutableList<ParserRuleContext> getInvariant() {
-//        return invariants.get(HeapLDT.BASE_HEAP_NAME.toString());
-//    }
-
-//    public ImmutableList<ParserRuleContext> getFreeInvariant() {
-//        return freeInvariants.get(HeapLDT.BASE_HEAP_NAME.toString());
-//    }
 
     public ImmutableList<ParserRuleContext> getAssignable() {
         return assignables.get(HeapLDT.BASE_HEAP_NAME.toString());
