@@ -13,37 +13,31 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.njml.JmlParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
+
+import java.util.Objects;
 
 /**
  * A JML model method declaration in textual form.
  */
 public final class TextualJMLMethodDecl extends TextualJMLConstruct {
-    private final String methodName;
-    private final PositionedString decl;
-    private final ParserRuleContext methodDefinition;
+    private final JmlParser.Method_declarationContext methodDefinition;
     
     
     public TextualJMLMethodDecl(ImmutableList<String> mods,
-                                ParserRuleContext methodDefinition) {
+                                JmlParser.Method_declarationContext methodDefinition) {
         super(mods);
-        assert decl != null;
-        this.decl = decl;
-        this.methodName = methodName;
         this.methodDefinition = methodDefinition;
-        setPosition(decl);
     }
-    
-    
-    public PositionedString getDecl() {
-        return decl;
+
+    public JmlParser.Method_declarationContext getDecl() {
+        return methodDefinition;
     }
-    
-    
+
     public String getMethodName() {
-        return methodName;
+        return methodDefinition.IDENT().getText();
     }
 
     public ParserRuleContext getMethodDefinition() {
@@ -52,26 +46,20 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     
     @Override
     public String toString() {
-        return decl.toString();
+        return methodDefinition.getText();
     }
-    
-    
+
     @Override
     public boolean equals(Object o) {
-        if(!(o instanceof TextualJMLMethodDecl)) {
-            return false;
-        }
-        TextualJMLMethodDecl md = (TextualJMLMethodDecl) o;
-        return mods.equals(md.mods) 
-               && decl.equals(md.decl) 
-               && methodDefinition.equals(md.methodDefinition) 
-               && methodName.equals(md.methodName);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TextualJMLMethodDecl that = (TextualJMLMethodDecl) o;
+        return Objects.equals(methodDefinition, that.methodDefinition);
     }
-    
-    
+
     @Override
     public int hashCode() {
-        return mods.hashCode() + decl.hashCode() + methodName.hashCode() + methodDefinition.hashCode();
+        return Objects.hash(methodDefinition);
     }
 
     public int getStateCount() {

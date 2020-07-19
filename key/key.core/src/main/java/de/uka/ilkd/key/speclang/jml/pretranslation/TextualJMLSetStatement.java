@@ -16,15 +16,12 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import de.uka.ilkd.key.njml.JmlParser;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.speclang.PositionedString;
-
-
 /**
  * A JML set statement in textual form.
  */
 public final class TextualJMLSetStatement extends TextualJMLConstruct {
     
-    private final PositionedString assignment;
+    private final JmlParser.Set_statementContext assignment;
     
     
     public TextualJMLSetStatement(ImmutableList<String> mods,
@@ -36,7 +33,7 @@ public final class TextualJMLSetStatement extends TextualJMLConstruct {
     }
     
     
-    public PositionedString getAssignment() {
+    public JmlParser.Set_statementContext getAssignment() {
         return assignment;
     }
     

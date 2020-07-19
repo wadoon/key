@@ -30,36 +30,14 @@ import java.util.List;
  * @version 1 (5/15/20)
  */
 @RunWith(Parameterized.class)
-public class ContractTranslatorTest {
+public class MethodlevelTranslatorTest {
     @Parameterized.Parameter(value = 0)
     public String expr = "";
 
     @Parameterized.Parameters()
     public static Collection<Object[]> getFiles() throws IOException {
-        InputStream resourceAsStream = ExpressionTranslatorTest.class.getResourceAsStream("classlevel.txt");
-        return readInputs(resourceAsStream);
-    }
-
-    static Collection<Object[]> readInputs(InputStream resourceAsStream) throws IOException {
-        List<Object[]> seq = new LinkedList<>();
-        try (InputStream s = resourceAsStream;
-             BufferedReader reader = new BufferedReader(new InputStreamReader(s))) {
-            String l;
-            StringBuilder content = new StringBuilder();
-            while ((l = reader.readLine()) != null) {
-                if (l.trim().isEmpty() || l.startsWith("#"))
-                    continue;
-                content.append(l).append('\n');
-            }
-            final String[] split = content.toString().split("---\\s*Contract\\s*---\n");
-            System.out.println("cases: " + split.length);
-            for (String value : split) {
-                value = value.trim();
-                if (!value.isEmpty())
-                    seq.add(new Object[]{value.replaceAll("---Contract---", "")});
-            }
-        }
-        return seq;
+        InputStream resourceAsStream = ExpressionTranslatorTest.class.getResourceAsStream("methodlevel.txt");
+        return ContractTranslatorTest.readInputs(resourceAsStream);
     }
 
     private Recoder2KeY r2k;

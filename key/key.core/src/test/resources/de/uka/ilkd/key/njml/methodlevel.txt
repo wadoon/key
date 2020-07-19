@@ -1,0 +1,9 @@
+--- Contract ---
+//@ set cause = arg0;
+--- Contract ---
+//@ set message = arg0;
+//@ set cause = arg1;
+--- Contract ---
+//@ assert true;
+--- Contract ---
+//@ assume true;

@@ -135,7 +135,7 @@ JML_ML_END: '*/' -> channel(HIDDEN);
 SL_COMMENT: '//' ~'@' ~('\n'|'\r')* -> channel(HIDDEN);
 WS: (' ' | '\t' | '\n' | '\r' | '@')+ -> channel(HIDDEN);
 
-ML_COMMENT: '/*' -> pushMode(mlComment);
+ML_COMMENT: '/*' -> more, pushMode(mlComment);
 
 NEST_START: '{|' ;
 NEST_END: '|}' ;
@@ -402,7 +402,7 @@ END_BRACE: '}' -> more, popMode;
 ANY_CHAR: . -> more;
 
 mode mlComment;
-ML_COMMENT_END: '*/' -> type(COMMENT), channel(HIDDEN), popMode;
+ML_COMMENT_END: ('*/'|EOF) -> type(COMMENT), channel(HIDDEN), popMode;
 ML_ANY: . -> more;
 
 mode string;

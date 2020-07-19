@@ -4,11 +4,13 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT;
+import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT_FREE;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS_ONLY;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
@@ -50,18 +52,20 @@ public class JmlFacade {
     }
 
     static JmlParser createParser(JmlLexer lexer) {
-        return new JmlParser(new CommonTokenStream(lexer));
-            /*p.addErrorListener(new BaseErrorListener() {
+        JmlParser p = new JmlParser(new CommonTokenStream(lexer));
+        p.addErrorListener(new BaseErrorListener() {
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+                Token t = (Token) offendingSymbol;
                 throw new RuntimeException("line " + line + ":" + charPositionInLine + " " + msg);
             }
-        });*/
+        });
+        return p;
     }
 
     public static ParserRuleContext parseTop(PositionedString expr) {
         JmlParser p = createParser(createLexer(expr));
-        return p.classlevel_comment();
+        return p.classlevel_comments();
     }
 
     public static ParserRuleContext parseClause(String s) {
@@ -71,7 +75,7 @@ public class JmlFacade {
 
     static ImmutableList<TextualJMLConstruct> parseClasslevel(JmlLexer lexer) {
         @NotNull JmlParser p = createParser(lexer);
-        JmlParser.Classlevel_commentContext ctx = p.classlevel_comment();
+        JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
         TextualTranslator translator = new TextualTranslator();
         ctx.accept(translator);
         return translator.constructs;
@@ -100,10 +104,21 @@ public class JmlFacade {
     static class TextualTranslator extends JmlParserBaseVisitor<Object> {
         public ImmutableList<TextualJMLConstruct> constructs = ImmutableSLList.nil();
         private ImmutableList<String> mods = ImmutableSLList.nil();
+        @Nullable
         private TextualJMLSpecCase methodContract;
+        @Nullable
+        private TextualJMLLoopSpec loopContract;
+
+        @Override
+        public Object visitModifier(JmlParser.ModifierContext ctx) {
+            mods = mods.append(ctx.getText());
+            return null;
+        }
 
         @Override
         public Object visitClasslevel_comment(JmlParser.Classlevel_commentContext ctx) {
+            mods = ImmutableSLList.nil();
+            acceptAll(ctx.modifiers());
             for (JmlParser.Classlevel_elementContext c : ctx.classlevel_element()) {
                 c.accept(this);
             }
@@ -362,16 +377,16 @@ public class JmlFacade {
 
         @Override
         public Object visitLoop_specification(JmlParser.Loop_specificationContext ctx) {
-            methodContract = new TextualJMLLoopSpec(mods);
+            loopContract = new TextualJMLLoopSpec(mods);
             constructs = constructs.append(methodContract);
             return null;
         }
 
         @Override
         public Object visitLoop_invariant(JmlParser.Loop_invariantContext ctx) {
-            methodContract.addClause(
-                    ctx.LOOP_INVARIANT().getText().endsWith("_free") ? INVARIANT_FREE : INVARIANT
-                    ctx);
+            assert loopContract != null;
+            TextualJMLLoopSpec.ClauseHd type = ctx.LOOP_INVARIANT().getText().endsWith("_free") ? INVARIANT_FREE : INVARIANT;
+            loopContract.addClause(type, ctx);
             return null;
         }
 

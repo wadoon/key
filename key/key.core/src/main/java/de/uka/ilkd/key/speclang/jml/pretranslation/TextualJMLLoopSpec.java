@@ -16,44 +16,58 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+
+import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ASSIGNABLE;
 
 
 /**
  * A JML loop specification (invariant, assignable clause, decreases
  * clause, ...) in textual form.
  */
-public final class TextualJMLLoopSpec extends TextualJMLSpecCase {
+public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     private ParserRuleContext variant = null;
 
+    public enum Clause {
+        INFORMATION_FLOW
+    }
+
+    /**
+     * Heap-dependent clauses
+     */
+    public enum ClauseHd {
+        ASSIGNABLE,
+        INVARIANT,
+        INVARIANT_FREE
+    }
+
+    private Map<Object, List<ParserRuleContext>> clauses = new HashMap<>();
+    private Map<ParserRuleContext, Name> heaps = new HashMap<>();
+
     public TextualJMLLoopSpec(ImmutableList<String> mods) {
-        super(mods, Behavior.BEHAVIOR);
+        super(mods);
     }
 
-
-    public void addInvariant(ParserRuleContext ps) {
-        addGeneric(invariants, ps);
+    public TextualJMLLoopSpec addClause(Clause clause, ParserRuleContext ctx) {
+        clauses.computeIfAbsent(clause, it -> new ArrayList<>()).add(ctx);
+        return this;
     }
 
-    public void addFreeInvariant(ParserRuleContext ps) {
-        addGeneric(freeInvariants, ps);
+    public TextualJMLLoopSpec addClause(ClauseHd clause, ParserRuleContext ctx) {
+        return addClause(clause, null, ctx);
     }
 
-    public void addAssignable(ParserRuleContext ps) {
-        addGeneric(assignables, ps);
-    }
+    public TextualJMLLoopSpec addClause(ClauseHd clause, @Nullable Name heapName, ParserRuleContext ctx) {
+        if (heapName == null)
+            heapName = HeapLDT.BASE_HEAP_NAME;
 
-    public void addInfFlowSpecs(ParserRuleContext ps) {
-        infFlowSpecs = infFlowSpecs.append(ps);
-    }
-
-    public void addInfFlowSpecs(ImmutableList<ParserRuleContext> l) {
-        infFlowSpecs = infFlowSpecs.append(l);
+        clauses.computeIfAbsent(clause, it -> new ArrayList<>()).add(ctx);
+        heaps.put(ctx, heapName);
+        return this;
     }
 
     public void setVariant(ParserRuleContext ps) {
@@ -62,36 +76,51 @@ public final class TextualJMLLoopSpec extends TextualJMLSpecCase {
         setPosition(ps);
     }
 
-    public ImmutableList<ParserRuleContext> getAssignable() {
-        return assignables.get(HeapLDT.BASE_HEAP_NAME.toString());
+    private ImmutableList<ParserRuleContext> getList(Object key) {
+        return ImmutableList.fromList(clauses.getOrDefault(key, new ArrayList<>()));
     }
 
-    public ImmutableList<ParserRuleContext> getAssignable(String hName) {
-        return assignables.get(hName);
+    public ImmutableList<ParserRuleContext> getAssignable() {
+        return getList(ASSIGNABLE);
     }
+
+    /*public ImmutableList<ParserRuleContext> getAssignable(String hName) {
+        return getList(ClauseHd.ASSIGNABLE);
+    }*/
 
     public Map<String, ImmutableList<ParserRuleContext>> getAssignables() {
-        return assignables;
+        return getMap(ClauseHd.ASSIGNABLE);
     }
 
     public ImmutableList<ParserRuleContext> getInfFlowSpecs() {
-        return infFlowSpecs;
+        return getList(Clause.INFORMATION_FLOW);
     }
 
     public Map<String, ImmutableList<ParserRuleContext>> getInvariants() {
-        return invariants;
+        return getMap(ClauseHd.INVARIANT);
+    }
+
+    private Map<String, ImmutableList<ParserRuleContext>> getMap(ClauseHd clause) {
+        ImmutableList<ParserRuleContext> seq = getList(clause);
+        Name defaultHeap = HeapLDT.BASE_HEAP_NAME;
+        Map<String, ImmutableList<ParserRuleContext>> map = new HashMap<>();
+        for (ParserRuleContext context : seq) {
+            String h = heaps.getOrDefault(context, defaultHeap).toString();
+            ImmutableList<ParserRuleContext> l = map.getOrDefault(h, ImmutableSLList.nil());
+            map.put(h, l.append(context));
+        }
+        return map;
     }
 
     public Map<String, ImmutableList<ParserRuleContext>> getFreeInvariants() {
-        return freeInvariants;
+        return getMap(ClauseHd.INVARIANT_FREE);
     }
 
     public ParserRuleContext getVariant() {
         return variant;
     }
 
-
-    @Override
+    /*@Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
         Iterator<ParserRuleContext> it;
@@ -126,27 +155,30 @@ public final class TextualJMLLoopSpec extends TextualJMLSpecCase {
 
         return sb.toString();
     }
+       */
 
 
     @Override
+    public String toString() {
+        return "TextualJMLLoopSpec{" +
+                "variant=" + variant +
+                ", clauses=" + clauses +
+                ", heaps=" + heaps +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TextualJMLLoopSpec)) {
-            return false;
-        }
-        TextualJMLLoopSpec ls = (TextualJMLLoopSpec) o;
-        return mods.equals(ls.mods)
-                && invariants.equals(ls.invariants)
-                && assignables.equals(ls.assignables)
-                && infFlowSpecs.equals(ls.infFlowSpecs)
-                && (variant == null && ls.variant == null
-                || variant != null && variant.equals(ls.variant));
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TextualJMLLoopSpec that = (TextualJMLLoopSpec) o;
+        return variant.equals(that.variant) &&
+                clauses.equals(that.clauses) &&
+                heaps.equals(that.heaps);
     }
 
     @Override
     public int hashCode() {
-        return mods.hashCode()
-                + invariants.hashCode()
-                + assignables.hashCode()
-                + infFlowSpecs.hashCode();
+        return Objects.hash(variant, clauses, heaps);
     }
 }

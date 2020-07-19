@@ -102,8 +102,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         ENSURES,
         ENSURES_FREE,
         AXIOMS,
-        INVARIANT,
-        INVARIANT_FREE
     }
     //private ImmutableList<Triple<PositionedString, PositionedString, PositionedString>> abbreviations = ImmutableSLList.nil();
 
@@ -197,7 +195,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                 ", name='" + name + '\'' +
                 '}';
     }
-
 
     /*
     @Override
@@ -300,29 +297,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     */
 
     //region legacy api
-    public void addAxioms(ParserRuleContext methodDefinition) {
-    }
-
-    public void addAssignable(ParserRuleContext positionedString) {
-    }
-
     public void addRequires(ParserRuleContext label) {
         addClause(REQUIRES, label);
     }
 
     public void addSignals(PositionedLabeledString label) {
-    }
-
-    public void addDiverges(ParserRuleContext aTrue) {
-    }
-
-    public void addSignals(ParserRuleContext prepend) {
-    }
-
-    public void addEnsures(ParserRuleContext prepend) {
-    }
-
-    public void addRequires(ImmutableList<ParserRuleContext> precond) {
+        System.out.println("TODO .addSignals");
     }
 
     public Triple<ParserRuleContext, ParserRuleContext, ParserRuleContext>[] getAbbreviations() {
@@ -355,10 +335,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public void addEnsures(PositionedLabeledString ensures_) {
+        System.out.println("TODO .addEnsures");
     }
 
     public void addSignalsOnly(PositionedString ctx) {
-
+        System.out.println("TODO: addSignalsOnly");
     }
 
     public ImmutableList<ParserRuleContext> getSignalsOnly() {

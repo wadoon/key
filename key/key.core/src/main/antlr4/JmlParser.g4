@@ -2,7 +2,8 @@ parser grammar JmlParser;
 
 options { tokenVocab=JmlLexer; }
 
-classlevel_comment: modifiers (classlevel_element modifiers)* EOF;
+classlevel_comments: classlevel_comment* EOF;
+classlevel_comment: modifiers (classlevel_element modifiers)+;
 classlevel_element
   : class_invariant | depends_clause | method_specification
   | field_or_method_declaration | represents_clause
@@ -109,8 +110,8 @@ returns_clause: RETURNS predornot? ;
 name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
 old_clause: OLD modifiers type IDENT INITIALISER ;
 
-field_or_method_declaration: (method_declaration | field_declaration) SEMI_TOPLEVEL;
-field_declaration: type IDENT (EMPTYBRACKETS)* initialiser?;
+field_or_method_declaration: (method_declaration | field_declaration);
+field_declaration: type IDENT (EMPTYBRACKETS)* initialiser? SEMI_TOPLEVEL;
 method_declaration: type IDENT param_list BODY;
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
 param_decl: ((NON_NULL | NULLABLE))? IDENT ((AXIOM_NAME_BEGIN AXION_NAME_END | EMPTYBRACKETS))* IDENT;
@@ -125,7 +126,7 @@ in_group_clause: IN expression;
 maps_into_clause: MAPS expression;
 nowarn_pragma: NOWARN expression;
 debug_statement: DEBUG expression;
-set_statement: SET expression;
+set_statement: SET name EQUAL_SINGLE expression SEMI_TOPLEVEL;
 merge_point_statement: MERGE_POINT (MERGE_PROC (STRING_LITERAL))? (MERGE_PARAMS (BODY))? SEMICOLON;
 loop_specification
   : loop_invariant

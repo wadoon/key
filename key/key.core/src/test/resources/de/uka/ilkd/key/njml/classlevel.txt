@@ -1,5 +1,3 @@
-ensures true;
-requires true;
 ---Contract---
 /*@ public normal_behavior
       @   assignable \nothing;
@@ -99,22 +97,16 @@ requires true;
      @    assignable message, cause;
      @*/
 --- Contract ---
-//@ set message = arg0;
-//@ set cause = arg1;
---- Contract ---
-
    /*@ public normal_behavior
      @    requires true;
      @    ensures message == null && cause == arg0;
      @    assignable message, cause;
      @*/
 --- Contract ---
-
 /*@ public normal_behavior
      @    ensures \result == message;
      @*/
 --- Contract ---
-
 /*@ public normal_behavior
      @    ensures \result == cause;
      @*/
@@ -125,8 +117,6 @@ requires true;
      @    assignable cause;
      @ helper // needs to be helper because called in constructor
      @*/
---- Contract ---
-//@ set cause = arg0;
 --- Contract ---
 //@ public instance ghost \seq seq;
 --- Contract ---
@@ -491,9 +481,6 @@ requires true;
      @    assignable message, cause;
      @*/
 --- Contract ---
-//@ set message = arg0;
-//@ set cause = arg1;
---- Contract ---
    /*@ public normal_behavior
      @    requires true;
      @    ensures message == null && cause == arg0;
@@ -515,8 +502,6 @@ requires true;
      @ helper // needs to be helper because called in constructor
      @*/
 --- Contract ---
-//@ set cause = arg0;
---- Contract ---
 /*@ public normal_behavior
      @    ensures \result == message;
      @*/
@@ -531,8 +516,6 @@ requires true;
      @    assignable cause;
      @ helper // needs to be helper because called in constructor
      @*/
---- Contract ---
-//@ set cause = arg0;
 --- Contract ---
 //@ protected nullable ghost String message = null;
    //@ protected nullable ghost Throwable cause = null;
@@ -996,9 +979,6 @@ requires true;
      @    assignable message, cause;
      @*/
 --- Contract ---
-//@ set message = arg0;
-       //@ set cause = arg1;
-
    /*@ public normal_behavior
      @    requires true;
      @    ensures message == null && cause == arg0;
@@ -1019,8 +999,6 @@ requires true;
      @    assignable cause;
      @ helper // needs to be helper because called in constructor
      @*/
---- Contract ---
-//@ set cause = arg0;
 --- Contract ---
 // public void printStackTrace(java.io.PrintStream arg0);
 // public void printStackTrace(java.io.PrintWriter arg0);
