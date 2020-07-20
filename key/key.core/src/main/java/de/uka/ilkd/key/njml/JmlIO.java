@@ -89,7 +89,8 @@ public class JmlIO {
     public static Term translateTerm(ParserRuleContext expr, KeYJavaType containerType, ProgramVariable selfVar, ImmutableList<ProgramVariable> allVars,
                                      ProgramVariable o, ProgramVariable o1, Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atPres1, OriginTermLabel.SpecType type, Services services) {
         JmlIO io = new JmlIO(services, containerType, selfVar, allVars, o, o1,atPres, atPres1 );
-        return (Term) io.interpret(expr);
+        SLExpression e = (SLExpression) io.interpret(expr);
+        return e.getTerm();
     }
 
 
@@ -141,7 +142,8 @@ public class JmlIO {
     }
 
     public Term translateTerm(ParserRuleContext expr) {
-        return ((SLExpression) interpret(expr)).getTerm();
+        Object interpret = interpret(expr);
+        return ((SLExpression) interpret).getTerm();
     }
 
     public Term parseExpression(String input) {

@@ -45,23 +45,23 @@ public class MethodlevelTranslatorTest {
 
     @Before
     public void setup() {
-        if (services != null) return;
-        services = TacletForTests.services();
+        //if (services != null) return;
+        /*services = TacletForTests.services();
         r2k = new Recoder2KeY(services, services.getNamespaces());
-        r2k.parseSpecialClasses();
+        r2k.parseSpecialClasses();*/
     }
 
     @Test
     public void parseAndInterpret() throws SLTranslationException {
         System.out.println(expr);
         Assert.assertNotEquals("", expr);
-        KeYJavaType kjt = new KeYJavaType(Sort.ANY);
+        /*KeYJavaType kjt = new KeYJavaType(Sort.ANY);
         ProgramVariable self = new LocationVariable(new ProgramElementName("self"), kjt);
         ProgramVariable result = new LocationVariable(new ProgramElementName("result"), kjt);
-        ProgramVariable exc = new LocationVariable(new ProgramElementName("exc"), kjt);
+        ProgramVariable exc = new LocationVariable(new ProgramElementName("exc"), kjt);*/
         JmlLexer lexer = JmlFacade.createLexer(expr);
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
-        JmlParser.Classlevel_commentContext ctx = parser.classlevel_comment();
+        JmlParser.Methodlevel_commentContext ctx = parser.methodlevel_comment();
         if (parser.getNumberOfSyntaxErrors() != 0)
             debugLexer();
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());

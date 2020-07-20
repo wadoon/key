@@ -75,7 +75,6 @@ public class ContractTranslatorTest {
 
     @Test
     public void parseAndInterpret() throws SLTranslationException {
-        System.out.println(expr);
         Assert.assertNotEquals("", expr);
         KeYJavaType kjt = new KeYJavaType(Sort.ANY);
         ProgramVariable self = new LocationVariable(new ProgramElementName("self"), kjt);
@@ -83,9 +82,11 @@ public class ContractTranslatorTest {
         ProgramVariable exc = new LocationVariable(new ProgramElementName("exc"), kjt);
         JmlLexer lexer = JmlFacade.createLexer(expr);
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
-        JmlParser.Classlevel_commentContext ctx = parser.classlevel_comment();
-        if (parser.getNumberOfSyntaxErrors() != 0)
+        JmlParser.Classlevel_commentsContext ctx = parser.classlevel_comments();
+        if (parser.getNumberOfSyntaxErrors() != 0) {
+            System.out.println(expr);
             debugLexer();
+        }
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
         //Translator et = new Translator(services, kjt, self, ImmutableSLList.nil(), result, exc,
         //        new HashMap<>(), new HashMap<>());

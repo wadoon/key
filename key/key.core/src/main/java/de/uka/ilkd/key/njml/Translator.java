@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.njml;
 
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -23,7 +22,6 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -301,7 +299,7 @@ public class Translator extends JmlParserBaseVisitor<Object> {
         if (ctx.LOCSET() != null) return javaInfo.getKeYJavaType(PrimitiveType.JAVA_LOCSET);
         if (ctx.SEQ() != null) return javaInfo.getKeYJavaType(PrimitiveType.JAVA_SEQ);
         if (ctx.FREE() != null) return javaInfo.getKeYJavaType(PrimitiveType.JAVA_FREE_ADT);
-        return null;
+        throw new IllegalArgumentException();
     }
 
 
@@ -407,6 +405,7 @@ public class Translator extends JmlParserBaseVisitor<Object> {
         if (null != ctx.NOTHING()) return tb.empty();
         if (null != ctx.EVERYTHING()) return tb.createdLocs();
         if (null != ctx.NOT_SPECIFIED()) return tb.createdLocs();
+        if (null != ctx.STRICTLY_NOTHING()) return tb.strictlyNothing();
         else
             return accept(ctx.storeRefExpr());
     }
@@ -434,14 +433,14 @@ public class Translator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
-    public Term visitPredornot(JmlParser.PredornotContext ctx) {
+    public SLExpression visitPredornot(JmlParser.PredornotContext ctx) {
         if (ctx.predicate() != null) return accept(ctx.predicate());
         if (ctx.NOT_SPECIFIED() != null)
-            return translator.createSkolemExprBool(ctx.NOT_SPECIFIED().getText()).getTerm();
+            return new SLExpression(translator.createSkolemExprBool(ctx.NOT_SPECIFIED().getText()).getTerm());
         if (ctx.SAME() != null) {
             return null; //TODO check
         }
-        return null;
+        throw new IllegalArgumentException();
     }
 
     @Override
@@ -451,7 +450,7 @@ public class Translator extends JmlParserBaseVisitor<Object> {
         if (!expr.isTerm() && expr.getTerm().sort() == Sort.FORMULA) {
             raiseError("Expected a formula: " + expr);
         }
-        return expr.getTerm();
+        return expr;
     }
 
     @Override
@@ -731,7 +730,7 @@ public class Translator extends JmlParserBaseVisitor<Object> {
                     break;
             }
 
-            SLExpression left = expressions.get(i-1);
+            SLExpression left = expressions.get(i - 1);
             SLExpression right = expressions.get(i);
             SLExpression rel = new SLExpression(tb.func(f, left.getTerm(), right.getTerm()));
             if (result == null) {
@@ -740,7 +739,7 @@ public class Translator extends JmlParserBaseVisitor<Object> {
                 result = new SLExpression(tb.and(result.getTerm(), rel.getTerm()));
             }
         }
-        assert result!=null;
+        assert result != null;
         return result;
     }
 
@@ -1852,25 +1851,25 @@ public class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Term visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
+    public SLExpression visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
         Term t;
         LocationVariable heap = accept(ctx.targetHeap());
         if (ctx.STRICTLY_NOTHING() != null) t = tb.strictlyNothing();
         else t = translator.assignable(requireNonNull(accept(ctx.storeRefUnion())));
         contractClauses.add(ContractClauses.ASSIGNABLE, heap, t);
-        return null;
+        return new SLExpression(t);
     }
 
 
     @Override
-    public Object visitSignals_only_clause(JmlParser.Signals_only_clauseContext ctx) {
+    public SLExpression visitSignals_only_clause(JmlParser.Signals_only_clauseContext ctx) {
         ImmutableList<KeYJavaType> typeList = ImmutableSLList.nil();
         for (JmlParser.ReferencetypeContext context : ctx.referencetype()) {
             typeList = typeList.append((KeYJavaType) accept(context));
         }
         Term t = translator.signalsOnly(typeList, this.excVar);
         contractClauses.signalsOnly = t;
-        return null;
+        return new SLExpression(t);
     }
 
 
@@ -1893,10 +1892,10 @@ public class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Term visitReturns_clause(JmlParser.Returns_clauseContext ctx) {
+    public SLExpression visitReturns_clause(JmlParser.Returns_clauseContext ctx) {
         @Nullable Term pred = accept(ctx.predornot());
         contractClauses.returns = translator.createReturns(pred);
-        return null;
+        return new SLExpression(pred);
     }
 
 
@@ -1942,12 +1941,11 @@ public class Translator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
-    public ClassInvariantImpl visitClass_invariant(JmlParser.Class_invariantContext ctx) {
+    public SLExpression visitClass_invariant(JmlParser.Class_invariantContext ctx) {
         ImmutableList<TextualJMLConstruct> result;
         String name = null;
-        ctx.expression().getText();
-        Term expr = accept(ctx.expression());
-        return factory.createJMLClassInvariant(containerType, mods, name, expr);
+        SLExpression expr = accept(ctx.expression());
+        return expr;
     }
 
     @Override
@@ -2038,78 +2036,78 @@ public class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitEnsures_clause(JmlParser.Ensures_clauseContext ctx) {
         String type = ctx.ENSURES().getText();
-        Term t = accept(ctx.predornot());
+        SLExpression t = accept(ctx.predornot());
         LocationVariable heap = accept(ctx.targetHeap());
-        insertSimpleClause(type, heap, t,
+        insertSimpleClause(type, heap, t.getTerm(),
                 ContractClauses.ENSURES,
                 ContractClauses.ENSURES_FREE,
                 ContractClauses.ENSURES);
-        return null;
+        return t;
     }
 
 
     @Override
     public Object visitRequires_clause(JmlParser.Requires_clauseContext ctx) {
         String type = ctx.REQUIRES().getText();
-        Term t = accept(ctx.predornot());
+        SLExpression t = accept(ctx.predornot());
         LocationVariable heap = accept(ctx.targetHeap());
-        insertSimpleClause(type, heap, t,
+        insertSimpleClause(type, heap, t.getTerm(),
                 ContractClauses.REQUIRES,
                 ContractClauses.REQUIRES_FREE,
                 ContractClauses.REQUIRES);
-        return null;
+        return t;
     }
 
     @Override
     public Object visitMeasured_by_clause(JmlParser.Measured_by_clauseContext ctx) {
         String type = ctx.MEASURED_BY().getText();
-        Term t = accept(ctx.predornot());
-        contractClauses.measuredBy = t;
-        return null;
+        SLExpression t = accept(ctx.predornot());
+        contractClauses.measuredBy = t.getTerm();
+        return t;
     }
 
     @Override
     public Object visitCaputures_clause(JmlParser.Caputures_clauseContext ctx) {
         String type = ctx.CAPTURES().getText();
-        Term t = accept(ctx.predornot());
+        SLExpression t = accept(ctx.predornot());
         //insertSimpleClause(type, t,
         //        contractClauses.requires, contractClauses.requiresFree, contractClauses.requires);
-        return null;
+        return t;
     }
 
     @Override
     public Object visitDiverges_clause(JmlParser.Diverges_clauseContext ctx) {
-        Term t = accept(ctx.predornot());
-        contractClauses.diverges = t;
-        return null;
+        SLExpression t = accept(ctx.predornot());
+        contractClauses.diverges = t.getTerm();
+        return t;
     }
 
     @Override
     public Object visitWorking_space_clause(JmlParser.Working_space_clauseContext ctx) {
         String type = ctx.WORKING_SPACE().getText();
-        Term t = accept(ctx.predornot());
+        SLExpression t = accept(ctx.predornot());
         //insertSimpleClause(type, t,
         //        contractClauses.requires, contractClauses.requiresFree, contractClauses.requires);
-        return null;
+        return (t);
     }
 
     @Override
     public Object visitDuration_clause(JmlParser.Duration_clauseContext ctx) {
         String type = ctx.DURATION().getText();
-        Term t = accept(ctx.predornot());
+        SLExpression t = accept(ctx.predornot());
         //insertSimpleClause(type, t,
         //        contractClauses., contractClauses.requiresFree, contractClauses.requires);
-        return null;
+        return t;
     }
 
     @Override
     public Object visitWhen_clause(JmlParser.When_clauseContext ctx) {
         String type = ctx.WHEN().getText();
-        Term t = accept(ctx.predornot());
+        SLExpression t = accept(ctx.predornot());
         assert false;
         //insertSimpleClause(type, t,
         //        contractClauses., contractClauses.requiresFree, contractClauses.requires);
-        return null;
+        return t;
     }
 
 
@@ -2364,14 +2362,14 @@ public class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public LocationVariable visitTargetHeap(JmlParser.TargetHeapContext ctx) {
-        String heapName = ctx.ident().getText();
+        String heapName = ctx.getText();
         switch (heapName) {
-            case "permission":
+            case "<permission>":
                 return getPermissionHeap();
-            case "savedHeap":
-            case "saved":
+            case "<savedHeap>":
+            case "<saved>":
                 return getSavedHeap();
-            case "heap":
+            case "<heap>":
                 return getBaseHeap();
         }
         return null;

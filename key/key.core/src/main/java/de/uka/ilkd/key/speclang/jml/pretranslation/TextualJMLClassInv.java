@@ -22,14 +22,7 @@ import org.key_project.util.collection.ImmutableList;
  * A JML class invariant declaration in textual form.
  */
 public final class TextualJMLClassInv extends TextualJMLConstruct {
-
     private final ParserRuleContext inv;
-
-
-    public TextualJMLClassInv(ImmutableList<String> mods,
-                              ParserRuleContext inv) {
-        this(mods, inv, null);
-    }
 
     public TextualJMLClassInv(ImmutableList<String> mods,
                               ParserRuleContext inv, String name) {
@@ -42,7 +35,7 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
 
     public TextualJMLClassInv(ImmutableList<String> mods, JmlParser.Class_invariantContext ctx) {
         super(mods, null);
-        inv = null;
+        inv = ctx;
     }
 
     public ParserRuleContext getInv() {

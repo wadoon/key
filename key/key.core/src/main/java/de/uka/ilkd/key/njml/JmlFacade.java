@@ -185,7 +185,8 @@ public class JmlFacade {
 
         @Override
         public Object visitTargetHeap(JmlParser.TargetHeapContext ctx) {
-            return new Name(ctx.ident().getText());
+            String t = ctx.getText();
+            return new Name(t.substring(1, t.length() - 1));
         }
 
         @Override

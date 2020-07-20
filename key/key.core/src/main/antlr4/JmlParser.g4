@@ -53,37 +53,38 @@ clause
   | signals_clause   | signals_only_clause | variant_function  | name_clause
   | breaks_clause    | continues_clause    | returns_clause    | separates_clause
   | determines_clause
-  ) SEMI_TOPLEVEL;
+  );
 
 // clauses
-targetHeap : LT ident GT;
-ensures_clause: ENSURES targetHeap? predornot;
-requires_clause: REQUIRES targetHeap? predornot;
-measured_by_clause: MEASURED_BY predornot;
-caputures_clause: CAPTURES predornot;
-diverges_clause: DIVERGES predornot;
-working_space_clause: WORKING_SPACE predornot;
-duration_clause: DURATION predornot;
-when_clause: WHEN predornot;
-accessible_clause: ACCESSIBLE targetHeap? storeRefUnion ;
-assignable_clause: ASSIGNABLE targetHeap? (storeRefUnion | STRICTLY_NOTHING) ;
+targetHeap : SPECIAL_IDENT;
+ensures_clause: ENSURES targetHeap? predornot SEMI_TOPLEVEL;
+requires_clause: REQUIRES targetHeap? predornot SEMI_TOPLEVEL;
+measured_by_clause: MEASURED_BY predornot SEMI_TOPLEVEL;
+caputures_clause: CAPTURES predornot SEMI_TOPLEVEL;
+diverges_clause: DIVERGES predornot SEMI_TOPLEVEL;
+working_space_clause: WORKING_SPACE predornot SEMI_TOPLEVEL;
+duration_clause: DURATION predornot SEMI_TOPLEVEL;
+when_clause: WHEN predornot SEMI_TOPLEVEL;
+accessible_clause: ACCESSIBLE targetHeap? storeRefUnion SEMI_TOPLEVEL;
+assignable_clause: ASSIGNABLE targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
 depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? ;
 //decreases_clause: DECREASES termexpression (COMMA termexpression)*;
 represents_clause
   : REPRESENTS lhs=expression
     (((LARROW | EQUAL_SINGLE) (rhs=expression|t=storeRefUnion))
     | (SUCH_THAT predicate))
+    SEMI_TOPLEVEL
   ;
 separates_clause
   : SEPARATES (NOTHING | sep=infflowspeclist)
     ((DECLASSIFIES (NOTHING | decl=infflowspeclist))
      | (ERASES (NOTHING |erase=infflowspeclist)) | (NEW_OBJECTS (NOTHING |newobj=infflowspeclist)))*
-
+    SEMI_TOPLEVEL
   ;
 loop_separates_clause
   : LOOP_SEPARATES (NOTHING | sep=infflowspeclist)
     (NEW_OBJECTS (NOTHING | newobj=infflowspeclist))*
-
+    SEMI_TOPLEVEL
   ;
 
 determines_clause
@@ -93,19 +94,21 @@ determines_clause
     ( (DECLASSIFIES (NOTHING |decl+=infflowspeclist))
     | (ERASES (NOTHING |erases+=infflowspeclist))
     | (NEW_OBJECTS (NOTHING |newObs+=infflowspeclist)))*
+    SEMI_TOPLEVEL
    ;
 
 loop_determines_clause
   : LOOP_DETERMINES
     (NOTHING |det=infflowspeclist)
     BY ITSELF ((NEW_OBJECTS (NOTHING |newObs+=infflowspeclist)))*
+    SEMI_TOPLEVEL
   ;
 
-signals_clause: SIGNALS LPAREN referencetype (IDENT)? RPAREN (predornot)? ;
-signals_only_clause: SIGNALS_ONLY (NOTHING |referencetype (COMMA referencetype)*) ;
-breaks_clause: BREAKS LPAREN (IDENT)? RPAREN (predornot)? ;
-continues_clause: CONTINUES LPAREN (IDENT)? RPAREN (predornot)? ;
-returns_clause: RETURNS predornot? ;
+signals_clause: SIGNALS LPAREN referencetype (IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
+signals_only_clause: SIGNALS_ONLY (NOTHING |referencetype (COMMA referencetype)*)  SEMI_TOPLEVEL;
+breaks_clause: BREAKS LPAREN (IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
+continues_clause: CONTINUES LPAREN (IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
+returns_clause: RETURNS predornot? SEMI_TOPLEVEL;
 
 name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
 old_clause: OLD modifiers type IDENT INITIALISER ;
@@ -136,11 +139,11 @@ loop_specification
     | assignable_clause
     | variant_function)*;
 
-loop_invariant: LOOP_INVARIANT expression;
-variant_function: DECREASING expression;
+loop_invariant: LOOP_INVARIANT expression SEMI_TOPLEVEL;
+variant_function: DECREASING expression SEMI_TOPLEVEL;
 //loop_separates_clause: SEPARATES expression;
 //loop_determines_clause: DETERMINES expression;
-assume_statement: ASSUME expression;
+assume_statement: ASSUME expression SEMI_TOPLEVEL;
 initialiser: EQUAL_SINGLE expression;
 block_specification: method_specification;
 block_loop_specification:
@@ -163,14 +166,14 @@ infflowspeclist: termexpression (COMMA termexpression)*;
 storeRefUnion: list = storeRefList;
 storeRefList: storeref (COMMA storeref)*;
 storeRefIntersect: storeRefList;
-storeref: (NOTHING | EVERYTHING | NOT_SPECIFIED | storeRefExpr);
+storeref: (NOTHING | EVERYTHING | NOT_SPECIFIED |  STRICTLY_NOTHING | storeRefExpr);
 createLocset: (LOCSET | SINGLETON) LPAREN exprList RPAREN;
 exprList: expression (COMMA expression)*;
 storeRefExpr: expression;
 predornot: (predicate |NOT_SPECIFIED | SAME);
 predicate: expression;
 
-expressionEOF: expression EOF;
+expressionEOF: (expression|storeref)  EOF;
 expression: conditionalexpr;
 conditionalexpr: equivalenceexpr (QUESTIONMARK conditionalexpr COLON conditionalexpr)?;
 equivalenceexpr: impliesexpr (EQV_ANTIV impliesexpr)*;
@@ -224,7 +227,7 @@ primaryexpr
   | array_initializer
   ;
 this_: THIS;
-ident: IDENT | JML_IDENT;
+ident: IDENT | JML_IDENT | SPECIAL_IDENT;
 inv:INV;
 true_:TRUE;
 false_:FALSE;

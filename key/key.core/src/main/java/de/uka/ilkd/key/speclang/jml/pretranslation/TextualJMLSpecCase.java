@@ -43,7 +43,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     private ImmutableList<ParserRuleContext> getList(ClauseHd clause, String heap) {
-        return getList(clause, heap);
+        return getList(clause);//FIXME
     }
 
     public ImmutableList<ParserRuleContext> getAccessible(String toString) {
@@ -306,7 +306,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public Triple<ParserRuleContext, ParserRuleContext, ParserRuleContext>[] getAbbreviations() {
-        return null;
+        System.out.println("TODO .getAbbreviations");
+        return new Triple[0];
     }
 
     public ImmutableList<ParserRuleContext> getInfFlowSpecs() {
