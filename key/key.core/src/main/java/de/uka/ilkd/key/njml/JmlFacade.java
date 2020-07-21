@@ -70,7 +70,7 @@ public class JmlFacade {
 
     public static ParserRuleContext parseClause(String s) {
         JmlParser p = createParser(createLexer(s));
-        return p.clause();//TODO EOF
+        return p.clauseEOF().clause();//TODO EOF
     }
 
     static ImmutableList<TextualJMLConstruct> parseClasslevel(JmlLexer lexer) {
@@ -334,9 +334,6 @@ public class JmlFacade {
 
         @Override
         public Object visitModifiers(JmlParser.ModifiersContext ctx) {
-            for (JmlParser.ModifierContext modifierContext : ctx.modifier()) {
-
-            }
             return super.visitModifiers(ctx);
         }
 
@@ -379,7 +376,8 @@ public class JmlFacade {
         @Override
         public Object visitLoop_specification(JmlParser.Loop_specificationContext ctx) {
             loopContract = new TextualJMLLoopSpec(mods);
-            constructs = constructs.append(methodContract);
+            methodContract = null;
+            constructs = constructs.append(loopContract);
             return null;
         }
 
@@ -393,6 +391,11 @@ public class JmlFacade {
 
         @Override
         public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
+            return null;
+        }
+
+        @Override
+        public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
             return null;
         }
 

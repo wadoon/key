@@ -26,7 +26,6 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -44,6 +43,7 @@ import org.key_project.util.collection.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS_ONLY;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
 import static java.lang.String.format;
 
@@ -54,12 +54,10 @@ import static java.lang.String.format;
  * one of these classes, you probably need to change the other as well.
  */
 public final class JMLSpecExtractor implements SpecExtractor {
-
     private static final String THROWABLE = "java.lang.Throwable";
     private static final String ERROR = "java.lang.Error";
     private static final String RUNTIME_EXCEPTION = "java.lang.RuntimeException";
-    private static final String DEFAULT_SIGNALS_ONLY = "signals_only " + ERROR
-            + ", " + RUNTIME_EXCEPTION + ";";
+    private static final String DEFAULT_SIGNALS_ONLY = format("signals_only %s, %s;", ERROR, RUNTIME_EXCEPTION);
     private final Services services;
     private final JMLSpecFactory jsf;
     private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
@@ -117,19 +115,18 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     // includes unchecked exceptions (instances of Error or RuntimeException)
     // (see resolution to issue #1379)
-    private String getDefaultSignalsOnly(IProgramMethod pm) {
+    private ParserRuleContext getDefaultSignalsOnly(IProgramMethod pm) {
         if (pm.getThrown() == null) {
-            return DEFAULT_SIGNALS_ONLY;
+            return JmlFacade.parseClause(DEFAULT_SIGNALS_ONLY);
         }
 
-        ImmutableArray<TypeReference> exceptions = pm.getThrown()
-                .getExceptions();
+        ImmutableArray<TypeReference> exceptions = pm.getThrown().getExceptions();
 
         if (exceptions == null) {
-            return DEFAULT_SIGNALS_ONLY;
+            return JmlFacade.parseClause(DEFAULT_SIGNALS_ONLY);
         }
 
-        String exceptionsString = ERROR + ", " + RUNTIME_EXCEPTION + ", ";
+        String exceptionsString = format("%s, %s, ", ERROR, RUNTIME_EXCEPTION);
 
         for (int i = 0; i < exceptions.size(); i++) {
             if (services.getJavaInfo().isSubtype(
@@ -147,7 +144,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             exceptionsString = exceptionsString.substring(0,
                     exceptionsString.length() - 2);
         }
-        return "signals_only " + exceptionsString + ";";
+        return JmlFacade.parseClause("signals_only " + exceptionsString + ";");
     }
 
     /**
@@ -450,15 +447,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     //ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
                 if (specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-                    specCase.addEnsures(
-                            new PositionedString("ensures " + invString).label(
-                                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                    specCase.addClause(ENSURES, JmlFacade.parseExpr(invString));
+                    //label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
-                if (specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR
-                        && !pm.isModel()) {
-                    specCase.addSignals(new PositionedString(
-                            "signals (Throwable e) " + invString).label(
-                            ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                if (specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
+                    specCase.addClause(TextualJMLSpecCase.Clause.SIGNALS,
+                            JmlFacade.parseClause(format("signals (Throwable e) %s;", invString)));
+                    //TODO ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
             }
 
@@ -498,8 +493,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             if (specCase.getSignalsOnly().isEmpty()
                     && specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR
                     && !pm.isModel()) {
-                specCase.addSignalsOnly(
-                        new PositionedString(getDefaultSignalsOnly(pm)));
+                specCase.addClause(SIGNALS_ONLY, getDefaultSignalsOnly(pm));
             }
 
             // translate contract

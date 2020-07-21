@@ -45,6 +45,7 @@ spec_case:
 spec_header: requires_clause+;*/
 
 spec_body: a+=clause+ (NEST_START inner+=clause* (also_keyword+ spec_body)* NEST_END)?;
+clauseEOF: clause EOF;
 clause
   :
   ( ensures_clause   | requires_clause     | measured_by_clause

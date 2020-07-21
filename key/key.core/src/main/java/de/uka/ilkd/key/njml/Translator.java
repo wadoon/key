@@ -2223,11 +2223,13 @@ public class Translator extends JmlParserBaseVisitor<Object> {
             resolverManager.pushLocalVariablesNamespace();
             resolverManager.putIntoTopLocalVariablesNamespace(eVar, excType);
         }
-        Term result = accept(ctx.predornot());
+        SLExpression result = accept(ctx.predornot());
         if (vName != null) {
             resolverManager.popLocalVariablesNamespace();
         }
-        return translator.signals(result, eVar, excVar, excType);
+        Term r = translator.signals(result.getTerm(), eVar, excVar, excType);
+        contractClauses.signalsOnly = r;
+        return new SLExpression(r);
     }
 
     @Override

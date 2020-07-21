@@ -16,7 +16,6 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.njml.JmlParser;
-import de.uka.ilkd.key.speclang.PositionedLabeledString;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Triple;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -25,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.*;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
@@ -42,28 +42,32 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(ENSURES_FREE, toString);
     }
 
-    private ImmutableList<ParserRuleContext> getList(ClauseHd clause, String heap) {
-        return getList(clause);//FIXME
+    private ImmutableList<ParserRuleContext> getList(@NotNull ClauseHd clause, @NotNull String heap) {
+        Name def = new Name("unknown");
+        return ImmutableList.fromList(
+                getList(clause).stream().filter(
+                        it -> heap.equals(heaps.getOrDefault(it, def).toString()))
+                        .collect(Collectors.toList()));
     }
 
-    public ImmutableList<ParserRuleContext> getAccessible(String toString) {
-        return getList(ACCESSIBLE, toString);
+    public ImmutableList<ParserRuleContext> getAccessible(String heap) {
+        return getList(ACCESSIBLE, heap);
     }
 
-    public ImmutableList<ParserRuleContext> getAxioms(String toString) {
-        return getList(AXIOMS, toString);
+    public ImmutableList<ParserRuleContext> getAxioms(String heap) {
+        return getList(AXIOMS, heap);
     }
 
-    public ImmutableList<ParserRuleContext> getEnsures(String toString) {
-        return getList(ENSURES, toString);
+    public ImmutableList<ParserRuleContext> getEnsures(String heap) {
+        return getList(ENSURES, heap);
     }
 
-    public ImmutableList<ParserRuleContext> getRequires(String toString) {
-        return getList(REQUIRES, toString);
+    public ImmutableList<ParserRuleContext> getRequires(String heap) {
+        return getList(REQUIRES, heap);
     }
 
-    public ImmutableList<ParserRuleContext> getAssignable(String toString) {
-        return getList(ASSIGNABLE, toString);
+    public ImmutableList<ParserRuleContext> getAssignable(String heap) {
+        return getList(ASSIGNABLE, heap);
     }
 
     public ImmutableList<ParserRuleContext> getDecreases() {
@@ -113,10 +117,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         super(mods);
         assert behavior != null;
         this.behavior = behavior;
-        for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
+        /*for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
             //heaps.put(hName.toString(), new ArrayList<>(32));
             //accessibles.put(hName.toString() + "AtPre", ImmutableSLList.nil());
-        }
+        }*/
     }
 
     public TextualJMLSpecCase addClause(Clause clause, ParserRuleContext ctx) {
@@ -301,10 +305,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         addClause(REQUIRES, label);
     }
 
-    public void addSignals(PositionedLabeledString label) {
-        System.out.println("TODO .addSignals");
-    }
-
     public Triple<ParserRuleContext, ParserRuleContext, ParserRuleContext>[] getAbbreviations() {
         System.out.println("TODO .getAbbreviations");
         return new Triple[0];
@@ -332,15 +332,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public ImmutableList<ParserRuleContext> getMeasuredBy() {
         return getList(MEASURED_BY);
-    }
-
-
-    public void addEnsures(PositionedLabeledString ensures_) {
-        System.out.println("TODO .addEnsures");
-    }
-
-    public void addSignalsOnly(PositionedString ctx) {
-        System.out.println("TODO: addSignalsOnly");
     }
 
     public ImmutableList<ParserRuleContext> getSignalsOnly() {
