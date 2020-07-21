@@ -17,6 +17,7 @@ import java.util.List;
 
 public class DaisyBoundsBuiltinRule implements BuiltInRule {
     public static final DaisyBoundsBuiltinRule INSTANCE = new DaisyBoundsBuiltinRule();
+    public static final Name NAME = new Name("Daisy Bounds Rule");
 
     private List<Term> gatherPreconditions(Sequent sequent, Services services) {
         List<Term> res = new ArrayList<>();
@@ -58,18 +59,28 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
      */
     private Pair<Float, Float> daisyComputeBounds(List<Term> preconditions, List<Term> lets, Term floatExpr) {
 
-        return DaisyAPI.computeRange(preconditions,floatExpr,lets);
+//        return DaisyAPI.computeRange(preconditions,floatExpr,lets);
+        // js: just for testing
+        return new Pair(0.f, 0.f);
     }
 
     @Override
     // must return false if some bounds are not specified
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        return false;
+        Services services = goal.proof().getServices();
+        FloatLDT floatLDT = new FloatLDT(services);
+        Operator op = pio.subTerm().op();
+        boolean res = (op == floatLDT.getJavaAdd()
+                || op == floatLDT.getJavaSub()
+                || op == floatLDT.getJavaMul()
+                || op == floatLDT.getJavaDiv());
+        return res;
     }
 
     @Override
+    //
     public boolean isApplicableOnSubTerms() {
-        return false;
+        return true;
     }
 
     @Override
@@ -107,11 +118,11 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
 
     @Override
     public Name name() {
-        return null;
+        return NAME;
     }
 
     @Override
     public String displayName() {
-        return null;
+        return NAME.toString();
     }
 }
