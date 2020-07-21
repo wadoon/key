@@ -102,16 +102,20 @@ public class KeyBridgeUtils {
         return getDummyKJTAndServices().second.copyPreservesLDTInformation();
     }
 
+    public static String termToString(final Term t, final Services services) {
+        return LogicPrinter.quickPrintTerm(t, services, false, false);
+    }
+
     public static String jmlStringToJavaDLString(String jmlString, final KeYJavaType dummyKJT,
             final Services services) {
-        return LogicPrinter.quickPrintTerm(jmlStringToJavaDLTerm(jmlString, dummyKJT, services),
-                services, false, false);
+        return termToString(jmlStringToJavaDLTerm(jmlString, dummyKJT, services), services);
     }
 
     public static Term jmlStringToJavaDLTerm(String jmlString, final KeYJavaType dummyKJT,
             final Services services) {
         try {
-            Term parsed = KeyBridgeUtils.translateJML(jmlString, dummyKJT, services);
+            Term parsed = KeyBridgeUtils.translateJML(jmlString.replaceAll(Pattern.quote("\\hasTo"),
+                    Matcher.quoteReplacement("\\dl_hasTo")), dummyKJT, services);
             parsed = KeyBridgeUtils.removeLabels(parsed, services);
             return parsed;
         } catch (Exception e) {

@@ -199,7 +199,7 @@ public class FrameConditionProver implements InstantiationAspectProver {
     private String getAssignableTermString(final AEInstantiationModel model,
             final APEInstantiation inst, final Services services)
             throws UnsuccessfulAPERetrievalException {
-        return LogicPrinter.quickPrintTerm(helper.getAssignableTerm(model, inst, services),
+        return LogicPrinter.quickPrintTerm(helper.getJMLAssignableTerm(model, inst, services),
                 services, false, false);
     }
 

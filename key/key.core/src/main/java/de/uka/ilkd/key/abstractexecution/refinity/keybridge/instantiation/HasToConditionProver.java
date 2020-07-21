@@ -114,7 +114,7 @@ public class HasToConditionProver implements InstantiationAspectProver {
                 .map(tb::singletonPV).collect(unionReducer);
 
         final Set<AbstractUpdateLoc> hasToLocs = AbstractUpdateFactory
-                .abstrUpdateLocsFromUnionTerm(helper.getAssignableTerm(model, inst, services),
+                .abstrUpdateLocsFromUnionTerm(helper.getJMLAssignableTerm(model, inst, services),
                         Optional.empty(), services)
                 .stream().filter(HasToLoc.class::isInstance).map(HasToLoc.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
@@ -153,6 +153,12 @@ public class HasToConditionProver implements InstantiationAspectProver {
             proof.setProofFile(file);
         } catch (IOException e) {
             throw new RuntimeException("Could not save KeY proof", e);
+        }
+
+        if (!proof.closed()) {
+            System.err.println("[INFO] Possible incompleteness issue with HasTo prover:\n"
+                    + "The HasTo prover is sound, but incomplete, since it only extracts\n"
+                    + "assigned program variables, and not heap locations, from instantiations.");
         }
 
         return new ProofResult(proof.closed(), proof);

@@ -47,7 +47,8 @@ public class InstantiationChecker {
 
         final InstantiationAspectProver[] checkers = new InstantiationAspectProver[] {
                 new FrameConditionProver(), //
-                new HasToConditionProver() //
+                new HasToConditionProver(), //
+                new FootprintConditionProver()
         };
 
         for (final InstantiationAspectProver checker : checkers) {
@@ -56,8 +57,6 @@ public class InstantiationChecker {
             printIndividualProofResultStats(checkerProofResult, checker.proofObjective());
             result = result.merge(checkerProofResult);
         }
-
-        ///////// Footprint Specification
 
         ///////// Termination
 

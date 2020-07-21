@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -42,9 +44,11 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
+import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
@@ -271,34 +275,138 @@ public class InstantiationAspectProverHelper {
     /**
      * Returns the assignable term of the given {@link APEInstantiation}.
      * 
-     * @param inst
-     * @param services
-     * @return
+     * @param model The {@link AEInstantiationModel} containing the APE to analyze.
+     * @param inst The instantiation corresponding to the APE to analyze.
+     * @param services The {@link Services} object.
+     * @return The assignable JML term.
      * @throws UnsuccessfulAPERetrievalException
      */
-    protected Term getAssignableTerm(final AEInstantiationModel model, final APEInstantiation inst,
+    public Term getJMLAssignableTerm(final AEInstantiationModel model, final APEInstantiation inst,
             Services services) throws UnsuccessfulAPERetrievalException {
-        final String jmlAssignableTermList = getAssignableTerm(retrieveAPEs(model).stream()
-                .filter(r -> r.getLine() == inst.getApeLineNumber()).findFirst()
-                .orElseThrow(() -> new UnsuccessfulAPERetrievalException(
-                        "Expected to find APE with line no. " + inst.getApeLineNumber()
-                                + ", but did not.")));
+        return getJMLAssignableOrAccessibleTerm(model, inst, true, services);
+    }
+
+    /**
+     * Returns the accessible term of the given {@link APEInstantiation}.
+     * 
+     * @param model The {@link AEInstantiationModel} containing the APE to analyze.
+     * @param inst The instantiation corresponding to the APE to analyze.
+     * @param services The {@link Services} object.
+     * @return The accessible JML term.
+     * @throws UnsuccessfulAPERetrievalException
+     */
+    public Term getJMLAccessibleTerm(final AEInstantiationModel model, final APEInstantiation inst,
+            Services services) throws UnsuccessfulAPERetrievalException {
+        return getJMLAssignableOrAccessibleTerm(model, inst, false, services);
+    }
+
+    /**
+     * Returns the accessible term string of the given {@link APEInstantiation}.
+     * 
+     * @param model The {@link AEInstantiationModel} containing the APE to analyze.
+     * @param inst The instantiation corresponding to the APE to analyze.
+     * @param services The {@link Services} object.
+     * @return The accessible JML term.
+     * @throws UnsuccessfulAPERetrievalException
+     */
+    public String getJavaDLAccessibleTermString(final AEInstantiationModel model,
+            final APEInstantiation inst, Services services)
+            throws UnsuccessfulAPERetrievalException {
+        return LogicPrinter.quickPrintTerm(
+                getJMLAssignableOrAccessibleTerm(model, inst, false, services), services, false,
+                false);
+    }
+
+    /**
+     * Returns the assignable or accessible term of the given
+     * {@link APEInstantiation}.
+     * 
+     * @param model The {@link AEInstantiationModel} containing the APE to analyze.
+     * @param inst The instantiation corresponding to the APE to analyze.
+     * @param assignable true if the assignable spec should be returned, false if
+     * the accessible spec should be returned.
+     * @param services The {@link Services} object.
+     * @return The assignable or accessible JML term.
+     * @throws UnsuccessfulAPERetrievalException
+     */
+    private Term getJMLAssignableOrAccessibleTerm(final AEInstantiationModel model,
+            final APEInstantiation inst, boolean assignable, Services services)
+            throws UnsuccessfulAPERetrievalException {
+        final List<String> jmlAssignables = getJMLAssignableOrAccessibleTerms(model, inst,
+                assignable);
 
         // Translate comma-separated list into \set_union term
-        final String jmlAssignableTerm = Arrays.stream(jmlAssignableTermList.split(","))
-                .map(String::trim).collect(Collectors.reducing("\\empty",
-                        (a1, a2) -> String.format("\\set_union(%s, %s)", a1, a2)));
+        final String jmlAssignableTerm = jmlAssignables.stream().collect(Collectors
+                .reducing("\\empty", (a1, a2) -> String.format("\\set_union(%s, %s)", a1, a2)));
 
         return KeyBridgeUtils.jmlStringToJavaDLTerm( //
                 jmlAssignableTerm, KeyBridgeUtils.dummyKJT(), services);
     }
 
-    private static String getAssignableTerm(final APERetrievalResult ape) {
+    /**
+     * Returns the JML assignable terms from the APE corresponding to the given
+     * instantiation.
+     * 
+     * @param model The {@link AEInstantiationModel} containing the APE to analyze.
+     * @param inst The instantiation corresponding to the APE to analyze.
+     * @return The assignables for the APE.
+     * @throws UnsuccessfulAPERetrievalException If the APE corresponding to the
+     * instantiation could not be found.
+     */
+    public List<String> getJMLAssignableTerms(final AEInstantiationModel model,
+            final APEInstantiation inst) throws UnsuccessfulAPERetrievalException {
+        return getJMLAssignableOrAccessibleTerms(model, inst, true);
+    }
+
+    /**
+     * Returns the JML assignable or accessible terms from the APE corresponding to
+     * the given instantiation.
+     * 
+     * @param model The {@link AEInstantiationModel} containing the APE to analyze.
+     * @param inst The instantiation corresponding to the APE to analyze.
+     * @param assignable true if the assignable spec should be returned, false if
+     * the accessible spec should be returned.
+     * @return The assignables for the APE.
+     * @throws UnsuccessfulAPERetrievalException If the APE corresponding to the
+     * instantiation could not be found.
+     */
+    private List<String> getJMLAssignableOrAccessibleTerms(final AEInstantiationModel model,
+            final APEInstantiation inst, boolean assignable)
+            throws UnsuccessfulAPERetrievalException {
+        final String jmlAssignableTermCSVList = getJMLAssignableOrAccessibleTerm(retrieveAPEs(model)
+                .stream().filter(r -> r.getLine() == inst.getApeLineNumber()).findFirst()
+                .orElseThrow(() -> new UnsuccessfulAPERetrievalException(
+                        "Expected to find APE with line no. " + inst.getApeLineNumber()
+                                + ", but did not.")),
+                assignable);
+
+        return Arrays.stream(jmlAssignableTermCSVList.split(",")).map(String::trim)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the assignable or accessible String of the given APE.
+     * 
+     * @param ape The {@link APERetrievalResult}.
+     * @param assignable true if the assignable spec should be returned, false if
+     * the accessible spec should be returned.
+     * @return The assignable or accessible specification.
+     */
+    private static String getJMLAssignableOrAccessibleTerm(final APERetrievalResult ape,
+            boolean assignable) {
+        final Predicate<TextualJMLSpecCase> filter = assignable ? //
+                (c -> c.getAssignable() != null) : (c -> c.getAccessible() != null);
+
+        final Function<TextualJMLSpecCase, ImmutableList<PositionedString>> getter = assignable
+                ? TextualJMLSpecCase::getAssignable
+                : TextualJMLSpecCase::getAccessible;
+
+        final String keyword = assignable ? "assignable" : "accessible";
+
         return ape.getJMLConstructs().stream().filter(TextualJMLSpecCase.class::isInstance)
                 .map(TextualJMLSpecCase.class::cast).filter(c -> c.getBehavior() == Behavior.NONE)
-                .filter(c -> c.getAssignable() != null).map(TextualJMLSpecCase::getAssignable)
-                .map(ImmutableList::head).findAny().map(str -> str.text)
-                .map(str -> str.replaceAll("assignable ", "")).map(str -> str.replaceAll(";", ""))
+                .filter(filter).map(getter).map(ImmutableList::head).findAny().map(str -> str.text)
+                .map(str -> str.replaceAll(keyword + " ", "")).map(str -> str.replaceAll(";", ""))
                 .orElse("\\everything");
     }
 
@@ -328,8 +436,6 @@ public class InstantiationAspectProverHelper {
                                 .createAdditionalPremises(model.getAbstractLocationSets())))
                 .replaceAll(PROOF, "" /* unused... */);
     }
-
-    ////////////// Private Static Functions //////////////
 
     /**
      * @return A string representing the instantiations of symbolic functions and
