@@ -12,7 +12,6 @@
 //
 package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,7 +22,6 @@ import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.ProofResult;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
@@ -48,7 +46,8 @@ public class InstantiationChecker {
         final InstantiationAspectProver[] checkers = new InstantiationAspectProver[] {
                 new FrameConditionProver(), //
                 new HasToConditionProver(), //
-                new FootprintConditionProver()
+                new FootprintConditionProver(), //
+                new TerminationProver(), ///
         };
 
         for (final InstantiationAspectProver checker : checkers) {
@@ -58,23 +57,35 @@ public class InstantiationChecker {
             result = result.merge(checkerProofResult);
         }
 
-        ///////// Termination
-
         ///////// Normal Completion Spec
+
+        //TODO
 
         ///////// Completion Due to Return Spec
 
+        //TODO
+
         ///////// Completion Due to Thrown Exception Spec
+
+        //TODO
 
         ///////// Completion Due to Break Spec
 
+        //TODO
+
         ///////// Completion Due to Continue Spec
+
+        //TODO
 
         ///////// NOTE (DS, 2020-07-16): Labeled continue / break omitted, spec case not yet supported.
 
         ///////// Constraints (assumptions) satisfied
 
+        //TODO
+
         ///////// Consistent instantiations of APEs w/ same IDs
+
+        //TODO
 
         return result;
     }
@@ -89,8 +100,6 @@ public class InstantiationChecker {
             } else {
                 println("Could not prove " + proofObjective + ".");
                 println("Failed proof(s):");
-                proofResult.getProofs().stream().filter(p -> !p.closed()).map(Proof::getProofFile)
-                        .map(File::toString).forEach(this::println);
             }
         }
     }
@@ -117,39 +126,19 @@ public class InstantiationChecker {
 
     public static void main(String[] args) throws JAXBException, SAXException, IOException,
             ProblemLoaderException, SLTranslationException {
-//        final Path testFile = Paths.get(
-//                "/home/dscheurer/key-workspace/GIT/key/key/key.ui/examples/abstract_execution/SlideStatements/Correct/slideStatements.aer");
-//        final AERelationalModel relModel = //
-//                AERelationalModel.fromXml(
-//                        Files.readAllLines(testFile).stream().collect(Collectors.joining("\n")));
-//
-//        // There are ASs at lines 19 and 25
-//        final AEInstantiationModel instModel = //
-//                AEInstantiationModel.fromRelationalModel(relModel, true);
-//
-//        for (final String newPV : new String[] { "a", "b", "d", "w", "x", "y", "z" }) {
-//            instModel.getProgramVariableDeclarations()
-//                    .add(new ProgramVariableDeclaration("int", newPV));
-//        }
-//
-//        instModel.addFunctionInstantiation(new FunctionInstantiation(
-//                instModel.getAbstractLocationSets().stream()
-//                        .filter(decl -> decl.getFuncName().equals("frameA")).findAny().get(),
-//                "union(singletonPV(PV(x)), union(singletonPV(PV(y)), singletonPV(PV(z))))"));
-//
-//        instModel.addFunctionInstantiation(new FunctionInstantiation(
-//                instModel.getAbstractLocationSets().stream()
-//                        .filter(decl -> decl.getFuncName().equals("footprintA")).findAny().get(),
-//                "union(singletonPV(PV(y)), singletonPV(PV(w)))"));
-//
-//        instModel.addApeInstantiation(new APEInstantiation(19, "x = y++; z = w;"));
-//        instModel.addApeInstantiation(new APEInstantiation(25, "a = b + 17; int c = 2*d+a;"));
-
         final Path testFile = Paths.get("/home/dscheurer/key-workspace/GIT/key/key/key.ui/examples/"
                 + "abstract_execution/instantiation_checking/SlideStatements/slideStatementsInstP1.aei");
         final AEInstantiationModel instModel = AEInstantiationModel.fromPath(testFile);
 
         final InstantiationChecker checker = new InstantiationChecker(instModel);
-        checker.proveInstantiation(true);
+        final ProofResult result = checker.proveInstantiation(true);
+
+        final Path outputDir = Paths.get("output/");
+        if (outputDir.toFile().exists()) {
+            outputDir.toFile().delete();
+        }
+
+        result.saveBundlesToDir(outputDir);
+        System.out.println("Saved proofs to " + outputDir.toAbsolutePath().toString());
     }
 }

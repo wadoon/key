@@ -38,6 +38,7 @@ import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
+import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.APEInstantiation;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -510,6 +511,12 @@ public class KeyBridgeUtils {
         } catch (IOException e) {
             throw new IllegalStateException(message, e);
         }
+    }
+
+    public static String getFilenameForAPEProof(final String baseName, boolean closed,
+            final APEInstantiation inst) {
+        return String.format("%s_APE_line_%d_%s.zproof", baseName.replaceAll("\\W+", ""),
+                inst.getApeLineNumber(), closed ? "closed" : "failed");
     }
 
 }

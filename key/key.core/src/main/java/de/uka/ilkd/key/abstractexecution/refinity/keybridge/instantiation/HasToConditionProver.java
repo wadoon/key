@@ -161,7 +161,8 @@ public class HasToConditionProver implements InstantiationAspectProver {
                     + "assigned program variables, and not heap locations, from instantiations.");
         }
 
-        return new ProofResult(proof.closed(), proof);
+        return new ProofResult(proof.closed(), proof,
+                KeyBridgeUtils.getFilenameForAPEProof(proofObjective(), proof.closed(), inst));
     }
 
     /**

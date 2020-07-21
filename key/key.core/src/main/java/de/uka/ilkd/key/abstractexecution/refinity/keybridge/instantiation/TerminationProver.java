@@ -21,22 +21,20 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.ProofResult;
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.RetrieveProgramResult;
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.UnsuccessfulAPERetrievalException;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.APEInstantiation;
 import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Proof;
 
 /**
  * @author Dominic Steinhoefel
  *
  */
-public class FrameConditionProver implements InstantiationAspectProver {
-    private static final String FRAME_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/frameProblem.key";
+public class TerminationProver implements InstantiationAspectProver {
+    private static final String TERMINATION_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/terminationProblem.key";
 
     private static final String PRECONDITION = "<PRECONDITION>";
     private static final String PROGRAMVARIABLES = "<PROGRAMVARIABLES>";
@@ -45,32 +43,30 @@ public class FrameConditionProver implements InstantiationAspectProver {
     private static final String PARAMS = "<PARAMS>";
     private static final String ADDITIONAL_PREMISES = "<ADDITIONAL_PREMISES>";
     private static final String SYMINSTS = "<SYMINSTS>";
-    private static final String ASSIGNABLES = "<ASSIGNABLES>";
-    private static final String AT_PRES = "<AT_PRES>";
-    private static final String PV_AT_PRE_POSTS = "<PV_AT_PRE_POSTS>";
 
     private final InstantiationAspectProverHelper helper = InstantiationAspectProverHelper.INSTANCE;
 
-    private final String keyProveFrameScaffold;
+    private final String keyProveTerminationScaffold;
 
-    public FrameConditionProver() {
-        keyProveFrameScaffold = KeyBridgeUtils.readResource(FRAME_PROBLEM_FILE_SCAFFOLD);
+    public TerminationProver() {
+        keyProveTerminationScaffold = KeyBridgeUtils
+                .readResource(TERMINATION_PROBLEM_FILE_SCAFFOLD);
     }
 
     @Override
     public ProofResult prove(AEInstantiationModel model) {
-        return model.getApeInstantiations().stream().map(inst -> proveFrameInst(model, inst))
+        return model.getApeInstantiations().stream().map(inst -> proveTermination(model, inst))
                 .collect(ProofResult.REDUCER);
     }
 
     @Override
     public String initMessage() {
-        return "Proving Frame Condition(s)...";
+        return "Proving Termination (if applicable)...";
     }
 
     @Override
     public String proofObjective() {
-        return "frame condition(s)";
+        return "termination";
     }
 
     /**
@@ -80,8 +76,8 @@ public class FrameConditionProver implements InstantiationAspectProver {
      * @param inst The {@link APEInstantiation}
      * @return A {@link ProofResult} for the frame problem.
      */
-    private ProofResult proveFrameInst(final AEInstantiationModel model, APEInstantiation inst) {
-        final String keyFileContent = createProveFrameKeYFile(model, inst);
+    private ProofResult proveTermination(final AEInstantiationModel model, APEInstantiation inst) {
+        final String keyFileContent = createProveTerminationKeYFile(model, inst);
         final String javaFileContent = helper.createJavaFile(model, inst.getInstantiation());
 
         final Proof proof;
@@ -96,8 +92,11 @@ public class FrameConditionProver implements InstantiationAspectProver {
                 KeyBridgeUtils.getFilenameForAPEProof(proofObjective(), proof.closed(), inst));
     }
 
-    private String createProveFrameKeYFile(final AEInstantiationModel model,
+    private String createProveTerminationKeYFile(final AEInstantiationModel model,
             final APEInstantiation inst) {
+        // TODO: Termination only has to be proven if the APE is specified to terminate.
+        // This information has to be added to the model!
+
         final Services services = helper.getPopulatedDummyServices(model);
 
         final String javaDLPreCondRelation = KeyBridgeUtils.createJavaDLPreCondition(
@@ -111,8 +110,7 @@ public class FrameConditionProver implements InstantiationAspectProver {
 
         //////////
 
-        final String atPres;
-        final LinkedHashSet<LocationVariable> instProgVars;
+        final String newVars;
 
         {
             final RetrieveProgramResult retrProgRes = helper.retrieveProgram(model,
@@ -125,33 +123,10 @@ public class FrameConditionProver implements InstantiationAspectProver {
             final List<String> ignPVs = Arrays
                     .asList(new String[] { "_result", "_exc", "_objUnderTest" });
 
-            instProgVars = progVarCol.result().stream()
+            final LinkedHashSet<LocationVariable> instProgVars = progVarCol.result().stream()
                     .filter(lv -> !ignPVs.contains(lv.name().toString()))
                     .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-            atPres = instProgVars.stream().map(pv -> String.format("%1$s_AtPre:=%1$s", pv))
-                    .collect(Collectors.joining("||"));
-        }
 
-        //////////
-
-        final String javaDlAssignableTerm = getAssignableTermString(model, inst, services);
-
-        //////////
-
-        final String pvAtPrePosts;
-
-        {
-            pvAtPrePosts = instProgVars.stream().map(LocationVariable::toString)
-                    .map(v -> String.format("(%1$s=%1$s_AtPre | pvElementOf(PV(%1$s), %2$s))", v,
-                            javaDlAssignableTerm))
-                    .collect(Collectors.joining("\n              & "));
-        }
-
-        //////////
-
-        final String newVars;
-
-        {
             final String newInstVars = instProgVars.stream()
                     .filter(lv -> !model.getProgramVariableDeclarations().stream()
                             .anyMatch(pvd -> pvd.getName().equals(lv.name().toString())))
@@ -159,15 +134,10 @@ public class FrameConditionProver implements InstantiationAspectProver {
                             lv.getKeYJavaType().getSort().name().toString(), lv.name().toString()))
                     .collect(Collectors.joining("\n  "));
 
-            final String atPreVars = instProgVars.stream()
-                    .map(lv -> String.format("%s %s_AtPre;",
-                            lv.getKeYJavaType().getSort().name().toString(), lv.name().toString()))
-                    .collect(Collectors.joining("\n  "));
-
-            newVars = "\n  " + newInstVars + "\n  " + atPreVars;
+            newVars = "\n  " + newInstVars;
         }
 
-        return keyProveFrameScaffold
+        return keyProveTerminationScaffold
                 .replaceAll(FUNCTIONS,
                         Matcher.quoteReplacement(
                                 InstantiationAspectProverHelper.createFuncDecls(model)))
@@ -180,28 +150,10 @@ public class FrameConditionProver implements InstantiationAspectProver {
                         Matcher.quoteReplacement(
                                 InstantiationAspectProverHelper.createParams(model)))
                 .replaceAll(SYMINSTS, Matcher.quoteReplacement(symInsts))
-                .replaceAll(AT_PRES, Matcher.quoteReplacement(atPres))
-                .replaceAll(ASSIGNABLES, Matcher.quoteReplacement(javaDlAssignableTerm))
-                .replaceAll(PV_AT_PRE_POSTS, pvAtPrePosts)
                 .replaceAll(Pattern.quote(PRECONDITION),
                         Matcher.quoteReplacement(javaDLPreCondRelation))
                 .replaceAll(ADDITIONAL_PREMISES, Matcher.quoteReplacement(
                         KeyBridgeUtils.createAdditionalPremises(model.getAbstractLocationSets())));
-    }
-
-    /**
-     * Returns a String representation of the assignable term of the given
-     * {@link APEInstantiation}.
-     * 
-     * @param inst
-     * @return
-     * @throws UnsuccessfulAPERetrievalException
-     */
-    private String getAssignableTermString(final AEInstantiationModel model,
-            final APEInstantiation inst, final Services services)
-            throws UnsuccessfulAPERetrievalException {
-        return LogicPrinter.quickPrintTerm(helper.getJMLAssignableTerm(model, inst, services),
-                services, false, false);
     }
 
 }

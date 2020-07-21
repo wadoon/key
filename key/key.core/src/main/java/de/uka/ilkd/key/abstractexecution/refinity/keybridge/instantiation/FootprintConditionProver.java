@@ -102,7 +102,8 @@ public class FootprintConditionProver implements InstantiationAspectProver {
             throw rte;
         }
 
-        return new ProofResult(proof.closed(), proof);
+        return new ProofResult(proof.closed(), proof,
+                KeyBridgeUtils.getFilenameForAPEProof(proofObjective(), proof.closed(), inst));
     }
 
     private String createProveFootprintKeYFile(final AEInstantiationModel model,
@@ -138,17 +139,18 @@ public class FootprintConditionProver implements InstantiationAspectProver {
                 final List<FunctionInstantiation> functionInstantiations = model
                         .getFunctionInstantiations();
                 for (int j = 0; j < functionInstantiations.size(); j++) {
-                    
+
                     final Term assignableTerm;
                     {
                         final Term origTerm = jmlAssignableTerms.get(i);
-                        if (origTerm.op() == services.getTypeConverter().getLocSetLDT().getHasTo()) {
+                        if (origTerm.op() == services.getTypeConverter().getLocSetLDT()
+                                .getHasTo()) {
                             assignableTerm = origTerm.sub(0);
                         } else {
                             assignableTerm = origTerm;
                         }
                     }
-                    
+
                     final FunctionInstantiation instantiation = functionInstantiations.get(j);
 
                     if (assignableTerm.sort() != services.getTypeConverter().getLocSetLDT()
