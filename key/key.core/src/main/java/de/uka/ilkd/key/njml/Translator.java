@@ -2329,36 +2329,41 @@ public class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitLoop_invariant(JmlParser.Loop_invariantContext ctx) {
-        return super.visitLoop_invariant(ctx);
+        return accept(ctx.expression());
     }
 
     @Override
     public Object visitVariant_function(JmlParser.Variant_functionContext ctx) {
-        return super.visitVariant_function(ctx);
+        return accept(ctx.expression());
     }
 
     @Override
     public Object visitInitialiser(JmlParser.InitialiserContext ctx) {
+        assert false;
         return super.visitInitialiser(ctx);
     }
 
     @Override
     public Object visitBlock_specification(JmlParser.Block_specificationContext ctx) {
+        assert false;
         return super.visitBlock_specification(ctx);
     }
 
     @Override
     public Object visitBlock_loop_specification(JmlParser.Block_loop_specificationContext ctx) {
+        assert false;
         return super.visitBlock_loop_specification(ctx);
     }
 
     @Override
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
+        assert false;
         return super.visitAssert_statement(ctx);
     }
 
     @Override
     public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
+        assert false;
         return super.visitAssume_statement(ctx);
     }
 

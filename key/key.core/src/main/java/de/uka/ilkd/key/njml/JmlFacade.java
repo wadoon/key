@@ -249,7 +249,17 @@ public class JmlFacade {
 
         @Override
         public Object visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
-            methodContract.addClause(ASSIGNABLE, accept(ctx.targetHeap()), ctx);
+            if (methodContract != null)
+                methodContract.addClause(ASSIGNABLE, accept(ctx.targetHeap()), ctx);
+            if (loopContract != null)
+                loopContract.addClause(TextualJMLLoopSpec.ClauseHd.ASSIGNABLE, accept(ctx.targetHeap()), ctx);
+            return null;
+        }
+
+        @Override
+        public Object visitVariant_function(JmlParser.Variant_functionContext ctx) {
+            assert loopContract != null;
+            loopContract.setVariant(ctx);
             return null;
         }
 
@@ -378,7 +388,7 @@ public class JmlFacade {
             loopContract = new TextualJMLLoopSpec(mods);
             methodContract = null;
             constructs = constructs.append(loopContract);
-            return null;
+            return super.visitLoop_specification(ctx);
         }
 
         @Override
@@ -391,22 +401,30 @@ public class JmlFacade {
 
         @Override
         public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
+            //TODO
+            System.out.println("TextualTranslator.visitAssume_statement");
             return null;
         }
 
         @Override
         public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
+            //TODO
+            System.out.println("TextualTranslator.visitAssert_statement");
             return null;
         }
 
         @Override
         public Object visitBlock_specification(JmlParser.Block_specificationContext ctx) {
-            return super.visitBlock_specification(ctx);
+            //TODO
+            System.out.println("TextualTranslator.visitBlock_specification");
+            return null;
         }
 
         @Override
         public Object visitBlock_loop_specification(JmlParser.Block_loop_specificationContext ctx) {
-            return super.visitBlock_loop_specification(ctx);
+            //TODO
+            System.out.println("TextualTranslator.visitBlock_loop_specification");
+            return null;
         }
     }
 }

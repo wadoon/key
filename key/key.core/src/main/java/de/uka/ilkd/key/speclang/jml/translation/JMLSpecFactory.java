@@ -113,7 +113,7 @@ public class JMLSpecFactory {
             Term invariant;
             ImmutableList<ParserRuleContext> originalInvariant
                     = originalInvariants.get(heap.name().toString());
-            if (originalInvariant.isEmpty()) {
+            if (originalInvariant == null || originalInvariant.isEmpty()) {
                 invariant = null;
             } else {
                 invariant = tb.tt();
@@ -140,7 +140,7 @@ public class JMLSpecFactory {
             Term freeInvariant;
             ImmutableList<ParserRuleContext> originalFreeInvariant
                     = originalFreeInvariants.get(heap.name().toString());
-            if (originalFreeInvariant.isEmpty()) {
+            if (originalFreeInvariant == null || originalFreeInvariant.isEmpty()) {
                 freeInvariant = null;
             } else {
                 freeInvariant = tb.tt();
