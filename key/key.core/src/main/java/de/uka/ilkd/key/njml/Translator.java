@@ -27,6 +27,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.translation.JMLResolverManager;
+import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
@@ -53,7 +54,7 @@ import static java.util.Objects.requireNonNull;
  * @version 1 (5/10/20)
  */
 @SuppressWarnings("unchecked")
-public class Translator extends JmlParserBaseVisitor<Object> {
+class Translator extends JmlParserBaseVisitor<Object> {
     private final Services services;
     private final TermBuilder tb;
     private final JavaInfo javaInfo;
@@ -1785,7 +1786,7 @@ public class Translator extends JmlParserBaseVisitor<Object> {
 
     //region contract
     private ImmutableSLList<String> mods;
-    private JmlSpecFactory factory;
+    private JMLSpecFactory factory;
     private Object currentBehavior;
     private ContractClauses contractClauses = new ContractClauses();
     private List<Term> abbreviations = new ArrayList<>(64);
@@ -2067,7 +2068,7 @@ public class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitCaputures_clause(JmlParser.Caputures_clauseContext ctx) {
+    public Object visitCaptures_clause(JmlParser.Captures_clauseContext ctx) {
         String type = ctx.CAPTURES().getText();
         SLExpression t = accept(ctx.predornot());
         //insertSimpleClause(type, t,

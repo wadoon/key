@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.speclang.jml;
 
 import de.uka.ilkd.key.njml.JmlFacade;
-import de.uka.ilkd.key.njml.JmlParsingFacade;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;

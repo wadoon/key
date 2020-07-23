@@ -49,7 +49,7 @@ clauseEOF: clause EOF;
 clause
   :
   ( ensures_clause   | requires_clause     | measured_by_clause
-  | caputures_clause | diverges_clause     | working_space_clause
+  | captures_clause | diverges_clause     | working_space_clause
   | duration_clause  | when_clause         | assignable_clause | accessible_clause
   | signals_clause   | signals_only_clause | variant_function  | name_clause
   | breaks_clause    | continues_clause    | returns_clause    | separates_clause
@@ -61,7 +61,7 @@ targetHeap : SPECIAL_IDENT;
 ensures_clause: ENSURES targetHeap? predornot SEMI_TOPLEVEL;
 requires_clause: REQUIRES targetHeap? predornot SEMI_TOPLEVEL;
 measured_by_clause: MEASURED_BY predornot SEMI_TOPLEVEL;
-caputures_clause: CAPTURES predornot SEMI_TOPLEVEL;
+captures_clause: CAPTURES predornot SEMI_TOPLEVEL;
 diverges_clause: DIVERGES predornot SEMI_TOPLEVEL;
 working_space_clause: WORKING_SPACE predornot SEMI_TOPLEVEL;
 duration_clause: DURATION predornot SEMI_TOPLEVEL;

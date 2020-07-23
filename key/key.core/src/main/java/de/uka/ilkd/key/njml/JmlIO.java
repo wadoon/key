@@ -19,11 +19,12 @@ import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static de.uka.ilkd.key.njml.JmlFacade.TODO;
 
 /**
  * @author Alexander Weigl
@@ -69,13 +70,13 @@ public class JmlIO {
     }
 
     public static Pair<IObserverFunction, Term> translateRepresents(ParserRuleContext clause, KeYJavaType kjt, ProgramVariable selfVar, Object o, Object o1, Object o2, Object o3, Object o4, Class<Pair> pairClass, Services services) {
+        TODO();
         System.out.println("JmlIO.translateRepresents");
         return null;
     }
 
     public static boolean isKnownFunction(String functionName) {
-        System.out.println("JmlIO.isKnownFunction");
-        return false;//TODO java2jdl
+        return JmlTermFactory.jml2jdl.containsKey(functionName);
     }
 
     public static Term translateTerm(ParserRuleContext expr,

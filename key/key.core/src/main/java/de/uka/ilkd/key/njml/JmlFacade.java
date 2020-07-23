@@ -1,19 +1,10 @@
 package de.uka.ilkd.key.njml;
 
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import org.antlr.v4.runtime.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT;
-import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT_FREE;
-import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS;
-import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS_ONLY;
-import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
 
 /**
  * @author Alexander Weigl
@@ -101,7 +92,7 @@ public class JmlFacade {
         return translator.constructs;
     }
 
-    static class TextualTranslator extends JmlParserBaseVisitor<Object> {
+    /*static class TextualTranslator extends JmlParserBaseVisitor<Object> {
         public ImmutableList<TextualJMLConstruct> constructs = ImmutableSLList.nil();
         private ImmutableList<String> mods = ImmutableSLList.nil();
         @Nullable
@@ -246,6 +237,7 @@ public class JmlFacade {
             methodContract.addClause(ACCESSIBLE, accept(ctx.targetHeap()), ctx);
             return null;
         }
+
 
         @Override
         public Object visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
@@ -426,5 +418,10 @@ public class JmlFacade {
             System.out.println("TextualTranslator.visitBlock_loop_specification");
             return null;
         }
+}
+*/
+    public static void TODO() {
+        throw new IllegalStateException("to be implemented");
     }
 }
+

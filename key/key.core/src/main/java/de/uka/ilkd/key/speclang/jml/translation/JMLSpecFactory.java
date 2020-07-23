@@ -520,7 +520,9 @@ public class JMLSpecFactory {
                 InfFlowSpec translated
                         = JmlIO.translateInformation(expr, pm.getContainerType(), selfVar, paramVars,
                         resultVar, excVar, null, null, InfFlowSpec.class, services);
-                result = result.append(translated);
+                if (translated != null) {
+                    result = result.append(translated);
+                }
             }
             return result;
         }
@@ -573,7 +575,7 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         Term result = tb.empty();
         for (ParserRuleContext expr : originalClauses) {
-            if(expr==null) continue;//TODO trace
+            if (expr == null) continue;//TODO trace
             Term translated = JmlIO.translateTerm(expr, pm.getContainerType(), selfVar,
                     paramVars, null, null, atPres, atBefores, specType, services);
 
@@ -708,7 +710,7 @@ public class JMLSpecFactory {
                                           ImmutableList<ParserRuleContext> assignableClauses) throws SLTranslationException {
 
         for (ParserRuleContext expr : assignableClauses) {
-            if(expr==null) continue;//TODO trace
+            if (expr == null) continue;//TODO trace
             Term translated = jmlIo
                     .classType(pm.getContainerType())
                     .selfVar(selfVar)
