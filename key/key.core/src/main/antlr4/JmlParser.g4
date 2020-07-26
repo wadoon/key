@@ -9,8 +9,9 @@ classlevel_element
   | field_or_method_declaration | represents_clause
   | history_constraint | initially_clause | class_axiom
   | monitors_for_clause | readable_if_clause | writable_if_clause
-  | datagroup_clause | set_statement
-  | assert_statement | assume_statement | nowarn_pragma;
+  | datagroup_clause  | set_statement | nowarn_pragma
+  | accessible_clause | assert_statement | assume_statement
+  ;
 
 methodlevel_comment: (modifiers? methodlevel_element) EOF;
 methodlevel_element
@@ -66,8 +67,8 @@ diverges_clause: DIVERGES predornot SEMI_TOPLEVEL;
 working_space_clause: WORKING_SPACE predornot SEMI_TOPLEVEL;
 duration_clause: DURATION predornot SEMI_TOPLEVEL;
 when_clause: WHEN predornot SEMI_TOPLEVEL;
-accessible_clause: ACCESSIBLE targetHeap? storeRefUnion SEMI_TOPLEVEL;
-assignable_clause: ASSIGNABLE targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
+accessible_clause: ACCESSIBLE targetHeap? ((name|INV) COLON)? storeRefUnion SEMI_TOPLEVEL;
+assignable_clause: (ASSIGNABLE|MODIFIES) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
 depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? ;
 //decreases_clause: DECREASES termexpression (COMMA termexpression)*;
 represents_clause

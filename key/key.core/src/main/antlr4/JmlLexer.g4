@@ -141,6 +141,10 @@ NEST_START: '{|' ;
 NEST_END: '|}' ;
 SEMICOLON : ';' -> type(SEMI_TOPLEVEL);
 BODY_START: '{' -> more, pushMode(body);
+
+C_IDENT: '\\'? LETTER (LETTERORDIGIT)* -> type(IDENT);
+E_COLON: ':' -> type(COLON);
+
 ERROR_CHAR: .;
 
 mode expr;
@@ -163,13 +167,15 @@ VOID: 'void';
 E_NULLABLE: 'nullable'->type(NULLABLE);
 E_NONNULL: 'non_null' -> type(NON_NULL);
 
+
+DEPENDS: 'depends';  // internal translation for 'accessible' on model fields
+
 /* JML and JML* keywords */
 /*ACCESSIBLE: 'accessible';
 ASSIGNABLE: 'assignable';
 BREAKS: 'breaks';
 CONTINUES: 'continues';
 DECREASES: 'decreases'; // internal translation for 'measured_by'
-DEPENDS: 'depends';  // internal translation for 'accessible' on model fields
 DETERMINES: 'determines';  //KeY extension, not official JML
 ENSURES: 'ensures';
 ENSURES_FREE: 'ensures_free';

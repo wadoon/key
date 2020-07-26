@@ -1209,3 +1209,15 @@
       @   ensures sum == (\sum int i; 0 <= i && i < a.length; a[i]);
       @   ensures sum <= a.length * max;
       @*/
+--- Contract ---
+//@ model \locset footprint;
+//@ accessible footprint: footprint;
+//@ accessible \inv: footprint;
+--- Contract ---
+//@ accessible \inv: footprint;
+--- Contract ---
+//@ model \locset footprint;
+//@ accessible footprint: footprint;
+//@ requires x > 0;
+//@ requires \disjoint(footprint,\singleton(x));
+//@ ensures x > 0;
