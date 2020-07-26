@@ -13,11 +13,12 @@ classlevel_element
   | accessible_clause | assert_statement | assume_statement
   ;
 
-methodlevel_comment: (modifiers? methodlevel_element) EOF;
+methodlevel_comment: (modifiers? methodlevel_element)+ EOF;
 methodlevel_element
   : field_or_method_declaration | set_statement | merge_point_statement
   | loop_specification | assert_statement | assume_statement | nowarn_pragma
   | debug_statement | block_specification | block_loop_specification
+  | assert_statement | assume_statement
  ;
 
 modifiers: modifier+;
@@ -151,7 +152,7 @@ block_specification: method_specification;
 block_loop_specification:
   (loop_contract_keyword spec_case (also_keyword)+ loop_contract_keyword spec_case)+;
 loop_contract_keyword: LOOP_CONTRACT;
-assert_statement: (ASSERT expression | UNREACHABLE SEMICOLON);
+assert_statement: (ASSERT expression | UNREACHABLE) SEMI_TOPLEVEL;
 //breaks_clause: BREAKS expression;
 //continues_clause: CONTINUES expression;
 //returns_clause: RETURNS expression;
