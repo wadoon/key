@@ -180,7 +180,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
             try {
                 parseTerm(it);
                 fail();
-            } catch (SLTranslationException e) {
+            } catch (RuntimeException e) {
                 assertTrue(e.getMessage().startsWith("Number constant out of bounds"));
             }
         }
@@ -198,7 +198,7 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
             try {
                 parseTerm(it);
                 fail();
-            } catch (SLTranslationException e) {
+            } catch (RuntimeException e) {
                 assertTrue(e.getMessage().startsWith("Number constant out of bounds"));
             }
         }

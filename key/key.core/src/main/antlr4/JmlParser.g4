@@ -3,7 +3,7 @@ parser grammar JmlParser;
 options { tokenVocab=JmlLexer; }
 
 classlevel_comments: classlevel_comment* EOF;
-classlevel_comment: modifiers (classlevel_element modifiers)+;
+classlevel_comment: modifiers? (classlevel_element modifiers?)+ | modifiers | set_statement;
 classlevel_element
   : class_invariant | depends_clause | method_specification
   | field_or_method_declaration | represents_clause
@@ -12,14 +12,14 @@ classlevel_element
   | datagroup_clause | set_statement
   | assert_statement | assume_statement | nowarn_pragma;
 
-methodlevel_comment: (modifiers methodlevel_element) EOF;
+methodlevel_comment: (modifiers? methodlevel_element) EOF;
 methodlevel_element
   : field_or_method_declaration | set_statement | merge_point_statement
   | loop_specification | assert_statement | assume_statement | nowarn_pragma
   | debug_statement | block_specification | block_loop_specification
  ;
 
-modifiers: modifier*;
+modifiers: modifier+;
 modifier
   : ABSTRACT | FINAL | GHOST | HELPER | INSTANCE | MODEL | NON_NULL
   | NULLABLE | NULLABLE_BY_DEFAULT | PRIVATE | PROTECTED | PUBLIC | PURE

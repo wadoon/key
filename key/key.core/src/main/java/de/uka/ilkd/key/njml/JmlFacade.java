@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.njml;
 
+import com.google.common.base.Stopwatch;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.Interval;
 import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.ImmutableList;
 
@@ -29,17 +31,20 @@ public class JmlFacade {
     }
 
     public static JmlParser.ExpressionContext parseExpr(PositionedString expr) {
-        final JmlLexer lexer = createLexer(expr);
-        lexer._mode = JmlLexer.expr;
-        JmlParser parser = createParser(lexer);
-        return parser.expressionEOF().expression();
+        return getExpressionContext(createLexer(expr));
     }
 
     public static JmlParser.ExpressionContext parseExpr(String expr) {
-        final JmlLexer lexer = createLexer(expr);
+        return getExpressionContext(createLexer(expr));
+    }
+
+    private static JmlParser.ExpressionContext getExpressionContext(JmlLexer lexer) {
         lexer._mode = JmlLexer.expr;
+        Stopwatch sw = Stopwatch.createStarted();
         JmlParser parser = createParser(lexer);
-        return parser.expressionEOF().expression();
+        JmlParser.ExpressionContext ctx = parser.expressionEOF().expression();
+        System.out.println("JmlFacade.parseExpr: " + sw);
+        return ctx;
     }
 
     static JmlParser createParser(JmlLexer lexer) {
@@ -48,6 +53,7 @@ public class JmlFacade {
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
                 Token t = (Token) offendingSymbol;
+                System.err.println(t.getTokenSource().getInputStream().getText(Interval.of(0, 10000)));
                 throw new RuntimeException("line " + line + ":" + charPositionInLine + " " + msg);
             }
         });
@@ -56,19 +62,24 @@ public class JmlFacade {
 
     public static ParserRuleContext parseTop(PositionedString expr) {
         JmlParser p = createParser(createLexer(expr));
-        return p.classlevel_comments();
+        Stopwatch sw = Stopwatch.createStarted();
+        JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
+        System.out.println("JmlFacade.parseTop: " + sw.toString());
+        return ctx;
     }
 
     public static ParserRuleContext parseClause(String s) {
         JmlParser p = createParser(createLexer(s));
-        return p.clauseEOF().clause();//TODO EOF
+        return p.clauseEOF().clause();
     }
 
     static ImmutableList<TextualJMLConstruct> parseClasslevel(JmlLexer lexer) {
         @NotNull JmlParser p = createParser(lexer);
+        Stopwatch sw = Stopwatch.createStarted();
         JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
         TextualTranslator translator = new TextualTranslator();
         ctx.accept(translator);
+        System.out.println("JmlFacade.parseClasslevel: " + sw);
         return translator.constructs;
     }
 
@@ -86,9 +97,11 @@ public class JmlFacade {
 
     private static ImmutableList<TextualJMLConstruct> parseMethodlevel(JmlLexer lexer) {
         @NotNull JmlParser p = createParser(lexer);
+        Stopwatch sw = Stopwatch.createStarted();
         JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
         TextualTranslator translator = new TextualTranslator();
         ctx.accept(translator);
+        System.out.println("JmlFacade.parseMethodlevel: " + sw);
         return translator.constructs;
     }
 

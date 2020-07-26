@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -24,8 +25,6 @@ import org.key_project.util.collection.ImmutableSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.uka.ilkd.key.njml.JmlFacade.TODO;
-
 /**
  * @author Alexander Weigl
  * @version 1 (7/1/20)
@@ -38,7 +37,8 @@ public class JmlIO {
         this(services, containerType, self, o, o1, o2, o3, new HashMap<>());
     }
 
-    public JmlIO() {}
+    public JmlIO() {
+    }
 
     private Services services;
     private KeYJavaType specInClass;
@@ -60,19 +60,9 @@ public class JmlIO {
         this.atPres = atPres;
     }
 
-    public static InfFlowSpec translateInformation(ParserRuleContext expr,
-                                                   KeYJavaType containerType, ProgramVariable selfVar,
-                                                   ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
-                                                   ProgramVariable excVar, Object o, Object o1,
-                                                   Class<InfFlowSpec> infFlowSpecClass, Services services) {
-        System.out.println("JmlIO.translateInformation");
-        return null;
-    }
-
-    public static Pair<IObserverFunction, Term> translateRepresents(ParserRuleContext clause, KeYJavaType kjt, ProgramVariable selfVar, Object o, Object o1, Object o2, Object o3, Object o4, Class<Pair> pairClass, Services services) {
-        TODO();
-        System.out.println("JmlIO.translateRepresents");
-        return null;
+    public Pair<IObserverFunction, Term> translateRepresents(ParserRuleContext clause) {
+        Object interpret = interpret(clause);
+        return (Pair<IObserverFunction, Term>) interpret;
     }
 
     public static boolean isKnownFunction(String functionName) {
@@ -89,25 +79,41 @@ public class JmlIO {
 
     public static Term translateTerm(ParserRuleContext expr, KeYJavaType containerType, ProgramVariable selfVar, ImmutableList<ProgramVariable> allVars,
                                      ProgramVariable o, ProgramVariable o1, Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atPres1, OriginTermLabel.SpecType type, Services services) {
-        JmlIO io = new JmlIO(services, containerType, selfVar, allVars, o, o1,atPres, atPres1 );
+        JmlIO io = new JmlIO(services, containerType, selfVar, allVars, o, o1, atPres, atPres1);
         SLExpression e = (SLExpression) io.interpret(expr);
+        //TODO set label
         return e.getTerm();
     }
 
 
-    public static Pair<Label, Term> translateLabeledClause(ParserRuleContext parserRuleContext, KeYJavaType containerType, ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar, ProgramVariable excVar, Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores, OriginTermLabel.SpecType breaks, Services services) {
-        System.out.println("JmlIO.translateLabeledClause");
-        return null;
+    public static Pair<Label, Term> translateLabeledClause(
+            ParserRuleContext parserRuleContext, KeYJavaType containerType,
+            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar, ProgramVariable excVar,
+            Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores,
+            OriginTermLabel.SpecType breaks, Services services) {
+        JmlIO io = new JmlIO(services, containerType, selfVar, paramVars, resultVar, excVar, atPres, atBefores);
+        Term t = io.translateTerm(parserRuleContext);
+        String label;
+        if (parserRuleContext instanceof JmlParser.Continues_clauseContext) {
+            label = ((JmlParser.Continues_clauseContext) parserRuleContext).IDENT().getText();
+        } else if (parserRuleContext instanceof JmlParser.Breaks_clauseContext) {
+            label = ((JmlParser.Breaks_clauseContext) parserRuleContext).IDENT().getText();
+        } else {
+            throw new IllegalArgumentException();
+        }
+        //TODO set label
+        return new Pair<>(new ProgramElementName(label), t);
     }
 
     public static MergeParamsSpec translateMergeParams(ParserRuleContext mergeParamsParseStr, KeYJavaType kjt, ProgramVariable selfVar, ImmutableList<ProgramVariable> append, ProgramVariable resultVar, ProgramVariable excVar, Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atPres1, Object o, Class<MergeParamsSpec> mergeParamsSpecClass, Services services) {
         System.out.println("JmlIO.translateMergeParams");
-        return null;
+        throw new RuntimeException();
     }
 
     public static Triple<IObserverFunction, Term, Term> translateDependencyContract(ParserRuleContext originalDep, KeYJavaType kjt, ProgramVariable selfVar, Object o, Object o1, Object o2, Object o3, Object o4, Services services) {
         System.out.println("JmlIO.translateDependencyContract");
-        return null;
+        throw new RuntimeException();
     }
 
     public ImmutableList<TextualJMLConstruct> parseClassLevel(String concatenatedComment, String fileName, Position pos) {
@@ -195,4 +201,7 @@ public class JmlIO {
         return this;
     }
 
+    public InfFlowSpec translateInfFlow(ParserRuleContext expr) {
+        return (InfFlowSpec) this.interpret(expr);
+    }
 }

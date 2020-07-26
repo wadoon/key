@@ -1908,17 +1908,16 @@ class Translator extends JmlParserBaseVisitor<Object> {
         assert lhs != null;
         Triple<IObserverFunction, Term, Term> a = translator.depends(lhs, rhs, mby);
         //todo where depends should go?
-        return null;
+        return a;
     }
 
 
     @Override
     public ImmutableList<TextualJMLConstruct> visitClasslevel_comment(JmlParser.Classlevel_commentContext ctx) {
-        ImmutableList<TextualJMLConstruct> result = ImmutableSLList.<TextualJMLConstruct>nil();
         this.mods = ImmutableSLList.<String>nil();
         /* there may be some modifiers after the declarations */
         this.mods = (ImmutableSLList<String>) this.<String>listOf(ctx.modifiers());
-        result = listOf(ctx.classlevel_element());
+        ImmutableList<TextualJMLConstruct> result = listOf(ctx.classlevel_element());
         this.mods = (ImmutableSLList<String>) mods.prepend(this.mods);
         return result;
     }
@@ -2067,6 +2066,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return t;
     }
 
+
     @Override
     public Object visitCaptures_clause(JmlParser.Captures_clauseContext ctx) {
         String type = ctx.CAPTURES().getText();
@@ -2114,7 +2114,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Pair<IObserverFunction, Term> visitRepresents_clause(JmlParser.Represents_clauseContext ctx) {
-        //TODO
         SLExpression lhs = accept(ctx.lhs);
         assert lhs != null;
         boolean representsClauseLhsIsLocSet = lhs.getTerm().sort().equals(locSetLDT.targetSort());
@@ -2180,12 +2179,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
         ImmutableList<Term> decl = ImmutableSLList.nil();
         ImmutableList<Term> erases = ImmutableSLList.nil();
         ImmutableList<Term> newObs = ImmutableSLList.nil();
-        ImmutableList<Term> det = accept(ctx.det);
         ImmutableList<Term> by = ImmutableSLList.nil();
+
+        ImmutableList<Term> det = accept(ctx.det);
 
         if (ctx.ITSELF() != null) by = det;
         else by = append(by, ctx.by);
-
 
         decl = append(decl, ctx.decl);
         erases = append(erases, ctx.erases);
