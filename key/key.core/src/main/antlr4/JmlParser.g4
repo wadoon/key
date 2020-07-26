@@ -28,16 +28,16 @@ modifier
   | CODE_JAVA_MATH | CODE_SAVE_MATH | CODE_BIGINT_MATH
  ;
 
+class_axiom: AXIOM expression SEMI_TOPLEVEL;
+initially_clause: INITIALLY expression SEMI_TOPLEVEL;
 class_invariant: INVARIANT expression SEMI_TOPLEVEL;
 //axiom_name: AXIOM_NAME_BEGIN IDENT AXIOM_NAME_END;
-class_axiom: AXIOM expression;
-initially_clause: INITIALLY expression;
 method_specification: (also_keyword)* spec_case ((also_keyword)+ spec_case)*;
 also_keyword: (ALSO | FOR_EXAMPLE | IMPLIES_THAT);
 spec_case:
   (modifier)?
   behavior=(BEHAVIOR | NORMAL_BEHAVIOR | MODEL_BEHAVIOUR | EXCEPTIONAL_BEHAVIOUR
-  | BREAK_BEHAVIOR | CONTINUE_BEHAVIOR | RETURN_BEHAVIOR )?
+           | BREAK_BEHAVIOR | CONTINUE_BEHAVIOR | RETURN_BEHAVIOR )?
   spec_body
 ;
 
@@ -188,25 +188,17 @@ andexpr: equalityexpr (AND equalityexpr)*;
 equalityexpr: relationalexpr (EQ_NEQ relationalexpr)*;
 
 relationalexpr
-  : relational_lockset
+  : shiftexpr
+  | relational_lockset
   | relational_chain
   | instance_of
   | st_expr
-  | shiftexpr
   ;
 
 st_expr: shiftexpr ST shiftexpr;
 instance_of: shiftexpr INSTANCEOF typespec;
-
-relational_chain
-  :  shiftexpr ( op+=(LT | GT | LEQ | GEQ) shiftexpr)+
-  ;
-
-relational_lockset
-  : shiftexpr LOCKSET_LT postfixexpr
-  | shiftexpr LOCKSET_LEQ postfixexpr
-  ;
-
+relational_chain:  shiftexpr ( op+=(LT | GT | LEQ | GEQ) shiftexpr)+;
+relational_lockset: shiftexpr (LOCKSET_LT|LOCKSET_LEQ|ST) postfixexpr;
 
 shiftexpr: additiveexpr (op+=(SHIFTRIGHT|SHIFTLEFT|UNSIGNEDSHIFTRIGHT) additiveexpr)*;
 additiveexpr: multexpr (op+=(PLUS|MINUS) multexpr)*;
@@ -322,7 +314,7 @@ sequence
 mapExpression: MAP_GET | MAP_OVERRIDE | MAP_UPDATE | MAP_REMOVE | IN_DOMAIN | DOMAIN_IMPLIES_CREATED | MAP_SIZE | MAP_SINGLETON | IS_FINITE;
 quantifier: FORALL | EXISTS | MIN | MAX | NUM_OF | PRODUCT | SUM;
 infinite_union_expr: LPAREN UNIONINF (boundvarmodifiers)? quantifiedvardecls SEMI (predicate SEMI)* storeref RPAREN;
-specquantifiedexpression: LPAREN quantifier (boundvarmodifiers)? quantifiedvardecls SEMI (expression SEMI)* expression RPAREN;
+specquantifiedexpression: LPAREN quantifier (boundvarmodifiers)? quantifiedvardecls SEMI (expression SEMI)? expression RPAREN;
 oldexpression: (PRE LPAREN expression RPAREN | OLD LPAREN expression (COMMA IDENT)? RPAREN);
 beforeexpression: (BEFORE LPAREN expression RPAREN);
 bsumterm: LPAREN BSUM quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;

@@ -43,7 +43,7 @@ public class JmlFacade {
         Stopwatch sw = Stopwatch.createStarted();
         JmlParser parser = createParser(lexer);
         JmlParser.ExpressionContext ctx = parser.expressionEOF().expression();
-        System.out.println("JmlFacade.parseExpr: " + sw);
+        //System.out.println("JmlFacade.parseExpr: " + sw);
         return ctx;
     }
 
@@ -64,7 +64,7 @@ public class JmlFacade {
         JmlParser p = createParser(createLexer(expr));
         Stopwatch sw = Stopwatch.createStarted();
         JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
-        System.out.println("JmlFacade.parseTop: " + sw.toString());
+        //System.out.println("JmlFacade.parseTop: " + sw.toString());
         return ctx;
     }
 
@@ -79,7 +79,7 @@ public class JmlFacade {
         JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
         TextualTranslator translator = new TextualTranslator();
         ctx.accept(translator);
-        System.out.println("JmlFacade.parseClasslevel: " + sw);
+        //System.out.println("JmlFacade.parseClasslevel: " + sw);
         return translator.constructs;
     }
 
@@ -101,7 +101,7 @@ public class JmlFacade {
         JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
         TextualTranslator translator = new TextualTranslator();
         ctx.accept(translator);
-        System.out.println("JmlFacade.parseMethodlevel: " + sw);
+        //System.out.println("JmlFacade.parseMethodlevel: " + sw);
         return translator.constructs;
     }
 

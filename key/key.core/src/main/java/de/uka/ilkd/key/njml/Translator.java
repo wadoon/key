@@ -542,7 +542,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitRelationalexpr(JmlParser.RelationalexprContext ctx) {
-        return oneOf(ctx.shiftexpr(), ctx.instance_of(), ctx.relational_chain(), ctx.relational_lockset(), ctx.st_expr());
+        return oneOf(ctx.shiftexpr(), ctx.instance_of(),
+                ctx.relational_chain(), ctx.relational_lockset(), ctx.st_expr());
     }
 
     @Override

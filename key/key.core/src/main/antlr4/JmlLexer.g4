@@ -132,14 +132,14 @@ WRITABLE: 'writable' -> pushMode(expr);
 JML_SL_START: '//@' -> channel(HIDDEN);
 JML_ML_START: '/*@' -> channel(HIDDEN);
 JML_ML_END: '*/' -> channel(HIDDEN);
-SL_COMMENT: '//' ~'@' ~('\n'|'\r')* -> channel(HIDDEN);
+SL_COMMENT: ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> channel(HIDDEN);
 WS: (' ' | '\t' | '\n' | '\r' | '@')+ -> channel(HIDDEN);
 
 ML_COMMENT: '/*' -> more, pushMode(mlComment);
 
 NEST_START: '{|' ;
 NEST_END: '|}' ;
-SEMICOLON : ';';
+SEMICOLON : ';' -> type(SEMI_TOPLEVEL);
 BODY_START: '{' -> more, pushMode(body);
 ERROR_CHAR: .;
 
@@ -324,7 +324,7 @@ RBRACE:               '}' {decrBrace();};
 LBRACKET:             '[' {incrBracket();};
 RBRACKET:             ']' {decrBracket();};
 SEMI_TOPLEVEL:        {   semicolonOnToplevel()}? ';' -> popMode; //jump back to contract mode
-SEMI:               { ! semicolonOnToplevel()}? ';';
+SEMI:                 { ! semicolonOnToplevel()}? ';';
 
 fragment LETTER: 'a'..'z' | 'A'..'Z' | '_' | '$';
 
