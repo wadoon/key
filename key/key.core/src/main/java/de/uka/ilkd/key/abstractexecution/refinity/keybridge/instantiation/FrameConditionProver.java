@@ -98,7 +98,9 @@ public class FrameConditionProver implements InstantiationAspectProver {
 
     private String createProveFrameKeYFile(final AEInstantiationModel model,
             final APEInstantiation inst) {
-        final Services services = helper.getPopulatedDummyServices(model);
+        final RetrieveProgramResult retrProgRes = helper.retrieveProgram(model,
+                inst.getInstantiation());
+        final Services services = retrProgRes.getServices();
 
         final String javaDLPreCondRelation = KeyBridgeUtils.createJavaDLPreCondition(
                 model.getPreCondition(), model.getProgramVariableDeclarations(),
@@ -115,11 +117,8 @@ public class FrameConditionProver implements InstantiationAspectProver {
         final LinkedHashSet<LocationVariable> instProgVars;
 
         {
-            final RetrieveProgramResult retrProgRes = helper.retrieveProgram(model,
-                    inst.getInstantiation());
             final ProgramVariableCollector progVarCol = new ProgramVariableCollector(
-                    retrProgRes.getProgram(), retrProgRes.getLocalSpecRepo(),
-                    retrProgRes.getServices());
+                    retrProgRes.getProgram(), retrProgRes.getLocalSpecRepo(), services);
             progVarCol.start();
 
             final List<String> ignPVs = Arrays
