@@ -13,7 +13,7 @@ classlevel_element
   | accessible_clause | assert_statement | assume_statement
   ;
 
-methodlevel_comment: (modifiers? methodlevel_element)+ EOF;
+methodlevel_comment: (modifiers? methodlevel_element)* EOF;
 methodlevel_element
   : field_or_method_declaration | set_statement | merge_point_statement
   | loop_specification | assert_statement | assume_statement | nowarn_pragma

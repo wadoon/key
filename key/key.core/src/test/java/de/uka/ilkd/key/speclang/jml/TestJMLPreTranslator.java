@@ -51,7 +51,7 @@ public class TestJMLPreTranslator {
         assertEquals(0, specCase.getEnsures().size());
         assertEquals(0, specCase.getSignals().size());
         assertEquals(0, specCase.getSignalsOnly().size());
-        assertEquals("requirestrue", specCase.getRequires().head().getText().trim());
+        assertEquals("requirestrue;", specCase.getRequires().head().getText().trim());
     }
 
 
@@ -81,11 +81,11 @@ public class TestJMLPreTranslator {
 
         System.out.println(specCase);
 
-        assertEquals("ensuresfalse", specCase.getEnsures().head().getText().trim());
-        assertEquals("assignable\\nothing", specCase.getAssignable().head().getText().trim());
-        assertEquals("signals(Exception)e", specCase.getSignals().head().getText().trim());
-        assertEquals("signals_onlyonlythis", specCase.getSignalsOnly().head().getText().trim());
-        assertEquals("requirestrue", specCase.getRequires().head().getText().trim());
+        assertEquals("ensuresfalse;", specCase.getEnsures().head().getText().trim());
+        assertEquals("assignable\\nothing;", specCase.getAssignable().head().getText().trim());
+        assertEquals("signals(Exception)e;", specCase.getSignals().head().getText().trim());
+        assertEquals("signals_onlyonlythis;", specCase.getSignalsOnly().head().getText().trim());
+        assertEquals("requirestrue;", specCase.getRequires().head().getText().trim());
     }
 
 

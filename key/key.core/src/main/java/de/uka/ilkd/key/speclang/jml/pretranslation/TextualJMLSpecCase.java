@@ -306,7 +306,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public Triple<ParserRuleContext, ParserRuleContext, ParserRuleContext>[] getAbbreviations() {
-        System.out.println("TODO .getAbbreviations");
+        //TODO System.out.println("TODO .getAbbreviations");
         return new Triple[0];
     }
 

@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static de.uka.ilkd.key.njml.JmlFacade.TODO;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -1486,11 +1487,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitPrimaryignore10(JmlParser.Primaryignore10Context ctx) {
-        return super.visitPrimaryignore10(ctx);
-    }
-
-    @Override
     public SLExpression visitSequenceEmpty(JmlParser.SequenceEmptyContext ctx) {
         return new SLExpression(tb.seqEmpty());
     }
@@ -1971,16 +1967,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return listOf(ctx.spec_case());
     }
 
-    @Override
-    public Object visitClasslevel_element(JmlParser.Classlevel_elementContext ctx) {
-        return super.visitClasslevel_element(ctx);
-    }
-
-    @Override
-    public Object visitMethodlevel_element(JmlParser.Methodlevel_elementContext ctx) {
-        return super.visitMethodlevel_element(ctx);
-    }
-
     //TODO init
     IProgramMethod pm = null;
 
@@ -2005,7 +1991,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitSpec_body(JmlParser.Spec_bodyContext ctx) {
         listOf(ctx.clause());
         listOf(ctx.spec_body());
-        return super.visitSpec_body(ctx);
+        return null;//super.visitSpec_body(ctx);
     }
 
 
@@ -2235,11 +2221,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitName_clause(JmlParser.Name_clauseContext ctx) {
+        TODO();
         return super.visitName_clause(ctx);
     }
 
     @Override
     public Object visitOld_clause(JmlParser.Old_clauseContext ctx) {
+        TODO();
         return super.visitOld_clause(ctx);
     }
 
@@ -2250,81 +2238,85 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitField_declaration(JmlParser.Field_declarationContext ctx) {
+        TODO();
         return super.visitField_declaration(ctx);
     }
 
     @Override
     public Object visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
+        TODO();
         return super.visitMethod_declaration(ctx);
     }
 
     @Override
-    public Object visitParam_list(JmlParser.Param_listContext ctx) {
-        return super.visitParam_list(ctx);
-    }
-
-    @Override
-    public Object visitParam_decl(JmlParser.Param_declContext ctx) {
-        return super.visitParam_decl(ctx);
-    }
-
-    @Override
     public Object visitHistory_constraint(JmlParser.History_constraintContext ctx) {
+        TODO();
         return super.visitHistory_constraint(ctx);
     }
 
     @Override
     public Object visitDatagroup_clause(JmlParser.Datagroup_clauseContext ctx) {
+        TODO();
         return super.visitDatagroup_clause(ctx);
     }
 
     @Override
     public Object visitMonitors_for_clause(JmlParser.Monitors_for_clauseContext ctx) {
+        TODO();
         return super.visitMonitors_for_clause(ctx);
     }
 
     @Override
     public Object visitReadable_if_clause(JmlParser.Readable_if_clauseContext ctx) {
+        TODO();
         return super.visitReadable_if_clause(ctx);
     }
 
     @Override
     public Object visitWritable_if_clause(JmlParser.Writable_if_clauseContext ctx) {
+        TODO();
         return super.visitWritable_if_clause(ctx);
     }
 
     @Override
     public Object visitIn_group_clause(JmlParser.In_group_clauseContext ctx) {
+        TODO();
         return super.visitIn_group_clause(ctx);
     }
 
     @Override
     public Object visitMaps_into_clause(JmlParser.Maps_into_clauseContext ctx) {
+        TODO();
         return super.visitMaps_into_clause(ctx);
     }
 
     @Override
     public Object visitNowarn_pragma(JmlParser.Nowarn_pragmaContext ctx) {
+        TODO();
         return super.visitNowarn_pragma(ctx);
     }
 
     @Override
     public Object visitDebug_statement(JmlParser.Debug_statementContext ctx) {
+        TODO();
         return super.visitDebug_statement(ctx);
     }
 
     @Override
     public Object visitSet_statement(JmlParser.Set_statementContext ctx) {
+        TODO();
         return super.visitSet_statement(ctx);
     }
 
     @Override
     public Object visitMerge_point_statement(JmlParser.Merge_point_statementContext ctx) {
+        TODO();
         return super.visitMerge_point_statement(ctx);
     }
 
     @Override
     public Object visitLoop_specification(JmlParser.Loop_specificationContext ctx) {
+        TODO();
         return super.visitLoop_specification(ctx);
     }
 
@@ -2340,31 +2332,31 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitInitialiser(JmlParser.InitialiserContext ctx) {
-        assert false;
+        TODO();
         return super.visitInitialiser(ctx);
     }
 
     @Override
     public Object visitBlock_specification(JmlParser.Block_specificationContext ctx) {
-        assert false;
+        TODO();
         return super.visitBlock_specification(ctx);
     }
 
     @Override
     public Object visitBlock_loop_specification(JmlParser.Block_loop_specificationContext ctx) {
-        assert false;
+        TODO();
         return super.visitBlock_loop_specification(ctx);
     }
 
     @Override
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
-        assert false;
+        TODO();
         return super.visitAssert_statement(ctx);
     }
 
     @Override
     public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
-        assert false;
+        TODO();
         return super.visitAssume_statement(ctx);
     }
 

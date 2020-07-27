@@ -48,6 +48,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitSpec_case(JmlParser.Spec_caseContext ctx) {
         Behavior behaviour = getBehavior(ctx.behavior);
         methodContract = new TextualJMLSpecCase(mods, behaviour);
+        loopContract = null;
         constructs = constructs.append(methodContract);
         return super.visitSpec_case(ctx);
     }
