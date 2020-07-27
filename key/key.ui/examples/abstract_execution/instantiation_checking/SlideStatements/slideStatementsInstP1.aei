@@ -142,7 +142,7 @@
 	        <declaration predName="throwsExcA">
 	            <argSort>any</argSort>
 	        </declaration>
-            <instantiation>throwsExcA(y, w)</instantiation>
+            <instantiation>false</instantiation><!-- possible: throwsExcA(y, w) -->
             <instArgSort>int</instArgSort>
             <instArgSort>int</instArgSort>
         </predicateInst>
@@ -150,7 +150,7 @@
 	        <declaration predName="throwsExcB">
 	            <argSort>any</argSort>
 	        </declaration>
-            <instantiation>throwsExcB(b, d, a)</instantiation>
+            <instantiation>b = 0</instantiation>
 	        <instArgSort>int</instArgSort>
 	        <instArgSort>int</instArgSort>
 	        <instArgSort>int</instArgSort>
@@ -216,7 +216,7 @@
             <instantiation>x = y++; z = w; if (w == 17) { return Integer.valueOf(z); }</instantiation>
         </apeInst>
         <apeInst apeLineNumber="31">
-            <instantiation>a = b + 17; int c = 2*d+a;</instantiation>
+            <instantiation>a = b/b + 17; int c = 2*d+a;</instantiation>
         </apeInst>
     </apeInstantiations>
 </ns2:aeInstantiationModel>

@@ -75,6 +75,7 @@ public class InstantiationChecker {
                 new FootprintConditionProver(profile.get()), //
                 new TerminationProver(profile.get()), //
                 new ReturnsSpecProver(profile.get()), //
+                new ExcSpecProver(profile.get()), //
         };
 
         blParr: {
@@ -87,11 +88,17 @@ public class InstantiationChecker {
             int i = 0;
             for (final InstantiationAspectProver checker : checkers) {
                 threads[i++] = new Thread(() -> {
-                    println(checker.initMessage());
-                    final ProofResult checkerProofResult = checker.prove(model);
-                    printIndividualProofResultStats(checkerProofResult, checker.proofObjective());
-                    synchronized (result) {
-                        result = result.merge(checkerProofResult);
+                    try {
+                        println(checker.initMessage());
+                        final ProofResult checkerProofResult = checker.prove(model);
+                        printIndividualProofResultStats(checkerProofResult,
+                                checker.proofObjective());
+                        synchronized (result) {
+                            result = result.merge(checkerProofResult);
+                        }
+                    } catch (Throwable t) {
+                        System.err.println("Error occurred: " + t.getMessage());
+                        t.printStackTrace();
                     }
                 });
             }
@@ -111,38 +118,27 @@ public class InstantiationChecker {
             }
 
             for (final InstantiationAspectProver checker : checkers) {
-                println(checker.initMessage());
-                final ProofResult checkerProofResult = checker.prove(model);
-                printIndividualProofResultStats(checkerProofResult, checker.proofObjective());
-                result = result.merge(checkerProofResult);
+                try {
+                    println(checker.initMessage());
+                    final ProofResult checkerProofResult = checker.prove(model);
+                    printIndividualProofResultStats(checkerProofResult, checker.proofObjective());
+                    result = result.merge(checkerProofResult);
+                } catch (Throwable t) {
+                    System.err.println("Error occurred: " + t.getMessage());
+                    t.printStackTrace();
+                }
             }
         }
 
-        ///////// Normal Completion Spec
+        ///////// 
 
-        //TODO
-
-        ///////// Completion Due to Thrown Exception Spec
-
-        //TODO
-
-        ///////// Completion Due to Break Spec
-
-        //TODO
-
-        ///////// Completion Due to Continue Spec
-
-        //TODO
-
-        ///////// NOTE (DS, 2020-07-16): Labeled continue / break omitted, spec case not yet supported.
-
-        ///////// Constraints (assumptions) satisfied
-
-        //TODO
-
-        ///////// Consistent instantiations of APEs w/ same IDs
-
-        //TODO
+        // TODO:
+        // - Normal Completion Spec
+        // - Completion Due to Break Spec
+        // - Completion Due to Continue Spec
+        // [ - NOTE (DS, 2020-07-16): Labeled continue / break omitted, spec case not yet supported. ]
+        // - Constraints (assumptions) satisfied
+        // - Consistent instantiations of APEs w/ same IDs
 
         return result;
     }
@@ -201,7 +197,7 @@ public class InstantiationChecker {
         long startTime = System.currentTimeMillis();
 
         final InstantiationChecker checker = new InstantiationChecker(instModel);
-        final ProofResult result = checker.proveInstantiation(true, true);
+        final ProofResult result = checker.proveInstantiation(true, false);
 
         long endTime = System.currentTimeMillis();
         double durationSecs = (double) (endTime - startTime) / (double) 1000;
