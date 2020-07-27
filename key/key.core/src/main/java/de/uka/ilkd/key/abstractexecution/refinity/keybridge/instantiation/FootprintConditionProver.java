@@ -35,6 +35,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 /**
@@ -58,12 +59,18 @@ public class FootprintConditionProver implements InstantiationAspectProver {
     private static final String ACCESSIBLES = "<ACCESSIBLES>";
     private static final String PVS_ANON = "<PVS_ANON>";
 
-    private final InstantiationAspectProverHelper helper = InstantiationAspectProverHelper.INSTANCE;
+    private final InstantiationAspectProverHelper helper;
 
     private final String keyProveFootprintScaffold;
 
     public FootprintConditionProver() {
         keyProveFootprintScaffold = KeyBridgeUtils.readResource(FOOTPRINT_PROBLEM_FILE_SCAFFOLD);
+        helper = new InstantiationAspectProverHelper();
+    }
+
+    public FootprintConditionProver(final Profile profile) {
+        keyProveFootprintScaffold = KeyBridgeUtils.readResource(FOOTPRINT_PROBLEM_FILE_SCAFFOLD);
+        helper = new InstantiationAspectProverHelper(profile);
     }
 
     @Override
@@ -96,7 +103,8 @@ public class FootprintConditionProver implements InstantiationAspectProver {
 
         final Proof proof;
         try {
-            proof = KeyBridgeUtils.createProofAndRun(keyFileContent, javaFileContent, 10000);
+            proof = KeyBridgeUtils.createProofAndRun(keyFileContent, javaFileContent, 10000,
+                    helper.profile());
         } catch (RuntimeException rte) {
             // Maybe convert to different exception class...
             throw rte;

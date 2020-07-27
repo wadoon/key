@@ -42,6 +42,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.util.MiscTools;
@@ -60,10 +61,16 @@ public class HasToConditionProver implements InstantiationAspectProver {
 
     private final String keyHeaderScaffold;
 
-    private final InstantiationAspectProverHelper helper = InstantiationAspectProverHelper.INSTANCE;
+    private final InstantiationAspectProverHelper helper;
 
     public HasToConditionProver() {
         keyHeaderScaffold = KeyBridgeUtils.readResource(KEY_HEADER_SCAFFOLD);
+        helper = new InstantiationAspectProverHelper();
+    }
+
+    public HasToConditionProver(final Profile profile) {
+        keyHeaderScaffold = KeyBridgeUtils.readResource(KEY_HEADER_SCAFFOLD);
+        helper = new InstantiationAspectProverHelper(profile);
     }
 
     @Override

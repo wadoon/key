@@ -33,6 +33,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**
@@ -54,7 +55,7 @@ public class ReturnsSpecProver implements InstantiationAspectProver {
     private static final String PRE_SPEC = "<PRE_SPEC>";
     private static final String POST_SPEC = "<POST_SPEC>";
 
-    private final InstantiationAspectProverHelper helper = InstantiationAspectProverHelper.INSTANCE;
+    private final InstantiationAspectProverHelper helper;
 
     private final String keyProveReturnsSpecScaffold;
 
@@ -69,6 +70,13 @@ public class ReturnsSpecProver implements InstantiationAspectProver {
     public ReturnsSpecProver() {
         keyProveReturnsSpecScaffold = KeyBridgeUtils
                 .readResource(RETURNS_SPEC_PROBLEM_FILE_SCAFFOLD);
+        helper = new InstantiationAspectProverHelper();
+    }
+
+    public ReturnsSpecProver(final Profile profile) {
+        keyProveReturnsSpecScaffold = KeyBridgeUtils
+                .readResource(RETURNS_SPEC_PROBLEM_FILE_SCAFFOLD);
+        helper = new InstantiationAspectProverHelper(profile);
     }
 
     @Override
@@ -189,7 +197,8 @@ public class ReturnsSpecProver implements InstantiationAspectProver {
 
         final Proof proof;
         try {
-            proof = KeyBridgeUtils.createProofAndRun(keyFileContent, javaFileContent, 10000);
+            proof = KeyBridgeUtils.createProofAndRun(keyFileContent, javaFileContent, 10000,
+                    helper.profile());
         } catch (RuntimeException rte) {
             // Maybe convert to different exception class...
             throw rte;

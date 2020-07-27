@@ -20,14 +20,16 @@ import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice;
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
 
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.InstantiationAspectProverHelper;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
 import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
-import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;
 
 /**
  * @author Dominic Steinhoefel
  */
 public class KeYJMLErrorParser extends AbstractParser {
+    private static final InstantiationAspectProverHelper HELPER = new InstantiationAspectProverHelper();
+
     private AEInstantiationModel instModel = null;
     private Optional<DefaultParserNotice> notice = null;
 
@@ -60,7 +62,7 @@ public class KeYJMLErrorParser extends AbstractParser {
             return result;
         }
 
-        KeyBridgeUtils.getFirstKeYJMLParserErrorMessage(instModel).ifPresent(t -> {
+        HELPER.getFirstKeYJMLParserErrorMessage(instModel).ifPresent(t -> {
             notice = Optional.of(new DefaultParserNotice( //
                     this, t.first, t.second - 1, -1, 2));
         });

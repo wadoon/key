@@ -32,13 +32,10 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.IOUtil;
 
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.UnsuccessfulAPERetrievalException;
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.InstantiationAspectProverHelper;
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.relational.RelationalProofBundleConverter;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
-import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.APEInstantiation;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.KeYProgModelInfo;
@@ -54,6 +51,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
@@ -64,7 +62,6 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
-import de.uka.ilkd.key.util.Triple;
 import recoder.ModelException;
 
 /**
@@ -186,21 +183,23 @@ public class KeyBridgeUtils {
      * contents and initiates a proof. The proof is saved in the temporary directory
      * to a file with the given name.
      * 
-     * @param keyFileName Name of the .key file.
-     * @param javaSrcDirName Name of the source directory for the Java file (e.g.,
-     * "src")
-     * @param javaFileName Name of the Java file
-     * @param proofFileName Name of the .proof file
      * @param keyFileContent Content of the .key file
      * @param javaFileContent Content of the .java file
      * @param maxRuleApps Number of steps to run. If 0, proof is not started (only
      * root is created), if -1, there is no bound, if > 0, this is the maximum
      * number of rules applied.
+     * @param profile TODO
+     * @param keyFileName Name of the .key file.
+     * @param javaSrcDirName Name of the source directory for the Java file (e.g.,
+     * "src")
+     * @param javaFileName Name of the Java file
+     * @param proofFileName Name of the .proof file
+     * 
      * @return The created proof file.
      * @throws RuntimeException
      */
     public static Proof createProofAndRun(final String keyFileContent, final String javaFileContent,
-            int maxRuleApps) throws RuntimeException {
+            final int maxRuleApps, final Profile profile) throws RuntimeException {
         final String keyFileName = "problem.key";
         final String javaSrcDirName = "src";
         final String javaFileName = "Problem.java";
@@ -224,8 +223,8 @@ public class KeyBridgeUtils {
 
         KeYEnvironment<?> env;
         try {
-            env = KeYEnvironment.load(JavaProfile.getDefaultInstance(), keyFile.toFile(),
-                    Collections.emptyList(), null, Collections.emptyList(), false);
+            env = KeYEnvironment.load(profile, keyFile.toFile(), Collections.emptyList(), null,
+                    Collections.emptyList(), true);
         } catch (ProblemLoaderException e) {
             throw new RuntimeException("Could not load KeY problem" + errMsgDirString,
                     MiscTools.findExceptionCauseOfClass(SLTranslationException.class, e)
@@ -290,42 +289,6 @@ public class KeyBridgeUtils {
             final APEInstantiation inst) {
         return String.format("%s_APE_line_%d_%s.zproof", baseName.replaceAll("\\W+", ""),
                 inst.getApeLineNumber(), closed ? "closed" : "failed");
-    }
-
-    /**
-     * Tries to parse the loaded {@link AEInstantiationModel} and returns
-     * information about the first found JML/Java error: Message, line, and column
-     * number.
-     * 
-     * @return Information about the first found JML/Java-Error or an empty
-     * {@link Optional}.
-     */
-    public static Optional<Triple<String, Integer, Integer>> getFirstKeYJMLParserErrorMessage(
-            final AEInstantiationModel model) {
-        try {
-            InstantiationAspectProverHelper.INSTANCE.createRetrievalProof(model, 0,
-                    model.getProgram());
-        } catch (UnsuccessfulAPERetrievalException exc) {
-            if (exc.getCause() instanceof ModelException) {
-                final ModelException mexc = (ModelException) exc.getCause();
-
-                final Pattern p = Pattern.compile("@([0-9]+)/([0-9]+)");
-                final Matcher m = p.matcher(mexc.getMessage());
-
-                if (!m.matches()) {
-                    return Optional.empty();
-                }
-
-                return Optional.of(new Triple<>(mexc.getMessage(), Integer.parseInt(m.group(1)) - 3,
-                        Integer.parseInt(m.group(2)) - 8));
-            } else if (exc.getCause() instanceof SLTranslationException) {
-                final SLTranslationException slte = (SLTranslationException) exc.getCause();
-                return Optional.of(new Triple<>(slte.getMessage(), slte.getPosition().getLine() - 3,
-                        slte.getPosition().getColumn() - 8));
-            }
-        }
-
-        return Optional.empty();
     }
 
     public static String jmlStringToJavaDLString(String jmlString, final KeYJavaType dummyKJT,

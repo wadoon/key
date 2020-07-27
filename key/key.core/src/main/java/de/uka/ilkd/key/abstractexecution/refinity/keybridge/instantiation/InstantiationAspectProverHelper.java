@@ -57,6 +57,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -64,14 +66,13 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.Triple;
 import recoder.ModelException;
 
 /**
  * @author Dominic Steinhoefel
  */
 public class InstantiationAspectProverHelper {
-    public static final InstantiationAspectProverHelper INSTANCE = new InstantiationAspectProverHelper();
-
     private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/Problem.java";
     private static final String APE_RETRIEVAL_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/programRetrievalProblem.key";
 
@@ -94,6 +95,8 @@ public class InstantiationAspectProverHelper {
     /** A cached list of APEs in the model to save time. */
     private Optional<List<APERetrievalResult>> apes = Optional.empty();
 
+    private final Profile profile;
+
     /**
      * A "dummy" {@link Services} object with no associated proof, but with
      * namespaces populated according to the definitions in the instantiation model.
@@ -104,151 +107,16 @@ public class InstantiationAspectProverHelper {
      */
     private Services services = null;
 
-    public static String createFuncDecls(final AEInstantiationModel model) {
-        final String functionsDecl;
-
-        {
-            final String locSetDecls = model.getAbstractLocationSets().stream()
-                    .map(FunctionDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
-
-            final String userDefinedFuncDeclsInst = model.getFunctionInstantiations().stream()
-                    .filter(inst -> !inst.getDeclaration().getResultSortName().equals("LocSet"))
-                    .map(FunctionInstantiation::toDeclarationString)
-                    .collect(Collectors.joining("\n  "));
-
-            final String userDefinedFuncDeclsUnInst = model.getFunctionDeclarations().stream()
-                    .filter(decl -> !model.getFunctionInstantiations().stream()
-                            .map(FunctionInstantiation::getDeclaration)
-                            .anyMatch(decl2 -> !decl.getFuncName().equals(decl2.getFuncName())))
-                    .map(FunctionDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
-
-            String userDefinedFuncDecls = userDefinedFuncDeclsInst;
-            if (!userDefinedFuncDeclsInst.isEmpty() && !userDefinedFuncDeclsUnInst.isEmpty()) {
-                userDefinedFuncDecls += "\n";
-            }
-            userDefinedFuncDecls += userDefinedFuncDeclsUnInst;
-
-            final String skolemPVAnonFuncDecls = model.getProgramVariableDeclarations().stream()
-                    .map(decl -> String.format("%s _%s;", decl.getTypeName(), decl.getVarName()))
-                    .collect(Collectors.joining("\n  "));
-
-            functionsDecl = locSetDecls + (!model.getFunctionDeclarations().isEmpty() ? "\n  " : "")
-                    + userDefinedFuncDecls
-                    + (!model.getProgramVariableDeclarations().isEmpty() ? "\n  " : "")
-                    + skolemPVAnonFuncDecls;
-        }
-
-        return functionsDecl;
-    }
-
-    public static String createParams(final AEInstantiationModel model) {
-        final String params = model.getProgramVariableDeclarations().stream()
-                .map(ProgramVariableDeclaration::getVarName).collect(Collectors.joining(","));
-        return params;
-    }
-
-    public static String createPredDecls(final AEInstantiationModel model) {
-        final String instPredicatesDecl = model.getPredicateInstantiations().stream()
-                .map(PredicateInstantiation::toDeclarationString)
-                .collect(Collectors.joining("\n  "));
-
-        final String additionalPredicatesDecl = model.getPredicateDeclarations().stream()
-                .filter(decl -> !model.getPredicateInstantiations().stream()
-                        .map(PredicateInstantiation::getDeclaration)
-                        .anyMatch(decl2 -> !decl.getPredName().equals(decl2.getPredName())))
-                .map(PredicateDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
-
-        return instPredicatesDecl
-                + (!instPredicatesDecl.isEmpty() && !additionalPredicatesDecl.isEmpty() ? "\n  "
-                        : "")
-                + additionalPredicatesDecl;
-    }
-
-    public static String createProgvarDecls(final AEInstantiationModel model) {
-        final String progvarsDecl = model.getProgramVariableDeclarations().stream()
-                .map(ProgramVariableDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
-        return progvarsDecl;
-    }
-
-    /**
-     * @return A string representing the instantiations of symbolic functions and
-     * predicates.
-     */
-    public static String createLocSetInstAssumptions(final AEInstantiationModel model) {
-        /*
-         * NOTE (DS, 2020-06-27): We're currently only creating instantiation
-         * assumptions for LocSet constants, and are for now disregarding parametric
-         * location sets. This should be considered in the future.
-         */
-
-        return model.getFunctionInstantiations().stream()
-                .filter(inst -> inst.getDeclaration().getResultSortName().equals("LocSet"))
-                .filter(inst -> inst.getInstArgSorts().size() == 0
-                        && inst.getDeclaration().getArgSorts().size() == 0)
-                .map(inst -> String.format("%s = %s", inst.getDeclaration().getFuncName(),
-                        inst.getInstantiation()))
-                .collect(Collectors.joining(" &\n  "));
-    }
-
-    /**
-     * Returns the assignable or accessible String of the given APE.
-     * 
-     * @param ape The {@link APERetrievalResult}.
-     * @param assignable true if the assignable spec should be returned, false if
-     * the accessible spec should be returned.
-     * @return The assignable or accessible specification.
-     */
-    private static String getJMLAssignableOrAccessibleTerm(final APERetrievalResult ape,
-            boolean assignable) {
-        final Predicate<TextualJMLSpecCase> filter = assignable ? //
-                (c -> c.getAssignable() != null) : (c -> c.getAccessible() != null);
-
-        final Function<TextualJMLSpecCase, ImmutableList<PositionedString>> getter = assignable
-                ? TextualJMLSpecCase::getAssignable
-                : TextualJMLSpecCase::getAccessible;
-
-        final String keyword = assignable ? "assignable" : "accessible";
-
-        return ape.getJMLConstructs().stream().filter(TextualJMLSpecCase.class::isInstance)
-                .map(TextualJMLSpecCase.class::cast).filter(c -> c.getBehavior() == Behavior.NONE)
-                .filter(filter).map(getter).map(ImmutableList::head).findAny().map(str -> str.text)
-                .map(str -> str.replaceAll(keyword + " ", "")).map(str -> str.replaceAll(";", ""))
-                .orElse("\\everything");
-    }
-
-    private static ImmutableSet<Term> locsetsFromLocsetString(final String locsetTermStr,
-            final Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-        final Term parsed;
-        try {
-            parsed = KeyBridgeUtils.parseTerm(locsetTermStr, new GoalLocalSpecificationRepository(),
-                    services);
-        } catch (RecognitionException e) {
-            throw new InvalidSyntaxException("Could not parse LocSet expression", e);
-        }
-
-        return tb.locsetUnionToSet(parsed);
-    }
-
-    // Copied from JMLSpecFactory
-    private static TextualJMLConstruct[] parseMethodLevelComments(final Comment[] comments,
-            final String fileName) throws SLTranslationException {
-        if (comments.length == 0) {
-            return new TextualJMLConstruct[0];
-        }
-        final String concatenatedComment = Arrays.stream(comments).map(Comment::toSource)
-                .collect(Collectors.joining("\n"));
-        final Position position = comments[0].getStartPosition();
-        final KeYJMLPreParser preParser = //
-                new KeYJMLPreParser(concatenatedComment, fileName, position);
-        final ImmutableList<TextualJMLConstruct> constructs = preParser.parseMethodlevelComment();
-        //        warnings = warnings.union(preParser.getWarnings());
-        return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
-    }
-
-    private InstantiationAspectProverHelper() {
+    public InstantiationAspectProverHelper(final Profile profile) {
         javaScaffold = KeyBridgeUtils.readResource(JAVA_PROBLEM_FILE_SCAFFOLD);
         keyRetrieveAPEsScaffold = KeyBridgeUtils.readResource(APE_RETRIEVAL_PROBLEM_FILE_SCAFFOLD);
+        this.profile = profile;
+    }
+
+    public InstantiationAspectProverHelper() {
+        javaScaffold = KeyBridgeUtils.readResource(JAVA_PROBLEM_FILE_SCAFFOLD);
+        keyRetrieveAPEsScaffold = KeyBridgeUtils.readResource(APE_RETRIEVAL_PROBLEM_FILE_SCAFFOLD);
+        this.profile = new JavaProfile();
     }
 
     public String createJavaFile(final AEInstantiationModel model, final String origProgram) {
@@ -308,7 +176,8 @@ public class InstantiationAspectProverHelper {
 
         final Proof proof;
         try {
-            proof = KeyBridgeUtils.createProofAndRun(keyFileContent, javaFileContent, maxNumSteps);
+            proof = KeyBridgeUtils.createProofAndRun(keyFileContent, javaFileContent, maxNumSteps,
+                    profile);
         } catch (RuntimeException rte) {
             throw new UnsuccessfulAPERetrievalException(rte.getMessage(), rte.getCause());
         }
@@ -359,6 +228,41 @@ public class InstantiationAspectProverHelper {
         }
 
         return result;
+    }
+
+    /**
+     * Tries to parse the loaded {@link AEInstantiationModel} and returns
+     * information about the first found JML/Java error: Message, line, and column
+     * number.
+     * 
+     * @return Information about the first found JML/Java-Error or an empty
+     * {@link Optional}.
+     */
+    public Optional<Triple<String, Integer, Integer>> getFirstKeYJMLParserErrorMessage(
+            final AEInstantiationModel model) {
+        try {
+            createRetrievalProof(model, 0, model.getProgram());
+        } catch (UnsuccessfulAPERetrievalException exc) {
+            if (exc.getCause() instanceof ModelException) {
+                final ModelException mexc = (ModelException) exc.getCause();
+
+                final Pattern p = Pattern.compile("@([0-9]+)/([0-9]+)");
+                final Matcher m = p.matcher(mexc.getMessage());
+
+                if (!m.matches()) {
+                    return Optional.empty();
+                }
+
+                return Optional.of(new Triple<>(mexc.getMessage(), Integer.parseInt(m.group(1)) - 3,
+                        Integer.parseInt(m.group(2)) - 8));
+            } else if (exc.getCause() instanceof SLTranslationException) {
+                final SLTranslationException slte = (SLTranslationException) exc.getCause();
+                return Optional.of(new Triple<>(slte.getMessage(), slte.getPosition().getLine() - 3,
+                        slte.getPosition().getColumn() - 8));
+            }
+        }
+
+        return Optional.empty();
     }
 
     /**
@@ -484,6 +388,10 @@ public class InstantiationAspectProverHelper {
         }
 
         return KeyBridgeUtils.termToString(formula, services);
+    }
+
+    public Profile profile() {
+        return profile;
     }
 
     /**
@@ -710,6 +618,148 @@ public class InstantiationAspectProverHelper {
         }
 
         return "";
+    }
+
+    public static String createFuncDecls(final AEInstantiationModel model) {
+        final String functionsDecl;
+
+        {
+            final String locSetDecls = model.getAbstractLocationSets().stream()
+                    .map(FunctionDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
+
+            final String userDefinedFuncDeclsInst = model.getFunctionInstantiations().stream()
+                    .filter(inst -> !inst.getDeclaration().getResultSortName().equals("LocSet"))
+                    .map(FunctionInstantiation::toDeclarationString)
+                    .collect(Collectors.joining("\n  "));
+
+            final String userDefinedFuncDeclsUnInst = model.getFunctionDeclarations().stream()
+                    .filter(decl -> !model.getFunctionInstantiations().stream()
+                            .map(FunctionInstantiation::getDeclaration)
+                            .anyMatch(decl2 -> !decl.getFuncName().equals(decl2.getFuncName())))
+                    .map(FunctionDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
+
+            String userDefinedFuncDecls = userDefinedFuncDeclsInst;
+            if (!userDefinedFuncDeclsInst.isEmpty() && !userDefinedFuncDeclsUnInst.isEmpty()) {
+                userDefinedFuncDecls += "\n";
+            }
+            userDefinedFuncDecls += userDefinedFuncDeclsUnInst;
+
+            final String skolemPVAnonFuncDecls = model.getProgramVariableDeclarations().stream()
+                    .map(decl -> String.format("%s _%s;", decl.getTypeName(), decl.getVarName()))
+                    .collect(Collectors.joining("\n  "));
+
+            functionsDecl = locSetDecls + (!model.getFunctionDeclarations().isEmpty() ? "\n  " : "")
+                    + userDefinedFuncDecls
+                    + (!model.getProgramVariableDeclarations().isEmpty() ? "\n  " : "")
+                    + skolemPVAnonFuncDecls;
+        }
+
+        return functionsDecl;
+    }
+
+    /**
+     * @return A string representing the instantiations of symbolic functions and
+     * predicates.
+     */
+    public static String createLocSetInstAssumptions(final AEInstantiationModel model) {
+        /*
+         * NOTE (DS, 2020-06-27): We're currently only creating instantiation
+         * assumptions for LocSet constants, and are for now disregarding parametric
+         * location sets. This should be considered in the future.
+         */
+
+        return model.getFunctionInstantiations().stream()
+                .filter(inst -> inst.getDeclaration().getResultSortName().equals("LocSet"))
+                .filter(inst -> inst.getInstArgSorts().size() == 0
+                        && inst.getDeclaration().getArgSorts().size() == 0)
+                .map(inst -> String.format("%s = %s", inst.getDeclaration().getFuncName(),
+                        inst.getInstantiation()))
+                .collect(Collectors.joining(" &\n  "));
+    }
+
+    public static String createParams(final AEInstantiationModel model) {
+        final String params = model.getProgramVariableDeclarations().stream()
+                .map(ProgramVariableDeclaration::getVarName).collect(Collectors.joining(","));
+        return params;
+    }
+
+    public static String createPredDecls(final AEInstantiationModel model) {
+        final String instPredicatesDecl = model.getPredicateInstantiations().stream()
+                .map(PredicateInstantiation::toDeclarationString)
+                .collect(Collectors.joining("\n  "));
+
+        final String additionalPredicatesDecl = model.getPredicateDeclarations().stream()
+                .filter(decl -> !model.getPredicateInstantiations().stream()
+                        .map(PredicateInstantiation::getDeclaration)
+                        .anyMatch(decl2 -> !decl.getPredName().equals(decl2.getPredName())))
+                .map(PredicateDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
+
+        return instPredicatesDecl
+                + (!instPredicatesDecl.isEmpty() && !additionalPredicatesDecl.isEmpty() ? "\n  "
+                        : "")
+                + additionalPredicatesDecl;
+    }
+
+    public static String createProgvarDecls(final AEInstantiationModel model) {
+        final String progvarsDecl = model.getProgramVariableDeclarations().stream()
+                .map(ProgramVariableDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
+        return progvarsDecl;
+    }
+
+    /**
+     * Returns the assignable or accessible String of the given APE.
+     * 
+     * @param ape The {@link APERetrievalResult}.
+     * @param assignable true if the assignable spec should be returned, false if
+     * the accessible spec should be returned.
+     * @return The assignable or accessible specification.
+     */
+    private static String getJMLAssignableOrAccessibleTerm(final APERetrievalResult ape,
+            boolean assignable) {
+        final Predicate<TextualJMLSpecCase> filter = assignable ? //
+                (c -> c.getAssignable() != null) : (c -> c.getAccessible() != null);
+
+        final Function<TextualJMLSpecCase, ImmutableList<PositionedString>> getter = assignable
+                ? TextualJMLSpecCase::getAssignable
+                : TextualJMLSpecCase::getAccessible;
+
+        final String keyword = assignable ? "assignable" : "accessible";
+
+        return ape.getJMLConstructs().stream().filter(TextualJMLSpecCase.class::isInstance)
+                .map(TextualJMLSpecCase.class::cast).filter(c -> c.getBehavior() == Behavior.NONE)
+                .filter(filter).map(getter).map(ImmutableList::head).findAny().map(str -> str.text)
+                .map(str -> str.replaceAll(keyword + " ", "")).map(str -> str.replaceAll(";", ""))
+                .orElse("\\everything");
+    }
+
+    private static ImmutableSet<Term> locsetsFromLocsetString(final String locsetTermStr,
+            final Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final Term parsed;
+        try {
+            parsed = KeyBridgeUtils.parseTerm(locsetTermStr, new GoalLocalSpecificationRepository(),
+                    services);
+        } catch (RecognitionException e) {
+            throw new InvalidSyntaxException("Could not parse LocSet expression", e);
+        }
+
+        return tb.locsetUnionToSet(parsed);
+    }
+
+    // Copied from JMLSpecFactory
+    private static TextualJMLConstruct[] parseMethodLevelComments(final Comment[] comments,
+            final String fileName) throws SLTranslationException {
+        if (comments.length == 0) {
+            return new TextualJMLConstruct[0];
+        }
+        final String concatenatedComment = Arrays.stream(comments).map(Comment::toSource)
+                .collect(Collectors.joining("\n"));
+        final Position position = comments[0].getStartPosition();
+        final KeYJMLPreParser preParser = //
+                new KeYJMLPreParser(concatenatedComment, fileName, position);
+        final ImmutableList<TextualJMLConstruct> constructs = preParser.parseMethodlevelComment();
+        //        warnings = warnings.union(preParser.getWarnings());
+        return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
     }
 
     public static class APERetrievalResult {

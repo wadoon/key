@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.Profile;
 
 /**
  * @author Dominic Steinhoefel
@@ -44,13 +45,20 @@ public class TerminationProver implements InstantiationAspectProver {
     private static final String ADDITIONAL_PREMISES = "<ADDITIONAL_PREMISES>";
     private static final String SYMINSTS = "<SYMINSTS>";
 
-    private final InstantiationAspectProverHelper helper = InstantiationAspectProverHelper.INSTANCE;
+    private final InstantiationAspectProverHelper helper;
 
     private final String keyProveTerminationScaffold;
 
     public TerminationProver() {
         keyProveTerminationScaffold = KeyBridgeUtils
                 .readResource(TERMINATION_PROBLEM_FILE_SCAFFOLD);
+        helper = new InstantiationAspectProverHelper();
+    }
+
+    public TerminationProver(final Profile profile) {
+        keyProveTerminationScaffold = KeyBridgeUtils
+                .readResource(TERMINATION_PROBLEM_FILE_SCAFFOLD);
+        helper = new InstantiationAspectProverHelper(profile);
     }
 
     @Override
@@ -82,7 +90,8 @@ public class TerminationProver implements InstantiationAspectProver {
 
         final Proof proof;
         try {
-            proof = KeyBridgeUtils.createProofAndRun(keyFileContent, javaFileContent, 10000);
+            proof = KeyBridgeUtils.createProofAndRun(keyFileContent, javaFileContent, 10000,
+                    helper.profile());
         } catch (RuntimeException rte) {
             // Maybe convert to different exception class...
             throw rte;

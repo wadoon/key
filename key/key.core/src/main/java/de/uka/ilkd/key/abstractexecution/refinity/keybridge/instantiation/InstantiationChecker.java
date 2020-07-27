@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import javax.xml.bind.JAXBException;
@@ -26,6 +28,10 @@ import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.ProofResult;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
@@ -34,6 +40,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
  */
 public class InstantiationChecker {
     private final AEInstantiationModel model;
+    /* non-final */ ProofResult result;
 
     public InstantiationChecker(final AEInstantiationModel instModel) throws IOException {
         this.model = instModel;
@@ -43,23 +50,72 @@ public class InstantiationChecker {
 
     ////////////// Public Member Functions //////////////
 
-    public ProofResult proveInstantiation(final boolean printOutput) {
+    /**
+     * Tries to prove the instantiation correct with separate proof obligations for
+     * all aspects.
+     * 
+     * @param printOutput true <=> Prints some information about the current state
+     * to the console, including information about successful and/or failed proofs.
+     * @param parallel true <=> Aspects should be proven in parallel. Degree of
+     * parallelism is unfortunately limited, since the RECODER framework cannot run
+     * in parallel due to the use of static fields (see comment regarding
+     * synchronized statement in {@link ProblemInitializer#prepare(EnvInput)}
+     * @return A combined {@link ProofResult} for all of the aspect proofs.
+     */
+    public ProofResult proveInstantiation(final boolean printOutput, boolean parallel) {
         this.printOutput = printOutput;
-        /* non-final */ ProofResult result = ProofResult.EMPTY;
+        this.result = ProofResult.EMPTY;
+
+        final Supplier<Profile> profile = () -> parallel ? new JavaProfile()
+                : JavaProfile.getDefaultInstance();
 
         final InstantiationAspectProver[] checkers = new InstantiationAspectProver[] {
-                new FrameConditionProver(), //
-                new HasToConditionProver(), //
-                new FootprintConditionProver(), //
-                new TerminationProver(), //
-                new ReturnsSpecProver(), //
+                new FrameConditionProver(profile.get()), //
+                new HasToConditionProver(profile.get()), //
+                new FootprintConditionProver(profile.get()), //
+                new TerminationProver(profile.get()), //
+                new ReturnsSpecProver(profile.get()), //
         };
 
-        for (final InstantiationAspectProver checker : checkers) {
-            println(checker.initMessage());
-            final ProofResult checkerProofResult = checker.prove(model);
-            printIndividualProofResultStats(checkerProofResult, checker.proofObjective());
-            result = result.merge(checkerProofResult);
+        blParr: {
+            if (!parallel) {
+                break blParr;
+            }
+
+            final Thread[] threads = new Thread[checkers.length];
+
+            int i = 0;
+            for (final InstantiationAspectProver checker : checkers) {
+                threads[i++] = new Thread(() -> {
+                    println(checker.initMessage());
+                    final ProofResult checkerProofResult = checker.prove(model);
+                    printIndividualProofResultStats(checkerProofResult, checker.proofObjective());
+                    synchronized (result) {
+                        result = result.merge(checkerProofResult);
+                    }
+                });
+            }
+
+            Arrays.stream(threads).forEach(Thread::start);
+            Arrays.stream(threads).forEach(t -> {
+                try {
+                    t.join();
+                } catch (InterruptedException e) {
+                }
+            });
+        }
+
+        blSeq: {
+            if (parallel) {
+                break blSeq;
+            }
+
+            for (final InstantiationAspectProver checker : checkers) {
+                println(checker.initMessage());
+                final ProofResult checkerProofResult = checker.prove(model);
+                printIndividualProofResultStats(checkerProofResult, checker.proofObjective());
+                result = result.merge(checkerProofResult);
+            }
         }
 
         ///////// Normal Completion Spec
@@ -97,9 +153,9 @@ public class InstantiationChecker {
             String proofObjective) {
         if (printOutput) {
             if (proofResult.isSuccess()) {
-                println("Success.");
+                println("Successfully proved " + proofObjective + ".");
             } else {
-                println("Could not prove " + proofObjective + ".");
+                err("Could not prove " + proofObjective + ".");
             }
         }
     }
@@ -118,6 +174,18 @@ public class InstantiationChecker {
         }
     }
 
+    /**
+     * Prints the given string to System.out (w/ newline) if the field
+     * {@link #printOutput} is set to true.
+     * 
+     * @param str The string to (conditionally) print.
+     */
+    private void err(final String str) {
+        if (printOutput) {
+            System.err.println(str);
+        }
+    }
+
     ////////////// Private Static Functions //////////////
 
     ////////////// Inner Classes //////////////
@@ -130,8 +198,14 @@ public class InstantiationChecker {
                 + "abstract_execution/instantiation_checking/SlideStatements/slideStatementsInstP1.aei");
         final AEInstantiationModel instModel = AEInstantiationModel.fromPath(testFile);
 
+        long startTime = System.currentTimeMillis();
+
         final InstantiationChecker checker = new InstantiationChecker(instModel);
-        final ProofResult result = checker.proveInstantiation(true);
+        final ProofResult result = checker.proveInstantiation(true, true);
+
+        long endTime = System.currentTimeMillis();
+        double durationSecs = (double) (endTime - startTime) / (double) 1000;
+        System.out.println("Duration: " + durationSecs + "s");
 
         final Path outputDir = Paths.get("output/");
         if (outputDir.toFile().exists()) {

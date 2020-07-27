@@ -30,6 +30,7 @@ import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.Profile;
 
 /**
  * @author Dominic Steinhoefel
@@ -49,12 +50,18 @@ public class FrameConditionProver implements InstantiationAspectProver {
     private static final String AT_PRES = "<AT_PRES>";
     private static final String PV_AT_PRE_POSTS = "<PV_AT_PRE_POSTS>";
 
-    private final InstantiationAspectProverHelper helper = InstantiationAspectProverHelper.INSTANCE;
+    private final InstantiationAspectProverHelper helper;
 
     private final String keyProveFrameScaffold;
 
     public FrameConditionProver() {
         keyProveFrameScaffold = KeyBridgeUtils.readResource(FRAME_PROBLEM_FILE_SCAFFOLD);
+        helper = new InstantiationAspectProverHelper();
+    }
+
+    public FrameConditionProver(final Profile profile) {
+        keyProveFrameScaffold = KeyBridgeUtils.readResource(FRAME_PROBLEM_FILE_SCAFFOLD);
+        helper = new InstantiationAspectProverHelper(profile);
     }
 
     @Override
@@ -86,7 +93,8 @@ public class FrameConditionProver implements InstantiationAspectProver {
 
         final Proof proof;
         try {
-            proof = KeyBridgeUtils.createProofAndRun(keyFileContent, javaFileContent, 10000);
+            proof = KeyBridgeUtils.createProofAndRun(keyFileContent, javaFileContent, 10000,
+                    helper.profile());
         } catch (RuntimeException rte) {
             // Maybe convert to different exception class...
             throw rte;
