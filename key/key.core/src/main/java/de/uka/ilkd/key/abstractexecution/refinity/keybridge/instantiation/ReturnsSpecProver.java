@@ -61,5 +61,10 @@ public class ReturnsSpecProver extends AbstractSpecProver implements Instantiati
     protected Behavior targetedBehavior() {
         return Behavior.RETURN_BEHAVIOR;
     }
+    
+    @Override
+    protected String javaCodeSuffix() {
+        return "\nbreak;";
+    }
 
 }

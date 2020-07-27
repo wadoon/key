@@ -12,18 +12,17 @@
 //
 package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation;
 
-import java.util.ArrayList;
+import static org.key_project.util.java.FunctionWithException.catchExc;
+
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.antlr.runtime.RecognitionException;
-
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.CompletionCondition;
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.InvalidSyntaxException;
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.ProofResult;
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.RetrieveProgramResult;
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.TriviallySatisfiedSpecCaseException;
@@ -42,41 +41,51 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
  * 
  * @author Dominic Steinhoefel
  */
-public abstract class AbstractSpecProver implements InstantiationAspectProver {
+public class NormalCompletionSpecProver implements InstantiationAspectProver {
+    private static final String NORMAL_COMPLETION_SPEC_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/normalCompletionSpecProblem.key";
+
     private static final String FUNCTIONS = "<FUNCTIONS>";
+
     private static final String PREDICATES = "<PREDICATES>";
     private static final String PROGRAMVARIABLES = "<PROGRAMVARIABLES>";
-
     private static final String PRECONDITION = "<PRECONDITION>";
+
     private static final String ADDITIONAL_PREMISES = "<ADDITIONAL_PREMISES>";
     private static final String SYMINSTS = "<SYMINSTS>";
     private static final String PARAMS = "<PARAMS>";
-
     private static final String PRE_SPEC = "<PRE_SPEC>";
+
     private static final String POST_SPEC = "<POST_SPEC>";
+    private final String keyProveNormalCompletionSpecScaffold;
 
     private final InstantiationAspectProverHelper helper;
 
-    private static String mquote(final String str) {
-        return Matcher.quoteReplacement(str);
-    }
-
-    private static String pquote(final String str) {
-        return Pattern.quote(str);
-    }
-
-    public AbstractSpecProver() {
+    public NormalCompletionSpecProver() {
         helper = new InstantiationAspectProverHelper();
+        keyProveNormalCompletionSpecScaffold = KeyBridgeUtils
+                .readResource(NORMAL_COMPLETION_SPEC_PROBLEM_FILE_SCAFFOLD);
     }
 
-    public AbstractSpecProver(final Profile profile) {
+    public NormalCompletionSpecProver(final Profile profile) {
         helper = new InstantiationAspectProverHelper(profile);
+        keyProveNormalCompletionSpecScaffold = KeyBridgeUtils
+                .readResource(NORMAL_COMPLETION_SPEC_PROBLEM_FILE_SCAFFOLD);
+    }
+
+    @Override
+    public String initMessage() {
+        return "Proving Normal Completion Behavior Condition(s)...";
+    }
+
+    @Override
+    public String proofObjective() {
+        return "normal completion behavior condition(s)";
     }
 
     @Override
     public ProofResult prove(AEInstantiationModel model) {
-        return model.getApeInstantiations().stream().map(inst -> proveAbrComplSpecInst(model, inst))
-                .collect(ProofResult.REDUCER);
+        return model.getApeInstantiations().stream()
+                .map(inst -> proveNormalComplSpecInst(model, inst)).collect(ProofResult.REDUCER);
     }
 
     private String createProveAbrComplBehSpecKeYFile(final AEInstantiationModel model,
@@ -105,9 +114,8 @@ public abstract class AbstractSpecProver implements InstantiationAspectProver {
                     retrProgRes.getServices());
             progVarCol.start();
 
-            final List<String> ignPVs = new ArrayList<>(ignPVs());
-            Arrays.stream(new String[] { "_objUnderTest", "heap", "savedHeap" })
-                    .forEach(ignPVs::add);
+            final List<String> ignPVs = Arrays
+                    .asList(new String[] { "_normal", "_objUnderTest", "heap", "savedHeap" });
 
             final LinkedHashSet<LocationVariable> instProgVars = progVarCol.result().stream()
                     .filter(lv -> !ignPVs.contains(lv.name().toString()))
@@ -127,25 +135,25 @@ public abstract class AbstractSpecProver implements InstantiationAspectProver {
         final String postspec;
 
         {
-            final CompletionCondition condition = helper.getCompletionConditions(model, inst)
-                    .stream().filter(cond -> cond.getBehavior() == targetedBehavior()).findAny()
-                    .orElseThrow(() -> new TriviallySatisfiedSpecCaseException());
+            final List<CompletionCondition> conditionsForPre = helper
+                    .getCompletionConditions(model, inst).stream()
+                    .filter(cond -> cond.getBehavior() != Behavior.NORMAL_BEHAVIOR)
+                    .collect(Collectors.toList());
 
-            try {
-                prespec = helper.instantiate( //
-                        condition.getJavaDLPrecondition().orElse("true"), model, services);
-                postspec = helper.instantiate( //
-                        condition.getJavaDLPostcondition().orElse("true"), model, services);
-            } catch (RecognitionException e) {
-                throw new InvalidSyntaxException(
-                        "Could not parse precondition, postcondition, or their instantiations: "
-                                + e.getMessage(),
-                        e);
-            }
+            final Optional<CompletionCondition> conditionForPost = helper
+                    .getCompletionConditions(model, inst).stream()
+                    .filter(cond -> cond.getBehavior() == Behavior.NORMAL_BEHAVIOR).findAny();
+
+            prespec = conditionsForPre.stream().map(catchExc(c -> helper.instantiate( //
+                    c.getJavaDLPrecondition().orElse("true"), model, services)))
+                    .map(cond -> String.format("!(%s)", cond)).collect(Collectors.joining(" & "));
+
+            postspec = conditionForPost.map(catchExc(c -> helper.instantiate( //
+                    c.getJavaDLPostcondition().orElse("true"), model, services))).orElse("true");
 
         }
 
-        return keyFileScaffold()
+        return keyProveNormalCompletionSpecScaffold
                 .replaceAll(FUNCTIONS,
                         mquote(InstantiationAspectProverHelper.createFuncDecls(model)))
                 .replaceAll(PREDICATES,
@@ -163,40 +171,13 @@ public abstract class AbstractSpecProver implements InstantiationAspectProver {
     }
 
     /**
-     * @return The behavior targeted of the specification case (e.g., completion due
-     * to a break).
-     */
-    protected abstract Behavior targetedBehavior();
-
-    /**
-     * @return The content of the KeY problem file scaffold.
-     */
-    protected abstract String keyFileScaffold();
-
-    /**
-     * @return The lists of program variables to ignore (not declare as new
-     * variables).
-     */
-    protected abstract List<String> ignPVs();
-
-    /**
-     * @return Some Java code which should be added after the instantiation. For
-     * instance, a break statement if return behavior should be checked: thus, it is
-     * made sure that no wrong result is produced due to the default "return null;"
-     * in the Java scaffold.
-     */
-    protected String javaCodeSuffix() {
-        return "";
-    }
-
-    /**
      * Attempts to prove that the given instantiation satisfies the frame condition
      * of the APE to instantiate.
      * 
      * @param inst The {@link APEInstantiation}
      * @return A {@link ProofResult} for the frame problem.
      */
-    private ProofResult proveAbrComplSpecInst(final AEInstantiationModel model,
+    private ProofResult proveNormalComplSpecInst(final AEInstantiationModel model,
             APEInstantiation inst) {
         String keyFileContent;
         try {
@@ -206,7 +187,7 @@ public abstract class AbstractSpecProver implements InstantiationAspectProver {
         }
 
         final String javaFileContent = helper.createJavaFile(model,
-                inst.getInstantiation() + javaCodeSuffix());
+                inst.getInstantiation() + "\nbreak __dummyLabel__;");
 
         final Proof proof;
         try {
@@ -219,6 +200,14 @@ public abstract class AbstractSpecProver implements InstantiationAspectProver {
 
         return new ProofResult(proof.closed(), proof,
                 KeyBridgeUtils.getFilenameForAPEProof(proofObjective(), proof.closed(), inst));
+    }
+
+    private static String mquote(final String str) {
+        return Matcher.quoteReplacement(str);
+    }
+
+    private static String pquote(final String str) {
+        return Pattern.quote(str);
     }
 
 }

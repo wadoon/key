@@ -73,6 +73,7 @@ public class InstantiationChecker {
                 new FrameConditionProver(profile.get()), //
                 new HasToConditionProver(profile.get()), //
                 new FootprintConditionProver(profile.get()), //
+                new NormalCompletionSpecProver(profile.get()), //
                 new TerminationProver(profile.get()), //
                 new ReturnsSpecProver(profile.get()), //
                 new ExcSpecProver(profile.get()), //
