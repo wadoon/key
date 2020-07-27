@@ -76,6 +76,8 @@ public class InstantiationChecker {
                 new TerminationProver(profile.get()), //
                 new ReturnsSpecProver(profile.get()), //
                 new ExcSpecProver(profile.get()), //
+                new BreaksSpecProver(profile.get()), //
+                new ContinuesSpecProver(profile.get()), //
         };
 
         blParr: {
@@ -134,9 +136,8 @@ public class InstantiationChecker {
 
         // TODO:
         // - Normal Completion Spec
-        // - Completion Due to Break Spec
-        // - Completion Due to Continue Spec
         // [ - NOTE (DS, 2020-07-16): Labeled continue / break omitted, spec case not yet supported. ]
+        // - Basic consistency checks: E.g., mutual exclusion of abrupt completion preconditions
         // - Constraints (assumptions) satisfied
         // - Consistent instantiations of APEs w/ same IDs
 

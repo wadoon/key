@@ -24,12 +24,16 @@
 /*@ return_behavior
   @   requires returnsA(\value(footprintA));
   @   ensures resultA(\value(footprintA)); */
+//@ break_behavior requires false;
+//@ continue_behavior requires false;
 \abstract_statement A;
 
 //@ assignable frameB, \hasTo(hasToFrameB);
 //@ accessible footprintB;
 //@ exceptional_behavior requires throwsExcB(\value(footprintB));
 //@ return_behavior requires returnsB(\value(footprintB));
+//@ break_behavior requires false;
+//@ continue_behavior requires false;
 \abstract_statement B;</program>
     <methodLevelContext></methodLevelContext>
     <locationSets>
@@ -212,10 +216,10 @@
         </functionInst>
     </functionInstantiations>
     <apeInstantiations>
-        <apeInst apeLineNumber="25">
+        <apeInst apeLineNumber="27">
             <instantiation>x = y++; z = w; if (w == 17) { return Integer.valueOf(z); }</instantiation>
         </apeInst>
-        <apeInst apeLineNumber="31">
+        <apeInst apeLineNumber="35">
             <instantiation>a = b/b + 17; int c = 2*d+a;</instantiation>
         </apeInst>
     </apeInstantiations>
