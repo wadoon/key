@@ -14,9 +14,7 @@ package de.uka.ilkd.key.abstractexecution.refinity.model.instantiation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -102,7 +100,7 @@ public class FunctionInstantiation {
         assert instantiation != null;
         assert instArgSorts != null;
         assert resultSort != null;
-        
+
         final NamespaceSet namespaces = services.getNamespaces();
 
         final List<Sort> sorts = //
@@ -148,21 +146,7 @@ public class FunctionInstantiation {
         assert instArgSorts != null;
         assert resultSort != null;
 
-        Supplier<IntStream> stream = () -> IntStream.range(1, instArgSorts.size() + 1);
-
-        final String qfdParamDecl = stream.get()
-                .mapToObj(i -> String.format("(\\forall %s _p%d; ", instArgSorts.get(i - 1), i))
-                .collect(Collectors.joining());
-
-        final String paramList = stream.get().mapToObj(i -> String.format("_p%d", i))
-                .collect(Collectors.joining(", "));
-
-        final String closingParens = stream.get().mapToObj(i -> ")").collect(Collectors.joining());
-
-        return qfdParamDecl
-                + String.format("(%s%s = %s)", declaration.getFuncName(),
-                        instArgSorts.size() == 0 ? "" : "(" + paramList + ")", instantiation)
-                + closingParens;
+        return String.format("%s -> %s", declaration, instantiation);
     }
 
     @Override

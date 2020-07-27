@@ -175,9 +175,19 @@ public class InstantiationAspectProverHelper {
      * predicates.
      */
     public static String createLocSetInstAssumptions(final AEInstantiationModel model) {
+        /*
+         * NOTE (DS, 2020-06-27): We're currently only creating instantiation
+         * assumptions for LocSet constants, and are for now disregarding parametric
+         * location sets. This should be considered in the future.
+         */
+
         return model.getFunctionInstantiations().stream()
                 .filter(inst -> inst.getDeclaration().getResultSortName().equals("LocSet"))
-                .map(FunctionInstantiation::toString).collect(Collectors.joining(" &\n  "));
+                .filter(inst -> inst.getInstArgSorts().size() == 0
+                        && inst.getDeclaration().getArgSorts().size() == 0)
+                .map(inst -> String.format("%s = %s", inst.getDeclaration().getFuncName(),
+                        inst.getInstantiation()))
+                .collect(Collectors.joining(" &\n  "));
     }
 
     /**
