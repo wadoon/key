@@ -174,13 +174,10 @@ public class InstantiationAspectProverHelper {
      * @return A string representing the instantiations of symbolic functions and
      * predicates.
      */
-    public static String createSymInsts(final AEInstantiationModel model) {
-        final String funcInsts = model.getFunctionInstantiations().stream()
+    public static String createLocSetInstAssumptions(final AEInstantiationModel model) {
+        return model.getFunctionInstantiations().stream()
+                .filter(inst -> inst.getDeclaration().getResultSortName().equals("LocSet"))
                 .map(FunctionInstantiation::toString).collect(Collectors.joining(" &\n  "));
-        final String predInsts = model.getPredicateInstantiations().stream()
-                .map(PredicateInstantiation::toString).collect(Collectors.joining(" &\n  "));
-        return funcInsts.isEmpty() ? (predInsts.isEmpty() ? "true" : predInsts)
-                : (predInsts.isEmpty() ? funcInsts : funcInsts + " &\n  " + predInsts);
     }
 
     /**

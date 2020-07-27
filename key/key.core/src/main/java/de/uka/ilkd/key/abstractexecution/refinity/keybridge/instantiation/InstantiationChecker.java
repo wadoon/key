@@ -49,9 +49,9 @@ public class InstantiationChecker {
 
         final InstantiationAspectProver[] checkers = new InstantiationAspectProver[] {
                 new FrameConditionProver(), //
-//                new HasToConditionProver(), //
-//                new FootprintConditionProver(), //
-//                new TerminationProver(), //
+                new HasToConditionProver(), //
+                new FootprintConditionProver(), //
+                new TerminationProver(), //
                 new ReturnsSpecProver(), //
         };
 

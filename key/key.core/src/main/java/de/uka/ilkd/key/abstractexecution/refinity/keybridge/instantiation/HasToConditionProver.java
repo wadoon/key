@@ -130,7 +130,7 @@ public class HasToConditionProver implements InstantiationAspectProver {
         {
             try {
                 assumptionTerm = KeyBridgeUtils.parseTerm(//
-                        InstantiationAspectProverHelper.createSymInsts(model), localSpecRepo,
+                        InstantiationAspectProverHelper.createLocSetInstAssumptions(model), localSpecRepo,
                         services);
             } catch (RecognitionException re) {
                 throw new InvalidSyntaxException(re.getMessage(), re.getCause());

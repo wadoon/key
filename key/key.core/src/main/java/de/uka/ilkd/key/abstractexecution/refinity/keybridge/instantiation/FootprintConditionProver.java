@@ -122,7 +122,7 @@ public class FootprintConditionProver implements InstantiationAspectProver {
 
         //////////
 
-        final String symInsts = InstantiationAspectProverHelper.createSymInsts(model);
+        final String symInsts = InstantiationAspectProverHelper.createLocSetInstAssumptions(model);
 
         //////////
 

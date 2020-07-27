@@ -48,6 +48,7 @@ public class ReturnsSpecProver implements InstantiationAspectProver {
 
     private static final String PRECONDITION = "<PRECONDITION>";
     private static final String ADDITIONAL_PREMISES = "<ADDITIONAL_PREMISES>";
+    private static final String SYMINSTS = "<SYMINSTS>";
     private static final String PARAMS = "<PARAMS>";
 
     private static final String PRE_SPEC = "<PRE_SPEC>";
@@ -97,6 +98,10 @@ public class ReturnsSpecProver implements InstantiationAspectProver {
                 model.getPreCondition(), model.getProgramVariableDeclarations(),
                 model.getAbstractLocationSets(), model.getPredicateDeclarations(),
                 model.getFunctionDeclarations(), KeyBridgeUtils.dummyKJT(), services);
+
+        //////////
+
+        final String symInsts = InstantiationAspectProverHelper.createLocSetInstAssumptions(model);
 
         //////////
 
@@ -155,6 +160,7 @@ public class ReturnsSpecProver implements InstantiationAspectProver {
                 .replaceAll(PROGRAMVARIABLES,
                         mquote(InstantiationAspectProverHelper.createProgvarDecls(model) + newVars))
                 .replaceAll(PARAMS, mquote(InstantiationAspectProverHelper.createParams(model)))
+                .replaceAll(SYMINSTS, Matcher.quoteReplacement(symInsts))
                 .replaceAll(pquote(PRECONDITION), mquote(javaDLPreCondRelation))
                 .replaceAll(ADDITIONAL_PREMISES,
                         mquote(KeyBridgeUtils

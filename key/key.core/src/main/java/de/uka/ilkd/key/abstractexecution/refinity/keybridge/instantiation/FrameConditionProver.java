@@ -44,6 +44,7 @@ public class FrameConditionProver implements InstantiationAspectProver {
     private static final String FUNCTIONS = "<FUNCTIONS>";
     private static final String PARAMS = "<PARAMS>";
     private static final String ADDITIONAL_PREMISES = "<ADDITIONAL_PREMISES>";
+    private static final String SYMINSTS = "<SYMINSTS>";
     private static final String ASSIGNABLES = "<ASSIGNABLES>";
     private static final String AT_PRES = "<AT_PRES>";
     private static final String PV_AT_PRE_POSTS = "<PV_AT_PRE_POSTS>";
@@ -106,6 +107,10 @@ public class FrameConditionProver implements InstantiationAspectProver {
 
         //////////
 
+        final String symInsts = InstantiationAspectProverHelper.createLocSetInstAssumptions(model);
+
+        //////////
+
         final String atPres;
         final LinkedHashSet<LocationVariable> instProgVars;
 
@@ -122,8 +127,6 @@ public class FrameConditionProver implements InstantiationAspectProver {
 
             instProgVars = progVarCol.result().stream()
                     .filter(lv -> !ignPVs.contains(lv.name().toString()))
-                    .filter(lv -> lv.sort() != services.getTypeConverter().getHeapLDT()
-                            .targetSort())
                     .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
             atPres = instProgVars.stream().map(pv -> String.format("%1$s_AtPre:=%1$s", pv))
                     .collect(Collectors.joining("||"));
@@ -138,7 +141,9 @@ public class FrameConditionProver implements InstantiationAspectProver {
         final String pvAtPrePosts;
 
         {
-            pvAtPrePosts = instProgVars.stream().map(LocationVariable::toString)
+            pvAtPrePosts = instProgVars.stream().filter(
+                    lv -> lv.sort() != services.getTypeConverter().getHeapLDT().targetSort())
+                    .map(LocationVariable::toString)
                     .map(v -> String.format("(%1$s=%1$s_AtPre | pvElementOf(PV(%1$s), %2$s))", v,
                             javaDlAssignableTerm))
                     .collect(Collectors.joining("\n              & "));
@@ -176,6 +181,7 @@ public class FrameConditionProver implements InstantiationAspectProver {
                 .replaceAll(PARAMS,
                         Matcher.quoteReplacement(
                                 InstantiationAspectProverHelper.createParams(model)))
+                .replaceAll(SYMINSTS, Matcher.quoteReplacement(symInsts))
                 .replaceAll(AT_PRES, Matcher.quoteReplacement(atPres))
                 .replaceAll(ASSIGNABLES, Matcher.quoteReplacement(javaDlAssignableTerm))
                 .replaceAll(PV_AT_PRE_POSTS, pvAtPrePosts)

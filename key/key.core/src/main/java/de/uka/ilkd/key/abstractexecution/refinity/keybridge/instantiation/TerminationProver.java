@@ -106,7 +106,7 @@ public class TerminationProver implements InstantiationAspectProver {
 
         //////////
 
-        final String symInsts = InstantiationAspectProverHelper.createSymInsts(model);
+        final String symInsts = InstantiationAspectProverHelper.createLocSetInstAssumptions(model);
 
         //////////
 
