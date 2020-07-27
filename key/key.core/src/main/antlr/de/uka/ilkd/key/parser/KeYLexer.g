@@ -328,8 +328,7 @@ lexer grammar KeYLexer;
         // Keywords related to taclets
         SAMEUPDATELEVEL : '\\sameUpdateLevel';
         INSEQUENTSTATE : '\\inSequentState';
-        INABSTRACTUPDATESCOPE : '\\inAbstractUpdateScope';
-        NOTINABSTRACTUPDATESCOPE : '\\notInAbstractUpdateScope';
+        NOTINPVSCOPE : '\\notInPVScope';
         ANTECEDENTPOLARITY : '\\antecedentPolarity';
         SUCCEDENTPOLARITY : '\\succedentPolarity';
         CLOSEGOAL : '\\closegoal';

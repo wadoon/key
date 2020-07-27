@@ -155,7 +155,7 @@ public final class JavaInfo {
         return kpmi;
     }
 
-    void setKeYProgModelInfo(KeYProgModelInfo kpmi){
+    public void setKeYProgModelInfo(KeYProgModelInfo kpmi){
         this.kpmi = kpmi;
     }
 
@@ -911,7 +911,7 @@ public final class JavaInfo {
                       +" Not yet implemented.");
         }
         final NamespaceSet nss = services.getNamespaces().copy();
-        final JavaBlock block = kpmi.readBlock(java, cd, nss);
+        final JavaBlock block = kpmi.readBlock(java, cd, nss, services);
         // if we are here everything is fine and we can add the
         // changes (may be new array types)
         // Until end 2016, a protocol mode for namespaces was used here
@@ -925,7 +925,7 @@ public final class JavaInfo {
      */
     public JavaBlock readJavaBlock(String java) {
         NamespaceSet nss = services.getNamespaces().copy();
-        final JavaBlock block = kpmi.readJavaBlock(java, nss);
+        final JavaBlock block = kpmi.readJavaBlock(java, nss, services);
         // if we are here everything is fine and we can add the
         // changes (may be new array types)
         // Until end 2016, a protocol mode for namespaces was used here

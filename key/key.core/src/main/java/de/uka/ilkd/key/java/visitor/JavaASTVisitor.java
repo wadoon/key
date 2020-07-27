@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.java.visitor;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
 import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
@@ -560,6 +561,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     public void performActionOnMethodBodyStatement(MethodBodyStatement x) {
         doDefaultAction(x);
     }
+    
+    @Override
+    public void performActionOnDirectMethodBodyStatement(DirectMethodBodyStatement x) {
+        doDefaultAction(x);
+    }
 
     @Override
     public void performActionOnMethodDeclaration(MethodDeclaration x) {
@@ -918,13 +924,13 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
-    public void performActionOnTransactionStatement(TransactionStatement x) {
-        doDefaultAction(x);
+    public void performActionOnAbstractProgramElementContract(BlockContract x) {
+        // do nothing
     }
 
     @Override
-    public void performActionOnAbstractProgramElementContract(BlockContract x) {
-        // do nothing
+    public void performActionOnTransactionStatement(TransactionStatement x) {
+        doDefaultAction(x);
     }
 
     @Override

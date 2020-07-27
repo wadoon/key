@@ -7,7 +7,7 @@
 // Technical University Darmstadt, Germany
 // Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General
+// The KeY system is public by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation;
@@ -22,9 +22,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.CompletionCondition;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.InvalidSyntaxException;
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.RetrieveProgramResult;
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.UnsuccessfulAPERetrievalException;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
@@ -41,9 +46,14 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -78,6 +88,7 @@ public class InstantiationAspectProverHelper {
     private static final String PROOF = "<PROOF>";
 
     private final String javaScaffold;
+
     private final String keyRetrieveAPEsScaffold;
 
     /** A cached list of APEs in the model to save time. */
@@ -93,115 +104,181 @@ public class InstantiationAspectProverHelper {
      */
     private Services services = null;
 
+    public static String createFuncDecls(final AEInstantiationModel model) {
+        final String functionsDecl;
+
+        {
+            final String locSetDecls = model.getAbstractLocationSets().stream()
+                    .map(FunctionDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
+
+            final String userDefinedFuncDeclsInst = model.getFunctionInstantiations().stream()
+                    .filter(inst -> !inst.getDeclaration().getResultSortName().equals("LocSet"))
+                    .map(FunctionInstantiation::toDeclarationString)
+                    .collect(Collectors.joining("\n  "));
+
+            final String userDefinedFuncDeclsUnInst = model.getFunctionDeclarations().stream()
+                    .filter(decl -> !model.getFunctionInstantiations().stream()
+                            .map(FunctionInstantiation::getDeclaration)
+                            .anyMatch(decl2 -> !decl.getFuncName().equals(decl2.getFuncName())))
+                    .map(FunctionDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
+
+            String userDefinedFuncDecls = userDefinedFuncDeclsInst;
+            if (!userDefinedFuncDeclsInst.isEmpty() && !userDefinedFuncDeclsUnInst.isEmpty()) {
+                userDefinedFuncDecls += "\n";
+            }
+            userDefinedFuncDecls += userDefinedFuncDeclsUnInst;
+
+            final String skolemPVAnonFuncDecls = model.getProgramVariableDeclarations().stream()
+                    .map(decl -> String.format("%s _%s;", decl.getTypeName(), decl.getVarName()))
+                    .collect(Collectors.joining("\n  "));
+
+            functionsDecl = locSetDecls + (!model.getFunctionDeclarations().isEmpty() ? "\n  " : "")
+                    + userDefinedFuncDecls
+                    + (!model.getProgramVariableDeclarations().isEmpty() ? "\n  " : "")
+                    + skolemPVAnonFuncDecls;
+        }
+
+        return functionsDecl;
+    }
+
+    public static String createParams(final AEInstantiationModel model) {
+        final String params = model.getProgramVariableDeclarations().stream()
+                .map(ProgramVariableDeclaration::getVarName).collect(Collectors.joining(","));
+        return params;
+    }
+
+    public static String createPredDecls(final AEInstantiationModel model) {
+        final String instPredicatesDecl = model.getPredicateInstantiations().stream()
+                .map(PredicateInstantiation::toDeclarationString)
+                .collect(Collectors.joining("\n  "));
+
+        final String additionalPredicatesDecl = model.getPredicateDeclarations().stream()
+                .filter(decl -> !model.getPredicateInstantiations().stream()
+                        .map(PredicateInstantiation::getDeclaration)
+                        .anyMatch(decl2 -> !decl.getPredName().equals(decl2.getPredName())))
+                .map(PredicateDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
+
+        return instPredicatesDecl
+                + (!instPredicatesDecl.isEmpty() && !additionalPredicatesDecl.isEmpty() ? "\n  "
+                        : "")
+                + additionalPredicatesDecl;
+    }
+
+    public static String createProgvarDecls(final AEInstantiationModel model) {
+        final String progvarsDecl = model.getProgramVariableDeclarations().stream()
+                .map(ProgramVariableDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
+        return progvarsDecl;
+    }
+
+    /**
+     * @return A string representing the instantiations of symbolic functions and
+     * predicates.
+     */
+    public static String createSymInsts(final AEInstantiationModel model) {
+        final String funcInsts = model.getFunctionInstantiations().stream()
+                .map(FunctionInstantiation::toString).collect(Collectors.joining(" &\n  "));
+        final String predInsts = model.getPredicateInstantiations().stream()
+                .map(PredicateInstantiation::toString).collect(Collectors.joining(" &\n  "));
+        return funcInsts.isEmpty() ? (predInsts.isEmpty() ? "true" : predInsts)
+                : (predInsts.isEmpty() ? funcInsts : funcInsts + " &\n  " + predInsts);
+    }
+
+    /**
+     * Returns the assignable or accessible String of the given APE.
+     * 
+     * @param ape The {@link APERetrievalResult}.
+     * @param assignable true if the assignable spec should be returned, false if
+     * the accessible spec should be returned.
+     * @return The assignable or accessible specification.
+     */
+    private static String getJMLAssignableOrAccessibleTerm(final APERetrievalResult ape,
+            boolean assignable) {
+        final Predicate<TextualJMLSpecCase> filter = assignable ? //
+                (c -> c.getAssignable() != null) : (c -> c.getAccessible() != null);
+
+        final Function<TextualJMLSpecCase, ImmutableList<PositionedString>> getter = assignable
+                ? TextualJMLSpecCase::getAssignable
+                : TextualJMLSpecCase::getAccessible;
+
+        final String keyword = assignable ? "assignable" : "accessible";
+
+        return ape.getJMLConstructs().stream().filter(TextualJMLSpecCase.class::isInstance)
+                .map(TextualJMLSpecCase.class::cast).filter(c -> c.getBehavior() == Behavior.NONE)
+                .filter(filter).map(getter).map(ImmutableList::head).findAny().map(str -> str.text)
+                .map(str -> str.replaceAll(keyword + " ", "")).map(str -> str.replaceAll(";", ""))
+                .orElse("\\everything");
+    }
+
+    private static ImmutableSet<Term> locsetsFromLocsetString(final String locsetTermStr,
+            final Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final Term parsed;
+        try {
+            parsed = KeyBridgeUtils.parseTerm(locsetTermStr, new GoalLocalSpecificationRepository(),
+                    services);
+        } catch (RecognitionException e) {
+            throw new InvalidSyntaxException("Could not parse LocSet expression", e);
+        }
+
+        return tb.locsetUnionToSet(parsed);
+    }
+
+    // Copied from JMLSpecFactory
+    private static TextualJMLConstruct[] parseMethodLevelComments(final Comment[] comments,
+            final String fileName) throws SLTranslationException {
+        if (comments.length == 0) {
+            return new TextualJMLConstruct[0];
+        }
+        final String concatenatedComment = Arrays.stream(comments).map(Comment::toSource)
+                .collect(Collectors.joining("\n"));
+        final Position position = comments[0].getStartPosition();
+        final KeYJMLPreParser preParser = //
+                new KeYJMLPreParser(concatenatedComment, fileName, position);
+        final ImmutableList<TextualJMLConstruct> constructs = preParser.parseMethodlevelComment();
+        //        warnings = warnings.union(preParser.getWarnings());
+        return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
+    }
+
     private InstantiationAspectProverHelper() {
         javaScaffold = KeyBridgeUtils.readResource(JAVA_PROBLEM_FILE_SCAFFOLD);
         keyRetrieveAPEsScaffold = KeyBridgeUtils.readResource(APE_RETRIEVAL_PROBLEM_FILE_SCAFFOLD);
     }
 
-    protected Services getPopulatedDummyServices(final AEInstantiationModel model) {
-        if (services != null) {
-            return services.copy(false);
-        }
-
-        services = KeyBridgeUtils.dummyServices();
-        model.getProgramVariableDeclarations().stream()
-                .map(pvDecl -> new ProgramVariableDeclaration(pvDecl.getTypeName(),
-                        "_" + pvDecl.getVarName()))
-                .forEach(pvDecl -> pvDecl.checkAndRegister(services));
-
-        model.fillNamespacesFromModel(services);
-
-        return services;
-    }
-
-    protected String createJavaFile(final AEInstantiationModel model,
-            final String bodyReplacement) {
+    public String createJavaFile(final AEInstantiationModel model, final String origProgram) {
         final String paramsDecl = model.getProgramVariableDeclarations().stream()
                 .map(decl -> String.format("%s %s", decl.getTypeName(), decl.getVarName()))
                 .collect(Collectors.joining(","));
 
-        final String program = KeyBridgeUtils.preprocessJavaCode(bodyReplacement,
-                model.getAbstractLocationSets(), model.getPredicateDeclarations(),
-                model.getFunctionDeclarations());
-        final String context = KeyBridgeUtils.preprocessJavaCode(model.getMethodLevelContext(),
-                model.getAbstractLocationSets(), model.getPredicateDeclarations(),
-                model.getFunctionDeclarations());
+        final Function<String, String> addBlocks;
+        final Function<String, String> escapeDL;
+        final Function<String, String> indent;
+        final Function<String, String> instantiate;
+        final Function<String, String> combined;
+
+        {
+            addBlocks = p -> KeyBridgeUtils.addBlocksAfterConstraints(p);
+            escapeDL = p -> KeyBridgeUtils.escapeDL(p, model.getAbstractLocationSets(),
+                    model.getPredicateDeclarations(), model.getFunctionDeclarations());
+            indent = p -> p.replaceAll("\n", "\n        ");
+            instantiate = p -> substituteLocsetValueInstsInString(p, model);
+
+            // NOTE (DS, 2020-06-24): It seems to be crucial to execute addBlocks
+            // first, otherwise, I got a StackOverflowError for one example. A closer
+            // Look at the thing is eventually required...
+
+            combined = addBlocks //
+                    .andThen(instantiate) //
+                    .andThen(escapeDL) //
+                    .andThen(indent);
+        }
+
+        final String program = combined.apply(origProgram);
+
+        final String context = combined.apply(model.getMethodLevelContext());
 
         return javaScaffold.replaceAll(PARAMS, paramsDecl)
                 .replaceAll(BODY, Matcher.quoteReplacement(program))
                 .replaceAll(CONTEXT, Matcher.quoteReplacement(context));
-    }
-
-    /**
-     * Returns a list of APEs from the {@link AEInstantiationModel}.
-     * 
-     * @return List of retrieved APEs.
-     * @throws UnsuccessfulAPERetrievalException if something went wrong. If the
-     * reason is an {@link SLTranslationException} (i.e., problem in the JML specs),
-     * the cause of the thrown exception object is the
-     * {@link SLTranslationException}. If the reason is an {@link ModelException}
-     * (i.e., problem in the Java code), the cause of the thrown exception object is
-     * the {@link ModelException}.
-     */
-    protected List<APERetrievalResult> retrieveAPEs(final AEInstantiationModel model) {
-        if (apes.isPresent()) {
-            return apes.get();
-        }
-
-        final RetrieveProgramResult retrProgRes = retrieveProgram(model, model.getProgram());
-
-        final CollectAPEVisitor visitor = new CollectAPEVisitor(retrProgRes.getProgram(),
-                retrProgRes.getLocalSpecRepo(), retrProgRes.getServices());
-        visitor.start();
-
-        final List<APERetrievalResult> result = visitor.getResult();
-
-        // Cache result 
-        this.apes = Optional.of(result);
-
-        return result;
-    }
-
-    /**
-     * Returns a list of APEs from the {@link AEInstantiationModel}.
-     * 
-     * @return List of retrieved APEs.
-     * @throws UnsuccessfulAPERetrievalException if something went wrong. If the
-     * reason is an {@link SLTranslationException} (i.e., problem in the JML specs),
-     * the cause of the thrown exception object is the
-     * {@link SLTranslationException}. If the reason is an {@link ModelException}
-     * (i.e., problem in the Java code), the cause of the thrown exception object is
-     * the {@link ModelException}.
-     */
-    protected RetrieveProgramResult retrieveProgram(final AEInstantiationModel model,
-            final String code) {
-        final Proof proof = createRetrievalProof(model, 80, code);
-
-        Node currNode = proof.root();
-        while (currNode.getAppliedRuleApp() != null
-                && !currNode.getAppliedRuleApp().rule().name().toString().equals("methodBodyExpand")
-                && currNode.childrenCount() == 1) {
-            currNode = currNode.child(0);
-        }
-
-        if (!currNode.getAppliedRuleApp().rule().name().toString().equals("methodBodyExpand")) {
-            throw new UnsuccessfulAPERetrievalException(
-                    "Could not find methodBodyExpand application");
-        }
-
-        currNode = currNode.child(0);
-
-        final Term formulaWithJavaBlock = //
-                currNode.sequent().succedent().asList().reverse().head().formula();
-
-        final JavaBlock javaBlock = TermBuilder.goBelowUpdates(formulaWithJavaBlock).javaBlock();
-
-        if (javaBlock.isEmpty()) {
-            throw new UnsuccessfulAPERetrievalException(
-                    "Found an empty JavaBlock, probably wrong assumptions about proof structure");
-        }
-
-        return new RetrieveProgramResult(javaBlock.program(), proof);
     }
 
     /**
@@ -232,72 +309,49 @@ public class InstantiationAspectProverHelper {
         return proof;
     }
 
-    protected static String createParams(final AEInstantiationModel model) {
-        final String params = model.getProgramVariableDeclarations().stream()
-                .map(ProgramVariableDeclaration::getVarName).collect(Collectors.joining(","));
-        return params;
-    }
+    /**
+     * Returns the pre- and postcondition pairs for all "completion conditions"
+     * (e.g., normal or exceptional behavior).
+     * 
+     * @param ape The APE for which to retrieve the {@link CompletionCondition}s.
+     * @return The list of {@link CompletionCondition}s for the given
+     * {@link APERetrievalResult}.
+     */
+    public List<CompletionCondition> getCompletionConditions(final AEInstantiationModel model,
+            final APEInstantiation inst) {
+        final LocationVariable resultVar = (LocationVariable) services.getNamespaces()
+                .programVariables().lookup("result");
+        assert resultVar != null;
 
-    protected static String createProgvarDecls(final AEInstantiationModel model) {
-        final String progvarsDecl = model.getProgramVariableDeclarations().stream()
-                .map(ProgramVariableDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
-        return progvarsDecl;
-    }
+        final List<CompletionCondition> result = new ArrayList<>();
 
-    protected static String createPredDecls(final AEInstantiationModel model) {
-        final String predicatesDecl = model.getPredicateDeclarations().stream()
-                .map(PredicateDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
-        return predicatesDecl;
-    }
+        final List<TextualJMLSpecCase> specs = getAPE(model, inst).getJMLConstructs().stream()
+                .filter(TextualJMLSpecCase.class::isInstance).map(TextualJMLSpecCase.class::cast)
+                .filter(c -> c.getBehavior() != Behavior.NONE).collect(Collectors.toList());
 
-    protected static String createFuncDecls(final AEInstantiationModel model) {
-        final String functionsDecl;
+        final Function<ImmutableList<PositionedString>, Optional<String>> defaultMapper = list -> list
+                .isEmpty() ? Optional.empty()
+                        : Optional.of(list.stream().map(str -> str.text)
+                                .collect(Collectors.joining(" && ")));
 
-        {
-            final String locSetDecls = model.getAbstractLocationSets().stream()
-                    .map(FunctionDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
+        for (final TextualJMLSpecCase spec : specs) {
+            final Behavior behavior = spec.getBehavior();
+            final String precondition = defaultMapper.apply(spec.getRequires())
+                    .map(pre -> KeyBridgeUtils.jmlStringToJavaDLString(pre,
+                            KeyBridgeUtils.dummyKJT(), null, services))
+                    .orElse(null);
 
-            final String userDefinedFuncDecls = model.getFunctionDeclarations().stream()
-                    .map(FunctionDeclaration::toKeYFileDecl).collect(Collectors.joining("\n  "));
+            final String postcondition = defaultMapper.apply(spec.getEnsures())
+                    .map(pre -> KeyBridgeUtils.jmlStringToJavaDLString(pre,
+                            KeyBridgeUtils.dummyKJT(), resultVar, services))
+                    .orElse(null);
 
-            final String skolemPVAnonFuncDecls = model.getProgramVariableDeclarations().stream()
-                    .map(decl -> String.format("%s _%s;", decl.getTypeName(), decl.getVarName()))
-                    .collect(Collectors.joining("\n  "));
+            // TODO: Check behavior w.r.t. special variables (e.g., \result)
 
-            functionsDecl = locSetDecls + (!model.getFunctionDeclarations().isEmpty() ? "\n  " : "")
-                    + userDefinedFuncDecls
-                    + (!model.getProgramVariableDeclarations().isEmpty() ? "\n  " : "")
-                    + skolemPVAnonFuncDecls;
+            result.add(new CompletionCondition(behavior, precondition, postcondition));
         }
-        return functionsDecl;
-    }
 
-    /**
-     * Returns the assignable term of the given {@link APEInstantiation}.
-     * 
-     * @param model The {@link AEInstantiationModel} containing the APE to analyze.
-     * @param inst The instantiation corresponding to the APE to analyze.
-     * @param services The {@link Services} object.
-     * @return The assignable JML term.
-     * @throws UnsuccessfulAPERetrievalException
-     */
-    public Term getJMLAssignableTerm(final AEInstantiationModel model, final APEInstantiation inst,
-            Services services) throws UnsuccessfulAPERetrievalException {
-        return getJMLAssignableOrAccessibleTerm(model, inst, true, services);
-    }
-
-    /**
-     * Returns the accessible term of the given {@link APEInstantiation}.
-     * 
-     * @param model The {@link AEInstantiationModel} containing the APE to analyze.
-     * @param inst The instantiation corresponding to the APE to analyze.
-     * @param services The {@link Services} object.
-     * @return The accessible JML term.
-     * @throws UnsuccessfulAPERetrievalException
-     */
-    public Term getJMLAccessibleTerm(final AEInstantiationModel model, final APEInstantiation inst,
-            Services services) throws UnsuccessfulAPERetrievalException {
-        return getJMLAssignableOrAccessibleTerm(model, inst, false, services);
+        return result;
     }
 
     /**
@@ -318,29 +372,31 @@ public class InstantiationAspectProverHelper {
     }
 
     /**
-     * Returns the assignable or accessible term of the given
-     * {@link APEInstantiation}.
+     * Returns the accessible term of the given {@link APEInstantiation}.
      * 
      * @param model The {@link AEInstantiationModel} containing the APE to analyze.
      * @param inst The instantiation corresponding to the APE to analyze.
-     * @param assignable true if the assignable spec should be returned, false if
-     * the accessible spec should be returned.
      * @param services The {@link Services} object.
-     * @return The assignable or accessible JML term.
+     * @return The accessible JML term.
      * @throws UnsuccessfulAPERetrievalException
      */
-    private Term getJMLAssignableOrAccessibleTerm(final AEInstantiationModel model,
-            final APEInstantiation inst, boolean assignable, Services services)
-            throws UnsuccessfulAPERetrievalException {
-        final List<String> jmlAssignables = getJMLAssignableOrAccessibleTerms(model, inst,
-                assignable);
+    public Term getJMLAccessibleTerm(final AEInstantiationModel model, final APEInstantiation inst,
+            Services services) throws UnsuccessfulAPERetrievalException {
+        return getJMLAssignableOrAccessibleTerm(model, inst, false, services);
+    }
 
-        // Translate comma-separated list into \set_union term
-        final String jmlAssignableTerm = jmlAssignables.stream().collect(Collectors
-                .reducing("\\empty", (a1, a2) -> String.format("\\set_union(%s, %s)", a1, a2)));
-
-        return KeyBridgeUtils.jmlStringToJavaDLTerm( //
-                jmlAssignableTerm, KeyBridgeUtils.dummyKJT(), services);
+    /**
+     * Returns the assignable term of the given {@link APEInstantiation}.
+     * 
+     * @param model The {@link AEInstantiationModel} containing the APE to analyze.
+     * @param inst The instantiation corresponding to the APE to analyze.
+     * @param services The {@link Services} object.
+     * @return The assignable JML term.
+     * @throws UnsuccessfulAPERetrievalException
+     */
+    public Term getJMLAssignableTerm(final AEInstantiationModel model, final APEInstantiation inst,
+            Services services) throws UnsuccessfulAPERetrievalException {
+        return getJMLAssignableOrAccessibleTerm(model, inst, true, services);
     }
 
     /**
@@ -358,56 +414,141 @@ public class InstantiationAspectProverHelper {
         return getJMLAssignableOrAccessibleTerms(model, inst, true);
     }
 
-    /**
-     * Returns the JML assignable or accessible terms from the APE corresponding to
-     * the given instantiation.
-     * 
-     * @param model The {@link AEInstantiationModel} containing the APE to analyze.
-     * @param inst The instantiation corresponding to the APE to analyze.
-     * @param assignable true if the assignable spec should be returned, false if
-     * the accessible spec should be returned.
-     * @return The assignables for the APE.
-     * @throws UnsuccessfulAPERetrievalException If the APE corresponding to the
-     * instantiation could not be found.
-     */
-    private List<String> getJMLAssignableOrAccessibleTerms(final AEInstantiationModel model,
-            final APEInstantiation inst, boolean assignable)
-            throws UnsuccessfulAPERetrievalException {
-        final String jmlAssignableTermCSVList = getJMLAssignableOrAccessibleTerm(retrieveAPEs(model)
-                .stream().filter(r -> r.getLine() == inst.getApeLineNumber()).findFirst()
-                .orElseThrow(() -> new UnsuccessfulAPERetrievalException(
-                        "Expected to find APE with line no. " + inst.getApeLineNumber()
-                                + ", but did not.")),
-                assignable);
+    public Services getPopulatedDummyServices(final AEInstantiationModel model) {
+        if (services != null) {
+            return KeyBridgeUtils.copyWithKeyProgModelInfo(services);
+        }
 
-        return Arrays.stream(jmlAssignableTermCSVList.split(",")).map(String::trim)
-                .collect(Collectors.toList());
+        services = KeyBridgeUtils.dummyServices();
+        model.getProgramVariableDeclarations().stream()
+                .map(pvDecl -> new ProgramVariableDeclaration(pvDecl.getTypeName(),
+                        "_" + pvDecl.getVarName()))
+                .forEach(pvDecl -> pvDecl.checkAndRegister(services));
+
+        model.fillNamespacesFromModel(services);
+
+        return services;
     }
 
     /**
-     * Returns the assignable or accessible String of the given APE.
+     * Instantiates function and predicate symbols in the given formula with their
+     * instantiations. E.g., "returnsA(\value(footprintA))" is first instantiated to
+     * "returnsA(\value(x), \value(y))" (if footprintA is instantiated to "x, y"),
+     * and then the whole predicate is replaced by the instantiating formula, e.g.,
+     * "x == null". Returns a String representation of the result.
      * 
-     * @param ape The {@link APERetrievalResult}.
-     * @param assignable true if the assignable spec should be returned, false if
-     * the accessible spec should be returned.
-     * @return The assignable or accessible specification.
+     * @param formulaStr The formula which should be instantiated (e.g., a pre- or
+     * postcondition).
+     * @param model The {@link AEInstantiationModel} for instantiations of function
+     * and predicate symbols.
+     * @param services The {@link Services} object (primarily for namespaces!)
+     * @return The instantiated String
+     * @throws RecognitionException if there was a syntax error in the (abstract)
+     * formula formulaStr, or in the instantiating functions / predications.
      */
-    private static String getJMLAssignableOrAccessibleTerm(final APERetrievalResult ape,
-            boolean assignable) {
-        final Predicate<TextualJMLSpecCase> filter = assignable ? //
-                (c -> c.getAssignable() != null) : (c -> c.getAccessible() != null);
+    public String instantiate(final String formulaStr, final AEInstantiationModel model,
+            final Services services) throws RecognitionException {
+        Term formula = KeyBridgeUtils.parseTerm( //
+                substituteLocsetValueInstsInString(formulaStr, model),
+                new GoalLocalSpecificationRepository(), services);
 
-        final Function<TextualJMLSpecCase, ImmutableList<PositionedString>> getter = assignable
-                ? TextualJMLSpecCase::getAssignable
-                : TextualJMLSpecCase::getAccessible;
+        for (final FunctionInstantiation finst : model.getFunctionInstantiations()) {
+            final de.uka.ilkd.key.logic.op.Function func = services.getNamespaces().functions()
+                    .lookup(finst.getDeclaration().getFuncName());
+            assert func != null;
 
-        final String keyword = assignable ? "assignable" : "accessible";
+            final Term inst = KeyBridgeUtils.parseTerm(finst.getInstantiation(),
+                    new GoalLocalSpecificationRepository(), services);
 
-        return ape.getJMLConstructs().stream().filter(TextualJMLSpecCase.class::isInstance)
-                .map(TextualJMLSpecCase.class::cast).filter(c -> c.getBehavior() == Behavior.NONE)
-                .filter(filter).map(getter).map(ImmutableList::head).findAny().map(str -> str.text)
-                .map(str -> str.replaceAll(keyword + " ", "")).map(str -> str.replaceAll(";", ""))
-                .orElse("\\everything");
+            formula = GenericTermReplacer.replace( //
+                    formula, t -> t.op() == func, t -> inst, services);
+        }
+
+        for (final PredicateInstantiation finst : model.getPredicateInstantiations()) {
+            final de.uka.ilkd.key.logic.op.Function pred = services.getNamespaces().functions()
+                    .lookup(finst.getDeclaration().getPredName());
+            assert pred != null;
+
+            final Term inst = KeyBridgeUtils.parseTerm(finst.getInstantiation(),
+                    new GoalLocalSpecificationRepository(), services);
+
+            formula = GenericTermReplacer.replace( //
+                    formula, t -> t.op() == pred, t -> inst, services);
+        }
+
+        return KeyBridgeUtils.termToString(formula, services);
+    }
+
+    /**
+     * Returns a list of APEs from the {@link AEInstantiationModel}.
+     * 
+     * @return List of retrieved APEs.
+     * @throws UnsuccessfulAPERetrievalException if something went wrong. If the
+     * reason is an {@link SLTranslationException} (i.e., problem in the JML specs),
+     * the cause of the thrown exception object is the
+     * {@link SLTranslationException}. If the reason is an {@link ModelException}
+     * (i.e., problem in the Java code), the cause of the thrown exception object is
+     * the {@link ModelException}.
+     */
+    public List<APERetrievalResult> retrieveAPEs(final AEInstantiationModel model) {
+        if (apes.isPresent()) {
+            return apes.get();
+        }
+
+        final RetrieveProgramResult retrProgRes = retrieveProgram(model, model.getProgram());
+
+        final CollectAPEVisitor visitor = new CollectAPEVisitor(retrProgRes.getProgram(),
+                retrProgRes.getLocalSpecRepo(), retrProgRes.getServices());
+        visitor.start();
+
+        final List<APERetrievalResult> result = visitor.getResult();
+
+        // Cache result 
+        this.apes = Optional.of(result);
+
+        return result;
+    }
+
+    /**
+     * Returns a list of APEs from the {@link AEInstantiationModel}.
+     * 
+     * @return List of retrieved APEs.
+     * @throws UnsuccessfulAPERetrievalException if something went wrong. If the
+     * reason is an {@link SLTranslationException} (i.e., problem in the JML specs),
+     * the cause of the thrown exception object is the
+     * {@link SLTranslationException}. If the reason is an {@link ModelException}
+     * (i.e., problem in the Java code), the cause of the thrown exception object is
+     * the {@link ModelException}.
+     */
+    public RetrieveProgramResult retrieveProgram(final AEInstantiationModel model,
+            final String code) {
+        final Proof proof = createRetrievalProof(model, 80, code);
+
+        Node currNode = proof.root();
+        while (currNode.getAppliedRuleApp() != null
+                && !currNode.getAppliedRuleApp().rule().name().toString().equals("methodBodyExpand")
+                && currNode.childrenCount() == 1) {
+            currNode = currNode.child(0);
+        }
+
+        if (!currNode.getAppliedRuleApp().rule().name().toString().equals("methodBodyExpand")) {
+            throw new UnsuccessfulAPERetrievalException(
+                    "Could not find methodBodyExpand application");
+        }
+
+        currNode = currNode.child(0);
+
+        final Term formulaWithJavaBlock = //
+                currNode.sequent().succedent().asList().reverse().head().formula();
+
+        final JavaBlock javaBlock = TermBuilder.goBelowUpdates(formulaWithJavaBlock).javaBlock();
+
+        if (javaBlock.isEmpty()) {
+            throw new UnsuccessfulAPERetrievalException(
+                    "Found an empty JavaBlock, probably wrong assumptions about proof structure");
+        }
+
+        return new RetrieveProgramResult(javaBlock.program(), proof);
     }
 
     private String createRetrievalKeYFile(final AEInstantiationModel model) {
@@ -438,47 +579,130 @@ public class InstantiationAspectProverHelper {
     }
 
     /**
-     * @return A string representing the instantiations of symbolic functions and
-     * predicates.
+     * Returns the APE for the designated instantiation.
+     * 
+     * @param model The model in which the APE referred to by the instantiation is
+     * contained.
+     * @param inst The instantiation.
+     * @return The requested APE.
+     * @throws UnsuccessfulAPERetrievalException If the requested APE could not be
+     * found.
      */
-    protected static String createSymInsts(final AEInstantiationModel model) {
-        final String funcInsts = model.getFunctionInstantiations().stream()
-                .map(FunctionInstantiation::toString).collect(Collectors.joining(" &\n  "));
-        final String predInsts = model.getPredicateInstantiations().stream()
-                .map(PredicateInstantiation::toString).collect(Collectors.joining(" &\n  "));
-        return funcInsts.isEmpty() ? (predInsts.isEmpty() ? "true" : predInsts)
-                : (predInsts.isEmpty() ? funcInsts : funcInsts + " &\n  " + predInsts);
+    private APERetrievalResult getAPE(final AEInstantiationModel model, final APEInstantiation inst)
+            throws UnsuccessfulAPERetrievalException {
+        return retrieveAPEs(model).stream().filter(r -> r.getLine() == inst.getApeLineNumber())
+                .findFirst()
+                .orElseThrow(() -> new UnsuccessfulAPERetrievalException(
+                        "Expected to find APE with line no. " + inst.getApeLineNumber()
+                                + ", but did not."));
     }
 
-    private static class CollectAPEVisitor extends JavaASTVisitor {
-        private final List<APERetrievalResult> result = new ArrayList<>();
+    /**
+     * Returns the assignable or accessible term of the given
+     * {@link APEInstantiation}.
+     * 
+     * @param model The {@link AEInstantiationModel} containing the APE to analyze.
+     * @param inst The instantiation corresponding to the APE to analyze.
+     * @param assignable true if the assignable spec should be returned, false if
+     * the accessible spec should be returned.
+     * @param services The {@link Services} object.
+     * @return The assignable or accessible JML term.
+     * @throws UnsuccessfulAPERetrievalException
+     */
+    private Term getJMLAssignableOrAccessibleTerm(final AEInstantiationModel model,
+            final APEInstantiation inst, boolean assignable, Services services)
+            throws UnsuccessfulAPERetrievalException {
+        final List<String> jmlAssignables = getJMLAssignableOrAccessibleTerms(model, inst,
+                assignable);
 
-        public CollectAPEVisitor(ProgramElement root,
-                GoalLocalSpecificationRepository localSpecRepo, Services services) {
-            super(root, localSpecRepo, services);
+        // Translate comma-separated list into \set_union term
+        final String jmlAssignableTerm = jmlAssignables.stream().collect(Collectors
+                .reducing("\\empty", (a1, a2) -> String.format("\\set_union(%s, %s)", a1, a2)));
+
+        return KeyBridgeUtils.jmlStringToJavaDLTerm( //
+                jmlAssignableTerm, KeyBridgeUtils.dummyKJT(), null,
+                services.getNamespaces().programVariables().allElements().stream()
+                        .map(ProgramVariable.class::cast)
+                        .collect(ImmutableSLList.toImmutableList()),
+                services);
+    }
+
+    /**
+     * Returns the JML assignable or accessible terms from the APE corresponding to
+     * the given instantiation.
+     * 
+     * @param model The {@link AEInstantiationModel} containing the APE to analyze.
+     * @param inst The instantiation corresponding to the APE to analyze.
+     * @param assignable true if the assignable spec should be returned, false if
+     * the accessible spec should be returned.
+     * @return The assignables for the APE.
+     * @throws UnsuccessfulAPERetrievalException If the APE corresponding to the
+     * instantiation could not be found.
+     */
+    private List<String> getJMLAssignableOrAccessibleTerms(final AEInstantiationModel model,
+            final APEInstantiation inst, boolean assignable)
+            throws UnsuccessfulAPERetrievalException {
+        final APERetrievalResult ape = getAPE(model, inst);
+        final String jmlAssignableTermCSVList = getJMLAssignableOrAccessibleTerm(ape, assignable);
+
+        return Arrays.stream(jmlAssignableTermCSVList.split(",")).map(String::trim)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Substitutes the location set instantiations in value terms, e.g.,
+     * "<code>\value(footprintA)</code>" ->
+     * "<code>\value(singletonPV(PV(x))), \value(...), ...</code>".
+     * 
+     * @param substIn The string in which to perform the substitution.
+     * @param model The {@link AEInstantiationModel} (for the substitutions).
+     * @return The instantiated String.
+     */
+    private String substituteLocsetValueInstsInString(final String substIn,
+            final AEInstantiationModel model) {
+        /* non-final */ String result = substIn;
+
+        for (final FunctionInstantiation inst : model.getFunctionInstantiations().stream()
+                .filter(finst -> finst.getDeclaration().getResultSortName().equals("LocSet"))
+                .collect(Collectors.toList())) {
+            final String locsetTermStr = inst.getInstantiation();
+            final Services services = getPopulatedDummyServices(model);
+
+            final String valPattern = Pattern.quote("\\value") + "\\s*\\(\\s*"
+                    + Pattern.quote(inst.getDeclaration().getFuncName()) + "\\s*\\)";
+
+            final String instantiation = Matcher.quoteReplacement( //
+                    locsetsFromLocsetString(locsetTermStr, services).stream()
+                            .map(t -> String.format("%s\\value(%s)",
+                                    typeCastForLocsetSingleton(t, services),
+                                    KeyBridgeUtils.termToString(t, services).replaceAll("\n", "")))
+                            .collect(Collectors.joining(",")));
+
+            result = result.replaceAll(valPattern, instantiation);
         }
 
-        @Override
-        protected void doDefaultAction(SourceElement node) {
-            if (node instanceof AbstractProgramElement) {
-                final AbstractProgramElement ape = (AbstractProgramElement) node;
+        return result;
+    }
 
-                List<TextualJMLConstruct> jmlConstructs;
-                try {
-                    jmlConstructs = Arrays
-                            .stream(parseMethodLevelComments(ape.getComments(), "DummyProblemFile"))
-                            .collect(Collectors.toList());
-                } catch (SLTranslationException e) {
-                    throw new RuntimeException("Could not parse APE comments", e);
-                }
+    /**
+     * Given a singletonPV, singleton, or abstract locset, returns a type cast
+     * "(TYPE) ". For an abstract locset, returns the empty string.
+     * 
+     * @param t The term from which to obtain the type cast.
+     * @return The type cast.
+     */
+    private String typeCastForLocsetSingleton(final Term t, final Services services) {
+        final Operator op = t.op();
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
 
-                result.add(new APERetrievalResult(ape, jmlConstructs));
-            }
+        if (op == locSetLDT.getSingletonPV()) {
+            return "(" + ((LocationVariable) t.sub(0).sub(0).op()).sort().name().toString() + ") ";
+        } else if (op == locSetLDT.getSingleton()) {
+            System.err.println(
+                    "Unimplemented: Get type cast for singleton locations (InstantiationAspectProverHelper)");
         }
 
-        public List<APERetrievalResult> getResult() {
-            return result;
-        }
+        return "";
     }
 
     public static class APERetrievalResult {
@@ -507,20 +731,35 @@ public class InstantiationAspectProverHelper {
         }
     }
 
-    // Copied from JMLSpecFactory
-    private static TextualJMLConstruct[] parseMethodLevelComments(final Comment[] comments,
-            final String fileName) throws SLTranslationException {
-        if (comments.length == 0) {
-            return new TextualJMLConstruct[0];
+    private static class CollectAPEVisitor extends JavaASTVisitor {
+        private final List<APERetrievalResult> result = new ArrayList<>();
+
+        public CollectAPEVisitor(ProgramElement root,
+                GoalLocalSpecificationRepository localSpecRepo, Services services) {
+            super(root, localSpecRepo, services);
         }
-        final String concatenatedComment = Arrays.stream(comments).map(Comment::toSource)
-                .collect(Collectors.joining("\n"));
-        final Position position = comments[0].getStartPosition();
-        final KeYJMLPreParser preParser = //
-                new KeYJMLPreParser(concatenatedComment, fileName, position);
-        final ImmutableList<TextualJMLConstruct> constructs = preParser.parseMethodlevelComment();
-        //        warnings = warnings.union(preParser.getWarnings());
-        return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
+
+        @Override
+        public void doDefaultAction(SourceElement node) {
+            if (node instanceof AbstractProgramElement) {
+                final AbstractProgramElement ape = (AbstractProgramElement) node;
+
+                List<TextualJMLConstruct> jmlConstructs;
+                try {
+                    jmlConstructs = Arrays
+                            .stream(parseMethodLevelComments(ape.getComments(), "DummyProblemFile"))
+                            .collect(Collectors.toList());
+                } catch (SLTranslationException e) {
+                    throw new RuntimeException("Could not parse APE comments", e);
+                }
+
+                result.add(new APERetrievalResult(ape, jmlConstructs));
+            }
+        }
+
+        public List<APERetrievalResult> getResult() {
+            return result;
+        }
     }
 
 }

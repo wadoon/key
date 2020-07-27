@@ -707,6 +707,11 @@ public class Recoder2KeYConverter {
 	return EmptySetLiteral.LOCSET;
     }
 
+    public SingletonPVFun convert(de.uka.ilkd.key.java.recoderext.adt.SingletonPVFun e) {
+        ExtList children = collectChildren(e);
+        return new SingletonPVFun(children);
+    }
+
     public Singleton convert(de.uka.ilkd.key.java.recoderext.adt.Singleton e) {
         ExtList children = collectChildren(e);
 	return new Singleton(children);
@@ -919,6 +924,34 @@ public class Recoder2KeYConverter {
 
         return new MethodBodyStatement(bodySource, resultVar, mr);
     }
+
+    public DirectMethodBodyStatement convert(
+            de.uka.ilkd.key.java.recoderext.DirectMethodBodyStatement rmbs) {
+        final TypeReference bodySource = convert(rmbs.getBodySource());
+        final IProgramVariable resultVar = rmbs.getResultVariable() != null ? (IProgramVariable) callConvert(rmbs
+                .getResultVariable())
+                : null;
+        final ReferencePrefix invocationTarget = (ReferencePrefix) callConvert(rmbs
+                .getReferencePrefix());
+        final ProgramElementName methodName = convert(rmbs.getMethodName());
+
+        final ASTList<recoder.java.Expression> args = rmbs.getArguments();
+        final Expression[] keyArgs;
+        if (args != null) {
+            keyArgs = new Expression[args.size()];
+            for (int i = 0, sz = args.size(); i < sz; i++) {
+                keyArgs[i] = (Expression) callConvert(args.get(i));
+            }
+        } else {
+            keyArgs = new Expression[0];
+        }
+
+        final MethodReference mr = new MethodReference(new ImmutableArray<Expression>(
+                keyArgs), methodName, invocationTarget);
+
+        return new DirectMethodBodyStatement(bodySource, resultVar, mr);
+    }
+
 
     public LoopScopeBlock convert(
         de.uka.ilkd.key.java.recoderext.LoopScopeBlock lsb) {

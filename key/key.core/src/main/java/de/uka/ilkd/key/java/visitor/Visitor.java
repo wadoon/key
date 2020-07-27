@@ -427,4 +427,6 @@ public interface Visitor {
 
     void performActionOnCcatchBreakWildcardParameterDeclaration(
             CcatchBreakWildcardParameterDeclaration ccatchBreakWildcardParameterDeclaration);
+    void performActionOnDirectMethodBodyStatement(
+            DirectMethodBodyStatement directMethodBodyStatement);
 }

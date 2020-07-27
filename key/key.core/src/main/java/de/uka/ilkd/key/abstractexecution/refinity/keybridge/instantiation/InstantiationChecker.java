@@ -12,9 +12,13 @@
 //
 package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.stream.Stream;
 
 import javax.xml.bind.JAXBException;
 
@@ -44,10 +48,11 @@ public class InstantiationChecker {
         /* non-final */ ProofResult result = ProofResult.EMPTY;
 
         final InstantiationAspectProver[] checkers = new InstantiationAspectProver[] {
-                new FrameConditionProver(), //
-                new HasToConditionProver(), //
-                new FootprintConditionProver(), //
-                new TerminationProver(), ///
+//                new FrameConditionProver(), //
+//                new HasToConditionProver(), //
+//                new FootprintConditionProver(), //
+//                new TerminationProver(), //
+                new ReturnsSpecProver(), //
         };
 
         for (final InstantiationAspectProver checker : checkers) {
@@ -58,10 +63,6 @@ public class InstantiationChecker {
         }
 
         ///////// Normal Completion Spec
-
-        //TODO
-
-        ///////// Completion Due to Return Spec
 
         //TODO
 
@@ -99,7 +100,6 @@ public class InstantiationChecker {
                 println("Success.");
             } else {
                 println("Could not prove " + proofObjective + ".");
-                println("Failed proof(s):");
             }
         }
     }
@@ -135,7 +135,9 @@ public class InstantiationChecker {
 
         final Path outputDir = Paths.get("output/");
         if (outputDir.toFile().exists()) {
-            outputDir.toFile().delete();
+            try (Stream<Path> walk = Files.walk(outputDir)) {
+                walk.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+            }
         }
 
         result.saveBundlesToDir(outputDir);

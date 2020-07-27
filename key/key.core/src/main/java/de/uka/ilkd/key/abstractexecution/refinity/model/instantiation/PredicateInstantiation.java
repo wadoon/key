@@ -1,17 +1,20 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2010 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2020 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
 package de.uka.ilkd.key.abstractexecution.refinity.model.instantiation;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -20,7 +23,13 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import de.uka.ilkd.key.abstractexecution.refinity.model.FuncOrPredDecl;
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * @author Dominic Steinhoefel
@@ -32,14 +41,17 @@ public class PredicateInstantiation {
     private PredicateDeclaration declaration;
     @XmlElement(name = "instantiation")
     private String instantiation;
+    @XmlElement(name = "instArgSort")
+    private List<String> instArgSorts = new ArrayList<>();
 
     public PredicateInstantiation() {
     }
 
     public PredicateInstantiation(final PredicateDeclaration declaration,
-            final String instantiation) {
+            final String instantiation, final List<String> instArgSorts) {
         this.declaration = declaration;
         this.instantiation = instantiation;
+        this.instArgSorts = instArgSorts;
     }
 
     public PredicateDeclaration getDeclaration() {
@@ -58,23 +70,77 @@ public class PredicateInstantiation {
         this.instantiation = instantiation;
     }
 
+    public List<String> getInstArgSorts() {
+        return instArgSorts;
+    }
+
+    public void setInstArgSorts(List<String> instArgSorts) {
+        this.instArgSorts = instArgSorts;
+    }
+
+    /**
+     * Adds a function symbol corresponding to this {@link FuncOrPredDecl} to the
+     * {@link Services} object if not already present.
+     * 
+     * @param services The {@link Services} object whose namespaces to populate.
+     * @throws RuntimeException If the name is already present or some sort not
+     * known.
+     */
+    public void checkAndRegister(final Services services) {
+        final NamespaceSet namespaces = services.getNamespaces();
+
+        final List<Sort> sorts = //
+                getInstArgSorts().stream().map(namespaces.sorts()::lookup)
+                        .collect(Collectors.toList());
+
+        for (int i = 0; i < sorts.size(); i++) {
+            if (sorts.get(i) == null) {
+                throw new RuntimeException("The sort " + getInstArgSorts().get(i) + " is unknown.",
+                        null);
+            }
+        }
+
+        final String predName = declaration.getPredName();
+
+        if (namespaces.functions().lookup(predName) != null) {
+            throw new RuntimeException("The predicate " + predName
+                    + " is already registered, please choose another one.", null);
+        }
+
+        namespaces.functions()
+                .add(new Function(new Name(predName), Sort.FORMULA, sorts.toArray(new Sort[0])));
+
+    }
+
+    public String toDeclarationString() {
+        if (instArgSorts.isEmpty()) {
+            return String.format("%s;", declaration.getPredName());
+        }
+
+        return String.format("%s(%s);", declaration.getPredName(),
+                instArgSorts.stream().collect(Collectors.joining(", ")));
+    }
+
     @Override
     public String toString() {
         assert declaration != null;
         assert instantiation != null;
+        assert instArgSorts != null;
 
-        final String qfdParamDecl = IntStream.range(1, declaration.getArgSorts().size()).mapToObj(
-                i -> String.format("(\\forall %s _p%d; ", declaration.getArgSorts().get(i - 1), i))
+        Supplier<IntStream> stream = () -> IntStream.range(1, instArgSorts.size() + 1);
+
+        final String qfdParamDecl = stream.get()
+                .mapToObj(i -> String.format("(\\forall %s _p%d; ", instArgSorts.get(i - 1), i))
                 .collect(Collectors.joining());
 
-        final String paramList = IntStream.range(1, declaration.getArgSorts().size())
-                .mapToObj(i -> String.format("_p%d", i)).collect(Collectors.joining(", "));
+        final String paramList = stream.get().mapToObj(i -> String.format("_p%d", i))
+                .collect(Collectors.joining(", "));
 
-        final String closingParens = IntStream.range(1, declaration.getArgSorts().size())
-                .mapToObj(i -> ")").collect(Collectors.joining());
+        final String closingParens = stream.get().mapToObj(i -> ")").collect(Collectors.joining());
 
-        return qfdParamDecl + String.format("(%s%s <==> %s)", declaration.getPredName(),
-                declaration.getArgSorts().size() == 0 ? "" : "(" + paramList + ")", instantiation)
+        return qfdParamDecl
+                + String.format("((%s%s) <-> (%s))", declaration.getPredName(),
+                        instArgSorts.size() == 0 ? "" : "(" + paramList + ")", instantiation)
                 + closingParens;
     }
 
@@ -82,7 +148,8 @@ public class PredicateInstantiation {
     public boolean equals(Object obj) {
         return obj != null && (obj instanceof PredicateInstantiation)
                 && ((PredicateInstantiation) obj).declaration.equals(this.declaration)
-                && ((PredicateInstantiation) obj).instantiation.equals(this.instantiation);
+                && ((PredicateInstantiation) obj).instantiation.equals(this.instantiation)
+                && ((PredicateInstantiation) obj).instArgSorts.equals(this.instArgSorts);
     }
 
 }

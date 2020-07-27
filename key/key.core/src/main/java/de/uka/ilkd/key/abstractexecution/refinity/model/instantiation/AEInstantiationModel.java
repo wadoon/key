@@ -343,10 +343,28 @@ public class AEInstantiationModel {
      * @throws RuntimeException If a name is already present, or a sort not known.
      */
     public void fillNamespacesFromModel(final Services services) {
-        getAbstractLocationSets().forEach(loc -> loc.checkAndRegister(services));
         getProgramVariableDeclarations().forEach(pv -> pv.checkAndRegister(services));
-        getPredicateDeclarations().forEach(pred -> pred.checkAndRegister(services));
-        getFunctionDeclarations().forEach(pred -> pred.checkAndRegister(services));
+
+        getPredicateInstantiations().forEach(inst -> inst.checkAndRegister(services));
+        getFunctionInstantiations().forEach(inst -> inst.checkAndRegister(services));
+
+        getAbstractLocationSets().stream()
+                .filter(decl -> !getFunctionInstantiations().stream()
+                        .map(FunctionInstantiation::getDeclaration)
+                        .anyMatch(decl2 -> decl.getFuncName().equals(decl2.getFuncName())))
+                .forEach(loc -> loc.checkAndRegister(services));
+
+        getPredicateDeclarations().stream()
+                .filter(decl -> !getPredicateInstantiations().stream()
+                        .map(PredicateInstantiation::getDeclaration)
+                        .anyMatch(decl2 -> decl.getPredName().equals(decl2.getPredName())))
+                .forEach(pred -> pred.checkAndRegister(services));
+
+        getFunctionDeclarations().stream()
+                .filter(decl -> !getFunctionInstantiations().stream()
+                        .map(FunctionInstantiation::getDeclaration)
+                        .anyMatch(decl2 -> decl.getFuncName().equals(decl2.getFuncName())))
+                .forEach(pred -> pred.checkAndRegister(services));
     }
 
     /**

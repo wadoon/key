@@ -139,6 +139,9 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#expand-method-body".equals(mcName)) {
             return new ExpandMethodBody(list
                     .get(SchemaVariable.class));
+        } else if ("#expand-direct-method-body".equals(mcName)) {
+            return new ExpandDirectMethodBody(list
+                    .get(SchemaVariable.class));
         } else if ("#method-call".equals(mcName)) {
             ProgramSV[] svw = mc.getSV();
             ProgramSV execSV = null;

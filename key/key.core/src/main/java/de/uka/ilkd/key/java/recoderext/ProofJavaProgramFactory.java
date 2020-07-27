@@ -436,6 +436,15 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     }
 
     /**
+     * Create a {@link MethodBodyStatement}.
+     */
+    public DirectMethodBodyStatement createDirectMethodBodyStatement(TypeReference bodySource,
+                                                         Expression resVar,
+                                                         MethodReference methRef) {
+        return new DirectMethodBodyStatement(bodySource, resVar, methRef);
+    }
+
+    /**
      * Create a {@link CatchAllStatement}.
      */
     public Statement createCatchAllStatement(VariableReference param,

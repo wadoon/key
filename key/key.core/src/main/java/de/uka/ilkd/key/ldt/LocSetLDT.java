@@ -59,10 +59,6 @@ public final class LocSetLDT extends LDT {
     private final Function value;
     private final Function irr;
     private final Function pvElementOf;
-    private final Function PV;
-    
-    //additional sorts
-    private final Sort progVarSort;    
     
     public LocSetLDT(TermServices services) {
 	super(NAME, services);
@@ -87,8 +83,6 @@ public final class LocSetLDT extends LDT {
         hasTo = addFunction(services, "hasTo");
         value = addFunction(services, "value");
         pvElementOf = addFunction(services, "pvElementOf");
-        progVarSort = services.getNamespaces().sorts().lookup("ProgVar");
-        PV = addFunction(services, "PV");
     }
 
     public Function getEmpty() {
@@ -165,14 +159,6 @@ public final class LocSetLDT extends LDT {
 
     public Function getPVElementOf() {
         return pvElementOf;
-    }
-
-    public Function getPV() {
-        return PV;
-    }
-
-    public Sort getProgVarSort() {
-        return progVarSort;
     }
 
     /**

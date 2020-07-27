@@ -45,6 +45,7 @@ import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
 import de.uka.ilkd.key.java.expression.operator.adt.*;
+import de.uka.ilkd.key.java.statement.DirectMethodBodyStatement;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.Ccatch;
@@ -128,6 +129,8 @@ public abstract class ProgramSVSort extends AbstractSort {
     public static final ProgramSVSort METHODBODY = new MethodBodySort();
 
     public static final ProgramSVSort NONMODELMETHODBODY = new NonModelMethodBodySort();
+
+    public static final ProgramSVSort DIRECTMETHODBODY = new DirectMethodBodySort();
 
     public static final ProgramSVSort PROGRAMMETHOD = new ProgramMethodSort();
 
@@ -932,12 +935,44 @@ public abstract class ProgramSVSort extends AbstractSort {
 
         @Override
         protected boolean canStandFor(ProgramElement pe, Services services) {
-            if (!(pe instanceof MethodBodyStatement)) {
+            if (!(pe instanceof MethodBodyStatement) || (pe instanceof DirectMethodBodyStatement)) {
                 return false;
             }
 
             final IProgramMethod pm =
                     ((MethodBodyStatement) pe).getProgramMethod(services);
+            if (pm == null) {
+                return false;
+            }
+            final MethodDeclaration methodDeclaration = pm.getMethodDeclaration();
+
+            return !(//pm.isModel() ||
+                    methodDeclaration.getBody() == null)
+                    || (methodDeclaration instanceof ConstructorDeclaration);
+        }
+
+    }
+
+    /**
+     * This sort represents a type of program schema variables that
+     * match only on *direct* method body statements, i.e., method
+     * body statements where the body should be included without a
+     * method frame.
+     */
+    private static final class DirectMethodBodySort extends ProgramSVSort {
+
+        public DirectMethodBodySort() {
+            super(new Name("DirectMethodBody"));
+        }
+
+        @Override
+        protected boolean canStandFor(ProgramElement pe, Services services) {
+            if (!(pe instanceof DirectMethodBodyStatement)) {
+                return false;
+            }
+
+            final IProgramMethod pm =
+                    ((DirectMethodBodyStatement) pe).getProgramMethod(services);
             if (pm == null) {
                 return false;
             }

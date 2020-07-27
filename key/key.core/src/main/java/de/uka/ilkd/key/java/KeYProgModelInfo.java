@@ -50,9 +50,6 @@ import recoder.abstraction.Constructor;
 import recoder.java.CompilationUnit;
 
 public class KeYProgModelInfo{
-
-
-    private Services services;
     private KeYCrossReferenceServiceConfiguration sc = null;
     private KeYRecoderMapping mapping;
     private TypeConverter typeConverter;
@@ -60,16 +57,14 @@ public class KeYProgModelInfo{
         new LinkedHashMap<KeYJavaType, HashMap<String, IProgramMethod>>();
     private KeYRecoderExcHandler exceptionHandler = null;
 
-    public KeYProgModelInfo(Services services, TypeConverter typeConverter,
-            KeYRecoderExcHandler keh){
- 	this(services, new KeYCrossReferenceServiceConfiguration(keh),
-	     new KeYRecoderMapping(), typeConverter);
+    public KeYProgModelInfo(TypeConverter typeConverter, KeYRecoderExcHandler keh){
+ 	this(new KeYCrossReferenceServiceConfiguration(keh), new KeYRecoderMapping(),
+	     typeConverter);
 	exceptionHandler = keh;
     }
 
-    KeYProgModelInfo(Services services, KeYCrossReferenceServiceConfiguration crsc,
-		     KeYRecoderMapping krm, TypeConverter typeConverter) {
-        this.services = services;
+    KeYProgModelInfo(KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping krm,
+		     TypeConverter typeConverter) {
 	 sc = crsc;
 	 this.typeConverter = typeConverter;
 	 this.mapping       = krm;
@@ -722,7 +717,7 @@ public class KeYProgModelInfo{
         return asKeYJavaTypes(getAllRecoderSubtypes(ct));
     }
 
-    private Recoder2KeY createRecoder2KeY(NamespaceSet nss) {
+    private Recoder2KeY createRecoder2KeY(NamespaceSet nss, Services services) {
 	return new Recoder2KeY(services, sc, rec2key(), nss, typeConverter);
     }
 
@@ -732,11 +727,12 @@ public class KeYProgModelInfo{
      * @param block a String describing a java block
      * @param cd ClassDeclaration representing the context in which the
      * block has to be interpreted.
+     * @param services TODO
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readBlock(String block, ClassDeclaration cd,
-            NamespaceSet nss){
-        return createRecoder2KeY(nss).readBlock(block, new Context
+            NamespaceSet nss, Services services){
+        return createRecoder2KeY(nss, services).readBlock(block, new Context
             (sc, (recoder.java.declaration.ClassDeclaration)
 	     rec2key().toRecoder(cd)));
     }
@@ -745,10 +741,11 @@ public class KeYProgModelInfo{
     /**
      * Parses a given JavaBlock using an empty context.
      * @param block a String describing a java block
+     * @param services TODO
      * @return the parsed and resolved JavaBlock
      */
-    public JavaBlock readJavaBlock(String block, NamespaceSet nss) {
-        return createRecoder2KeY(nss).readBlockWithEmptyContext(block);
+    public JavaBlock readJavaBlock(String block, NamespaceSet nss, Services services) {
+        return createRecoder2KeY(nss, services).readBlockWithEmptyContext(block);
     }
 
 
@@ -890,7 +887,6 @@ public class KeYProgModelInfo{
 
 
     public KeYProgModelInfo copy() {
- 	return new KeYProgModelInfo(services, getServConf(), rec2key().copy(),
- 				    typeConverter);
+ 	return new KeYProgModelInfo(getServConf(), rec2key().copy(), typeConverter);
     }
 }

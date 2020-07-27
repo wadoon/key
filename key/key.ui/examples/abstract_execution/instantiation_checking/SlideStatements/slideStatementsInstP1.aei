@@ -21,7 +21,9 @@
 //@ assignable frameA;
 //@ accessible footprintA;
 //@ exceptional_behavior requires throwsExcA(\value(footprintA));
-//@ return_behavior requires returnsA(\value(footprintA));
+/*@ return_behavior
+  @   requires returnsA(\value(footprintA));
+  @   ensures resultA(\value(footprintA)); */
 \abstract_statement A;
 
 //@ assignable frameB, \hasTo(hasToFrameB);
@@ -76,6 +78,9 @@
         <predicate predName="returnsB">
             <argSort>any</argSort>
         </predicate>
+        <predicate predName="resultA">
+            <argSort>any</argSort>
+        </predicate>
     </predicates>
     <programVariables>
         <programVariable typeName="int" varName="a">
@@ -106,8 +111,59 @@
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
         </programVariable>
+        <programVariable typeName="java.lang.Object" varName="result">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="java.lang.Throwable" varName="exc">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
     </programVariables>
-    <predicateInstantiations/>
+    <predicateInstantiations>
+        <predicateInst>
+	        <declaration predName="returnsA">
+	            <argSort>any</argSort>
+	        </declaration>
+            <instantiation>w = 17</instantiation>
+            <instArgSort>int</instArgSort>
+            <instArgSort>int</instArgSort>
+        </predicateInst>
+        <predicateInst>
+	        <declaration predName="returnsB">
+	            <argSort>any</argSort>
+	        </declaration>
+            <instantiation>false</instantiation>
+	        <instArgSort>int</instArgSort>
+	        <instArgSort>int</instArgSort>
+	        <instArgSort>int</instArgSort>
+        </predicateInst>
+        <predicateInst>
+	        <declaration predName="throwsExcA">
+	            <argSort>any</argSort>
+	        </declaration>
+            <instantiation>throwsExcA(y, w)</instantiation>
+            <instArgSort>int</instArgSort>
+            <instArgSort>int</instArgSort>
+        </predicateInst>
+        <predicateInst>
+	        <declaration predName="throwsExcB">
+	            <argSort>any</argSort>
+	        </declaration>
+            <instantiation>throwsExcB(b, d, a)</instantiation>
+	        <instArgSort>int</instArgSort>
+	        <instArgSort>int</instArgSort>
+	        <instArgSort>int</instArgSort>
+        </predicateInst>
+        <predicateInst>
+        	<declaration predName="resultA">
+            	<argSort>any</argSort>
+        	</declaration>
+            <instantiation>((java.lang.Integer) result).intValue() = w</instantiation>
+	        <instArgSort>int</instArgSort>
+	        <instArgSort>int</instArgSort>
+        </predicateInst>
+    </predicateInstantiations>
     <functionInstantiations>
         <functionInst>
             <declaration funcName="frameA">
@@ -116,6 +172,7 @@
                 <resultSortName>LocSet</resultSortName>
             </declaration>
             <instantiation>union(singletonPV(PV(x)), union(singletonPV(PV(y)), singletonPV(PV(z))))</instantiation>
+            <resultSort>LocSet</resultSort>
         </functionInst>
         <functionInst>
             <declaration funcName="footprintA">
@@ -124,6 +181,7 @@
                 <resultSortName>LocSet</resultSortName>
             </declaration>
             <instantiation>union(singletonPV(PV(y)), singletonPV(PV(w)))</instantiation>
+            <resultSort>LocSet</resultSort>
         </functionInst>
         <functionInst>
             <declaration funcName="frameB">
@@ -132,6 +190,7 @@
                 <resultSortName>LocSet</resultSortName>
             </declaration>
             <instantiation>empty</instantiation>
+            <resultSort>LocSet</resultSort>
         </functionInst>
         <functionInst>
             <declaration funcName="hasToFrameB">
@@ -140,6 +199,7 @@
                 <resultSortName>LocSet</resultSortName>
             </declaration>
             <instantiation>singletonPV(PV(a))</instantiation>
+            <resultSort>LocSet</resultSort>
         </functionInst>
         <functionInst>
             <declaration funcName="footprintB">
@@ -148,13 +208,14 @@
                 <resultSortName>LocSet</resultSortName>
             </declaration>
             <instantiation>union(singletonPV(PV(b)), union(singletonPV(PV(d)), singletonPV(PV(a))))</instantiation>
+            <resultSort>LocSet</resultSort>
         </functionInst>
     </functionInstantiations>
     <apeInstantiations>
-        <apeInst apeLineNumber="23">
-            <instantiation>x = y++; z = w;</instantiation>
+        <apeInst apeLineNumber="25">
+            <instantiation>x = y++; z = w; if (w == 17) { return Integer.valueOf(z); }</instantiation>
         </apeInst>
-        <apeInst apeLineNumber="29">
+        <apeInst apeLineNumber="31">
             <instantiation>a = b + 17; int c = 2*d+a;</instantiation>
         </apeInst>
     </apeInstantiations>

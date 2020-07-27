@@ -278,7 +278,7 @@ public class RelationalProofBundleConverter {
     private String createJavaDLPostCondition(final KeYJavaType dummyKJT, final Services services) {
         final String jmlPostCondRelation = preparedJMLPostCondition(model.getPostCondition(),
                 model);
-        return KeyBridgeUtils.jmlStringToJavaDLString(jmlPostCondRelation, dummyKJT, services);
+        return KeyBridgeUtils.jmlStringToJavaDLString(jmlPostCondRelation, dummyKJT, null, services);
     }
 
     public static String preparedJMLPostCondition(final String unpreparedJmlPostCondition,

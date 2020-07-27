@@ -43,6 +43,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.ProgVarLDT;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -473,6 +474,7 @@ public class AbstractUpdateFactory {
         t = MiscTools.simplifyUpdatesInTerm(t, services);
 
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        final ProgVarLDT pvLDT = services.getTypeConverter().getProgVarLDT();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
         final Operator op = t.op();
@@ -481,7 +483,7 @@ public class AbstractUpdateFactory {
             return new IrrelevantAssignable(t);
         } else if (op instanceof LocationVariable) {
             return new PVLoc((LocationVariable) op);
-        } else if (op instanceof Function && (Function) op == locSetLDT.getPV()) {
+        } else if (op instanceof Function && (Function) op == pvLDT.getPvConstructor()) {
             return new PVLoc((LocationVariable) t.sub(0).op());
         } else if (op == locSetLDT.getAllLocs()) {
             return new AllLocsLoc(locSetLDT.getAllLocs());

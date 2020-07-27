@@ -111,6 +111,7 @@
     <xs:sequence>
       <xs:element name="declaration" type="predicateDeclaration" minOccurs="0"/>
       <xs:element name="instantiation" type="xs:string" minOccurs="0"/>
+      <xs:element name="instArgSort" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -118,6 +119,8 @@
     <xs:sequence>
       <xs:element name="declaration" type="functionDeclaration" minOccurs="0"/>
       <xs:element name="instantiation" type="xs:string" minOccurs="0"/>
+      <xs:element name="resultSort" type="xs:string" minOccurs="0"/>
+      <xs:element name="instArgSort" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
 

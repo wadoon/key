@@ -44,6 +44,7 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.ProgVarLDT;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -1553,13 +1554,15 @@ public class TermBuilder {
 
     public Term singletonPV(Term pv) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        assert pv.sort() == locSetLDT.getProgVarSort();
+        final ProgVarLDT pvLDT = services.getTypeConverter().getProgVarLDT();
+        assert pv.sort() == pvLDT.getProgVarSort();
         return func(locSetLDT.getSingletonPV(), pv);
     }
 
     public Term singletonPV(LocationVariable pv) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        return func(locSetLDT.getSingletonPV(), func(locSetLDT.getPV(), var(pv)));
+        final ProgVarLDT pvLDT = services.getTypeConverter().getProgVarLDT();
+        return func(locSetLDT.getSingletonPV(), func(pvLDT.getPvConstructor(), var(pv)));
     }
 
     public Term hasTo(Term locSetTerm) {
@@ -1716,10 +1719,12 @@ public class TermBuilder {
 
     private Term wrapInSingletonPV(Term s) {
         final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+        final ProgVarLDT pvLDT = services.getTypeConverter().getProgVarLDT();
+        
         if (s.op() instanceof LocationVariable) {
             return singletonPV((LocationVariable) s.op());
         } else if (s.op() instanceof Function
-                && ((Function) s.op()).sort() == ldt.getProgVarSort()) {
+                && ((Function) s.op()).sort() == pvLDT.getProgVarSort()) {
             return singletonPV(s);
         }
 
