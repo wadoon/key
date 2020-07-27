@@ -48,7 +48,7 @@ public class InstantiationChecker {
         /* non-final */ ProofResult result = ProofResult.EMPTY;
 
         final InstantiationAspectProver[] checkers = new InstantiationAspectProver[] {
-//                new FrameConditionProver(), //
+                new FrameConditionProver(), //
 //                new HasToConditionProver(), //
 //                new FootprintConditionProver(), //
 //                new TerminationProver(), //
