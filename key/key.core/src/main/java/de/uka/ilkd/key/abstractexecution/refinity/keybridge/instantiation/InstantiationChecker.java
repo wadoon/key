@@ -136,11 +136,11 @@ public class InstantiationChecker {
         ///////// 
 
         // TODO:
-        // - Normal Completion Spec
-        // [ - NOTE (DS, 2020-07-16): Labeled continue / break omitted, spec case not yet supported. ]
         // - Basic consistency checks: E.g., mutual exclusion of abrupt completion preconditions
-        // - Constraints (assumptions) satisfied
         // - Consistent instantiations of APEs w/ same IDs
+        // - Constraints (assumptions) satisfied
+        
+        // [ - NOTE (DS, 2020-07-16): Labeled continue / break omitted, spec case not yet supported. ]
 
         return result;
     }
