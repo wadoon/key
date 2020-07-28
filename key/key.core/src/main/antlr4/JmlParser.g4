@@ -132,7 +132,12 @@ maps_into_clause: MAPS expression;
 nowarn_pragma: NOWARN expression;
 debug_statement: DEBUG expression;
 set_statement: SET name EQUAL_SINGLE expression SEMI_TOPLEVEL;
-merge_point_statement: MERGE_POINT (MERGE_PROC (STRING_LITERAL))? (MERGE_PARAMS (BODY))? SEMICOLON;
+merge_point_statement:
+  MERGE_POINT
+  (MERGE_PROC (proc=STRING_LITERAL))?
+  (mergeparamsspec)?
+  SEMI_TOPLEVEL
+;
 loop_specification
   : loop_invariant
     ( loop_invariant
@@ -156,11 +161,25 @@ assert_statement: (ASSERT expression | UNREACHABLE) SEMI_TOPLEVEL;
 //continues_clause: CONTINUES expression;
 //returns_clause: RETURNS expression;
 
-//post-parser
-//TODO top: mergeparamsspec (SEMI)? EOF;
 
+mergeparamsspec:
+    MERGE_PARAMS
+      LBRACE
+          latticetype=IDENT COLON
+          LPAREN
+              (phType=typespec)
+              (phName=IDENT)
+          RPAREN
 
-mergeparamsspec: MERGE_PARAMS LBRACE (IDENT) COLON LPAREN (typespec) (IDENT) RPAREN RARROW LBRACE (predicate) (COMMA (predicate))* RBRACE RBRACE;
+          RARROW
+
+          LBRACE
+              (abstrPred+=predicate)
+              (COMMA abstrPred+=predicate)*
+          RBRACE
+      RBRACE
+;
+
 termexpression: expression;
 
 infflowspeclist: termexpression (COMMA termexpression)*;

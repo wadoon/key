@@ -53,7 +53,6 @@ public class MethodlevelTranslatorTest {
 
     @Test
     public void parseAndInterpret() throws SLTranslationException {
-        System.out.println(expr);
         Assert.assertNotEquals("", expr);
         /*KeYJavaType kjt = new KeYJavaType(Sort.ANY);
         ProgramVariable self = new LocationVariable(new ProgramElementName("self"), kjt);
@@ -61,9 +60,13 @@ public class MethodlevelTranslatorTest {
         ProgramVariable exc = new LocationVariable(new ProgramElementName("exc"), kjt);*/
         JmlLexer lexer = JmlFacade.createLexer(expr);
         JmlParser parser = new JmlParser(new CommonTokenStream(lexer));
-        JmlParser.Methodlevel_commentContext ctx = parser.methodlevel_comment();
-        if (parser.getNumberOfSyntaxErrors() != 0)
+        try {
+            JmlParser.Methodlevel_commentContext ctx = parser.methodlevel_comment();
+            if (parser.getNumberOfSyntaxErrors() != 0)
+                debugLexer();
+        } catch (Exception e) {
             debugLexer();
+        }
         Assert.assertEquals(0, parser.getNumberOfSyntaxErrors());
         //Translator et = new Translator(services, kjt, self, ImmutableSLList.nil(), result, exc,
         //        new HashMap<>(), new HashMap<>());
@@ -74,14 +77,6 @@ public class MethodlevelTranslatorTest {
 
     private void debugLexer() {
         JmlLexer lexer = JmlFacade.createLexer(expr);
-        Token tok;
-        do {
-            int modeBefore = lexer._mode;
-            tok = lexer.nextToken();
-            boolean sTl = lexer.semicolonOnToplevel();
-            System.out.println(sTl);
-            System.out.printf("(%3d) %15s %25s [%d->%d]\n",
-                    tok.getType(), lexer.getVocabulary().getDisplayName(tok.getType()), tok.getText(), modeBefore, lexer._mode);
-        } while (tok.getType() != -1);
+        DebugJmlLexer.debug(lexer);
     }
 }

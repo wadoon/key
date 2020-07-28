@@ -13,10 +13,7 @@ import de.uka.ilkd.key.java.expression.literal.LongLiteral;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.*;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -32,6 +29,7 @@ import de.uka.ilkd.key.speclang.translation.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -2307,6 +2305,17 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitMerge_point_statement(JmlParser.Merge_point_statementContext ctx) {
         TODO();
         return super.visitMerge_point_statement(ctx);
+    }
+
+    @Override
+    public Object visitMergeparamsspec(JmlParser.MergeparamsspecContext ctx) {
+        String latticeType = ctx.latticetype.getText();
+        KeYJavaType phType = accept(ctx.typespec());
+        String phName = ctx.phName.getText();
+        LocationVariable placeholder = new LocationVariable(new ProgramElementName(phName), phType);
+        resolverManager.putIntoTopLocalVariablesNamespace(placeholder);
+        ImmutableList<Term> preds = listOf(ctx.predicate());
+        return new MergeParamsSpec(latticeType, placeholder, preds);
     }
 
     @Override

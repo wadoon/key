@@ -450,8 +450,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
         // create MPS, attach to AST
         try {
-            MergePointStatement mps = new MergePointStatement(
-                    stat.getMergeProc(), stat.getMergeParams());
+            MergePointStatement mps = new MergePointStatement(stat.getMergeProc());
             mps.setComments(
                     new ASTArrayList<>(Arrays.asList(originalComments)));
 

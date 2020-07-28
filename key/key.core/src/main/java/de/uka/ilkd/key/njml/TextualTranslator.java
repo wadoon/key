@@ -339,6 +339,13 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitMerge_point_statement(JmlParser.Merge_point_statementContext ctx) {
+        TextualJMLMergePointDecl mergePointDecl = new TextualJMLMergePointDecl(mods, ctx);
+        constructs = constructs.append(mergePointDecl);
+        return null;
+    }
+
+    @Override
     public Object visitLoop_invariant(JmlParser.Loop_invariantContext ctx) {
         assert loopContract != null;
         TextualJMLLoopSpec.ClauseHd type = ctx.LOOP_INVARIANT().getText().endsWith("_free") ? INVARIANT_FREE : INVARIANT;

@@ -35,6 +35,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.njml.JmlFacade;
 import de.uka.ilkd.key.njml.JmlIO;
+import de.uka.ilkd.key.njml.JmlParser;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
@@ -58,6 +59,8 @@ import org.key_project.util.collection.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import static java.lang.String.format;
 
 /**
  * A factory for creating class invariants and operation contracts from textual JML specifications.
@@ -1188,41 +1191,39 @@ public class JMLSpecFactory {
 
     public ImmutableSet<MergeContract> createJMLMergeContracts(final IProgramMethod method,
                                                                final MergePointStatement mps, final TextualJMLMergePointDecl mergePointDecl,
-                                                               ImmutableList<ProgramVariable> methodParams) throws SLTranslationException {
+                                                               ImmutableList<ProgramVariable> methodParams)
+            throws SLTranslationException {
+        final JmlParser.Merge_point_statementContext ctx = mergePointDecl.getMergeProc();
 
-        final String mergeProcStr
-                = mergePointDecl.getMergeProc() == null ? MergeByIfThenElse.instance().toString()
-                : mergePointDecl.getMergeProc().text.replaceAll("\"", "");
-        final String mergeParamsStr = mergePointDecl.getMergeParams() == null ? null
+        final String mergeProcStr = ctx.proc != null
+                ? MergeByIfThenElse.instance().toString() //default merge procedure
+                : ctx.proc.getText().replaceAll("\"", "");
+
+        /*final String mergeParamsStr = mergePointDecl.getMergeParams() == null ? null
                 : mergePointDecl.getMergeParams().text;
         final ParserRuleContext mergeParamsParseStr = mergeParamsStr == null ? null
-                : JmlFacade.parseClause("merge_params " + mergeParamsStr);
-
+                : JmlFacade.parseClause("merge_params " + mergeParamsStr);*/
         MergeProcedure mergeProc = MergeProcedure.getProcedureByName(mergeProcStr);
-
         if (mergeProc == null) {
-            throw new SLTranslationException("Unknown merge procedure: \"" + mergeProcStr + "\"",
+            throw new SLTranslationException(format("Unknown merge procedure: \"%s\"", mergeProcStr),
                     mergePointDecl.getSourceFileName(), mergePointDecl.getApproxPosition());
         }
         ImmutableSet<MergeContract> result = DefaultImmutableSet.nil();
 
         KeYJavaType kjt = method.getContainerType();
         if (mergeProc instanceof UnparametricMergeProcedure) {
-
-            result = result.add(//
-                    new UnparameterizedMergeContract(mergeProc, mps, kjt));
-
-        } else if (mergeProc instanceof ParametricMergeProcedure) {
-
-            assert mergeProc instanceof MergeWithPredicateAbstraction : "Currently, "
-                    + "MergeWithPredicateAbstraction(Factory) is "
-                    + "the only supported ParametricMergeProcedure";
+            final UnparameterizedMergeContract unparameterizedMergeContract
+                    = new UnparameterizedMergeContract(mergeProc, mps, kjt);
+            result = result.add(unparameterizedMergeContract);
+        } else if (mergeProc instanceof ParametricMergeProcedure) { // arguments expected looking for params
+            if (!(mergeProc instanceof MergeWithPredicateAbstraction))
+                throw new IllegalStateException(
+                        "Currently, MergeWithPredicateAbstraction(Factory) is the only supported ParametricMergeProcedure");
 
             // @formatter:off
             // Expected merge params structure:
             // merge_params <LATTICE-TYPE>: (<TYPE> <PLACHOLDER>) -> {<JML-FORMULA>}
             // @formatter:on
-
             final ProgramVariableCollection progVars = createProgramVariables(method);
 
             // Determine the variables in "\old(...)" expressions and register
@@ -1236,10 +1237,14 @@ public class JMLSpecFactory {
             params.forEach(param -> atPres.put(param,
                     tb.var(tb.heapAtPreVar(param + atPrePrefix, param.sort(), false))));
 
-            final MergeParamsSpec specs = JmlIO.translateMergeParams(mergeParamsParseStr, kjt,
-                    progVars.selfVar, append(ImmutableSLList.nil(), params),
-                    progVars.resultVar, progVars.excVar, atPres, atPres,
-                    null, MergeParamsSpec.class, services);
+            final MergeParamsSpec specs = jmlIo
+                    .classType(kjt)
+                    .selfVar(progVars.selfVar)
+                    .parameters(append(ImmutableSLList.nil(), params))
+                    .resultVariable(progVars.resultVar)
+                    .exceptionVariable(progVars.excVar)
+                    .atPres(atPres)
+                    .translateMergeParams(ctx.mergeparamsspec());
 
             result = result.add(new PredicateAbstractionMergeContract(mps, atPres, kjt,
                     specs.getLatticeType(),
@@ -1248,10 +1253,9 @@ public class JMLSpecFactory {
                             .collect(Collectors
                                     .toCollection(ArrayList::new))));
         } else {
-            assert false : "MergeProcedures should either be an "
-                    + "UnparametricMergeProcedure or a ParametricMergeProcedure";
+            throw new IllegalStateException(
+                    "MergeProcedures should either be an UnparametricMergeProcedure or a ParametricMergeProcedure");
         }
-
         return result;
     }
 

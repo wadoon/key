@@ -21,9 +21,8 @@ lexer grammar JmlLexer;
    boolean semicolonOnToplevel() { return bracketLevel==0 && bracesLevel == 0 && parenthesisLevel==0; }
 }
 
-tokens {BODY, COMMENT}
+tokens {BODY, COMMENT, STRING_LITERAL}
 
-/*modifiers*/
 MODEL_BEHAVIOUR: 'model_' BEHAVIOR ;
 ABSTRACT: 'abstract';
 BEHAVIOR: 'behavior'| 'behaviour';
@@ -106,8 +105,8 @@ LOOP_DETERMINES: 'loop_determines';  // internal translation for 'determines' in
 LOOP_SEPARATES: 'loop_separates';  //KeY extension, deprecated
 MAPS: 'maps' Pred -> pushMode(expr);
 MEASURED_BY: 'measured_by' Pred -> pushMode(expr);
-MERGE_POINT: 'merge_point' -> pushMode(expr);
-MERGE_PROC: 'merge_proc' -> pushMode(expr);
+MERGE_POINT: 'merge_point';
+MERGE_PROC: 'merge_proc';
 MERGE_PARAMS: 'merge_params' -> pushMode(expr);
 MODIFIABLE: 'modifiable' Pred -> pushMode(expr);
 MODIFIES: 'modifies' Pred -> pushMode(expr);
@@ -144,7 +143,7 @@ BODY_START: '{' -> more, pushMode(body);
 C_EQUAL: '=' -> type(EQUAL_SINGLE);
 C_LPAREN: '(' -> type(LPAREN);
 C_RPAREN: ')' -> type(RPAREN);
-
+C_STRING_LITERAL: '"' -> pushMode(string), more;
 
 C_IDENT: '\\'? LETTER (LETTERORDIGIT)* -> type(IDENT);
 E_COLON: ':' -> type(COLON);
@@ -390,7 +389,7 @@ CHAR_LITERAL:
 fragment OCT_CHAR:
         (('0'|'1'|'2'|'3') OCTDIGIT OCTDIGIT) | (OCTDIGIT OCTDIGIT) | OCTDIGIT;
 
-STRING_LITERAL: '"' -> mode(string),more;
+STRING_LITERAL: '"' -> pushMode(string),more;
 E_WS: [ \t\n\r\u000c@]+ -> channel(HIDDEN), type(WS);
 INFORMAL_DESCRIPTION: '(*'  ( '*' ~')' | ~'*' )* '*)';
 

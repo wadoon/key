@@ -106,9 +106,8 @@ public class JmlIO {
         return new Pair<>(new ProgramElementName(label), t);
     }
 
-    public static MergeParamsSpec translateMergeParams(ParserRuleContext mergeParamsParseStr, KeYJavaType kjt, ProgramVariable selfVar, ImmutableList<ProgramVariable> append, ProgramVariable resultVar, ProgramVariable excVar, Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atPres1, Object o, Class<MergeParamsSpec> mergeParamsSpecClass, Services services) {
-        System.out.println("JmlIO.translateMergeParams");
-        throw new RuntimeException();
+    public MergeParamsSpec translateMergeParams(JmlParser.MergeparamsspecContext ctx) {
+        return (MergeParamsSpec) interpret(ctx);
     }
 
     public static Triple<IObserverFunction, Term, Term> translateDependencyContract(ParserRuleContext originalDep, KeYJavaType kjt, ProgramVariable selfVar, Object o, Object o1, Object o2, Object o3, Object o4, Services services) {

@@ -19,3 +19,9 @@
           @  assignable sum, max;
           @  decreases a.length - k;
           @*/
+--- Contract ---
+merge_point;
+--- Contract ---
+merge_point
+merge_proc "MergeByPredicateAbstraction"
+merge_params {conjunctive: (int x) -> {x >= 0, (x == \old(b) || x == -\old(b))}};
