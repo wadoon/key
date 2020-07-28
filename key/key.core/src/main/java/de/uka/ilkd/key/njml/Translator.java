@@ -2232,11 +2232,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitField_or_method_declaration(JmlParser.Field_or_method_declarationContext ctx) {
-        return oneOf(ctx.field_declaration(), ctx.method_declaration());
-    }
-
-    @Override
     public Object visitField_declaration(JmlParser.Field_declarationContext ctx) {
         TODO();
         return super.visitField_declaration(ctx);

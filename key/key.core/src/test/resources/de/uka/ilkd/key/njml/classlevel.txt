@@ -1221,3 +1221,14 @@
 //@ requires x > 0;
 //@ requires \disjoint(footprint,\singleton(x));
 //@ ensures x > 0;
+--- Contract ---
+model int f(int x) {
+ return x+1;
+}
+--- Contract ---
+/*@ model_behaviour
+  @   requires true;
+  @ model int f(int x) {
+  @   return x+1;
+  @ }
+  @*/

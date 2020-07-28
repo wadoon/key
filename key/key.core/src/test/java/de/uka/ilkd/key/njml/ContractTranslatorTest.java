@@ -68,9 +68,9 @@ public class ContractTranslatorTest {
     @Before
     public void setup() {
         if (services != null) return;
-        services = TacletForTests.services();
-        r2k = new Recoder2KeY(services, services.getNamespaces());
-        r2k.parseSpecialClasses();
+        //services = TacletForTests.services();
+        //r2k = new Recoder2KeY(services, services.getNamespaces());
+        //r2k.parseSpecialClasses();
     }
 
     @Test
@@ -97,14 +97,6 @@ public class ContractTranslatorTest {
 
     private void debugLexer() {
         JmlLexer lexer = JmlFacade.createLexer(expr);
-        Token tok;
-        do {
-            int modeBefore = lexer._mode;
-            tok = lexer.nextToken();
-            boolean sTl = lexer.semicolonOnToplevel();
-            System.out.println(sTl);
-            System.out.printf("(%3d) %15s %25s [%d->%d]\n",
-                    tok.getType(), lexer.getVocabulary().getDisplayName(tok.getType()), tok.getText(), modeBefore, lexer._mode);
-        } while (tok.getType() != -1);
+        DebugJmlLexer.debug(lexer);
     }
 }

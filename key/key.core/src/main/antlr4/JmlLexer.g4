@@ -48,7 +48,7 @@ SPEC_BIGINT_MATH: 'spec_bigint_math';
 SPEC_JAVA_MATH: 'spec_java_math';
 SPEC_PROTECTED: 'spec_protected';
 SPEC_PUBLIC: 'spec_public';
-GHOST: 'ghost' -> pushMode(expr);
+GHOST: 'ghost' /*-> pushMode(expr)*/;
 SPEC_NAME: 'name'; // ???
 SPEC_SAFE_MATH: 'spec_safe_math';
 STATIC: 'static';
@@ -66,7 +66,7 @@ PUBLIC: 'public';
 PURE: 'pure';
 RETURN_BEHAVIOR: 'return_' BEHAVIOR;
 FINAL: 'final';
-MODEL: 'model';
+MODEL: 'model'/*  -> pushMode(expr)*/;
 
 AXIOM_NAME_BEGIN:'[';
 AXIOM_NAME_END:']';
@@ -141,6 +141,10 @@ NEST_START: '{|' ;
 NEST_END: '|}' ;
 SEMICOLON : ';' -> type(SEMI_TOPLEVEL);
 BODY_START: '{' -> more, pushMode(body);
+C_EQUAL: '=' -> type(EQUAL_SINGLE);
+C_LPAREN: '(' -> type(LPAREN);
+C_RPAREN: ')' -> type(RPAREN);
+
 
 C_IDENT: '\\'? LETTER (LETTERORDIGIT)* -> type(IDENT);
 E_COLON: ':' -> type(COLON);

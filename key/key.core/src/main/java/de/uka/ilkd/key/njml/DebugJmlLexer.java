@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * @version 2019-12-09
  */
 public class DebugJmlLexer {
-    private static final String DEFAULT_FORMAT = "%02d %20s %d:%-50s\n";
+    private static final String DEFAULT_FORMAT = "%02d:%02d %15s %-40s [%d->%d] C:%d\n";
     private final PrintStream stream;
     private final String format;
     private final Collection<JmlLexer> lexer;
@@ -89,12 +89,14 @@ public class DebugJmlLexer {
     private void run(JmlLexer toks) {
         Token t;
         do {
+            int modeBefore = toks._mode;
             t = toks.nextToken();
             stream.format(format,
-                    toks.getLine(),
+                    t.getLine(),
+                    t.getCharPositionInLine(),
                     toks.getVocabulary().getSymbolicName(t.getType()),
-                    toks._mode,
-                    t.getText().replace("\n", "\\n"));
+                    t.getText().replace("\n", "\\n"),
+                    modeBefore, toks._mode, t.getChannel());
             //if (t.getType() == JmlLexer.ERROR_CHAR) stream.println("!!ERROR!!");
         } while (t.getType() != CommonToken.EOF);
     }

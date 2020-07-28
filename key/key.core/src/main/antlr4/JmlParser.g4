@@ -6,7 +6,7 @@ classlevel_comments: classlevel_comment* EOF;
 classlevel_comment: modifiers? (classlevel_element modifiers?)+ | modifiers | set_statement;
 classlevel_element
   : class_invariant | depends_clause | method_specification
-  | field_or_method_declaration | represents_clause
+  | method_declaration | field_declaration | represents_clause
   | history_constraint | initially_clause | class_axiom
   | monitors_for_clause | readable_if_clause | writable_if_clause
   | datagroup_clause  | set_statement | nowarn_pragma
@@ -15,7 +15,7 @@ classlevel_element
 
 methodlevel_comment: (modifiers? methodlevel_element)* EOF;
 methodlevel_element
-  : field_or_method_declaration | set_statement | merge_point_statement
+  : field_declaration | set_statement | merge_point_statement
   | loop_specification | assert_statement | assume_statement | nowarn_pragma
   | debug_statement | block_specification | block_loop_specification
   | assert_statement | assume_statement
@@ -116,7 +116,6 @@ returns_clause: RETURNS predornot? SEMI_TOPLEVEL;
 name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
 old_clause: OLD modifiers type IDENT INITIALISER ;
 
-field_or_method_declaration: (method_declaration | field_declaration);
 field_declaration: type IDENT (EMPTYBRACKETS)* initialiser? SEMI_TOPLEVEL;
 method_declaration: type IDENT param_list BODY;
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
