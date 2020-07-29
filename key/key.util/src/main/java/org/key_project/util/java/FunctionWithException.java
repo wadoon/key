@@ -27,4 +27,26 @@ public interface FunctionWithException<T, R, E extends Exception> {
             }
         };
     }
+
+    static <T, R, E extends Exception> Function<T, R> catchExc(FunctionWithException<T, R, E> fe,
+            String message) {
+        return arg -> {
+            try {
+                return fe.apply(arg);
+            } catch (Exception e) {
+                throw new RuntimeException(message, e);
+            }
+        };
+    }
+
+    static <T, R, E extends Exception> Function<T, R> catchExc(FunctionWithException<T, R, E> fe,
+            Function<Exception, String> message) {
+        return arg -> {
+            try {
+                return fe.apply(arg);
+            } catch (Exception e) {
+                throw new RuntimeException(message.apply(e), e);
+            }
+        };
+    }
 }

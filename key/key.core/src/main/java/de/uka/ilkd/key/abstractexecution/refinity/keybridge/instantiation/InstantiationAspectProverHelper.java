@@ -14,6 +14,7 @@ package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -46,6 +47,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -75,6 +77,7 @@ import recoder.ModelException;
 public class InstantiationAspectProverHelper {
     private static final String JAVA_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/Problem.java";
     private static final String APE_RETRIEVAL_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/programRetrievalProblem.key";
+    private static final String KEY_HEADER_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/header.key";
 
     private static final String BODY = "<BODY>";
     private static final String CONTEXT = "<CONTEXT>";
@@ -92,6 +95,8 @@ public class InstantiationAspectProverHelper {
 
     private final String keyRetrieveAPEsScaffold;
 
+    private final String keyHeaderScaffold;
+
     /** A cached list of APEs in the model to save time. */
     private Optional<List<APERetrievalResult>> apes = Optional.empty();
 
@@ -107,16 +112,18 @@ public class InstantiationAspectProverHelper {
      */
     private Services services = null;
 
-    public InstantiationAspectProverHelper(final Profile profile) {
-        javaScaffold = KeyBridgeUtils.readResource(JAVA_PROBLEM_FILE_SCAFFOLD);
-        keyRetrieveAPEsScaffold = KeyBridgeUtils.readResource(APE_RETRIEVAL_PROBLEM_FILE_SCAFFOLD);
-        this.profile = profile;
-    }
-
     public InstantiationAspectProverHelper() {
         javaScaffold = KeyBridgeUtils.readResource(JAVA_PROBLEM_FILE_SCAFFOLD);
         keyRetrieveAPEsScaffold = KeyBridgeUtils.readResource(APE_RETRIEVAL_PROBLEM_FILE_SCAFFOLD);
+        keyHeaderScaffold = KeyBridgeUtils.readResource(KEY_HEADER_SCAFFOLD);
         this.profile = new JavaProfile();
+    }
+
+    public InstantiationAspectProverHelper(final Profile profile) {
+        javaScaffold = KeyBridgeUtils.readResource(JAVA_PROBLEM_FILE_SCAFFOLD);
+        keyRetrieveAPEsScaffold = KeyBridgeUtils.readResource(APE_RETRIEVAL_PROBLEM_FILE_SCAFFOLD);
+        keyHeaderScaffold = KeyBridgeUtils.readResource(KEY_HEADER_SCAFFOLD);
+        this.profile = profile;
     }
 
     public String createJavaFile(final AEInstantiationModel model, final String origProgram) {
@@ -390,6 +397,63 @@ public class InstantiationAspectProverHelper {
         return KeyBridgeUtils.termToString(formula, services);
     }
 
+    /**
+     * Returns a header for a KeY proof, including declarations of variables in the
+     * instantiation.
+     * 
+     * @param inst The instantiation (for declaring free variables).
+     * @return The header.
+     */
+    public String keyFileHeader(final AEInstantiationModel model, final APEInstantiation inst) {
+        final LinkedHashSet<LocationVariable> instProgVars;
+
+        {
+            final RetrieveProgramResult retrProgRes = retrieveProgram(model,
+                    inst.getInstantiation());
+            final ProgramVariableCollector progVarCol = new ProgramVariableCollector(
+                    retrProgRes.getProgram(), retrProgRes.getLocalSpecRepo(),
+                    retrProgRes.getServices());
+            progVarCol.start();
+
+            final List<String> ignPVs = Arrays
+                    .asList(new String[] { "_result", "_exc", "_objUnderTest" });
+
+            instProgVars = progVarCol.result().stream()
+                    .filter(lv -> !ignPVs.contains(lv.name().toString()))
+                    .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+        }
+
+        //////////
+
+        final String newVars;
+
+        {
+            final String newInstVars = instProgVars.stream()
+                    .filter(lv -> !model.getProgramVariableDeclarations().stream()
+                            .anyMatch(pvd -> pvd.getName().equals(lv.name().toString())))
+                    .map(lv -> String.format("%s %s;",
+                            lv.getKeYJavaType().getSort().name().toString(), lv.name().toString()))
+                    .collect(Collectors.joining("\n  "));
+
+            final String atPreVars = instProgVars.stream()
+                    .map(lv -> String.format("%s %s_AtPre;",
+                            lv.getKeYJavaType().getSort().name().toString(), lv.name().toString()))
+                    .collect(Collectors.joining("\n  "));
+
+            newVars = "\n  " + newInstVars + "\n  " + atPreVars;
+        }
+
+        return keyHeaderScaffold
+                .replaceAll(FUNCTIONS,
+                        Matcher.quoteReplacement(
+                                InstantiationAspectProverHelper.createFuncDecls(model)))
+                .replaceAll(PREDICATES,
+                        Matcher.quoteReplacement(
+                                InstantiationAspectProverHelper.createPredDecls(model)))
+                .replaceAll(PROGRAMVARIABLES, Matcher.quoteReplacement(
+                        InstantiationAspectProverHelper.createProgvarDecls(model) + newVars));
+    }
+
     public Profile profile() {
         return profile;
     }
@@ -422,6 +486,29 @@ public class InstantiationAspectProverHelper {
         this.apes = Optional.of(result);
 
         return result;
+    }
+
+    /**
+     * Returns the abstract program element for the given instantiation.
+     * 
+     * @param model The {@link AEInstantiationModel}.
+     * @param inst The {@link APEInstantiation} determining the
+     * {@link AbstractProgramElement} to receive.
+     * @return The {@link AbstractProgramElement}.
+     * @throws UnsuccessfulAPERetrievalException if no or more than 1 instantiation
+     * are found.
+     */
+    public APERetrievalResult getAPEForInst(final AEInstantiationModel model,
+            final APEInstantiation inst) {
+        final List<APERetrievalResult> results = retrieveAPEs(model).stream()
+                .filter(r -> r.line == inst.getApeLineNumber()).collect(Collectors.toList());
+
+        if (results.size() != 1) {
+            throw new UnsuccessfulAPERetrievalException(
+                    String.format("Found %d APEs for instantiations, expected 1", results.size()));
+        }
+
+        return results.get(0);
     }
 
     /**
@@ -766,13 +853,15 @@ public class InstantiationAspectProverHelper {
         private final int line;
         private final AbstractProgramElement ape;
         private final List<TextualJMLConstruct> jmlConstructs;
+        private final Proof proof;
 
         public APERetrievalResult(final AbstractProgramElement ape,
-                final List<TextualJMLConstruct> jmlConstructs) {
+                final List<TextualJMLConstruct> jmlConstructs, final Proof proof) {
             this.ape = ape;
             this.jmlConstructs = jmlConstructs;
             // There's a shift of 3 lines in the dummy Java file.
             this.line = ape.getStartPosition().getLine() - 3;
+            this.proof = proof;
         }
 
         public AbstractProgramElement getApe() {
@@ -786,14 +875,24 @@ public class InstantiationAspectProverHelper {
         public int getLine() {
             return line;
         }
+
+        public Services getServices() {
+            return proof.getServices();
+        }
+
+        public GoalLocalSpecificationRepository getLocalSpecRepo() {
+            return proof.openGoals().head().getLocalSpecificationRepository();
+        }
     }
 
     private static class CollectAPEVisitor extends JavaASTVisitor {
         private final List<APERetrievalResult> result = new ArrayList<>();
+        private final Proof proof;
 
         public CollectAPEVisitor(ProgramElement root,
                 GoalLocalSpecificationRepository localSpecRepo, Services services) {
             super(root, localSpecRepo, services);
+            this.proof = services.getProof();
         }
 
         @Override
@@ -810,7 +909,7 @@ public class InstantiationAspectProverHelper {
                     throw new RuntimeException("Could not parse APE comments", e);
                 }
 
-                result.add(new APERetrievalResult(ape, jmlConstructs));
+                result.add(new APERetrievalResult(ape, jmlConstructs, proof));
             }
         }
 

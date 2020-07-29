@@ -14,12 +14,9 @@ package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -36,7 +33,6 @@ import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstanti
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.APEInstantiation;
 import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -53,23 +49,13 @@ import de.uka.ilkd.key.util.MiscTools;
  * @author Dominic Steinhoefel
  */
 public class HasToConditionProver implements InstantiationAspectProver {
-    private static final String KEY_HEADER_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/header.key";
-
-    private static final String PROGRAMVARIABLES = "<PROGRAMVARIABLES>";
-    private static final String PREDICATES = "<PREDICATES>";
-    private static final String FUNCTIONS = "<FUNCTIONS>";
-
-    private final String keyHeaderScaffold;
-
     private final InstantiationAspectProverHelper helper;
 
     public HasToConditionProver() {
-        keyHeaderScaffold = KeyBridgeUtils.readResource(KEY_HEADER_SCAFFOLD);
         helper = new InstantiationAspectProverHelper();
     }
 
     public HasToConditionProver(final Profile profile) {
-        keyHeaderScaffold = KeyBridgeUtils.readResource(KEY_HEADER_SCAFFOLD);
         helper = new InstantiationAspectProverHelper(profile);
     }
 
@@ -137,8 +123,8 @@ public class HasToConditionProver implements InstantiationAspectProver {
         {
             try {
                 assumptionTerm = KeyBridgeUtils.parseTerm(//
-                        InstantiationAspectProverHelper.createLocSetInstAssumptions(model), localSpecRepo,
-                        services);
+                        InstantiationAspectProverHelper.createLocSetInstAssumptions(model),
+                        localSpecRepo, services);
             } catch (RecognitionException re) {
                 throw new InvalidSyntaxException(re.getMessage(), re.getCause());
             }
@@ -148,7 +134,8 @@ public class HasToConditionProver implements InstantiationAspectProver {
 
         Proof proof;
         try {
-            proof = KeyBridgeUtils.prove(proofTerm, keyFileHeader(model, inst), 10000, services);
+            proof = KeyBridgeUtils.prove(proofTerm, helper.keyFileHeader(model, inst), 10000,
+                    services);
         } catch (ProofInputException e) {
             throw new InvalidSyntaxException("Problems while proving hasTo condition", e);
         }
@@ -170,63 +157,6 @@ public class HasToConditionProver implements InstantiationAspectProver {
 
         return new ProofResult(proof.closed(), proof,
                 KeyBridgeUtils.getFilenameForAPEProof(proofObjective(), proof.closed(), inst));
-    }
-
-    /**
-     * Returns a header for a KeY proof, including declarations of variables in the
-     * instantiation.
-     * 
-     * @param inst The instantiation (for declaring free variables).
-     * @return The header.
-     */
-    private String keyFileHeader(final AEInstantiationModel model, final APEInstantiation inst) {
-        final LinkedHashSet<LocationVariable> instProgVars;
-
-        {
-            final RetrieveProgramResult retrProgRes = helper.retrieveProgram(model,
-                    inst.getInstantiation());
-            final ProgramVariableCollector progVarCol = new ProgramVariableCollector(
-                    retrProgRes.getProgram(), retrProgRes.getLocalSpecRepo(),
-                    retrProgRes.getServices());
-            progVarCol.start();
-
-            final List<String> ignPVs = Arrays
-                    .asList(new String[] { "_result", "_exc", "_objUnderTest" });
-
-            instProgVars = progVarCol.result().stream()
-                    .filter(lv -> !ignPVs.contains(lv.name().toString()))
-                    .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-        }
-
-        //////////
-
-        final String newVars;
-
-        {
-            final String newInstVars = instProgVars.stream()
-                    .filter(lv -> !model.getProgramVariableDeclarations().stream()
-                            .anyMatch(pvd -> pvd.getName().equals(lv.name().toString())))
-                    .map(lv -> String.format("%s %s;",
-                            lv.getKeYJavaType().getSort().name().toString(), lv.name().toString()))
-                    .collect(Collectors.joining("\n  "));
-
-            final String atPreVars = instProgVars.stream()
-                    .map(lv -> String.format("%s %s_AtPre;",
-                            lv.getKeYJavaType().getSort().name().toString(), lv.name().toString()))
-                    .collect(Collectors.joining("\n  "));
-
-            newVars = "\n  " + newInstVars + "\n  " + atPreVars;
-        }
-
-        return keyHeaderScaffold
-                .replaceAll(FUNCTIONS,
-                        Matcher.quoteReplacement(
-                                InstantiationAspectProverHelper.createFuncDecls(model)))
-                .replaceAll(PREDICATES,
-                        Matcher.quoteReplacement(
-                                InstantiationAspectProverHelper.createPredDecls(model)))
-                .replaceAll(PROGRAMVARIABLES, Matcher.quoteReplacement(
-                        InstantiationAspectProverHelper.createProgvarDecls(model) + newVars));
     }
 
 }

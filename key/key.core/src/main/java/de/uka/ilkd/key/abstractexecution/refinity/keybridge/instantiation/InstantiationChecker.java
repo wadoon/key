@@ -79,6 +79,7 @@ public class InstantiationChecker {
                 new ExcSpecProver(profile.get()), //
                 new BreaksSpecProver(profile.get()), //
                 new ContinuesSpecProver(profile.get()), //
+                new PrecMutualExclusionProver(profile.get())
         };
 
         blParr: {
@@ -136,7 +137,7 @@ public class InstantiationChecker {
         ///////// 
 
         // TODO:
-        // - Basic consistency checks: E.g., mutual exclusion of abrupt completion preconditions
+        // - Conformance of pred and func insts with their footprints
         // - Consistent instantiations of APEs w/ same IDs
         // - Constraints (assumptions) satisfied
         

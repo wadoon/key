@@ -37,7 +37,8 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**
- * Abstract super class for provers of abrupt completion behavior.
+ * Normal completion: Postcondition satisfied, completes normally if none of the
+ * other specs holds.
  * 
  * @author Dominic Steinhoefel
  */

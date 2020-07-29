@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,6 +54,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -143,6 +145,42 @@ public class AbstractUpdateFactory {
             return getName();
         }
     };
+
+    private final static Map<PreconditionType, Behavior> BEHAVIOR_TYPES_MAP = new LinkedHashMap<>();
+    private final static Map<Behavior, PreconditionType> BEHAVIOR_TYPES_REV_MAP = new LinkedHashMap<>();
+
+    static {
+        BEHAVIOR_TYPES_MAP.put(PreconditionType.RETURN, Behavior.RETURN_BEHAVIOR);
+        BEHAVIOR_TYPES_MAP.put(PreconditionType.EXC, Behavior.EXCEPTIONAL_BEHAVIOR);
+        BEHAVIOR_TYPES_MAP.put(PreconditionType.NORMAL, Behavior.NORMAL_BEHAVIOR);
+        BEHAVIOR_TYPES_MAP.put(PreconditionType.BREAK, Behavior.BREAK_BEHAVIOR);
+        BEHAVIOR_TYPES_MAP.put(PreconditionType.CONT, Behavior.CONTINUE_BEHAVIOR);
+
+        for (Entry<PreconditionType, Behavior> entry : BEHAVIOR_TYPES_MAP.entrySet()) {
+            BEHAVIOR_TYPES_REV_MAP.put(entry.getValue(), entry.getKey());
+        }
+    }
+
+    /**
+     * Returns the block contract behavior for an AE precondition type.
+     * 
+     * @param pt The {@link PreconditionType}.
+     * @return The requested block contract behavior.
+     */
+    public static Behavior getBlockContractBehaviorForPreconditionType(final PreconditionType pt) {
+        return BEHAVIOR_TYPES_MAP.get(pt);
+    }
+
+    /**
+     * Returns the AE precondition type for a block contract behavior.
+     * 
+     * @param pt The {@link Behavior}.
+     * @return The requested {@link PreconditionType}.
+     */
+    public static PreconditionType getPreconditionTypeForBlockContractBehavior(
+            final Behavior behavior) {
+        return BEHAVIOR_TYPES_REV_MAP.get(behavior);
+    }
 
     /**
      * Constructor. NOTE: You should not use this constructor, but instead access
