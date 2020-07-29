@@ -14,6 +14,8 @@ package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +24,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableList;
@@ -56,6 +59,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -405,6 +409,19 @@ public class InstantiationAspectProverHelper {
      * @return The header.
      */
     public String keyFileHeader(final AEInstantiationModel model, final APEInstantiation inst) {
+        return keyFileHeader(model, inst, Collections.emptyList(), Collections.emptyList());
+    }
+
+    /**
+     * Returns a header for a KeY proof, including declarations of variables in the
+     * instantiation.
+     * 
+     * @param inst The instantiation (for declaring free variables).
+     * @return The header.
+     */
+    public String keyFileHeader(final AEInstantiationModel model, final APEInstantiation inst,
+            final Collection<LocationVariable> additionalVars,
+            final Collection<de.uka.ilkd.key.logic.op.Function> additionalFunctions) {
         final LinkedHashSet<LocationVariable> instProgVars;
 
         {
@@ -428,7 +445,7 @@ public class InstantiationAspectProverHelper {
         final String newVars;
 
         {
-            final String newInstVars = instProgVars.stream()
+            final String newInstVars = Stream.concat(instProgVars.stream(), additionalVars.stream())
                     .filter(lv -> !model.getProgramVariableDeclarations().stream()
                             .anyMatch(pvd -> pvd.getName().equals(lv.name().toString())))
                     .map(lv -> String.format("%s %s;",
@@ -443,10 +460,20 @@ public class InstantiationAspectProverHelper {
             newVars = "\n  " + newInstVars + "\n  " + atPreVars;
         }
 
-        return keyHeaderScaffold
-                .replaceAll(FUNCTIONS,
-                        Matcher.quoteReplacement(
-                                InstantiationAspectProverHelper.createFuncDecls(model)))
+        /////////
+
+        final Function<String, String> wrapInPars = str -> str.isEmpty() ? ""
+                : String.format("(%s)", str);
+
+        final String newFuncs = additionalFunctions.stream()
+                .map(f -> String.format("%s %s%s;", f.sort().toString(), f.name().toString(),
+                        wrapInPars.apply(f.argSorts().stream().map(Sort::toString)
+                                .collect(Collectors.joining(", ")))))
+                .collect(Collectors.joining("\n  "));
+
+        return keyHeaderScaffold.replaceAll(FUNCTIONS,
+                Matcher.quoteReplacement(InstantiationAspectProverHelper.createFuncDecls(model)
+                        + (newFuncs.isEmpty() ? "" : "\n  " + newFuncs)))
                 .replaceAll(PREDICATES,
                         Matcher.quoteReplacement(
                                 InstantiationAspectProverHelper.createPredDecls(model)))

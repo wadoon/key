@@ -62,7 +62,7 @@ public class PrecMutualExclusionProver implements InstantiationAspectProver {
 
     @Override
     public ProofResult prove(final AEInstantiationModel model) {
-        return model.getApeInstantiations().stream().map(inst -> proveHasToInst(model, inst))
+        return model.getApeInstantiations().stream().map(inst -> proveMutualExclusion(model, inst))
                 .collect(ProofResult.REDUCER);
     }
 
@@ -77,13 +77,10 @@ public class PrecMutualExclusionProver implements InstantiationAspectProver {
     }
 
     /**
-     * Attempts to prove that the given instantiation satisfies the hasTo condition
-     * of the APE to instantiate.
-     * 
      * @param inst The {@link APEInstantiation}
      * @return A {@link ProofResult} for the frame problem.
      */
-    private ProofResult proveHasToInst(final AEInstantiationModel model,
+    private ProofResult proveMutualExclusion(final AEInstantiationModel model,
             final APEInstantiation inst) {
         final APERetrievalResult apeRetr = helper.getAPEForInst(model, inst);
 
@@ -147,7 +144,7 @@ public class PrecMutualExclusionProver implements InstantiationAspectProver {
 
             toProve = tb.imp(javaDLPreCond, toProve);
         }
-        
+
         // Frequently, the proof is trivial, since many preconditions are false
         if (toProve.op() == Junctor.TRUE) {
             return ProofResult.EMPTY;

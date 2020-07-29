@@ -70,16 +70,17 @@ public class InstantiationChecker {
                 : JavaProfile.getDefaultInstance();
 
         final InstantiationAspectProver[] checkers = new InstantiationAspectProver[] {
-                new FrameConditionProver(profile.get()), //
-                new HasToConditionProver(profile.get()), //
-                new FootprintConditionProver(profile.get()), //
-                new NormalCompletionSpecProver(profile.get()), //
-                new TerminationProver(profile.get()), //
-                new ReturnsSpecProver(profile.get()), //
-                new ExcSpecProver(profile.get()), //
-                new BreaksSpecProver(profile.get()), //
-                new ContinuesSpecProver(profile.get()), //
-                new PrecMutualExclusionProver(profile.get())
+//                new FrameConditionProver(profile.get()), //
+//                new HasToConditionProver(profile.get()), //
+//                new FootprintConditionProver(profile.get()), //
+//                new NormalCompletionSpecProver(profile.get()), //
+//                new TerminationProver(profile.get()), //
+//                new ReturnsSpecProver(profile.get()), //
+//                new ExcSpecProver(profile.get()), //
+//                new BreaksSpecProver(profile.get()), //
+//                new ContinuesSpecProver(profile.get()), //
+//                new PrecMutualExclusionProver(profile.get()), //
+                new PredFuncInstsFootprintConformanceProver(profile.get()), //
         };
 
         blParr: {

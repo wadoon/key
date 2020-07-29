@@ -59,6 +59,7 @@ public final class LocSetLDT extends LDT {
     private final Function value;
     private final Function irr;
     private final Function pvElementOf;
+    private final Function anonPV;
     
     public LocSetLDT(TermServices services) {
 	super(NAME, services);
@@ -83,6 +84,7 @@ public final class LocSetLDT extends LDT {
         hasTo = addFunction(services, "hasTo");
         value = addFunction(services, "value");
         pvElementOf = addFunction(services, "pvElementOf");
+        anonPV = addFunction(services, "anonPV");
     }
 
     public Function getEmpty() {
@@ -169,6 +171,10 @@ public final class LocSetLDT extends LDT {
      */
     public Function getValue() {
         return value;
+    }
+
+    public Function getAnonPV() {
+        return anonPV;
     }
 
     @Override
