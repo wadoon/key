@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.antlr.runtime.RecognitionException;
+
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.InvalidSyntaxException;
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.ProofResult;
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.InstantiationAspectProverHelper.APERetrievalResult;
@@ -35,6 +37,7 @@ import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -127,6 +130,27 @@ public class PrecMutualExclusionProver implements InstantiationAspectProver {
 
                 toProve = tb.and(toProve, tb.or(tb.not(prec1), tb.not(prec2)));
             }
+        }
+
+        if (!model.getPreCondition().trim().isEmpty()) {
+            final Term javaDLPreCond;
+            try {
+                javaDLPreCond = KeyBridgeUtils.parseTerm(KeyBridgeUtils.createJavaDLPreCondition(
+                        model.getPreCondition(), model.getProgramVariableDeclarations(),
+                        model.getAbstractLocationSets(), model.getPredicateDeclarations(),
+                        model.getFunctionDeclarations(), KeyBridgeUtils.dummyKJT(), services),
+                        localSpecRepo, services);
+            } catch (RecognitionException re) {
+                throw new InvalidSyntaxException(
+                        "Could not parse specified relational precondition", re);
+            }
+
+            toProve = tb.imp(javaDLPreCond, toProve);
+        }
+        
+        // Frequently, the proof is trivial, since many preconditions are false
+        if (toProve.op() == Junctor.TRUE) {
+            return ProofResult.EMPTY;
         }
 
         final Proof proof;
