@@ -218,7 +218,7 @@
     </functionInstantiations>
     <apeInstantiations>
         <apeInst apeLineNumber="27">
-            <instantiation>x = y++; z = w; if (w == 17) { return Integer.valueOf(z); }</instantiation>
+            <instantiation>x = y++; z = w; if (w == 17) { return z; }</instantiation>
         </apeInst>
         <apeInst apeLineNumber="35">
             <instantiation>a = b/b + 17; int c = 2*d+a;</instantiation>

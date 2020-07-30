@@ -74,8 +74,8 @@ public class KeyBridgeUtils {
     private static final String AE_CONSTRAINT = "ae_constraint";
 
     // Special Keywords
-    private static final String RESULT = "_result";
-    private static final String EXC = "_exc";
+    private static final String RESULT = "result";
+    private static final String EXC = "exc";
 
     public static final java.util.function.Function<String, Collector<String, ?, String>> DL_PREFIX_FOLD = //
             currRes -> Collectors.reducing(currRes,
