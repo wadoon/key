@@ -38,6 +38,8 @@ import de.uka.ilkd.key.abstractexecution.refinity.keybridge.ProofResult;
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.InstantiationAspectProverHelper.APERetrievalResult;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.APEInstantiation;
+import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.FunctionInstantiation;
+import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.PredicateInstantiation;
 import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.FilterVisitor;
@@ -326,25 +328,31 @@ public class PredFuncInstsFootprintConformanceProver implements InstantiationAsp
             final Services services) {
         final GoalLocalSpecificationRepository localSpecRepo = new GoalLocalSpecificationRepository();
 
-        final Map<Function, Term> funcInsts = model.getFunctionInstantiations().stream()
-                .filter(finst -> !finst.getDeclaration().getArgSorts().isEmpty())
-                .collect(Collectors.toMap(
-                        finst -> services.getNamespaces().functions()
-                                .lookup(finst.getDeclaration().getName()),
-                        catchExc(
-                                finst -> KeyBridgeUtils.parseTerm(finst.getInstantiation(),
-                                        localSpecRepo, services),
-                                "Could not parse function or predicate instantiation")));
+        final Map<Function, Term> funcInsts;
+        {
+            final java.util.function.Function<FunctionInstantiation, Term> parse = catchExc(
+                    finst -> KeyBridgeUtils.parseTerm(finst.getInstantiation(), localSpecRepo,
+                            services),
+                    "Could not parse function or predicate instantiation");
+            funcInsts = model
+                    .getFunctionInstantiations().stream().filter(
+                            finst -> !finst.getDeclaration().getArgSorts().isEmpty())
+                    .collect(Collectors.toMap(finst -> services.getNamespaces().functions()
+                            .lookup(finst.getDeclaration().getName()), parse));
+        }
 
-        final Map<Function, Term> predInsts = model.getPredicateInstantiations().stream()
-                .filter(pinst -> !pinst.getDeclaration().getArgSorts().isEmpty())
-                .collect(Collectors.toMap(
-                        pinst -> services.getNamespaces().functions()
-                                .lookup(pinst.getDeclaration().getName()),
-                        catchExc(
-                                pinst -> KeyBridgeUtils.parseTerm(pinst.getInstantiation(),
-                                        localSpecRepo, services),
-                                "Could not parse function or predicate instantiation")));
+        final Map<Function, Term> predInsts;
+        {
+            final java.util.function.Function<PredicateInstantiation, Term> parse = catchExc(
+                    pinst -> KeyBridgeUtils.parseTerm(pinst.getInstantiation(), localSpecRepo,
+                            services),
+                    "Could not parse function or predicate instantiation");
+            predInsts = model
+                    .getPredicateInstantiations().stream().filter(
+                            pinst -> !pinst.getDeclaration().getArgSorts().isEmpty())
+                    .collect(Collectors.toMap(pinst -> services.getNamespaces().functions()
+                            .lookup(pinst.getDeclaration().getName()), parse));
+        }
 
         final Map<Function, Term> funcPredInsts = new LinkedHashMap<>();
         funcPredInsts.putAll(funcInsts);

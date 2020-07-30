@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -100,14 +101,17 @@ public class PrecMutualExclusionProver implements InstantiationAspectProver {
                 .collect(Collectors.toMap(finst -> finst.getDeclaration().getName(),
                         PredicateInstantiation::getInstantiation));
 
-        final Map<Function, Term> funcPredInsts = Stream
-                .concat(funcInstsStr.entrySet().stream(), predInstsStr.entrySet().stream())
-                .collect(Collectors.toMap(
-                        fpinst -> services.getNamespaces().functions().lookup(fpinst.getKey()),
-                        catchExc(
-                                fpinst -> (Term) KeyBridgeUtils.parseTerm(fpinst.getValue(),
-                                        localSpecRepo, services),
-                                "Could not parse function or predicate instantiation")));
+        final Map<Function, Term> funcPredInsts;
+        {
+            final java.util.function.Function<Entry<String, String>, Term> parse = catchExc(
+                    fpinst -> KeyBridgeUtils.parseTerm(fpinst.getValue(), localSpecRepo, services),
+                    "Could not parse function or predicate instantiation");
+            funcPredInsts = Stream
+                    .concat(funcInstsStr.entrySet().stream(), predInstsStr.entrySet().stream())
+                    .collect(Collectors.toMap(
+                            fpinst -> services.getNamespaces().functions().lookup(fpinst.getKey()),
+                            parse));
+        }
 
         final List<Term> preconditions = helper.getCompletionConditions(model, inst).stream()
                 .filter(cond -> behaviors.contains(cond.getBehavior()))
