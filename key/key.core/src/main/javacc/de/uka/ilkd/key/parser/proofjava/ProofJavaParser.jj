@@ -4697,7 +4697,7 @@ Exec ExecStatement() :
         }
     ]
 
-    [
+    (
         LOOKAHEAD("ccatch" "("  "\\Return" param = FormalParameter() ")")
         "ccatch"
         {
@@ -4713,7 +4713,7 @@ Exec ExecStatement() :
             cat.setBody(block);
             branches.add(cat);
         }
-    ]
+    )*
 
     [
         LOOKAHEAD("ccatch" "("  "\\Break" ")")
