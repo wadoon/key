@@ -132,9 +132,9 @@ public class KeyBridgeUtils {
             final Consumer<String> appender = var -> {
                 sb.append("\n     & ")//
                         .append(qfrPrefix.toString()) //
-                        .append("disjoint(singletonPV(") //
+                        .append("disjoint(singletonPV(PV(") //
                         .append(var) //
-                        .append("),") //
+                        .append(")),") //
                         .append(decl.getFuncName()) //
                         .append(argsParams) //
                         .append(")") //
@@ -286,7 +286,7 @@ public class KeyBridgeUtils {
 
     public static String getFilenameForAPEProof(final String baseName, boolean closed,
             final APEInstantiation inst) {
-        return String.format("%s_APE_line_%d_%s.zproof", baseName.replaceAll("\\W+", ""),
+        return String.format("%s_APE_line_%d_%s.zproof", baseName.replaceAll("\\W+", "_"),
                 inst.getApeLineNumber(), closed ? "closed" : "failed");
     }
 

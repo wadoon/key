@@ -115,7 +115,7 @@
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
         </programVariable>
-        <programVariable typeName="java.lang.Object" varName="result">
+        <programVariable typeName="int" varName="result">
             <relevantOne>-1</relevantOne>
             <relevantTwo>-1</relevantTwo>
         </programVariable>
@@ -163,7 +163,8 @@
         	<declaration predName="resultA">
             	<argSort>any</argSort>
         	</declaration>
-            <instantiation>((java.lang.Integer) result).intValue() = w</instantiation>
+            <!--<instantiation>((java.lang.Integer) result).intValue() = w</instantiation>-->
+            <instantiation>result = w</instantiation>
 	        <instArgSort>int</instArgSort>
 	        <instArgSort>int</instArgSort>
         </predicateInst>
