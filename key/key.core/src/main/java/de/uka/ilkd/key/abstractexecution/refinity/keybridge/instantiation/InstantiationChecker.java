@@ -81,6 +81,8 @@ public class InstantiationChecker {
                 new ContinuesSpecProver(profile.get()), //
                 new PrecMutualExclusionProver(profile.get()), //
                 new PredFuncInstsFootprintConformanceProver(profile.get()), //
+                new ConsistentInstantiationProver(profile.get()), // unimplemented
+                new AEConstraintsProver(profile.get()), // unimplemented
         };
 
         blParr: {
