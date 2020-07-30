@@ -10,15 +10,14 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FinishAbstractProofMacro extends StrategyProofMacro {
+public class ContinueAbstractProofMacro extends StrategyProofMacro {
 	@Override
     public String getName() {
-        return "Finish abstract proof part";
+        return "Continue abstract proof";
     }
 
     @Override
@@ -33,19 +32,18 @@ public class FinishAbstractProofMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
-        return new FinishAbstractProofStrategy(proof.getActiveStrategy(), proof.getSettings().getStrategySettings().getActiveStrategyProperties());
+        return new ContinueAbstractProofStrategy(proof.getActiveStrategy(), proof.getSettings().getStrategySettings().getActiveStrategyProperties());
     }
     
-    private static class FinishAbstractProofStrategy implements Strategy {
-    	
+    private static class ContinueAbstractProofStrategy implements Strategy {
     	private final Strategy delegate;
-        private static final Name NAME = new Name(FinishAbstractProofStrategy.class.getSimpleName());
+        private static final Name NAME = new Name(ContinueAbstractProofStrategy.class.getSimpleName());
 
         public List<String> forbiddenRuleSets;
         public List<String> forbiddenRules;
         public boolean firstOrderGoalsForbidden;
 
-        public FinishAbstractProofStrategy(Strategy delegate, StrategyProperties strategyProperties) {
+        public ContinueAbstractProofStrategy(Strategy delegate, StrategyProperties strategyProperties) {
             this.delegate = delegate;
             this.forbiddenRuleSets = Arrays.stream(strategyProperties.getProperty(StrategyProperties.ABSTRACT_PROOF_FORBIDDEN_RULE_SETS)
                     .split(","))
