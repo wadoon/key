@@ -70,7 +70,7 @@ public class InstantiationChecker {
                 : JavaProfile.getDefaultInstance();
 
         final InstantiationAspectProver[] checkers = new InstantiationAspectProver[] {
-//                new FrameConditionProver(profile.get()), //
+                new FrameConditionProver(profile.get()), //
 //                new HasToConditionProver(profile.get()), //
 //                new FootprintConditionProver(profile.get()), //
 //                new NormalCompletionSpecProver(profile.get()), //
@@ -80,7 +80,7 @@ public class InstantiationChecker {
 //                new BreaksSpecProver(profile.get()), //
 //                new ContinuesSpecProver(profile.get()), //
 //                new PrecMutualExclusionProver(profile.get()), //
-                new PredFuncInstsFootprintConformanceProver(profile.get()), //
+//                new PredFuncInstsFootprintConformanceProver(profile.get()), //
         };
 
         blParr: {

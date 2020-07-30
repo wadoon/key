@@ -555,12 +555,12 @@ public class InstantiationAspectProverHelper {
 
         Node currNode = proof.root();
         while (currNode.getAppliedRuleApp() != null
-                && !currNode.getAppliedRuleApp().rule().name().toString().equals("methodBodyExpand")
+                && !currNode.getAppliedRuleApp().rule().name().toString().equals("directMethodBodyExpand")
                 && currNode.childrenCount() == 1) {
             currNode = currNode.child(0);
         }
 
-        if (!currNode.getAppliedRuleApp().rule().name().toString().equals("methodBodyExpand")) {
+        if (!currNode.getAppliedRuleApp().rule().name().toString().equals("directMethodBodyExpand")) {
             throw new UnsuccessfulAPERetrievalException(
                     "Could not find methodBodyExpand application");
         }
