@@ -10,7 +10,7 @@
 // The KeY system is public by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation;
+package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,10 +32,12 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.CompletionCondition;
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.InvalidSyntaxException;
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.RetrieveProgramResult;
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.UnsuccessfulAPERetrievalException;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.exception.InvalidSyntaxException;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.exception.UnsuccessfulAPERetrievalException;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.resultobjects.APERetrievalResult;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.resultobjects.CompletionCondition;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.resultobjects.RetrieveProgramResult;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.visitor.CollectAPEVisitor;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
@@ -46,10 +48,7 @@ import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.PredicateI
 import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
@@ -861,7 +860,7 @@ public class InstantiationAspectProverHelper {
     }
 
     // Copied from JMLSpecFactory
-    private static TextualJMLConstruct[] parseMethodLevelComments(final Comment[] comments,
+    public static TextualJMLConstruct[] parseMethodLevelComments(final Comment[] comments,
             final String fileName) throws SLTranslationException {
         if (comments.length == 0) {
             return new TextualJMLConstruct[0];
@@ -874,75 +873,6 @@ public class InstantiationAspectProverHelper {
         final ImmutableList<TextualJMLConstruct> constructs = preParser.parseMethodlevelComment();
         //        warnings = warnings.union(preParser.getWarnings());
         return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
-    }
-
-    public static class APERetrievalResult {
-        private final int line;
-        private final AbstractProgramElement ape;
-        private final List<TextualJMLConstruct> jmlConstructs;
-        private final Proof proof;
-
-        public APERetrievalResult(final AbstractProgramElement ape,
-                final List<TextualJMLConstruct> jmlConstructs, final Proof proof) {
-            this.ape = ape;
-            this.jmlConstructs = jmlConstructs;
-            // There's a shift of 3 lines in the dummy Java file.
-            this.line = ape.getStartPosition().getLine() - 3;
-            this.proof = proof;
-        }
-
-        public AbstractProgramElement getApe() {
-            return ape;
-        }
-
-        public List<TextualJMLConstruct> getJMLConstructs() {
-            return jmlConstructs;
-        }
-
-        public int getLine() {
-            return line;
-        }
-
-        public Services getServices() {
-            return proof.getServices();
-        }
-
-        public GoalLocalSpecificationRepository getLocalSpecRepo() {
-            return proof.openGoals().head().getLocalSpecificationRepository();
-        }
-    }
-
-    private static class CollectAPEVisitor extends JavaASTVisitor {
-        private final List<APERetrievalResult> result = new ArrayList<>();
-        private final Proof proof;
-
-        public CollectAPEVisitor(ProgramElement root,
-                GoalLocalSpecificationRepository localSpecRepo, Services services) {
-            super(root, localSpecRepo, services);
-            this.proof = services.getProof();
-        }
-
-        @Override
-        public void doDefaultAction(SourceElement node) {
-            if (node instanceof AbstractProgramElement) {
-                final AbstractProgramElement ape = (AbstractProgramElement) node;
-
-                List<TextualJMLConstruct> jmlConstructs;
-                try {
-                    jmlConstructs = Arrays
-                            .stream(parseMethodLevelComments(ape.getComments(), "DummyProblemFile"))
-                            .collect(Collectors.toList());
-                } catch (SLTranslationException e) {
-                    throw new RuntimeException("Could not parse APE comments", e);
-                }
-
-                result.add(new APERetrievalResult(ape, jmlConstructs, proof));
-            }
-        }
-
-        public List<APERetrievalResult> getResult() {
-            return result;
-        }
     }
 
 }

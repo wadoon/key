@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation;
+package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,44 +22,49 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 /**
  * @author Dominic Steinhoefel
  */
-public class ContinuesSpecProver extends AbstractSpecProver implements InstantiationAspectProver {
-    private static final String KEY_PROVE_CONTINUES_SPEC_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/continuesSpecProblem.key";
+public class ReturnsSpecProver extends AbstractSpecProver implements InstantiationAspectProver {
+    private static final String KEY_PROVE_RETURNS_SPEC_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/returnsSpecProblem.key";
 
-    private final String keyProveContinuesSpecScaffold;
+    private final String keyProveReturnsSpecScaffold;
 
-    public ContinuesSpecProver() {
+    public ReturnsSpecProver() {
         super();
-        keyProveContinuesSpecScaffold = KeyBridgeUtils.readResource(KEY_PROVE_CONTINUES_SPEC_SCAFFOLD);
+        keyProveReturnsSpecScaffold = KeyBridgeUtils.readResource(KEY_PROVE_RETURNS_SPEC_SCAFFOLD);
     }
 
-    public ContinuesSpecProver(final Profile profile) {
+    public ReturnsSpecProver(final Profile profile) {
         super(profile);
-        keyProveContinuesSpecScaffold = KeyBridgeUtils.readResource(KEY_PROVE_CONTINUES_SPEC_SCAFFOLD);
+        keyProveReturnsSpecScaffold = KeyBridgeUtils.readResource(KEY_PROVE_RETURNS_SPEC_SCAFFOLD);
     }
 
     @Override
     public String initMessage() {
-        return "Proving Continue Behavior Condition(s)...";
+        return "Proving Return Behavior Condition(s)...";
     }
 
     @Override
     public String proofObjective() {
-        return "continue behavior condition(s)";
+        return "return behavior condition(s)";
     }
 
     @Override
     protected List<String> ignPVs() {
-        return Arrays.asList(new String[] { "_didContinue" });
+        return Arrays.asList(new String[] { "result", "_returned" });
     }
 
     @Override
     protected String keyFileScaffold() {
-        return keyProveContinuesSpecScaffold;
+        return keyProveReturnsSpecScaffold;
     }
 
     @Override
     protected Behavior targetedBehavior() {
-        return Behavior.CONTINUE_BEHAVIOR;
+        return Behavior.RETURN_BEHAVIOR;
+    }
+    
+    @Override
+    protected String javaCodeSuffix() {
+        return "\nbreak;";
     }
 
 }

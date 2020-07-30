@@ -10,9 +10,9 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation;
+package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover;
 
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.ProofResult;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.resultobjects.ProofResult;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
 
 /**

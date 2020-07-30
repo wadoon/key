@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation;
+package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover;
 
 import static org.key_project.util.java.FunctionWithException.catchExc;
 
@@ -22,10 +22,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.CompletionCondition;
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.ProofResult;
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.RetrieveProgramResult;
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.TriviallySatisfiedSpecCaseException;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.exception.TriviallySatisfiedSpecCaseException;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.resultobjects.CompletionCondition;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.resultobjects.ProofResult;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.resultobjects.RetrieveProgramResult;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.APEInstantiation;
 import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;

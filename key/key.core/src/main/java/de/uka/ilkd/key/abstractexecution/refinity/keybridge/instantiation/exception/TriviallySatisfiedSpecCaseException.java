@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.refinity.keybridge;
+package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.exception;
 
 /**
  * Thrown if a specification case is trivially satisfied, e.g., because no

@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation;
+package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,30 +21,31 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**
  * @author Dominic Steinhoefel
+ *
  */
-public class ReturnsSpecProver extends AbstractSpecProver implements InstantiationAspectProver {
-    private static final String KEY_PROVE_RETURNS_SPEC_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/returnsSpecProblem.key";
+public class ExcSpecProver extends AbstractSpecProver implements InstantiationAspectProver {
+    private static final String EXC_SPEC_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/excSpecProblem.key";
 
-    private final String keyProveReturnsSpecScaffold;
+    private final String keyProveExcSpecScaffold;
 
-    public ReturnsSpecProver() {
+    public ExcSpecProver() {
         super();
-        keyProveReturnsSpecScaffold = KeyBridgeUtils.readResource(KEY_PROVE_RETURNS_SPEC_SCAFFOLD);
+        keyProveExcSpecScaffold = KeyBridgeUtils.readResource(EXC_SPEC_PROBLEM_FILE_SCAFFOLD);
     }
 
-    public ReturnsSpecProver(final Profile profile) {
+    public ExcSpecProver(final Profile profile) {
         super(profile);
-        keyProveReturnsSpecScaffold = KeyBridgeUtils.readResource(KEY_PROVE_RETURNS_SPEC_SCAFFOLD);
+        keyProveExcSpecScaffold = KeyBridgeUtils.readResource(EXC_SPEC_PROBLEM_FILE_SCAFFOLD);
     }
 
     @Override
     public String initMessage() {
-        return "Proving Return Behavior Condition(s)...";
+        return "Proving Exceptional Behavior Condition(s)...";
     }
 
     @Override
     public String proofObjective() {
-        return "return behavior condition(s)";
+        return "exceptional behavior condition(s)";
     }
 
     @Override
@@ -54,17 +55,12 @@ public class ReturnsSpecProver extends AbstractSpecProver implements Instantiati
 
     @Override
     protected String keyFileScaffold() {
-        return keyProveReturnsSpecScaffold;
+        return keyProveExcSpecScaffold;
     }
 
     @Override
     protected Behavior targetedBehavior() {
-        return Behavior.RETURN_BEHAVIOR;
-    }
-    
-    @Override
-    protected String javaCodeSuffix() {
-        return "\nbreak;";
+        return Behavior.EXCEPTIONAL_BEHAVIOR;
     }
 
 }

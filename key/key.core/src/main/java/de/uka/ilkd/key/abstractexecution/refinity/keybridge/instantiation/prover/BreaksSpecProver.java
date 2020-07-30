@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation;
+package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,46 +21,45 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**
  * @author Dominic Steinhoefel
- *
  */
-public class ExcSpecProver extends AbstractSpecProver implements InstantiationAspectProver {
-    private static final String EXC_SPEC_PROBLEM_FILE_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/excSpecProblem.key";
+public class BreaksSpecProver extends AbstractSpecProver implements InstantiationAspectProver {
+    private static final String KEY_PROVE_BREAKS_SPEC_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/breaksSpecProblem.key";
 
-    private final String keyProveExcSpecScaffold;
+    private final String keyProveBreaksSpecScaffold;
 
-    public ExcSpecProver() {
+    public BreaksSpecProver() {
         super();
-        keyProveExcSpecScaffold = KeyBridgeUtils.readResource(EXC_SPEC_PROBLEM_FILE_SCAFFOLD);
+        keyProveBreaksSpecScaffold = KeyBridgeUtils.readResource(KEY_PROVE_BREAKS_SPEC_SCAFFOLD);
     }
 
-    public ExcSpecProver(final Profile profile) {
+    public BreaksSpecProver(final Profile profile) {
         super(profile);
-        keyProveExcSpecScaffold = KeyBridgeUtils.readResource(EXC_SPEC_PROBLEM_FILE_SCAFFOLD);
+        keyProveBreaksSpecScaffold = KeyBridgeUtils.readResource(KEY_PROVE_BREAKS_SPEC_SCAFFOLD);
     }
 
     @Override
     public String initMessage() {
-        return "Proving Exceptional Behavior Condition(s)...";
+        return "Proving Break Behavior Condition(s)...";
     }
 
     @Override
     public String proofObjective() {
-        return "exceptional behavior condition(s)";
+        return "break behavior condition(s)";
     }
 
     @Override
     protected List<String> ignPVs() {
-        return Arrays.asList(new String[] { "result", "_returned" });
+        return Arrays.asList(new String[] { "_didBreak" });
     }
 
     @Override
     protected String keyFileScaffold() {
-        return keyProveExcSpecScaffold;
+        return keyProveBreaksSpecScaffold;
     }
 
     @Override
     protected Behavior targetedBehavior() {
-        return Behavior.EXCEPTIONAL_BEHAVIOR;
+        return Behavior.BREAK_BEHAVIOR;
     }
 
 }

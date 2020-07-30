@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation;
+package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,44 +22,44 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 /**
  * @author Dominic Steinhoefel
  */
-public class BreaksSpecProver extends AbstractSpecProver implements InstantiationAspectProver {
-    private static final String KEY_PROVE_BREAKS_SPEC_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/breaksSpecProblem.key";
+public class ContinuesSpecProver extends AbstractSpecProver implements InstantiationAspectProver {
+    private static final String KEY_PROVE_CONTINUES_SPEC_SCAFFOLD = "/de/uka/ilkd/key/refinity/instantiation/continuesSpecProblem.key";
 
-    private final String keyProveBreaksSpecScaffold;
+    private final String keyProveContinuesSpecScaffold;
 
-    public BreaksSpecProver() {
+    public ContinuesSpecProver() {
         super();
-        keyProveBreaksSpecScaffold = KeyBridgeUtils.readResource(KEY_PROVE_BREAKS_SPEC_SCAFFOLD);
+        keyProveContinuesSpecScaffold = KeyBridgeUtils.readResource(KEY_PROVE_CONTINUES_SPEC_SCAFFOLD);
     }
 
-    public BreaksSpecProver(final Profile profile) {
+    public ContinuesSpecProver(final Profile profile) {
         super(profile);
-        keyProveBreaksSpecScaffold = KeyBridgeUtils.readResource(KEY_PROVE_BREAKS_SPEC_SCAFFOLD);
+        keyProveContinuesSpecScaffold = KeyBridgeUtils.readResource(KEY_PROVE_CONTINUES_SPEC_SCAFFOLD);
     }
 
     @Override
     public String initMessage() {
-        return "Proving Break Behavior Condition(s)...";
+        return "Proving Continue Behavior Condition(s)...";
     }
 
     @Override
     public String proofObjective() {
-        return "break behavior condition(s)";
+        return "continue behavior condition(s)";
     }
 
     @Override
     protected List<String> ignPVs() {
-        return Arrays.asList(new String[] { "_didBreak" });
+        return Arrays.asList(new String[] { "_didContinue" });
     }
 
     @Override
     protected String keyFileScaffold() {
-        return keyProveBreaksSpecScaffold;
+        return keyProveContinuesSpecScaffold;
     }
 
     @Override
     protected Behavior targetedBehavior() {
-        return Behavior.BREAK_BEHAVIOR;
+        return Behavior.CONTINUE_BEHAVIOR;
     }
 
 }

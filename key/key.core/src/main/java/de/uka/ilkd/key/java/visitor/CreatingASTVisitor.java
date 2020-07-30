@@ -134,7 +134,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnStatementBlock(final StatementBlock x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 StatementBlock newBlock = new StatementBlock(changeList);
                 performActionOnBlockContract(x, newBlock);
                 performActionOnLoopContract(x, newBlock);
@@ -148,7 +148,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnAbstractStatement(AbstractStatement x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 AbstractStatement newAbstrStmt = new AbstractStatement(changeList);
                 performActionOnAbstractProgramElementContract(x, newAbstrStmt);
                 return newAbstrStmt;
@@ -161,7 +161,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnAbstractExpression(AbstractExpression x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 AbstractExpression newAbstrExpr = new AbstractExpression(changeList);
                 performActionOnAbstractProgramElementContract(x, newAbstrExpr);
                 return newAbstrExpr;
@@ -174,7 +174,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnMergePointStatement(MergePointStatement x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 MergePointStatement newMps = new MergePointStatement(changeList);
                 performActionOnMergeContract(x, newMps);
                 return newMps;
@@ -257,7 +257,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new If(changeList);
             }
         };
@@ -269,7 +269,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnThen(Then x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Then(changeList);
             }
         };
@@ -375,7 +375,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnTypeReference(final TypeReference x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new TypeRef(changeList, x.getKeYJavaType(),
                         x.getDimensions());
             }
@@ -387,7 +387,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnElse(Else x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Else(changeList);
             }
         };
@@ -420,7 +420,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnCatch(Catch x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Catch(changeList);
             }
         };
@@ -431,7 +431,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnCcatch(Ccatch x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Ccatch(changeList);
             }
         };
@@ -442,7 +442,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnThrow(Throw x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Throw(changeList);
             }
         };
@@ -453,7 +453,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnTry(Try x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Try(changeList);
             }
         };
@@ -463,7 +463,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnExec(Exec x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Exec(changeList);
             }
         };
@@ -474,7 +474,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnDefault(Default x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Default(changeList);
             }
         };
@@ -485,7 +485,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnFinally(Finally x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Finally(changeList);
             }
         };
@@ -496,7 +496,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnInstanceof(Instanceof x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Instanceof(changeList);
             }
         };
@@ -507,7 +507,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnBreak(Break x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Break(changeList);
             }
         };
@@ -518,7 +518,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnContinue(Continue x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Continue(changeList);
             }
         };
@@ -529,7 +529,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnFor(final For x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 For newFor = new For(changeList);
                 performActionOnLoopInvariant((For) pe, newFor);
                 performActionOnLoopContract(x, newFor);
@@ -543,7 +543,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnEnhancedFor(final EnhancedFor x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 EnhancedFor enhancedFor = new EnhancedFor(changeList);
                 performActionOnLoopInvariant((EnhancedFor) pe, enhancedFor);
                 performActionOnLoopContract(x, enhancedFor);
@@ -619,7 +619,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             final MethodBodyStatement x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new MethodBodyStatement(changeList);
             }
         };
@@ -630,7 +630,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnSynchronizedBlock(SynchronizedBlock x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new SynchronizedBlock(changeList);
             }
         };
@@ -641,7 +641,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnLoopScopeBlock(LoopScopeBlock x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new LoopScopeBlock(changeList);
             }
         };
@@ -652,7 +652,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnCopyAssignment(CopyAssignment x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new CopyAssignment(changeList);
             }
         };
@@ -663,7 +663,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnPreIncrement(PreIncrement x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new PreIncrement(changeList);
             }
         };
@@ -674,7 +674,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnPostIncrement(PostIncrement x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new PostIncrement(changeList);
             }
         };
@@ -685,7 +685,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnPlus(Plus x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Plus(changeList);
             }
         };
@@ -696,7 +696,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnTimes(Times x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Times(changeList);
             }
         };
@@ -707,7 +707,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnMinus(Minus x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Minus(changeList);
             }
         };
@@ -718,7 +718,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnEquals(Equals x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Equals(changeList);
             }
         };
@@ -729,7 +729,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnNotEquals(NotEquals x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new NotEquals(changeList);
             }
         };
@@ -740,7 +740,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnReturn(Return x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Return(changeList);
             }
         };
@@ -751,7 +751,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnLessThan(LessThan x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new LessThan(changeList);
             }
         };
@@ -763,7 +763,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             ParenthesizedExpression x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new ParenthesizedExpression(changeList);
             }
         };
@@ -774,7 +774,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnPassiveExpression(PassiveExpression x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new PassiveExpression(changeList);
             }
         };
@@ -785,7 +785,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnTypeCast(TypeCast x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new TypeCast(changeList);
             }
         };
@@ -796,7 +796,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnGreaterThan(GreaterThan x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new GreaterThan(changeList);
             }
         };
@@ -807,7 +807,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnBinaryAnd(BinaryAnd x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new BinaryAnd(changeList);
             }
         };
@@ -818,7 +818,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnBinaryOr(BinaryOr x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new BinaryOr(changeList);
             }
         };
@@ -829,7 +829,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnBinaryXOr(BinaryXOr x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new BinaryXOr(changeList);
             }
         };
@@ -840,7 +840,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnBinaryNot(BinaryNot x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new BinaryNot(changeList);
             }
         };
@@ -851,7 +851,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnBinaryAndAssignment(BinaryAndAssignment x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new BinaryAndAssignment(changeList);
             }
         };
@@ -862,7 +862,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnBinaryOrAssignment(BinaryOrAssignment x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new BinaryOrAssignment(changeList);
             }
         };
@@ -873,7 +873,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnBinaryXOrAssignment(BinaryXOrAssignment x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new BinaryXOrAssignment(changeList);
             }
         };
@@ -884,7 +884,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnDivideAssignment(DivideAssignment x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new DivideAssignment(changeList);
             }
         };
@@ -895,7 +895,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnMinusAssignment(MinusAssignment x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new MinusAssignment(changeList);
             }
         };
@@ -906,7 +906,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnModuloAssignment(ModuloAssignment x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new ModuloAssignment(changeList);
             }
         };
@@ -917,7 +917,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnPlusAssignment(PlusAssignment x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new PlusAssignment(changeList);
             }
         };
@@ -928,7 +928,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnPostDecrement(PostDecrement x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new PostDecrement(changeList);
             }
         };
@@ -939,7 +939,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnPreDecrement(PreDecrement x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new PreDecrement(changeList);
             }
         };
@@ -950,7 +950,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnShiftLeftAssignment(ShiftLeftAssignment x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new ShiftLeftAssignment(changeList);
             }
         };
@@ -961,7 +961,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnShiftRightAssignment(ShiftRightAssignment x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new ShiftRightAssignment(changeList);
             }
         };
@@ -972,7 +972,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnTimesAssignment(TimesAssignment x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new TimesAssignment(changeList);
             }
         };
@@ -983,7 +983,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnConditional(Conditional x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Conditional(changeList);
             }
         };
@@ -995,7 +995,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             UnsignedShiftRightAssignment x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new UnsignedShiftRightAssignment(changeList);
             }
         };
@@ -1006,7 +1006,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnDivide(Divide x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Divide(changeList);
             }
         };
@@ -1019,7 +1019,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             NewArray y = (NewArray) pe;
 
             @Override
-            ProgramElement createNewElement(ExtList children) {
+            protected ProgramElement createNewElement(ExtList children) {
                 ArrayInitializer arrInit = children.get(ArrayInitializer.class);
                 children.remove(arrInit);
                 return new NewArray(children, y.getKeYJavaType(), arrInit,
@@ -1034,7 +1034,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnNew(New x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList children) {
+            protected ProgramElement createNewElement(ExtList children) {
                 PositionInfo pi = children
                         .removeFirstOccurrence(PositionInfo.class);
                 if (!preservesPositionInfo) {
@@ -1057,7 +1057,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnLogicalNot(LogicalNot x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new LogicalNot(changeList);
             }
         };
@@ -1068,7 +1068,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnLogicalAnd(LogicalAnd x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new LogicalAnd(changeList);
             }
         };
@@ -1079,7 +1079,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnLogicalOr(LogicalOr x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new LogicalOr(changeList);
             }
         };
@@ -1090,7 +1090,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnModulo(Modulo x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Modulo(changeList);
             }
         };
@@ -1101,7 +1101,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnNegative(Negative x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Negative(changeList);
             }
         };
@@ -1112,7 +1112,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnPositive(Positive x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Positive(changeList);
             }
         };
@@ -1123,7 +1123,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnShiftLeft(ShiftLeft x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new ShiftLeft(changeList);
             }
         };
@@ -1134,7 +1134,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnShiftRight(ShiftRight x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new ShiftRight(changeList);
             }
         };
@@ -1145,7 +1145,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnUnsignedShiftRight(UnsignedShiftRight x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new UnsignedShiftRight(changeList);
             }
         };
@@ -1157,7 +1157,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnArrayReference(ArrayReference x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList children) {
+            protected ProgramElement createNewElement(ExtList children) {
                 PositionInfo pos = children
                         .removeFirstOccurrence(PositionInfo.class);
                 ArrayReference y = (ArrayReference) pe;
@@ -1180,7 +1180,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnMetaClassReference(MetaClassReference x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new MetaClassReference(changeList);
             }
         };
@@ -1193,7 +1193,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             SuperConstructorReference x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList children) {
+            protected ProgramElement createNewElement(ExtList children) {
                 PositionInfo pos = children
                         .removeFirstOccurrence(PositionInfo.class);
                 SuperConstructorReference y = (SuperConstructorReference) pe;
@@ -1219,7 +1219,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             ThisConstructorReference x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new ThisConstructorReference(changeList);
             }
         };
@@ -1230,7 +1230,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnExecutionContext(ExecutionContext x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new ExecutionContext(changeList);
             }
         };
@@ -1241,7 +1241,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnSuperReference(final SuperReference x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new SuperReference(changeList);
             }
         };
@@ -1252,7 +1252,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnThisReference(final ThisReference x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new ThisReference(changeList);
             }
         };
@@ -1263,7 +1263,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnArrayLengthReference(ArrayLengthReference x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new ArrayLengthReference(changeList);
             }
         };
@@ -1274,7 +1274,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnSwitch(Switch x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Switch(changeList);
             }
         };
@@ -1285,7 +1285,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnClassInitializer(ClassInitializer x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new ClassInitializer(changeList);
             }
         };
@@ -1296,7 +1296,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnArrayInitializer(final ArrayInitializer x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new ArrayInitializer(changeList,
                         x.getKeYJavaType(services, null));
             }
@@ -1308,7 +1308,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnPackageReference(PackageReference x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new PackageReference(changeList);
             }
         };
@@ -1319,7 +1319,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnPackageSpecification(PackageSpecification x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new PackageSpecification(changeList);
             }
         };
@@ -1330,7 +1330,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnLessOrEquals(LessOrEquals x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new LessOrEquals(changeList);
             }
         };
@@ -1341,7 +1341,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnGreaterOrEquals(GreaterOrEquals x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new GreaterOrEquals(changeList);
             }
         };
@@ -1353,7 +1353,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             LocalVariableDeclaration x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new LocalVariableDeclaration(changeList);
             }
         };
@@ -1375,7 +1375,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         }
 
         @Override
-        ProgramElement createNewElement(ExtList changeList) {
+        protected ProgramElement createNewElement(ExtList changeList) {
             return new ParameterDeclaration(changeList,
                     x.parentIsInterfaceDeclaration(), x.isVarArg());
         }
@@ -1386,7 +1386,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnForUpdates(final ForUpdates x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 PositionInfo pi;
                 if (!preservesPositionInfo) {
                     pi = PositionInfo.UNDEFINED;
@@ -1403,7 +1403,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnGuard(Guard x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Guard(changeList);
             }
         };
@@ -1414,7 +1414,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnLoopInit(LoopInit x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 final PositionInfo pi;
                 if (!preservesPositionInfo) {
                     pi = PositionInfo.UNDEFINED;
@@ -1431,7 +1431,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnSingleton(Singleton x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Singleton(changeList);
             }
         };
@@ -1442,7 +1442,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnSingletonPV(SingletonPV x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new SingletonPV(changeList);
             }
         };
@@ -1453,7 +1453,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnSingletonPVFun(SingletonPVFun x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new SingletonPVFun(changeList);
             }
         };
@@ -1464,7 +1464,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnSetUnion(SetUnion x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new SetUnion(changeList);
             }
         };
@@ -1475,7 +1475,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnIntersect(Intersect x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new Intersect(changeList);
             }
         };
@@ -1486,7 +1486,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnSetMinus(SetMinus x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new SetMinus(changeList);
             }
         };
@@ -1497,7 +1497,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnAllFields(AllFields x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new AllFields(changeList);
             }
         };
@@ -1508,7 +1508,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnSeqSingleton(SeqSingleton x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new SeqSingleton(changeList);
             }
         };
@@ -1519,7 +1519,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnSeqConcat(SeqConcat x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new SeqConcat(changeList);
             }
         };
@@ -1530,7 +1530,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnSeqReverse(SeqReverse x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new SeqReverse(changeList);
             }
         };
@@ -1542,7 +1542,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             final DLEmbeddedExpression x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new DLEmbeddedExpression(x.getFunctionSymbol(),
                         changeList);
             }
@@ -1554,7 +1554,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnSeqSub(SeqSub x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new SeqSub(changeList);
             }
         };
@@ -1565,7 +1565,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnSeqLength(SeqLength x) {
         DefaultAction def = new DefaultAction(x) {
             @Override
-            ProgramElement createNewElement(ExtList changeList) {
+            protected ProgramElement createNewElement(ExtList changeList) {
                 return new SeqLength(changeList);
             }
         };
@@ -1621,7 +1621,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             this.pe = pe;
         }
 
-        abstract ProgramElement createNewElement(ExtList changeList);
+        protected abstract ProgramElement createNewElement(ExtList changeList);
 
         public void doAction(ProgramElement x) {
             ExtList changeList = stack.peek();

@@ -10,24 +10,32 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation;
+package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover;
 
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.ProofResult;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.resultobjects.ProofResult;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.init.Profile;
 
 /**
- * Proves that specified <tt>ae_constraint</tt>s are satisfied.
+ * Proves that all APEs with the same identifiers are instantiated consistently,
+ * i.e., the instantiated programs are equivalent modulo renaming of their
+ * footprint.
  * 
- * NOT YET IMPLEMENTED.
+ * <p>CURRENTLY NOT IMPLEMENTED.
+ * 
+ * <p>Implementation strategy: Create renaming table based on comparing frames and
+ * footprints, then check equalsModRenaming of {@link SourceElement}. The
+ * problematic case are partial instantiations with abstract elements, then this
+ * cannot as easily be done.
  * 
  * @author Dominic Steinhoefel
  */
-public class AEConstraintsProver implements InstantiationAspectProver {
-    public AEConstraintsProver() {
+public class ConsistentInstantiationProver implements InstantiationAspectProver {
+    public ConsistentInstantiationProver() {
     }
 
-    public AEConstraintsProver(final Profile profile) {
+    public ConsistentInstantiationProver(final Profile profile) {
     }
 
     @Override
@@ -42,7 +50,7 @@ public class AEConstraintsProver implements InstantiationAspectProver {
 
     @Override
     public String proofObjective() {
-        return "validity of instantiated assumptions";
+        return "consistent instantiation of APEs";
     }
 
 }

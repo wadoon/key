@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.refinity.keybridge;
+package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.exception;
 
 public class UnsuccessfulAPERetrievalException extends RuntimeException {
     private static final long serialVersionUID = 1L;
