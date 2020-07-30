@@ -342,11 +342,11 @@ public class AEInstantiationModel {
      * @param services The {@link Services} object to populate.
      * @throws RuntimeException If a name is already present, or a sort not known.
      */
-    public void fillNamespacesFromModel(final Services services) {
-        getProgramVariableDeclarations().forEach(pv -> pv.checkAndRegister(services));
+    public void fillNamespacesFromModelSave(final Services services) {
+        getProgramVariableDeclarations().forEach(pv -> pv.checkAndRegisterSave(services));
 
-        getPredicateInstantiations().forEach(inst -> inst.checkAndRegister(services));
-        getFunctionInstantiations().forEach(inst -> inst.checkAndRegister(services));
+        getPredicateInstantiations().forEach(inst -> inst.checkAndRegisterSave(services));
+        getFunctionInstantiations().forEach(inst -> inst.checkAndRegisterSave(services));
 
         getAbstractLocationSets().stream()
                 .filter(decl -> !getFunctionInstantiations().stream()
@@ -368,6 +368,20 @@ public class AEInstantiationModel {
     }
 
     /**
+     * Adds program variables and predicate and function symbols from the
+     * instantiation to the given {@link Services} object, if not yet known. Omits
+     * adding them otherwise.
+     * 
+     * @param services The {@link Services} object.
+     * @throws RuntimeException If a sort is not known.
+     */
+    public void fillNamespacesFromNewInstsUnsafe(final Services services) {
+        getProgramVariableDeclarations().forEach(pv -> pv.registerIfUnknown(services));
+        getPredicateInstantiations().forEach(inst -> inst.registerIfUnknown(services));
+        getFunctionInstantiations().forEach(inst -> inst.registerIfUnknown(services));
+    }
+
+    /**
      * Populates the given {@link Services} object with function and program
      * variable symbols corresponding to the definitions in this model. Returns
      * false if an error occurred, true otherwise.
@@ -377,7 +391,7 @@ public class AEInstantiationModel {
      */
     public boolean tryFillNamespacesFromModel(final Services services) {
         try {
-            fillNamespacesFromModel(services);
+            fillNamespacesFromModelSave(services);
             return true;
         } catch (RuntimeException exc) {
             return false;

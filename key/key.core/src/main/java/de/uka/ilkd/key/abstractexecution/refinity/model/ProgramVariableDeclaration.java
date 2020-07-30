@@ -85,7 +85,7 @@ public class ProgramVariableDeclaration extends NullarySymbolDeclaration {
      * 
      * @param services The {@link Services} object whose namespaces to populate.
      */
-    public void checkAndRegister(final Services services) {
+    public void checkAndRegisterSave(final Services services) {
         final Sort sort = services.getNamespaces().sorts().lookup(getTypeName());
 
         if (sort == null) {
@@ -101,6 +101,31 @@ public class ProgramVariableDeclaration extends NullarySymbolDeclaration {
 
         services.getNamespaces().programVariables().add(new LocationVariableBuilder(
                 new ProgramElementName(getVarName()), services.getJavaInfo().getKeYJavaType(sort)).create());
+    }
+
+    /**
+     * Adds a program variable symbol corresponding to this
+     * {@link ProgramVariableDeclaration} to the {@link Services} object
+     * 
+     * @param services The {@link Services} object whose namespaces to populate.
+     * @return true iff successful.
+     */
+    public boolean registerIfUnknown(final Services services) {
+        final Sort sort = services.getNamespaces().sorts().lookup(getTypeName());
+
+        if (sort == null) {
+            throw new RuntimeException("Sort \"" + getTypeName() + "\" is not known");
+        }
+
+        final Name name = new Name(getVarName());
+
+        if (services.getNamespaces().lookup(name) == null) {
+            services.getNamespaces().programVariables().add(new LocationVariable(
+                    new ProgramElementName(getVarName()), services.getJavaInfo().getKeYJavaType(sort)));
+            return true;
+        }
+
+        return false;
     }
 
     public static Optional<ProgramVariableDeclaration> fromString(final String str)

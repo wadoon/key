@@ -306,7 +306,7 @@ public class RelationalProofBundleConverter {
         model.getProgramVariableDeclarations().stream()
                 .map(pvDecl -> new ProgramVariableDeclaration(pvDecl.getTypeName(),
                         "_" + pvDecl.getVarName()))
-                .forEach(pvDecl -> pvDecl.checkAndRegister(services));
+                .forEach(pvDecl -> pvDecl.checkAndRegisterSave(services));
 
         model.fillNamespacesFromModel(services);
     }

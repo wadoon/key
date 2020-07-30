@@ -328,7 +328,7 @@ public class AERelationalModel {
      */
     public void fillNamespacesFromModel(final Services services) {
         getAbstractLocationSets().forEach(loc -> loc.checkAndRegister(services));
-        getProgramVariableDeclarations().forEach(pv -> pv.checkAndRegister(services));
+        getProgramVariableDeclarations().forEach(pv -> pv.checkAndRegisterSave(services));
         getPredicateDeclarations().forEach(pred -> pred.checkAndRegister(services));
         getFunctionDeclarations().forEach(pred -> pred.checkAndRegister(services));
     }

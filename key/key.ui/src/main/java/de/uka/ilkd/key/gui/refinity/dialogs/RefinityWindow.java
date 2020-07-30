@@ -1280,7 +1280,7 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
                     } else {
                         // add again
                         try {
-                            selectedElem.checkAndRegister(services);
+                            selectedElem.checkAndRegisterSave(services);
                         } catch (RuntimeException exc) {
                         }
                     }

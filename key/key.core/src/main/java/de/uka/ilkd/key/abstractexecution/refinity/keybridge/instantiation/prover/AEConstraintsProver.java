@@ -12,22 +12,12 @@
 //
 package de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover;
 
-import java.util.Map;
+import org.antlr.runtime.RecognitionException;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.proginst.AbstractProgramInstantiator;
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.resultobjects.ProofResult;
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.resultobjects.RetrieveProgramResult;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
-import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
  * Proves that specified <tt>ae_constraint</tt>s are satisfied.
@@ -49,14 +39,13 @@ public class AEConstraintsProver implements InstantiationAspectProver {
 
     @Override
     public ProofResult prove(final AEInstantiationModel model) {
-        final RetrieveProgramResult retrProgRes = helper.retrieveProgram(model, model.getProgram());
-        final JavaProgramElement abstractProgram = retrProgRes.getProgram();
-        final GoalLocalSpecificationRepository localSpecRepo = retrProgRes.getLocalSpecRepo();
-        final Services services = retrProgRes.getServices();
-        
-        // instantiate APEs
-        final InstantiateAPEsVisitor instAPEsVisitor = new InstantiateAPEsVisitor(abstractProgram, true,
-                localSpecRepo, services);
+        final AbstractProgramInstantiator instantiator = new AbstractProgramInstantiator(model, helper);
+        try {
+            final String instProg = instantiator.instantiate();
+        } catch (RecognitionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         return ProofResult.EMPTY;
     }
@@ -69,34 +58,6 @@ public class AEConstraintsProver implements InstantiationAspectProver {
     @Override
     public String proofObjective() {
         return "validity of instantiated assumptions";
-    }
-    
-    private Map<AbstractProgramElement, JavaProgramElement> apeInsts(final AEInstantiationModel model) {
-        final Map<AbstractProgramElement, JavaProgramElement> result = new LinkedHashMap<>();
-        
-        
-        
-        return result;
-    }
-
-    private static class InstantiateAPEsVisitor extends CreatingASTVisitor {
-        public InstantiateAPEsVisitor(ProgramElement root, boolean preservesPos,
-                GoalLocalSpecificationRepository localSpecRepo, Services services) {
-            super(root, preservesPos, localSpecRepo, services);
-        }
-
-        @Override
-        public void performActionOnAbstractStatement(AbstractStatement x) {
-            DefaultAction def = new DefaultAction(x) {
-                @Override
-                protected ProgramElement createNewElement(ExtList changeList) {
-                    AbstractStatement newAbstrStmt = new AbstractStatement(changeList);
-                    performActionOnAbstractProgramElementContract(x, newAbstrStmt);
-                    return newAbstrStmt;
-                }
-            };
-            def.doAction(x);
-        }
     }
 
 }

@@ -95,7 +95,7 @@ public class FunctionInstantiation {
      * @throws RuntimeException If the name is already present or some sort not
      * known.
      */
-    public void checkAndRegister(final Services services) {
+    public void checkAndRegisterSave(final Services services) {
         assert declaration != null;
         assert instantiation != null;
         assert instArgSorts != null;
@@ -128,6 +128,49 @@ public class FunctionInstantiation {
 
         namespaces.functions()
                 .add(new Function(new Name(funcName), targetSort, sorts.toArray(new Sort[0])));
+    }
+
+    /**
+     * Adds a function symbol corresponding to this {@link FuncOrPredDecl} to the
+     * {@link Services} object if not already present.
+     * 
+     * @param services The {@link Services} object whose namespaces to populate.
+     * @throws RuntimeException If some sort not known.
+     * @return true iff successful.
+     */
+    public boolean registerIfUnknown(final Services services) {
+        assert declaration != null;
+        assert instantiation != null;
+        assert instArgSorts != null;
+        assert resultSort != null;
+
+        final NamespaceSet namespaces = services.getNamespaces();
+
+        final List<Sort> sorts = //
+                getInstArgSorts().stream().map(namespaces.sorts()::lookup)
+                        .collect(Collectors.toList());
+
+        for (int i = 0; i < sorts.size(); i++) {
+            if (sorts.get(i) == null) {
+                throw new RuntimeException("The sort " + getInstArgSorts().get(i) + " is unknown.",
+                        null);
+            }
+        }
+
+        final String funcName = declaration.getFuncName();
+
+        final Sort targetSort = namespaces.sorts().lookup(resultSort);
+        if (targetSort == null) {
+            throw new RuntimeException("The sort " + resultSort + " is unknown.", null);
+        }
+
+        if (namespaces.functions().lookup(funcName) == null) {
+            namespaces.functions()
+                    .add(new Function(new Name(funcName), targetSort, sorts.toArray(new Sort[0])));
+            return true;
+        }
+
+        return false;
     }
 
     public String toDeclarationString() {

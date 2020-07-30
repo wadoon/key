@@ -71,7 +71,7 @@ import recoder.ModelException;
  */
 public class KeyBridgeUtils {
     // AE Keywords
-    private static final String AE_CONSTRAINT = "ae_constraint";
+    public static final String AE_CONSTRAINT = "ae_constraint";
 
     // Special Keywords
     private static final String RESULT = "result";
@@ -264,15 +264,15 @@ public class KeyBridgeUtils {
 
     public static String dlPrefixRigidModelElements(final List<FunctionDeclaration> locsets,
             final List<PredicateDeclaration> preds, final List<FunctionDeclaration> funcs,
-            String result) {
-        result = locsets.stream().map(FunctionDeclaration::getFuncName)
-                .collect(KeyBridgeUtils.DL_PREFIX_FOLD.apply(result));
-        result = funcs.stream().map(FunctionDeclaration::getFuncName)
-                .collect(KeyBridgeUtils.DL_PREFIX_FOLD.apply(result));
-        result = preds.stream().map(PredicateDeclaration::getPredName)
-                .collect(KeyBridgeUtils.DL_PREFIX_FOLD.apply(result));
+            String termStr) {
+        termStr = locsets.stream().map(FunctionDeclaration::getFuncName)
+                .collect(KeyBridgeUtils.DL_PREFIX_FOLD.apply(termStr));
+        termStr = funcs.stream().map(FunctionDeclaration::getFuncName)
+                .collect(KeyBridgeUtils.DL_PREFIX_FOLD.apply(termStr));
+        termStr = preds.stream().map(PredicateDeclaration::getPredName)
+                .collect(KeyBridgeUtils.DL_PREFIX_FOLD.apply(termStr));
 
-        return result;
+        return termStr;
     }
 
     public static KeYJavaType dummyKJT() {

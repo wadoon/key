@@ -84,7 +84,7 @@ public class PredicateInstantiation {
      * @throws RuntimeException If the name is already present or some sort not
      * known.
      */
-    public void checkAndRegister(final Services services) {
+    public void checkAndRegisterSave(final Services services) {
         final NamespaceSet namespaces = services.getNamespaces();
 
         final List<Sort> sorts = //
@@ -107,7 +107,39 @@ public class PredicateInstantiation {
 
         namespaces.functions()
                 .add(new Function(new Name(predName), Sort.FORMULA, sorts.toArray(new Sort[0])));
+    }
 
+    /**
+     * Adds a function symbol corresponding to this {@link FuncOrPredDecl} to the
+     * {@link Services} object if not already present.
+     * 
+     * @param services The {@link Services} object whose namespaces to populate.
+     * @throws RuntimeException If some sort not known.
+     * @return true iff successful.
+     */
+    public boolean registerIfUnknown(final Services services) {
+        final NamespaceSet namespaces = services.getNamespaces();
+
+        final List<Sort> sorts = //
+                getInstArgSorts().stream().map(namespaces.sorts()::lookup)
+                        .collect(Collectors.toList());
+
+        for (int i = 0; i < sorts.size(); i++) {
+            if (sorts.get(i) == null) {
+                throw new RuntimeException("The sort " + getInstArgSorts().get(i) + " is unknown.",
+                        null);
+            }
+        }
+
+        final String predName = declaration.getPredName();
+
+        if (namespaces.functions().lookup(predName) == null) {
+            namespaces.functions().add(
+                    new Function(new Name(predName), Sort.FORMULA, sorts.toArray(new Sort[0])));
+            return true;
+        }
+
+        return false;
     }
 
     public String toDeclarationString() {
