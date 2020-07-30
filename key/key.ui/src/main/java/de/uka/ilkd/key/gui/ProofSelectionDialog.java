@@ -1,8 +1,9 @@
 package de.uka.ilkd.key.gui;
 
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -14,7 +15,19 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.TitledBorder;
 
 /**
  * This dialog allows the user to select the proof to load from a proof bundle.
@@ -60,11 +73,11 @@ public final class ProofSelectionDialog extends JDialog {
      * @param bundlePath the path of the proof bundle to load
      * @throws IOException if the proof bundle can not be read
      */
-    private ProofSelectionDialog(Path bundlePath) throws IOException {
+    private ProofSelectionDialog(final List<Path> proofs) throws IOException {
         super(MainWindow.getInstance(), "Choose proof to load", true);
 
         // create and fill list with proofs available for loading
-        JList<Path> list = createAndFillList(bundlePath);
+        JList<Path> list = createAndFillList(proofs);
 
         // create scroll pane with list
         JScrollPane scrollPane = new JScrollPane(list);
@@ -111,6 +124,16 @@ public final class ProofSelectionDialog extends JDialog {
         setMinimumSize(new Dimension(300, 200));
         pack();
     }
+    
+    private static List<Path> getProofs(final Path bundlePath) throws ZipException, IOException {
+        try (ZipFile bundle = new ZipFile(bundlePath.toFile())) {
+
+            // create a list of all *.proof files (only top level in bundle)
+            return bundle.stream().filter(e -> !e.isDirectory())
+                    .filter(e -> e.getName().endsWith(".proof")).map(e -> Paths.get(e.getName()))
+                    .collect(Collectors.toList());
+        }
+    }
 
     /**
      * Creates a JList and fills it with the proofs found in the bundle.
@@ -118,17 +141,7 @@ public final class ProofSelectionDialog extends JDialog {
      * @return the created JList
      * @throws IOException if the proof bundle can not be read
      */
-    private JList<Path> createAndFillList(Path bundlePath) throws IOException {
-        // read zip
-        ZipFile bundle = new ZipFile(bundlePath.toFile());
-
-        // create a list of all *.proof files (only top level in bundle)
-        List<Path> proofs = bundle.stream()
-            .filter(e -> !e.isDirectory())
-            .filter(e -> e.getName().endsWith(".proof"))
-            .map(e -> Paths.get(e.getName()))
-            .collect(Collectors.toList());
-
+    private JList<Path> createAndFillList(final List<Path> proofs) throws IOException {
         // show the list in a JList
         DefaultListModel<Path> model = new DefaultListModel<>();
         for (Path p : proofs) {
@@ -207,7 +220,13 @@ public final class ProofSelectionDialog extends JDialog {
     private static Path showDialog(Path bundlePath) {
         Path proofPath = null;
         try {
-            ProofSelectionDialog dialog = new ProofSelectionDialog(bundlePath);
+            final List<Path> proofs = getProofs(bundlePath);
+            
+            if (proofs.size() == 1) {
+                return proofs.get(0);
+            }
+            
+            ProofSelectionDialog dialog = new ProofSelectionDialog(proofs);
             dialog.setLocationRelativeTo(MainWindow.getInstance()); // center dialog
             dialog.setVisible(true);
             proofPath = dialog.proofToLoad;
