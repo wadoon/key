@@ -40,6 +40,8 @@ import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalM
  * @author Dominic Steinhoefel
  */
 public class Main {
+    private static final String SCHEMA_FILE_PATH = "/de/uka/ilkd/key/refinity/instantiation/schema2.xsd";
+
     @Parameter
     private List<String> parameters = new ArrayList<>();
 
@@ -76,57 +78,6 @@ public class Main {
             "-printschema" }, description = "If set, prints the XML schema for *.aei files and exists.")
     private boolean printSchemaFile = false;
 
-    public static void main(String... argv) {
-        Main main = new Main();
-        final JCommander jcommander = JCommander.newBuilder().addObject(main).build();
-        jcommander.parse(argv);
-        main.run(jcommander);
-    }
-
-    private void run(final JCommander jcommander) {
-        if (help) {
-            jcommander.usage();
-            System.exit(0);
-        }
-
-        if (printSchemaFile) {
-            printSchema();
-            System.exit(0);
-            return;
-        }
-
-        if (inputFile == null) {
-            System.err.println("You have to specify an input file (-file).");
-            jcommander.usage();
-            System.exit(1);
-            return;
-        }
-
-        final Path file = Paths.get(inputFile);
-
-        if (convertAERModel) {
-            convertRelationalModel(file);
-        } else {
-            proofInstantiationModel(file);
-        }
-
-        System.exit(0);
-    }
-
-    private void printSchema() {
-        try {
-            final Path schemaFilePath = FindResources
-                    .getResource("/de/uka/ilkd/key/refinity/instantiation/schema2.xsd", Main.class);
-            byte[] encoded = Files.readAllBytes(schemaFilePath);
-            System.out.println(new String(encoded, StandardCharsets.UTF_8));
-        } catch (URISyntaxException | IOException e) {
-            System.err.printf("Problem while trying to access schema file resouce (%s): %s%n",
-                    e.getClass().getName(), e.getMessage());
-            System.exit(1);
-            return;
-        }
-    }
-
     private void convertRelationalModel(final Path file) {
         if (!AERelationalModel.fileHasAEModelEnding(file.toFile())) {
             System.err.printf("No *.aer file: %s%n", file.getFileName());
@@ -151,6 +102,19 @@ public class Main {
             instModel.saveToFile(outfile.toFile());
         } catch (IOException | JAXBException e) {
             System.err.printf("Problem saving AE Instantiation Model (%s): %s%n",
+                    e.getClass().getName(), e.getMessage());
+            System.exit(1);
+            return;
+        }
+    }
+
+    private void printSchema() {
+        try {
+            final Path schemaFilePath = FindResources.getResource(SCHEMA_FILE_PATH, Main.class);
+            byte[] encoded = Files.readAllBytes(schemaFilePath);
+            System.out.println(new String(encoded, StandardCharsets.UTF_8));
+        } catch (URISyntaxException | IOException e) {
+            System.err.printf("Problem while trying to access schema file resouce (%s): %s%n",
                     e.getClass().getName(), e.getMessage());
             System.exit(1);
             return;
@@ -197,6 +161,43 @@ public class Main {
                 System.exit(1);
             }
         }
+    }
+
+    private void run(final JCommander jcommander) {
+        if (help) {
+            jcommander.usage();
+            System.exit(0);
+        }
+
+        if (printSchemaFile) {
+            printSchema();
+            System.exit(0);
+            return;
+        }
+
+        if (inputFile == null) {
+            System.err.println("You have to specify an input file (-file).");
+            jcommander.usage();
+            System.exit(1);
+            return;
+        }
+
+        final Path file = Paths.get(inputFile);
+
+        if (convertAERModel) {
+            convertRelationalModel(file);
+        } else {
+            proofInstantiationModel(file);
+        }
+
+        System.exit(0);
+    }
+
+    public static void main(String... argv) {
+        Main main = new Main();
+        final JCommander jcommander = JCommander.newBuilder().addObject(main).build();
+        jcommander.parse(argv);
+        main.run(jcommander);
     }
 
 }
