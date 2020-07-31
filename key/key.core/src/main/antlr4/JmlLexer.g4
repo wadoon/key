@@ -2,8 +2,9 @@
 lexer grammar JmlLexer;
 
 @header {
-    import de.uka.ilkd.key.util.Debug;
-    import java.util.regex.*;
+import java.util.Collection;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 }
 
 @members{
@@ -22,6 +23,11 @@ lexer grammar JmlLexer;
    boolean semicolonOnToplevel() { return bracketLevel==0 && bracesLevel == 0 && parenthesisLevel==0; }
 
 
+    Pattern keyForbidden = Pattern.compile("-key($|[+-])");
+    public void setCommentMarkers(Collection<String> str) {
+    		String p = "(" + str.stream().collect(Collectors.joining("|")) + ")($|[+-])";
+    		keyForbidden = Pattern.compile(p);
+    }
 
 
     /**
@@ -53,7 +59,6 @@ lexer grammar JmlLexer;
             while (true) {
                 final char point = (char) _input.LA(1);
                 if (point == '@') {//comment closed
-                    Pattern keyForbidden = Pattern.compile("-key($|[+-])");
                     return keyForbidden.matcher(markers.toString()).find();
                 } else if (Character.isJavaIdentifierPart(point) || point == '-' || point == '+') {
                     markers.append(point);
