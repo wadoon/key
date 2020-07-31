@@ -70,11 +70,11 @@ public class RelationalProofBundleConverter {
     // Special Keywords
     private static final String RESULT_1 = "\\result_1";
     private static final String RESULT_2 = "\\result_2";
-    private static final String RESULT = "_result";
+    private static final String RESULT = "result";
 
     public static final String RES1 = "_res1";
     public static final String RES2 = "_res2";
-    public static final String EXC = "_exc";
+    public static final String EXC = "exc";
 
     private final AERelationalModel model;
     private final Optional<String> proofString;
