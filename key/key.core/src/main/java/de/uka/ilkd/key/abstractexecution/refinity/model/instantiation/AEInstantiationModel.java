@@ -308,7 +308,7 @@ public class AEInstantiationModel {
      * @return An {@link AEInstantiationModel} iff the file could be verified to be
      * an {@link AEInstantiationModel} file, otherwise an empty {@link Optional}.
      */
-    public static Optional<AEInstantiationModel> isRelationalModelFile(File file) {
+    public static Optional<AEInstantiationModel> isAEInstantiationFile(File file) {
         if (!fileHasAEModelEnding(file)) {
             return Optional.empty();
         }

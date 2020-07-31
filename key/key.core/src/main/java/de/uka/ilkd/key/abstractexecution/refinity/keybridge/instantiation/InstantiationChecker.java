@@ -56,13 +56,22 @@ public class InstantiationChecker {
     private final AEInstantiationModel model;
     /* non-final */ ProofResult result;
 
-    public InstantiationChecker(final AEInstantiationModel instModel) throws IOException {
-        this.model = instModel;
-    }
+    /**
+     * Verbosity: 0 for totally silent, 1 for basic status information, 2 for
+     * detailed status information, 4 for debug information. Currently, 2/4 are not
+     * implemented/considered.
+     */
+    private int verbosity = 0;
 
     ////////////// Public Static Functions ////////////// 
 
     ////////////// Public Member Functions //////////////
+
+    public InstantiationChecker(final AEInstantiationModel instModel) throws IOException {
+        this.model = instModel;
+    }
+
+    ////////////// Private Member Functions //////////////
 
     /**
      * Tries to prove the instantiation correct with separate proof obligations for
@@ -76,8 +85,8 @@ public class InstantiationChecker {
      * synchronized statement in {@link ProblemInitializer#prepare(EnvInput)}
      * @return A combined {@link ProofResult} for all of the aspect proofs.
      */
-    public ProofResult proveInstantiation(final boolean printOutput, boolean parallel) {
-        this.printOutput = printOutput;
+    public ProofResult proveInstantiation(final int verbosity, boolean parallel) {
+        this.verbosity = verbosity;
         this.result = ProofResult.EMPTY;
 
         final Supplier<Profile> profile = () -> parallel ? new JavaProfile()
@@ -155,37 +164,10 @@ public class InstantiationChecker {
 
         // TODO:
         // - Consistent instantiations of APEs w/ same IDs
-        
+
         // [ - NOTE (DS, 2020-07-16): Labeled continue / break omitted, spec case not yet supported. ]
 
         return result;
-    }
-
-    ////////////// Private Member Functions //////////////
-
-    private void printIndividualProofResultStats(final ProofResult proofResult,
-            String proofObjective) {
-        if (printOutput) {
-            if (proofResult.isSuccess()) {
-                println("Successfully proved " + proofObjective + ".");
-            } else {
-                err("Could not prove " + proofObjective + ".");
-            }
-        }
-    }
-
-    private boolean printOutput = true;
-
-    /**
-     * Prints the given string to System.out (w/ newline) if the field
-     * {@link #printOutput} is set to true.
-     * 
-     * @param str The string to (conditionally) print.
-     */
-    private void println(final String str) {
-        if (printOutput) {
-            System.out.println(str);
-        }
     }
 
     /**
@@ -195,8 +177,31 @@ public class InstantiationChecker {
      * @param str The string to (conditionally) print.
      */
     private void err(final String str) {
-        if (printOutput) {
+        if (verbosity > 0) {
             System.err.println(str);
+        }
+    }
+
+    private void printIndividualProofResultStats(final ProofResult proofResult,
+            String proofObjective) {
+        if (verbosity > 0) {
+            if (proofResult.isSuccess()) {
+                println("Successfully proved " + proofObjective + ".");
+            } else {
+                err("Could not prove " + proofObjective + ".");
+            }
+        }
+    }
+
+    /**
+     * Prints the given string to System.out (w/ newline) if the field
+     * {@link #printOutput} is set to true.
+     * 
+     * @param str The string to (conditionally) print.
+     */
+    private void println(final String str) {
+        if (verbosity > 0) {
+            System.out.println(str);
         }
     }
 
@@ -215,7 +220,7 @@ public class InstantiationChecker {
         long startTime = System.currentTimeMillis();
 
         final InstantiationChecker checker = new InstantiationChecker(instModel);
-        final ProofResult result = checker.proveInstantiation(true, false);
+        final ProofResult result = checker.proveInstantiation(1, false);
 
         long endTime = System.currentTimeMillis();
         double durationSecs = (double) (endTime - startTime) / (double) 1000;
