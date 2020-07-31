@@ -59,13 +59,11 @@ public class AbstractProgramInstantiator {
             if (segment instanceof AEConstraintSegment) {
                 final AEConstraintSegment constrSeg = (AEConstraintSegment) segment;
 
-                final String prefixedTerm = KeyBridgeUtils
-                        .dlPrefixRigidModelElements(model.getAbstractLocationSets(),
+                final String prefixedTerm = prefixSpecialConstructsForJML(
+                        KeyBridgeUtils.dlPrefixRigidModelElements(model.getAbstractLocationSets(),
                                 model.getPredicateDeclarations(), model.getFunctionDeclarations(),
                                 helper.substituteLocsetValueInstsInString(
-                                        constrSeg.getFormulaContent(), model))
-                        .replaceAll("([^\\\\])singletonPV\\b", "$1\\\\dl_singletonPV")
-                        .replaceAll("\\bPV\\b", Matcher.quoteReplacement("\\dl_PV"));
+                                        constrSeg.getFormulaContent(), model)));
 
                 /* non-final */ Term instTerm = KeyBridgeUtils.jmlStringToJavaDLTerm(prefixedTerm,
                         KeyBridgeUtils.dummyKJT(),
@@ -77,12 +75,10 @@ public class AbstractProgramInstantiator {
                         services);
 
                 instTerm = helper.instantiateTerm(instTerm, model, services);
-                
-                // TODO: Translate the term to a JML representation, easiest by prefixing all functions with "\dl_".
-                //       Also, pretty-print to get rid of the Z terms.
 
-                progSb.append("//@ assert ").append(KeyBridgeUtils.termToString(instTerm, services))
-                        .append(";\n{ ; }\n");
+                final String instantiatedJMLFormula = JMLLogicPrinter.printTerm(instTerm, services);
+
+                progSb.append("//@ assert ").append(instantiatedJMLFormula).append(";\n{ ; }\n");
             } else if (segment instanceof AbstractStatementProgramSegment) {
                 final AbstractStatementProgramSegment asSeg = (AbstractStatementProgramSegment) segment;
                 final Optional<APEInstantiation> maybeInst = model.getApeInstantiations().stream()
@@ -98,6 +94,11 @@ public class AbstractProgramInstantiator {
         }
 
         return progSb.toString();
+    }
+
+    private static String prefixSpecialConstructsForJML(final String javaDLTerm) {
+        return javaDLTerm.replaceAll("([^\\\\])singletonPV\\b", "$1\\\\dl_singletonPV")
+                .replaceAll("\\bPV\\b", Matcher.quoteReplacement("\\dl_PV"));
     }
 
 }

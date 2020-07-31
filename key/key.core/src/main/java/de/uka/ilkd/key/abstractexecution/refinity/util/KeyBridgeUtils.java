@@ -398,6 +398,10 @@ public class KeyBridgeUtils {
         return LogicPrinter.quickPrintTerm(t, services, false, false);
     }
 
+    public static String termToStringPretty(final Term t, final Services services) {
+        return LogicPrinter.quickPrintTerm(t, services, true, false);
+    }
+
     /////////////// PRIVATE METHODS ///////////////
 
     public static String addBlocksAfterConstraints(final String javaCode) {
