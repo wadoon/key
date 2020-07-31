@@ -3,6 +3,7 @@ lexer grammar JmlLexer;
 
 @header {
     import de.uka.ilkd.key.util.Debug;
+    import java.util.regex.*;
 }
 
 @members{
@@ -19,6 +20,54 @@ lexer grammar JmlLexer;
    private void decrBracket() { bracketLevel--;}
 
    boolean semicolonOnToplevel() { return bracketLevel==0 && bracesLevel == 0 && parenthesisLevel==0; }
+
+
+
+
+    /**
+     * Lookahead for determining we are at the start of comment and not a "JML starter".
+     * <p>
+     * This method returns true iff we are currently at
+     * - "// "
+     * - "// @"
+     * - "//+"
+     * - "//-"
+     * - "//-key+openjml@"
+     * For a given starter: "//".
+     * <p>
+     * This method resets the position on the input stream (mark/rewind).
+     */
+    private boolean isComment(String starter) {
+        int mark = _input.mark();
+        int startPos = _input.index(); //store position for rewinding
+        try {
+            for (int i = 0; i < starter.length(); i++) {
+                if (_input.LA(1) == starter.charAt(i)) {
+                    _input.consume();
+                } else {
+                    return false;
+                }
+            }
+
+            StringBuilder markers = new StringBuilder();
+            while (true) {
+                final char point = (char) _input.LA(1);
+                if (point == '@') {//comment closed
+                    Pattern keyForbidden = Pattern.compile("-key($|[+-])");
+                    return keyForbidden.matcher(markers.toString()).find();
+                } else if (Character.isJavaIdentifierPart(point) || point == '-' || point == '+') {
+                    markers.append(point);
+                    _input.consume();
+                } else {
+                    return true;
+                }
+            }
+        } finally {
+            _input.seek(startPos);
+            _input.release(mark);
+        }
+    }
+
 }
 
 tokens {BODY, COMMENT, STRING_LITERAL}
@@ -128,14 +177,8 @@ WHEN: 'when' Pred -> pushMode(expr);
 WORKING_SPACE: 'working_space' Pred -> pushMode(expr);
 WRITABLE: 'writable' -> pushMode(expr);
 
-JML_SL_START: '//@' -> channel(HIDDEN);
-JML_ML_START: '/*@' -> channel(HIDDEN);
 JML_ML_END: '*/' -> channel(HIDDEN);
-SL_COMMENT: ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> channel(HIDDEN);
 WS: (' ' | '\t' | '\n' | '\r' | '@')+ -> channel(HIDDEN);
-
-ML_COMMENT: '/*' -> more, pushMode(mlComment);
-
 NEST_START: '{|' ;
 NEST_END: '|}' ;
 SEMICOLON : ';' -> type(SEMI_TOPLEVEL);
@@ -144,9 +187,14 @@ C_EQUAL: '=' -> type(EQUAL_SINGLE);
 C_LPAREN: '(' -> type(LPAREN);
 C_RPAREN: ')' -> type(RPAREN);
 C_STRING_LITERAL: '"' -> pushMode(string), more;
-
 C_IDENT: '\\'? LETTER (LETTERORDIGIT)* -> type(IDENT);
-E_COLON: ':' -> type(COLON);
+C_COLON: ':' -> type(COLON);
+
+SL_COMMENT: {isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> channel(HIDDEN);
+ML_COMMENT: {isComment("/*")}? '/*' -> more, pushMode(mlComment);
+
+JML_SL_START: '//' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
+JML_ML_START: '/*' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
 
 ERROR_CHAR: .;
 
@@ -290,6 +338,13 @@ WORKINGSPACE: '\\working_space';
 // ONLY_CALLED: '\\only_called';
 // ONLY_CAPTURED: '\\only_captured';
 
+
+E_JML_SL_START: '//@' -> type(JML_SL_START), channel(HIDDEN);
+E_JML_ML_START: '/*@' -> type(JML_ML_START), channel(HIDDEN);
+E_JML_ML_END: '*/' -> channel(HIDDEN);
+E_SL_COMMENT: {isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> type(COMMENT), channel(HIDDEN);
+E_ML_COMMENT: {isComment("/*")}? '/*' -> more, pushMode(mlComment);
+
 AND: '&';
 BITWISENOT: '~';
 COLON: ':';
@@ -393,10 +448,6 @@ STRING_LITERAL: '"' -> pushMode(string),more;
 E_WS: [ \t\n\r\u000c@]+ -> channel(HIDDEN), type(WS);
 INFORMAL_DESCRIPTION: '(*'  ( '*' ~')' | ~'*' )* '*)';
 
-E_JML_SL_START: '//@' -> channel(HIDDEN);
-E_JML_ML_START: '/*@' -> channel(HIDDEN);
-E_JML_ML_END: '*/' -> channel(HIDDEN);
-E_SL_COMMENT: '//' ~[@] ~('\n'|'\r')* -> channel(HIDDEN), type(SL_COMMENT);
 DOC_COMMENT: '/**' -> pushMode(mlComment);
 fragment PRAGMA: '\\nowarn';
 

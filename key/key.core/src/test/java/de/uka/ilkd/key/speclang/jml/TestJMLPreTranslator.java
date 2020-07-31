@@ -14,15 +14,18 @@
 package de.uka.ilkd.key.speclang.jml;
 
 import de.uka.ilkd.key.njml.JmlFacade;
+import de.uka.ilkd.key.njml.JmlLexer;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import junit.framework.TestCase;
+import org.antlr.v4.runtime.Token;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.key_project.util.collection.ImmutableList;
 
+import static de.uka.ilkd.key.njml.JmlLexer.*;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertSame;
 import static org.junit.Assert.*;
@@ -32,6 +35,66 @@ public class TestJMLPreTranslator {
     private ImmutableList<TextualJMLConstruct> parseMethodSpec(String ms) throws SLTranslationException {
         return JmlFacade.parseClasslevel(ms);
     }
+
+    //region lexing
+    @Test
+    public void testLexer1() {
+        String in = "/*@ normal_behavior\n"
+                + "     requires true;\n"
+                + "  */";
+        lex(in, JML_ML_START, WS, NORMAL_BEHAVIOR, WS, REQUIRES);
+    }
+
+    @Test
+    public void testLexer2() {
+        lex("ensures //-key@ this should be ignored\n" +
+                        "true;",
+                ENSURES, WS, COMMENT, WS, TRUE, SEMI_TOPLEVEL, EOF);
+    }
+
+    @Test
+    public void testLexer3() {
+        lex("ensures      /*-key@ this should be ignored */ true;",
+                ENSURES, WS, COMMENT, WS, TRUE, SEMI_TOPLEVEL, EOF);
+    }
+
+    @Test
+    public void testLexer4() {
+        lex("/*-openjml@ ensures true; */",
+                JML_ML_START, WS, ENSURES, WS, TRUE, SEMI_TOPLEVEL, WS, JML_ML_END, EOF);
+    }
+
+    @Test
+    public void testLexer5() {
+        lex("/*@ pure */ /*@ ensures true;",
+                JML_ML_START, WS, PURE, WS, JML_ML_END, WS, JML_ML_START, WS, ENSURES, WS, TRUE, SEMI_TOPLEVEL, EOF);
+    }
+
+    @Test
+    public void testLexer6() {
+        lex("//@ normal_behaviour\n"
+                        + "//@  ensures false\n"
+                        + "//@          || true;\n"
+                        + "//@  assignable \\nothing;\n"
+                        + "//@ also exceptional_behaviour\n"
+                        + "//@  requires o == null;\n"
+                        + "//@  signals Exception;\n",
+                JML_SL_START, WS, NORMAL_BEHAVIOR, WS, JML_SL_START, WS, ENSURES, WS);
+    }
+
+    private void lex(String in, int... expected) {
+        JmlLexer lexer = JmlFacade.createLexer(in);
+        Token t;
+        int idx = 0;
+        do {
+            t = lexer.nextToken();
+            System.out.printf("%s\n", t);
+            if (idx < expected.length) {
+                assertEquals(expected[idx++], t.getType());
+            }
+        } while (t.getType() != -1);
+    }
+    //endregion
 
     @Test
     public void testSimpleSpec() throws SLTranslationException {
