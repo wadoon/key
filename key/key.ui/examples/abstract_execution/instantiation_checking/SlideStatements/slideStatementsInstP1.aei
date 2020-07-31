@@ -15,6 +15,7 @@
   @   \mutex(throwsExcA(\value(footprintA)), returnsB(\value(footprintB))) &amp;&amp;
   @
   @   (throwsExcA(\value(footprintA)) || returnsA(\value(footprintA)) ==&gt; \disjoint(frameB, relevant)) &amp;&amp;
+  @   (throwsExcA(\value(footprintA)) || returnsA(\value(footprintA)) ==&gt; \disjoint(hasToFrameB, relevant)) &amp;&amp;
   @   (throwsExcB(\value(footprintB)) || returnsB(\value(footprintB)) ==&gt; \disjoint(frameA, relevant));
   @*/
 
@@ -154,7 +155,7 @@
 	        <declaration predName="throwsExcB">
 	            <argSort>any</argSort>
 	        </declaration>
-            <instantiation>b = 0</instantiation>
+            <instantiation>false</instantiation>
 	        <instArgSort>int</instArgSort>
 	        <instArgSort>int</instArgSort>
 	        <instArgSort>int</instArgSort>
@@ -170,6 +171,15 @@
         </predicateInst>
     </predicateInstantiations>
     <functionInstantiations>
+        <functionInst>
+            <declaration funcName="relevant">
+                <relevantOne>-1</relevantOne>
+                <relevantTwo>-1</relevantTwo>
+                <resultSortName>LocSet</resultSortName>
+            </declaration>
+            <instantiation>union(singletonPV(PV(y)), singletonPV(PV(z)))</instantiation>
+            <resultSort>LocSet</resultSort>
+        </functionInst>
         <functionInst>
             <declaration funcName="frameA">
                 <relevantOne>-1</relevantOne>
@@ -217,11 +227,11 @@
         </functionInst>
     </functionInstantiations>
     <apeInstantiations>
-        <apeInst apeLineNumber="27">
+        <apeInst apeLineNumber="28">
             <instantiation>x = y++; z = w; if (w == 17) { return z; }</instantiation>
         </apeInst>
-        <apeInst apeLineNumber="35">
-            <instantiation>a = b/b + 17; int c = 2*d+a;</instantiation>
+        <apeInst apeLineNumber="36">
+            <instantiation>a = b + 17; int c = 2*d+a;</instantiation>
         </apeInst>
     </apeInstantiations>
 </ns2:aeInstantiationModel>

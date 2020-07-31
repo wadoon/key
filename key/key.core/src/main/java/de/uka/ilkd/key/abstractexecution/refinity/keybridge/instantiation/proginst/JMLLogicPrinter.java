@@ -32,6 +32,8 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
+import de.uka.ilkd.key.speclang.jml.translation.JMLTranslator;
+import de.uka.ilkd.key.speclang.jml.translation.JMLTranslator.JMLKeyWord;
 
 /**
  * Specialized {@link LogicPrinter} for printing JavaDL terms in JML syntax.
@@ -64,10 +66,11 @@ public final class JMLLogicPrinter extends SequentViewLogicPrinter {
         {
             final String opName = t.op().name().toString();
 
-            final String[] jmlKeywords = new String[] { //
-                    "disjoint", "intersect", "union", "value" };
+            final String[] specialJmlKeywords = new String[] { "value" };
 
-            if (Arrays.binarySearch(jmlKeywords, opName) >= 0) {
+            if (Arrays.binarySearch(specialJmlKeywords, opName) >= 0
+                    || Arrays.stream(JMLTranslator.JMLKeyWord.values()).map(JMLKeyWord::jmlName)
+                            .anyMatch(opName::equals)) {
                 name = "\\" + opName;
             } else {
                 name = "\\dl_" + opName;

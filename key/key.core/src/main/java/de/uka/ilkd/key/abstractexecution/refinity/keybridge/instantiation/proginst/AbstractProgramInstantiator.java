@@ -29,13 +29,16 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
- * Instantiates an abstract program.
+ * Instantiates an abstract program. Replaces ae_constraint by assert. The
+ * result again contains JML expressions.
  * 
  * @author Dominic Steinhoefel
  */
 public class AbstractProgramInstantiator {
     private final AEInstantiationModel model;
     private final InstantiationAspectProverHelper helper;
+    private int hasAEConstraints = -1;
+    private Services services = null;
 
     public AbstractProgramInstantiator(final AEInstantiationModel model,
             final InstantiationAspectProverHelper helper) {
@@ -45,7 +48,7 @@ public class AbstractProgramInstantiator {
 
     public String instantiate() throws RecognitionException {
         final RetrieveProgramResult retrRes = helper.retrieveProgram(model, model.getProgram());
-        final Services services = retrRes.getServices();
+        services = retrRes.getServices();
         model.fillNamespacesFromNewInstsUnsafe(services);
 
         final LightweightAbstractProgramParser parser = //
@@ -57,6 +60,8 @@ public class AbstractProgramInstantiator {
         final StringBuilder progSb = new StringBuilder();
         for (final ProgramSegment segment : segments) {
             if (segment instanceof AEConstraintSegment) {
+                hasAEConstraints = 1;
+
                 final AEConstraintSegment constrSeg = (AEConstraintSegment) segment;
 
                 final String prefixedTerm = prefixSpecialConstructsForJML(
@@ -78,7 +83,9 @@ public class AbstractProgramInstantiator {
 
                 final String instantiatedJMLFormula = JMLLogicPrinter.printTerm(instTerm, services);
 
-                progSb.append("//@ assert ").append(instantiatedJMLFormula).append(";\n{ ; }\n");
+                progSb.append("/*@ assert ")
+                        .append(instantiatedJMLFormula.trim().replace("\n", "  \n  @ "))
+                        .append("; */\n{ ; }\n");
             } else if (segment instanceof AbstractStatementProgramSegment) {
                 final AbstractStatementProgramSegment asSeg = (AbstractStatementProgramSegment) segment;
                 final Optional<APEInstantiation> maybeInst = model.getApeInstantiations().stream()
@@ -94,6 +101,33 @@ public class AbstractProgramInstantiator {
         }
 
         return progSb.toString();
+    }
+
+    /**
+     * @return true iff the parsed program has at least one ae_constraint block.
+     * @throws IllegalStateException if called before calling
+     * {@link #instantiate()}.
+     */
+    public boolean hasAEConstraints() {
+        if (hasAEConstraints < 0) {
+            throw new IllegalStateException(
+                    "Called hasAEConstraints() before calling instantiate()");
+        }
+
+        return hasAEConstraints > 0;
+    }
+
+    /**
+     * @return A services object filled with all symbols of the instantiation.
+     * @throws IllegalStateException if called before calling
+     * {@link #instantiate()}.
+     */
+    public Services getServices() {
+        if (services == null) {
+            throw new IllegalStateException("Called getServices() before calling instantiate()");
+        }
+
+        return services;
     }
 
     private static String prefixSpecialConstructsForJML(final String javaDLTerm) {

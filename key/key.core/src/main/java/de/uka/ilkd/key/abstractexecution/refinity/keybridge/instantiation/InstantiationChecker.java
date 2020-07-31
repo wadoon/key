@@ -27,7 +27,19 @@ import javax.xml.bind.JAXBException;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover.AEConstraintsProver;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover.BreaksSpecProver;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover.ConsistentInstantiationProver;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover.ContinuesSpecProver;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover.ExcSpecProver;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover.FootprintConditionProver;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover.FrameConditionProver;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover.HasToConditionProver;
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover.InstantiationAspectProver;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover.NormalCompletionSpecProver;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover.PrecMutualExclusionProver;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover.PredFuncInstsFootprintConformanceProver;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover.ReturnsSpecProver;
+import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.prover.TerminationProver;
 import de.uka.ilkd.key.abstractexecution.refinity.keybridge.instantiation.resultobjects.ProofResult;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -72,19 +84,19 @@ public class InstantiationChecker {
                 : JavaProfile.getDefaultInstance();
 
         final InstantiationAspectProver[] checkers = new InstantiationAspectProver[] {
-//                new FrameConditionProver(profile.get()), //
-//                new HasToConditionProver(profile.get()), //
-//                new FootprintConditionProver(profile.get()), //
-//                new NormalCompletionSpecProver(profile.get()), //
-//                new TerminationProver(profile.get()), //
-//                new ReturnsSpecProver(profile.get()), //
-//                new ExcSpecProver(profile.get()), //
-//                new BreaksSpecProver(profile.get()), //
-//                new ContinuesSpecProver(profile.get()), //
-//                new PrecMutualExclusionProver(profile.get()), //
-//                new PredFuncInstsFootprintConformanceProver(profile.get()), //
-//                new ConsistentInstantiationProver(profile.get()), // unimplemented
-                new AEConstraintsProver(profile.get()), // unimplemented
+                new FrameConditionProver(profile.get()), //
+                new HasToConditionProver(profile.get()), //
+                new FootprintConditionProver(profile.get()), //
+                new NormalCompletionSpecProver(profile.get()), //
+                new TerminationProver(profile.get()), //
+                new ReturnsSpecProver(profile.get()), //
+                new ExcSpecProver(profile.get()), //
+                new BreaksSpecProver(profile.get()), //
+                new ContinuesSpecProver(profile.get()), //
+                new PrecMutualExclusionProver(profile.get()), //
+                new PredFuncInstsFootprintConformanceProver(profile.get()), //
+                new ConsistentInstantiationProver(profile.get()), // unimplemented
+                new AEConstraintsProver(profile.get()), //
         };
 
         blParr: {
@@ -143,7 +155,6 @@ public class InstantiationChecker {
 
         // TODO:
         // - Consistent instantiations of APEs w/ same IDs
-        // - Constraints (assumptions) satisfied
         
         // [ - NOTE (DS, 2020-07-16): Labeled continue / break omitted, spec case not yet supported. ]
 

@@ -286,8 +286,13 @@ public class KeyBridgeUtils {
 
     public static String getFilenameForAPEProof(final String baseName, boolean closed,
             final APEInstantiation inst) {
-        return String.format("%s_APE_line_%d_%s.zproof", baseName.replaceAll("\\W+", "_"),
-                inst.getApeLineNumber(), closed ? "closed" : "failed");
+        return getFilenameForProof(
+                String.format("%s_APE_line_%d", baseName, inst.getApeLineNumber()), closed);
+    }
+
+    public static String getFilenameForProof(final String baseName, boolean closed) {
+        return String.format("%s_%s.zproof", baseName.replaceAll("\\W+", "_"),
+                closed ? "closed" : "failed");
     }
 
     public static String jmlStringToJavaDLString(String jmlString, final KeYJavaType dummyKJT,
