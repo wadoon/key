@@ -32,11 +32,11 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.IOUtil;
 
-import de.uka.ilkd.key.abstractexecution.refinity.keybridge.relational.RelationalProofBundleConverter;
 import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.APEInstantiation;
+import de.uka.ilkd.key.abstractexecution.refinity.relational.RelationalProofBundleConverter;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.KeYProgModelInfo;
 import de.uka.ilkd.key.java.Services;

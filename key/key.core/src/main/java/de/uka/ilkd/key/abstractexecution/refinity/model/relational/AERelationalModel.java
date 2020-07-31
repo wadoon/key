@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -273,6 +274,20 @@ public class AERelationalModel {
         jaxbUnmarshaller.setSchema(schema);
 
         return (AERelationalModel) jaxbUnmarshaller.unmarshal(new StringReader(xml));
+    }
+
+    /**
+     * Reads an {@link AERelationalModel} form the given path.
+     * 
+     * @param path The path from which to read.
+     * @return The parsed {@link AERelationalModel}.
+     * @throws JAXBException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public static AERelationalModel fromPath(final Path path)
+            throws JAXBException, SAXException, IOException {
+        return fromXml(Files.readAllLines(path).stream().collect(Collectors.joining("\n")));
     }
 
     /**
