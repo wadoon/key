@@ -30,7 +30,7 @@ public class JavaProfileWithDaisy extends JavaProfile {
         ImmutableList<BuiltInRule> result =
                 ImmutableSLList.<BuiltInRule>nil().
                         prepend(DaisyBoundsBuiltinRule.INSTANCE);
-        result.prepend(super.initBuiltInRules());
+        result = result.prepend(super.initBuiltInRules());
         return result;
     }
 }

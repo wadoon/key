@@ -112,6 +112,7 @@ public final class ProofInitServiceUtil {
             result.put(resolver.getProfileName(), resolver);
          }
          catch (ServiceConfigurationError e) {
+            e.printStackTrace();
             // Nothing to do, in case that a DefaultProfileResolver is not available. In such a case the corresponding Profile will not be available as well.
          }
       }

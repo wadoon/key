@@ -315,9 +315,15 @@ project(":key.core") {
 project("keyext.daisy") {
 
     apply plugin: 'scala'
+    apply plugin: 'application'
     dependencies {
         compile project(":key.core")
         compile files("$rootDir/keyext.daisy/lib/fatDaisy_2.11-0.1.jar")
+        runtime project(":key.ui")
+    }
+
+    application {
+        mainClassName = "de.uka.ilkd.key.core.Main"
     }
 }
 
