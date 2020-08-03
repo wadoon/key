@@ -69,6 +69,7 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         Services services = goal.proof().getServices();
         FloatLDT floatLDT = new FloatLDT(services);
+        if (pio == null) return false;
         Operator op = pio.subTerm().op();
         boolean res = (op == floatLDT.getJavaAdd()
                 || op == floatLDT.getJavaSub()
