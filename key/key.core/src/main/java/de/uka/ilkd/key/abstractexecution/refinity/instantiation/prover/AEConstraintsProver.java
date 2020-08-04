@@ -29,7 +29,6 @@ import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.Profile;
 
 /**
  * Proves that specified <tt>ae_constraint</tt>s are satisfied.
@@ -58,8 +57,8 @@ public class AEConstraintsProver implements InstantiationAspectProver {
                 .readResource(CONSTRAINTS_PROBLEM_FILE_SCAFFOLD);
     }
 
-    public AEConstraintsProver(final Profile profile) {
-        helper = new InstantiationAspectProverHelper(profile);
+    public AEConstraintsProver(final InstantiationAspectProverHelper helper) {
+        this.helper = helper;
         keyProveConstraintsScaffold = KeyBridgeUtils
                 .readResource(CONSTRAINTS_PROBLEM_FILE_SCAFFOLD);
     }

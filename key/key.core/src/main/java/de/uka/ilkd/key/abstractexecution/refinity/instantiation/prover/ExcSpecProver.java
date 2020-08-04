@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**
@@ -33,8 +32,8 @@ public class ExcSpecProver extends AbstractSpecProver implements InstantiationAs
         keyProveExcSpecScaffold = KeyBridgeUtils.readResource(EXC_SPEC_PROBLEM_FILE_SCAFFOLD);
     }
 
-    public ExcSpecProver(final Profile profile) {
-        super(profile);
+    public ExcSpecProver(final InstantiationAspectProverHelper helper) {
+        super(helper);
         keyProveExcSpecScaffold = KeyBridgeUtils.readResource(EXC_SPEC_PROBLEM_FILE_SCAFFOLD);
     }
 

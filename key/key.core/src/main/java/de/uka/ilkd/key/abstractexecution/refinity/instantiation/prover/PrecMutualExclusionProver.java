@@ -40,7 +40,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -57,8 +56,8 @@ public class PrecMutualExclusionProver implements InstantiationAspectProver {
         helper = new InstantiationAspectProverHelper();
     }
 
-    public PrecMutualExclusionProver(final Profile profile) {
-        helper = new InstantiationAspectProverHelper(profile);
+    public PrecMutualExclusionProver(final InstantiationAspectProverHelper helper) {
+        this.helper = helper;
     }
 
     @Override

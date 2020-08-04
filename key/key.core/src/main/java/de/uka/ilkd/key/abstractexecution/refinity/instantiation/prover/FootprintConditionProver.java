@@ -35,7 +35,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
 /**
@@ -68,9 +67,9 @@ public class FootprintConditionProver implements InstantiationAspectProver {
         helper = new InstantiationAspectProverHelper();
     }
 
-    public FootprintConditionProver(final Profile profile) {
+    public FootprintConditionProver(final InstantiationAspectProverHelper helper) {
         keyProveFootprintScaffold = KeyBridgeUtils.readResource(FOOTPRINT_PROBLEM_FILE_SCAFFOLD);
-        helper = new InstantiationAspectProverHelper(profile);
+        this.helper = helper;
     }
 
     @Override

@@ -30,7 +30,6 @@ import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.Profile;
 
 /**
  * @author Dominic Steinhoefel
@@ -59,9 +58,9 @@ public class FrameConditionProver implements InstantiationAspectProver {
         helper = new InstantiationAspectProverHelper();
     }
 
-    public FrameConditionProver(final Profile profile) {
+    public FrameConditionProver(final InstantiationAspectProverHelper helper) {
         keyProveFrameScaffold = KeyBridgeUtils.readResource(FRAME_PROBLEM_FILE_SCAFFOLD);
-        helper = new InstantiationAspectProverHelper(profile);
+        this.helper = helper;
     }
 
     @Override

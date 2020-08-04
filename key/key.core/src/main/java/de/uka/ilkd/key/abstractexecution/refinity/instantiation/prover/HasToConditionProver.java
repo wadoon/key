@@ -38,7 +38,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.util.MiscTools;
@@ -55,8 +54,8 @@ public class HasToConditionProver implements InstantiationAspectProver {
         helper = new InstantiationAspectProverHelper();
     }
 
-    public HasToConditionProver(final Profile profile) {
-        helper = new InstantiationAspectProverHelper(profile);
+    public HasToConditionProver(final InstantiationAspectProverHelper helper) {
+        this.helper = helper;
     }
 
     @Override

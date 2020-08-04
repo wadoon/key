@@ -33,7 +33,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**
@@ -67,8 +66,8 @@ public class NormalCompletionSpecProver implements InstantiationAspectProver {
                 .readResource(NORMAL_COMPLETION_SPEC_PROBLEM_FILE_SCAFFOLD);
     }
 
-    public NormalCompletionSpecProver(final Profile profile) {
-        helper = new InstantiationAspectProverHelper(profile);
+    public NormalCompletionSpecProver(final InstantiationAspectProverHelper helper) {
+        this.helper = helper;
         keyProveNormalCompletionSpecScaffold = KeyBridgeUtils
                 .readResource(NORMAL_COMPLETION_SPEC_PROBLEM_FILE_SCAFFOLD);
     }

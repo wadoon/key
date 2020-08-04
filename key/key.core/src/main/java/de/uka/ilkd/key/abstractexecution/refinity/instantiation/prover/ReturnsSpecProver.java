@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.uka.ilkd.key.abstractexecution.refinity.util.KeyBridgeUtils;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**
@@ -32,8 +31,8 @@ public class ReturnsSpecProver extends AbstractSpecProver implements Instantiati
         keyProveReturnsSpecScaffold = KeyBridgeUtils.readResource(KEY_PROVE_RETURNS_SPEC_SCAFFOLD);
     }
 
-    public ReturnsSpecProver(final Profile profile) {
-        super(profile);
+    public ReturnsSpecProver(final InstantiationAspectProverHelper helper) {
+        super(helper);
         keyProveReturnsSpecScaffold = KeyBridgeUtils.readResource(KEY_PROVE_RETURNS_SPEC_SCAFFOLD);
     }
 

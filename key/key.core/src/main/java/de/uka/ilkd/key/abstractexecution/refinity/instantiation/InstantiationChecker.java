@@ -25,6 +25,7 @@ import de.uka.ilkd.key.abstractexecution.refinity.instantiation.prover.Footprint
 import de.uka.ilkd.key.abstractexecution.refinity.instantiation.prover.FrameConditionProver;
 import de.uka.ilkd.key.abstractexecution.refinity.instantiation.prover.HasToConditionProver;
 import de.uka.ilkd.key.abstractexecution.refinity.instantiation.prover.InstantiationAspectProver;
+import de.uka.ilkd.key.abstractexecution.refinity.instantiation.prover.InstantiationAspectProverHelper;
 import de.uka.ilkd.key.abstractexecution.refinity.instantiation.prover.NormalCompletionSpecProver;
 import de.uka.ilkd.key.abstractexecution.refinity.instantiation.prover.PrecMutualExclusionProver;
 import de.uka.ilkd.key.abstractexecution.refinity.instantiation.prover.PredFuncInstsFootprintConformanceProver;
@@ -32,9 +33,7 @@ import de.uka.ilkd.key.abstractexecution.refinity.instantiation.prover.ReturnsSp
 import de.uka.ilkd.key.abstractexecution.refinity.instantiation.prover.TerminationProver;
 import de.uka.ilkd.key.abstractexecution.refinity.instantiation.resultobjects.ProofResult;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.EnvInput;
 
 /**
@@ -71,23 +70,26 @@ public class InstantiationChecker {
         this.verbosity = verbosity;
         this.result = ProofResult.EMPTY;
 
-        final Supplier<Profile> profile = () -> parallel ? new JavaProfile()
-                : JavaProfile.getDefaultInstance();
+        final Supplier<InstantiationAspectProverHelper> helper;
+        {
+            final InstantiationAspectProverHelper staticHelper = new InstantiationAspectProverHelper();
+            helper = () -> parallel ? new InstantiationAspectProverHelper() : staticHelper;
+        }
 
         final InstantiationAspectProver[] checkers = new InstantiationAspectProver[] {
-                new FrameConditionProver(profile.get()), //
-                new HasToConditionProver(profile.get()), //
-                new FootprintConditionProver(profile.get()), //
-                new NormalCompletionSpecProver(profile.get()), //
-                new TerminationProver(profile.get()), //
-                new ReturnsSpecProver(profile.get()), //
-                new ExcSpecProver(profile.get()), //
-                new BreaksSpecProver(profile.get()), //
-                new ContinuesSpecProver(profile.get()), //
-                new PrecMutualExclusionProver(profile.get()), //
-                new PredFuncInstsFootprintConformanceProver(profile.get()), //
-                new ConsistentInstantiationProver(profile.get()), // unimplemented
-                new AEConstraintsProver(profile.get()), //
+                new FrameConditionProver(helper.get()), //
+                new HasToConditionProver(helper.get()), //
+                new FootprintConditionProver(helper.get()), //
+                new NormalCompletionSpecProver(helper.get()), //
+                new TerminationProver(helper.get()), //
+                new ReturnsSpecProver(helper.get()), //
+                new ExcSpecProver(helper.get()), //
+                new BreaksSpecProver(helper.get()), //
+                new ContinuesSpecProver(helper.get()), //
+                new PrecMutualExclusionProver(helper.get()), //
+                new PredFuncInstsFootprintConformanceProver(helper.get()), //
+                new ConsistentInstantiationProver(helper.get()), // unimplemented
+                new AEConstraintsProver(helper.get()), //
         };
 
         blParr: {

@@ -34,7 +34,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 
 /**
@@ -65,12 +65,12 @@ public abstract class AbstractSpecProver implements InstantiationAspectProver {
         return Pattern.quote(str);
     }
 
-    public AbstractSpecProver() {
-        helper = new InstantiationAspectProverHelper();
+    public AbstractSpecProver(final InstantiationAspectProverHelper helper) {
+        this.helper = helper;
     }
 
-    public AbstractSpecProver(final Profile profile) {
-        helper = new InstantiationAspectProverHelper(profile);
+    public AbstractSpecProver() {
+        helper = new InstantiationAspectProverHelper(new JavaProfile());
     }
 
     @Override

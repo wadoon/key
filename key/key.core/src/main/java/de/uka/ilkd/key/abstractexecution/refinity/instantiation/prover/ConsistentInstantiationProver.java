@@ -15,7 +15,6 @@ package de.uka.ilkd.key.abstractexecution.refinity.instantiation.prover;
 import de.uka.ilkd.key.abstractexecution.refinity.instantiation.resultobjects.ProofResult;
 import de.uka.ilkd.key.abstractexecution.refinity.model.instantiation.AEInstantiationModel;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.proof.init.Profile;
 
 /**
  * Proves that all APEs with the same identifiers are instantiated consistently,
@@ -35,7 +34,7 @@ public class ConsistentInstantiationProver implements InstantiationAspectProver 
     public ConsistentInstantiationProver() {
     }
 
-    public ConsistentInstantiationProver(final Profile profile) {
+    public ConsistentInstantiationProver(final InstantiationAspectProverHelper helper) {
     }
 
     @Override

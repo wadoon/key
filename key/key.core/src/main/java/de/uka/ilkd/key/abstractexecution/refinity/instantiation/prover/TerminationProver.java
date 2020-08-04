@@ -28,7 +28,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.Profile;
 
 /**
  * @author Dominic Steinhoefel
@@ -55,10 +54,10 @@ public class TerminationProver implements InstantiationAspectProver {
         helper = new InstantiationAspectProverHelper();
     }
 
-    public TerminationProver(final Profile profile) {
+    public TerminationProver(final InstantiationAspectProverHelper helper) {
         keyProveTerminationScaffold = KeyBridgeUtils
                 .readResource(TERMINATION_PROBLEM_FILE_SCAFFOLD);
-        helper = new InstantiationAspectProverHelper(profile);
+        this.helper = helper;
     }
 
     @Override

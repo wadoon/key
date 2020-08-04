@@ -53,7 +53,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -75,8 +74,8 @@ public class PredFuncInstsFootprintConformanceProver implements InstantiationAsp
         helper = new InstantiationAspectProverHelper();
     }
 
-    public PredFuncInstsFootprintConformanceProver(final Profile profile) {
-        helper = new InstantiationAspectProverHelper(profile);
+    public PredFuncInstsFootprintConformanceProver(final InstantiationAspectProverHelper helper) {
+        this.helper = helper;
     }
 
     @Override

@@ -12,12 +12,14 @@
 //
 package de.uka.ilkd.key.abstractexecution.refinity.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -25,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableArray;
@@ -253,9 +256,16 @@ public class KeyBridgeUtils {
      * @throws RuntimeException
      */
     public static Path createTmpDir() throws RuntimeException {
-        Path tmpDir;
+        final Path tmpDir;
         try {
             tmpDir = Files.createTempDirectory("AEInstCheckerTmp_");
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try (Stream<Path> walk = Files.walk(tmpDir)) {
+                    walk.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+                } catch (IOException e) {
+                    throw new RuntimeException("Could not delete temporary directory", e);
+                }
+            }));
         } catch (IOException e) {
             throw new RuntimeException("Could not create temporary directory", e);
         }
