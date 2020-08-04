@@ -147,7 +147,7 @@ DIVERGES: 'diverges' Pred -> pushMode(expr);
 ENSURES: ('ensures' (Pfree|Pred) | 'post' Pred )-> pushMode(expr);
 FOR_EXAMPLE: 'for_example' -> pushMode(expr);
 //FORALL: 'forall' -> pushMode(expr); //?
-HELPER: 'helper' -> pushMode(expr);
+HELPER: 'helper';
 IMPLIES_THAT: 'implies_that' -> pushMode(expr);
 IN: 'in' Pred -> pushMode(expr);
 INITIALLY: 'initially' -> pushMode(expr);

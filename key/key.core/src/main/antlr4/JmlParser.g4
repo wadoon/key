@@ -59,7 +59,7 @@ clause
   );
 
 // clauses
-targetHeap : SPECIAL_IDENT;
+targetHeap : SPECIAL_IDENT+;
 ensures_clause: ENSURES targetHeap? predornot SEMI_TOPLEVEL;
 requires_clause: REQUIRES targetHeap? predornot SEMI_TOPLEVEL;
 measured_by_clause: MEASURED_BY predornot SEMI_TOPLEVEL;
@@ -68,7 +68,9 @@ diverges_clause: DIVERGES predornot SEMI_TOPLEVEL;
 working_space_clause: WORKING_SPACE predornot SEMI_TOPLEVEL;
 duration_clause: DURATION predornot SEMI_TOPLEVEL;
 when_clause: WHEN predornot SEMI_TOPLEVEL;
-accessible_clause: ACCESSIBLE targetHeap? ((name|INV) COLON)? storeRefUnion SEMI_TOPLEVEL;
+accessible_clause: ACCESSIBLE targetHeap? ((name|INV) COLON)? storeRefUnion
+(MEASURED_BY expression)?
+SEMI_TOPLEVEL;
 assignable_clause: (ASSIGNABLE|MODIFIES) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
 depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? ;
 //decreases_clause: DECREASES termexpression (COMMA termexpression)*;
@@ -117,11 +119,9 @@ name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
 old_clause: OLD modifiers type IDENT INITIALISER ;
 
 field_declaration: type IDENT (EMPTYBRACKETS)* initialiser? SEMI_TOPLEVEL;
-method_declaration: type IDENT param_list BODY;
+method_declaration: type IDENT param_list (BODY|SEMI_TOPLEVEL);
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
 param_decl: ((NON_NULL | NULLABLE))? IDENT ((AXIOM_NAME_BEGIN AXION_NAME_END | EMPTYBRACKETS))* IDENT;
-//represents_clause: REPRESENTS expression;
-//depends_clause: ACCESSIBLE expression;
 history_constraint: CONSTRAINT expression;
 datagroup_clause: (in_group_clause | maps_into_clause);
 monitors_for_clause: MONITORS_FOR expression;
