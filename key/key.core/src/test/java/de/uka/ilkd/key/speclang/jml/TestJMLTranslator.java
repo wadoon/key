@@ -33,6 +33,7 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static org.junit.Assert.*;
 
 
@@ -170,7 +171,6 @@ public class TestJMLTranslator {
 
     @Test
     public void testSimpleQuery() {
-
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         IProgramMethod getOne = javaInfo.getProgramMethod(testClassType,
                 "getOne",
@@ -470,16 +470,15 @@ public class TestJMLTranslator {
 
     @Test
     public void testCorrectImplicitThisResolution() {
-
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         LocationVariable array = (LocationVariable) javaInfo.getAttribute(
                 "testPackage.TestClass::array");
 
-        Term result = jmlIO.parseExpression("(\\forall TestClass a;a.array == array; a == this)");
+        Term result = jmlIO.selfVar(selfVar)
+                .parseExpression("(\\forall TestClass a;a.array == array; a == this)");
 
         assertNotNull(result);
-        final LogicVariable qv =
-                new LogicVariable(new Name("a"), selfVar.sort());
+        final LogicVariable qv = new LogicVariable(new Name("a"), selfVar.sort());
         final Function fieldSymbol = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
                 array, services);
         Term expected = TB.all(qv,
@@ -496,8 +495,9 @@ public class TestJMLTranslator {
                                         TB.NULL()))), // implicit non null
                         TB.equals(TB.var(qv), TB.var(selfVar))));
 
-        assertTrue("Expected:" + ProofSaver.printTerm(expected, services)
-                        + "\n Was:" + ProofSaver.printTerm(result, services),
-                result.equalsModRenaming(expected));
+        final boolean condition = result.equalsModRenaming(expected);
+        assertTrue(format("Expected:%s\n Was:%s",
+                ProofSaver.printTerm(expected, services), ProofSaver.printTerm(result, services)),
+                condition);
     }
 }
