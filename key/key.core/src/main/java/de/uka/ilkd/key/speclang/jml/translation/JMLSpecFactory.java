@@ -1592,7 +1592,7 @@ public class JMLSpecFactory {
         return createJMLLoopInvariant(pm, loop,
                 textualLoopSpec.getInvariants(),
                 textualLoopSpec.getFreeInvariants(),
-                textualLoopSpec.getAssignables(),
+                textualLoopSpec.getAssignablesInit(),
                 textualLoopSpec.getInfFlowSpecs(),
                 textualLoopSpec.getVariant());
     }

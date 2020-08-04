@@ -92,12 +92,35 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return getMap(ClauseHd.ASSIGNABLE);
     }
 
+    public Map<String, ImmutableList<ParserRuleContext>> getAssignablesInit() {
+        return getMapInit(ClauseHd.ASSIGNABLE);
+    }
+
+
     public ImmutableList<ParserRuleContext> getInfFlowSpecs() {
         return getList(Clause.INFORMATION_FLOW);
     }
 
     public Map<String, ImmutableList<ParserRuleContext>> getInvariants() {
         return getMap(ClauseHd.INVARIANT);
+    }
+
+    private Map<String, ImmutableList<ParserRuleContext>> getMapInit(ClauseHd clause) {
+        ImmutableList<ParserRuleContext> seq = getList(clause);
+        Name defaultHeap = HeapLDT.BASE_HEAP_NAME;
+        Map<String, ImmutableList<ParserRuleContext>> map = new HashMap<>();
+        for (ParserRuleContext context : seq) {
+            String h = heaps.getOrDefault(context, defaultHeap).toString();
+            ImmutableList<ParserRuleContext> l = map.getOrDefault(h, ImmutableSLList.nil());
+            map.put(h, l.append(context));
+        }
+
+        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
+            if (!map.containsKey(h.toString())) {
+                map.put(h.toString(), ImmutableSLList.nil());
+            }
+        }
+        return map;
     }
 
     private Map<String, ImmutableList<ParserRuleContext>> getMap(ClauseHd clause) {
