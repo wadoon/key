@@ -59,9 +59,7 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
      */
     private Pair<Float, Float> daisyComputeBounds(List<Term> preconditions, List<Term> lets, Term floatExpr) {
 
-//        return DaisyAPI.computeRange(preconditions,floatExpr,lets);
-        // js: just for testing
-        return new Pair(0.f, 0.f);
+        return DaisyAPI.computeRange(preconditions,floatExpr,lets);
     }
 
     @Override

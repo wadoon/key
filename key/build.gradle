@@ -320,6 +320,7 @@ project("keyext.daisy") {
         compile project(":key.core")
         compile files("$rootDir/keyext.daisy/lib/fatDaisy_2.11-0.1.jar")
         runtime project(":key.ui")
+        compile 'org.scala-lang:scala-library:2.12.7'
     }
 
     application {
