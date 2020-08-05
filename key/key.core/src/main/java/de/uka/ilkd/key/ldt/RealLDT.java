@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.ldt;
 
+import de.uka.ilkd.key.java.expression.literal.RealLiteral;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -30,81 +31,88 @@ import de.uka.ilkd.key.logic.op.Function;
  * Complete this class if you want to add support for the JML \real type.
  *
  * At the moment this class contains only stubs.
- * @author bruns
+ * @author bruns, mulbrich
  */
 public final class RealLDT extends LDT {
 
     public static final Name NAME = new Name("real");
-
+    
+    public static final String R_NAME = "R";
+    private final Function theRealSymbol;
 
     public RealLDT(TermServices services) {
-	super(NAME, services);
+        super(NAME, services);
+        this.theRealSymbol = services.getNamespaces().functions().lookup(R_NAME);
     }
 
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	    			 Term[] subs,
-	    			 Services services,
-	    			 ExecutionContext ec) {
-	return false;
+                                 Term[] subs,
+                                 Services services,
+                                 ExecutionContext ec) {
+        return false;
     }
 
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	    		         Term left,
-	    		         Term right,
-	    		         Services services,
-	    		         ExecutionContext ec) {
-	return false;
+                                 Term left,
+                                 Term right,
+                                 Services services,
+                                 ExecutionContext ec) {
+        return false;
     }
 
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	    		         Term sub,
-	    		         TermServices services,
-	    		         ExecutionContext ec) {
-	return false;
+                                 Term sub,
+                                 TermServices services,
+                                 ExecutionContext ec) {
+        return false;
     }
 
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-        // return skolem term
-        final Function sk = new Function(new Name(""+NAME+lit),targetSort());
-        return services.getTermBuilder().func(sk);
+        assert lit instanceof RealLiteral : "Must be a \\real literal";
+        RealLiteral rlit = (RealLiteral) lit;
+        return services.getTermBuilder().and();
     }
 
 
     @Override
     public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
-	    			   Services services,
-	    			   ExecutionContext ec) {
-	assert false;
-	return null;
+                                   Services services,
+                                   ExecutionContext ec) {
+        assert false;
+        return null;
     }
 
 
     @Override
     public boolean hasLiteralFunction(Function f) {
-	return false;
+        return false;
     }
 
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-	return null;
+        return null;
     }
 
 
     @Override
     public final Type getType(Term t) {
-	if(t.sort() == targetSort()) {
-	    return PrimitiveType.JAVA_REAL;
-	} else {
-	    return null;
-	}
+        if(t.sort() == targetSort()) {
+            return PrimitiveType.JAVA_REAL;
+        } else {
+            return null;
+        }
+    }
+
+    public Function getRealSymbol() {
+        return theRealSymbol;
     }
 }

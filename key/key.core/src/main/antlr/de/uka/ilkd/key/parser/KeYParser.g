@@ -3543,7 +3543,15 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
         }
     | 
         ((MINUS)? NUM_LITERAL) => (MINUS {neg = "-";})? number=NUM_LITERAL
-        { a = toZNotation(neg+number.getText(), functions());}    
+        { a = toZNotation(neg+number.getText(), functions());}
+    | ((MINUS)? REAL_LITERAL) => (MINUS {neg = "-";})? number=REAL_LITERAL
+        {  String n = number.getText();
+           String[] parts = n.substring(0, n.length() - 1).split("/");
+           Term num = toZNotation(neg+parts[0], functions());
+           Term den = toZNotation(parts.length>1 ? parts[1] : "1", functions());
+           a = getTermFactory().createTerm(services.getTypeConverter().getRealLDT().getRealSymbol(),
+                                           num, den);
+        }
     | AT a = abbreviation
     | varfuncid = funcpred_name
         ( (~LBRACE | LBRACE bound_variables) =>

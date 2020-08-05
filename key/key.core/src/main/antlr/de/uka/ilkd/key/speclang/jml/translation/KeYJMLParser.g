@@ -19,6 +19,7 @@ options {
     import de.uka.ilkd.key.java.expression.literal.CharLiteral;
     import de.uka.ilkd.key.java.expression.literal.IntLiteral;
     import de.uka.ilkd.key.java.expression.literal.LongLiteral;
+    import de.uka.ilkd.key.java.expression.literal.RealLiteral;
     import de.uka.ilkd.key.java.expression.Literal;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.ldt.*;

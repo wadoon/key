@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Stack;
 
+import de.uka.ilkd.key.java.expression.literal.RealLiteral;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -1074,6 +1075,13 @@ public class PrettyPrinter {
         printHeader(x);
         writeInternalIndentation(x);
         write(x.getValueString());
+        printFooter(x);
+    }
+
+    public void printRealLiteral(RealLiteral x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        write(x.getValue());
         printFooter(x);
     }
 

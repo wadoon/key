@@ -645,6 +645,11 @@ HEX
 	('a'..'f'|'A'..'F'|DIGIT )
     ;
 
+REAL_LITERAL
+:   DIGIT+ ( '/' ('1'..'9') DIGIT* )? ('r'|'R')
+    ;
+
+
 fragment
 LETTER
 :	'a'..'z'|'A'..'Z'

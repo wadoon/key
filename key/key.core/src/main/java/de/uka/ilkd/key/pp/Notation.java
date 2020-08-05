@@ -611,55 +611,99 @@ public abstract class Notation {
 	    }
 	}
     }
-    
 
-    /**
-     * The standard concrete syntax for the character literal indicator `C'.
-     */
-    static final class CharLiteral extends Notation {
-	public CharLiteral() {
-	    super(1000);
+
+	/**
+	 * The standard concrete syntax for the character literal indicator `C'.
+	 */
+	static final class CharLiteral extends Notation {
+		public CharLiteral() {
+			super(1000);
+		}
+
+		private static String printCharTerm(Term t) {
+
+			char charVal = 0;
+			int intVal = 0;
+
+			String result = NumLiteral.printNumberTerm(t.sub(0));
+
+			if (result == null) {
+				return null;
+			}
+
+			try {
+				intVal = Integer.parseInt(result);
+				charVal = (char) intVal;
+				if (intVal - charVal != 0)
+					throw new NumberFormatException(); // overflow!
+
+			} catch (NumberFormatException ex) {
+				System.out.println("Oops. " + result + " is not of type char");
+				return null;
+			}
+
+			return ("'" + Character.valueOf(charVal)) + "'";
+		}
+
+		public void print(Term t, LogicPrinter sp) throws IOException {
+			final String charString = printCharTerm(t);
+			if (charString != null) {
+				sp.printConstant(charString);
+			} else {
+				sp.printFunctionTerm(t);
+			}
+		}
 	}
 
-	private static String printCharTerm(Term t) {
 
-	    char charVal = 0;
-	    int intVal = 0;
+	/**
+	 * The standard concrete syntax for the real literal indicator `R'.
+	 */
+	static final class RealLiteral extends Notation {
+		public RealLiteral() {
+			super(1000);
+		}
 
-	    String result = NumLiteral.printNumberTerm(t.sub(0));
+		private static String printCharTerm(Term t) {
 
-	    if (result == null) {
-		return null;
-	    }
+			char charVal = 0;
+			int intVal = 0;
 
-	    try {
-		intVal = Integer.parseInt(result);
-		charVal = (char) intVal;
-		if (intVal - charVal != 0)
-		    throw new NumberFormatException(); // overflow!
+			String result = NumLiteral.printNumberTerm(t.sub(0));
 
-	    } catch (NumberFormatException ex) {
-		System.out.println("Oops. " + result + " is not of type char");
-		return null;
-	    }
+			if (result == null) {
+				return null;
+			}
 
-	    return ("'" + Character.valueOf(charVal)) + "'";
+			try {
+				intVal = Integer.parseInt(result);
+				charVal = (char) intVal;
+				if (intVal - charVal != 0)
+					throw new NumberFormatException(); // overflow!
+
+			} catch (NumberFormatException ex) {
+				System.out.println("Oops. " + result + " is not of type char");
+				return null;
+			}
+
+			return ("'" + Character.valueOf(charVal)) + "'";
+		}
+
+		public void print(Term t, LogicPrinter sp) throws IOException {
+
+			String numStr = NumLiteral.printNumberTerm(t.sub(0));
+			String denStr = NumLiteral.printNumberTerm(t.sub(1));
+
+			if(denStr.equals("1")) {
+				sp.printConstant(numStr + "r");
+			} else {
+				sp.printConstant(numStr + "/" + denStr + "r");
+			}
+		}
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    final String charString = printCharTerm(t);
-	    if (charString != null) {
-		sp.printConstant(charString);
-	    } else {
-		sp.printFunctionTerm(t);
-	    }
-	}
-    }
-    
-
-  
-
-    /**
+	/**
      * The standard concrete syntax for sequence singletons.
      */
     public static final class SeqSingletonNotation extends Notation {
