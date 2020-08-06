@@ -64,7 +64,7 @@ public abstract class TextualJMLConstruct {
      * @param loopContract boolean to identify contract as loop contract
      * @see #isLoopContract()
      */
-    final void setLoopContract(boolean loopContract) {
+    public final void setLoopContract(boolean loopContract) {
         this.loopContract = loopContract;
     }
 

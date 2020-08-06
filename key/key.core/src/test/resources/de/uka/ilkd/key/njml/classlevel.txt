@@ -1,3 +1,37 @@
+/*@ normal_behavior
+      @ assignable footprint;
+      @ ensures size() == \old(size()) + 1;
+      @ ensures get(size() - 1) == o;
+      @ ensures (\forall int i; 0 <= i && i < size() - 1; get(i) == \old(get(i)));
+      @ ensures \new_elems_fresh(footprint);
+      @ diverges true;
+      @*/
+      /*@nullable@*/
+---Contract---
+       /*@ normal_behavior
+            @ requires 0 <= i && i < size();
+            @ assignable \nothing;
+            @ accessible footprint;
+            @ ensures \result == get(i);
+            @*/
+          /*@nullable@*/
+---Contract---
+    /*@ accessible \inv: footprint;
+      @ invariant items != null;
+      @ invariant 0 <= count && count <= items.length;
+      @ invariant \typeof(items) == \type(Object[]);
+      @*/
+---Contract---
+    /*@ model \locset footprint;
+      @ accessible footprint: footprint;
+      @ represents footprint = count, items, items[*];
+      @*/
+---Contract---
+/*@ normal_behavior
+      @ assignable \nothing;
+      @ ensures size() == 0;
+      @ ensures \fresh(footprint);
+      @*/
 ---Contract---
 /*@ model_behavior
       @ ensures x>0 ==> \result;

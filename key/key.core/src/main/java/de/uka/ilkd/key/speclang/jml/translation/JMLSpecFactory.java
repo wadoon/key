@@ -56,6 +56,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.*;
 
+import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -1047,7 +1048,10 @@ public class JMLSpecFactory {
         final ProgramVariable selfVar = isStatic ? null : tb.selfVar(kjt, false);
 
         // translateToTerm expression
-        final Pair<IObserverFunction, Term> rep = jmlIo.translateRepresents(originalRep);
+        final Pair<IObserverFunction, Term> rep =
+                jmlIo.classType(kjt)
+                        .selfVar(selfVar)
+                        .translateRepresents(originalRep);
         // represents clauses must be unique per type
         for (Pair<KeYJavaType, IObserverFunction> p : modelFields) {
             if (p.first.equals(kjt) && p.second.equals(rep.first)) {
@@ -1066,13 +1070,18 @@ public class JMLSpecFactory {
     @SuppressWarnings("unchecked")
     public ClassAxiom createJMLRepresents(KeYJavaType kjt, TextualJMLRepresents textualRep)
             throws SLTranslationException {
+
         boolean isStatic = textualRep.getMods().contains("static");
         // create variable for self
         final ProgramVariable selfVar = isStatic ? null : tb.selfVar(kjt, false);
 
         // translateToTerm expression
         final ParserRuleContext clause = textualRep.getRepresents();
-        final Pair<IObserverFunction, Term> rep = jmlIo.translateRepresents(clause);
+        final Pair<IObserverFunction, Term> rep = jmlIo
+                .classType(kjt)
+                .selfVar(selfVar)
+                .translateRepresents(clause);
+
         // check whether there already is a represents clause
         if (!modelFields.add(new Pair<>(kjt, rep.first))) {
             throw new SLWarningException("JML represents clauses must occur uniquely per "
@@ -1124,6 +1133,7 @@ public class JMLSpecFactory {
                                                 ParserRuleContext originalDep) throws SLTranslationException {
         assert kjt != null;
         assert originalDep != null;
+        jmlIo.classType(kjt);
 
         // create variable for self
         ProgramVariable selfVar = tb.selfVar(kjt, false);

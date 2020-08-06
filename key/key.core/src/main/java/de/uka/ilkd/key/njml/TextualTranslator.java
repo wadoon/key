@@ -368,13 +368,16 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitBlock_specification(JmlParser.Block_specificationContext ctx) {
-        TODO();
-        return super.visitBlock_specification(ctx);
+        accept(ctx.method_specification());
+        return null;
     }
 
     @Override
     public Object visitBlock_loop_specification(JmlParser.Block_loop_specificationContext ctx) {
-        TODO();
-        return super.visitBlock_loop_specification(ctx);
+        acceptAll(ctx.spec_case());
+        for (TextualJMLConstruct construct : constructs) {
+            construct.setLoopContract(true);
+        }
+        return null;
     }
 }

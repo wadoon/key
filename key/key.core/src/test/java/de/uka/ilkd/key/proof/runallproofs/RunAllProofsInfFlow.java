@@ -1,5 +1,6 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
+//
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
@@ -20,6 +21,7 @@ import java.util.Collections;
 import org.antlr.runtime.RecognitionException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -29,16 +31,16 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 
 /**
  * This test case captures all information flow run-all-proof scenarios.
- *
+ * <p>
  * The test case is controlled by the index file (see {@value #INDEX_FILE}).
- *
+ * <p>
  * If the property "{@value #SKIP_INF_FLOW_PROPERTY}" is set to true, then
  * no info-flow run-all-proof tests will be run.
  *
  * @author M. Ulbrich
- *
  */
 @RunWith(Parameterized.class)
+@Ignore
 public class RunAllProofsInfFlow extends RunAllProofsTest {
 
     private static final String SKIP_INF_FLOW_PROPERTY = "key.runallproofs.skipInfFlow";
@@ -52,7 +54,7 @@ public class RunAllProofsInfFlow extends RunAllProofsTest {
     @Parameters(name = "{0}")
     public static Collection<RunAllProofsTestUnit[]> data() throws IOException, RecognitionException {
 
-        if(Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY)) {
+        if (Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY)) {
             return Collections.emptyList();
         }
 

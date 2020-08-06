@@ -916,7 +916,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitIdent(JmlParser.IdentContext ctx) {
-        fullyQualifiedName = ctx.getText();
+        fullyQualifiedName = ctx.getText();//TODO += ?
         return lookupIdentifier(ctx.getText(), null, null, ctx.start);
     }
 
@@ -1840,10 +1840,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Term visitAccessible_clause(JmlParser.Accessible_clauseContext ctx) {
+        //TODO measured_by expression
         Term t = translator.accessible(requireNonNull(accept(ctx.storeRefUnion())));
         LocationVariable heap = accept(ctx.targetHeap());
         contractClauses.add(ContractClauses.ACCESSIBLE, heap, t);
-        return null;
+        return t;
     }
 
     @Override
@@ -2124,8 +2125,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
             t = tb.equals(lhs.getTerm(), rhsTerm);
         } else {
-            t = accept(ctx.storeRefUnion());
-            t = tb.equals(lhs.getTerm(), t);
+            SLExpression a = oneOf(ctx.rhs, ctx.t);
+            assert a != null;
+            t = tb.equals(lhs.getTerm(), a.getTerm());
         }
         if (ctx.SUCH_THAT() != null) t = accept(ctx.predicate());
         return translator.represents(lhs, t);
