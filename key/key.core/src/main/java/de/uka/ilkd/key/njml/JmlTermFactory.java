@@ -452,7 +452,7 @@ public final class JmlTermFactory {
             boolean nullable,
             Iterable<LogicVariable> qvs,
             Term t1, Term t2,
-            KeYJavaType resultType,
+            @Nullable  KeYJavaType resultType,
             UnboundedNumericalQuantifier unbounded,
             BoundedNumericalQuantifier bounded) {
         Iterator<LogicVariable> it = qvs.iterator();
@@ -468,6 +468,10 @@ public final class JmlTermFactory {
         } else {
             t = bounded.apply(lv, lowerBound(t1, lv), upperBound(t1, lv), t2);
         }
+
+        if(resultType==null)
+            resultType = services.getTypeConverter().getKeYJavaType(t2);
+
         final JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper(services, exc);
         // cast to specific JML type (fixes bug #1347)
         try {

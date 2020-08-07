@@ -1596,9 +1596,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 return translator.quantifiedMin(guard, body,
                         declVars.first, nullable, declVars.second);
             case JmlLexer.NUM_OF:
+                KeYJavaType kjtInt = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
                 return translator.quantifiedNumOf(guard, body,
                         declVars.first, nullable, declVars.second,
-                        expr.getType());
+                        kjtInt);
             case JmlLexer.SUM:
                 return translator.quantifiedSum(declVars.first, nullable,
                         declVars.second, guard, body,
