@@ -153,7 +153,7 @@ IN: 'in' Pred -> pushMode(expr);
 INITIALLY: 'initially' -> pushMode(expr);
 INSTANCE: 'instance';
 INVARIANT: 'invariant' Pred -> pushMode(expr);
-LOOP_CONTRACT: 'loop_contract' -> pushMode(expr);
+LOOP_CONTRACT: 'loop_contract';
 LOOP_INVARIANT: ('loop_invariant' (Pfree|Pred) | 'maintaining' Pred) -> pushMode(expr);
 LOOP_DETERMINES: 'loop_determines';  // internal translation for 'determines' in loop invariants
 LOOP_SEPARATES: 'loop_separates';  //KeY extension, deprecated

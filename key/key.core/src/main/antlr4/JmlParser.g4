@@ -146,7 +146,7 @@ loop_specification
     | assignable_clause
     | variant_function)*;
 
-loop_invariant: LOOP_INVARIANT expression SEMI_TOPLEVEL;
+loop_invariant: LOOP_INVARIANT targetHeap? expression SEMI_TOPLEVEL;
 variant_function: DECREASING expression SEMI_TOPLEVEL;
 //loop_separates_clause: SEPARATES expression;
 //loop_determines_clause: DETERMINES expression;
@@ -154,7 +154,7 @@ assume_statement: ASSUME expression SEMI_TOPLEVEL;
 initialiser: EQUAL_SINGLE expression;
 block_specification: method_specification;
 block_loop_specification:
-  (loop_contract_keyword spec_case (also_keyword)+ loop_contract_keyword spec_case)+;
+  loop_contract_keyword spec_case ((also_keyword)+ loop_contract_keyword spec_case)*;
 loop_contract_keyword: LOOP_CONTRACT;
 assert_statement: (ASSERT expression | UNREACHABLE) SEMI_TOPLEVEL;
 //breaks_clause: BREAKS expression;

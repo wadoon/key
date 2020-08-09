@@ -32,7 +32,7 @@ statisticsFile = ../../key.core.test/testresults/runallproofs/runStatistics.csv
  *                 perGroup - one subprocess is created for each group
  *                 perFile - one subprocess is created for each file
  */
-forkMode = perGroup
+forkMode = noFork
 
 /*
  * Enable or disable proof reloading.

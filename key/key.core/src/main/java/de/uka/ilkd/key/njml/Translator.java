@@ -1891,9 +1891,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitReturns_clause(JmlParser.Returns_clauseContext ctx) {
-        @Nullable Term pred = accept(ctx.predornot());
-        contractClauses.returns = translator.createReturns(pred);
-        return new SLExpression(pred);
+        @Nullable SLExpression pred = accept(ctx.predornot());
+        contractClauses.returns = translator.createReturns(pred.getTerm());
+        return pred;
     }
 
 

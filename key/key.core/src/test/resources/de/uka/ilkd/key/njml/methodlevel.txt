@@ -1,4 +1,32 @@
 --- Contract ---
+loop_invariant
+     (\forall short j; true; true)
+     ;
+--- Contract ---
+/*@ loop_contract normal_behavior
+  @ requires i <= 42;
+  @ ensures i == 42;
+  @*/
+--- Contract ---
+/*@
+   loop_invariant i >= 0 && i <= length &&
+      srcOffset + i >= 0 && srcOffset + i <= src.length &&
+      destOffset + i >= 0 && destOffset + i <= dest.length &&
+     (\forall short j; j >= 0 && j< length;
+         dest[destOffset + j] == (j<i ? \old(src[srcOffset + j]) : \old(dest[destOffset + j]))
+     )
+   ;
+   loop_invariant<savedHeap>
+     (\forall short j; j >= 0 && j < length;
+        \backup(dest[destOffset + j]) ==
+          ((j >= i || \backup(\transactionUpdated(dest))) ?
+              \old(\backup(dest[destOffset + j])) :
+              \old(src[srcOffset + j]))
+     );
+   decreases length - i;
+   assignable<heap><savedHeap> dest[destOffset..destOffset+length-1];
+@*/
+--- Contract ---
 //@ set cause = arg0;
 --- Contract ---
 //@ set message = arg0;
