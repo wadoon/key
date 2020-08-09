@@ -81,7 +81,7 @@ public class JmlIO {
                                      ProgramVariable o, ProgramVariable o1, Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atPres1, OriginTermLabel.SpecType type, Services services) {
         JmlIO io = new JmlIO(services, containerType, selfVar, allVars, o, o1, atPres, atPres1);
         SLExpression e = (SLExpression) io.interpret(expr);
-        //TODO set label
+        //TODO weigl set label
         return e.getTerm();
     }
 

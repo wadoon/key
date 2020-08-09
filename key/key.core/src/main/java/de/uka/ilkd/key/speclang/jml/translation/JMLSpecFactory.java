@@ -583,7 +583,7 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         Term result = tb.empty();
         for (ParserRuleContext expr : originalClauses) {
-            if (expr == null) continue;//TODO trace
+            if (expr == null) continue;//TODO weigl trace null back to origin
             Term translated = JmlIO.translateTerm(expr, pm.getContainerType(), selfVar,
                     paramVars, null, null, atPres, atBefores, specType, services);
 

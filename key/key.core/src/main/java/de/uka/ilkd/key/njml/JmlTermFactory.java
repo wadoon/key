@@ -936,14 +936,16 @@ public final class JmlTermFactory {
         return new SLExpression(resultTerm, seqtype);
     }
 
-    public SLExpression createUnionF(boolean nullable, Pair<
-            KeYJavaType, ImmutableList<LogicVariable>> declVars, Term t, Term t2) {
+    public SLExpression createUnionF(boolean nullable,
+                                     Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars,
+                                     Term expr,
+                                     Term guard) {
         final JavaInfo javaInfo = services.getJavaInfo();
         final Term restr = JmlTermFactory.this.typerestrict(declVars.first, nullable, declVars.second);
-        final Term guard = t2 == null ? restr : tb.and(restr, t2);
+        guard = guard == null ? restr : tb.and(restr, guard);
         return createIntersect(tb.infiniteUnion(
                 declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]),
-                guard, t), javaInfo);
+                guard, expr), javaInfo);
     }
 
     public SLExpression createUnion(JavaInfo javaInfo, Term t) {

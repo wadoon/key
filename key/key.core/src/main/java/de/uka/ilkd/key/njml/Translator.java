@@ -966,6 +966,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
                     params);
         } catch (SLTranslationException exc) {
             // no type name found maybe package?
+        } catch (ClassCastException e){
+
         }
 
         if (result != null) {
@@ -1453,11 +1455,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
             resolverManager.pushLocalVariablesNamespace();
             resolverManager.putIntoTopLocalVariablesNamespace(declVars.second, declVars.first);
         }
-        Term t2 = accept(predicate);
+        SLExpression t2 = accept(predicate);
         Term t = accept(storeref);
         if (declVars != null) resolverManager.popLocalVariablesNamespace();
         assert declVars != null;
-        return translator.createUnionF(Boolean.TRUE.equals(nullable), declVars, t, t2);
+        return translator.createUnionF(Boolean.TRUE.equals(nullable), declVars, t, t2.getTerm());
     }
 
     @Override
@@ -1864,7 +1866,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         for (LocationVariable heap : heaps) {
             contractClauses.add(ContractClauses.ACCESSIBLE, heap, t);
         }
-        return t;
+        return new SLExpression(t);
     }
 
     @Override
@@ -2132,6 +2134,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Pair<IObserverFunction, Term> visitRepresents_clause(JmlParser.Represents_clauseContext ctx) {
         SLExpression lhs = accept(ctx.lhs);
+        SLExpression rhs = accept(ctx.rhs);
+        Term storeRef= accept(ctx.t);
+
         assert lhs != null;
         boolean representsClauseLhsIsLocSet = lhs.getTerm().sort().equals(locSetLDT.targetSort());
         if (!lhs.isTerm()
@@ -2144,9 +2149,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
 
         Term t;
-        if (representsClauseLhsIsLocSet) {
-            SLExpression rhs = accept(ctx.rhs);
-            assert rhs != null;
+        if (!representsClauseLhsIsLocSet) {
+            assert lhs != null;
             if (!rhs.isTerm()) {
                 raiseError("Represents clause with unexpected rhs: " + rhs);
             }
@@ -2156,11 +2160,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
             t = tb.equals(lhs.getTerm(), rhsTerm);
         } else {
-            SLExpression a = oneOf(ctx.rhs, ctx.t);
-            assert a != null;
-            t = tb.equals(lhs.getTerm(), a.getTerm());
+            t = rhs != null ? rhs.getTerm() : storeRef;
+            assert t != null;
+            t = tb.equals(lhs.getTerm(), t);
         }
-        if (ctx.SUCH_THAT() != null) t = accept(ctx.predicate());
+        if (ctx.SUCH_THAT() != null)
+            t = accept(ctx.predicate());
         return translator.represents(lhs, t);
     }
 
