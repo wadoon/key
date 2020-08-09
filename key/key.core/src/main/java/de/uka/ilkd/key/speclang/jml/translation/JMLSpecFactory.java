@@ -56,7 +56,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.*;
 
-import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -1139,8 +1138,10 @@ public class JMLSpecFactory {
         ProgramVariable selfVar = tb.selfVar(kjt, false);
 
         // translateToTerm expression
-        Triple<IObserverFunction, Term, Term> dep = JmlIO.translateDependencyContract(originalDep, kjt,
-                selfVar, null, null, null, null, null, services);
+        Triple<IObserverFunction, Term, Term> dep = jmlIo
+                .selfVar(selfVar)
+                .classType(kjt)
+                .translateDependencyContract(originalDep);
         return cf.dep(kjt, targetHeap, dep, dep.first.isStatic() ? null : selfVar);
     }
 

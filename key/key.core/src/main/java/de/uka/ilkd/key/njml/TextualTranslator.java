@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.njml;
 
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -50,7 +51,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         methodContract = new TextualJMLSpecCase(mods, behaviour);
         loopContract = null;
         constructs = constructs.append(methodContract);
-        return super.visitSpec_case(ctx);
+        super.visitSpec_case(ctx);
+        methodContract = null;
+        return null;
     }
 
     private Behavior getBehavior(Token behavior) {
@@ -100,31 +103,44 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitTargetHeap(JmlParser.TargetHeapContext ctx) {
-        String t = ctx.getText();
-        return new Name(t.substring(1, t.length() - 1));
+    public Name[] visitTargetHeap(JmlParser.TargetHeapContext ctx) {
+        if (ctx == null || ctx.SPECIAL_IDENT().size() == 0) {
+            return new Name[]{HeapLDT.BASE_HEAP_NAME};
+        }
+        Name[] heaps = new Name[ctx.SPECIAL_IDENT().size()];
+        for (int i = 0; i < ctx.SPECIAL_IDENT().size(); i++) {
+            String t = ctx.SPECIAL_IDENT(i).getText();
+            heaps[i] = new Name(t.substring(1, t.length() - 1));
+        }
+        return heaps;
     }
 
     @Override
     public Object visitEnsures_clause(JmlParser.Ensures_clauseContext ctx) {
         assert methodContract != null;
-        methodContract.addClause(
-                ctx.ENSURES().getText().endsWith("_free")
-                        ? ENSURES_FREE
-                        : ENSURES,
-                accept(ctx.targetHeap()),
-                ctx);
+        Name[] heaps = visitTargetHeap(ctx.targetHeap());
+        for (Name heap : heaps) {
+            methodContract.addClause(
+                    ctx.ENSURES().getText().endsWith("_free")
+                            ? ENSURES_FREE
+                            : ENSURES,
+                    heap,
+                    ctx);
+        }
         return null;
     }
 
     @Override
     public Object visitRequires_clause(JmlParser.Requires_clauseContext ctx) {
         assert methodContract != null;
-        methodContract.addClause(
-                ctx.REQUIRES().getText().endsWith("_free")
-                        ? REQUIRES_FREE
-                        : REQUIRES,
-                ctx);
+        Name[] heaps = visitTargetHeap(ctx.targetHeap());
+        for (Name heap : heaps) {
+            methodContract.addClause(
+                    ctx.REQUIRES().getText().endsWith("_free")
+                            ? REQUIRES_FREE
+                            : REQUIRES,
+                    heap, ctx);
+        }
         return null;
     }
 
@@ -167,16 +183,32 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitAccessible_clause(JmlParser.Accessible_clauseContext ctx) {
         assert methodContract != null;
-        methodContract.addClause(ACCESSIBLE, accept(ctx.targetHeap()), ctx);
+        boolean depends = ctx.MEASURED_BY() != null || ctx.COLON() != null;
+        Name[] heaps = visitTargetHeap(ctx.targetHeap());
+        for (Name heap : heaps) {
+            if (depends) {
+                TextualJMLDepends d = new TextualJMLDepends(mods, ctx);
+                constructs = constructs.append(d);
+            } else if (methodContract != null) {
+                methodContract.addClause(ACCESSIBLE, heap, ctx);
+            } else {
+                assert false;
+            }
+        }
         return null;
     }
 
     @Override
     public Object visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
-        if (methodContract != null)
-            methodContract.addClause(ASSIGNABLE, accept(ctx.targetHeap()), ctx);
-        if (loopContract != null)
-            loopContract.addClause(TextualJMLLoopSpec.ClauseHd.ASSIGNABLE, accept(ctx.targetHeap()), ctx);
+        Name[] heaps = visitTargetHeap(ctx.targetHeap());
+        for (Name heap : heaps) {
+            if (methodContract != null) {
+                methodContract.addClause(ASSIGNABLE, heap, ctx);
+            }
+            if (loopContract != null) {
+                loopContract.addClause(TextualJMLLoopSpec.ClauseHd.ASSIGNABLE, heap, ctx);
+            }
+        }
         return null;
     }
 
@@ -335,7 +367,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         loopContract = new TextualJMLLoopSpec(mods);
         methodContract = null;
         constructs = constructs.append(loopContract);
-        return super.visitLoop_specification(ctx);
+        super.visitLoop_specification(ctx);
+        loopContract = null;
+        return null;
     }
 
     @Override
@@ -349,9 +383,13 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitLoop_invariant(JmlParser.Loop_invariantContext ctx) {
         assert loopContract != null;
         TextualJMLLoopSpec.ClauseHd type = ctx.LOOP_INVARIANT().getText().endsWith("_free") ? INVARIANT_FREE : INVARIANT;
-        loopContract.addClause(type, ctx);
+        Name[] heaps = visitTargetHeap(ctx.targetHeap());
+        for (Name heap : heaps) {
+            loopContract.addClause(type, heap, ctx);
+        }
         return null;
     }
+
 
     @Override
     public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {

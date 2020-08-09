@@ -427,7 +427,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitStoreRefExpr(JmlParser.StoreRefExprContext ctx) {
+    public Term visitStoreRefExpr(JmlParser.StoreRefExprContext ctx) {
         return translator.createStoreRef(requireNonNull(accept(ctx.expression())));
     }
 
@@ -1840,21 +1840,42 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
-    public Term visitAccessible_clause(JmlParser.Accessible_clauseContext ctx) {
-        //TODO measured_by expression
-        Term t = translator.accessible(requireNonNull(accept(ctx.storeRefUnion())));
-        LocationVariable heap = accept(ctx.targetHeap());
-        contractClauses.add(ContractClauses.ACCESSIBLE, heap, t);
+    public Object visitAccessible_clause(JmlParser.Accessible_clauseContext ctx) {
+        if(ctx.COLON()!=null || ctx.MEASURED_BY()!=null) {//depends clause
+            //depends clause
+            /*
+               lhs=expression
+                COLON rhs=storeRefUnion
+                (MEASURED_BY mby=expression)? SEMI
+                    { result = translator.translate(
+                            dep.getText(), Triple.class, lhs, rhs, mby, services); }
+                ;
+            */
+            SLExpression lhs = accept(ctx.lhs);
+            Term rhs =  accept(ctx.rhs);
+            SLExpression mby = accept(ctx.mby);
+            assert lhs != null;
+            Triple<IObserverFunction, Term, Term> a = translator.depends(lhs, rhs, mby);
+            return a;
+        }
+        final Term term = requireNonNull(accept(ctx.storeRefUnion()));
+        Term t = translator.accessible(term);
+        LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
+        for (LocationVariable heap : heaps) {
+            contractClauses.add(ContractClauses.ACCESSIBLE, heap, t);
+        }
         return t;
     }
 
     @Override
     public SLExpression visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
         Term t;
-        LocationVariable heap = accept(ctx.targetHeap());
+        LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
         if (ctx.STRICTLY_NOTHING() != null) t = tb.strictlyNothing();
         else t = translator.assignable(requireNonNull(accept(ctx.storeRefUnion())));
-        contractClauses.add(ContractClauses.ASSIGNABLE, heap, t);
+        for (LocationVariable heap : heaps) {
+            contractClauses.add(ContractClauses.ASSIGNABLE, heap, t);
+        }
         return new SLExpression(t);
     }
 
@@ -1899,6 +1920,15 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Triple<IObserverFunction, Term, Term> visitDepends_clause(JmlParser.Depends_clauseContext ctx) {
+        /*
+          dep=DEPENDS lhs=expression
+    COLON rhs=storeRefUnion
+    (MEASURED_BY mby=expression)? SEMI
+        { result = translator.translate(
+                dep.getText(), Triple.class, lhs, rhs, mby, services); }
+    ;
+         */
+
         SLExpression lhs = accept(ctx.expression(0));
         Term rhs = accept(ctx.storeRefUnion());
         SLExpression mby = accept(ctx.expression(1));
@@ -2368,18 +2398,24 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public LocationVariable visitTargetHeap(JmlParser.TargetHeapContext ctx) {
-        String heapName = ctx.getText();
-        switch (heapName) {
-            case "<permission>":
-                return getPermissionHeap();
-            case "<savedHeap>":
-            case "<saved>":
-                return getSavedHeap();
-            case "<heap>":
-                return getBaseHeap();
+    public LocationVariable[] visitTargetHeap(JmlParser.TargetHeapContext ctx) {
+        if (ctx==null||ctx.SPECIAL_IDENT().size() == 0) return new LocationVariable[]{getBaseHeap()};
+        LocationVariable[] heaps = new LocationVariable[ctx.SPECIAL_IDENT().size()];
+        for (int i = 0; i < ctx.SPECIAL_IDENT().size(); i++) {
+            String heapName = ctx.SPECIAL_IDENT(i).getText();
+            switch (heapName) {
+                case "<permission>":
+                    heaps[i] = getPermissionHeap();
+                case "<savedHeap>":
+                case "<saved>":
+                    heaps[i] = getSavedHeap();
+                case "<heap>":
+                    heaps[i] = getBaseHeap();
+                default:
+                    throw new IllegalStateException("Unknown heap.");
+            }
         }
-        return null;
+        return heaps;
     }
 
     //endregion

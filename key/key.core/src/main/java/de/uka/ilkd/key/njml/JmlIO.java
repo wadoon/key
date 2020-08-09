@@ -110,11 +110,6 @@ public class JmlIO {
         return (MergeParamsSpec) interpret(ctx);
     }
 
-    public static Triple<IObserverFunction, Term, Term> translateDependencyContract(ParserRuleContext originalDep, KeYJavaType kjt, ProgramVariable selfVar, Object o, Object o1, Object o2, Object o3, Object o4, Services services) {
-        System.out.println("JmlIO.translateDependencyContract");
-        throw new RuntimeException();
-    }
-
     public ImmutableList<TextualJMLConstruct> parseClassLevel(String concatenatedComment, String fileName, Position pos) {
         return parseClassLevel(new PositionedString(concatenatedComment, fileName, pos));
     }
@@ -202,5 +197,9 @@ public class JmlIO {
 
     public InfFlowSpec translateInfFlow(ParserRuleContext expr) {
         return (InfFlowSpec) this.interpret(expr);
+    }
+
+    public Triple<IObserverFunction, Term, Term> translateDependencyContract(ParserRuleContext ctx) {
+        return (Triple<IObserverFunction, Term, Term>) interpret(ctx);
     }
 }

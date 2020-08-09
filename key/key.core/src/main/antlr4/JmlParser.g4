@@ -68,8 +68,9 @@ diverges_clause: DIVERGES predornot SEMI_TOPLEVEL;
 working_space_clause: WORKING_SPACE predornot SEMI_TOPLEVEL;
 duration_clause: DURATION predornot SEMI_TOPLEVEL;
 when_clause: WHEN predornot SEMI_TOPLEVEL;
-accessible_clause: ACCESSIBLE targetHeap? ((name|INV) COLON)? storeRefUnion
-(MEASURED_BY expression)?
+accessible_clause: ACCESSIBLE targetHeap?
+                    (lhs=expression COLON)? rhs=storeRefUnion
+                    (MEASURED_BY mby=expression)?
 SEMI_TOPLEVEL;
 assignable_clause: (ASSIGNABLE|MODIFIES) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
 depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? ;
