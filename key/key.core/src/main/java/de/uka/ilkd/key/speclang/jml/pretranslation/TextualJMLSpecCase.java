@@ -113,7 +113,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private Map<Object, List<ParserRuleContext>> clauses = new HashMap<>();
     private Map<ParserRuleContext, Name> heaps = new HashMap<>();
 
-    public TextualJMLSpecCase(ImmutableList<String> mods, Behavior behavior) {
+    public TextualJMLSpecCase(ImmutableList<String> mods, @NotNull Behavior behavior) {
         super(mods);
         assert behavior != null;
         this.behavior = behavior;

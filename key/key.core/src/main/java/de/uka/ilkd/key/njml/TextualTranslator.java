@@ -58,7 +58,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     private Behavior getBehavior(Token behavior) {
         if (behavior == null) {
-            return Behavior.BEHAVIOR;
+            return Behavior.NONE; // lightweight specification
         }
 
         switch (behavior.getType()) {

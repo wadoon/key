@@ -125,14 +125,7 @@ keySettings = "#Proof-Settings-Config-File
 
 "
 
-group list_seq {
-   provable ./heap/list_seq/SimplifiedLinkedList.remove.key
-   provable ./heap/list_seq/ArrayList.ArrayList.key
-   provable ./heap/list_seq/ArrayList.add.key
-   provable ./heap/list_seq/ArrayList.contains.key
-   provable ./heap/list_seq/ArrayList.enlarge.key
-   provable ./heap/list_seq/ArrayList.get.key
-   provable ./heap/list_seq/ArrayList.newArray.key
-   provable ./heap/list_seq/ArrayList.remove.0.key
-   provable ./heap/list_seq/ArrayList.remove.1.key
+# Comprehension Tests
+group comprehensions {
+   provable ./heap/comprehensions/general_sum.key
 }
