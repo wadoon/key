@@ -1459,7 +1459,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         Term t = accept(storeref);
         if (declVars != null) resolverManager.popLocalVariablesNamespace();
         assert declVars != null;
-        return translator.createUnionF(Boolean.TRUE.equals(nullable), declVars, t, t2.getTerm());
+        return translator.createUnionF(Boolean.TRUE.equals(nullable), declVars, t, t2 == null ? tb.tt() : t2.getTerm());
     }
 
     @Override
