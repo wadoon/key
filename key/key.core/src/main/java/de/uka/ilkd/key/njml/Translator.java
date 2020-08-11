@@ -966,7 +966,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                     params);
         } catch (SLTranslationException exc) {
             // no type name found maybe package?
-        } catch (ClassCastException e){
+        } catch (ClassCastException e) {
 
         }
 
@@ -1843,7 +1843,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitAccessible_clause(JmlParser.Accessible_clauseContext ctx) {
-        if(ctx.COLON()!=null || ctx.MEASURED_BY()!=null) {//depends clause
+        if (ctx.COLON() != null || ctx.MEASURED_BY() != null) {//depends clause
             //depends clause
             /*
                lhs=expression
@@ -1854,7 +1854,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 ;
             */
             SLExpression lhs = accept(ctx.lhs);
-            Term rhs =  accept(ctx.rhs);
+            Term rhs = accept(ctx.rhs);
             SLExpression mby = accept(ctx.mby);
             assert lhs != null;
             Triple<IObserverFunction, Term, Term> a = translator.depends(lhs, rhs, mby);
@@ -1896,20 +1896,20 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Pair<Label, Term> visitBreaks_clause(JmlParser.Breaks_clauseContext ctx) {
-        String label = ctx.IDENT().getText();
-        Term pred = accept(ctx.predornot());
-        @NotNull Pair<Label, Term> t = translator.createBreaks(pred, label);
+        String label = ctx.lbl == null ? "" : ctx.lbl.getText(); //TODO weigl: right label if omitted
+        SLExpression pred = accept(ctx.predornot());
+        @NotNull Pair<Label, Term> t = translator.createBreaks(pred.getTerm(), label);
         contractClauses.add(ContractClauses.BREAKS, t.first, t.second);
-        return null;
+        return t;
     }
 
     @Override
     public Pair<Label, Term> visitContinues_clause(JmlParser.Continues_clauseContext ctx) {
-        String label = ctx.IDENT().getText();
-        Term pred = accept(ctx.predornot());
-        @NotNull Pair<Label, Term> t = translator.createContinues(pred, label);
+        String label = ctx.lbl == null ? "" : ctx.lbl.getText(); //TODO weigl: right label if omitted
+        SLExpression pred = accept(ctx.predornot());
+        @NotNull Pair<Label, Term> t = translator.createContinues(pred.getTerm(), label);
         contractClauses.add(ContractClauses.CONTINUES, t.first, t.second);
-        return null;
+        return t;
     }
 
     @Override
@@ -2135,7 +2135,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Pair<IObserverFunction, Term> visitRepresents_clause(JmlParser.Represents_clauseContext ctx) {
         SLExpression lhs = accept(ctx.lhs);
         SLExpression rhs = accept(ctx.rhs);
-        Term storeRef= accept(ctx.t);
+        Term storeRef = accept(ctx.t);
 
         assert lhs != null;
         boolean representsClauseLhsIsLocSet = lhs.getTerm().sort().equals(locSetLDT.targetSort());
@@ -2392,19 +2392,18 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
-        TODO();
-        return super.visitAssert_statement(ctx);
+        if (ctx.UNREACHABLE() != null) return new SLExpression(tb.not(tb.tt()));
+        return accept(ctx.expression());
     }
 
     @Override
     public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
-        TODO();
-        return super.visitAssume_statement(ctx);
+        return accept(ctx.expression());
     }
 
     @Override
     public LocationVariable[] visitTargetHeap(JmlParser.TargetHeapContext ctx) {
-        if (ctx==null||ctx.SPECIAL_IDENT().size() == 0) return new LocationVariable[]{getBaseHeap()};
+        if (ctx == null || ctx.SPECIAL_IDENT().size() == 0) return new LocationVariable[]{getBaseHeap()};
         LocationVariable[] heaps = new LocationVariable[ctx.SPECIAL_IDENT().size()];
         for (int i = 0; i < ctx.SPECIAL_IDENT().size(); i++) {
             String heapName = ctx.SPECIAL_IDENT(i).getText();

@@ -114,8 +114,8 @@ loop_determines_clause
 
 signals_clause: SIGNALS LPAREN referencetype (IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
 signals_only_clause: SIGNALS_ONLY (NOTHING |referencetype (COMMA referencetype)*)  SEMI_TOPLEVEL;
-breaks_clause: BREAKS LPAREN (IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
-continues_clause: CONTINUES LPAREN (IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
+breaks_clause: BREAKS LPAREN (lbl=IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
+continues_clause: CONTINUES LPAREN (lbl=IDENT)? RPAREN (predornot)? SEMI_TOPLEVEL;
 returns_clause: RETURNS predornot? SEMI_TOPLEVEL;
 
 name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;

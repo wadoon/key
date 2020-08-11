@@ -214,8 +214,10 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitVariant_function(JmlParser.Variant_functionContext ctx) {
-        assert loopContract != null;
-        loopContract.setVariant(ctx);
+        if(loopContract != null)
+            loopContract.setVariant(ctx);
+        else
+            methodContract.addClause(DECREASES, ctx);
         return null;
     }
 
@@ -393,14 +395,20 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
-        TODO();
+        //FIXME check with mu/rb
+        TextualJMLSpecCase b = new TextualJMLSpecCase(ImmutableSLList.nil(), Behavior.NONE);
+        constructs = constructs.prepend(b);
+        b.addClause(REQUIRES_FREE, ctx);
         return null;
     }
 
 
     @Override
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
-        TODO();
+        //FIXME check with mu/rb
+        TextualJMLSpecCase b = new TextualJMLSpecCase(ImmutableSLList.nil(), Behavior.NONE);
+        constructs = constructs.prepend(b);
+        b.addClause(ENSURES, ctx);
         return null;
     }
 

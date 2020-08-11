@@ -91,10 +91,12 @@ public class JmlIO {
             ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar, ProgramVariable excVar,
             Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores,
-            OriginTermLabel.SpecType breaks, Services services) {
+            OriginTermLabel.SpecType type, Services services) {
+        //FIXME attach type to the generated terms
         JmlIO io = new JmlIO(services, containerType, selfVar, paramVars, resultVar, excVar, atPres, atBefores);
-        Term t = io.translateTerm(parserRuleContext);
-        String label;
+        Pair<Label, Term> t = (Pair<Label, Term>) io.interpret(parserRuleContext);
+        return t;
+        /*String label;
         if (parserRuleContext instanceof JmlParser.Continues_clauseContext) {
             label = ((JmlParser.Continues_clauseContext) parserRuleContext).IDENT().getText();
         } else if (parserRuleContext instanceof JmlParser.Breaks_clauseContext) {
@@ -102,8 +104,7 @@ public class JmlIO {
         } else {
             throw new IllegalArgumentException();
         }
-        //TODO set label
-        return new Pair<>(new ProgramElementName(label), t);
+        return new Pair<>(new ProgramElementName(label), t);*/
     }
 
     public MergeParamsSpec translateMergeParams(JmlParser.MergeparamsspecContext ctx) {
