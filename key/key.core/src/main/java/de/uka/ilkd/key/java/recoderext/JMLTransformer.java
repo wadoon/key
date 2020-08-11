@@ -41,6 +41,8 @@ import recoder.list.generic.ASTList;
 
 import java.util.*;
 
+import static java.lang.String.format;
+
 /**
  * RecodeR transformation that parses JML comments, and attaches code-like
  * specifications (ghost fields, set statements, model methods) directly to the
@@ -360,7 +362,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
         assert originalComments.length > 0;
 
         // prepend Java modifiers
-        PositionedString declWithMods = convertToString(decl.getMods(), decl.getDecl());
+        PositionedString declWithMods =
+                new PositionedString(decl.getParsableDeclaration());
 
         // only handle model methods
         if (!decl.getMods().contains("model")) {
@@ -383,7 +386,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             // transformFieldDecl() above
         } catch (Throwable e) {
             throw new SLTranslationException(
-                    e.getMessage() + " (" + e.getClass().getName() + ")",
+                    format("%s (%s)", e.getMessage(), e.getClass().getName()),
                     declWithMods.fileName, declWithMods.pos, e);
         }
 

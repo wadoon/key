@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.njml.JmlTermFactory;
 import de.uka.ilkd.key.util.MiscTools;
 import recoder.java.Expression;
 
@@ -22,8 +23,7 @@ public class RegisteredEscapeExpression extends EscapeExpression {
     private final String mapEscape;
 
     RegisteredEscapeExpression(String mapEscape, List<Expression> arguments) {
-        //TODO
-        super("\\map"/*JMLTranslator.jml2jdl.get(mapEscape)*/, arguments);
+        super(JmlTermFactory.jml2jdl.get(mapEscape), arguments);
         this.mapEscape = mapEscape;
     }
 
