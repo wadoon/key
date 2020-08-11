@@ -108,9 +108,9 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
         TermBuilder tb = new TermBuilder(tf, services);
 
         Term resLower = tb.func(floatLDT.getGreaterOrEquals(), expr, lowerTerm);
-        Term resUpper = tb.func(floatLDT.getGreaterOrEquals(), expr, upperTerm);
-        resultGoal.addFormula((SequentFormula) resLower, ra.posInOccurrence());
-        resultGoal.addFormula((SequentFormula) resUpper, ra.posInOccurrence());
+        Term resUpper = tb.func(floatLDT.getLessOrEquals(), expr, upperTerm);
+        resultGoal.addFormula(new SequentFormula(resLower), true, false);
+        resultGoal.addFormula(new SequentFormula(resUpper), true, false);
 
         return result;
     }
