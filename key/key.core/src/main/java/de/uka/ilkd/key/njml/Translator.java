@@ -30,6 +30,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
+import org.antlr.misc.IntArrayList;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -2277,9 +2278,31 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
-        TODO();
-        return super.visitMethod_declaration(ctx);
+    public SLExpression visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
+        //preStart(contextThread)
+        // == (\dl_writePermissionObject(contextThread, \permission(this.number)));
+        if(ctx.BODY()==null) return new SLExpression(tb.tt());
+
+        String bodyString = ctx.BODY() == null ? ";" : ctx.BODY().getText();
+        if (bodyString.charAt(0) != '{' || bodyString.charAt(bodyString.length() - 1) != '}')
+            throw new IllegalStateException();
+        bodyString = bodyString.substring(1, bodyString.length() - 1).trim();
+        if (!bodyString.startsWith("return "))
+            throw new IllegalStateException("return expected, instead: " + bodyString);
+        int beginIndex = bodyString.indexOf(" ") + 1;
+        int endIndex = bodyString.lastIndexOf(";");
+        bodyString = bodyString.substring(beginIndex, endIndex);
+
+        String paramsString;
+        List<JmlParser.Param_declContext> paramDecls = ctx.param_list().param_decl();
+        if (paramDecls.size() > 0)
+            paramsString = "(" + paramDecls.stream().map(it -> it.p.getText()).collect(Collectors.joining(",")) + ")";
+        else
+            paramsString = "()"; //default no params
+
+        String equality = ctx.IDENT() + paramsString + " == (" + bodyString + ")";
+        JmlParser.ExpressionContext equal = JmlFacade.parseExpr(equality);
+        return accept(equal);
     }
 
     @Override
@@ -2423,7 +2446,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
                     heaps[i] = getBaseHeap();
                     break;
                 default:
-                    throw new IllegalStateException("Unknown heap: " + heapName);
+                    heaps[i] = heapLDT.getHeapForName(new Name(heapName));
+                    //throw new IllegalStateException("Unknown heap: " + heapName);
             }
         }
         return heaps;

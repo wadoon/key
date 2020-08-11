@@ -147,4 +147,5 @@ public abstract class TextualJMLConstruct {
         }
         setPosition(ps);
     }
+
 }

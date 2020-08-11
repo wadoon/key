@@ -13,8 +13,9 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import com.google.common.base.Strings;
+import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.njml.JmlParser;
-import de.uka.ilkd.key.speclang.PositionedString;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
 
@@ -35,13 +36,13 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
         this.methodDefinition = methodDefinition;
     }
 
-    public String getParsableDeclaration() {
+    public String getParsableBody() {
         //<heap> preStart(contextThread) == (\dl_writePermissionObject(contextThread, \permission(this.number))); (file:/home/weigl/work/key/key/key.core/../key.ui/examples/index/.././heap/permissions/threads/src/Fib.java, 8/24)
         List<JmlParser.Param_declContext> paramDecls = methodDefinition.param_list().param_decl();
         String bodyString = methodDefinition.BODY() == null ? ";" : methodDefinition.BODY().getText();
         String paramsString;
         if (paramDecls.size() > 0)
-            paramsString = "("+paramDecls.stream().map(it -> it.p.getText()).collect(Collectors.joining(","))+")";
+            paramsString = "(" + paramDecls.stream().map(it -> it.p.getText()).collect(Collectors.joining(",")) + ")";
         else
             paramsString = "()"; //default no params
         if (bodyString.charAt(0) != '{' || bodyString.charAt(bodyString.length() - 1) != '}')
@@ -55,6 +56,25 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
         return this.getMethodName() + paramsString + " == (" + bodyString + ");";
     }
 
+    public String getParsableDeclaration() {
+        String m = mods.stream()
+                .map(it -> {
+                    if (JMLTransformer.javaMods.contains(it)) {
+                        return it;
+                    } else {
+                        return Strings.repeat(" ", it.length());
+                    }
+                })
+                .collect(Collectors.joining(" "));
+
+        String paramsString = methodDefinition.param_list().param_decl()
+                .stream()
+                .map(it -> it.t.getText() + " " + it.p.getText())
+                .collect(Collectors.joining(","));
+        return String.format("%s %s %s (%s);",
+                m, methodDefinition.type().getText(),
+                getMethodName(), paramsString);
+    }
 
     public JmlParser.Method_declarationContext getDecl() {
         return methodDefinition;

@@ -58,7 +58,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
     private static final String JML = "/*@";
     private static final String JMR = "@*/";
 
-    private static final ImmutableList<String> javaMods = ImmutableSLList
+    public static final ImmutableList<String> javaMods = ImmutableSLList
             .<String>nil().prepend("abstract", "final", "private", "protected",
                     "public", "static");
 
