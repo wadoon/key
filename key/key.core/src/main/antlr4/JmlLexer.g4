@@ -194,6 +194,7 @@ C_RPAREN: ')' -> type(RPAREN);
 C_STRING_LITERAL: '"' -> pushMode(string), more;
 C_IDENT: '\\'? LETTER (LETTERORDIGIT)* -> type(IDENT);
 C_COLON: ':' -> type(COLON);
+C_DOT: '.' -> type(DOT);
 
 SL_COMMENT: {isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> channel(HIDDEN);
 ML_COMMENT: {isComment("/*")}? '/*' -> more, pushMode(mlComment);

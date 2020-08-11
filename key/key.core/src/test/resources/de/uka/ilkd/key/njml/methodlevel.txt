@@ -1,3 +1,6 @@
+---Contract---
+//@ ghost \locset oldPcDep = UpdateAbstraction.pcDep;         //entering conditional
+//@ set UpdateAbstraction.pcDep = \set_union(UpdateAbstraction.pcDep, UpdateAbstraction.hDep); //entering conditional
 --- Contract ---
 loop_invariant
      (\forall short j; true; true)

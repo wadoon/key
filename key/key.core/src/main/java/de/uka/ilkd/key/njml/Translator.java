@@ -1942,13 +1942,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
-    public ImmutableList<TextualJMLConstruct> visitClasslevel_comment(JmlParser.Classlevel_commentContext ctx) {
+    public Object visitClasslevel_element0(JmlParser.Classlevel_element0Context ctx) {
         this.mods = ImmutableSLList.<String>nil();
         /* there may be some modifiers after the declarations */
-        this.mods = (ImmutableSLList<String>) this.<String>listOf(ctx.modifiers());
-        ImmutableList<TextualJMLConstruct> result = listOf(ctx.classlevel_element());
-        this.mods = (ImmutableSLList<String>) mods.prepend(this.mods);
-        return result;
+        this.mods = accept(ctx.modifiers());
+        listOf(ctx.modifier2());
+        return accept(ctx.classlevel_element());
     }
 
     @Override
@@ -2056,11 +2055,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitEnsures_clause(JmlParser.Ensures_clauseContext ctx) {
         String type = ctx.ENSURES().getText();
         SLExpression t = accept(ctx.predornot());
-        LocationVariable heap = accept(ctx.targetHeap());
-        insertSimpleClause(type, heap, t.getTerm(),
-                ContractClauses.ENSURES,
-                ContractClauses.ENSURES_FREE,
-                ContractClauses.ENSURES);
+        LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
+        for (LocationVariable heap : heaps) {
+            insertSimpleClause(type, heap, t.getTerm(),
+                    ContractClauses.ENSURES,
+                    ContractClauses.ENSURES_FREE,
+                    ContractClauses.ENSURES);
+        }
         return t;
     }
 
@@ -2069,11 +2070,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitRequires_clause(JmlParser.Requires_clauseContext ctx) {
         String type = ctx.REQUIRES().getText();
         SLExpression t = accept(ctx.predornot());
-        LocationVariable heap = accept(ctx.targetHeap());
-        insertSimpleClause(type, heap, t.getTerm(),
-                ContractClauses.REQUIRES,
-                ContractClauses.REQUIRES_FREE,
-                ContractClauses.REQUIRES);
+        LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
+        for (LocationVariable heap : heaps) {
+            insertSimpleClause(type, heap, t.getTerm(),
+                    ContractClauses.REQUIRES,
+                    ContractClauses.REQUIRES_FREE,
+                    ContractClauses.REQUIRES);
+        }
         return t;
     }
 
@@ -2409,14 +2412,18 @@ class Translator extends JmlParserBaseVisitor<Object> {
             String heapName = ctx.SPECIAL_IDENT(i).getText();
             switch (heapName) {
                 case "<permission>":
+                case "<permissions>":
                     heaps[i] = getPermissionHeap();
+                    break;
                 case "<savedHeap>":
                 case "<saved>":
                     heaps[i] = getSavedHeap();
+                    break;
                 case "<heap>":
                     heaps[i] = getBaseHeap();
+                    break;
                 default:
-                    throw new IllegalStateException("Unknown heap.");
+                    throw new IllegalStateException("Unknown heap: " + heapName);
             }
         }
         return heaps;

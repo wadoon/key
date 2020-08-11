@@ -3,7 +3,8 @@ parser grammar JmlParser;
 options { tokenVocab=JmlLexer; }
 
 classlevel_comments: classlevel_comment* EOF;
-classlevel_comment: modifiers? (classlevel_element modifiers?)+ | modifiers | set_statement;
+classlevel_comment: (classlevel_element0)+ | modifiers | set_statement;
+classlevel_element0: modifiers? classlevel_element modifier2*;
 classlevel_element
   : class_invariant | depends_clause | method_specification
   | method_declaration | field_declaration | represents_clause
@@ -29,6 +30,10 @@ modifier
   | NO_STATE | SPEC_JAVA_MATH | SPEC_SAVE_MATH | SPEC_BIGINT_MATH
   | CODE_JAVA_MATH | CODE_SAVE_MATH | CODE_BIGINT_MATH
  ;
+modifier2
+  : HELPER
+ ;
+
 
 class_axiom: AXIOM expression SEMI_TOPLEVEL;
 initially_clause: INITIALLY expression SEMI_TOPLEVEL;

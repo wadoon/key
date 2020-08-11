@@ -1,3 +1,4 @@
+---Contract---
 /*@ normal_behavior
       @ assignable footprint;
       @ ensures size() == \old(size()) + 1;

@@ -30,12 +30,11 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitClasslevel_comment(JmlParser.Classlevel_commentContext ctx) {
+    public Object visitClasslevel_element0(JmlParser.Classlevel_element0Context ctx) {
         mods = ImmutableSLList.nil();
-        acceptAll(ctx.modifiers());
-        for (JmlParser.Classlevel_elementContext c : ctx.classlevel_element()) {
-            c.accept(this);
-        }
+        accept(ctx.modifiers());
+        accept(ctx.classlevel_element());
+        acceptAll(ctx.modifier2());
         return null;
     }
 
@@ -214,7 +213,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitVariant_function(JmlParser.Variant_functionContext ctx) {
-        if(loopContract != null)
+        if (loopContract != null)
             loopContract.setVariant(ctx);
         else
             methodContract.addClause(DECREASES, ctx);
@@ -345,6 +344,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitField_declaration(JmlParser.Field_declarationContext ctx) {
+        assert mods.size() > 0;
         TextualJMLFieldDecl inv = new TextualJMLFieldDecl(mods, ctx);
         constructs = constructs.append(inv);
         return null;
