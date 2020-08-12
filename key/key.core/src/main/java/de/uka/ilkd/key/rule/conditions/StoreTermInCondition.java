@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.LightweightSyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -41,7 +40,7 @@ public class StoreTermInCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable sv, SVSubstitute instCandidate,
-            MatchConditions matchCond, Goal goal, Services services) {
+            MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         if (svInst.getInstantiation(storeInSV) != null) {
@@ -49,8 +48,7 @@ public class StoreTermInCondition implements VariableCondition {
         }
 
         final LightweightSyntacticalReplaceVisitor replVisitor = //
-                new LightweightSyntacticalReplaceVisitor(svInst,
-                        goal.getLocalSpecificationRepository(), services);
+                new LightweightSyntacticalReplaceVisitor(svInst, services);
         term.execPostOrder(replVisitor);
         final Term instantiatedTerm = replVisitor.getTerm();
 

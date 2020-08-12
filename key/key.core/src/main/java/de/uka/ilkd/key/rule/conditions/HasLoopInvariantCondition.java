@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -23,7 +22,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Checks whether a loop has an invariant (either normal or "free").
- * 
+ *
  * @author Dominic Steinhoefel
  */
 public class HasLoopInvariantCondition implements VariableCondition {
@@ -38,13 +37,13 @@ public class HasLoopInvariantCondition implements VariableCondition {
 
     @Override
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
-            MatchConditions matchCond, Goal goal, Services services) {
+            MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         final LoopStatement loop = (LoopStatement) svInst
                 .getInstantiation(loopStmtSV);
         final LoopSpecification loopSpec = //
-                goal.getLocalSpecificationRepository().getLoopSpec(loop);
+                services.getSpecificationRepository().getLoopSpec(loop);
 
         if (loopSpec == null) {
             return null;

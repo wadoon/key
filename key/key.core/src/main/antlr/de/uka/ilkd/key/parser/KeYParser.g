@@ -4043,19 +4043,20 @@ type_resolver returns [TypeResolver tr = null]
 varcond_new [TacletBuilder b]
 :
    NEW LPAREN x=varId COMMA
-      ( TYPEOF LPAREN y=varId RPAREN 
-      {
-       b.addVarsNew((SchemaVariable) x, (SchemaVariable) y);
-	  }
+      (
+          TYPEOF LPAREN y=varId RPAREN {
+            b.addVarsNew((SchemaVariable) x, (SchemaVariable) y);
+          }
       |
          DEPENDINGON LPAREN y=varId RPAREN {
-	    b.addVarsNewDependingOn((SchemaVariable)x, (SchemaVariable)y);
-	  }
+            b.addVarsNewDependingOn((SchemaVariable)x, (SchemaVariable)y);
+          }
       | kjt=keyjavatype {
-		b.addVarsNew((SchemaVariable) x, kjt.getJavaType());
-	  }
+                b.addVarsNew((SchemaVariable) x, kjt.getJavaType());
+          }
       )
    RPAREN
+
 ;
 
 varcond_newlabel [TacletBuilder b] 
