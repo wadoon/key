@@ -96,8 +96,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     public static final String BODY_PRESERVES_INVARIANT_LABEL = "Body Preserves Invariant";
 
-    private static Term lastFocusTerm;
-    private static Instantiation lastInstantiation;
 
 
     private static InfFlowData prepareSetUpOfInfFlowValidityGoal(final Goal infFlowGoal,
@@ -216,11 +214,6 @@ public final class WhileInvariantRule implements BuiltInRule {
                                              Services services) throws RuleAbortException {
         final Term focusTerm = app.posInOccurrence().subTerm();
 
-        if (focusTerm == lastFocusTerm &&
-                lastInstantiation.inv == services.getSpecificationRepository()
-                .getLoopSpec(lastInstantiation.loop)) {
-            return lastInstantiation;
-        }
 
 	//leading update?
 	final Pair<Term, Term> update = applyUpdates(focusTerm, services);
@@ -261,8 +254,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//cache and return result
 	final Instantiation result = new Instantiation(u, progPost, loop, spec, selfTerm,
 	                                               innermostExecutionContext);
-	lastFocusTerm = focusTerm;
-	lastInstantiation = result;
 	return result;
     }
 

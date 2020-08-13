@@ -41,10 +41,5 @@
 			<type>2</type>
 			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.ui/src/main/java</locationURI>
 		</link>
-		<link>
-			<name>key.ui.lib</name>
-			<type>2</type>
-			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.ui/lib</locationURI>
-		</link>
 	</linkedResources>
 </projectDescription>

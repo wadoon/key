@@ -130,8 +130,8 @@ options {
          prooflabel2tag.put("contract", ProofElementID.CONTRACT);
          prooflabel2tag.put("ifInst", ProofElementID.ASSUMES_INST_BUILT_IN);     
          prooflabel2tag.put("userinteraction", ProofElementID.USER_INTERACTION);
-         prooflabel2tag.put("proofscript", ProofElementID.PROOF_SCRIPT);
          prooflabel2tag.put("notes", ProofElementID.NOTES);
+         prooflabel2tag.put("proofscript", ProofElementID.PROOF_SCRIPT);
          prooflabel2tag.put("newnames", ProofElementID.NEW_NAMES);
          prooflabel2tag.put("autoModeTime", ProofElementID.AUTOMODE_TIME);  
          prooflabel2tag.put("mergeProc", ProofElementID.MERGE_PROCEDURE);
@@ -4041,22 +4041,27 @@ type_resolver returns [TypeResolver tr = null]
 
 
 varcond_new [TacletBuilder b]
+@init {
+  boolean isDependingOn = false;
+}
 :
    NEW LPAREN x=varId COMMA
-      (
-          TYPEOF LPAREN y=varId RPAREN {
-            b.addVarsNew((SchemaVariable) x, (SchemaVariable) y);
-          }
-      |
-         DEPENDINGON LPAREN y=varId RPAREN {
-            b.addVarsNewDependingOn((SchemaVariable)x, (SchemaVariable)y);
-          }
-      | kjt=keyjavatype {
-                b.addVarsNew((SchemaVariable) x, kjt);
-          }
-      )
+   (
+      ( TYPEOF LPAREN y=varId RPAREN | kjt=keyjavatype )
+      |  DEPENDINGON LPAREN y=varId RPAREN { isDependingOn = true; }
+   )
    RPAREN
-
+   {
+       if (isDependingOn) {
+           b.addVarsNewDependingOn((SchemaVariable) x, (SchemaVariable) y);
+       } else {
+           if ( y != null) {
+              b.addVarsNew((SchemaVariable)x, (SchemaVariable)y);
+           } else if ( kjt != null) {
+              b.addVarsNew((SchemaVariable) x, kjt);
+           }
+       }
+   }
 ;
 
 varcond_newlabel [TacletBuilder b] 

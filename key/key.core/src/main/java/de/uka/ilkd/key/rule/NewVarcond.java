@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /**
@@ -64,7 +63,7 @@ public class NewVarcond {
     }
 
 
-    public Type getType() {
+    public KeYJavaType getType() {
 	return type;
     }
 

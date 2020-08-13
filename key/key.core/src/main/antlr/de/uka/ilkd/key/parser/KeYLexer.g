@@ -226,6 +226,8 @@ lexer grammar KeYLexer;
 
         // Keywords for varcond and related stuff
 	SAME_OBSERVER : '\\sameObserver';
+    STORE_STMT_IN : '\\storeStmtIn' ;
+    STORE_TERM_IN : '\\storeTermIn' ;
 	VARCOND : '\\varcond';
 	HAS_INVARIANT : '\\hasInvariant';
 	GET_INVARIANT : '\\getInvariant';
