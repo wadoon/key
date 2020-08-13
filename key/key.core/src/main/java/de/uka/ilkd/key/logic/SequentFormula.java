@@ -50,7 +50,6 @@ public class SequentFormula {
     }
 
     /** equal if terms and constraints are equal */
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) { return true; }
 	if (obj instanceof SequentFormula) {
@@ -63,12 +62,10 @@ public class SequentFormula {
     }
 
     /** String representation */
-    @Override
     public String toString() {
 	return term.toString();
     }
 
-    @Override
     public int hashCode () {
         return hashCode;
     }

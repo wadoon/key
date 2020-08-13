@@ -574,7 +574,6 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                             new AbstractStrategyPropertyDefinition[props.size()]));
     }
 
-    @Override
     public Strategy create(Proof proof,
                            StrategyProperties strategyProperties) {
         return new JavaCardDLStrategy(proof, strategyProperties);

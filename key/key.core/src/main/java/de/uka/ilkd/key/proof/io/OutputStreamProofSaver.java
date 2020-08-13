@@ -539,8 +539,7 @@ public class OutputStreamProofSaver {
                 .getJustifInfo()
                 .getJustification(appliedRuleApp, proof.getServices());
 
-        assert ruleJusti instanceof RuleJustificationBySpec :
-            "Please consult bug #1111 if this fails.";
+        assert ruleJusti instanceof RuleJustificationBySpec : "Please consult bug #1111 if this fails.";
 
         final RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
         output.append(" (contract \"");

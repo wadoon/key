@@ -24,10 +24,8 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 
-/**
- * Miscellaneous static methods related to Java blocks or statements in KeY.
+/** Miscellaneous static methods related to Java blocks or statements in KeY.
  * Mostly moved from key.util.MiscTools here.
- *
  * @author bruns
  *
  */
@@ -62,8 +60,8 @@ public final class JavaTools {
             Services services) {
         assert jb.program() != null;
         final SourceElement activeStatement = JavaTools.getActiveStatement(jb);
-        Statement newProg = (Statement) (new CreatingASTVisitor(jb.program(),
-            false, services) {
+        Statement newProg = (Statement)
+            (new CreatingASTVisitor(jb.program(), false, services) {
             private boolean done = false;
 
             public ProgramElement go() {
@@ -99,12 +97,10 @@ public final class JavaTools {
         final MethodFrame result = new JavaASTVisitor(pe, services) {
             private MethodFrame res;
 
-            @Override
             protected void doAction(ProgramElement node) {
                 node.visit(this);
             }
 
-            @Override
             protected void doDefaultAction(SourceElement node) {
                 if (node instanceof MethodFrame && res == null) {
                     res = (MethodFrame) node;
@@ -128,10 +124,12 @@ public final class JavaTools {
         return getInnermostMethodFrame(jb.program(), services);
     }
 
-    public static ExecutionContext getInnermostExecutionContext(JavaBlock jb,
+    public static ExecutionContext getInnermostExecutionContext(
+        						JavaBlock jb, 
             Services services) {
         final MethodFrame frame = getInnermostMethodFrame(jb, services);
-        return frame == null ? null
+    return frame == null 
+               ? null
                 : (ExecutionContext) frame.getExecutionContext();
     }
 

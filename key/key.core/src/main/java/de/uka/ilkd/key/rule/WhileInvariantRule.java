@@ -105,10 +105,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                                  LoopSpecification spec,
                                                                  Services services,
                                                                  LoopInvariantBuiltInRuleApp ruleApp,
-                                                                 final ImmutableSet<ProgramVariable>
-                                                                            localIns,
-                                                                 final ImmutableSet<ProgramVariable>
-                                                                            localOuts,
+            final ImmutableSet<ProgramVariable> localIns,
+            final ImmutableSet<ProgramVariable> localOuts,
                                                                  final Term anonUpdate,
                                                                  final JavaBlock guardJb)
             throws RuleAbortException {
@@ -827,8 +825,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable heap : heapContext) {
-            final Term m =
-                    inst.inv.getModifies(heap, inst.selfTerm, atPres, services);
+            final Term m = inst.inv.getModifies(heap, inst.selfTerm, atPres, services);
             mods.put(heap, m);
         }
 

@@ -248,11 +248,12 @@ import java.util.regex.*;
     WHEN_RED 			: 'when_redundantly';
     WORKING_SPACE 		: 'working_space';
     WORKING_SPACE_RED 		: 'working_space_redundantly';
-    WRITABLE			: 'writable'; ML_COMMENT
+    WRITABLE			: 'writable';
+
+ML_COMMENT
 :
   {isComment("/*")}? =>
-    ('/*' (
-	    options { greedy = false; } : .)* '*/')
+    ('/*' (options { greedy = false; } : .)* '*/')
   { $channel = HIDDEN; }
 ;
 
@@ -272,7 +273,8 @@ JML_COMMENT_START
 fragment ANNOTATIONS: ANNOTATION+;
 fragment ANNOTATION
 :
-  ('+'|'-') ('a'..'z'|'A'..'Z')*// in early JML //+@ and //-@ was also allowed.
+  ('+'|'-') ('a'..'z'|'A'..'Z')*
+  // in early JML //+@ and //-@ was also allowed.
   // we accept both.
 ;
 
