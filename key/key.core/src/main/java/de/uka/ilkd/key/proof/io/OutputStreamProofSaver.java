@@ -715,12 +715,6 @@ public class OutputStreamProofSaver {
         ps.append(")\n");
     }
 
-    /**
-     * TODO
-     * @param seq TODO
-     * @param pos TODO
-     * @return TODO
-     */
     public static String posInOccurrence2Proof(Sequent seq,
             PosInOccurrence pos) {
         if (pos == null) {
