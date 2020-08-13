@@ -75,16 +75,12 @@ public class AutoMacro extends StrategyProofMacro {
      * All names of currently implemented parameters belong here.
      */
     //@formatter:off
-    private static final String[] PARAMS = {
-            BREAKPOINT_PARAM_NAME,
-            ALLOW_SPLITS_PARAM_NAME,
-            WHITELIST_PARAM_NAME,
-            SYMBEX_ONLY_PARAM_NAME,
-            ONLY_HUMAN_PARAM_NAME, };
+    private static final String[] PARAMS = { BREAKPOINT_PARAM_NAME,
+        ALLOW_SPLITS_PARAM_NAME, WHITELIST_PARAM_NAME,
+        SYMBEX_ONLY_PARAM_NAME, ONLY_HUMAN_PARAM_NAME, };
     //@formatter:off
 
     /** The breakpoint parameter: String repr. of the statements */
-
     private Optional<String> breakpoint = Optional.empty();
     /** True iff splits allowed. */
     private boolean allowSplits = true;
@@ -138,22 +134,17 @@ public class AutoMacro extends StrategyProofMacro {
             throws IllegalArgumentException {
         if (paramName.equals(BREAKPOINT_PARAM_NAME)) {
             breakpoint = Optional.ofNullable(paramValue);
-        }
-        else if (paramName.equals(ALLOW_SPLITS_PARAM_NAME)) {
+        } else if (paramName.equals(ALLOW_SPLITS_PARAM_NAME)) {
             allowSplits = checkBoolean(ALLOW_SPLITS_PARAM_NAME, paramValue);
-        }
-        else if (paramName.equals(SYMBEX_ONLY_PARAM_NAME)) {
+        } else if (paramName.equals(SYMBEX_ONLY_PARAM_NAME)) {
             symbexOnly = checkBoolean(SYMBEX_ONLY_PARAM_NAME, paramValue);
-        }
-        else if (paramName.equals(ONLY_HUMAN_PARAM_NAME)) {
+        } else if (paramName.equals(ONLY_HUMAN_PARAM_NAME)) {
             onlyHumanReadable = checkBoolean(ONLY_HUMAN_PARAM_NAME, paramValue);
-        }
-        else if (paramName.equals(WHITELIST_PARAM_NAME)) {
+        } else if (paramName.equals(WHITELIST_PARAM_NAME)) {
             whitelist = StreamSupport
                     .stream(Arrays.spliterator(paramValue.split(",")), true)
                     .collect(Collectors.toList());
-        }
-        else {
+        } else {
             super.setParameter(paramName, paramValue);
         }
     }
@@ -161,11 +152,9 @@ public class AutoMacro extends StrategyProofMacro {
     private boolean checkBoolean(String paramName, String paramValue) {
         if (paramValue.equalsIgnoreCase("true")) {
             return true;
-        }
-        else if (paramValue.equalsIgnoreCase("false")) {
+        } else if (paramValue.equalsIgnoreCase("false")) {
             return false;
-        }
-        else {
+        } else {
             throw new IllegalArgumentException(String.format(
                     "Illegal argument for boolean parameter %s: %s", paramName,
                     paramValue));
