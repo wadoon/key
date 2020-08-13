@@ -1055,8 +1055,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         SLExpression result = lookupIdentifier(lookupName, receiver, new SLParameters(params), ctx.LPAREN().getSymbol());
         if (result == null) {
-            raiseError("Method " + lookupName + "("
-                    + createSignatureString(params) + ") not found!", ctx.LPAREN().getSymbol());
+            raiseError(String.format("Method %s(%s) not found!",
+                    lookupName, createSignatureString(params)), ctx.LPAREN().getSymbol());
         }
         if (((IProgramMethod) result.getTerm().op()).getStateCount() > 1
                 && (atPres == null || atPres.get(getBaseHeap()) == null)) {
