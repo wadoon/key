@@ -1890,10 +1890,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
             Term rhs = accept(ctx.rhs);
             SLExpression mby = accept(ctx.mby);
             assert lhs != null;
-            //weigl: seems strange maybe someone missed switched the values
             assert rhs != null;
-            Triple<IObserverFunction, Term, Term> a = translator.depends(new SLExpression(rhs), lhs.getTerm(), mby);
-            return a;
+            try{
+                return translator.depends(lhs, rhs, mby);
+            }catch(Exception e) {
+                //weigl: seems strange maybe someone missed switched the values
+                return translator.depends(new SLExpression(rhs), lhs.getTerm(), mby);
+            }
         }
         final Term term = requireNonNull(accept(ctx.storeRefUnion()));
         Term t = translator.accessible(term);
