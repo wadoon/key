@@ -15,21 +15,13 @@ package de.uka.ilkd.key.proof;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EventObject;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Vector;
+import java.util.*;
+import java.util.function.Predicate;
 
 import javax.swing.SwingUtilities;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -877,6 +869,26 @@ public class Proof implements Named {
         }
     }
 
+
+    /**
+     * Bread-first search for the first node, that matches the given
+     * predicate.
+     * @param pred non-null test function
+     * @return a node fulfilling {@code pred} or null
+     */
+    public @Nullable Node findAny(@NotNull Predicate<Node> pred) {
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(root);
+        while(!queue.isEmpty()) {
+            Node cur = queue.poll();
+            if(pred.test(cur)) return cur;
+            Iterator<Node> iter = cur.childrenIterator();
+            while(iter.hasNext()) queue.add(iter.next());
+        }
+        return null;
+    }
+
+
     public void traverseFromChildToParent(Node child, Node parent, ProofVisitor visitor) {
         do {
             visitor.visit(this, child);
@@ -1206,7 +1218,7 @@ public class Proof implements Named {
     }
 
     public void removeRuleAppListener(RuleAppListener p) {
-        synchronized (ruleAppListenerList) {
+        synchronized (ruleAppListenerList) { // TODO (DS, 2019-03-19): Is null for SET tests!?!
             ruleAppListenerList.remove(p);
         }
     }

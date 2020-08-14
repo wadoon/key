@@ -16,6 +16,8 @@ package de.uka.ilkd.key.pp;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.key_project.util.collection.ImmutableList;
 
