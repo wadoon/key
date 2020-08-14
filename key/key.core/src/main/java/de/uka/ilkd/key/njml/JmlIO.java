@@ -4,7 +4,6 @@ import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -69,42 +68,16 @@ public class JmlIO {
         return JmlTermFactory.jml2jdl.containsKey(functionName);
     }
 
-    public static Term translateTerm(ParserRuleContext expr,
-                                     KeYJavaType containerType,
-                                     ProgramVariable self,
-                                     ImmutableList<ProgramVariable> o, ProgramVariable o1, ProgramVariable o2, Map<LocationVariable, Term> o3, Services services) {
-        JmlIO io = new JmlIO(services, containerType, self, o, o1, o2, o3);
-        return (Term) io.interpret(expr);
-    }
-
-    public static Term translateTerm(ParserRuleContext expr, KeYJavaType containerType, ProgramVariable selfVar, ImmutableList<ProgramVariable> allVars,
-                                     ProgramVariable o, ProgramVariable o1, Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atPres1, OriginTermLabel.SpecType type, Services services) {
-        JmlIO io = new JmlIO(services, containerType, selfVar, allVars, o, o1, atPres, atPres1);
-        SLExpression e = (SLExpression) io.interpret(expr);
-        //TODO weigl set label
-        return e.getTerm();
+    private Term attachTermLabel(Term term, OriginTermLabel.SpecType type) {
+        return services.getTermBuilder().addLabel(term,
+                new OriginTermLabel(new OriginTermLabel.Origin(type)));
     }
 
 
-    public static Pair<Label, Term> translateLabeledClause(
-            ParserRuleContext parserRuleContext, KeYJavaType containerType,
-            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable resultVar, ProgramVariable excVar,
-            Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores,
-            OriginTermLabel.SpecType type, Services services) {
-        //FIXME attach type to the generated terms
-        JmlIO io = new JmlIO(services, containerType, selfVar, paramVars, resultVar, excVar, atPres, atBefores);
-        Pair<Label, Term> t = (Pair<Label, Term>) io.interpret(parserRuleContext);
-        return t;
-        /*String label;
-        if (parserRuleContext instanceof JmlParser.Continues_clauseContext) {
-            label = ((JmlParser.Continues_clauseContext) parserRuleContext).IDENT().getText();
-        } else if (parserRuleContext instanceof JmlParser.Breaks_clauseContext) {
-            label = ((JmlParser.Breaks_clauseContext) parserRuleContext).IDENT().getText();
-        } else {
-            throw new IllegalArgumentException();
-        }
-        return new Pair<>(new ProgramElementName(label), t);*/
+    public Pair<Label, Term> translateLabeledClause(
+            ParserRuleContext parserRuleContext, OriginTermLabel.SpecType type) {
+        Pair<Label, Term> t = (Pair<Label, Term>) interpret(parserRuleContext);
+        return new Pair<>(t.first, attachTermLabel(t.second, type));
     }
 
     public MergeParamsSpec translateMergeParams(JmlParser.MergeparamsspecContext ctx) {
@@ -146,6 +119,11 @@ public class JmlIO {
     public Term translateTerm(ParserRuleContext expr) {
         Object interpret = interpret(expr);
         return ((SLExpression) interpret).getTerm();
+    }
+
+    public Term translateTerm(ParserRuleContext expr, OriginTermLabel.SpecType type) {
+        Term t = translateTerm(expr);
+        return attachTermLabel(t, type);
     }
 
     public Term parseExpression(String input) {
@@ -203,4 +181,11 @@ public class JmlIO {
     public Triple<IObserverFunction, Term, Term> translateDependencyContract(ParserRuleContext ctx) {
         return (Triple<IObserverFunction, Term, Term>) interpret(ctx);
     }
+
+    public JmlIO atBefore(Map<LocationVariable, Term> atBefores) {
+        this.atBefores = atBefores;
+        return this;
+    }
+
+
 }

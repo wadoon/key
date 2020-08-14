@@ -1,4 +1,57 @@
 ---Contract---
+// from jml ref manual
+ /* disabled @   old \bigint sum =
+      @		(\sum int j; 0 <= j && j < a.length; (\bigint)a[j]);
+      @   requires Long.MIN_VALUE <= sum && sum <= Long.MAX_VALUE;
+      @   assignable \nothing;
+      @   ensures \result == sum;
+      @*/
+---Contract---
+// from jml ref manual, disabled
+//  @ ghost int i = 0;
+//  @ ghost int zero = 0, j, k = i+3;
+//  @ ghost float[] a = {1, 2, 3};
+//  @ ghost Object o;
+//  @ final ghost non_null Object nno = new Object();
+---Contract---
+// from jml ref manual
+/*@ protected behavior
+  @   requires P;
+  @   diverges false;
+  @   assignable X;
+  @   when \not_specified;
+  @   working_space \not_specified;
+  @   duration \not_specified;
+  @   ensures Q;
+  @   signals_only Exception;
+  @   signals (Exception) R;
+  @*/
+---Contract---
+// from jml ref manual
+     /** A specification that can't be satisfied. */
+      /*@  public normal_behavior
+       @    requires z <= 99;
+       @    assignable \nothing;
+       @    ensures \result > z;
+       @ also
+       @  public exceptional_behavior
+       @    requires z < 0;
+       @    assignable \nothing;
+       @    signals (IllegalArgumentException) true;
+       @*/
+---Contract---
+// from jml ref manual
+          /*@  public exceptional_behavior
+            @     requires z < 99;
+            @     assignable \nothing;
+            @     signals_only IllegalArgumentException;
+            @ also
+            @   public exceptional_behavior
+            @     requires z > 0;
+            @     assignable \nothing;
+            @     signals_only NullPointerException;
+            @*/
+---Contract---
 /*@ normal_behavior
       @ assignable footprint;
       @ ensures size() == \old(size()) + 1;

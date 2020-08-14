@@ -30,7 +30,7 @@ import java.util.List;
  * @version 1 (5/15/20)
  */
 @RunWith(Parameterized.class)
-public class ContractTranslatorTest {
+public class ClasslevelTranslatorTest {
     @Parameterized.Parameter(value = 0)
     public String expr = "";
 

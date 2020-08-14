@@ -398,7 +398,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         //FIXME check with mu/rb
         TextualJMLSpecCase b = new TextualJMLSpecCase(ImmutableSLList.nil(), Behavior.NONE);
         constructs = constructs.prepend(b);
-        b.addClause(REQUIRES_FREE, ctx);
+        b.addClause(ENSURES_FREE, ctx);
         return null;
     }
 
@@ -408,7 +408,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         //FIXME check with mu/rb
         TextualJMLSpecCase b = new TextualJMLSpecCase(ImmutableSLList.nil(), Behavior.NONE);
         constructs = constructs.prepend(b);
-        b.addClause(ENSURES, ctx);
+        b.addClause(REQUIRES, ctx);
         return null;
     }
 

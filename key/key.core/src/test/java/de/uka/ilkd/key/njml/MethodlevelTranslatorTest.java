@@ -2,28 +2,17 @@ package de.uka.ilkd.key.njml;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author Alexander Weigl
@@ -37,7 +26,7 @@ public class MethodlevelTranslatorTest {
     @Parameterized.Parameters()
     public static Collection<Object[]> getFiles() throws IOException {
         InputStream resourceAsStream = ExpressionTranslatorTest.class.getResourceAsStream("methodlevel.txt");
-        return ContractTranslatorTest.readInputs(resourceAsStream);
+        return ClasslevelTranslatorTest.readInputs(resourceAsStream);
     }
 
     private Recoder2KeY r2k;
