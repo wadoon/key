@@ -444,11 +444,11 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
                     specCase.addClause(REQUIRES, JmlFacade.parseExpr(format("%s.\\inv", pm.getName())));
-                    //ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                    //TODO ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
                 if (specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                     specCase.addClause(ENSURES, JmlFacade.parseExpr(invString));
-                    //label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                    //TODO label(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
                 if (specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
                     specCase.addClause(TextualJMLSpecCase.Clause.SIGNALS,
