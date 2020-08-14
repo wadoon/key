@@ -44,7 +44,7 @@ public class ForInitUnfoldTransformer extends ProgramTransformer {
     public ProgramElement[] transform(ProgramElement pe, GoalLocalSpecificationRepository localSpecRepo,
             Services services, SVInstantiations svInst) {
         Debug.assertTrue(pe instanceof LoopInit,
-            "ForInitUnfoldTransformer cannot handle ", pe);
+                "ForInitUnfoldTransformer cannot handle ", pe);
 
         final LoopInit astLoopInit = (LoopInit) pe;
         final Statement[] loopInitStatementList = new Statement[astLoopInit

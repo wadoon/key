@@ -97,7 +97,7 @@ public final class JavaTools {
     /**
      * Returns the innermost method frame of the passed java block
      */
-    public static MethodFrame getInnermostMethodFrame(JavaBlock jb,
+    public static MethodFrame getInnermostMethodFrame(ProgramElement pe,
                                       Services services) {
         final ProgramElement pe = jb.program();
         final MethodFrame result = new JavaASTVisitor(pe, new GoalLocalSpecificationRepository(), services) {
@@ -121,6 +121,13 @@ public final class JavaTools {
         return result;
     }
 
+    /**
+     * Returns the innermost method frame of the passed java block
+     */
+    public static MethodFrame getInnermostMethodFrame(JavaBlock jb,
+            Services services) {
+        return getInnermostMethodFrame(jb.program(), services);
+    }
 
     public static ExecutionContext getInnermostExecutionContext(
         						JavaBlock jb,
