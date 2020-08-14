@@ -1107,11 +1107,19 @@ public final class JmlTermFactory {
     public Triple<IObserverFunction, Term, Term> depends
             (SLExpression lhs, Term rhs, SLExpression mby) {
         LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
-        if (!lhs.isTerm()
-                || !(lhs.getTerm().op() instanceof IObserverFunction)
-                || lhs.getTerm().sub(0).op() != heap) {
-            throw exc.createException0("Depends clause with unexpected lhs: " + lhs);
+
+        if (!lhs.isTerm())
+            throw exc.createException0("Left hand side of depends clause should be a term, given:" + lhs);
+
+        if(!(lhs.getTerm().op() instanceof IObserverFunction))
+            throw exc.createException0("Left hand side of depends clause should be of type IObserverFunction, given:"
+                    + lhs.getTerm().op().getClass());
+
+        if(lhs.getTerm().sub(0).op() != heap) {
+            throw exc.createException0("Depends clause should be heap dependent of heap "
+                    + heap + ", given" + lhs.getTerm().sub(0).op());
         }
+
         return new Triple<>((IObserverFunction) lhs.getTerm().op(), rhs,
                 mby == null ? null : mby.getTerm());
     }

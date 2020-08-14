@@ -30,7 +30,6 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
-import org.antlr.misc.IntArrayList;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -47,6 +46,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.njml.JmlFacade.TODO;
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -899,6 +899,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
+    public SLExpression visitTransactionUpdated(JmlParser.TransactionUpdatedContext ctx) {
+        String fieldName = "<transactionConditionallyUpdated>";
+        return lookupIdentifier(fieldName, accept(ctx.expression()), null, ctx.start);
+    }
+
+
+
+    @Override
     public SLExpression visitPostfixexpr(JmlParser.PostfixexprContext ctx) {
         String oldFqName = fullyQualifiedName;
         fullyQualifiedName = "";
@@ -908,8 +916,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
             receiver = expr;
             expr = accept(c);
         }
+
         if (expr == null) {
-            raiseError("Expression " + fullyQualifiedName + " cannot be resolved.");
+            raiseError(format("Expression %s cannot be resolved.", fullyQualifiedName));
         }
         fullyQualifiedName = oldFqName;
         return expr;
@@ -917,7 +926,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitIdent(JmlParser.IdentContext ctx) {
-        fullyQualifiedName = ctx.getText();//TODO += ?
+        fullyQualifiedName += ctx.getText();
         return lookupIdentifier(ctx.getText(), null, null, ctx.start);
     }
 
@@ -993,6 +1002,28 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public SLExpression visitPrimarySuffixAccess(JmlParser.PrimarySuffixAccessContext ctx) {
         String lookupName;
+        boolean methodCall = ctx.LPAREN() != null;
+
+        SLParameters params = null;
+        if (methodCall) {
+            params = visitParameters(ctx.expressionlist());
+            //lookupName = lookupName.substring(lookupName.lastIndexOf('.') + 1);
+
+            /*SLExpression result = lookupIdentifier(lookupName, receiver, new SLParameters(params), ctx.LPAREN().getSymbol());
+            if (result == null) {
+                raiseError(String.format("Method %s(%s) not found!",
+                        lookupName, createSignatureString(params)), ctx.LPAREN().getSymbol());
+            }
+            if (((IProgramMethod) result.getTerm().op()).getStateCount() > 1
+                    && (atPres == null || atPres.get(getBaseHeap()) == null)) {
+                raiseError("Two-state model method " + lookupName + " not allowed in this context!", ctx.LPAREN().getSymbol());
+            }*/
+        }
+
+        if (fullyQualifiedName.startsWith("\\dl_")) {
+                return translator.dlKeyword(fullyQualifiedName, params.getParameters());
+        }
+
         if (ctx.IDENT() != null) {
             String id = ctx.IDENT().getText();
             if (receiver == null) {
@@ -1003,17 +1034,19 @@ class Translator extends JmlParserBaseVisitor<Object> {
             }
             fullyQualifiedName = fullyQualifiedName + "." + id;
             try {
-                return lookupIdentifier(lookupName, receiver, null, ctx.IDENT().getSymbol());
+                return lookupIdentifier(lookupName, receiver, params, ctx.IDENT().getSymbol());
             } catch (Exception e) {
                 return lookupIdentifier(fullyQualifiedName, null, null,
                         ctx.IDENT().getSymbol());
             }
         }
         if (ctx.TRANSIENT() != null) {
+            assert !methodCall;
             return lookupIdentifier("<transient>", receiver, null, ctx.TRANSIENT().getSymbol());
         }
         if (ctx.THIS() != null) {
-            return new SLExpression(
+            assert !methodCall;
+            SLExpression expr = new SLExpression(
                     services.getTypeConverter().findThisForSort(receiver.getType().getSort(),
                             tb.var(selfVar),
                             javaInfo.getKeYJavaType(selfVar.sort()),
@@ -1021,9 +1054,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
                     receiver.getType());
         }
         if (ctx.INV() != null) {
+            assert !methodCall;
             return translator.createInv(receiver.getTerm(), receiver.getType());
         }
         if (ctx.MULT() != null) {
+            assert !methodCall;
             return new SLExpression(tb.allFields(receiver.getTerm()),
                     javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
         }
@@ -1034,12 +1069,28 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitPrimarySuffixCall(JmlParser.PrimarySuffixCallContext ctx) {
         String lookupName = fullyQualifiedName;
-        ImmutableList<SLExpression> params = accept(ctx.expressionlist());
+        SLParameters params = visitParameters(ctx.expressionlist());
 
         if (fullyQualifiedName.startsWith("\\dl_")) {
-            return translator.dlKeyword(fullyQualifiedName, params);
+            return translator.dlKeyword(fullyQualifiedName, params.getParameters());
         }
 
+        lookupName = lookupName.substring(lookupName.lastIndexOf('.') + 1);
+
+        SLExpression result = lookupIdentifier(lookupName, receiver, params, ctx.LPAREN().getSymbol());
+        if (result == null) {
+            raiseError(format("Method %s(%s) not found!",
+                    lookupName, createSignatureString(params.getParameters())), ctx.LPAREN().getSymbol());
+        }
+        if (((IProgramMethod) result.getTerm().op()).getStateCount() > 1
+                && (atPres == null || atPres.get(getBaseHeap()) == null)) {
+            raiseError("Two-state model method " + lookupName + " not allowed in this context!", ctx.LPAREN().getSymbol());
+        }
+        return result;
+    }
+
+    private SLParameters visitParameters(JmlParser.ExpressionlistContext ctx) {
+        ImmutableList<SLExpression> params = accept(ctx);
         ImmutableList<SLExpression> preHeapParams = ImmutableSLList.nil();
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             Term p;
@@ -1051,18 +1102,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             preHeapParams = preHeapParams.append(new SLExpression(p));
         }
         params = (params == null) ? preHeapParams : params.prepend(preHeapParams);
-        lookupName = lookupName.substring(lookupName.lastIndexOf('.') + 1);
-
-        SLExpression result = lookupIdentifier(lookupName, receiver, new SLParameters(params), ctx.LPAREN().getSymbol());
-        if (result == null) {
-            raiseError(String.format("Method %s(%s) not found!",
-                    lookupName, createSignatureString(params)), ctx.LPAREN().getSymbol());
-        }
-        if (((IProgramMethod) result.getTerm().op()).getStateCount() > 1
-                && (atPres == null || atPres.get(getBaseHeap()) == null)) {
-            raiseError("Two-state model method " + lookupName + " not allowed in this context!", ctx.LPAREN().getSymbol());
-        }
-        return result;
+        return new SLParameters(params);
     }
 
     @Override
@@ -1846,19 +1886,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitAccessible_clause(JmlParser.Accessible_clauseContext ctx) {
         if (ctx.COLON() != null || ctx.MEASURED_BY() != null) {//depends clause
             //depends clause
-            /*
-               lhs=expression
-                COLON rhs=storeRefUnion
-                (MEASURED_BY mby=expression)? SEMI
-                    { result = translator.translate(
-                            dep.getText(), Triple.class, lhs, rhs, mby, services); }
-                ;
-            */
             SLExpression lhs = accept(ctx.lhs);
             Term rhs = accept(ctx.rhs);
             SLExpression mby = accept(ctx.mby);
             assert lhs != null;
-            Triple<IObserverFunction, Term, Term> a = translator.depends(lhs, rhs, mby);
+            //weigl: seems strange maybe someone missed switched the values
+            assert rhs != null;
+            Triple<IObserverFunction, Term, Term> a = translator.depends(new SLExpression(rhs), lhs.getTerm(), mby);
             return a;
         }
         final Term term = requireNonNull(accept(ctx.storeRefUnion()));
@@ -2281,7 +2315,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
         //preStart(contextThread)
         // == (\dl_writePermissionObject(contextThread, \permission(this.number)));
-        if(ctx.BODY()==null) return new SLExpression(tb.tt());
+        if (ctx.BODY() == null) return new SLExpression(tb.tt());
 
         String bodyString = ctx.BODY() == null ? ";" : ctx.BODY().getText();
         if (bodyString.charAt(0) != '{' || bodyString.charAt(bodyString.length() - 1) != '}')

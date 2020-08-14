@@ -256,8 +256,9 @@ null_:NULL;
 transactionUpdated: TRANSACTIONUPDATED LPAREN expression RPAREN;
 
 primarysuffix
-  : DOT (IDENT | TRANSIENT | THIS | INV | MULT) #primarySuffixAccess
-  | LPAREN (expressionlist)? RPAREN            #primarySuffixCall
+  : DOT (IDENT | TRANSIENT | THIS | INV | MULT)
+    (LPAREN (expressionlist)? RPAREN)? #primarySuffixAccess
+  | (LPAREN (expressionlist)? RPAREN)  #primarySuffixCall
   | LBRACKET (from=expression (DOTDOT to=expression)? | MULT) RBRACKET #primarySuffixArray
   ;
 
@@ -289,7 +290,7 @@ jmlprimary
   | PERMISSION LPAREN expression RPAREN                                               #primaryPermission
   | NONNULLELEMENTS LPAREN expression RPAREN                                          #primaryNNE
   | INFORMAL_DESCRIPTION                                                              #primaryInformalDesc
-  //| JML_IDENT (LPAREN (expressionlist)? RPAREN)?                                      #primaryDLCall
+  //| JML_IDENT (LPAREN (expressionlist)? RPAREN)                                       #primaryDLCall
   | MAPEMPTY                                                                          #primaryMapEmpty
   | mapExpression LPAREN (expressionlist)? RPAREN                                     #primaryMapExpr
   | SEQ2MAP LPAREN (expressionlist)? RPAREN                                           #primarySeq2Map
@@ -316,7 +317,7 @@ jmlprimary
   | STRING_EQUAL LPAREN expression COMMA expression RPAREN                            #primaryStringEq
   | EMPTYSET                                                                          #primaryEmptySet
   | createLocset                                                                      #primaryignor9
-  | (UNION | UNION_2) LPAREN storeRefUnion RPAREN                                     #primaryUnion
+  | UNION LPAREN storeRefUnion RPAREN                                                 #primaryUnion
   | INTERSECT LPAREN storeRefIntersect RPAREN                                         #primaryIntersect
   | SETMINUS LPAREN storeref COMMA storeref RPAREN                                    #primarySetMinux
   | ALLFIELDS LPAREN expression RPAREN                                                #primaryAllFields
