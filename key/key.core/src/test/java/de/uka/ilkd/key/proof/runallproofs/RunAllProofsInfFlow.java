@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofGroup;
 import org.antlr.runtime.RecognitionException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -40,24 +41,20 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
  */
 @RunWith(Parameterized.class)
 public class RunAllProofsInfFlow extends RunAllProofsTest {
-
     private static final String SKIP_INF_FLOW_PROPERTY = "key.runallproofs.skipInfFlow";
     public static final String INDEX_FILE = "index/automaticInfFlow.txt";
     private static ProofCollection proofCollection;
 
-    public RunAllProofsInfFlow(RunAllProofsTestUnit unit) {
+    public RunAllProofsInfFlow(ProofGroup unit) {
         super(unit);
     }
 
     @Parameters(name = "{0}")
-    public static Collection<RunAllProofsTestUnit[]> data() throws IOException, RecognitionException {
-
+    public static Collection<ProofGroup[]> data() throws IOException, RecognitionException {
         if(Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY)) {
             return Collections.emptyList();
         }
-
-        proofCollection = parseIndexFile(INDEX_FILE);
-        return data(proofCollection);
+        return data(ProofCollections.getInfFlowCollection());
     }
 
     @BeforeClass

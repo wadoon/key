@@ -1,10 +1,6 @@
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.util.Properties;
 
 /**
@@ -12,19 +8,14 @@ import java.util.Properties;
  * filesystem, that is obtained from a {@link DataRecordingStrategy} run.
  */
 public class RuleIndependentData {
-
     private static final String APPLY_STRATEGY_DURATION = "applyStrategyDuration";
-
     private final File ruleIndependentDataDir;
-
     private final File totalTimesFile;
-
     private final Properties totalTimesData = new Properties();
 
-    private RuleIndependentData(ProfilingDirectories directories) {
-        ruleIndependentDataDir = directories.ruleIndependentDataDir;
+    private RuleIndependentData() {
+        ruleIndependentDataDir = ProfilingDirectories.ruleIndependentDataDir;
         totalTimesFile = new File(ruleIndependentDataDir, "totaltimes.properties");
-
         /*
          * Load previous totaltimes from filesystem.
          */
@@ -48,7 +39,7 @@ public class RuleIndependentData {
     }
 
     private void addTotalDurationAndInvocations(String functionName,
-            FunctionPerformanceData data) {
+                                                FunctionPerformanceData data) {
         add(functionName + "Invocations", data.totalInvocations);
         add(functionName + "Duration", data.totalDuration);
     }
@@ -76,9 +67,9 @@ public class RuleIndependentData {
          * Update data in file: PercentageOverTime.data
          */
         File percentageOverTimeFile = new File(ruleIndependentDataDir, "PercentageOverTime.data");
-        String[] columns = new String[] {
+        String[] columns = new String[]{
                 "System.currentTimeMillis()", "computeCostPercentage",
-                "instantiateAppPercentage" };
+                "instantiateAppPercentage"};
         String description = "Percentages of how much time computeCost() and instantiateApp() take "
                 + "in overall applyStrategy() execution.";
         try (DataRecordingTable table = new DataRecordingTable(percentageOverTimeFile, columns, description)) {
@@ -106,8 +97,8 @@ public class RuleIndependentData {
      * {@link DataRecordingStrategy}.
      */
     public static void updateData(long applyStrategyDuration,
-            DataRecordingStrategy dataRecordingStrategy) {
-        RuleIndependentData t = new RuleIndependentData(dataRecordingStrategy.dataRecordingTestFile.directories);
+                                  DataRecordingStrategy dataRecordingStrategy) {
+        RuleIndependentData t = new RuleIndependentData();
 
         t.add("applyStrategyInvocations", 1);
         t.add(APPLY_STRATEGY_DURATION, applyStrategyDuration);

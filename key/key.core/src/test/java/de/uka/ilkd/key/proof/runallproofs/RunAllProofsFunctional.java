@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofGroup;
 import org.antlr.runtime.RecognitionException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -39,23 +40,21 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
  */
 @RunWith(Parameterized.class)
 public class RunAllProofsFunctional extends RunAllProofsTest {
-
     public static final Boolean SKIP_FUNCTIONAL_PROPERTY = Boolean.getBoolean("key.runallproofs.skipFunctional");
-
     public static final String INDEX_FILE = "index/automaticJAVADL.txt";
 
     private static ProofCollection proofCollection;
 
-    public RunAllProofsFunctional(RunAllProofsTestUnit unit) {
+    public RunAllProofsFunctional(ProofGroup unit) {
         super(unit);
     }
 
     @Parameters(name = "{0}")
-    public static Collection<RunAllProofsTestUnit[]> data() throws IOException, RecognitionException {
+    public static Collection<ProofGroup[]> data() throws IOException, RecognitionException {
         if (SKIP_FUNCTIONAL_PROPERTY) {
             return Collections.emptyList();
         }
-        proofCollection = parseIndexFile(INDEX_FILE);
+        proofCollection = ProofCollections.getJavaDlProofCollection();
         return data(proofCollection);
     }
 

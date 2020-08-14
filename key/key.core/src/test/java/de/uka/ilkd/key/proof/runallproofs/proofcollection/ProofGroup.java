@@ -1,13 +1,16 @@
-package de.uka.ilkd.key.proof.runallproofs;
+package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.*;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
+import de.uka.ilkd.key.proof.runallproofs.TestResult;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -15,18 +18,14 @@ import java.util.List;
  *
  * @author Kai Wallisch
  */
-public final class RunAllProofsTestUnit implements Serializable {
-
-    private static final long serialVersionUID = -2406881153415390937L;
-
+public final class ProofGroup {
     /**
      * The name of this test.
      */
-    private String testName;
+    private String groupName;
 
     private final ProofCollectionSettings settings;
-    private final List<TestFile> testFiles;
-    private final boolean ungrouped;
+    private final List<ProofTest> proofTests = new LinkedList<>();
 
     /**
      * Method {@link Object#toString()} is used by class {@link RunAllProofsTest}
@@ -35,21 +34,23 @@ public final class RunAllProofsTestUnit implements Serializable {
      */
     @Override
     public String toString() {
-        return testName;
+        return groupName;
     }
 
-    public RunAllProofsTestUnit(String name, ProofCollectionSettings settings,
-                                List<TestFile> testFiles, boolean ungrouped) {
-        this.testName = name;
+    public ProofGroup(String name,
+                      ProofCollectionSettings settings) {
+        this.groupName = name;
         this.settings = settings;
-        this.testFiles = testFiles;
-        this.ungrouped = ungrouped;
+    }
+
+    public boolean isSingleton() {
+        return proofTests.size() <= 1;
     }
 
     /**
      * Run the test of this unit and return a {@link TestResult}.
      * <p>
-     * If {@link #ungrouped} is true, the result is the result of that single
+     * If {@link #isSingleton()} is true, the result is the result of that single
      * test. Otherwise all results are aggregated into a single testresult.
      * <p>
      * The way of execution is determined by the {@link #settings}, in
@@ -58,19 +59,19 @@ public final class RunAllProofsTestUnit implements Serializable {
      * @return either a single test result or an aggregated test result, not
      * <code>null</code>.
      */
-    public TestResult runTest() throws Exception {
+    public TestResult runTests() throws Exception {
         /*
          * List of test results containing one test result for each test
          * file contained in this group.
          */
         List<TestResult> testResults;
 
-        boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
+        boolean verbose = settings.isVerbose();
         if (verbose) {
-            System.out.println("Running test " + testName);
+            System.out.println("Running test " + groupName);
         }
 
-        boolean ignoreTest = "true".equals(settings.get(RunAllProofsTest.IGNORE_KEY));
+        boolean ignoreTest = settings.isIgnore();
         if (ignoreTest) {
             if (verbose) {
                 System.out.println("... ignoring this test due to 'ignore=true' in file");
@@ -81,22 +82,22 @@ public final class RunAllProofsTestUnit implements Serializable {
         ForkMode forkMode = settings.getForkMode();
         switch (forkMode) {
             case PERGROUP:
-                testResults = ForkedTestFileRunner.processTestFiles(testFiles, getTempDir());
+                testResults = ForkedTestFileRunner.processTestFiles(proofTests, getTempDir());
                 break;
 
             case NOFORK:
                 testResults = new ArrayList<>();
-                for (TestFile testFile : testFiles) {
-                    TestResult testResult = testFile.runKey();
+                for (ProofTest proofTest : proofTests) {
+                    TestResult testResult = proofTest.runKey();
                     testResults.add(testResult);
                 }
                 break;
 
             case PERFILE:
                 testResults = new ArrayList<>();
-                for (TestFile testFile : testFiles) {
+                for (ProofTest proofTest : proofTests) {
                     TestResult testResult =
-                            ForkedTestFileRunner.processTestFile(testFile, getTempDir());
+                            ForkedTestFileRunner.processTestFile(proofTest, getTempDir());
                     testResults.add(testResult);
                 }
                 break;
@@ -106,29 +107,29 @@ public final class RunAllProofsTestUnit implements Serializable {
         }
 
         if (verbose) {
-            System.out.println("Returning from test " + testName);
+            System.out.format("Returning from test %s\n", groupName);
         }
 
         /*
          * Merge list of test results into one single test result, unless it is a
          * singleton case outside any group declaration.
          */
-        if (ungrouped) {
+        if (isSingleton()) {
             assert testResults.size() == 1 : "Ungrouped test runs must have one case";
             return testResults.get(0);
         }
 
         boolean success = true;
-        String message = "group " + testName + ":\n";
+        StringBuilder message = new StringBuilder("group " + groupName + ":\n");
         for (TestResult testResult : testResults) {
             success &= testResult.success;
-            message += testResult.message + "\n";
+            message.append(testResult.message).append("\n");
         }
-        return new TestResult(message, success);
+        return new TestResult(message.toString(), success);
     }
 
-    public String getTestName() {
-        return testName;
+    public String getGroupName() {
+        return groupName;
     }
 
     /*
@@ -144,36 +145,40 @@ public final class RunAllProofsTestUnit implements Serializable {
                 runAllProofsTempDir.mkdirs();
             }
             tempDir = Files.createTempDirectory(runAllProofsTempDir.toPath(),
-                    testName + "-");
+                    groupName + "-");
         }
         return tempDir;
     }
 
-    public RunAllProofsTestUnit provable(String fileName) {
-        TestFile file = new TestFile(TestProperty.PROVABLE, fileName, settings, tempDir);
-        testFiles.add(file);
+    public ProofGroup provable(String fileName) {
+        ProofTest file = new ProofTest(ProofTest.TestProperty.PROVABLE, fileName, settings);
+        proofTests.add(file);
         return this;
     }
 
-    public RunAllProofsTestUnit notprovable(String fileName) {
-        TestFile file = new TestFile(TestProperty.NOTPROVABLE, fileName, settings, tempDir);
-        testFiles.add(file);
+    public ProofGroup notprovable(String fileName) {
+        ProofTest file = new ProofTest(ProofTest.TestProperty.NOT_PROVABLE, fileName, settings);
+        proofTests.add(file);
         return this;
     }
 
-    public RunAllProofsTestUnit localSettings(String s) {
+    public ProofGroup localSettings(String s) {
         //TODO
         return this;
     }
 
-    public RunAllProofsTestUnit directory(String s) {
+    public ProofGroup loadable(String fileName) {
+        ProofTest file = new ProofTest(ProofTest.TestProperty.PROVABLE, fileName, settings);
+        proofTests.add(file);
+        return this;
+    }
+
+    public ProofGroup directory(String s) {
         //TODO
         return this;
     }
 
-    public RunAllProofsTestUnit loadable(String fileName) {
-        TestFile file = new TestFile(TestProperty.PROVABLE, fileName, settings, tempDir);
-        testFiles.add(file);
-        return this;
+    public void setGroupName(String name) {
+        groupName = name;
     }
 }

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 public class RuleData {
-
     int numberInvocations = 1;
     long duration;
 
@@ -13,5 +12,4 @@ public class RuleData {
         numberInvocations++;
         this.duration += duration;
     }
-
 }

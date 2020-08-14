@@ -21,9 +21,6 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
  * {@link ProofCollectionSettings}, which is immutable as well.
  */
 public class StatisticsFile implements Serializable {
-
-   private static final long serialVersionUID = 1L;
-
    private final File statisticsFile;
 
    @SuppressWarnings("rawtypes")
@@ -51,7 +48,6 @@ public class StatisticsFile implements Serializable {
             }
 
          }, new LongColumn("Nodes") {
-
             @Override
             long getLongValueFromStatistics(Statistics statistics) {
                return statistics.nodes;

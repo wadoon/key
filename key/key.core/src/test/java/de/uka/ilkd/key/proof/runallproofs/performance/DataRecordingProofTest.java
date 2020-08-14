@@ -7,18 +7,16 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofTest;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.Pair;
 
 @SuppressWarnings("serial")
-class DataRecordingTestFile extends TestFile<ProfilingDirectories> {
-
-    public DataRecordingTestFile(TestProperty testProperty, String path, ProofCollectionSettings settings) {
-        super(testProperty, path, settings, new ProfilingDirectories(settings.runStart));
+class DataRecordingProofTest extends ProofTest {
+    public DataRecordingProofTest(TestProperty testProperty, String path, ProofCollectionSettings settings) {
+        super(testProperty, path, settings);
     }
 
     @Override

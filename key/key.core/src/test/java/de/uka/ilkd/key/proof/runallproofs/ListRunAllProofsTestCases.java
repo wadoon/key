@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofGroup;
+import org.antlr.runtime.RecognitionException;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.antlr.runtime.RecognitionException;
 
 /**
  * Used by {@link RunAllProofsTest} command line interface to print out a list
@@ -12,19 +13,16 @@ import org.antlr.runtime.RecognitionException;
  * key/scripts/runAllProofs
  *
  * @author Kai Wallisch
- *
  * @see RunAllProofsTestSuite
  * @see RunAllProofsTest
  */
 public class ListRunAllProofsTestCases {
-
     public static void main(String[] args) throws IOException, RecognitionException {
-        List<RunAllProofsTestUnit> units = new LinkedList<RunAllProofsTestUnit>();
-        units.addAll(RunAllProofsTest.parseIndexFile(RunAllProofsFunctional.INDEX_FILE).createRunAllProofsTestUnits());
-        units.addAll(RunAllProofsTest.parseIndexFile(RunAllProofsInfFlow.INDEX_FILE).createRunAllProofsTestUnits());
-        for (RunAllProofsTestUnit unit : units) {
-            System.out.println(unit.getTestName());
+        List<ProofGroup> units = new LinkedList<ProofGroup>();
+        units.addAll(ProofCollections.getJavaDlProofCollection().createRunAllProofsTestUnits());
+        units.addAll(ProofCollections.getInfFlowCollection().createRunAllProofsTestUnits());
+        for (ProofGroup unit : units) {
+            System.out.println(unit.getGroupName());
         }
     }
-
 }
