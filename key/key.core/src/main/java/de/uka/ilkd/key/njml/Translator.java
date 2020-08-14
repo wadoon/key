@@ -1004,6 +1004,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
         String lookupName;
         boolean methodCall = ctx.LPAREN() != null;
 
+        /*if (fullyQualifiedName.startsWith("\\dl_")) {
+            return translator.dlKeyword(fullyQualifiedName, accept(ctx.expressionlist()));
+        }*/
+
         SLParameters params = null;
         if (methodCall) {
             params = visitParameters(ctx.expressionlist());
@@ -1018,10 +1022,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
                     && (atPres == null || atPres.get(getBaseHeap()) == null)) {
                 raiseError("Two-state model method " + lookupName + " not allowed in this context!", ctx.LPAREN().getSymbol());
             }*/
-        }
-
-        if (fullyQualifiedName.startsWith("\\dl_")) {
-                return translator.dlKeyword(fullyQualifiedName, params.getParameters());
         }
 
         if (ctx.IDENT() != null) {
@@ -1069,11 +1069,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitPrimarySuffixCall(JmlParser.PrimarySuffixCallContext ctx) {
         String lookupName = fullyQualifiedName;
-        SLParameters params = visitParameters(ctx.expressionlist());
 
         if (fullyQualifiedName.startsWith("\\dl_")) {
-            return translator.dlKeyword(fullyQualifiedName, params.getParameters());
+            return translator.dlKeyword(fullyQualifiedName, accept(ctx.expressionlist()));
         }
+        SLParameters params = visitParameters(ctx.expressionlist());
 
         lookupName = lookupName.substring(lookupName.lastIndexOf('.') + 1);
 
