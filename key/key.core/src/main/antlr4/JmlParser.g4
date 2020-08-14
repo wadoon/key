@@ -6,7 +6,7 @@ classlevel_comments: classlevel_comment* EOF;
 classlevel_comment: (classlevel_element0)+ | modifiers | set_statement;
 classlevel_element0: modifiers? classlevel_element modifier2*;
 classlevel_element
-  : class_invariant | depends_clause | method_specification
+  : class_invariant /*| depends_clause*/ | method_specification
   | method_declaration | field_declaration | represents_clause
   | history_constraint | initially_clause | class_axiom
   | monitors_for_clause | readable_if_clause | writable_if_clause
@@ -67,7 +67,7 @@ clause
 targetHeap : SPECIAL_IDENT+;
 ensures_clause: ENSURES targetHeap? predornot SEMI_TOPLEVEL;
 requires_clause: REQUIRES targetHeap? predornot SEMI_TOPLEVEL;
-measured_by_clause: MEASURED_BY predornot SEMI_TOPLEVEL;
+measured_by_clause: MEASURED_BY predornot (COMMA predornot)* SEMI_TOPLEVEL;
 captures_clause: CAPTURES predornot SEMI_TOPLEVEL;
 diverges_clause: DIVERGES predornot SEMI_TOPLEVEL;
 working_space_clause: WORKING_SPACE predornot SEMI_TOPLEVEL;
@@ -80,7 +80,7 @@ accessible_clause
                     (MEASURED_BY mby=expression)?
     SEMI_TOPLEVEL;
 assignable_clause: (ASSIGNABLE|MODIFIES) targetHeap? (storeRefUnion | STRICTLY_NOTHING) SEMI_TOPLEVEL;
-depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? ;
+//depends_clause: DEPENDS expression COLON storeRefUnion (MEASURED_BY expression)? ;
 //decreases_clause: DECREASES termexpression (COMMA termexpression)*;
 represents_clause
   : REPRESENTS lhs=expression

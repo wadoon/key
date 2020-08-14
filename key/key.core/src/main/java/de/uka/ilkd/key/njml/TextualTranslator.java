@@ -220,12 +220,12 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         return null;
     }
 
-    @Override
+    /*    @Override
     public Object visitDepends_clause(JmlParser.Depends_clauseContext ctx) {
         TextualJMLDepends depends = new TextualJMLDepends(mods, ctx);
         constructs = constructs.append(depends);
         return null;
-    }
+    }*/
 
     @Override
     public Object visitInitially_clause(JmlParser.Initially_clauseContext ctx) {

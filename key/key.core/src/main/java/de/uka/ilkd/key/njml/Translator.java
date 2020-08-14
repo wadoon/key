@@ -39,11 +39,10 @@ import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static de.uka.ilkd.key.njml.JmlFacade.TODO;
 import static java.lang.String.format;
@@ -1958,25 +1957,16 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
 
+    /*
     @Override
     public Triple<IObserverFunction, Term, Term> visitDepends_clause(JmlParser.Depends_clauseContext ctx) {
-        /*
-          dep=DEPENDS lhs=expression
-    COLON rhs=storeRefUnion
-    (MEASURED_BY mby=expression)? SEMI
-        { result = translator.translate(
-                dep.getText(), Triple.class, lhs, rhs, mby, services); }
-    ;
-         */
-
         SLExpression lhs = accept(ctx.expression(0));
         Term rhs = accept(ctx.storeRefUnion());
         SLExpression mby = accept(ctx.expression(1));
         assert lhs != null;
         Triple<IObserverFunction, Term, Term> a = translator.depends(lhs, rhs, mby);
-        //todo where depends should go?
         return a;
-    }
+    }*/
 
 
     @Override
@@ -2121,9 +2111,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitMeasured_by_clause(JmlParser.Measured_by_clauseContext ctx) {
         String type = ctx.MEASURED_BY().getText();
-        SLExpression t = accept(ctx.predornot());
-        contractClauses.measuredBy = t.getTerm();
-        return t;
+        final List<SLExpression> seq = ctx.predornot().stream().map(it -> (SLExpression) accept(it))
+                .collect(Collectors.toList());
+        Optional<SLExpression> t = seq.stream()
+                .reduce((a,b)-> new SLExpression(tb.pair(a.getTerm(), b.getTerm())));
+        Term result = t.orElse(seq.get(0)).getTerm();
+        contractClauses.measuredBy = result;
+        return new SLExpression(result);
     }
 
 
