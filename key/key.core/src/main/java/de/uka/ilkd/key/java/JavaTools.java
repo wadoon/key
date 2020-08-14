@@ -99,7 +99,6 @@ public final class JavaTools {
      */
     public static MethodFrame getInnermostMethodFrame(ProgramElement pe,
                                       Services services) {
-        final ProgramElement pe = jb.program();
         final MethodFrame result = new JavaASTVisitor(pe, new GoalLocalSpecificationRepository(), services) {
             private MethodFrame res;
             @Override

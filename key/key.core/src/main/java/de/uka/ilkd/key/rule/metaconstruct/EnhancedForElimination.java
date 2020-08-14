@@ -323,7 +323,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         loop = KeYJavaASTFactory.forLoop(inits, guard,
                 updates, declArrayElemVar, getNextElement, body);
 
-        setInvariant(enhancedFor, loop, localSpecRepo, services);
+        setInvariant(enhancedFor, loop, indexVariable, Optional.empty(), localSpecRepo, services);
 
         // arr = exp; for(...) body
         StatementBlock composition = KeYJavaASTFactory.block(arrAssignment, loop);
@@ -377,7 +377,7 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         // block
         final StatementBlock outerBlock = KeYJavaASTFactory.block(itinit, valuesInit, loop);
-        setInvariant(enhancedFor, loop, localSpecRepo, services);
+        setInvariant(enhancedFor, loop, indexVariable, Optional.of(valuesVariable), localSpecRepo, services);
         return outerBlock;
 
     }

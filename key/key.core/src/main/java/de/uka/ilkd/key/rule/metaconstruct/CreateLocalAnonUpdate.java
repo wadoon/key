@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -44,7 +45,7 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
     }
 
     @Override
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(Term term, SVInstantiations svInst, GoalLocalSpecificationRepository localSpecRepo, Services services) {
         final Term target = term.sub(0);
 
         // the target term should have a Java block
@@ -60,7 +61,7 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
         assert pe instanceof StatementBlock;
 
         final ImmutableSet<ProgramVariable> localOuts = //
-                MiscTools.getLocalOuts(pe, services);
+                MiscTools.getLocalOuts(pe, localSpecRepo, services);
         return createLocalAnonUpdate(localOuts, services);
     }
 
