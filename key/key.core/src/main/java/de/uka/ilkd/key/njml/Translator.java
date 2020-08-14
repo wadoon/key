@@ -28,7 +28,6 @@ import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -40,9 +39,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static de.uka.ilkd.key.njml.JmlFacade.TODO;
 import static java.lang.String.format;
@@ -904,7 +901,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
 
-
     @Override
     public SLExpression visitPostfixexpr(JmlParser.PostfixexprContext ctx) {
         String oldFqName = fullyQualifiedName;
@@ -954,6 +950,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (selfVar == null) {
             raiseError("Cannot access \"this\" in a static context!");
         }
+        return getThisReceiver();
+    }
+
+    @NotNull
+    private SLExpression getThisReceiver() {
         return new SLExpression(tb.var(selfVar), selfVar.getKeYJavaType());
     }
 
@@ -1078,8 +1079,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         SLExpression result = lookupIdentifier(lookupName, receiver, params, ctx.LPAREN().getSymbol());
         if (result == null) {
-            raiseError(format("Method %s(%s) not found!",
-                    lookupName, createSignatureString(params.getParameters())), ctx.LPAREN().getSymbol());
+            if(fullyQualifiedName.indexOf('.')<0) {
+                //resolve by prefixing an `this.`
+                result = lookupIdentifier(lookupName, getThisReceiver(), params, ctx.LPAREN().getSymbol());
+            }
+            if (result == null) {
+                raiseError(format("Method %s(%s) not found!",
+                        lookupName, createSignatureString(params.getParameters())), ctx.LPAREN().getSymbol());
+            }
         }
         if (((IProgramMethod) result.getTerm().op()).getStateCount() > 1
                 && (atPres == null || atPres.get(getBaseHeap()) == null)) {
@@ -1890,9 +1897,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
             SLExpression mby = accept(ctx.mby);
             assert lhs != null;
             assert rhs != null;
-            try{
+            try {
                 return translator.depends(lhs, rhs, mby);
-            }catch(Exception e) {
+            } catch (Exception e) {
                 //weigl: seems strange maybe someone missed switched the values
                 return translator.depends(new SLExpression(rhs), lhs.getTerm(), mby);
             }
@@ -2114,7 +2121,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         final List<SLExpression> seq = ctx.predornot().stream().map(it -> (SLExpression) accept(it))
                 .collect(Collectors.toList());
         Optional<SLExpression> t = seq.stream()
-                .reduce((a,b)-> new SLExpression(tb.pair(a.getTerm(), b.getTerm())));
+                .reduce((a, b) -> new SLExpression(tb.pair(a.getTerm(), b.getTerm())));
         Term result = t.orElse(seq.get(0)).getTerm();
         contractClauses.measuredBy = result;
         return new SLExpression(result);
