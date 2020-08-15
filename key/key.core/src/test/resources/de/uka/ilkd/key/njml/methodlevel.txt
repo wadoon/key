@@ -4,7 +4,7 @@
   @                   i <= j && 0 <= j && j < a.length;
   @                   (\bigint)a[j]);
   @ decreasing i; @*/
-//@ assert i < 0 && -1 <= i && i <= a.length;
+// @ assert i < 0 && -1 <= i && i <= a.length;
 // @ hence_by (i < 0 && -1 <= i) ==> i == -1;
 // @ assert i == -1 && i <= a.length;
 // @ assert sum == (\sum int j; 0 <= j && j < a.length; (\bigint)a[j]);
@@ -13,6 +13,14 @@
 // @ unreachable;
 // @ debug x = x + 1;
 // @ debug aList.add(y);
+---Contract---
+//@ ghost int oldx = x;
+        //@ ghost \bigint p = 0;
+        /*@ maintaining 0 <= x && x <= oldx;
+          @ maintaining z == y * (oldx - x);
+	  @ maintaining (\bigint)z == p;
+          @ decreasing  x;
+	  @*/
 ---Contract---
 //@ ghost \locset oldPcDep = UpdateAbstraction.pcDep;         //entering conditional
 //@ set UpdateAbstraction.pcDep = \set_union(UpdateAbstraction.pcDep, UpdateAbstraction.hDep); //entering conditional

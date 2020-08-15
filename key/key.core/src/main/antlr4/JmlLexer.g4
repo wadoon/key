@@ -188,7 +188,7 @@ NEST_START: '{|' ;
 NEST_END: '|}' ;
 SEMICOLON : ';' -> type(SEMI_TOPLEVEL);
 BODY_START: '{' -> more, pushMode(body);
-C_EQUAL: '=' -> type(EQUAL_SINGLE);
+C_EQUAL: '=' -> type(EQUAL_SINGLE), pushMode(expr);
 C_LPAREN: '(' -> type(LPAREN);
 C_RPAREN: ')' -> type(RPAREN);
 C_STRING_LITERAL: '"' -> pushMode(string), more;
