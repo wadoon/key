@@ -46,7 +46,7 @@ public abstract class SLResolverManager {
     private final TermBuilder tb;
 
     private ImmutableList<Namespace<?>> /*ParsableVariable*/
-            localVariablesNamespaces = ImmutableSLList.<Namespace<?>>nil();
+            localVariablesNamespaces = ImmutableSLList.nil();
 
     private Map<ParsableVariable, KeYJavaType> kjts
             = new LinkedHashMap<ParsableVariable, KeYJavaType>();

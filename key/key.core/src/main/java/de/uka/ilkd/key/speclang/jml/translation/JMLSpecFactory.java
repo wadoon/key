@@ -109,8 +109,7 @@ public class JMLSpecFactory {
                                                                          Map<String, ImmutableList<ParserRuleContext>> originalInvariants,
                                                                          ProgramVariable selfVar, ImmutableList<ProgramVariable> allVars,
                                                                          final ImmutableList<LocationVariable> allHeaps,
-                                                                         final Map<LocationVariable, Term> atPres, final Services services, final TermBuilder tb)
-            throws SLTranslationException {
+                                                                         final Map<LocationVariable, Term> atPres, final Services services, final TermBuilder tb) {
         Map<LocationVariable, Term> invariants = new LinkedHashMap<LocationVariable, Term>();
         for (LocationVariable heap : allHeaps) {
             Term invariant;
@@ -141,8 +140,7 @@ public class JMLSpecFactory {
                                                                              Map<String, ImmutableList<ParserRuleContext>> originalFreeInvariants,
                                                                              ProgramVariable selfVar, ImmutableList<ProgramVariable> allVars,
                                                                              final ImmutableList<LocationVariable> allHeaps,
-                                                                             final Map<LocationVariable, Term> atPres, final Services services, final TermBuilder tb)
-            throws SLTranslationException {
+                                                                             final Map<LocationVariable, Term> atPres, final Services services, final TermBuilder tb) {
         Map<LocationVariable, Term> freeInvariants = new LinkedHashMap<LocationVariable, Term>();
         for (LocationVariable heap : allHeaps) {
             Term freeInvariant;
@@ -514,6 +512,7 @@ public class JMLSpecFactory {
             // (ghost)
             // parameter
             Term rhs = jmlIo
+                    .clear()
                     .classType(inClass)
                     .selfVar(progVars.selfVar)
                     .parameters(progVars.paramVars)
@@ -537,6 +536,7 @@ public class JMLSpecFactory {
             ImmutableList<InfFlowSpec> result = ImmutableSLList.nil();
             for (ParserRuleContext expr : originalClauses) {
                 InfFlowSpec translated = jmlIo
+                        .clear()
                         .classType(pm.getContainerType())
                         .selfVar(selfVar)
                         .parameters(paramVars)
@@ -588,7 +588,9 @@ public class JMLSpecFactory {
                                     ImmutableList<ParserRuleContext> originalClauses) throws SLTranslationException {
         Term result = tb.ff();
         for (ParserRuleContext expr : originalClauses) {
-            Term translated = jmlIo.classType(pm.getContainerType())
+            Term translated = jmlIo
+                    .clear()
+                    .classType(pm.getContainerType())
                     .selfVar(selfVar)
                     .parameters(paramVars)
                     .translateTerm(expr);
@@ -606,6 +608,7 @@ public class JMLSpecFactory {
         for (ParserRuleContext expr : originalClauses) {
             if (expr == null) continue;//TODO weigl trace null back to origin
             Term translated = jmlIo
+                    .clear()
                     .classType(pm.getContainerType())
                     .selfVar(selfVar)
                     .parameters(paramVars)
@@ -640,6 +643,7 @@ public class JMLSpecFactory {
         Map<Label, Term> result = new LinkedHashMap<Label, Term>();
         for (int i = array.length - 1; i >= 0; i--) {
             Pair<Label, Term> translation = jmlIo
+                    .clear()
                     .classType( pm.getContainerType())
                     .parameters(paramVars)
                     .selfVar(selfVar)
@@ -663,6 +667,7 @@ public class JMLSpecFactory {
         Map<Label, Term> result = new LinkedHashMap<Label, Term>();
         for (int i = array.length - 1; i >= 0; i--) {
             Pair<Label, Term> translation = jmlIo
+                    .clear()
                     .classType( pm.getContainerType())
                     .parameters(paramVars)
                     .selfVar(selfVar)
@@ -758,6 +763,7 @@ public class JMLSpecFactory {
         for (ParserRuleContext expr : assignableClauses) {
             if (expr == null) continue;//TODO trace
             Term translated = jmlIo
+                    .clear()
                     .classType(pm.getContainerType())
                     .selfVar(selfVar)
                     .parameters(paramVars)
@@ -779,6 +785,7 @@ public class JMLSpecFactory {
         if (!originalMeasuredBy.isEmpty()) {
             for (ParserRuleContext expr : originalMeasuredBy) {
                 Term translated = jmlIo
+                        .clear()
                         .classType(pm.getContainerType())
                         .selfVar(selfVar)
                         .parameters(paramVars)
@@ -801,6 +808,7 @@ public class JMLSpecFactory {
         if (!originalDecreases.isEmpty()) {
             for (ParserRuleContext expr : originalDecreases) {
                 Term translated = jmlIo
+                        .clear()
                         .classType(pm.getContainerType())
                         .selfVar(selfVar)
                         .parameters(paramVars)
@@ -1017,6 +1025,7 @@ public class JMLSpecFactory {
 
         // translateToTerm expression
         final Term inv0 = jmlIo
+                .clear()
                 .classType(kjt)
                 .selfVar(selfVar)
                 .translateTerm(originalInv);
@@ -1041,6 +1050,7 @@ public class JMLSpecFactory {
 
         // translateToTerm expression
         final Term inv0 = jmlIo
+                .clear()
                 .classType(kjt)
                 .selfVar(selfVar)
                 .translateTerm(textualInv.getInv());
@@ -1061,6 +1071,7 @@ public class JMLSpecFactory {
 
         // translateToTerm expression
         final Term inv0 = jmlIo
+                .clear()
                 .classType(kjt)
                 .selfVar(selfVar)
                 .translateTerm(original);
@@ -1091,6 +1102,7 @@ public class JMLSpecFactory {
         // translateToTerm expression
         final Pair<IObserverFunction, Term> rep =
                 jmlIo.classType(kjt)
+                        .clear()
                         .selfVar(selfVar)
                         .translateRepresents(originalRep);
         // represents clauses must be unique per type
@@ -1100,7 +1112,7 @@ public class JMLSpecFactory {
                         "JML represents clauses must occur uniquely per type and target.", originalRep);
             }
         }
-        modelFields.add(new Pair<KeYJavaType, IObserverFunction>(kjt, rep.first));
+        modelFields.add(new Pair<>(kjt, rep.first));
         Term repFormula = tb.convertToFormula(rep.second);
         // create class axiom
         return new RepresentsAxiom("JML represents clause for " + rep.first.name().toString(),
@@ -1119,6 +1131,7 @@ public class JMLSpecFactory {
         // translateToTerm expression
         final ParserRuleContext clause = textualRep.getRepresents();
         final Pair<IObserverFunction, Term> rep = jmlIo
+                .clear()
                 .classType(kjt)
                 .selfVar(selfVar)
                 .translateRepresents(clause);
@@ -1158,6 +1171,7 @@ public class JMLSpecFactory {
 
         // translate expression
         final Term inv0 = jmlIo
+                .clear()
                 .classType(kjt)
                 .selfVar(selfVar)
                 .translateTerm(originalRep);
@@ -1171,16 +1185,17 @@ public class JMLSpecFactory {
     }
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, LocationVariable targetHeap,
-                                                ParserRuleContext originalDep) throws SLTranslationException {
+                                                ParserRuleContext originalDep) {
         assert kjt != null;
         assert originalDep != null;
-        jmlIo.classType(kjt);
 
         // create variable for self
         ProgramVariable selfVar = tb.selfVar(kjt, false);
 
         // translateToTerm expression
         Triple<IObserverFunction, Term, Term> dep = jmlIo
+                .clear()
+                .classType(kjt)
                 .selfVar(selfVar)
                 .classType(kjt)
                 .translateDependencyContract(originalDep);
@@ -1291,6 +1306,7 @@ public class JMLSpecFactory {
                     tb.var(tb.heapAtPreVar(param + atPrePrefix, param.sort(), false))));
 
             final MergeParamsSpec specs = jmlIo
+                    .clear()
                     .classType(kjt)
                     .selfVar(progVars.selfVar)
                     .parameters(append(ImmutableSLList.nil(), params))
@@ -1569,7 +1585,9 @@ public class JMLSpecFactory {
         if (originalVariant == null) {
             variant = null;
         } else {
-            variant = jmlIo.classType(pm.getContainerType())
+            variant = jmlIo
+                    .clear()
+                    .classType(pm.getContainerType())
                     .selfVar(selfVar)
                     .parameters(allVars)
                     .atPres(atPres)
@@ -1619,7 +1637,9 @@ public class JMLSpecFactory {
             } else {
                 a = tb.empty();
                 for (ParserRuleContext expr : as) {
-                    Term translated = jmlIo.classType(pm.getContainerType())
+                    Term translated = jmlIo
+                            .clear()
+                            .classType(pm.getContainerType())
                             .selfVar(selfVar)
                             .parameters(allVars)
                             .atPres(atPres)

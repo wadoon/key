@@ -19,6 +19,7 @@ import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.util.HashMap;
@@ -188,4 +189,15 @@ public class JmlIO {
     }
 
 
+    public JmlIO clear() {
+        resultVariable(null);
+        atBefore(null);
+        atPres(null);
+        classType(null);
+        selfVar(null);
+        warnings = DefaultImmutableSet.nil();
+        exceptionVariable(null);
+        parameters(ImmutableSLList.nil());
+        return this;
+    }
 }
