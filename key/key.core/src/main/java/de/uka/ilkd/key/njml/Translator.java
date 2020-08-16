@@ -921,7 +921,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitIdent(JmlParser.IdentContext ctx) {
-        fullyQualifiedName += ctx.getText();
+        appendToFullyQualifiedName(ctx.getText());
         return lookupIdentifier(ctx.getText(), null, null, ctx.start);
     }
 
@@ -1001,6 +1001,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitPrimarySuffixAccess(JmlParser.PrimarySuffixAccessContext ctx) {
+        SLExpression receiver = this.receiver;
         String lookupName;
         boolean methodCall = ctx.LPAREN() != null;
 
@@ -1185,7 +1186,15 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (resultVar == null) {
             raiseError("\\result used in wrong context");
         }
+        appendToFullyQualifiedName("\\result");
         return new SLExpression(tb.var(resultVar), resultVar.getKeYJavaType());
+    }
+
+    private void appendToFullyQualifiedName(String suffix) {
+        if(fullyQualifiedName.isEmpty())
+            fullyQualifiedName=suffix;
+        else
+            fullyQualifiedName += "." + suffix;
     }
 
     @Override
