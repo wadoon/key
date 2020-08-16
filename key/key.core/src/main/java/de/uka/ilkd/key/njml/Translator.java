@@ -2200,8 +2200,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
 
         Term t;
-        if (!representsClauseLhsIsLocSet) {
-            assert lhs != null;
+        if (ctx.SUCH_THAT() != null)
+            t = ((SLExpression) accept(ctx.predicate())).getTerm();
+        else if (!representsClauseLhsIsLocSet) {
+            assert rhs != null;
             if (!rhs.isTerm()) {
                 raiseError("Represents clause with unexpected rhs: " + rhs);
             }
@@ -2215,8 +2217,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
             assert t != null;
             t = tb.equals(lhs.getTerm(), t);
         }
-        if (ctx.SUCH_THAT() != null)
-            t = accept(ctx.predicate());
         return translator.represents(lhs, t);
     }
 
