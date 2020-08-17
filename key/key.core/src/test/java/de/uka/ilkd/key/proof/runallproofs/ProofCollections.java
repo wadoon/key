@@ -750,12 +750,12 @@ public final class ProofCollections {
         c.addGroup("reload_examples")
                 .provable("./firstTouch/05-ReverseArray/reverseArray.key")
                 .loadable("standard_key/arith/saveProofTest.key.proof")
-                .loadable(". / heap / permutedSum / perm.proof")
-                .loadable(". / firstTouch / 05 - ReverseArray / reverseArray.proof")
-                .loadable(". / heap / verifyThis15_1_RelaxedPrefix / relax.proof")
-                .loadable(". / heap / verifyThis15_3_DLL / doUndo.proof")
-                .loadable(". / heap / verifyThis15_2_ParallelGcd / parallelGcd.proof")
-                .loadable(". / heap / verifyThis17_1_PairInsertionSort / sort.proof.gz");
+                .loadable("./heap/permutedSum/perm.proof")
+                .loadable("./firstTouch/05 - ReverseArray/reverseArray.proof")
+                .loadable("./heap/verifyThis15_1_RelaxedPrefix/relax.proof")
+                .loadable("./heap/verifyThis15_3_DLL/doUndo.proof")
+                .loadable("./heap/verifyThis15_2_ParallelGcd/parallelGcd.proof")
+                .loadable("./heap/verifyThis17_1_PairInsertionSort/sort.proof.gz");
         return c;
     }
 
@@ -1658,7 +1658,7 @@ public final class ProofCollections {
                 .provable("./heap/strictly_pure/useStrictlyPureMethod.key")
 // this file contains Unicode symbols for logic operators
                 .provable("./standard_key/unicode_test.key")
-                .provable("./standard_key/ arith / binomial1.key")
+                .provable("./standard_key/arith/binomial1.key")
                 .provable("./standard_key/arith/binomial2.key")
                 .provable("./standard_key/arith/check_jdiv.key")
                 .provable("./standard_key/arith/check_jdiv_concrete.key")
