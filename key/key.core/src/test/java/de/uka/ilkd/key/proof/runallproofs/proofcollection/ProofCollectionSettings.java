@@ -30,7 +30,7 @@ public class ProofCollectionSettings implements Serializable {
     private static final String KEY_RUN_ONLY_ON = "runOnlyOn";
     private static final String KEY_DIRECTORY = "directory";
     public static final String IGNORE_KEY = "ignore";
-    public static final String FORK_TIMEOUT_KEY = "forkTimeout";
+    public static final String KEY_FORK_TIMEOUT = "forkTimeout";
     public static final String FORK_DEBUG_PORT = "forkDebugPort";
     private static final String KEY_FORK_MEMORY = "forkMemory";
 
@@ -176,7 +176,7 @@ public class ProofCollectionSettings implements Serializable {
      */
     public File getBaseDirectory() {
         String baseDirectoryName = get(KEY_BASE_DIRECTORY);
-        if(baseDirectoryName==null) baseDirectoryName = ".";
+        if (baseDirectoryName == null) baseDirectoryName = ".";
         return new File(baseDirectoryName).getAbsoluteFile();
     }
 
@@ -326,7 +326,7 @@ public class ProofCollectionSettings implements Serializable {
     }
 
     public ProofCollectionSettings setForkTimeout(int timeout) {
-        //TODO
+        settings.put(KEY_FORK_TIMEOUT, String.valueOf(timeout));
         return this;
     }
 
@@ -363,7 +363,7 @@ public class ProofCollectionSettings implements Serializable {
     }
 
     public int getForkTimeout() {
-        final String v = get(FORK_TIMEOUT_KEY);
+        final String v = get(KEY_FORK_TIMEOUT);
         return v != null ? Integer.parseInt(v) : 100000;
     }
 
@@ -371,7 +371,13 @@ public class ProofCollectionSettings implements Serializable {
         return get(KEY_FORK_MEMORY);
     }
 
-    public void setForkMemory(int memory) {
+    public ProofCollectionSettings setForkMemory(int memory) {
         settings.put(KEY_FORK_MEMORY, String.valueOf(memory));
+        return this;
+    }
+
+    public ProofCollectionSettings setKeySettings(String settings) {
+        this.settings.put(KEY_SETTINGS_KEY, settings);
+        return this;
     }
 }
