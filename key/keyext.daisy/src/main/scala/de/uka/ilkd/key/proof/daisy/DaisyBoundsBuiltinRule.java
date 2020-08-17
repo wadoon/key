@@ -57,9 +57,9 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
        @param floatExpr the expression for which bounds are to be computed
        @return a lower and upper bound for the floating point expression
      */
-    private Pair<Float, Float> daisyComputeBounds(List<Term> preconditions, List<Term> lets, Term floatExpr) {
+    private Pair<Float, Float> daisyComputeBounds(List<Term> preconditions, List<Term> lets, Term floatExpr, Services services) {
 
-        return DaisyAPI.computeRange(preconditions,floatExpr,lets);
+        return DaisyAPI.computeRange(preconditions,floatExpr,lets,services);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
         List<Term> precs = gatherPreconditions(seq, services);
         List<Term> letExprs = gatherLetExprs(seq, services);
         Term expr = ((DaisyBoundsRuleApp) ra).getExpr();
-        Pair<Float, Float> bounds = daisyComputeBounds(precs, letExprs, expr);
+        Pair<Float, Float> bounds = daisyComputeBounds(precs, letExprs, expr, services);
         Float lower = bounds.first;
         FloatLiteral lowerLit = new FloatLiteral(lower);
         Float upper = bounds.second;
