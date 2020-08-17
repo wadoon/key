@@ -84,6 +84,11 @@ public class ProofCollectionSettings implements Serializable {
         settings = createUnmodifiableMapContainingDefaults();
     }
 
+    public ProofCollectionSettings(ProofCollectionSettings parent) {
+        settings = new HashMap<>(parent.settings);
+    }
+
+
     /**
      * Converts a list of map entries to an unmodifiable map containing the
      * specified entries and additionally default entries specified in
@@ -169,6 +174,11 @@ public class ProofCollectionSettings implements Serializable {
         return lks;
     }
 
+    public ProofCollectionSettings setLocalKeYSettings(String props) {
+        settings.put(KEY_LOCAL_SETTINGS, props);
+        return this;
+    }
+
     /**
      * Settings must specify a base directory. Relative
      * {@link ProofCollectionSettings} paths will be treated as relative to
@@ -229,9 +239,7 @@ public class ProofCollectionSettings implements Serializable {
 
         Set<String> enabledTestCaseNames = new LinkedHashSet<>();
         String[] testCaseList = testCases.split(",");
-        for (String testCaseName : testCaseList) {
-            enabledTestCaseNames.add(testCaseName);
-        }
+        Collections.addAll(enabledTestCaseNames, testCaseList);
         enabledTestCaseNames = Collections.unmodifiableSet(enabledTestCaseNames);
         return enabledTestCaseNames;
     }
@@ -341,8 +349,8 @@ public class ProofCollectionSettings implements Serializable {
     }
 
     public ProofCollectionSettings setKeySettingsFromFile(String filename) {
-        //TODO
-        return this;
+        throw new RuntimeException("todo");
+//        return this;
     }
 
     public ProofCollectionSettings setVerbose(boolean value) {
@@ -376,7 +384,7 @@ public class ProofCollectionSettings implements Serializable {
         return this;
     }
 
-    public ProofCollectionSettings setKeySettings(String settings) {
+    public ProofCollectionSettings setGlobalKeYSettings(String settings) {
         this.settings.put(KEY_SETTINGS_KEY, settings);
         return this;
     }

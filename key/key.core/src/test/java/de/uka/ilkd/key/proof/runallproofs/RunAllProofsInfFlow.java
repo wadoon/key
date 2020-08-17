@@ -13,11 +13,9 @@
 
 package de.uka.ilkd.key.proof.runallproofs;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofGroup;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 import org.antlr.runtime.RecognitionException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -25,25 +23,25 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * This test case captures all information flow run-all-proof scenarios.
- *
+ * <p>
  * The test case is controlled by the index file (see {@value #INDEX_FILE}).
- *
+ * <p>
  * If the property "{@value #SKIP_INF_FLOW_PROPERTY}" is set to true, then
  * no info-flow run-all-proof tests will be run.
  *
  * @author M. Ulbrich
- *
  */
 @RunWith(Parameterized.class)
 public class RunAllProofsInfFlow extends RunAllProofsTest {
     private static final String SKIP_INF_FLOW_PROPERTY = "key.runallproofs.skipInfFlow";
     public static final String INDEX_FILE = "index/automaticInfFlow.txt";
-    private static ProofCollection proofCollection;
+    private static ProofCollection proofCollection = ProofCollections.getInfFlowCollection();
 
     public RunAllProofsInfFlow(ProofGroup unit) {
         super(unit);
@@ -51,10 +49,10 @@ public class RunAllProofsInfFlow extends RunAllProofsTest {
 
     @Parameters(name = "{0}")
     public static Collection<ProofGroup[]> data() throws IOException, RecognitionException {
-        if(Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY)) {
+        if (Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY)) {
             return Collections.emptyList();
         }
-        return data(ProofCollections.getInfFlowCollection());
+        return data(proofCollection);
     }
 
     @BeforeClass

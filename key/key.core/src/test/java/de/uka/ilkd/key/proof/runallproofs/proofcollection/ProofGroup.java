@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 
@@ -9,7 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,10 +35,9 @@ public final class ProofGroup {
         return groupName;
     }
 
-    public ProofGroup(String name,
-                      ProofCollectionSettings settings) {
+    public ProofGroup(String name, ProofCollectionSettings settings) {
         this.groupName = name;
-        this.settings = settings;
+        this.settings = new ProofCollectionSettings(settings);
     }
 
     public boolean isSingleton() {
@@ -150,31 +147,33 @@ public final class ProofGroup {
         return tempDir;
     }
 
+    private String localDirectory = "";
+
     public ProofGroup provable(String fileName) {
-        ProofTest file = new ProofTest(ProofTest.TestProperty.PROVABLE, fileName, settings);
+        ProofTest file = new ProofTest(ProofTest.TestProperty.PROVABLE, localDirectory + fileName, settings);
         proofTests.add(file);
         return this;
     }
 
     public ProofGroup notprovable(String fileName) {
-        ProofTest file = new ProofTest(ProofTest.TestProperty.NOT_PROVABLE, fileName, settings);
+        ProofTest file = new ProofTest(ProofTest.TestProperty.NOT_PROVABLE, localDirectory + fileName, settings);
         proofTests.add(file);
         return this;
     }
 
     public ProofGroup localSettings(String s) {
-        //TODO
+        settings.setLocalKeYSettings(s);
         return this;
     }
 
     public ProofGroup loadable(String fileName) {
-        ProofTest file = new ProofTest(ProofTest.TestProperty.PROVABLE, fileName, settings);
+        ProofTest file = new ProofTest(ProofTest.TestProperty.PROVABLE, localDirectory + fileName, settings);
         proofTests.add(file);
         return this;
     }
 
     public ProofGroup directory(String s) {
-        //TODO
+        localDirectory = s;
         return this;
     }
 

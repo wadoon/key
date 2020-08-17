@@ -18,7 +18,7 @@ public final class ProofCollections {
                 .setForkTimeout(2000)
                 .setReloadEnabled(true)
                 .setTempDir("runallproofs_tmp")
-                .setKeySettings("#Proof-Settings-Config-File\n" +
+                .setGlobalKeYSettings("#Proof-Settings-Config-File\n" +
                         "#Mon Aug 03 16:58:18 CEST 2009\n" +
                         "[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT\n" +
                         "[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT\n" +
@@ -225,7 +225,7 @@ public final class ProofCollections {
                 .provable("./heap/removeDups/removeDup.key").provable("./heap/saddleback_search/Saddleback_search.key");
         c.addGroup("quicksort")
                 .localSettings("[Choice] DefaultChoices = moreSeqRules - moreSeqRules:on")
-                .directory("heap/quicksort")
+                .directory("heap/quicksort/")
                 .provable("toplevel.key")
                 .provable("sort.key")
                 .provable("split.key");/*
@@ -789,7 +789,7 @@ public final class ProofCollections {
                 .provable("./firstTouch/05-ReverseArray/reverseArray.key")
                 .loadable("standard_key/arith/saveProofTest.key.proof")
                 .loadable("./heap/permutedSum/perm.proof")
-                .loadable("./firstTouch/05 - ReverseArray/reverseArray.proof")
+                .loadable("./firstTouch/05-ReverseArray/reverseArray.proof")
                 .loadable("./heap/verifyThis15_1_RelaxedPrefix/relax.proof")
                 .loadable("./heap/verifyThis15_3_DLL/doUndo.proof")
                 .loadable("./heap/verifyThis15_2_ParallelGcd/parallelGcd.proof")
@@ -800,12 +800,14 @@ public final class ProofCollections {
     public static ProofCollection getInfFlowCollection() {
         ProofCollection c = new ProofCollection();
         c.getSettings().setBaseDirectory("../")
-                .setStatisticsFile("../../key.core.test/testresults/runallproofs/runStatistics_infflow.csv")
+                .setBaseDirectory(FindResources.getExampleDirectory().getAbsolutePath())
+                .setStatisticsFile("build/test-results/testRunAllProofs/runStatistics_infflow.csv")
                 .setForkMode(ForkMode.PERGROUP)
                 .setReloadEnabled(false)
-                .setTempDir("../../key.core.test/runallproofs_infflow_tmp")
+                .setTempDir("build/tmp/runallproofs_infflow_tmp")
                 .setForkTimeout(1000)
                 .setVerbose(true);
+
         //  forkMemory = 1000m
         //  runOnlyOn = group1,group2
         //  //  Tests for information flow
