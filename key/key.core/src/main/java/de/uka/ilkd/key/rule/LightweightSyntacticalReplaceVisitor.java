@@ -106,7 +106,8 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
         subStack = new Stack<Object>(); // of Term
     }
 
-    public LightweightSyntacticalReplaceVisitor(GoalLocalSpecificationRepository localSpecRepo, Services services) {
+    public LightweightSyntacticalReplaceVisitor(GoalLocalSpecificationRepository localSpecRepo,
+            Services services) {
         this(SVInstantiations.EMPTY_SVINSTANTIATIONS, localSpecRepo, services);
     }
 
@@ -136,8 +137,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
 
         if (jb.program() instanceof ContextStatementBlock) {
             trans = new ProgramReplaceVisitor(
-                    new StatementBlock(
-                            ((ContextStatementBlock) jb.program()).getBody()), // TODO
+                    new StatementBlock(((ContextStatementBlock) jb.program()).getBody()), // TODO
                     localSpecRepo, services, svInst);
             trans.start();
             result = addContext((StatementBlock) trans.result());

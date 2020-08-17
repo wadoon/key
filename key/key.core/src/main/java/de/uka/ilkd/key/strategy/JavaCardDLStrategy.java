@@ -221,7 +221,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             inftyConst());
         }
 
-        final Feature loopInvF;
+        Feature loopInvF;
         final String loopProp =
                 strategyProperties
                         .getProperty(StrategyProperties.LOOP_OPTIONS_KEY);
@@ -274,7 +274,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         final Feature simplifyUpdAbstrFeature = StaticFeatureCollection
                 .simplifyUpdateAbstrFeature();
-
         return SumFeature.createSum(
                 AutomatedRuleFeature.INSTANCE,
                 NonDuplicateAppFeature.INSTANCE,
@@ -357,8 +356,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 "find_term_not_in_assumes",
                 ifZero(MatchedIfFeature.INSTANCE,
                         not(contains(AssumptionProjection.create(0),
-                                FocusProjection.INSTANCE))));        
-        
+                                FocusProjection.INSTANCE))));
+
         bindRuleSet(
                 d,
                 "update_elim",
@@ -429,14 +428,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                         numbers)),
                         termSmallerThan("commEqLeft", "commEqRight")),
                         longConst(-5000)));
-        
+
         bindRuleSet(
                 d,
                 "cnf_setComm",
                 add(SetsSmallerThanFeature.create(instOf("commRight"),
                         instOf("commLeft"), locSetLDT),
                         NotInScopeOfModalityFeature.INSTANCE, longConst(-800)));
-
         bindRuleSet(d, "simplify_literals",
         // ifZero ( ConstraintStrengthenFeatureUC.create(proof),
         // longConst ( 0 ),
@@ -1003,14 +1001,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private boolean classAxiomDelayedApplication() {
         String classAxiomSetting =
                 strategyProperties
-                        .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
+                .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
         return StrategyProperties.CLASS_AXIOM_DELAYED.equals(classAxiomSetting);
     }
 
     private boolean classAxiomApplicationEnabled() {
         String classAxiomSetting =
                 strategyProperties
-                        .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
+                .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
         return !StrategyProperties.CLASS_AXIOM_OFF.equals(classAxiomSetting);
     }
 
@@ -1241,6 +1239,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 FindDepthFeature.INSTANCE, 20)), inftyConst()));
 
         bindRuleSet(d, "setEqualityBlastingRight", longConst(-100));
+
+        bindRuleSet(
+                d,
+                "cnf_setComm",
+                add(SetsSmallerThanFeature.create(instOf("commRight"),
+                        instOf("commLeft"), locSetLDT),
+                        NotInScopeOfModalityFeature.INSTANCE, longConst(-800)));
 
         bindRuleSet(d, "elimQuantifier", -1000);
         bindRuleSet(d, "elimQuantifierWithCast", 50);
@@ -2663,7 +2668,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                 .create(heapLDT),
                                                 not(ff.ifThenElse)))),
                         not(ContainsTermFeature.create(instOf("s"), instOf("t1")))));
-        
+
         // Without EqNonDuplicateAppFeature.INSTANCE
         // rule 'applyEq' might be applied on the same term
         // without changing the sequent for a really long time. This is tested by

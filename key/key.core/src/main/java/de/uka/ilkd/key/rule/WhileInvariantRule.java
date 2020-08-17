@@ -43,7 +43,6 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
@@ -247,7 +246,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                     innermostMethodFrame == null
                 ? null
                 : (ExecutionContext) innermostMethodFrame.getExecutionContext();
-	    localSpecRepo.addLoopInvariant(spec);
+	localSpecRepo.addLoopInvariant(spec);
 
         //cache and return result
         final Instantiation result = new Instantiation(u, progPost, loop, spec, selfTerm,

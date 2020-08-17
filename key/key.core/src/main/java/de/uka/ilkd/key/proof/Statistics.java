@@ -349,7 +349,7 @@ public class Statistics {
         /**
          * Returns 1 if ruleApp is a loop scope invariant taclet application, and 0
          * otherwise.
-         * 
+         *
          * @param ruleApp The {@link RuleApp} to check.
          * @return 1 or 0.
          */
@@ -370,7 +370,7 @@ public class Statistics {
 
         /**
          * Returns 1 if ruleApp belongs to the given rule set, and 0 otherwise.
-         * 
+         *
          * @param ruleApp The {@link RuleApp} to check.
          * @return 1 or 0.
          */

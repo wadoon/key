@@ -368,7 +368,7 @@ public final class AuxiliaryContractBuilders {
         private final Services services;
         
         private final GoalLocalSpecificationRepository localSpecRepo;
-
+        
         /**
          *
          * @param goal

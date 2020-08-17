@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -61,27 +60,7 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.ClassWellDefinedness;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.ContractAxiom;
-import de.uka.ilkd.key.speclang.ContractFactory;
-import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.InitiallyClause;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.MethodWellDefinedness;
-import de.uka.ilkd.key.speclang.PartialInvAxiom;
-import de.uka.ilkd.key.speclang.QueryAxiom;
-import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.speclang.SpecificationElement;
-import de.uka.ilkd.key.speclang.StatementWellDefinedness;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
@@ -95,6 +74,7 @@ import de.uka.ilkd.key.util.Pair;
 public final class SpecificationRepository {
 
     public static final String CONTRACT_COMBINATION_MARKER = "#";
+
     /**
      * @see #limitObs(IObserverFunction)
      * @see #unlimitObs(IObserverFunction)
@@ -250,12 +230,13 @@ public final class SpecificationRepository {
         return tacletBuilder.getTaclet();
     }
 
-    static IObserverFunction getCanonicalFormForKJT(IObserverFunction obs, KeYJavaType kjt,
-            Map<IObserverFunction, IObserverFunction> limitedToUnlimited, Services services) {
+    private IObserverFunction getCanonicalFormForKJT(IObserverFunction obs,
+            KeYJavaType kjt) {
         assert obs != null;
         assert kjt != null;
-        if (!(obs instanceof IProgramMethod) || obs.getContainerType().equals(kjt)) {
-            return unlimitObs(obs, limitedToUnlimited);
+        if (!(obs instanceof IProgramMethod)
+                || obs.getContainerType().equals(kjt)) {
+            return unlimitObs(obs);
         }
         final IProgramMethod pm = (IProgramMethod) obs;
         if (pm.isConstructor()) {
@@ -266,13 +247,15 @@ public final class SpecificationRepository {
         // search through all locally available methods
         final String name = pm.getMethodDeclaration().getName();
         final int numParams = pm.getParameterDeclarationCount();
-        final ImmutableList<IProgramMethod> candidatePMs = services.getJavaInfo()
-                .getAllProgramMethods(kjt);
+        final ImmutableList<IProgramMethod> candidatePMs = services
+                .getJavaInfo().getAllProgramMethods(kjt);
         outer: for (IProgramMethod candidatePM : candidatePMs) {
             if (candidatePM.getMethodDeclaration().getName().equals(name)
-                    && candidatePM.getParameterDeclarationCount() == numParams) {
+                    && candidatePM
+                            .getParameterDeclarationCount() == numParams) {
                 for (int i = 0; i < numParams; i++) {
-                    if (!candidatePM.getParameterType(i).equals(pm.getParameterType(i))) {
+                    if (!candidatePM.getParameterType(i)
+                            .equals(pm.getParameterType(i))) {
                         continue outer;
                     }
                 }
@@ -282,16 +265,18 @@ public final class SpecificationRepository {
 
         // not found (happens for private methods of superclasses)
         // -> search through superclasses
-        for (KeYJavaType sup : services.getJavaInfo().getAllSupertypes(kjt).removeAll(kjt)) {
-            final IProgramMethod result = (IProgramMethod) getCanonicalFormForKJT(obs, sup,
-                    limitedToUnlimited, services);
+        for (KeYJavaType sup : services.getJavaInfo().getAllSupertypes(kjt)
+                .removeAll(kjt)) {
+            final IProgramMethod result = (IProgramMethod) getCanonicalFormForKJT(
+                    obs, sup);
             if (result != null) {
                 return result;
             }
         }
 
         // should not happen
-        assert false : "Could not find method " + pm.getName() + " in type " + kjt;
+        assert false : "Could not find method " + pm.getName() + " in type "
+                + kjt;
         return null;
     }
 
@@ -310,7 +295,7 @@ public final class SpecificationRepository {
         for (KeYJavaType sub : javaInfo.getAllSubtypes(kjt)) {
             assert sub != null;
             final IProgramMethod subPM = (IProgramMethod) getCanonicalFormForKJT(
-                    pm, sub, limitedToUnlimited, services);
+                    pm, sub);
             result = result.prepend(
                     new Pair<KeYJavaType, IObserverFunction>(sub, subPM));
         }
@@ -407,7 +392,7 @@ public final class SpecificationRepository {
 
     private Contract prepareContract(Contract contract) {
         // sanity check
-        assert getCanonicalFormForKJT(contract.getTarget(), contract.getKJT(), limitedToUnlimited, services)
+        assert getCanonicalFormForKJT(contract.getTarget(), contract.getKJT())
                 .equals(contract.getTarget());
 
         // set id
@@ -671,7 +656,7 @@ public final class SpecificationRepository {
             IObserverFunction target) {
         assert kjt != null;
         assert target != null;
-        target = getCanonicalFormForKJT(target, kjt, limitedToUnlimited, services);
+        target = getCanonicalFormForKJT(target, kjt);
         final Pair<KeYJavaType, IObserverFunction> pair = new Pair<KeYJavaType, IObserverFunction>(
                 kjt, target);
         final ImmutableSet<WellDefinednessCheck> result = wdChecks.get(pair);
@@ -778,29 +763,15 @@ public final class SpecificationRepository {
         }
     }
 
-    private static IObserverFunction unlimitObs(IObserverFunction obs,
-            Map<IObserverFunction, IObserverFunction> limitedToUnlimited) {
-        IObserverFunction result = limitedToUnlimited.get(obs);
-        if (result == null) {
-            result = obs;
-        }
-        return result;
-    }
-
-    void addContract(BlockContract blockContract) {
-        addContract(cf.funcBlock(blockContract));
-    }
-
-    void addContract(LoopContract loopContract) {
-        addContract(cf.funcLoop(loopContract));
-    }
-
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
 
     /**
      * Applies the specified operator to every contract in this repository.
+     *
+     * NOTE: For loop invariants and block contracts, you have to call
+     * {@link GoalLocalSpecificationRepository#map(UnaryOperator, Services)}.
      *
      * @param op an operator.
      * @param services services.
@@ -827,6 +798,10 @@ public final class SpecificationRepository {
             result = result.union(s);
         }
         return WellDefinednessCheck.isOn() ? result : removeWdChecks(result);
+        /*
+         * TODO (DS, 2019-11-06): Check if callers also have to call the goal-local
+         * equivalent.
+         */
     }
 
     /**
@@ -836,7 +811,7 @@ public final class SpecificationRepository {
             IObserverFunction target) {
         assert kjt != null;
         assert target != null;
-        target = getCanonicalFormForKJT(target, kjt, limitedToUnlimited, services);
+        target = getCanonicalFormForKJT(target, kjt);
         final Pair<KeYJavaType, IObserverFunction> pair = new Pair<KeYJavaType, IObserverFunction>(
                 kjt, target);
         final ImmutableSet<Contract> result = WellDefinednessCheck.isOn()
@@ -850,7 +825,7 @@ public final class SpecificationRepository {
      */
     public ImmutableSet<FunctionalOperationContract> getOperationContracts(
             KeYJavaType kjt, IProgramMethod pm) {
-        pm = (IProgramMethod) getCanonicalFormForKJT(pm, kjt, limitedToUnlimited, services);
+        pm = (IProgramMethod) getCanonicalFormForKJT(pm, kjt);
         final Pair<KeYJavaType, IProgramMethod> pair = new Pair<KeYJavaType, IProgramMethod>(
                 kjt, pm);
         final ImmutableSet<FunctionalOperationContract> result = operationContracts
@@ -1576,8 +1551,24 @@ public final class SpecificationRepository {
     public ImmutableSet<MergeContract> getMergeContracts(
             MergePointStatement mps) {
         final ImmutableSet<MergeContract> contracts = mergeContracts.get(mps);
-        return Optional.ofNullable (contracts)
-                .orElseGet(() -> DefaultImmutableSet. nil());
+        if (contracts == null) {
+            return DefaultImmutableSet.<MergeContract> nil();
+        } else {
+            return contracts;
+        }
+    }
+
+    /**
+     * Adds a new functional {@code LoopContract} to the repository.
+     *
+     * @param contract the {@code LoopContract} to add.
+     */
+    public void addFunctionalLoopContract(final LoopContract contract) {
+        if (contract.isInternalOnly()) {
+            addContract(cf.funcBlock(contract.toBlockContract()));
+        } else {
+            addContract(cf.funcLoop(contract));
+        }
     }
 
     /**
@@ -1603,6 +1594,15 @@ public final class SpecificationRepository {
         mergeContracts.put(mps, DefaultImmutableSet.nil());
     }
 
+    /**
+     * Adds the supplied {@link SpecificationElement}s (functional contracts, class
+     * invariants and axioms, initially clauses, and merge contracts) to the
+     * repository. NOTE: Block and loop contracts are locally stored in the
+     * {@link GoalLocalSpecificationRepository}, so they have to be separately
+     * registered!
+     *
+     * @param specs The contracts to register.
+     */
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {
         for (SpecificationElement spec : specs) {
             if (spec instanceof Contract) {
@@ -1670,6 +1670,14 @@ public final class SpecificationRepository {
             result = obs;
         }
         return result;
+    }
+
+    void addContract(BlockContract blockContract) {
+        addContract(cf.funcBlock(blockContract));
+    }
+
+    void addContract(LoopContract loopContract) {
+        addContract(cf.funcLoop(loopContract));
     }
 
     // Public interface for well-definedness checks

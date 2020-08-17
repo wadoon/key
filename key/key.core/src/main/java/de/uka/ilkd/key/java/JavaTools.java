@@ -73,6 +73,7 @@ public final class JavaTools {
                     return el.get(ProgramElement.class); 
                 }
                 
+                @Override
                 public void doAction(ProgramElement node) {
                     if(!done && node == activeStatement) {
                         done = true;
@@ -97,13 +98,15 @@ public final class JavaTools {
      * Returns the innermost method frame of the passed java block
      */
     public static MethodFrame getInnermostMethodFrame(ProgramElement pe,
-                                      Services services) { 
+                                      Services services) {
         final MethodFrame result = new JavaASTVisitor(pe, new GoalLocalSpecificationRepository(), services) {
             private MethodFrame res;
+
             @Override
             protected void doAction(ProgramElement node) {
                 node.visit(this);
             }
+
             @Override
             protected void doDefaultAction(SourceElement node) {
                 if(node instanceof MethodFrame && res == null) {
@@ -127,10 +130,12 @@ public final class JavaTools {
         return getInnermostMethodFrame(jb.program(), services);
     }
 
-    public static ExecutionContext getInnermostExecutionContext(JavaBlock jb,
+    public static ExecutionContext getInnermostExecutionContext(
+        						JavaBlock jb, 
         						Services services) {
     final MethodFrame frame = getInnermostMethodFrame(jb, services);
-        return frame == null ? null
+    return frame == null 
+               ? null
            : (ExecutionContext) frame.getExecutionContext();	
     }
     

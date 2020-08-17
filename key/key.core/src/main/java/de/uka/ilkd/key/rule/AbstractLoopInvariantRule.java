@@ -539,7 +539,6 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                 tb.getBaseHeap(), anonHeapTerm);
     }
 
-
     /**
      * Prepare anon update, wellformed formula, frame condition and reachable
      * state formula.

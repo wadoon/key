@@ -13,18 +13,10 @@
 
 package de.uka.ilkd.key.parser;
 
-import java.io.IOException;
-import java.io.Reader;
-
-import org.antlr.runtime.RecognitionException;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -32,6 +24,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.RuleSet;
+import org.antlr.runtime.RecognitionException;
+
+import java.io.IOException;
+import java.io.Reader;
 
 
 /** This class wraps the default KeY-Term-Parser.
@@ -45,7 +41,6 @@ public final class DefaultTermParser {
      * specified namespaces. The method ensures, that the term has the
      * specified sort.
      * @param sort The expected sort of the term.
-     * @param localSpecRepo TODO
      * @return The parsed term of the specified sort.
      * @throws ParserException The method throws a ParserException, if
      * the input could not be parsed correctly or the term has an
@@ -53,11 +48,12 @@ public final class DefaultTermParser {
     public Term parse(Reader in, 
 	    	      Sort sort, 
 	    	      GoalLocalSpecificationRepository localSpecRepo,
-                      Services services,
+	    	      Services services,
                       Namespace<QuantifiableVariable> var_ns,
                       Namespace<Function> func_ns,
                       Namespace<Sort> sort_ns,
-                      Namespace<IProgramVariable> progVar_ns, AbbrevMap scm)
+                      Namespace<IProgramVariable> progVar_ns,
+                      AbbrevMap scm)
         throws ParserException
     {
 	return parse(in , sort, localSpecRepo,
@@ -75,7 +71,6 @@ public final class DefaultTermParser {
      * specified namespaces. The method ensures, that the term has the
      * specified sort.
      * @param sort The expected sort of the term; must not be null.
-     * @param localSpecRepo TODO
      * @return The parsed term of the specified sort.
      * @throws ParserException The method throws a ParserException, if
      * the input could not be parsed correctly or the term has an
@@ -83,8 +78,9 @@ public final class DefaultTermParser {
     public Term parse(Reader in, 
 	    	      Sort sort, 
 	    	      GoalLocalSpecificationRepository localSpecRepo,
-                      Services services, 
-                      NamespaceSet nss, AbbrevMap scm)
+	    	      Services services,
+                      NamespaceSet nss, 
+                      AbbrevMap scm)
         throws ParserException
     {
         KeYParserF parser = null;
@@ -112,7 +108,6 @@ public final class DefaultTermParser {
      /**
      * The method reads the input and parses a sequent with the
      * specified namespaces.
-     * @param localSpecRepo TODO
      * @return the paresed String as Sequent Object
      * @throws ParserException The method throws a ParserException, if
      * the input could not be parsed correctly

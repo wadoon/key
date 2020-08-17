@@ -31,24 +31,14 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.FunctionalBlockContract;
-import de.uka.ilkd.key.speclang.FunctionalLoopContract;
-import de.uka.ilkd.key.speclang.InitiallyClause;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.SpecificationElement;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.Pair;
 
 /**
  * Contains specification elements that are local to a {@link Goal}, primarily
  * because they are subject to program variable renaming taking place during
  * proof construction. Examples are block and loop contracts.
- * 
+ *
  * @author Dominic Steinhoefel
  */
 public class GoalLocalSpecificationRepository {
@@ -288,7 +278,6 @@ public class GoalLocalSpecificationRepository {
         blockContracts.put(b, getBlockContracts(block).add(contract));
 
         handleAddForFakeAEBlock(contract, block);
-
         if (addFunctionalContract) {
             services.getSpecificationRepository().addContract(contract);
         }
@@ -313,7 +302,6 @@ public class GoalLocalSpecificationRepository {
         ImmutableSet<BlockContract> set = blockContracts.get(b);
         final ImmutableSet<BlockContract> newContractSet = set.remove(contract);
         blockContracts.put(b, newContractSet);
-
         handleRemoveForFakeAEBlock(contract, block);
     }
 
@@ -354,11 +342,7 @@ public class GoalLocalSpecificationRepository {
         }
 
         if (addFunctionalContract) {
-            if (contract.isInternalOnly()) {
-                services.getSpecificationRepository().addContract(contract.toBlockContract());
-            } else {
-                services.getSpecificationRepository().addContract(contract);
-            }
+            services.getSpecificationRepository().addFunctionalLoopContract(contract);
         }
     }
 

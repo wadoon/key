@@ -52,7 +52,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
      * @see #toLoopContract()
      */
     private LoopContract loopContract = null;
-    
+
     /**
      * @see #creationTime()
      */
@@ -111,7 +111,6 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
      *
      * @param contracts
      *            a set of block contracts to combine.
-     * @param localSpecRepo TODO
      * @param services
      *            services.
      * @return the combination of the specified block contracts.
@@ -331,7 +330,6 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
          *            map from every heap to an assignable term.
          * @param hasMod
          *            map specifying on which heaps this contract has a modifies clause.
-         * @param localSpecRepo TODO
          * @param services
          *            services.
          */
@@ -377,7 +375,6 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
          *
          * @param contracts
          *            the contracts to combine.
-         * @param localSpecRepo TODO
          * @param services
          *            services.
          */

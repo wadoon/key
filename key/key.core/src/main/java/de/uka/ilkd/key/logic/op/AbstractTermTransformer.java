@@ -27,44 +27,8 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.rule.metaconstruct.AddCast;
-import de.uka.ilkd.key.rule.metaconstruct.ArrayBaseInstanceOf;
-import de.uka.ilkd.key.rule.metaconstruct.BreaksPrecondition;
-import de.uka.ilkd.key.rule.metaconstruct.ConstantValue;
-import de.uka.ilkd.key.rule.metaconstruct.ContinuesPrecondition;
-import de.uka.ilkd.key.rule.metaconstruct.CreateBeforeLoopUpdate;
-import de.uka.ilkd.key.rule.metaconstruct.CreateFrameCond;
-import de.uka.ilkd.key.rule.metaconstruct.CreateHeapAnonUpdate;
-import de.uka.ilkd.key.rule.metaconstruct.CreateLocalAnonUpdate;
-import de.uka.ilkd.key.rule.metaconstruct.CreateWellformedCond;
-import de.uka.ilkd.key.rule.metaconstruct.EnumConstantValue;
-import de.uka.ilkd.key.rule.metaconstruct.ExcPrecondition;
-import de.uka.ilkd.key.rule.metaconstruct.ExpandQueriesMetaConstruct;
-import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
-import de.uka.ilkd.key.rule.metaconstruct.MemberPVToField;
-import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula2;
-import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula3;
-import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula4;
-import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula5;
-import de.uka.ilkd.key.rule.metaconstruct.ObserverEqualityMetaConstruct;
-import de.uka.ilkd.key.rule.metaconstruct.ReturnPrecondition;
-import de.uka.ilkd.key.rule.metaconstruct.arith.DivideLCRMonomials;
-import de.uka.ilkd.key.rule.metaconstruct.arith.DivideMonomials;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaAdd;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaBinaryAnd;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaBinaryOr;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaBinaryXOr;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaDiv;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaEqual;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaGeq;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaGreater;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaLeq;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaLess;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaMul;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaPow;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaShiftLeft;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaShiftRight;
-import de.uka.ilkd.key.rule.metaconstruct.arith.MetaSub;
+import de.uka.ilkd.key.rule.metaconstruct.*;
+import de.uka.ilkd.key.rule.metaconstruct.arith.*;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -139,7 +103,6 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer ADD_CAST = new AddCast();
 
     public static final AbstractTermTransformer EXPAND_QUERIES = new ExpandQueriesMetaConstruct();
-
     public static final AbstractTermTransformer MUTUAL_EXCLUSION_FORMULA_2 = new MutualExclusionFormula2();
     public static final AbstractTermTransformer MUTUAL_EXCLUSION_FORMULA_3 = new MutualExclusionFormula3();
     public static final AbstractTermTransformer MUTUAL_EXCLUSION_FORMULA_4 = new MutualExclusionFormula4();

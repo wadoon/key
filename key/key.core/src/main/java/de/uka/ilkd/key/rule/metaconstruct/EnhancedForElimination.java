@@ -81,10 +81,12 @@ public class EnhancedForElimination extends ProgramTransformer {
      * @see #getIteratorVariable()
      */
     private static final String IT = "it";
+
     /**
      * Name for the array variable.
      */
     private static final String ARR = "arr";
+
     /**
      * Name for the {@code \index} variable.
      *
@@ -200,29 +202,29 @@ public class EnhancedForElimination extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe,
             GoalLocalSpecificationRepository localSpecRepo, Services services, SVInstantiations svInst) {
-
         assert pe instanceof EnhancedFor : "Only works on enhanced fors";
 
-    EnhancedFor enhancedFor = (EnhancedFor) pe;
+        EnhancedFor enhancedFor = (EnhancedFor) pe;
 
-    Expression expression = enhancedFor.getGuardExpression();
+        Expression expression = enhancedFor.getGuardExpression();
 
-    if (execContext == null) {
-        if (execContextSV == null) {
-            execContext = svInst.getContextInstantiation().activeStatementContext();
-        } else {
-            execContext = (ExecutionContext) svInst
-                    .getInstantiation((SchemaVariable) execContextSV);
+        if (execContext == null) {
+            if (execContextSV == null) {
+                execContext = svInst.getContextInstantiation().activeStatementContext();
+            } else {
+                execContext = (ExecutionContext) svInst
+                        .getInstantiation((SchemaVariable) execContextSV);
+            }
         }
-    }
-    ProgramElement result;
-    if (!isArrayType(expression, services)) {
-        result = makeIterableForLoop(enhancedFor, localSpecRepo, services);
-    } else {
-        result = makeArrayForLoop(enhancedFor, localSpecRepo, services);
-    }
 
-    return new ProgramElement[] { result };
+        ProgramElement result;
+        if (!isArrayType(expression, services)) {
+        result = makeIterableForLoop(enhancedFor, localSpecRepo, services);
+        } else {
+        result = makeArrayForLoop(enhancedFor, localSpecRepo, services);
+        }
+
+        return new ProgramElement[] { result };
     }
 
     /**
@@ -271,7 +273,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * Checks if an expression has an array type.
      *
      * @param expression the expression to check
-     * @param services the services for lookups
+     * @param services   the services for lookups
      * @return true, if expression's type is a subtype of Iterable
      */
     private boolean isArrayType(Expression expression, Services services) {
@@ -283,7 +285,6 @@ public class EnhancedForElimination extends ProgramTransformer {
      * arr = exp; for(int i = 0; i < arr.length; i++) body;
      */
     private ProgramElement makeArrayForLoop(EnhancedFor enhancedFor, GoalLocalSpecificationRepository localSpecRepo, Services services) {
-
         Expression expression = enhancedFor.getGuardExpression();
         Statement body = enhancedFor.getBody();
 
@@ -292,13 +293,13 @@ public class EnhancedForElimination extends ProgramTransformer {
         final JavaInfo ji = services.getJavaInfo();
 
         // T[] arr = exp;
-        // TODO: how to get a more appropriate execution context?
         final KeYJavaType arrayType = expression.getKeYJavaType(services, execContext);
         final ProgramVariable arrayVar = KeYJavaASTFactory.localVariable(services,
                 ARR, arrayType);
         final Statement arrAssignment = KeYJavaASTFactory.declare(arrayVar, expression);
 
         head = KeYJavaASTFactory.block(arrAssignment);
+
         // for(int i; i < arr.length; i++)
         final KeYJavaType intType = ji.getPrimitiveKeYJavaType("int");
         indexVariable = KeYJavaASTFactory.localVariable(services, INDEX, intType);
@@ -312,7 +313,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         final IProgramVariable programVariable = lvd.getVariables().get(0).getProgramVariable();
         assert programVariable instanceof ProgramVariable :
             "Since this is a concrete program, the spec must not be schematic";
-        final ProgramVariable lvdVar = (ProgramVariable)programVariable;
+        final ProgramVariable lvdVar = (ProgramVariable) programVariable;
         final Statement declArrayElemVar = KeYJavaASTFactory.declare(lvdVar);
 
         // a = arr[i];
@@ -373,6 +374,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         loop = new While(itGuard, block, null, new ExtList());
 
         head = KeYJavaASTFactory.block(itinit, valuesInit);
+
         // block
         final StatementBlock outerBlock = KeYJavaASTFactory.block(itinit, valuesInit, loop);
         setInvariant(enhancedFor, loop, indexVariable, Optional.of(valuesVariable), localSpecRepo, services);
@@ -402,12 +404,12 @@ public class EnhancedForElimination extends ProgramTransformer {
     /*
      * <values> = \seq_concat(<values>, \seq_singleton(<lvd>));
      */
-    private Statement makeValuesUpdate(ProgramVariable valuesVar, LocalVariableDeclaration lvd){
+    private Statement makeValuesUpdate(ProgramVariable valuesVar, LocalVariableDeclaration lvd) {
         final VariableSpecification var = lvd.getVariables().get(0);
         final IProgramVariable element = var.getProgramVariable();
         assert element instanceof ProgramVariable :
             "Since this is a concrete program, the spec must not be schematic";
-        final Expression seqSingleton = new SeqSingleton((ProgramVariable)element);
+        final Expression seqSingleton = new SeqSingleton((ProgramVariable) element);
         final Expression seqConcat = new SeqConcat(valuesVar, seqSingleton);
         final Statement assignment = new CopyAssignment(valuesVar, seqConcat);
         return assignment;
@@ -419,7 +421,6 @@ public class EnhancedForElimination extends ProgramTransformer {
      *
      * @param original    original loop.
      * @param transformed transformed loop.
-     * @param localSpecRepo TODO
      * @param services    services.
      */
     private void setInvariant(EnhancedFor original, LoopStatement transformed,
@@ -479,7 +480,7 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         // replace values
         maybeValuesVar
-        .ifPresent(v -> updateInvs(newInvs, tb.values(), v, services));
+            .ifPresent(v -> updateInvs(newInvs, tb.values(), v, services));
         if (maybeValuesVar.isPresent()) {
             maybeVariant = maybeVariant
                     .map(variant -> GenericTermReplacer.replace(variant,
@@ -510,10 +511,10 @@ public class EnhancedForElimination extends ProgramTransformer {
             final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         invs.entrySet().stream().filter(entry -> entry.getValue() != null)
-        .map(entry -> new Pair<LocationVariable, Term>(entry.getKey(),
+            .map(entry -> new Pair<LocationVariable, Term>(entry.getKey(),
                 GenericTermReplacer.replace(entry.getValue(),
                         termToReplace::equals, t -> tb.var(replaceWith),
                         services)))
-        .forEach(p -> invs.put(p.first, p.second));
+            .forEach(p -> invs.put(p.first, p.second));
     }
 }

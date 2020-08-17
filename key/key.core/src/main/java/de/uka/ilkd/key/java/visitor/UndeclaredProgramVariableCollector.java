@@ -33,7 +33,7 @@ import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
  * <p>
  * This class is a specialization of {@link ProgramVariableCollector} which
  * returns as result ({@link #result()}) used {@link LocationVariable} which
- * are undeclared, but used in the given {@link ProgramElement}.
+ * are undeclared, but used in the given {@link ProgramElement.
  * </p>
  * <p>
  * Declared {@link LocationVariable}s are:
@@ -55,24 +55,21 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
     * Contains the super result.
     */
    private LinkedHashSet<LocationVariable> allVariables;
-
+   
    /**
     * Contains the undeclared variables as result.
     */
    private LinkedHashSet<LocationVariable> undeclaredVariables;
-
-    /**
-     * Constructor.
-     * 
-     * @param root          The {@link ProgramElement} to collect undeclared
-     *                      variables in.
-     * @param localSpecRepo TODO
-     * @param services      The {@link Services} to use.
-     */
+   
+   /**
+    * Constructor.
+    * @param root The {@link ProgramElement} to collect undeclared variables in.
+    * @param services The {@link Services} to use.
+    */
     public UndeclaredProgramVariableCollector(ProgramElement root,
             GoalLocalSpecificationRepository localSpecRepo, Services services) {
         super(root, localSpecRepo, services);
-    }
+   }
 
    /**
     * {@inheritDoc}
@@ -124,7 +121,7 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
    public Set<IProgramVariable> getDeclaredVariables() {
       return declaredVariables;
    }
-
+   
    /**
     * Returns all used variables.
     * @return All used variables.

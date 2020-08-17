@@ -23,7 +23,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Checks whether a loop has an invariant (either normal or "free").
- * 
+ *
  * @author Dominic Steinhoefel
  */
 public class HasLoopInvariantCondition implements VariableCondition {

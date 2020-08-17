@@ -127,7 +127,6 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
      * @param loops the loops whose contracts to update.
      * @param atPreVars all remembrance variables.
      * @param atPreHeapVars all remembrance heaps.
-     * @param localSpecRepo TODO
      * @param services services.
      */
     public void updateBlockAndLoopContracts(final ImmutableSet<StatementBlock> blocks,
@@ -149,7 +148,6 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
      * @param statements the blocks and loops whose contracts to update.
      * @param atPreVars all remembrance variables.
      * @param atPreHeapVars all remembrance heaps.
-     * @param localSpecRepo TODO
      * @param services services.
      */
     public void updateBlockAndLoopContracts(final ImmutableSet<? extends JavaStatement> statements,
@@ -560,7 +558,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     (StatementBlock) statement, newPreconditions, newPostconditions,
                     newFreePostconditions, newModifiesClauses, newDeclaresClauses,
                     newAccessibleClauses, contract.getInfFlowSpecs(), newVariables,
-                    contract.getMby(newVariables, services));
+                            contract.getMby(newVariables, services));
 
             localSpecRepo.removeBlockContract((BlockContract) contract);
             localSpecRepo.addBlockContract(newBlockContract, false, services);
@@ -572,15 +570,15 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                         newPreconditions, newPostconditions, newFreePostconditions,
                         newModifiesClauses, newDeclaresClauses, newAccessibleClauses,
                         contract.getInfFlowSpecs(), newVariables,
-                        contract.getMby(newVariables, services),
-                        ((LoopContract) contract).getDecreases(newVariables, services));
+                                contract.getMby(newVariables, services),
+                                ((LoopContract) contract).getDecreases(newVariables, services));
             } else {
                 newLoopContract = ((LoopContract) contract).update((LoopStatement) statement,
                         newPreconditions, newPostconditions, newFreePostconditions,
                         newModifiesClauses, newDeclaresClauses, newAccessibleClauses,
                         contract.getInfFlowSpecs(), newVariables,
-                        contract.getMby(newVariables, services),
-                        ((LoopContract) contract).getDecreases(newVariables, services));
+                                contract.getMby(newVariables, services),
+                                ((LoopContract) contract).getDecreases(newVariables, services));
             }
 
             localSpecRepo.removeLoopContract((LoopContract) contract);

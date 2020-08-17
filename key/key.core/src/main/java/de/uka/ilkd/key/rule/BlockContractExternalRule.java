@@ -127,7 +127,6 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         if (representsJMLAssumeStmt) {
             return new Term[] { freePostcondition };
         }
-        
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
                 .buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
@@ -136,7 +135,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         final Term atMostOneFlagSetCondition
                 = conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
         return new Term[] { postcondition, freePostcondition, wellFormedAnonymisationHeapsCondition,
-                reachableOutCondition, atMostOneFlagSetCondition };
+            reachableOutCondition, atMostOneFlagSetCondition };
     }
 
     /**
@@ -239,7 +238,6 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder
                 = new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self,
                         services);
-        
         final Term[] preconditions = createPreconditions(instantiation, contract, heaps,
                 localInVariables, conditionsAndClausesBuilder, services);
         final Term[] assumptions = createAssumptions(localOutVariables, anonymisationHeaps,
@@ -251,7 +249,6 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
         final GoalsConfigurator configurator = new GoalsConfigurator(application,
                 new TermLabelState(), instantiation, contract.getLabels(), variables,
                 application.posInOccurrence(), goal.getLocalSpecificationRepository(), services, this);
-        
         if (application.representsJMLAssumeStmt) {
             result = goal.split(1);
         } else {

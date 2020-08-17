@@ -25,7 +25,7 @@ import de.uka.ilkd.key.util.MiscTools;
 /**
  * Extracts the loop invariants for a loop term (for all applicable heap
  * contexts).
- * 
+ *
  * @author Dominic Steinhoefel
  */
 public class LoopInvariantCondition implements VariableCondition {

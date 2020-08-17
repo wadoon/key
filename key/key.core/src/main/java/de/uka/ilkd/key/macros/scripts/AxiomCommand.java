@@ -13,7 +13,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 /**
  * The axiom command takes one argument: a formula to which the command is
  * applied.
- * 
+ *
  * @see AssumeCommand The assume command is a synonym for the axiom command.
  */
 public class AxiomCommand

@@ -26,8 +26,9 @@ public class ReattachLoopInvariant extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, GoalLocalSpecificationRepository localSpecRepo,
-            Services services, SVInstantiations svInst) {
+    public ProgramElement[] transform(ProgramElement pe,
+            GoalLocalSpecificationRepository localSpecRepo, Services services,
+            SVInstantiations svInst) {
         final ProgramElement context = //
                 svInst.getContextInstantiation().contextProgram();
 

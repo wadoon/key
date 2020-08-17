@@ -51,6 +51,7 @@ class BasicSnippetData {
     final TermBuilder tb;
 
     final Services services;
+
     final GoalLocalSpecificationRepository localSpecRepo;
 
     /**
@@ -127,7 +128,7 @@ class BasicSnippetData {
 
 
     BasicSnippetData(FunctionalOperationContract contract,
-                     GoalLocalSpecificationRepository localSpecRepo, Services services) {
+            GoalLocalSpecificationRepository localSpecRepo, Services services) {
         this.hasMby = contract.hasMby();
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -146,7 +147,7 @@ class BasicSnippetData {
                 new StateVars(contract.getSelf(), contract.getParams(),
                               contract.getResult(), contract.getExc(), heap);
     }
-    
+
     BasicSnippetData(LoopSpecification invariant,
                      ExecutionContext context,
                      Term guardTerm,
@@ -197,8 +198,8 @@ class BasicSnippetData {
         origVars = new StateVars(invariant.getInternalSelfTerm(),
                                  guardTerm, localVarsTerms, heap);
     }
-    
-    
+
+
     BasicSnippetData(InformationFlowContract contract,
                      GoalLocalSpecificationRepository localSpecRepo, Services services) {
         this.hasMby = contract.hasMby();
@@ -208,7 +209,7 @@ class BasicSnippetData {
 
         contractContents.put(Key.TARGET_METHOD, contract.getTarget());
         contractContents.put(Key.FOR_CLASS, contract.getKJT());
-        contractContents.put(Key.PRECONDITION, contract.getPre());        
+        contractContents.put(Key.PRECONDITION, contract.getPre());
         contractContents.put(Key.FREE_PRECONDITION, contract.getFreePre());
         contractContents.put(Key.MODIFIES, contract.getMod());
         contractContents.put(Key.DEPENDENS, contract.getDep());

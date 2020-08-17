@@ -88,7 +88,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      *            the statement where the prog vars are replaced
      * @param map
      *            the HashMap with the replacements
-     * @param localSpecRepo The goal-local specification repository
      * @param services
      *            the services instance
      */
@@ -111,7 +110,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      *            decides if all variables are to be replaced
      * @param services
      *            the services instance
-     * @param localSpecRepo The goal-local specification repository
      */
     public ProgVarReplaceVisitor(ProgramElement st,
             Map<ProgramVariable, ProgramVariable> map, boolean replaceall,
@@ -141,7 +139,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return new LocationVariable(
                 VariableNamer.parseName(name.toString() + postFix,
                         name.getCreationInfo()),
-                MiscTools.fixKeYJavaType(pv, services), pv.isFinal(), pv.getPositionInfo());
+                MiscTools.fixKeYJavaType(pv, services), pv.isFinal());
     }
 
     @Override
@@ -196,7 +194,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             performActionOnBlockContract(block, block, false);
         }
     }
-    
+
     /** starts the walker */
     @Override
     public void start() {
@@ -229,6 +227,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return replaceVariablesInTerm(t, this.replaceMap, services);
     }
 
+    @SuppressWarnings("unlikely-arg-type")
     private static Term replaceVariablesInTerm(Term t,
             Map<ProgramVariable, ProgramVariable> replaceMap,
             Services services) {
@@ -252,9 +251,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             Operator op = t.op();
             if (op instanceof ElementaryUpdate) {
                 ElementaryUpdate uop = (ElementaryUpdate) t.op();
-                if (replaceMap.containsKey((LocationVariable) uop.lhs())) {
+                if (replaceMap.containsKey(uop.lhs())) {
                     UpdateableOperator replacedLhs = (UpdateableOperator) replaceMap
-                            .get((LocationVariable) uop.lhs());
+                            .get(uop.lhs());
                     op = ElementaryUpdate.getInstance(replacedLhs);
                     changed = changed || uop != op;
                 }
@@ -405,7 +404,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     createNewBlockContract(oldContract, block, !oldElem.equals(newElem)), services);
         }
     }
-    
+
     private MergeContract createNewMergeContract(
             final MergeContract oldContract, final MergePointStatement newMps,
             final boolean changed) {

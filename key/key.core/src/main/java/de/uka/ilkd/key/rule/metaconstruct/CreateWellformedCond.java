@@ -29,7 +29,7 @@ import de.uka.ilkd.key.util.MiscTools;
  * Creates the wellformedness condition for the given anonymizing heap terms if
  * they apply for the current profile and modality type. At least generates the
  * "wellFormed(anon_heap_LOOP)" condition for the anonymized standard heap.
- * 
+ *
  * @author Dominic Steinhoefel
  */
 public final class CreateWellformedCond extends AbstractTermTransformer {
@@ -55,7 +55,7 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
 
     /**
      * Creates a wellformedness condition containing the applicable heaps.
-     * 
+     *
      * @param isTransaction
      *            Signals a transaction modality.
      * @param isPermissions

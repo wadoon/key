@@ -112,9 +112,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
      * Services.
      */
     private final Services services;
-    
-    private final GoalLocalSpecificationRepository localSpecRepo;
 
+    private final GoalLocalSpecificationRepository localSpecRepo;
     /**
      * @see LoopContract#getLoopLabels()
      */
@@ -168,7 +167,6 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
      *            the contract's decreases clause.
      * @param functionalContracts
      *            the functional contracts corresponding to this contract.
-     * @param localSpecRepo TODO
      * @param services
      *            services.
      */
@@ -275,7 +273,6 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
      *            the contract's decreases clause.
      * @param functionalContracts
      *            the functional contracts corresponding to this contract.
-     * @param localSpecRepo TODO
      * @param services
      *            services.
      */
@@ -339,7 +336,6 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
      *
      * @param contracts
      *            a set of loop contracts to combine.
-     * @param localSpecRepo TODO
      * @param services
      *            services.
      * @return the combination of the specified loop contracts.
@@ -453,7 +449,6 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
      *            the label to use for continue statements.
      * @param loopLabels
      *            all labels belonging to the loop.
-     * @param localSpecRepo TODO
      * @param services
      *            services.
      * @return the loop's body. If the loop is a for-loop, it is transformed to a while-loop.
@@ -1050,7 +1045,6 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
          *            map specifying on which heaps this contract has a modifies clause.
          * @param decreases
          *            the decreases term.
-         * @param localSpecRepo TODO
          * @param services
          *            services.
          */
@@ -1115,7 +1109,6 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
          *            map specifying on which heaps this contract has a modifies clause.
          * @param decreases
          *            the decreases term.
-         * @param localSpecRepo TODO
          * @param services
          *            services.
          */
@@ -1186,7 +1179,6 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
          *
          * @param contracts
          *            the contracts to combine.
-         * @param localSpecRepo TODO
          * @param services
          *            services.
          */
