@@ -36,6 +36,7 @@ stages:
 
 compile:classes:
   stage: primary
+  needs: []
   image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
@@ -50,6 +51,7 @@ compile:classes:
 
 compile:testClasses:
   stage: secondary
+  needs: ["compile:classes"]
   image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
@@ -62,8 +64,9 @@ compile:testClasses:
       - build
       - .gradle
 
-compile:testClasses8:
+compile:testClasses8:  
   stage: secondary
+  needs: []
   image: wadoon/key-test-docker:jdk8
   script:
     - javac -version
@@ -72,6 +75,7 @@ compile:testClasses8:
 
 compile:testFast:key.util:
   stage: ternary
+  needs: ["compile:testClasses"]
   image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
@@ -91,6 +95,7 @@ compile:testFast:key.util:
 
 compile:testFast:key.core:
   stage: ternary
+  needs: ["compile:testClasses"]
   image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
@@ -110,6 +115,7 @@ compile:testFast:key.core:
 
 compile:testFast:proofref:
   stage: ternary
+  needs: ["compile:testClasses"]
   image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
@@ -129,6 +135,7 @@ compile:testFast:proofref:
 
 compile:testFast:testgen:
   stage: ternary
+  needs: ["compile:testClasses"]
   image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
@@ -147,6 +154,7 @@ compile:testFast:testgen:
 
 compile:testFast:interactionlog:
   stage: ternary
+  needs: ["compile:testClasses"]
   image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
@@ -165,6 +173,7 @@ compile:testFast:interactionlog:
 
 compile:testFast:ui:
   stage: ternary
+  needs: ["compile:testClasses"]
   image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
@@ -184,6 +193,7 @@ compile:testFast:ui:
 
 compile:testFast:removegenerics:
   stage: ternary
+  needs: ["compile:testClasses"]
   image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
@@ -244,6 +254,7 @@ compile:testFast:removegenerics:
 
 checkstyle:
   stage: primary
+  needs: []
   image: wadoon/key-test-docker:jdk11
   allow_failure: true
   script:
