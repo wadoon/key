@@ -16,8 +16,10 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
-import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -46,6 +48,35 @@ public final class EnumConstantCondition extends VariableConditionAdapter {
 	this.reference = reference;
     }
 
+    /**
+     * Given a select term of the form {@code E::select(heap, null, E::$name} for
+     * en enum {@code E} and an enum constant {@code name} within, extract the
+     * program variable representing that field in the class
+     *
+     * @param term a selection term of the above kind.
+     * @param services services to lookup things
+     * @return {@code null} if this is not a term of this kind (or not a constant),
+     *      the corresponding program variable otherwise.
+     */
+    public static ProgramVariable extractEnumProgramVar(Term term, Services services) {
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        if(heapLDT.isSelectOp(term.op())) {
+            Term fieldTerm = term.sub(2);
+            Operator fieldOp = fieldTerm.op();
+            if (fieldOp instanceof Function) {
+                String name = ((Function) fieldOp).name().toString();
+                int split = name.indexOf("::$");
+                if (split >= 0) {
+                    ProgramVariable progvar = services.getJavaInfo()
+                            .getAttribute(name.substring(split + 3),
+                                    name.substring(0, split));
+                    return progvar;
+                }
+            }
+        }
+
+        return null;
+    }
 
     @Override
     public boolean check(SchemaVariable var, 
@@ -54,21 +85,13 @@ public final class EnumConstantCondition extends VariableConditionAdapter {
 			 Services services) {
 
         if (var == reference) {
-            // new ObjectInspector(var).setVisible(true);
-            // new ObjectInspector(subst).setVisible(true);
-            ProgramVariable progvar;
-
-            if (subst instanceof FieldReference) {
-                progvar = ((FieldReference) subst).getProgramVariable();
-            } else if (subst instanceof Term
-                    && ((Term) subst).op() instanceof ProgramVariable) {
-                progvar = (ProgramVariable) ((Term) subst).op();
+            Term term = (Term) subst;
+            ProgramVariable progvar = extractEnumProgramVar(term, services);
+            if (progvar != null) {
+                return EnumClassDeclaration.isEnumConstant(progvar);
             } else {
                 return false;
             }
-
-            return EnumClassDeclaration.isEnumConstant(progvar);
-
         }
         return true;
     }

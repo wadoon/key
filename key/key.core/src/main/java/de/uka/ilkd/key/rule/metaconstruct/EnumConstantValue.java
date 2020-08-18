@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.rule.conditions.EnumConstantCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -51,35 +52,17 @@ public final class EnumConstantValue extends AbstractTermTransformer {
      */
     public Term transform(Term term, SVInstantiations svInst, Services services) {
         term = term.sub(0);
-        Operator op = term.op();
 
-        if (op instanceof ProgramVariable) {
-            int value;
+        ProgramVariable pv = EnumConstantCondition.extractEnumProgramVar(term, services);
 
-            ProgramVariable pv = (ProgramVariable) op;
-            //String varname = pv.getProgramElementName().getProgramName();
+        int value = EnumClassDeclaration.indexOf(pv);
+        if(value == -1) {
+            throw new IllegalArgumentException(term + " is not an enum constant");
+        }
 
-            if (false){//varname.endsWith(ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE)) {//TODO
-                // <nextToCreate>
-                if (pv.getContainerType().getJavaType() instanceof EnumClassDeclaration) {
-                    EnumClassDeclaration ecd = (EnumClassDeclaration) pv
-                            .getContainerType().getJavaType();
-                    value = ecd.getNumberOfConstants();
-                } else {
-                    throw new IllegalArgumentException(term
-                            + " is not in an enum type.");
-                }
-            } else {
-                // enum constant
-                value = EnumClassDeclaration.indexOf(pv);
-                if(value == -1)
-                    throw new IllegalArgumentException(term + " is not an enum constant");
-            }
-
-	    final IntLiteral valueLiteral = KeYJavaASTFactory.intLiteral(value);
+        final IntLiteral valueLiteral = KeYJavaASTFactory.intLiteral(value);
 	    term = services.getTypeConverter().convertToLogicElement(
 		    valueLiteral);
-        }   
 
         return term;
     }
