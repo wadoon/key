@@ -60,7 +60,7 @@ public final class ProofCollections {
         // forkDebugPort = "wait:1234"
         // verboseOutput = true
         //runOnlyOn = group1,group2
-        c.getSettings().setKeySettingsFromFile("");
+        //c.getSettings().setKeySettingsFromFile("");
 
         c.addGroup("newBook")
                 .provable("newBook/09.list_modelfield/ArrayList.add.key")

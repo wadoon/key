@@ -57,6 +57,9 @@ public final class ProofGroup {
      * <code>null</code>.
      */
     public TestResult runTests() throws Exception {
+        if (proofTests.isEmpty())
+            return new TestResult("Empty Group", true);
+
         /*
          * List of test results containing one test result for each test
          * file contained in this group.
