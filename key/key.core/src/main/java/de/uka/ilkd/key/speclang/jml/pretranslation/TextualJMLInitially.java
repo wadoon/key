@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import org.antlr.v4.runtime.ParserRuleContext;
+import de.uka.ilkd.key.njml.LabeledParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -22,24 +22,24 @@ import org.key_project.util.collection.ImmutableList;
  * @author Daniel Bruns
  */
 public final class TextualJMLInitially extends TextualJMLConstruct {
-    
-    private final ParserRuleContext inv;
-    
-    
-    public TextualJMLInitially(ImmutableList<String> mods, ParserRuleContext inv) {
+
+    private final LabeledParserRuleContext inv;
+
+
+    public TextualJMLInitially(ImmutableList<String> mods, LabeledParserRuleContext inv) {
         super(mods);
         assert inv != null;
         this.inv = inv;
         setPosition(inv);
     }
-    
-    public ParserRuleContext getInv() {
+
+    public LabeledParserRuleContext getInv() {
         return inv;
     }
     
     @Override
     public String toString() {
-        return inv.toString();
+        return inv.first.getText();
     }
     
     

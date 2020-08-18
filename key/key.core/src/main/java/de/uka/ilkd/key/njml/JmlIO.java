@@ -17,10 +17,7 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -65,6 +62,10 @@ public class JmlIO {
         return (Pair<IObserverFunction, Term>) interpret;
     }
 
+    public Pair<IObserverFunction, Term> translateRepresents(LabeledParserRuleContext clause) {
+        return translateRepresents(clause.first); //TODO weigl handle label?
+    }
+
     public static boolean isKnownFunction(String functionName) {
         return JmlTermFactory.jml2jdl.containsKey(functionName);
     }
@@ -80,6 +81,13 @@ public class JmlIO {
         Pair<Label, Term> t = (Pair<Label, Term>) interpret(parserRuleContext);
         return new Pair<>(t.first, attachTermLabel(t.second, type));
     }
+
+    public Pair<Label, Term> translateLabeledClause(
+            LabeledParserRuleContext parserRuleContext, OriginTermLabel.SpecType type) {
+        Pair<Label, Term> t = (Pair<Label, Term>) interpret(parserRuleContext.first);//TODO weigl label
+        return new Pair<>(t.first, attachTermLabel(t.second, type));
+    }
+
 
     public MergeParamsSpec translateMergeParams(JmlParser.MergeparamsspecContext ctx) {
         return (MergeParamsSpec) interpret(ctx);
@@ -121,6 +129,25 @@ public class JmlIO {
         Object interpret = interpret(expr);
         return ((SLExpression) interpret).getTerm();
     }
+
+    public Term translateTerm(LabeledParserRuleContext expr) {
+        Term term = translateTerm(expr.first);
+        if (expr.second != null)
+            return services.getTermBuilder().addLabel(term, expr.second);
+        else
+            return term;
+    }
+
+    public Term translateTerm(LabeledParserRuleContext expr, OriginTermLabel.SpecType type) {
+        Term term = translateTerm(expr.first);
+        OriginTermLabel origin = new OriginTermLabel(new OriginTermLabel.Origin(type));
+        if (expr.second != null)
+            return services.getTermBuilder().addLabel(term,
+                    new ImmutableArray<>(origin, expr.second));
+        else
+            return services.getTermBuilder().addLabel(term, origin);
+    }
+
 
     public Term translateTerm(ParserRuleContext expr, OriginTermLabel.SpecType type) {
         Term t = translateTerm(expr);
@@ -179,8 +206,16 @@ public class JmlIO {
         return (InfFlowSpec) this.interpret(expr);
     }
 
+    public InfFlowSpec translateInfFlow(LabeledParserRuleContext expr) {
+        return translateInfFlow(expr.first);//TODO weigl label?
+    }
+
     public Triple<IObserverFunction, Term, Term> translateDependencyContract(ParserRuleContext ctx) {
         return (Triple<IObserverFunction, Term, Term>) interpret(ctx);
+    }
+
+    public Triple<IObserverFunction, Term, Term> translateDependencyContract(LabeledParserRuleContext ctx) {
+        return translateDependencyContract(ctx.first);
     }
 
     public JmlIO atBefore(Map<LocationVariable, Term> atBefores) {

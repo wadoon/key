@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import de.uka.ilkd.key.njml.LabeledParserRuleContext;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -23,8 +24,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * According to Sect. 8 of the JML reference manual, axioms may not have any modifiers.
  */
 public final class TextualJMLClassAxiom extends TextualJMLConstruct {
-
-    private final ParserRuleContext inv;
+    private final LabeledParserRuleContext inv;
 
     /**
      * new textual representation.
@@ -32,20 +32,20 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
      * @param mods modifiers (are currently ignored)
      * @param inv  the expression in this clause
      */
-    public TextualJMLClassAxiom(ImmutableList<String> mods, ParserRuleContext inv) {
+    public TextualJMLClassAxiom(ImmutableList<String> mods, LabeledParserRuleContext inv) {
         super(ImmutableSLList.<String>nil()); // no modifiers allowed in axiom clause (see Sect. 8 of reference manual)
         assert inv != null;
         this.inv = inv;
         setPosition(inv);
     }
 
-    public TextualJMLClassAxiom(ImmutableList<String> mods, ParserRuleContext inv, String name) {
+    public TextualJMLClassAxiom(ImmutableList<String> mods, LabeledParserRuleContext inv, String name) {
         this(mods, inv);
         this.name = name;
     }
 
 
-    public ParserRuleContext getAxiom() {
+    public LabeledParserRuleContext getAxiom() {
         return inv;
     }
 

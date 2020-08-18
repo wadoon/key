@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.njml.JmlFacade;
 import de.uka.ilkd.key.njml.JmlIO;
 import de.uka.ilkd.key.njml.JmlParser;
+import de.uka.ilkd.key.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
@@ -52,7 +53,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.*;
 
@@ -60,6 +61,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.DIVERGES;
+import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS;
+import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ENSURES;
+import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.REQUIRES;
 import static java.lang.String.format;
 
 /**
@@ -106,20 +111,20 @@ public class JMLSpecFactory {
     }
 
     private static Map<LocationVariable, Term> translateToTermInvariants(IProgramMethod pm,
-                                                                         Map<String, ImmutableList<ParserRuleContext>> originalInvariants,
+                                                                         Map<String, ImmutableList<LabeledParserRuleContext>> originalInvariants,
                                                                          ProgramVariable selfVar, ImmutableList<ProgramVariable> allVars,
                                                                          final ImmutableList<LocationVariable> allHeaps,
                                                                          final Map<LocationVariable, Term> atPres, final Services services, final TermBuilder tb) {
         Map<LocationVariable, Term> invariants = new LinkedHashMap<LocationVariable, Term>();
         for (LocationVariable heap : allHeaps) {
             Term invariant;
-            ImmutableList<ParserRuleContext> originalInvariant
+            ImmutableList<LabeledParserRuleContext> originalInvariant
                     = originalInvariants.get(heap.name().toString());
             if (originalInvariant == null || originalInvariant.isEmpty()) {
                 invariant = null;
             } else {
                 invariant = tb.tt();
-                for (ParserRuleContext expr : originalInvariant) {
+                for (LabeledParserRuleContext expr : originalInvariant) {
                     Term translated = new JmlIO()
                             .services(services)
                             .classType(pm.getContainerType())
@@ -137,20 +142,20 @@ public class JMLSpecFactory {
     }
 
     private static Map<LocationVariable, Term> translateToTermFreeInvariants(IProgramMethod pm,
-                                                                             Map<String, ImmutableList<ParserRuleContext>> originalFreeInvariants,
+                                                                             Map<String, ImmutableList<LabeledParserRuleContext>> originalFreeInvariants,
                                                                              ProgramVariable selfVar, ImmutableList<ProgramVariable> allVars,
                                                                              final ImmutableList<LocationVariable> allHeaps,
                                                                              final Map<LocationVariable, Term> atPres, final Services services, final TermBuilder tb) {
         Map<LocationVariable, Term> freeInvariants = new LinkedHashMap<LocationVariable, Term>();
         for (LocationVariable heap : allHeaps) {
             Term freeInvariant;
-            ImmutableList<ParserRuleContext> originalFreeInvariant
+            ImmutableList<LabeledParserRuleContext> originalFreeInvariant
                     = originalFreeInvariants.get(heap.name().toString());
             if (originalFreeInvariant == null || originalFreeInvariant.isEmpty()) {
                 freeInvariant = null;
             } else {
                 freeInvariant = tb.tt();
-                for (ParserRuleContext expr : originalFreeInvariant) {
+                for (LabeledParserRuleContext expr : originalFreeInvariant) {
                     Term translated = new JmlIO()
                             .services(services)
                             .classType(pm.getContainerType())
@@ -360,7 +365,8 @@ public class JMLSpecFactory {
 
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             translateAssignable(pm, progVars, heap, savedHeap,
-                    textualSpecCase.getAssignable(heap.name().toString()), clauses);
+                    textualSpecCase.getAssignable(heap.name().toString()),
+                    clauses);
             translateRequires(pm, progVars, heap, savedHeap,
                     textualSpecCase.getRequires(heap.name().toString()),
                     textualSpecCase.getRequiresFree(heap.name().toString()), clauses);
@@ -397,8 +403,8 @@ public class JMLSpecFactory {
 
     private void translateAccessible(IProgramMethod pm, ProgramVariableCollection progVars,
                                      LocationVariable heap, ProgramVariable heapAtPre, final LocationVariable savedHeap,
-                                     ImmutableList<ParserRuleContext> accessible,
-                                     ImmutableList<ParserRuleContext> accessiblePre, ContractClauses clauses)
+                                     ImmutableList<LabeledParserRuleContext> accessible,
+                                     ImmutableList<LabeledParserRuleContext> accessiblePre, ContractClauses clauses)
             throws SLTranslationException {
         if (heap == savedHeap && accessible.isEmpty()) {
             clauses.accessibles.put(heap, null);
@@ -412,7 +418,7 @@ public class JMLSpecFactory {
     }
 
     private void translateAxioms(IProgramMethod pm, ProgramVariableCollection progVars,
-                                 LocationVariable heap, ImmutableList<ParserRuleContext> axioms, ContractClauses clauses,
+                                 LocationVariable heap, ImmutableList<LabeledParserRuleContext> axioms, ContractClauses clauses,
                                  Behavior originalBehavior) throws SLTranslationException {
         if (axioms.isEmpty()) {
             clauses.axioms.put(heap, null);
@@ -426,7 +432,7 @@ public class JMLSpecFactory {
 
     private void translateEnsures(IProgramMethod pm, ProgramVariableCollection progVars,
                                   LocationVariable heap, final LocationVariable savedHeap,
-                                  ImmutableList<ParserRuleContext> ensures, ImmutableList<ParserRuleContext> ensuresFree,
+                                  ImmutableList<LabeledParserRuleContext> ensures, ImmutableList<LabeledParserRuleContext> ensuresFree,
                                   ContractClauses clauses, Behavior originalBehavior) throws SLTranslationException {
         if (heap == savedHeap && ensures.isEmpty()) {
             clauses.ensures.put(heap, null);
@@ -449,8 +455,8 @@ public class JMLSpecFactory {
 
     private void translateRequires(IProgramMethod pm, ProgramVariableCollection progVars,
                                    LocationVariable heap, final LocationVariable savedHeap,
-                                   final ImmutableList<ParserRuleContext> requires,
-                                   final ImmutableList<ParserRuleContext> requiresFree, ContractClauses clauses)
+                                   final ImmutableList<LabeledParserRuleContext> requires,
+                                   final ImmutableList<LabeledParserRuleContext> requiresFree, ContractClauses clauses)
             throws SLTranslationException {
         if (heap == savedHeap && requires.isEmpty()) {
             clauses.requires.put(heap, null);
@@ -470,15 +476,15 @@ public class JMLSpecFactory {
 
     private void translateAssignable(IProgramMethod pm, ProgramVariableCollection progVars,
                                      LocationVariable heap, final LocationVariable savedHeap,
-                                     final ImmutableList<ParserRuleContext> mod, ContractClauses clauses)
+                                     final ImmutableList<LabeledParserRuleContext> mod, ContractClauses clauses)
             throws SLTranslationException {
         clauses.hasMod.put(heap,
                 !translateStrictlyPure(pm, progVars.selfVar, progVars.paramVars, mod));
         if (heap == savedHeap && mod.isEmpty()) {
             clauses.assignables.put(heap, null);
         } else if (!clauses.hasMod.get(heap)) {
-            final ImmutableList<ParserRuleContext> assignableNothing = ImmutableSLList
-                    .<ParserRuleContext>nil().append(getAssignableNothing());
+            final ImmutableList<LabeledParserRuleContext> assignableNothing = ImmutableSLList
+                    .<LabeledParserRuleContext>nil().append(getAssignableNothing());
             clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
                     progVars.paramVars, progVars.atPres, progVars.atBefores, assignableNothing));
         } else {
@@ -488,8 +494,10 @@ public class JMLSpecFactory {
     }
 
     @NotNull
-    private ParserRuleContext getAssignableNothing() {
-        return JmlFacade.parseClause("assignable \\nothing;");
+    private LabeledParserRuleContext getAssignableNothing() {
+        return new LabeledParserRuleContext(
+                JmlFacade.parseClause("assignable \\nothing;"),
+                ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
     }
 
     /**
@@ -502,9 +510,9 @@ public class JMLSpecFactory {
                                                               ProgramVariableCollection progVars,
                                                               ContractClauses clauses)
             throws SLTranslationException {
-        for (Triple<ParserRuleContext, ParserRuleContext, ParserRuleContext> abbrv : textualSpecCase.getAbbreviations()) {
-            final KeYJavaType abbrKJT = services.getJavaInfo().getKeYJavaType(abbrv.first.getText());
-            final ProgramElementName abbrVarName = new ProgramElementName(abbrv.second.getText());
+        for (Triple<LabeledParserRuleContext, LabeledParserRuleContext, LabeledParserRuleContext> abbrv : textualSpecCase.getAbbreviations()) {
+            final KeYJavaType abbrKJT = services.getJavaInfo().getKeYJavaType(abbrv.first.first.getText());
+            final ProgramElementName abbrVarName = new ProgramElementName(abbrv.second.first.getText());
             final LocationVariable abbrVar = new LocationVariable(abbrVarName, abbrKJT, true, true);
             assert abbrVar.isGhost() : "specification parameter not ghost";
             services.getNamespaces().programVariables().addSafely(abbrVar);
@@ -529,12 +537,12 @@ public class JMLSpecFactory {
                                                                    ProgramVariable selfVar,
                                                                    ImmutableList<ProgramVariable> paramVars,
                                                                    ProgramVariable resultVar, ProgramVariable excVar,
-                                                                   ImmutableList<ParserRuleContext> originalClauses) throws SLTranslationException {
+                                                                   ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
         if (originalClauses.isEmpty()) {
             return ImmutableSLList.nil();
         } else {
             ImmutableList<InfFlowSpec> result = ImmutableSLList.nil();
-            for (ParserRuleContext expr : originalClauses) {
+            for (LabeledParserRuleContext expr : originalClauses) {
                 InfFlowSpec translated = jmlIo
                         .clear()
                         .classType(pm.getContainerType())
@@ -559,11 +567,11 @@ public class JMLSpecFactory {
     private Term translateAndClauses(IProgramMethod pm, ProgramVariable selfVar,
                                      ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
                                      ProgramVariable excVar, Map<LocationVariable, Term> atPres,
-                                     Map<LocationVariable, Term> atBefores, ImmutableList<ParserRuleContext> originalClauses,
+                                     Map<LocationVariable, Term> atBefores, ImmutableList<LabeledParserRuleContext> originalClauses,
                                      SpecType specType)
             throws SLTranslationException {
         // The array is used to invert the order in which the elements are read.
-        ParserRuleContext[] array = new ParserRuleContext[originalClauses.size()];
+        LabeledParserRuleContext[] array = new LabeledParserRuleContext[originalClauses.size()];
         originalClauses.toArray(array);
 
         jmlIo.classType(pm.getContainerType())
@@ -585,9 +593,9 @@ public class JMLSpecFactory {
 
     private Term translateOrClauses(IProgramMethod pm, ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars,
-                                    ImmutableList<ParserRuleContext> originalClauses) throws SLTranslationException {
+                                    ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
         Term result = tb.ff();
-        for (ParserRuleContext expr : originalClauses) {
+        for (LabeledParserRuleContext expr : originalClauses) {
             Term translated = jmlIo
                     .clear()
                     .classType(pm.getContainerType())
@@ -601,11 +609,11 @@ public class JMLSpecFactory {
 
     private Term translateUnionClauses(IProgramMethod pm, ProgramVariable selfVar,
                                        ImmutableList<ProgramVariable> paramVars, Map<LocationVariable, Term> atPres,
-                                       Map<LocationVariable, Term> atBefores, ImmutableList<ParserRuleContext> originalClauses,
+                                       Map<LocationVariable, Term> atBefores, ImmutableList<LabeledParserRuleContext> originalClauses,
                                        SpecType specType)
             throws SLTranslationException {
         Term result = tb.empty();
-        for (ParserRuleContext expr : originalClauses) {
+        for (LabeledParserRuleContext expr : originalClauses) {
             if (expr == null) continue;//TODO weigl trace null back to origin
             Term translated = jmlIo
                     .clear()
@@ -637,21 +645,21 @@ public class JMLSpecFactory {
                                              ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
                                              ProgramVariable excVar, Map<LocationVariable, Term> atPres,
                                              Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
-                                             ImmutableList<ParserRuleContext> originalClauses) throws SLTranslationException {
-        ParserRuleContext[] array = new ParserRuleContext[originalClauses.size()];
+                                             ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
+        LabeledParserRuleContext[] array = new LabeledParserRuleContext[originalClauses.size()];
         originalClauses.toArray(array);
         Map<Label, Term> result = new LinkedHashMap<Label, Term>();
         for (int i = array.length - 1; i >= 0; i--) {
             Pair<Label, Term> translation = jmlIo
                     .clear()
-                    .classType( pm.getContainerType())
+                    .classType(pm.getContainerType())
                     .parameters(paramVars)
                     .selfVar(selfVar)
                     .resultVariable(resultVar)
                     .exceptionVariable(excVar)
                     .atPres(atPres)
                     .atBefore(atBefores)
-                    .translateLabeledClause(array[i],SpecType.BREAKS);
+                    .translateLabeledClause(array[i], SpecType.BREAKS);
             result.put(translation.first, translation.second);
         }
         return result;
@@ -661,21 +669,21 @@ public class JMLSpecFactory {
                                                 ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
                                                 ProgramVariable excVar, Map<LocationVariable, Term> atPres,
                                                 Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
-                                                ImmutableList<ParserRuleContext> originalClauses) throws SLTranslationException {
-        ParserRuleContext[] array = new ParserRuleContext[originalClauses.size()];
+                                                ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
+        LabeledParserRuleContext[] array = new LabeledParserRuleContext[originalClauses.size()];
         originalClauses.toArray(array);
         Map<Label, Term> result = new LinkedHashMap<Label, Term>();
         for (int i = array.length - 1; i >= 0; i--) {
             Pair<Label, Term> translation = jmlIo
                     .clear()
-                    .classType( pm.getContainerType())
+                    .classType(pm.getContainerType())
                     .parameters(paramVars)
                     .selfVar(selfVar)
                     .resultVariable(resultVar)
                     .exceptionVariable(excVar)
                     .atPres(atPres)
                     .atBefore(atBefores)
-                    .translateLabeledClause(array[i],SpecType.CONTINUES);
+                    .translateLabeledClause(array[i], SpecType.CONTINUES);
             result.put(translation.first, translation.second);
         }
         return result;
@@ -685,7 +693,7 @@ public class JMLSpecFactory {
                                   ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
                                   ProgramVariable excVar, Map<LocationVariable, Term> atPres,
                                   Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
-                                  ImmutableList<ParserRuleContext> originalClauses) throws SLTranslationException {
+                                  ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
         if (originalBehavior == Behavior.NORMAL_BEHAVIOR) {
             assert originalClauses.isEmpty();
             return tb.ff();
@@ -699,7 +707,7 @@ public class JMLSpecFactory {
                                   ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
                                   ProgramVariable excVar, Map<LocationVariable, Term> atPres,
                                   Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
-                                  ImmutableList<ParserRuleContext> originalClauses) throws SLTranslationException {
+                                  ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
         if (originalBehavior == Behavior.NORMAL_BEHAVIOR) {
             assert originalClauses.isEmpty();
             return tb.ff();
@@ -710,7 +718,7 @@ public class JMLSpecFactory {
     }
 
     private Term translateSignalsOnly(IProgramMethod pm, ProgramVariable excVar,
-                                      Behavior originalBehavior, ImmutableList<ParserRuleContext> originalClauses)
+                                      Behavior originalBehavior, ImmutableList<LabeledParserRuleContext> originalClauses)
             throws SLTranslationException {
         return translateSignals(pm, null, null, null, excVar, null, null, originalBehavior,
                 originalClauses);
@@ -720,7 +728,7 @@ public class JMLSpecFactory {
                                   ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
                                   ProgramVariable excVar, Map<LocationVariable, Term> atPres,
                                   Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
-                                  ImmutableList<ParserRuleContext> originalClauses) throws SLTranslationException {
+                                  ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
         if (originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR) {
             assert originalClauses.isEmpty();
             return tb.ff();
@@ -733,7 +741,7 @@ public class JMLSpecFactory {
     @SuppressWarnings("unused")
     private Term translateAccessible(IProgramMethod pm, ProgramVariable selfVar,
                                      ImmutableList<ProgramVariable> paramVars, Map<LocationVariable, Term> atPres,
-                                     Map<LocationVariable, Term> atBefores, ImmutableList<ParserRuleContext> originalClauses)
+                                     Map<LocationVariable, Term> atBefores, ImmutableList<LabeledParserRuleContext> originalClauses)
             throws SLTranslationException {
         if (originalClauses.isEmpty()) {
             return tb.allLocs();
@@ -745,7 +753,7 @@ public class JMLSpecFactory {
 
     private Term translateAssignable(IProgramMethod pm, ProgramVariable selfVar,
                                      ImmutableList<ProgramVariable> paramVars, Map<LocationVariable, Term> atPres,
-                                     Map<LocationVariable, Term> atBefores, ImmutableList<ParserRuleContext> originalClauses)
+                                     Map<LocationVariable, Term> atBefores, ImmutableList<LabeledParserRuleContext> originalClauses)
             throws SLTranslationException {
 
         if (originalClauses.isEmpty()) {
@@ -758,10 +766,10 @@ public class JMLSpecFactory {
 
     private boolean translateStrictlyPure(IProgramMethod pm, ProgramVariable selfVar,
                                           ImmutableList<ProgramVariable> paramVars,
-                                          ImmutableList<ParserRuleContext> assignableClauses) throws SLTranslationException {
+                                          ImmutableList<LabeledParserRuleContext> assignableClauses) throws SLTranslationException {
 
-        for (ParserRuleContext expr : assignableClauses) {
-            if (expr == null) continue;//TODO trace
+        for (LabeledParserRuleContext expr : assignableClauses) {
+            if (expr == null) continue;//TODO weigl trace null back to origin
             Term translated = jmlIo
                     .clear()
                     .classType(pm.getContainerType())
@@ -780,10 +788,10 @@ public class JMLSpecFactory {
 
     private Term translateMeasuredBy(IProgramMethod pm, ProgramVariable selfVar,
                                      ImmutableList<ProgramVariable> paramVars,
-                                     ImmutableList<ParserRuleContext> originalMeasuredBy) throws SLTranslationException {
+                                     ImmutableList<LabeledParserRuleContext> originalMeasuredBy) throws SLTranslationException {
         Term measuredBy = null;
         if (!originalMeasuredBy.isEmpty()) {
-            for (ParserRuleContext expr : originalMeasuredBy) {
+            for (LabeledParserRuleContext expr : originalMeasuredBy) {
                 Term translated = jmlIo
                         .clear()
                         .classType(pm.getContainerType())
@@ -803,10 +811,10 @@ public class JMLSpecFactory {
     private Term translateDecreases(IProgramMethod pm, ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars, Map<LocationVariable, Term> atPres,
                                     Map<LocationVariable, Term> atBefores,
-                                    ImmutableList<ParserRuleContext> originalDecreases) throws SLTranslationException {
+                                    ImmutableList<LabeledParserRuleContext> originalDecreases) throws SLTranslationException {
         Term decreases = null;
         if (!originalDecreases.isEmpty()) {
-            for (ParserRuleContext expr : originalDecreases) {
+            for (LabeledParserRuleContext expr : originalDecreases) {
                 Term translated = jmlIo
                         .clear()
                         .classType(pm.getContainerType())
@@ -1016,7 +1024,7 @@ public class JMLSpecFactory {
     // -------------------------------------------------------------------------
     public ClassInvariant createJMLClassInvariant(
             @NotNull KeYJavaType kjt, VisibilityModifier visibility,
-            boolean isStatic, @NotNull ParserRuleContext originalInv) throws SLTranslationException {
+            boolean isStatic, @NotNull LabeledParserRuleContext originalInv) throws SLTranslationException {
         assert kjt != null;
         assert originalInv != null;
 
@@ -1062,7 +1070,7 @@ public class JMLSpecFactory {
     }
 
     public InitiallyClause createJMLInitiallyClause(KeYJavaType kjt, VisibilityModifier visibility,
-                                                    ParserRuleContext original) throws SLTranslationException {
+                                                    LabeledParserRuleContext original) throws SLTranslationException {
         assert kjt != null;
         assert original != null;
 
@@ -1080,8 +1088,7 @@ public class JMLSpecFactory {
 
         // create invariant
         String name = getInicName();
-        InitiallyClauseImpl res = new InitiallyClauseImpl(name, name, kjt, new Public(), inv, selfVar, original);
-        return res;
+        return new InitiallyClauseImpl(name, name, kjt, new Public(), inv, selfVar, original);
 
     }
 
@@ -1092,7 +1099,7 @@ public class JMLSpecFactory {
 
     @SuppressWarnings("unchecked")
     public ClassAxiom createJMLRepresents(KeYJavaType kjt, VisibilityModifier visibility,
-                                          ParserRuleContext originalRep, boolean isStatic) throws SLTranslationException {
+                                          LabeledParserRuleContext originalRep, boolean isStatic) throws SLTranslationException {
         assert kjt != null;
         assert originalRep != null;
 
@@ -1129,7 +1136,7 @@ public class JMLSpecFactory {
         final ProgramVariable selfVar = isStatic ? null : tb.selfVar(kjt, false);
 
         // translateToTerm expression
-        final ParserRuleContext clause = textualRep.getRepresents();
+        final LabeledParserRuleContext clause = textualRep.getRepresents();
         final Pair<IObserverFunction, Term> rep = jmlIo
                 .clear()
                 .classType(kjt)
@@ -1138,10 +1145,11 @@ public class JMLSpecFactory {
 
         // check whether there already is a represents clause
         if (!modelFields.add(new Pair<>(kjt, rep.first))) {
+            Token start = clause.first.start;
             throw new SLWarningException("JML represents clauses must occur uniquely per "
                     + "type and target." + "\nAll but one are ignored.",
-                    clause.start.getTokenSource().getSourceName(),
-                    new Position(clause.start.getLine(), clause.start.getCharPositionInLine()));
+                    start.getTokenSource().getSourceName(),
+                    new Position(start.getLine(), start.getCharPositionInLine()));
         }
         // create class axiom
         String name = "JML represents clause for " + rep.first.name().toString();
@@ -1162,7 +1170,7 @@ public class JMLSpecFactory {
      * @throws SLTranslationException translation exception
      */
     public ClassAxiom createJMLClassAxiom(KeYJavaType kjt, TextualJMLClassAxiom textual) throws SLTranslationException {
-        ParserRuleContext originalRep = textual.getAxiom();
+        LabeledParserRuleContext originalRep = textual.getAxiom();
         assert kjt != null;
         assert originalRep != null;
 
@@ -1185,7 +1193,7 @@ public class JMLSpecFactory {
     }
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, LocationVariable targetHeap,
-                                                ParserRuleContext originalDep) {
+                                                LabeledParserRuleContext originalDep) {
         assert kjt != null;
         assert originalDep != null;
 
@@ -1204,7 +1212,7 @@ public class JMLSpecFactory {
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, TextualJMLDepends textualDep)
             throws SLTranslationException {
-        ParserRuleContext dep = null;
+        LabeledParserRuleContext dep = null;
         LocationVariable targetHeap = null;
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             dep = textualDep.getDepends(heap.name().toString()).head();
@@ -1269,7 +1277,7 @@ public class JMLSpecFactory {
 
         /*final String mergeParamsStr = mergePointDecl.getMergeParams() == null ? null
                 : mergePointDecl.getMergeParams().text;
-        final ParserRuleContext mergeParamsParseStr = mergeParamsStr == null ? null
+        final LabeledParserRuleContext mergeParamsParseStr = mergeParamsStr == null ? null
                 : JmlFacade.parseClause("merge_params " + mergeParamsStr);*/
         MergeProcedure mergeProc = MergeProcedure.getProcedureByName(mergeProcStr);
         if (mergeProc == null) {
@@ -1521,10 +1529,10 @@ public class JMLSpecFactory {
     }
 
     private LoopSpecification createJMLLoopInvariant(IProgramMethod pm, LoopStatement loop,
-                                                     Map<String, ImmutableList<ParserRuleContext>> originalInvariants,
-                                                     Map<String, ImmutableList<ParserRuleContext>> originalFreeInvariants,
-                                                     Map<String, ImmutableList<ParserRuleContext>> originalAssignables,
-                                                     ImmutableList<ParserRuleContext> originalInfFlowSpecs, ParserRuleContext originalVariant)
+                                                     Map<String, ImmutableList<LabeledParserRuleContext>> originalInvariants,
+                                                     Map<String, ImmutableList<LabeledParserRuleContext>> originalFreeInvariants,
+                                                     Map<String, ImmutableList<LabeledParserRuleContext>> originalAssignables,
+                                                     ImmutableList<LabeledParserRuleContext> originalInfFlowSpecs, LabeledParserRuleContext originalVariant)
             throws SLTranslationException {
         assert pm != null;
         assert loop != null;
@@ -1580,7 +1588,7 @@ public class JMLSpecFactory {
 
     private Term translateToTermVariant(IProgramMethod pm, ProgramVariable selfVar,
                                         Map<LocationVariable, Term> atPres, ImmutableList<ProgramVariable> allVars,
-                                        ParserRuleContext originalVariant) throws SLTranslationException {
+                                        LabeledParserRuleContext originalVariant) throws SLTranslationException {
         final Term variant;
         if (originalVariant == null) {
             variant = null;
@@ -1601,7 +1609,7 @@ public class JMLSpecFactory {
             IProgramMethod pm, ProgramVariable selfVar, ProgramVariable resultVar,
             ProgramVariable excVar, ImmutableList<ProgramVariable> allVars,
             final ImmutableList<LocationVariable> allHeaps,
-            ImmutableList<ParserRuleContext> originalInfFlowSpecs) throws SLTranslationException {
+            ImmutableList<LabeledParserRuleContext> originalInfFlowSpecs) throws SLTranslationException {
         Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs
                 = new LinkedHashMap<>();
         ImmutableList<InfFlowSpec> infFlowSpecTermList;
@@ -1621,7 +1629,7 @@ public class JMLSpecFactory {
     private Map<LocationVariable, Term> translateToTermAsssignable(IProgramMethod pm,
                                                                    ProgramVariable selfVar, Map<LocationVariable, Term> atPres,
                                                                    ImmutableList<ProgramVariable> allVars,
-                                                                   Map<String, ImmutableList<ParserRuleContext>> originalAssignables)
+                                                                   Map<String, ImmutableList<LabeledParserRuleContext>> originalAssignables)
             throws SLTranslationException {
         Map<LocationVariable, Term> mods = new LinkedHashMap<>();
         for (String h : originalAssignables.keySet()) {
@@ -1631,12 +1639,12 @@ public class JMLSpecFactory {
                 continue;
             }
             Term a;
-            ImmutableList<ParserRuleContext> as = originalAssignables.get(h);
+            ImmutableList<LabeledParserRuleContext> as = originalAssignables.get(h);
             if (as.isEmpty()) {
                 a = tb.allLocs();
             } else {
                 a = tb.empty();
-                for (ParserRuleContext expr : as) {
+                for (LabeledParserRuleContext expr : as) {
                     Term translated = jmlIo
                             .clear()
                             .classType(pm.getContainerType())
@@ -1692,11 +1700,24 @@ public class JMLSpecFactory {
         // clauses only apply to constructors, not to method "+pm);
         final ImmutableList<String> mods = ImmutableSLList.<String>nil().append("private");
         final TextualJMLSpecCase specCase = new TextualJMLSpecCase(mods, Behavior.NONE);
-        //TODO specCase.addName(ini.getName());
-        //TODO specCase.addRequires(createPrecond(pm, ini.getOriginalSpec()));
-        //TODO specCase.addEnsures(ini.getOriginalSpec().prepend("\\invariant_for(this) &&"));
-        //TODO specCase.addSignals(ini.getOriginalSpec().prepend("\\invariant_for(this) &&"));
-        //TODO specCase.addDiverges(new ParserRuleContext("true"));
+        specCase.addName(ini.getName());
+        for (LabeledParserRuleContext context : createPrecond(pm, ini.getOriginalSpec())) {
+            specCase.addClause(REQUIRES, context);
+        }
+
+        final String invariantFor = "\\invariant_for(this)";
+        final LabeledParserRuleContext ctxFor = new LabeledParserRuleContext(
+                JmlFacade.parseExpr(invariantFor),
+                ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL);
+
+        specCase.addClause(ENSURES, ctxFor);
+        specCase.addClause(ENSURES, ini.getOriginalSpec());
+
+        specCase.addClause(SIGNALS, ctxFor);
+        specCase.addClause(SIGNALS, ini.getOriginalSpec());
+
+        specCase.addClause(DIVERGES, JmlFacade.parseExpr("true"));
+
         ImmutableSet<Contract> resultList = createJMLOperationContracts(pm, specCase);
         assert resultList.size() == 1;
         Contract result = resultList.toArray(new Contract[1])[0];
@@ -1704,16 +1725,16 @@ public class JMLSpecFactory {
         return ((FunctionalOperationContract) result);
     }
 
-    private ImmutableList<ParserRuleContext> createPrecond(IProgramMethod pm, ParserRuleContext originalSpec) {
-        ImmutableList<ParserRuleContext> res = ImmutableSLList.nil();
+    private ImmutableList<LabeledParserRuleContext> createPrecond(IProgramMethod pm, LabeledParserRuleContext originalSpec) {
+        ImmutableList<LabeledParserRuleContext> res = ImmutableSLList.nil();
         // TODO: add static invariant
         for (ParameterDeclaration p : pm.getMethodDeclaration().getParameters()) {
             if (!JMLInfoExtractor.parameterIsNullable(pm, p)) {
-                final ImmutableSet<ParserRuleContext> nonNullPositionedString = JMLSpecExtractor.createNonNullPositionedString(
+                final ImmutableSet<LabeledParserRuleContext> nonNullPositionedString = JMLSpecExtractor.createNonNullPositionedString(
                         p.getVariableSpecification().getName(),
                         p.getVariableSpecification().getProgramVariable().getKeYJavaType(), false,
-                        originalSpec.start.getTokenSource().getSourceName(),
-                        new Position(originalSpec.start.getLine(), originalSpec.start.getCharPositionInLine()), services);
+                        originalSpec.first.start.getTokenSource().getSourceName(),
+                        new Position(originalSpec.first.start.getLine(), originalSpec.first.start.getCharPositionInLine()), services);
                 res = res.append(nonNullPositionedString);
             }
         }

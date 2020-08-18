@@ -15,7 +15,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
-import org.antlr.v4.runtime.ParserRuleContext;
+import de.uka.ilkd.key.njml.LabeledParserRuleContext;
 import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -30,7 +30,7 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
  * clause, ...) in textual form.
  */
 public final class TextualJMLLoopSpec extends TextualJMLConstruct {
-    private ParserRuleContext variant = null;
+    private LabeledParserRuleContext variant = null;
 
     public enum Clause {
         INFORMATION_FLOW
@@ -45,23 +45,23 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         INVARIANT_FREE
     }
 
-    private Map<Object, List<ParserRuleContext>> clauses = new HashMap<>();
-    private Map<ParserRuleContext, Name> heaps = new HashMap<>();
+    private Map<Object, List<LabeledParserRuleContext>> clauses = new HashMap<>();
+    private Map<LabeledParserRuleContext, Name> heaps = new HashMap<>();
 
     public TextualJMLLoopSpec(ImmutableList<String> mods) {
         super(mods);
     }
 
-    public TextualJMLLoopSpec addClause(Clause clause, ParserRuleContext ctx) {
+    public TextualJMLLoopSpec addClause(Clause clause, LabeledParserRuleContext ctx) {
         clauses.computeIfAbsent(clause, it -> new ArrayList<>()).add(ctx);
         return this;
     }
 
-    public TextualJMLLoopSpec addClause(ClauseHd clause, ParserRuleContext ctx) {
+    public TextualJMLLoopSpec addClause(ClauseHd clause, LabeledParserRuleContext ctx) {
         return addClause(clause, null, ctx);
     }
 
-    public TextualJMLLoopSpec addClause(ClauseHd clause, @Nullable Name heapName, ParserRuleContext ctx) {
+    public TextualJMLLoopSpec addClause(ClauseHd clause, @Nullable Name heapName, LabeledParserRuleContext ctx) {
         if (heapName == null)
             heapName = HeapLDT.BASE_HEAP_NAME;
 
@@ -70,48 +70,48 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return this;
     }
 
-    public void setVariant(ParserRuleContext ps) {
+    public void setVariant(LabeledParserRuleContext ps) {
         assert variant == null;
         variant = ps;
         setPosition(ps);
     }
 
-    private ImmutableList<ParserRuleContext> getList(Object key) {
+    private ImmutableList<LabeledParserRuleContext> getList(Object key) {
         return ImmutableList.fromList(clauses.getOrDefault(key, new ArrayList<>()));
     }
 
-    public ImmutableList<ParserRuleContext> getAssignable() {
+    public ImmutableList<LabeledParserRuleContext> getAssignable() {
         return getList(ASSIGNABLE);
     }
 
-    /*public ImmutableList<ParserRuleContext> getAssignable(String hName) {
+    /*public ImmutableList<LabeledParserRuleContext> getAssignable(String hName) {
         return getList(ClauseHd.ASSIGNABLE);
     }*/
 
-    public Map<String, ImmutableList<ParserRuleContext>> getAssignables() {
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignables() {
         return getMap(ClauseHd.ASSIGNABLE);
     }
 
-    public Map<String, ImmutableList<ParserRuleContext>> getAssignablesInit() {
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getAssignablesInit() {
         return getMapInit(ClauseHd.ASSIGNABLE);
     }
 
 
-    public ImmutableList<ParserRuleContext> getInfFlowSpecs() {
+    public ImmutableList<LabeledParserRuleContext> getInfFlowSpecs() {
         return getList(Clause.INFORMATION_FLOW);
     }
 
-    public Map<String, ImmutableList<ParserRuleContext>> getInvariants() {
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getInvariants() {
         return getMap(ClauseHd.INVARIANT);
     }
 
-    private Map<String, ImmutableList<ParserRuleContext>> getMapInit(ClauseHd clause) {
-        ImmutableList<ParserRuleContext> seq = getList(clause);
+    private Map<String, ImmutableList<LabeledParserRuleContext>> getMapInit(ClauseHd clause) {
+        ImmutableList<LabeledParserRuleContext> seq = getList(clause);
         Name defaultHeap = HeapLDT.BASE_HEAP_NAME;
-        Map<String, ImmutableList<ParserRuleContext>> map = new HashMap<>();
-        for (ParserRuleContext context : seq) {
+        Map<String, ImmutableList<LabeledParserRuleContext>> map = new HashMap<>();
+        for (LabeledParserRuleContext context : seq) {
             String h = heaps.getOrDefault(context, defaultHeap).toString();
-            ImmutableList<ParserRuleContext> l = map.getOrDefault(h, ImmutableSLList.nil());
+            ImmutableList<LabeledParserRuleContext> l = map.getOrDefault(h, ImmutableSLList.nil());
             map.put(h, l.append(context));
         }
 
@@ -123,30 +123,30 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return map;
     }
 
-    private Map<String, ImmutableList<ParserRuleContext>> getMap(ClauseHd clause) {
-        ImmutableList<ParserRuleContext> seq = getList(clause);
+    private Map<String, ImmutableList<LabeledParserRuleContext>> getMap(ClauseHd clause) {
+        ImmutableList<LabeledParserRuleContext> seq = getList(clause);
         Name defaultHeap = HeapLDT.BASE_HEAP_NAME;
-        Map<String, ImmutableList<ParserRuleContext>> map = new HashMap<>();
-        for (ParserRuleContext context : seq) {
+        Map<String, ImmutableList<LabeledParserRuleContext>> map = new HashMap<>();
+        for (LabeledParserRuleContext context : seq) {
             String h = heaps.getOrDefault(context, defaultHeap).toString();
-            ImmutableList<ParserRuleContext> l = map.getOrDefault(h, ImmutableSLList.nil());
+            ImmutableList<LabeledParserRuleContext> l = map.getOrDefault(h, ImmutableSLList.nil());
             map.put(h, l.append(context));
         }
         return map;
     }
 
-    public Map<String, ImmutableList<ParserRuleContext>> getFreeInvariants() {
+    public Map<String, ImmutableList<LabeledParserRuleContext>> getFreeInvariants() {
         return getMap(ClauseHd.INVARIANT_FREE);
     }
 
-    public ParserRuleContext getVariant() {
+    public LabeledParserRuleContext getVariant() {
         return variant;
     }
 
     /*@Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        Iterator<ParserRuleContext> it;
+        Iterator<LabeledParserRuleContext> it;
 
         for (Name heap : HeapLDT.VALID_HEAP_NAMES) {
             it = invariants.get(heap.toString()).iterator();

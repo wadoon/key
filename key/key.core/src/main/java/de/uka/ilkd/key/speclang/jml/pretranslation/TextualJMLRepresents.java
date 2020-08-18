@@ -13,8 +13,7 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import de.uka.ilkd.key.speclang.PositionedString;
-import org.antlr.v4.runtime.ParserRuleContext;
+import de.uka.ilkd.key.njml.LabeledParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -22,22 +21,22 @@ import org.key_project.util.collection.ImmutableList;
  */
 public final class TextualJMLRepresents extends TextualJMLConstruct {
 
-    private final ParserRuleContext represents;
+    private final LabeledParserRuleContext represents;
 
 
-    public TextualJMLRepresents(ImmutableList<String> mods, ParserRuleContext represents) {
+    public TextualJMLRepresents(ImmutableList<String> mods, LabeledParserRuleContext represents) {
         super(mods);
         assert represents != null;
         this.represents = represents;
         setPosition(represents);
     }
 
-    public TextualJMLRepresents(ImmutableList<String> mods, ParserRuleContext represents, String name) {
+    public TextualJMLRepresents(ImmutableList<String> mods, LabeledParserRuleContext represents, String name) {
         this(mods, represents);
         this.name = name;
     }
 
-    public ParserRuleContext getRepresents() {
+    public LabeledParserRuleContext getRepresents() {
         return represents;
     }
 

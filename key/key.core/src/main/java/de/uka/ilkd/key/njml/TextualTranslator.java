@@ -186,7 +186,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         for (Name heap : heaps) {
             if (depends) {
-                TextualJMLDepends d = new TextualJMLDepends(mods, ctx);
+                TextualJMLDepends d = new TextualJMLDepends(mods, new LabeledParserRuleContext(ctx));
                 constructs = constructs.append(d);
             } else if (methodContract != null) {
                 methodContract.addClause(ACCESSIBLE, heap, ctx);
@@ -205,7 +205,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
                 methodContract.addClause(ASSIGNABLE, heap, ctx);
             }
             if (loopContract != null) {
-                loopContract.addClause(TextualJMLLoopSpec.ClauseHd.ASSIGNABLE, heap, ctx);
+                loopContract.addClause(TextualJMLLoopSpec.ClauseHd.ASSIGNABLE, heap, new LabeledParserRuleContext(ctx));
             }
         }
         return null;
@@ -214,7 +214,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitVariant_function(JmlParser.Variant_functionContext ctx) {
         if (loopContract != null)
-            loopContract.setVariant(ctx);
+            loopContract.setVariant(new LabeledParserRuleContext(ctx, null));
         else
             methodContract.addClause(DECREASES, ctx);
         return null;
@@ -229,14 +229,14 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitInitially_clause(JmlParser.Initially_clauseContext ctx) {
-        TextualJMLInitially initially = new TextualJMLInitially(mods, ctx);
+        TextualJMLInitially initially = new TextualJMLInitially(mods, new LabeledParserRuleContext(ctx, null));
         constructs = constructs.append(initially);
         return null;
     }
 
     @Override
     public Object visitRepresents_clause(JmlParser.Represents_clauseContext ctx) {
-        TextualJMLRepresents represents = new TextualJMLRepresents(mods, ctx);
+        TextualJMLRepresents represents = new TextualJMLRepresents(mods, new LabeledParserRuleContext(ctx));
         constructs = constructs.append(represents);
         return super.visitRepresents_clause(ctx);
     }
@@ -336,7 +336,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitClass_axiom(JmlParser.Class_axiomContext ctx) {
-        TextualJMLClassAxiom inv = new TextualJMLClassAxiom(mods, ctx);
+        TextualJMLClassAxiom inv = new TextualJMLClassAxiom(mods, new LabeledParserRuleContext(ctx, null));
         constructs = constructs.append(inv);
         return null;
     }
@@ -387,7 +387,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         TextualJMLLoopSpec.ClauseHd type = ctx.LOOP_INVARIANT().getText().endsWith("_free") ? INVARIANT_FREE : INVARIANT;
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         for (Name heap : heaps) {
-            loopContract.addClause(type, heap, ctx);
+            loopContract.addClause(type, heap, new LabeledParserRuleContext(ctx));
         }
         return null;
     }

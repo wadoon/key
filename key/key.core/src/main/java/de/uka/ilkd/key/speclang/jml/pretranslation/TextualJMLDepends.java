@@ -15,7 +15,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
-import org.antlr.v4.runtime.ParserRuleContext;
+import de.uka.ilkd.key.njml.LabeledParserRuleContext;
 import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -29,9 +29,9 @@ import java.util.Map;
  * Note that such clauses for *methods* are part of TextualJMLSpecCase.
  */
 public final class TextualJMLDepends extends TextualJMLConstruct {
-    private Map<String, ImmutableList<ParserRuleContext>> depends = new LinkedHashMap<>();
+    private Map<String, ImmutableList<LabeledParserRuleContext>> depends = new LinkedHashMap<>();
 
-    public TextualJMLDepends(ImmutableList<String> mods, @NotNull ParserRuleContext depends) {
+    public TextualJMLDepends(ImmutableList<String> mods, @NotNull LabeledParserRuleContext depends) {
         super(mods);
         for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
             this.depends.put(hName.toString(), ImmutableSLList.nil());
@@ -39,11 +39,11 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
         addGeneric(this.depends, depends);
     }
 
-    public ImmutableList<ParserRuleContext> getDepends() {
+    public ImmutableList<LabeledParserRuleContext> getDepends() {
         return depends.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
 
-    public ImmutableList<ParserRuleContext> getDepends(String hName) {
+    public ImmutableList<LabeledParserRuleContext> getDepends(String hName) {
         return depends.get(hName);
     }
 

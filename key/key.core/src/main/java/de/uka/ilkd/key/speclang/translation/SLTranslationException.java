@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -24,55 +25,59 @@ public class SLTranslationException extends ProofInputException {
     private final String fileName;
     private final Position pos;
 
-   public SLTranslationException(String message, Throwable cause,
-         String fileName, Position pos) {
-      super(message, cause);
-      assert fileName != null;
-      assert pos != null;
-      this.fileName = fileName;
-      this.pos = pos;
-   }
+    public SLTranslationException(String message, Throwable cause,
+                                  String fileName, Position pos) {
+        super(message, cause);
+        assert fileName != null;
+        assert pos != null;
+        this.fileName = fileName;
+        this.pos = pos;
+    }
 
-   public SLTranslationException(String message, String fileName, Position pos,
-         Throwable cause) {
-      this(message, cause, fileName, pos);
-   }
+    public SLTranslationException(String message, String fileName, Position pos,
+                                  Throwable cause) {
+        this(message, cause, fileName, pos);
+    }
 
-   public SLTranslationException(String message, String fileName, Position pos) {
-      this(message, null, fileName, pos);
-   }
+    public SLTranslationException(String message, String fileName, Position pos) {
+        this(message, null, fileName, pos);
+    }
 
-   public SLTranslationException(String message, String fileName, int line,
-         int column) {
-      this(message, null, fileName, new Position(line, column));
-   }
+    public SLTranslationException(String message, String fileName, int line,
+                                  int column) {
+        this(message, null, fileName, new Position(line, column));
+    }
 
-   public SLTranslationException(String message) {
-      this(message, null, "no file", Position.UNDEFINED);
-   }
+    public SLTranslationException(String message) {
+        this(message, null, "no file", Position.UNDEFINED);
+    }
 
-   public SLTranslationException(String message, Throwable cause) {
-      this(message);
-   }
+    public SLTranslationException(String message, Throwable cause) {
+        this(message);
+    }
 
     public SLTranslationException(String message, ParserRuleContext expr) {
         this(message, expr.start.getTokenSource().getSourceName(), new Position(expr.start.getLine(), expr.start.getCharPositionInLine()));
     }
 
+    public SLTranslationException(String message, LabeledParserRuleContext expr) {
+        this(message, expr.first);
+    }
+
     public String getFileName() {
-      return fileName;
-   }
+        return fileName;
+    }
 
-   public Position getPosition() {
-      return pos;
-   }
+    public Position getPosition() {
+        return pos;
+    }
 
-   public int getLine() {
-      return pos.getLine();
-   }
+    public int getLine() {
+        return pos.getLine();
+    }
 
-   public int getColumn() {
-      return pos.getColumn();
-   }
+    public int getColumn() {
+        return pos.getColumn();
+    }
 
 }

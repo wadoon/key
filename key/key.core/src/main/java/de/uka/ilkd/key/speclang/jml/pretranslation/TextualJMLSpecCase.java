@@ -15,8 +15,8 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.njml.JmlParser;
-import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.util.Triple;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jetbrains.annotations.NotNull;
@@ -34,15 +34,16 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
  * textual form. Is also used for block contracts.
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
-    public ImmutableList<ParserRuleContext> getRequiresFree(String toString) {
+
+    public ImmutableList<LabeledParserRuleContext> getRequiresFree(String toString) {
         return getList(REQUIRES_FREE, toString);
     }
 
-    public ImmutableList<ParserRuleContext> getEnsuresFree(String toString) {
+    public ImmutableList<LabeledParserRuleContext> getEnsuresFree(String toString) {
         return getList(ENSURES_FREE, toString);
     }
 
-    private ImmutableList<ParserRuleContext> getList(@NotNull ClauseHd clause, @NotNull String heap) {
+    private ImmutableList<LabeledParserRuleContext> getList(@NotNull ClauseHd clause, @NotNull String heap) {
         Name def = new Name("unknown");
         return ImmutableList.fromList(
                 getList(clause).stream().filter(
@@ -50,31 +51,28 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                         .collect(Collectors.toList()));
     }
 
-    public ImmutableList<ParserRuleContext> getAccessible(String heap) {
+    public ImmutableList<LabeledParserRuleContext> getAccessible(String heap) {
         return getList(ACCESSIBLE, heap);
     }
 
-    public ImmutableList<ParserRuleContext> getAxioms(String heap) {
+    public ImmutableList<LabeledParserRuleContext> getAxioms(String heap) {
         return getList(AXIOMS, heap);
     }
 
-    public ImmutableList<ParserRuleContext> getEnsures(String heap) {
+    public ImmutableList<LabeledParserRuleContext> getEnsures(String heap) {
         return getList(ENSURES, heap);
     }
 
-    public ImmutableList<ParserRuleContext> getRequires(String heap) {
+    public ImmutableList<LabeledParserRuleContext> getRequires(String heap) {
         return getList(REQUIRES, heap);
     }
 
-    public ImmutableList<ParserRuleContext> getAssignable(String heap) {
+    public ImmutableList<LabeledParserRuleContext> getAssignable(String heap) {
         return getList(ASSIGNABLE, heap);
     }
 
-    public ImmutableList<ParserRuleContext> getDecreases() {
+    public ImmutableList<LabeledParserRuleContext> getDecreases() {
         return getList(DECREASES);
-    }
-
-    public void addAssignable(String toString, JmlParser.ExpressionContext parseExpr) {
     }
 
     /**
@@ -110,8 +108,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     //private ImmutableList<Triple<PositionedString, PositionedString, PositionedString>> abbreviations = ImmutableSLList.nil();
 
     private final Behavior behavior;
-    private Map<Object, List<ParserRuleContext>> clauses = new HashMap<>();
-    private Map<ParserRuleContext, Name> heaps = new HashMap<>();
+    private Map<Object, List<LabeledParserRuleContext>> clauses = new HashMap<>();
+    private Map<LabeledParserRuleContext, Name> heaps = new HashMap<>();
 
     public TextualJMLSpecCase(ImmutableList<String> mods, @NotNull Behavior behavior) {
         super(mods);
@@ -123,38 +121,35 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         }*/
     }
 
-    public TextualJMLSpecCase addClause(Clause clause, ParserRuleContext ctx) {
+    public TextualJMLSpecCase addClause(Clause clause, LabeledParserRuleContext ctx) {
         clauses.computeIfAbsent(clause, it -> new ArrayList<>()).add(ctx);
         return this;
     }
 
-    public TextualJMLSpecCase addClause(ClauseHd clause, ParserRuleContext ctx) {
+    public TextualJMLSpecCase addClause(ClauseHd clause, LabeledParserRuleContext ctx) {
         return addClause(clause, null, ctx);
     }
 
-    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName, ParserRuleContext ctx) {
+    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName, LabeledParserRuleContext ctx) {
         if (heapName == null)
             heapName = HeapLDT.BASE_HEAP_NAME;
-
         clauses.computeIfAbsent(clause, it -> new ArrayList<>()).add(ctx);
         heaps.put(ctx, heapName);
         return this;
     }
 
-    /*
-     * Produce a (textual) block contract from a JML assert statement.
-     * The resulting contract has an empty precondition, the assert expression
-     * as a postcondition, and strictly_nothing as frame.
-    public static TextualJMLSpecCase assert2blockContract(ImmutableList<String> mods, PositionedString assertStm) {
-        final TextualJMLSpecCase res = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
-        res.addName(new PositionedString("assert " + assertStm.text, assertStm.fileName, assertStm.pos));
-        res.addClause(Clause.ENSURES, assertStm);
-        res.addClause(Clause.ASSIGNABLE, new PositionedString("assignable \\strictly_nothing;", assertStm.fileName, assertStm.pos));
-        res.setPosition(assertStm);
-        return res;
-    }
-    */
 
+    public TextualJMLSpecCase addClause(Clause clause, ParserRuleContext ctx) {
+        return addClause(clause, new LabeledParserRuleContext(ctx, null));
+    }
+
+    public TextualJMLSpecCase addClause(ClauseHd clause, ParserRuleContext ctx) {
+        return addClause(clause, null, new LabeledParserRuleContext(ctx, null));
+    }
+
+    public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName, ParserRuleContext ctx) {
+        return addClause(clause, heapName, new LabeledParserRuleContext(ctx, null));
+    }
 
     /**
      * Merge clauses of two spec cases.
@@ -177,9 +172,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return res;
     }
 
-    public void addName(PositionedString n) {
-        this.name = n.text;
-        setPosition(n);
+    public void addName(String n) {
+        this.name = n;
+        //setPosition(n);
     }
 
     public Behavior getBehavior() {
@@ -301,60 +296,60 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     */
 
     //region legacy api
-    public void addRequires(ParserRuleContext label) {
+    public void addRequires(LabeledParserRuleContext label) {
         addClause(REQUIRES, label);
     }
 
-    public Triple<ParserRuleContext, ParserRuleContext, ParserRuleContext>[] getAbbreviations() {
+    public Triple<LabeledParserRuleContext, LabeledParserRuleContext, LabeledParserRuleContext>[] getAbbreviations() {
         //TODO System.out.println("TODO .getAbbreviations");
         return new Triple[0];
     }
 
-    public ImmutableList<ParserRuleContext> getInfFlowSpecs() {
+    public ImmutableList<LabeledParserRuleContext> getInfFlowSpecs() {
         return getList(INFORMATION_FLOW);
     }
 
-    public ImmutableList<ParserRuleContext> getReturns() {
+    public ImmutableList<LabeledParserRuleContext> getReturns() {
         return getList(RETURNS);
     }
 
-    public ImmutableList<ParserRuleContext> getContinues() {
+    public ImmutableList<LabeledParserRuleContext> getContinues() {
         return getList(CONTINUES);
     }
 
-    public ImmutableList<ParserRuleContext> getBreaks() {
+    public ImmutableList<LabeledParserRuleContext> getBreaks() {
         return getList(BREAKS);
     }
 
-    public ImmutableList<ParserRuleContext> getDiverges() {
+    public ImmutableList<LabeledParserRuleContext> getDiverges() {
         return getList(DIVERGES);
     }
 
-    public ImmutableList<ParserRuleContext> getMeasuredBy() {
+    public ImmutableList<LabeledParserRuleContext> getMeasuredBy() {
         return getList(MEASURED_BY);
     }
 
-    public ImmutableList<ParserRuleContext> getSignalsOnly() {
+    public ImmutableList<LabeledParserRuleContext> getSignalsOnly() {
         return getList(SIGNALS_ONLY);
     }
 
-    public ImmutableList<ParserRuleContext> getRequires() {
+    public ImmutableList<LabeledParserRuleContext> getRequires() {
         return getList(REQUIRES);
     }
 
-    private ImmutableList<ParserRuleContext> getList(Object key) {
+    private ImmutableList<LabeledParserRuleContext> getList(Object key) {
         return ImmutableList.fromList(clauses.getOrDefault(key, new ArrayList<>()));
     }
 
-    public ImmutableList<ParserRuleContext> getAssignable() {
+    public ImmutableList<LabeledParserRuleContext> getAssignable() {
         return getList(ASSIGNABLE);
     }
 
-    public ImmutableList<ParserRuleContext> getEnsures() {
+    public ImmutableList<LabeledParserRuleContext> getEnsures() {
         return getList(ENSURES);
     }
 
-    public ImmutableList<ParserRuleContext> getSignals() {
+    public ImmutableList<LabeledParserRuleContext> getSignals() {
         return getList(SIGNALS);
     }
     //endregion

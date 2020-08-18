@@ -16,6 +16,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.PositionedString;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -107,15 +108,19 @@ public abstract class TextualJMLConstruct {
         approxPos = new Position(ps.start.getLine(), ps.start.getCharPositionInLine());
     }
 
+    protected void setPosition(LabeledParserRuleContext ps) {
+        setPosition(ps.first);
+    }
+
     /**
      * @param item
      * @param ps
      * @deprecated
      */
-    protected void addGeneric(Map<String, ImmutableList<ParserRuleContext>> item, @NotNull ParserRuleContext ps) {
-        String t = ps.getText();
+    protected void addGeneric(Map<String, ImmutableList<LabeledParserRuleContext>> item, @NotNull LabeledParserRuleContext ps) {
+        String t = ps.first.getText();
         if (!t.startsWith("<") || t.startsWith("<inv>")) {
-            ImmutableList<ParserRuleContext> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());
+            ImmutableList<LabeledParserRuleContext> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());
             l = l.append(ps);
             item.put(HeapLDT.BASE_HEAP_NAME.toString(), l);
             return;
@@ -141,7 +146,7 @@ public abstract class TextualJMLConstruct {
         //ps = new PositionedString(t, ps.fileName, ps.pos);
 
         for (String h : hs) {
-            ImmutableList<ParserRuleContext> l = item.get(h);
+            ImmutableList<LabeledParserRuleContext> l = item.get(h);
             l = l.append(ps);
             item.put(h, l);
         }
