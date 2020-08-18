@@ -198,7 +198,6 @@ public final class IconFactory {
 
     private static Image junit = getImage("images/toolbar/junit_logo.png");
     private static Image jml = getImage("images/toolbar/jml.png");
-    private static Image uml = getImage("images/toolbar/uml.png");
 
     // private static Image expandGoals = getImage("images/toolbar/expandGoals.png");
     // private static Image scriptAppLogo = getImage("images/scriptAppLogo.png");
