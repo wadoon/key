@@ -25,14 +25,26 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
         ImmutableList<SequentFormula> anteFormulas = sequent.antecedent().asList();
         for (SequentFormula sf : anteFormulas) {
             Operator op = sf.formula().op();
-            if (op == floatLDT.getGreaterThan()
-                || op == floatLDT.getGreaterOrEquals()
-                || op == floatLDT.getLessThan()
-                || op == floatLDT.getLessOrEquals()) {
+            if (isFloatCmp(op, floatLDT) && isFloatLitCmp(sf.formula(), floatLDT)) {
                 res.add(sf.formula());
             }
         }
         return res;
+    }
+
+    // return true if the term has 2 subterms and (at least) one of them is a float literal.
+    // if both are literals, we don't need the term, but it does not hurt either.
+    private boolean isFloatLitCmp(Term t, FloatLDT floatLDT) {
+        return t.subs().size() == 2
+                && (t.sub(0).op() == floatLDT.getFloatSymbol()
+                    || t.sub(1).op() == floatLDT.getFloatSymbol());
+    }
+
+    private boolean isFloatCmp(Operator op, FloatLDT floatLDT) {
+        return op == floatLDT.getGreaterThan()
+                || op == floatLDT.getGreaterOrEquals()
+                || op == floatLDT.getLessThan()
+                || op == floatLDT.getLessOrEquals();
     }
 
     private List<Term> gatherLetExprs(Sequent sequent, Services services) {
