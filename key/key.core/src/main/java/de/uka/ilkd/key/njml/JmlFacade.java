@@ -30,21 +30,27 @@ public class JmlFacade {
         return createLexer(CharStreams.fromString(expr));
     }
 
-    public static JmlParser.ExpressionContext parseExpr(PositionedString expr) {
+    public static ParserRuleContext parseExpr(PositionedString expr) {
         return getExpressionContext(createLexer(expr));
     }
 
-    public static JmlParser.ExpressionContext parseExpr(String expr) {
+    public static ParserRuleContext parseExpr(String expr) {
         return getExpressionContext(createLexer(expr));
     }
 
-    private static JmlParser.ExpressionContext getExpressionContext(JmlLexer lexer) {
+    private static ParserRuleContext getExpressionContext(JmlLexer lexer) {
         lexer._mode = JmlLexer.expr;
-        Stopwatch sw = Stopwatch.createStarted();
         JmlParser parser = createParser(lexer);
-        JmlParser.ExpressionContext ctx = parser.expressionEOF().expression();
-        //System.out.println("JmlFacade.parseExpr: " + sw);
-        return ctx;
+        JmlParser.ExpressionEOFContext ctx = parser.expressionEOF();
+        ParserRuleContext c;
+        if (ctx.expression() != null) {
+            c = ctx.expression();
+        } else {
+            c = ctx.storeref();
+        }
+        if (c == null)
+            throw new NullPointerException();
+        return c;
     }
 
     static JmlParser createParser(JmlLexer lexer) {

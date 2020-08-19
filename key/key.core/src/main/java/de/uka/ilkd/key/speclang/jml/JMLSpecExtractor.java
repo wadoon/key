@@ -181,7 +181,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             final String nonNullString = arrayDepth > 0
                     ? format("\\dl_nonNull(\\dl_heap(),%s,%d)", varName, arrayDepth)
                     : format("%s != null", varName);
-            JmlParser.ExpressionContext ps = JmlFacade.parseExpr(nonNullString);
+            ParserRuleContext ps = JmlFacade.parseExpr(nonNullString);
             result = result.add(
                     new LabeledParserRuleContext(ps, ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
         }
@@ -261,7 +261,6 @@ public final class JMLSpecExtractor implements SpecExtractor {
                             final ClassInvariant jmlClassInvariant = jsf.createJMLClassInvariant(kjt,
                                     visibility, isStatic,
                                     classInv);
-                            //TODO weigl jmlClassInvariant.setOriginLabel(classInv.second);
                             result = result.add(jmlClassInvariant);
                         }
                     }
@@ -445,17 +444,17 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 // the internal symbol
                 final String invString = pm.isStatic() ? "\\inv" : "<inv>";
                 if (!pm.isConstructor()) {
-                    final JmlParser.ExpressionContext ctx = JmlFacade.parseExpr(invString);
+                    final ParserRuleContext ctx = JmlFacade.parseExpr(invString);
                     specCase.addClause(REQUIRES, new LabeledParserRuleContext(ctx,
                             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
-                    final JmlParser.ExpressionContext ctx = JmlFacade.parseExpr(format("%s.\\inv", pm.getName()));
+                    final ParserRuleContext ctx = JmlFacade.parseExpr(format("%s.\\inv", pm.getName()));
                     specCase.addClause(REQUIRES, new LabeledParserRuleContext(ctx,
                             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
                 if (specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-                    final JmlParser.ExpressionContext ctx = JmlFacade.parseExpr(invString);
+                    final ParserRuleContext ctx = JmlFacade.parseExpr(invString);
                     specCase.addClause(ENSURES, new LabeledParserRuleContext(ctx,
                             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }

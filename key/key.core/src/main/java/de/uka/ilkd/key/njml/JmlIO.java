@@ -127,7 +127,11 @@ public class JmlIO {
 
     public Term translateTerm(ParserRuleContext expr) {
         Object interpret = interpret(expr);
-        return ((SLExpression) interpret).getTerm();
+        if (interpret instanceof SLExpression) {
+            return ((SLExpression) interpret).getTerm();
+        } else {
+            return (Term) interpret;
+        }
     }
 
     public Term translateTerm(LabeledParserRuleContext expr) {

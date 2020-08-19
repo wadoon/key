@@ -2348,7 +2348,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             paramsString = "()"; //default no params
 
         String equality = ctx.IDENT() + paramsString + " == (" + bodyString + ")";
-        JmlParser.ExpressionContext equal = JmlFacade.parseExpr(equality);
+        ParserRuleContext equal = JmlFacade.parseExpr(equality);
         return accept(equal);
     }
 

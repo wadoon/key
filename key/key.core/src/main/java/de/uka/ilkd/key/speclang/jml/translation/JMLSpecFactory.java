@@ -614,7 +614,6 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         Term result = tb.empty();
         for (LabeledParserRuleContext expr : originalClauses) {
-            if (expr == null) continue;//TODO weigl trace null back to origin
             Term translated = jmlIo
                     .clear()
                     .classType(pm.getContainerType())
@@ -769,7 +768,7 @@ public class JMLSpecFactory {
                                           ImmutableList<LabeledParserRuleContext> assignableClauses) throws SLTranslationException {
 
         for (LabeledParserRuleContext expr : assignableClauses) {
-            if (expr == null) continue;//TODO weigl trace null back to origin
+            assert expr.first != null;
             Term translated = jmlIo
                     .clear()
                     .classType(pm.getContainerType())
