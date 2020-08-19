@@ -418,11 +418,11 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
                 return res;
             }
             */
-        TextualJMLSpecCase b = new TextualJMLSpecCase(ImmutableSLList.nil(), Behavior.NONE);
+        TextualJMLSpecCase b = new TextualJMLSpecCase(ImmutableSLList.nil(), Behavior.NORMAL_BEHAVIOR);
         constructs = constructs.prepend(b);
         b.addName("assert " + ctx.getText());
         b.addClause(ENSURES, ctx);
-        b.addClause(ASSIGNABLE, JmlFacade.parseExpr("assignable \\strictly_nothing;"));
+        b.addClause(ASSIGNABLE, JmlFacade.parseClause("assignable \\strictly_nothing;"));
         return null;
     }
 
