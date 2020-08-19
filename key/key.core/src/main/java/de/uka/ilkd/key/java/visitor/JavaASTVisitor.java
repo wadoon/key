@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.java.visitor;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
 import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.CcatchBreakLabelParameterDeclaration;
@@ -51,7 +52,6 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
-import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
@@ -112,7 +112,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
         }
         else if (node instanceof AbstractProgramElement && services != null) {
             ImmutableSet<BlockContract> contracts = localSpecRepo
-                    .getAbstractProgramElementContracts((de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement) node);
+                    .getAbstractProgramElementContracts((AbstractProgramElement) node);
             contracts.forEach(this::performActionOnAbstractProgramElementContract);
         }
     }
