@@ -32,12 +32,10 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
         return res;
     }
 
-    // return true if the term has 2 subterms and (at least) one of them is a float literal.
-    // if both are literals, we don't need the term, but it does not hurt either.
+    // return true if both subterms are either float literals or simple variables
     private boolean isFloatLitCmp(Term t, FloatLDT floatLDT) {
-        return t.subs().size() == 2
-                && (t.sub(0).op() == floatLDT.getFloatSymbol()
-                    || t.sub(1).op() == floatLDT.getFloatSymbol());
+        return (t.sub(0).subs().size() == 0 || t.sub(0).op() == floatLDT.getFloatSymbol())
+                && (t.sub(1).subs().size() == 0 || t.sub(1).op() == floatLDT.getFloatSymbol());
     }
 
     private boolean isFloatCmp(Operator op, FloatLDT floatLDT) {
