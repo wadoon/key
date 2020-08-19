@@ -66,7 +66,7 @@ public class KeYLexerTokens {
     private static String[] tokenNames;
 
     public static String[] getTokennames() {
-        if(tokenNames == null) {
+        if (tokenNames == null) {
             prepareTokens();
         }
         return tokenNames;
@@ -96,6 +96,7 @@ public class KeYLexerTokens {
         names[KeYParser.MODIFIES] = "'\\modifies'";
         names[KeYParser.PROGRAMVARIABLES] = "'\\programVariables'";
         names[KeYParser.VARCOND] = "'\\varcond'";
+        names[KeYParser.GET_INVARIANT] = "'\\getInvariant'";
         names[KeYParser.APPLY_UPDATE_ON_RIGID] = "'\\applyUpdateOnRigid'";
         names[KeYParser.DEPENDINGON] = "'\\dependingOn'";
         names[KeYParser.DISJOINTMODULONULL] = "'\\disjointModuloNull'";
