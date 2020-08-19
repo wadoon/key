@@ -18,7 +18,6 @@ import de.uka.ilkd.key.njml.JmlLexer;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import junit.framework.TestCase;
 import org.antlr.v4.runtime.Token;
 import org.junit.Ignore;
@@ -67,7 +66,8 @@ public class TestJMLPreTranslator {
     @Test
     public void testLexer5() {
         lex("/*@ pure */ /*@ ensures true;",
-                JML_ML_START, WS, PURE, WS, JML_ML_END, WS, JML_ML_START, WS, ENSURES, WS, TRUE, SEMI_TOPLEVEL, EOF);
+                JML_ML_START, WS, PURE, WS, JML_ML_END, WS,
+                JML_ML_START, WS, ENSURES, WS, TRUE, SEMI_TOPLEVEL, EOF);
     }
 
     @Test
@@ -82,6 +82,31 @@ public class TestJMLPreTranslator {
                 JML_SL_START, WS, NORMAL_BEHAVIOR, WS, JML_SL_START, WS, ENSURES, WS);
     }
 
+    @Test
+    public void testLexer7() {
+        lex("//+ESC@ special comment for ESC",
+                SL_COMMENT);
+    }
+
+    @Test
+    public void testLexer8() {
+        lex("//+ESC+key@ behaviour",
+                JML_SL_START, WS, BEHAVIOR);
+    }
+
+    @Test
+    public void testLexer9() {
+        lex("//+ESC+key-key@ behaviour",
+                SL_COMMENT);
+    }
+
+    @Test
+    public void testLexer10() {
+        lex("//-@ behaviour", SL_COMMENT);
+        lex("//+key+@ behaviour", SL_COMMENT);
+        lex("//key@ behaviour", SL_COMMENT);
+    }
+
     private void lex(String in, int... expected) {
         JmlLexer lexer = JmlFacade.createLexer(in);
         Token t;
@@ -90,14 +115,18 @@ public class TestJMLPreTranslator {
             t = lexer.nextToken();
             System.out.printf("%s\n", t);
             if (idx < expected.length) {
-                assertEquals(expected[idx++], t.getType());
+                assertEquals(
+                        String.format("Token wanted '%s', but got '%s'. ",
+                                lexer.getVocabulary().getDisplayName(expected[idx]),
+                                lexer.getVocabulary().getDisplayName(t.getType())),
+                        expected[idx++], t.getType());
             }
         } while (t.getType() != -1);
     }
     //endregion
 
     @Test
-    public void testSimpleSpec() throws SLTranslationException {
+    public void testSimpleSpec() {
         ImmutableList<TextualJMLConstruct> constructs = parseMethodSpec(
                 "/*@ normal_behavior\n"
                         + "     requires true;\n"
@@ -119,7 +148,7 @@ public class TestJMLPreTranslator {
 
 
     @Test
-    public void testComplexSpec() throws SLTranslationException {
+    public void testComplexSpec() {
         ImmutableList<TextualJMLConstruct> constructs
                 = parseMethodSpec("/*@ behaviour\n"
                 + "  @  requires true;\n"
@@ -153,7 +182,7 @@ public class TestJMLPreTranslator {
 
 
     @Test
-    public void testMultipleSpecs() throws SLTranslationException {
+    public void testMultipleSpecs() {
         ImmutableList<TextualJMLConstruct> constructs
                 = parseMethodSpec("//@ normal_behaviour\n"
                 + "//@  ensures false\n"
@@ -186,7 +215,7 @@ public class TestJMLPreTranslator {
     }
 
     @Test
-    public void testAtInModelmethod() throws SLTranslationException {
+    public void testAtInModelmethod() {
         parseMethodSpec(
                 "/*@ model_behaviour\n" +
                         "  @   requires true;\n" +
@@ -198,25 +227,25 @@ public class TestJMLPreTranslator {
 
     @Test(expected = Exception.class)
     @Ignore
-    public void disabled_testMLCommentEndInSLComment1() throws SLTranslationException {
+    public void disabled_testMLCommentEndInSLComment1() {
         parseMethodSpec("//@ requires @*/ true;");
         fail("Characters '@*/' should not be parsed");
     }
 
     @Test(expected = Exception.class)
     @Ignore
-    public void disabled_testMLCommentEndInSLComment2() throws SLTranslationException {
+    public void disabled_testMLCommentEndInSLComment2() {
         parseMethodSpec("//@ requires */ true;");
     }
 
     @Test(expected = Exception.class)
-    public void testFailure() throws SLTranslationException {
+    public void testFailure() {
         parseMethodSpec("/*@ normal_behaviour \n @ signals ohoh;  @*/");
         fail();
     }
 
     @Test(expected = Exception.class)
-    public void testFailure2() throws SLTranslationException {
+    public void testFailure2() {
         parseMethodSpec("/*@ behaviour\n"
                 + "  @  requires (;((;;);();();(();;;(;)));\n"
                 + "  @*/");
