@@ -59,7 +59,7 @@ import org.key_project.util.collection.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.stream.Stream;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.DIVERGES;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS;
@@ -1322,12 +1322,13 @@ public class JMLSpecFactory {
                     .atPres(atPres)
                     .translateMergeParams(ctx.mergeparamsspec());
 
+            final Stream<Term> stream = specs.getPredicates().stream();
+            final List<AbstractionPredicate> abstractionPredicates = stream
+                    .map(t -> AbstractionPredicate.create(t, specs.getPlaceholder(), services))
+                    .collect(Collectors.toList());
+
             result = result.add(new PredicateAbstractionMergeContract(mps, atPres, kjt,
-                    specs.getLatticeType(),
-                    StreamSupport.stream(specs.getPredicates().spliterator(), true).map(
-                            t -> AbstractionPredicate.create(t, specs.getPlaceholder(), services))
-                            .collect(Collectors
-                                    .toCollection(ArrayList::new))));
+                    specs.getLatticeType(), abstractionPredicates));
         } else {
             throw new IllegalStateException(
                     "MergeProcedures should either be an UnparametricMergeProcedure or a ParametricMergeProcedure");

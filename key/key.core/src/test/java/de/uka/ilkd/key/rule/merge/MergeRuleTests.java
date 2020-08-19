@@ -13,13 +13,6 @@
 
 package de.uka.ilkd.key.rule.merge;
 
-import java.io.File;
-import java.util.Iterator;
-
-import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -34,15 +27,19 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
+import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.ProofStarter;
 import junit.framework.TestCase;
+import org.junit.Test;
+
+import java.io.File;
+import java.util.Iterator;
 
 /**
  * Test suite for the {@link MergeRule}.
  *
  * @author Dominic Scheurer
  */
-@Ignore //FIXME disabled due to testing
 public class MergeRuleTests extends TestCase {
 
     private static final File TEST_RESOURCES_DIR_PREFIX = new File(HelperClassForTests.TESTCASE_DIRECTORY, "merge/");

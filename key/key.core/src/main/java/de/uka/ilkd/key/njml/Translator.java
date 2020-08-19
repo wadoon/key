@@ -2425,7 +2425,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
         String phName = ctx.phName.getText();
         LocationVariable placeholder = new LocationVariable(new ProgramElementName(phName), phType);
         resolverManager.putIntoTopLocalVariablesNamespace(placeholder);
-        ImmutableList<Term> preds = listOf(ctx.predicate());
+        ImmutableList<SLExpression> expr = listOf(ctx.predicate());
+
+        ImmutableList<Term> preds =
+                ImmutableList.fromList(
+                        expr.stream().map(SLExpression::getTerm)
+                                .collect(Collectors.toList()));
         return new MergeParamsSpec(latticeType, placeholder, preds);
     }
 
