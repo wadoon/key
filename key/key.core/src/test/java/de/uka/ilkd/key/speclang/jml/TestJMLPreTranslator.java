@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 
 
 public class TestJMLPreTranslator {
-    private ImmutableList<TextualJMLConstruct> parseMethodSpec(String ms) throws SLTranslationException {
+    private ImmutableList<TextualJMLConstruct> parseMethodSpec(String ms) {
         return JmlFacade.parseClasslevel(ms);
     }
 
@@ -114,7 +114,7 @@ public class TestJMLPreTranslator {
         assertEquals(0, specCase.getEnsures().size());
         assertEquals(0, specCase.getSignals().size());
         assertEquals(0, specCase.getSignalsOnly().size());
-        assertEquals("requirestrue;", specCase.getRequires().head().getText().trim());
+        assertEquals("requirestrue;", specCase.getRequires().head().first.getText().trim());
     }
 
 
@@ -144,11 +144,11 @@ public class TestJMLPreTranslator {
 
         System.out.println(specCase);
 
-        assertEquals("ensuresfalse;", specCase.getEnsures().head().getText().trim());
-        assertEquals("assignable\\nothing;", specCase.getAssignable().head().getText().trim());
-        assertEquals("signals(Exception)e;", specCase.getSignals().head().getText().trim());
-        assertEquals("signals_onlyonlythis;", specCase.getSignalsOnly().head().getText().trim());
-        assertEquals("requirestrue;", specCase.getRequires().head().getText().trim());
+        assertEquals("ensuresfalse;", specCase.getEnsures().head().first.getText().trim());
+        assertEquals("assignable\\nothing;", specCase.getAssignable().head().first.getText().trim());
+        assertEquals("signals(Exception)e;", specCase.getSignals().head().first.getText().trim());
+        assertEquals("signals_onlyonlythis;", specCase.getSignalsOnly().head().first.getText().trim());
+        assertEquals("requirestrue;", specCase.getRequires().head().first.getText().trim());
     }
 
 
