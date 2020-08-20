@@ -247,14 +247,14 @@ compile:testFast:removegenerics:
 #      junit:
 #        - "**/**/build/test-results/*/TEST-*.xml"
 
-checkstyle:
-  stage: primary
-  image: wadoon/key-test-docker:jdk11
-  allow_failure: true
-  script:
-    - echo "**** Check the commit's gitlab page for a readable checkstyle report ****"
-    - (key/scripts/tools/checkstyle/runIncrementalCheckstyle.sh | key/scripts/tools/checkstyle/tojson.py | tee report.json)
-  artifacts:
-    reports:
-      codequality: report.json
-    expire_in: 1 year
+#checkstyle: 
+  #stage: primary
+  #image: wadoon/key-test-docker:jdk11
+  #allow_failure: true
+  #script:
+    #- echo "**** Check the commit's gitlab page for a readable checkstyle report ****"
+   # - (key/scripts/tools/checkstyle/runIncrementalCheckstyle.sh | key/scripts/tools/checkstyle/tojson.py | tee report.json)
+  #artifacts:
+    #reports:
+      #codequality: report.json
+    #expire_in: 1 year
