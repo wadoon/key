@@ -25,11 +25,17 @@ stages:
     - primary
     - secondary
     - ternary
-    - test
-
-include:
-  - template: Code-Quality.gitlab-ci.yml
-
+    
+code_quality:
+  stage: primary
+  image: codeclimate/codeclimate
+  allow_failure: true
+  script:
+    - codeclimate help      
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+    expire_in: 1 week  
 # compile:oraclejdk8:
 #   stage: primary
 #   image: key-dev-jdk8
