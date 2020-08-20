@@ -251,7 +251,7 @@ compile:testFast:removegenerics:
   #image: wadoon/key-test-docker:jdk11
   #allow_failure: true
   #script:
-    - echo "**** Check the commit's gitlab page for a readable checkstyle report ****"
+    #- echo "**** Check the commit's gitlab page for a readable checkstyle report ****"
    # - (key/scripts/tools/checkstyle/runIncrementalCheckstyle.sh | key/scripts/tools/checkstyle/tojson.py | tee report.json)
   #artifacts:
     #reports:
