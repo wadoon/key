@@ -166,7 +166,7 @@ public class JavaProfile extends AbstractProfile {
     @Override
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {
         ImmutableSet<StrategyFactory> set = super.getStrategyFactories();
-        set = set.add(DEFAULT);
+        set = set.add(getDefaultStrategyFactory());
         return set;
     }
 

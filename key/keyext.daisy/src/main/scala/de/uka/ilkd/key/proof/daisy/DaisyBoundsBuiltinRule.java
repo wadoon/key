@@ -134,4 +134,9 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
     public String displayName() {
         return NAME.toString();
     }
+
+    @Override
+    public String toString() {
+        return displayName();
+    }
 }
