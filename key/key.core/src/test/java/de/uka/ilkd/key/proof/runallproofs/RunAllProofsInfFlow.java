@@ -14,20 +14,18 @@
 
 package de.uka.ilkd.key.proof.runallproofs;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 import org.antlr.runtime.RecognitionException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * This test case captures all information flow run-all-proof scenarios.
@@ -40,7 +38,6 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
  * @author M. Ulbrich
  */
 @RunWith(Parameterized.class)
-@Ignore
 public class RunAllProofsInfFlow extends RunAllProofsTest {
 
     private static final String SKIP_INF_FLOW_PROPERTY = "key.runallproofs.skipInfFlow";
