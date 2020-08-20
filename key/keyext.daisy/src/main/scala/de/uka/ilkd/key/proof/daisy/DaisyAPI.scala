@@ -71,7 +71,7 @@ object DaisyAPI {
       val varUpperBound = item._2._2
       if (varUpperBound isDefined)
         daisyInputValMap += varId -> Interval(varLowerBound.get, varUpperBound.get)
-      else throw new Exception("Upper or lower bound not given")
+      else throw new IllegalArgumentException("Upper or lower bound not given")
 
     }
 
@@ -103,7 +103,7 @@ object DaisyAPI {
       val fl: Double = floatLDT.translateTerm(floatExpr, new ExtList, services).asInstanceOf[FloatLiteral].getValue.toDouble
       RealLiteral(Rational.fromDouble(fl))
     }
-    else throw new Exception("Operation" + op + "not supported")
+    else throw new IllegalArgumentException("Operation " + op + " not supported")
   }
 
   def main(args: Array[String]): Unit = {
