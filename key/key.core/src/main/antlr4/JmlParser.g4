@@ -88,6 +88,7 @@ represents_clause
     | (SUCH_THAT predicate))
     SEMI_TOPLEVEL
   ;
+
 separates_clause
   : SEPARATES (NOTHING | sep=infflowspeclist)
     ((DECLASSIFIES (NOTHING | decl=infflowspeclist))
@@ -95,25 +96,33 @@ separates_clause
     SEMI_TOPLEVEL
   ;
 loop_separates_clause
-  : LOOP_SEPARATES (NOTHING | sep=infflowspeclist)
-    (NEW_OBJECTS (NOTHING | newobj=infflowspeclist))*
+  : LOOP_SEPARATES
+    sep=infflowspeclist
+    (NEW_OBJECTS newobj+=infflowspeclist)*
     SEMI_TOPLEVEL
+  ;
+
+infflowspeclist
+  : NOTHING
+  | expressionlist
   ;
 
 determines_clause
   : DETERMINES
-    (NOTHING|det=infflowspeclist)
-    BY (NOTHING | (ITSELF) | by=infflowspeclist)
-    ( (DECLASSIFIES (NOTHING |decl+=infflowspeclist))
-    | (ERASES (NOTHING |erases+=infflowspeclist))
-    | (NEW_OBJECTS (NOTHING |newObs+=infflowspeclist)))*
+    determined=infflowspeclist
+    BY (byItself=ITSELF|by=infflowspeclist)
+    ( DECLASSIFIES decl+=infflowspeclist
+    | ERASES       erases+=infflowspeclist
+    | NEW_OBJECTS newObs+=infflowspeclist
+    )*
     SEMI_TOPLEVEL
-   ;
+  ;
 
 loop_determines_clause
   : LOOP_DETERMINES
-    (NOTHING |det=infflowspeclist)
-    BY ITSELF ((NEW_OBJECTS (NOTHING |newObs+=infflowspeclist)))*
+    det=infflowspeclist
+    BY ITSELF
+    (NEW_OBJECTS newObs+=infflowspeclist)*
     SEMI_TOPLEVEL
   ;
 
@@ -189,8 +198,6 @@ mergeparamsspec:
 ;
 
 termexpression: expression;
-
-infflowspeclist: termexpression (COMMA termexpression)*;
 
 storeRefUnion: list = storeRefList;
 storeRefList: storeref (COMMA storeref)*;

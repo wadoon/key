@@ -262,6 +262,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitLoop_determines_clause(JmlParser.Loop_determines_clauseContext ctx) {
         TODO();
+        //loopContract.addClause(TextualJMLLoopSpec.Clause.INFORMATION_FLOW, ctx);
         return super.visitLoop_determines_clause(ctx);
     }
 

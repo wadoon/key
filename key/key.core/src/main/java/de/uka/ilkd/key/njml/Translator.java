@@ -300,8 +300,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
 
-    private <T> ImmutableList<T> append(ImmutableList<T> by,
-                                        ParserRuleContext ctx) {
+    private <T> ImmutableList<T> append(ImmutableList<T> by, ParserRuleContext ctx) {
         return by.append((T) accept(ctx));
     }
 
@@ -1080,7 +1079,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         SLExpression result = lookupIdentifier(lookupName, receiver, params, ctx.LPAREN().getSymbol());
         if (result == null) {
-            if(fullyQualifiedName.indexOf('.')<0) {
+            if (fullyQualifiedName.indexOf('.') < 0) {
                 //resolve by prefixing an `this.`
                 result = lookupIdentifier(lookupName, getThisReceiver(), params, ctx.LPAREN().getSymbol());
             }
@@ -1191,8 +1190,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     private void appendToFullyQualifiedName(String suffix) {
-        if(fullyQualifiedName.isEmpty())
-            fullyQualifiedName=suffix;
+        if (fullyQualifiedName.isEmpty())
+            fullyQualifiedName = suffix;
         else
             fullyQualifiedName += "." + suffix;
     }
@@ -2244,7 +2243,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Object visitLoop_separates_clause(JmlParser.Loop_separates_clauseContext ctx) {
         ImmutableList<Term> sep = accept(ctx.sep);
         ImmutableList<Term> newObs = ImmutableSLList.nil();
-        newObs = newObs.append((Iterable<Term>) accept(ctx.newobj));
+        for (JmlParser.InfflowspeclistContext context : ctx.newobj) {
+            newObs = newObs.append((ImmutableList<Term>) accept(context));
+        }
         return new InfFlowSpec(sep, sep, newObs);
     }
 
@@ -2255,19 +2256,24 @@ class Translator extends JmlParserBaseVisitor<Object> {
         ImmutableList<Term> newObs = ImmutableSLList.nil();
         ImmutableList<Term> by = ImmutableSLList.nil();
 
-        ImmutableList<Term> det = accept(ctx.det);
+        ImmutableList<Term> determined = accept(ctx.determined);
 
-        if (ctx.ITSELF() != null) by = det;
-        else by = append(by, ctx.by);
+        if (ctx.byItself != null) {
+            by = determined;
+        } else {
+            @Nullable ImmutableList<Term> t = accept(ctx.by);
+            assert t != null;
+            by = by.append(t);
+        }
 
         decl = append(decl, ctx.decl);
         erases = append(erases, ctx.erases);
         newObs = append(newObs, ctx.newObs);
 
-        assert det != null;
-        det = det.append(erases);
+        assert determined != null;
+        determined = determined.append(erases);
         by = by.append(decl);
-        return new InfFlowSpec(by, det, newObs);
+        return new InfFlowSpec(by, determined, newObs);
     }
 
     @Override
@@ -2281,7 +2287,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public ImmutableList<Term> visitInfflowspeclist(JmlParser.InfflowspeclistContext ctx) {
-        ImmutableList<Term> result = listOf(ctx.termexpression());
+        if (ctx.NOTHING() != null) return ImmutableSLList.nil();
+        ImmutableList<SLExpression> seq = accept(ctx.expressionlist());
+        assert seq != null;
+        ImmutableList<Term> result = ImmutableList.fromList(
+                seq.stream().map(SLExpression::getTerm).collect(Collectors.toList())
+        );
         return translator.infflowspeclist(result);
     }
     //endregion

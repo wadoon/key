@@ -1,14 +1,5 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Map;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -16,16 +7,20 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.LinkedHashMap;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Map;
 
 
 /**
@@ -93,15 +88,15 @@ abstract class ReplaceAndRegisterMethod {
                               StateVars origVars,
                               StateVars poVars,
                               TermBuilder tb) {
-        ImmutableList<Term> resultPreExps = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> resultPreExps = ImmutableSLList.nil();
         for (Term t : terms.preExpressions) {
             resultPreExps = resultPreExps.append(replace(t, origVars, poVars, tb));
         }
-        ImmutableList<Term> resultPostExps = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> resultPostExps = ImmutableSLList.nil();
         for (Term t : terms.postExpressions) {
             resultPostExps = resultPostExps.append(replace(t, origVars, poVars, tb));
         }
-        ImmutableList<Term> resultNewObjecs = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> resultNewObjecs = ImmutableSLList.nil();
         for (Term t : terms.newObjects) {
             resultNewObjecs = resultNewObjecs.append(replace(t, origVars, poVars, tb));
         }
@@ -192,7 +187,7 @@ abstract class ReplaceAndRegisterMethod {
     }
 
     final private static class QuantifiableVariableVisitor implements Visitor {
-        private HashSet<QuantifiableVariable> vars = new LinkedHashSet<QuantifiableVariable>();
+        private final HashSet<QuantifiableVariable> vars = new LinkedHashSet<QuantifiableVariable>();
 
         @Override
         public boolean visitSubtree(Term visited) {
