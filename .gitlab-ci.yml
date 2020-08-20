@@ -29,6 +29,7 @@ stages:
     - primary
     - secondary
     - ternary
+    - test
 
 # compile:oraclejdk8:
 #   stage: primary
