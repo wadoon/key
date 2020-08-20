@@ -79,6 +79,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     public static final AbstractTermTransformer ENUM_CONSTANT_VALUE = new EnumConstantValue();
 
+    public static final AbstractTermTransformer ENUM_COUNT_CONSTANTS = new EnumCountConstants();
+
     public static final AbstractTermTransformer DIVIDE_MONOMIALS = new DivideMonomials();
 
     public static final AbstractTermTransformer DIVIDE_LCR_MONOMIALS = new DivideLCRMonomials();

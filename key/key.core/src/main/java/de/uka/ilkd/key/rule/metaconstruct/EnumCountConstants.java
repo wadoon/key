@@ -15,28 +15,29 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.conditions.EnumConstantCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
  * resolve a program variable to an integer literal.
  * 
- * If the PV is an enum constant, its index in the enum constant array is
- * returned.
+ * If the PC is a term of an enum type, then the number
+ * of enum constants in that type is returned.
  * 
  * @author mulbrich
  */
-public final class EnumConstantValue extends AbstractTermTransformer {
+public final class EnumCountConstants extends AbstractTermTransformer {
 
-    public EnumConstantValue() {
-        super(new Name("#enumconstantvalue"), 1);
+    public EnumCountConstants() {
+        super(new Name("#enumcountconstants"), 1);
     }
 
     /**
@@ -47,17 +48,11 @@ public final class EnumConstantValue extends AbstractTermTransformer {
      * of the constant.
      * 
      * @throws IllegalArgumentException
-     *             if the pv is neither a constant nor ntc.
+     *             if the argument is not of enum type
      */
     public Term transform(Term term, SVInstantiations svInst, Services services) {
-        term = term.sub(0);
-
-        ProgramVariable pv = EnumConstantCondition.extractEnumProgramVar(term, services);
-
-        int value = EnumClassDeclaration.indexOf(pv);
-        if(value == -1) {
-            throw new IllegalArgumentException(term + " is not an enum constant");
-        }
+        KeYJavaType kjt = services.getTypeConverter().getKeYJavaType(term.sub(0));
+        int value = EnumClassDeclaration.getNumberOfConstants(kjt);
 
         final IntLiteral valueLiteral = KeYJavaASTFactory.intLiteral(value);
 	    term = services.getTypeConverter().convertToLogicElement(

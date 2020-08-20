@@ -124,6 +124,21 @@ public class EnumClassDeclaration extends ClassDeclaration {
     }
 
     /**
+     * Get the number of defined enum constants in a type.
+     * Throws an exception if the type is not an enum.
+     * @param kjt a non-null type to check
+     * @return the number of defined enum constants in kjt
+     * @throws IllegalArgumentException if kjt is not an enum type
+     */
+    public static int getNumberOfConstants(KeYJavaType kjt) {
+        Type type = kjt.getJavaType();
+        if (type instanceof EnumClassDeclaration) {
+            return ((EnumClassDeclaration) type).getNumberOfConstants();
+        }
+        throw new IllegalArgumentException("The type " + type + " is not an enum declaration.");
+    }
+
+    /**
      * check whether a PV is an enum constant of any enum type.
      * @param attribute ProgramVariable to check.
      * @return true iff attribute is an enum constant.
@@ -136,8 +151,15 @@ public class EnumClassDeclaration extends ClassDeclaration {
         else
             return false;
     }
-    
-    // TODO DOC
+
+    /**
+     * Get the index within the enum constants of a type for a particular
+     * enum constant.
+     *
+     * @param attribute a program variable representing an enum constant
+     * @return {@code 0 <= result < E.values().length}, a valid index into
+     *         the list of constants.
+     */
     public static int indexOf(ProgramVariable attribute) {
         KeYJavaType kjt = attribute.getKeYJavaType();
         Type type = kjt.getJavaType();
