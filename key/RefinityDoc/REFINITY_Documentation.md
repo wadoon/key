@@ -1,6 +1,10 @@
 # REFINITY Documentation
 
-REFINITY is a workbench for modeling and verifying Java-based program transformation rules. It is based on KeY and Abstract Execution.
+REFINITY is a workbench for modeling and verifying Java-based program transformation rules. It is based on KeY and Abstract Execution. Here, we describe the user interface of REFINITY, how to specify program transformation rules with pre- and postconditions using the tool, and its file format. At the end of the document, you find helpful references / scientific publications (which can also be helpful).
+
+This documentation is under ongoing development. 
+
+Last update: 2020-08-21.
 
 ## Getting Started
 
