@@ -35,7 +35,14 @@ public final class LocationVariable extends ProgramVariable
      * approximation, i.e., if this flag is true, the variable is fresh for sure,
      * otherwise we do not know.
      */
-    private boolean isFreshVariable = false;
+    private final boolean isFresh;
+    
+
+    public LocationVariable(ProgramElementName name, KeYJavaType t, KeYJavaType containingType,
+            boolean isStatic, boolean isModel, boolean isGhost, boolean isFinal, boolean isFresh) {
+        super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, isFinal);
+        this.isFresh = isFresh;
+    }
 
     public LocationVariable(ProgramElementName name,
                         KeYJavaType        t,
@@ -44,14 +51,7 @@ public final class LocationVariable extends ProgramVariable
                         boolean            isModel,
                         boolean isGhost,
                         boolean isFinal) {
-        super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, isFinal);
-    }
-    
-
-    public LocationVariable(ProgramElementName name, KeYJavaType t, KeYJavaType containingType,
-            boolean isStatic, boolean isModel, boolean isGhost, boolean isFinal, boolean fresh) {
-        super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, isFinal);
-        this.isFreshVariable = fresh;
+        this(name, t, containingType, isStatic, isModel, isGhost, isFinal, false);
     }
     
     public LocationVariable(ProgramElementName name,
@@ -59,36 +59,37 @@ public final class LocationVariable extends ProgramVariable
             		    KeYJavaType        containingType,
             		    boolean            isStatic,
             		    boolean            isModel) {
-        super(name, t.getSort(), t, containingType, isStatic, isModel, false);
+        this(name, t, containingType, isStatic, isModel, false, false, false);
     }
 
 
     public LocationVariable(ProgramElementName name, KeYJavaType t) {
-        super(name, t.getSort(), t, null, false, false, false);
+        this(name, t, null, false, false, false, false, false);
     }
     
     public LocationVariable(ProgramElementName name, KeYJavaType t, PositionInfo posInfo) {
-        super(name, t.getSort(), t, null, false, false, false);
+        this(name, t, null, false, false, false, false, false);
         this.posInfo = posInfo;
     }
 
 
     public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isFinal) {
-        super(name, t.getSort(), t, null, false, false, false, isFinal);
+        this(name, t, null, false, false, false, isFinal, false);
     }
     
     public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isFinal, PositionInfo posInfo) {
-        super(name, t.getSort(), t, null, false, false, false, isFinal);
+        this(name, t, null, false, false, false, isFinal, false);
         this.posInfo = posInfo;
     }
 
     public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isGhost, boolean isFinal) {
-        super(name, t.getSort(), t, null, false, false, isGhost, isFinal);
+        this(name, t, null, false, false, isGhost, isFinal, false);
     }
 
 
     public LocationVariable(ProgramElementName name, Sort s) {
         super(name, s, null, null, false, false, false);
+        this.isFresh = false;
     }
 
     @Override
@@ -111,7 +112,7 @@ public final class LocationVariable extends ProgramVariable
      * @return whether this {@link LocationVariable} is freshly introduced.
      */
     public boolean isFreshVariable() {
-        return isFreshVariable;
+        return isFresh;
     }
 
     @Override

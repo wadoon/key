@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
@@ -39,7 +38,6 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.ParametricSkolemLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.HeapLoc;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -63,6 +61,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
@@ -318,13 +317,20 @@ public class AbstractExecutionUtils {
      * location variable loc is irrelevant for abstract location sets.
      * 
      * <p>
+     * Implementation note: This depends on the
+     * {@link LocationVariable#isFreshVariable()} flag being correctly set. For
+     * "varcond new" conditions in taclets, this has been taken care of, but for
+     * {@link BuiltInRule}s, it may fail. This is a completeness problem (some
+     * simplifications will not take place), but not soundness-relevant.
+     * 
+     * <p>
      * Pure method.
      * 
-     * @param loc      The {@link AbstractUpdateLoc} to check.
-     * @param goal     The context {@link Goal}.
+     * @param loc The {@link AbstractUpdateLoc} to check.
+     * @param goal The context {@link Goal}.
      * @param services The {@link Services} object.
      * @return true iff loc is irrelevant for Skolem location sets since it is
-     *         created fresh by KeY rules.
+     * created fresh by KeY rules.
      */
     public static boolean locIsCreatedFresh(final AbstractUpdateLoc loc, final Goal goal,
             final Services services) {
@@ -333,43 +339,7 @@ public class AbstractExecutionUtils {
         }
 
         final LocationVariable locVar = ((PVLoc) unwrapHasTo(loc)).getVar();
-
-        /*
-         * Location variables that either are already present in the root sequent, or
-         * are not related to the source, are considered fresh. Additionally, there is a
-         * freshness flag for special variables like the exc, self and result variables
-         * created in operation POs. We consider variables that don't have position
-         * information as not related to the source. It would be soundness critical if
-         * declarations of variables in the source code were not given position
-         * information.
-         */
-
-        if (locVar.isFreshVariable()) {
-            return true;
-        }
-
-        /*
-         * NOTE (DS, 2019-11-18): If using the TermProgramVariableCollector, also
-         * program variables occurring in the initial JavaBlock will be considered. This
-         * isn't generally a bad idea; however, it's problematic with exception
-         * variables in catch clauses which we anyway consider separately and don't want
-         * to mess up the results for Skolem locset symbols. Everything of interest
-         * (non-fresh) should be initialized in an update or so.
-         */
-
-//        final TermProgramVariableCollector collector = new TermProgramVariableCollector(
-//                goal.getLocalSpecificationRepository(), services);
-        final OpCollector collector = new OpCollector();
-
-        StreamSupport.stream(goal.proof().root().sequent().spliterator(), true)
-                .map(SequentFormula::formula).forEach(term -> term.execPostOrder(collector));
-        if (collector.ops().contains(locVar)) {
-            // Location was already present in the root node.
-            return false;
-        }
-
-        return locVar.getPositionInfo() == PositionInfo.UNDEFINED
-                || !locVar.getPositionInfo().startEndValid();
+        return locVar.isFreshVariable();
     }
 
     /**

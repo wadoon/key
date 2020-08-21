@@ -550,7 +550,8 @@ public final class AuxiliaryContractBuilders {
                 String newName
                         = services.getTermBuilder().newName(placeholderVariable.name().toString());
                 LocationVariable newVariable = new LocationVariable(new ProgramElementName(newName),
-                        placeholderVariable.getKeYJavaType());
+                        placeholderVariable.getKeYJavaType(), null, false, false, false, false,
+                        true /* fresh */);
 
                 if (goal != null) {
                     goal.addProgramVariable(newVariable);

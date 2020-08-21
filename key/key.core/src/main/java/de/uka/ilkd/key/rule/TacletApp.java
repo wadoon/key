@@ -1419,7 +1419,6 @@ public abstract class TacletApp implements RuleApp {
             if (nvc != null) {
         	KeYJavaType kjt;
         	Object o = nvc.getTypeDefiningObject();
-        	JavaInfo javaInfo = services.getJavaInfo ();
         	if (o instanceof SchemaVariable) {
                     final TypeConverter tc = services.getTypeConverter();
         	    final SchemaVariable peerSV = (SchemaVariable)o;
@@ -1440,8 +1439,13 @@ public abstract class TacletApp implements RuleApp {
         	    kjt =(KeYJavaType)o;
         	}
                 assert kjt != null : "could not find kjt for: " + o;
-        	return new LocationVariable
-        	    (VariableNamer.parseName(instantiation), kjt);
+                
+                // NOTE (DS, 2020-08-21): Variable is flagged as "fresh", which is used
+                // by the Abstract Execution simplification rules: Fresh variables are
+                // not considered part of abstract location sets, since they cannot be
+                // subject of the specification (they're proof-only variables).
+                return new LocationVariable(VariableNamer.parseName(instantiation), kjt, null,
+                        false, false, false, false, true /* fresh */);
             }
         }
         return null;

@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -393,8 +392,9 @@ public class TermBuilder {
     }
 
     /**
-     * Creates a program variable for the atPre heap. Take care to register it
-     * in the namespaces.
+     * Creates a program variable for the atPre heap. Take care to register it in
+     * the namespaces. Variable is set as fresh (see
+     * {@link LocationVariable#isFreshVariable()}).
      */
     public LocationVariable heapAtPreVar(String baseName, Sort sort,
             boolean makeNameUnique) {
@@ -402,8 +402,8 @@ public class TermBuilder {
         if (makeNameUnique) {
             baseName = newName(baseName);
         }
-        return new LocationVariable(new ProgramElementName(baseName),
-                new KeYJavaType(sort));
+        return new LocationVariable(new ProgramElementName(baseName), new KeYJavaType(sort), null,
+                false, false, false, false, true /* fresh */);
     }
 
     // -------------------------------------------------------------------------
