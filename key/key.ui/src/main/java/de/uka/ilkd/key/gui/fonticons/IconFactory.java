@@ -489,6 +489,11 @@ public final class IconFactory {
         //return scaleIcon(interactiveAppLogo, size, size);
     }
 
+    public static Icon scriptAppLogo(int size) {
+        return SCRIPT.load(size);
+        //return scaleIcon(interactiveAppLogo, size, size);
+    }
+
     public static Icon get(IconProvider provider, float size) {
         return cache.computeIfAbsent(provider.getKey(size), d -> provider.load(size));
     }
