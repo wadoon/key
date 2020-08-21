@@ -22,6 +22,20 @@ On the left-hand side of the user interface, symbols used in the APFs can be dec
 
 The three compartments at the bottom serve to declare pre- and postconditions of the model.
 
+Most GUI elements have brief tooltip help texts, so hover with the mouse over an element you do not understand and chances are good that you get help.
+
+The functionality of the toolbar buttons are (from left to right in the order of their appearance):
+
+- Create a new REFINITY model. Will open a new window.
+- Open an existing REFINITY model (*.aer file). Opens a new window if the current file is not fresh/empty.
+- Save the current REFINITY model (as an *.aer file).
+- Increase font size (useful for presentations).
+- Decrease font size.
+- Synchronize scrolling: If you scroll in one abstract program pane, the other one follows synchronously. Especially helpful if you "align" the input and output of your transformation rule, as in the picture above.
+- Start proof. Generates a KeY proof obligation, loads it into KeY and starts the automatic proof search.
+- Certify proof. Load an existing *.proof file and try to apply it to the current model. Reports success if the certificate could be successfully checked.
+- Exit. Closes the REFINITY *and* KeY windows.
+
 In the next section, we explain how abstract programs are specified; afterward, we move to the specification of pre- and postconditions.
 
 - [ ] Tooltips
@@ -32,6 +46,8 @@ In the next section, we explain how abstract programs are specified; afterward, 
 In progress.
 
 The specification language is described in-depth in reference [2].
+
+
 
 ## Declaring Proof Goals
 
@@ -53,4 +69,4 @@ In progress.
 
 ----
 
-REFINITY has been developed by Dominic Steinhöfel.
+REFINITY has been developed by [Dominic Steinhöfel](https://www.dominic-steinhoefel.de/).
