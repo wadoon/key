@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Container for RuleApp instances with cost as determined by 
@@ -95,13 +95,13 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * may be an instance of <code>TopRuleAppCost</code>.
      */
     public static ImmutableList<RuleAppContainer> createAppContainers(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos, Goal goal) {
-        ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+        ImmutableList<RuleAppContainer> result = KeYCollections.<RuleAppContainer>nil();
 
         if (rules.size() == 1) {
             result = result.prepend( createAppContainer(rules.head(), pos, goal));
         } else if (rules.size() > 1) {
-            ImmutableList<NoPosTacletApp> tacletApplications = ImmutableSLList.<NoPosTacletApp>nil();
-            ImmutableList<IBuiltInRuleApp> builtInRuleApplications = ImmutableSLList.<IBuiltInRuleApp>nil();
+            ImmutableList<NoPosTacletApp> tacletApplications = KeYCollections.<NoPosTacletApp>nil();
+            ImmutableList<IBuiltInRuleApp> builtInRuleApplications = KeYCollections.<IBuiltInRuleApp>nil();
 
             for (RuleApp rule : rules) {
                 if (rule instanceof NoPosTacletApp) {

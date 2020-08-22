@@ -2,10 +2,7 @@ package de.uka.ilkd.key.rule.match.legacy;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -226,8 +223,8 @@ public final class LegacyTacletMatcher implements TacletMatcher {
             Term                             p_template,
             MatchConditions                  p_matchCond,
             Services                         p_services ) {
-        ImmutableList<IfFormulaInstantiation> resFormulas = ImmutableSLList.<IfFormulaInstantiation>nil();
-        ImmutableList<MatchConditions> resMC = ImmutableSLList.<MatchConditions>nil();
+        ImmutableList<IfFormulaInstantiation> resFormulas = KeYCollections.<IfFormulaInstantiation>nil();
+        ImmutableList<MatchConditions> resMC = KeYCollections.<MatchConditions>nil();
 
         Term updateFormula;
         if (p_matchCond.getInstantiations().getUpdateContext().isEmpty())
@@ -261,7 +258,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
 
         for (final IfFormulaInstantiation candidateInst: p_toMatch) {
             assert itIfSequent.hasNext() : "p_toMatch and assumes sequent must have same number of elements";
-            newMC = matchIf ( ImmutableSLList.<IfFormulaInstantiation>nil()
+            newMC = matchIf ( KeYCollections.<IfFormulaInstantiation>nil()
                     .prepend ( candidateInst ),
                     itIfSequent.next ().formula (),
                     p_matchCond,

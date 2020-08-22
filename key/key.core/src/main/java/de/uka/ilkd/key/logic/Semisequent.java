@@ -16,7 +16,7 @@ package de.uka.ilkd.key.logic;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -35,7 +35,7 @@ public class Semisequent implements Iterable<SequentFormula> {
 
     /** used by inner class Empty*/
     private Semisequent() {
-        seqList = ImmutableSLList.<SequentFormula>nil();
+        seqList = KeYCollections.<SequentFormula>nil();
     }
 
 
@@ -55,7 +55,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      * seqList */
     public Semisequent(SequentFormula seqFormula) {
         assert seqFormula != null;
-        this.seqList = ImmutableSLList.<SequentFormula>nil().append(seqFormula);
+        this.seqList = KeYCollections.<SequentFormula>nil().append(seqFormula);
     }
 
 
@@ -494,7 +494,7 @@ public class Semisequent implements Iterable<SequentFormula> {
         @Override
         public SemisequentChangeInfo insertFirst(SequentFormula sequentFormula) {
             final SemisequentChangeInfo sci = new SemisequentChangeInfo
-                    (ImmutableSLList.<SequentFormula>nil().prepend(sequentFormula));
+                    (KeYCollections.<SequentFormula>nil().prepend(sequentFormula));
             sci.addedFormula(0, sequentFormula);
             return sci;
         }
@@ -546,7 +546,7 @@ public class Semisequent implements Iterable<SequentFormula> {
          */
         @Override
         public SemisequentChangeInfo remove(int idx) {
-            return new SemisequentChangeInfo(ImmutableSLList.<SequentFormula>nil());
+            return new SemisequentChangeInfo(KeYCollections.<SequentFormula>nil());
         }
 
         /** returns index of a {@link SequentFormula}

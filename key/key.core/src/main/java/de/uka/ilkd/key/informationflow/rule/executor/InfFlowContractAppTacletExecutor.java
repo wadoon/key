@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.informationflow.rule.executor;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.java.Services;
@@ -18,6 +17,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.executor.javadl.RewriteTacletExecutor;
 import de.uka.ilkd.key.util.properties.Properties;
+import org.key_project.util.collection.KeYCollections;
 
 public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfFlowContractAppTaclet> {
     /**
@@ -70,7 +70,7 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor<InfF
         ImmutableList<Term> applFormulas =
                 goal.getStrategyInfo(INF_FLOW_CONTRACT_APPL_PROPERTY);
         if (applFormulas == null) {
-            applFormulas = ImmutableSLList.<Term>nil();
+            applFormulas = KeYCollections.<Term>nil();
         }
         applFormulas = applFormulas.append(applFormula);
         StrategyInfoUndoMethod undo = new StrategyInfoUndoMethod() {

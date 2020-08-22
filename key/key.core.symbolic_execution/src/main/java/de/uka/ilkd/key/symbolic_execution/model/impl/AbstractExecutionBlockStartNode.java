@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Provides a basic implementation of {@link IExecutionBlockStartNode}.
@@ -17,7 +17,7 @@ public abstract class AbstractExecutionBlockStartNode<S extends SourceElement> e
    /**
     * The up to know discovered completing {@link IExecutionNode}s.
     */
-   private ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableSLList.nil();
+   private ImmutableList<IExecutionNode<?>> blockCompletions = KeYCollections.nil();
 
    /**
     * Defines if a block is or might be opened.

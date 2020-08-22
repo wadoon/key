@@ -19,10 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -374,7 +371,7 @@ public abstract class AbstractPO implements IPersistablePO {
             ImmutableList<Pair<Sort, IObserverFunction>> scc = allSCCs.get(node);
             for (Taclet axiomTaclet :
                 axiom.getTaclets(DefaultImmutableSet.fromImmutableList(scc == null ?
-                        ImmutableSLList.<Pair<Sort, IObserverFunction>>nil() : scc),
+                        KeYCollections.<Pair<Sort, IObserverFunction>>nil() : scc),
                         proofConfig.getServices())) {
                 assert axiomTaclet != null : "class axiom returned null taclet: "
                         + axiom.getName();
@@ -429,7 +426,7 @@ public abstract class AbstractPO implements IPersistablePO {
 
         if (node.index == node.lowLink) {
             ImmutableList<Pair<Sort, IObserverFunction>> scc =
-                    ImmutableSLList.<Pair<Sort, IObserverFunction>>nil();
+                    KeYCollections.<Pair<Sort, IObserverFunction>>nil();
             Vertex sccMember;
             do  {
                 sccMember = stack.pop();

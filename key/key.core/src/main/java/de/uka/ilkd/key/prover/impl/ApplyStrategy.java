@@ -22,7 +22,6 @@ package de.uka.ilkd.key.prover.impl;
 
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -39,6 +38,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Applies rules in an automated fashion.
@@ -204,7 +204,7 @@ public class ApplyStrategy extends AbstractProverCore {
 	 */
     @Override
 	public synchronized ApplyStrategyInfo start(Proof proof, Goal goal) {
-        return start(proof, ImmutableSLList.<Goal>nil().prepend(goal));
+        return start(proof, KeYCollections.<Goal>nil().prepend(goal));
     }
 
     /* (non-Javadoc)
@@ -348,7 +348,7 @@ public class ApplyStrategy extends AbstractProverCore {
         final GoalChooser goalChooser = getGoalChooserForProof(proof);
         proof = null;
         if(goalChooser!=null){
-            goalChooser.init(null, ImmutableSLList.<Goal>nil());
+            goalChooser.init(null, KeYCollections.<Goal>nil());
         }
     }
 

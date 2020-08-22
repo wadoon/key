@@ -15,10 +15,8 @@ package org.key_project.util.collection;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -26,37 +24,6 @@ import java.util.stream.StreamSupport;
  * List interface to be implemented by non-destructive lists
  */
 public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
-
-    /**
-     * Returns a Collector that accumulates the input elements into a new ImmutableList.
-     *
-     * @return a Collector that accumulates the input elements into a new ImmutableList.
-     */
-    public static <T> Collector<T, List<T>, ImmutableList<T>> collector() {
-        return Collector.of(
-                LinkedList<T>::new,
-                (list, el) -> list.add(el),
-                (list1, list2) -> {
-                    list1.addAll(list2);
-                    return list1; },
-                ImmutableList::<T>fromList);
-    }
-
-    /**
-     * Creates an ImmutableList from a List.
-     *
-     * @param list a List.
-     * @return an ImmutableList containing the same elements as the specified list.
-     */
-    public static <T> ImmutableList<T> fromList(List<T> list) {
-        ImmutableList<T> result = ImmutableSLList.nil();
-
-        for (T el : list) {
-            result = result.append(el);
-        }
-
-        return result;
-    }
 
     /**
      * prepends element to the list (non-destructive)
@@ -79,6 +46,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * prepends an immutable list in reverse order, i.e.,
      * [4,5,6].prepend([1,2,3]) will be [3,2,1,4,5,6]
      * (more efficient than {@link ImmutableList#prepend(ImmutableList)})
+     *
      * @return reverse(collection)++this
      */
     ImmutableList<T> prependReverse(ImmutableList<T> collection);
@@ -86,6 +54,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
     /**
      * prepends an iterable collection in reverse order, i.e.,
      * [4,5,6].prepend([1,2,3]) will be [3,2,1,4,5,6]
+     *
      * @return reverse(collection)++this
      */
     ImmutableList<T> prependReverse(Iterable<T> collection);
@@ -134,6 +103,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
 
     /**
      * return true if predicate is fullfilled for at least one element
+     *
      * @param predicate the predicate
      * @return true if predicate is fullfilled for at least one element
      */
@@ -169,7 +139,6 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
     /**
      * @return int representing number of elements in list
      */
-
     int size();
 
     /**

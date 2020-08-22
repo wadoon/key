@@ -13,7 +13,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.antlr.runtime.RecognitionException;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,7 +80,7 @@ public class AbstractTestTermParser {
                     new ParserConfig(services, nss),
                     new ParserConfig(services, nss),
                     null,
-                    ImmutableSLList.<Taclet>nil()).problem();
+                    KeYCollections.<Taclet>nil()).problem();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);

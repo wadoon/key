@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -41,6 +40,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * <p>
@@ -481,7 +481,7 @@ public class DelayedCutProcessor implements Runnable {
      */
     private void uncoverDecisionPredicate(DelayedCut cut,
             List<NodeGoalPair> openLeaves) {
-        ImmutableList<NodeGoalPair> list = ImmutableSLList.<NodeGoalPair> nil();
+        ImmutableList<NodeGoalPair> list = KeYCollections.<NodeGoalPair> nil();
         for (NodeGoalPair pair : openLeaves) {
             list = list.append(new NodeGoalPair(pair.node, pair.goal.apply(
                     cut.getHideApp()).head()));

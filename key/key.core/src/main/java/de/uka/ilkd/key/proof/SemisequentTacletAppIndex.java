@@ -15,11 +15,7 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
@@ -142,7 +138,7 @@ public class SemisequentTacletAppIndex {
      */
     private ImmutableList<TermTacletAppIndex> removeFormulas(ImmutableList<FormulaChangeInfo> infos) {
 
-        ImmutableList<TermTacletAppIndex> oldIndices = ImmutableSLList.<TermTacletAppIndex>nil();
+        ImmutableList<TermTacletAppIndex> oldIndices = KeYCollections.<TermTacletAppIndex>nil();
 
         for (FormulaChangeInfo info1 : infos) {
             final FormulaChangeInfo info = info1;

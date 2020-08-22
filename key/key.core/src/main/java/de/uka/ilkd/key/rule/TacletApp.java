@@ -20,12 +20,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -33,7 +28,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
@@ -566,7 +560,7 @@ public abstract class TacletApp implements RuleApp {
         final TermBuilder tb = services.getTermBuilder();
 
         TacletApp app = this;
-        ImmutableList<String> proposals = ImmutableSLList.<String> nil();
+        ImmutableList<String> proposals = KeYCollections.<String> nil();
 
         for (final SchemaVariable sv : uninstantiatedVars()) {
             if (sv.arity() != 0) {
@@ -681,7 +675,7 @@ public abstract class TacletApp implements RuleApp {
 	final TermBuilder tb = services.getTermBuilder();
 
 	TacletApp app = this;
-	ImmutableList<String> proposals = ImmutableSLList.<String>nil();
+	ImmutableList<String> proposals = KeYCollections.<String>nil();
 
 	for (final SchemaVariable sv : uninstantiatedVars()) {
 	    if (sv.arity() != 0) {
@@ -1067,7 +1061,7 @@ public abstract class TacletApp implements RuleApp {
 		"The if formulas have already been instantiated");
 
 	if (taclet().ifSequent().isEmpty())
-	    return ImmutableSLList.<TacletApp>nil().prepend(this);
+	    return KeYCollections.<TacletApp>nil().prepend(this);
 
 	return findIfFormulaInstantiationsHelp(
 		createSemisequentList(taclet().ifSequent() // Matching starting
@@ -1075,7 +1069,7 @@ public abstract class TacletApp implements RuleApp {
 		createSemisequentList(taclet().ifSequent().antecedent()),
 		IfFormulaInstSeq.createList(p_seq, false, p_services), IfFormulaInstSeq
 			.createList(p_seq, true, p_services),
-		ImmutableSLList.<IfFormulaInstantiation>nil(), matchConditions(),
+		KeYCollections.<IfFormulaInstantiation>nil(), matchConditions(),
 		p_services);
 
     }
@@ -1111,8 +1105,8 @@ public abstract class TacletApp implements RuleApp {
 					             p_alreadyMatched,
 					             p_services);
 		if (res != null)
-		    return ImmutableSLList.<TacletApp>nil().prepend(res);
-		return ImmutableSLList.<TacletApp>nil();
+		    return KeYCollections.<TacletApp>nil().prepend(res);
+		return KeYCollections.<TacletApp>nil();
 	    } else {
 		// Change from succedent to antecedent
 		p_ifSeqTail = p_ifSeqTail2nd;
@@ -1126,7 +1120,7 @@ public abstract class TacletApp implements RuleApp {
 
 	// For each matching formula call the method again to match
 	// the remaining terms
-	ImmutableList<TacletApp> res = ImmutableSLList.<TacletApp>nil();
+	ImmutableList<TacletApp> res = KeYCollections.<TacletApp>nil();
 	Iterator<IfFormulaInstantiation> itCand = mr.getFormulas().iterator();
 	Iterator<MatchConditions> itMC = mr.getMatchConditions().iterator();
 	p_ifSeqTail = p_ifSeqTail.tail();
@@ -1140,7 +1134,7 @@ public abstract class TacletApp implements RuleApp {
     }
 
     private ImmutableList<SequentFormula> createSemisequentList(Semisequent p_ss) {
-	ImmutableList<SequentFormula> res = ImmutableSLList.<SequentFormula>nil();
+	ImmutableList<SequentFormula> res = KeYCollections.<SequentFormula>nil();
 
         for (Object p_s : p_ss) res = res.prepend((SequentFormula) p_s);
 

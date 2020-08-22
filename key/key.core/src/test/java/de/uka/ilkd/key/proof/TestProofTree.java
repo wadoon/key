@@ -18,7 +18,6 @@ import java.util.Iterator;
 import junit.framework.TestCase;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.TacletForTests;
+import org.key_project.util.collection.KeYCollections;
 
 /** class tests the tree of proof
 */
@@ -149,7 +149,7 @@ public class TestProofTree extends TestCase {
     }
 
     public static ImmutableList<Goal> emptyGoalList() {
-	return ImmutableSLList.<Goal>nil();
+	return KeYCollections.<Goal>nil();
     }
     
 

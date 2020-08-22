@@ -16,12 +16,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
@@ -86,7 +81,7 @@ class Instantiation {
    }
 
    private static ImmutableSet<Term> sequentToTerms(Sequent seq) {
-      ImmutableList<Term> res = ImmutableSLList.<Term> nil();
+      ImmutableList<Term> res = KeYCollections.<Term> nil();
       for (final SequentFormula cf : seq) {
          res = res.prepend(cf.formula());
       }
@@ -162,7 +157,7 @@ class Instantiation {
     *         succedent
     */
    private ImmutableSet<Term> initAssertLiterals(Sequent seq, TermServices services) {
-      ImmutableList<Term> assertLits = ImmutableSLList.nil();
+      ImmutableList<Term> assertLits = KeYCollections.nil();
       for (final SequentFormula cf : seq.antecedent()) {
          final Term atom = cf.formula();
          final Operator op = atom.op();

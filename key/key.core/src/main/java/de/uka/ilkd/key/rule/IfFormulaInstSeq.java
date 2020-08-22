@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -25,6 +24,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Instantiation of an if-formula that is a formula of an existing
@@ -65,7 +65,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
      */
     private static ImmutableList<IfFormulaInstantiation> createListHelp(Sequent     p_s,
             boolean antec ) {
-        ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.<IfFormulaInstantiation>nil();
+        ImmutableList<IfFormulaInstantiation> res = KeYCollections.<IfFormulaInstantiation>nil();
         Iterator<SequentFormula>  it;
         if (antec) {
             it = p_s.antecedent().iterator ();

@@ -28,10 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -369,7 +366,7 @@ public class MergeRule implements BuiltInRule {
         progVars = progVars.union(getUpdateLeftSideLocations(state1.first));
         progVars = progVars.union(getUpdateLeftSideLocations(state2.first));
 
-        ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
+        ImmutableList<Term> newElementaryUpdates = KeYCollections.nil();
 
         // New constraints on introduced Skolem constants
         Term newAdditionalConstraints = null;
@@ -764,7 +761,7 @@ public class MergeRule implements BuiltInRule {
 
         // Find potential partners -- for which isApplicable is true and
         // they have the same program counter (and post condition).
-        ImmutableList<MergePartner> potentialPartners = ImmutableSLList.nil();
+        ImmutableList<MergePartner> potentialPartners = KeYCollections.nil();
 
         for (final Goal g : allGoals) {
             if (!g.equals(goal) && !g.isLinked()) {

@@ -21,10 +21,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Label;
@@ -226,7 +223,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     private ImmutableList<Term> replaceVariablesInTerms(
             ImmutableList<Term> terms) {
-        ImmutableList<Term> res = ImmutableSLList.<Term> nil();
+        ImmutableList<Term> res = KeYCollections.<Term> nil();
         boolean changed = false;
         for (final Term term : terms) {
             final Term newTerm = replaceVariablesInTerm(term);
@@ -238,7 +235,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     private ImmutableList<InfFlowSpec> replaceVariablesInTermListTriples(
             ImmutableList<InfFlowSpec> terms) {
-        ImmutableList<InfFlowSpec> res = ImmutableSLList.<InfFlowSpec> nil();
+        ImmutableList<InfFlowSpec> res = KeYCollections.<InfFlowSpec> nil();
         boolean changed = false;
         for (final InfFlowSpec innerTerms : terms) {
             final ImmutableList<Term> renamedPreExpressions = replaceVariablesInTerms(

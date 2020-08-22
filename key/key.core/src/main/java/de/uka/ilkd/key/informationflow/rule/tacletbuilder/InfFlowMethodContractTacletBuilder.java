@@ -9,10 +9,7 @@
 //
 package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
@@ -87,7 +84,7 @@ public final class InfFlowMethodContractTacletBuilder
         ImmutableSet<InformationFlowContract> ifContracts =
                 getInformFlowContracts(methodContract.getTarget(), services);
         ImmutableList<Term> contractsApplications =
-                ImmutableSLList.<Term>nil();
+                KeYCollections.<Term>nil();
         for (InformationFlowContract cont : ifContracts) {
             InfFlowPOSnippetFactory f =
                     POSnippetFactory.getInfFlowFactory(cont, contAppData,

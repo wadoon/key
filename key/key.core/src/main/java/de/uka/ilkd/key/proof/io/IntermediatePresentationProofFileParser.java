@@ -19,7 +19,6 @@ import java.util.Stack;
 import java.util.Vector;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.logic.Name;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Parses a KeY proof file into an intermediate representation. The parsed
@@ -217,7 +217,7 @@ public class IntermediatePresentationProofFileParser
             BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
 
             if (builtinInfo.builtinIfInsts == null) {
-                builtinInfo.builtinIfInsts = ImmutableSLList
+                builtinInfo.builtinIfInsts = KeYCollections
                         .<Pair<Integer, PosInTerm>> nil();
             }
             builtinInfo.currIfInstFormula = 0;
@@ -226,7 +226,7 @@ public class IntermediatePresentationProofFileParser
 
         case NEW_NAMES: // newnames
             final String[] newNames = str.split(",");
-            ruleInfo.currNewNames = ImmutableSLList.<Name> nil();
+            ruleInfo.currNewNames = KeYCollections.<Name> nil();
             for (int in = 0; in < newNames.length; in++) {
                 ruleInfo.currNewNames = ruleInfo.currNewNames
                         .append(new Name(newNames[in]));
@@ -467,9 +467,9 @@ public class IntermediatePresentationProofFileParser
     private static class TacletInformation extends RuleInformation {
         /* + Taclet Information */
         protected LinkedList<String> loadedInsts = null;
-        protected ImmutableList<String> ifSeqFormulaList = ImmutableSLList
+        protected ImmutableList<String> ifSeqFormulaList = KeYCollections
                 .<String> nil();
-        protected ImmutableList<String> ifDirectFormulaList = ImmutableSLList
+        protected ImmutableList<String> ifDirectFormulaList = KeYCollections
                 .<String> nil();
 
         public TacletInformation(String ruleName) {

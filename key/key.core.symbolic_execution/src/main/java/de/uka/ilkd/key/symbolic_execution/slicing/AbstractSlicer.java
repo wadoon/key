@@ -12,7 +12,7 @@ import java.util.TreeSet;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
@@ -706,7 +706,7 @@ public abstract class AbstractSlicer {
    protected Location normalizeAlias(Services services,
                                      Location location, 
                                      SequentInfo info) {
-      ImmutableList<Access> normalizedAccesses = ImmutableSLList.nil();
+      ImmutableList<Access> normalizedAccesses = KeYCollections.nil();
       for (Access access : location.getAccesses()) {
          if (access.isArrayIndex()) {
             access = normalizeArrayIndex(access, info);
@@ -861,7 +861,7 @@ public abstract class AbstractSlicer {
                                  ReferencePrefix prefix, 
                                  ExecutionContext ec,
                                  ReferencePrefix thisReference) {
-      ImmutableList<Access> accesses = toLocationRecursive(services, prefix, ec, thisReference, ImmutableSLList.<Access>nil());
+      ImmutableList<Access> accesses = toLocationRecursive(services, prefix, ec, thisReference, KeYCollections.<Access>nil());
       return new Location(accesses);
    }
    

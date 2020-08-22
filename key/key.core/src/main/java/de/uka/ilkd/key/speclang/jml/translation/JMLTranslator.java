@@ -24,7 +24,6 @@ import java.util.TreeMap;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
@@ -72,6 +71,7 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Translates JML expressions to FOL.
@@ -984,7 +984,7 @@ public final class JMLTranslator {
                         (ImmutableList<SLExpression>) params[0];
                 Services services = (Services) params[1];
 
-                ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
+                ImmutableList<Term> terms = KeYCollections.<Term>nil();
                 for (SLExpression expr : exprList) {
                     if (expr.isTerm()) {
                         Term t = expr.getTerm();
@@ -1461,7 +1461,7 @@ public final class JMLTranslator {
                         (ImmutableList<SLExpression>) params[1];
                 if(list == null) {
                     // it may be that there were no arguments and the list is null
-                    list = ImmutableSLList.<SLExpression>nil();
+                    list = KeYCollections.<SLExpression>nil();
                 }
                 Services services = (Services) params[2];
 
@@ -1638,7 +1638,7 @@ public final class JMLTranslator {
                         JMLTranslationMethod createMethod =
                                 translationMethods.get(JMLKeyWord.CREATE_LOCSET);
                         ImmutableList<SLExpression> exprList =
-                                ImmutableSLList.<SLExpression>nil();
+                                KeYCollections.<SLExpression>nil();
                         exprList = exprList.append(expr);
                         return (Term) createMethod.translate(excManager,
                                                              exprList, services);
@@ -1663,7 +1663,7 @@ public final class JMLTranslator {
                         (ImmutableList<SLExpression>) params[0];
                 Services services = (Services) params[1];
 
-                ImmutableList<Term> singletons = ImmutableSLList.<Term>nil();
+                ImmutableList<Term> singletons = KeYCollections.<Term>nil();
                 for (SLExpression expr : exprList) {
                     if (expr.isTerm()) {
                         Term t = expr.getTerm();
@@ -1711,7 +1711,7 @@ public final class JMLTranslator {
                 @SuppressWarnings("unused")// please keep it for documentation purposes
                 TermServices services = (TermServices) params[1];
 
-                ImmutableList<Term> disTerms = ImmutableSLList.<Term>nil();
+                ImmutableList<Term> disTerms = KeYCollections.<Term>nil();
                 while (!list.isEmpty()) {
                     Term t1 = list.head();
                     list = list.tail();
@@ -2311,7 +2311,7 @@ public final class JMLTranslator {
             Term t;
             if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
                 // not interval range, create unbounded comprehension term
-                ImmutableList<QuantifiableVariable> _qvs = ImmutableSLList.<QuantifiableVariable>nil().prepend(lv);
+                ImmutableList<QuantifiableVariable> _qvs = KeYCollections.<QuantifiableVariable>nil().prepend(lv);
                 while (it.hasNext()) {
                     _qvs = _qvs.prepend(it.next());
                 }
@@ -2519,7 +2519,7 @@ public final class JMLTranslator {
 
             Term[] args;
             if (list == null) {
-                list = ImmutableSLList.<SLExpression>nil();
+                list = KeYCollections.<SLExpression>nil();
             }
 
             Term heap = tb.getBaseHeap();

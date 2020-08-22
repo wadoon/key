@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -32,6 +31,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
 import de.uka.ilkd.key.rule.match.vm.instructions.MatchSchemaVariableInstruction;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.KeYCollections;
 
 /** 
  * Matching algorithm using a virtual machine based approach inspired by Voronkonv et al.
@@ -109,13 +109,13 @@ public class VMTacletMatcher implements TacletMatcher {
         TacletMatchProgram prg = assumesMatchPrograms.get(p_template);
 
         
-        ImmutableList<IfFormulaInstantiation> resFormulas = ImmutableSLList.<IfFormulaInstantiation>nil();
-        ImmutableList<MatchConditions> resMC = ImmutableSLList.<MatchConditions>nil();
+        ImmutableList<IfFormulaInstantiation> resFormulas = KeYCollections.<IfFormulaInstantiation>nil();
+        ImmutableList<MatchConditions> resMC = KeYCollections.<MatchConditions>nil();
 
         final boolean updateContextPresent = 
                 !p_matchCond.getInstantiations().getUpdateContext().isEmpty();
         ImmutableList<UpdateLabelPair> context = 
-                ImmutableSLList.<SVInstantiations.UpdateLabelPair>nil();
+                KeYCollections.<SVInstantiations.UpdateLabelPair>nil();
         
         if (updateContextPresent) { 
             context = p_matchCond.getInstantiations().getUpdateContext();   
@@ -186,7 +186,7 @@ public class VMTacletMatcher implements TacletMatcher {
 
         for (final IfFormulaInstantiation candidateInst: p_toMatch) {
             assert itIfSequent.hasNext() : "p_toMatch and assumes sequent must have same number of elements";
-            newMC = matchIf ( ImmutableSLList.<IfFormulaInstantiation>nil()
+            newMC = matchIf ( KeYCollections.<IfFormulaInstantiation>nil()
                     .prepend ( candidateInst ),
                     itIfSequent.next ().formula (),
                     p_matchCond,

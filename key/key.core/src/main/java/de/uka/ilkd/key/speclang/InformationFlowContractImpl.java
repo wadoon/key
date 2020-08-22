@@ -31,7 +31,7 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.util.InfFlowSpec;
-
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -175,11 +175,11 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                op.apply(origMby),
                                                op.apply(origMod), hasRealModifiesClause, origSelf,
                                                origParams.stream().map(op)
-                                               .collect(ImmutableList.collector()),
+                                               .collect(KeYCollections.collector()),
                                                op.apply(origResult), op.apply(origExc),
                                                op.apply(origAtPre), op.apply(origDep),
                                                origInfFlowSpecs.stream().map(spec -> spec.map(op))
-                                               .collect(ImmutableList.collector()),
+                                               .collect(KeYCollections.collector()),
                                                toBeSaved, id);
     }
 

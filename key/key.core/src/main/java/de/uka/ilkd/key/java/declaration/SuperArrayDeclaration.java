@@ -14,12 +14,12 @@
 package de.uka.ilkd.key.java.declaration;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * At the moment the mere purpose of this Class is to provide an encapsulation
@@ -58,7 +58,7 @@ public class SuperArrayDeclaration extends TypeDeclaration{
      * returns the local declared supertypes
      */
     public ImmutableList<KeYJavaType> getSupertypes() {
-	return ImmutableSLList.<KeYJavaType>nil();
+	return KeYCollections.<KeYJavaType>nil();
     }
 
 

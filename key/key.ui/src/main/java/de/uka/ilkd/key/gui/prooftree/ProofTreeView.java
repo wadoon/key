@@ -53,7 +53,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -79,6 +78,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.KeYCollections;
 
 public class ProofTreeView extends JPanel implements TabPanel {
 
@@ -704,7 +704,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
          */
         @Override
         public void autoModeStarted(ProofEvent e) {
-            modifiedSubtrees = ImmutableSLList.<Node>nil();
+            modifiedSubtrees = KeYCollections.<Node>nil();
             modifiedSubtreesCache = new LinkedHashSet<Node>();
             if (delegateModel == null) {
                 Debug.out("delegateModel is null");

@@ -16,7 +16,6 @@ package de.uka.ilkd.key.java.declaration;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.NamedProgramElement;
 import de.uka.ilkd.key.java.ParentIsInterfaceDeclaration;
@@ -32,6 +31,7 @@ import de.uka.ilkd.key.java.abstraction.Method;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Type declaration.
@@ -215,10 +215,10 @@ public abstract class TypeDeclaration extends JavaDeclaration
      */
     public ImmutableList<Field> getAllFields(Services services) {
         if (members == null) {
-            return ImmutableSLList.<Field>nil();
+            return KeYCollections.<Field>nil();
         }
 
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = KeYCollections.<Field>nil();
 
         for (MemberDeclaration member : members) {
             if (member instanceof FieldDeclaration) {                

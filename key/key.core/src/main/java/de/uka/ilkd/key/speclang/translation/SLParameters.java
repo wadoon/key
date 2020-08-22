@@ -14,13 +14,12 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Wraps a list of expressions.
@@ -55,7 +54,7 @@ public final class SLParameters {
      * @return the list of types that compose the type signature
      */
     public ImmutableList<KeYJavaType> getSignature(Services services) {
-        ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
+        ImmutableList<KeYJavaType> result = KeYCollections.<KeYJavaType>nil();
         for(SLExpression expr : parameters) {
             KeYJavaType type = expr.getType();
             if (type == null) {

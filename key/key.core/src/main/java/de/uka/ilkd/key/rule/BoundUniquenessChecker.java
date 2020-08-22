@@ -17,12 +17,12 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * The bound uniqueness checker ensures that schemavariables can be bound
@@ -38,7 +38,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 public class BoundUniquenessChecker {
 
     private HashSet<QuantifiableVariable> boundVars = new LinkedHashSet<QuantifiableVariable>();
-    private ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
+    private ImmutableList<Term> terms = KeYCollections.<Term>nil();
 
     public BoundUniquenessChecker(Sequent seq) {
         addAll(seq);

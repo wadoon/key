@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.logic;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Records the changes made to a semisequent. Keeps track of added and
@@ -23,18 +23,18 @@ import org.key_project.util.collection.ImmutableSLList;
 public class SemisequentChangeInfo {
    
     /** contains the added formulas to the semisequent */
-    private ImmutableList<SequentFormula> added   = ImmutableSLList.<SequentFormula>nil();
+    private ImmutableList<SequentFormula> added   = KeYCollections.<SequentFormula>nil();
     /** contains the removed formulas from the semisequent */
-    private ImmutableList<SequentFormula> removed = ImmutableSLList.<SequentFormula>nil();
+    private ImmutableList<SequentFormula> removed = KeYCollections.<SequentFormula>nil();
     /** contains the modified formulas from the semisequent */
-    private ImmutableList<FormulaChangeInfo> modified = ImmutableSLList.<FormulaChangeInfo>nil();
+    private ImmutableList<FormulaChangeInfo> modified = KeYCollections.<FormulaChangeInfo>nil();
     /** stores the redundance free formula list of the semisequent */
-    private ImmutableList<SequentFormula> modifiedSemisequent = ImmutableSLList.<SequentFormula>nil(); 
+    private ImmutableList<SequentFormula> modifiedSemisequent = KeYCollections.<SequentFormula>nil();
     /**
      * contains formulas that have been tried to add, but which have been rejected due to
      * already existing formulas in the sequent subsuming these formulas 
      */
-    private ImmutableList<SequentFormula> rejected = ImmutableSLList.<SequentFormula>nil(); 
+    private ImmutableList<SequentFormula> rejected = KeYCollections.<SequentFormula>nil();
     
     /** */
     private int lastFormulaIndex = -1;

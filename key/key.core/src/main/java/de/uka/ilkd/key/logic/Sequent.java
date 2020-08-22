@@ -18,10 +18,10 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * This class represents a sequent. A sequent consists of an antecedent and
@@ -438,7 +438,7 @@ public class Sequent implements Iterable<SequentFormula> {
 
         @Override
         public Iterator<SequentFormula> iterator() {
-            return ImmutableSLList.<SequentFormula>nil().iterator();
+            return KeYCollections.<SequentFormula>nil().iterator();
         }
 
         @Override

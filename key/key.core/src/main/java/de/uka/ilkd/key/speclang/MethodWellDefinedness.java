@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -40,6 +39,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * A contract for checking the well-definedness of a specification for a method or model field.
@@ -210,7 +210,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      */
     private ImmutableList<ParsableVariable> paramsSV() {
         ImmutableList<ParsableVariable> paramsSV =
-                ImmutableSLList.<ParsableVariable>nil();
+                KeYCollections.<ParsableVariable>nil();
         for (ProgramVariable pv: getOrigVars().params) {
             paramsSV = paramsSV.append(SchemaVariableFactory.createTermSV(
                     pv.name(), pv.getKeYJavaType().getSort()));
@@ -244,7 +244,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             assert params != null;
             final ProgramVariable selfVar =
                     self instanceof ProgramVariable ? (ProgramVariable)self : null;
-            ImmutableList<ProgramVariable> paramVars = ImmutableSLList.<ProgramVariable>nil();
+            ImmutableList<ProgramVariable> paramVars = KeYCollections.<ProgramVariable>nil();
             for (ParsableVariable pv: params) {
                 assert pv instanceof ProgramVariable : pv.toString();
                 paramVars = paramVars.append((ProgramVariable)pv);

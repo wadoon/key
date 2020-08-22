@@ -18,12 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -72,7 +67,7 @@ public final class GenericSortInstantiations {
 	  Services                                             services) {
 
 	ImmutableList<GenericSort>                          sorts      =
-	    ImmutableSLList.<GenericSort>nil();
+	    KeYCollections.<GenericSort>nil();
 	GenericSortCondition                       c;
 	
         final Iterator<GenericSortCondition>             it;
@@ -181,7 +176,7 @@ public final class GenericSortInstantiations {
      */
     public ImmutableList<GenericSortCondition> toConditions () {
 	ImmutableList<GenericSortCondition>          res  =
-	    ImmutableSLList.<GenericSortCondition>nil();
+	    KeYCollections.<GenericSortCondition>nil();
 	
 	
 	for (final ImmutableMapEntry<GenericSort,Sort> entry : insts) {
@@ -220,7 +215,7 @@ public final class GenericSortInstantiations {
     private final static GenericSortException 
     UNSATISFIABLE_SORT_CONSTRAINTS = new GenericSortException
     ( "Conditions for generic sorts could not be solved: ", 
-                    ImmutableSLList.<GenericSortCondition>nil() );
+                    KeYCollections.<GenericSortCondition>nil() );
     
     /**
      * Really solve the conditions given
@@ -244,7 +239,7 @@ public final class GenericSortInstantiations {
 	res = solveHelp ( topologicalSorts,
 			  DefaultImmutableMap.<GenericSort,Sort>nilMap(),
 			  p_conditions,
-			  ImmutableSLList.<GenericSort>nil(),
+			  KeYCollections.<GenericSort>nil(),
 			  services);
 
 
@@ -291,9 +286,9 @@ public final class GenericSortInstantiations {
 
 	// Find the sorts "gs" has to be a supersort of and the
 	// identity conditions
-	ImmutableList<Sort>                     subsorts     = ImmutableSLList.<Sort>nil();
+	ImmutableList<Sort>                     subsorts     = KeYCollections.<Sort>nil();
 	ImmutableList<GenericSortCondition>     idConditions =
-	                        ImmutableSLList.<GenericSortCondition>nil();
+	                        KeYCollections.<GenericSortCondition>nil();
 
 	// subsorts given by the conditions (could be made faster
 	// by using a hash map for storing the conditions)
@@ -401,7 +396,7 @@ public final class GenericSortInstantiations {
                 if ( chosen != condSort ( itC ) ) throw FAIL_EXCEPTION;
             }
 
-            return ImmutableSLList.<Sort>nil().prepend ( chosen );
+            return KeYCollections.<Sort>nil().prepend ( chosen );
         } else {
             // if a list of possible instantiations of the generic
             // sort has been given, use it
@@ -414,7 +409,7 @@ public final class GenericSortInstantiations {
 
     private static ImmutableList<Sort> toList (ImmutableSet<Sort> p_set) {
         ImmutableList<Sort> res;
-        res = ImmutableSLList.<Sort>nil();
+        res = KeYCollections.<Sort>nil();
         final Iterator<Sort> it = p_set.iterator ();
         while ( it.hasNext () )
             res = res.prepend ( it.next () );
@@ -456,7 +451,7 @@ public final class GenericSortInstantiations {
 	    return p_curRes; // nothing further to be done
 
 	Iterator<GenericSort> it = topology ( p_remainingSorts ).iterator ();
-	p_remainingSorts         = ImmutableSLList.<GenericSort>nil();
+	p_remainingSorts         = KeYCollections.<GenericSort>nil();
 
 	// reverse the order of the sorts, to start with the most
 	// general one
@@ -551,7 +546,7 @@ public final class GenericSortInstantiations {
      * @return sorted sorts
      */
     private static ImmutableList<GenericSort> topology ( ImmutableList<GenericSort> p_sorts ) {
-	ImmutableList<GenericSort>     res     = ImmutableSLList.<GenericSort>nil();
+	ImmutableList<GenericSort>     res     = KeYCollections.<GenericSort>nil();
 	Iterator<GenericSort> it;
 	GenericSort           curMax;
 	GenericSort           tMax;
@@ -567,7 +562,7 @@ public final class GenericSortInstantiations {
 		continue;
 	    }
 
-	    tList   = ImmutableSLList.<GenericSort>nil();
+	    tList   = KeYCollections.<GenericSort>nil();
 
 	    while ( it.hasNext () ) {
 		tMax = it.next ();
@@ -640,16 +635,16 @@ public final class GenericSortInstantiations {
      */
     private static ImmutableList<Sort> findMinimalElements (Set<Sort> p_inside) {
         if ( p_inside.size () == 1 )
-            return ImmutableSLList.<Sort>nil()
+            return KeYCollections.<Sort>nil()
                         .prepend ( p_inside.iterator ().next () );
 
-        ImmutableList<Sort> res = ImmutableSLList.<Sort>nil();
+        ImmutableList<Sort> res = KeYCollections.<Sort>nil();
         final Iterator<Sort> it = p_inside.iterator ();
         
         mainloop: while ( it.hasNext () ) {
             final Sort sort = it.next ();
 
-            ImmutableList<Sort> res2 = ImmutableSLList.<Sort>nil();
+            ImmutableList<Sort> res2 = KeYCollections.<Sort>nil();
             final Iterator<Sort> itSort = res.iterator ();
             while ( itSort.hasNext () ) {
                 final Sort oldMinimal = itSort.next ();

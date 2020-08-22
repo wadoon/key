@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -33,6 +32,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Cache that is used for accelerating <code>TermTacletAppIndex</code>.
@@ -109,7 +109,7 @@ public class TermTacletAppIndexCacheSet {
      * the scope of binders
      */
     private final ITermTacletAppIndexCache belowUpdateCacheEmptyPrefix =
-        new BelowUpdateCache ( ImmutableSLList.<QuantifiableVariable>nil() );
+        new BelowUpdateCache ( KeYCollections.<QuantifiableVariable>nil() );
 
     /**
      * cache for locations that are below programs, but not in the scope of
@@ -129,10 +129,10 @@ public class TermTacletAppIndexCacheSet {
     public TermTacletAppIndexCacheSet(Map<CacheKey, TermTacletAppIndex> cache) {
        assert cache != null;
        this.cache = cache;
-       antecCache = new TopLevelCache ( ImmutableSLList.<QuantifiableVariable>nil(), cache );
-       succCache = new TopLevelCache  (ImmutableSLList.<QuantifiableVariable>nil(), cache );
-       topLevelCacheEmptyPrefix = new TopLevelCache ( ImmutableSLList.<QuantifiableVariable>nil(), cache );
-       belowProgCacheEmptyPrefix = new BelowProgCache ( ImmutableSLList.<QuantifiableVariable>nil(), cache );
+       antecCache = new TopLevelCache ( KeYCollections.<QuantifiableVariable>nil(), cache );
+       succCache = new TopLevelCache  (KeYCollections.<QuantifiableVariable>nil(), cache );
+       topLevelCacheEmptyPrefix = new TopLevelCache ( KeYCollections.<QuantifiableVariable>nil(), cache );
+       belowProgCacheEmptyPrefix = new BelowProgCache ( KeYCollections.<QuantifiableVariable>nil(), cache );
     }
     
     ////////////////////////////////////////////////////////////////////////////

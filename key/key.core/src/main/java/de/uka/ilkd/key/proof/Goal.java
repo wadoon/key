@@ -32,7 +32,7 @@ import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -69,7 +69,7 @@ public final class Goal {
     /**
      * list of all applied rule applications at this branch
      */
-    private ImmutableList<RuleApp> appliedRuleApps = ImmutableSLList.<RuleApp>nil();
+    private ImmutableList<RuleApp> appliedRuleApps = KeYCollections.<RuleApp>nil();
     /**
      * this object manages the tags for all formulas of the sequent
      */
@@ -145,7 +145,7 @@ public final class Goal {
     public Goal(Node node, RuleAppIndex ruleAppIndex) {
         this(node,
                 ruleAppIndex,
-                ImmutableSLList.<RuleApp>nil(),
+                KeYCollections.<RuleApp>nil(),
                 null,
                 new QueueRuleApplicationManager(),
                 new MapProperties(),
@@ -591,7 +591,7 @@ public final class Goal {
      * @return the list of new created goals.
      */
     public ImmutableList<Goal> split(int n) {
-        ImmutableList<Goal> goalList = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> goalList = KeYCollections.<Goal>nil();
 
         final Node parent = node; // has to be stored because the node
         // of this goal will be replaced

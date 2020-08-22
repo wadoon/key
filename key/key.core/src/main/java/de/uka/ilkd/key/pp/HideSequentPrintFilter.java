@@ -18,10 +18,9 @@ import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * This filter takes a search string and yields a sequent containing only
@@ -61,7 +60,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
             return;
         }
 
-        antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+        antec = KeYCollections.<SequentPrintFilterEntry>nil();
         it = originalSequent.antecedent().iterator();
         while (it.hasNext()) {
             SequentFormula sf = it.next();
@@ -78,7 +77,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
             }
         }
 
-        succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
+        succ = KeYCollections.<SequentPrintFilterEntry>nil();
         it = originalSequent.succedent().iterator();
         while (it.hasNext()) {
             SequentFormula sf = it.next();

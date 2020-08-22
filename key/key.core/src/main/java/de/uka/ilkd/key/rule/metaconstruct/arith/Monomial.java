@@ -18,7 +18,6 @@ import java.util.Iterator;
 
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -28,6 +27,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Class for analysing and modifying monomial expressions over the integers
@@ -42,7 +42,7 @@ public class Monomial {
         this.coefficient = coefficient;
     }
 
-    public static final Monomial ONE = new Monomial ( ImmutableSLList.<Term>nil(),
+    public static final Monomial ONE = new Monomial ( KeYCollections.<Term>nil(),
                                                       BigInteger.ONE );
 
     public static Monomial create(Term monoTerm, Services services) {
@@ -143,7 +143,7 @@ public class Monomial {
         final BigInteger c = this.coefficient;
 
         if ( a.signum () == 0 || c.signum () == 0 )
-            return new Monomial ( ImmutableSLList.<Term>nil(), BigInteger.ZERO );
+            return new Monomial ( KeYCollections.<Term>nil(), BigInteger.ZERO );
 
         return new Monomial ( difference ( m.parts, this.parts ),
                               LexPathOrdering.divide ( a, c ) );
@@ -245,7 +245,7 @@ public class Monomial {
 
     private static class Analyser {
         public BigInteger coeff = BigInteger.ONE;
-        public ImmutableList<Term> parts = ImmutableSLList.<Term>nil();
+        public ImmutableList<Term> parts = KeYCollections.<Term>nil();
         private final Services services;
         private final Operator numbers, mul;
 

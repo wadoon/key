@@ -27,7 +27,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.ArrayUtil;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -339,7 +339,7 @@ public class SymbolicExecutionTreeBuilder {
             }
          }.run();
          Map<Node, ImmutableList<Node>> methodCallStack = getMethodCallStack(label);
-         methodCallStack.put(root, ImmutableSLList.<Node>nil().append(initialStack));
+         methodCallStack.put(root, KeYCollections.<Node>nil().append(initialStack));
       }
    }
 
@@ -702,7 +702,7 @@ public class SymbolicExecutionTreeBuilder {
       /**
        * Contains all {@link Node}s which are closed after a join.
        */
-      private ImmutableList<Node> joinNodes = ImmutableSLList.<Node>nil();
+      private ImmutableList<Node> joinNodes = KeYCollections.<Node>nil();
 
       /**
        * Constructor.
@@ -1049,7 +1049,7 @@ public class SymbolicExecutionTreeBuilder {
             }
          }
          else {
-            stack = ImmutableSLList.nil();
+            stack = KeYCollections.nil();
          }
          // Add new node to call stack.
          stack = stack.prepend(node);
@@ -1178,10 +1178,10 @@ public class SymbolicExecutionTreeBuilder {
                afterBlockMap = new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>(afterBlockMap);
             }
             afterBlockMaps.put(node, afterBlockMap);
-            JavaPair secondPair = new JavaPair(stackSize, ImmutableSLList.<SourceElement>nil().append(sourceElements));
+            JavaPair secondPair = new JavaPair(stackSize, KeYCollections.<SourceElement>nil().append(sourceElements));
             ImmutableList<IExecutionNode<?>> blockStartList = afterBlockMap.get(secondPair);
             if (blockStartList == null) {
-               blockStartList = ImmutableSLList.nil();
+               blockStartList = KeYCollections.nil();
             }
             blockStartList = blockStartList.append(blockStartNode);
             afterBlockMap.put(secondPair, blockStartList);
@@ -1249,7 +1249,7 @@ public class SymbolicExecutionTreeBuilder {
             SourceElement currentActiveStatement = NodeInfo.computeActiveStatement(ruleApp);
             JavaBlock currentJavaBlock = ruleApp.posInOccurrence().subTerm().javaBlock();
             MethodFrame currentInnerMostMethodFrame = JavaTools.getInnermostMethodFrame(currentJavaBlock, proof.getServices());
-            return !isAfterBlockReached(currentStackSize, currentInnerMostMethodFrame, currentActiveStatement, expectedStackSize, ImmutableSLList.<SourceElement>nil().append(expectedSourceElements).iterator());
+            return !isAfterBlockReached(currentStackSize, currentInnerMostMethodFrame, currentActiveStatement, expectedStackSize, KeYCollections.<SourceElement>nil().append(expectedSourceElements).iterator());
          }
          else {
             return true; // No single SE node reached, so allow blocks
@@ -1517,7 +1517,7 @@ public class SymbolicExecutionTreeBuilder {
       Map<Node, ImmutableList<Node>> currentMethodCallStackMap = getMethodCallStack(currentNode.getAppliedRuleApp());
       Map<Node, ImmutableList<Node>> newMethodCallStackMap = getMethodCallStack(label.getId());
       ImmutableList<Node> currentMethodCallStack = findMethodCallStack(currentMethodCallStackMap, currentNode);
-      ImmutableList<Node> newMethodCallStack = ImmutableSLList.nil();
+      ImmutableList<Node> newMethodCallStack = KeYCollections.nil();
       Set<Node> currentIgnoreSet = getMethodReturnsToIgnore(label.getId());
       assert newMethodCallStack.isEmpty() : "Method call stack is not empty.";
       Iterator<Node> currentIter = currentMethodCallStack.iterator();

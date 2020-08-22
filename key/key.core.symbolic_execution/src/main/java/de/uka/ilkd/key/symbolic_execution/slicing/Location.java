@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Services;
@@ -36,7 +36,7 @@ public class Location {
     */
    public Location(Access... accesses) {
       assert accesses != null;
-      this.accesses = ImmutableSLList.<Access>nil().append(accesses);
+      this.accesses = KeYCollections.<Access>nil().append(accesses);
    }
 
    /**

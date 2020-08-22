@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.proof;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import org.key_project.util.collection.KeYCollections;
 
 public class BuiltInRuleAppIndex {
 
@@ -51,7 +51,7 @@ public class BuiltInRuleAppIndex {
     public ImmutableList<IBuiltInRuleApp> getBuiltInRule(Goal            goal, 
 						         PosInOccurrence pos) {
 
-	ImmutableList<IBuiltInRuleApp> result = ImmutableSLList.<IBuiltInRuleApp>nil();
+	ImmutableList<IBuiltInRuleApp> result = KeYCollections.<IBuiltInRuleApp>nil();
 
         ImmutableList<BuiltInRule> rules = index.rules();
         while (!rules.isEmpty()) {
@@ -126,7 +126,7 @@ public class BuiltInRuleAppIndex {
                                           SequentFormula cfma, 
                                           NewRuleListener listener ) {
         final PosInOccurrence pos = new PosInOccurrence( cfma, PosInTerm.getTopLevel(), antec );
-        ImmutableList<BuiltInRule> subrules = ImmutableSLList.nil();
+        ImmutableList<BuiltInRule> subrules = KeYCollections.nil();
         while (!rules.isEmpty()) {
             final BuiltInRule rule = rules.head();
             rules = rules.tail();

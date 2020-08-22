@@ -20,7 +20,6 @@ import java.util.Map;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -61,6 +60,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * This class creates the <code>&lt;createArray&gt;</code> method for array
@@ -142,7 +142,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *         field declaration of the given list
      */
     protected ImmutableList<Field> filterField(ImmutableArray<MemberDeclaration> list) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = KeYCollections.<Field>nil();
         for (int i = list.size() - 1; i >= 0; i--) {
             MemberDeclaration pe = list.get(i);
             if (pe instanceof FieldDeclaration) {
@@ -162,7 +162,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *         field declaration of the given list
      */
     protected final ImmutableList<Field> filterField(FieldDeclaration field) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = KeYCollections.<Field>nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
             result = result.prepend(spec.get(i));
@@ -179,7 +179,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @return a list with all implicit fields found in 'list'
      */
     protected ImmutableList<Field> filterImplicitFields(ImmutableList<Field> list) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = KeYCollections.<Field>nil();
         for (Field aList : list) {
             Field field = aList;
             if (field instanceof ImplicitFieldSpecification) {

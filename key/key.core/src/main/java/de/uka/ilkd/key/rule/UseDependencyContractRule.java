@@ -18,10 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -105,7 +102,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
 
     private ImmutableSet<Term> addEqualDefs(ImmutableSet<Term> terms, Goal g) {
-	ImmutableList<Term> result = ImmutableSLList.nil();
+	ImmutableList<Term> result = KeYCollections.nil();
 
 	for(SequentFormula cf : g.sequent().antecedent()) {
 	    final Term formula = cf.formula();
@@ -206,7 +203,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	if(heapTerm.equals(stepHeap)) {
 	    return new Pair<Term,ImmutableList<PosInOccurrence>>(
 		    		TB.empty(),
-		    		ImmutableSLList.<PosInOccurrence>nil());
+		    		KeYCollections.<PosInOccurrence>nil());
 	} else if(op == heapLDT.getStore()) {
 	    final Term h = heapTerm.sub(0);
 	    final Term o = heapTerm.sub(1);
@@ -462,7 +459,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             selfTerm = focus.sub(target.getHeapCount(services)*target.getStateCount());
         }
 
-        ImmutableList<Term> paramTerms = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> paramTerms = KeYCollections.<Term>nil();
         for(int i = target.getHeapCount(services)*target.getStateCount() + (target.isStatic() ? 0 : 1); i < focus.arity(); i++) {
             paramTerms = paramTerms.append(focus.sub(i));
         }
@@ -502,7 +499,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Term[] subs = focus.subs().toArray(new Term[focus.arity()]);
         int heapExprIndex = 0;
         boolean useful = false;
-        ImmutableList<PosInOccurrence> ifInsts = ImmutableSLList.<PosInOccurrence>nil();
+        ImmutableList<PosInOccurrence> ifInsts = KeYCollections.<PosInOccurrence>nil();
         int hc = 0;
         for(LocationVariable heap : heaps) {
           if(hc >= obsHeapCount) {

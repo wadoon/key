@@ -72,6 +72,7 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * JDialog for selecting a subset of candidate goals as partners for a {@link MergeRule}
@@ -439,7 +440,7 @@ public class MergePartnerSelectionDialog extends JDialog {
      */
     public ImmutableList<MergePartner> getChosenCandidates() {
         ImmutableSLList<MergePartner> result =
-                ImmutableSLList.nil();
+                KeYCollections.nil();
 
         if (chosenGoals != null) {
             return result.append(chosenGoals);
@@ -587,7 +588,7 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @return An ImmutableList consisting of the elements in it.
      */
     private <T> ImmutableList<T> immutableListFromIterabe(Iterable<T> it) {
-        ImmutableList<T> result = ImmutableSLList.nil();
+        ImmutableList<T> result = KeYCollections.nil();
         for (T t : it) {
             result = result.prepend(t);
         }

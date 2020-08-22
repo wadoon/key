@@ -67,6 +67,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -297,7 +298,7 @@ public class QueryExpand implements BuiltInRule {
     	path.setSize(depth);
     	final ImmutableSLList<QuantifiableVariable> instVars;
     	if(allowExpandBelowInstQuantifier){
-    		instVars = ImmutableSLList.nil();
+    		instVars = KeYCollections.nil();
     	}else{
     		instVars = null;
     	}

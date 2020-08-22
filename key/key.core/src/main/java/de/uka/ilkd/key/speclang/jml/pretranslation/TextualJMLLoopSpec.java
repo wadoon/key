@@ -18,11 +18,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.PositionedString;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -38,7 +38,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         assignables = new LinkedHashMap<String, ImmutableList<PositionedString>>();
     
     private ImmutableList<PositionedString>
-        infFlowSpecs = ImmutableSLList.<PositionedString>nil();
+        infFlowSpecs = KeYCollections.<PositionedString>nil();
 
     private Map<String, ImmutableList<PositionedString>>
         invariants = new LinkedHashMap<String, ImmutableList<PositionedString>>();
@@ -50,9 +50,9 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     public TextualJMLLoopSpec(ImmutableList<String> mods) {
         super(mods);
         for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
-          assignables.put(heap.toString(), ImmutableSLList.<PositionedString>nil());
-          invariants.put(heap.toString(), ImmutableSLList.<PositionedString>nil());
-          freeInvariants.put(heap.toString(), ImmutableSLList.<PositionedString>nil());
+          assignables.put(heap.toString(), KeYCollections.<PositionedString>nil());
+          invariants.put(heap.toString(), KeYCollections.<PositionedString>nil());
+          freeInvariants.put(heap.toString(), KeYCollections.<PositionedString>nil());
         }
     }
 

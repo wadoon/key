@@ -16,12 +16,12 @@ package de.uka.ilkd.key.logic;
 import junit.framework.TestCase;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
+import org.key_project.util.collection.KeYCollections;
 
 public class TestSemisequent extends TestCase {
     
@@ -229,7 +229,7 @@ public class TestSemisequent extends TestCase {
 
 	Semisequent expected = extract(extract(extract(origin.insertLast(con[4])).insertLast(con[5])).
 				       insertLast(con[6]));
-	ImmutableList<SequentFormula> insertionList = ImmutableSLList.<SequentFormula>nil().
+	ImmutableList<SequentFormula> insertionList = KeYCollections.<SequentFormula>nil().
 		    prepend(con[0]).prepend(con[1]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
 	Semisequent result = extract(origin.insert(origin.size(), insertionList));
 	assertEquals("Both semisequents should be equal.", expected, result);
@@ -241,7 +241,7 @@ public class TestSemisequent extends TestCase {
 				     insertLast(con[1])).insertLast(con[2]));
  	Semisequent expected = extract(extract(extract(origin.insert(2, con[4])).insert(3, con[5])).insert(4, con[6]));
 	ImmutableList<SequentFormula> insertionList = 
-	    ImmutableSLList.<SequentFormula>nil().prepend(con[0]).prepend(con[1]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
+	    KeYCollections.<SequentFormula>nil().prepend(con[0]).prepend(con[1]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
 	Semisequent result = extract(origin.insert(origin.size()-1, insertionList));
 	assertEquals("Both semisequents should be equal.", expected, result);
 	
@@ -256,16 +256,16 @@ public class TestSemisequent extends TestCase {
 	  extract(extract(extract(extract(origin.remove(2)).insertLast(con[4])).
 			  insertLast(con[5])).insertLast(con[6]));
 	// insert: [a,b,c,q,p]
-	ImmutableList<SequentFormula> insertionList = ImmutableSLList.<SequentFormula>nil().
+	ImmutableList<SequentFormula> insertionList = KeYCollections.<SequentFormula>nil().
 	  prepend(con[0]).prepend(con[1]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
 
 	SemisequentChangeInfo result = origin.replace(origin.size()-1, insertionList);
 
 	assertEquals("SemisequentChangeInfo is corrupt due to wrong added formula list:",
-		     ImmutableSLList.<SequentFormula>nil().prepend(con[4]).
+		     KeYCollections.<SequentFormula>nil().prepend(con[4]).
 		     prepend(con[5]).prepend(con[6]), result.addedFormulas());
 	assertEquals("SemisequentChangeInfo is corrupt due to wrong removed formula list:",
-		     ImmutableSLList.<SequentFormula>nil().prepend(con[2]),
+		     KeYCollections.<SequentFormula>nil().prepend(con[2]),
 		     result.removedFormulas());
 	assertEquals("Both semisequents should be equal.", expected, extract(result));
 	
@@ -280,15 +280,15 @@ public class TestSemisequent extends TestCase {
 				       (extract(extract(origin.insertLast(con[4])).
 						insertLast(con[5])).insertLast(con[6])).insertLast(con[2]));
 	// insert:[a,b,c,r,r,q,p]
- 	ImmutableList<SequentFormula> insertionList = ImmutableSLList.<SequentFormula>nil().
+ 	ImmutableList<SequentFormula> insertionList = KeYCollections.<SequentFormula>nil().
  	    prepend(con[0]).prepend(con[1]).prepend(con[2]).prepend(con[3]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
 	
 	SemisequentChangeInfo sci = origin.replace(origin.size(), insertionList);
 	assertEquals("SemisequentChangeInfo is corrupt due to wrong added formula list:",
-		     ImmutableSLList.<SequentFormula>nil().prepend(con[4]).prepend(con[5]).
+		     KeYCollections.<SequentFormula>nil().prepend(con[4]).prepend(con[5]).
 		     prepend(con[6]).prepend(con[3]), sci.addedFormulas());
 	assertEquals("SemisequentChangeInfo is corrupt due to wrong removed formula list:",
-		     ImmutableSLList.<SequentFormula>nil(), sci.removedFormulas());
+		     KeYCollections.<SequentFormula>nil(), sci.removedFormulas());
  	assertEquals("Both semisequents should be equal.", expected, extract(sci));	
     }
 

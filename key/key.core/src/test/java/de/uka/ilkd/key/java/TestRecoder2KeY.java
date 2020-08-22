@@ -21,7 +21,6 @@ import java.io.Reader;
 import junit.framework.TestCase;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.TacletForTests;
+import org.key_project.util.collection.KeYCollections;
 
 public class TestRecoder2KeY extends TestCase {
 	
@@ -134,7 +134,7 @@ public class TestRecoder2KeY extends TestCase {
     public void testReadBlockWithContext() {
 	ProgramVariable pv = new LocationVariable
 	    (new ProgramElementName("i"), TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT));
-	ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil().prepend(pv);		
+	ImmutableList<ProgramVariable> list = KeYCollections.<ProgramVariable>nil().prepend(pv);
 	JavaBlock block = c2k.readBlock("{ i = 2; }", c2k.createContext(list));
 	ProgramVariable prgVarCmp = (ProgramVariable)	    
 	    ((Operator)((StatementBlock)block.program()).

@@ -21,7 +21,6 @@ import junit.framework.TestCase;
 
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
@@ -36,6 +35,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.key_project.util.collection.KeYCollections;
 
 
 public class TestTermTacletAppIndex extends TestCase{   
@@ -174,7 +174,7 @@ public class TestTermTacletAppIndex extends TestCase{
 
     private void checkTermIndex(PosInOccurrence pio,
                                 TermTacletAppIndex termIdx) {
-        ImmutableList<Taclet> listA = ImmutableSLList.<Taclet>nil();
+        ImmutableList<Taclet> listA = KeYCollections.<Taclet>nil();
         ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
         ImmutableList<Taclet> listC = listA.prepend(remove_zero.taclet());
         
@@ -188,7 +188,7 @@ public class TestTermTacletAppIndex extends TestCase{
 
     private void checkTermIndex2(PosInOccurrence pio,
 				 TermTacletAppIndex termIdx) {
-	ImmutableList<Taclet> listA = ImmutableSLList.<Taclet>nil();
+	ImmutableList<Taclet> listA = KeYCollections.<Taclet>nil();
 	ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
 	ImmutableList<Taclet> listC = listA.prepend(remove_zero.taclet());
 
@@ -201,7 +201,7 @@ public class TestTermTacletAppIndex extends TestCase{
 
     private void checkTermIndex3(PosInOccurrence pio,
 				 TermTacletAppIndex termIdx) {
-	ImmutableList<Taclet> listA = ImmutableSLList.<Taclet>nil();
+	ImmutableList<Taclet> listA = KeYCollections.<Taclet>nil();
 	ImmutableList<Taclet> listB = listA.prepend(remove_f.taclet());
 	ImmutableList<Taclet> listC = listA.prepend(remove_zero.taclet());
 	ImmutableList<Taclet> listD = listB.prepend(remove_ff.taclet());

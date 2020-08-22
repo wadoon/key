@@ -14,13 +14,13 @@
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Default implementation of {@link ISymbolicLayout}.
@@ -40,7 +40,7 @@ public class SymbolicLayout extends AbstractElement implements ISymbolicLayout {
    /**
     * The contained {@link ISymbolicObject}s.
     */
-   private ImmutableList<ISymbolicObject> objects = ImmutableSLList.nil();
+   private ImmutableList<ISymbolicObject> objects = KeYCollections.nil();
 
    /**
     * Constructor.

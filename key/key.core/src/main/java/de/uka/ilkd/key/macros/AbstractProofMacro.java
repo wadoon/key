@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.macros;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.settings.ProofSettings;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Takes care of providing the whole ProofMacro interface by only making it
@@ -41,7 +41,7 @@ public abstract class AbstractProofMacro implements ProofMacro {
     private static ImmutableList<Goal> getGoals(Node node) {
         if (node == null) {
             // can happen during initialisation
-            return ImmutableSLList.<Goal>nil();
+            return KeYCollections.<Goal>nil();
         } else {
             return node.proof().getSubtreeEnabledGoals(node);
         }

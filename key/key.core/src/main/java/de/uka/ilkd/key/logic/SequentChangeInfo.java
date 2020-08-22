@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.logic;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Records the changes made to a sequent. Keeps track of added and removed
@@ -160,9 +160,9 @@ public class SequentChangeInfo {
    */
   public ImmutableList<SequentFormula> addedFormulas(boolean antec) {
     return antec ? (antecedent != null ? antecedent.addedFormulas()
-		    : ImmutableSLList.<SequentFormula>nil()) :
+		    : KeYCollections.<SequentFormula>nil()) :
       (succedent != null ? succedent.addedFormulas() : 
-       ImmutableSLList.<SequentFormula>nil());
+       KeYCollections.<SequentFormula>nil());
   }
 
   /** 
@@ -189,9 +189,9 @@ public class SequentChangeInfo {
    */
   public ImmutableList<SequentFormula> removedFormulas(boolean antec) {
     return antec ? (antecedent != null ? antecedent.removedFormulas()
-		    : ImmutableSLList.<SequentFormula>nil()) :
+		    : KeYCollections.<SequentFormula>nil()) :
       (succedent != null ? succedent.removedFormulas() : 
-       ImmutableSLList.<SequentFormula>nil());
+       KeYCollections.<SequentFormula>nil());
   }
 
   /** 
@@ -218,9 +218,9 @@ public class SequentChangeInfo {
    */
   public ImmutableList<FormulaChangeInfo> modifiedFormulas(boolean antec) {
       return antec ? (antecedent != null ? antecedent.modifiedFormulas()
-		      : ImmutableSLList.<FormulaChangeInfo>nil()) :
+		      : KeYCollections.<FormulaChangeInfo>nil()) :
 	  (succedent != null ? succedent.modifiedFormulas() : 
-	   ImmutableSLList.<FormulaChangeInfo>nil());
+	   KeYCollections.<FormulaChangeInfo>nil());
   }
 
   /** 
@@ -244,9 +244,9 @@ public class SequentChangeInfo {
    */
   public ImmutableList<SequentFormula> rejectedFormulas(boolean antec) {
       return antec ? (antecedent != null ? antecedent.rejectedFormulas()
-                      : ImmutableSLList.<SequentFormula>nil()) :
+                      : KeYCollections.<SequentFormula>nil()) :
           (succedent != null ? succedent.rejectedFormulas() : 
-           ImmutableSLList.<SequentFormula>nil());
+           KeYCollections.<SequentFormula>nil());
   }
 
   /** 

@@ -23,7 +23,6 @@ import javax.swing.SwingUtilities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -56,6 +55,7 @@ import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -92,14 +92,14 @@ public class Proof implements Named {
     private List<ProofTreeListener> listenerList = new LinkedList<ProofTreeListener>();
 
     /** list with the open goals of the proof */
-    private ImmutableList<Goal> openGoals = ImmutableSLList.<Goal>nil();
+    private ImmutableList<Goal> openGoals = KeYCollections.<Goal>nil();
 
     /**
      * list with the closed goals of the proof, needed to make pruning in closed branches
      * possible. If the list needs too much memory, pruning can be disabled via the
      * command line option "--no-pruning-closed". In this case the list will not be filled.
      */
-    private ImmutableList<Goal> closedGoals = ImmutableSLList.<Goal>nil();
+    private ImmutableList<Goal> closedGoals = KeYCollections.<Goal>nil();
 
     /** declarations &c, read from a problem file or otherwise */
     private String problemHeader = "";
@@ -486,7 +486,7 @@ public class Proof implements Named {
      * @author mulbrich
      */
     private ImmutableList<Goal> filterEnabledGoals(ImmutableList<Goal> goals) {
-        ImmutableList<Goal> enabledGoals = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> enabledGoals = KeYCollections.<Goal>nil();
         for(Goal g : goals) {
             if(g.isAutomatic() && !g.isLinked()) {
                 enabledGoals = enabledGoals.prepend(g);
@@ -542,7 +542,7 @@ public class Proof implements Named {
         if (b) {
             // For the moment it is necessary to fire the message ALWAYS
             // in order to detect branch closing.
-            fireProofGoalsAdded(ImmutableSLList.<Goal>nil());
+            fireProofGoalsAdded(KeYCollections.<Goal>nil());
         }
     }
 
@@ -765,7 +765,7 @@ public class Proof implements Named {
         }
 
         private void removeOpenGoals(Collection<Node> toBeRemoved) {
-            ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
+            ImmutableList<Goal> newGoalList = KeYCollections.nil();
             for(Goal openGoal : openGoals){
                 if(!toBeRemoved.contains(openGoal.node())){
                     newGoalList = newGoalList.append(openGoal);
@@ -782,7 +782,7 @@ public class Proof implements Named {
          * @param toBeRemoved the goals to remove
          */
         private void removeClosedGoals(Collection<Node> toBeRemoved) {
-            ImmutableList<Goal> newGoalList = ImmutableSLList.nil();
+            ImmutableList<Goal> newGoalList = KeYCollections.nil();
             for(Goal closedGoal : closedGoals) {
                 if(!toBeRemoved.contains(closedGoal.node())) {
                     newGoalList = newGoalList.prepend(closedGoal);
@@ -792,7 +792,7 @@ public class Proof implements Named {
         }
 
         private ImmutableList<Node> cut(Node node) {
-            ImmutableList<Node> children = ImmutableSLList.nil();
+            ImmutableList<Node> children = KeYCollections.nil();
             Iterator<Node> it = node.childrenIterator();
 
             while(it.hasNext()) {
@@ -966,7 +966,7 @@ public class Proof implements Named {
      * goals
      */
     protected void fireProofGoalsAdded(Goal goal) {
-        fireProofGoalsAdded(ImmutableSLList.<Goal>nil().prepend(goal));
+        fireProofGoalsAdded(KeYCollections.<Goal>nil().prepend(goal));
     }
 
 
@@ -1094,7 +1094,7 @@ public class Proof implements Named {
      */
 
     public ImmutableList<Goal> getSubtreeGoals(Node node) {
-        ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> result = KeYCollections.<Goal>nil();
         List<Node> leaves = node.getLeaves();
         for (final Goal goal : openGoals) {
             //if list contains node, remove it to make the list faster later
@@ -1111,7 +1111,7 @@ public class Proof implements Named {
      * @return the closed goals in the subtree
      */
     public ImmutableList<Goal> getClosedSubtreeGoals(Node node) {
-        ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> result = KeYCollections.<Goal>nil();
         List<Node> leaves = node.getLeaves();
         for (final Goal goal : closedGoals) {
             //if list contains node, remove it to make the list faster later

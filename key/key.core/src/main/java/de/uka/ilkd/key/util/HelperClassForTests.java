@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
@@ -68,7 +68,7 @@ public class HelperClassForTests {
       public RuleCollection getStandardRules() {
                 return new RuleCollection(
                                 RuleSourceFactory.fromDefaultLocation(ldtFile), 
-                                ImmutableSLList.<BuiltInRule>nil());
+                                KeYCollections.<BuiltInRule>nil());
             }
         };
     

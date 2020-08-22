@@ -16,7 +16,6 @@ package de.uka.ilkd.key.logic;
 import junit.framework.TestCase;
 
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -30,10 +29,10 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
+import org.key_project.util.collection.KeYCollections;
 
 
-
-public class TestTerm extends TestCase { 
+public class TestTerm extends TestCase {
 
     private TermBuilder tb;
     private TermFactory tf;
@@ -121,7 +120,7 @@ public class TestTerm extends TestCase {
 	Term t_allxt1=tb.all(x, t2());
 	Term t_allxt1_andt2=tf.createTerm(Junctor.AND,t_allxt1,t1());
 	Term t_exw_allxt1_andt2 =
-                tb.ex(ImmutableSLList.<QuantifiableVariable>nil().append(w, x),
+                tb.ex(KeYCollections.<QuantifiableVariable>nil().append(w, x),
                      t_allxt1_andt2);
 	assertTrue(!t_exw_allxt1_andt2.freeVars().contains(w)
 		   && !t_exw_allxt1_andt2.freeVars().contains(x));

@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -27,6 +26,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStart;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * The default implementation of {@link IExecutionStart}.
@@ -36,7 +36,7 @@ public class ExecutionStart extends AbstractExecutionNode<SourceElement> impleme
    /**
     * The up to know discovered {@link IExecutionTermination}s.
     */
-   private ImmutableList<IExecutionTermination> terminations = ImmutableSLList.nil();
+   private ImmutableList<IExecutionTermination> terminations = KeYCollections.nil();
    
    /**
     * Constructor.

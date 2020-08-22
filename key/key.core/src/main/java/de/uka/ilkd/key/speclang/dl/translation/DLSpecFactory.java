@@ -17,7 +17,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -44,6 +43,7 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -164,7 +164,7 @@ public final class DLSpecFactory {
 	    			UseOperationContractRule.Instantiation inst) 
 	    	throws ProofInputException {
 	ImmutableList<ProgramVariable> result 
-		= ImmutableSLList.<ProgramVariable> nil();	
+		= KeYCollections.<ProgramVariable> nil();
 	for(Term param : inst.actualParams) {
 	    if(param.op() instanceof ProgramVariable) {
 		result = result.append((ProgramVariable) param.op());

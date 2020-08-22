@@ -24,7 +24,6 @@ import junit.framework.TestCase;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -61,6 +60,7 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring.RefactoringScope;
 import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Tests {@link TermLabelManager}
@@ -614,32 +614,32 @@ public class TestTermLabelManager extends TestCase {
          Profile profile = new JavaProfile() {
             @Override
             protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
-               ImmutableList<TermLabelPolicy> applicationTermPolicies = ImmutableSLList.nil();
+               ImmutableList<TermLabelPolicy> applicationTermPolicies = KeYCollections.nil();
                if (applicationTermPolicy != null) {
                   applicationTermPolicies = applicationTermPolicies.prepend(applicationTermPolicy);
                }
-               ImmutableList<TermLabelPolicy> modalityTermPolicies = ImmutableSLList.nil();
+               ImmutableList<TermLabelPolicy> modalityTermPolicies = KeYCollections.nil();
                if (modalityTermPolicy != null) {
                   modalityTermPolicies = modalityTermPolicies.prepend(modalityTermPolicy);
                }
-               ImmutableList<ChildTermLabelPolicy> directChildTermLabelPolicies = ImmutableSLList.nil();
+               ImmutableList<ChildTermLabelPolicy> directChildTermLabelPolicies = KeYCollections.nil();
                if (directChildPolicy != null) {
                   directChildTermLabelPolicies = directChildTermLabelPolicies.prepend(directChildPolicy);
                }
-               ImmutableList<ChildTermLabelPolicy> childAndGrandchildTermLabelPolicies = ImmutableSLList.nil();
+               ImmutableList<ChildTermLabelPolicy> childAndGrandchildTermLabelPolicies = KeYCollections.nil();
                if (childAndGrandchildPolicy != null) {
                   childAndGrandchildTermLabelPolicies = childAndGrandchildTermLabelPolicies.prepend(childAndGrandchildPolicy);
                }
-               ImmutableList<TermLabelUpdate> termLabelUpdates = ImmutableSLList.nil();
+               ImmutableList<TermLabelUpdate> termLabelUpdates = KeYCollections.nil();
                if (update != null) {
                   termLabelUpdates = termLabelUpdates.prepend(update);
                }
-               ImmutableList<TermLabelRefactoring> termLabelRefactorings = ImmutableSLList.nil();
+               ImmutableList<TermLabelRefactoring> termLabelRefactorings = KeYCollections.nil();
                if (refactoring != null) {
                   termLabelRefactorings = termLabelRefactorings.prepend(refactoring);
                }
 
-               ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
+               ImmutableList<TermLabelConfiguration> result = KeYCollections.nil();
                result = result.prepend(new TermLabelConfiguration(new Name("ONE"), new LoggingFactory(new Name("ONE")), applicationTermPolicies, modalityTermPolicies, directChildTermLabelPolicies, childAndGrandchildTermLabelPolicies, termLabelUpdates, termLabelRefactorings, null));
                result = result.prepend(new TermLabelConfiguration(new Name("TWO"), new LoggingFactory(new Name("TWO")), applicationTermPolicies, modalityTermPolicies, directChildTermLabelPolicies, childAndGrandchildTermLabelPolicies, termLabelUpdates, termLabelRefactorings, null));
                result = result.prepend(new TermLabelConfiguration(new Name("THREE"), new LoggingFactory(new Name("THREE")), applicationTermPolicies, modalityTermPolicies, directChildTermLabelPolicies, childAndGrandchildTermLabelPolicies, termLabelUpdates, termLabelRefactorings, null));
@@ -660,7 +660,7 @@ public class TestTermLabelManager extends TestCase {
    private static class LoggingTermLabelRefactoring implements TermLabelRefactoring {
       private RefactoringScope scope;
 
-      private ImmutableList<Name> supportedRuleNames = ImmutableSLList.nil();
+      private ImmutableList<Name> supportedRuleNames = KeYCollections.nil();
 
       public LoggingTermLabelRefactoring(RefactoringScope scope, String... supportedRules) {
          this.scope = scope;
@@ -699,7 +699,7 @@ public class TestTermLabelManager extends TestCase {
    private static class LoggingTermLabelUpdate implements TermLabelUpdate {
       private TermLabel toAdd;
 
-      private ImmutableList<Name> supportedRuleNames = ImmutableSLList.nil();
+      private ImmutableList<Name> supportedRuleNames = KeYCollections.nil();
 
       public LoggingTermLabelUpdate(TermLabel toAdd, String... supportedRules) {
          this.toAdd = toAdd;
@@ -722,7 +722,7 @@ public class TestTermLabelManager extends TestCase {
    }
 
    private static class LoggingChildTermLabelPolicy implements ChildTermLabelPolicy {
-      private ImmutableList<Name> supportedRuleNames = ImmutableSLList.nil();
+      private ImmutableList<Name> supportedRuleNames = KeYCollections.nil();
 
       private List<TermLabel> log = new LinkedList<TermLabel>();
 

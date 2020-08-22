@@ -17,8 +17,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -32,6 +30,7 @@ import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -214,6 +213,6 @@ public final class ClassInvariantImpl implements ClassInvariant {
         }
         return new OriginalVariables(self, null, null,
                 new LinkedHashMap<LocationVariable, ProgramVariable>(),
-                ImmutableSLList.<ProgramVariable>nil());
+                KeYCollections.<ProgramVariable>nil());
     }
 }

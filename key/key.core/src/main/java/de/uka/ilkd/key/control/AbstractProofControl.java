@@ -5,10 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.proof.*;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.java.Services;
@@ -98,7 +95,7 @@ public abstract class AbstractProofControl implements ProofControl {
 
    @Override
    public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos) {
-        ImmutableList<BuiltInRule> rules = ImmutableSLList.<BuiltInRule>nil();
+        ImmutableList<BuiltInRule> rules = KeYCollections.<BuiltInRule>nil();
 
         for (RuleApp ruleApp : focusedGoal.ruleAppIndex().getBuiltInRules(focusedGoal, pos)) {
             BuiltInRule r = (BuiltInRule) ruleApp.rule();
@@ -128,7 +125,7 @@ public abstract class AbstractProofControl implements ProofControl {
                             pos,
                             focusedGoal.proof().getServices()), pos);
         }
-        return ImmutableSLList.<TacletApp>nil();
+        return KeYCollections.<TacletApp>nil();
     }
 
     @Override
@@ -140,7 +137,7 @@ public abstract class AbstractProofControl implements ProofControl {
                             focusedGoal.proof().getServices()), pos);
         }
 
-        return ImmutableSLList.<TacletApp>nil();
+        return KeYCollections.<TacletApp>nil();
     }
 
     /**
@@ -149,7 +146,7 @@ public abstract class AbstractProofControl implements ProofControl {
      */
     private ImmutableList<TacletApp> filterTaclet(Goal focusedGoal, ImmutableList<NoPosTacletApp> tacletInstances, PosInOccurrence pos) {
         java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<Taclet>();
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> result = KeYCollections.<TacletApp>nil();
         for (NoPosTacletApp app : tacletInstances) {
             if (isMinimizeInteraction()) {
                 ImmutableList<TacletApp> ifCandidates
@@ -319,7 +316,7 @@ public abstract class AbstractProofControl implements ProofControl {
             TacletFilter filter) {
         Services services = goal.proof().getServices();
         ImmutableSet<TacletApp> result = DefaultImmutableSet.<TacletApp>nil();
-        ImmutableList<TacletApp> fittingApps = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> fittingApps = KeYCollections.<TacletApp>nil();
         final RuleAppIndex index = goal.ruleAppIndex();
 
         if (pos == null) {
@@ -456,7 +453,7 @@ public abstract class AbstractProofControl implements ProofControl {
      */
     protected ImmutableSet<IBuiltInRuleApp> getBuiltInRuleAppsForName(Goal focusedGoal, String name, PosInOccurrence pos) {
         ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
-        ImmutableList<BuiltInRule> match = ImmutableSLList.<BuiltInRule>nil();
+        ImmutableList<BuiltInRule> match = KeYCollections.<BuiltInRule>nil();
 
         //get all possible rules for current position in sequent
         ImmutableList<BuiltInRule> list = getBuiltInRule(focusedGoal, pos);
@@ -635,7 +632,7 @@ public abstract class AbstractProofControl implements ProofControl {
             goal.setRuleAppManager(focusManager);
         }
 
-        startAutoMode(goal.proof(), ImmutableSLList.<Goal>nil().prepend(goal), new FocussedAutoModeTaskListener(goal.proof()));
+        startAutoMode(goal.proof(), KeYCollections.<Goal>nil().prepend(goal), new FocussedAutoModeTaskListener(goal.proof()));
     }
 
     /**

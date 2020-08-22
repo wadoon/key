@@ -25,7 +25,6 @@ import java.util.Properties;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -51,6 +50,7 @@ import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
 import de.uka.ilkd.key.rule.metaconstruct.PostWork;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * <p>
@@ -177,7 +177,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             result[1] = new StatementBlock(call);
         }
        assert result[1] != null : "null body in method";
-       return ImmutableSLList.<StatementBlock>nil().prepend(result);
+       return KeYCollections.<StatementBlock>nil().prepend(result);
     }
 
     /**

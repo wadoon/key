@@ -16,10 +16,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -147,7 +144,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
         ImmutableList<ProgramVariable> replaceVars =
-                ImmutableSLList.<ProgramVariable>nil();
+                KeYCollections.<ProgramVariable>nil();
         replaceVars = replaceVars.append(
                 services.getTypeConverter().getHeapLDT().getHeap());
         if (!isStatic) {

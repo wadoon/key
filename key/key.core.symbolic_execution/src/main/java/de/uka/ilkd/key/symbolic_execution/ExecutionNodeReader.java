@@ -31,7 +31,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.xml.sax.Attributes;
@@ -1226,7 +1226,7 @@ public class ExecutionNodeReader {
       /**
        * The completed blocks.
        */
-      private ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = ImmutableSLList.nil();
+      private ImmutableList<IExecutionBlockStartNode<?>> completedBlocks = KeYCollections.nil();
 
       /**
        * The formated conditions under which a block is completed.
@@ -1236,12 +1236,12 @@ public class ExecutionNodeReader {
       /**
        * The contained outgoing links.
        */
-      private ImmutableList<IExecutionLink> outgoingLinks = ImmutableSLList.<IExecutionLink>nil();
+      private ImmutableList<IExecutionLink> outgoingLinks = KeYCollections.<IExecutionLink>nil();
 
       /**
        * The contained incoming links.
        */
-      private ImmutableList<IExecutionLink> incomingLinks = ImmutableSLList.<IExecutionLink>nil();
+      private ImmutableList<IExecutionLink> incomingLinks = KeYCollections.<IExecutionLink>nil();
       
       /**
        * Constructor.
@@ -1524,7 +1524,7 @@ public class ExecutionNodeReader {
       /**
        * The block completions.
        */
-      private ImmutableList<IExecutionNode<?>> blockCompletions = ImmutableSLList.nil();
+      private ImmutableList<IExecutionNode<?>> blockCompletions = KeYCollections.nil();
       
       /**
        * Is a block opened?
@@ -1697,7 +1697,7 @@ public class ExecutionNodeReader {
       /**
        * The up to now discovered {@link IExecutionTermination}s.
        */
-      private ImmutableList<IExecutionTermination> terminations = ImmutableSLList.nil();
+      private ImmutableList<IExecutionTermination> terminations = KeYCollections.nil();
       
       /**
        * Constructor.
@@ -1939,7 +1939,7 @@ public class ExecutionNodeReader {
       /**
        * The up to now discovered {@link IExecutionBaseMethodReturn<?>}s.
        */
-      private ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = ImmutableSLList.nil();
+      private ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = KeYCollections.nil();
       
       /**
        * Constructor.

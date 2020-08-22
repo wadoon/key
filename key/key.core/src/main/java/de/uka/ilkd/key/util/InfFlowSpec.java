@@ -3,9 +3,9 @@ package de.uka.ilkd.key.util;
 import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.Term;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -38,14 +38,14 @@ public class InfFlowSpec {
      */
     public InfFlowSpec map(UnaryOperator<Term> op) {
         return new InfFlowSpec(
-                preExpressions.stream().map(op).collect(ImmutableList.collector()),
-                postExpressions.stream().map(op).collect(ImmutableList.collector()),
-                newObjects.stream().map(op).collect(ImmutableList.collector()));
+                preExpressions.stream().map(op).collect(KeYCollections.collector()),
+                postExpressions.stream().map(op).collect(KeYCollections.collector()),
+                newObjects.stream().map(op).collect(KeYCollections.collector()));
     }
 
     private InfFlowSpec() {
-        this.preExpressions = ImmutableSLList.<Term>nil();
-        this.postExpressions = ImmutableSLList.<Term>nil();
-        this.newObjects = ImmutableSLList.<Term>nil();
+        this.preExpressions = KeYCollections.<Term>nil();
+        this.postExpressions = KeYCollections.<Term>nil();
+        this.newObjects = KeYCollections.<Term>nil();
     }
 }

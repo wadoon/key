@@ -37,7 +37,6 @@ import javax.swing.tree.TreePath;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
@@ -73,6 +72,7 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * This UI component visualizes the {@link OriginTermLabel}s of a term and its sub-terms.
@@ -547,7 +547,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
     private ImmutableList<Integer> getPosTablePath(PosInOccurrence pos) {
         if (pos == null) {
-            return ImmutableSLList.<Integer>nil().prepend(0);
+            return KeYCollections.<Integer>nil().prepend(0);
         }
 
         InitialPositionTable posTable = view.posTable;

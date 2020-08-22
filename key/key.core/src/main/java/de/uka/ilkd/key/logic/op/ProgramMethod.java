@@ -18,7 +18,6 @@ import java.io.IOException;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Expression;
@@ -48,6 +47,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * The program method represents a (pure) method in the logic. In case of a
@@ -496,7 +496,7 @@ public final class ProgramMethod extends ObserverFunction
 
     @Override
     public ImmutableList<LocationVariable> collectParameters() {
-        ImmutableList<LocationVariable> paramVars = ImmutableSLList
+        ImmutableList<LocationVariable> paramVars = KeYCollections
                 .<LocationVariable> nil();
         int numParams = getParameterDeclarationCount();
         for (int i = numParams - 1; i >= 0; i--) {

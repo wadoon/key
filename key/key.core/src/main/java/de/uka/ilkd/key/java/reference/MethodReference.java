@@ -16,7 +16,6 @@ package de.uka.ilkd.key.java.reference;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
@@ -36,6 +35,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  *  Method reference.
@@ -269,7 +269,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      */
     public ImmutableList<KeYJavaType> getMethodSignature(Services services,
 						ExecutionContext ec) {
-	ImmutableList<KeYJavaType> signature = ImmutableSLList.<KeYJavaType>nil();
+	ImmutableList<KeYJavaType> signature = KeYCollections.<KeYJavaType>nil();
 	if (arguments != null) {
             final TypeConverter typeConverter = services.getTypeConverter();
 	    for (int i = arguments.size()-1; i>=0; i--) {		

@@ -18,10 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
@@ -64,7 +61,7 @@ public class InitConfig {
     private RuleJustificationInfo justifInfo = new RuleJustificationInfo();
 
 
-    private ImmutableList<Taclet> taclets = ImmutableSLList.<Taclet>nil();
+    private ImmutableList<Taclet> taclets = KeYCollections.<Taclet>nil();
 
     /**
      * maps categories to their default choice (both represented as Strings),
@@ -199,7 +196,7 @@ public class InitConfig {
             c2DC.remove(c.category());
         }
 
-        ImmutableList<Choice> category2DefaultChoiceList = ImmutableSLList.nil();
+        ImmutableList<Choice> category2DefaultChoiceList = KeYCollections.nil();
         for (final String s : c2DC.values()) {
             final Choice c = (Choice) choiceNS().lookup(new Name(s));
             if(c!=null){
@@ -283,7 +280,7 @@ public class InitConfig {
     public ImmutableList<BuiltInRule> builtInRules() {
         Profile profile = getProfile();
         return (profile == null
-        	? ImmutableSLList.<BuiltInRule>nil()
+        	? KeYCollections.<BuiltInRule>nil()
         	: profile.getStandardRules().getStandardBuiltInRules());
     }
     

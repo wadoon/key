@@ -18,9 +18,9 @@ import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.Term;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * A collection of static methods to deal with {@link TermLabel}.
@@ -79,7 +79,7 @@ class TermLabelOperationsInterpreter {
      * @return a list which represents a redundancy free result of merging labels in t1 and t2
      */
     public static ImmutableList<Term> resolveRedundancy(Term t1, Term t2) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = KeYCollections.<Term>nil();
         if (!t2.hasLabels()) {
             return result.prepend(t1);
         } else if (!t1.hasLabels()) {

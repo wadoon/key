@@ -19,10 +19,7 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -50,20 +47,20 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
          * Translation of the taclets stored in <code>taclets</code>.
          * 
          * */
-        private ImmutableList<TacletFormula> translation = ImmutableSLList
+        private ImmutableList<TacletFormula> translation = KeYCollections
                         .nil();
 
         /**
          * Taclets can not be translated because checking the taclet failed.
          */
-        private ImmutableList<TacletFormula> notTranslated = ImmutableSLList
+        private ImmutableList<TacletFormula> notTranslated = KeYCollections
                         .nil();
 
         /**
          * If a instantiation failure occurs the returned information is stored
          * in a String.
          */
-        private ImmutableList<String> instantiationFailures = ImmutableSLList
+        private ImmutableList<String> instantiationFailures = KeYCollections
                         .nil();
 
 
@@ -106,8 +103,8 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
                         return translation;
                 translate = false;
                 usedSorts.clear();
-                notTranslated = ImmutableSLList.nil();
-                translation = ImmutableSLList.nil();
+                notTranslated = KeYCollections.nil();
+                translation = KeYCollections.nil();
 
                 ImmutableSet<Sort> emptySetSort = DefaultImmutableSet.nil();
 

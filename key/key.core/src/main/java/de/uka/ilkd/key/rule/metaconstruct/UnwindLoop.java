@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * This class is used to perform program transformations needed for the symbolic
@@ -90,7 +90,7 @@ public class UnwindLoop extends ProgramTransformer {
     @Override
     public ImmutableList<SchemaVariable> neededInstantiations(
             SVInstantiations svInst) {
-        ImmutableList<SchemaVariable> ret = ImmutableSLList
+        ImmutableList<SchemaVariable> ret = KeYCollections
                 .<SchemaVariable> nil();
 
         if (innerLabel != null) {

@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.proof.init;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -51,6 +50,7 @@ import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * This profile sets up KeY for verification of JavaCard programs.
@@ -100,12 +100,12 @@ public class JavaProfile extends AbstractProfile {
     @Override
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
         ImmutableList<TermLabelPolicy> originTermLabelPolicyList =
-                ImmutableSLList.<TermLabelPolicy>nil().append(new OriginTermLabelPolicy());
+                KeYCollections.<TermLabelPolicy>nil().append(new OriginTermLabelPolicy());
         ImmutableList<TermLabelRefactoring> originTermLabelRefactorings =
-                ImmutableSLList.<TermLabelRefactoring>nil().append(
+                KeYCollections.<TermLabelRefactoring>nil().append(
                         new OriginTermLabelRefactoring());
 
-        ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
+        ImmutableList<TermLabelConfiguration> result = KeYCollections.nil();
         result = result.prepend(
             new TermLabelConfiguration(
                     ParameterlessTermLabel.ANON_HEAP_LABEL_NAME,

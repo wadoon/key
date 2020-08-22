@@ -13,10 +13,7 @@
 
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Sequent;
@@ -36,7 +33,7 @@ public class TacletGoalTemplate {
     private Sequent addedSeq = Sequent.EMPTY_SEQUENT;     
 
     /** stores list of Taclet which are introduced*/
-    private ImmutableList<Taclet> addedRules = ImmutableSLList.<Taclet>nil();
+    private ImmutableList<Taclet> addedRules = KeYCollections.<Taclet>nil();
 
     /** program variables added by this taclet to the namespace */
     private ImmutableSet<SchemaVariable> addedProgVars

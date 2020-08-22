@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.visitor.ProgramSVCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
@@ -38,6 +37,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Collects all schemavariables occurring in the 
@@ -61,7 +61,7 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
 
 
     public TacletSchemaVariableCollector() {
-	varList = ImmutableSLList.<SchemaVariable>nil();
+	varList = KeYCollections.<SchemaVariable>nil();
     }
 
     
@@ -70,7 +70,7 @@ public class TacletSchemaVariableCollector extends DefaultVisitor {
      * (needed by unwind loop constructs to determine which labels are needed)
      */
     public TacletSchemaVariableCollector(SVInstantiations svInsts) {
-	varList = ImmutableSLList.<SchemaVariable>nil();
+	varList = KeYCollections.<SchemaVariable>nil();
 	instantiations = svInsts;
     }
 

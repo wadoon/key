@@ -16,7 +16,6 @@ import java.util.Set;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -33,6 +32,7 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilderSchemaVarCollector;
 import de.uka.ilkd.key.util.MiscTools;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -60,7 +60,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     ImmutableList<Term> createTermSV(ImmutableList<Term> ts,
                                      String schemaPrefix,
                                      Services services) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = KeYCollections.<Term>nil();
         for (Term t : ts) {
             result = result.append(createTermSV(t, schemaPrefix, services));
         }

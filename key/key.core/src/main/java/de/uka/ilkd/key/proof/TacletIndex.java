@@ -15,10 +15,7 @@ package de.uka.ilkd.key.proof;
 
 import java.util.*;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
@@ -74,7 +71,7 @@ public abstract class TacletIndex  {
 
     /** contains NoFind-Taclets */
     protected ImmutableList<NoPosTacletApp> noFindList
-	= ImmutableSLList.<NoPosTacletApp>nil();
+	= KeYCollections.<NoPosTacletApp>nil();
 
     /**
      * keeps track of no pos taclet apps with partial 
@@ -95,7 +92,7 @@ public abstract class TacletIndex  {
         rwList     = new LinkedHashMap<>();
         antecList  = new LinkedHashMap<>();    
         succList   = new LinkedHashMap<>();
-        noFindList = ImmutableSLList.<NoPosTacletApp>nil();
+        noFindList = KeYCollections.<NoPosTacletApp>nil();
         addTaclets(toNoPosTacletApp(tacletSet));
     }
 
@@ -156,7 +153,7 @@ public abstract class TacletIndex  {
 	Object indexObj=getIndexObj((FindTaclet)tacletApp.taclet());
 	ImmutableList<NoPosTacletApp> opList = map.get(indexObj);	
 	if (opList == null) {
-	    opList = ImmutableSLList.<NoPosTacletApp>nil().prepend(tacletApp);
+	    opList = KeYCollections.<NoPosTacletApp>nil().prepend(tacletApp);
 	} else {
 	    opList = opList.prepend(tacletApp);
 	}
@@ -189,7 +186,7 @@ public abstract class TacletIndex  {
     }
 
     public static ImmutableSet<NoPosTacletApp> toNoPosTacletApp(Iterable<Taclet> rule) {
-	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+	ImmutableList<NoPosTacletApp> result = KeYCollections.<NoPosTacletApp>nil();
 	for (Taclet t : rule) {
 	    result = result.prepend(NoPosTacletApp.createNoPosTacletApp(t));
 	}
@@ -338,7 +335,7 @@ public abstract class TacletIndex  {
     private ImmutableList<NoPosTacletApp> getJavaTacletList(
             HashMap<Object, ImmutableList<NoPosTacletApp>> map,
             ProgramElement pe, PrefixOccurrences prefixOccurrences) {        
-        ImmutableList<NoPosTacletApp> res = ImmutableSLList.nil();
+        ImmutableList<NoPosTacletApp> res = KeYCollections.nil();
         if (pe instanceof ProgramPrefix) {
             int next = prefixOccurrences.occurred(pe);
             NonTerminalProgramElement nt = (NonTerminalProgramElement) pe;
@@ -361,7 +358,7 @@ public abstract class TacletIndex  {
 	    	final boolean ignoreUpdates,
 	    	final PrefixOccurrences prefixOccurrences) {
 	
-        ImmutableList<NoPosTacletApp> res = ImmutableSLList.nil();
+        ImmutableList<NoPosTacletApp> res = KeYCollections.nil();
         final Operator op = term.op();
 	
 	assert !(op instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable) : "metavariables are disabled";
@@ -582,7 +579,7 @@ public abstract class TacletIndex  {
      */
     public ImmutableList<NoPosTacletApp> getPartialInstantiatedApps() {
         ImmutableList<NoPosTacletApp> result = 
-            ImmutableSLList.<NoPosTacletApp>nil(); 
+            KeYCollections.<NoPosTacletApp>nil();
         final Iterator<NoPosTacletApp> it = partialInstantiatedRuleApps.iterator();
         while (it.hasNext()) {
             result = result.prepend(it.next());
@@ -677,7 +674,7 @@ public abstract class TacletIndex  {
 	 */
 	public ImmutableList<NoPosTacletApp> getList
 	    (HashMap<Object, ImmutableList<NoPosTacletApp>> map) {
-	    ImmutableList<NoPosTacletApp> result=ImmutableSLList.<NoPosTacletApp>nil();
+	    ImmutableList<NoPosTacletApp> result= KeYCollections.<NoPosTacletApp>nil();
 	    for (int i=0; i<PREFIXTYPES; i++) {
 		if (occurred[i]) {
 		    ImmutableList<NoPosTacletApp> inMap=map.get(prefixClasses[i]);

@@ -12,7 +12,8 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +101,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         RuleAppIndex index = g.ruleAppIndex();
         index.autoModeStopped();
 
-        ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
+        ImmutableList<TacletApp> allApps = KeYCollections.nil();
 
         //filter taclets that are applicable on the given formula
         //filter taclets that are applicable on the given formula in the antecedent

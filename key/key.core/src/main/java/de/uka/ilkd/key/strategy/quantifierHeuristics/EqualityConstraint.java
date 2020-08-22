@@ -21,10 +21,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.key_project.util.LRUCache;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
@@ -570,8 +567,8 @@ public class EqualityConstraint implements Constraint {
      */
     private Constraint unifyHelp (Term t1, Term t2, boolean modifyThis, TermServices services) {
 	return unifyHelp ( t1, t2,
-			   ImmutableSLList.<QuantifiableVariable>nil(), 
-			   ImmutableSLList.<QuantifiableVariable>nil(),
+			   KeYCollections.<QuantifiableVariable>nil(),
+			   KeYCollections.<QuantifiableVariable>nil(),
 			   null,
 			   modifyThis, services);
     }
@@ -769,8 +766,8 @@ public class EqualityConstraint implements Constraint {
      * would cause a cycle 
      */
     private boolean hasCycle ( Metavariable mv, Term term ) {
-        ImmutableList<Metavariable> body          = ImmutableSLList.<Metavariable>nil();
-        ImmutableList<Term>         fringe        = ImmutableSLList.<Term>nil();
+        ImmutableList<Metavariable> body          = KeYCollections.<Metavariable>nil();
+        ImmutableList<Term>         fringe        = KeYCollections.<Term>nil();
         Term               checkForCycle = term;
         
         while ( true ) {

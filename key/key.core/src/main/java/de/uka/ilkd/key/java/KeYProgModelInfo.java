@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.Field;
@@ -45,6 +44,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import org.key_project.util.collection.KeYCollections;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Constructor;
 import recoder.java.CompilationUnit;
@@ -119,7 +119,7 @@ public class KeYProgModelInfo{
 
     public ImmutableList<Method> getAllMethods(KeYJavaType kjt) {
         List<recoder.abstraction.Method> rmethods=getAllRecoderMethods(kjt);
-        ImmutableList<Method> result = ImmutableSLList.<Method>nil();
+        ImmutableList<Method> result = KeYCollections.<Method>nil();
         for (int i=rmethods.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rmethods.get(i);
             Method m=
@@ -138,7 +138,7 @@ public class KeYProgModelInfo{
 
     public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
         List<recoder.abstraction.Method> rmethods=getAllRecoderMethods(kjt);
-        ImmutableList<IProgramMethod> result = ImmutableSLList.<IProgramMethod>nil();
+        ImmutableList<IProgramMethod> result = KeYCollections.<IProgramMethod>nil();
         for (int i=rmethods.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rmethods.get(i);
             IProgramMethod m=(IProgramMethod)rec2key().toKeY(rm);
@@ -409,7 +409,7 @@ public class KeYProgModelInfo{
 				   ImmutableList<Type> signature, KeYJavaType context){
         List<recoder.abstraction.Method> rml =
 	    getRecoderMethods(ct, m, signature, context);
-        ImmutableList<Method> result = ImmutableSLList.<Method>nil();
+        ImmutableList<Method> result = KeYCollections.<Method>nil();
         for (int i=rml.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rml.get(i);
             Method method=(Method)rec2key().toKeY(rm);
@@ -428,7 +428,7 @@ public class KeYProgModelInfo{
 
     public ImmutableList<Method> getMethods(KeYJavaType ct){
         List<recoder.abstraction.Method> rml = getRecoderMethods(ct);
-        ImmutableList<Method> result = ImmutableSLList.<Method>nil();
+        ImmutableList<Method> result = KeYCollections.<Method>nil();
         for (int i=rml.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rml.get(i);
 	    if(!(rm instanceof recoder.bytecode.MethodInfo)){
@@ -448,7 +448,7 @@ public class KeYProgModelInfo{
 	 */
     public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType ct){
         List<recoder.abstraction.Method> rml = getRecoderMethods(ct);
-        ImmutableList<ProgramMethod> result = ImmutableSLList.<ProgramMethod>nil();
+        ImmutableList<ProgramMethod> result = KeYCollections.<ProgramMethod>nil();
         for (int i=rml.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rml.get(i);
 	    if(!(rm instanceof recoder.bytecode.MethodInfo)){
@@ -467,7 +467,7 @@ public class KeYProgModelInfo{
 
     public ImmutableList<IProgramMethod> getConstructors(KeYJavaType ct){
         List<? extends Constructor> rcl = getRecoderConstructors(ct);
-        ImmutableList<IProgramMethod> result = ImmutableSLList.<IProgramMethod>nil();
+        ImmutableList<IProgramMethod> result = KeYCollections.<IProgramMethod>nil();
         for (int i=rcl.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rcl.get(i);
 	    IProgramMethod m=(IProgramMethod) rec2key().toKeY(rm);
@@ -567,7 +567,7 @@ public class KeYProgModelInfo{
      * @return list with the corresponding fields as KeY datastructures
      */
     private ImmutableList<Field> asKeYFields(List<? extends recoder.abstraction.Field> rfl) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = KeYCollections.<Field>nil();
         if(rfl == null){
             // this occurs for the artificial Null object at the moment
             // should it have implicit fields?
@@ -633,7 +633,7 @@ public class KeYProgModelInfo{
      * @return the list of visible fields
      */
     private ImmutableList<Field> getVisibleArrayFields(KeYJavaType arrayType) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = KeYCollections.<Field>nil();
 
         final ImmutableArray<MemberDeclaration> members =
             ((ArrayDeclaration)arrayType.getJavaType()).getMembers();
@@ -691,7 +691,7 @@ public class KeYProgModelInfo{
      * the same order
      */
     private ImmutableList<KeYJavaType> asKeYJavaTypes(final List<recoder.abstraction.ClassType> rctl) {
-        ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
+        ImmutableList<KeYJavaType> result = KeYCollections.<KeYJavaType>nil();
         for (int i=rctl.size()-1; i>=0 ; i--){
             final recoder.abstraction.ClassType rct = rctl.get(i);
             final KeYJavaType kct = (KeYJavaType)rec2key().toKeY(rct);
@@ -777,7 +777,7 @@ public class KeYProgModelInfo{
 	}
 
 
-        ImmutableList<KeYJavaType> classList = ImmutableSLList.<KeYJavaType>nil();
+        ImmutableList<KeYJavaType> classList = KeYCollections.<KeYJavaType>nil();
 	classList = recFindImplementations(rct, name, rsignature, classList);
 
 

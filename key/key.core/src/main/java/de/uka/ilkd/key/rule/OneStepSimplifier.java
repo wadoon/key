@@ -21,10 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.key_project.util.LRUCache;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.Immutables;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -73,7 +70,7 @@ public final class OneStepSimplifier implements BuiltInRule {
      * in any case there was a measurable slowdown. -- DB 03/06/14
      */
     private static final ImmutableList<String> ruleSets
-    = ImmutableSLList.<String>nil().append("concrete")
+    = KeYCollections.<String>nil().append("concrete")
     .append("update_elim")
     .append("update_apply_on_update")
     .append("update_apply")
@@ -116,7 +113,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                     String ruleSetName,
                     ImmutableList<String> excludedRuleSetNames) {
         assert !proof.openGoals().isEmpty();
-        ImmutableList<Taclet> result = ImmutableSLList.<Taclet>nil();
+        ImmutableList<Taclet> result = KeYCollections.<Taclet>nil();
 
         //collect apps present in all open goals
         Set<NoPosTacletApp> allApps
@@ -189,11 +186,11 @@ public final class OneStepSimplifier implements BuiltInRule {
         if(proof != lastProof) {
             shutdownIndices();
             lastProof = proof;
-            appsTakenOver = ImmutableSLList.<NoPosTacletApp>nil();
+            appsTakenOver = KeYCollections.<NoPosTacletApp>nil();
             indices = new TacletIndex[ruleSets.size()];
             notSimplifiableCaches = (Map<Term,Term>[]) new LRUCache[indices.length];
             int i = 0;
-            ImmutableList<String> done = ImmutableSLList.<String>nil();
+            ImmutableList<String> done = KeYCollections.<String>nil();
             for(String ruleSet : ruleSets) {
                 ImmutableList<Taclet> taclets = tacletsForRuleSet(proof,
                                 ruleSet,
@@ -435,7 +432,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         PosInOccurrence applicatinPIO = new PosInOccurrence(new SequentFormula(formula),
                                                             PosInTerm.getTopLevel(), // TODO: This should be the precise sub term
                                                             inAntecedent); // It is required to create a new PosInOccurrence because formula and pio.constrainedFormula().formula() are only equals module renamings and term labels
-        ImmutableList<IfFormulaInstantiation> ifInst = ImmutableSLList.nil();
+        ImmutableList<IfFormulaInstantiation> ifInst = KeYCollections.nil();
         ifInst = ifInst.append(new IfFormulaInstDirect(pio.sequentFormula()));
         TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO, lastProof.getServices());
         return ta;
@@ -507,7 +504,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         //simplify as long as possible
         ImmutableList<SequentFormula> list
-        = ImmutableSLList.<SequentFormula>nil();
+        = KeYCollections.<SequentFormula>nil();
         SequentFormula simplifiedCf = cf;
         while(true) {
             simplifiedCf = simplifyConstrainedFormula(services,
@@ -528,7 +525,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         //return
         PosInOccurrence[] ifInstsArr = ifInsts.toArray(new PosInOccurrence[0]);
         ImmutableList<PosInOccurrence> immutableIfInsts
-        = ImmutableSLList.<PosInOccurrence>nil().append(ifInstsArr);
+        = KeYCollections.<PosInOccurrence>nil().append(ifInstsArr);
         return new Instantiation(list.head(),
                         list.size(),
                         immutableIfInsts);

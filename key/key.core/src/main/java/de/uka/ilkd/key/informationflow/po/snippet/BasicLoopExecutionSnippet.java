@@ -3,7 +3,6 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -19,6 +18,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.KeYCollections;
 
 public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         implements FactoryMethod {
@@ -26,7 +26,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
     @Override
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> posts = KeYCollections.<Term>nil();
         if (poVars.post.self != null)
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
 

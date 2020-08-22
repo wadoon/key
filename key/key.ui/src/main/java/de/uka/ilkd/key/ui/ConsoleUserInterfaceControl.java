@@ -21,7 +21,6 @@ import java.io.OutputStreamWriter;
 import java.util.List;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -57,6 +56,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Implementation of {@link UserInterfaceControl} used by command line interface of KeY.
@@ -67,7 +67,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
 
    // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
-   ImmutableList<Proof> proofStack = ImmutableSLList.<Proof>nil();
+   ImmutableList<Proof> proofStack = KeYCollections.<Proof>nil();
 
    final byte verbosity;
    final KeYMediator mediator;

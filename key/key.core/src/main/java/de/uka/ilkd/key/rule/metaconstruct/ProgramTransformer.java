@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.io.IOException;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
@@ -37,6 +36,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import org.key_project.util.collection.KeYCollections;
 
 /** 
  * ProgramTransformers are used to describe schematic transformations 
@@ -245,7 +245,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @return a list of schema variables relevant for this entity;
      */
     public ImmutableList<SchemaVariable> needs() {
-	return ImmutableSLList.<SchemaVariable>nil();
+	return KeYCollections.<SchemaVariable>nil();
     }
     
     /**
@@ -257,7 +257,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @return a list of schema variables relevant for this entity;
      */
     public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
-	return ImmutableSLList.<SchemaVariable>nil();
+	return KeYCollections.<SchemaVariable>nil();
     }
 
 }

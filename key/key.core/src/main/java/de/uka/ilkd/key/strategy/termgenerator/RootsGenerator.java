@@ -16,8 +16,6 @@ package de.uka.ilkd.key.strategy.termgenerator;
 import java.math.BigInteger;
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -31,6 +29,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -97,14 +96,14 @@ public class RootsGenerator implements TermGenerator {
     }
 
     private Iterator<Term> emptyIterator() {
-        return ImmutableSLList.<Term>nil().iterator ();
+        return KeYCollections.<Term>nil().iterator ();
     }
 
     private Iterator<Term> toIterator(Term res) {
         if (res.equalsModIrrelevantTermLabels (tb.ff ())) {
             return emptyIterator ();
         }
-        return ImmutableSLList.<Term>nil().prepend (res).iterator ();
+        return KeYCollections.<Term>nil().prepend (res).iterator ();
     }
 
     private Term breakDownEq(Term var, BigInteger lit, int pow,

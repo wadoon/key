@@ -5,10 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
@@ -242,7 +239,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<Term> renamedLocalOuts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> renamedLocalOuts = KeYCollections.<Term>nil();
         for (Term varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
@@ -264,7 +261,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<Term> renamedLocalOuts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> renamedLocalOuts = KeYCollections.<Term>nil();
         for (Term varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 

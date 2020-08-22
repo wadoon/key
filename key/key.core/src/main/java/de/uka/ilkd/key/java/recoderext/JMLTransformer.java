@@ -21,10 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import de.uka.ilkd.key.util.MiscTools;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -78,7 +75,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
     private static final String JML = "/*@";
     private static final String JMR = "@*/";
 
-    private static final ImmutableList<String> javaMods = ImmutableSLList
+    private static final ImmutableList<String> javaMods = KeYCollections
             .<String> nil().prepend("abstract", "final", "private", "protected",
                     "public", "static");
 

@@ -16,7 +16,6 @@ package de.uka.ilkd.key.ldt;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -42,6 +41,7 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -126,7 +126,7 @@ public final class HeapLDT extends LDT {
         acc               = addFunction(services, "acc");
         reach             = addFunction(services, "reach");
         prec		  = addFunction(services, "prec");
-        heaps = ImmutableSLList.<LocationVariable>nil()
+        heaps = KeYCollections.<LocationVariable>nil()
         		 .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
         		 .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
         if(services instanceof Services) {

@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.rule;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -24,6 +23,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.KeYCollections;
 
 public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 
@@ -34,7 +34,7 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio, Contract contract) {
-        this(rule, pio, ImmutableSLList.<PosInOccurrence>nil(), contract);
+        this(rule, pio, KeYCollections.<PosInOccurrence>nil(), contract);
     }
 
     protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio,

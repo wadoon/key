@@ -4,7 +4,6 @@ import java.util.EnumMap;
 import java.util.List;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
@@ -25,6 +24,7 @@ import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -166,7 +166,7 @@ class BasicSnippetData {
         ImmutableList<InfFlowSpec> infFlowSpecs =
                 invariant.getInfFlowSpecs(services);
         ImmutableList<InfFlowSpec> modifedSpecs =
-                ImmutableSLList.<InfFlowSpec>nil();
+                KeYCollections.<InfFlowSpec>nil();
         for(InfFlowSpec infFlowSpec : infFlowSpecs) {
             ImmutableList<Term> modifiedPreExps =
                     infFlowSpec.preExpressions.append(guardTerm);
@@ -258,7 +258,7 @@ class BasicSnippetData {
 
 
     private ImmutableList<Term> toTermList(ImmutableSet<ProgramVariable> vars) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = KeYCollections.<Term>nil();
         for (ProgramVariable v : vars) {
             result = result.append(tb.var(v));
         }

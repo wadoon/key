@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -67,7 +67,7 @@ public class StateVars {
         this.mbyAtPre = mbyAtPre;
 
         ImmutableList<Term> terms =
-                ImmutableSLList.<Term>nil();
+                KeYCollections.<Term>nil();
         terms = appendIfNotNull(terms, heap);
         terms = appendIfNotNull(terms, self);
         terms = appendIfNotNull(terms, guard);
@@ -78,7 +78,7 @@ public class StateVars {
         termList = terms;
 
         ImmutableList<Term> allTerms =
-                ImmutableSLList.<Term>nil();
+                KeYCollections.<Term>nil();
         allTerms = allTerms.append(heap);
         allTerms = allTerms.append(self);
         allTerms = allTerms.append(guard);
@@ -170,7 +170,7 @@ public class StateVars {
     private static ImmutableList<Term> copyVariables(ImmutableList<Term> ts,
                                                      String postfix,
                                                      Services services) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = KeYCollections.<Term>nil();
         for (Term t : ts) {
             result = result.append(copyVariable(t, postfix, services));
         }
@@ -341,7 +341,7 @@ public class StateVars {
                     preVars.mbyAtPre :
                     copyVariable(origPostVars.mbyAtPre, postfix, services);
 
-        ImmutableList<Term> localPostVars = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> localPostVars = KeYCollections.<Term>nil();
         Iterator<Term> origPreVarsIt = origPreVars.localVars.iterator();
         Iterator<Term> localPreVarsIt = preVars.localVars.iterator();
         for (Term origPostVar : origPostVars.localVars) {
@@ -476,7 +476,7 @@ public class StateVars {
     static <T> ImmutableList<T> ops(ImmutableList<Term> terms,
                                     Class<T> opClass)
             throws IllegalArgumentException {
-        ImmutableList<T> ops = ImmutableSLList.<T>nil();
+        ImmutableList<T> ops = KeYCollections.<T>nil();
         for (Term t : terms) {
             ops = ops.append(t.op(opClass));
         }

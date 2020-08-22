@@ -15,7 +15,6 @@ package de.uka.ilkd.key.speclang.jml;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -28,6 +27,7 @@ import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.util.MiscTools;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Helper class used by the JML translation. Provides methods that look for
@@ -67,7 +67,7 @@ public final class JMLInfoExtractor {
     
     
     private static boolean hasJMLModifier(TypeDeclaration td, String mod) {
-        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> coms = KeYCollections.<Comment>nil();
         
         // Either mod is attached to the declaration itself ...
         coms = coms.prepend(td.getComments());
@@ -88,7 +88,7 @@ public final class JMLInfoExtractor {
 
     
     private static boolean hasJMLModifier(IProgramMethod pm, String mod) {
-        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> coms = KeYCollections.<Comment>nil();
         final MethodDeclaration method = pm.getMethodDeclaration();
         
         // Either mod is attached to the method itself ...
@@ -127,7 +127,7 @@ public final class JMLInfoExtractor {
      * @return
      */
 	private static ImmutableList<Comment> extractFieldModifiers(String fieldName, KeYJavaType containingClass) {
-        ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> comments = KeYCollections.<Comment>nil();
 		if(!(containingClass.getJavaType() instanceof TypeDeclaration)) {
             return comments;
         }
@@ -172,7 +172,7 @@ public final class JMLInfoExtractor {
     //-------------------------------------------------------------------------
     
     public static boolean hasJMLModifier(FieldDeclaration fd, String mod) {
-        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> coms = KeYCollections.<Comment>nil();
 	
 	// Either mod is attached to the declaration itself ...
         coms = coms.prepend(fd.getComments());
@@ -277,7 +277,7 @@ public final class JMLInfoExtractor {
     public static boolean parameterIsNullable(IProgramMethod pm,
             ParameterDeclaration pd) {
 	assert pm.getMethodDeclaration().getParameters().contains(pd): "parameter "+pd+" does not belong to method declaration "+pm;
-	ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
+	ImmutableList<Comment> comments = KeYCollections.<Comment>nil();
         comments = comments.prepend(pd.getComments());
         comments = comments.prepend(pd.getTypeReference().getComments());
         comments = comments.prepend(pd.getVariableSpecification()
@@ -300,7 +300,7 @@ public final class JMLInfoExtractor {
     public static boolean resultIsNullable(IProgramMethod pm) {
         MethodDeclaration md = pm.getMethodDeclaration();
         
-        ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> comments = KeYCollections.<Comment>nil();
         for(Modifier mod : md.getModifiers()) {
             comments = comments.prepend(mod.getComments());
         }

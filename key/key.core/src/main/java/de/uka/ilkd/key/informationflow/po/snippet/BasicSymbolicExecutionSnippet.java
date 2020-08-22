@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -32,6 +31,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  *
@@ -47,7 +47,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
         assert poVars.exceptionParameter.op() instanceof LocationVariable :
                 "Something is wrong with the catch variable";
 
-        ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> posts = KeYCollections.<Term>nil();
         if (poVars.post.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }

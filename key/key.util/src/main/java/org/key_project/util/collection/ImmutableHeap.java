@@ -32,62 +32,67 @@ public interface ImmutableHeap<T extends Comparable<T>> extends java.io.Serializ
     /**
      * @return true iff this heap is empty
      */
-    boolean isEmpty ();
+    boolean isEmpty();
 
     /**
      * Add an element to this heap object
+     *
      * @param element The element to be added
      * @return a heap that contains all elements of this heap, and
      * additionally <code>element</code>
      */
-    ImmutableHeap<T> insert ( T element );
+    ImmutableHeap<T> insert(T element);
 
     /**
      * Add multiple elements to this heap object
+     *
      * @param elements The elements to be added
      * @return a heap that contains all elements of this heap, and
      * additionally all objects from <code>elements</code>
      */
-    ImmutableHeap<T> insert ( Iterator<T> elements );
+    ImmutableHeap<T> insert(Iterator<T> elements);
 
     /**
      * Add multiple elements to this heap object
+     *
      * @param h a heap containing the elements to be added
      * @return a heap that contains all elements of this heap, and
      * additionally all objects from <code>h</code>
      */
-    ImmutableHeap<T> insert ( ImmutableHeap<T> h );
+    ImmutableHeap<T> insert(ImmutableHeap<T> h);
 
     /**
      * @return the minimum element of this heap, or null iff this heap
      * is empty (<code>isEmpty()==true</code>)
      */
-    T findMin ();
+    T findMin();
 
     /**
      * Remove the minimum element from this heap
+     *
      * @return a heap that contains all elements of this heap except
      * for the minimum element
      */
-    ImmutableHeap<T> deleteMin ();
+    ImmutableHeap<T> deleteMin();
 
     /**
      * Remove all elements of this heap which are <code>equal</code>
      * to <code>element</code>.
+     *
      * @return heap that has all occurrences of <code>element</code>
      * removed
      */
-    ImmutableHeap<T> removeAll ( T element );
+    ImmutableHeap<T> removeAll(T element);
 
     /**
      * @return the number of elements this heap holds
      */
-    int size ();
+    int size();
 
     /**
      * @return an iterator that returns all elements of this heap in
      * increasing order
      */
-    Iterator<T> sortedIterator ();
+    Iterator<T> sortedIterator();
 
 }

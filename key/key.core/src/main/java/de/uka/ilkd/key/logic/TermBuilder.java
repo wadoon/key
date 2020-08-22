@@ -19,11 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -279,7 +275,7 @@ public class TermBuilder {
      */
     public ImmutableList<ProgramVariable> paramVars(IObserverFunction obs,
             boolean makeNamesUnique) {
-        ImmutableList<ProgramVariable> result = ImmutableSLList
+        ImmutableList<ProgramVariable> result = KeYCollections
                 .<ProgramVariable> nil();
         for (int i = 0, n = obs.getNumParams(); i < n; i++) {
             final KeYJavaType paramType = obs.getParamType(i);
@@ -307,7 +303,7 @@ public class TermBuilder {
     public ImmutableList<ProgramVariable> paramVars(String postfix,
             IObserverFunction obs, boolean makeNamesUnique) {
         final ImmutableList<ProgramVariable> paramVars = paramVars(obs, true);
-        ImmutableList<ProgramVariable> result = ImmutableSLList
+        ImmutableList<ProgramVariable> result = KeYCollections
                 .<ProgramVariable> nil();
         for (ProgramVariable paramVar : paramVars) {
             ProgramElementName pen = new ProgramElementName(
@@ -409,7 +405,7 @@ public class TermBuilder {
     }
 
     public ImmutableList<Term> var(ProgramVariable... vs) {
-        ImmutableList<Term> result = ImmutableSLList.<Term> nil();
+        ImmutableList<Term> result = KeYCollections.<Term> nil();
         for (ProgramVariable v : vs) {
             result = result.append(var(v));
         }
@@ -417,7 +413,7 @@ public class TermBuilder {
     }
 
     public ImmutableList<Term> var(Iterable<ProgramVariable> vs) {
-        ImmutableList<Term> result = ImmutableSLList.<Term> nil();
+        ImmutableList<Term> result = KeYCollections.<Term> nil();
         for (ProgramVariable v : vs) {
             result = result.append(var(v));
         }
@@ -1008,7 +1004,7 @@ public class TermBuilder {
     }
 
     public Term parallel(Iterable<Term> lhss, Iterable<Term> values) {
-        ImmutableList<Term> updates = ImmutableSLList.<Term> nil();
+        ImmutableList<Term> updates = KeYCollections.<Term> nil();
         Iterator<Term> lhssIt = lhss.iterator();
         Iterator<Term> rhssIt = values.iterator();
         while (lhssIt.hasNext()) {
@@ -1049,7 +1045,7 @@ public class TermBuilder {
     }
 
     public ImmutableList<Term> apply(Term update, ImmutableList<Term> targets) {
-        ImmutableList<Term> result = ImmutableSLList.<Term> nil();
+        ImmutableList<Term> result = KeYCollections.<Term> nil();
         for (Term target : targets) {
             result = result.append(apply(update, target));
         }
@@ -1080,7 +1076,7 @@ public class TermBuilder {
 
     public ImmutableList<Term> applyElementary(Term heap,
             Iterable<Term> targets) {
-        ImmutableList<Term> result = ImmutableSLList.<Term> nil();
+        ImmutableList<Term> result = KeYCollections.<Term> nil();
         for (Term target : targets) {
             result = result.append(apply(elementary(heap), target, null));
         }
@@ -1103,7 +1099,7 @@ public class TermBuilder {
         if (updates.length == 0) {
             return target;
         } else {
-            ImmutableList<Term> updateList = ImmutableSLList.<Term> nil()
+            ImmutableList<Term> updateList = KeYCollections.<Term> nil()
                     .append(updates).tail();
             return apply(updates[0], applySequential(updateList, target), null);
         }
@@ -1512,7 +1508,7 @@ public class TermBuilder {
     }
 
     public ImmutableList<Term> wd(Iterable<Term> l) {
-        ImmutableList<Term> res = ImmutableSLList.<Term> nil();
+        ImmutableList<Term> res = KeYCollections.<Term> nil();
         for (Term t : l) {
             res = res.append(wd(t));
         }
@@ -1934,7 +1930,7 @@ public class TermBuilder {
         final Term modAtPre = or.replace(mod);
         final Term createdAtPre = or.replace(created(heapTerm, objVarTerm));
 
-        ImmutableList<QuantifiableVariable> quantVars = ImmutableSLList
+        ImmutableList<QuantifiableVariable> quantVars = KeYCollections
                 .<QuantifiableVariable> nil();
         quantVars = quantVars.append(objVar);
         quantVars = quantVars.append(fieldVar);
@@ -1980,7 +1976,7 @@ public class TermBuilder {
 
         final OpReplacer or = new OpReplacer(normalToAtPre, tf);
 
-        ImmutableList<QuantifiableVariable> quantVars = ImmutableSLList
+        ImmutableList<QuantifiableVariable> quantVars = KeYCollections
                 .<QuantifiableVariable> nil();
         quantVars = quantVars.append(objVar);
         quantVars = quantVars.append(fieldVar);
@@ -2146,7 +2142,7 @@ public class TermBuilder {
         assert s.sort().equals(setLDT.targetSort());
         final Function union = setLDT.getUnion();
         ImmutableSet<Term> result = DefaultImmutableSet.<Term> nil();
-        ImmutableList<Term> workingList = ImmutableSLList.<Term> nil()
+        ImmutableList<Term> workingList = KeYCollections.<Term> nil()
                 .prepend(s);
         while (!workingList.isEmpty()) {
             Term f = workingList.head();
@@ -2174,7 +2170,7 @@ public class TermBuilder {
      * Removes leading updates from the passed term.
      */
     public static Pair<ImmutableList<Term>, Term> goBelowUpdates2(Term term) {
-        ImmutableList<Term> updates = ImmutableSLList.<Term> nil();
+        ImmutableList<Term> updates = KeYCollections.<Term> nil();
         while (term.op() instanceof UpdateApplication) {
             updates = updates.append(UpdateApplication.getUpdate(term));
             term = UpdateApplication.getTarget(term);
@@ -2200,7 +2196,7 @@ public class TermBuilder {
      * @return The {@link Term} {@link Sort}s.
      */
     public ImmutableList<Sort> getSorts(Iterable<Term> terms) {
-        ImmutableList<Sort> result = ImmutableSLList.<Sort> nil();
+        ImmutableList<Sort> result = KeYCollections.<Sort> nil();
         for (Term t : terms) {
             result = result.append(t.sort());
         }

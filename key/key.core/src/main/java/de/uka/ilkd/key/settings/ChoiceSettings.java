@@ -24,10 +24,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
@@ -95,7 +92,7 @@ public class ChoiceSettings implements Settings, Cloneable {
     
 
     private ImmutableSet<Choice> choiceMap2choiceSet(HashMap<String, String> ccc) {
-        ImmutableList<Choice> choices = ImmutableSLList.nil();        
+        ImmutableList<Choice> choices = KeYCollections.nil();
         for (final Map.Entry<String,String> entry : ccc.entrySet()) {
             choices = choices.
               prepend(new Choice(new Name(entry.getValue()), entry.getKey()));

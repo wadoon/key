@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * This {@link TermLabelRefactoring} removes the supported {@link TermLabel}
@@ -66,7 +66,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     */
    @Override
    public ImmutableList<Name> getSupportedRuleNames() {
-      return ImmutableSLList.<Name>nil().prepend(UseOperationContractRule.INSTANCE.name())
+      return KeYCollections.<Name>nil().prepend(UseOperationContractRule.INSTANCE.name())
                                         .prepend(WhileInvariantRule.INSTANCE.name())
                                         .prepend(BlockContractInternalRule.INSTANCE.name())
                                         .prepend(BlockContractExternalRule.INSTANCE.name())

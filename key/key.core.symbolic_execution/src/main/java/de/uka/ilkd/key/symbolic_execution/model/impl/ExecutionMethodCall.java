@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -27,6 +26,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.KeYTypeUtil;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * The default implementation of {@link IExecutionMethodCall}.
@@ -36,7 +36,7 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
    /**
     * The up to know discovered {@link IExecutionBaseMethodReturn}s.
     */
-   private ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = ImmutableSLList.nil();
+   private ImmutableList<IExecutionBaseMethodReturn<?>> methodReturns = KeYCollections.nil();
 
    /**
     * Constructor.

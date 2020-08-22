@@ -17,7 +17,7 @@ import java.util.Set;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
@@ -48,7 +48,7 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
     */
    @Override
    public ImmutableList<Name> getSupportedRuleNames() {
-      return ImmutableSLList.<Name>nil().append(BlockContractInternalRule.INSTANCE.name());
+      return KeYCollections.<Name>nil().append(BlockContractInternalRule.INSTANCE.name());
    }
 
    /**

@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -32,6 +31,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Try to rewrite a monomial (term) <code>source</code> so that it becomes a
@@ -79,14 +79,14 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         final List<CofactorPolynomial> cofactorPolys = extractPolys ( goal, services );
 
         if ( cofactorPolys.isEmpty () )
-            return ImmutableSLList.<Term>nil().iterator ();
+            return KeYCollections.<Term>nil().iterator ();
         
         return computeMultiples(sourceM, targetM, cofactorPolys, services)
                .iterator();
     }
 
     private Iterator<Term> toIterator(Term quotient) {
-        return ImmutableSLList.<Term>nil().prepend ( quotient ).iterator ();
+        return KeYCollections.<Term>nil().prepend ( quotient ).iterator ();
     }
 
     /**
@@ -99,7 +99,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      */
     private ImmutableList<Term> computeMultiples(Monomial sourceM, Monomial targetM,
                                         List<CofactorPolynomial> cofactorPolys, Services services) {
-        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> res = KeYCollections.<Term>nil();
         
         final List<CofactorItem> cofactorMonos = new ArrayList<CofactorItem> ();
         cofactorMonos.add ( new CofactorMonomial ( targetM, Polynomial.ONE ) );

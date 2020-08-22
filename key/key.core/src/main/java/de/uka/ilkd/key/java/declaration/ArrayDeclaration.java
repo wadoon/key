@@ -15,7 +15,6 @@ package de.uka.ilkd.key.java.declaration;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -29,6 +28,8 @@ import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import org.key_project.util.collection.KeYCollections;
+
 /**
  * KeY used to model arrays using only the {@link
  * de.uka.ilkd.key.java.abstraction.ArrayType}. As the only attribute of
@@ -252,7 +253,7 @@ public class ArrayDeclaration
      * returns the local declared supertypes
      */
     public ImmutableList<KeYJavaType> getSupertypes() {
-	return ImmutableSLList.<KeYJavaType>nil().append(superType);
+	return KeYCollections.<KeYJavaType>nil().append(superType);
     }
 
     /** 

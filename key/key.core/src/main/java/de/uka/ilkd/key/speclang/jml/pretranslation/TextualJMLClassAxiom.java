@@ -14,9 +14,9 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.speclang.PositionedString;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -33,7 +33,7 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
      */
     public TextualJMLClassAxiom(ImmutableList<String> mods, 
 	                      PositionedString inv) {
-        super(ImmutableSLList.<String>nil()); // no modifiers allowed in axiom clause (see Sect. 8 of reference manual)
+        super(KeYCollections.<String>nil()); // no modifiers allowed in axiom clause (see Sect. 8 of reference manual)
         assert inv != null;
         this.inv = inv;
         setPosition(inv);

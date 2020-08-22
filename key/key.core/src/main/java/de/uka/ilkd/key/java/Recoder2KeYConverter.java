@@ -25,7 +25,6 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -188,6 +187,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.KeYCollections;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
@@ -601,7 +601,7 @@ public class Recoder2KeYConverter {
      *         field declaration of the given list
      */
     private ImmutableList<Field> filterField(FieldDeclaration field) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = KeYCollections.<Field>nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
             result = result.prepend(spec.get(i));
@@ -2118,7 +2118,7 @@ public class Recoder2KeYConverter {
        if (arg.getMethodContext() != null) {
           JavaInfo jInfo = services.getJavaInfo();
 
-          ImmutableList<KeYJavaType> paramTypes = ImmutableSLList.<KeYJavaType>nil();
+          ImmutableList<KeYJavaType> paramTypes = KeYCollections.<KeYJavaType>nil();
           for (recoder.java.reference.TypeReference tr : arg.getMethodContext().getParamTypes()) {
              TypeReference keyTR = convert(tr);
              paramTypes = paramTypes.append(keyTR.getKeYJavaType());

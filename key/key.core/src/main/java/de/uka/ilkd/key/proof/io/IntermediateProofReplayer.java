@@ -30,10 +30,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
@@ -496,7 +493,7 @@ public class IntermediateProofReplayer {
         ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(),
             services);
 
-        ImmutableList<IfFormulaInstantiation> ifFormulaList = ImmutableSLList
+        ImmutableList<IfFormulaInstantiation> ifFormulaList = KeYCollections
                 .<IfFormulaInstantiation> nil();
         for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
             ifFormulaList = ifFormulaList.append(
@@ -568,7 +565,7 @@ public class IntermediateProofReplayer {
 
         // Load ifInsts, if applicable
         if (currInterm.getBuiltInIfInsts() != null) {
-            builtinIfInsts = ImmutableSLList.nil();
+            builtinIfInsts = KeYCollections.nil();
             for (final Pair<Integer, PosInTerm> ifInstP : currInterm
                     .getBuiltInIfInsts()) {
                 final int currIfInstFormula = ifInstP.first;
@@ -805,7 +802,7 @@ public class IntermediateProofReplayer {
 
         }
 
-        ImmutableList<MergePartner> joinPartners = ImmutableSLList.nil();
+        ImmutableList<MergePartner> joinPartners = KeYCollections.nil();
         for (Triple<Node, PosInOccurrence, NodeIntermediate> partnerNodeInfo : partnerNodesInfo) {
 
             final Triple<Term, Term, Term> ownSEState = sequentToSETriple(

@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -65,7 +65,7 @@ public class Main {
             KeYJavaType classType = env.getJavaInfo().getKeYJavaType("Number");
             IProgramMethod pm = env.getJavaInfo().getProgramMethod(classType, 
                                                                    "equals", 
-                                                                   ImmutableSLList.<Type>nil().append(classType), 
+                                                                   KeYCollections.<Type>nil().append(classType),
                                                                    classType);
             // Instantiate proof for symbolic execution of the program method (Java semantics)
             AbstractOperationPO po = new ProgramMethodPO(env.getInitConfig(), 

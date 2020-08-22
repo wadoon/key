@@ -28,7 +28,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -432,12 +432,12 @@ public class SymbolicLayoutReader {
       /**
        * The objects.
        */
-      private ImmutableList<ISymbolicObject> objects = ImmutableSLList.nil();
+      private ImmutableList<ISymbolicObject> objects = KeYCollections.nil();
 
       /**
        * The symbolic equivalence classes.
        */
-      private ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses = ImmutableSLList.nil();
+      private ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses = KeYCollections.nil();
 
       /**
        * {@inheritDoc}
@@ -498,12 +498,12 @@ public class SymbolicLayoutReader {
       /**
        * The associations.
        */
-      private ImmutableList<ISymbolicAssociation> associations = ImmutableSLList.nil();
+      private ImmutableList<ISymbolicAssociation> associations = KeYCollections.nil();
 
       /**
        * The values.
        */
-      private ImmutableList<ISymbolicValue> values = ImmutableSLList.nil();
+      private ImmutableList<ISymbolicValue> values = KeYCollections.nil();
 
       /**
        * {@inheritDoc}
@@ -1023,7 +1023,7 @@ public class SymbolicLayoutReader {
        * @param representativeString The representative term.
        */
       public KeYlessEquivalenceClass(String representativeString) {
-         this(ImmutableSLList.<String>nil(), representativeString);
+         this(KeYCollections.<String>nil(), representativeString);
       }
 
       /**

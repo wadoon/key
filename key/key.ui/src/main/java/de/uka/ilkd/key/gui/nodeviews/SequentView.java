@@ -71,6 +71,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.KeYCollections;
 
 /*
  * Parent class of CurrentGoalView and InnerNodeView.
@@ -738,7 +739,7 @@ public abstract class SequentView extends JEditorPane {
                 for (int j = 0; j < max_age && j < sortedArray.length; ++j) {
                     if (sortedArray[j].equals(entry)) {
                         Color color = computeColorForAge(max_age, j);
-                        ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil()
+                        ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) KeYCollections.<Integer>nil()
                                 .prepend(0).append(i);
                         Range r = ipt.rangeForPath(list);
                         Range newR = new Range(r.start() + 1, r.end() + 1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
@@ -754,7 +755,7 @@ public abstract class SequentView extends JEditorPane {
                 int age = computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(), form, max_age + 2);
                 if(age < max_age) {
                     Color color = computeColorForAge(max_age, age);
-                    ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) ImmutableSLList.<Integer>nil().prepend(0).append(i);
+                    ImmutableSLList<Integer> list = (ImmutableSLList<Integer>) KeYCollections.<Integer>nil().prepend(0).append(i);
                     Range r = ipt.rangeForPath(list);
                     Range newR = new Range(r.start()+1, r.end()+1); // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath ist schuld
                     Object tag = getColorHighlight(color);

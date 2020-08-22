@@ -16,11 +16,7 @@ package de.uka.ilkd.key.java;
 import java.util.List;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import recoder.ServiceConfiguration;
 import recoder.service.NameInfo;
@@ -493,7 +489,7 @@ public class Recoder2KeYTypeConverter {
      *         field declaration of the given list
      */
     private ImmutableList<Field> filterField(FieldDeclaration field) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = KeYCollections.<Field>nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
             result = result.prepend(spec.get(i));
@@ -511,7 +507,7 @@ public class Recoder2KeYTypeConverter {
      *         field declaration of the given list
      */
     private ImmutableList<Field> filterField(ExtList list) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = KeYCollections.<Field>nil();
         for (Object aList : list) {
             Object pe = aList;
             if (pe instanceof FieldDeclaration) {

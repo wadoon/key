@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -39,6 +38,7 @@ import de.uka.ilkd.key.rule.executor.RuleExecutor;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -172,7 +172,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
     protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi, TermLabelState termLabelState, TacletLabelHint labelHint,
             PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal, RuleApp tacletApp, Services services) {       
 
-        ImmutableList<SequentFormula> replacements = ImmutableSLList.<SequentFormula>nil();
+        ImmutableList<SequentFormula> replacements = KeYCollections.<SequentFormula>nil();
 
         for (SequentFormula sf : semi) {
             replacements = replacements.append
@@ -379,7 +379,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             PosInOccurrence posOfFind,
             Services services, 
             MatchConditions matchCond) {
-        ImmutableList<RenamingTable> renamings = ImmutableSLList.<RenamingTable>nil();
+        ImmutableList<RenamingTable> renamings = KeYCollections.<RenamingTable>nil();
         for (final SchemaVariable sv : pvs) {
             final ProgramVariable inst 
             = (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
@@ -468,7 +468,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                         ifPart = services.getTermBuilder().not(ifPart);          
 
                     if ( res == null ) {
-                        res = ImmutableSLList.<SequentChangeInfo>nil();
+                        res = KeYCollections.<SequentChangeInfo>nil();
                         for (int j = 0; j< p_numberOfNewGoals + 1; j++) {
                             res = res.prepend(SequentChangeInfo.createSequentChangeInfo((SemisequentChangeInfo)null, 
                                     (SemisequentChangeInfo)null, p_goal.sequent(), p_goal.sequent()));
@@ -499,7 +499,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         }
 
         if ( res == null ) {
-            res = ImmutableSLList.<SequentChangeInfo>nil();
+            res = KeYCollections.<SequentChangeInfo>nil();
             for (int j = 0; j< p_numberOfNewGoals; j++) {
                 res = res.prepend(SequentChangeInfo.createSequentChangeInfo((SemisequentChangeInfo)null, 
                         (SemisequentChangeInfo)null, p_goal.sequent(), p_goal.sequent()));

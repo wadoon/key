@@ -8,7 +8,7 @@ public class TestImmutables extends TestCase {
 
     @Test
     public void testRemoveDuplicatesLarge() {
-        ImmutableList<Integer> l = ImmutableSLList.<Integer>nil();
+        ImmutableList<Integer> l = KeYCollections.<Integer>nil();
         for(int i = 0; i < 100; i++) {
             l = l.prepend((i * 2) % 160);
         }
@@ -44,7 +44,7 @@ public class TestImmutables extends TestCase {
         };
 
         for (int i = 0; i < a.length; i++) {
-            ImmutableList<String> l = ImmutableSLList.<String>nil().prepend(a[i]).reverse();
+            ImmutableList<String> l = KeYCollections.<String>nil().prepend(a[i]).reverse();
 
             assertFalse(Immutables.isDuplicateFree(l));
 
@@ -60,7 +60,7 @@ public class TestImmutables extends TestCase {
     @Test
     public void testRemoveDuplicatesIdentical() {
         String[] a = { "a", "b", "c", "d", "e" };
-        ImmutableList<String> l = ImmutableSLList.<String>nil().prepend(a);
+        ImmutableList<String> l = KeYCollections.<String>nil().prepend(a);
 
         ImmutableList<String> cleaned = Immutables.removeDuplicates(l);
 
@@ -73,7 +73,7 @@ public class TestImmutables extends TestCase {
                 {  }, {"a"}, { null }, { null, "a" } };
 
         for (String[] strings : a) {
-            ImmutableList<String> l = ImmutableSLList.<String>nil().prepend(strings);
+            ImmutableList<String> l = KeYCollections.<String>nil().prepend(strings);
             assertTrue(Immutables.isDuplicateFree(l));
         }
 
@@ -85,7 +85,7 @@ public class TestImmutables extends TestCase {
                 { null, "a", null }};
 
         for (String[] strings : b) {
-            ImmutableList<String> l = ImmutableSLList.<String>nil().prepend(strings);
+            ImmutableList<String> l = KeYCollections.<String>nil().prepend(strings);
             assertFalse(Immutables.isDuplicateFree(l));
         }
 
@@ -135,7 +135,7 @@ public class TestImmutables extends TestCase {
 
     public void testEqualityEmpty() throws Exception {
         ImmutableSet<Object> s1 = DefaultImmutableSet.<Object>nil();
-        ImmutableSet<Object> s2 = DefaultImmutableSet.fromImmutableList(ImmutableSLList.nil());
+        ImmutableSet<Object> s2 = DefaultImmutableSet.fromImmutableList(KeYCollections.nil());
         assertEquals(0, s1.size());
         assertEquals(0, s2.size());
 

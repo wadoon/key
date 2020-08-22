@@ -14,13 +14,13 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.LexPathOrdering;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermOrdering;
 import de.uka.ilkd.key.proof.Goal;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -57,7 +57,7 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
 
     protected abstract static class Collector {
     
-        private ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
+        private ImmutableList<Term> terms = KeYCollections.<Term>nil();
     
         protected void addTerm(Term mon) {
             terms = terms.prepend ( mon );

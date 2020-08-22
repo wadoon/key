@@ -16,11 +16,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.Iterator;
 
 import org.key_project.util.LRUCache;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -137,8 +133,8 @@ class UniTrigger implements Trigger {
     private static boolean containsLoop(ImmutableMap<QuantifiableVariable,Term> varMap,
                                         QuantifiableVariable var) {
         ImmutableList<QuantifiableVariable> body          =
-            ImmutableSLList.<QuantifiableVariable>nil();
-        ImmutableList<Term>                 fringe        = ImmutableSLList.<Term>nil();
+            KeYCollections.<QuantifiableVariable>nil();
+        ImmutableList<Term>                 fringe        = KeYCollections.<Term>nil();
         Term                       checkForCycle = varMap.get( var );
         
         if ( checkForCycle.op () == var ) return false;

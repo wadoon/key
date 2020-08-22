@@ -38,7 +38,7 @@ import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.Assert;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 
 import java.io.File;
 import java.io.StringReader;
@@ -69,7 +69,7 @@ public class TacletForTests {
             public RuleCollection getStandardRules() {
                 return new RuleCollection(
                                 RuleSourceFactory.fromDefaultLocation(ldtFile),
-                                ImmutableSLList.<BuiltInRule>nil());
+                                KeYCollections.<BuiltInRule>nil());
             }
         };
 

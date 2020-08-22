@@ -17,11 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -222,7 +218,7 @@ public final class QueryAxiom extends ClassAxiom {
 
         //create java block
         final ImmutableList<KeYJavaType> sig =
-                ImmutableSLList.<KeYJavaType>nil()
+                KeYCollections.<KeYJavaType>nil()
 		                 .append(target.getParamTypes()
 		                	       .toArray(
                               new KeYJavaType[target.getNumParams()]));
@@ -302,7 +298,7 @@ public final class QueryAxiom extends ClassAxiom {
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         tacletBuilder.addTacletGoalTemplate(
                 new RewriteTacletGoalTemplate(addedSeq,
-                                              ImmutableSLList.<Taclet>nil(),
+                                              KeYCollections.<Taclet>nil(),
                                               replacewith));
         tacletBuilder.setName(MiscTools.toValidTacletName(name));
         tacletBuilder.addRuleSet(new RuleSet(new Name("query_axiom")));

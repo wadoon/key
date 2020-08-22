@@ -19,10 +19,7 @@ package de.uka.ilkd.key.rule;
 
 import junit.framework.TestCase;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -165,7 +162,7 @@ public class TestSchemaModalOperators extends TestCase {
 	rtb.setFind(find); 
 	rtb.addTacletGoalTemplate(new                                            
 	        RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,                           
-                                    ImmutableSLList.<Taclet>nil(),                   
+                                    KeYCollections.<Taclet>nil(),
                                     replace));                                 
 
 	RewriteTaclet t = rtb.getRewriteTaclet();

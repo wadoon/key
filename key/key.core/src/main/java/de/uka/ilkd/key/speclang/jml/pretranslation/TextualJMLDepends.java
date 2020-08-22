@@ -17,11 +17,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.PositionedString;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -38,7 +38,7 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
         super(mods);
         assert depends != null;
         for(Name hName : HeapLDT.VALID_HEAP_NAMES) {
-            this.depends.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+            this.depends.put(hName.toString(), KeYCollections.<PositionedString>nil());
         }
         addGeneric(this.depends, depends);
     }

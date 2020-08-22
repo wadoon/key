@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
@@ -48,7 +48,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     * @param settings The {@link IModelSettings} to use.
     */
    public SymbolicEquivalenceClass(Services services, IModelSettings settings) {
-      this(services, ImmutableSLList.<Term>nil(), settings);
+      this(services, KeYCollections.<Term>nil(), settings);
    }
 
    /**
@@ -92,7 +92,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
     */
    @Override
    public ImmutableList<String> getTermStrings() {
-      ImmutableList<String> strings = ImmutableSLList.nil();
+      ImmutableList<String> strings = KeYCollections.nil();
       for (Term term : terms) {
          strings = strings.append(formatTerm(term, services));
       }

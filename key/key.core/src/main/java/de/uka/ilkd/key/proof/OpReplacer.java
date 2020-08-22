@@ -17,11 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -265,7 +261,7 @@ public class OpReplacer {
      * @return the list of transformed terms.
      */
     public ImmutableList<Term> replace(ImmutableList<Term> terms) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = KeYCollections.<Term>nil();
         for(final Term term : terms) {
             result = result.append(replace(term));
         }
@@ -280,7 +276,7 @@ public class OpReplacer {
      */
     public ImmutableList<InfFlowSpec> replaceInfFlowSpec(ImmutableList<InfFlowSpec> terms) {
         ImmutableList<InfFlowSpec>
-                result = ImmutableSLList.<InfFlowSpec>nil();
+                result = KeYCollections.<InfFlowSpec>nil();
         if (terms == null) {
             return result;
         }

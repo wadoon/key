@@ -14,10 +14,11 @@
 package de.uka.ilkd.key.java.visitor;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.ProgramElement;
-/** Walks through a java AST in depth-left-fist-order. 
+import org.key_project.util.collection.KeYCollections;
+
+/** Walks through a java AST in depth-left-fist-order.
  * You can set the type of nodes you want to collect and then start the
  * walker. The found nodes of the given type are returned as a 
  * IList<JavaProgramElement>
@@ -28,7 +29,7 @@ public class JavaASTCollector extends JavaASTWalker {
     private Class<?> type;
     /** the list of found elements */
     private ImmutableList<ProgramElement> resultList = 
-	ImmutableSLList.<ProgramElement>nil();
+	KeYCollections.<ProgramElement>nil();
 
     /** create the JavaASTWalker 
      * @param root the ProgramElement where to begin

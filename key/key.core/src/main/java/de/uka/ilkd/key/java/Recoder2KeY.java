@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.NullType;
@@ -73,6 +72,7 @@ import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.ZipFileCollection;
+import org.key_project.util.collection.KeYCollections;
 import recoder.ParserException;
 import recoder.ProgramFactory;
 import recoder.bytecode.ByteCodeParser;
@@ -1239,7 +1239,7 @@ public class Recoder2KeY implements JavaReader {
      */
     public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> varns, String s) {
         Iterator<IProgramVariable> it = varns.allElements().iterator();
-        ImmutableList<ProgramVariable> pvs = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> pvs = KeYCollections.<ProgramVariable>nil();
         while (it.hasNext()) {
             Named n = it.next();
             if (n instanceof ProgramVariable) {

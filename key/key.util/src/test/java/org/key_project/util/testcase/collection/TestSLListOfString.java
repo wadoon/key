@@ -18,7 +18,7 @@ import java.util.Iterator;
 import org.junit.Before;
 import org.junit.Test;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 
 /** tests non-destructive list implementation with String */
 
@@ -41,18 +41,18 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
     @Before
     public void setUp() {
-	a = ImmutableSLList.<String>nil().prepend("C").prepend("B").prepend("A");
-	a1 = ImmutableSLList.<String>nil()
+	a = KeYCollections.<String>nil().prepend("C").prepend("B").prepend("A");
+	a1 = KeYCollections.<String>nil()
 	    .prepend("C").prepend("B").prepend("A");
-	b = ImmutableSLList.<String>nil()
+	b = KeYCollections.<String>nil()
 	    .prepend("B").prepend("A");
-	c = ImmutableSLList.<String>nil()
+	c = KeYCollections.<String>nil()
 	    .prepend("D").prepend("C").prepend("B").prepend("A");
-	d = ImmutableSLList.<String>nil()
+	d = KeYCollections.<String>nil()
 	    .prepend("A").prepend("B").prepend("A");
-	e = ImmutableSLList.<String>nil()
+	e = KeYCollections.<String>nil()
 	    .prepend((String)null).prepend("B").prepend("A");
-	e1 = ImmutableSLList.<String>nil().prepend((String)null).prepend("B").prepend("A");
+	e1 = KeYCollections.<String>nil().prepend((String)null).prepend("B").prepend("A");
     }
 
     // tests prepend and implicitly iterator, size
@@ -60,7 +60,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
     public void testPrepend() {
 	@SuppressWarnings("unchecked")
    ImmutableList<String>[] newList = new ImmutableList[str.length+1];
-	newList[0] = ImmutableSLList.nil();
+	newList[0] = KeYCollections.nil();
 
 	for (int i=1;i<str.length+1;i++) {
 	    newList[i]=newList[i-1].prepend(str[i-1]);
@@ -98,7 +98,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
     public void testAppend() {
 	@SuppressWarnings("unchecked")
    ImmutableList<String>[] newList=new ImmutableList[str.length+1];
-	newList[0]=ImmutableSLList.nil();
+	newList[0]= KeYCollections.nil();
 
 	for (int i=1;i<str.length+1;i++) {
 	    newList[i]=newList[i-1].append(str[i-1]);
@@ -137,7 +137,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
     public void testHeadTail() {
 	@SuppressWarnings("unchecked")
    ImmutableList<String>[] newList=new ImmutableList[str.length+1];
-	newList[0]=ImmutableSLList.<String>nil();
+	newList[0]= KeYCollections.<String>nil();
 
 	for (int i=1;i<str.length+1;i++) {
 	    newList[i]=newList[i-1].prepend(str[i-1]);
@@ -152,7 +152,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
    // tests contains
     @Test
     public void testContains() {
-	ImmutableList<String> newList=ImmutableSLList.<String>nil();
+	ImmutableList<String> newList= KeYCollections.<String>nil();
 
 	for (int i=1;i<str.length+1;i++) {
 	    newList=newList.append(str[i-1]);
@@ -167,7 +167,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
   // tests removeAll
     @Test
     public void testRemoveAll() {
-	ImmutableList<String> newList=ImmutableSLList.<String>nil();
+	ImmutableList<String> newList= KeYCollections.<String>nil();
 
 	newList=newList.append(str[0]);
 	for (int i=1;i<str.length+1;i++) {
@@ -181,7 +181,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
     @Test
     public void testRemoveFirst() {
-	ImmutableList<String> newList=ImmutableSLList.<String>nil();
+	ImmutableList<String> newList= KeYCollections.<String>nil();
 
 	newList=newList.prepend(str[0]);
 	for (int i=1;i<str.length+1;i++) {
@@ -216,7 +216,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
     @Test
     public void testToString() {
-	ImmutableList<String> newList=ImmutableSLList.<String>nil();
+	ImmutableList<String> newList= KeYCollections.<String>nil();
         for (String aStr : str) {
             newList = newList.append(aStr);
         }
@@ -226,7 +226,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
     public static void performanceTest(int n) {
 	System.out.println("Performance Test for " + n + " elements");
-	ImmutableList<String> newList=ImmutableSLList.<String>nil();
+	ImmutableList<String> newList= KeYCollections.<String>nil();
 	System.out.println("Create list with prepend.");
 	long start = System.currentTimeMillis();
 	for (int i = 0; i<n; i++) {
@@ -253,7 +253,7 @@ public class TestSLListOfString extends junit.framework.TestCase {
 
 
     public static void main(String[] args) {
-	ImmutableList<String> newList=ImmutableSLList.<String>nil();
+	ImmutableList<String> newList= KeYCollections.<String>nil();
 	newList.prepend("a");
 
  	performanceTest(10);

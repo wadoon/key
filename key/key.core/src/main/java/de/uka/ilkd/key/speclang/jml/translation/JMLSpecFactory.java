@@ -22,11 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Label;
@@ -252,7 +248,7 @@ public class JMLSpecFactory {
     // -------------------------------------------------------------------------
     private static class ContractClauses {
 
-        public ImmutableList<Term> abbreviations = ImmutableSLList.<Term>nil();
+        public ImmutableList<Term> abbreviations = KeYCollections.<Term>nil();
         public Map<LocationVariable, Term> requires = new LinkedHashMap<LocationVariable, Term>();
         public Map<LocationVariable, Term> requiresFree
                 = new LinkedHashMap<LocationVariable, Term>();
@@ -304,7 +300,7 @@ public class JMLSpecFactory {
      */
     private ImmutableList<ProgramVariable> collectLocalVariables(StatementContainer sc,
             LoopStatement loop) {
-        ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> result = KeYCollections.<ProgramVariable>nil();
         for (int i = 0, m = sc.getStatementCount(); i < m; i++) {
             Statement s = sc.getStatementAt(i);
 
@@ -516,7 +512,7 @@ public class JMLSpecFactory {
         if (heap == savedHeap && mod.isEmpty()) {
             clauses.assignables.put(heap, null);
         } else if (!clauses.hasMod.get(heap)) {
-            final ImmutableList<PositionedString> assignableNothing = ImmutableSLList
+            final ImmutableList<PositionedString> assignableNothing = KeYCollections
                     .<PositionedString>nil().append(new PositionedString("assignable \\nothing;"));
             clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
                     progVars.paramVars, progVars.atPres, progVars.atBefores, assignableNothing));
@@ -558,9 +554,9 @@ public class JMLSpecFactory {
             ProgramVariable resultVar, ProgramVariable excVar,
             ImmutableList<PositionedString> originalClauses) throws SLTranslationException {
         if (originalClauses.isEmpty()) {
-            return ImmutableSLList.<InfFlowSpec>nil();
+            return KeYCollections.<InfFlowSpec>nil();
         } else {
-            ImmutableList<InfFlowSpec> result = ImmutableSLList.<InfFlowSpec>nil();
+            ImmutableList<InfFlowSpec> result = KeYCollections.<InfFlowSpec>nil();
             for (PositionedString expr : originalClauses) {
                 InfFlowSpec translated
                         = JMLTranslator.translate(expr, pm.getContainerType(), selfVar, paramVars,
@@ -1085,7 +1081,7 @@ public class JMLSpecFactory {
         // create class axiom
         return new RepresentsAxiom("JML represents clause for " + rep.first.name().toString(),
                 rep.first, kjt, visibility, null, repFormula, selfVar,
-                ImmutableSLList.<ProgramVariable>nil(), null);
+                KeYCollections.<ProgramVariable>nil(), null);
     }
 
     @SuppressWarnings("unchecked")
@@ -1111,7 +1107,7 @@ public class JMLSpecFactory {
                 : "JML represents clause \"" + textualRep.getName() + "\" for " + rep.first.name();
         Term repFormula = tb.convertToFormula(rep.second);
         return new RepresentsAxiom(name, displayName, rep.first, kjt, getVisibility(textualRep),
-                null, repFormula, selfVar, ImmutableSLList.<ProgramVariable>nil(), null);
+                null, repFormula, selfVar, KeYCollections.<ProgramVariable>nil(), null);
     }
 
     /**
@@ -1271,7 +1267,7 @@ public class JMLSpecFactory {
             });
 
             final MergeParamsSpec specs = JMLTranslator.translate(mergeParamsParseStr, kjt,
-                    progVars.selfVar, append(ImmutableSLList.<ProgramVariable>nil(), params),
+                    progVars.selfVar, append(KeYCollections.<ProgramVariable>nil(), params),
                     progVars.resultVar, progVars.excVar, atPres, atPres,
                     null, MergeParamsSpec.class, services);
 
@@ -1427,7 +1423,7 @@ public class JMLSpecFactory {
                     method.collectParameters())
                             .append(collectLocalVariablesVisibleTo(block, method));
         } else {
-            vars = append(ImmutableSLList.nil(), method.collectParameters())
+            vars = append(KeYCollections.nil(), method.collectParameters())
                     .append(collectLocalVariablesVisibleTo(block, method));
         }
 
@@ -1453,7 +1449,7 @@ public class JMLSpecFactory {
 
     private ImmutableList<ProgramVariable> collectLocalVariablesVisibleTo(final Statement statement,
             final StatementContainer container) {
-        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
+        ImmutableList<ProgramVariable> result = KeYCollections.nil();
         final int statementCount = container.getStatementCount();
         for (int i = 0; i < statementCount; i++) {
             final Statement s = container.getStatementAt(i);
@@ -1584,7 +1580,7 @@ public class JMLSpecFactory {
                 infFlowSpecTermList = translateInfFlowSpecClauses(pm, selfVar, allVars, resultVar,
                         excVar, originalInfFlowSpecs);
             } else {
-                infFlowSpecTermList = ImmutableSLList.<InfFlowSpec>nil();
+                infFlowSpecTermList = KeYCollections.<InfFlowSpec>nil();
             }
             infFlowSpecs.put(heap, infFlowSpecTermList);
         }
@@ -1626,7 +1622,7 @@ public class JMLSpecFactory {
     // Hence this little helper.
     private ImmutableList<ProgramVariable> append(ImmutableList<ProgramVariable> localVars,
             ImmutableList<LocationVariable> paramVars) {
-        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
+        ImmutableList<ProgramVariable> result = KeYCollections.nil();
         for (LocationVariable param : paramVars) {
             result = result.prepend(param);
         }
@@ -1658,7 +1654,7 @@ public class JMLSpecFactory {
             IProgramMethod pm) throws SLTranslationException {
         // if (! pm.isConstructor()) throw new SLTranslationException("Initially
         // clauses only apply to constructors, not to method "+pm);
-        final ImmutableList<String> mods = ImmutableSLList.<String>nil().append("private");
+        final ImmutableList<String> mods = KeYCollections.<String>nil().append("private");
         final TextualJMLSpecCase specCase = new TextualJMLSpecCase(mods, Behavior.NONE);
         specCase.addName(new PositionedString(ini.getName()));
         specCase.addRequires(createPrecond(pm, ini.getOriginalSpec()));
@@ -1674,7 +1670,7 @@ public class JMLSpecFactory {
 
     private ImmutableList<PositionedString> createPrecond(IProgramMethod pm,
             PositionedString originalSpec) {
-        ImmutableList<PositionedString> res = ImmutableSLList.<PositionedString>nil();
+        ImmutableList<PositionedString> res = KeYCollections.<PositionedString>nil();
         // TODO: add static invariant
         for (ParameterDeclaration p : pm.getMethodDeclaration().getParameters()) {
             if (!JMLInfoExtractor.parameterIsNullable(pm, p)) {

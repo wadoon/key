@@ -19,7 +19,6 @@ import java.io.File;
 import junit.framework.TestCase;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -39,6 +38,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.key_project.util.collection.KeYCollections;
 
 
 public class TestTacletIndex extends TestCase{   
@@ -121,7 +121,7 @@ public class TestTacletIndex extends TestCase{
      */
     public void disabled_testNonInteractiveIsShownOnlyIfHeuristicIsMissed() {
 	Term term_p1 = TacletForTests.parseTerm("p(one, zero)");	
-	ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
+	ImmutableList<RuleSet> listofHeuristic= KeYCollections.<RuleSet>nil();
         listofHeuristic=listofHeuristic.prepend(h3);
         PosInOccurrence pos = new PosInOccurrence(new SequentFormula(term_p1),
                 PosInTerm.getTopLevel(), true);
@@ -139,7 +139,7 @@ public class TestTacletIndex extends TestCase{
 
   	assertTrue("Noninteractive nofindrule is not in list, but none of its "+
 		   "heuristics is active.",
-		   isRuleIn(variante_one.getNoFindTaclet(new IHTacletFilter (true, ImmutableSLList.<RuleSet>nil()),
+		   isRuleIn(variante_one.getNoFindTaclet(new IHTacletFilter (true, KeYCollections.<RuleSet>nil()),
    			    null),ruleNoFindNonH1H2H3));  
 
  	assertTrue("Noninteractive nofindrule is in list, but one of its "+
@@ -151,7 +151,7 @@ public class TestTacletIndex extends TestCase{
 
     public void testShownIfHeuristicFits() {
         Services services = new Services(AbstractProfile.getDefaultProfile());
-        ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
+        ImmutableList<RuleSet> listofHeuristic= KeYCollections.<RuleSet>nil();
 	listofHeuristic=listofHeuristic.prepend(h3).prepend(h2);
 
 	Term term_p1 = TacletForTests.parseTerm("p(one, zero)");	
@@ -186,7 +186,7 @@ public class TestTacletIndex extends TestCase{
 
     public void testNoMatchingFindRule() {
         Services services = new Services(AbstractProfile.getDefaultProfile());
-        ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
+        ImmutableList<RuleSet> listofHeuristic= KeYCollections.<RuleSet>nil();
 
 	Term term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
 	
@@ -222,7 +222,7 @@ public class TestTacletIndex extends TestCase{
 
 	Term term_p4 = TacletForTests.parseTerm("p(zero, one)");
 
-	ImmutableList<RuleSet> listofHeuristic=ImmutableSLList.<RuleSet>nil();
+	ImmutableList<RuleSet> listofHeuristic= KeYCollections.<RuleSet>nil();
         PosInOccurrence posAntec = new PosInOccurrence(new SequentFormula(term_p4),
                 PosInTerm.getTopLevel(), true);
 	

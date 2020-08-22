@@ -3,7 +3,6 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
@@ -25,6 +24,7 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * instantiate var=a occ=2 with="a_8" hide
@@ -110,7 +110,7 @@ public class InstantiateCommand
         RuleAppIndex index = g.ruleAppIndex();
         index.autoModeStopped();
 
-        ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
+        ImmutableList<TacletApp> allApps = KeYCollections.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
             if (p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
                 continue;

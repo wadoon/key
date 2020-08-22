@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Services;
@@ -481,7 +481,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                         List<IExecutionValue> values = new LinkedList<IExecutionValue>();
                         StateExecutionVariable variable = allStateVariables.get(new LocationDefinition(firstPair.getProgramVariable(), firstPair.getArrayIndex()));
                         assert variable != null;
-                        createValues(variable, pairsList, firstPair, contentMap, values, ImmutableSLList.<Term>nil());
+                        createValues(variable, pairsList, firstPair, contentMap, values, KeYCollections.<Term>nil());
                         variable.values = values.toArray(new IExecutionValue[values.size()]);
                      }
                   }

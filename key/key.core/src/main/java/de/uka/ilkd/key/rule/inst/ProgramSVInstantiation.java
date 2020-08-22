@@ -16,10 +16,10 @@ package de.uka.ilkd.key.rule.inst;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import org.key_project.util.collection.KeYCollections;
 
 
 /** this class wrapps a ImmMap<SchemaVariable,JavaProgramElement> and
@@ -34,7 +34,7 @@ public class ProgramSVInstantiation {
 	EMPTY_PROGRAMSVINSTANTIATION = new ProgramSVInstantiation();
 
     /** the map with the instantiations */
-    private ImmutableList<ProgramSVEntry> list = ImmutableSLList.<ProgramSVEntry>nil();
+    private ImmutableList<ProgramSVEntry> list = KeYCollections.<ProgramSVEntry>nil();
     
     /** integer to cache the hashcode */
     private int hashcode = 0;
@@ -82,7 +82,7 @@ public class ProgramSVInstantiation {
      */
     public ProgramSVInstantiation replace(SchemaVariable sv, 
 					  JavaProgramElement prgElement) { 
-	ImmutableList<ProgramSVEntry> result = ImmutableSLList.<ProgramSVEntry>nil()
+	ImmutableList<ProgramSVEntry> result = KeYCollections.<ProgramSVEntry>nil()
 	    .prepend(new ProgramSVEntry(sv, prgElement));
         for (final ProgramSVEntry entry : list) {
             if (entry.key() != sv) {

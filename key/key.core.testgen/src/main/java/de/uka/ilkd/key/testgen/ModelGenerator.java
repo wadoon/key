@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.model.Model;
+import org.key_project.util.collection.KeYCollections;
 
 public class ModelGenerator implements SolverLauncherListener{
    private final Services services;
@@ -175,7 +175,7 @@ public class ModelGenerator implements SolverLauncherListener{
 
 	public Term sequentToTerm(Sequent s) {
 
-		ImmutableList<Term> ante = ImmutableSLList.nil();
+		ImmutableList<Term> ante = KeYCollections.nil();
 
 		final TermBuilder tb = services.getTermBuilder();
 		ante = ante.append(tb.tt());
@@ -183,7 +183,7 @@ public class ModelGenerator implements SolverLauncherListener{
 			ante = ante.append(f.formula());
 		}
 
-		ImmutableList<Term> succ = ImmutableSLList.nil();
+		ImmutableList<Term> succ = KeYCollections.nil();
 		succ = succ.append(tb.ff());
 		for (SequentFormula f : s.succedent()) {
 			succ = succ.append(f.formula());

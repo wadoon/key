@@ -19,7 +19,6 @@ import java.util.ListIterator;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
@@ -56,6 +55,7 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import org.key_project.util.collection.KeYCollections;
 
 public final class WhileInvariantTransformer {
     /** the outer label that is used to leave the while loop ('l1') */
@@ -358,7 +358,7 @@ public final class WhileInvariantTransformer {
                 originalLoop, svInst,
                 javaInfo == null ? null : javaInfo.getServices());
         w.start();
-        instantiations = ImmutableSLList.<SchemaVariable> nil();
+        instantiations = KeYCollections.<SchemaVariable> nil();
         if (w.innerLabelNeeded()) {
             instantiations = instantiations.prepend(innerLabel);
         }

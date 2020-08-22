@@ -16,13 +16,13 @@ package de.uka.ilkd.key.util;
 import junit.framework.TestCase;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Tests for {@link SearchNodePreorderIterator}.
@@ -107,7 +107,7 @@ public class TestSearchNodePreorderIterator extends TestCase {
    protected void assertRoot(Node root) {
       // List children
       NodePreorderIterator iter = new NodePreorderIterator(root);
-      ImmutableList<Node> childList = ImmutableSLList.<Node>nil();
+      ImmutableList<Node> childList = KeYCollections.<Node>nil();
       while (iter.hasNext()) {
          Node next = iter.next();
          childList = childList.append(next);

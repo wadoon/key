@@ -17,7 +17,6 @@ package de.uka.ilkd.key.proof.proofevent;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -27,6 +26,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Node;
+import org.key_project.util.collection.KeYCollections;
 
 
 /** Information about a node replacing its parent after a rule
@@ -189,7 +189,7 @@ public class NodeReplacement {
     private void removeNodeChanges ( SequentFormula p_cf,
 				     boolean            p_inAntec ) {
 	Iterator<NodeChange> it     = changes.iterator ();
-	changes                     = ImmutableSLList.<NodeChange>nil();
+	changes                     = KeYCollections.<NodeChange>nil();
 	NodeChange           oldNC;
 	PosInOccurrence      oldPio;
 
@@ -216,7 +216,7 @@ public class NodeReplacement {
      */
     public Iterator<NodeChange> getNodeChanges () {
 	if ( changes == null ) {
-	    changes = ImmutableSLList.<NodeChange>nil();
+	    changes = KeYCollections.<NodeChange>nil();
 	    addNodeChanges ();
 	}
 	return changes.iterator ();

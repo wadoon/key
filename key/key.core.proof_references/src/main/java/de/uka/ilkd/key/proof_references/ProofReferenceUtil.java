@@ -16,7 +16,7 @@ package de.uka.ilkd.key.proof_references;
 import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
@@ -57,7 +57,7 @@ public final class ProofReferenceUtil {
    /**
     * The default {@link IProofReferencesAnalyst}s.
     */
-   public static final ImmutableList<IProofReferencesAnalyst> DEFAULT_ANALYSTS = ImmutableSLList.<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst(),
+   public static final ImmutableList<IProofReferencesAnalyst> DEFAULT_ANALYSTS = KeYCollections.<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst(),
                                                                                                                                        new MethodCallProofReferencesAnalyst(),
                                                                                                                                        new ContractProofReferencesAnalyst(),
                                                                                                                                        new ProgramVariableReferencesAnalyst(),

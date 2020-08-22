@@ -18,10 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
@@ -368,7 +365,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<Term> localOuts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> localOuts = KeYCollections.<Term>nil();
         for(final Term varTerm: varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
@@ -390,7 +387,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<Term> localOuts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> localOuts = KeYCollections.<Term>nil();
         for(final Term varTerm: varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
@@ -913,7 +910,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term reachableState = null;
         Term anonHeap = null;
         ImmutableList<AnonUpdateData> anonUpdateDatas =
-                ImmutableSLList.<AnonUpdateData>nil();
+                KeYCollections.<AnonUpdateData>nil();
         for (LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon
             = createAnonUpdate(heap, mods.get(heap), inst.inv, services);

@@ -17,7 +17,6 @@ import java.io.File;
 import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Node;
@@ -28,6 +27,7 @@ import de.uka.ilkd.key.proof_references.analyst.ContractProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.IProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.analyst.MethodBodyExpandProofReferencesAnalyst;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Tests for {@link ProofReferenceUtil}.
@@ -44,7 +44,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
                 "UseOperationContractTest",
                 "main",
                 true,
-                ImmutableSLList.<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst(), new ContractProofReferencesAnalyst()),
+                KeYCollections.<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst(), new ContractProofReferencesAnalyst()),
                 new ExpectedProofReferences(IProofReference.INLINE_METHOD, "UseOperationContractTest::main"),
                 new ExpectedProofReferences(IProofReference.USE_CONTRACT, "pre: {heap=java.lang.Object::<inv>(heap,self)<<impl>>}; mby: null; post: {heap=and(and(equals(result<<origin(ensures @ file UseOperationContractTest.java @ line 12) ([])>>,Z(2(4(#))))<<origin(ensures @ file UseOperationContractTest.java @ line 12) ([])>>,java.lang.Object::<inv>(heap,self)<<impl>>)<<SC>>,equals(exc<<origin(ensures (implicit)) ([])>>,null)<<impl, origin(ensures (implicit)) ([])>>)}; mods: {heap=allLocs, savedHeap=null}; hasMod: {heap=true, savedHeap=true}; termination: diamond; transaction: false"));
    }
@@ -59,7 +59,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
                 "MethodBodyExpand",
                 "main",
                 false,
-                ImmutableSLList.<IProofReferencesAnalyst>nil());
+                KeYCollections.<IProofReferencesAnalyst>nil());
    }
 
    /**
@@ -72,7 +72,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
                 "MethodBodyExpand",
                 "main",
                 false,
-                ImmutableSLList.<IProofReferencesAnalyst>nil().append(new ContractProofReferencesAnalyst()));
+                KeYCollections.<IProofReferencesAnalyst>nil().append(new ContractProofReferencesAnalyst()));
    }
 
    /**
@@ -85,7 +85,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
                 "MethodBodyExpand",
                 "main",
                 false,
-                ImmutableSLList.<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst()),
+                KeYCollections.<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst()),
                 new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::main"),
                 new ExpectedProofReferences(IProofReference.INLINE_METHOD, "MethodBodyExpand::magic42"));
    }

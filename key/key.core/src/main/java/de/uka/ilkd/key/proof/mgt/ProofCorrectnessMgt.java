@@ -17,10 +17,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -111,7 +108,7 @@ public final class ProofCorrectnessMgt {
 	ImmutableSet<ImmutableList<Contract>> newPaths 
 		= DefaultImmutableSet.nil();
 	for(Contract c : contractsToBeApplied) {
-	    newPaths = newPaths.add(ImmutableSLList.<Contract>nil().prepend(c));
+	    newPaths = newPaths.add(KeYCollections.<Contract>nil().prepend(c));
 	}
 	
 	//look for cycles

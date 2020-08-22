@@ -18,7 +18,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -46,7 +45,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import junit.framework.TestCase;
-
+import org.key_project.util.collection.KeYCollections;
 
 
 public class TestJMLTranslator extends TestCase {
@@ -208,7 +207,7 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         JMLTranslator.translate(new PositionedString(
                 "(o.i)"),
-                testClassType, selfVar, ImmutableSLList.<ProgramVariable>nil().prepend(var),
+                testClassType, selfVar, KeYCollections.<ProgramVariable>nil().prepend(var),
                 null, null, null, null, Term.class, services);
     }
 
@@ -240,7 +239,7 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         IProgramMethod getOne = javaInfo.getProgramMethod(testClassType,
                                                          "getOne",
-                                                         ImmutableSLList.<KeYJavaType>nil(),
+                                                         KeYCollections.<KeYJavaType>nil(),
                                                          testClassType);
 
         try {
@@ -478,7 +477,7 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable excVar = buildExcVar();
 
         ImmutableList<KeYJavaType> signature =
-                ImmutableSLList.<KeYJavaType>nil();
+                KeYCollections.<KeYJavaType>nil();
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "getOne",
                                                      signature, testClassType);
@@ -583,7 +582,7 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         ImmutableList<KeYJavaType> signature =
-                ImmutableSLList.<KeYJavaType>nil();
+                KeYCollections.<KeYJavaType>nil();
         signature = signature.append(javaInfo.getKeYJavaType(
                 PrimitiveType.JAVA_INT));
 
@@ -612,7 +611,7 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         ImmutableList<KeYJavaType> signature =
-                ImmutableSLList.<KeYJavaType>nil();
+                KeYCollections.<KeYJavaType>nil();
         signature = signature.append(javaInfo.getKeYJavaType(
                 PrimitiveType.JAVA_LONG));
 
@@ -641,7 +640,7 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         ImmutableList<KeYJavaType> signature =
-                ImmutableSLList.<KeYJavaType>nil();
+                KeYCollections.<KeYJavaType>nil();
         signature = signature.append(javaInfo.getKeYJavaType(
                 PrimitiveType.JAVA_INT));
 
@@ -670,7 +669,7 @@ public class TestJMLTranslator extends TestCase {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         ImmutableList<KeYJavaType> signature =
-                ImmutableSLList.<KeYJavaType>nil();
+                KeYCollections.<KeYJavaType>nil();
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType,
                                                      "staticMethod", signature,

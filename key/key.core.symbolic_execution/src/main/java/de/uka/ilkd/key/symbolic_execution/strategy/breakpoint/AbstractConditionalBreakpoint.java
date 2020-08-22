@@ -21,7 +21,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaTools;
@@ -61,6 +60,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Adds the funtionality to breakpoints to evaluate conditions.
@@ -293,7 +293,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
       }
       //collect all variables needed to parse the condition
       setSelfVar(new LocationVariable(new ProgramElementName(getProof().getServices().getTermBuilder().newName("self")), containerType, null, false, false));
-      ImmutableList<ProgramVariable> varsForCondition = ImmutableSLList.nil();
+      ImmutableList<ProgramVariable> varsForCondition = KeYCollections.nil();
       if(getPm()!=null){
        //collect parameter variables
          for (ParameterDeclaration pd : getPm().getParameters()) {
@@ -313,7 +313,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
       }
       JavaInfo info = getProof().getServices().getJavaInfo();
       ImmutableList<KeYJavaType> kjts = info.getAllSupertypes(containerType);
-      ImmutableList<ProgramVariable> globalVars = ImmutableSLList.nil();
+      ImmutableList<ProgramVariable> globalVars = KeYCollections.nil();
       for(KeYJavaType kjtloc: kjts){
          if (kjtloc.getJavaType() instanceof TypeDeclaration) {
             ImmutableList<Field> fields = info.getAllFields((TypeDeclaration)kjtloc.getJavaType());

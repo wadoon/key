@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
@@ -37,6 +36,7 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Command that applies a calculus rule All parameters are passed as strings and
@@ -145,7 +145,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 .findIfFormulaInstantiations(
                         state.getFirstOpenAutomaticGoal().sequent(), services);
 
-        assumesCandidates = ImmutableList.fromList(filterList(p, assumesCandidates));
+        assumesCandidates = KeYCollections.fromList(filterList(p, assumesCandidates));
 
         if (assumesCandidates.size() != 1) {
             throw new ScriptException("Not a unique \\assumes instantiation");
@@ -284,7 +284,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         final BuiltInRuleAppIndex index = g.ruleAppIndex()
                 .builtInRuleAppIndex();
 
-        ImmutableList<IBuiltInRuleApp> allApps = ImmutableSLList.nil();
+        ImmutableList<IBuiltInRuleApp> allApps = KeYCollections.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
             if (!isFormulaSearchedFor(p, sf, services)) {
                 continue;
@@ -315,7 +315,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         RuleAppIndex index = g.ruleAppIndex();
         index.autoModeStopped();
 
-        ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
+        ImmutableList<TacletApp> allApps = KeYCollections.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
             if (!isFormulaSearchedFor(p, sf, services)) {
                 continue;

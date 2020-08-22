@@ -27,26 +27,20 @@ import java.util.stream.StreamSupport;
 public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     /**
-     *
-     */
-    private static final long serialVersionUID = -5000602574000532257L;
-
-    /**
      * Constant defining the set size at which an optimized union operation will be executed.
      */
     public static final int UNION_OPTIMIZATION_SIZE = 100;
-
-    /** list containing the elements */
+    /**
+     *
+     */
+    private static final long serialVersionUID = -5000602574000532257L;
+    /**
+     * list containing the elements
+     */
     private final ImmutableList<T> elementList;
 
-    /** the empty set */
-    @SuppressWarnings("unchecked")
-    public static final <T> DefaultImmutableSet<T> nil() {
-        return (DefaultImmutableSet<T>) NILSet.NIL;
-    }
-
     protected DefaultImmutableSet() {
-        elementList = ImmutableSLList.<T>nil();
+        elementList = KeYCollections.nil();
     }
 
     /**
@@ -55,7 +49,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      * @param element of type <T> the new Set contains
      */
     protected DefaultImmutableSet(T element) {
-        elementList = (ImmutableSLList.<T>nil()).prepend(element);
+        elementList = (KeYCollections.<T>nil()).prepend(element);
     }
 
     /**
@@ -68,7 +62,47 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         this.elementList = elementList;
     }
 
-//    private static HashSet<String> previousComplains = new HashSet<>();
+    /**
+     * the empty set
+     */
+    @SuppressWarnings("unchecked")
+    public static final <T> DefaultImmutableSet<T> nil() {
+        return (DefaultImmutableSet<T>) NILSet.NIL;
+    }
+
+    /**
+     * Create an immutable set from an immutable list.
+     *
+     * @param list a non-null immutable list
+     * @return a fresh immutable set with the same iteration order.
+     */
+    public static <T> ImmutableSet<T> fromImmutableList(ImmutableList<T> list) {
+        if (list.isEmpty()) {
+            return nil();
+        } else {
+            return new DefaultImmutableSet<T>(Immutables.removeDuplicates(list));
+        }
+    }
+
+    /**
+     * Create an immutable set from a mutable set
+     *
+     * @param set a non-null mutable set
+     * @return a fresh immutable set with all the elements in set
+     */
+    public static <T> ImmutableSet<T> fromSet(Set<T> set) {
+        if (set.isEmpty()) {
+            return nil();
+        } else {
+            ImmutableList<T> backerList = KeYCollections.nil();
+            for (T element : set) {
+                backerList = backerList.prepend(element);
+            }
+            return new DefaultImmutableSet<T>(backerList);
+        }
+    }
+
+    //    private static HashSet<String> previousComplains = new HashSet<>();
     private void complainAboutSize() {
 //        // Immutable linear sets are very expensive with O(n) addition
 //        // and O(n) lookup.
@@ -117,7 +151,9 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         }
     }
 
-    /** @return union of this set with set */
+    /**
+     * @return union of this set with set
+     */
     @Override
     public ImmutableSet<T> union(ImmutableSet<? extends T> set) {
         if (set instanceof DefaultImmutableSet && size() * set.size() > UNION_OPTIMIZATION_SIZE) {
@@ -147,7 +183,9 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         return new DefaultImmutableSet<T>(unionElements);
     }
 
-    /** @return intersection of this set with set */
+    /**
+     * @return intersection of this set with set
+     */
     @SuppressWarnings("unchecked")
     @Override
     public ImmutableSet<T> intersect(ImmutableSet<? extends T> set) {
@@ -157,7 +195,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
             return (ImmutableSet<T>) set;
         }
 
-        ImmutableList<T> intersectElements = ImmutableSLList.<T>nil();
+        ImmutableList<T> intersectElements = KeYCollections.nil();
         for (T el : set) {
             if (contains(el)) {
                 intersectElements = intersectElements.prepend(el);
@@ -165,13 +203,15 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         }
 
         if (intersectElements.isEmpty()) {
-            return DefaultImmutableSet.<T>nil();
+            return DefaultImmutableSet.nil();
         } else {
             return new DefaultImmutableSet<T>(intersectElements);
         }
     }
 
-    /** @return Iterator<T> of the set */
+    /**
+     * @return Iterator<T> of the set
+     */
     @Override
     public Iterator<T> iterator() {
         return elementList.iterator();
@@ -182,14 +222,18 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         return StreamSupport.stream(spliterator(), false);
     }
 
-    /** @return true iff obj in set */
+    /**
+     * @return true iff obj in set
+     */
     @Override
     public boolean contains(T obj) {
         complainAboutSize();
         return elementList.contains(obj);
     }
 
-    /** @return true iff this set is subset of set s */
+    /**
+     * @return true iff this set is subset of set s
+     */
     @Override
     public boolean subset(ImmutableSet<T> s) {
         if (size() > s.size()) {
@@ -215,13 +259,17 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         return elementList.exists(predicate);
     }
 
-    /** @return int the cardinality of the set */
+    /**
+     * @return int the cardinality of the set
+     */
     @Override
     public int size() {
         return elementList.size();
     }
 
-    /** @return true iff the set is empty */
+    /**
+     * @return true iff the set is empty
+     */
     @Override
     public boolean isEmpty() {
         return false;
@@ -230,7 +278,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     @Override
     public ImmutableSet<T> remove(T element) {
         final ImmutableList<T> list = elementList.removeFirst(element);
-        return list.isEmpty() ? DefaultImmutableSet.<T>nil() : new DefaultImmutableSet<T>(list);
+        return list.isEmpty() ? DefaultImmutableSet.nil() : new DefaultImmutableSet<T>(list);
     }
 
     /**
@@ -286,38 +334,6 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         return elementList;
     }
 
-    /**
-     * Create an immutable set from an immutable list.
-     *
-     * @param list a non-null immutable list
-     * @return a fresh immutable set with the same iteration order.
-     */
-    public static <T> ImmutableSet<T> fromImmutableList(ImmutableList<T> list) {
-        if (list.isEmpty()) {
-            return nil();
-        } else {
-            return new DefaultImmutableSet<T>(Immutables.removeDuplicates(list));
-        }
-    }
-
-    /**
-     * Create an immutable set from a mutable set
-     *
-     * @param set a non-null mutable set
-     * @return a fresh immutable set with all the elements in set
-     */
-    public static <T> ImmutableSet<T> fromSet(Set<T> set) {
-        if (set.isEmpty()) {
-            return nil();
-        } else {
-            ImmutableList<T> backerList = ImmutableSLList.nil();
-            for (T element : set) {
-                backerList = backerList.prepend(element);
-            }
-            return new DefaultImmutableSet<T>(backerList);
-        }
-    }
-
     @Override
     public String toString() {
         Iterator<T> it = this.iterator();
@@ -332,14 +348,16 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         return str.toString();
     }
 
-    /** represents the empty set for elements of type <T> */
+    /**
+     * represents the empty set for elements of type <T>
+     */
     private static class NILSet<T> extends DefaultImmutableSet<T> {
 
+        static final NILSet<?> NIL = new NILSet<>();
         /**
          *
          */
         private static final long serialVersionUID = -8055357307337694419L;
-        static final NILSet<?> NIL = new NILSet<>();
 
         private NILSet() {
         }
@@ -353,19 +371,25 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
             return NIL;
         }
 
-        /** adds an element */
+        /**
+         * adds an element
+         */
         @Override
         public ImmutableSet<T> add(T element) {
             return new DefaultImmutableSet<T>(element);
         }
 
-        /** adds an element (which is unique, since the set was empty) */
+        /**
+         * adds an element (which is unique, since the set was empty)
+         */
         @Override
         public ImmutableSet<T> addUnique(T element) {
             return new DefaultImmutableSet<T>(element);
         }
 
-        /** @return union of this set with set */
+        /**
+         * @return union of this set with set
+         */
         @SuppressWarnings("unchecked")
         @Override
         public ImmutableSet<T> union(ImmutableSet<? extends T> set) {
@@ -373,31 +397,41 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
             return (ImmutableSet<T>) set;
         }
 
-        /** @return true iff obj in set */
+        /**
+         * @return true iff obj in set
+         */
         @Override
         public boolean contains(T obj) {
             return false;
         }
 
-        /** @return Iterator<T> of the set */
+        /**
+         * @return Iterator<T> of the set
+         */
         @Override
         public Iterator<T> iterator() {
-            return ImmutableSLList.<T>nil().iterator();
+            return KeYCollections.<T>nil().iterator();
         }
 
-        /** @return true iff this set is subset of set s */
+        /**
+         * @return true iff this set is subset of set s
+         */
         @Override
         public boolean subset(ImmutableSet<T> s) {
             return true;
         }
 
-        /** @return int the cardinality of the set */
+        /**
+         * @return int the cardinality of the set
+         */
         @Override
         public int size() {
             return 0;
         }
 
-        /** @return true iff the set is empty */
+        /**
+         * @return true iff the set is empty
+         */
         @Override
         public boolean isEmpty() {
             return true;

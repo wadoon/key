@@ -18,7 +18,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.MemberDeclaration;
@@ -31,6 +30,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -44,14 +44,14 @@ public abstract class SLResolverManager {
     public final SLTranslationExceptionManager excManager;
 
     private ImmutableList<SLExpressionResolver> resolvers 
-    	= ImmutableSLList.<SLExpressionResolver>nil();
+    	= KeYCollections.<SLExpressionResolver>nil();
     private final KeYJavaType specInClass;
     private final ParsableVariable selfVar;
     private final boolean useLocalVarsAsImplicitReceivers;
     private final TermBuilder tb;    
     
     private ImmutableList<Namespace<?>> /*ParsableVariable*/
-        localVariablesNamespaces = ImmutableSLList.<Namespace<?>>nil();
+        localVariablesNamespaces = KeYCollections.<Namespace<?>>nil();
 
     private Map<ParsableVariable,KeYJavaType> kjts 
 	= new LinkedHashMap<ParsableVariable,KeYJavaType>();

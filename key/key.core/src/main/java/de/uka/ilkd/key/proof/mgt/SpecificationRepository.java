@@ -22,10 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -231,7 +228,7 @@ public final class SpecificationRepository {
         tacletBuilder.setFind(limitedTerm);
         tacletBuilder.addTacletGoalTemplate(
                 new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                        ImmutableSLList.<Taclet> nil(), unlimitedTerm));
+                        KeYCollections.<Taclet> nil(), unlimitedTerm));
         tacletBuilder.setName(MiscTools.toValidTacletName(
                 "unlimit " + getUniqueNameForObserver(unlimited)));
         return tacletBuilder.getTaclet();
@@ -260,7 +257,7 @@ public final class SpecificationRepository {
         final Sequent addedSeq = Sequent.createAnteSequent(
                 Semisequent.EMPTY_SEMISEQUENT.insertFirst(cf).semisequent());
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(
-                addedSeq, ImmutableSLList.<Taclet> nil(),
+                addedSeq, KeYCollections.<Taclet> nil(),
                 tb.func(unlimited, subs)));
         tacletBuilder.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);
         tacletBuilder.setName(MiscTools.toValidTacletName(
@@ -331,7 +328,7 @@ public final class SpecificationRepository {
 
     private ImmutableSet<Pair<KeYJavaType, IObserverFunction>> getOverridingMethods(
             KeYJavaType kjt, IProgramMethod pm) {
-        ImmutableList<Pair<KeYJavaType, IObserverFunction>> result = ImmutableSLList
+        ImmutableList<Pair<KeYJavaType, IObserverFunction>> result = KeYCollections
                 .nil();
 
         // static methods and constructors are not overriden
@@ -639,7 +636,7 @@ public final class SpecificationRepository {
      */
     private static ImmutableSet<Contract> removeWdChecks(
             ImmutableSet<Contract> contracts) {
-        ImmutableList<Contract> result = ImmutableSLList.nil();
+        ImmutableList<Contract> result = KeYCollections.nil();
         if (contracts == null) {
             return contracts;
         }
@@ -1257,13 +1254,13 @@ public final class SpecificationRepository {
                 final ClassAxiom invRepresentsAxiom = new RepresentsAxiom(
                         "Class invariant axiom for " + kjt.getFullName(),
                         invSymbol, kjt, new Private(), null, invDef, selfVar,
-                        ImmutableSLList.<ProgramVariable> nil(), null);
+                        KeYCollections.<ProgramVariable> nil(), null);
                 result = result.add(invRepresentsAxiom);
 
                 final ClassAxiom staticInvRepresentsAxiom = new RepresentsAxiom(
                         "Static class invariant axiom for " + kjt.getFullName(),
                         staticInvSymbol, kjt, new Private(), null, staticInvDef, null,
-                        ImmutableSLList.<ProgramVariable> nil(), null);
+                        KeYCollections.<ProgramVariable> nil(), null);
                 result = result.add(staticInvRepresentsAxiom);
             }
             // add query axioms for own class
@@ -1326,7 +1323,7 @@ public final class SpecificationRepository {
                     // model pm per class
                     // We need to construct an inheritance chain of contracts
                     // starting at the bottom
-                    ImmutableList<FunctionalOperationContract> lookupContracts = ImmutableSLList
+                    ImmutableList<FunctionalOperationContract> lookupContracts = KeYCollections
                             .<FunctionalOperationContract> nil();
                     ImmutableSet<FunctionalOperationContract> cs = getOperationContracts(
                             kjt, pm);

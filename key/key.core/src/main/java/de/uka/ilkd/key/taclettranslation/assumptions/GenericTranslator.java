@@ -18,10 +18,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -280,7 +277,7 @@ class GenericTranslator {
                         ImmutableSet<Sort> instSorts, Taclet t,
                         TacletConditions conditions, int maxGeneric)
                         throws IllegalTacletException {
-                ImmutableList<Term> instantiatedTerms = ImmutableSLList.nil();
+                ImmutableList<Term> instantiatedTerms = KeYCollections.nil();
                 if (maxGeneric < genericSorts.size()) {
                         throw new IllegalTacletException(
                                         "To many different generic sorts. Found: "

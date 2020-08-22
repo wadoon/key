@@ -19,7 +19,7 @@ import java.util.Set;
 /**
  * This class is a collection of methods that operate on immutable collections,
  * in particular {@link ImmutableSet}s and {@link ImmutableList}s.
- *
+ * <p>
  * This class cannot be instantiated.
  *
  * @author Mattias Ulbrich
@@ -32,22 +32,21 @@ public final class Immutables {
 
     /**
      * Checks whether an immutable list is free of duplicates.
-     *
+     * <p>
      * A list has a duplicate if it during iteration it visits two objects o1
      * and o2 such that <code>o1==null ? o2 == null : o1.equals(o2)</code> is true.
      * <code>null</code> may appear in the list.
-     *
+     * <p>
      * The implementation uses a hash set internally and thus runs in O(n).
      *
-     * @param list
-     *            any list, must not be <code>null</code>
+     * @param list any list, must not be <code>null</code>
      * @return true iff every
      */
     public static <T> boolean isDuplicateFree(ImmutableList<T> list) {
 
         HashSet<T> set = new HashSet<T>();
         for (T element : list) {
-            if(set.contains(element)) {
+            if (set.contains(element)) {
                 return false;
             }
             set.add(element);
@@ -58,52 +57,50 @@ public final class Immutables {
 
     /**
      * Removes duplicate entries from an immutable list.
-     *
+     * <p>
      * A list has a duplicate if it during iteration it visits two objects o1
      * and o2 such that <code>o1==null ? o2 == null : o1.equals(o2)</code> is
      * true. <code>null</code> may appear in the list.
-     *
+     * <p>
      * If an element occurs duplicated, its first (in order of iteration)
      * occurrence is kept, while later occurrences are removeed.
-     *
+     * <p>
      * If a list iterates "a", "b", "a" in this order, removeDuplicates returns
      * a list iterating "a", "b".
-     *
+     * <p>
      * The implementation uses a hash set internally and thus runs in O(n).
-     *
+     * <p>
      * It reuses as much created datastructure as possible. In particular, if
      * the list is already duplicate-fre, it does not allocate new memory (well,
      * only temporarily) and returns the argument.
-     *
+     * <p>
      * Sidenote: Would that not make a nice KeY-Verification condition? Eat your
      * own dogfood.
      *
-     * @param list
-     *            any list, must not be <code>null</code>
-     *
+     * @param list any list, must not be <code>null</code>
      * @return a duplicate-free version of the argument, never <code>null</code>
      */
     public static <T> ImmutableList<T> removeDuplicates(ImmutableList<T> list) {
 
-        if(list.isEmpty()) {
+        if (list.isEmpty()) {
             return list;
         }
 
-        ImmutableList<ImmutableList<T>> stack = ImmutableSLList.nil();
+        ImmutableList<ImmutableList<T>> stack = KeYCollections.nil();
 
-        while(!list.isEmpty()) {
+        while (!list.isEmpty()) {
             stack = stack.prepend(list);
             list = list.tail();
         }
 
         HashSet<T> alreadySeen = new HashSet<T>();
-        ImmutableList<T> result = ImmutableSLList.nil();
+        ImmutableList<T> result = KeYCollections.nil();
 
-        while(!stack.isEmpty()) {
+        while (!stack.isEmpty()) {
             ImmutableList<T> top = stack.head();
             T element = top.head();
             stack = stack.tail();
-            if(alreadySeen.contains(element)) {
+            if (alreadySeen.contains(element)) {
                 // ok, no more reuse possible, go to 2nd loop
                 break;
             }
@@ -111,11 +108,11 @@ public final class Immutables {
             alreadySeen.add(element);
         }
 
-        while(!stack.isEmpty()) {
+        while (!stack.isEmpty()) {
             ImmutableList<T> top = stack.head();
             T element = top.head();
             stack = stack.tail();
-            if(!alreadySeen.contains(element)) {
+            if (!alreadySeen.contains(element)) {
                 result = result.prepend(element);
                 alreadySeen.add(element);
             }
@@ -134,7 +131,7 @@ public final class Immutables {
 
         ImmutableList<T> result = l1;
         for (T element : l2) {
-            if(!lookup.contains(element)) {
+            if (!lookup.contains(element)) {
                 result = result.prepend(element);
             }
         }
@@ -147,7 +144,7 @@ public final class Immutables {
     }
 
     public static <T> ImmutableList<T> createListFrom(Iterable<T> iterable) {
-        ImmutableList<T> result = ImmutableSLList.<T>nil();
+        ImmutableList<T> result = KeYCollections.nil();
         for (T t : iterable) {
             result = result.prepend(t);
         }

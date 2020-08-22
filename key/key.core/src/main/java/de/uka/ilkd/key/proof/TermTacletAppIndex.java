@@ -93,7 +93,7 @@ public class TermTacletAppIndex {
             RuleFilter      filter,
             Services        services,
             TacletIndex     tacletIndex) {
-        ImmutableList<NoPosTacletApp> tacletInsts = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> tacletInsts = KeYCollections.<NoPosTacletApp>nil();
         if ( pos.isTopLevel () ) {
             if ( pos.isInAntec () ) {
                 tacletInsts =
@@ -590,10 +590,10 @@ public class TermTacletAppIndex {
             RuleFilter p_filter,
             Services services) {
 
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> result = KeYCollections.<TacletApp>nil();
 
         final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>>
-        allTacletsHereAndBelow = collectAllTacletAppsHereAndBelow(pos, ImmutableSLList.nil());
+        allTacletsHereAndBelow = collectAllTacletAppsHereAndBelow(pos, KeYCollections.nil());
 
         for (final Pair<PosInOccurrence,
                 ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
@@ -617,7 +617,7 @@ public class TermTacletAppIndex {
             NewRuleListener listener ) {
 
         final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>>
-        result = ImmutableSLList.nil();
+        result = KeYCollections.nil();
         final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>>
         allTacletsHereAndBelow = collectAllTacletAppsHereAndBelow( pos, result );
 
@@ -665,7 +665,7 @@ public class TermTacletAppIndex {
             NewRuleListener listener) {
         final ImmutableList<Pair<PosInOccurrence,ImmutableList<NoPosTacletApp>>>
         allTacletsHereAndBelow =
-        collectAllTacletAppsAffectedByModification(pathToModification, ImmutableSLList.nil());
+        collectAllTacletAppsAffectedByModification(pathToModification, KeYCollections.nil());
 
         for (final Pair<PosInOccurrence,ImmutableList<NoPosTacletApp>> pair :
             allTacletsHereAndBelow) {
@@ -737,7 +737,7 @@ public class TermTacletAppIndex {
      */
     public static ImmutableList<NoPosTacletApp> filter (RuleFilter p_filter,
             ImmutableList<NoPosTacletApp> taclets) {
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = KeYCollections.<NoPosTacletApp>nil();
 
         for (final NoPosTacletApp app :  taclets) {
             if ( p_filter.filter ( app.taclet () ) ) {

@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -38,6 +37,7 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.KeYCollections;
 
 
 /** the class manages the available TacletApps. This index has to be
@@ -246,7 +246,7 @@ public class TacletAppIndex  {
     static ImmutableList<TacletApp> createTacletApps(ImmutableList<NoPosTacletApp> tacletInsts,
                                             PosInOccurrence pos,
                                             Services services) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> result = KeYCollections.<TacletApp>nil();
         for (NoPosTacletApp tacletApp : tacletInsts) {
             if (tacletApp.taclet() instanceof FindTaclet) {
                 PosTacletApp newTacletApp = tacletApp.setPosInOccurrence ( pos, services );
@@ -303,7 +303,7 @@ public class TacletAppIndex  {
         final Iterator<NoPosTacletApp> it =
             getFindTaclet ( pos, filter, services ).iterator();
 
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = KeYCollections.<NoPosTacletApp>nil();
 
         while ( it.hasNext () ) {
             final NoPosTacletApp tacletApp = it.next ();

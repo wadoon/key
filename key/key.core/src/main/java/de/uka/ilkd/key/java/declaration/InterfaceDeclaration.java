@@ -15,13 +15,13 @@ package de.uka.ilkd.key.java.declaration;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  *  Interface declaration.
@@ -199,7 +199,7 @@ public class InterfaceDeclaration extends TypeDeclaration {
      * returns the local declared supertypes
      */
     public ImmutableList<KeYJavaType> getSupertypes() {
-	ImmutableList<KeYJavaType> types = ImmutableSLList.<KeYJavaType>nil();
+	ImmutableList<KeYJavaType> types = KeYCollections.<KeYJavaType>nil();
 	if (extending != null) {
 	    for (int i = extending.getTypeReferenceCount()-1; i>=0; i--) {		
 		types = types.prepend

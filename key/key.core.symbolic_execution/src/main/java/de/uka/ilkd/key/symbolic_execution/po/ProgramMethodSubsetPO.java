@@ -22,7 +22,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Position;
@@ -179,7 +179,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
       for (LocationVariable x : undeclaredVariables) {
          register(x, services);
       }
-      return ImmutableSLList.<StatementBlock>nil().prepend(null, result, null, null);
+      return KeYCollections.<StatementBlock>nil().prepend(null, result, null, null);
    }
 
    /**
@@ -271,7 +271,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     * @return The created {@link ImmutableList}.
     */
    protected static ImmutableList<ProgramVariable> convert(Collection<LocationVariable> c) {
-      ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
+      ImmutableList<ProgramVariable> result = KeYCollections.nil();
       for (LocationVariable var : c) {
          result = result.append(var);
       }

@@ -15,7 +15,6 @@ package de.uka.ilkd.key.macros;
 
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left
@@ -181,7 +181,7 @@ public class TryCloseMacro extends AbstractProofMacro {
                 Node node = goal.node();
                 int maxSteps = numberSteps > 0 ? numberSteps : proof.getSettings().getStrategySettings().getMaxSteps();
                 final ApplyStrategyInfo result =
-                      applyStrategy.start(proof, ImmutableSLList.<Goal>nil().prepend(goal),
+                      applyStrategy.start(proof, KeYCollections.<Goal>nil().prepend(goal),
                             maxSteps, -1, false);
                 //final Goal closedGoal;
 

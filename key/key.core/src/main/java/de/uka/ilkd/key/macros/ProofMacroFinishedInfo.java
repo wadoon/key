@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * An information object with additional information about the
@@ -36,7 +36,7 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
 
     ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof,
                            long time, int appliedRules, int closedGoals) {
-        this(macro, ImmutableSLList.<Goal>nil().prepend(goal), proof,
+        this(macro, KeYCollections.<Goal>nil().prepend(goal), proof,
              time, appliedRules, closedGoals, false);
     }
 
@@ -134,13 +134,13 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     public ImmutableList<Goal> getGoals() {
         final Object result = getResult();
         if (result == null) {
-            return ImmutableSLList.<Goal>nil();
+            return KeYCollections.<Goal>nil();
         } else {
             return (ImmutableList<Goal>)result;
         }
     }
 
     public static ProofMacroFinishedInfo getDefaultInfo(ProofMacro macro, Proof proof) {
-        return new ProofMacroFinishedInfo(macro, ImmutableSLList.<Goal>nil(), proof, false);
+        return new ProofMacroFinishedInfo(macro, KeYCollections.<Goal>nil(), proof, false);
     }
 }

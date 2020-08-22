@@ -24,7 +24,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
@@ -57,6 +56,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * The menu shown by a {@link CurrentGoalViewListener} when the user clicks on a
@@ -132,7 +132,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         return list.stream().filter(
                 app -> !app.rule().name().toString()
                         .equals(INTRODUCE_AXIOM_TACLET_NAME))
-                .collect(ImmutableSLList.toImmutableList());
+                .collect(KeYCollections.toImmutableList());
     }
 
     /**
@@ -142,7 +142,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @return list without RewriteTaclets
      */
     public static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> result = KeYCollections.<TacletApp>nil();
         Iterator<TacletApp> it = list.iterator();
 
         while (it.hasNext()) {
@@ -356,7 +356,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      */
     public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds,
             TacletAppComparator comp) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> result = KeYCollections.<TacletApp>nil();
 
         List<TacletApp> list = new ArrayList<TacletApp>(finds.size());
 

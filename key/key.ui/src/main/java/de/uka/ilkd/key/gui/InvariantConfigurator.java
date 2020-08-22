@@ -45,7 +45,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
@@ -61,6 +60,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * @author Dreiner, bruns
@@ -1027,11 +1027,11 @@ public class InvariantConfigurator {
                       new StringReader(newObjectsAsString), Sort.ANY,
                       services, services.getNamespaces(), getAbbrevMap());
                 ImmutableList<InfFlowSpec> result =
-                    ImmutableSLList.<InfFlowSpec>nil()
+                    KeYCollections.<InfFlowSpec>nil()
                                    .append(new InfFlowSpec
-                                                     (ImmutableSLList.<Term>nil().append(preExps),
-                                                      ImmutableSLList.<Term>nil().append(postExps),
-                                                      ImmutableSLList.<Term>nil().append(newObjects)));
+                                                     (KeYCollections.<Term>nil().append(preExps),
+                                                      KeYCollections.<Term>nil().append(postExps),
+                                                      KeYCollections.<Term>nil().append(newObjects)));
                 return result;
             }
 

@@ -15,12 +15,7 @@ package de.uka.ilkd.key.rule.inst;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -87,8 +82,8 @@ public class SVInstantiations {
 
     /** creates a new SVInstantions object with an empty map */
     private SVInstantiations() {
-	genericSortConditions = ImmutableSLList.<GenericSortCondition>nil();
-	updateContext = ImmutableSLList.<UpdateLabelPair>nil();
+	genericSortConditions = KeYCollections.<GenericSortCondition>nil();
+	updateContext = KeYCollections.<UpdateLabelPair>nil();
         map = DefaultImmutableMap.<SchemaVariable,InstantiationEntry<?>>nilMap();
 	interesting = DefaultImmutableMap.<SchemaVariable,InstantiationEntry<?>>nilMap();
     }
@@ -190,7 +185,7 @@ public class SVInstantiations {
         return add(sv,
         	   new ListInstantiation(
                            sv,
-        		   ImmutableSLList.<Object>nil().prepend(list)),
+        		   KeYCollections.<Object>nil().prepend(list)),
                    services);
     }
 
@@ -222,7 +217,7 @@ public class SVInstantiations {
 	    				       Services services) {
         return addInteresting(
                 sv,
-                new ListInstantiation(sv, ImmutableSLList.<Object>nil().prepend(list)),
+                new ListInstantiation(sv, KeYCollections.<Object>nil().prepend(list)),
                 services);
     }
 
@@ -598,7 +593,7 @@ public class SVInstantiations {
             return this;
         }       
         return new SVInstantiations(map, interesting(),
-                ImmutableSLList.<UpdateLabelPair>nil(), getGenericSortInstantiations(),
+                KeYCollections.<UpdateLabelPair>nil(), getGenericSortInstantiations(),
                 getGenericSortConditions());
     }
 
@@ -710,7 +705,7 @@ public class SVInstantiations {
             result = result.put(entry.key(), entry.value());
         }
         
-        ImmutableList<UpdateLabelPair> updates = ImmutableSLList.<UpdateLabelPair>nil();
+        ImmutableList<UpdateLabelPair> updates = KeYCollections.<UpdateLabelPair>nil();
         
         if (other.getUpdateContext().isEmpty()) {
             updates = getUpdateContext();

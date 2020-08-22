@@ -25,11 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.JavaProgramElement;
@@ -1254,7 +1250,7 @@ public class MergeRuleUtils {
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(Node node,
             PosInOccurrence pio, Services services) {
 
-        ImmutableList<SequentFormula> pathConditionSet = ImmutableSLList.nil();
+        ImmutableList<SequentFormula> pathConditionSet = KeYCollections.nil();
         pathConditionSet = pathConditionSet
                 .prepend(node.sequent().antecedent().asList());
 
@@ -1294,7 +1290,7 @@ public class MergeRuleUtils {
      */
     public static ImmutableList<SymbolicExecutionState> sequentsToSEPairs(
             Iterable<MergePartner> sequentInfos) {
-        ImmutableList<SymbolicExecutionState> result = ImmutableSLList.nil();
+        ImmutableList<SymbolicExecutionState> result = KeYCollections.nil();
         for (MergePartner sequentInfo : sequentInfos) {
             final Node node = sequentInfo.getGoal().node();
             final Services services = sequentInfo.getGoal().proof()
@@ -1571,7 +1567,7 @@ public class MergeRuleUtils {
         TermBuilder tb = services.getTermBuilder();
 
         ImmutableSet<QuantifiableVariable> freeVars = term.freeVars();
-        ImmutableList<Term> elementaries = ImmutableSLList.nil();
+        ImmutableList<Term> elementaries = KeYCollections.nil();
 
         for (LocationVariable loc : getLocationVariables(term, services)) {
             final String newName = tb
@@ -1867,7 +1863,7 @@ public class MergeRuleUtils {
         if (openGoals.isEmpty()) {
             return tb.tt();
         } else {
-            ImmutableList<Term> goalImplications = ImmutableSLList.nil();
+            ImmutableList<Term> goalImplications = KeYCollections.nil();
             for (Goal goal : openGoals) {
                 Term goalImplication = sequentToFormula(goal.sequent(),
                         services);
@@ -1893,8 +1889,8 @@ public class MergeRuleUtils {
     private static Term sequentToFormula(Sequent sequent, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
-        ImmutableList<Term> negAntecedentForms = ImmutableSLList.nil();
-        ImmutableList<Term> succedentForms = ImmutableSLList.nil();
+        ImmutableList<Term> negAntecedentForms = KeYCollections.nil();
+        ImmutableList<Term> succedentForms = KeYCollections.nil();
 
         // Shift antecedent formulae to the succedent by negation
         for (SequentFormula sf : sequent.antecedent().asList()) {

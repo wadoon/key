@@ -13,8 +13,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 
@@ -1058,7 +1058,7 @@ public abstract class AbstractUpdateExtractor {
       ImmutableList<Term> originalUpdates = computeOriginalUpdates(modalityPio, currentLayout);
       // Combine memory layout with original updates
       Map<LocationVariable, Term> preUpdateMap = new HashMap<LocationVariable, Term>();
-      ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
+      ImmutableList<Term> additionalUpdates = KeYCollections.nil();
       for (ExtractLocationParameter evp : locations) {
          additionalUpdates = additionalUpdates.append(evp.createPreUpdate());
          preUpdateMap.put(evp.getPreVariable(), evp.getPreUpdateTarget());
@@ -1202,7 +1202,7 @@ public abstract class AbstractUpdateExtractor {
    protected ImmutableList<Term> computeOriginalUpdates(PosInOccurrence pio, boolean currentLayout) {
       ImmutableList<Term> originalUpdates;
       if (!currentLayout) {
-         originalUpdates = ImmutableSLList.nil();
+         originalUpdates = KeYCollections.nil();
       }
       else {
          if (node.proof().root() == node) {
@@ -1401,7 +1401,7 @@ public abstract class AbstractUpdateExtractor {
        * @param goal The current {@link Goal} to start backward iteration at.
        */
       public NodeGoal(Goal goal) {
-         this(goal.node(), ImmutableSLList.<Goal>nil().prepend(goal));
+         this(goal.node(), KeYCollections.<Goal>nil().prepend(goal));
       }
 
       /**

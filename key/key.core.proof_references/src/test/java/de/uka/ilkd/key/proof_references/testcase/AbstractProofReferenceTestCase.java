@@ -21,10 +21,7 @@ import java.util.LinkedHashSet;
 import junit.framework.TestCase;
 
 import org.junit.Assert;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
@@ -165,7 +162,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
          @Override
          public void doTest(KeYEnvironment<?> environment, Proof proof) throws Exception {
             // Compute proof references
-            ImmutableList<IProofReferencesAnalyst> analysts = ImmutableSLList.nil();
+            ImmutableList<IProofReferencesAnalyst> analysts = KeYCollections.nil();
             if (analyst != null) {
                analysts = analysts.append(analyst);
             }

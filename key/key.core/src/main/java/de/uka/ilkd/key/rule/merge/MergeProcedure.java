@@ -16,7 +16,6 @@ package de.uka.ilkd.key.rule.merge;
 import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -28,6 +27,7 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Defines a concrete merge procedure, in particular the result of merging two
@@ -52,12 +52,12 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 public abstract class MergeProcedure {
 
     /** Concrete merge procedures. */
-    static ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableSLList
+    static ImmutableList<MergeProcedure> CONCRETE_RULES = KeYCollections
             .<MergeProcedure> nil();
 
     static {
         CONCRETE_RULES =
-                ImmutableSLList.<MergeProcedure> nil()
+                KeYCollections.<MergeProcedure> nil()
                         .prepend(MergeTotalWeakening.instance())
                         .prepend(MergeWithPredicateAbstractionFactory.instance())
                         .prepend(MergeIfThenElseAntecedent.instance())

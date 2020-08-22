@@ -14,11 +14,11 @@
 package de.uka.ilkd.key.pp;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * A PositionTable describes the start and end positions of substrings of a
@@ -104,7 +104,7 @@ public class PositionTable {
     protected ImmutableList<Integer> pathForIndex(int index) {
         int sub = searchEntry(index);
         if (sub == -1) {
-            return ImmutableSLList.<Integer>nil();
+            return KeYCollections.<Integer>nil();
         } else {
             return children[sub].pathForIndex(index - startPos[sub]).prepend(Integer.valueOf(sub));
         }

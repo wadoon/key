@@ -15,11 +15,7 @@ package de.uka.ilkd.key.logic;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -292,8 +288,8 @@ class TermImpl implements Term {
             return true;
         }
         return unifyHelp(this, o,
-                ImmutableSLList.<QuantifiableVariable>nil(),
-                ImmutableSLList.<QuantifiableVariable>nil(),
+                KeYCollections.<QuantifiableVariable>nil(),
+                KeYCollections.<QuantifiableVariable>nil(),
                 null);
     }
 

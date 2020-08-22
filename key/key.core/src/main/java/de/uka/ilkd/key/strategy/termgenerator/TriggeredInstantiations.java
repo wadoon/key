@@ -17,11 +17,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -139,10 +135,10 @@ public class TriggeredInstantiations implements TermGenerator {
                 } else {
                     // at the moment instantiations with more than one
                     // missing taclet variable not supported
-                    return ImmutableSLList.<Term> nil().iterator();
+                    return KeYCollections.<Term> nil().iterator();
                 }
             } else {
-                return ImmutableSLList.<Term> nil().iterator();
+                return KeYCollections.<Term> nil().iterator();
             }
 
         } else {
@@ -224,7 +220,7 @@ public class TriggeredInstantiations implements TermGenerator {
     private ImmutableList<Term> instantiateConditions(Services services,
             TacletApp app, final Term middle) {
         ImmutableList<Term> conditions;
-        conditions = ImmutableSLList.<Term> nil();
+        conditions = KeYCollections.<Term> nil();
         for (Term singleAvoidCond : app.taclet().getTrigger().getAvoidConditions()) {
             conditions = conditions.append(instantiateTerm(
                     singleAvoidCond,

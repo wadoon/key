@@ -24,7 +24,6 @@ import java.util.Set;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.ClassType;
@@ -63,6 +62,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * an instance serves as representation of a Java model underlying a DL
@@ -600,7 +600,7 @@ public final class JavaInfo {
             String methodName,
             List<List<KeYJavaType>> signature,
             KeYJavaType context) {
-        ImmutableList<KeYJavaType> partialSignature = ImmutableSLList.nil();
+        ImmutableList<KeYJavaType> partialSignature = KeYCollections.nil();
         return getProgramMethodFromPartialSignature(classType, methodName, signature, partialSignature, context);
     }
 
@@ -621,7 +621,7 @@ public final class JavaInfo {
 	    				  String methodName,
 	    				  ProgramVariable[] args,
 	    				  KeYJavaType context){
-        ImmutableList<Type> types = ImmutableSLList.<Type>nil();
+        ImmutableList<Type> types = KeYCollections.<Type>nil();
         for (int i = args.length - 1; i>=0; i--) {
             types = types.prepend(args[i].getKeYJavaType());
         }
@@ -653,7 +653,7 @@ public final class JavaInfo {
     public IProgramMethod getToplevelPM(KeYJavaType kjt, IProgramMethod pm) {
 	final String methodName = pm.getName();
     	final ImmutableList<KeYJavaType> sig
-		= ImmutableSLList.<KeYJavaType>nil()
+		= KeYCollections.<KeYJavaType>nil()
 		                 .append(pm.getParamTypes()
 		                	   .toArray(
 		                      new KeYJavaType[pm.getNumParams()]));
@@ -821,7 +821,7 @@ public final class JavaInfo {
 
     /** gets an array of expression and returns a list of types */
     private ImmutableList<KeYJavaType> getKeYJavaTypes(ImmutableArray<? extends Expression> args) {
-	ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
+	ImmutableList<KeYJavaType> result = KeYCollections.<KeYJavaType>nil();
 	if (args != null) {
 	    for (int i = args.size()-1; i >= 0 ; i--) {
 		final Expression argument = args.get(i);
@@ -877,7 +877,7 @@ public final class JavaInfo {
      */
     private ImmutableList<Field> filterLocalDeclaredFields(TypeDeclaration classDecl,
             Filter filter) {
-        ImmutableList<Field> fields = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> fields = KeYCollections.<Field>nil();
         final ImmutableArray<MemberDeclaration> members = classDecl.getMembers();
         for (int i = members.size()-1; i>=0; i--) {
             final MemberDeclaration member = members.get(i);
@@ -968,7 +968,7 @@ public final class JavaInfo {
      * int the field declaration of the given list
      */
     private final ImmutableList<Field> getFields(FieldDeclaration field) {
-	ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+	ImmutableList<Field> result = KeYCollections.<Field>nil();
 	final ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
 	for (int i = spec.size()-1; i>=0; i--) {
 	    result = result.prepend(spec.get(i));
@@ -985,7 +985,7 @@ public final class JavaInfo {
      * int the field declaration of the given list
      */
     private ImmutableList<Field> getFields(ImmutableArray<MemberDeclaration> list) {
-	ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+	ImmutableList<Field> result = KeYCollections.<Field>nil();
 	for (int i = list.size()-1; i >= 0; i--) {
 	    final MemberDeclaration pe = list.get(i);
 	    if (pe instanceof FieldDeclaration) {
@@ -1137,7 +1137,7 @@ public final class JavaInfo {
                                                   KeYJavaType type,
                                                   boolean traverseSubtypes) {
         ImmutableList<ProgramVariable> result =
-            ImmutableSLList.<ProgramVariable>nil();
+            KeYCollections.<ProgramVariable>nil();
 
 	if (!(type.getSort().extendsTrans(objectSort()))) {
 	    return result;
@@ -1156,7 +1156,7 @@ public final class JavaInfo {
 
         // the assert statements below are not for fun, some methods rely
         // on the correct order
-        ImmutableList<KeYJavaType> hierarchy = ImmutableSLList.<KeYJavaType>nil();
+        ImmutableList<KeYJavaType> hierarchy = KeYCollections.<KeYJavaType>nil();
         if (traverseSubtypes) {
             hierarchy = kpmi.getAllSubtypes(type);
             assert !hierarchy.contains(type);
@@ -1304,7 +1304,7 @@ public final class JavaInfo {
             final KeYJavaType kjt =
                 getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
             defaultExecutionContext =
-                new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null);
+                new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, KeYCollections.<KeYJavaType>nil()), null);
         }
         return defaultExecutionContext;
     }
@@ -1326,7 +1326,7 @@ public final class JavaInfo {
      */
     public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType type) {
         if (type.getJavaType() instanceof ArrayType) {
-            ImmutableList<KeYJavaType> res = ImmutableSLList.<KeYJavaType>nil();
+            ImmutableList<KeYJavaType> res = KeYCollections.<KeYJavaType>nil();
             for (Sort s: getSuperSorts(type.getSort()))
                 res = res.append(getKeYJavaType(s));
             return res;
@@ -1335,7 +1335,7 @@ public final class JavaInfo {
     }
 
     private ImmutableList<Sort> getSuperSorts(Sort sort){
-        ImmutableList<Sort> res = ImmutableSLList.<Sort>nil();
+        ImmutableList<Sort> res = KeYCollections.<Sort>nil();
         final Sort object = getJavaLangObject().getSort();
         if (sort != object)
             for (Sort exsort: sort.extendsSorts(services)) {
@@ -1380,7 +1380,7 @@ public final class JavaInfo {
             return result;
         }
 
-        result = ImmutableSLList.<KeYJavaType>nil();
+        result = KeYCollections.<KeYJavaType>nil();
 
         if (k1.getSort().extendsTrans(k2.getSort())) {
             result = getAllSubtypes(k1).prepend(k1);

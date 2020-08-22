@@ -23,7 +23,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.TestCase;
 
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -83,8 +83,8 @@ public class TestSymbolicLayoutWriterAndReader extends TestCase {
     */
    protected ISymbolicLayout createModel() {
       KeYlessLayout model = new KeYlessLayout();
-      model.addEquivalenceClass(new KeYlessEquivalenceClass(ImmutableSLList.<String>nil().append("A", "B", "C"), "A"));
-      model.addEquivalenceClass(new KeYlessEquivalenceClass(ImmutableSLList.<String>nil().append("1", "2", "3"), "63"));
+      model.addEquivalenceClass(new KeYlessEquivalenceClass(KeYCollections.<String>nil().append("A", "B", "C"), "A"));
+      model.addEquivalenceClass(new KeYlessEquivalenceClass(KeYCollections.<String>nil().append("1", "2", "3"), "63"));
       // state
       KeYlessState state = new KeYlessState("exampleState");
       state.addValue(new KeYlessValue("v1", "v1", false, "-1", "v1Value", "t1", null));

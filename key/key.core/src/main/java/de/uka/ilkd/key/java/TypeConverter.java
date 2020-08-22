@@ -19,8 +19,8 @@ import java.util.Map;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
+import org.key_project.util.collection.KeYCollections;
 import recoder.service.ConstantEvaluator;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.ClassType;
@@ -96,7 +96,7 @@ public final class TypeConverter {
     // Maps LDT names to LDT instances.
     private Map<Name,LDT> LDTs = null;
     
-    private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
+    private ImmutableList<LDT> models = KeYCollections.<LDT>nil();
     
     private HeapLDT heapLDT = null;
     //private IntegerLDT integerLDT = null;
@@ -112,7 +112,7 @@ public final class TypeConverter {
     
     private void init(Map<Name, LDT> map) {
         LDTs = map;
-        models = ImmutableSLList.<LDT>nil();
+        models = KeYCollections.<LDT>nil();
         if (LDTs != null) {
             for (LDT ldt : LDTs.values()) {
                 models = models.prepend(ldt);

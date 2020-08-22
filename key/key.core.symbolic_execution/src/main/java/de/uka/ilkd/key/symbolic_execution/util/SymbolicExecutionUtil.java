@@ -30,7 +30,7 @@ import java.util.Set;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
@@ -266,7 +266,7 @@ public final class SymbolicExecutionUtil {
             return tb.tt();
          }
          else {
-            ImmutableList<Term> goalImplications = ImmutableSLList.nil();
+            ImmutableList<Term> goalImplications = KeYCollections.nil();
             for (Goal goal : openGoals) {
                Term goalImplication = sequentToImplication(goal.sequent(), goal.proof().getServices());
                goalImplication = tb.not(goalImplication);
@@ -306,7 +306,7 @@ public final class SymbolicExecutionUtil {
     * @return The list with all contained {@link Term}s.
     */
    public static ImmutableList<Term> listSemisequentTerms(Semisequent semisequent) {
-      ImmutableList<Term> terms = ImmutableSLList.nil();
+      ImmutableList<Term> terms = KeYCollections.nil();
       if (semisequent != null) {
          for (SequentFormula sf : semisequent) {
             terms = terms.append(sf.formula());
@@ -1689,7 +1689,7 @@ public final class SymbolicExecutionUtil {
          return collectGoalsInSubtree(executionElement.getProofNode());
       }
       else {
-         return ImmutableSLList.nil();
+         return KeYCollections.nil();
       }
    }
 
@@ -2495,8 +2495,8 @@ public final class SymbolicExecutionUtil {
                   throw new ProofInputException("Only PosTacletApp are allowed with a replace term in branch computation but rule \"" + app + "\" was found.");
                }
                // Create new lists
-               ImmutableList<Term> tempAntecedents = ImmutableSLList.nil();
-               ImmutableList<Term> tempSuccedents = ImmutableSLList.nil();
+               ImmutableList<Term> tempAntecedents = KeYCollections.nil();
+               ImmutableList<Term> tempSuccedents = KeYCollections.nil();
                // Apply updates on antecedents and add result to new antecedents list
                for (Term a : newAntecedents) {
                   tempAntecedents = tempAntecedents.append(services.getTermBuilder().applyUpdatePairsSequential(app.instantiations().getUpdateContext(), a));
@@ -2560,7 +2560,7 @@ public final class SymbolicExecutionUtil {
       for (SequentFormula sf : parent) {
          parentSFs.add(sf);
       }
-      ImmutableList<Term> result = ImmutableSLList.nil();
+      ImmutableList<Term> result = KeYCollections.nil();
       for (SequentFormula sf : child) {
          if (!parentSFs.contains(sf)) {
             result = result.append(sf.formula());
@@ -2679,7 +2679,7 @@ public final class SymbolicExecutionUtil {
                                                                                       StrategyProperties.QUERY_OFF, // Stop at queries to to avoid endless executions and scenarios in which a precondition or null pointer check can't be shown
                                                                                       splittingOption,
                                                                                       false);
-      ImmutableList<Term> goalCondtions = ImmutableSLList.<Term>nil();
+      ImmutableList<Term> goalCondtions = KeYCollections.<Term>nil();
       for (Pair<Term, Node> pair : resultValuesAndConditions) {
          Term goalCondition = pair.first;
          goalCondition = SymbolicExecutionUtil.replaceSkolemConstants(pair.second.sequent(), goalCondition, services);
@@ -2853,7 +2853,7 @@ public final class SymbolicExecutionUtil {
     * @return The found initial {@link ElementaryUpdate}s.
     */
    public static ImmutableList<Term> computeRootElementaryUpdates(Node root) {
-      ImmutableList<Term> result = ImmutableSLList.nil();
+      ImmutableList<Term> result = KeYCollections.nil();
       Sequent sequent = root.sequent();
       for (SequentFormula sf : sequent.succedent()) {
          Term term = sf.formula();
@@ -2875,17 +2875,17 @@ public final class SymbolicExecutionUtil {
          return collectElementaryUpdates(updateTerm);
       }
       else if (term.op() == UpdateJunctor.PARALLEL_UPDATE) {
-         ImmutableList<Term> result = ImmutableSLList.nil();
+         ImmutableList<Term> result = KeYCollections.nil();
          for (int i = 0; i < term.arity(); i++) {
             result = result.prepend(collectElementaryUpdates(term.sub(i)));
          }
          return result;
       }
       else if (term.op() instanceof ElementaryUpdate) {
-         return ImmutableSLList.<Term>nil().prepend(term);
+         return KeYCollections.<Term>nil().prepend(term);
       }
       else {
-         return ImmutableSLList.<Term>nil();
+         return KeYCollections.<Term>nil();
       }
    }
 

@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Instances of this class are immutable
@@ -101,15 +101,15 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     public final ImmutableList<RuleAppContainer> createFurtherApps(Goal p_goal) {
         if (!isStillApplicable(p_goal)
                 || (getTacletApp().ifInstsComplete() && !ifFormulasStillValid(p_goal))) {
-            return ImmutableSLList.nil();
+            return KeYCollections.nil();
         }
 
         final TacletAppContainer newCont = createContainer(p_goal);
         if (newCont.getCost() instanceof TopRuleAppCost) {
-            return ImmutableSLList.nil();
+            return KeYCollections.nil();
         }
 
-        ImmutableList<RuleAppContainer> res = ImmutableSLList.<RuleAppContainer>nil().prepend(newCont);
+        ImmutableList<RuleAppContainer> res = KeYCollections.<RuleAppContainer>nil().prepend(newCont);
 
         if (getTacletApp().ifInstsComplete()) {
             res = addInstances(getTacletApp(), res, p_goal);
@@ -234,7 +234,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             costs.add(p_goal.getGoalStrategy().computeCost ( app, p_pio, p_goal ));
         }
         
-        ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+        ImmutableList<RuleAppContainer> result = KeYCollections.<RuleAppContainer>nil();
         for (RuleAppCost cost : costs) {
             final TacletAppContainer container = 
                     createContainer ( p_app.head(), p_pio, p_goal, cost, true );

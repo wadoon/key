@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -67,6 +66,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * <p>
@@ -850,7 +850,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
             Services services) {
         // Create parameters for predicate
         // SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
-        ImmutableList<Term> arguments = ImmutableSLList.nil(); //tb.var(paramVars);
+        ImmutableList<Term> arguments = KeYCollections.nil(); //tb.var(paramVars);
         // Method parameters
         for (LocationVariable formalParam : formalParamVars) {
             arguments = arguments.prepend(tb.var(formalParam));
@@ -1088,7 +1088,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                       final Services proofServices) {
         // create arguments from formal parameters for method call
         ImmutableList<LocationVariable> formalParamVars =
-                ImmutableSLList.<LocationVariable> nil();
+                KeYCollections.<LocationVariable> nil();
         for (ProgramVariable paramVar : paramVars) {
             if (isCopyOfMethodArgumentsUsed()) {
                 ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
@@ -1110,7 +1110,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 collectLookupContracts(final IProgramMethod pm,
                                        final Services proofServices) {
         ImmutableList<FunctionalOperationContract> lookupContracts =
-                ImmutableSLList.<FunctionalOperationContract>nil();
+                KeYCollections.<FunctionalOperationContract>nil();
         ImmutableSet<FunctionalOperationContract> cs =
                 proofServices.getSpecificationRepository()
                     .getOperationContracts(getCalleeKeYJavaType(), pm);

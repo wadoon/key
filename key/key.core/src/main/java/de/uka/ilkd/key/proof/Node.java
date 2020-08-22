@@ -24,10 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
@@ -72,13 +69,13 @@ public class Node {
      * a linked list of the locally generated program variables. It extends the list
      * of the parent node.
      */
-    private ImmutableList<IProgramVariable> localProgVars = ImmutableSLList.<IProgramVariable>nil();
+    private ImmutableList<IProgramVariable> localProgVars = KeYCollections.<IProgramVariable>nil();
 
     /**
      * a linked list of the locally generated function symbols. It extends the list
      * of the parent node.
      */
-    private ImmutableList<Function> localFunctions = ImmutableSLList.<Function>nil();
+    private ImmutableList<Function> localFunctions = KeYCollections.<Function>nil();
 
     private boolean closed = false;
 

@@ -18,10 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -136,7 +133,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                             addGhostParams(ImmutableList<ProgramVariable> paramVars,
                                            ImmutableList<ProgramVariable> origParams) {
         // make sure ghost parameters are present
-        ImmutableList<ProgramVariable> ghostParams = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> ghostParams = KeYCollections.<ProgramVariable>nil();
         for (ProgramVariable param: origParams) {
             if (param.isGhost())
                 ghostParams = ghostParams.append(param);
@@ -197,7 +194,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         if (vars.params != null && !vars.params.isEmpty()) {
             params = createParams(target, vars.params, services);
         } else {
-            params = ImmutableSLList.<ProgramVariable>nil();
+            params = KeYCollections.<ProgramVariable>nil();
         }
         return new Variables(self, result, exception, atPres, params, heap, anonHeap, services);
     }

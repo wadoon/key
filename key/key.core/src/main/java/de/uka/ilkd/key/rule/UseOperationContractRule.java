@@ -17,11 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
@@ -214,7 +210,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             }
         } else {
             New n = (New) mr;
-            ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
+            ImmutableList<KeYJavaType> sig = KeYCollections.<KeYJavaType>nil();
             for (Expression e : n.getArguments()) {
                 sig = sig.append(e.getKeYJavaType(services, ec));
             }
@@ -250,7 +246,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             MethodOrConstructorReference mr,
             ExecutionContext ec,
             Services services) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = KeYCollections.<Term>nil();
         for (Expression expr : mr.getArguments()) {
             Term actualParam = services.getTypeConverter().convertToLogicElement(expr, ec);
             result = result.append(actualParam);
@@ -779,7 +775,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         Term wellFormedAnon = null;
         Term atPreUpdates = null;
         Term reachableState = null;
-        ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.<AnonUpdateData>nil();
+        ImmutableList<AnonUpdateData> anonUpdateDatas = KeYCollections.<AnonUpdateData>nil();
 
         for (LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon;

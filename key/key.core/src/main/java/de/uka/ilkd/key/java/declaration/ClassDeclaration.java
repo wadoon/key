@@ -15,7 +15,6 @@ package de.uka.ilkd.key.java.declaration;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  *  There are several types of class declarations:
@@ -252,7 +252,7 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      * returns the local declared supertypes
      */
     public ImmutableList<KeYJavaType> getSupertypes() {
-	ImmutableList<KeYJavaType> types = ImmutableSLList.<KeYJavaType>nil();
+	ImmutableList<KeYJavaType> types = KeYCollections.<KeYJavaType>nil();
 	if (implementing != null) {
 	    for (int i = implementing.getTypeReferenceCount()-1; i>=0; i--) {
 		types = types.prepend(implementing.getTypeReferenceAt(i).

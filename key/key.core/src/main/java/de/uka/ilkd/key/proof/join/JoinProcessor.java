@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.TreeSet;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -37,6 +36,7 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * <p>
@@ -122,7 +122,7 @@ public class JoinProcessor implements Runnable {
 
         orRight(result);
 
-        ImmutableList<Goal> list = ImmutableSLList.<Goal> nil();
+        ImmutableList<Goal> list = KeYCollections.<Goal> nil();
 
         for (NodeGoalPair pair : cut.getGoalsAfterUncovering()) {
             if (pair.node == partner.getNode(0)

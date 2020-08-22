@@ -17,10 +17,7 @@ import java.util.Iterator;
 
 import junit.framework.TestCase;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -198,7 +195,7 @@ public class TestApplyTaclet extends TestCase{
 		     seq.succedent().getFirst().formula(),
 		     fma.sub(1));
 	ImmutableList<NoPosTacletApp> nfapp=goals.head().indexOfTaclets().getNoFindTaclet
-	    (new IHTacletFilter ( true, ImmutableSLList.<RuleSet>nil() ),
+	    (new IHTacletFilter ( true, KeYCollections.<RuleSet>nil() ),
 	     null);
 	Term aimpb=TacletForTests.parseTerm("A -> B");
 	assertTrue("Cut Rule should be inserted to TacletIndex.", nfapp.size()==1);
@@ -716,7 +713,7 @@ public class TestApplyTaclet extends TestCase{
 
 	assertTrue("Expected four rule applications.",rApplist.size()==4);
 
-	ImmutableList<TacletApp> appList = ImmutableSLList.<TacletApp>nil();
+	ImmutableList<TacletApp> appList = KeYCollections.<TacletApp>nil();
         for (TacletApp aRApplist : rApplist)
             appList = appList.prepend
                     (aRApplist.findIfFormulaInstantiations
@@ -750,7 +747,7 @@ public class TestApplyTaclet extends TestCase{
 
 	assertTrue("Expected three rule applications.",rApplist.size()==3);
 
-	ImmutableList<TacletApp> appList = ImmutableSLList.<TacletApp>nil();
+	ImmutableList<TacletApp> appList = KeYCollections.<TacletApp>nil();
 	Iterator<TacletApp> appIt = rApplist.iterator ();
 	while ( appIt.hasNext () )
 	    appList = appList.prepend
@@ -763,7 +760,7 @@ public class TestApplyTaclet extends TestCase{
 	SequentFormula ifformula =
 	    new SequentFormula ( ifterm );
 	ImmutableList<IfFormulaInstantiation> ifInsts =
-	    ImmutableSLList.<IfFormulaInstantiation>nil().prepend
+	    KeYCollections.<IfFormulaInstantiation>nil().prepend
 	    ( new IfFormulaInstDirect ( ifformula ) );
 	appIt = rApplist.iterator ();
 	while ( appIt.hasNext () ) {

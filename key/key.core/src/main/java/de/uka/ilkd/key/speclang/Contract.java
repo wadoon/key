@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -29,6 +28,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * A contractual agreement about an ObserverFunction.
@@ -318,7 +318,7 @@ public interface Contract extends SpecificationElement {
             this.exception = excVar;
             this.atPres = (Map<LocationVariable, ProgramVariable>) atPreVars;
             if (paramVars == null) {
-                this.params = ImmutableSLList.<ProgramVariable> nil();
+                this.params = KeYCollections.<ProgramVariable> nil();
             } else {
                 this.params = (ImmutableList<ProgramVariable>) paramVars;
             }

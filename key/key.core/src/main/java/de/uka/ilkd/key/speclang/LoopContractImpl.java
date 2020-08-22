@@ -14,6 +14,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.MapUtil;
 
 import de.uka.ilkd.key.java.Expression;
@@ -792,7 +793,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
         return update(
                 block,
                 newPreconditions, newPostconditions, newModifiesClauses,
-                infFlowSpecs.stream().map(spec -> spec.map(op)).collect(ImmutableList.collector()),
+                infFlowSpecs.stream().map(spec -> spec.map(op)).collect(KeYCollections.collector()),
                 variables,
                 newMeasuredBy, newDecreases);
     }

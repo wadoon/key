@@ -15,10 +15,7 @@ package de.uka.ilkd.key.strategy;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.ImmutableHeap;
-import org.key_project.util.collection.ImmutableLeftistHeap;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -232,7 +229,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
          * Working list contains rule apps that cannot be completed in the
          * current round but will be reconsidered during the next round.
          */
-        ImmutableList<RuleAppContainer> workingList = ImmutableSLList.nil();
+        ImmutableList<RuleAppContainer> workingList = KeYCollections.nil();
 
         /**
          * Try to find a rule app that can be completed until both queues are

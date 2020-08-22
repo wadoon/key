@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
@@ -42,6 +41,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SortException;
+import org.key_project.util.collection.KeYCollections;
 
 public class TacletInstantiationModel {
 
@@ -169,7 +169,7 @@ public class TacletInstantiationModel {
     private TacletApp createTacletAppFromIfs(TacletApp tacletApp) throws IfMismatchException,
             SVInstantiationParserException, MissingInstantiationException, SortMismatchException {
 
-        ImmutableList<IfFormulaInstantiation> instList = ImmutableSLList
+        ImmutableList<IfFormulaInstantiation> instList = KeYCollections
                 .<IfFormulaInstantiation>nil();
 
         for (int i = ifChoiceModel.length - 1; i >= 0; --i) {

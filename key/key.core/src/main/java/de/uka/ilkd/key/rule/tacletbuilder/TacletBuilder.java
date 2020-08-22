@@ -17,10 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Choice;
@@ -54,17 +51,17 @@ public abstract class TacletBuilder<T extends Taclet> {
 
     protected Name name                     = NONAME;
     protected Sequent ifseq                 = Sequent.EMPTY_SEQUENT;
-    protected ImmutableList<NewVarcond> varsNew      = ImmutableSLList.<NewVarcond>nil();
-    protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.<NotFreeIn>nil();
+    protected ImmutableList<NewVarcond> varsNew      = KeYCollections.<NewVarcond>nil();
+    protected ImmutableList<NotFreeIn> varsNotFreeIn = KeYCollections.<NotFreeIn>nil();
     protected ImmutableList<NewDependingOn> varsNewDependingOn =
-	ImmutableSLList.<NewDependingOn>nil();
-    protected ImmutableList<TacletGoalTemplate> goals= ImmutableSLList.<TacletGoalTemplate>nil();
-    protected ImmutableList<RuleSet> ruleSets    = ImmutableSLList.<RuleSet>nil();
+	KeYCollections.<NewDependingOn>nil();
+    protected ImmutableList<TacletGoalTemplate> goals= KeYCollections.<TacletGoalTemplate>nil();
+    protected ImmutableList<RuleSet> ruleSets    = KeYCollections.<RuleSet>nil();
     protected TacletAttributes attrs        = new TacletAttributes();
 
     /** List of additional generic conditions on the instantiations of
      * schema variables. */
-    protected ImmutableList<VariableCondition> variableConditions       = ImmutableSLList.<VariableCondition>nil();
+    protected ImmutableList<VariableCondition> variableConditions       = KeYCollections.<VariableCondition>nil();
     protected HashMap<TacletGoalTemplate, ImmutableSet<Choice>> goal2Choices          = null;
     protected ImmutableSet<Choice> choices           = DefaultImmutableSet.<Choice>nil();
     protected ImmutableSet<TacletAnnotation> tacletAnnotations = DefaultImmutableSet.<TacletAnnotation>nil();

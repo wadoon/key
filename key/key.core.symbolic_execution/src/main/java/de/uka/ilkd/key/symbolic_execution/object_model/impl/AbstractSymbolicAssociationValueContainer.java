@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
@@ -34,12 +34,12 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
    /**
     * The contained {@link ISymbolicAssociation}s.
     */
-   private ImmutableList<ISymbolicAssociation> associations = ImmutableSLList.nil();
+   private ImmutableList<ISymbolicAssociation> associations = KeYCollections.nil();
    
    /**
     * The contained {@link ISymbolicValue}s.
     */
-   private ImmutableList<ISymbolicValue> values = ImmutableSLList.nil();
+   private ImmutableList<ISymbolicValue> values = KeYCollections.nil();
 
    /**
     * Constructor.

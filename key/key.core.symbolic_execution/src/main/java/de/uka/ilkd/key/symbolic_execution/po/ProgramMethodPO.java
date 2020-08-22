@@ -21,7 +21,7 @@ import java.util.Properties;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Expression;
@@ -153,7 +153,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
       ImmutableArray<Expression> args = new ImmutableArray<Expression>(formalParVars.toArray(new ProgramVariable[formalParVars.size()]));
       MethodBodyStatement mbs = new MethodBodyStatement(pm, selfVar, resultVar, args);
       StatementBlock result = new StatementBlock(mbs);
-      return ImmutableSLList.<StatementBlock>nil().prepend(null, result, null, null);
+      return KeYCollections.<StatementBlock>nil().prepend(null, result, null, null);
    }
 
    /**
@@ -377,7 +377,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
       if (type == null) {
          throw new IOException("Can't find type \"" + className + "\".");
       }
-      ImmutableList<KeYJavaType> parameterTypes = ImmutableSLList.nil();
+      ImmutableList<KeYJavaType> parameterTypes = KeYCollections.nil();
       for (int i = 0; i < types.length; i++) {
          KeYJavaType paramType = javaInfo.getKeYJavaType(types[i].trim());
          if (paramType == null) {

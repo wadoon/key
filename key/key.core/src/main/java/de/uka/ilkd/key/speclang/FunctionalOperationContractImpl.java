@@ -27,7 +27,7 @@ import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.MapUtil;
 
 import de.uka.ilkd.key.java.Expression;
@@ -438,7 +438,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     private ImmutableList<ProgramVariable> addGhostParams(
             ImmutableList<ProgramVariable> paramVars) {
         // make sure ghost parameters are present
-        ImmutableList<ProgramVariable> ghostParams = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> ghostParams = KeYCollections.<ProgramVariable>nil();
         for (ProgramVariable param : originalParamVars) {
             if (param.isGhost()) {
                 ghostParams = ghostParams.append(param);
@@ -451,7 +451,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     /** Make sure ghost parameters appear in the list of parameter variables. */
     private ImmutableList<Term> addGhostParamTerms(ImmutableList<Term> paramVars) {
         // make sure ghost parameters are present
-        ImmutableList<Term> ghostParams = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> ghostParams = KeYCollections.<Term>nil();
         for (ProgramVariable param : originalParamVars) {
             if (param.isGhost()) {
                 ghostParams = ghostParams.append(tb.var(param));

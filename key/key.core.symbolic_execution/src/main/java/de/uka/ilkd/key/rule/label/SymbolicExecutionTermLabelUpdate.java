@@ -17,7 +17,7 @@ import java.util.Set;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
@@ -52,7 +52,7 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
     */
    @Override
    public ImmutableList<Name> getSupportedRuleNames() {
-      return ImmutableSLList.<Name>nil()
+      return KeYCollections.<Name>nil()
                             .prepend(WhileInvariantRule.INSTANCE.name())
                             .prepend(BlockContractInternalRule.INSTANCE.name())
                             .prepend(BlockContractExternalRule.INSTANCE.name())

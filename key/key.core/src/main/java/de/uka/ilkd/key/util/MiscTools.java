@@ -35,7 +35,6 @@ import org.key_project.util.Filenames;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.KeYCollections;
 
@@ -721,7 +720,7 @@ public final class MiscTools {
 
     public static ImmutableList<Term> toTermList(Iterable<ProgramVariable> list,
             TermBuilder tb) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = KeYCollections.<Term>nil();
         for (ProgramVariable pv : list) {
             if (pv != null) {
                 Term t = tb.var(pv);
@@ -750,7 +749,7 @@ public final class MiscTools {
 
     public static ImmutableList<Term> filterOutDuplicates(ImmutableList<Term> localIns,
             ImmutableList<Term> localOuts) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = KeYCollections.<Term>nil();
         for (Term localIn : localIns) {
             if (!localOuts.contains(localIn)) {
                 result = result.append(localIn);

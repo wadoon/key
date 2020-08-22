@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -32,6 +31,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * Makes sure that {@link SymbolicExecutionUtil#LOOP_BODY_LABEL} is introduced
@@ -44,7 +44,7 @@ public class LoopBodyTermLabelUpdate implements TermLabelUpdate {
     */
    @Override
    public ImmutableList<Name> getSupportedRuleNames() {
-      return ImmutableSLList.<Name>nil().append(WhileInvariantRule.INSTANCE.name());
+      return KeYCollections.<Name>nil().append(WhileInvariantRule.INSTANCE.name());
    }
 
    /**

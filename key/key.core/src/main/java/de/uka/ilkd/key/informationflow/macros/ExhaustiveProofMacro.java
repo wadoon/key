@@ -16,7 +16,6 @@ package de.uka.ilkd.key.informationflow.macros;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
@@ -34,6 +33,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros
@@ -52,7 +52,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                                                   ProofMacro macro) {
         if (posInOcc == null || posInOcc.subTerm() == null) {
             return null;
-        } else if (macro.canApplyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc)) {
+        } else if (macro.canApplyTo(proof, KeYCollections.<Goal>nil().prepend(goal), posInOcc)) {
             return posInOcc;
         } else {
             final Term subTerm = posInOcc.subTerm();
@@ -132,7 +132,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                 if (!isCached) {
                     // node has not been checked before, so do it
                     boolean canBeApplied =
-                            canApplyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc);
+                            canApplyTo(proof, KeYCollections.<Goal>nil().prepend(goal), posInOcc);
                     if (!canBeApplied) {
                         // canApplyTo checks all open goals. thus, if it returns
                         // false, then this macro is not applicable at all and
@@ -151,7 +151,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                     pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, getName(), 0));
                     synchronized(macro) {
                         // wait for macro to terminate
-                        info = macro.applyTo(uic, proof, ImmutableSLList.<Goal>nil().prepend(goal),
+                        info = macro.applyTo(uic, proof, KeYCollections.<Goal>nil().prepend(goal),
                                 applicableAt, pml);
                     }
                     pml.taskFinished(info);

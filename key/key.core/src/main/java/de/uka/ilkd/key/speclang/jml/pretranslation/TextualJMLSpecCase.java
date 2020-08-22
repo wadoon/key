@@ -18,12 +18,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Triple;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * A JML specification case (i.e., more or less an operation contract) in
@@ -34,29 +34,29 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private final Behavior behavior;
     private PositionedString workingSpace = null;
     private ImmutableList<PositionedString> measuredBy =
-            ImmutableSLList.<PositionedString>nil();
+            KeYCollections.<PositionedString>nil();
     private ImmutableList<PositionedString> signals =
-            ImmutableSLList.<PositionedString>nil();
+            KeYCollections.<PositionedString>nil();
     private ImmutableList<PositionedString> signalsOnly =
-            ImmutableSLList.<PositionedString>nil();
+            KeYCollections.<PositionedString>nil();
     private ImmutableList<PositionedString> diverges =
-            ImmutableSLList.<PositionedString>nil();
+            KeYCollections.<PositionedString>nil();
     private ImmutableList<PositionedString> depends =
-            ImmutableSLList.<PositionedString>nil();
+            KeYCollections.<PositionedString>nil();
     private ImmutableList<PositionedString> breaks =
-            ImmutableSLList.<PositionedString>nil();
+            KeYCollections.<PositionedString>nil();
     private ImmutableList<PositionedString> continues =
-            ImmutableSLList.<PositionedString>nil();
+            KeYCollections.<PositionedString>nil();
     private ImmutableList<PositionedString> returns =
-            ImmutableSLList.<PositionedString>nil();
+            KeYCollections.<PositionedString>nil();
     private ImmutableList<PositionedString> decreases =
-            ImmutableSLList.<PositionedString>nil();
+            KeYCollections.<PositionedString>nil();
 
     private ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> abbreviations =
-            ImmutableSLList.<Triple<PositionedString,PositionedString,PositionedString>>nil();
+            KeYCollections.<Triple<PositionedString,PositionedString,PositionedString>>nil();
 
     private ImmutableList<PositionedString> infFlowSpecs =
-            ImmutableSLList.<PositionedString>nil();
+            KeYCollections.<PositionedString>nil();
     
     private Map<String, ImmutableList<PositionedString>>
       accessibles = new LinkedHashMap<String, ImmutableList<PositionedString>>();
@@ -85,14 +85,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         assert behavior != null;
         this.behavior = behavior;
         for(Name hName : HeapLDT.VALID_HEAP_NAMES) {
-          assignables.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
-          requires.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
-          requiresFree.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
-          ensures.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
-          ensuresFree.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
-          accessibles.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
-          accessibles.put(hName.toString()+"AtPre", ImmutableSLList.<PositionedString>nil());
-          axioms.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+          assignables.put(hName.toString(), KeYCollections.<PositionedString>nil());
+          requires.put(hName.toString(), KeYCollections.<PositionedString>nil());
+          requiresFree.put(hName.toString(), KeYCollections.<PositionedString>nil());
+          ensures.put(hName.toString(), KeYCollections.<PositionedString>nil());
+          ensuresFree.put(hName.toString(), KeYCollections.<PositionedString>nil());
+          accessibles.put(hName.toString(), KeYCollections.<PositionedString>nil());
+          accessibles.put(hName.toString()+"AtPre", KeYCollections.<PositionedString>nil());
+          axioms.put(hName.toString(), KeYCollections.<PositionedString>nil());
         }
     }
 

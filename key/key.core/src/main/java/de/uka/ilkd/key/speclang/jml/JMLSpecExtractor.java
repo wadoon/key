@@ -20,11 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Label;
@@ -434,7 +430,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             constructs = preParser.parseClasslevelComment();
             warnings = warnings.union(preParser.getWarnings());
         } else {
-            constructs = ImmutableSLList.<TextualJMLConstruct> nil();
+            constructs = KeYCollections.<TextualJMLConstruct> nil();
         }
 
         // create JML contracts out of constructs, add them to result
@@ -453,7 +449,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 // specification
                 // create an empty one and insert it:
                 TextualJMLSpecCase modelSpec = new TextualJMLSpecCase(
-                        ImmutableSLList.<String> nil(),
+                        KeYCollections.<String> nil(),
                         Behavior.NORMAL_BEHAVIOR);
                 TextualJMLConstruct[] t = new TextualJMLConstruct[constructsArray.length
                         + 1];

@@ -3,7 +3,6 @@ package de.uka.ilkd.key.strategy;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.IfInstantiationCachePool.IfInstantiationCache;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * This class implements custom instantiation of if-formulas.
@@ -32,7 +32,7 @@ public class IfInstantiator {
     private ImmutableList<IfFormulaInstantiation> allAntecFormulas;
     private ImmutableList<IfFormulaInstantiation> allSuccFormulas;
 
-    private ImmutableList<NoPosTacletApp> results = ImmutableSLList.nil();
+    private ImmutableList<NoPosTacletApp> results = KeYCollections.nil();
 
     private final TacletAppContainer tacletAppContainer;
 
@@ -74,7 +74,7 @@ public class IfInstantiator {
             findIfFormulaInstantiationsHelp(
                     ifSequent.succedent().asList().reverse(), //// Matching with the last formula
                     ifSequent.antecedent().asList().reverse(),
-                    ImmutableSLList.nil(), tacletAppContainer.getTacletApp().matchConditions(),
+                    KeYCollections.nil(), tacletAppContainer.getTacletApp().matchConditions(),
                     false);
         }
     }
@@ -113,7 +113,7 @@ public class IfInstantiator {
      *         <code>isNewFormula</code> returns <code>true</code>
      */
     private ImmutableList<IfFormulaInstantiation> selectNewFormulas(boolean p_antec) {
-        ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.nil();
+        ImmutableList<IfFormulaInstantiation> res = KeYCollections.nil();
 
         for (final IfFormulaInstantiation ifInstantiation : getAllSequentFormulas(p_antec) ) {
             if (isNewFormulaDirect((IfFormulaInstSeq) ifInstantiation))

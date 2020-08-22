@@ -18,7 +18,6 @@ import junit.framework.TestCase;
 import org.junit.Assert;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -33,6 +32,7 @@ import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
+import org.key_project.util.collection.KeYCollections;
 
 /** class tests the term factory
 */
@@ -155,7 +155,7 @@ public class TestTermFactory extends TestCase {
     }
 
     public void testQuantifierTerm() {
-	Term t_forallx_px=TB.all(ImmutableSLList.<QuantifiableVariable>nil().append(x),t1());
+	Term t_forallx_px=TB.all(KeYCollections.<QuantifiableVariable>nil().append(x),t1());
 	Assert.assertEquals(t_forallx_px,
 			    new TermImpl(Quantifier.ALL,new ImmutableArray<Term>(t1()), new ImmutableArray<QuantifiableVariable>(x), null));
     }
@@ -220,7 +220,7 @@ public class TestTermFactory extends TestCase {
 	Exception exc=new Exception();
         Term result = null;
 	try {
-	    result=TB.all(ImmutableSLList.<QuantifiableVariable>nil(), t1());
+	    result=TB.all(KeYCollections.<QuantifiableVariable>nil(), t1());
 	} catch (TermCreationException e) {
 	    exc=e;	    
 	}

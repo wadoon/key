@@ -26,7 +26,7 @@ import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 
 import javax.swing.*;
 import java.awt.*;
@@ -206,7 +206,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             seqView.getMediator().getSelectedGoal().sequent();
         
  
-        ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.<PosTacletApp>nil();
+        ImmutableList<PosTacletApp> applicableApps = KeYCollections.<PosTacletApp>nil();
         if (targetPos.isSequent()) {
             // collects all applicable taclets at the source position
             // which have an addrule section
@@ -245,7 +245,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             final Services services,
             final Sequent sequent) {
         
-        ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.<PosTacletApp>nil();
+        ImmutableList<PosTacletApp> applicableApps = KeYCollections.<PosTacletApp>nil();
         // all applicable taclets where the drag source has been interpreted
         // as
         // the find part and the drop position as the one of the
@@ -327,10 +327,10 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             				            Services services) {
 
         if (findPos == null || findPos.isSequent()) {
-            return ImmutableSLList.<PosTacletApp>nil();
+            return KeYCollections.<PosTacletApp>nil();
         }
 
-        ImmutableList<TacletApp> allTacletsAtFindPosition = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> allTacletsAtFindPosition = KeYCollections.<TacletApp>nil();
       KeYMediator r = seqView.getMediator();
 
         // if in replaceWithMode only apps that contain at least one replacewith
@@ -365,7 +365,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             PosInOccurrence findPos,
             Services services) {
 
-        ImmutableList<PosTacletApp> applicableApps = ImmutableSLList.<PosTacletApp>nil();
+        ImmutableList<PosTacletApp> applicableApps = KeYCollections.<PosTacletApp>nil();
         for (TacletApp tacletApp : tacletApps) {
             TacletApp app = tacletApp;
             if (app instanceof NoPosTacletApp) {
@@ -400,7 +400,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
     private ImmutableList<PosTacletApp> completeIfInstantiations(ImmutableList<PosTacletApp> apps,
             Sequent seq, PosInOccurrence ifPIO, Services services) {
 
-        ImmutableList<PosTacletApp> result = ImmutableSLList.<PosTacletApp>nil();
+        ImmutableList<PosTacletApp> result = KeYCollections.<PosTacletApp>nil();
 
         final ImmutableList<IfFormulaInstantiation> ifFmlInst;
               
@@ -411,7 +411,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         } else {          
             final IfFormulaInstSeq ifInst = new IfFormulaInstSeq(seq,
 	        ifPIO.isInAntec(), ifPIO.sequentFormula());
-            ifFmlInst = ImmutableSLList.<IfFormulaInstantiation>nil()
+            ifFmlInst = KeYCollections.<IfFormulaInstantiation>nil()
                     .prepend(ifInst);
         }
 
@@ -427,7 +427,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                 } else if (ifFmlInst == null) {
                     // as either all taclets have an if sequent or none
                     // we can exit here
-                    return ImmutableSLList.<PosTacletApp>nil();
+                    return KeYCollections.<PosTacletApp>nil();
                 } else {
                     // the right side is not checked in tacletapp
                     // not sure where to incorporate the check...
@@ -465,9 +465,9 @@ public class DragNDropInstantiator extends DropTargetAdapter {
     private ImmutableList<PosTacletApp> completeInstantiations(ImmutableList<PosTacletApp> apps,
              PosInOccurrence missingSVPIO, Services services) {
 
-        ImmutableList<PosTacletApp> result = ImmutableSLList.<PosTacletApp>nil();
+        ImmutableList<PosTacletApp> result = KeYCollections.<PosTacletApp>nil();
         if (missingSVPIO == null) {        
-            return ImmutableSLList.<PosTacletApp>nil(); 
+            return KeYCollections.<PosTacletApp>nil();
         }
 
         for (PosTacletApp app1 : apps) {

@@ -17,8 +17,6 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -35,6 +33,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.SuccTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletPrefixBuilder;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * class tests the building of Taclets in TacletBuilders, especially the
@@ -75,7 +74,7 @@ public class TestTacletBuild extends TestCase {
 	sb.setFind(t1);
 	sb.addTacletGoalTemplate
 	    (new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-					 ImmutableSLList.<Taclet>nil(),
+					 KeYCollections.<Taclet>nil(),
 					 t2));
 	boolean thrown=false;
 	try {

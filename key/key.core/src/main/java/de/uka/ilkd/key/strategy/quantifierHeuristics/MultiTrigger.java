@@ -15,12 +15,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -44,7 +39,7 @@ class MultiTrigger implements Trigger {
     @Override
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(
             ImmutableSet<Term> targetTerms, Services services) {
-        ImmutableList<Substitution> res = ImmutableSLList.nil();
+        ImmutableList<Substitution> res = KeYCollections.nil();
 
         ImmutableSet<Substitution> mulsubs = setMultiSubstitution(triggers.iterator(),
                 targetTerms, services);
@@ -61,7 +56,7 @@ class MultiTrigger implements Trigger {
     /** help function for getMultiSubstitution */
     private ImmutableSet<Substitution> setMultiSubstitution(
             Iterator<? extends Trigger> ts, ImmutableSet<Term> terms, Services services) {
-        ImmutableList<Substitution> res = ImmutableSLList.nil();
+        ImmutableList<Substitution> res = KeYCollections.nil();
         if (ts.hasNext()) {
             ImmutableSet<Substitution> subi = ts.next().getSubstitutionsFromTerms(
                     terms, services);

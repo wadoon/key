@@ -16,7 +16,6 @@ package de.uka.ilkd.key.strategy;
 import java.util.Optional;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * A rule app manager that ensures that rules are only applied to a certain
@@ -101,7 +101,7 @@ public class FocussedBreakpointRuleApplicationManager
     public void rulesAdded(ImmutableList<? extends RuleApp> rules,
             PosInOccurrence pos) {
         ImmutableList<RuleApp> applicableRules = //
-                ImmutableSLList.<RuleApp> nil();
+                KeYCollections.<RuleApp> nil();
         for (RuleApp r : rules) {
             if (mayAddRule(r, pos)) {
                 applicableRules = applicableRules.prepend(r);

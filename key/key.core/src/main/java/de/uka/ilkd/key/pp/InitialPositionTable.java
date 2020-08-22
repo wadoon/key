@@ -14,11 +14,11 @@
 package de.uka.ilkd.key.pp;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.IntIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * An InitialPositionTable is a PositionTable that describes the
@@ -35,12 +35,12 @@ import de.uka.ilkd.key.logic.SequentFormula;
  */
 public class InitialPositionTable extends PositionTable{
 
-    private ImmutableList<Range> updateRanges = ImmutableSLList.<Range>nil();
+    private ImmutableList<Range> updateRanges = KeYCollections.<Range>nil();
     
     /** Ranges of keywords */
-    private ImmutableList<Range> keywordRanges = ImmutableSLList.<Range>nil();
+    private ImmutableList<Range> keywordRanges = KeYCollections.<Range>nil();
     /** Ranges of java blocks */
-    private ImmutableList<Range> javaBlockRanges = ImmutableSLList.<Range>nil();
+    private ImmutableList<Range> javaBlockRanges = KeYCollections.<Range>nil();
 
     /**
      * creates a new Initial PositionTable.
@@ -108,7 +108,7 @@ public class InitialPositionTable extends PositionTable{
      */
     public ImmutableList<Integer> pathForPosition(PosInOccurrence pio,
                                                   SequentPrintFilter filter) {
-        ImmutableList<Integer> p = ImmutableSLList.<Integer>nil();
+        ImmutableList<Integer> p = KeYCollections.<Integer>nil();
         p = prependPathInFormula(p, pio);
         int index = indexOfCfma(pio.sequentFormula(), filter);
         if (index == -1) {

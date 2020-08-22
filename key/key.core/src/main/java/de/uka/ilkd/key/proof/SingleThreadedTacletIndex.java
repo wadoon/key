@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * The default taclet index implementation. It executes method 
@@ -61,7 +61,7 @@ final class SingleThreadedTacletIndex extends TacletIndex {
     protected ImmutableList<NoPosTacletApp> matchTaclets(
             ImmutableList<NoPosTacletApp> tacletApps, RuleFilter p_filter,
             PosInOccurrence pos, Services services) {
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = KeYCollections.<NoPosTacletApp>nil();
         if (tacletApps == null) {
             return result;
         }

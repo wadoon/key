@@ -16,11 +16,11 @@ package de.uka.ilkd.key.pp;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -36,12 +36,12 @@ public abstract class SequentPrintFilter {
     /**
      * the antecedent of the filtered formula
      */
-    ImmutableList<SequentPrintFilterEntry> antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+    ImmutableList<SequentPrintFilterEntry> antec = KeYCollections.<SequentPrintFilterEntry>nil();
 
      /**
      * the antecedent of the filtered formula
      */
-    ImmutableList<SequentPrintFilterEntry> succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
+    ImmutableList<SequentPrintFilterEntry> succ = KeYCollections.<SequentPrintFilterEntry>nil();
 
     /**
      * @return the original sequent
@@ -89,13 +89,13 @@ public abstract class SequentPrintFilter {
      * antecedent/succendent lists of print filter entries.
      */
     protected void filterIdentity() {
-        antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+        antec = KeYCollections.<SequentPrintFilterEntry>nil();
         Iterator<SequentFormula> it = originalSequent.antecedent().iterator();
         while (it.hasNext()) {
             antec = antec.append(new IdentityFilterEntry(it.next()));
         }
 
-        succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
+        succ = KeYCollections.<SequentPrintFilterEntry>nil();
         it = originalSequent.succedent().iterator();
         while (it.hasNext()) {
             succ = succ.append(new IdentityFilterEntry(it.next()));

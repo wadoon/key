@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
@@ -139,7 +139,7 @@ public class TermLabelManager {
    /**
     * All rule independent {@link TermLabelUpdate}s.
     */
-   private ImmutableList<TermLabelUpdate> allRulesUpdates = ImmutableSLList.<TermLabelUpdate>nil();
+   private ImmutableList<TermLabelUpdate> allRulesUpdates = KeYCollections.<TermLabelUpdate>nil();
 
    /**
     * All rule specific {@link TermLabelRefactoring}s.
@@ -149,12 +149,12 @@ public class TermLabelManager {
    /**
     * All rule independent {@link TermLabelRefactoring}s.
     */
-   private ImmutableList<TermLabelRefactoring> allRulesRefactorings = ImmutableSLList.<TermLabelRefactoring>nil();
+   private ImmutableList<TermLabelRefactoring> allRulesRefactorings = KeYCollections.<TermLabelRefactoring>nil();
 
    /**
     * The {@link Name}s of all supported {@link TermLabel}s.
     */
-   private ImmutableList<Name> supportedTermLabelnames = ImmutableSLList.<Name>nil();
+   private ImmutableList<Name> supportedTermLabelnames = KeYCollections.<Name>nil();
 
    /**
     * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelMerger}.
@@ -269,7 +269,7 @@ public class TermLabelManager {
                for (Name rule : supportedRules) {
                   ImmutableList<TermLabelUpdate> ruleUpdates = ruleSpecificUpdates.get(rule);
                   if (ruleUpdates == null) {
-                     ruleUpdates = ImmutableSLList.nil();
+                     ruleUpdates = KeYCollections.nil();
                   }
                   ruleUpdates = ruleUpdates.prepend(update);
                   ruleSpecificUpdates.put(rule, ruleUpdates);
@@ -299,7 +299,7 @@ public class TermLabelManager {
                for (Name rule : supportedRules) {
                   ImmutableList<TermLabelRefactoring> ruleRefactorings = ruleSpecificRefactorings.get(rule);
                   if (ruleRefactorings == null) {
-                     ruleRefactorings = ImmutableSLList.nil();
+                     ruleRefactorings = KeYCollections.nil();
                   }
                   ruleRefactorings = ruleRefactorings.prepend(refactoring);
                   ruleSpecificRefactorings.put(rule, ruleRefactorings);
@@ -336,7 +336,7 @@ public class TermLabelManager {
          return manager.getSupportedTermLabelNames();
       }
       else {
-         return ImmutableSLList.nil();
+         return KeYCollections.nil();
       }
    }
 
@@ -1669,9 +1669,9 @@ public class TermLabelManager {
                                                         Object hint,
                                                         Term tacletTerm) {
         RefactoringsContainer refactorings =
-                new RefactoringsContainer(ImmutableSLList.nil(), ImmutableSLList.nil(),
-                                          ImmutableSLList.nil(), ImmutableSLList.nil(),
-                                          ImmutableSLList.nil());
+                new RefactoringsContainer(KeYCollections.nil(), KeYCollections.nil(),
+                                          KeYCollections.nil(), KeYCollections.nil(),
+                                          KeYCollections.nil());
 
         refactorings =
                 computeRuleSpecificRefactorings(state, services,

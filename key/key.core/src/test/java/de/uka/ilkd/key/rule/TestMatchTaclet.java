@@ -21,7 +21,6 @@ import java.io.File;
 import junit.framework.TestCase;
 
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -51,6 +50,7 @@ import de.uka.ilkd.key.proof.TacletIndexKit;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.key_project.util.collection.KeYCollections;
 
 
 public class TestMatchTaclet extends TestCase {
@@ -287,7 +287,7 @@ public class TestMatchTaclet extends TestCase {
                 PosInTerm.getTopLevel(), false);
 
 	TacletApp tacletApp = index.getSuccedentTaclet(pio,
-	                                               new IHTacletFilter (true, ImmutableSLList.<RuleSet>nil()),
+	                                               new IHTacletFilter (true, KeYCollections.<RuleSet>nil()),
 	                                               services).iterator().next();
 	assertTrue("Match should be possible(modulo renaming)",
 		   tacletApp.findIfFormulaInstantiations ( seq, services ).size()>0);

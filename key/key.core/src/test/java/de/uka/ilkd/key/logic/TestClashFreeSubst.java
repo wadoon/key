@@ -17,8 +17,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Stack;
 
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
@@ -38,6 +36,7 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import junit.framework.TestCase;
+import org.key_project.util.collection.KeYCollections;
 
 public class TestClashFreeSubst extends TestCase {
 
@@ -228,7 +227,7 @@ public class TestClashFreeSubst extends TestCase {
 			    top.varsBoundHere(0).get(i);
 		    }
 		    subStack.pop();
-		    subStack.push(TacletForTests.services().getTermBuilder().all(ImmutableSLList.<QuantifiableVariable>nil().append(bv), top.sub(0)));
+		    subStack.push(TacletForTests.services().getTermBuilder().all(KeYCollections.<QuantifiableVariable>nil().append(bv), top.sub(0)));
 		    return;
 		}
 	    }

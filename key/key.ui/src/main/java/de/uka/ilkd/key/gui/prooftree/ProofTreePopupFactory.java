@@ -35,7 +35,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
@@ -591,7 +591,7 @@ public class ProofTreePopupFactory {
                 // No functionality is allowed in this method body!
                 r.getUI().getProofControl()
                     .startAutoMode(r.getSelectedProof(),
-                                   ImmutableSLList.<Goal>nil().prepend(invokedGoal));
+                                   KeYCollections.<Goal>nil().prepend(invokedGoal));
             }
         }
     }

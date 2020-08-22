@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -51,6 +50,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.KeYCollections;
 
 /**
  * A contract for checking the well-definedness of a jml specification element
@@ -129,8 +129,8 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     private Pair<ImmutableList<Term>, ImmutableList<Term>> sort(Term spec) {
         assert spec != null;
-        ImmutableList<Term> implicit = ImmutableSLList.<Term>nil();
-        ImmutableList<Term> explicit = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> implicit = KeYCollections.<Term>nil();
+        ImmutableList<Term> explicit = KeYCollections.<Term>nil();
         if (spec.arity() > 0
                 && spec.op().equals(Junctor.AND)) { // Conjunctions
             assert spec.arity() == 2;
@@ -362,7 +362,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     private ImmutableList<Term> replace(Iterable<Term> l, Variables vars) {
-        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> res = KeYCollections.<Term>nil();
         for (Term t: l) {
             res = res.append(replace(t, vars));
         }
@@ -371,7 +371,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
     private ImmutableList<LocationVariable> getHeaps() {
         ImmutableList<LocationVariable> result =
-                ImmutableSLList.<LocationVariable>nil();
+                KeYCollections.<LocationVariable>nil();
         return result.append(getHeap());
     }
 
@@ -648,7 +648,7 @@ public abstract class WellDefinednessCheck implements Contract {
                                          ImmutableList<ParsableVariable> params,
                                          boolean taclet,
                                          Services services) {
-        ImmutableList<Term> resList = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> resList = KeYCollections.<Term>nil();
 
         // "self != null"
         final Term selfNotNull = generateSelfNotNull(self);
@@ -887,7 +887,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return a list of all remaining clauses
      */
     ImmutableList<Term> getRest() {
-        ImmutableList<Term> rest = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> rest = KeYCollections.<Term>nil();
         final Term accessible = this.accessible;
         if (accessible != null) {
             rest = rest.append(accessible);
@@ -1033,7 +1033,7 @@ public abstract class WellDefinednessCheck implements Contract {
                                     ImmutableList<? extends ParsableVariable> parameters,
                                     boolean taclet,
                                     Services services) {
-        ImmutableList<ParsableVariable> params = ImmutableSLList.<ParsableVariable>nil();
+        ImmutableList<ParsableVariable> params = KeYCollections.<ParsableVariable>nil();
         for (ParsableVariable pv: parameters) {
             params = params.append(pv);
         }

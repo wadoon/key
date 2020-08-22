@@ -24,10 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
@@ -732,7 +729,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     * @return The created {@link ISymbolicEquivalenceClass} instances.
     */
    protected ImmutableList<ISymbolicEquivalenceClass> lazyComputeEquivalenceClasses(ImmutableSet<Term> appliedCuts) {
-      ImmutableList<ISymbolicEquivalenceClass> result = ImmutableSLList.nil();
+      ImmutableList<ISymbolicEquivalenceClass> result = KeYCollections.nil();
       for (Term term : appliedCuts) {
          if (Junctor.NOT != term.op()) {
             assert term.op() == Equality.EQUALS;

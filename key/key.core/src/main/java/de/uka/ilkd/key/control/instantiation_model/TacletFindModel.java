@@ -22,7 +22,6 @@ import javax.swing.table.AbstractTableModel;
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -71,6 +70,7 @@ import de.uka.ilkd.key.rule.inst.RigidnessException;
 import de.uka.ilkd.key.rule.inst.SortException;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.KeYCollections;
 
 public class TacletFindModel extends AbstractTableModel {
 
@@ -148,7 +148,7 @@ public class TacletFindModel extends AbstractTableModel {
 
         noEditRow = count - 1;
 
-        ImmutableList<String> proposals = ImmutableSLList.<String>nil();
+        ImmutableList<String> proposals = KeYCollections.<String>nil();
 
         for (SchemaVariable var : tacletApp.uninstantiatedVars()) {
 

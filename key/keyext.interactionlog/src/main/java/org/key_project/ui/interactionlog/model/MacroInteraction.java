@@ -8,7 +8,7 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.KeYCollections;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -49,7 +49,7 @@ public final class MacroInteraction extends NodeInteraction {
 
         ImmutableList<Goal> openGoals =
                 info.getProof() != null ?
-                        info.getProof().openGoals() : ImmutableSLList.<Goal>nil();
+                        info.getProof().openGoals() : KeYCollections.<Goal>nil();
         this.openGoalSerialNumbers = openGoals.stream().map(g -> g.node().serialNr()).collect(Collectors.toList());
         this.openGoalNodeIds = openGoals.stream().map(g -> NodeIdentifier.get(g.node())).collect(Collectors.toList());
     }

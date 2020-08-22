@@ -1,15 +1,12 @@
 package org.key_project.util.collection;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
  * Utilities for Collections.
- *
  *
  * @author Alexander Weigl
  * @version 1 (29.03.19)
@@ -19,20 +16,21 @@ public class KeYCollections {
     // Methods operating on Arrays
     // =======================================================
 
+    private final static ImmutableList<?> NIL = new ImmutableSLList.NIL<>();
+
+    // =======================================================
+    // Methods operating on Collections
+    // =======================================================
+
     /**
      * Concatenates two arrays. The second array may have an entry type that is a
      * subtype of the first one.
      */
     public static <S, T extends S> S[] concat(S[] s1, T[] s2) {
         S[] res = Arrays.copyOf(s1, s1.length + s2.length);
-        for (int i = 0; i < s2.length; i++)
-            res[i + s1.length] = s2[i];
+        System.arraycopy(s2, 0, res, s1.length, s2.length);
         return res;
     }
-
-    // =======================================================
-    // Methods operating on Collections
-    // =======================================================
 
     /**
      * Combine two maps by function application.
@@ -42,8 +40,8 @@ public class KeYCollections {
      * (provided in Java SE) as <code>m0</code>.
      */
     public static <S, T, U> Map<S, U> apply(Map<S, ? extends T> m0, Map<T, U> m1) {
-        Map<S, U> res = null;
-        final int size = m0.size() < m1.size() ? m0.size() : m1.size();
+        Map<S, U> res;
+        final int size = Math.min(m0.size(), m1.size());
         // try to use more specific implementation
         if (m0 instanceof java.util.TreeMap)
             res = new java.util.TreeMap<S, U>();
@@ -62,7 +60,6 @@ public class KeYCollections {
         }
         return res;
     }
-
 
     /**
      * Join the string representations of a collection of objects into onw
@@ -119,5 +116,53 @@ public class KeYCollections {
             }
         }
         return res.toString();
+    }
+
+    /**
+     * Returns a Collector that accumulates the input elements into a new ImmutableList.
+     *
+     * @return a Collector that accumulates the input elements into a new ImmutableList.
+     */
+    public static <T> Collector<T, List<T>, ImmutableList<T>> collector() {
+        return Collector.of(
+                LinkedList::new,
+                List::add,
+                (list1, list2) -> {
+                    list1.addAll(list2);
+                    return list1;
+                },
+                KeYCollections::fromList);
+    }
+
+    /**
+     * Creates an ImmutableList from a List.
+     *
+     * @param list a List.
+     * @return an ImmutableList containing the same elements as the specified list.
+     */
+    public static <T> ImmutableList<T> fromList(List<T> list) {
+        ImmutableList<T> result = nil();
+
+        for (T el : list) {
+            result = result.append(el);
+        }
+
+        return result;
+    }
+
+    /**
+     * the empty list
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> ImmutableSLList<T> nil() {
+        return (ImmutableSLList<T>) NIL;
+    }
+
+    public static <T> ImmutableSLList<T> singleton(T obj) {
+        return new ImmutableSLList.Cons<T>(obj, nil());
+    }
+
+    public static <T> Collector<T, List<T>, ImmutableList<T>> toImmutableList() {
+        return new ImmutableSLList.ImmutableListCollector<>();
     }
 }

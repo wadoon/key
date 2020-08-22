@@ -3,7 +3,6 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -17,6 +16,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import org.key_project.util.collection.KeYCollections;
 
 
 /**
@@ -119,8 +119,8 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
             IProgramMethod pm,
             ProofObligationVars poVars,
             boolean hasMby) {
-        ImmutableList<Term> relevantPreVars = ImmutableSLList.<Term>nil();
-        ImmutableList<Term> relevantPostVars = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> relevantPreVars = KeYCollections.<Term>nil();
+        ImmutableList<Term> relevantPostVars = KeYCollections.<Term>nil();
 
         if (!pm.isStatic()) {
             // self is relevant in the pre and post state for constructors
