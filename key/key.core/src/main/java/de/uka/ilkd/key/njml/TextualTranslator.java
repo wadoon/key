@@ -76,7 +76,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
             case JmlLexer.CONTINUE_BEHAVIOR:
                 return Behavior.CONTINUE_BEHAVIOR;
         }
-        return null;
+        throw new IllegalStateException("No behavior is given");
     }
 
     @Override
@@ -396,7 +396,6 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
-        //FIXME check with mu/rb
         TextualJMLSpecCase b = new TextualJMLSpecCase(ImmutableSLList.nil(), Behavior.NONE);
         constructs = constructs.prepend(b);
         b.addClause(ENSURES_FREE, ctx);

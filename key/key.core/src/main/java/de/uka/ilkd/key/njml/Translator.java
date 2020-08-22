@@ -1626,6 +1626,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         Term guard = tb.tt();
         if (ctx.expression().size() == 2) {
             SLExpression a = accept(ctx.expression(0));
+            assert a != null;
             guard = a.getTerm();
         }
         SLExpression expr =
@@ -1843,7 +1844,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private JMLSpecFactory factory;
     private Object currentBehavior;
     private ContractClauses contractClauses = new ContractClauses();
-    private List<Term> abbreviations = new ArrayList<>(64);
+    private final List<Term> abbreviations = new ArrayList<>(64);
 
     private PositionedString flipHeaps(String declString, PositionedString result) {
         return flipHeaps(declString, result, false);
@@ -1927,7 +1928,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
         Term t;
         LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
         if (ctx.STRICTLY_NOTHING() != null) t = tb.strictlyNothing();
-        else t = translator.assignable(requireNonNull(accept(ctx.storeRefUnion())));
+        else {
+            final Term storeRef = accept(ctx.storeRefUnion());
+            assert storeRef != null;
+            t = translator.assignable(storeRef);
+        }
         for (LocationVariable heap : heaps) {
             contractClauses.add(ContractClauses.ASSIGNABLE, heap, t);
         }
@@ -1951,6 +1956,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Pair<Label, Term> visitBreaks_clause(JmlParser.Breaks_clauseContext ctx) {
         String label = ctx.lbl == null ? "" : ctx.lbl.getText(); //TODO weigl: right label if omitted
         SLExpression pred = accept(ctx.predornot());
+        assert pred != null;
         @NotNull Pair<Label, Term> t = translator.createBreaks(pred.getTerm(), label);
         contractClauses.add(ContractClauses.BREAKS, t.first, t.second);
         return t;
@@ -1960,6 +1966,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public Pair<Label, Term> visitContinues_clause(JmlParser.Continues_clauseContext ctx) {
         String label = ctx.lbl == null ? "" : ctx.lbl.getText(); //TODO weigl: right label if omitted
         SLExpression pred = accept(ctx.predornot());
+        assert pred != null;
         @NotNull Pair<Label, Term> t = translator.createContinues(pred.getTerm(), label);
         contractClauses.add(ContractClauses.CONTINUES, t.first, t.second);
         return t;
@@ -1968,6 +1975,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public SLExpression visitReturns_clause(JmlParser.Returns_clauseContext ctx) {
         @Nullable SLExpression pred = accept(ctx.predornot());
+        assert pred != null;
         contractClauses.returns = translator.createReturns(pred.getTerm());
         return pred;
     }
@@ -1987,7 +1995,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitClasslevel_element0(JmlParser.Classlevel_element0Context ctx) {
-        this.mods = ImmutableSLList.<String>nil();
+        this.mods = ImmutableSLList.nil();
         /* there may be some modifiers after the declarations */
         this.mods = accept(ctx.modifiers());
         listOf(ctx.modifier2());
@@ -1996,9 +2004,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public ImmutableList<TextualJMLConstruct> visitMethodlevel_comment(JmlParser.Methodlevel_commentContext ctx) {
-        ImmutableList<TextualJMLConstruct> result = ImmutableSLList.<TextualJMLConstruct>nil();
-        mods = ImmutableSLList.<String>nil();
-        return null;//listOf(ctx.methodlevel_element());
+        mods = ImmutableSLList.nil();
+        return null;
     }
 
     @Override
@@ -2014,10 +2021,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitClass_invariant(JmlParser.Class_invariantContext ctx) {
-        ImmutableList<TextualJMLConstruct> result;
-        String name = null;
-        SLExpression expr = accept(ctx.expression());
-        return expr;
+        return accept(ctx.expression());
     }
 
     @Override
@@ -2101,6 +2105,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression t = accept(ctx.predornot());
         LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
         for (LocationVariable heap : heaps) {
+            assert t != null;
             insertSimpleClause(type, heap, t.getTerm(),
                     ContractClauses.ENSURES,
                     ContractClauses.ENSURES_FREE,
@@ -2116,6 +2121,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression t = accept(ctx.predornot());
         LocationVariable[] heaps = visitTargetHeap(ctx.targetHeap());
         for (LocationVariable heap : heaps) {
+            assert t != null;
             insertSimpleClause(type, heap, t.getTerm(),
                     ContractClauses.REQUIRES,
                     ContractClauses.REQUIRES_FREE,
@@ -2126,7 +2132,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitMeasured_by_clause(JmlParser.Measured_by_clauseContext ctx) {
-        String type = ctx.MEASURED_BY().getText();
         final List<SLExpression> seq = ctx.predornot().stream().map(it -> (SLExpression) accept(it))
                 .collect(Collectors.toList());
         Optional<SLExpression> t = seq.stream()
@@ -2139,32 +2144,26 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitCaptures_clause(JmlParser.Captures_clauseContext ctx) {
-        String type = ctx.CAPTURES().getText();
-        SLExpression t = accept(ctx.predornot());
-        //insertSimpleClause(type, t,
-        //        contractClauses.requires, contractClauses.requiresFree, contractClauses.requires);
-        return t;
+        return this.<SLExpression>accept(ctx.predornot());
     }
 
     @Override
     public Object visitDiverges_clause(JmlParser.Diverges_clauseContext ctx) {
         SLExpression t = accept(ctx.predornot());
+        assert t != null;
         contractClauses.diverges = t.getTerm();
         return t;
     }
 
     @Override
     public Object visitWorking_space_clause(JmlParser.Working_space_clauseContext ctx) {
-        String type = ctx.WORKING_SPACE().getText();
-        SLExpression t = accept(ctx.predornot());
         //insertSimpleClause(type, t,
         //        contractClauses.requires, contractClauses.requiresFree, contractClauses.requires);
-        return (t);
+        return (this.<SLExpression>accept(ctx.predornot()));
     }
 
     @Override
     public Object visitDuration_clause(JmlParser.Duration_clauseContext ctx) {
-        String type = ctx.DURATION().getText();
         SLExpression t = accept(ctx.predornot());
         //insertSimpleClause(type, t,
         //        contractClauses., contractClauses.requiresFree, contractClauses.requires);
@@ -2173,7 +2172,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitWhen_clause(JmlParser.When_clauseContext ctx) {
-        String type = ctx.WHEN().getText();
         SLExpression t = accept(ctx.predornot());
         assert false;
         //insertSimpleClause(type, t,
@@ -2314,6 +2312,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         if (vName != null) {
             resolverManager.popLocalVariablesNamespace();
         }
+        assert result != null;
         Term r = translator.signals(result.getTerm(), eVar, excVar, excType);
         contractClauses.signalsOnly = r;
         return new SLExpression(r);
