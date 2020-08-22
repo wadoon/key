@@ -304,10 +304,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return by.append((T) accept(ctx));
     }
 
-    private <T> ImmutableList<T> append(ImmutableList<T> target,
-                                        List<? extends ParserRuleContext> ctx) {
+    private ImmutableList<Term> append(ImmutableList<Term> target,
+                                       List<JmlParser.InfflowspeclistContext> ctx) {
         for (ParserRuleContext c : ctx) {
-            target = target.append((T) accept(c));
+            ImmutableList<Term> t = accept(c);
+            target = target.append(t);
         }
         return target;
     }
@@ -2273,6 +2274,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         assert determined != null;
         determined = determined.append(erases);
         by = by.append(decl);
+
         return new InfFlowSpec(by, determined, newObs);
     }
 
