@@ -996,6 +996,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     //region suffix
+
+    //receiver value of attribute access, functions calls or array access
     private SLExpression receiver;
     private String fullyQualifiedName;
 
@@ -1069,6 +1071,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitPrimarySuffixCall(JmlParser.PrimarySuffixCallContext ctx) {
+        final SLExpression receiver = this.receiver;
         String lookupName = fullyQualifiedName;
 
         if (fullyQualifiedName.startsWith("\\dl_")) {
@@ -1114,10 +1117,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitPrimarySuffixArray(JmlParser.PrimarySuffixArrayContext ctx) {
+        SLExpression curReceiver = receiver;
         SLExpression rangeFrom = accept(ctx.from);
         SLExpression rangeTo = accept(ctx.to);
         //TODO not handled by code ctx.MULT()
-        return translator.arrayRef(receiver, fullyQualifiedName, rangeFrom, rangeTo);
+        return translator.arrayRef(curReceiver, fullyQualifiedName, rangeFrom, rangeTo);
     }
     //endregion
 
