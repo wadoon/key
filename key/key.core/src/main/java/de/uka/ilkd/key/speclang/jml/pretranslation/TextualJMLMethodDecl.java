@@ -15,7 +15,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import com.google.common.base.Strings;
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
-import de.uka.ilkd.key.njml.JmlParser;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
 

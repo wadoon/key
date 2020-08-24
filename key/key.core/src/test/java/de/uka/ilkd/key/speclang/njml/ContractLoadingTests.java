@@ -1,11 +1,10 @@
-package de.uka.ilkd.key.njml;
+package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.api.KeYApi;
 import de.uka.ilkd.key.api.ProofManagementApi;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.Test;
 
 import java.io.File;

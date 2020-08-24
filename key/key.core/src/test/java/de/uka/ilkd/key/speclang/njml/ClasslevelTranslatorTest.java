@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.njml;
+package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
@@ -7,10 +7,8 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
-import de.uka.ilkd.key.njml.JmlFacade;
-import de.uka.ilkd.key.njml.JmlLexer;
+import de.uka.ilkd.key.speclang.njml.JmlFacade;
+import de.uka.ilkd.key.speclang.njml.JmlLexer;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
@@ -24,7 +24,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.key_project.util.collection.ImmutableList;
 
-import static de.uka.ilkd.key.njml.JmlLexer.*;
+import static de.uka.ilkd.key.speclang.njml.JmlLexer.*;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertSame;
 import static org.junit.Assert.*;

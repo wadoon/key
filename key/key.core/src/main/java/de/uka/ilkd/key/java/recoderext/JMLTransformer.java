@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import com.google.common.base.Strings;
-import de.uka.ilkd.key.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;

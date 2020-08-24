@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.njml.LabeledParserRuleContext;
+import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import org.antlr.v4.runtime.ParserRuleContext;
 

@@ -146,6 +146,10 @@ public class SLExceptionFactory {
         Debug.out("JML translator warning: " + msg);
         warnings.add(createPositionedString(msg, t));
     }
+
+    public List<PositionedString> getWarnings() {
+        return warnings;
+    }
     //endregion
 
     /**

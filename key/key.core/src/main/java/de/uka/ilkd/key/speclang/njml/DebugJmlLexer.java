@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.njml;
+package de.uka.ilkd.key.speclang.njml;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonToken;

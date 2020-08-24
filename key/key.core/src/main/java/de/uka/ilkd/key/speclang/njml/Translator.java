@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.njml;
+package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
@@ -41,7 +41,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static de.uka.ilkd.key.njml.JmlFacade.TODO;
+import static de.uka.ilkd.key.speclang.njml.JmlFacade.TODO;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
@@ -2517,7 +2517,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
         return heaps;
     }
-
     //endregion
 
     //region exception helper
@@ -2535,6 +2534,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     private void raiseError(String msg) {
         throw new RuntimeException(msg);
+    }
+
+    List<PositionedString> getWarnings() {
+        return exc.getWarnings();
     }
     //endregion
 }

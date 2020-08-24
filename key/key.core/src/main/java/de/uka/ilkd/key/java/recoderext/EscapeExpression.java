@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Operator;

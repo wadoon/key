@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.njml;
+package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.logic.Term;

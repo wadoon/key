@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.njml;
+package de.uka.ilkd.key.speclang.njml;
 
 import com.google.common.base.Stopwatch;
 import de.uka.ilkd.key.speclang.PositionedString;

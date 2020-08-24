@@ -20,8 +20,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.njml.LabeledParserRuleContext;
-import org.antlr.v4.runtime.ParserRuleContext;
+import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 
 public interface InitiallyClause extends SpecificationElement {

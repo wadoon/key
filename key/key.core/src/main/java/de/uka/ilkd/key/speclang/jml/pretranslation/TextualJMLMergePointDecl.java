@@ -13,12 +13,9 @@
 
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import de.uka.ilkd.key.njml.JmlParser;
-import org.antlr.v4.runtime.ParserRuleContext;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.speclang.PositionedString;
 
 import java.util.Objects;
 

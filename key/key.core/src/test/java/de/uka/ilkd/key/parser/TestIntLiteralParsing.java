@@ -3,9 +3,8 @@ package de.uka.ilkd.key.parser;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 

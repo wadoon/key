@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.njml.JmlTermFactory;
+import de.uka.ilkd.key.speclang.njml.JmlTermFactory;
 import de.uka.ilkd.key.util.MiscTools;
 import recoder.java.Expression;
 
