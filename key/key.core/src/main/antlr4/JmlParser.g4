@@ -90,11 +90,15 @@ represents_clause
   ;
 
 separates_clause
-  : SEPARATES (NOTHING | sep=infflowspeclist)
-    ((DECLASSIFIES (NOTHING | decl=infflowspeclist))
-     | (ERASES (NOTHING |erase=infflowspeclist)) | (NEW_OBJECTS (NOTHING |newobj=infflowspeclist)))*
+  : SEPARATES
+    sep=infflowspeclist
+    ( DECLASSIFIES   decl+=infflowspeclist
+    | ERASES        erase+=infflowspeclist
+    | NEW_OBJECTS  newobj+=infflowspeclist
+    )*
     SEMI_TOPLEVEL
   ;
+
 loop_separates_clause
   : LOOP_SEPARATES
     sep=infflowspeclist

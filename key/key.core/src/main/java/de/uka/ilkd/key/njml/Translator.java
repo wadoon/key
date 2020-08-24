@@ -2232,23 +2232,20 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         ImmutableList<Term> sep = accept(ctx.sep);
 
-        decl = decl.append((Iterable<Term>) accept(ctx.decl));
-        erases = erases.append((Iterable<Term>) accept(ctx.decl));
-        newObs = newObs.append((Iterable<Term>) accept(ctx.newobj));
+        decl = append(decl, ctx.decl);
+        erases = append(erases, ctx.erase);
+        newObs = append(newObs, ctx.newobj);
         assert sep != null;
         decl = sep.append(decl);
         erases = sep.append(erases);
         return new InfFlowSpec(decl, erases, newObs);
-        //return InfFlowSpec.EMPTY_INF_FLOW_SPEC;
     }
 
     @Override
     public Object visitLoop_separates_clause(JmlParser.Loop_separates_clauseContext ctx) {
         ImmutableList<Term> sep = accept(ctx.sep);
         ImmutableList<Term> newObs = ImmutableSLList.nil();
-        for (JmlParser.InfflowspeclistContext context : ctx.newobj) {
-            newObs = newObs.append((ImmutableList<Term>) accept(context));
-        }
+        newObs = append(newObs, ctx.newobj);
         return new InfFlowSpec(sep, sep, newObs);
     }
 

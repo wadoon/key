@@ -243,13 +243,16 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitSeparates_clause(JmlParser.Separates_clauseContext ctx) {
-        return super.visitSeparates_clause(ctx);
+        assert methodContract != null;
+        methodContract.addClause(INFORMATION_FLOW, ctx);
+        return null;
     }
 
     @Override
     public Object visitLoop_separates_clause(JmlParser.Loop_separates_clauseContext ctx) {
-        TODO();
-        return super.visitLoop_separates_clause(ctx);
+        assert loopContract != null;
+        loopContract.addClause(TextualJMLLoopSpec.Clause.INFORMATION_FLOW, new LabeledParserRuleContext(ctx));
+        return null;
     }
 
     @Override
