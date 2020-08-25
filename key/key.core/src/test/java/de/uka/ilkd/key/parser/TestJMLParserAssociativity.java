@@ -3,11 +3,11 @@ package de.uka.ilkd.key.parser;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test behaviour of for inputs in which braces are
@@ -26,8 +26,10 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
          */
         KeYJavaType containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
         ProgramVariable self = services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
-        JmlIO io = new JmlIO(getServices(), containerType, self,
-                null, null, null, null);
+        JmlIO io = new JmlIO()
+                .services(getServices())
+                .classType(containerType)
+                .selfVar(self);
         return io.parseExpression(p);
     }
 
@@ -36,7 +38,7 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
      * that have same precedence.
      *
      * Example
-     * 1 + 2 - 3 + 4 = ???                                  
+     * 1 + 2 - 3 + 4 = ???
      * Left-associative parsing: (((1 + 2) - 3) + 4) = 4
      * Right-associative parsing: (1 + (2 - (3 + 4))) = -4
      */
@@ -82,7 +84,7 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
         s1 = parseTerm("1 == 1 ==> 2 == 2 ==> 3 == 3").toString();
         s2 = "imp(equals(Z(1(#)),Z(1(#))),imp(equals(Z(2(#)),Z(2(#))),equals(Z(3(#)),Z(3(#)))))";
         assertEquals(s1, s2);
-        
+
         // test <==
         s1 = parseTerm("1 == 1 <== 2 == 2 <== 3 == 3").toString();
         s2 = "imp(equals(Z(3(#)),Z(3(#))),imp(equals(Z(2(#)),Z(2(#))),equals(Z(1(#)),Z(1(#)))))";

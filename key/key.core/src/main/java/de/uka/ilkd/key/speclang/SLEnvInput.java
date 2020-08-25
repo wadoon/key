@@ -366,7 +366,9 @@ public final class SLEnvInput extends AbstractEnvInput {
         specRepos.createContractsFromInitiallyClauses();
 
         //update warnings to user
-        warnings = warnings.union(specExtractor.getWarnings());
+        final ImmutableSet<PositionedString> jmlWarnings
+                = DefaultImmutableSet.fromImmutableList(specExtractor.getWarnings());
+        warnings = warnings.union(jmlWarnings);
         return warnings;
     }
 

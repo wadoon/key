@@ -61,7 +61,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     private static final String DEFAULT_SIGNALS_ONLY = format("signals_only %s, %s;", ERROR, RUNTIME_EXCEPTION);
     private final Services services;
     private final JMLSpecFactory jsf;
-    private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
+    private ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -298,7 +298,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             ImmutableList<TextualJMLConstruct> constructs
                     = jmlIO.parseClassLevel(concatenatedComment, fileName, pos);
 
-            warnings = warnings.union(jmlIO.getWarnings());
+            warnings = warnings.append(jmlIO.getWarnings());
 
             // create class invs out of textual constructs, add them to result
             for (TextualJMLConstruct c : constructs) {
@@ -330,7 +330,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                         // not specifications.
                     }
                 } catch (SLWarningException e) {
-                    warnings = warnings.add(e.getWarning());
+                    warnings = warnings.append(e.getWarning());
                 }
             }
         }
@@ -377,7 +377,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             // call preparser
             JmlIO io = new JmlIO();
             constructs = io.parseClassLevel(concatenatedComment, fileName, pos);
-            warnings = warnings.union(io.getWarnings());
+            warnings = warnings.append(io.getWarnings());
         } else {
             constructs = ImmutableSLList.<TextualJMLConstruct>nil();
         }
@@ -508,7 +508,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     result = result.add(contract);
                 }
             } catch (SLWarningException e) {
-                warnings = warnings.add(e.getWarning());
+                warnings = warnings.append(e.getWarning());
             }
         }
 
@@ -618,7 +618,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 result = result.union(jsf.createJMLBlockContracts(method,
                         labels, block, specificationCase));
             } catch (final SLWarningException exception) {
-                warnings = warnings.add(exception.getWarning());
+                warnings = warnings.append(exception.getWarning());
             }
         }
         return result;
@@ -640,7 +640,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 result = result.union(jsf.createJMLLoopContracts(method,
                         labels, loop, specificationCase));
             } catch (final SLWarningException exception) {
-                warnings = warnings.add(exception.getWarning());
+                warnings = warnings.append(exception.getWarning());
             }
         }
         return result;
@@ -662,7 +662,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 result = result.union(jsf.createJMLLoopContracts(method,
                         labels, block, specificationCase));
             } catch (final SLWarningException exception) {
-                warnings = warnings.add(exception.getWarning());
+                warnings = warnings.append(exception.getWarning());
             }
         }
         return result;
@@ -684,7 +684,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         final ImmutableList<TextualJMLConstruct> constructs =
                 io.parseMethodlevel(concatenatedComment, fileName, position);
-        warnings = warnings.union(io.getWarnings());
+        warnings = warnings.append(io.getWarnings());
         return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
     }
 
@@ -718,7 +718,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         JmlIO io = new JmlIO();
         ImmutableList<TextualJMLConstruct> constructs =
                 io.parseMethodlevel(concatenatedComment, fileName, pos);
-        warnings = warnings.union(io.getWarnings());
+        warnings = warnings.append(io.getWarnings());
 
         // create JML loop invariant out of last construct
         if (constructs.size() == 0) {
@@ -730,14 +730,14 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 TextualJMLLoopSpec textualLoopSpec = (TextualJMLLoopSpec) c;
                 result = jsf.createJMLLoopInvariant(pm, loop, textualLoopSpec);
             } catch (SLWarningException e) {
-                warnings = warnings.add(e.getWarning());
+                warnings = warnings.append(e.getWarning());
             }
         }
         return result;
     }
 
     @Override
-    public ImmutableSet<PositionedString> getWarnings() {
-        return JMLTransformer.getWarningsOfLastInstance().union(warnings);
+    public ImmutableList<PositionedString> getWarnings() {
+        return warnings.append(JMLTransformer.getWarningsOfLastInstance());
     }
 }

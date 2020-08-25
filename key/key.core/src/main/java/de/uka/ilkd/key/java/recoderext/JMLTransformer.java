@@ -14,18 +14,16 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import com.google.common.base.Strings;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.Method;
@@ -62,7 +60,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             .<String>nil().prepend("abstract", "final", "private", "protected",
                     "public", "static");
 
-    private static ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
+    private static ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
 
     private final HashMap<TypeDeclaration, List<Method>> typeDeclaration2Methods;
 
@@ -82,7 +80,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
     public JMLTransformer(CrossReferenceServiceConfiguration services,
                           TransformerCache cache) {
         super(services, cache);
-        warnings = DefaultImmutableSet.nil();
+        warnings = ImmutableSLList.nil();
         typeDeclaration2Constructores = new LinkedHashMap<>();
         typeDeclaration2Methods = new LinkedHashMap<>();
     }
@@ -504,7 +502,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             JmlIO io = new JmlIO();
             ImmutableList<TextualJMLConstruct> constructs
                     = io.parseClassLevel(concatenatedComment, fileName, pos);
-            warnings = warnings.union(io.getWarnings());
+            warnings = warnings.append(io.getWarnings());
 
             // handle model and ghost declarations in textual constructs
             // (and set assignments which RecodeR evilly left hanging *behind*
@@ -561,7 +559,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         JmlIO io = new JmlIO();
         ImmutableList<TextualJMLConstruct> constructs
                 = io.parseMethodlevel(concatenatedComment, fileName, pos);
-        warnings = warnings.union(io.getWarnings());
+        warnings = warnings.append(io.getWarnings());
 
         // handle ghost declarations and set assignments in textual constructs
         for (TextualJMLConstruct c : constructs) {
@@ -721,7 +719,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         }
     }
 
-    public static ImmutableSet<PositionedString> getWarningsOfLastInstance() {
+    public static ImmutableList<PositionedString> getWarningsOfLastInstance() {
         return warnings;
     }
 
