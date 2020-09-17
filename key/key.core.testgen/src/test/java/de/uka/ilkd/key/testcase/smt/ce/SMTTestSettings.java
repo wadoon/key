@@ -61,6 +61,16 @@ public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings{
     }
 
     @Override
+    public boolean quantifiersEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean disableSqrtAxiomatizing() {
+        return false;
+    }
+
+    @Override
     public boolean useAssumptionsForBigSmallIntegers() {
 	return false;
     }
