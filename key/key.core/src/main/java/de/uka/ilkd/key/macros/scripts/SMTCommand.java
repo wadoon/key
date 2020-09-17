@@ -8,6 +8,8 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import java.util.*;
 
@@ -42,8 +44,19 @@ public class SMTCommand
             throws ScriptException, InterruptedException {
         SolverTypeCollection su = computeSolvers(args.solver);
 
-        Goal goal = state.getFirstOpenAutomaticGoal();
+        ImmutableList<Goal> goals;
+        if (args.all) {
+             goals = state.getProof().openGoals();
+        } else {
+             goals = ImmutableSLList.<Goal>nil().prepend(state.getFirstOpenAutomaticGoal());
+        }
 
+        for (Goal goal : goals) {
+            runSMT(args, su, goal);
+        }
+    }
+
+    private void runSMT(SMTCommandArguments args, SolverTypeCollection su, Goal goal) {
         SMTSettings settings = new SMTSettings(
                 goal.proof().getSettings().getSMTSettings(),
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
@@ -77,6 +90,9 @@ public class SMTCommand
     static class SMTCommandArguments {
         @Option("solver")
         public String solver = "Z3";
+
+        @Option(value = "all", required = false)
+        public boolean all = false;
     }
 
 }
