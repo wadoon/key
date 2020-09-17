@@ -5,6 +5,8 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import org.key_project.util.helper.FindResources;
 
 /**
+ * This file contains factory methods for creating well-known proof collections.
+ *
  * @author Alexander Weigl
  * @version 1 (8/14/20)
  */
@@ -54,13 +56,7 @@ public final class ProofCollections {
                         "[SMTSettings]useUninterpretedMultiplication=true\n" +
                         "[SMTSettings]SelectedTaclets=\n" +
                         "[Choice]DefaultChoices=assertions-assertions:on , intRules-intRules:arithmeticSemanticsIgnoringOF , initialisation-initialisation:disableStaticInitialisation , programRules-programRules:Java , runtimeExceptions-runtimeExceptions:ban , JavaCard-JavaCard:on , Strings-Strings:on , modelFields-modelFields:showSatisfiability , bigint-bigint:on , sequences-sequences:on , reach-reach:on , integerSimplificationRules-integerSimplificationRules:full , wdOperator-wdOperator:L , wdChecks-wdChecks:off , permissions-permissions:off , moreSeqRules-moreSeqRules:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal:off , javaLoopTreatment-javaLoopTreatment:efficient\n" +
-                        "[Strategy]ActiveStrategy=JavaCardDLStrategy\n")
-        ;
-        // forkMemory = 1000m
-        // forkDebugPort = "wait:1234"
-        // verboseOutput = true
-        //runOnlyOn = group1,group2
-        //c.getSettings().setKeySettingsFromFile("");
+                        "[Strategy]ActiveStrategy=JavaCardDLStrategy\n");
 
         c.addGroup("newBook")
                 .provable("newBook/09.list_modelfield/ArrayList.add.key")
@@ -119,8 +115,8 @@ public final class ProofCollections {
                 .provable("heap/block_contracts/Simple__square.key")
                 .provable("heap/block_contracts/Simple__unnecessaryBlockContract.key")
                 .provable("heap/block_contracts/Simple__unnecessaryLoopInvariant.key")
-// the following test has a reload problem probably caused by the one-step-simplifier
-//.provable("(": ./heap/block_contracts/GreatestCommonDivisor.key")
+                // the following test has a reload problem probably caused by the one-step-simplifier
+                //.provable("("heap/block_contracts/GreatestCommonDivisor.key")
                 .provable("standard_key/java_dl/jml-assert/assert.key")
                 .provable("heap/block_loop_contracts/SimpleVariants/sum_onBlock_external.key")
                 .provable("heap/block_loop_contracts/SimpleVariants/sum_onBlock_internal.key")
@@ -130,6 +126,7 @@ public final class ProofCollections {
                 .provable("heap/block_loop_contracts/SimpleVariants/sum_onLoop_loop.key")
                 .notprovable("./heap/block_loop_contracts/Finally/block_finally.key")
                 .notprovable("./heap/block_loop_contracts/Finally/loop_finally.key");//// Tests for Java Card (should also include the API, pending fix to bug //1475)
+
         c.addGroup("javaCard")
                 .provable("heap/javacard/updateBalance0.key")
                 .provable("heap/javacard/updateBalance1.key")
@@ -149,6 +146,7 @@ public final class ProofCollections {
                 .provable("heap/information_flow/UpdateAbstraction_ex7_5_secure.key")
                 .provable("heap/information_flow/UpdateAbstraction_ex7_6_secure.key")
                 .provable("heap/information_flow/UpdateAbstraction_ex9_secure.key");
+
         c.addGroup("list")
                 .provable("heap/list/ArrayList_add.key")
                 .provable("heap/list/ArrayList_ArrayList.key")
@@ -180,6 +178,7 @@ public final class ProofCollections {
                 .provable("./heap/list/LinkedList_size.key")
                 .provable("./heap/list/MySet_footprint.key")
                 .provable("./heap/list/MySet_MySet.key");
+
         c.addGroup("list_ghost")
                 .provable("./heap/list_ghost/ArrayList_add.key")
                 .provable("./heap/list_ghost/ArrayList_ArrayList.key")
@@ -190,10 +189,12 @@ public final class ProofCollections {
                 .provable("./heap/list_ghost/ArrayList_inv.key")
                 .provable("./heap/list_ghost/ArrayList_size_dep.key")
                 .provable("./heap/list_ghost/ArrayList_size.key");
+
         c.addGroup("list_recursive")
                 .provable("./heap/list_recursiveSpec/ListOperationsNonNull_getNextNN_normal_behavior.key")
                 .provable("./heap/list_recursiveSpec/ListOperationsNonNull_setValueAt_normal_behavior.key")
                 .provable("./heap/list_recursiveSpec/ListOperationsNonNull_remove_normal_behavior.key");
+
         c.addGroup("list_seq")
                 .provable("./heap/list_seq/SimplifiedLinkedList.remove.key")
                 .provable("./heap/list_seq/ArrayList.ArrayList.key")
@@ -204,6 +205,7 @@ public final class ProofCollections {
                 .provable("./heap/list_seq/ArrayList.newArray.key")
                 .provable("./heap/list_seq/ArrayList.remove.0.key")
                 .provable("./heap/list_seq/ArrayList.remove.1.key");
+
         c.addGroup("observer")
                 .provable("./heap/observer/ExampleObserver_ExampleObserver.key")
                 .provable("./heap/observer/ExampleObserver_inv.key")
@@ -219,16 +221,20 @@ public final class ProofCollections {
                 .provable("./heap/observer/ExampleSubject_notifyObservers.key")
                 .provable("./heap/observer/ExampleSubject_value_dep.key")
                 .provable("./heap/observer/ExampleSubject_value.key");
+
         c.addGroup("removeDups")
                 .provable("./heap/removeDups/arrayPart.key")
                 .provable("./heap/removeDups/contains.key")
                 .provable("./heap/removeDups/removeDup.key").provable("./heap/saddleback_search/Saddleback_search.key");
+
         c.addGroup("quicksort")
-                .localSettings("[Choice] DefaultChoices = moreSeqRules - moreSeqRules:on")
+                .localSettings("[Choice]DefaultChoices=moreSeqRules-moreSeqRules:on")
                 .directory("heap/quicksort/")
                 .provable("toplevel.key")
                 .provable("sort.key")
-                .provable("split.key");/*
+                .provable("split.key");
+
+        /*
          * These are simpler regression tests that show a certain feature works
          * fine.
          */
@@ -458,16 +464,16 @@ public final class ProofCollections {
                 .provable("./standard_key/java_dl/jml-bigint/cast.key")
                 .provable("./standard_key/java_dl/jml-free/loopInvFree.key")
                 .provable("./standard_key/java_dl/jml-free/ensuresFree.key")
-// proof gets very long
-// requires further investigations
+                // proof gets very long
+                // requires further investigations
                 .provable("./standard_key/java_dl/jml-information-flow.key")
                 .notprovable("./standard_key/java_dl/jml-min/min-unprovable1.key")
                 .notprovable("./standard_key/java_dl/jml-min/min-unprovable2.key")
                 .provable("./standard_key/java_dl/methodCall.key")
                 .provable("./standard_key/java_dl/methodCall1.key")
                 .provable("./standard_key/java_dl/methodCall1box.key")
-//// Commented out as this can not be proved modularly sound (See !183 which is related)
-//  .provable("./standard_key/java_dl/methodCall2.key")
+                // Commented out as this can not be proved modularly sound (See !183 which is related)
+                //  .provable("./standard_key/java_dl/methodCall2.key")
                 .provable("./standard_key/java_dl/methodCall3.key")
                 .provable("./standard_key/java_dl/polishFlagSort.key")
                 .provable("./standard_key/java_dl/postConditionTaclets1.key")
@@ -619,11 +625,9 @@ public final class ProofCollections {
                 .provable("./heap/model_methods/Recell_Recell_post_set.key")
                 .provable("./heap/model_methods/Recell_set.key")
                 .provable("./heap/model_methods/Recell_undo.key");
-        // Well-Definedness check problems:
-        // FIXME: Needs to be commented out for now
-//        as loading different taclet options
-//        does currently not work
-//addGroup("wdChecks")
+// Well-Definedness check problems:
+//  Needs to be commented out for now as loading different taclet options does currently not work
+//c.addGroup("wdChecks")
 //   .provable("./heap/vstte10_01_SumAndMax/SumAndMax_sumAndMaxWD.key")
 //   .provable("./heap/vstte10_01_SumAndMax/SumAndMax_sumAndMaxWithWDLoop.key")
 //   .provable("./heap/vstte10_03_LinkedList/Node_consWD.key")
@@ -687,7 +691,7 @@ public final class ProofCollections {
 //   .notprovable("./heap/vstte10_04_Queens/Queens_nQueensWD.key")
 //   .notprovable("./heap/vstte10_04_Queens/Queens_searchWD.key")
 //   .notprovable("./heap/vstte10_05_Queue/LinkedList_tailWD.key")
-//// Permission heap problems:
+
         c.addGroup("permissionHeap")
                 .provable("./heap/permissions/permissions_method0.key")
                 .provable("./heap/permissions/permissions_method1.key")
@@ -784,7 +788,7 @@ public final class ProofCollections {
         // .provable(": ./heap/permissions/threads/Plotter_staticPermissions_accessible.key")
         // Is .provable(", but very heavy (~400000 steps)
         // .provable(": ./heap/permissions/threads/Plotter_startTransfer_contract.key")// These are the proof files which can be loaded from the examples menu.
-// They must work with the current version.
+
         c.addGroup("reload_examples")
                 .provable("./firstTouch/05-ReverseArray/reverseArray.key")
                 .loadable("standard_key/arith/saveProofTest.key.proof")
