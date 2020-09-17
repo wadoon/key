@@ -99,14 +99,23 @@ task testProveRules(type: Test) {
     filter { includeTestsMatching "ProveRulesTest" }
 }
 
-task testRunAllProofs(type: Test) {
+task testRunAllProofsFunctional(type: Test) {
     description 'Proof/reload all keyfiles tagged for regression testing'
     group "verification"
-    filter { 
-        // TODO does not exist any more: includeTestsMatching "RunAllProofsTestSuite"
-        includeTestsMatching "RunAllProofsInfFlow"
-        includeTestsMatching "RunAllProofsFunctional"
-    }
+    filter {includeTestsMatching "RunAllProofsFunctional" }
+}
+
+
+task testRunAllProofsInfFlow(type: Test) {
+    description 'Proof/reload all keyfiles tagged for regression testing'
+    group "verification"
+    filter {includeTestsMatching "RunAllProofsInfFlow"}
+}
+
+task testRunAllProofs {
+    description 'Proof/reload all keyfiles tagged for regression testing'
+    group "verification"
+    dependsOn(testRunAllProofsFunctional, testRunAllProofsInfFlow)
 }
 
 //Generation of the three version files within the resources by executing `git'.
