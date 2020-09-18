@@ -284,7 +284,10 @@ public class MasterHandler {
 
         //TODO js since many axioms are all-quantified, this is a cheap way to disable quantifiers
         if (services.getProof().getSettings().getSMTSettings().enableQuantifiers) {
-            if (snippets.containsKey(functionName + ".axioms")) {
+            if (functionName == "float" ) {
+                VerbatimSMT ax = new VerbatimSMT(snippets.getProperty(functionName + ".axioms"));
+                addAxiom(ax);
+            } else if (snippets.containsKey(functionName + ".axioms")&& services.getProof().getSettings().getSMTSettings().axiomatizationInSMT ) {
                 VerbatimSMT ax = new VerbatimSMT(snippets.getProperty(functionName + ".axioms"));
                 addAxiom(ax);
             }

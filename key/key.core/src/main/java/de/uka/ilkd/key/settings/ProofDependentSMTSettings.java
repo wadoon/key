@@ -33,6 +33,8 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
 
         private static final String DISABLE_SQRT_AXIOMATIZING = "[SMTSettings]disableSqrtAxiomatizing";
 
+        private static final String AXIOMATIZATION_IN_SMT = "[SMTSettings]axiomatizationInSMT";
+
         private static final String INSTANTIATE_NULL_PREDICATES = "[SMTSettings]instantiateHierarchyAssumptions";
 
 
@@ -59,6 +61,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
         public boolean useExplicitTypeHierarchy     = false;
         public boolean enableQuantifiers     = true;
         public boolean disableSqrtAxiomatizing = false;
+        public boolean axiomatizationInSMT = false;
         public boolean useNullInstantiation         = true;
         public boolean useBuiltInUniqueness          = false;
         public boolean useUIMultiplication          = true;
@@ -88,6 +91,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
                 this.useExplicitTypeHierarchy      = data.useExplicitTypeHierarchy;
                 this.enableQuantifiers             = data.enableQuantifiers;
                 this.disableSqrtAxiomatizing       = data.disableSqrtAxiomatizing;
+                this.axiomatizationInSMT           = data.axiomatizationInSMT;
                 this.useNullInstantiation          = data.useNullInstantiation;
                 this.maxGenericSorts               = data.maxGenericSorts;
                 this.useBuiltInUniqueness          = data.useBuiltInUniqueness;
@@ -123,6 +127,8 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
                         enableQuantifiers);
                 disableSqrtAxiomatizing = SettingsConverter.read(props, DISABLE_SQRT_AXIOMATIZING,
                     disableSqrtAxiomatizing);
+                axiomatizationInSMT = SettingsConverter.read(props, AXIOMATIZATION_IN_SMT,
+                    axiomatizationInSMT);
                 useNullInstantiation = SettingsConverter.read(props,INSTANTIATE_NULL_PREDICATES,
                                 useNullInstantiation);
                 useBuiltInUniqueness = SettingsConverter.read(props,USE_BUILT_IN_UNIQUENESS,useBuiltInUniqueness);
@@ -146,6 +152,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
                 SettingsConverter.store(props,EXPLICIT_TYPE_HIERARCHY,useExplicitTypeHierarchy);
                 SettingsConverter.store(props,ENABLE_QUANTIFIERS,enableQuantifiers);
                 SettingsConverter.store(props,DISABLE_SQRT_AXIOMATIZING,disableSqrtAxiomatizing);
+                SettingsConverter.store(props,AXIOMATIZATION_IN_SMT,axiomatizationInSMT);
                 SettingsConverter.store(props,INSTANTIATE_NULL_PREDICATES,useNullInstantiation);
                 SettingsConverter.store(props,MAX_GENERIC_SORTS,maxGenericSorts);
                 SettingsConverter.store(props,TACLET_SELECTION,supportedTaclets.getNamesOfSelectedTaclets());

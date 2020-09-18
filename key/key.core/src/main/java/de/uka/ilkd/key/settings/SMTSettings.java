@@ -146,7 +146,13 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
         @Override
         public boolean disableSqrtAxiomatizing() {
 
-            return pdSettings.enableQuantifiers;
+            return pdSettings.disableSqrtAxiomatizing;
+        }
+
+        @Override
+        public boolean axiomatizationInSMT() {
+
+           return pdSettings.axiomatizationInSMT;
         }
 
         @Override

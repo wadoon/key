@@ -611,6 +611,7 @@ class TranslationOptions extends TablePanel{
 	private JCheckBox useExplicitTypeHierachy;
 	private JCheckBox enableQuantifiers;
 	private JCheckBox disableSqrtAxiomatizing;
+	private JCheckBox axiomatizationInSMT;
 	private JCheckBox useNullInstantiation;
 	private JCheckBox useBuiltInUniqueness;
 	private JCheckBox useUIMultiplication;
@@ -631,6 +632,7 @@ class TranslationOptions extends TablePanel{
 
 	private static final String infoDisableSqrtAxiomatizing = "If this option is selected, axiomatizing the \"Math.sqrt\"" +
 			" will be disabled and instead the \"fp.sqrt\" is used";
+	private static final String infoAxiomsInSMT = "If this option is selected, axiomatization for transcendental functions occurs at the smt level i.e. in the smt translation";
 	private static final String infoUseNullInstantiation =
 			"At the moment this option has only effect on hierarchy assumptions regarding the null object.\n"
 					+ "Example: Let A and B be classes.\n"
@@ -690,6 +692,7 @@ class TranslationOptions extends TablePanel{
 		createUseExplicitTypeHierachy();
 		createEnableQuantifiers();
 		createDisableSqrtAxiomatizing();
+		createAxiomatizationInSMT();
 		createNullInstantiation();
 		createBuiltInUniqueness();
 		createUIMultiplication();
@@ -720,6 +723,15 @@ class TranslationOptions extends TablePanel{
 					infoDisableSqrtAxiomatizing,
 					settings.disableSqrtAxiomatizing,
 					e -> settings.disableSqrtAxiomatizing = disableSqrtAxiomatizing.isSelected());
+		}
+	}
+
+	private void createAxiomatizationInSMT() {
+		if (axiomatizationInSMT == null) {
+			axiomatizationInSMT = addCheckBox("Axiomatization in SMT",
+					infoAxiomsInSMT,
+					settings.axiomatizationInSMT,
+					e -> settings.axiomatizationInSMT = axiomatizationInSMT.isSelected());
 		}
 	}
 
