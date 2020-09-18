@@ -62,8 +62,10 @@ public class SMTCommand
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                 goal.proof());
         SolverLauncher launcher = new SolverLauncher(settings);
-        Collection<SMTProblem> probList = new LinkedList<SMTProblem>();
+        Collection<SMTProblem> probList = new LinkedList<>();
         probList.add(new SMTProblem(goal));
+        TimerListener timerListener = new TimerListener();
+        launcher.addListener(timerListener);
         launcher.launch(su.getTypes(), probList, goal.proof().getServices());
 
         for (SMTProblem problem : probList) {
@@ -73,6 +75,8 @@ public class SMTCommand
                 problem.getGoal().apply(app);
             }
         }
+
+        System.err.println("SMT Runtime: " + timerListener.getRuntime() + " ms");
     }
 
     private SolverTypeCollection computeSolvers(String value) {
@@ -95,4 +99,22 @@ public class SMTCommand
         public boolean all = false;
     }
 
+    private static class TimerListener implements SolverLauncherListener {
+        private long start;
+        private long stop;
+
+        @Override
+        public void launcherStarted(Collection<SMTProblem> problems, Collection<SolverType> solverTypes, SolverLauncher launcher) {
+            this.start = System.currentTimeMillis();
+        }
+
+        @Override
+        public void launcherStopped(SolverLauncher launcher, Collection<SMTSolver> finishedSolvers) {
+            this.stop = System.currentTimeMillis();
+        }
+
+        public long getRuntime() {
+            return stop - start;
+        }
+    }
 }
