@@ -2033,6 +2033,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         // axiom statements may not be prefixed with any modifiers (see Sect. 8 of the JML reference manual)
         if (!mods.isEmpty())
             exc.raiseNotSupported("modifiers in axiom clause");
+        TODO();
         return null;//factory.createJMLClassAxiom(kjt, mods, ctx.expression());
     }
 
@@ -2042,6 +2043,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             if (!(s.equals("public") || s.equals("private") || s.equals("protected")))
                 exc.raiseNotSupported("modifier " + s + " in initially clause");
         }
+        TODO();
         return null;// factory.createJMLInitiallyClause(kjt, mods, ctx.expression());
     }
 
