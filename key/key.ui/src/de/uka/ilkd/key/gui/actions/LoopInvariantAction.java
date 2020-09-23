@@ -4,7 +4,8 @@ import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.loopinvgen.LoopInvGenerator;
+import de.uka.ilkd.key.java.Statement;
+//import de.uka.ilkd.key.loopinvgen.DependenceLoopInvGenerator;
 import de.uka.ilkd.key.proof.Goal;
 
 public class LoopInvariantAction extends MainWindowAction {
@@ -21,9 +22,9 @@ public class LoopInvariantAction extends MainWindowAction {
 		Goal g = mediator.getSelectedGoal();
 		if (g != null) {
 			// loop invariant generation
-			LoopInvGenerator lig = new LoopInvGenerator(g);
-			lig.setInvInSpec(null);
-			System.out.println("fine");
+		//	DependenceLoopInvGenerator lig = new DependenceLoopInvGenerator(g);
+		
+		//	lig.genLI();
 		}
 		
 	}
