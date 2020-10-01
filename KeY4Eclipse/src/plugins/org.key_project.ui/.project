@@ -32,11 +32,6 @@
 			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.ui/examples</locationURI>
 		</link>
 		<link>
-			<name>key.lib</name>
-			<type>2</type>
-			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.ui/lib</locationURI>
-		</link>
-		<link>
 			<name>key.resources</name>
 			<type>2</type>
 			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.ui/src/main/resources</locationURI>

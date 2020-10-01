@@ -13,5 +13,8 @@
 	<classpathentry kind="lib" path="key.ui.lib/docking-frames-core.jar"/>
 	<classpathentry kind="lib" path="key.ui.lib/docking-frames-ext-toolbar-common.jar"/>
 	<classpathentry kind="lib" path="key.ui.lib/docking-frames-ext-toolbar.jar"/>
+	<classpathentry kind="lib" path="key.ui.lib/miglayout-core-5.2.jar"/>
+	<classpathentry kind="lib" path="key.ui.lib/miglayout-swing-5.2.jar"/>
+	<classpathentry kind="lib" path="key.ui.lib/annotations-17.0.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
