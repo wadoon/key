@@ -47,9 +47,9 @@
 			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.ui/src/main/java</locationURI>
 		</link>
 		<link>
-			<name>keyext.interactionlog</name>
+			<name>key.ui.lib</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/keyext.interactionlog/src/main/java</locationURI>
+			<locationURI>$%7BPARENT-4-PROJECT_LOC%7D/key/key.ui/lib</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
