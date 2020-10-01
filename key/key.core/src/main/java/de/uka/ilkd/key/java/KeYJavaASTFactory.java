@@ -79,6 +79,7 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
@@ -131,8 +132,8 @@ public abstract class KeYJavaASTFactory {
 	(ProgramElementName name, TypeReference typeRef) {
 	return new LocalVariableDeclaration
 	    (typeRef, new VariableSpecification
-	     (new LocationVariable(name,
-				  typeRef.getKeYJavaType())));
+	     (new LocationVariableBuilder(name,
+				  typeRef.getKeYJavaType()).create()));
     }
 
     /**
@@ -166,7 +167,7 @@ public abstract class KeYJavaASTFactory {
 	return new LocalVariableDeclaration
 	    (new TypeRef(type),
 	     new VariableSpecification
-		 (new LocationVariable(name, type),
+		 (new LocationVariableBuilder(name, type).create(),
 		  init, type));
     }
 
@@ -250,7 +251,7 @@ public abstract class KeYJavaASTFactory {
 	return new LocalVariableDeclaration
 	    (new TypeRef(type),
 	     new VariableSpecification
-		 (new LocationVariable(new ProgramElementName(name), type)));
+		 (new LocationVariableBuilder(new ProgramElementName(name), type).create()));
     }
 
     /**
@@ -357,7 +358,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static ProgramVariable localVariable(ProgramElementName name,
             KeYJavaType kjt, final PositionInfo posInfo) {
-        return new LocationVariable(name, kjt, posInfo);
+        return new LocationVariableBuilder(name, kjt).posInfo(posInfo).create();
     }
 
     /**

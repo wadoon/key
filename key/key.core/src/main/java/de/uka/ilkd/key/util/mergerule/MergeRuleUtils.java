@@ -59,6 +59,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -623,8 +624,8 @@ public class MergeRuleUtils {
 
         do {
             newName = services.getTermBuilder().newName(prefix);
-            result = new LocationVariable(//
-                    new ProgramElementName(newName), sort);
+            result = new LocationVariableBuilder(//
+                    new ProgramElementName(newName), sort).create();
             Namespace<IProgramVariable> variables = //
                     services.getNamespaces().programVariables();
             variables.add(result);

@@ -43,6 +43,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -54,6 +55,7 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -1444,8 +1446,8 @@ public abstract class TacletApp implements RuleApp {
                 // by the Abstract Execution simplification rules: Fresh variables are
                 // not considered part of abstract location sets, since they cannot be
                 // subject of the specification (they're proof-only variables).
-                return new LocationVariable(VariableNamer.parseName(instantiation), kjt, null,
-                        false, false, false, false, true /* fresh */);
+                return new LocationVariableBuilder(VariableNamer.parseName(instantiation), kjt)
+                        .freshVar().create();
             }
         }
         return null;

@@ -56,6 +56,7 @@ import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
@@ -258,7 +259,7 @@ public class TermBuilder {
         if (makeNameUnique) {
             name = newName(name);
         }
-        return new LocationVariable(new ProgramElementName(name), kjt, null, false, false, false, false, true);
+        return new LocationVariableBuilder(new ProgramElementName(name), kjt).freshVar().create();
     }
 
     /**
@@ -307,8 +308,8 @@ public class TermBuilder {
             if (makeNamesUnique) {
                 name = newName(name);
             }
-            final LocationVariable paramVar = new LocationVariable(
-                    new ProgramElementName(name), paramType);
+            final LocationVariable paramVar = new LocationVariableBuilder(
+                    new ProgramElementName(name), paramType).create();
             result = result.append(paramVar);
         }
         return result;
@@ -326,8 +327,8 @@ public class TermBuilder {
         for (ProgramVariable paramVar : paramVars) {
             ProgramElementName pen = new ProgramElementName(
                     paramVar.name() + postfix);
-            LocationVariable formalParamVar = new LocationVariable(pen,
-                    paramVar.getKeYJavaType());
+            LocationVariable formalParamVar = new LocationVariableBuilder(pen,
+                    paramVar.getKeYJavaType()).create();
             result = result.append(formalParamVar);
         }
         return result;
@@ -354,8 +355,9 @@ public class TermBuilder {
             if (makeNameUnique) {
                 name = newName(name);
             }
-            return new LocationVariable(new ProgramElementName(name),
-                    pm.getReturnType(), null, false, false, false, false, true);
+
+            return new LocationVariableBuilder(new ProgramElementName(name), pm.getReturnType())
+                    .freshVar().create();
         }
     }
 
@@ -376,9 +378,9 @@ public class TermBuilder {
         if (makeNameUnique) {
             name = newName(name);
         }
-        return new LocationVariable(new ProgramElementName(name),
-                services.getJavaInfo().getTypeByClassName(JAVA_LANG_THROWABLE), null, false, false,
-                false, false, true);
+        
+        return new LocationVariableBuilder(new ProgramElementName(name),
+                services.getJavaInfo().getTypeByClassName(JAVA_LANG_THROWABLE)).freshVar().create();
     }
 
     /**
@@ -402,8 +404,8 @@ public class TermBuilder {
         if (makeNameUnique) {
             baseName = newName(baseName);
         }
-        return new LocationVariable(new ProgramElementName(baseName), new KeYJavaType(sort), null,
-                false, false, false, false, true /* fresh */);
+        return new LocationVariableBuilder(new ProgramElementName(baseName), new KeYJavaType(sort))
+                .freshVar().create();
     }
 
     // -------------------------------------------------------------------------

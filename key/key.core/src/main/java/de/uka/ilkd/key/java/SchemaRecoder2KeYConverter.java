@@ -52,6 +52,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -442,7 +443,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
                 = ProgramSVSort.VARIABLE.getSVWithSort(l, ProgramElementName.class);
             if (pv instanceof ProgramElementName) { // sth. like #type i;
                 KeYJavaType kjt = new KeYJavaType(typeSVType);
-                pv = new LocationVariable((ProgramElementName) pv, kjt);
+                pv = new LocationVariableBuilder((ProgramElementName) pv, kjt).create();
             }
             ProgramElement init = ProgramSVSort.VARIABLEINIT.getSVWithSort(l,
                     Expression.class);

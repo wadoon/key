@@ -255,8 +255,8 @@ options {
           ImmutableSLList.<ProgramVariable>nil();
        for(LogicVariable lv : vars.second) {
           ProgramVariable pv =
-             new LocationVariable(new ProgramElementName(lv.name().toString()),
-                                  vars.first);
+             new LocationVariableBuilder(new ProgramElementName(lv.name().toString()),
+                                  vars.first).create();
              result = result.append(pv);
        }
        return result;
@@ -739,7 +739,7 @@ mergeparamsspec returns [MergeParamsSpec result = null] throws SLTranslationExce
             (phType = typespec)
             (phName = IDENT)
             {
-                placeholder = new LocationVariable(new ProgramElementName(phName.getText()), phType);
+                placeholder = new LocationVariableBuilder(new ProgramElementName(phName.getText()), phType).create();
                 resolverManager.putIntoTopLocalVariablesNamespace(placeholder);
             }
         RPAREN

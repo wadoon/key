@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -100,7 +101,7 @@ public class TestClashFreeSubst extends TestCase {
 
 	f = lookup_func("f"); g = lookup_func("g");
 	p = lookup_func("p"); q = lookup_func("q");
-	pv0 = new LocationVariable (new ProgramElementName ( "pv0" ), srt);
+	pv0 = new LocationVariableBuilder(new ProgramElementName ( "pv0" ), srt).create();
 	nss.programVariables().add ( pv0 );
 
 	// The declaration parser cannot parse LogicVariables; these

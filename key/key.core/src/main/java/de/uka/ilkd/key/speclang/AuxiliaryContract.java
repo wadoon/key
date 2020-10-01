@@ -37,6 +37,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
@@ -1251,8 +1252,8 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @return a variable with a name based on the specified base name of the specified type.
          */
         private LocationVariable createVariable(final String name, final KeYJavaType type) {
-            return new LocationVariable(services.getVariableNamer().getTemporaryNameProposal(name),
-                    type);
+            return new LocationVariableBuilder(services.getVariableNamer().getTemporaryNameProposal(name),
+                    type).create();
         }
     }
 

@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -247,7 +248,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
          if (resultVar == null) {
             IProgramMethod pm = mbs.getProgramMethod(services);
             if (!pm.isVoid()) {
-               resultVar = new LocationVariable(new ProgramElementName(services.getTermBuilder().newName("TmpResultVar")), pm.getReturnType());
+               resultVar = new LocationVariableBuilder(new ProgramElementName(services.getTermBuilder().newName("TmpResultVar")), pm.getReturnType()).create();
             }
          }
          if (resultVar != null) {

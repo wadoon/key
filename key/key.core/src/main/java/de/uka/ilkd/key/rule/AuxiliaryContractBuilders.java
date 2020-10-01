@@ -64,6 +64,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.macros.WellDefinednessMacro;
@@ -496,8 +497,8 @@ public final class AuxiliaryContractBuilders {
 
                 String newName
                         = services.getTermBuilder().newName(value.name().toString() + suffix);
-                LocationVariable newValue = new LocationVariable(new ProgramElementName(newName),
-                        value.getKeYJavaType());
+                LocationVariable newValue = new LocationVariableBuilder(new ProgramElementName(newName),
+                        value.getKeYJavaType()).create();
 
                 result.put(key, newValue);
             }
@@ -549,9 +550,9 @@ public final class AuxiliaryContractBuilders {
             if (placeholderVariable != null) {
                 String newName
                         = services.getTermBuilder().newName(placeholderVariable.name().toString());
-                LocationVariable newVariable = new LocationVariable(new ProgramElementName(newName),
-                        placeholderVariable.getKeYJavaType(), null, false, false, false, false,
-                        true /* fresh */);
+                final LocationVariable newVariable = new LocationVariableBuilder(
+                        new ProgramElementName(newName), placeholderVariable.getKeYJavaType())
+                                .freshVar().create();
 
                 if (goal != null) {
                     goal.addProgramVariable(newVariable);

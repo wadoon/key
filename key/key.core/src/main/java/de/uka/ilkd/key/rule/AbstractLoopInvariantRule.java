@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
@@ -231,9 +232,9 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         for (ProgramVariable pv : localOuts) {
             final String pvBeforeLoopName = tb
                     .newName(pv.name().toString() + "Before_LOOP");
-            final LocationVariable pvBeforeLoop = new LocationVariable(
+            final LocationVariable pvBeforeLoop = new LocationVariableBuilder(
                     new ProgramElementName(pvBeforeLoopName),
-                    pv.getKeYJavaType());
+                    pv.getKeYJavaType()).create();
             progVarNS.addSafely(pvBeforeLoop);
             beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
                     tb.elementary(pvBeforeLoop, tb.var(pv)));
@@ -356,8 +357,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final ProgramElementName variantName = new ProgramElementName(
                 tb.newName("variant"));
-        final LocationVariable variantPV = new LocationVariable(variantName,
-                Sort.ANY);
+        final LocationVariable variantPV = new LocationVariableBuilder(variantName,
+                Sort.ANY).create();
         services.getNamespaces().programVariables().addSafely(variantPV);
 
         final boolean dia = ((Modality) inst.progPost.op())

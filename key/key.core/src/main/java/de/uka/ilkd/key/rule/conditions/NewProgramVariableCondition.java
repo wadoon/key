@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -90,7 +91,7 @@ public class NewProgramVariableCondition implements VariableCondition {
 
         final String newName = services.getTermBuilder().newName(namePattern);
         final LocationVariable result =
-                new LocationVariable(new ProgramElementName(newName), type);
+                new LocationVariableBuilder(new ProgramElementName(newName), type).create();
         services.getNamespaces().programVariables().add(result);
 
         maybeFreshForSV

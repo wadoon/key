@@ -46,6 +46,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -136,10 +137,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         /*
          * if(pv.isFinal()){ return pv; }
          */
-        return new LocationVariable(
+        return new LocationVariableBuilder(
                 VariableNamer.parseName(name.toString() + postFix,
                         name.getCreationInfo()),
-                MiscTools.fixKeYJavaType(pv, services), pv.isFinal());
+                MiscTools.fixKeYJavaType(pv, services)).finalVar(pv.isFinal()).create();
     }
 
     @Override

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -207,9 +208,9 @@ public class StateVars {
         String newName = tb.newName(name);
         ProgramElementName pen = new ProgramElementName(newName);
         ProgramVariable progVar = (ProgramVariable) t.op();
-        LocationVariable newVar = new LocationVariable(pen, progVar.getKeYJavaType(),
-                                                       progVar.getContainerType(),
-                                                       progVar.isStatic(), progVar.isModel());
+        LocationVariable newVar = new LocationVariableBuilder(pen, progVar.getKeYJavaType())
+                .containingType(progVar.getContainerType()).staticVar(progVar.isStatic())
+                .modelVar(progVar.isModel()).create();
         register(newVar, services);
         return tb.var(newVar);
     }

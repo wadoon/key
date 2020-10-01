@@ -54,6 +54,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -926,9 +927,9 @@ public class Recoder2KeYConverter {
 
     public MergePointStatement convert(
         de.uka.ilkd.key.java.recoderext.MergePointStatement mps) {
-        final LocationVariable locVar = new LocationVariable(
+        final LocationVariable locVar = new LocationVariableBuilder(
                 services.getVariableNamer().getTemporaryNameProposal("x"),
-                services.getNamespaces().sorts().lookup("boolean"));
+                services.getNamespaces().sorts().lookup("boolean")).create();
 
         final Comment[] comments = new Comment[mps.getComments().size()];
         for (int i = 0; i < mps.getComments().size(); i++) {
@@ -1185,8 +1186,9 @@ public class Recoder2KeYConverter {
 
             final ProgramElementName name = VariableNamer
                     .parseName(makeAdmissibleName(recoderVarSpec.getName()));
-            final ProgramVariable pv = new LocationVariable(name,
-                    getKeYJavaType(recoderType), recoderVarSpec.isFinal(), positionInfo(recoderVarSpec));
+            final ProgramVariable pv = new LocationVariableBuilder(name,
+                    getKeYJavaType(recoderType)).finalVar(recoderVarSpec.isFinal())
+                            .posInfo(positionInfo(recoderVarSpec)).create();
             varSpec = new VariableSpecification(
                     collectChildren(recoderVarSpec), pv, recoderVarSpec
                     .getDimensions(), pv.getKeYJavaType());
@@ -1338,10 +1340,10 @@ public class Recoder2KeYConverter {
                 }
 
                 if (compileTimeConstant == null) {
-                    pv = new LocationVariable(pen, getKeYJavaType(recoderType),
-                            getKeYJavaType(recContainingClassType),
-                            recoderVarSpec.isStatic(),
-                            isModel, false, isFinal);
+                    pv = new LocationVariableBuilder(pen, getKeYJavaType(recoderType))
+                            .containingType(getKeYJavaType(recContainingClassType))
+                            .staticVar(recoderVarSpec.isStatic()).modelVar(isModel)
+                            .finalVar(isFinal).create();
                 } else {
                     pv = new ProgramConstant(pen, getKeYJavaType(recoderType),
                             getKeYJavaType(recContainingClassType),
@@ -1503,10 +1505,13 @@ public class Recoder2KeYConverter {
             final boolean isModel = false; // bytecode-only fields are no model fields
             final boolean isFinal = fs.isFinal();
 
-            pv = new LocationVariable(new ProgramElementName(makeAdmissibleName(fs.getName()),
-                    makeAdmissibleName(recField.getContainingClassType().getFullName())),
-                    getKeYJavaType(recoderType), getKeYJavaType(recField
-                            .getContainingClassType()), recField.isStatic(), isModel, false, isFinal);
+            final ClassType containingClassType = recField.getContainingClassType();
+            final ProgramElementName pvName = new ProgramElementName(
+                    makeAdmissibleName(fs.getName()),
+                    makeAdmissibleName(containingClassType.getFullName()));
+            pv = new LocationVariableBuilder(pvName, getKeYJavaType(recoderType))
+                    .containingType(getKeYJavaType(containingClassType))
+                    .staticVar(recField.isStatic()).modelVar(isModel).finalVar(isFinal).create();
             insertToMap(fs, new FieldSpecification(pv));
             return new FieldReference(pv, prefix);
         }

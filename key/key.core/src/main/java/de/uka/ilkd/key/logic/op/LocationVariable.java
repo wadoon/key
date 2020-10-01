@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -21,13 +21,15 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * This class represents proper program variables, which are not program
- * constants. See the description of the superclass ProgramVariable for
- * more information.
+ * constants. See the description of the superclass ProgramVariable for more
+ * information.
+ * 
+ * <p>
+ * To create objects of this class, use {@link LocationVariableBuilder}.
  */
-public final class LocationVariable extends ProgramVariable
-			            implements UpdateableOperator {
+public final class LocationVariable extends ProgramVariable implements UpdateableOperator {
     private PositionInfo posInfo = PositionInfo.UNDEFINED;
-    
+
     /**
      * This flag indicates that this location variable was created freshly for
      * proving purposes. E.e., the exception variable exc created for a standard
@@ -36,67 +38,27 @@ public final class LocationVariable extends ProgramVariable
      * otherwise we do not know.
      */
     private final boolean isFresh;
-    
 
-    public LocationVariable(ProgramElementName name, KeYJavaType t, KeYJavaType containingType,
-            boolean isStatic, boolean isModel, boolean isGhost, boolean isFinal, boolean isFresh) {
+    LocationVariable(ProgramElementName name, KeYJavaType t, KeYJavaType containingType,
+            PositionInfo posInfo, boolean isStatic, boolean isModel, boolean isGhost,
+            boolean isFinal, boolean isFresh) {
         super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, isFinal);
+        this.posInfo = posInfo;
         this.isFresh = isFresh;
     }
 
-    public LocationVariable(ProgramElementName name,
-                        KeYJavaType        t,
-                        KeYJavaType        containingType,
-                        boolean            isStatic,
-                        boolean            isModel,
-                        boolean isGhost,
-                        boolean isFinal) {
-        this(name, t, containingType, isStatic, isModel, isGhost, isFinal, false);
-    }
-    
-    public LocationVariable(ProgramElementName name,
-            		    KeYJavaType        t,
-            		    KeYJavaType        containingType,
-            		    boolean            isStatic,
-            		    boolean            isModel) {
-        this(name, t, containingType, isStatic, isModel, false, false, false);
-    }
-
-
-    public LocationVariable(ProgramElementName name, KeYJavaType t) {
-        this(name, t, null, false, false, false, false, false);
-    }
-    
-    public LocationVariable(ProgramElementName name, KeYJavaType t, PositionInfo posInfo) {
-        this(name, t, null, false, false, false, false, false);
+    LocationVariable(ProgramElementName name, Sort s, PositionInfo posInfo, boolean isStatic,
+            boolean isModel, boolean isGhost, boolean isFinal, boolean isFresh) {
+        super(name, s, null, null, isStatic, isModel, isGhost, isFinal);
+        this.isFresh = isFresh;
         this.posInfo = posInfo;
-    }
-
-
-    public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isFinal) {
-        this(name, t, null, false, false, false, isFinal, false);
-    }
-    
-    public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isFinal, PositionInfo posInfo) {
-        this(name, t, null, false, false, false, isFinal, false);
-        this.posInfo = posInfo;
-    }
-
-    public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isGhost, boolean isFinal) {
-        this(name, t, null, false, false, isGhost, isFinal, false);
-    }
-
-
-    public LocationVariable(ProgramElementName name, Sort s) {
-        super(name, s, null, null, false, false, false);
-        this.isFresh = false;
     }
 
     @Override
     public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
         v.performActionOnLocationVariable(this);
     }
-    
+
     @Override
     public PositionInfo getPositionInfo() {
         return posInfo;
@@ -117,12 +79,23 @@ public final class LocationVariable extends ProgramVariable
 
     @Override
     public UpdateableOperator rename(Name name) {
+        final LocationVariableBuilder lvb;
+        final ProgramElementName peName = new ProgramElementName(name.toString());
+        
         if (getKeYJavaType() != null) {
-        return new LocationVariable(new ProgramElementName(name.toString()),
-                                    getKeYJavaType(), getContainerType(),
-                                    isStatic(), isModel());
+            lvb = new LocationVariableBuilder(peName, getKeYJavaType());
         } else {
-            return new LocationVariable(new ProgramElementName(name.toString()), sort());
+            lvb = new LocationVariableBuilder(peName, sort());
         }
+
+        return lvb //
+                .containingType(getContainerType()) //
+                .posInfo(posInfo) //
+                .freshVar(isFresh) //
+                .staticVar(isStatic()) //
+                .modelVar(isModel()) //
+                .finalVar(isFinal()) //
+                .ghostVar(isGhost()) //
+                .create();
     }
 }

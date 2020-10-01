@@ -35,6 +35,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
@@ -231,7 +232,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         }
         String name = tb.newName(varTerm.toString() + "_After" + suffix);
         LocationVariable varAtPostVar
-                = new LocationVariable(new ProgramElementName(name), resultType);
+                = new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
         register(varAtPostVar, services);
         Term varAtPost = tb.var(varAtPostVar);
         return varAtPost;
@@ -251,7 +252,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
             String name = tb.newName(varTerm.toString() + "_Before");
             LocationVariable varAtPostVar
-                    = new LocationVariable(new ProgramElementName(name), resultType);
+                    = new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
             register(varAtPostVar, services);
             Term varAtPost = tb.var(varAtPostVar);
             renamedLocalOuts = renamedLocalOuts.append(varAtPost);
@@ -273,7 +274,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
             String name = tb.newName(varTerm.toString() + "_After");
             LocationVariable varAtPostVar
-                    = new LocationVariable(new ProgramElementName(name), resultType);
+                    = new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
             register(varAtPostVar, services);
             Term varAtPost = tb.var(varAtPostVar);
             renamedLocalOuts = renamedLocalOuts.append(varAtPost);

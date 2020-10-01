@@ -48,6 +48,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
 import de.uka.ilkd.key.proof.Proof;
@@ -281,8 +282,8 @@ public class AbstractUpdateTests extends AbstractTestTermParser {
     }
 
     private LocationVariable intVar(final String name) {
-        return new LocationVariable(new ProgramElementName(name),
-                DUMMY_SERVICES.getNamespaces().sorts().lookup("int"));
+        return new LocationVariableBuilder(new ProgramElementName(name),
+                DUMMY_SERVICES.getNamespaces().sorts().lookup("int")).create();
     }
 
 }

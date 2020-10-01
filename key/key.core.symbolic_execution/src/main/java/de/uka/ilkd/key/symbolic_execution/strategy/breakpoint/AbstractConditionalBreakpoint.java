@@ -45,6 +45,7 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.proof.Goal;
@@ -293,7 +294,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
          return getProof().getServices().getTermBuilder().tt();
       }
       //collect all variables needed to parse the condition
-      setSelfVar(new LocationVariable(new ProgramElementName(getProof().getServices().getTermBuilder().newName("self")), containerType, null, false, false));
+      setSelfVar(new LocationVariableBuilder(new ProgramElementName(getProof().getServices().getTermBuilder().newName("self")), containerType).create());
       ImmutableList<ProgramVariable> varsForCondition = ImmutableSLList.nil();
       if(getPm()!=null){
        //collect parameter variables

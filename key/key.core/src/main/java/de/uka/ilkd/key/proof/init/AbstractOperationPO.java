@@ -60,6 +60,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -981,7 +982,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         final KeYJavaType eType = javaInfo.getTypeByClassName(JAVA_LANG_THROWABLE);
         final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
         final ProgramElementName ePEN = new ProgramElementName("e");
-        final ProgramVariable eVar = new LocationVariable(ePEN, eType);
+        final ProgramVariable eVar = new LocationVariableBuilder(ePEN, eType).create();
 
         final StatementBlock sb2;
         if (exceptionVar == null) {
@@ -1099,7 +1100,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
             if (isCopyOfMethodArgumentsUsed()) {
                 ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
                 LocationVariable formalParamVar =
-                        new LocationVariable(pen, paramVar.getKeYJavaType());
+                        new LocationVariableBuilder(pen, paramVar.getKeYJavaType()).create();
                 formalParamVars = formalParamVars.append(formalParamVar);
                 register(formalParamVar, proofServices);
             } else {

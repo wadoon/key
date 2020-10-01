@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -207,8 +208,8 @@ public final class ClassInvariantImpl implements ClassInvariant {
         if (this.originalSelfVar instanceof ProgramVariable) {
             self = (ProgramVariable)this.originalSelfVar;
         } else if(this.originalSelfVar != null) {
-            self = new LocationVariable(
-                    new ProgramElementName(originalSelfVar.toString()), kjt);
+            self = new LocationVariableBuilder(
+                    new ProgramElementName(originalSelfVar.toString()), kjt).create();
         } else {
             self = null;
         }

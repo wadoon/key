@@ -35,6 +35,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -83,7 +84,7 @@ public class TestJMLTranslator extends TestCase {
 
     protected ProgramVariable buildSelfVarAsProgVar() {
         ProgramElementName classPEN = new ProgramElementName("self");
-        ProgramVariable result = new LocationVariable(classPEN, testClassType);
+        ProgramVariable result = new LocationVariableBuilder(classPEN, testClassType).create();
         return result;
     }
 
@@ -91,14 +92,14 @@ public class TestJMLTranslator extends TestCase {
     protected ProgramVariable buildExcVar() {
         KeYJavaType excType = javaInfo.getTypeByClassName("java.lang.Throwable");
         ProgramElementName excPEN = new ProgramElementName("exc");
-        return new LocationVariable(excPEN, excType);
+        return new LocationVariableBuilder(excPEN, excType).create();
     }
 
 
     protected ProgramVariable buildResultVar(IProgramMethod pm) {
         ProgramElementName resPEN = new ProgramElementName("result");
-        ProgramVariable result = new LocationVariable(resPEN,
-                                                      pm.getReturnType());
+        ProgramVariable result = new LocationVariableBuilder(resPEN,
+                                                      pm.getReturnType()).create();
         return result;
     }
 
@@ -204,7 +205,7 @@ public class TestJMLTranslator extends TestCase {
     // see bug #1528
     public void testParenExpression() throws SLTranslationException {
         ProgramElementName classPEN = new ProgramElementName("o");
-        ProgramVariable var = new LocationVariable(classPEN, testClassType);
+        ProgramVariable var = new LocationVariableBuilder(classPEN, testClassType).create();
         ProgramVariable selfVar = buildSelfVarAsProgVar();
         JMLTranslator.translate(new PositionedString(
                 "(o.i)"),

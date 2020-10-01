@@ -59,6 +59,7 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 
@@ -515,10 +516,10 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         }
 
         oldFlags.put(flag,
-                new LocationVariable(
+                new LocationVariableBuilder(
                         new ProgramElementName(
                                 flag.getProgramElementName().toString() + "__BEFORE_FINALLY"),
-                        flag.getKeYJavaType()));
+                        flag.getKeYJavaType()).create());
     }
 
     private void changed() {

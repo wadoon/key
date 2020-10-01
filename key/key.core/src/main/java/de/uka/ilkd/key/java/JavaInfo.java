@@ -55,6 +55,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -1450,9 +1451,10 @@ public final class JavaInfo {
     public ProgramVariable getInvProgramVar() {
         if(invProgVar == null) {
             ProgramElementName pen = new ProgramElementName("<inv>", "java.lang.Object");
-            invProgVar = new LocationVariable(pen,
-                                getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
-                                getJavaLangObject(), false, true);
+            
+            invProgVar = new LocationVariableBuilder(pen,
+                    getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN))
+                            .containingType(getJavaLangObject()).modelVar().create();
         }
         return invProgVar;
     }

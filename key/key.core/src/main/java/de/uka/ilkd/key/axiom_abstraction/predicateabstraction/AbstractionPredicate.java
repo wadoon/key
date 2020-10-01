@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -276,9 +277,9 @@ public abstract class AbstractionPredicate
                 Namespace<IProgramVariable> variables = services.getNamespaces()
                         .programVariables();
                 if (variables.lookup(ph.second) == null) {
-                    variables.add(new LocationVariable(
+                    variables.add(new LocationVariableBuilder(
                             new ProgramElementName(ph.second.toString()),
-                            ph.first));
+                            ph.first).create());
                 }
 
                 // Parse the predicate

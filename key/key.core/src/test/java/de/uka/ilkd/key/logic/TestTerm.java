@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -58,8 +59,8 @@ public class TestTerm extends TestCase {
     Function f=new Function(new Name("f"),sort1, new Sort[]{sort3}); 
         // f(:S3):S1
 
-    ProgramVariable pv0=new LocationVariable
-	( new ProgramElementName ("pv0"), sort1 ); //pv0:S1
+    ProgramVariable pv0=new LocationVariableBuilder
+	( new ProgramElementName ("pv0"), sort1 ).create(); //pv0:S1
 
 
     public TestTerm(String name) {

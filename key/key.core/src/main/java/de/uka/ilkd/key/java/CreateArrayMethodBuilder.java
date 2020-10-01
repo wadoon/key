@@ -58,6 +58,7 @@ import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -239,8 +240,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
         
-        final ProgramVariable paramLength = new LocationVariable(
-                new ProgramElementName("length"), integerType, true);
+        final ProgramVariable paramLength = new LocationVariableBuilder(
+                new ProgramElementName("length"), integerType).finalVar().create();
 
         final ParameterDeclaration param = new ParameterDeclaration(
                 new Modifier[0], new TypeRef(integerType),
@@ -382,8 +383,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
-        final ProgramVariable paramLength = new LocationVariable(
-                new ProgramElementName("length"), integerType);
+        final ProgramVariable paramLength = new LocationVariableBuilder(
+                new ProgramElementName("length"), integerType).create();
 
         final ParameterDeclaration param = new ParameterDeclaration(
                 new Modifier[0], new TypeRef(integerType),

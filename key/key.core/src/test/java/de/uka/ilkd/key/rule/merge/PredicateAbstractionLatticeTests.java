@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -195,8 +196,8 @@ public class PredicateAbstractionLatticeTests extends TestCase {
         final TermBuilder tb = services.getTermBuilder();
 
         final LocationVariable ph =
-                new LocationVariable(new ProgramElementName("ph"),
-                        (Sort) services.getNamespaces().sorts().lookup("int"));
+                new LocationVariableBuilder(new ProgramElementName("ph"),
+                        services.getNamespaces().sorts().lookup("int")).create();
         final AbstractionPredicate pred =
                 AbstractionPredicate.create(tb.geq(tb.var(ph), tb.zero()), ph,
                         services);

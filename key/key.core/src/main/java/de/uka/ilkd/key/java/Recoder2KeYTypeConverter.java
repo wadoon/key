@@ -45,7 +45,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.NullSort;
@@ -424,11 +424,8 @@ public class Recoder2KeYTypeConverter {
         recoder2key.rec2key().setSuperArrayType(superArrayType);
 
         FieldSpecification specLength = new FieldSpecification(
-                new LocationVariable(new ProgramElementName("length"),
-                        	     integerType, 
-                        	     superArrayType, 
-                        	     false,
-                        	     false, false, true));
+                new LocationVariableBuilder(new ProgramElementName("length"), integerType)
+                        .containingType(superArrayType).finalVar().create());
         FieldDeclaration f = new FieldDeclaration(new Modifier[] {
                 new Public(), new Final() }, new TypeRef(integerType),
                 new FieldSpecification[] { specLength }, false);

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 
@@ -138,7 +139,7 @@ public class ProofObligationVars {
         final KeYJavaType eType =
             javaInfo.getTypeByClassName("java.lang.Exception");
         final ProgramElementName ePEN = new ProgramElementName("e");
-        return tb.var(new LocationVariable(ePEN, eType));
+        return tb.var(new LocationVariableBuilder(ePEN, eType).create());
     }
 
     /**
@@ -153,7 +154,7 @@ public class ProofObligationVars {
             ProgramElementName pen = new ProgramElementName("_" +
                      paramVar.name());
             LocationVariable formalParamVar =
-                    new LocationVariable(pen, paramVar.getKeYJavaType());
+                    new LocationVariableBuilder(pen, paramVar.getKeYJavaType()).create();
             register(formalParamVar, services);
             Term formalParam = tb.var(formalParamVar);
             formalParamVars = formalParamVars.append(formalParam);

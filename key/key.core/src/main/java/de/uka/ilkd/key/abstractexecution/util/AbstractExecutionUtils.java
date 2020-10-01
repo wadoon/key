@@ -58,6 +58,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -259,8 +260,8 @@ public class AbstractExecutionUtils {
     public static StatementBlock createArtificialStatementBlockForAPE(
             AbstractExpression abstractExpr, KeYJavaType kjt, Sort sort) {
         final LocationVariable dummyVar = //
-                kjt == null ? new LocationVariable(new ProgramElementName("dummy"), sort)
-                        : new LocationVariable(new ProgramElementName("dummy"), kjt);
+                kjt == null ? new LocationVariableBuilder(new ProgramElementName("dummy"), sort).create()
+                        : new LocationVariableBuilder(new ProgramElementName("dummy"), kjt).create();
         final Assignment assign = new CopyAssignment(dummyVar, (AbstractExpression) abstractExpr);
 
         final ExtList children = new ExtList(abstractExpr.getComments());

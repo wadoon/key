@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
@@ -324,9 +325,9 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                     registeredPlaceholders.add(parsed);
                     final Namespace<IProgramVariable> pvs = goal.proof()
                             .getServices().getNamespaces().programVariables();
-                    pvs.add(new LocationVariable(
+                    pvs.add(new LocationVariableBuilder(
                         new ProgramElementName(parsed.second.toString()),
-                        parsed.first));
+                        parsed.first).create());
                 }
             }
         });
@@ -845,12 +846,12 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
             "firstTouch/01-Agatha/project.key");
 
         final ArrayList<LocationVariable> differingLocVars = new ArrayList<LocationVariable>();
-        differingLocVars.add(new LocationVariable(
+        differingLocVars.add(new LocationVariableBuilder(
             new ProgramElementName("test"),
-            (Sort) proof.getServices().getNamespaces().sorts().lookup("int")));
+            (Sort) proof.getServices().getNamespaces().sorts().lookup("int")).create());
         differingLocVars.add(
-            new LocationVariable(new ProgramElementName("test1"), (Sort) proof
-                    .getServices().getNamespaces().sorts().lookup("boolean")));
+            new LocationVariableBuilder(new ProgramElementName("test1"), (Sort) proof
+                    .getServices().getNamespaces().sorts().lookup("boolean")).create());
 
         final AbstractionPredicatesChoiceDialog dialog = //
                 new AbstractionPredicatesChoiceDialog(

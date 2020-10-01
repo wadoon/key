@@ -100,7 +100,7 @@ public class InstantiateVarsFreshCondition implements VariableCondition {
             final String newName =
                     services.getTermBuilder().newName(namePattern);
             freshVars[i] = //
-                    new LocationVariable(new ProgramElementName(newName), type);
+                    new LocationVariableBuilder(new ProgramElementName(newName), type).create();
             services.getNamespaces().programVariables().add(freshVars[i]);
         }
 

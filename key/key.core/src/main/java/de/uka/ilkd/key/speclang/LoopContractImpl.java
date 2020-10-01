@@ -43,6 +43,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -382,13 +383,13 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl
                                                     Services services) {
         if (variable != null) {
             LocationVariable rem =
-                    new LocationVariable(
+                    new LocationVariableBuilder(
                             services.getVariableNamer().getTemporaryNameProposal(
                                     variable.name()
                                     + VariablesCreator.REMEMBRANCE_SUFFIX
                             ),
                             variable.getKeYJavaType()
-                    );
+                    ).create();
             vars.variables.remembranceLocalVariables.put((LocationVariable) variable, rem);
         }
         return vars;

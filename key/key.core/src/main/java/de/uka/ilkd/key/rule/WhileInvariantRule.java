@@ -60,6 +60,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -321,7 +322,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
         final String name = tb.newName(varTerm.toString() + "_After" + suffix);
         final LocationVariable varAtPostVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
+                new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
         register(varAtPostVar, services);
         final Term varAtPost = tb.var(varAtPostVar);
         return varAtPost;
@@ -338,7 +339,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
         final String name = tb.newName(varTerm.toString() + "_Before");
         final LocationVariable varAtPreVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
+                new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
         register(varAtPreVar, services);
         final Term varAtPre = tb.var(varAtPreVar);
         return varAtPre;
@@ -355,7 +356,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
         final String name = tb.newName(varTerm.toString() + "_After");
         final LocationVariable varAtPostVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
+                new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
         register(varAtPostVar, services);
         final Term varAtPost = tb.var(varAtPostVar);
         return varAtPost;
@@ -375,7 +376,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
             final String name = tb.newName(varTerm.toString() + "_Before");
             final LocationVariable varAtPostVar =
-                    new LocationVariable(new ProgramElementName(name), resultType);
+                    new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
             register(varAtPostVar, services);
             final Term varAtPost = tb.var(varAtPostVar);
             localOuts = localOuts.append(varAtPost);
@@ -397,7 +398,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
             final String name = tb.newName(varTerm.toString() + "_After");
             final LocationVariable varAtPostVar =
-                    new LocationVariable(new ProgramElementName(name), resultType);
+                    new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
             register(varAtPostVar, services);
             final Term varAtPost = tb.var(varAtPostVar);
             localOuts = localOuts.append(varAtPost);
@@ -574,7 +575,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final ProgramElementName variantName
             = new ProgramElementName(tb.newName("variant"));
-        final LocationVariable variantPV = new LocationVariable(variantName, Sort.ANY);
+        final LocationVariable variantPV = new LocationVariableBuilder(variantName, Sort.ANY).create();
         services.getNamespaces().programVariables().addSafely(variantPV);
 
         final boolean dia = ((Modality)inst.progPost.op()).terminationSensitive();
@@ -652,7 +653,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                        final TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
         final ProgramElementName guardVarName = new ProgramElementName(tb.newName("b"));
-        final LocationVariable guardVar = new LocationVariable(guardVarName, booleanKJT);
+        final LocationVariable guardVar = new LocationVariableBuilder(guardVarName, booleanKJT).create();
         services.getNamespaces().programVariables().addSafely(guardVar);
         loopRuleApp.setGuard(tb.var(guardVar));
         final VariableSpecification guardVarSpec =
@@ -895,7 +896,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             final String pvBeforeLoopName
             = tb.newName(pv.name().toString() + "Before_LOOP");
             final LocationVariable pvBeforeLoop
-            = new LocationVariable(new ProgramElementName(pvBeforeLoopName), pv.getKeYJavaType());
+            = new LocationVariableBuilder(new ProgramElementName(pvBeforeLoopName), pv.getKeYJavaType()).create();
             services.getNamespaces().programVariables().addSafely(pvBeforeLoop);
             beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
                                            tb.elementary(pvBeforeLoop,

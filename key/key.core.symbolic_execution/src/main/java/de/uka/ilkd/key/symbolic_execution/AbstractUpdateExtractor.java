@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
@@ -794,7 +795,7 @@ public abstract class AbstractUpdateExtractor {
        * @throws ProofInputException Occurred Exception.
        */
       protected LocationVariable createLocationVariable(String name, Sort sort) throws ProofInputException {
-         return new LocationVariable(new ProgramElementName(name), sort);
+         return new LocationVariableBuilder(new ProgramElementName(name), sort).create();
       }
 
       /**

@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
@@ -80,7 +81,7 @@ public class TestVariableNamer extends TestCase {
     private ProgramVariable constructProgramVariable(ProgramElementName name) {
 	KeYJavaType myKeyJavaType
 	    = new KeYJavaType(new SortImpl(new Name("mysort")));
-    	return new LocationVariable(name, myKeyJavaType);
+    	return new LocationVariableBuilder(name, myKeyJavaType).create();
     }
 
     private ProgramVariable constructProgramVariable(String name) {

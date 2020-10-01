@@ -41,6 +41,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
@@ -309,8 +310,8 @@ public class TestMatchTaclet extends TestCase {
     // test match of update terms
     public void testUpdateMatch() {           
 	LocationVariable i 
-	   = new LocationVariable(new ProgramElementName("i"), 
-	        	          services.getJavaInfo().getKeYJavaType("int"));
+	   = new LocationVariableBuilder(new ProgramElementName("i"), 
+	        	          services.getJavaInfo().getKeYJavaType("int")).create();
 	services.getNamespaces().programVariables().add(i);
 	Term match = TacletForTests.parseTerm("\\<{}\\>{i:=2}(\\forall nat z; (q1(z)))");
 	match = match.sub(0);
@@ -407,8 +408,8 @@ public class TestMatchTaclet extends TestCase {
 		(PrimitiveType.JAVA_BYTE, 
 		 new SortImpl(new Name("byte")))),
 		 null,
-	     new LocationVariable(new ProgramElementName("testVar"),
-				 new SortImpl(new Name("testSort"))));
+	     new LocationVariableBuilder(new ProgramElementName("testVar"),
+				 new SortImpl(new Name("testSort"))).create());
 	MethodFrame mframe = new MethodFrame(null, ec, prg);
 	match = TB.dia
 	    (JavaBlock.createJavaBlock(new StatementBlock(mframe)), 

@@ -53,6 +53,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -171,15 +172,15 @@ public class QueryExpand implements BuiltInRule {
                callee = null;
                offset = 0;
            } else {
-               callee = new LocationVariable(
-                       new ProgramElementName(calleeName), calleeType);
+               callee = new LocationVariableBuilder(
+                       new ProgramElementName(calleeName), calleeType).create();
                offset = 1;
            }
 
            final ProgramVariable result =
-                   new LocationVariable(
+                   new LocationVariableBuilder(
                            new ProgramElementName(progResultName),
-                                   progResultType);
+                                   progResultType).create();
 
 
            final MethodReference mr = new MethodReference(args, method.getProgramElementName(), callee);
@@ -268,8 +269,8 @@ public class QueryExpand implements BuiltInRule {
         	final String baseName = pdecl.getVariableSpecification().getName();
         	final String newName = services.getTermBuilder().newName(baseName);
             final ProgramElementName argVarName = new ProgramElementName(newName);
-            args[i] = new LocationVariable(argVarName,
-                    pdecl.getVariableSpecification().getProgramVariable().getKeYJavaType());
+            args[i] = new LocationVariableBuilder(argVarName,
+                    pdecl.getVariableSpecification().getProgramVariable().getKeYJavaType()).create();
             progvarsNS.addSafely(args[i]);
             //newGoal.addProgramVariable(pv);
             i++;

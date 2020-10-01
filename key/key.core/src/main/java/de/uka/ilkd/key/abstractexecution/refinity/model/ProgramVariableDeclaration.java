@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -98,8 +99,8 @@ public class ProgramVariableDeclaration extends NullarySymbolDeclaration {
                     + "\" is already known to the system.<br/>\n" + "Plase choose a fresh one.");
         }
 
-        services.getNamespaces().programVariables().add(new LocationVariable(
-                new ProgramElementName(getVarName()), services.getJavaInfo().getKeYJavaType(sort)));
+        services.getNamespaces().programVariables().add(new LocationVariableBuilder(
+                new ProgramElementName(getVarName()), services.getJavaInfo().getKeYJavaType(sort)).create());
     }
 
     public static Optional<ProgramVariableDeclaration> fromString(final String str)

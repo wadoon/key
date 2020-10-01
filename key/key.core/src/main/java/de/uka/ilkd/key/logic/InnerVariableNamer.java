@@ -16,6 +16,7 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -86,7 +87,7 @@ public class InnerVariableNamer extends VariableNamer {
 
         ProgramVariable newvar = var;
         if (!newname.equals(name)) {
-            newvar = new LocationVariable(newname, var.getKeYJavaType(), var.getPositionInfo());
+            newvar = new LocationVariableBuilder(newname, var.getKeYJavaType()).posInfo(var.getPositionInfo()).create();
             map.put(var, newvar);
             renamingHistory = map;
         }

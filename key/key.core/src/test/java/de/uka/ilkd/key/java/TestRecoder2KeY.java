@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.TacletForTests;
 
@@ -132,8 +133,8 @@ public class TestRecoder2KeY extends TestCase {
 
 
     public void testReadBlockWithContext() {
-	ProgramVariable pv = new LocationVariable
-	    (new ProgramElementName("i"), TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT));
+	ProgramVariable pv = new LocationVariableBuilder
+	    (new ProgramElementName("i"), TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT)).create();
 	ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil().prepend(pv);		
 	JavaBlock block = c2k.readBlock("{ i = 2; }", c2k.createContext(list));
 	ProgramVariable prgVarCmp = (ProgramVariable)	    

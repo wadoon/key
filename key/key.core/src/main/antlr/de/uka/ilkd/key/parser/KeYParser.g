@@ -1920,12 +1920,12 @@ prog_var_decls
      		    //  	(var_name, getSourceName(), getLine(), getColumn());
 		    if(!(name instanceof ProgramVariable) || (name instanceof ProgramVariable && 
 			    !((ProgramVariable)name).getKeYJavaType().equals(kjt))) { 
-                      namespaces().programVariables().add(new LocationVariable
-                        (pvName, kjt));
+                      namespaces().programVariables().add(new LocationVariableBuilder
+                        (pvName, kjt).create());
 		    }
                   }else{
-                     namespaces().programVariables().add(new LocationVariable
-                        (pvName, kjt));
+                     namespaces().programVariables().add(new LocationVariableBuilder
+                        (pvName, kjt).create());
 		  }
 	       }
             }

@@ -65,6 +65,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
@@ -571,7 +572,8 @@ public class JMLSpecFactory {
                 .getAbbreviations()) {
             final KeYJavaType abbrKJT = services.getJavaInfo().getKeYJavaType(abbrv.first.text);
             final ProgramElementName abbrVarName = new ProgramElementName(abbrv.second.text);
-            final LocationVariable abbrVar = new LocationVariable(abbrVarName, abbrKJT, true, true);
+            final LocationVariable abbrVar = new LocationVariableBuilder(abbrVarName, abbrKJT)
+                    .ghostVar().finalVar().create();
             assert abbrVar.isGhost() : "specification parameter not ghost";
             services.getNamespaces().programVariables().addSafely(abbrVar);
             progVars.paramVars = progVars.paramVars.append(abbrVar); // treat as
