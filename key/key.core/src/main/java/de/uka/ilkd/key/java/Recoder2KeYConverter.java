@@ -61,6 +61,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.MiscTools;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
@@ -136,7 +137,7 @@ public class Recoder2KeYConverter {
      * caches constructor access for reflection. It is a HashMap<Class,
      * Constructor>
      */
-    private final HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>> constructorCache =
+    private final HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>> constructorCache = 
 	new LinkedHashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>>(400);
 
     /**
@@ -145,7 +146,7 @@ public class Recoder2KeYConverter {
      * when converting initializers. Access to this map is performed via the
      * method <code>getProgramVariableForFieldSpecification</code>
      */
-    private HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable> fieldSpecificationMapping =
+    private HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable> fieldSpecificationMapping = 
 	new LinkedHashMap<recoder.java.declaration.FieldSpecification, ProgramVariable>();
 
     /**
@@ -153,7 +154,7 @@ public class Recoder2KeYConverter {
      * have been started to convert but are not yet finished. The mapped value
      * is the reference to the later completed IProgramMethod.
      */
-    private HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod> methodsDeclaring =
+    private HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod> methodsDeclaring = 
 	new LinkedHashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod>();
 
     /**
@@ -732,7 +733,7 @@ public class Recoder2KeYConverter {
     }
 
     public AllObjects convert(de.uka.ilkd.key.java.recoderext.adt.AllObjects e) {
-        ExtList children = collectChildren(e);
+        ExtList children = collectChildren(e);	
 	return new AllObjects(children);
     }
 
@@ -767,7 +768,7 @@ public class Recoder2KeYConverter {
         ExtList children = collectChildren(e);
 	return new SeqReverse(children);
     }
-
+    
     public EmptyMapLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral e) {
         return EmptyMapLiteral.INSTANCE;
     }
@@ -789,10 +790,10 @@ public class Recoder2KeYConverter {
 
 	        Function f = (Function) named;
         DLEmbeddedExpression expression = new DLEmbeddedExpression(f, children);
-
+        
         expression.check(services, getKeYJavaType(getServiceConfiguration().getCrossReferenceSourceInfo()
 						  .getContainingClassType(e)));
-
+        
         return expression;
     }
 
@@ -930,12 +931,12 @@ public class Recoder2KeYConverter {
         final LocationVariable locVar = new LocationVariableBuilder(
                 services.getVariableNamer().getTemporaryNameProposal("x"),
                 services.getNamespaces().sorts().lookup("boolean")).create();
-
+        
         final Comment[] comments = new Comment[mps.getComments().size()];
         for (int i = 0; i < mps.getComments().size(); i++) {
             comments[i] = convert(mps.getComments().get(i));
         }
-
+        
         return new MergePointStatement(locVar, comments);
     }
 
@@ -1954,7 +1955,7 @@ public class Recoder2KeYConverter {
     }
 
     public ArrayInitializer convert(recoder.java.expression.ArrayInitializer arg) {
-        return new ArrayInitializer(collectChildrenAndComments(arg),
+        return new ArrayInitializer(collectChildrenAndComments(arg), 
                 getKeYJavaType(getServiceConfiguration().getSourceInfo().getType(arg.getASTParent())));
     }
 
@@ -2216,14 +2217,14 @@ public class Recoder2KeYConverter {
 
     public EmptyStatement convert(recoder.java.statement.EmptyStatement m) {
         return new EmptyStatement(collectChildrenAndComments(m));
-    }
-
+    }   
+    
     //modifiers
-
+    
     public Abstract convert(recoder.java.declaration.modifier.Abstract m) {
         return new Abstract(collectChildrenAndComments(m));
     }
-
+    
     public Public convert(recoder.java.declaration.modifier.Public m) {
         return new Public(collectChildrenAndComments(m));
     }
@@ -2243,7 +2244,7 @@ public class Recoder2KeYConverter {
     public Final convert(recoder.java.declaration.modifier.Final m) {
         return new Final(collectChildrenAndComments(m));
     }
-
+    
     public StrictFp convert(recoder.java.declaration.modifier.StrictFp m) {
         return new StrictFp(collectChildrenAndComments(m));
     }

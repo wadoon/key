@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 import javax.swing.JEditorPane;
 import javax.swing.text.html.HTMLDocument;
-
 import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
 
 /**
  * Performs a simple pattern-based syntax highlighting for KeY sequents by
@@ -100,7 +100,7 @@ public class HTMLSyntaxHighlighter {
      * NOTE (DS, 2018-11-17): The "&#045;" represents a hyphen "-" in HTML
      * encoding. One could probably do this differently ;)
      */
-    private final static String[] JAVA_KEYWORDS = { "if", "else", "for", "do", 
+    private final static String[] JAVA_KEYWORDS = { "if", "else", "for", "do",
         "final", "while", "return", "break", "switch", "case", "continue", "try",
         "catch", "finally", "assert", "null", "throw", "this", "true", "false",
         "int", "char", "long", "short", "\\Qmethod&#045;frame\\E",
@@ -108,7 +108,7 @@ public class HTMLSyntaxHighlighter {
         "\\Q\\Break\\E", "\\Q\\Continue\\E", "\\Qabstract_program\\E" };
 
     public final static String JAVA_KEYWORDS_REGEX = concat("|",
-        Arrays.asList(JAVA_KEYWORDS));
+            Arrays.asList(JAVA_KEYWORDS));
 
     // NOTE: \Q(...)\E escapes the String in (...)
     private final static String DELIMITERS_REGEX = concat(

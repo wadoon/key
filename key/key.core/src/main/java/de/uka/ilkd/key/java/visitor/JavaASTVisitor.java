@@ -14,26 +14,7 @@
 package de.uka.ilkd.key.java.visitor;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
-import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
-import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
-import de.uka.ilkd.key.java.CcatchBreakLabelParameterDeclaration;
-import de.uka.ilkd.key.java.CcatchBreakParameterDeclaration;
-import de.uka.ilkd.key.java.CcatchBreakWildcardParameterDeclaration;
-import de.uka.ilkd.key.java.CcatchContinueLabelParameterDeclaration;
-import de.uka.ilkd.key.java.CcatchContinueParameterDeclaration;
-import de.uka.ilkd.key.java.CcatchContinueWildcardParameterDeclaration;
-import de.uka.ilkd.key.java.CcatchReturnParameterDeclaration;
-import de.uka.ilkd.key.java.CcatchReturnValParameterDeclaration;
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.CompilationUnit;
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.Import;
-import de.uka.ilkd.key.java.PackageSpecification;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -51,6 +32,7 @@ import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.proof.mgt.GoalLocalSpecificationRepository;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -934,13 +916,13 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
-    public void performActionOnAbstractProgramElementContract(BlockContract x) {
-        // do nothing
+    public void performActionOnTransactionStatement(TransactionStatement x) {
+        doDefaultAction(x);
     }
 
     @Override
-    public void performActionOnTransactionStatement(TransactionStatement x) {
-        doDefaultAction(x);
+    public void performActionOnAbstractProgramElementContract(BlockContract x) {
+        // do nothing
     }
 
     @Override

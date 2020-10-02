@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-// This file is partially taken from the RECODER library, which is protected by
+// This file is partially taken from the RECODER library, which is protected by 
 // the LGPL, and modified.
 
 
@@ -46,25 +46,25 @@ import recoder.list.generic.ASTList;
 import recoder.util.StringUtils;
 
 public class ProofJavaProgramFactory extends JavaProgramFactory {
-
+    
     /**
      Protected constructor - use {@link #getInstance} instead.
      */
     protected ProofJavaProgramFactory() {}
 
-    /**
+    /** 
      The singleton instance of the program factory.
      */
-    private static ProofJavaProgramFactory theFactory
+    private static ProofJavaProgramFactory theFactory 
 	= new ProofJavaProgramFactory();
 
-    /**
+    /** 
      Returns the single instance of this class.
      */
     public static JavaProgramFactory getInstance() {
         return theFactory;
     }
-
+    
     @Override
     public void initialize(ServiceConfiguration cfg) {
 
@@ -73,16 +73,16 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
       /*// that is the original recoder code:
       ProofJavaParser.setAwareOfAssert(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
               PropertyNames.JDK1_4)));
-      ProofJavaParser.setJava5(ALLOW_JAVA5);
+      ProofJavaParser.setJava5(ALLOW_JAVA5); 
       */
       ProofJavaParser.setJava5(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
               PropertyNames.JAVA_5)));
       ProofJavaParser.setAwareOfAssert(true);
-
+      
   }
 
 
-    /**
+    /** 
      For internal reuse and synchronization.
      */
     private static final ProofJavaParser parser = new ProofJavaParser(System.in);
@@ -147,7 +147,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
             }
 	    if (pe.getFirstElement()!=null) {
 		Position pos = pe.getFirstElement().getStartPosition();
-		while ((commentIndex < commentCount)
+		while ((commentIndex < commentCount) 
 		       && pos.compareTo(cpos) > 0) {
 		    current.setPrefixed(true);
 		    attachComment(current, pe);
@@ -361,7 +361,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
      * Parse a {@link StatementBlock} from the given string.
      */
     @Override
-    public StatementBlock parseStatementBlock(Reader in)
+    public StatementBlock parseStatementBlock(Reader in) 
 	throws IOException, ParserException {
 	synchronized(parser) {
 	    try{
@@ -375,7 +375,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 
         }
     }
-
+    
     /**
      * Create a {@link PassiveExpression}.
      */
@@ -410,7 +410,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public LoopScopeBlock createLoopScopeBlock() {
         return new LoopScopeBlock();
     }
-
+    
     public AbstractStatement createAbstractPlaceholderStatement() {
         return new AbstractStatement();
     }
@@ -421,7 +421,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public MergePointStatement createMergePointStatement() {
         return new MergePointStatement();
     }
-
+    
     public MergePointStatement createMergePointStatement(Expression expr) {
         return new MergePointStatement(expr);
     }
@@ -442,7 +442,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 					     StatementBlock body) {
 	return new CatchAllStatement(param, body);
     }
-
+    
     /**
      * Create a comment.
      * @param text comment text
@@ -451,7 +451,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public Comment createComment(String text) {
         return new Comment(text);
     }
-
+    
     /**
      * Create a comment.
      * @param text comment text
@@ -460,7 +460,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public Comment createComment(String text, boolean prefixed) {
         return new Comment(text, prefixed);
     }
-
+    
     /**
      * Create an {@link ImplicitIdentifier}.
      */
@@ -473,11 +473,11 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public Identifier createIdentifier(String text) {
         return new ExtendedIdentifier(text);
     }
-
+    
     public ObjectTypeIdentifier createObjectTypeIdentifier(String text) {
         return new ObjectTypeIdentifier(text);
     }
-
+    
     public Exec createExec() {
         Exec res = new Exec();
         return res;

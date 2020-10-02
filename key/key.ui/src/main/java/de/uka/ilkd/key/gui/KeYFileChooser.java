@@ -93,7 +93,7 @@ public class KeYFileChooser {
         return getSelectedFile().getName().endsWith(".proof.gz");
     }
 
-    private KeYFileChooser(File initDir) {
+    public KeYFileChooser(File initDir) {
         fileChooser = new JFileChooser(initDir) {
             private static final long serialVersionUID = -7598570660247063980L;
 
@@ -276,6 +276,10 @@ public class KeYFileChooser {
                         file.getAbsolutePath() + " already exists. Overwrite?",
                         "Save warning", JOptionPane.YES_NO_OPTION,
                         JOptionPane.WARNING_MESSAGE, null, null, null);
+    }
+
+    public JFileChooser getFileChooser(){
+        return fileChooser;
     }
 
     /**
