@@ -25,6 +25,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
  * This test case captures all Abstract Execution run-all-proof scenarios.
@@ -46,6 +47,11 @@ public class RunAllProofsAbstractExecution extends RunAllProofsTest {
 
     public RunAllProofsAbstractExecution(RunAllProofsTestUnit unit) {
         super(unit);
+        // NOTE (DS, 2020-10-02):
+        // Origin labels interfere with proof reloading of the AE proofs.
+        // We turn them off here. Eventually, one should investigate the
+        // issue, or remove origin labels from KeY :)
+        ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().setUseOriginLabels(false);
     }
 
     @Parameters(name = "{0}")

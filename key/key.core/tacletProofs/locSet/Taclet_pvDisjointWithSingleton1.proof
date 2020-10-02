@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Fri Oct 02 16:04:10 CEST 2020
+#Fri Oct 02 16:07:49 CEST 2020
 [Labels]UseOriginLabels=true
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
 [SMTSettings]invariantForall=false
@@ -43,8 +43,8 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Fri Oct 02 16:04:10 CEST 2020
-name=disjointWithSingleton1
+#Fri Oct 02 16:07:49 CEST 2020
+name=pvDisjointWithSingleton1
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
 
@@ -52,33 +52,30 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 (keyLog "0" (keyUser "daniel" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
 (keyLog "1" (keyUser "dscheurer" ) (keyVersion "c7bb84b803898fcf9b3539f4e8cddca405a274e8"))
 
-(autoModeTime "278")
+(autoModeTime "355")
 
 (branch "dummy ID"
-(rule "equiv_right" (formula "1") (newnames "f_s,f_o,f_f"))
-(branch ""
+(rule "equiv_right" (formula "1"))
+(branch "Case '->'"
    (rule "notRight" (formula "2"))
-   (rule "disjointNotInOtherLocset1" (formula "1") (ifseqformula "2"))
-   (rule "elementOfSingleton" (formula "3"))
+   (rule "pvDsjointNotInOtherLocset1" (formula "1") (ifseqformula "2"))
+   (rule "pvElementOfSingletonPV" (formula "3"))
     (builtin "One Step Simplification" (formula "3"))
    (rule "closeTrue" (formula "3"))
 )
-(branch ""
+(branch "Case '<-'"
    (rule "notLeft" (formula "1"))
-   (rule "equalityToElementOfRight" (formula "2") (inst "pv=pv") (inst "fv=fv") (inst "ov=ov"))
+   (rule "equalityToElementOfRight" (formula "2") (inst "pv=pv") (inst "ov=ov") (inst "fv=fv"))
     (builtin "One Step Simplification" (formula "2"))
    (rule "elementOfIntersect" (formula "2") (term "0,0,0,0"))
-   (rule "elementOfSingleton" (formula "2") (term "1,0,0,0,0"))
-   (rule "pvElementOfIntersect" (formula "2") (term "0,0,1"))
     (builtin "One Step Simplification" (formula "2"))
-   (rule "allRight" (formula "2") (inst "sk=ov_0"))
-   (rule "allRight" (formula "2") (inst "sk=fv_0"))
+   (rule "allRight" (formula "2") (inst "sk=pv_0"))
    (rule "notRight" (formula "2"))
+   (rule "pvElementOfIntersect" (formula "1"))
    (rule "andLeft" (formula "1"))
-   (rule "andLeft" (formula "2"))
-   (rule "applyEqRigid" (formula "1") (term "1") (ifseqformula "3"))
-   (rule "applyEqRigid" (formula "1") (term "0") (ifseqformula "2"))
-   (rule "close" (formula "4") (ifseqformula "1"))
+   (rule "pvElementOfSingletonPV" (formula "2"))
+   (rule "applyEq" (formula "1") (term "0") (ifseqformula "2"))
+   (rule "close" (formula "3") (ifseqformula "1"))
 )
 )
 }
