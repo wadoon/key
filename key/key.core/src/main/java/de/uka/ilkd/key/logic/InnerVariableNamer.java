@@ -47,7 +47,12 @@ public class InnerVariableNamer extends VariableNamer {
 
 	return (maxInGlobals > maxInProgram ? maxInGlobals : maxInProgram);
     }
-
+    
+    /**
+     * @return A {@link LocationVariable} with
+     * {@link LocationVariable#isFreshVariable()} set to true having a goal-unique
+     * name.
+     */
     public ProgramVariable rename(ProgramVariable var,
                                   Goal goal,
                                   PosInOccurrence posOfFind) {
@@ -87,7 +92,13 @@ public class InnerVariableNamer extends VariableNamer {
 
         ProgramVariable newvar = var;
         if (!newname.equals(name)) {
-            newvar = new LocationVariableBuilder(newname, var.getKeYJavaType()).copyPropertiesFromLV((LocationVariable) var).create();
+            /*
+             * This method is only called by applyAddProgVars from TacletExecutor;
+             * therefore, the created variable is a fresh one, i.e., transparent to abstract
+             * location sets used in Abstract Execution. We therefore set it accordingly.
+             */
+            newvar = new LocationVariableBuilder(newname, var.getKeYJavaType())
+                    .copyPropertiesFromLV((LocationVariable) var).freshVar().create();
             map.put(var, newvar);
             renamingHistory = map;
         }

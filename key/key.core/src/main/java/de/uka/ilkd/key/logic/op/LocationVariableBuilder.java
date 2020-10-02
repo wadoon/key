@@ -91,6 +91,26 @@ public class LocationVariableBuilder {
         this.posInfo = Optional.empty();
     }
 
+    /**
+     * Returns a {@link LocationVariableBuilder} with the present name and type /
+     * sort, and flags, {@link PositionInfo} and containing {@link KeYJavaType} from
+     * the given {@link LocationVariable}. Useful for quickly copying / renaming
+     * etc. of {@link LocationVariable}s.
+     * 
+     * @param lv The {@link LocationVariable} from which to copy flags and optional
+     * object properties.
+     * @return The new {@link LocationVariableBuilder}.
+     */
+    public static LocationVariableBuilder fromLV(final LocationVariable lv) {
+        if (lv.getKeYJavaType() == null) {
+            return new LocationVariableBuilder(lv.getProgramElementName(), lv.sort())
+                    .copyPropertiesFromLV(lv);
+        } else {
+            return new LocationVariableBuilder(lv.getProgramElementName(), lv.getKeYJavaType())
+                    .copyPropertiesFromLV(lv);
+        }
+    }
+
     // ////////////////////////////////////// //
     //            Aux. Constructor            //
     // ////////////////////////////////////// //
