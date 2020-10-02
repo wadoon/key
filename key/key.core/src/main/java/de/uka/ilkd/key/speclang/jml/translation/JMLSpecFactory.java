@@ -573,7 +573,7 @@ public class JMLSpecFactory {
             final KeYJavaType abbrKJT = services.getJavaInfo().getKeYJavaType(abbrv.first.text);
             final ProgramElementName abbrVarName = new ProgramElementName(abbrv.second.text);
             final LocationVariable abbrVar = new LocationVariableBuilder(abbrVarName, abbrKJT)
-                    .ghostVar().finalVar().create();
+                    .ghostVar().finalVar().freshVar().create();
             assert abbrVar.isGhost() : "specification parameter not ghost";
             services.getNamespaces().programVariables().addSafely(abbrVar);
             progVars.paramVars = progVars.paramVars.append(abbrVar); // treat as

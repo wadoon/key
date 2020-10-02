@@ -283,7 +283,7 @@ public class AbstractUpdateTests extends AbstractTestTermParser {
 
     private LocationVariable intVar(final String name) {
         return new LocationVariableBuilder(new ProgramElementName(name),
-                DUMMY_SERVICES.getNamespaces().sorts().lookup("int")).create();
+                DUMMY_SERVICES.getNamespaces().sorts().lookup("int")).freshVar().create();
     }
 
 }

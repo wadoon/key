@@ -260,8 +260,11 @@ public class AbstractExecutionUtils {
     public static StatementBlock createArtificialStatementBlockForAPE(
             AbstractExpression abstractExpr, KeYJavaType kjt, Sort sort) {
         final LocationVariable dummyVar = //
-                kjt == null ? new LocationVariableBuilder(new ProgramElementName("dummy"), sort).create()
-                        : new LocationVariableBuilder(new ProgramElementName("dummy"), kjt).create();
+                kjt == null
+                        ? new LocationVariableBuilder(new ProgramElementName("dummy"), sort)
+                                .freshVar().create()
+                        : new LocationVariableBuilder(new ProgramElementName("dummy"), kjt)
+                                .freshVar().create();
         final Assignment assign = new CopyAssignment(dummyVar, (AbstractExpression) abstractExpr);
 
         final ExtList children = new ExtList(abstractExpr.getComments());

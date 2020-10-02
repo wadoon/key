@@ -48,6 +48,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * @author Dominic Steinhoefel
  */
 public class LocationVariableBuilder {
+    private static final PositionInfo DEFAULT_POSINFO = PositionInfo.UNDEFINED;
+    private static final KeYJavaType DEFAULT_CONTAINING_TYPE = null;
+
     private final ProgramElementName name;
 
     // Invariant: kjt.isPresent() <=> !sort.isPresent()
@@ -173,7 +176,35 @@ public class LocationVariableBuilder {
 
     public LocationVariableBuilder containingType(final KeYJavaType containingType) {
         return new LocationVariableBuilder(name, kjt, sort, Optional.ofNullable(containingType),
-                Optional.empty(), isStatic, isModel, isGhost, isFinal, isFresh);
+                posInfo, isStatic, isModel, isGhost, isFinal, isFresh);
+    }
+
+    // ////////////////////////////////////// //
+    //             Compound Setter            //
+    // ////////////////////////////////////// //
+
+    /**
+     * Returns a {@link LocationVariableBuilder} with the present name and type /
+     * sort, and flags, {@link PositionInfo} and containing {@link KeYJavaType} from
+     * the given {@link LocationVariable}. Useful for quickly copying / renaming
+     * etc. of {@link LocationVariable}s.
+     * 
+     * @param lv The {@link LocationVariable} from which to copy flags and optional
+     * object properties.
+     * @return The new {@link LocationVariableBuilder}.
+     */
+    public LocationVariableBuilder copyPropertiesFromLV(final LocationVariable lv) {
+        final LocationVariableBuilder newLvb;
+
+        if (sort.isPresent()) {
+            newLvb = new LocationVariableBuilder(name, sort.get());
+        } else {
+            newLvb = new LocationVariableBuilder(name, kjt.get());
+        }
+
+        return newLvb.staticVar(lv.isStatic()).modelVar(lv.isModel()).ghostVar(lv.isGhost())
+                .finalVar(lv.isFinal()).freshVar(lv.isFreshVariable()).posInfo(lv.getPositionInfo())
+                .containingType(lv.getContainerType());
     }
 
     // ////////////////////////////////////// //
@@ -183,13 +214,12 @@ public class LocationVariableBuilder {
     public LocationVariable create() {
         if (sort.isPresent()) {
             return new LocationVariable( //
-                    name, sort.get(), posInfo.orElse(PositionInfo.UNDEFINED), isStatic, isModel,
-                    isGhost, isFinal, isFresh);
+                    name, sort.get(), posInfo.orElse(DEFAULT_POSINFO), isStatic, isModel, isGhost,
+                    isFinal, isFresh);
         } else {
             return new LocationVariable( //
-                    name, kjt.get(), containingType.orElse(null),
-                    posInfo.orElse(PositionInfo.UNDEFINED), isStatic, isModel, isGhost, isFinal,
-                    isFresh);
+                    name, kjt.get(), containingType.orElse(DEFAULT_CONTAINING_TYPE),
+                    posInfo.orElse(DEFAULT_POSINFO), isStatic, isModel, isGhost, isFinal, isFresh);
         }
     }
 

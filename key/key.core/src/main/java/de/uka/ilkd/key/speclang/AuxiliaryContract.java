@@ -1253,7 +1253,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         private LocationVariable createVariable(final String name, final KeYJavaType type) {
             return new LocationVariableBuilder(services.getVariableNamer().getTemporaryNameProposal(name),
-                    type).create();
+                    type).freshVar().create();
         }
     }
 

@@ -138,9 +138,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
          * if(pv.isFinal()){ return pv; }
          */
         return new LocationVariableBuilder(
-                VariableNamer.parseName(name.toString() + postFix,
-                        name.getCreationInfo()),
-                MiscTools.fixKeYJavaType(pv, services)).finalVar(pv.isFinal()).create();
+                VariableNamer.parseName(name.toString() + postFix, name.getCreationInfo()),
+                MiscTools.fixKeYJavaType(pv, services))
+                        .copyPropertiesFromLV((LocationVariable) pv).create();
     }
 
     @Override

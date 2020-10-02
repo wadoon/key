@@ -625,7 +625,7 @@ public class MergeRuleUtils {
         do {
             newName = services.getTermBuilder().newName(prefix);
             result = new LocationVariableBuilder(//
-                    new ProgramElementName(newName), sort).create();
+                    new ProgramElementName(newName), sort).freshVar().create();
             Namespace<IProgramVariable> variables = //
                     services.getNamespaces().programVariables();
             variables.add(result);

@@ -248,7 +248,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
          if (resultVar == null) {
             IProgramMethod pm = mbs.getProgramMethod(services);
             if (!pm.isVoid()) {
-               resultVar = new LocationVariableBuilder(new ProgramElementName(services.getTermBuilder().newName("TmpResultVar")), pm.getReturnType()).create();
+               resultVar = new LocationVariableBuilder(new ProgramElementName(services.getTermBuilder().newName("TmpResultVar")), pm.getReturnType()).freshVar().create();
             }
          }
          if (resultVar != null) {

@@ -87,7 +87,7 @@ public class InnerVariableNamer extends VariableNamer {
 
         ProgramVariable newvar = var;
         if (!newname.equals(name)) {
-            newvar = new LocationVariableBuilder(newname, var.getKeYJavaType()).posInfo(var.getPositionInfo()).create();
+            newvar = new LocationVariableBuilder(newname, var.getKeYJavaType()).copyPropertiesFromLV((LocationVariable) var).create();
             map.put(var, newvar);
             renamingHistory = map;
         }

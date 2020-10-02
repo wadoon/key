@@ -173,7 +173,7 @@ public class QueryExpand implements BuiltInRule {
                offset = 0;
            } else {
                callee = new LocationVariableBuilder(
-                       new ProgramElementName(calleeName), calleeType).create();
+                       new ProgramElementName(calleeName), calleeType).freshVar().create();
                offset = 1;
            }
 

@@ -279,7 +279,7 @@ public abstract class AbstractionPredicate
                 if (variables.lookup(ph.second) == null) {
                     variables.add(new LocationVariableBuilder(
                             new ProgramElementName(ph.second.toString()),
-                            ph.first).create());
+                            ph.first).freshVar().create());
                 }
 
                 // Parse the predicate

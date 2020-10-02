@@ -91,7 +91,7 @@ public class NewProgramVariableCondition implements VariableCondition {
 
         final String newName = services.getTermBuilder().newName(namePattern);
         final LocationVariable result =
-                new LocationVariableBuilder(new ProgramElementName(newName), type).create();
+                new LocationVariableBuilder(new ProgramElementName(newName), type).freshVar().create();
         services.getNamespaces().programVariables().add(result);
 
         maybeFreshForSV

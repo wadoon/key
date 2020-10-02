@@ -848,10 +848,10 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         final ArrayList<LocationVariable> differingLocVars = new ArrayList<LocationVariable>();
         differingLocVars.add(new LocationVariableBuilder(
             new ProgramElementName("test"),
-            (Sort) proof.getServices().getNamespaces().sorts().lookup("int")).create());
+            (Sort) proof.getServices().getNamespaces().sorts().lookup("int")).freshVar().create());
         differingLocVars.add(
             new LocationVariableBuilder(new ProgramElementName("test1"), (Sort) proof
-                    .getServices().getNamespaces().sorts().lookup("boolean")).create());
+                    .getServices().getNamespaces().sorts().lookup("boolean")).freshVar().create());
 
         final AbstractionPredicatesChoiceDialog dialog = //
                 new AbstractionPredicatesChoiceDialog(

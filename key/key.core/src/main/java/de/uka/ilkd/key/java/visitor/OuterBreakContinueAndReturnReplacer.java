@@ -519,7 +519,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
                 new LocationVariableBuilder(
                         new ProgramElementName(
                                 flag.getProgramElementName().toString() + "__BEFORE_FINALLY"),
-                        flag.getKeYJavaType()).create());
+                        flag.getKeYJavaType()).freshVar().create());
     }
 
     private void changed() {

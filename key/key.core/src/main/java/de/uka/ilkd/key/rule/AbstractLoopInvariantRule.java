@@ -234,7 +234,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                     .newName(pv.name().toString() + "Before_LOOP");
             final LocationVariable pvBeforeLoop = new LocationVariableBuilder(
                     new ProgramElementName(pvBeforeLoopName),
-                    pv.getKeYJavaType()).create();
+                    pv.getKeYJavaType()).freshVar().create();
             progVarNS.addSafely(pvBeforeLoop);
             beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
                     tb.elementary(pvBeforeLoop, tb.var(pv)));
@@ -358,7 +358,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final ProgramElementName variantName = new ProgramElementName(
                 tb.newName("variant"));
         final LocationVariable variantPV = new LocationVariableBuilder(variantName,
-                Sort.ANY).create();
+                Sort.ANY).freshVar().create();
         services.getNamespaces().programVariables().addSafely(variantPV);
 
         final boolean dia = ((Modality) inst.progPost.op())

@@ -232,7 +232,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         }
         String name = tb.newName(varTerm.toString() + "_After" + suffix);
         LocationVariable varAtPostVar
-                = new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
+                = new LocationVariableBuilder(new ProgramElementName(name), resultType).freshVar().create();
         register(varAtPostVar, services);
         Term varAtPost = tb.var(varAtPostVar);
         return varAtPost;
@@ -252,7 +252,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
             String name = tb.newName(varTerm.toString() + "_Before");
             LocationVariable varAtPostVar
-                    = new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
+                    = new LocationVariableBuilder(new ProgramElementName(name), resultType).freshVar().create();
             register(varAtPostVar, services);
             Term varAtPost = tb.var(varAtPostVar);
             renamedLocalOuts = renamedLocalOuts.append(varAtPost);
@@ -274,7 +274,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
             String name = tb.newName(varTerm.toString() + "_After");
             LocationVariable varAtPostVar
-                    = new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
+                    = new LocationVariableBuilder(new ProgramElementName(name), resultType).freshVar().create();
             register(varAtPostVar, services);
             Term varAtPost = tb.var(varAtPostVar);
             renamedLocalOuts = renamedLocalOuts.append(varAtPost);

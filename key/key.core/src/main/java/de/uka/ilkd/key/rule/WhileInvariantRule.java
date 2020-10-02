@@ -322,7 +322,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
         final String name = tb.newName(varTerm.toString() + "_After" + suffix);
         final LocationVariable varAtPostVar =
-                new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
+                new LocationVariableBuilder(new ProgramElementName(name), resultType).freshVar().create();
         register(varAtPostVar, services);
         final Term varAtPost = tb.var(varAtPostVar);
         return varAtPost;
@@ -339,7 +339,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
         final String name = tb.newName(varTerm.toString() + "_Before");
         final LocationVariable varAtPreVar =
-                new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
+                new LocationVariableBuilder(new ProgramElementName(name), resultType).freshVar().create();
         register(varAtPreVar, services);
         final Term varAtPre = tb.var(varAtPreVar);
         return varAtPre;
@@ -356,7 +356,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
         final String name = tb.newName(varTerm.toString() + "_After");
         final LocationVariable varAtPostVar =
-                new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
+                new LocationVariableBuilder(new ProgramElementName(name), resultType).freshVar().create();
         register(varAtPostVar, services);
         final Term varAtPost = tb.var(varAtPostVar);
         return varAtPost;
@@ -376,7 +376,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
             final String name = tb.newName(varTerm.toString() + "_Before");
             final LocationVariable varAtPostVar =
-                    new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
+                    new LocationVariableBuilder(new ProgramElementName(name), resultType).freshVar().create();
             register(varAtPostVar, services);
             final Term varAtPost = tb.var(varAtPostVar);
             localOuts = localOuts.append(varAtPost);
@@ -398,7 +398,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
             final String name = tb.newName(varTerm.toString() + "_After");
             final LocationVariable varAtPostVar =
-                    new LocationVariableBuilder(new ProgramElementName(name), resultType).create();
+                    new LocationVariableBuilder(new ProgramElementName(name), resultType).freshVar().create();
             register(varAtPostVar, services);
             final Term varAtPost = tb.var(varAtPostVar);
             localOuts = localOuts.append(varAtPost);
@@ -575,7 +575,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final ProgramElementName variantName
             = new ProgramElementName(tb.newName("variant"));
-        final LocationVariable variantPV = new LocationVariableBuilder(variantName, Sort.ANY).create();
+        final LocationVariable variantPV = new LocationVariableBuilder(variantName, Sort.ANY).freshVar().create();
         services.getNamespaces().programVariables().addSafely(variantPV);
 
         final boolean dia = ((Modality)inst.progPost.op()).terminationSensitive();
@@ -896,7 +896,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             final String pvBeforeLoopName
             = tb.newName(pv.name().toString() + "Before_LOOP");
             final LocationVariable pvBeforeLoop
-            = new LocationVariableBuilder(new ProgramElementName(pvBeforeLoopName), pv.getKeYJavaType()).create();
+            = new LocationVariableBuilder(new ProgramElementName(pvBeforeLoopName), pv.getKeYJavaType()).freshVar().create();
             services.getNamespaces().programVariables().addSafely(pvBeforeLoop);
             beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
                                            tb.elementary(pvBeforeLoop,
