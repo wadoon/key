@@ -50,7 +50,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class LocationVariableBuilder {
     private final ProgramElementName name;
 
-    // Invariant: kjt.isPresent() <==> !sort.isPresent()
+    // Invariant: kjt.isPresent() <=> !sort.isPresent()
 
     private final Optional<KeYJavaType> kjt;
     private final Optional<Sort> sort;
@@ -183,12 +183,13 @@ public class LocationVariableBuilder {
     public LocationVariable create() {
         if (sort.isPresent()) {
             return new LocationVariable( //
-                    name, sort.get(), posInfo.orElse(null), isStatic, isModel, isGhost, isFinal,
-                    isFresh);
+                    name, sort.get(), posInfo.orElse(PositionInfo.UNDEFINED), isStatic, isModel,
+                    isGhost, isFinal, isFresh);
         } else {
             return new LocationVariable( //
-                    name, kjt.get(), containingType.orElse(null), posInfo.orElse(null), isStatic,
-                    isModel, isGhost, isFinal, isFresh);
+                    name, kjt.get(), containingType.orElse(null),
+                    posInfo.orElse(PositionInfo.UNDEFINED), isStatic, isModel, isGhost, isFinal,
+                    isFresh);
         }
     }
 
