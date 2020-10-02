@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java.visitor;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.abstractexecution.java.expression.AbstractExpression;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractStatement;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;

@@ -40,6 +40,8 @@ import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
+import de.uka.ilkd.key.java.expression.operator.adt.SingletonPV;
+import de.uka.ilkd.key.java.expression.operator.adt.SingletonPVFun;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
