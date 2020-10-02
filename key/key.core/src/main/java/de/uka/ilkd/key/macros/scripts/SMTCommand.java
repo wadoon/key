@@ -61,6 +61,11 @@ public class SMTCommand
                 goal.proof().getSettings().getSMTSettings(),
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
                 goal.proof());
+
+        if(args.timeout >= 0) {
+            settings = new SMTSettingsTimeoutWrapper(settings, args.timeout);
+        }
+
         SolverLauncher launcher = new SolverLauncher(settings);
         Collection<SMTProblem> probList = new LinkedList<>();
         probList.add(new SMTProblem(goal));
@@ -79,14 +84,15 @@ public class SMTCommand
         System.err.println("SMT Runtime: " + timerListener.getRuntime() + " ms");
     }
 
-    private SolverTypeCollection computeSolvers(String value) {
+    private SolverTypeCollection computeSolvers(String value) throws ScriptException {
         String[] parts = value.split(" *, *");
         List<SolverType> types = new ArrayList<SolverType>();
         for (String name : parts) {
             SolverType type = SOLVER_MAP.get(name);
-            if (type != null) {
-                types.add(type);
+            if (type == null) {
+                throw new ScriptException("Unknown SMT solver: " + value);
             }
+            types.add(type);
         }
         return new SolverTypeCollection(value, 1, types);
     }
@@ -97,6 +103,9 @@ public class SMTCommand
 
         @Option(value = "all", required = false)
         public boolean all = false;
+
+        @Option(value = "timeout", required = false)
+        public int timeout = -1;
     }
 
     private static class TimerListener implements SolverLauncherListener {
@@ -115,6 +124,20 @@ public class SMTCommand
 
         public long getRuntime() {
             return stop - start;
+        }
+    }
+
+    private class SMTSettingsTimeoutWrapper extends SMTSettings {
+        private final int timeout;
+
+        public SMTSettingsTimeoutWrapper(SMTSettings settings, int timeout) {
+            super(settings.getPdSettings(), settings.getPiSettings(), settings.getProof());
+            this.timeout = timeout;
+        }
+
+        @Override
+        public long getTimeout() {
+            return timeout;
         }
     }
 }
