@@ -50,6 +50,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
 import de.uka.ilkd.key.proof.Proof;
@@ -254,8 +255,8 @@ public class PredFuncInstsFootprintConformanceProver implements InstantiationAsp
             final List<LocationVariable> newPVs, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final String anonVarName = new Name(tb.newName("anon_" + lv)).toString();
-        final LocationVariable anonLV = new LocationVariable(new ProgramElementName(anonVarName),
-                lv.getKeYJavaType());
+        final LocationVariable anonLV = new LocationVariableBuilder(
+                new ProgramElementName(anonVarName), lv.getKeYJavaType()).freshVar().create();
         services.getNamespaces().programVariables().add(anonLV);
         newPVs.add(anonLV);
         return anonLV;

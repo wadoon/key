@@ -19,13 +19,11 @@ import java.util.regex.Pattern;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
-
 import javax.xml.bind.annotation.XmlTransient;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LocationVariableBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -120,8 +118,9 @@ public class ProgramVariableDeclaration extends NullarySymbolDeclaration {
         final Name name = new Name(getVarName());
 
         if (services.getNamespaces().lookup(name) == null) {
-            services.getNamespaces().programVariables().add(new LocationVariable(
-                    new ProgramElementName(getVarName()), services.getJavaInfo().getKeYJavaType(sort)));
+            services.getNamespaces().programVariables()
+                    .add(new LocationVariableBuilder(new ProgramElementName(getVarName()),
+                            services.getJavaInfo().getKeYJavaType(sort)).create());
             return true;
         }
 
