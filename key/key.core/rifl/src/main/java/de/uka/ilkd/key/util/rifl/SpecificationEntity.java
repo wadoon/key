@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.util.rifl;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Program elements which may be named as sources or sinks in RIFL/Java.
@@ -57,7 +58,7 @@ public abstract class SpecificationEntity {
 
         @Override
         public String qualifiedName() {
-            return (inPackage == "" ? "" : inPackage + ".") + inClass + "#" + name;
+            return (inPackage.isEmpty() ? "" : inPackage + ".") + inClass + "#" + name;
         }
     }
 
@@ -214,19 +215,23 @@ public abstract class SpecificationEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof SpecificationEntity) {
-            return (inPackage.equals(((SpecificationEntity) o).inPackage)
-                    && inClass.equals(((SpecificationEntity) o).inClass)
-                    && (type == ((SpecificationEntity) o).type));
-        } else { return false; }
+        if (this == o) return true;
+        if (!(this.getClass().equals(o.getClass()))) return false;
+        SpecificationEntity that = (SpecificationEntity) o;
+        return Objects.equals(inPackage, that.inPackage) &&
+                Objects.equals(inClass, that.inClass) &&
+                type == that.type;
     }
 
-    // //////////////////////////////////////////////////
+    @Override
+    public int hashCode() {
+        return Objects.hash(inPackage, inClass, type);
+    }
+
+// //////////////////////////////////////////////////
     // implementations
     // //////////////////////////////////////////////////
 
-    @Override
-    public abstract int hashCode();
 
     public abstract String qualifiedName();
 

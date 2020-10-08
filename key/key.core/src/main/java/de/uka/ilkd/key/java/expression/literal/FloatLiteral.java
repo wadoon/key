@@ -28,10 +28,9 @@ import de.uka.ilkd.key.logic.Name;
 
 /**
  *  Float literal.
- *  @author <TT>AutoDoc</TT>
  */
 
-public class FloatLiteral extends Literal {
+public final class FloatLiteral extends Literal {
 
     /**
  *      Textual representation of the value.

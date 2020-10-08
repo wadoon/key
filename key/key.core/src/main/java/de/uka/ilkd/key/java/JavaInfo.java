@@ -21,6 +21,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -97,8 +99,8 @@ public final class JavaInfo {
     private HashMap<String, KeYJavaType> name2KJTCache = null;
 
 
-    private LRUCache<Pair<KeYJavaType,KeYJavaType>, ImmutableList<KeYJavaType>> commonSubtypeCache
-    	= new LRUCache<Pair<KeYJavaType,KeYJavaType>, ImmutableList<KeYJavaType>>(200);
+    private final LRUCache<Pair<KeYJavaType,KeYJavaType>, ImmutableList<KeYJavaType>> commonSubtypeCache
+            = new LRUCache<>(200);
 
     private int nameCachedSize = 0;
     private int sortCachedSize = 0;
@@ -129,7 +131,7 @@ public final class JavaInfo {
     protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
     protected static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
 
-    private HashMap<KeYJavaType,ObserverFunction> staticInvs = new LinkedHashMap<KeYJavaType,ObserverFunction>();
+    private HashMap<KeYJavaType,ObserverFunction> staticInvs = new LinkedHashMap<>();
 
 
     /**
@@ -806,8 +808,12 @@ public final class JavaInfo {
 	if(result == null && ((ClassDeclaration) javaType).isAnonymousClass()){
         for (Sort sort : type.getSort().extendsSorts()) {
             Sort s = sort;
-            if (!((ClassType) getKeYJavaType(s).getJavaType()).isInterface()) {
-                return getKeYJavaType(s);
+            final KeYJavaType keYJavaType = getKeYJavaType(s);
+            assert keYJavaType != null;
+            final ClassType classType = (ClassType) keYJavaType.getJavaType();
+            final boolean isInterface = classType.isInterface();
+            if (! isInterface) {
+                return keYJavaType;
             }
         }
 	}
@@ -821,7 +827,7 @@ public final class JavaInfo {
 
     /** gets an array of expression and returns a list of types */
     private ImmutableList<KeYJavaType> getKeYJavaTypes(ImmutableArray<? extends Expression> args) {
-	ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
+	ImmutableList<KeYJavaType> result = ImmutableSLList.nil();
 	if (args != null) {
 	    for (int i = args.size()-1; i >= 0 ; i--) {
 		final Expression argument = args.get(i);
@@ -877,7 +883,7 @@ public final class JavaInfo {
      */
     private ImmutableList<Field> filterLocalDeclaredFields(TypeDeclaration classDecl,
             Filter filter) {
-        ImmutableList<Field> fields = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> fields = ImmutableSLList.nil();
         final ImmutableArray<MemberDeclaration> members = classDecl.getMembers();
         for (int i = members.size()-1; i>=0; i--) {
             final MemberDeclaration member = members.get(i);
@@ -948,10 +954,9 @@ public final class JavaInfo {
      * @return the program variable of the given name or null if not
      * found
      */
-    private final ProgramVariable find(String programName,
-                                       ImmutableList<Field> fields) {
-        for (Field field1 : fields) {
-            Field field = field1;
+    private ProgramVariable find(String programName,
+                                 ImmutableList<Field> fields) {
+        for (Field field : fields) {
             if (programName.equals(field.getProgramName())) {
                 return (ProgramVariable)
                         field.getProgramVariable();
@@ -967,8 +972,8 @@ public final class JavaInfo {
      * @return a IList<Field> the includes all field specifications found
      * int the field declaration of the given list
      */
-    private final ImmutableList<Field> getFields(FieldDeclaration field) {
-	ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+    private ImmutableList<Field> getFields(FieldDeclaration field) {
+	ImmutableList<Field> result = ImmutableSLList.nil();
 	final ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
 	for (int i = spec.size()-1; i>=0; i--) {
 	    result = result.prepend(spec.get(i));
@@ -985,7 +990,7 @@ public final class JavaInfo {
      * int the field declaration of the given list
      */
     private ImmutableList<Field> getFields(ImmutableArray<MemberDeclaration> list) {
-	ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+	ImmutableList<Field> result = ImmutableSLList.nil();
 	for (int i = list.size()-1; i >= 0; i--) {
 	    final MemberDeclaration pe = list.get(i);
 	    if (pe instanceof FieldDeclaration) {
@@ -1058,8 +1063,7 @@ public final class JavaInfo {
      * name declared locally in class <tt>classType</tt>
      * @return the attribute of the given name declared in <tt>classType</tt>
      */
-    public ProgramVariable getAttribute(final String name,
-					KeYJavaType classType) {
+    public ProgramVariable getAttribute(final String name, @NotNull KeYJavaType classType) {
 	if (classType.getJavaType() instanceof ArrayDeclaration) {
 	    ProgramVariable res = find(name,
 		    getFields(((ArrayDeclaration) classType.getJavaType())
@@ -1072,11 +1076,10 @@ public final class JavaInfo {
 	    final ImmutableList<Field> list = kpmi
 		    .getAllFieldsLocallyDeclaredIn(classType);
 	    for (Field aList : list) {
-		final Field f = aList;
-		if (f != null
-		        && (f.getName().equals(name) || f.getProgramName()
+            if (aList != null
+		        && (aList.getName().equals(name) || aList.getProgramName()
 		                .equals(name))) {
-		    return (ProgramVariable) f
+		    return (ProgramVariable) aList
 			    .getProgramVariable();
 		}
 	    }
@@ -1090,7 +1093,9 @@ public final class JavaInfo {
      */
     public ProgramVariable getAttribute(String attributeName, Sort s) {
 	assert s.extendsTrans(objectSort());
-        return getAttribute(attributeName, getKeYJavaType(s));
+        final KeYJavaType keYJavaType = getKeYJavaType(s);
+        assert keYJavaType != null;
+        return getAttribute(attributeName, keYJavaType);
     }
     
     /*
@@ -1137,7 +1142,7 @@ public final class JavaInfo {
                                                   KeYJavaType type,
                                                   boolean traverseSubtypes) {
         ImmutableList<ProgramVariable> result =
-            ImmutableSLList.<ProgramVariable>nil();
+            ImmutableSLList.nil();
 
 	if (!(type.getSort().extendsTrans(objectSort()))) {
 	    return result;
@@ -1156,7 +1161,7 @@ public final class JavaInfo {
 
         // the assert statements below are not for fun, some methods rely
         // on the correct order
-        ImmutableList<KeYJavaType> hierarchy = ImmutableSLList.<KeYJavaType>nil();
+        ImmutableList<KeYJavaType> hierarchy = ImmutableSLList.nil();
         if (traverseSubtypes) {
             hierarchy = kpmi.getAllSubtypes(type);
             assert !hierarchy.contains(type);
@@ -1165,16 +1170,13 @@ public final class JavaInfo {
         hierarchy = hierarchy.prepend(kpmi.getAllSupertypes(type));
         assert hierarchy.head() == type;
 
-
-        final Iterator<KeYJavaType> it = hierarchy.iterator();
-        while (it.hasNext()) {
-	    KeYJavaType st = it.next();
-	    if(st != null){
-		final ProgramVariable var = getAttribute(programName, st);
-		if (var != null) {
-		    result = result.prepend(var);
-		}
-	    }
+        for (KeYJavaType st : hierarchy) {
+            if (st != null) {
+                final ProgramVariable var = getAttribute(programName, st);
+                if (var != null) {
+                    result = result.prepend(var);
+                }
+            }
         }
 
         return result;
@@ -1229,7 +1231,7 @@ public final class JavaInfo {
      */
     public Sort objectSort() {
         if (getJavaLangObject() == null) {
-            return (Sort) services.getNamespaces().sorts().lookup("java.lang.Object");
+            return services.getNamespaces().sorts().lookup("java.lang.Object");
         } else {
             return getJavaLangObject().getSort();
         }
@@ -1240,7 +1242,7 @@ public final class JavaInfo {
      */
     public Sort cloneableSort() {
         if (getJavaLangCloneable() == null) {
-            return (Sort) services.getNamespaces().sorts().lookup("java.lang.Cloneable");
+            return services.getNamespaces().sorts().lookup("java.lang.Cloneable");
         } else {
             return getJavaLangCloneable().getSort();
         }
@@ -1251,7 +1253,7 @@ public final class JavaInfo {
      */
     public Sort serializableSort() {
         if (getJavaIoSerializable() == null) {
-            return (Sort) services.getNamespaces().sorts().lookup("java.io.Serializable");
+            return services.getNamespaces().sorts().lookup("java.io.Serializable");
         } else {
             return getJavaIoSerializable().getSort();
         }
@@ -1304,7 +1306,7 @@ public final class JavaInfo {
             final KeYJavaType kjt =
                 getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
             defaultExecutionContext =
-                new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null);
+                new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.nil()), null);
         }
         return defaultExecutionContext;
     }
@@ -1326,7 +1328,7 @@ public final class JavaInfo {
      */
     public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType type) {
         if (type.getJavaType() instanceof ArrayType) {
-            ImmutableList<KeYJavaType> res = ImmutableSLList.<KeYJavaType>nil();
+            ImmutableList<KeYJavaType> res = ImmutableSLList.nil();
             for (Sort s: getSuperSorts(type.getSort()))
                 res = res.append(getKeYJavaType(s));
             return res;
@@ -1335,7 +1337,7 @@ public final class JavaInfo {
     }
 
     private ImmutableList<Sort> getSuperSorts(Sort sort){
-        ImmutableList<Sort> res = ImmutableSLList.<Sort>nil();
+        ImmutableList<Sort> res = ImmutableSLList.nil();
         final Sort object = getJavaLangObject().getSort();
         if (sort != object)
             for (Sort exsort: sort.extendsSorts(services)) {
@@ -1373,14 +1375,14 @@ public final class JavaInfo {
      * @return the list of common subtypes of types <tt>k1</tt> and <tt>k2</tt>
      */
     public ImmutableList<KeYJavaType> getCommonSubtypes(KeYJavaType k1, KeYJavaType k2) {
-        final Pair<KeYJavaType,KeYJavaType> ck = new Pair<KeYJavaType, KeYJavaType>(k1, k2);
+        final Pair<KeYJavaType,KeYJavaType> ck = new Pair<>(k1, k2);
         ImmutableList<KeYJavaType> result = commonSubtypeCache.get(ck);
 
         if (result != null) {
             return result;
         }
 
-        result = ImmutableSLList.<KeYJavaType>nil();
+        result = ImmutableSLList.nil();
 
         if (k1.getSort().extendsTrans(k2.getSort())) {
             result = getAllSubtypes(k1).prepend(k1);
@@ -1390,8 +1392,7 @@ public final class JavaInfo {
             final ImmutableList<KeYJavaType> l1 = getAllSubtypes(k1);
             final ImmutableList<KeYJavaType> l2 = getAllSubtypes(k2);
 
-            for (KeYJavaType aL1 : l1) {
-                final KeYJavaType next = aL1;
+            for (KeYJavaType next : l1) {
                 if (l2.contains(next)) {
                     result = result.prepend(next);
                 }
@@ -1432,7 +1433,7 @@ public final class JavaInfo {
                           services.getTypeConverter().getHeapLDT().targetSort(),
                           getJavaLangObject(),
                           false,
-                          new ImmutableArray<KeYJavaType>(),
+                     new ImmutableArray<>(),
                           HeapContext.getModHeaps(services, false).size(),
                           1);
              services.getNamespaces().functions().add(inv);
@@ -1472,7 +1473,7 @@ public final class JavaInfo {
                     services.getTypeConverter().getHeapLDT().targetSort(),
                     target,
                     true,
-                    new ImmutableArray<KeYJavaType>(),
+                      new ImmutableArray<>(),
                HeapContext.getModHeaps(services, false).size(),
                     1);
               services.getNamespaces().functions().add(inv);
@@ -1495,7 +1496,7 @@ public final class JavaInfo {
      */
     public boolean isCanonicalProgramMethod(IProgramMethod method, KeYJavaType context)
             throws NullPointerException {
-        String name = method.getName().toString();
+        String name = method.getName();
         ImmutableArray<KeYJavaType> paramTypes = method.getParamTypes();
         IProgramMethod canonicalMethod;
         canonicalMethod = getProgramMethod(context, name, paramTypes, context);
@@ -1559,7 +1560,7 @@ public final class JavaInfo {
      * @param containerType the KeYJavaType of the context in which the type should be resolved
      * @return the KeYJavaType of the given type or <code>null</code> if type name is unknown
      */
-    public KeYJavaType getTypeByClassName(String name, KeYJavaType containerType) {
+    public KeYJavaType getTypeByClassName(String name, @Nullable KeYJavaType containerType) {
         KeYJavaType result = getTypeByName(name);
         if (result == null) {
             if (containerType != null) {

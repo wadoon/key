@@ -51,9 +51,9 @@ import recoder.java.declaration.ParameterDeclaration;
  * @author weigl, 2016-08-17
  */
 public class RIFLTransformer {
-    private List<File> result = new ArrayList<>();
+    private final List<File> result = new ArrayList<>();
 
-    public RIFLTransformer() throws ParserConfigurationException, SAXException {
+    public RIFLTransformer() {
         JPF.initialize(new CrossReferenceServiceConfiguration());
         assert JPF.getServiceConfiguration() != null;
     }
@@ -92,18 +92,12 @@ public class RIFLTransformer {
         assert savePath != null;
         assert kexh != null;
 
-        RIFLTransformer rt = null;
+        RIFLTransformer rt;
         try {
             rt = new RIFLTransformer();
             rt.doTransform(riflFilename, javaSource, savePath);
             return true;
-        }catch (final ParserConfigurationException e) {
-            kexh.reportException(e);
-        } catch (final SAXException e) {
-            kexh.reportException(e);
-        } catch (final ParserException e) {
-            kexh.reportException(e);
-        } catch (final IOException e) {
+        }catch (final ParserConfigurationException | SAXException | ParserException | IOException e) {
             kexh.reportException(e);
         }
         return false;
@@ -143,7 +137,7 @@ public class RIFLTransformer {
         final Walker walker = files.createWalker(".java");
 
         final ServiceConfiguration serviceConfiguration = JPF.getServiceConfiguration();
-        Map<CompilationUnit, File> javaCUs = new HashMap<CompilationUnit, File>();
+        Map<CompilationUnit, File> javaCUs = new HashMap<>();
 
         // parse
         while (walker.step()) {
@@ -154,22 +148,14 @@ public class RIFLTransformer {
             }
 
             final CompilationUnit cu;
-            Reader fr = null;
 
-            try {
-                fr = new BufferedReader(new FileReader(javaFile));
+            try (Reader fr = new BufferedReader(new FileReader(javaFile))) {
                 cu = JPF.parseCompilationUnit(fr);
 
                 //crud relative
                 File relative = relative(root, javaFile);
                 javaCUs.put(cu, relative); // relative path
                 serviceConfiguration.getChangeHistory().updateModel(); // workaround to an issue in recoder
-            } catch (IOException e) {
-                throw e;
-            } catch (ParserException e) {
-                throw e;
-            } finally {
-                if (fr != null) fr.close();
             }
         }
         return javaCUs;
@@ -254,18 +240,19 @@ public class RIFLTransformer {
 
 
     private void writeProblemFile(File problemFileName, String newJavaFolder, String poname) {
-        String tmp, blueprint = "";
+        String tmp;
+        StringBuilder blueprint = new StringBuilder();
         BufferedReader br = new BufferedReader(
                 new InputStreamReader(getClass().getResourceAsStream("blueprint_rifl.key")));
 
         try {
             while ((tmp = br.readLine()) != null) {
-                blueprint += tmp + "\n";
+                blueprint.append(tmp).append("\n");
             }
 
             FileWriter fw = new FileWriter(problemFileName);
             fw.write(
-                    blueprint.replaceAll("%%JAVA_SOURCE%%", newJavaFolder)
+                    blueprint.toString().replaceAll("%%JAVA_SOURCE%%", newJavaFolder)
                             .replaceAll("%%PO_NAME%%", poname)
             );
             br.close();
@@ -277,9 +264,7 @@ public class RIFLTransformer {
 
     private void ensureTargetDirExists(File target) throws IOException {
         if (target.exists()) {
-            if (target.isDirectory() && target.canWrite()) {
-                return; // nothing to do
-            } else { // bad
+            if (!target.isDirectory() || !target.canWrite()) { // bad
                 throw new IOException("target directory " + target + " not writable");
             }
         } else { // create directory

@@ -3,12 +3,14 @@ package de.uka.ilkd.key.axiom_abstraction;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import de.uka.ilkd.key.axiom_abstraction.signanalysis.Top;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An abstract domain is a countable lattice with a partial order relation and a
@@ -160,4 +162,28 @@ public abstract class AbstractDomainLattice implements
                 "No element is represented by the given String '" + s + "'.");
     }
 
+    @NotNull
+    protected static Iterator<AbstractDomainElement> getAbstractDomainElementIterator(AbstractDomainElement[] abstractDomainElems) {
+        return new Iterator<AbstractDomainElement>() {
+
+            int pos = 0;
+            final int size = abstractDomainElems.length;
+
+            @Override
+            public boolean hasNext() {
+                return pos < size - 1;
+            }
+
+            @Override
+            public AbstractDomainElement next() {
+                if (pos >= abstractDomainElems.length) {
+                    throw new NoSuchElementException();
+                }
+                return abstractDomainElems[pos++];
+            }
+
+            @Override
+            public void remove() {}
+        };
+    }
 }

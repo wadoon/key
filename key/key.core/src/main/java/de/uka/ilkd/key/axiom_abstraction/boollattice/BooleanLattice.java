@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.axiom_abstraction.boollattice;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
@@ -78,25 +79,6 @@ public class BooleanLattice extends AbstractDomainLattice {
 
     @Override
     public Iterator<AbstractDomainElement> iterator() {
-        return new Iterator<AbstractDomainElement>() {
-
-            int pos = 0;
-            final int size = ABSTRACT_DOMAIN_ELEMS.length;
-
-            @Override
-            public boolean hasNext() {
-                return pos < size - 1;
-            }
-
-            @Override
-            public AbstractDomainElement next() {
-                return ABSTRACT_DOMAIN_ELEMS[pos++];
-            }
-
-            @Override
-            public void remove() {
-            }
-        };
+        return getAbstractDomainElementIterator(ABSTRACT_DOMAIN_ELEMS);
     }
-
 }

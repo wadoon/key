@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.util.rifl;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -16,7 +17,7 @@ public class SecurityLattice {
 
     private final SecurityDomain top;
     private final SecurityDomain bottom;
-    private final Set<SecurityDomain> hash = new HashSet<SecurityDomain>();
+    private final Set<SecurityDomain> hash = new HashSet<>();
 
     /**
      * Creates a two-element lattice.
@@ -70,7 +71,7 @@ public class SecurityLattice {
      * Keeps track of <i>direct</i> super- and sub-elements.
      * Instances are mutable, but only by the lattice owning it.
      */
-    public final class SecurityDomain {
+    public static final class SecurityDomain {
 
         private final String name;
         private Set<SecurityDomain> superDomains;
@@ -113,8 +114,17 @@ public class SecurityLattice {
         @Override
         public String toString () { return name; }
 
-        // ensures unique names
         @Override
-        public int hashCode () { return name.hashCode(); }
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof SecurityDomain)) return false;
+            SecurityDomain that = (SecurityDomain) o;
+            return name.equals(that.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name);
+        }
     }
 }

@@ -20,7 +20,7 @@ package de.uka.ilkd.key.java;
    column numbers may be limited and cut off if superceded.
 */
 
-public class Position {
+public final class Position {
 
     /**
        The line number.

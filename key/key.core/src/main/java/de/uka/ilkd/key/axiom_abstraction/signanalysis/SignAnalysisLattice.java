@@ -1,17 +1,19 @@
 package de.uka.ilkd.key.axiom_abstraction.signanalysis;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A lattice for sign analysis of integers.
- * 
+ *
  * @author Dominic Scheurer
  */
 public class SignAnalysisLattice extends AbstractDomainLattice {
-   
+
    /**
     * All elements of this abstract domain.
     */
@@ -24,17 +26,17 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
       Geq.getInstance(),
       Top.getInstance()
    };
-   
+
    /**
     * The singleton instance of this lattice.
     */
    private static final SignAnalysisLattice INSTANCE = new SignAnalysisLattice();
-   
+
    /**
     * Private constructor (singleton!).
     */
    private SignAnalysisLattice() {}
-   
+
    /**
     * @return The singleton instance of this lattice.
     */
@@ -45,19 +47,19 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
    @Override
    public AbstractDomainElement join(AbstractDomainElement elem1,
          AbstractDomainElement elem2) {
-      
+
       if (!(elem1 instanceof SignAnalysisDomainElem) ||
           !(elem2 instanceof SignAnalysisDomainElem)) {
          throw new IllegalArgumentException("Expected arguments of the abstract domain of sign analysis.");
       }
-      
+
       SignAnalysisDomainElem a = (SignAnalysisDomainElem) elem1;
       SignAnalysisDomainElem b = (SignAnalysisDomainElem) elem2;
-      
+
       if (a.isTop() || b.isTop()) {
          return Top.getInstance();
       }
-      
+
       if (a.isLeq()) {
          if (b.isGeq() || b.isPos()) {
             return Top.getInstance();
@@ -65,7 +67,7 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
             return Leq.getInstance();
          }
       }
-      
+
       if (a.isGeq()) {
          if (b.isLeq() || b.isNeg()) {
             return Top.getInstance();
@@ -73,7 +75,7 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
             return Geq.getInstance();
          }
       }
-      
+
       if (b.isLeq()) {
          if (a.isGeq() || a.isPos()) {
             return Top.getInstance();
@@ -81,7 +83,7 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
             return Leq.getInstance();
          }
       }
-      
+
       if (b.isGeq()) {
          if (a.isLeq() || a.isNeg()) {
             return Top.getInstance();
@@ -89,7 +91,7 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
             return Geq.getInstance();
          }
       }
-      
+
       if (a.isNeg()) {
          if (b.isZero()) {
             return Leq.getInstance();
@@ -99,7 +101,7 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
             return Neg.getInstance();
          }
       }
-      
+
       if (a.isZero()) {
          if (b.isNeg()) {
             return Leq.getInstance();
@@ -109,7 +111,7 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
             return Zero.getInstance();
          }
       }
-      
+
       if (a.isPos()) {
          if (b.isZero()) {
             return Geq.getInstance();
@@ -119,31 +121,13 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
             return Pos.getInstance();
          }
       }
-      
+
       assert(a.isBottom()) : "Bug in sign lattice implementation.";
       return b;
    }
 
    @Override
    public Iterator<AbstractDomainElement> iterator() {
-      return new Iterator<AbstractDomainElement>() {
-
-         int pos = 0;
-         final int size = ABSTRACT_DOMAIN_ELEMS.length;
-         
-         @Override
-         public boolean hasNext() {
-            return pos < size - 1;
-         }
-
-         @Override
-         public AbstractDomainElement next() {
-            return ABSTRACT_DOMAIN_ELEMS[pos++];
-         }
-
-         @Override
-         public void remove() {}
-      };
+      return getAbstractDomainElementIterator(ABSTRACT_DOMAIN_ELEMS);
    }
-   
 }
