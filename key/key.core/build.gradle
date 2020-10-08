@@ -141,11 +141,11 @@ task generateVersionFiles() {
 // @AW: Say something here. From POV this explain by itself.
 processResources.dependsOn generateVersionFiles
 
-def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/njml"
+def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/speclang/njml"
 task runAntlr4(type: JavaExec) {
     //see incremental task api, prevents rerun if nothing has changed.
     inputs.dir "src/main/antlr4/"
-    outputs.dir "$projectDir/build/generated/antlr4/main/"
+    outputs.dir "build/generated/antlr4/main/"
     classpath = configurations.antlr4
     main = "org.antlr.v4.Tool"
     args = ["-visitor",
