@@ -22,7 +22,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.*;
@@ -43,11 +45,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     private ImmutableList<LabeledParserRuleContext> getList(@NotNull ClauseHd clause, @NotNull String heap) {
-        Name def = new Name("unknown");
-        return ImmutableList.fromList(
-                getList(clause).stream().filter(
-                        it -> heap.equals(heaps.getOrDefault(it, def).toString()))
-                        .collect(Collectors.toList()));
+        final Name def = new Name(heap);
+        List<LabeledParserRuleContext> seq = clauses.stream()
+                .filter(it -> it.clauseType.equals(clause))
+                .filter(it -> Objects.equals(it.heap, def))
+                .map(it -> it.ctx)
+                .collect(Collectors.toList());
+        return ImmutableList.fromList(seq);
     }
 
     public ImmutableList<LabeledParserRuleContext> getAccessible(String heap) {
@@ -107,8 +111,23 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     //private ImmutableList<Triple<PositionedString, PositionedString, PositionedString>> abbreviations = ImmutableSLList.nil();
 
     private final Behavior behavior;
-    private Map<Object, List<LabeledParserRuleContext>> clauses = new HashMap<>();
-    private Map<LabeledParserRuleContext, Name> heaps = new HashMap<>();
+    private ArrayList<Entry> clauses = new ArrayList<>(16);
+
+    private static class Entry {
+        final Object clauseType;
+        final LabeledParserRuleContext ctx;
+        final Name heap;
+
+        Entry(Object clauseType, LabeledParserRuleContext ctx, Name heap) {
+            this.clauseType = clauseType;
+            this.ctx = ctx;
+            this.heap = heap;
+        }
+
+        Entry(Object clauseType, LabeledParserRuleContext ctx) {
+            this(clauseType, ctx, null);
+        }
+    }
 
     public TextualJMLSpecCase(ImmutableList<String> mods, @NotNull Behavior behavior) {
         super(mods);
@@ -121,7 +140,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public TextualJMLSpecCase addClause(Clause clause, LabeledParserRuleContext ctx) {
-        clauses.computeIfAbsent(clause, it -> new ArrayList<>()).add(ctx);
+        clauses.add(new Entry(clause, ctx));
         return this;
     }
 
@@ -132,8 +151,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName, LabeledParserRuleContext ctx) {
         if (heapName == null)
             heapName = HeapLDT.BASE_HEAP_NAME;
-        clauses.computeIfAbsent(clause, it -> new ArrayList<>()).add(ctx);
-        heaps.put(ctx, heapName);
+        clauses.add(new Entry(clause, ctx, heapName));
         return this;
     }
 
@@ -158,8 +176,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      */
     public @NotNull TextualJMLSpecCase merge(@NotNull TextualJMLSpecCase other) {
         TextualJMLSpecCase res = clone();
-        res.clauses.putAll(other.clauses);
-        res.heaps.putAll(other.heaps);
+        res.clauses.addAll(other.clauses);
         return res;
     }
 
@@ -167,7 +184,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public @NotNull TextualJMLSpecCase clone() {
         TextualJMLSpecCase res = new TextualJMLSpecCase(getMods(), getBehavior());
         res.name = name;
-        res.clauses = new HashMap<>(clauses);
+        res.clauses = new ArrayList<>(clauses);
         return res;
     }
 
@@ -337,7 +354,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     private ImmutableList<LabeledParserRuleContext> getList(Object key) {
-        return ImmutableList.fromList(clauses.getOrDefault(key, new ArrayList<>()));
+        List<LabeledParserRuleContext> seq =
+                clauses.stream().filter(it -> it.clauseType.equals(key))
+                        .map(it -> it.ctx)
+                        .collect(Collectors.toList());
+        return ImmutableList.fromList(seq);
     }
 
     public ImmutableList<LabeledParserRuleContext> getAssignable() {
