@@ -196,7 +196,8 @@ public final class RepresentsAxiom extends ClassAxiom {
             return res;
         } else {
            if (originalPre != null)
-               //FIXME weigl: this was a runtime exception, I am not sure why?
+               //FIXME weigl: this was a runtime exception, I am not sure why.
+               //             I need a little bit help, why this is triggerd for my JML thing.
                System.err.println(
                        "Only functional represents for model methods is currently supported," +
                                " this should not have occurred.");
