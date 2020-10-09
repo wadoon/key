@@ -119,7 +119,7 @@ public class JMLSpecFactory {
         for (LocationVariable heap : allHeaps) {
             Term invariant;
             ImmutableList<LabeledParserRuleContext> originalInvariant
-                    = originalInvariants.get(heap.name().toString());
+                    = originalInvariants.get(heap.name());
             if (originalInvariant == null || originalInvariant.isEmpty()) {
                 invariant = null;
             } else {
@@ -150,7 +150,7 @@ public class JMLSpecFactory {
         for (LocationVariable heap : allHeaps) {
             Term freeInvariant;
             ImmutableList<LabeledParserRuleContext> originalFreeInvariant
-                    = originalFreeInvariants.get(heap.name().toString());
+                    = originalFreeInvariants.get(heap.name());
             if (originalFreeInvariant == null || originalFreeInvariant.isEmpty()) {
                 freeInvariant = null;
             } else {
@@ -365,20 +365,20 @@ public class JMLSpecFactory {
 
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             translateAssignable(pm, progVars, heap, savedHeap,
-                    textualSpecCase.getAssignable(heap.name().toString()),
+                    textualSpecCase.getAssignable(heap.name()),
                     clauses);
             translateRequires(pm, progVars, heap, savedHeap,
-                    textualSpecCase.getRequires(heap.name().toString()),
-                    textualSpecCase.getRequiresFree(heap.name().toString()), clauses);
+                    textualSpecCase.getRequires(heap.name()),
+                    textualSpecCase.getRequiresFree(heap.name()), clauses);
             translateEnsures(pm, progVars, heap, savedHeap,
-                    textualSpecCase.getEnsures(heap.name().toString()),
-                    textualSpecCase.getEnsuresFree(heap.name().toString()), clauses,
+                    textualSpecCase.getEnsures(heap.name()),
+                    textualSpecCase.getEnsuresFree(heap.name()), clauses,
                     originalBehavior);
-            translateAxioms(pm, progVars, heap, textualSpecCase.getAxioms(heap.name().toString()),
+            translateAxioms(pm, progVars, heap, textualSpecCase.getAxioms(heap.name()),
                     clauses, originalBehavior);
             translateAccessible(pm, progVars, heap, progVars.atPreVars.get(heap), savedHeap,
-                    textualSpecCase.getAccessible(heap.name().toString()),
-                    textualSpecCase.getAccessible(heap.name().toString() + "AtPre"), clauses);
+                    textualSpecCase.getAccessible(heap.name()),
+                    textualSpecCase.getAccessible(new Name(heap.name() + "AtPre")), clauses);
         }
         clauses.signals = translateSignals(pm, progVars.selfVar, progVars.paramVars,
                 progVars.resultVar, progVars.excVar, progVars.atPres, progVars.atBefores,
@@ -1121,7 +1121,7 @@ public class JMLSpecFactory {
         modelFields.add(new Pair<>(kjt, rep.first));
         Term repFormula = tb.convertToFormula(rep.second);
         // create class axiom
-        return new RepresentsAxiom("JML represents clause for " + rep.first.name().toString(),
+        return new RepresentsAxiom("JML represents clause for " + rep.first.name(),
                 rep.first, kjt, visibility, null, repFormula, selfVar,
                 ImmutableSLList.nil(), null);
     }
@@ -1151,7 +1151,7 @@ public class JMLSpecFactory {
                     new Position(start.getLine(), start.getCharPositionInLine()));
         }
         // create class axiom
-        String name = "JML represents clause for " + rep.first.name().toString();
+        String name = "JML represents clause for " + rep.first.name();
         String displayName = textualRep.getName() == null ? name
                 : "JML represents clause \"" + textualRep.getName() + "\" for " + rep.first.name();
         Term repFormula = tb.convertToFormula(rep.second);
@@ -1214,7 +1214,7 @@ public class JMLSpecFactory {
         LabeledParserRuleContext dep = null;
         LocationVariable targetHeap = null;
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
-            dep = textualDep.getDepends(heap.name().toString()).head();
+            dep = textualDep.getDepends(heap.name()).head();
             if (dep != null) {
                 targetHeap = heap;
                 break;

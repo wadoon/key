@@ -36,41 +36,40 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
-    public ImmutableList<LabeledParserRuleContext> getRequiresFree(String toString) {
+    public ImmutableList<LabeledParserRuleContext> getRequiresFree(Name toString) {
         return getList(REQUIRES_FREE, toString);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getEnsuresFree(String toString) {
+    public ImmutableList<LabeledParserRuleContext> getEnsuresFree(Name toString) {
         return getList(ENSURES_FREE, toString);
     }
 
-    private ImmutableList<LabeledParserRuleContext> getList(@NotNull ClauseHd clause, @NotNull String heap) {
-        final Name def = new Name(heap);
+    private ImmutableList<LabeledParserRuleContext> getList(@NotNull ClauseHd clause, @NotNull Name heap) {
         List<LabeledParserRuleContext> seq = clauses.stream()
                 .filter(it -> it.clauseType.equals(clause))
-                .filter(it -> Objects.equals(it.heap, def))
+                .filter(it -> Objects.equals(it.heap, heap))
                 .map(it -> it.ctx)
                 .collect(Collectors.toList());
         return ImmutableList.fromList(seq);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getAccessible(String heap) {
+    public ImmutableList<LabeledParserRuleContext> getAccessible(Name heap) {
         return getList(ACCESSIBLE, heap);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getAxioms(String heap) {
+    public ImmutableList<LabeledParserRuleContext> getAxioms(Name heap) {
         return getList(AXIOMS, heap);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getEnsures(String heap) {
+    public ImmutableList<LabeledParserRuleContext> getEnsures(Name heap) {
         return getList(ENSURES, heap);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getRequires(String heap) {
+    public ImmutableList<LabeledParserRuleContext> getRequires(Name heap) {
         return getList(REQUIRES, heap);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getAssignable(String heap) {
+    public ImmutableList<LabeledParserRuleContext> getAssignable(Name heap) {
         return getList(ASSIGNABLE, heap);
     }
 

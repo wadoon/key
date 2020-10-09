@@ -46,10 +46,10 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
         return depends.get(HeapLDT.BASE_HEAP_NAME);
     }
 
-    public ImmutableList<LabeledParserRuleContext> getDepends(String hName) {
-        return depends.get(new Name(hName));
+    public ImmutableList<LabeledParserRuleContext> getDepends(Name hName) {
+        return depends.get(hName);
     }
-    
+
     @Override
     public String toString() {
         return depends.toString();
