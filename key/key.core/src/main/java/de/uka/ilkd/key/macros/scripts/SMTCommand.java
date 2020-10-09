@@ -81,7 +81,7 @@ public class SMTCommand
             }
         }
 
-        System.err.println("SMT Runtime: " + timerListener.getRuntime() + " ms");
+        System.err.println("SMT Runtime, goal " + goal.node().serialNr() + ": " + timerListener.getRuntime() + " ms");
     }
 
     private SolverTypeCollection computeSolvers(String value) throws ScriptException {
@@ -90,7 +90,7 @@ public class SMTCommand
         for (String name : parts) {
             SolverType type = SOLVER_MAP.get(name);
             if (type == null) {
-                throw new ScriptException("Unknown SMT solver: " + value);
+                throw new ScriptException("Unknown SMT solver: " + name);
             }
             types.add(type);
         }
