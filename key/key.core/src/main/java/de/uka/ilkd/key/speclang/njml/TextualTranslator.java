@@ -34,7 +34,6 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         mods = ImmutableSLList.nil();
         accept(ctx.modifiers());
         accept(ctx.classlevel_element());
-        acceptAll(ctx.modifier2());
         return null;
     }
 
@@ -354,10 +353,11 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         return null;
     }
 
+
     @Override
     public Object visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
-        TextualJMLMethodDecl inv = new TextualJMLMethodDecl(mods, ctx);
-        constructs = constructs.append(inv);
+        TextualJMLMethodDecl decl = new TextualJMLMethodDecl(mods, ctx);
+        constructs = constructs.append(decl);
         return null;
     }
 

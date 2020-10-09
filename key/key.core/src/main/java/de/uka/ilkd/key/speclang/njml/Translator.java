@@ -1956,7 +1956,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
         this.mods = ImmutableSLList.nil();
         /* there may be some modifiers after the declarations */
         this.mods = accept(ctx.modifiers());
-        listOf(ctx.modifier2());
         return accept(ctx.classlevel_element());
     }
 

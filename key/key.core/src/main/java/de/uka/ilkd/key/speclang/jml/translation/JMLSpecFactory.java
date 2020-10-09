@@ -33,10 +33,6 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.speclang.njml.JmlFacade;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
-import de.uka.ilkd.key.speclang.njml.JmlParser;
-import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
@@ -46,6 +42,10 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.speclang.njml.JmlFacade;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
+import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -53,6 +53,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.*;
@@ -420,13 +421,18 @@ public class JMLSpecFactory {
     private void translateAxioms(IProgramMethod pm, ProgramVariableCollection progVars,
                                  LocationVariable heap, ImmutableList<LabeledParserRuleContext> axioms, ContractClauses clauses,
                                  Behavior originalBehavior) throws SLTranslationException {
-        if (axioms.isEmpty()) {
-            clauses.axioms.put(heap, null);
+        boolean empty =
+                axioms.isEmpty() //either the list is empty
+                        || (axioms.size() == 1 //or the first element is an empty method_decl
+                        && axioms.head().first instanceof JmlParser.Method_declarationContext
+                        && ((JmlParser.Method_declarationContext) axioms.head().first).BODY() == null);
+        if(empty){
+                clauses.axioms.put(heap, null);
         } else {
-            clauses.axioms.put(heap,
-                    translateEnsures(pm, progVars.selfVar, progVars.paramVars, progVars.resultVar,
-                            progVars.excVar, progVars.atPres, progVars.atBefores, originalBehavior,
-                            axioms));
+                clauses.axioms.put(heap,
+                        translateEnsures(pm, progVars.selfVar, progVars.paramVars, progVars.resultVar,
+                                progVars.excVar, progVars.atPres, progVars.atBefores, originalBehavior,
+                                axioms));
         }
     }
 
