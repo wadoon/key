@@ -32,7 +32,7 @@ class Cell {
     
     /*@ model \locset footprint;
       @ accessible footprint: footprint;
-      @ represents footprint = x;
+      @ represents footprint = \locset_of(x);
       @*/
     
     //@ accessible \inv: \nothing;

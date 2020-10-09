@@ -1335,9 +1335,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitPrimaryLocsetOf(JmlParser.PrimaryLocsetOfContext ctx) {
-        Term t = accept(ctx.storeref());
-        assert t != null;
-        return new SLExpression(t);
+        Term storeRef = accept(ctx.storeRefUnion());
+        assert storeRef != null;
+        return new SLExpression(storeRef);
     }
 
     @Override
