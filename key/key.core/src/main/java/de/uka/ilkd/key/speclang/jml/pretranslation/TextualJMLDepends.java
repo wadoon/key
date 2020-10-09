@@ -29,24 +29,27 @@ import java.util.Map;
  * Note that such clauses for *methods* are part of TextualJMLSpecCase.
  */
 public final class TextualJMLDepends extends TextualJMLConstruct {
-    private Map<String, ImmutableList<LabeledParserRuleContext>> depends = new LinkedHashMap<>();
+    private Map<Name, ImmutableList<LabeledParserRuleContext>> depends = new LinkedHashMap<>();
 
-    public TextualJMLDepends(ImmutableList<String> mods, @NotNull LabeledParserRuleContext depends) {
+    public TextualJMLDepends(ImmutableList<String> mods, Name[] heaps, @NotNull LabeledParserRuleContext depends) {
         super(mods);
         for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
-            this.depends.put(hName.toString(), ImmutableSLList.nil());
+            this.depends.put(hName, ImmutableSLList.nil());
         }
-        addGeneric(this.depends, depends);
+
+        for (Name heap : heaps) {
+            this.depends.put(heap, ImmutableSLList.singleton(depends));
+        }
     }
 
     public ImmutableList<LabeledParserRuleContext> getDepends() {
-        return depends.get(HeapLDT.BASE_HEAP_NAME.toString());
+        return depends.get(HeapLDT.BASE_HEAP_NAME);
     }
 
     public ImmutableList<LabeledParserRuleContext> getDepends(String hName) {
-        return depends.get(hName);
+        return depends.get(new Name(hName));
     }
-
+    
     @Override
     public String toString() {
         return depends.toString();

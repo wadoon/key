@@ -186,7 +186,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         for (Name heap : heaps) {
             if (depends) {
-                TextualJMLDepends d = new TextualJMLDepends(mods, new LabeledParserRuleContext(ctx));
+                TextualJMLDepends d = new TextualJMLDepends(mods, heaps, new LabeledParserRuleContext(ctx));
                 constructs = constructs.append(d);
             } else if (methodContract != null) {
                 methodContract.addClause(ACCESSIBLE, heap, ctx);
