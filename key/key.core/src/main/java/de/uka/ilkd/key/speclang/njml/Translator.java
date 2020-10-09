@@ -976,8 +976,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                     params);
         } catch (SLTranslationException exc) {
             // no type name found maybe package?
-        } catch (ClassCastException e) {
-
+        } catch (ClassCastException ignored) {
         }
 
         if (result != null) {
@@ -1055,6 +1054,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
                             javaInfo.getKeYJavaType(selfVar.sort()),
                             true),
                     receiver.getType());
+            return expr;
         }
         if (ctx.INV() != null) {
             assert !methodCall;
@@ -1848,59 +1848,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private JMLSpecFactory factory;
     private Object currentBehavior;
     private ContractClauses contractClauses = new ContractClauses();
-    private final List<Term> abbreviations = new ArrayList<>(64);
-
-    private PositionedString flipHeaps(String declString, PositionedString result) {
-        return flipHeaps(declString, result, false);
-    }
-
-    /**
-     * This method prepends a String to a given PositionedString and removes whitespaces from
-     * heap brackets at the beginning of it. (Why is this necessary?)
-     * <p>
-     * Note: Static manipulation of Strings that are passed to KeYJMLParser is fragile when it
-     * comes to error reporting. Original JML input should be left unmodified as much as possible
-     * so that correct error location can be reported to the user. Functionality of this method
-     * should be replaced by a more accurate implementation. (Kai Wallisch 07/2015)
-     */
-    private PositionedString flipHeaps(String declString, PositionedString result, boolean allowPreHeaps) {
-        String t = result.text;
-        String p = declString;
-
-        List<Name> validHeapNames = new ArrayList<Name>();
-
-        for (Name heapName : HeapLDT.VALID_HEAP_NAMES) {
-            validHeapNames.add(heapName);
-            if (allowPreHeaps) {
-                validHeapNames.add(new Name(heapName.toString() + "AtPre"));
-            }
-        }
-        for (Name heapName : validHeapNames) {
-            t = t.trim();
-            String l = "<" + heapName + ">";
-            String lsp = "< " + heapName + " >";
-            if (t.startsWith(l) || t.startsWith(lsp)) {
-                p = l + p;
-                t = t.substring(t.startsWith(lsp) ? lsp.length() : l.length());
-                result = new PositionedString(t, result.fileName, result.pos);
-            }
-        }
-        if (p.contains("<")) {
-            /*
-             * Using normal prepend without update of position in case p contains a heap
-             * because in that case prependAndUpdatePosition() might produce a negative
-             * column value. However, this alternative is also not ideal because it does
-             * not update the position after prepending a string. A rewrite of this
-             * method that does not rely on low-level string manipulation is recommended
-             * to fix this issue.
-             */
-            result = result.prepend(p + " ");
-        } else {
-            result = result.prependAndUpdatePosition(p + " ");
-        }
-        return result;
-    }
-
 
     @Override
     public Object visitAccessible_clause(JmlParser.Accessible_clauseContext ctx) {
@@ -2204,9 +2151,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
 
         Term t;
-        if (ctx.SUCH_THAT() != null)
-            t = ((SLExpression) accept(ctx.predicate())).getTerm();
-        else if (!representsClauseLhsIsLocSet) {
+        if (ctx.SUCH_THAT() != null) {
+            final SLExpression expr = accept(ctx.predicate());
+            assert expr != null;
+            t = expr.getTerm();
+        } else if (!representsClauseLhsIsLocSet) {
             assert rhs != null;
             if (!rhs.isTerm()) {
                 raiseError("Represents clause with unexpected rhs: " + rhs);
