@@ -1334,6 +1334,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
+    public Object visitPrimaryLocsetOf(JmlParser.PrimaryLocsetOfContext ctx) {
+        Term t = accept(ctx.storeref());
+        assert t != null;
+        return new SLExpression(t);
+    }
+
+    @Override
     public Object visitPrimaryDuration(JmlParser.PrimaryDurationContext ctx) {
         return translator.createSkolemExprLong(ctx.DURATION().getText());
     }

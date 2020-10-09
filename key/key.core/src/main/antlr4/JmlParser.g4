@@ -309,6 +309,7 @@ jmlprimary
   | NOT_ASSIGNED LPAREN storeRefUnion RPAREN                                          #primaryNotAssigned
   | FRESH LPAREN expressionlist RPAREN                                                #primaryFresh
   | REACH LPAREN storeref COMMA expression COMMA expression (COMMA expression)? RPAREN #primaryReach
+  | LOCSET_OF LPAREN storeref RPAREN                                                   #primaryLocsetOf
   | REACHLOCS LPAREN storeref COMMA expression (COMMA expression)? RPAREN             #primaryReachLocs
   | DURATION LPAREN expression RPAREN                                                 #primaryDuration
   | SPACE LPAREN expression RPAREN                                                    #primarySpace

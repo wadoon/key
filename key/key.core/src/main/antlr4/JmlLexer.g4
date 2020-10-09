@@ -356,6 +356,7 @@ PRE: '\\pre';
 PRODUCT: '\\product';
 REACH: '\\reach';
 REACHLOCS: '\\reachLocs';  //KeY extension, not official JML
+LOCSET_OF: '\\locset_of';  //KeY extension, not official JML
 REAL: '\\real';
 RESULT: '\\result';
 SAME: '\\same';
