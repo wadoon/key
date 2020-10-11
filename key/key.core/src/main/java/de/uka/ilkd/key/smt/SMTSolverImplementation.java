@@ -387,7 +387,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
            if(this.type.equals(SolverType.MATHSAT_SOLVER))
            {
              problemString = problemString.replaceAll("\\(declare-fun b2u \n \\(Bool\\) U\\)" ,";;removed");
-             problemString = problemString.replaceAll("\\(assert([\\s\\S](?!assert))*b2u([\\s\\S](?!assert))*" ,";;removed\n\n\r");
+             problemString = problemString.replaceAll("\\(assert([\\s\\S](?!assert))*b2u([\\s\\S](?!assert))" ,";;removed\n\n\r");
            }
 
             // TODO: Refactor when looking at taclet translation (MU+JS, 5/2019)
