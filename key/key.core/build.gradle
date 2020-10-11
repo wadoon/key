@@ -2,16 +2,29 @@ plugins {
     id 'ca.coglinc.javacc' version '2.4.0'
     id 'antlr'
 }
+plugins {
+    id 'ca.coglinc.javacc' version '2.4.0'
+    id 'antlr'
+}
+
+repositories { jcenter() }
+
+configurations { antlr4 }
 
 dependencies {
     compile project(':key.util')
+
     compile name: 'recoderKey'
-    compile group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
-    compile group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
+    compile group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
+    compile group: 'org.antlr', name: 'antlr-runtime', version: '3.5.2'
     compile group: 'antlr', name: 'antlr', version: '2.7.7'
 
-    javacc  group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
-    antlr   group: 'org.antlr', name:'antlr', version:'3.5.2'   // use ANTLR version 3
+    javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
+    antlr group: 'org.antlr', name: 'antlr', version: '3.5.2'   // use ANTLR version 3
+
+    antlr4 "org.antlr:antlr4:4.7.1"
+    compile "org.antlr:antlr4-runtime:4.7.1"
+    compile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
 }
 
 // The target directory for JavaCC (parser generation)
@@ -133,3 +146,29 @@ processResources.dependsOn generateVersionFiles
 
 // @AW: Delete? weigl: depends: If want that gradle check validates everything then not.
 // check.dependsOn << testProofRules << testRunAllProofs
+
+def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
+task runAntlr4JavaParser(type: JavaExec) {
+    //see incremental task api, prevents rerun if nothing has changed.
+    inputs.dir "src/main/antlr4/"
+    outputs.dir "$projectDir/build/generated/antlr4/main/"
+    classpath = configurations.antlr4
+    main = "org.antlr.v4.Tool"
+    args = ["-visitor",
+            "-Xexact-output-dir", "-o", antlr4Output,
+            "-package", "de.uka.ilkd.key.nparser",
+            "src/main/antlr4/KeYLexer.g4", "src/main/antlr4/KeYParser.g4"]
+    doFirst {
+        file(antlr4Output).mkdirs()
+        println("create $antlr4Output")
+    }
+}
+compileJava.dependsOn runAntlr4JavaParser
+
+task debugLexer(type: JavaExec) {
+    main = "de.uka.ilkd.key.nparser.DebugKeyLexer"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+}
+
+task ptest(type: Test) { group "verification"}
