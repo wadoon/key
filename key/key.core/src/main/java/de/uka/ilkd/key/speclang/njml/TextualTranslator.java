@@ -23,6 +23,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Nullable
     private TextualJMLLoopSpec loopContract;
 
+
     @Override
     public Object visitModifier(JmlParser.ModifierContext ctx) {
         mods = mods.append(ctx.getText());
@@ -30,18 +31,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitClasslevel_element0(JmlParser.Classlevel_element0Context ctx) {
-        mods = ImmutableSLList.nil();
-        accept(ctx.modifiers());
-        accept(ctx.classlevel_element());
-        return null;
-    }
-
-    @Override
     public Object visitMethodlevel_comment(JmlParser.Methodlevel_commentContext ctx) {
         return super.visitMethodlevel_comment(ctx);
     }
-
 
     @Override
     public Object visitSpec_case(JmlParser.Spec_caseContext ctx) {
@@ -327,6 +319,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitModifiers(JmlParser.ModifiersContext ctx) {
+        mods = ImmutableSLList.nil();
         return super.visitModifiers(ctx);
     }
 

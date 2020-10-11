@@ -1851,7 +1851,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     //endregion
 
     //region contract
-    private ImmutableSLList<String> mods;
+    private ImmutableList<String> mods;
     private JMLSpecFactory factory;
     private Object currentBehavior;
     private ContractClauses contractClauses = new ContractClauses();
@@ -1950,31 +1950,17 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return a;
     }*/
 
-
-    @Override
-    public Object visitClasslevel_element0(JmlParser.Classlevel_element0Context ctx) {
-        this.mods = ImmutableSLList.nil();
-        /* there may be some modifiers after the declarations */
-        this.mods = accept(ctx.modifiers());
-        return accept(ctx.classlevel_element());
-    }
-
-    @Override
-    public ImmutableList<TextualJMLConstruct> visitMethodlevel_comment(JmlParser.Methodlevel_commentContext ctx) {
-        mods = ImmutableSLList.nil();
-        return null;
-    }
-
     @Override
     public ImmutableList<String> visitModifiers(JmlParser.ModifiersContext ctx) {
-        return listOf(ctx.modifier());
+        mods = ImmutableSLList.nil();
+        return mods;
     }
 
     @Override
     public String visitModifier(JmlParser.ModifierContext ctx) {
+        mods = mods.append(ctx.getText());
         return ctx.getText();
     }
-
 
     @Override
     public SLExpression visitClass_invariant(JmlParser.Class_invariantContext ctx) {

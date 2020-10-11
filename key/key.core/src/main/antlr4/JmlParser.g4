@@ -3,8 +3,8 @@ parser grammar JmlParser;
 options { tokenVocab=JmlLexer; }
 
 classlevel_comments: classlevel_comment* EOF;
-classlevel_comment: (classlevel_element0)+ | modifiers | set_statement;
-classlevel_element0: modifiers? classlevel_element;
+classlevel_comment: classlevel_element | modifiers | set_statement;
+classlevel_element0: modifiers? (classlevel_element modifiers?);
 classlevel_element
   : class_invariant /*| depends_clause*/ | method_specification
   | method_declaration | field_declaration | represents_clause
@@ -14,7 +14,7 @@ classlevel_element
   | accessible_clause | assert_statement | assume_statement
   ;
 
-methodlevel_comment: (modifiers? methodlevel_element)* EOF;
+methodlevel_comment: (modifiers? methodlevel_element modifiers?)* EOF;
 methodlevel_element
   : field_declaration | set_statement | merge_point_statement
   | loop_specification | assert_statement | assume_statement | nowarn_pragma
