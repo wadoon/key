@@ -27,7 +27,7 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-grammar JavaK;
+grammar Java;
 
 compilationUnit
     : packageDeclaration? importDeclaration* typeDeclaration* EOF
@@ -38,7 +38,7 @@ packageDeclaration
     ;
 
 importDeclaration
-    : IMPORT STATIC? qualifiedName ('.' MUL)? ';'
+    : IMPORT STATIC? qualifiedName ('.' '*')? ';'
     ;
 
 typeDeclaration
@@ -72,7 +72,7 @@ variableModifier
     ;
 
 classDeclaration
-    : CLASS identifier typeParameters?
+    : CLASS IDENTIFIER typeParameters?
       (EXTENDS typeType)?
       (IMPLEMENTS typeList)?
       classBody
@@ -83,7 +83,7 @@ typeParameters
     ;
 
 typeParameter
-    : annotation* identifier (EXTENDS typeBound)?
+    : annotation* IDENTIFIER (EXTENDS typeBound)?
     ;
 
 typeBound
@@ -91,7 +91,7 @@ typeBound
     ;
 
 enumDeclaration
-    : ENUM identifier (IMPLEMENTS typeList)? '{' enumConstants? ','? enumBodyDeclarations? '}'
+    : ENUM IDENTIFIER (IMPLEMENTS typeList)? '{' enumConstants? ','? enumBodyDeclarations? '}'
     ;
 
 enumConstants
@@ -99,7 +99,7 @@ enumConstants
     ;
 
 enumConstant
-    : annotation* identifier arguments? classBody?
+    : annotation* IDENTIFIER arguments? classBody?
     ;
 
 enumBodyDeclarations
@@ -107,7 +107,7 @@ enumBodyDeclarations
     ;
 
 interfaceDeclaration
-    : INTERFACE identifier typeParameters? (EXTENDS typeList)? interfaceBody
+    : INTERFACE IDENTIFIER typeParameters? (EXTENDS typeList)? interfaceBody
     ;
 
 classBody
@@ -142,7 +142,7 @@ memberDeclaration
    for invalid return type after parsing.
  */
 methodDeclaration
-    : typeTypeOrVoid identifier formalParameters ('[' ']')*
+    : typeTypeOrVoid IDENTIFIER formalParameters ('[' ']')*
       (THROWS qualifiedNameList)?
       methodBody
     ;
@@ -166,7 +166,7 @@ genericConstructorDeclaration
     ;
 
 constructorDeclaration
-    : identifier formalParameters (THROWS qualifiedNameList)? constructorBody=block
+    : IDENTIFIER formalParameters (THROWS qualifiedNameList)? constructorBody=block
     ;
 
 fieldDeclaration
@@ -193,14 +193,14 @@ constDeclaration
     ;
 
 constantDeclarator
-    : identifier ('[' ']')* '=' variableInitializer
+    : IDENTIFIER ('[' ']')* '=' variableInitializer
     ;
 
 // see matching of [] comment in methodDeclaratorRest
 // methodBody from Java8
 interfaceMethodDeclaration
     : interfaceMethodModifier* (typeTypeOrVoid | typeParameters annotation* typeTypeOrVoid)
-      identifier formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody
+      IDENTIFIER formalParameters ('[' ']')* (THROWS qualifiedNameList)? methodBody
     ;
 
 // Java8
@@ -226,7 +226,7 @@ variableDeclarator
     ;
 
 variableDeclaratorId
-    : identifier ('[' ']')*
+    : IDENTIFIER ('[' ']')*
     ;
 
 variableInitializer
@@ -239,7 +239,7 @@ arrayInitializer
     ;
 
 classOrInterfaceType
-    : identifier typeArguments? ('.' identifier typeArguments?)*
+    : IDENTIFIER typeArguments? ('.' IDENTIFIER typeArguments?)*
     ;
 
 typeArgument
@@ -269,7 +269,7 @@ lastFormalParameter
     ;
 
 qualifiedName
-    : identifier ('.' identifier)*
+    : IDENTIFIER ('.' IDENTIFIER)*
     ;
 
 literal
@@ -279,9 +279,6 @@ literal
     | STRING_LITERAL
     | BOOL_LITERAL
     | NULL_LITERAL
-    | EMPTYMAPLITERAL
-    | EMPTYSEQLITERAL
-    | EMPTYSETLITERAL
     ;
 
 integerLiteral
@@ -298,7 +295,7 @@ floatLiteral
 
 // ANNOTATIONS
 altAnnotationQualifiedName
-    : (identifier DOT)* '@' identifier
+    : (IDENTIFIER DOT)* '@' IDENTIFIER
     ;
 
 annotation
@@ -310,7 +307,7 @@ elementValuePairs
     ;
 
 elementValuePair
-    : identifier '=' elementValue
+    : IDENTIFIER '=' elementValue
     ;
 
 elementValue
@@ -324,7 +321,7 @@ elementValueArrayInitializer
     ;
 
 annotationTypeDeclaration
-    : '@' INTERFACE identifier annotationTypeBody
+    : '@' INTERFACE IDENTIFIER annotationTypeBody
     ;
 
 annotationTypeBody
@@ -350,7 +347,7 @@ annotationMethodOrConstantRest
     ;
 
 annotationMethodRest
-    : identifier '(' ')' defaultValue?
+    : IDENTIFIER '(' ')' defaultValue?
     ;
 
 annotationConstantRest
@@ -384,51 +381,27 @@ localTypeDeclaration
     ;
 
 statement
-    : blockLabel=block                                        #bStatement
-    | ASSERT expression (':' expression)? ';'                 #assertStatement
-    | IF parExpression statement (ELSE statement)?            #ifStatement
-    | FOR '(' forControl ')' statement                        #forStatement
-    | WHILE parExpression statement                           #whileStatement
-    | DO statement WHILE parExpression ';'                    #doWhileStatement
-    | TRY block (catchClause+ finallyBlock? | finallyBlock)   #tryStatement
-    | TRY resourceSpecification block catchClause* finallyBlock? #tryWithResourceStatement
-    | SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}' #switchStatement
-    | SYNCHRONIZED parExpression block                        #synchronizedStatement
-    | RETURN expression? ';'                                  #returnStatement
-    | THROW expression ';'                                    #throwStatement
-    | BREAK identifier? ';'                                   #breakStatement
-    | CONTINUE IDENTIFIER? ';'                                #continueStatement
-    | SEMI #emptyStatement
-    | expression ';'                                          #statementExpression
-    | identifierLabel=identifier ':' statement                #labeledStatement
-    /** key statements */
-    | METHODFRAME LPAREN ( 'result->' qn=identifier COMMA)? ec=executionContext RPAREN COLON block
-                                                              #methodCallStatement
-    | (qn=identifier ASSIGN)? tmp=expression AT bodySource=typeType SEMI
-                                                              #methodBodyStatement
-    | LOOPSCOPE LPAREN  expression RPAREN block               #loopScope
-    | MERGE_POINT LPAREN expression RPAREN SEMI               #mergePointStatement
-    | '#catchAll' LPAREN qn=identifier RPAREN block           #catchAllStatement
-    | 'exec' block ccatchBlock*                               #execStatement
-    | (TRANSACTIONBEGIN | TRANSACTIONCOMMIT | TRANSACTIONFINISH | TRANSACTIONABORT) SEMI #transactionStatement
-    ;
-
-identifier: IDENTIFIER | ImplicitIdentifier | DL_EMBEDDED_FUNCTION | SEQ | MAP | SET |LOCSET | BIGINT;
-
-executionContext
-    : 'source=' identifier formalParameters AT classContext=typeType
-      ( COMMA THIS ASSIGN runtimeInstance=expression )?
-    ;
-
-ccatchBlock
-    : CCATCH LPAREN
-      type=(RETURNTYPE|BREAKTYPE|CONTINUETYPE)
-      (identifier | formalParameter | MUL)?
-      RPAREN block
+    : blockLabel=block
+    | ASSERT expression (':' expression)? ';'
+    | IF parExpression statement (ELSE statement)?
+    | FOR '(' forControl ')' statement
+    | WHILE parExpression statement
+    | DO statement WHILE parExpression ';'
+    | TRY block (catchClause+ finallyBlock? | finallyBlock)
+    | TRY resourceSpecification block catchClause* finallyBlock?
+    | SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}'
+    | SYNCHRONIZED parExpression block
+    | RETURN expression? ';'
+    | THROW expression ';'
+    | BREAK IDENTIFIER? ';'
+    | CONTINUE IDENTIFIER? ';'
+    | SEMI
+    | statementExpression=expression ';'
+    | identifierLabel=IDENTIFIER ':' statement
     ;
 
 catchClause
-    : CATCH '(' variableModifier* catchType identifier ')' block
+    : CATCH '(' variableModifier* catchType IDENTIFIER ')' block
     ;
 
 catchType
@@ -459,7 +432,7 @@ switchBlockStatementGroup
     ;
 
 switchLabel
-    : CASE (constantExpression=expression | enumConstantName=identifier) ':'
+    : CASE (constantExpression=expression | enumConstantName=IDENTIFIER) ':'
     | DEFAULT ':'
     ;
 
@@ -488,7 +461,7 @@ expressionList
     ;
 
 methodCall
-    : identifier '(' expressionList? ')'
+    : IDENTIFIER '(' expressionList? ')'
     | THIS '(' expressionList? ')'
     | SUPER '(' expressionList? ')'
     ;
@@ -496,7 +469,7 @@ methodCall
 expression
     : primary
     | expression bop='.'
-      ( identifier
+      ( IDENTIFIER
       | methodCall
       | THIS
       | NEW nonWildcardTypeArguments? innerCreator
@@ -528,27 +501,10 @@ expression
     | lambdaExpression // Java8
 
     // Java 8 methodReference
-    | expression '::' typeArguments? identifier
-    | typeType '::' (typeArguments? identifier | NEW)
+    | expression '::' typeArguments? IDENTIFIER
+    | typeType '::' (typeArguments? IDENTIFIER | NEW)
     | classType '::' typeArguments? NEW
     ;
-
-/*
-| adtGetter
-  | generalEscapeExpression()
-	;
-
-
-generalEscapeExpression
-  : (DL_EMBEDDED_FUNCTION | MAP_FUNCTION)
-    LPAREN (expression (COMMA expression())*)? RPAREN
-  ;
-
-adtGetter
-  : '\\indexOf' LPAREN expression COMMA expression RPAREN
-  | '\\seq_length' LPAREN expression RPAREN
-  | '\\seq_get' LPAREN expression COMMA expression RPAREN
-  ;*/
 
 // Java8
 lambdaExpression
@@ -557,9 +513,9 @@ lambdaExpression
 
 // Java8
 lambdaParameters
-    : identifier
+    : IDENTIFIER
     | '(' formalParameterList? ')'
-    | '(' identifier (',' identifier)* ')'
+    | '(' IDENTIFIER (',' IDENTIFIER)* ')'
     ;
 
 // Java8
@@ -573,13 +529,13 @@ primary
     | THIS
     | SUPER
     | literal
-    | identifier
+    | IDENTIFIER
     | typeTypeOrVoid '.' CLASS
     | nonWildcardTypeArguments (explicitGenericInvocationSuffix | THIS arguments)
     ;
 
 classType
-    : (classOrInterfaceType '.')? annotation* identifier typeArguments?
+    : (classOrInterfaceType '.')? annotation* IDENTIFIER typeArguments?
     ;
 
 creator
@@ -588,12 +544,12 @@ creator
     ;
 
 createdName
-    : identifier typeArgumentsOrDiamond? ('.' identifier typeArgumentsOrDiamond?)*
+    : IDENTIFIER typeArgumentsOrDiamond? ('.' IDENTIFIER typeArgumentsOrDiamond?)*
     | primitiveType
     ;
 
 innerCreator
-    : identifier nonWildcardTypeArgumentsOrDiamond? classCreatorRest
+    : IDENTIFIER nonWildcardTypeArgumentsOrDiamond? classCreatorRest
     ;
 
 arrayCreatorRest
@@ -639,12 +595,6 @@ primitiveType
     | LONG
     | FLOAT
     | DOUBLE
-    | BIGINT
-    | REAL
-    | LOCSET
-    | SEQ
-    | FREE
-    | MAP
     ;
 
 typeArguments
@@ -653,12 +603,12 @@ typeArguments
 
 superSuffix
     : arguments
-    | '.' identifier arguments?
+    | '.' IDENTIFIER arguments?
     ;
 
 explicitGenericInvocationSuffix
     : SUPER superSuffix
-    | identifier arguments
+    | IDENTIFIER arguments
     ;
 
 arguments
@@ -720,50 +670,6 @@ TRY:                'try';
 VOID:               'void';
 VOLATILE:           'volatile';
 WHILE:              'while';
-
-/// KEY STUFF
-
-BIGINT: '\\bigint';
-REAL: '\\real';
-BREAKTYPE: '\\Break';
-CCATCH: 'ccatch';
-CONTINUETYPE: '\\Continue';
-EXEC: 'exec';
-FREE: '\\free';
-LOCSET: '\\locset';
-LOOPSCOPE: 'loop-scope';
-MAP: '\\map';
-MERGE_POINT: 'merge_point';
-METHODFRAME: 'method-frame';
-RETURNTYPE: '\\Return';
-SEQ : '\\seq';
-SET : '\\set';
-TRANSACTIONBEGIN : '#beginJavaCardTransaction';
-TRANSACTIONCOMMIT : '#commitJavaCardTransaction';
-TRANSACTIONFINISH : '#finishJavaCardTransaction';
-TRANSACTIONABORT : '#abortJavaCardTransaction';
-
-EMPTYSETLITERAL : '\\empty';
-EMPTYSEQLITERAL : '\\seq_empty';
-EMPTYMAPLITERAL : '\\map_empty';
-
-DL_EMBEDDED_FUNCTION:  '\\dl_' Letter (LetterOrDigit)*;
-MAP_FUNCTION:
-      '\\map_get'
-    | '\\map_singleton'
-    | '\\map_override'
-    | '\\seq_2_map'
-    | '\\map_remove'
-    | '\\map_update'
-    | '\\in_domain'
-    | '\\domain_implies_created'
-    | '\\map_size'
-    | '\\is_finite'
-;
-
-ImplicitIdentifier: '<' Letter (LetterOrDigit)* '>';
-
-
 
 // Literals
 
@@ -854,7 +760,7 @@ WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
 COMMENT:            '/*' .*? '*/'    -> channel(HIDDEN);
 LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
 
-// identifiers
+// Identifiers
 
 IDENTIFIER:         Letter LetterOrDigit*;
 

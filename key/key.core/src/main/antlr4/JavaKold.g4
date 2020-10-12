@@ -62,7 +62,55 @@ Total lexer+parser time 3634ms.
 Total lexer+parser time 2497ms.
 
  */
-grammar Java9;
+grammar JavaK;
+
+@header{
+import java.io.*;
+import java.util.*;
+
+import recoder.*;
+import recoder.list.generic.*;
+import recoder.java.*;
+import recoder.java.declaration.*;
+import recoder.java.declaration.modifier.*;
+import recoder.java.expression.*;
+import recoder.java.expression.literal.*;
+import recoder.java.expression.operator.*;
+import recoder.java.reference.*;
+import recoder.java.statement.*;
+import recoder.io.*;
+
+import recoder.abstraction.TypeArgument.WildcardMode;
+
+import de.uka.ilkd.key.java.recoderext.*;
+import de.uka.ilkd.key.java.recoderext.adt.*;
+import recoder.abstraction.TypeArgument.WildcardMode;
+
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+
+/**
+   JavaCC AST generation specification based on the original Java1.1
+   grammar that comes with javacc, and includes the modification of D. Williams
+   to accept the Java 1.2 strictfp modifier.
+   Several patches have been added to allow semicola after member declarations.
+   Augmented with special constructs used in KeY proofs. These are:
+   <ul>
+   <li> method-call statement
+   <li> method-body statement
+   <li> implicit fields
+   <li> nearly all the JML expression syntax supported by KeY in set statements
+   </ul>
+   Augmented with meta constructs and schema variables for use of a schematic
+   Java in Taclets.
+ */
+}
+
+@members{
+
+}
 
 /*
  * Productions from §3 (Lexical Structure)
@@ -75,6 +123,9 @@ literal
 	|	CharacterLiteral
 	|	StringLiteral
 	|	NullLiteral
+	| EMPTYMAPLITERAL
+	| EMPTYSEQLITERAL
+	| EMPTYSETLITERAL
 	;
 
 /*
@@ -84,7 +135,7 @@ literal
 primitiveType
 	:	annotation* numericType
 	|	annotation* 'boolean'
-	;
+  ;
 
 numericType
 	:	integralType
@@ -791,6 +842,13 @@ statement
 	|	ifThenElseStatement
 	|	whileStatement
 	|	forStatement
+	| methodCallStatement
+	| methodBodyStatement
+	| loopScope
+	| mergePointStatement
+	| catchAllStatement
+  | execStatement
+  | transactionStatement
 	;
 
 statementNoShortIf
@@ -1003,6 +1061,53 @@ variableAccess
 	:	expressionName
 	|	fieldAccess
 	;
+
+/** key statements */
+loopScope
+  : LOOPSCOPE LPAREN  expression RPAREN block
+  ;
+
+mergePointStatement
+  : MERGE_POINT LPAREN expression RPAREN SEMI
+  ;
+
+
+methodBodyStatement
+  : (qn=identifier ASSIGN)?
+    tmp=expression AT bodySource=unannType SEMI
+  ;
+
+methodCallStatement
+  : METHODFRAME LPAREN
+     ( 'result->' qn=identifier COMMA)?
+     ec=executionContext
+    RPAREN COLON block
+  ;
+
+executionContext
+  : 'source=' methodDeclarator AT classContext=unannType
+    ( ',this=' runtimeInstance=expression )?
+  ;
+
+catchAllStatement
+  : '#catchAll' LPAREN qn=identifier RPAREN block
+  ;
+
+execStatement
+  : 'exec' block
+    ccatchBlock*
+  ;
+
+ccatchBlock
+  : CCATCH LPAREN
+    type=(RETURNTYPE|BREAKTYPE|CONTINUETYPE)
+    (identifier | formalParameter | MUL)?
+    RPAREN block
+  ;
+
+transactionStatement
+  : (TRANSACTIONBEGIN | TRANSACTIONCOMMIT | TRANSACTIONFINISH | TRANSACTIONABORT) SEMI
+  ;
 
 /*
  * Productions from §15 (Expressions)
@@ -1366,7 +1471,21 @@ unaryExpression
 	|	'+' unaryExpression
 	|	'-' unaryExpression
 	|	unaryExpressionNotPlusMinus
+	| adtGetter
+  | generalEscapeExpression()
 	;
+
+
+generalEscapeExpression
+  : (DL_EMBEDDED_FUNCTION | MAP_FUNCTION)
+    LPAREN (expression (COMMA expression())*)? RPAREN
+  ;
+
+adtGetter
+  : '\\indexOf' LPAREN expression COMMA expression RPAREN
+  | '\\seq_length' LPAREN expression RPAREN
+  | '\\seq_get' LPAREN expression COMMA expression RPAREN
+  ;
 
 preIncrementExpression
 	:	INC unaryExpression
@@ -1420,11 +1539,12 @@ castExpression
 	:	'(' primitiveType ')' unaryExpression
 	|	'(' referenceType additionalBound* ')' unaryExpressionNotPlusMinus
 	|	'(' referenceType additionalBound* ')' lambdaExpression
-	;
+    ;
 
 // LEXER
 
-identifier : Identifier | 'to' | 'module' | 'open' | 'with' | 'provides' | 'uses' | 'opens' | 'requires' | 'exports';
+identifier : Identifier | 'to' | 'module' | 'open' | 'with' | 'provides' | 'uses' | 'opens' | 'requires' | 'exports'
+           | ImplicitIdentifier;
 
 // §3.9 Keywords
 
@@ -1479,6 +1599,49 @@ VOID : 'void';
 VOLATILE : 'volatile';
 WHILE : 'while';
 UNDER_SCORE : '_';//Introduced in Java 9
+
+BIGINT: '\\bigint';
+REAL: '\\real';
+BREAKTYPE: '\\Break';
+CCATCH: 'ccatch';
+CONTINUETYPE: '\\Continue';
+EXEC: 'exec';
+FREE: '\\free';
+LOCSET: '\\locset';
+LOOPSCOPE: 'loop-scope';
+MAP: '\\map';
+MERGE_POINT: 'merge_point';
+METHODFRAME: 'method-frame';
+RETURNTYPE: '\\Return';
+SEQ : '\\seq';
+SET : '\\set';
+TRANSACTIONBEGIN : '#beginJavaCardTransaction';
+TRANSACTIONCOMMIT : '#commitJavaCardTransaction';
+TRANSACTIONFINISH : '#finishJavaCardTransaction';
+TRANSACTIONABORT : '#abortJavaCardTransaction';
+
+
+EMPTYSETLITERAL : '\\empty';
+EMPTYSEQLITERAL : '\\seq_empty';
+EMPTYMAPLITERAL : '\\map_empty';
+
+
+
+DL_EMBEDDED_FUNCTION:  '\\dl_' JavaLetter (JavaLetterOrDigit)*;
+MAP_FUNCTION:
+      '\\map_get'
+    | '\\map_singleton'
+    | '\\map_override'
+    | '\\seq_2_map'
+    | '\\map_remove'
+    | '\\map_update'
+    | '\\in_domain'
+    | '\\domain_implies_created'
+    | '\\map_size'
+    | '\\is_finite'
+;
+
+ImplicitIdentifier: '<' JavaLetter (JavaLetterOrDigit)* '>';
 
 // §3.10.1 Integer Literals
 
@@ -1677,8 +1840,8 @@ HexadecimalFloatingPointLiteral
 
 fragment
 HexSignificand
-	:	HexNumeral '.'?
-	|	'0' [xX] HexDigits? '.' HexDigits
+	:	HexNumeral DOT?
+	|	'0' [xX] HexDigits? DOT HexDigits
 	;
 
 fragment
@@ -1821,7 +1984,7 @@ URSHIFT_ASSIGN : '>>>=';
 // §3.8 Identifiers (must appear after all keywords in the grammar)
 
 Identifier
-	:	JavaLetter JavaLetterOrDigit*
+	:	JavaLetter JavaLetterOrDigit* ( '#' Digit* )?
 	;
 
 fragment
@@ -1853,6 +2016,10 @@ JavaLetterOrDigit
 WS  :  [ \t\r\n\u000C]+ -> skip
     ;
 
+DOC_COMMENT
+    :   '/**' .*? '*/' -> channel(HIDDEN)
+    ;
+
 COMMENT
     :   '/*' .*? '*/' -> channel(HIDDEN)
     ;
@@ -1860,3 +2027,5 @@ COMMENT
 LINE_COMMENT
     :   '//' ~[\r\n]* -> channel(HIDDEN)
     ;
+
+ERROR_CHAR: .; //catch all non-matched characters
