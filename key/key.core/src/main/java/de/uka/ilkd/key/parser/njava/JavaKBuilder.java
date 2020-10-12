@@ -372,6 +372,22 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         return result;
     }
 
+
+    @Override
+    public UncollatedReferenceQualifier visitQualifiedName(JavaKParser.QualifiedNameContext ctx) {
+        ASTList<Identifier> identifiers = mapOf(ctx.identifier());
+        UncollatedReferenceQualifier result = null;
+        for (Identifier identifier : identifiers) {
+            if (result == null) {
+                result = factory.createUncollatedReferenceQualifier(identifier);
+            } else {
+                result = factory.createUncollatedReferenceQualifier(result, identifier);
+            }
+        }
+        finish(result, ctx);
+        return result;
+    }
+
     @Override
     public Object visitImportDeclaration(JavaKParser.ImportDeclarationContext ctx) {
         Import result = factory.createImport();
@@ -431,10 +447,17 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
 
     @Override
     public TypeDeclaration visitTypeDeclaration(JavaKParser.TypeDeclarationContext ctx) {
-        TypeDeclaration td = oneOf(ctx.classDeclaration(),
-                ctx.enumDeclaration(), ctx.interfaceDeclaration(), ctx.annotationTypeDeclaration());
-        ASTList<DeclarationSpecifier> modifier = mapOf(ctx.classOrInterfaceModifier());
-        return td;
+        try {
+            TypeDeclaration td = oneOf(ctx.classDeclaration(),
+                    ctx.enumDeclaration(),
+                    ctx.interfaceDeclaration(),
+                    ctx.annotationTypeDeclaration());
+            ASTList<DeclarationSpecifier> modifier = mapOf(ctx.classOrInterfaceModifier());
+            //TODO Modifier
+            return td;
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     @Override
@@ -496,10 +519,15 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
             result.setImplementedTypes(im);
             finish(im, ctx);
         }
+        ASTList<MemberDeclaration> members = new ASTArrayList<>();
         ASTList<MemberDeclaration> constants = accept(ctx.enumConstants());
-        ASTList<MemberDeclaration> members = accept(ctx.enumBodyDeclarations());
-        constants.addAll(members);
-        result.setMembers(constants);
+        ASTList<MemberDeclaration> body = accept(ctx.enumBodyDeclarations());
+
+        if (constants != null)
+            members.addAll(constants);
+        if (body != null)
+            members.addAll(body);
+        result.setMembers(members);
         finish(result, ctx);
         return result;
     }
@@ -668,9 +696,7 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         } else {
             result = factory.createVariableSpecification(id, dim, init);
         }
-        setPrefixInfo(result, ctx); // only after "=" !!!!!!!!!!!!!!!        // TODO: WP:
-        checkConstruction(result);
-        setPostfixInfo(result, ctx);
+        finish(result, ctx);
         return result;
     }
 
@@ -683,7 +709,7 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitArrayInitializer(JavaKParser.ArrayInitializerContext ctx) {
+    public Expression visitArrayInitializer(JavaKParser.ArrayInitializerContext ctx) {
         ASTList<Expression> el = new ASTArrayList<>();
         ArrayInitializer result = factory.createArrayInitializer();
         List<Expression> init = mapOf(ctx.variableInitializer());
@@ -693,6 +719,7 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         return result;
     }
 
+
     @Override
     public MethodDeclaration visitMethodDeclaration(JavaKParser.MethodDeclarationContext ctx) {
         MethodDeclaration result = new MethodDeclaration();
@@ -701,7 +728,7 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         ASTList<TypeParameterDeclaration> typeParams = null;
         SourceElement dummy = null;
         TypeReference tr = accept(ctx.typeTypeOrVoid());
-        if (ctx.LBRACK() != null) {
+        if (ctx.LBRACK().size() != 0) {
             tr.setDimensions(ctx.LBRACK().size());
         }
         ASTList<UncollatedReferenceQualifier> nl = null;
@@ -953,36 +980,29 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         }
     }
     */
-    /*
-     * Type, name and expression syntax follows.
-     */
-    /*TODO
-@Override
-public TypeReference visitType(JavaKParser.TypeContext ctx) {
-    TypeReference result;
-    UncollatedReferenceQualifier qn;
-    int dimension = 0;
 
-    (
-            result = PrimitiveType()
-                    |
-                    qn = TypedName()
-    {
-        result = qn.toTypeReference();
+
+    @Override
+    public TypeReference visitTypeTypeOrVoid(JavaKParser.TypeTypeOrVoidContext ctx) {
+        if (ctx.VOID() != null) {
+            Identifier id = factory.createIdentifier(ctx.VOID().getText());
+            TypeReference result = factory.createTypeReference(id);
+            finish(id, ctx);
+            finish(result, ctx);
+            return result;
+        }
+        return expect(ctx.typeType());
     }
-  )
-    (  {
-        if (dimension == 0) setPrefixInfo(result, ctx);
-        dimension++;
-    } )*
-    {
-        result.setDimensions(dimension);
-        setPostfixInfo(result, ctx);
 
+    @Override
+    public Object visitTypeType(JavaKParser.TypeTypeContext ctx) {
+        TypeReference result = oneOf(ctx.classOrInterfaceType(), ctx.primitiveType());
+        int dimension = ctx.LBRACK().size();
+        result.setDimensions(dimension);
+        finish(result, ctx);
         return result;
     }
-}
-     */
+
 
     @Override
     public TypeReference visitPrimitiveType(JavaKParser.PrimitiveTypeContext ctx) {
@@ -1832,7 +1852,7 @@ default:
     @Override
     public Expression visitAccessExpr(JavaKParser.AccessExprContext ctx) {
         Expression expr = expect(ctx.expression());
-        if(ctx.identifier()!=null) {
+        if (ctx.identifier() != null) {
             Identifier id = expect(ctx.identifier());
             expr = factory.createUncollatedReferenceQualifier(
                     (ReferencePrefix) expr, id);
@@ -2174,7 +2194,9 @@ default:
     public Branch visitSwitchBlockStatementGroup(JavaKParser.SwitchBlockStatementGroupContext ctx) {
         ASTList<Branch> branches = mapOf(ctx.switchLabel());
         ASTList<Statement> block = mapOf(ctx.blockStatement());
-        if (branches.size() != 1) { throw new IllegalStateException(); }
+        if (branches.size() != 1) {
+            throw new IllegalStateException();
+        }
         Branch result = branches.get(0);
         if (result instanceof Case) {
             ((Case) result).setBody(block);
@@ -2221,7 +2243,7 @@ default:
         Statement trueStat = expect(ctx.then);
         thenStat.setBody(trueStat);
         result.setThen(thenStat);
-        if(ctx.ELSE()!=null) {
+        if (ctx.ELSE() != null) {
             Else elseStat = factory.createElse();
             Statement falseStat = accept(ctx.otherwise);
             elseStat.setBody(falseStat);
@@ -2265,7 +2287,7 @@ default:
 
     @Override
     public Object visitForControl(JavaKParser.ForControlContext ctx) {
-        if(ctx.SEMI() !=null) {
+        if (ctx.SEMI() != null) {
             LoopStatement result;
             ASTList<LoopInitializer> init = accept(ctx.forInit());
             Expression guard = null;
@@ -2297,11 +2319,11 @@ default:
     public ASTList<LoopInitializer> visitForInit(JavaKParser.ForInitContext ctx) {
         ASTList<LoopInitializer> result = new ASTArrayList<>();
         ASTList<Expression> exprs = accept(ctx.expressionList());
-        if(exprs!=null) {
+        if (exprs != null) {
             for (Expression expr : exprs) {
                 result.add((LoopInitializer) expr);
             }
-        }else{
+        } else {
             LocalVariableDeclaration varDecl = accept(ctx.localVariableDeclaration());
             result.add(varDecl);
         }
@@ -2403,7 +2425,7 @@ default:
         result.setBody(block);
         ASTList<Branch> catches = mapOf(ctx.catchClause());
         Finally fin = accept(ctx.finallyBlock());
-        if(fin!=null) catches.add(fin);
+        if (fin != null) catches.add(fin);
         result.setBranchList(catches);
         finish(result, ctx);
         return result;
@@ -2577,5 +2599,59 @@ default:
         }
         finish(result, ctx);
         return result;
+    }
+
+    @Override
+    public TypeReference visitCreatedName(JavaKParser.CreatedNameContext ctx) {
+        if (null != ctx.primitiveType()) {
+            return accept(ctx.primitiveType());
+        }
+        ASTList<Identifier> identifiers = mapOf(ctx.identifier());
+        UncollatedReferenceQualifier result = null;
+        for (Identifier identifier : identifiers) {
+            if (result == null) {
+                result = factory.createUncollatedReferenceQualifier(identifier);
+            } else {
+                result = factory.createUncollatedReferenceQualifier(result, identifier);
+            }
+        }
+        //TODO ctx.typeArgumentsOrDiamond()
+        finish(result, ctx);
+        return result.toTypeReference();
+    }
+
+    @Override
+    public Expression visitInstantiation(JavaKParser.InstantiationContext ctx) {
+        Expression result = null;
+        boolean classCreator = ctx.creator().classCreatorRest() != null;
+        boolean arrayCreator = ctx.creator().arrayCreatorRest() != null;
+        if (classCreator) {
+            ReferencePrefix accessPath = null; //TODO
+            TypeReference constructorName = accept(ctx.creator().createdName());
+            @Nullable ASTList<Expression> arguments = accept(ctx.creator().classCreatorRest().arguments());
+            @Nullable ClassDeclaration anonymousClass = accept(ctx.creator().classCreatorRest().classBody());
+            result = factory.createNew(accessPath, constructorName, arguments, anonymousClass);
+        }
+        if (arrayCreator) {
+            ReferencePrefix accessPath;
+            @Nullable ASTList<Expression> arguments = accept(ctx.creator().classCreatorRest().arguments());
+            @Nullable ClassDeclaration anonymousClass = accept(ctx.creator().classCreatorRest().classBody());
+            TypeReference arrayName = accept(ctx.creator().createdName());
+            ASTList<Expression> dimExpr = mapOf(ctx.creator().arrayCreatorRest().expression());
+            ArrayInitializer init = accept(ctx.creator().arrayCreatorRest().arrayInitializer());
+            int dims = 0;//TODO
+            if (init != null)
+                result = factory.createNewArray(arrayName, dims, init);
+            else
+                result = factory.createNewArray(arrayName, dimExpr);
+        }
+        finish(result, ctx);
+        return result;
+    }
+
+    @Override
+    protected Object aggregateResult(Object aggregate, Object nextResult) {
+        if (aggregate == null && nextResult != null) return nextResult;
+        return aggregate;
     }
 }
