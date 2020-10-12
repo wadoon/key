@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.parser.njava;
 
+import de.uka.ilkd.key.nparser.JavaKParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.Test;
 
@@ -14,12 +15,16 @@ public class JavaParserFacadeTest {
     @Test
     public void testAllInOne7() throws IOException {
         InputStream is = getClass().getResourceAsStream("/de/uka/ilkd/key/AllInOne7.java");
-        JavaParserFacade.parseFile(CharStreams.fromStream(is));
+        JavaKParser.CompilationUnitContext ctx = JavaParserFacade.parseFile(CharStreams.fromStream(is));
+        JavaKBuilder b = new JavaKBuilder();
+        ctx.accept(b);
     }
 
     @Test
     public void testAllInOne8() throws IOException {
         InputStream is = getClass().getResourceAsStream("/de/uka/ilkd/key/AllInOne8.java");
-        JavaParserFacade.parseFile(CharStreams.fromStream(is));
+        JavaKParser.CompilationUnitContext ctx = JavaParserFacade.parseFile(CharStreams.fromStream(is));
+        JavaKBuilder b = new JavaKBuilder();
+        ctx.accept(b);
     }
 }

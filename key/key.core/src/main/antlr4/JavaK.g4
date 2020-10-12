@@ -142,7 +142,7 @@ memberDeclaration
    for invalid return type after parsing.
  */
 methodDeclaration
-    : typeTypeOrVoid identifier formalParameters ('[' ']')*
+    : typeTypeOrVoid identifier formalParameters (LBRACK RBRACK)*
       (THROWS qualifiedNameList)?
       methodBody
     ;
@@ -226,7 +226,7 @@ variableDeclarator
     ;
 
 variableDeclaratorId
-    : identifier ('[' ']')*
+    : identifier (LBRACK RBRACK)*
     ;
 
 variableInitializer
@@ -244,7 +244,7 @@ classOrInterfaceType
 
 typeArgument
     : typeType
-    | '?' ((EXTENDS | SUPER) typeType)?
+    | QUESTION ((EXTENDS | SUPER) typeType)?
     ;
 
 qualifiedNameList
@@ -386,7 +386,7 @@ localTypeDeclaration
 statement
     : blockLabel=block                                        #bStatement
     | ASSERT expression (':' expression)? ';'                 #assertStatement
-    | IF parExpression statement (ELSE statement)?            #ifStatement
+    | IF parExpression then=statement (ELSE otherwise=statement)?            #ifStatement
     | FOR '(' forControl ')' statement                        #forStatement
     | WHILE parExpression statement                           #whileStatement
     | DO statement WHILE parExpression ';'                    #doWhileStatement
@@ -397,7 +397,7 @@ statement
     | RETURN expression? ';'                                  #returnStatement
     | THROW expression ';'                                    #throwStatement
     | BREAK identifier? ';'                                   #breakStatement
-    | CONTINUE IDENTIFIER? ';'                                #continueStatement
+    | CONTINUE identifier? ';'                                #continueStatement
     | SEMI #emptyStatement
     | expression ';'                                          #statementExpression
     | identifierLabel=identifier ':' statement                #labeledStatement
@@ -412,6 +412,8 @@ statement
     | 'exec' block ccatchBlock*                               #execStatement
     | (TRANSACTIONBEGIN | TRANSACTIONCOMMIT | TRANSACTIONFINISH | TRANSACTIONABORT) SEMI #transactionStatement
     ;
+
+//TODO passive expression
 
 identifier: IDENTIFIER | ImplicitIdentifier | DL_EMBEDDED_FUNCTION | SEQ | MAP | SET |LOCSET | BIGINT;
 
@@ -465,7 +467,7 @@ switchLabel
 
 forControl
     : enhancedForControl
-    | forInit? ';' expression? ';' forUpdate=expressionList?
+    | forInit? SEMI expression? SEMI forUpdate=expressionList?
     ;
 
 forInit
@@ -494,7 +496,7 @@ methodCall
     ;
 
 expression
-    : primary
+    : primary               #ignore
     | expression bop='.'
       ( identifier
       | methodCall
@@ -503,34 +505,35 @@ expression
       | SUPER superSuffix
       | explicitGenericInvocation
       )
-    | expression '[' expression ']'
-    | methodCall
-    | NEW creator
-    | '(' typeType ')' expression
-    | expression postfix=('++' | '--')
-    | prefix=('+'|'-'|'++'|'--') expression
-    | prefix=('~'|'!') expression
-    | expression bop=('*'|'/'|'%') expression
-    | expression bop=('+'|'-') expression
-    | expression ('<' '<' | '>' '>' '>' | '>' '>') expression
-    | expression bop=('<=' | '>=' | '>' | '<') expression
-    | expression bop=INSTANCEOF typeType
-    | expression bop=('==' | '!=') expression
-    | expression bop='&' expression
-    | expression bop='^' expression
-    | expression bop='|' expression
-    | expression bop='&&' expression
-    | expression bop='||' expression
-    | <assoc=right> expression bop='?' expression ':' expression
+      #accessExpr
+    | expression '[' expression ']' #arrayAccess
+    | methodCall                    #methodCallExpr
+    | NEW creator                   #instantiation
+    | '(' typeType ')' expression   #castExpression
+    | expression postfix=('++' | '--') #postfixExpression
+    | prefix=('+'|'-'|'++'|'--') expression #prefixExpression
+    | prefix=('~'|'!') expression           #unaryExpression
+    | expression bop=('*'|'/'|'%') expression #multiplicativeExpression
+    | expression bop=('+'|'-') expression     #additiveExpression
+    | expression bop=('<<' | '>>>' | '>>') expression #shiftExpression
+    | expression bop=('<=' | '>=' | '>' | '<') expression #relationalExpression
+    | expression bop=INSTANCEOF typeType       #instanceOfExpression
+    | expression bop=('==' | '!=') expression  #equalityExpression
+    | expression bop='&' expression            #andExpression
+    | expression bop='^' expression            #exclusvieOrExpression
+    | expression bop='|' expression            #inclusiveOrExpression
+    | expression bop='&&' expression           #conditionalAndExpression
+    | expression bop='||' expression           #conditionalOrExpression
+    | <assoc=right> expression bop='?' expression ':' expression #conditionalExpression
     | <assoc=right> expression
       bop=('=' | '+=' | '-=' | '*=' | '/=' | '&=' | '|=' | '^=' | '>>=' | '>>>=' | '<<=' | '%=')
-      expression
-    | lambdaExpression // Java8
+      expression #assignExpression
+    | lambdaExpression #ignore2 // Java8
 
     // Java 8 methodReference
-    | expression '::' typeArguments? identifier
-    | typeType '::' (typeArguments? identifier | NEW)
-    | classType '::' typeArguments? NEW
+    | expression '::' typeArguments? identifier #methodReference1
+    | typeType '::' (typeArguments? identifier | NEW) #methodReference2
+    | classType '::' typeArguments? NEW #methodReference3
     ;
 
 /*
@@ -627,7 +630,7 @@ typeList
     ;
 
 typeType
-    : annotation? (classOrInterfaceType | primitiveType) ('[' ']')*
+    : annotation? (classOrInterfaceType | primitiveType) (LBRACK RBRACK)*
     ;
 
 primitiveType
@@ -648,7 +651,7 @@ primitiveType
     ;
 
 typeArguments
-    : '<' typeArgument (',' typeArgument)* '>'
+    : LT typeArgument (COMMA typeArgument)* GT
     ;
 
 superSuffix
@@ -761,7 +764,7 @@ MAP_FUNCTION:
     | '\\is_finite'
 ;
 
-ImplicitIdentifier: '<' Letter (LetterOrDigit)* '>';
+ImplicitIdentifier: '`' Letter (LetterOrDigit)* '`';
 
 
 

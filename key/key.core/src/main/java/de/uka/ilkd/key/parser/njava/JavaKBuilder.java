@@ -6,23 +6,19 @@ import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
 import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
 import de.uka.ilkd.key.nparser.JavaKBaseVisitor;
-import de.uka.ilkd.key.nparser.JavaKLexer;
 import de.uka.ilkd.key.nparser.JavaKParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import recoder.abstraction.TypeArgument.WildcardMode;
+import recoder.abstraction.TypeArgument;
 import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.java.expression.ArrayInitializer;
 import recoder.java.expression.Assignment;
 import recoder.java.expression.Literal;
 import recoder.java.expression.Operator;
-import recoder.java.expression.operator.PreDecrement;
-import recoder.java.expression.operator.PreIncrement;
+import recoder.java.expression.operator.Instanceof;
 import recoder.java.expression.operator.TypeCast;
 import recoder.java.reference.*;
 import recoder.java.statement.*;
@@ -370,7 +366,7 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         annotations.trimToSize();
         PackageSpecification result = factory.createPackageSpecification();
         result.setAnnotations(annotations);
-        UncollatedReferenceQualifier qn = accept(ctx.packageName());
+        UncollatedReferenceQualifier qn = accept(ctx.qualifiedName());
         result.setPackageReference(qn.toPackageReference());
         finish(result, ctx);
         return result;
@@ -386,7 +382,7 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
             if (result.isMultiImport()) {
                 result.setStaticIdentifier(qn.getIdentifier());
             } else {
-                result.setStaticIdentifier(qn.toTypeReference().getIdentifier());
+                result.setReference(qn.toTypeReference());
             }
         } else {
             if (result.isMultiImport()) {
@@ -399,19 +395,7 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         return result;
     }
 
-    @Override
-    public Object visitStaticImportOnDemandDeclaration(JavaKParser.StaticImportOnDemandDeclarationContext ctx) {
-        UncollatedReferenceQualifier qn = expect(ctx.typeName());
-        Import result = factory.createImport();
-        result.setMultiImport(true);
-        result.setStaticImport(true);
-        result.setReference(qn.toTypeReference());
-        finish(result, ctx);
-        return result;
-    }
-
-
-    public Object getModifier(String s) {
+    protected DeclarationSpecifier getModifier(String s) {
         switch (s) {
             case "protected":
                 return factory.createProtected();
@@ -435,42 +419,35 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
                 //TODO return new AnnotationUse();
                 return null;
         }
-
     }
 
     @Override
-    public Object visitInterfaceModifier(JavaKParser.InterfaceModifierContext ctx) {
-        switch (ctx.getText()) {
-            case "strictfp":
-                return factory.createStrictFp();
-            case "public":
-                return factory.createPublic();
-            case "protected":
-                return factory.createProtected();
-            case "private":
-                return factory.createPrivate();
-            case "static":
-                return factory.createStatic();
-            case "abstract":
-                return factory.createAbstract();
-            default:
-                //TODO return new AnnotationUse();
-                return null;
+    public Object visitClassOrInterfaceModifier(JavaKParser.ClassOrInterfaceModifierContext ctx) {
+        if (ctx.annotation() != null) {
+            return expect(ctx.annotation());
         }
+        return getModifier(ctx.getText());
+    }
+
+    @Override
+    public TypeDeclaration visitTypeDeclaration(JavaKParser.TypeDeclarationContext ctx) {
+        TypeDeclaration td = oneOf(ctx.classDeclaration(),
+                ctx.enumDeclaration(), ctx.interfaceDeclaration(), ctx.annotationTypeDeclaration());
+        ASTList<DeclarationSpecifier> modifier = mapOf(ctx.classOrInterfaceModifier());
+        return td;
     }
 
     @Override
     public AnnotationDeclaration visitAnnotationTypeDeclaration(JavaKParser.AnnotationTypeDeclarationContext ctx) {
-        ASTList<MemberDeclaration> members = new ASTArrayList<MemberDeclaration>();
+        ASTList<MemberDeclaration> members = new ASTArrayList<>();
         MethodDeclaration md;
         FieldDeclaration fd;
         TypeDeclaration td;
         ASTList<DeclarationSpecifier> declSpecs = new ASTArrayList<DeclarationSpecifier>(), methodDs;
         AnnotationDeclaration result = new AnnotationDeclaration();
-        ASTList<DeclarationSpecifier> modifiers = mapOf(ctx.interfaceModifier());
         Identifier name = accept(ctx.identifier());
         methodDs = new ASTArrayList<>();
-        TypeReference methodRes = null;//TODO ? Type();
+        TypeReference methodRes = null;
         Expression methodDefExpr = null;
         Identifier methodName = null;
         md = factory.createAnnotationPropertyDeclaration(methodDs, methodRes, methodName, methodDefExpr);
@@ -482,43 +459,61 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         return result;
     }
 
-    private EnumDeclaration currentEnum;
+    @Override
+    public Object visitAnnotationTypeBody(JavaKParser.AnnotationTypeBodyContext ctx) {
+        return mapOf(ctx.annotationTypeElementDeclaration());
+    }
+
+    @Override
+    public MemberDeclaration visitAnnotationTypeElementDeclaration(JavaKParser.AnnotationTypeElementDeclarationContext ctx) {
+        MemberDeclaration decl = expect(ctx.annotationTypeElementRest());
+        ASTList<DeclarationSpecifier> modifier = mapOf(ctx.modifier());
+        //TODO transfer modifiers
+        return decl;
+    }
+
+    @Override
+    public Object visitAnnotationTypeElementRest(JavaKParser.AnnotationTypeElementRestContext ctx) {
+        if (ctx.typeType() != null) {
+            /*     : typeType annotationMethodOrConstantRest ';'*/
+            return null;
+        } else
+            return oneOf(ctx.classDeclaration(),
+                    ctx.interfaceDeclaration(),
+                    ctx.enumDeclaration(),
+                    ctx.annotationTypeDeclaration());
+    }
 
     @Override
     public EnumDeclaration visitEnumDeclaration(JavaKParser.EnumDeclarationContext ctx) {
-        ASTList<DeclarationSpecifier> modifiers = mapOf(ctx.classModifier());
-        EnumDeclaration result = currentEnum = new EnumDeclaration();
-        if (modifiers.size() != 0)
-            result.setDeclarationSpecifiers(modifiers);
+        EnumDeclaration result = new EnumDeclaration();
         Identifier id = accept(ctx.identifier());
         result.setIdentifier(id);
-
-        if (ctx.superinterfaces() != null) {
+        ASTList<TypeReference> interfaces = accept(ctx.typeList());
+        if (interfaces != null) {
             Implements im = factory.createImplements();
-            ASTList<UncollatedReferenceQualifier> nl = null;//TODO TypedNameList();
-            ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
-            for (int i = 0, s = nl.size(); i < s; i++) {
-                TypeReference tr =
-                        nl.get(i).toTypeReference();
-                trl.add(tr);
-            }
-            im.setSupertypes(trl);
+            im.setSupertypes(interfaces);
             result.setImplementedTypes(im);
             finish(im, ctx);
         }
-
-        ASTList<MemberDeclaration> members = accept(ctx.enumBody());
-        result.setMembers(members);
+        ASTList<MemberDeclaration> constants = accept(ctx.enumConstants());
+        ASTList<MemberDeclaration> members = accept(ctx.enumBodyDeclarations());
+        constants.addAll(members);
+        result.setMembers(constants);
         finish(result, ctx);
         return result;
     }
 
     @Override
-    public Object visitEnumConstant(JavaKParser.EnumConstantContext ctx) {
-        ASTList<DeclarationSpecifier> annotations = mapOf(ctx.enumConstantModifier());
-        Identifier id = accept(ctx.identifier());
-        ASTList<Expression> args = accept(ctx.argumentList());
+    public List<MemberDeclaration> visitEnumConstants(JavaKParser.EnumConstantsContext ctx) {
+        return mapOf(ctx.enumConstant());
+    }
 
+    @Override
+    public MemberDeclaration visitEnumConstant(JavaKParser.EnumConstantContext ctx) {
+        ASTList<DeclarationSpecifier> annotations = mapOf(ctx.annotation());
+        Identifier id = accept(ctx.identifier());
+        ASTList<Expression> args = accept(ctx.arguments());
         ClassDeclaration cd = null;
         if (ctx.classBody() != null) {
             cd = factory.createClassDeclaration();
@@ -526,7 +521,6 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
             cd.setMembers(members);
             finish(cd, ctx.classBody());
         }
-
         EnumClassDeclaration result = new EnumClassDeclaration();
         EnumConstructorReference ref = new EnumConstructorReference(args, cd);
         EnumConstantSpecification spec = new EnumConstantSpecification(id, ref);
@@ -536,63 +530,40 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitEnumConstantModifier(JavaKParser.EnumConstantModifierContext ctx) {
-        return super.visitEnumConstantModifier(ctx);
+    public Object visitEnumBodyDeclarations(JavaKParser.EnumBodyDeclarationsContext ctx) {
+        return mapOf(ctx.classBodyDeclaration());
     }
 
     @Override
-    public Object visitEnumBodyDeclarations(JavaKParser.EnumBodyDeclarationsContext ctx) {
-        currentClass = currentEnum;
-        return super.visitEnumBodyDeclarations(ctx);
-    }
-
-	/*
-@Override ClassDeclaration visitUnmodifiedClassDeclaration(JavaKParser.UnmodifiedClassDeclarationContext ctx)
-    {
-        ClassDeclaration                 result;
-        UncollatedReferenceQualifier     qn;
+    public Object visitClassDeclaration(JavaKParser.ClassDeclarationContext ctx) {
+        ClassDeclaration result;
+        UncollatedReferenceQualifier qn;
         ASTList<UncollatedReferenceQualifier> nl;
-        ASTList<MemberDeclaration>     mdl;
+        ASTList<MemberDeclaration> mdl;
         Extends ex;
         Implements im;
         ASTList<TypeParameterDeclaration> typeParams = null;
         Identifier id;
-    
-        "class"  {
         result = factory.createClassDeclaration();
-        setPrefixInfo(result);
-    }
+        id = expect(ctx.identifier());
+        result.setIdentifier(id);
 
-        id = ShortName()
-        {
-            result.setIdentifier(id);
-        }
-
-  [ typeParams = TypeParameters()
-        {
+        if (ctx.typeParameters() != null) {
+            typeParams = expect(ctx.typeParameters());
             result.setTypeParameters(typeParams);
         }
-  ]
 
-  [ "extends"
-        {
+        if (ctx.EXTENDS() != null) {
             ex = factory.createExtends();
-            setPrefixInfo(ex);
-        }
-        qn = TypedName()
-        {
+            qn = accept(ctx.typeType());
             ex.setSupertypes(new ASTArrayList<TypeReference>(1));
             ex.getSupertypes().add(qn.toTypeReference());
             result.setExtendedTypes(ex);
         }
-  ]
-  [ "implements"
-        {
+
+        if (ctx.IMPLEMENTS() != null) {
             im = factory.createImplements();
-            setPrefixInfo(im);
-        }
-        nl = TypedNameList()
-        {
+            nl = expect(ctx.typeList());
             ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
             for (int i = 0, s = nl.size(); i < s; i++) {
                 TypeReference tr =
@@ -602,200 +573,87 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
             im.setSupertypes(trl);
             result.setImplementedTypes(im);
         }
-  ]
-        mdl = ClassBody()
-        {
-            result.setMembers(mdl);
-            checkConstruction(result);
-            setPostfixInfo(result);
-            return result;
-        }
-    }
 
-@Override ASTList<MemberDeclaration> visitClassBody(JavaKParser.ClassBodyContext ctx)
-    {
-        ASTList<MemberDeclaration> result = new ASTArrayList<MemberDeclaration>();
-        MemberDeclaration md;
-    
-        "{"
-        (
-                md = ClassBodyDeclaration()
-        {
-            result.add(md);
-        }
-  )*
-        "}"
-        {
-            checkConstruction(result);
-            return result;
-        }
-    }
-	 */
-
-	/*
-@Override ClassDeclaration visitNestedClassDeclaration(JavaKParser.NestedClassDeclarationContext ctx)
-    {
-        ClassDeclaration result;
-        ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
-        DeclarationSpecifier m;
-    
-        (
-                (
-                        ( "static"    { m = factory.createStatic(); }    )
-    | ( "abstract"  { m = factory.createAbstract(); }  )
-    | ( "final"     { m = factory.createFinal(); }     )
-    | ( "public"    { m = factory.createPublic(); }    )
-    | ( "protected" { m = factory.createProtected(); } )
-    | ( "private"   { m = factory.createPrivate(); }   )
-    | ( "strictfp"  { m = factory.createStrictFp(); }  )
-    | ( m = AnnotationUse() 						   )
-    )
-        {
-            setPrefixInfo(m);
-            setPostfixInfo(m);
-            ml.add(m);
-        }
-  )*
-        result = UnmodifiedClassDeclaration()
-        {
-            result.setDeclarationSpecifiers(ml);
-            checkConstruction(result);
-            setPostfixInfo(result);
-            return result;
-        }
-    }
-	 */
-
-    @Override
-    public Object visitNormalInterfaceDeclaration(JavaKParser.NormalInterfaceDeclarationContext ctx) {
-        ASTList<DeclarationSpecifier> ml = mapOf(ctx.interfaceModifier());
-        InterfaceDeclaration result = new InterfaceDeclaration();
-        Identifier id = accept(ctx.identifier());
-        result.setIdentifier(id);
-        result.setDeclarationSpecifiers(ml);
-
-        //TODO body
-        ctx.interfaceBody();
-        ctx.typeParameters();
-
+        mdl = expect(ctx.classBody());
+        result.setMembers(mdl);
         finish(result, ctx);
         return result;
     }
 
-	/*
-@Override InterfaceDeclaration visitUnmodifiedInterfaceDeclaration(JavaKParser.UnmodifiedInterfaceDeclarationContext ctx)
-    {
-        InterfaceDeclaration             result;
-        ASTList<UncollatedReferenceQualifier> nl;
-        ASTList<MemberDeclaration>     mdl = new ASTArrayList<MemberDeclaration>();
-        MemberDeclaration                md;
-        Extends ex;
-        ASTList<TypeParameterDeclaration> typeParams = null;
-        Identifier id;
-    
-        "interface"
-        {
-            result = factory.createInterfaceDeclaration();
-            setPrefixInfo(result);
-        }
-
-        id = ShortName()
-        {
-            result.setIdentifier(id);
-        }
-
-  [ typeParams = TypeParameters()
-        {
-            result.setTypeParameters(typeParams);
-        }
-  ]
-  [ "extends"
-        {
-            ex = factory.createExtends();
-            setPrefixInfo(ex);
-        }
-        nl = TypedNameList()
-        {
-            ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
-            for (int i = 0, s = nl.size(); i < s; i++) {
-                TypeReference tr =
-                        nl.get(i).toTypeReference();
-                trl.add(tr);
-            }
-            ex.setSupertypes(trl);
-            result.setExtendedTypes(ex);
-        }
-  ]
-        "{"
-        (
-                md = InterfaceMemberDeclaration()
-        {
-            mdl.add(md);
-        }
-  )*
-        "}"
-        {
-            result.setMembers(mdl);
-            checkConstruction(result);
-            setPostfixInfo(result);
-            return result;
-        }
-    }
-
-@Override MemberDeclaration visitInterfaceMemberDeclaration(JavaKParser.InterfaceMemberDeclarationContext ctx)
-    {
-        MemberDeclaration result;
-    
-        (
-                LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" | AnnotationUse() )* "class" )
-        (result = NestedClassDeclaration() (";")*) // patch
-| LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp" | AnnotationUse() )* "interface" )
-        (result = NestedInterfaceDeclaration() (";")*) // patch
-| LOOKAHEAD( MethodDeclarationLookahead() )
-        (result = MethodDeclaration() (";")*) // patch
-| LOOKAHEAD( EnumDeclaration() )
-        (result = EnumDeclaration() (";")*)
-| LOOKAHEAD( AnnotationTypeDeclaration() )
-        (result = AnnotationTypeDeclaration() (";")*)
-| (result = FieldDeclaration() (";")*) // patch
-)
-        {
-            checkConstruction(result);
-            setPostfixInfo(result);
-            return result;
-        }
-    }
-	 */
 
     @Override
-    public Object visitFieldModifier(JavaKParser.FieldModifierContext ctx) {
-        if (ctx.annotation() != null) throw new IllegalArgumentException();
-        return getModifier(ctx.getText());
+    public ASTList<MemberDeclaration> visitClassBody(JavaKParser.ClassBodyContext ctx) {
+        return mapOf(ctx.classBodyDeclaration());
+    }
+
+    @Override
+    public MemberDeclaration visitClassBodyDeclaration(JavaKParser.ClassBodyDeclarationContext ctx) {
+        if (ctx.STATIC() != null) {
+            //TODO static block
+        } else if (ctx.memberDeclaration() != null) {
+            List<DeclarationSpecifier> modifiers = mapOf(ctx.modifier());
+            MemberDeclaration md = expect(ctx.memberDeclaration());
+            //TODO set modifiers
+            finish(md, ctx);
+            return md;
+        }
+        return null; //empty declaration
+    }
+
+    @Override
+    public Object visitInterfaceDeclaration(JavaKParser.InterfaceDeclarationContext ctx) {
+        InterfaceDeclaration result = new InterfaceDeclaration();
+        Identifier id = accept(ctx.identifier());
+        result.setIdentifier(id);
+        if (ctx.typeParameters() != null) {
+            ASTList<TypeParameterDeclaration> typeParams = expect(ctx.typeParameters());
+            result.setTypeParameters(typeParams);
+        }
+        if (ctx.EXTENDS() != null) {
+            Extends im = factory.createExtends();
+            ASTList<TypeReference> nl = expect(ctx.typeList());
+            im.setSupertypes(nl);
+            result.setExtendedTypes(im);
+        }
+        result.setMembers(expect(ctx.interfaceBody()));
+        finish(result, ctx);
+        return result;
+    }
+
+    @Override
+    public ASTList<MemberDeclaration> visitInterfaceBody(JavaKParser.InterfaceBodyContext ctx) {
+        return mapOf(ctx.interfaceBodyDeclaration());
+    }
+
+    @Override
+    public Object visitInterfaceBodyDeclaration(JavaKParser.InterfaceBodyDeclarationContext ctx) {
+        ASTList<DeclarationSpecifier> modifier = mapOf(ctx.modifier());
+        MemberDeclaration result = expect(ctx.interfaceMemberDeclaration());
+        //TODO set modifiers
+        finish(result, ctx);
+        return result;
+    }
+
+    @Override
+    public MemberDeclaration visitInterfaceMemberDeclaration(JavaKParser.InterfaceMemberDeclarationContext ctx) {
+        return oneOf(ctx.constDeclaration(), ctx.interfaceDeclaration(),
+                ctx.genericInterfaceMethodDeclaration(), ctx.interfaceDeclaration(),
+                ctx.annotationTypeDeclaration(), ctx.classDeclaration(),
+                ctx.enumDeclaration());
     }
 
     @Override
     public FieldDeclaration visitFieldDeclaration(JavaKParser.FieldDeclarationContext ctx) {
-        ASTList<DeclarationSpecifier> ml = mapOf(ctx.fieldModifier());
-        UncollatedReferenceQualifier qn;
-        ASTArrayList<FieldSpecification> vl = new ASTArrayList<>();
-
+        ASTArrayList<FieldSpecification> vl = expect(ctx.variableDeclarators());
         FieldDeclaration result = factory.createFieldDeclaration();
-
-        TypeReference tr = expect(ctx.unannType());
-        result.setDeclarationSpecifiers(ml);
+        TypeReference tr = expect(ctx.typeType());
         result.setTypeReference(tr);
-        //TODO set member
-        List<VariableSpecification> decls = accept(ctx.variableDeclaratorList());
-        assert decls != null;
-        for (VariableSpecification v : decls) {
-            vl.add((FieldSpecification) v);
-        }
         result.setFieldSpecifications(vl);
         finish(result, ctx);
         return result;
     }
 
-    boolean isForField = true;
+    private boolean isForField = true;
 
     @Override
     public VariableSpecification visitVariableDeclarator(JavaKParser.VariableDeclaratorContext ctx) {
@@ -819,7 +677,7 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
     @Override
     public Identifier visitVariableDeclaratorId(JavaKParser.VariableDeclaratorIdContext ctx) {
         Identifier result = accept(ctx.identifier());
-        tmpDimension = ctx.dims().RBRACK().size();
+        tmpDimension = ctx.RBRACK().size();
         finish(result, ctx);
         return result;
     }
@@ -828,7 +686,7 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
     public Object visitArrayInitializer(JavaKParser.ArrayInitializerContext ctx) {
         ASTList<Expression> el = new ASTArrayList<>();
         ArrayInitializer result = factory.createArrayInitializer();
-        List<Expression> init = accept(ctx.variableInitializerList());
+        List<Expression> init = mapOf(ctx.variableInitializer());
         init.forEach(it -> el.add(it));
         result.setArguments(el);
         finish(result, ctx);
@@ -838,28 +696,19 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
     @Override
     public MethodDeclaration visitMethodDeclaration(JavaKParser.MethodDeclarationContext ctx) {
         MethodDeclaration result = new MethodDeclaration();
-        ASTList<DeclarationSpecifier> m = mapOf(ctx.methodModifier());
         Throws th = null;
-        StatementBlock body = null;
+        StatementBlock body;
         ASTList<TypeParameterDeclaration> typeParams = null;
         SourceElement dummy = null;
-
-        if (ctx.methodHeader().typeParameters() != null) {
-            typeParams = accept(ctx.methodHeader().typeParameters());
+        TypeReference tr = accept(ctx.typeTypeOrVoid());
+        if (ctx.LBRACK() != null) {
+            tr.setDimensions(ctx.LBRACK().size());
         }
-
-        TypeReference tr = accept(ctx.methodHeader().result().unannType());
-
-
         ASTList<UncollatedReferenceQualifier> nl = null;
-        if (ctx.methodHeader().throws_() != null) {
+        if (ctx.THROWS() != null) {
             th = factory.createThrows();
             setPrefixInfo(th, ctx);
-            nl = accept(ctx.methodHeader().throws_().exceptionTypeList());
-        }
-
-        body = accept(ctx.methodBody());
-        if (nl != null) {
+            nl = accept(ctx.qualifiedNameList());
             ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
             for (int i = 0, s = nl.size(); i < s; i++) {
                 trl.add(nl.get(i).toTypeReference());
@@ -867,42 +716,22 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
             th.setExceptions(trl);
             result.setThrown(th);
         }
+        result.setIdentifier(expect(ctx.identifier()));
         result.setTypeParameters(typeParams);
-        result.setDeclarationSpecifiers(m);
+        body = accept(ctx.methodBody());
         result.setBody(body);
         finish(result, ctx);
         return result;
     }
 
-    /*
-    MethodDeclaration MethodDeclarator(TypeReference tr) :
-
-    {
-        Identifier id;
-        ASTList<ParameterDeclaration> pdl;
-        MethodDeclaration result;
-    
-        id = ShortName()
-        pdl = FormalParameters()
-
-        (  // array dims are indeed allowed after parameter list (!)
-        {
-            if (tr != null) {
-                tr.setDimensions(tr.getDimensions() + 1);
-            }
-        }
-  )*
-
-        {
-            result = factory.createMethodDeclaration();
-            result.setIdentifier(id);
-            result.setTypeReference(tr);
-            result.setParameters(pdl);
-            finish(result, ctx)
-            return result;
-        }
+    @Override
+    public Object visitGenericMethodDeclaration(JavaKParser.GenericMethodDeclarationContext ctx) {
+        MethodDeclaration result = expect(ctx.methodDeclaration());
+        ASTList<TypeParameterDeclaration> typeParams = accept(ctx.typeParameters());
+        result.setTypeParameters(typeParams);
+        finish(result, ctx);
+        return result;
     }
-     */
 
     @Override
     public ParameterDeclaration visitFormalParameter(JavaKParser.FormalParameterContext ctx) {
@@ -926,7 +755,7 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
             ml.add(mod);
         }
 
-        tr = accept(ctx.unannType());
+        tr = accept(ctx.typeType());
         //TODO isVarArg = true;
 
         id = accept(ctx.variableDeclaratorId());
@@ -1056,7 +885,7 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         }
     }
 */
-        /*TODO
+    /*TODO
     @Override
     public SpecialConstructorReference visitExplicitConstructorInvocation(JavaKParser.ExplicitConstructorInvocationContext ctx) {
         SpecialConstructorReference result;
@@ -1094,8 +923,7 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         }
     }
     */
-
-        /*TODO
+    /*TODO
 
     @Override
     public ClassInitializer visitInitializer(JavaKParser.InitializerContext ctx) {
@@ -1125,11 +953,9 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         }
     }
     */
-
     /*
      * Type, name and expression syntax follows.
      */
-
     /*TODO
 @Override
 public TypeReference visitType(JavaKParser.TypeContext ctx) {
@@ -1203,7 +1029,6 @@ public TypeReference visitType(JavaKParser.TypeContext ctx) {
         }
     }
     */
-
     /*public UncollatedReferenceQualifier visitName(JavaKParser.NameContext ctx) {
         UncollatedReferenceQualifier result;
         Identifier id;
@@ -1228,12 +1053,10 @@ public TypeReference visitType(JavaKParser.TypeContext ctx) {
             return result;
         }
     }*/
-
     /*
      * Identical copy of TypedName, but lookahead is different for
      * TypeArgument, if ImplicitIdentifier follows!
      */
-
     /*
     @Override
     public UncollatedReferenceQualifier visitDeclarationTypedName(JavaKParser.DeclarationTypedNameContext ctx) {
@@ -1269,7 +1092,6 @@ public TypeReference visitType(JavaKParser.TypeContext ctx) {
         }
     }
     */
-
     /*
     @Override
     public UncollatedReferenceQualifier visitTypedName(JavaKParser.TypedNameContext ctx) {
@@ -1308,44 +1130,31 @@ public TypeReference visitType(JavaKParser.TypeContext ctx) {
 
     @Override
     public ASTList<TypeArgumentDeclaration> visitTypeArguments(JavaKParser.TypeArgumentsContext ctx) {
-        return expect(ctx.typeArgumentList());
-    }
-
-    @Override
-    public Object visitTypeArgumentList(JavaKParser.TypeArgumentListContext ctx) {
         return mapOf(ctx.typeArgument());
     }
 
     @Override
     public TypeArgumentDeclaration visitTypeArgument(JavaKParser.TypeArgumentContext ctx) {
-        if (ctx.referenceType() != null) {
-            WildcardMode wm = WildcardMode.None;
-            TypeReference t;
+        if (ctx.QUESTION() != null) {
+            TypeArgument.WildcardMode wm = TypeArgument.WildcardMode.None;
             TypeArgumentDeclaration result = new TypeArgumentDeclaration();
-            t = accept(ctx.referenceType());
+            TypeReference t = accept(ctx.typeType());
             finish(result, ctx);
             return result;
         } else {//wildcard mode
-            return expect(ctx.wildcard());
-        }
-    }
-
-    @Override
-    public Object visitWildcard(JavaKParser.WildcardContext ctx) {
-        TypeArgumentDeclaration result = new TypeArgumentDeclaration();
-        ASTList<DeclarationSpecifier> annot = mapOf(ctx.annotation());
-        WildcardMode wm = WildcardMode.Any;
-        if (ctx.wildcardBounds() != null) {
-            if (ctx.wildcardBounds().EXTENDS() != null)
-                wm = WildcardMode.Extends;
+            TypeArgumentDeclaration result = new TypeArgumentDeclaration();
+            //ASTList<DeclarationSpecifier> annot = mapOf(ctx.annotation()); java9
+            TypeArgument.WildcardMode wm = TypeArgument.WildcardMode.Any;
+            if (ctx.EXTENDS() != null)
+                wm = TypeArgument.WildcardMode.Extends;
             else
-                wm = WildcardMode.Super;
-            TypeReference t = expect(ctx.wildcardBounds().referenceType());
+                wm = TypeArgument.WildcardMode.Super;
+            TypeReference t = expect(ctx.typeType());
             result.setTypeReference(t);
+            finish(result, ctx);
+            result.setWildcardMode(wm);
+            return result;
         }
-        finish(result, ctx);
-        result.setWildcardMode(wm);
-        return result;
     }
 
     /*
@@ -1398,10 +1207,9 @@ ASTList<UncollatedReferenceQualifier> NameList() :
      * Expression syntax follows.
      */
 
-    @Override
-    public Assignment visitAssignmentOperator(JavaKParser.AssignmentOperatorContext ctx) {
+    public Assignment visitAssignmentOperator(String op) {
         Assignment result;
-        switch (ctx.getText()) {
+        switch (op) {
             case "=":
                 result = factory.createCopyAssignment();
                 break;
@@ -1439,339 +1247,220 @@ ASTList<UncollatedReferenceQualifier> NameList() :
                 result = factory.createBinaryOrAssignment();
                 break;
             default:
-                throw new IllegalStateException("Unexpected value: " + ctx.getText());
+                throw new IllegalStateException("Unexpected value: " + op);
         }
-        finish(result, ctx);
         return result;
     }
 
     @Override
     public Expression visitConditionalExpression(JavaKParser.ConditionalExpressionContext ctx) {
-        if (ctx.COLON() == null) return accept(ctx.conditionalOrExpression());
-        Operator op = factory.createConditional();
-        Expression cond = accept(ctx.conditionalExpression());
-        Expression e1 = accept(ctx.expression());
-        Expression e2 = accept(ctx.conditionalOrExpression());
-        ASTList<Expression> args = new ASTArrayList<Expression>(3);
-        args.add(cond);
-        args.add(e1);
-        args.add(e2);
-        op.setArguments(args);
+        Expression cond = accept(ctx.expression(0));
+        Expression e1 = accept(ctx.expression(1));
+        Expression e2 = accept(ctx.expression(2));
+        Operator op = factory.createConditional(cond, e1, e2);
         finish(op, ctx);
         return op;
     }
 
     @Override
     public Expression visitConditionalOrExpression(JavaKParser.ConditionalOrExpressionContext ctx) {
-        Expression expr;
-        Expression result = accept(ctx.conditionalAndExpression());
-        if (ctx.conditionalOrExpression() == null) return result;
-        Operator op = factory.createLogicalOr();
-        expr = accept(ctx.conditionalOrExpression());
-
-        ASTList<Expression> args = new ASTArrayList<Expression>(2);
-        args.add(result);
-        args.add(expr);
-        op.setArguments(args);
-        result = op;
+        Expression result = accept(ctx.expression(0));
+        if (ctx.expression().size() == 1) return result;
+        Expression expr = accept(ctx.expression(1));
+        Operator op = factory.createLogicalOr(result, expr);
         finish(result, ctx);
         return result;
     }
 
     @Override
     public Expression visitConditionalAndExpression(JavaKParser.ConditionalAndExpressionContext ctx) {
-        Operator op;
-        Expression result = accept(ctx.inclusiveOrExpression());
-        if (ctx.conditionalAndExpression() == null) return result;
-        op = factory.createLogicalAnd();
-        Expression expr = accept(ctx.conditionalAndExpression());
-
-        ASTList<Expression> args = new ASTArrayList<Expression>(2);
-        args.add(result);
-        args.add(expr);
-        op.setArguments(args);
-        result = op;
+        Expression result = accept(ctx.expression(0));
+        if (ctx.expression().size() == 1) return result;
+        Expression expr = accept(ctx.expression(1));
+        Operator op = factory.createLogicalAnd(result, expr);
         finish(result, ctx);
         return result;
     }
 
     @Override
     public Expression visitInclusiveOrExpression(JavaKParser.InclusiveOrExpressionContext ctx) {
-        Expression result;
-        Expression expr;
-        Operator op;
-
-        result = accept(ctx.exclusiveOrExpression());
-        if (ctx.inclusiveOrExpression() == null) return result;
-
-        op = factory.createBinaryOr();
-        expr = accept(ctx.inclusiveOrExpression());
-
-        ASTList<Expression> args = new ASTArrayList<Expression>(2);
-        args.add(result);
-        args.add(expr);
-        op.setArguments(args);
-        result = op;
+        Expression result = accept(ctx.expression(0));
+        if (ctx.expression().size() == 1) return result;
+        Expression expr = accept(ctx.expression(1));
+        Operator op = factory.createBinaryOr(result, expr);
         finish(result, ctx);
         return result;
     }
 
     @Override
-    public Expression visitExclusiveOrExpression(JavaKParser.ExclusiveOrExpressionContext ctx) {
-        Expression result = accept(ctx.andExpression());
-        if (ctx.exclusiveOrExpression() == null) {
-            return result;
-        }
-
-        Operator op = factory.createBinaryXOr();
-        Expression expr = accept(ctx.exclusiveOrExpression());
-        ASTList<Expression> args = new ASTArrayList<Expression>(2);
-        args.add(result);
-        args.add(expr);
-        op.setArguments(args);
-        result = op;
-        setPostfixInfo(result, ctx);
+    public Expression visitExclusvieOrExpression(JavaKParser.ExclusvieOrExpressionContext ctx) {
+        Expression result = accept(ctx.expression(0));
+        if (ctx.expression().size() == 1) return result;
+        Expression expr = accept(ctx.expression(1));
+        Operator op = factory.createBinaryXOr(result, expr);
+        finish(result, ctx);
         return result;
+
     }
 
     @Override
     public Expression visitAndExpression(JavaKParser.AndExpressionContext ctx) {
-        Expression result;
-        Expression expr;
-        Operator op;
-
-        result = accept(ctx.equalityExpression());
-        if (ctx.andExpression() == null) return result;
-        op = factory.createBinaryAnd();
-        expr = accept(ctx.andExpression());
-        ASTList<Expression> args = new ASTArrayList<Expression>(2);
-        args.add(result);
-        args.add(expr);
-        op.setArguments(args);
-        result = op;
-
-        checkConstruction(result);
-        setPostfixInfo(result, ctx);
+        Expression result = accept(ctx.expression(0));
+        if (ctx.expression().size() == 1) return result;
+        Expression expr = accept(ctx.expression(1));
+        Operator op = factory.createBinaryAnd(result, expr);
+        finish(result, ctx);
         return result;
     }
 
     @Override
     public Expression visitEqualityExpression(JavaKParser.EqualityExpressionContext ctx) {
-        Operator cmp;
-        Expression a = accept(ctx.equalityExpression());
-        Expression b = expect(ctx.relationalExpression());
-        if (a == null) return b;
-        if (ctx.EQUAL() != null) {
-            cmp = factory.createEquals();
+        Expression result = accept(ctx.expression(0));
+        if (ctx.expression().size() == 1) return result;
+        Expression expr = accept(ctx.expression(1));
+        if (ctx.bop.equals("==")) {
+            result = factory.createEquals(result, expr);
         } else {
-            cmp = factory.createNotEquals();
+            result = factory.createNotEquals(result, expr);
         }
-        ASTList<Expression> args = new ASTArrayList<Expression>(2);
-        args.add(a);
-        args.add(b);
-        cmp.setArguments(args);
-        finish(cmp, ctx);
-        return cmp;
+        finish(result, ctx);
+        return result;
     }
 
-    public Expression visitInstanceOfExpression(JavaKParser.RelationalExpressionContext ctx) {
-        TypeReference tr;
-        Expression result = accept(ctx.relationalExpression());
-        tr = accept(ctx.referenceType());
-        result = factory.createInstanceof(result, tr);
-        setPrefixInfo(result, ctx);
+    @Override
+    public Object visitInstanceOfExpression(JavaKParser.InstanceOfExpressionContext ctx) {
+        TypeReference tr = expect(ctx.typeType());
+        Expression e = expect(ctx.expression());
+        Instanceof result = factory.createInstanceof(e, tr);
         finish(result, ctx);
         return result;
     }
 
     @Override
     public Expression visitRelationalExpression(JavaKParser.RelationalExpressionContext ctx) {
-        if (ctx.relationalExpression() == null) {
-            return accept(ctx.shiftExpression());
+        Expression result = accept(ctx.expression(0));
+        if (ctx.expression().size() == 1) return result;
+        Expression expr = accept(ctx.expression(1));
+        switch (ctx.bop.getText()) {
+            case "<":
+                result = factory.createLessThan(result, expr);
+                break;
+            case ">":
+                result = factory.createGreaterThan(result, expr);
+                break;
+            case "<=":
+                result = factory.createLessOrEquals(result, expr);
+                break;
+            case ">=":
+                result = factory.createGreaterOrEquals(result, expr);
+                break;
+            default:
+                assert false;
         }
-
-        Operator cmp = null;
-        if (ctx.LT() != null) {
-            cmp = factory.createLessThan();
-        } else if (ctx.GT() != null) {
-            cmp = factory.createGreaterThan();
-        } else if (ctx.LE() != null) {
-            cmp = factory.createLessOrEquals();
-        } else if (ctx.GE() != null) {
-            cmp = factory.createGreaterOrEquals();
-        }
-
-        ASTList<Expression> args = new ASTArrayList<Expression>(2);
-        args.add(accept(ctx.relationalExpression()));
-        args.add(accept(ctx.shiftExpression()));
-        assert cmp != null;
-        cmp.setArguments(args);
-        finish(cmp, ctx);
-        return cmp;
+        finish(result, ctx);
+        return result;
     }
 
     @Override
     public Expression visitShiftExpression(JavaKParser.ShiftExpressionContext ctx) {
-        Expression result;
-        Operator shift = null;
-        Expression expr;
-
-        if (ctx.shiftExpression() == null) return accept(ctx.additiveExpression());
-        if (ctx.LT().isEmpty()) {
-            shift = factory.createShiftLeft();
-        } else if (ctx.GT().size() == 2) {
-            shift = factory.createShiftRight();
-        } else if (ctx.GT().size() == 3) {
-            shift = factory.createUnsignedShiftRight();
+        Expression result = accept(ctx.expression(0));
+        Expression expr = accept(ctx.expression(1));
+        if (ctx.bop.getText().equals("<<")) {
+            result = factory.createShiftRight(result, expr);
+        } else if (ctx.bop.getText().equals(">>>")) {
+            result = factory.createUnsignedShiftRight(result, expr);
+        } else {
+            result = factory.createShiftLeft(result, expr);
         }
-        ASTList<Expression> args = new ASTArrayList<Expression>(2);
-        args.add(accept(ctx.shiftExpression()));
-        args.add(accept(ctx.additiveExpression()));
-        shift.setArguments(args);
-        result = shift;
         finish(result, ctx);
         return result;
     }
 
     @Override
     public Expression visitAdditiveExpression(JavaKParser.AdditiveExpressionContext ctx) {
-        Expression result;
-        Operator add = null;
-        Expression expr;
-
-        if (ctx.ADD() != null) {
-            add = factory.createPlus();
-            setPrefixInfo(add, ctx);
-        } else if (ctx.SUB() != null) {
-            add = factory.createMinus();
-            setPrefixInfo(add, ctx);
+        Expression result = accept(ctx.expression(0));
+        Expression expr = accept(ctx.expression(1));
+        if (ctx.bop.getText().equals("+")) {
+            result = factory.createPlus(result, expr);
+        } else {
+            result = factory.createMinus(result, expr);
         }
-
-        ASTList<Expression> args = new ASTArrayList<Expression>(2);
-        args.add(accept(ctx.additiveExpression()));
-        args.add(accept(ctx.multiplicativeExpression()));
-        add.setArguments(args);
-        result = add;
         finish(result, ctx);
         return result;
     }
 
     @Override
     public Expression visitMultiplicativeExpression(JavaKParser.MultiplicativeExpressionContext ctx) {
-        Expression result = null;
-        Operator mult = null;
-        Expression expr;
-        if (ctx.multiplicativeExpression() == null) return accept(ctx.unaryExpression());
-        if (ctx.MUL() != null) {
-            mult = factory.createTimes();
-            setPrefixInfo(mult, ctx);
-        } else if (ctx.DIV() != null) {
-            mult = factory.createDivide();
-            setPrefixInfo(mult, ctx);
-        } else if (ctx.MOD() != null) {
-            mult = factory.createModulo();
-            setPrefixInfo(mult, ctx);
+        Expression result = accept(ctx.expression(0));
+        Expression expr = accept(ctx.expression(1));
+        if (ctx.bop.getText().equals("*")) {
+            result = factory.createTimes(result, expr);
+        } else if (ctx.bop.getText().equals("%")) {
+            result = factory.createModulo(result, expr);
+        } else {
+            result = factory.createDivide(result, expr);
         }
-        ASTList<Expression> args = new ASTArrayList<Expression>(2);
-        args.add(accept(ctx.multiplicativeExpression()));
-        args.add(accept(ctx.unaryExpression()));
-        mult.setArguments(args);
-        result = mult;
         finish(result, ctx);
         return result;
     }
 
     @Override
     public Expression visitUnaryExpression(JavaKParser.UnaryExpressionContext ctx) {
-        Operator result;
-        if (ctx.ADD() != null) {
-            result = factory.createPositive();
-        } else if (ctx.SUB() != null) {
-            result = factory.createNegative();
+        Expression result = expect(ctx.expression());
+        if (ctx.prefix.getText().equals("~")) {
+            result = factory.createBinaryNot(result);
         } else {
-            return oneOf(ctx.preDecrementExpression(),
-                    ctx.preIncrementExpression(),
-                    ctx.unaryExpressionNotPlusMinus());
+            result = factory.createLogicalNot(result);
         }
-        result.setArguments(new ASTArrayList<>((Expression) accept(ctx.unaryExpression())));
-        /*result = ADTGetter() result = GeneralEscapExpression()*/
         finish(result, ctx);
         return result;
     }
 
     @Override
-    public PreIncrement visitPreIncrementExpression(JavaKParser.PreIncrementExpressionContext ctx) {
-        PreIncrement result = factory.createPreIncrement();
-        Expression expr = accept(ctx.unaryExpression());
-        result.setArguments(new ASTArrayList<>(expr));
-        finish(result, ctx);
-        return result;
-    }
+    public Object visitPrefixExpression(JavaKParser.PrefixExpressionContext ctx) {
+        Expression result = expect(ctx.expression());
+        switch (ctx.prefix.getText()) {
 
-    @Override
-    public PreDecrement visitPreDecrementExpression(JavaKParser.PreDecrementExpressionContext ctx) {
-        PreDecrement result = factory.createPreDecrement();
-        Expression expr = expect(ctx.unaryExpression());
-        result.setArguments(new ASTArrayList<Expression>(expr));
-        finish(result, ctx);
-        return result;
-    }
-
-    @Override
-    public Expression visitUnaryExpressionNotPlusMinus(JavaKParser.UnaryExpressionNotPlusMinusContext ctx) {
-        Operator result;
-        if (ctx.TILDE() != null) {
-            result = factory.createBinaryNot();
-        } else if (ctx.BANG() != null) {
-            result = factory.createLogicalNot();
-        } else {
-            return oneOf(ctx.postfixExpression(), ctx.castExpression());
+            case "++":
+                result = factory.createPreIncrement(result);
+                break;
+            case "--":
+                result = factory.createPreDecrement(result);
+                break;
+            case "+":
+                result = result;
+                break;
+            case "-":
+                result = factory.createNegative(result);
+                break;
         }
-
-        result.setArguments(new ASTArrayList<>((Expression) accept(ctx.unaryExpression())));
         finish(result, ctx);
         return result;
     }
-
 
     @Override
     public Expression visitPostfixExpression(JavaKParser.PostfixExpressionContext ctx) {
-        Expression result = oneOf(ctx.expressionName(), ctx.primary());
-        for (Token child : ctx.post) {
-            if (child.getType() == JavaKLexer.INC) {
+        Expression result = expect(ctx.expression());
+        switch (ctx.postfix.getText()) {
+            case "++":
                 result = factory.createPostIncrement(result);
-            } else {
+                break;
+            case "--":
                 result = factory.createPostDecrement(result);
-            }
+                break;
         }
         finish(result, ctx);
         return result;
     }
 
-
     @Override
     public TypeCast visitCastExpression(JavaKParser.CastExpressionContext ctx) {
-        TypeReference tr;
-        Expression expr;
-        TypeCast result = factory.createTypeCast();
-
-        if (ctx.primitiveType() != null) {
-            tr = accept(ctx.primitiveType());
-            expr = accept(ctx.unaryExpression());
-        } else if (ctx.referenceType() != null) {
-            tr = accept(ctx.referenceType());
-            //TODO additionalBound
-            expr = accept(ctx.unaryExpressionNotPlusMinus());
-        } else {
-            throw new IllegalArgumentException("lambdas are unsupported");
-        }
-        result.setTypeReference(tr);
-        result.setArguments(new ASTArrayList<>(expr));
-        checkConstruction(result);
-        setPostfixInfo(result, ctx);
+        TypeReference tr = expect(ctx.typeType());
+        Expression expr = expect(ctx.expression());
+        TypeCast result = factory.createTypeCast(expr, tr);
+        finish(result, ctx);
         return result;
     }
-
 
     /*@Override
     public Expression visitPrimaryExpression(JavaKParser.PrimaryExpressionContext ctx) {
@@ -2129,7 +1818,7 @@ default:
         }
     }
 */
-
+    /* TODO try to handle via generic java thingies.
     @Override
     public Expression visitGeneralEscapeExpression(JavaKParser.GeneralEscapeExpressionContext ctx) {
         TerminalNode t = ctx.DL_EMBEDDED_FUNCTION() != null ? ctx.DL_EMBEDDED_FUNCTION() : ctx.MAP_FUNCTION();
@@ -2138,136 +1827,112 @@ default:
         finish(result, ctx);
         return result;
     }
-/*
-@Override
-public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixContext ctx){
-        // reuses global suffix field
-        Expression expr;
-        ASTList<Expression> args;
-        Identifier id;
-        Literal lit;
-        ASTList<TypeArgumentDeclaration> typeArgs;
+    */
 
-        (
-//        //XXX it causes several warnings about nondeterminism. can those be ignored?
-//  LOOKAHEAD(2)
-//  ".." expr = accept(ctx.expression())
-//  {
-//      // subsequence range expression
-//      suffix.type = PrimarySuffixReturnValue.RANGE;
-//      suffix.expr = expr;
-//  }
-//|
-        LOOKAHEAD(2)
-        ".""this"
-        {
-        suffix.type=PrimarySuffixReturnValue.THIS;
+    @Override
+    public Expression visitAccessExpr(JavaKParser.AccessExprContext ctx) {
+        Expression expr = expect(ctx.expression());
+        if(ctx.identifier()!=null) {
+            Identifier id = expect(ctx.identifier());
+            expr = factory.createUncollatedReferenceQualifier(
+                    (ReferencePrefix) expr, id);
+        } else if (ctx.THIS() != null) {
+            UncollatedReferenceQualifier o = (UncollatedReferenceQualifier) expr;
+            TypeReference tr = o.toTypeReference();
+            expr = factory.createThisReference(tr);
+        } else if (ctx.SUPER() != null) {
+            UncollatedReferenceQualifier o = (UncollatedReferenceQualifier) expr;
+            TypeReference tr = o.toTypeReference();
+            expr = factory.createSuperReference(tr);
+        } else if (ctx.NEW() != null) {
+            //nonWildcardTypeArguments? innerCreator
+            suffix.type = PrimarySuffixReturnValue.ALLOCATION_EXPR;
+            suffix.expr = expr;
+            suffix.typeArgs = accept(ctx.nonWildcardTypeArguments());
+            //suffix.id = ShortName();
+        } else if (ctx.methodCall() != null) {
+            Object obj = accept(ctx.methodCall());
+            //args=Arguments()
+            suffix.type = PrimarySuffixReturnValue.ARGUMENTS;
+            //suffix.args = args;
         }
-        |
-        LOOKAHEAD(2,{isSuperAllowed()})
-        ".""super"
-        {
-        suffix.type=PrimarySuffixReturnValue.SUPER;
-        }
-        |
-        LOOKAHEAD(2)
-        "."expr=AllocatioExpression()
-        {
-        suffix.type=PrimarySuffixReturnValue.ALLOCATION_EXPR;
-        suffix.expr=expr;
-        }
-        |
-//  LOOKAHEAD(3) // explicit Generic method invocation
-        LOOKAHEAD(NonWildcardTypeArguments()ShortName()) // due to implicit indentifiers
-        "."
-        suffix.typeArgs=NonWildcardTypeArguments()suffix.id=ShortName()
-        {
-        suffix.type=suffix.IDENTIFIER;
-        }
-        |
-        expr=IndexRange()
+        /* expr=IndexRange()
         {
         // can be simple array access, or subsequence construction
         suffix.type=PrimarySuffixReturnValue.INDEX_EXPR;
         suffix.expr=expr;
-        }
-        |
-        "."
+        }*/
+        return expr;
+    }
 
-        suffix.id=ShortName()
-        {
-        suffix.type=PrimarySuffixReturnValue.IDENTIFIER;
+    @Override
+    public Object visitPrimary(JavaKParser.PrimaryContext ctx) {
+        if (ctx.expression() != null) {
+            return accept(ctx.expression());
+        } else if (ctx.THIS() != null) {
+            return factory.createThisReference();
+        } else if (ctx.SUPER() != null) {
+            return factory.createSuperReference();
+        } else if (ctx.CLASS() != null) {
+            TypeReference tr = expect(ctx.typeTypeOrVoid());
+            return factory.createMetaClassReference(tr);
+        } else if (ctx.nonWildcardTypeArguments() != null) {
+            assert false;
+            //TODO     | nonWildcardTypeArguments (explicitGenericInvocationSuffix | THIS arguments)
         }
-        |
-        args=Arguments()
-        {
-        suffix.type=PrimarySuffixReturnValue.ARGUMENTS;
-        suffix.args=args;
+        return oneOf(ctx.identifier(), ctx.literal());
+    }
+
+    @Override
+    public Literal visitIntegerLiteral(JavaKParser.IntegerLiteralContext ctx) {
+        String text = ctx.getText();
+        Literal result;
+        if (text.endsWith("L") || text.endsWith("l")) {
+            result = factory.createLongLiteral(text);
+        } else {
+            result = factory.createIntLiteral(text);
         }
-        )
-        {
-        return suffix;
+        finish(result, ctx);
+        return result;
+    }
+
+    @Override
+    public Literal visitFloatLiteral(JavaKParser.FloatLiteralContext ctx) {
+        String text = ctx.getText();
+        Literal result;
+        if (text.endsWith("F") || text.endsWith("f")) {
+            result = factory.createFloatLiteral(text);
+        } else {
+            result = factory.createDoubleLiteral(text);
         }
-        }
-*/
+        finish(result, ctx);
+        return result;
+    }
 
     @Override
     public Literal visitLiteral(JavaKParser.LiteralContext ctx) {
         String text = ctx.getText();
         Literal result = null;
-        if (ctx.IntegerLiteral() != null) {
-            if (text.endsWith("L") || text.endsWith("l")) {
-                result = factory.createLongLiteral(text);
-            } else {
-                result = factory.createIntLiteral(text);
-            }
-        } else if (ctx.FloatingPointLiteral() != null) {
-            if (text.endsWith("F") || text.endsWith("f")) {
-                result = factory.createFloatLiteral(text);
-            } else {
-                result = factory.createDoubleLiteral(text);
-            }
-        } else if (ctx.CharacterLiteral() != null) {
+        if (ctx.CHAR_LITERAL() != null) {
             result = factory.createCharLiteral(text);
-        } else if (ctx.StringLiteral() != null)
+        } else if (ctx.STRING_LITERAL() != null)
             result = factory.createStringLiteral(text);
-        else if (ctx.BooleanLiteral() != null) {
+        else if (ctx.BOOL_LITERAL() != null) {
             result = factory.createBooleanLiteral(Boolean.parseBoolean(text));
-        } else if (ctx.NullLiteral() != null) {
+        } else if (ctx.NULL_LITERAL() != null) {
             result = factory.createNullLiteral();
         } else if (ctx.EMPTYSETLITERAL() != null) {
             result = EmptySetLiteral.INSTANCE;
-            return result;
         } else if (ctx.EMPTYSEQLITERAL() != null) {
             result = EmptySeqLiteral.INSTANCE;
-            return result;
         } else if (ctx.EMPTYMAPLITERAL() != null) {
             result = EmptyMapLiteral.INSTANCE;
-            return result;
+        } else {
+            return oneOf(ctx.integerLiteral(), ctx.floatLiteral());
         }
         assert result != null;
         finish(result, ctx);
         return result;
-    }
-
-/*    @Override
-    public ASTList<Expression> visitArguments(JavaKParser.ArgumentsContext ctx) {
-        ASTList<Expression> result = null;
-        [result = ArgumentList()] 
-        {
-            // !!! should set end coordinates to parent, possibly
-            if (result != null) {
-                checkConstruction(result);
-
-            }
-            return result;
-        }
-    }
-*/
-
-    @Override
-    public ASTList<Expression> visitArgumentList(JavaKParser.ArgumentListContext ctx) {
-        return mapOf(ctx.expression());
     }
 
     /*@Override
@@ -2430,7 +2095,7 @@ public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixCont
             resVar = qn.toVariableReference();
         }
         Expression tmp = accept(ctx.expression());
-        TypeReference bodySource = accept(ctx.unannType());
+        TypeReference bodySource = accept(ctx.typeType());
         MethodBodyStatement result;
         MethodReference methRef;
         if (tmp instanceof MethodReference) {
@@ -2446,46 +2111,31 @@ public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixCont
 
     @Override
     public ExecutionContext visitExecutionContext(JavaKParser.ExecutionContextContext ctx) {
-        MethodSignature methodSignature = accept(ctx.methodDeclarator());
-        TypeReference classContext = accept(ctx.unannType());
+        Identifier methodName = expect(ctx.identifier());
+        ASTList<TypeReference> paramTypes = expect(ctx.formalParameters());
+        MethodSignature methodSignature = new MethodSignature(methodName, paramTypes);
+        TypeReference classContext = accept(ctx.typeType());
         Expression runtimeInstance = accept(ctx.expression());
         return new ExecutionContext(classContext, methodSignature,
                 (ReferencePrefix) runtimeInstance);
     }
 
     @Override
-    public Object visitMethodDeclarator(JavaKParser.MethodDeclaratorContext ctx) {
-        ASTList<TypeReference> paramTypes = new ASTArrayList<TypeReference>();
-        UncollatedReferenceQualifier name = expect(ctx.identifier());
-        //TODO paramTypes ctx.formalParameterList()
-        return factory.createMethodSignature(name.getIdentifier(), paramTypes);
-    }
-
-    @Override
     public StatementBlock visitBlock(JavaKParser.BlockContext ctx) {
-        return accept(ctx.blockStatements());
-    }
-
-    @Override
-    public StatementBlock visitBlockStatements(JavaKParser.BlockStatementsContext ctx) {
-        StatementBlock result = factory.createStatementBlock();
-        ASTList<Statement> sl = new ASTArrayList<>();
-        for (JavaKParser.BlockStatementContext context : ctx.blockStatement()) {
-            sl.add((Statement) accept(context));
-        }
-        result.setBody(sl);
+        ASTList<Statement> statments = mapOf(ctx.blockStatement());
+        StatementBlock result = factory.createStatementBlock(statments);
         finish(result, ctx);
         return result;
     }
 
     @Override
     public LocalVariableDeclaration visitLocalVariableDeclaration(JavaKParser.LocalVariableDeclarationContext ctx) {
-        ASTList<VariableSpecification> vl = expect(ctx.variableDeclaratorList());
+        ASTList<VariableSpecification> vl = expect(ctx.variableDeclarators());
         ASTList<DeclarationSpecifier> declSpecs = mapOf(ctx.variableModifier());
         LocalVariableDeclaration result = factory.createLocalVariableDeclaration();
         if (declSpecs.size() != 0)
             result.setDeclarationSpecifiers(declSpecs);
-        TypeReference tr = expect(ctx.unannType());
+        TypeReference tr = expect(ctx.typeType());
         result.setTypeReference(tr);
         result.setVariableSpecifications(vl);
         finish(result, ctx);
@@ -2493,10 +2143,9 @@ public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixCont
     }
 
     @Override
-    public ASTList<VariableSpecification> visitVariableDeclaratorList(JavaKParser.VariableDeclaratorListContext ctx) {
+    public Object visitVariableDeclarators(JavaKParser.VariableDeclaratorsContext ctx) {
         return mapOf(ctx.variableDeclarator());
     }
-
 
     @Override
     public EmptyStatement visitEmptyStatement(JavaKParser.EmptyStatementContext ctx) {
@@ -2505,41 +2154,32 @@ public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixCont
         return result;
     }
 
-
     @Override
     public Switch visitSwitchStatement(JavaKParser.SwitchStatementContext ctx) {
-        ASTList<Branch> branches = accept(ctx.switchBlock());
+        //| SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}' #switchStatement
+        ASTList<Branch> branches = mapOf(ctx.switchBlockStatementGroup());
+        ASTList<Branch> nonBodyCases = mapOf(ctx.switchLabel());
         Switch result = factory.createSwitch();
-        Expression expr = accept(ctx.expression());
+        Expression expr = accept(ctx.parExpression());
         result.setExpression(expr);
+        if (nonBodyCases != null) {
+            branches.addAll(nonBodyCases);
+        }
         result.setBranchList(branches);
         finish(result, ctx);
         return result;
     }
 
     @Override
-    public ASTList<Branch> visitSwitchBlock(JavaKParser.SwitchBlockContext ctx) {
-        ASTList<Branch> branches = new ASTArrayList<>();
-        for (JavaKParser.SwitchBlockStatementGroupContext b : ctx.switchBlockStatementGroup()) {
-            branches.add(accept(b));
-        }
-        if (!ctx.switchLabel().isEmpty()) {
-            //maybe todo
-        }
-        return branches;
-    }
-
-    @Override
-    public Object visitSwitchBlockStatementGroup(JavaKParser.SwitchBlockStatementGroupContext ctx) {
-        if (ctx.switchLabels().switchLabel().size() != 1) {
-            throw new IllegalStateException();
-        }
-        Branch result = expect(ctx.switchLabels().switchLabel(0));
-        ASTList<Statement> body = accept(ctx.blockStatements());
+    public Branch visitSwitchBlockStatementGroup(JavaKParser.SwitchBlockStatementGroupContext ctx) {
+        ASTList<Branch> branches = mapOf(ctx.switchLabel());
+        ASTList<Statement> block = mapOf(ctx.blockStatement());
+        if (branches.size() != 1) { throw new IllegalStateException(); }
+        Branch result = branches.get(0);
         if (result instanceof Case) {
-            ((Case) result).setBody(body);
+            ((Case) result).setBody(block);
         } else {
-            ((Default) result).setBody(body);
+            ((Default) result).setBody(block);
         }
         finish(result, ctx);
         return result;
@@ -2550,7 +2190,7 @@ public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixCont
         // handle ctx.enumConstantName()
         if (ctx.CASE() != null) {
             Case result = factory.createCase();
-            Expression expr = expect(ctx.constantExpression());
+            Expression expr = expect(ctx.expression());
             result.setExpression(expr);
             return result;
         } else {
@@ -2574,58 +2214,27 @@ public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixCont
 
 
     @Override
-    public Object visitIfThenStatement(JavaKParser.IfThenStatementContext ctx) {
+    public Object visitIfStatement(JavaKParser.IfStatementContext ctx) {
         If result = factory.createIf();
-        Expression cond = accept(ctx.expression());
+        Expression cond = accept(ctx.parExpression());
         Then thenStat = factory.createThen();
-        Statement trueStat = accept(ctx.statement());
+        Statement trueStat = expect(ctx.then);
         thenStat.setBody(trueStat);
-        result.setExpression(cond);
         result.setThen(thenStat);
+        if(ctx.ELSE()!=null) {
+            Else elseStat = factory.createElse();
+            Statement falseStat = accept(ctx.otherwise);
+            elseStat.setBody(falseStat);
+            result.setElse(elseStat);
+        }
+        result.setExpression(cond);
         finish(result, ctx);
         return result;
-    }
-
-    @Override
-    public Object visitIfThenElseStatement(JavaKParser.IfThenElseStatementContext ctx) {
-        If result = factory.createIf();
-        Expression cond = accept(ctx.expression());
-        Then thenStat = factory.createThen();
-        Statement trueStat = accept(ctx.statementNoShortIf());
-        thenStat.setBody(trueStat);
-        Else elseStat = factory.createElse();
-        setPrefixInfo(elseStat, ctx);
-        Statement falseStat = accept(ctx.statement());
-        elseStat.setBody(falseStat);
-        result.setExpression(cond);
-        result.setThen(thenStat);
-        result.setElse(elseStat);
-        finish(result, ctx);
-        return result;
-    }
-
-    @Override
-    public Object visitIfThenElseStatementNoShortIf(JavaKParser.IfThenElseStatementNoShortIfContext ctx) {
-        If result = factory.createIf();
-        Expression cond = accept(ctx.expression());
-        Then thenStat = factory.createThen();
-        Statement trueStat = accept(ctx.statementNoShortIf(0));
-        thenStat.setBody(trueStat);
-        Else elseStat = factory.createElse();
-        setPrefixInfo(elseStat, ctx);
-        Statement falseStat = accept(ctx.statementNoShortIf(1));
-        elseStat.setBody(falseStat);
-        result.setExpression(cond);
-        result.setThen(thenStat);
-        result.setElse(elseStat);
-        finish(result, ctx);
-        return result;
-
     }
 
     @Override
     public While visitWhileStatement(JavaKParser.WhileStatementContext ctx) {
-        Expression expr = accept(ctx.expression());
+        Expression expr = accept(ctx.parExpression());
         Statement stat = accept(ctx.statement());
         While result = factory.createWhile();
         result.setGuard(expr);
@@ -2635,9 +2244,9 @@ public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixCont
     }
 
     @Override
-    public Do visitDoStatement(JavaKParser.DoStatementContext ctx) {
+    public Object visitDoWhileStatement(JavaKParser.DoWhileStatementContext ctx) {
         Do result = factory.createDo();
-        Expression expr = accept(ctx.expression());
+        Expression expr = accept(ctx.parExpression());
         Statement stat = accept(ctx.statement());
         result.setGuard(expr);
         result.setBody(stat);
@@ -2646,33 +2255,38 @@ public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixCont
     }
 
     @Override
-    public LoopStatement visitBasicForStatement(JavaKParser.BasicForStatementContext ctx) {
-        LoopStatement result;
-        ASTList<LoopInitializer> init = accept(ctx.forInit());
-        Expression guard = null;
-        ASTList<Expression> update = null;
-        Statement body;
-        result = factory.createFor();
-        guard = accept(ctx.expression());
-        update = accept(ctx.forUpdate());
-        body = accept(ctx.statement());
-
-        result.setInitializers(init);
-        result.setGuard(guard);
-        result.setUpdates(update);
-        result.setBody(body);
-        finish(result, ctx);
-        return result;
-
+    public Object visitForStatement(JavaKParser.ForStatementContext ctx) {
+        LoopStatement loop = expect(ctx.forControl());
+        Statement s = expect(ctx.statement());
+        loop.setBody(s);
+        finish(loop, ctx);
+        return loop;
     }
 
     @Override
-    public EnhancedFor visitEnhancedForStatement(JavaKParser.EnhancedForStatementContext ctx) {
+    public Object visitForControl(JavaKParser.ForControlContext ctx) {
+        if(ctx.SEMI() !=null) {
+            LoopStatement result;
+            ASTList<LoopInitializer> init = accept(ctx.forInit());
+            Expression guard = null;
+            ASTList<Expression> update = null;
+            result = factory.createFor();
+            guard = accept(ctx.expression());
+            update = accept(ctx.forUpdate);
+            result.setInitializers(init);
+            result.setGuard(guard);
+            result.setUpdates(update);
+            finish(result, ctx);
+            return result;
+        }
+        return expect(ctx.enhancedForControl());
+    }
+
+    @Override
+    public EnhancedFor visitEnhancedForControl(JavaKParser.EnhancedForControlContext ctx) {
         EnhancedFor result = factory.createEnhancedFor();
         @NotNull ASTList<LoopInitializer> init = expect(ctx.variableDeclaratorId());
         @NotNull Expression guard = expect(ctx.expression());
-        @NotNull Statement body = expect(ctx.statement());
-        result.setBody(body);
         result.setInitializers(init);
         result.setGuard(guard);
         finish(result, ctx);
@@ -2681,27 +2295,17 @@ public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixCont
 
     @Override
     public ASTList<LoopInitializer> visitForInit(JavaKParser.ForInitContext ctx) {
-        ASTList<LoopInitializer> result = new ASTArrayList<LoopInitializer>();
-        ASTList<Expression> exprs = null;
-        ASTList<LocalVariableDeclaration> varDecl = accept(ctx.localVariableDeclaration());
-        if (varDecl != null) {
-            //TODO result.add(varDecl);
-        } else {
-            for (int i = 0, s = exprs.size(); i < s; i += 1)
-                result.add((LoopInitializer) exprs.get(i));
+        ASTList<LoopInitializer> result = new ASTArrayList<>();
+        ASTList<Expression> exprs = accept(ctx.expressionList());
+        if(exprs!=null) {
+            for (Expression expr : exprs) {
+                result.add((LoopInitializer) expr);
+            }
+        }else{
+            LocalVariableDeclaration varDecl = accept(ctx.localVariableDeclaration());
+            result.add(varDecl);
         }
         return result;
-    }
-
-
-    @Override
-    public ASTList<Expression> visitStatementExpressionList(JavaKParser.StatementExpressionListContext ctx) {
-        return mapOf(ctx.statementExpression());
-    }
-
-    @Override
-    public ASTList<Expression> visitForUpdate(JavaKParser.ForUpdateContext ctx) {
-        return accept(ctx.statementExpressionList());
     }
 
     @Override
@@ -2719,7 +2323,6 @@ public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixCont
         }
         return new TransactionStatement(type);
     }
-
 
     @Override
     public Break visitBreakStatement(JavaKParser.BreakStatementContext ctx) {
@@ -2764,7 +2367,7 @@ public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixCont
         Expression expr;
         StatementBlock block;
         result = factory.createSynchronizedBlock();
-        expr = accept(ctx.expression());
+        expr = accept(ctx.parExpression());
         block = accept(ctx.block());
         result.setExpression(expr);
         result.setBody(block);
@@ -2794,22 +2397,20 @@ public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixCont
 
     @Override
     public Try visitTryStatement(JavaKParser.TryStatementContext ctx) {
-        ASTList<Branch> branches = new ASTArrayList<Branch>(1);
+        //    | TRY block (catchClause+ finallyBlock? | finallyBlock)   #tryStatement
         Try result = factory.createTry();
         StatementBlock block = expect(ctx.block());
         result.setBody(block);
-        List<Catch> catches = accept(ctx.catches());
+        ASTList<Branch> catches = mapOf(ctx.catchClause());
+        Finally fin = accept(ctx.finallyBlock());
+        if(fin!=null) catches.add(fin);
+        result.setBranchList(catches);
         finish(result, ctx);
         return result;
     }
 
     @Override
-    public List<Catch> visitCatches(JavaKParser.CatchesContext ctx) {
-        return mapOf(ctx.catchClause());
-    }
-
-    @Override
-    public Finally visitFinally_(JavaKParser.Finally_Context ctx) {
+    public Object visitFinallyBlock(JavaKParser.FinallyBlockContext ctx) {
         Finally result = factory.createFinally();
         Statement block = accept(ctx.block());
         result.setBody(block);
@@ -2819,28 +2420,22 @@ public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixCont
 
     @Override
     public Catch visitCatchClause(JavaKParser.CatchClauseContext ctx) {
+        //    : CATCH '(' variableModifier* catchType identifier ')' block
         Catch cat = factory.createCatch();
-        ParameterDeclaration param = accept(ctx.catchFormalParameter());
+        ASTList<DeclarationSpecifier> modifiers = mapOf(ctx.variableModifier());
+        TypeReference tr = expect(ctx.catchType());
+        Identifier var = accept(ctx.identifier());
         Statement block = expect(ctx.block());
-        cat.setParameterDeclaration(param);
+        cat.setParameterDeclaration(new ParameterDeclaration(modifiers, tr, var));
         cat.setBody(block);
         finish(cat, ctx);
         return cat;
     }
 
     @Override
-    public ParameterDeclaration visitCatchFormalParameter(JavaKParser.CatchFormalParameterContext ctx) {
-        TypeReference type = accept(ctx.catchType());
-        ASTList<DeclarationSpecifier> mods = mapOf(ctx.variableModifier());
-        @NotNull Identifier id = expect(ctx.variableDeclaratorId());
-        ParameterDeclaration result = new ParameterDeclaration(mods, type, id);
-        finish(result, ctx);
-        return result;
-    }
-
-    @Override
     public Object visitCatchType(JavaKParser.CatchTypeContext ctx) {
-        return expect(ctx.unannClassType());
+        if (ctx.qualifiedName().size() > 1) throw new IllegalArgumentException();
+        return expect(ctx.qualifiedName(0));
     }
 
     @Override
@@ -2969,7 +2564,7 @@ public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixCont
 
     @Override
     public Expression visitElementValue(JavaKParser.ElementValueContext ctx) {
-        return oneOf(ctx.annotation(), ctx.conditionalExpression(), ctx.elementValueArrayInitializer());
+        return oneOf(ctx.annotation(), ctx.expression(), ctx.elementValueArrayInitializer());
     }
 
     @Override
@@ -2984,4 +2579,3 @@ public PrimarySuffixReturnValue visitPrimarySuffix(JavaKParser.PrimarySuffixCont
         return result;
     }
 }
-
