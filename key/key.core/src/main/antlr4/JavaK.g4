@@ -193,7 +193,7 @@ constDeclaration
     ;
 
 constantDeclarator
-    : identifier ('[' ']')* '=' variableInitializer
+    : identifier (LBRACK RBRACK)* '=' variableInitializer
     ;
 
 // see matching of [] comment in methodDeclaratorRest
@@ -279,6 +279,7 @@ literal
     | STRING_LITERAL
     | BOOL_LITERAL
     | NULL_LITERAL
+    | TEXT_BLOCK
     | EMPTYMAPLITERAL
     | EMPTYSEQLITERAL
     | EMPTYSETLITERAL
@@ -383,6 +384,8 @@ localTypeDeclaration
     | ';'
     ;
 
+throwStatement: THROW expression ';';
+
 statement
     : blockLabel=block                                        #bStatement
     | ASSERT expression (':' expression)? ';'                 #assertStatement
@@ -392,15 +395,17 @@ statement
     | DO statement WHILE parExpression ';'                    #doWhileStatement
     | TRY block (catchClause+ finallyBlock? | finallyBlock)   #tryStatement
     | TRY resourceSpecification block catchClause* finallyBlock? #tryWithResourceStatement
-    | SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}' #switchStatement
+    | SWITCH parExpression '{' (switchRule+ | switchBlockStatementGroup* switchLabel*) '}' #switchStatement
     | SYNCHRONIZED parExpression block                        #synchronizedStatement
     | RETURN expression? ';'                                  #returnStatement
-    | THROW expression ';'                                    #throwStatement
+    | throwStatement                                          #ignore4
     | BREAK identifier? ';'                                   #breakStatement
     | CONTINUE identifier? ';'                                #continueStatement
     | SEMI #emptyStatement
     | expression ';'                                          #statementExpression
     | identifierLabel=identifier ':' statement                #labeledStatement
+    | // java 12+
+      YIELD expression ';'                                    #yieldStatement
     /** key statements */
     | METHODFRAME LPAREN ( 'result->' qn=identifier COMMA)? ec=executionContext RPAREN COLON block
                                                               #methodCallStatement
@@ -457,12 +462,18 @@ resource
  *  To handle empty cases at the end, we add switchLabel* to statement.
  */
 switchBlockStatementGroup
-    : switchLabel+ blockStatement+
+    : (switchLabel ':')+ blockStatement+
+    ;
+
+switchRule:
+      switchLabel '->' expression
+    | switchLabel '->' block
+    | switchLabel '->' throwStatement
     ;
 
 switchLabel
-    : CASE (constantExpression=expression | enumConstantName=identifier) ':'
-    | DEFAULT ':'
+    : CASE (constantExpression=expression | enumConstantName=identifier)
+    | DEFAULT
     ;
 
 forControl
@@ -513,6 +524,8 @@ expression
     | expression postfix=('++' | '--') #postfixExpression
     | prefix=('+'|'-'|'++'|'--') expression #prefixExpression
     | prefix=('~'|'!') expression           #unaryExpression
+    | // Java 12+
+      SWITCH parExpression '{' (switchRule+ | switchBlockStatementGroup* switchLabel*) '}'#switchExpression
     | expression bop=('*'|'/'|'%') expression #multiplicativeExpression
     | expression bop=('+'|'-') expression     #additiveExpression
     | expression bop=('<<' | '>>>' | '>>') expression #shiftExpression
@@ -535,6 +548,7 @@ expression
     | typeType '::' (typeArguments? identifier | NEW) #methodReference2
     | classType '::' typeArguments? NEW #methodReference3
     ;
+
 
 /*
 | adtGetter
@@ -572,7 +586,7 @@ lambdaBody
     ;
 
 primary
-    : '(' expression ')'
+    : LPAREN expression RPAREN
     | THIS
     | SUPER
     | literal
@@ -723,6 +737,7 @@ TRY:                'try';
 VOID:               'void';
 VOLATILE:           'volatile';
 WHILE:              'while';
+YIELD:              'yield';
 
 /// KEY STUFF
 
@@ -790,6 +805,9 @@ CHAR_LITERAL:       '\'' (~['\\\r\n] | EscapeSequence) '\'';
 STRING_LITERAL:     '"' (~["\\\r\n] | EscapeSequence)* '"';
 
 NULL_LITERAL:       'null';
+
+TEXT_BLOCK:         '"""' .*? '"""';
+
 
 // Separators
 

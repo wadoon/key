@@ -1,12 +1,10 @@
 package de.uka.ilkd.key.parser.njava;
 
 import de.uka.ilkd.key.java.recoderext.*;
-import de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral;
-import de.uka.ilkd.key.java.recoderext.adt.EmptySeqLiteral;
-import de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral;
-import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
+import de.uka.ilkd.key.java.recoderext.adt.*;
 import de.uka.ilkd.key.nparser.JavaKBaseVisitor;
 import de.uka.ilkd.key.nparser.JavaKParser;
+import org.antlr.misc.IntArrayList;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.jetbrains.annotations.NotNull;
@@ -14,11 +12,9 @@ import org.jetbrains.annotations.Nullable;
 import recoder.abstraction.TypeArgument;
 import recoder.java.*;
 import recoder.java.declaration.*;
-import recoder.java.expression.ArrayInitializer;
-import recoder.java.expression.Assignment;
-import recoder.java.expression.Literal;
-import recoder.java.expression.Operator;
+import recoder.java.expression.*;
 import recoder.java.expression.operator.Instanceof;
+import recoder.java.expression.operator.NewArray;
 import recoder.java.expression.operator.TypeCast;
 import recoder.java.reference.*;
 import recoder.java.statement.*;
@@ -26,11 +22,15 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.parser.ParseException;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.lang.String.format;
 
 /**
  * @author Alexander Weigl
@@ -340,19 +340,18 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
     }
     //endregion
 
-    protected <T2> List<T2> mapMapOf(List<? extends RuleContext>... ctxss) {
-        return Arrays.stream(ctxss)
-                .flatMap(it -> it.stream().map(a -> (T2) accept(a)))
-                .collect(Collectors.toList());
-    }
-
-    //endregion
-
     @Override
     public CompilationUnit visitCompilationUnit(JavaKParser.CompilationUnitContext ctx) {
         PackageSpecification ps = accept(ctx.packageDeclaration());
+        if (ps == null) {
+            ps = new PackageSpecification();
+        }
         ASTList<Import> imports = mapOf(ctx.importDeclaration());
-        ASTList<TypeDeclaration> declarations = mapOf(ctx.typeDeclaration());
+        ASTList<TypeDeclaration> tmp = mapOf(ctx.typeDeclaration());
+        ASTList<TypeDeclaration> declarations = new ASTArrayList<>();
+        for (TypeDeclaration typeDeclaration : tmp) {
+            if(typeDeclaration!=null) declarations.add(typeDeclaration); //Remove empty declaration
+        }
         CompilationUnit result = factory.createCompilationUnit(ps, imports, declarations);
         finish(result, ctx);
         return result;
@@ -453,7 +452,7 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
                     ctx.interfaceDeclaration(),
                     ctx.annotationTypeDeclaration());
             ASTList<DeclarationSpecifier> modifier = mapOf(ctx.classOrInterfaceModifier());
-            //TODO Modifier
+            set(td, modifier);
             return td;
         } catch (IllegalArgumentException e) {
             return null;
@@ -464,9 +463,7 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
     public AnnotationDeclaration visitAnnotationTypeDeclaration(JavaKParser.AnnotationTypeDeclarationContext ctx) {
         ASTList<MemberDeclaration> members = new ASTArrayList<>();
         MethodDeclaration md;
-        FieldDeclaration fd;
-        TypeDeclaration td;
-        ASTList<DeclarationSpecifier> declSpecs = new ASTArrayList<DeclarationSpecifier>(), methodDs;
+        ASTList<DeclarationSpecifier> declSpecs = new ASTArrayList<>(), methodDs;
         AnnotationDeclaration result = new AnnotationDeclaration();
         Identifier name = accept(ctx.identifier());
         methodDs = new ASTArrayList<>();
@@ -491,7 +488,8 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
     public MemberDeclaration visitAnnotationTypeElementDeclaration(JavaKParser.AnnotationTypeElementDeclarationContext ctx) {
         MemberDeclaration decl = expect(ctx.annotationTypeElementRest());
         ASTList<DeclarationSpecifier> modifier = mapOf(ctx.modifier());
-        //TODO transfer modifiers
+        set(decl, modifier);
+        finish(decl, ctx);
         return decl;
     }
 
@@ -563,51 +561,46 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
     }
 
     @Override
+    public ASTList<TypeParameterDeclaration> visitTypeParameters(JavaKParser.TypeParametersContext ctx) {
+        return mapOf(ctx.typeParameter());
+    }
+
+    @Override
     public Object visitClassDeclaration(JavaKParser.ClassDeclarationContext ctx) {
-        ClassDeclaration result;
-        UncollatedReferenceQualifier qn;
-        ASTList<UncollatedReferenceQualifier> nl;
-        ASTList<MemberDeclaration> mdl;
-        Extends ex;
-        Implements im;
-        ASTList<TypeParameterDeclaration> typeParams = null;
-        Identifier id;
-        result = factory.createClassDeclaration();
-        id = expect(ctx.identifier());
+        ClassDeclaration result = factory.createClassDeclaration();
+        Identifier id = expect(ctx.identifier());
         result.setIdentifier(id);
 
         if (ctx.typeParameters() != null) {
-            typeParams = expect(ctx.typeParameters());
+            ASTList<TypeParameterDeclaration> typeParams = expect(ctx.typeParameters());
             result.setTypeParameters(typeParams);
         }
 
         if (ctx.EXTENDS() != null) {
-            ex = factory.createExtends();
-            qn = accept(ctx.typeType());
-            ex.setSupertypes(new ASTArrayList<TypeReference>(1));
-            ex.getSupertypes().add(qn.toTypeReference());
+            Extends ex = factory.createExtends();
+            TypeReference tr = expect(ctx.typeType());
+            ex.setSupertypes(new ASTArrayList<>(1));
+            ex.getSupertypes().add(tr);
             result.setExtendedTypes(ex);
         }
 
         if (ctx.IMPLEMENTS() != null) {
-            im = factory.createImplements();
-            nl = expect(ctx.typeList());
-            ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
-            for (int i = 0, s = nl.size(); i < s; i++) {
-                TypeReference tr =
-                        nl.get(i).toTypeReference();
-                trl.add(tr);
-            }
-            im.setSupertypes(trl);
+            Implements im = factory.createImplements();
+            ASTList<TypeReference> nl = expect(ctx.typeList());
+            im.setSupertypes(nl);
             result.setImplementedTypes(im);
         }
 
-        mdl = expect(ctx.classBody());
+        ASTList<MemberDeclaration> mdl = expect(ctx.classBody());
         result.setMembers(mdl);
         finish(result, ctx);
         return result;
     }
 
+    @Override
+    public Object visitTypeList(JavaKParser.TypeListContext ctx) {
+        return mapOf(ctx.typeType());
+    }
 
     @Override
     public ASTList<MemberDeclaration> visitClassBody(JavaKParser.ClassBodyContext ctx) {
@@ -621,15 +614,24 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         } else if (ctx.memberDeclaration() != null) {
             List<DeclarationSpecifier> modifiers = mapOf(ctx.modifier());
             MemberDeclaration md = expect(ctx.memberDeclaration());
-            //TODO set modifiers
+            set(md, modifiers);
             finish(md, ctx);
             return md;
         }
         return null; //empty declaration
     }
 
+    private void set(Object md, List<DeclarationSpecifier> modifiers) {
+        try {
+            Method m = md.getClass().getMethod("setDeclarationSpecifiers", ASTList.class);
+            m.invoke(md, modifiers);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ignored) {
+            throw new RuntimeException(md.getClass() + " does not have setDeclarationSpecifiers");
+        }
+    }
+
     @Override
-    public Object visitInterfaceDeclaration(JavaKParser.InterfaceDeclarationContext ctx) {
+    public InterfaceDeclaration visitInterfaceDeclaration(JavaKParser.InterfaceDeclarationContext ctx) {
         InterfaceDeclaration result = new InterfaceDeclaration();
         Identifier id = accept(ctx.identifier());
         result.setIdentifier(id);
@@ -655,9 +657,9 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
 
     @Override
     public Object visitInterfaceBodyDeclaration(JavaKParser.InterfaceBodyDeclarationContext ctx) {
-        ASTList<DeclarationSpecifier> modifier = mapOf(ctx.modifier());
+        ASTList<DeclarationSpecifier> modifiers = mapOf(ctx.modifier());
         MemberDeclaration result = expect(ctx.interfaceMemberDeclaration());
-        //TODO set modifiers
+        set(result, modifiers);
         finish(result, ctx);
         return result;
     }
@@ -668,6 +670,32 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
                 ctx.genericInterfaceMethodDeclaration(), ctx.interfaceDeclaration(),
                 ctx.annotationTypeDeclaration(), ctx.classDeclaration(),
                 ctx.enumDeclaration());
+    }
+
+    @Override
+    public Object visitConstDeclaration(JavaKParser.ConstDeclarationContext ctx) {
+        ASTList<FieldSpecification> vl = mapOf(ctx.constantDeclarator());
+        FieldDeclaration result = factory.createFieldDeclaration();
+        TypeReference tr = expect(ctx.typeType());
+        result.setTypeReference(tr);
+        result.setFieldSpecifications(vl);
+        finish(result, ctx);
+        return result;
+    }
+
+    @Override
+    public Object visitConstantDeclarator(JavaKParser.ConstantDeclaratorContext ctx) {
+        VariableSpecification result;
+        Identifier id = accept(ctx.identifier());
+        Expression init = accept(ctx.variableInitializer());
+        int dim = ctx.LBRACK().size();
+        if (isForField) {
+            result = factory.createFieldSpecification(id, dim, init);
+        } else {
+            result = factory.createVariableSpecification(id, dim, init);
+        }
+        finish(result, ctx);
+        return result;
     }
 
     @Override
@@ -685,7 +713,6 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
 
     @Override
     public VariableSpecification visitVariableDeclarator(JavaKParser.VariableDeclaratorContext ctx) {
-        isForField = true;
         int dim;
         VariableSpecification result;
         Identifier id = accept(ctx.variableDeclaratorId());
@@ -698,6 +725,11 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         }
         finish(result, ctx);
         return result;
+    }
+
+    @Override
+    public Expression visitVariableInitializer(JavaKParser.VariableInitializerContext ctx) {
+        return oneOf(ctx.expression(), ctx.arrayInitializer());
     }
 
     @Override
@@ -723,7 +755,6 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
     @Override
     public MethodDeclaration visitMethodDeclaration(JavaKParser.MethodDeclarationContext ctx) {
         MethodDeclaration result = new MethodDeclaration();
-        Throws th = null;
         StatementBlock body;
         ASTList<TypeParameterDeclaration> typeParams = null;
         SourceElement dummy = null;
@@ -731,12 +762,10 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         if (ctx.LBRACK().size() != 0) {
             tr.setDimensions(ctx.LBRACK().size());
         }
-        ASTList<UncollatedReferenceQualifier> nl = null;
         if (ctx.THROWS() != null) {
-            th = factory.createThrows();
-            setPrefixInfo(th, ctx);
-            nl = accept(ctx.qualifiedNameList());
-            ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
+            Throws th = factory.createThrows();
+            ASTList<UncollatedReferenceQualifier> nl = accept(ctx.qualifiedNameList());
+            ASTList<TypeReference> trl = new ASTArrayList<>();
             for (int i = 0, s = nl.size(); i < s; i++) {
                 trl.add(nl.get(i).toTypeReference());
             }
@@ -749,6 +778,11 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         result.setBody(body);
         finish(result, ctx);
         return result;
+    }
+
+    @Override
+    public ASTList<UncollatedReferenceQualifier> visitQualifiedNameList(JavaKParser.QualifiedNameListContext ctx) {
+        return mapOf(ctx.qualifiedName());
     }
 
     @Override
@@ -1871,10 +1905,9 @@ default:
             suffix.typeArgs = accept(ctx.nonWildcardTypeArguments());
             //suffix.id = ShortName();
         } else if (ctx.methodCall() != null) {
-            Object obj = accept(ctx.methodCall());
-            //args=Arguments()
-            suffix.type = PrimarySuffixReturnValue.ARGUMENTS;
-            //suffix.args = args;
+            MethodReference obj = expect(ctx.methodCall());
+            obj.setReferencePrefix((ReferencePrefix) expr);
+            expr = obj;
         }
         /* expr=IndexRange()
         {
@@ -1882,25 +1915,34 @@ default:
         suffix.type=PrimarySuffixReturnValue.INDEX_EXPR;
         suffix.expr=expr;
         }*/
+        finish(expr, ctx);
         return expr;
     }
 
     @Override
-    public Object visitPrimary(JavaKParser.PrimaryContext ctx) {
+    public Expression visitPrimary(JavaKParser.PrimaryContext ctx) {
+        Expression result = null;
         if (ctx.expression() != null) {
-            return accept(ctx.expression());
+            result = accept(ctx.expression());
+            result = factory.createParenthesizedExpression(result);
         } else if (ctx.THIS() != null) {
-            return factory.createThisReference();
+            result = factory.createThisReference();
         } else if (ctx.SUPER() != null) {
-            return factory.createSuperReference();
+            result = factory.createSuperReference();
         } else if (ctx.CLASS() != null) {
             TypeReference tr = expect(ctx.typeTypeOrVoid());
-            return factory.createMetaClassReference(tr);
+            result = factory.createMetaClassReference(tr);
         } else if (ctx.nonWildcardTypeArguments() != null) {
             assert false;
             //TODO     | nonWildcardTypeArguments (explicitGenericInvocationSuffix | THIS arguments)
+        } else if (ctx.identifier() != null) {
+            Identifier id = expect(ctx.identifier());
+            result = factory.createUncollatedReferenceQualifier(id);
+        } else {
+            result = expect(ctx.literal());
         }
-        return oneOf(ctx.identifier(), ctx.literal());
+        finish(result, ctx);
+        return result;
     }
 
     @Override
@@ -2142,10 +2184,26 @@ default:
 
     @Override
     public StatementBlock visitBlock(JavaKParser.BlockContext ctx) {
-        ASTList<Statement> statments = mapOf(ctx.blockStatement());
-        StatementBlock result = factory.createStatementBlock(statments);
+        ASTList<Statement> statements = mapOf(ctx.blockStatement());
+        StatementBlock result = factory.createStatementBlock(statements);
         finish(result, ctx);
         return result;
+    }
+
+    @Override
+    public Statement visitLocalTypeDeclaration(JavaKParser.LocalTypeDeclarationContext ctx) {
+        ASTList<DeclarationSpecifier> modifiers = mapOf(ctx.classOrInterfaceModifier());
+        if (ctx.classDeclaration() != null) {
+            ClassDeclaration td = expect(ctx.classDeclaration());
+            td.setDeclarationSpecifiers(modifiers);
+            return td;
+        } else {
+            //InterfaceDeclaration is not a statement!
+            InterfaceDeclaration td = expect(ctx.interfaceDeclaration());
+            td.setDeclarationSpecifiers(modifiers);
+            assert false;
+            return null;
+        }
     }
 
     @Override
@@ -2177,7 +2235,11 @@ default:
     @Override
     public Switch visitSwitchStatement(JavaKParser.SwitchStatementContext ctx) {
         //| SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}' #switchStatement
-        ASTList<Branch> branches = mapOf(ctx.switchBlockStatementGroup());
+        List<Branch> b =
+                ctx.switchBlockStatementGroup().stream()
+                        .flatMap(it -> visitSwitchBlockStatementGroup(it).stream())
+                        .collect(Collectors.toList());
+        ASTList<Branch> branches = new ASTArrayList<>(b);
         ASTList<Branch> nonBodyCases = mapOf(ctx.switchLabel());
         Switch result = factory.createSwitch();
         Expression expr = accept(ctx.parExpression());
@@ -2191,20 +2253,17 @@ default:
     }
 
     @Override
-    public Branch visitSwitchBlockStatementGroup(JavaKParser.SwitchBlockStatementGroupContext ctx) {
+    public ASTList<Branch> visitSwitchBlockStatementGroup(JavaKParser.SwitchBlockStatementGroupContext ctx) {
         ASTList<Branch> branches = mapOf(ctx.switchLabel());
         ASTList<Statement> block = mapOf(ctx.blockStatement());
-        if (branches.size() != 1) {
-            throw new IllegalStateException();
-        }
-        Branch result = branches.get(0);
+        Branch result = branches.get(branches.size() - 1);
         if (result instanceof Case) {
             ((Case) result).setBody(block);
         } else {
             ((Default) result).setBody(block);
         }
         finish(result, ctx);
-        return result;
+        return branches;
     }
 
     @Override
@@ -2455,9 +2514,10 @@ default:
     }
 
     @Override
-    public Object visitCatchType(JavaKParser.CatchTypeContext ctx) {
+    public TypeReference visitCatchType(JavaKParser.CatchTypeContext ctx) {
         if (ctx.qualifiedName().size() > 1) throw new IllegalArgumentException();
-        return expect(ctx.qualifiedName(0));
+        UncollatedReferenceQualifier id = expect(ctx.qualifiedName(0));
+        return id.toTypeReference();
     }
 
     @Override
@@ -2589,6 +2649,7 @@ default:
         return oneOf(ctx.annotation(), ctx.expression(), ctx.elementValueArrayInitializer());
     }
 
+
     @Override
     public Identifier visitIdentifier(JavaKParser.IdentifierContext ctx) {
         Identifier result;
@@ -2599,6 +2660,23 @@ default:
         }
         finish(result, ctx);
         return result;
+    }
+
+
+    @Override
+    public TypeReference visitClassOrInterfaceType(JavaKParser.ClassOrInterfaceTypeContext ctx) {
+        ASTList<Identifier> identifiers = mapOf(ctx.identifier());
+        UncollatedReferenceQualifier result = null;
+        for (Identifier identifier : identifiers) {
+            if (result == null) {
+                result = factory.createUncollatedReferenceQualifier(identifier);
+            } else {
+                result = factory.createUncollatedReferenceQualifier(result, identifier);
+            }
+        }
+        //TODO ctx.typeArgumentsOrDiamond()
+        finish(result, ctx);
+        return result.toTypeReference();
     }
 
     @Override
@@ -2629,13 +2707,16 @@ default:
             ReferencePrefix accessPath = null; //TODO
             TypeReference constructorName = accept(ctx.creator().createdName());
             @Nullable ASTList<Expression> arguments = accept(ctx.creator().classCreatorRest().arguments());
-            @Nullable ClassDeclaration anonymousClass = accept(ctx.creator().classCreatorRest().classBody());
+            @Nullable ClassDeclaration anonymousClass = null;
+            ASTList<MemberDeclaration> block = accept(ctx.creator().classCreatorRest().classBody());
+            if (block != null) {
+                anonymousClass = factory.createClassDeclaration();
+                anonymousClass.setMembers(block);
+            }
             result = factory.createNew(accessPath, constructorName, arguments, anonymousClass);
         }
         if (arrayCreator) {
             ReferencePrefix accessPath;
-            @Nullable ASTList<Expression> arguments = accept(ctx.creator().classCreatorRest().arguments());
-            @Nullable ClassDeclaration anonymousClass = accept(ctx.creator().classCreatorRest().classBody());
             TypeReference arrayName = accept(ctx.creator().createdName());
             ASTList<Expression> dimExpr = mapOf(ctx.creator().arrayCreatorRest().expression());
             ArrayInitializer init = accept(ctx.creator().arrayCreatorRest().arrayInitializer());
@@ -2653,5 +2734,191 @@ default:
     protected Object aggregateResult(Object aggregate, Object nextResult) {
         if (aggregate == null && nextResult != null) return nextResult;
         return aggregate;
+    }
+
+    @Override
+    public Expression visitArrayAccess(JavaKParser.ArrayAccessContext ctx) {
+        Expression e = expect(ctx.expression(0));
+        Expression idx = expect(ctx.expression(1));
+        Expression result = null;
+        //weigl: this could maybe replaced with a cast to ReferencePrefix
+        if (e instanceof UncollatedReferenceQualifier ||
+                e instanceof MethodReference ||
+                e instanceof ParenthesizedExpression ||
+                //tmpResult instanceof ThisReference || // this[i] in array initialization
+                e instanceof ADTPrefixConstruct ||
+                e instanceof NewArray ||
+                e instanceof VariableReference) {
+            if (idx instanceof RangeExpression) {
+                result = new SeqSub((ADTPrefixConstruct) e, (RangeExpression) idx);
+            } else {
+                // Now we know that this is an array reference
+                ASTList<Expression> indicees = new ASTArrayList<Expression>(1);
+                indicees.add(idx);
+                result = factory.createArrayReference((ReferencePrefix) e, indicees);
+            }
+        } else if (e instanceof ArrayReference) {
+            ((ArrayReference) e).getDimensionExpressions().add(idx);
+        } else {
+            throw new RuntimeException(
+                    format("Bad index context - %s in %s", e.getClass().getName(), ctx.getText()));
+              /*
+                e.g. StringLiteral, TypeReference, NewArray
+                (would have to be in parentheses), SuperReference, ...
+              */
+        }
+
+        finish(result, ctx);
+        return result;
+    }
+
+    @Override
+    public ASTList<Expression> visitExpressionList(JavaKParser.ExpressionListContext ctx) {
+        return mapOf(ctx.expression());
+    }
+
+    @Override
+    public JavaNonTerminalProgramElement visitMethodCall(JavaKParser.MethodCallContext ctx) {
+        ASTList<Expression> args = accept(ctx.expressionList());
+        JavaNonTerminalProgramElement result = null;
+        if (ctx.identifier() != null) {
+            Identifier name = accept(ctx.identifier());
+            result = factory.createMethodReference(name, args);
+        }
+
+        if (ctx.THIS() != null) {
+            result = factory.createThisConstructorReference(args);
+        }
+
+        if (ctx.SUPER() != null) {
+            result = factory.createSuperConstructorReference(args);
+        }
+
+        finish(result, ctx);
+        return result;
+    }
+
+    @Override
+    public Object visitMethodCallExpr(JavaKParser.MethodCallExprContext ctx) {
+        return expect(ctx.methodCall());
+    }
+
+    @Override
+    public Statement visitStatementExpression(JavaKParser.StatementExpressionContext ctx) {
+        @NotNull Object e = expect(ctx.expression());
+        try {
+            return (Statement) e;
+        } catch (ClassCastException aaa) {
+            Expression a = expect(ctx.expression());
+            return null;
+        }
+    }
+
+    @Override
+    public Object visitAssignExpression(JavaKParser.AssignExpressionContext ctx) {
+        Assignment result = null;
+        Expression lhs = expect(ctx.expression(0));
+        Expression rhs = expect(ctx.expression(1));
+        switch (ctx.bop.getText()) {
+            case "=":
+                result = factory.createCopyAssignment(lhs, rhs);
+                break;
+            case "+=":
+                result = factory.createPlusAssignment(lhs, rhs);
+                break;
+            case "*=":
+                result = factory.createTimesAssignment(lhs, rhs);
+                break;
+            case "-=":
+                result = factory.createMinusAssignment(lhs, rhs);
+                break;
+            case "/=":
+                result = factory.createDivideAssignment(lhs, rhs);
+                break;
+            case "&=":
+                result = factory.createBinaryAndAssignment(lhs, rhs);
+                break;
+            case "|=":
+                result = factory.createBinaryOrAssignment(lhs, rhs);
+                break;
+            case "^=":
+                result = factory.createBinaryXOrAssignment(lhs, rhs);
+                break;
+            case ">>=":
+                result = factory.createShiftRightAssignment(lhs, rhs);
+                break;
+            case ">>>=":
+                result = factory.createUnsignedShiftRightAssignment(lhs, rhs);
+                break;
+            case "<<=":
+                result = factory.createShiftLeftAssignment(lhs, rhs);
+                break;
+            case "%=":
+                result = factory.createModuloAssignment(lhs, rhs);
+                break;
+            default:
+                assert false;
+        }
+        finish(result, ctx);
+        return result;
+    }
+
+    @Override
+    public ASTList<ParameterDeclaration>  visitFormalParameters(JavaKParser.FormalParametersContext ctx) {
+        return accept(ctx.formalParameterList());
+    }
+
+    @Override
+    public ASTList<ParameterDeclaration>  visitFormalParameterList(JavaKParser.FormalParameterListContext ctx) {
+        ASTList<ParameterDeclaration> seq =  mapOf(ctx.formalParameter());
+        if (ctx.lastFormalParameter() != null) {
+            seq.add(expect(ctx.lastFormalParameter()));
+        }
+        return seq;
+    }
+
+    @Override
+    public ConstructorDeclaration visitConstructorDeclaration(JavaKParser.ConstructorDeclarationContext ctx) {
+        ConstructorDeclaration result = factory.createConstructorDeclaration();
+        Identifier id = expect(ctx.identifier());
+        @Nullable ASTList<ParameterDeclaration> pdl = accept(ctx.formalParameters());
+        if (ctx.THROWS() != null) {
+            Throws th = factory.createThrows();
+            result.setThrown(th);
+        }
+        result.setBody(expect(ctx.block()));
+        result.setIdentifier(id);
+        result.setParameters(pdl);
+        finish(result, ctx);
+        return result;
+    }
+
+    @Override
+    public Object visitGenericConstructorDeclaration(JavaKParser.GenericConstructorDeclarationContext ctx) {
+        ConstructorDeclaration result = expect(ctx.constructorDeclaration());
+        ASTList<TypeParameterDeclaration> typeParams = expect(ctx.typeParameters());
+        result.setTypeParameters(typeParams);
+        finish(result, ctx);
+        return result;
+    }
+
+    @Override
+    public Object visitGenericInterfaceMethodDeclaration(JavaKParser.GenericInterfaceMethodDeclarationContext ctx) {
+        return super.visitGenericInterfaceMethodDeclaration(ctx);
+    }
+
+    @Override
+    public Object visitLambdaExpression(JavaKParser.LambdaExpressionContext ctx) {
+        throw new RuntimeException();
+    }
+
+    @Override
+    public Object visitLambdaParameters(JavaKParser.LambdaParametersContext ctx) {
+        throw new RuntimeException();
+    }
+
+    @Override
+    public Object visitLambdaBody(JavaKParser.LambdaBodyContext ctx) {
+        throw new RuntimeException();
     }
 }

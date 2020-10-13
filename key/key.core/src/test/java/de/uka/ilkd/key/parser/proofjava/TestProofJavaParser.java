@@ -20,6 +20,9 @@ import recoder.java.Expression;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import recoder.java.JavaProgramFactory;
+import recoder.java.Statement;
+import recoder.list.generic.ASTList;
 
 /**
  * 
@@ -83,5 +86,10 @@ public class TestProofJavaParser extends TestCase {
         factory.parseMemberDeclaration("private <Default> getDefault() { };");
         factory.parseMemberDeclaration("private <T> Type m() { };");
     }
-        
+
+    public void test1() throws ParserException {
+        //JavaProgramFactory factory = ProofJavaProgramFactory.getInstance();
+        Expression obj = factory.parseExpression("Foo.class.getName() + \": overloaded constructor \" + this()");
+        System.out.println(obj);
+    }
 }
