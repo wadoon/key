@@ -11,6 +11,12 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.AbstractGenericSpe
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.requires.RequiresValueKeywordSort;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.spec_expression.PredicateParser;
 
+/**
+ * The assume keyword.
+ *
+ * @author Lukas Grätz
+ *
+ */
 public class AssumeKeyword extends AbstractGenericSpecificationKeyword {
 
    /**

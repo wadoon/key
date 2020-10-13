@@ -64,6 +64,7 @@ import org.key_project.jmlediting.profile.jmlref.spec_keyword.AxiomKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.DivergesKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.EnsuresKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.InitiallyKeyword;
+import org.key_project.jmlediting.profile.jmlref.spec_keyword.NameKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.MeasuredByKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.SignalsKeyword;
 import org.key_project.jmlediting.profile.jmlref.spec_keyword.SignalsOnlyKeyword;
@@ -122,7 +123,7 @@ IJMLExpressionProfile {
       this.getSupportedKeywordsInternal().addAll(
             Arrays.asList(new EnsuresKeyword(), new AssignableKeyword(),
                   new AccessibleKeyword(), new RequiresKeyword(),
-                  new AssumeKeyword(),
+                  new AssumeKeyword(), new NameKeyword(),
                   new BehaviorKeyword(lang), new ExceptionalBehaviorKeyword(
                         lang), new NormalBehaviorKeyword(lang),
                         new AlsoKeyword(), new HelperKeyword(), new PureKeyword(),
