@@ -163,7 +163,7 @@ public class EditorFacade {
 
         @Override
         public Editor read(EditorDockableData editorDockableData) {
-            if (editorDockableData.path != null && !editorDockableData.path.isBlank())
+            if (editorDockableData.path != null && !editorDockableData.path.trim().isEmpty())
                 return open(Paths.get(editorDockableData.path));
             else {
                 Editor e = open(editorDockableData.mimeType);
@@ -203,7 +203,8 @@ public class EditorFacade {
         @Override
         public Editor open(Path path) throws IOException {
             Editor e = open();
-            e.setText(Files.readString(path));
+            assert false;
+            //e.setText(Files.readString(path));
             e.setDirty(false);
             e.setPath(path);
             return e;

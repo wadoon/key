@@ -666,9 +666,10 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         private void update() {
             if (isSelected()) {
                 try {
-                    String s = Files.readString(getPath());
-                    setText(s);
-                } catch (IOException e) {
+                    assert false;
+                    //String s = Files.readString(getPath());
+                    //setText(s);
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

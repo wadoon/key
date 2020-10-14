@@ -142,7 +142,7 @@ public class Actions {
                 Path path = f.toPath().resolveSibling(
                         name + ".kps"
                 );
-                var editor = (ScriptEditor) EditorFacade.open(path);
+                ScriptEditor editor = (ScriptEditor) EditorFacade.open(path);
                 if (editor == null) {
                     window.setStatusLine("Could not find a corresponding proof file for proof: " + path);
                 } else {

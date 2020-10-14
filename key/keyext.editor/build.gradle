@@ -4,15 +4,14 @@ plugins {
 dependencies {
     implementation project(":key.ui")
 
-    antlr "org.antlr:antlr4:4.7.2" // use ANTLR version 4
-    implementation "org.antlr:antlr4:4.7.2" // use ANTLR version 4
+    antlr "org.antlr:antlr4:4.8-1" // use ANTLR version 4
+    implementation "org.antlr:antlr4:4.8-1" // use ANTLR version 4
 
-
-    implementation "com.fifesoft:rsyntaxtextarea:3.0.2"
-    implementation "com.fifesoft:rstaui:3.0.0"
-    implementation "com.fifesoft:autocomplete:3.0.0"
-    compileOnly "org.projectlombok:lombok:1.18.6"
-    annotationProcessor "org.projectlombok:lombok:1.18.6"
+    implementation "com.fifesoft:rsyntaxtextarea:3.1.1"
+    implementation "com.fifesoft:rstaui:3.1.0"
+    implementation "com.fifesoft:autocomplete:3.1.0"
+    compileOnly "org.projectlombok:lombok:1.18.14"
+    annotationProcessor "org.projectlombok:lombok:1.18.14"
 }
 
 //https://github.com/gradle/gradle/issues/2565

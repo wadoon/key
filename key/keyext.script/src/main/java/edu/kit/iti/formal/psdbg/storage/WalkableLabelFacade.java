@@ -82,7 +82,9 @@ public class WalkableLabelFacade {
         input = removePrefixAndSuffix(input, prefix, suffix);
         Pattern reOuter = Pattern.compile(delimEntries);
         Collection<Pair<Integer, T>> seq = new ArrayList<>();
-        if(input.isBlank()) return seq;
+        if (input.trim().isEmpty()) {
+            return seq;
+        }
         reOuter.splitAsStream(input).forEach(
                 chunk -> {
                     String s[] = chunk.split(Pattern.quote(delimLength));

@@ -196,11 +196,13 @@ public class EditorExtension implements KeYGuiExtension,
                 if (c == JFileChooser.APPROVE_OPTION) {
                     File f = fc.getSelectedFile();
                     try {
-                        Files.writeString(f.toPath(), editor.getText());
+                        //Files.writeString(f.toPath(), editor.getText());
+                        assert false;
+
                         editor.setPath(f.toPath());
                         editor.setDirty(false);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
+                    } catch (Exception e1) {
+                        //e1.printStackTrace();
                     }
                 }
             } else {
@@ -225,9 +227,11 @@ public class EditorExtension implements KeYGuiExtension,
             if (editor != null) {
                 if (editor.getPath() != null) {
                     try {
-                        Files.writeString(editor.getPath(), editor.getText());
+                        //Files.writeString(editor.getPath(), editor.getText());
+                        assert false;
+
                         editor.setDirty(false);
-                    } catch (IOException e1) {
+                    } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                 } else {

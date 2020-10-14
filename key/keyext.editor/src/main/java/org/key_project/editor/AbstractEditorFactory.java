@@ -34,8 +34,9 @@ public abstract class AbstractEditorFactory implements EditorFactory {
     @Override
     public Editor open(Path path) throws IOException {
         if (path.toString().endsWith(suffix)) {
-            val e = open();
-            e.setText(Files.readString(path));
+            @NotNull Editor e = open();
+            //e.setText(Files.readString(path));
+            assert false;
             e.setDirty(false);
             e.setPath(path);
             e.setMimeType(mimeType);
