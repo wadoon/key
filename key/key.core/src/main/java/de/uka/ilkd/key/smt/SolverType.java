@@ -703,7 +703,7 @@ public interface SolverType  {
 		}
 
 		public String getDefaultSolverParameters() {
-			return "-input=smt2";
+			return "-input=smt2 -proof_generation=FALSE";
 		}
 
 		@Override
