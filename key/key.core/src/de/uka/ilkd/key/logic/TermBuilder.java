@@ -40,6 +40,8 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.loopinvgen.DependencePredicate;
+import de.uka.ilkd.key.loopinvgen.NoRDependencePredicate;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -923,7 +925,19 @@ public class TermBuilder {
     public Term anonEventUpdate(Term timestamp,Term anonUnique) {
         return tf.createTerm(AnonEventUpdate.getAnonEventUpdateFor(services), timestamp, anonUnique);
     }
+    
+    //DEPENDENCY PREDICATES
+//    public Term dependencePredicateNoR(Sort[] array) {
+//        return tf.createTerm( , );
+//    }
+    //
 
+    public Term noRaW(Term locSet) {
+    	Function noRaW = services.getNamespaces().functions().lookup("noRaW");
+    	assert noRaW != null : "Did not find dependency predicate noRaW";
+    	return this.func(noRaW, locSet);
+    }
+    
     public Term elementary(UpdateableOperator lhs, Term rhs) {
         ElementaryUpdate eu = ElementaryUpdate.getInstance(lhs);
         return tf.createTerm(eu, rhs);
