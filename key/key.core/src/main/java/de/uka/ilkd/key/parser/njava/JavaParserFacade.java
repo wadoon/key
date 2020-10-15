@@ -30,21 +30,22 @@ public class JavaParserFacade {
     }
 
     public static CompilationUnit parseCompilationUnit(CharStream stream) {
-        //ASTList<Comment> comments = getCommentTokens(stream);
-        JavaKParser.CompilationUnitContext unit = createParser(stream).compilationUnit();
+        JavaKLexer lexer = createLexer(stream);
+        JavaKParser parser = createParser(lexer);
+        JavaKParser.CompilationUnitContext unit = parser.compilationUnit();
+        ASTList<Comment> comments = getCommentTokens(lexer.docs);
         CompilationUnit cu = (CompilationUnit) translate(unit);
-        //cu.setComments(comments);
+        cu.setComments(comments);
         return cu;
     }
 
-    private static ASTList<Comment> getCommentTokens(CharStream stream) {
+    private static JavaKParser createParser(JavaKLexer lexer) {
+        return new JavaKParser(new CommonTokenStream(lexer));
+    }
+
+    private static ASTList<Comment> getCommentTokens(List<Token> stream) {
         ASTList<Comment> seq = new ASTArrayList<>();
-        JavaKLexer lexer = createLexer(stream);
-        CommonTokenStream commentStream = new CommonTokenStream(lexer, JavaKLexer.HIDDEN);
-        commentStream.fill();
-        Token token;
-        do {
-            token = commentStream.LT(1);
+        for (Token token : stream) {
             if (token.getType() == JavaKLexer.LINE_COMMENT){
                 Comment c = new SingleLineComment(token.getText());
                 seq.add(c);
@@ -53,9 +54,7 @@ public class JavaParserFacade {
                 Comment c = new Comment(token.getText());
                 seq.add(c);
             }
-            if(token.getType()!=Token.EOF)
-                commentStream.consume();
-        } while (token.getType() != Token.EOF);
+        }
         return seq;
     }
 
@@ -64,8 +63,7 @@ public class JavaParserFacade {
     }
 
     public static JavaKParser createParser(CharStream stream) {
-        JavaKParser parser = new JavaKParser(new CommonTokenStream(createLexer(stream)));
-        return parser;
+        return createParser(createLexer(stream));
     }
 
     public static JavaKLexer createLexer(CharStream stream) {

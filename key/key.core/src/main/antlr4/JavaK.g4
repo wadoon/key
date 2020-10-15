@@ -493,7 +493,7 @@ methodCallStatement
     : METHODFRAME LPAREN ( 'result->' qn=identifier COMMA)? ec=executionContext RPAREN COLON block
     ;
 methodBodyStatement
-    : (qn=identifier ASSIGN)? tmp=expression AT bodySource=typeType SEMI
+    : METHODFRAME LPAREN (qn=identifier ASSIGN)? tmp=expression AT bodySource=typeType RPAREN COLON block
     ;
 
 loopScope: LOOPSCOPE LPAREN  expression RPAREN block;
