@@ -29,6 +29,26 @@
 
 grammar JavaK;
 
+@parser::members {
+  /** allow special key-java constructs */
+  boolean keyMode = true;
+  /** allow special key-java constructs */
+  boolean schemeMode = true;
+}
+
+@lexer::members {
+  public java.util.List<Token> docs = new java.util.ArrayList<>(1024);
+@Override
+	public Token nextToken() {
+		Token tok = super.nextToken();
+		if (tok.getType() == JavaKLexer.COMMENT || tok.getType() == JavaKLexer.LINE_COMMENT) {
+			docs.add(tok);
+		}
+		return tok;
+	}
+
+}
+
 compilationUnit
     : packageDeclaration? importDeclaration* typeDeclaration* EOF
     ;
@@ -166,7 +186,7 @@ genericConstructorDeclaration
     ;
 
 constructorDeclaration
-    : identifier formalParameters (THROWS qualifiedNameList)? constructorBody=block
+    : identifier formalParameters (THROWS qualifiedNameList)? (constructorBody=block|';')//allow only decls w/o implementation
     ;
 
 fieldDeclaration
@@ -283,7 +303,34 @@ literal
     | EMPTYMAPLITERAL
     | EMPTYSEQLITERAL
     | EMPTYSETLITERAL
+    | {schemeMode}?
+      isStaticSV
+    | {schemeMode}?
+      isStaticEvaluateSV
     ;
+
+isStaticEvaluateSV
+    : | '#static-evaluate' '(' e=expression /*checked for intanceOf*/ ')'
+    ;
+     /*        	{  result = factory.createRKeYMetaConstructExpression();
+             	   ((RKeYMetaConstructExpression)result).setChild((Operator)e);
+             	   ((RKeYMetaConstructExpression)result).setName("#static-evaluate");
+             	}*/
+
+isStaticSV:  ISSTATIC '(' expression ')';
+/*{
+    RKeYMetaConstructExpression result;
+    Expression e;
+}
+{*/
+/*     { result = factory.createRKeYMetaConstructExpression();
+       ((RKeYMetaConstructExpression)result).setChild(e);
+       ((RKeYMetaConstructExpression)result).setName("#isstatic");
+       return result;
+     }
+*/
+
+
 
 integerLiteral
     : DECIMAL_LITERAL
@@ -387,40 +434,296 @@ localTypeDeclaration
 throwStatement: THROW expression ';';
 
 statement
-    : blockLabel=block                                        #bStatement
-    | ASSERT expression (':' expression)? ';'                 #assertStatement
-    | IF parExpression then=statement (ELSE otherwise=statement)?            #ifStatement
-    | FOR '(' forControl ')' statement                        #forStatement
-    | WHILE parExpression statement                           #whileStatement
-    | DO statement WHILE parExpression ';'                    #doWhileStatement
-    | TRY block (catchClause+ finallyBlock? | finallyBlock)   #tryStatement
-    | TRY resourceSpecification block catchClause* finallyBlock? #tryWithResourceStatement
-    | SWITCH parExpression '{' (switchRule+ | switchBlockStatementGroup* switchLabel*) '}' #switchStatement
-    | SYNCHRONIZED parExpression block                        #synchronizedStatement
-    | RETURN expression? ';'                                  #returnStatement
-    | throwStatement                                          #ignore4
-    | BREAK identifier? ';'                                   #breakStatement
-    | CONTINUE identifier? ';'                                #continueStatement
-    | SEMI #emptyStatement
-    | expression ';'                                          #statementExpression
-    | identifierLabel=identifier ':' statement                #labeledStatement
+    : block
+    | assertStatement
+    | ifStatement
+    | forStatement
+    | whileStatement
+    | doWhileStatement
+    | tryStatement
+    | tryWithResourceStatement
+    | switchStatement
+    | synchronizedStatement
+    | returnStatement
+    | throwStatement
+    | breakStatement
+    | continueStatement
+    | emptyStatement
+    | statementExpression
+    | labeledStatement
     | // java 12+
-      YIELD expression ';'                                    #yieldStatement
-    /** key statements */
-    | METHODFRAME LPAREN ( 'result->' qn=identifier COMMA)? ec=executionContext RPAREN COLON block
-                                                              #methodCallStatement
-    | (qn=identifier ASSIGN)? tmp=expression AT bodySource=typeType SEMI
-                                                              #methodBodyStatement
-    | LOOPSCOPE LPAREN  expression RPAREN block               #loopScope
-    | MERGE_POINT LPAREN expression RPAREN SEMI               #mergePointStatement
-    | '#catchAll' LPAREN qn=identifier RPAREN block           #catchAllStatement
-    | 'exec' block ccatchBlock*                               #execStatement
-    | (TRANSACTIONBEGIN | TRANSACTIONCOMMIT | TRANSACTIONFINISH | TRANSACTIONABORT) SEMI #transactionStatement
+      yieldStatement
+    | {keyMode}?    keyStatements
+    /* key scheme mode */
+    | {schemeMode}? schemeStatements
+;
+
+assertStatement: ASSERT expression (':' expression)? ';';
+ifStatement: IF parExpression then=statement (ELSE otherwise=statement)?;
+forStatement: FOR '(' forControl ')' statement;
+whileStatement: WHILE parExpression statement;
+doWhileStatement: DO statement WHILE parExpression ';';
+tryStatement: TRY block (catchClause+ finallyBlock? | finallyBlock);
+tryWithResourceStatement: TRY resourceSpecification block catchClause* finallyBlock?;
+switchStatement: SWITCH parExpression '{' (switchRule+ | switchBlockStatementGroup* switchLabel*) '}';
+synchronizedStatement: SYNCHRONIZED parExpression block;
+returnStatement: RETURN expression? ';';
+breakStatement: BREAK identifier? ';';
+continueStatement: CONTINUE identifier? ';';
+emptyStatement: SEMI;
+statementExpression: expression ';';
+labeledStatement: identifier ':' statement;
+// java 12+
+yieldStatement: YIELD expression ';';
+
+
+/** key statements */
+keyStatements
+    : methodBodyStatement
+    | methodCallStatement
+    | loopScope
+    | mergePointStatement
+    | catchAllStatement
+    | execStatement
+    | transactionStatement
     ;
+
+/** key statements */
+methodCallStatement
+    : METHODFRAME LPAREN ( 'result->' qn=identifier COMMA)? ec=executionContext RPAREN COLON block
+    ;
+methodBodyStatement
+    : (qn=identifier ASSIGN)? tmp=expression AT bodySource=typeType SEMI
+    ;
+
+loopScope: LOOPSCOPE LPAREN  expression RPAREN block;
+mergePointStatement: MERGE_POINT LPAREN expression RPAREN SEMI;
+catchAllStatement: '#catchAll' LPAREN qn=identifier RPAREN block;
+execStatement: 'exec' block ccatchBlock*;
+transactionStatement: (TRANSACTIONBEGIN | TRANSACTIONCOMMIT | TRANSACTIONFINISH | TRANSACTIONABORT) SEMI;
+
+
+schemeStatements
+    : rMethodCallStatement
+    //TODO | rMethodBodyStatement
+    | keYMetaConstructStatement
+    | statementSV
+    ;
+
+/* VariableSpecification SVVariableDeclarator(boolean isForField) :
+   {
+       Identifier id;
+       int dim = 0;
+       Expression init = null;
+       VariableSpecification result;
+   }
+   {
+       ((id = VariableDeclaratorId() { dim = tmpDimension; })
+        |(id = VariableSV()  {dim = tmpDimension; }))
+
+   	[ "=" (init = VariableInitializer())
+   	|(init = ExpressionSV())
+   	]
+   	{
+   	    if (isForField) {
+   		System.err.println("FIELD DECL WITH SV NOT SUPPORTED");
+   		result=null;
+   	    } else {
+   		result = factory.createVariableSpecification(id, dim, init); //!!CHANGE
+   	    }
+   	    //    setPrefixInfo(result); // only after "=" !!!!!!!!!!!!!!!
+   	    checkConstruction(result);
+   	    return result;
+   	}
+   }*/
+
+   //TODO TypeSV TypeMC
+
+expressionSV : SVIDENTIFIER;
+	//return factory.getExpressionSV(token.image);
+catchSV: SVIDENTIFIER;
+  // CatchSVWrapper factory.getCatchSV(token.image);
+
+ccatchSV: SVIDENTIFIER;
+//ccatchSVWrapper factory.getCcatchSV(token.image);
+
+statementSV : SVIDENTIFIER;
+//StatementSVWrapper factory.getStatementSV(token.image);
+
+variableSV : SVIDENTIFIER;
+executionContextSV : SVIDENTIFIER;
+
+rMethodCallStatement
+    : 'method-frame' '('
+        (variableSV ',')?
+        (executionContext | executionContextSV)
+      	')' ':'
+      block
+    ;
+
+/*{
+    RMethodCallStatement result;
+    ProgramVariableSVWrapper res = null;
+    ExecutionContext exec = null;
+    StatementBlock block;
+}
+{
+    "method-frame"  "("
+	(LOOKAHEAD(2) res = VariableSV() "," )?
+	(LOOKAHEAD(2) exec = ExecutionContext() |
+	 exec = ExecutionContextSV()) ")"
+	":"
+	block = Block()
+    {
+	result = factory.createRMethodCallStatement(res, exec, block);
+	checkConstruction(result);
+	return result;
+    }
+}*/
+/*
+LocalVariableDeclaration SVLocalVariableDeclaration() :
+{
+    LocalVariableDeclaration result;
+    ASTList<VariableSpecification> vl = new ASTArrayList<VariableSpecification>(1);
+    TypeReference tr;
+    VariableSpecification var;
+}
+{
+    {
+	result = factory.createLocalVariableDeclaration();
+	setPrefixInfo(result);
+    }
+    [ "final"
+    {
+	Final fi = factory.createFinal();
+	setPrefixInfo(fi);
+	result.setDeclarationSpecifiers(new ASTArrayList<DeclarationSpecifier>(fi));
+    }
+    |
+      "ghost"
+    {
+    	Ghost g = new Ghost();
+    	setPrefixInfo(g);
+    	result.setDeclarationSpecifiers(new ASTArrayList<DeclarationSpecifier>(g));
+    }
+    ]
+	(tr = TypeMC() | tr = TypeSV() | tr = Type() )
+	var = SVVariableDeclarator(false) {vl.add(var);}
+    {
+	result.setTypeReference(tr);
+	result.setVariableSpecifications(vl);
+	checkConstruction(result);
+
+	return result;
+    }
+}
+*/
+
+/*
+StatementBlock StartBlock() :
+{
+    StatementBlock result = null;
+    ASTList<Statement> sl = new ASTArrayList<Statement>();
+    Statement stat;
+    ExecCtxtSVWrapper ec = null;
+    TypeSVWrapper tr = null;
+    MethodSignatureSVWrapper pm = null;
+    ExpressionSVWrapper sv = null;
+}
+{
+   "{" (   LOOKAHEAD(2)
+           ( <DOT> ( LOOKAHEAD(2)
+		     pm=MethodSignatureSV() "@" tr = TypeSV()  "(" (sv = ExpressionSV())? ")" |
+	             ec = ExecutionContextSV() ))?
+            <CONTEXTSTART>
+            {
+              if (tr == null) {
+                 result = factory.createContextStatementBlock(ec);
+	      } else {
+                 result = factory.createContextStatementBlock(tr, pm, sv);
+	      }
+              setPrefixInfo(result);
+            }
+           (stat = BlockStatement() { sl.add(stat); } )*
+           <CONTEXTEND>
+       |
+	  ({
+             result = factory.createStatementBlock();
+             setPrefixInfo(result);
+           }
+           ( stat = BlockStatement()
+               {
+                   sl.add(stat);
+               }
+           )*)
+      )
+   "}" {
+         result.setBody(sl);
+         checkConstruction(result);
+         return result;
+       }
+}
+*/
+
+jumpLabelSV: SVIDENTIFIER;
+//	    return factory.getJumpLabelSV(token.image);
+
+typeMC
+    :  TYPEOF '(' expression ')';
+           /*{ result = factory.createRKeYMetaConstructType();
+             ((RKeYMetaConstructType)result).setChild(e);
+             ((RKeYMetaConstructType)result).setName("#typeof");
+             return result;
+           } */
+/*{
+    RKeYMetaConstructType result;
+    Expression e;
+}
+{*/
+
+
+keYMetaConstructStatement
+    : '#unwind-loop' '('
+        innerLabel=jumpLabelSV ',' outerLabel=jumpLabelSV ','
+        (whileStatement | forStatement | doWhileStatement)
+        ')' ';'
+    | '#unwind-loop-bounded'
+      '('
+          innerLabel=jumpLabelSV ',' outerLabel=jumpLabelSV ','
+          (whileStatement | forStatement | doWhileStatement)
+      ')' ';'
+    | FORINITUNFOLDTRANSFORMER '(' forInit ')' ';'
+    | LOOPSCOPEINVARIANTTRANSFORMER '(' whileStatement ')' ';'
+    | UNPACK '(' forStatement ')' ';'
+    | '#for-to-while' '(' innerLabel=jumpLabelSV ',' outerLabel=jumpLabelSV ','
+       statement ')'
+    | SWITCHTOIF '(' statement ')'
+    | '#do-break' '(' labeledStatement ')' ';'
+    | '#evaluate-arguments' '(' statementExpression ')' ';'
+    | '#replace' '(' statement ',' variableSV ')' ';'
+	  |	   '#method-call' '(' primary ')' ';'
+	  | '#expand-method-body' '(' statement (',' variableSV )?  ')' ';'
+	  | '#constructor-call' '(' sv = SVIDENTIFIER ',' consRef = SVIDENTIFIER ')' ';'
+	  | '#special-constructor-call' '(' expr=SVIDENTIFIER ')' ';'
+	  |	'#post-work' '(' expr=SVIDENTIFIER ')' ';'
+	  | '#static-initialisation' '(' primary ')' ';'
+	  | '#resolve-multiple-var-decl' '(' statement ')' ';'
+	  | '#array-post-declaration' '(' statement ')' ';'
+	  | '#init-array-creation' '(' variableSV ',' expressionSV ')' ';'
+	  | '#init-array-creation-transient' '(' variableSV ',' expressionSV ')' ';'
+	  | '#init-array-assignments' '(' variableSV ',' expressionSV ')' ';'
+    | '#enhancedfor-elim' '(' forStatement ')' ';'
+    | REATTACHLOOPINVARIANT '(' whileStatement ')' ';'
+    ;
+
 
 //TODO passive expression
 
-identifier: IDENTIFIER | ImplicitIdentifier | DL_EMBEDDED_FUNCTION | SEQ | MAP | SET |LOCSET | BIGINT;
+identifier
+    : IDENTIFIER | ImplicitIdentifier | DL_EMBEDDED_FUNCTION
+    | SEQ | MAP | SET |LOCSET | BIGINT
+    | {schemeMode}? SVIDENTIFIER //	result = factory.getExpressionSV(token.image);
+    ;
 
 executionContext
     : 'source=' identifier formalParameters AT classContext=typeType
@@ -548,7 +851,6 @@ expression
     | typeType '::' (typeArguments? identifier | NEW) #methodReference2
     | classType '::' typeArguments? NEW #methodReference3
     ;
-
 
 /*
 | adtGetter
@@ -682,6 +984,10 @@ arguments
     : '(' expressionList? ')'
     ;
 
+keymeta//TODO find place
+    : '#create-object' '(' expressionSV ')'
+    | '#length-reference' '(' expressionSV ')'
+    ;
 
 /***** LEXER *****/
 
@@ -760,6 +1066,19 @@ TRANSACTIONBEGIN : '#beginJavaCardTransaction';
 TRANSACTIONCOMMIT : '#commitJavaCardTransaction';
 TRANSACTIONFINISH : '#finishJavaCardTransaction';
 TRANSACTIONABORT : '#abortJavaCardTransaction';
+GHOST: 'ghost';
+ISSTATIC: '#isstatic';
+EVALARGS: '#evaluate-arguments';
+REPLACEARGS: '#replace';
+CONTEXTSTART: '..';
+//CONTEXTEND: '...'; superseded by ELLIPSIS
+TYPEOF: '#typeof';
+SWITCHTOIF: '#switch-to-if';
+UNPACK: '#unpack';
+REATTACHLOOPINVARIANT: '#reattachLoopInvariant';
+FORINITUNFOLDTRANSFORMER: '#forInitUnfoldTransformer';
+LOOPSCOPEINVARIANTTRANSFORMER: '#loopScopeInvariantTransformer';
+SETSV: '#set';
 
 EMPTYSETLITERAL : '\\empty';
 EMPTYSEQLITERAL : '\\seq_empty';
@@ -878,6 +1197,7 @@ LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
 // identifiers
 
 IDENTIFIER:         Letter LetterOrDigit*;
+SVIDENTIFIER:       '#' IDENTIFIER;
 
 // Fragment rules
 

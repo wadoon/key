@@ -86,10 +86,4 @@ public class TestProofJavaParser extends TestCase {
         factory.parseMemberDeclaration("private <Default> getDefault() { };");
         factory.parseMemberDeclaration("private <T> Type m() { };");
     }
-
-    public void test1() throws ParserException {
-        //JavaProgramFactory factory = ProofJavaProgramFactory.getInstance();
-        Expression obj = factory.parseExpression("Foo.class.getName() + \": overloaded constructor \" + this()");
-        System.out.println(obj);
-    }
 }

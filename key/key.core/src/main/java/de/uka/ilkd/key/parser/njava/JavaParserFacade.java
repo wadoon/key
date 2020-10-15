@@ -1,13 +1,16 @@
 package de.uka.ilkd.key.parser.njava;
 
+import antlr.ASTNULLType;
 import de.uka.ilkd.key.nparser.JavaKLexer;
 import de.uka.ilkd.key.nparser.JavaKParser;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 import recoder.java.Comment;
 import recoder.java.CompilationUnit;
 import recoder.java.SingleLineComment;
+import recoder.java.SourceElement;
+import recoder.java.declaration.FieldDeclaration;
+import recoder.java.declaration.MemberDeclaration;
+import recoder.java.declaration.MethodDeclaration;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
@@ -19,12 +22,18 @@ import java.util.List;
  * @version 1 (10/12/20)
  */
 public class JavaParserFacade {
-    public static CompilationUnit parseCompilationUnit(CharStream stream) {
-        ASTList<Comment> comments = getCommentTokens(stream);
-        JavaKParser.CompilationUnitContext unit = createParser(stream).compilationUnit();
+
+    private static SourceElement translate(ParserRuleContext ctx) {
         JavaKBuilder builder = new JavaKBuilder();
-        CompilationUnit cu = (CompilationUnit) unit.accept(builder);
-        cu.setComments(comments);
+        SourceElement obj = (SourceElement) ctx.accept(builder);
+        return obj;
+    }
+
+    public static CompilationUnit parseCompilationUnit(CharStream stream) {
+        //ASTList<Comment> comments = getCommentTokens(stream);
+        JavaKParser.CompilationUnitContext unit = createParser(stream).compilationUnit();
+        CompilationUnit cu = (CompilationUnit) translate(unit);
+        //cu.setComments(comments);
         return cu;
     }
 
@@ -32,8 +41,10 @@ public class JavaParserFacade {
         ASTList<Comment> seq = new ASTArrayList<>();
         JavaKLexer lexer = createLexer(stream);
         CommonTokenStream commentStream = new CommonTokenStream(lexer, JavaKLexer.HIDDEN);
-        Token token = commentStream.get(1);
+        commentStream.fill();
+        Token token;
         do {
+            token = commentStream.LT(1);
             if (token.getType() == JavaKLexer.LINE_COMMENT){
                 Comment c = new SingleLineComment(token.getText());
                 seq.add(c);
@@ -42,7 +53,8 @@ public class JavaParserFacade {
                 Comment c = new Comment(token.getText());
                 seq.add(c);
             }
-            commentStream.consume();
+            if(token.getType()!=Token.EOF)
+                commentStream.consume();
         } while (token.getType() != Token.EOF);
         return seq;
     }
@@ -59,5 +71,21 @@ public class JavaParserFacade {
     public static JavaKLexer createLexer(CharStream stream) {
         JavaKLexer lexer = new JavaKLexer(stream);
         return lexer;
+    }
+
+    public static FieldDeclaration parseFieldDeclaration(CharStream stream) {
+        return null;
+    }
+
+    public static MemberDeclaration parseMemberDeclaration(CharStream stream) {
+        return null;
+    }
+
+    public static MethodDeclaration parseMethodDeclaration(CharStream stream) {
+        return null;
+    }
+
+    public static SourceElement parseStatementBlock(CharStream stream) {
+        return translate(createParser(stream).block());
     }
 }

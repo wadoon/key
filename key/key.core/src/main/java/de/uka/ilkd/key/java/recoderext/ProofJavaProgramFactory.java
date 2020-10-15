@@ -17,8 +17,7 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.util.List;
 
 import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
@@ -176,6 +175,28 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         }
     }
 
+    static PrintStream out;
+    static {
+        try {
+            out = new PrintStream("/tmp/java.txt");
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> out.close()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    Reader print(Reader in, String type) throws IOException {
+        StringBuilder s= new StringBuilder();
+        char[] cbuf = new char[1024];
+        int len=0;
+        while((len = in.read(cbuf)) > 0) {
+            s.append(cbuf,0,len);
+        }
+        out.format("==== %s\n %s \n", type, s);
+        StringReader n = new StringReader(s.toString());
+        return n;
+    }
+
     /**
      Parse a {@link CompilationUnit} from the given reader.
      */
@@ -183,6 +204,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public CompilationUnit parseCompilationUnit(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try {
+            in=print(in, "compilationUnit");
 		ProofJavaParser.initialize(in);
 		CompilationUnit res = ProofJavaParser.CompilationUnit();
 		postWork(res);
@@ -200,7 +222,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public TypeDeclaration parseTypeDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		ProofJavaParser.initialize(in);
+            in=print(in, "typedecl");
+            ProofJavaParser.initialize(in);
 		TypeDeclaration res = ProofJavaParser.TypeDeclaration();
 		postWork(res);
 		return res;
@@ -218,7 +241,9 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public FieldDeclaration parseFieldDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		ProofJavaParser.initialize(in);
+            in=print(in, "field");
+
+            ProofJavaParser.initialize(in);
 		FieldDeclaration res = ProofJavaParser.FieldDeclaration();
 		postWork(res);
 		return res;
@@ -236,7 +261,9 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public MethodDeclaration parseMethodDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		ProofJavaParser.initialize(in);
+            in=print(in, "method");
+
+            ProofJavaParser.initialize(in);
 		MethodDeclaration res = ProofJavaParser.MethodDeclaration();
 		postWork(res);
 		return res;
@@ -254,7 +281,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public MemberDeclaration parseMemberDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		ProofJavaParser.initialize(in);
+            in= print(in, "member");
+            ProofJavaParser.initialize(in);
 		MemberDeclaration res = ProofJavaParser.ClassBodyDeclaration();
 		postWork(res);
 		return res;
@@ -272,7 +300,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public ParameterDeclaration parseParameterDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		ProofJavaParser.initialize(in);
+            in=print(in, "param");
+            ProofJavaParser.initialize(in);
 		ParameterDeclaration res = ProofJavaParser.FormalParameter();
 		postWork(res);
 		return res;
@@ -290,7 +319,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public ConstructorDeclaration parseConstructorDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		ProofJavaParser.initialize(in);
+            in=print(in, "constr");
+            ProofJavaParser.initialize(in);
 		ConstructorDeclaration res = ProofJavaParser.ConstructorDeclaration();
 		postWork(res);
 		return res;
@@ -308,7 +338,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public TypeReference parseTypeReference(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		ProofJavaParser.initialize(in);
+            in=print(in, "type");
+            ProofJavaParser.initialize(in);
 		TypeReference res = ProofJavaParser.ResultType();
 		postWork(res);
 		return res;
@@ -326,7 +357,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public Expression parseExpression(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		ProofJavaParser.initialize(in);
+            in=print(in, "expr");
+            ProofJavaParser.initialize(in);
 		Expression res = ProofJavaParser.Expression();
 		postWork(res);
 		return res;
@@ -344,7 +376,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public ASTList<Statement> parseStatements(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		ProofJavaParser.initialize(in);
+            in=print(in, "statement");
+            ProofJavaParser.initialize(in);
 		ASTList<Statement> res = ProofJavaParser.GeneralizedStatements();
 		for (int i = 0; i < res.size(); i += 1) {
 		    postWork(res.get(i));
@@ -365,7 +398,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 	throws IOException, ParserException {
 	synchronized(parser) {
 	    try{
-		ProofJavaParser.initialize(in);
+            in=print(in, "block");
+            ProofJavaParser.initialize(in);
 		StatementBlock res = ProofJavaParser.StartBlock();
 		postWork(res);
 		return res;

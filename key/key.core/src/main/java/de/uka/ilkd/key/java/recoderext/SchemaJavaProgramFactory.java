@@ -17,7 +17,9 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.List;
 
 import de.uka.ilkd.key.logic.Name;
@@ -138,6 +140,28 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
     public MergePointStatement createMergePointStatement(Expression e) {
         return new MergePointStatement(e);
+    }
+
+    static PrintStream out;
+    static {
+        try {
+            out = new PrintStream("/tmp/schema.txt");
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> out.close()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    Reader print(Reader in, String type) throws IOException {
+        StringBuilder s= new StringBuilder();
+        char[] cbuf = new char[1024];
+        int len=0;
+        while((len = in.read(cbuf)) > 0) {
+            s.append(cbuf,0,len);
+        }
+        out.format("==== %s\n %s \n", type, s);
+        StringReader n = new StringReader(s.toString());
+        return n;
     }
 
     /**
@@ -363,7 +387,8 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     public CompilationUnit parseCompilationUnit(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try {
-		SchemaJavaParser.initialize(in);
+            in=print(in, "compilationUnit");
+            SchemaJavaParser.initialize(in);
 		CompilationUnit res = SchemaJavaParser.CompilationUnit();
 		postWork(res);
 		return res;
@@ -382,7 +407,8 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     public TypeDeclaration parseTypeDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		SchemaJavaParser.initialize(in);
+            in=print(in, "typedecl");
+            SchemaJavaParser.initialize(in);
 		TypeDeclaration res = SchemaJavaParser.TypeDeclaration();
 		postWork(res);
 		return res;
@@ -402,7 +428,8 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     public FieldDeclaration parseFieldDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		SchemaJavaParser.initialize(in);
+            in=print(in, "field");
+            SchemaJavaParser.initialize(in);
 		FieldDeclaration res = SchemaJavaParser.FieldDeclaration();
 		postWork(res);
 		return res;
@@ -422,7 +449,8 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     public MethodDeclaration parseMethodDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		SchemaJavaParser.initialize(in);
+            in=print(in, "method");
+            SchemaJavaParser.initialize(in);
 		MethodDeclaration res = SchemaJavaParser.MethodDeclaration();
 		postWork(res);
 		return res;
@@ -442,7 +470,8 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     public MemberDeclaration parseMemberDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		SchemaJavaParser.initialize(in);
+            in=print(in, "member");
+            SchemaJavaParser.initialize(in);
 		MemberDeclaration res = SchemaJavaParser.ClassBodyDeclaration();
 		postWork(res);
 		return res;
@@ -462,7 +491,8 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     public ParameterDeclaration parseParameterDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		SchemaJavaParser.initialize(in);
+            in=print(in, "param");
+            SchemaJavaParser.initialize(in);
 		ParameterDeclaration res = SchemaJavaParser.FormalParameter();
 		postWork(res);
 		return res;
@@ -482,7 +512,8 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     public ConstructorDeclaration parseConstructorDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		SchemaJavaParser.initialize(in);
+            in=print(in, "constr");
+            SchemaJavaParser.initialize(in);
 		ConstructorDeclaration res = SchemaJavaParser.ConstructorDeclaration();
 		postWork(res);
 		return res;
@@ -522,7 +553,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     public Expression parseExpression(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
-		SchemaJavaParser.initialize(in);
+            in=print(in, "expr");
+
+            SchemaJavaParser.initialize(in);
 		Expression res = SchemaJavaParser.Expression();
 		postWork(res);
 		return res;
@@ -541,8 +574,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     @Override
     public ASTList<Statement> parseStatements(Reader in) throws IOException, ParserException {
         synchronized(parser) {
-	    try{
-		SchemaJavaParser.initialize(in);
+	    try{            in=print(in, "statement");
+
+            SchemaJavaParser.initialize(in);
 		ASTList<Statement> res = SchemaJavaParser.GeneralizedStatements();
 		for (int i = 0; i < res.size(); i += 1) {
 		    postWork(res.get(i));
@@ -565,7 +599,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 	throws IOException, ParserException {
 	synchronized(parser) {
 	    try{
-		SchemaJavaParser.initialize(in);
+            in=print(in, "block");
+
+            SchemaJavaParser.initialize(in);
 		StatementBlock res = SchemaJavaParser.StartBlock();
 		postWork(res);
 		return res;

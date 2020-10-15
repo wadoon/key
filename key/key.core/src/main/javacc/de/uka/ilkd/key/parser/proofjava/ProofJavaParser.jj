@@ -62,6 +62,7 @@ import recoder.abstraction.TypeArgument.WildcardMode;
  */
 @SuppressWarnings("all")
 public class ProofJavaParser {
+
     public static final void initialize(Reader r) {
         current = null;
         comments.clear();

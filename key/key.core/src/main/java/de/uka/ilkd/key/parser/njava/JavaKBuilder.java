@@ -2,9 +2,11 @@ package de.uka.ilkd.key.parser.njava;
 
 import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.recoderext.adt.*;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.JavaKBaseVisitor;
 import de.uka.ilkd.key.nparser.JavaKParser;
-import org.antlr.misc.IntArrayList;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +27,6 @@ import recoder.parser.ParseException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,7 +39,7 @@ import static java.lang.String.format;
  */
 public class JavaKBuilder extends JavaKBaseVisitor<Object> {
     //region copied
-    private static ProofJavaProgramFactory factory = (ProofJavaProgramFactory) ProofJavaProgramFactory.getInstance();
+    private static final ProofJavaProgramFactory factory = (ProofJavaProgramFactory) ProofJavaProgramFactory.getInstance();
 
     static boolean superAllowed = true;
     private TypeDeclaration currentClass;
@@ -77,9 +78,9 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
     }
 
     public void finish(SourceElement element, ParserRuleContext ctx) {
-        setPrefixInfo(element, ctx);
+         /*setPrefixInfo(element, ctx); TODO
         setPostfixInfo(element, ctx);
-        checkConstruction(element);
+        checkConstruction(element);*/
     }
 
     protected void setPrefixInfo(SourceElement constrResult, ParserRuleContext ctx) {
@@ -282,6 +283,111 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
     static PrimaryPrefixReturnValue prefix = new PrimaryPrefixReturnValue();
     //endregion
 
+    //region scheme
+    private static final SchemaJavaProgramFactory sfactory
+            = (SchemaJavaProgramFactory) SchemaJavaProgramFactory.getInstance();
+
+    private static void testLeftHandSide(Expression expr) throws ParseException {
+        if (expr instanceof ExpressionSVWrapper) {
+            SchemaVariable sv = ((ExpressionSVWrapper) expr).getSV();
+            if (!isLeftHandSide(sv.sort())) {
+                throw new ParseException
+                        ("Schema variable " + sv + " should be one of lefthandside"
+                                + " or nonsimpleexpression or variable or simple expression.");
+            }
+        }
+
+    }
+
+    private static boolean isLeftHandSide(Sort s) {
+        return s == ProgramSVSort.VARIABLE ||
+                s == ProgramSVSort.STATICVARIABLE ||
+                s == ProgramSVSort.LEFTHANDSIDE ||
+                s == ProgramSVSort.SIMPLEEXPRESSION ||
+                s == ProgramSVSort.NONSIMPLEEXPRESSION;
+    }
+
+    private static boolean isLocalVariable(String svName) {
+        return sfactory.lookupSchemaVariableType(svName, ProgramSVSort.VARIABLE);
+    }
+
+    private void checkConstructionScheme(SourceElement constrResult)
+            throws ParseException {
+        if (constrResult == null) {
+            throw new ParseException
+                    (constrResult + " An illegal null object was created during tree construction");
+        }
+
+        //check forinit sv is only in forinit:
+        if ((constrResult instanceof ExpressionContainer)
+                && !(constrResult instanceof For)) {
+            ExpressionContainer ec
+                    = (ExpressionContainer) constrResult;
+            for (int i = 0; i < ec.getExpressionCount(); i++) {
+                if (ec.getExpressionAt(i)
+                        instanceof ExpressionSVWrapper) {
+                    checkExpressionSVWrapper(ProgramSVSort.LOOPINIT, ec.getExpressionAt(i));
+                }
+            }
+        }
+        if (constrResult instanceof For) {
+            For f = (For) constrResult;
+            if (f.getUpdates() != null) for (int i = 0; i < f.getUpdates().size(); i++) {
+                checkExpressionSVWrapper(ProgramSVSort.LOOPINIT, f.getUpdates().get(i));
+            }
+            checkExpressionSVWrapper(ProgramSVSort.LOOPINIT, f.getGuard());
+            ASTList<LoopInitializer> li = f.getInitializers();
+            if ((li != null) && (li.size() > 0)) {
+                if (li.get(0) instanceof ExpressionSVWrapper) {
+                    if (li.size() != 1) throw new ParseException("ForInit SV not allowed this way.");
+                } else for (int i = 0; i < li.size(); i++) {
+                    checkExpressionSVWrapper(ProgramSVSort.LOOPINIT, li.get(i));
+                }
+            }
+
+        }
+
+        //check label sv is only in labeled statement:
+        if (!(constrResult instanceof LabeledStatement)
+                && (constrResult instanceof NonTerminalProgramElement)) {
+
+            NonTerminalProgramElement p = (NonTerminalProgramElement) constrResult;
+            for (int i = 0; i < p.getChildCount(); i++) {
+
+                if (p.getChildAt(i) instanceof ExpressionSVWrapper) {
+                    checkExpressionSVWrapper(ProgramSVSort.LABEL, p.getChildAt(i));
+                }
+            }
+        }
+    }
+
+    private static void checkExpressionSVWrapper(ProgramSVSort notOfSort,
+                                                 ProgramElement exp) throws ParseException {
+        if (exp != null && exp instanceof ExpressionSVWrapper) {
+            SchemaVariable sv = ((ExpressionSVWrapper) exp).getSV();
+            if (sv.sort() == notOfSort) {
+                throw new ParseException(sv
+                        + ": " + notOfSort
+                        + " not allowed here");
+            }
+        }
+    }
+
+    private static void checkLabelSVWrapper(ProgramSVSort notOfSort,
+                                            ProgramElement exp) throws ParseException {
+        if (exp != null && exp instanceof LabelSVWrapper) {
+            SchemaVariable sv = ((LabelSVWrapper) exp).getSV();
+            if (sv.sort() == notOfSort) {
+                throw new ParseException(sv
+                        + ": " + notOfSort
+                        + " not allowed here");
+            }
+        }
+    }
+
+    //endregion
+
+
     //region helper
 
     /**
@@ -350,7 +456,7 @@ public class JavaKBuilder extends JavaKBaseVisitor<Object> {
         ASTList<TypeDeclaration> tmp = mapOf(ctx.typeDeclaration());
         ASTList<TypeDeclaration> declarations = new ASTArrayList<>();
         for (TypeDeclaration typeDeclaration : tmp) {
-            if(typeDeclaration!=null) declarations.add(typeDeclaration); //Remove empty declaration
+            if (typeDeclaration != null) declarations.add(typeDeclaration); //Remove empty declaration
         }
         CompilationUnit result = factory.createCompilationUnit(ps, imports, declarations);
         finish(result, ctx);
@@ -2864,13 +2970,13 @@ default:
     }
 
     @Override
-    public ASTList<ParameterDeclaration>  visitFormalParameters(JavaKParser.FormalParametersContext ctx) {
+    public ASTList<ParameterDeclaration> visitFormalParameters(JavaKParser.FormalParametersContext ctx) {
         return accept(ctx.formalParameterList());
     }
 
     @Override
-    public ASTList<ParameterDeclaration>  visitFormalParameterList(JavaKParser.FormalParameterListContext ctx) {
-        ASTList<ParameterDeclaration> seq =  mapOf(ctx.formalParameter());
+    public ASTList<ParameterDeclaration> visitFormalParameterList(JavaKParser.FormalParameterListContext ctx) {
+        ASTList<ParameterDeclaration> seq = mapOf(ctx.formalParameter());
         if (ctx.lastFormalParameter() != null) {
             seq.add(expect(ctx.lastFormalParameter()));
         }
@@ -2886,7 +2992,7 @@ default:
             Throws th = factory.createThrows();
             result.setThrown(th);
         }
-        result.setBody(expect(ctx.block()));
+        result.setBody(accept(ctx.block())); //may be empty, KeY special
         result.setIdentifier(id);
         result.setParameters(pdl);
         finish(result, ctx);
