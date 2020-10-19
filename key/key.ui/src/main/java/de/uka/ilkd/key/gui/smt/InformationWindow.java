@@ -74,7 +74,7 @@ public class InformationWindow extends JDialog {
     private JTabbedPane tabbedPane;
     private Model model;
 
-    public InformationWindow(Dialog parent, SMTSolver solver, Collection<Information> information,
+    public InformationWindow(SMTSolver solver, Collection<Information> information,
                              String title) {
         super(parent);
         this.setTitle(title);
