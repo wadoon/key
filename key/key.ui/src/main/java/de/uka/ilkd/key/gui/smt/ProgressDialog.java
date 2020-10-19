@@ -59,6 +59,7 @@ public class ProgressDialog extends JDialog{
         private static final long serialVersionUID = 1L;
         private final ProgressTable   table;
         private JButton  applyButton;
+    private JButton  focusButton;
         private JButton  stopButton;
         private JScrollPane scrollPane;
 
@@ -75,6 +76,7 @@ public class ProgressDialog extends JDialog{
         public void stopButtonClicked();
         public void discardButtonClicked();
         public void additionalInformationChosen(Object obj);
+        void focusButtonClicked();
     }
 
     public ProgressDialog(ProgressModel model,ProgressDialogListener listener, boolean counterexample,
@@ -103,6 +105,7 @@ public class ProgressDialog extends JDialog{
                 buttonBox.add(Box.createHorizontalStrut(5));
                 if(!counterexample){
                 	buttonBox.add(getApplyButton());
+                    buttonBox.add(getFocusButton());
                     buttonBox.add(Box.createHorizontalStrut(5));
                 }
                 
@@ -185,12 +188,28 @@ public class ProgressDialog extends JDialog{
         	
         	return statusMessageBox;
 		}
-        
 
-        
-   
-        
-        
+    private JButton getFocusButton() {
+        if(focusButton == null){
+            focusButton = new JButton("Focus goals");
+            focusButton.setEnabled(false);
+            focusButton.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        listener.focusButtonClicked();
+                    } catch(Exception exception) {
+                        // There may be exceptions during rule application that should not be lost.
+                        ExceptionDialog.showDialog(ProgressDialog.this, exception);
+                    }
+                }
+            });
+
+        }
+        return focusButton;
+    }
+
         private JButton getApplyButton() {
                 if(applyButton == null){
                        applyButton = new JButton("Apply");
@@ -255,6 +274,7 @@ public class ProgressDialog extends JDialog{
                         stopButton.setText("Discard");
                         if(applyButton!=null)
                         applyButton.setEnabled(true);
+                        focusButton.setEnabled(true);
                         break;
                 case stopModus:
                         stopButton.setText("Stop");

@@ -96,13 +96,16 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
 
         sb.append("\n; --- Sequent\n");
+        int i = 0;
         for (SExpr ass : results) {
+            ass = SExprs.named(ass, "L_" + (i++));
             SExpr assertion = new SExpr("assert", ass);
             assertion.appendTo(sb);
             sb.append("\n");
         }
 
         sb.append("\n(check-sat)");
+        sb.append("\n(get-unsat-core)");
 
         sb.append("\n\n; --- Translation of unknown values\n");
         for (Term t : master.getUnknownValues().keySet()) {

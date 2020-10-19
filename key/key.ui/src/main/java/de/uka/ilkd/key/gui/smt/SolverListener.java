@@ -262,8 +262,19 @@ public class SolverListener implements SolverLauncherListener {
             } finally {
                 mediator.startInterface(true);
             }
-
         }
+
+    private void focusResults() {
+        KeYMediator mediator = MainWindow.getInstance().getMediator();
+        mediator.stopInterface(true);
+        try {
+            SMTFocusResults.focus(problems, mediator.getServices());
+        } finally {
+            mediator.startInterface(true);
+        }
+    }
+
+
         
         private void showInformation(InternSMTProblem problem){	
         	    new InformationWindow(problem.solver,problem.information,"Information for "+ problem.toString());
@@ -707,7 +718,12 @@ public class SolverListener implements SolverLauncherListener {
             		  showInformation((InternSMTProblem)obj);   
             	  }
             }
-    };
+
+            @Override
+            public void focusButtonClicked() {
+                focusResults();
+            }
+        };
 
     /**
      * Checks if the given {@link Term} contains a modality, query, or update.
