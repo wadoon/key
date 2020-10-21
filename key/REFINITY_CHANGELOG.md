@@ -1,5 +1,13 @@
+
 REFINITY CHANGES
 ================
+
+## 2020-10-21 (v0.9.7) Dominic Steinhoefel <steinhoefel@cs.tu-darmstadt.de>
+
+  * Syntax checking for APE specifications
+  * Instantiation checking: Check whether a concrete program is an instance of
+    an abstract one. Early testing face, only programmatic access.
+  * Bugfixes (e.g., no saving necessary before validating a proof)
 
 ## 2020-06-12 (v0.9.6) Dominic Steinhoefel <steinhoefel@cs.tu-darmstadt.de>
 
