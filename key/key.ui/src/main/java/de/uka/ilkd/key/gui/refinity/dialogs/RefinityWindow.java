@@ -515,9 +515,10 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
 
     /**
      * First updates the model, then loads form the model. This is in particular
-     * useful to react to changes in the {@link RelevantLocation}s, because this
-     * affects the relevant locations. When removing a {@link RelevantLocation},
-     * potentially a relevant location has to be removed, too.
+     * useful to react to changes in the declarations of free program variables and
+     * abstract location sets, because this affects the relevant locations. When
+     * removing free program variables and abstract location sets, potentially a
+     * relevant location has to be removed, too.
      */
     private void refresh() {
         updateModel();
@@ -837,6 +838,8 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
     }
 
     private void checkProof() {
+        updateModel();
+        
         final KeYFileChooser keYFileChooser = KeYFileChooser
                 .getFileChooser("Select file to load proof or problem");
 
@@ -1498,6 +1501,8 @@ public class RefinityWindow extends JFrame implements RefinityWindowConstants {
     }
 
     private void checkKeYSyntax() {
+        updateModel();
+        
         final KeYJMLErrorParser leftErrorParser = new KeYJMLErrorParser(model, true);
         final KeYJMLErrorParser rightErrorParser = new KeYJMLErrorParser(model, false);
         
