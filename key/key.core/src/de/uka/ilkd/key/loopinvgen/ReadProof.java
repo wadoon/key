@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.loopinvgen;
 
 import java.lang.reflect.Array;
+import java.text.DateFormat.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +11,8 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import com.sun.javafx.fxml.expression.Expression;
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.TopLevelAttribute;
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.TopLevelElement;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.ProgramVariableName;
@@ -20,11 +23,14 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.expression.operator.Equals;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
+import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -38,6 +44,7 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.strategy.feature.TopLevelFindFeature;
 
 public class ReadProof {
 
@@ -73,26 +80,29 @@ public class ReadProof {
 		return null;
 	}
 
-	public ArrayList<SequentFormula> getAntecedent() {
-		ArrayList<SequentFormula> res = null;
+	public Semisequent getAntecedent() {
+		Semisequent ant = null;
 		if (goal.sequent().antecedent() != null)
+			ant = goal.sequent().antecedent();
 			System.out.println(" Antecedent: " + goal.sequent().antecedent());
 
-		for (SequentFormula sf : goal.sequent().antecedent()) {
-			if (sf.formula().op() instanceof DependencePredicate || sf.formula().op() instanceof AccessPredicate) {
-				res.add(sf);
-			}
-		}
+		//for (SequentFormula sf : goal.sequent().antecedent()) {
+//			if (sf.formula().op() instanceof DependencePredicate || sf.formula().op() instanceof AccessPredicate) {
+//				res.add(sf);
+//			}
+		//}
 // Uncomment after adding the shifting rule		
 //		if (res != null)
 //			for (int i = 0; i < res.size(); i++) {
 //				System.out.println(res.get(i));
 //			}
-		return res;
+		return ant;
 	}
 
+
+
 	
-	public Set<?> collectAllSubterms(Sequent s) {
+	public Set<Term> collectAllSubterms(Sequent s) {
 	    TermCollector collector = new TermCollector();
 		for (SequentFormula sf : s) {
 			sf.formula().execPostOrder(collector);
@@ -103,17 +113,14 @@ public class ReadProof {
 	
 	
 	
-//	public ImmutableArray<Term> getArray() {
-//		ImmutableArray<Term> sarr = null;
-//		for (SequentFormula sf : goal.sequent().succedent()) {
-//			if (sf.formula().sort() == ArraySort.ANY) {
-//				System.out.println("blah");
-//			}
-//
-//			sarr = sf.formula().subs();
+	public void getArray() {
+//		Set<Term> pvf = null;
+//		Semisequent seq = goal.sequent().succedent();
+//		for (SequentFormula sf : seq) {
+//			if(sf.formula().op() instanceof ProgramVariable || sf.formula().op() instanceof Field)
+//				//TODO
 //		}
-//		return sarr;
-//	}
+}
 
 	public Statement getLoopBody() {
 		Statement body = ((LoopStatement) this.getLoopFormula()).getBody();

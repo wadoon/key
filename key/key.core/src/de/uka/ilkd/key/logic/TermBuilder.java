@@ -40,8 +40,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.loopinvgen.DependencePredicate;
-import de.uka.ilkd.key.loopinvgen.NoRDependencePredicate;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -926,17 +924,52 @@ public class TermBuilder {
         return tf.createTerm(AnonEventUpdate.getAnonEventUpdateFor(services), timestamp, anonUnique);
     }
     
-    //DEPENDENCY PREDICATES
-//    public Term dependencePredicateNoR(Sort[] array) {
-//        return tf.createTerm( , );
-//    }
-    //
-
-    public Term noRaW(Term locSet) {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+    //TODO: defining an ADT and then removing these. Input Should not be an array.
+    
+    public Term noRaW(Term[] locSet) {
     	Function noRaW = services.getNamespaces().functions().lookup("noRaW");
     	assert noRaW != null : "Did not find dependency predicate noRaW";
     	return this.func(noRaW, locSet);
     }
+    
+    public Term noWaR(Term[] locSet) {
+    	Function noWaR = services.getNamespaces().functions().lookup("noWaR");
+    	assert noWaR != null : "Did not find dependency predicate noWaR";
+    	return this.func(noWaR, locSet);
+    }
+    
+    public Term noWaW(Term[] locSet) {
+    	Function noWaW = services.getNamespaces().functions().lookup("noWaW");
+    	assert noWaW != null : "Did not find dependency predicate noWaW";
+    	return this.func(noWaW, locSet);
+    }
+    
+    public Term noR(Term[] locSet) {
+    	Function noR = services.getNamespaces().functions().lookup("noR");
+    	assert noR != null : "Did not find dependency predicate noR";
+    	return this.func(noR, locSet);
+    }
+    
+    public Term noW(Term[] locSet) {
+    	Function noW = services.getNamespaces().functions().lookup("noW");
+    	assert noW != null : "Did not find dependency predicate noW";
+    	return this.func(noW, locSet);
+    }
+    
+    public Term rPred(Term[] locSet) {
+    	Function rPred = services.getNamespaces().functions().lookup("rPred");
+    	assert rPred != null : "Did not find dependency predicate noW";
+    	return this.func(rPred, locSet);
+    }
+    
+    public Term wPred(Term[] locSet) {
+    	Function wPred = services.getNamespaces().functions().lookup("wPred");
+    	assert wPred != null : "Did not find dependency predicate noW";
+    	return this.func(wPred, locSet);
+    }
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     public Term elementary(UpdateableOperator lhs, Term rhs) {
         ElementaryUpdate eu = ElementaryUpdate.getInstance(lhs);
