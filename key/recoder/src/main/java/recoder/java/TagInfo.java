@@ -1,73 +1,21 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.java;
 
-import java.io.IOException;
-import java.io.LineNumberReader;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.io.*;
+import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
 
-/**
- * Information about the tags in a java style structured comment (DocComment).
- * Such a comment has an introductionary description and a list of tagged
- * descriptions.
- * 
- * @author RN
- * @author AL
- */
-
 public class TagInfo {
-
-    /** the raw (unparsed) comment string. */
+    private static final Enumeration EMPTY_ENUMERATION = (new Vector(0)).elements();
     String rawComment;
-
-    /** the introductionary comment lines without comment characters. */
-
     String introText;
-
-    /**
-     * the tags contained in the comment. This is required to obtain the order
-     * in which the tags occur
-     */
-
-    List<String> tagNames;
-
-    /**
-     * the tags and their string values. Tags are stored without the leading
-     * <tt>@</tt> sign
-     */
-
+    Vector<String> tagNames;
     Properties tagValues;
-
     boolean analyzed;
 
-    /**
-     * Creates a new instance from the given string. The given string must not
-     * be <CODE>null</CODE>.
-     * 
-     * @param comment
-     *            the string containing the comment.
-     */
-
     protected TagInfo(DocComment dc) {
-        rawComment = dc.getText();
+        this.rawComment = dc.getText();
     }
-
-    /**
-     * Strips comment characters from the beginning and end of the given string
-     * representing a single line.
-     * 
-     * @param line
-     *            the string representing the line. The line is assumed to be
-     *            non empty.
-     * @return the stripped and trimmed string
-     */
 
     protected String stripCommentChars(String line) {
         String result = line.trim();
@@ -76,11 +24,11 @@ public class TagInfo {
             int right = result.length() - 1;
             if (result.charAt(left) == '/')
                 left++;
-            while ((left <= right) && (result.charAt(left) == '*'))
+            while (left <= right && result.charAt(left) == '*')
                 left++;
             if (result.charAt(right) == '/')
                 right--;
-            while ((left <= right) && (result.charAt(right) == '*'))
+            while (left <= right && result.charAt(right) == '*')
                 right--;
             if (left <= right) {
                 result = result.substring(left, right + 1).trim();
@@ -91,137 +39,85 @@ public class TagInfo {
         return result;
     }
 
-    /**
-     * parses the raw comment string and computes the intro and tag values.
-     */
-
     protected void parseRawComment() {
-        LineNumberReader lnr = new LineNumberReader(new StringReader(rawComment));
+        LineNumberReader lnr = new LineNumberReader(new StringReader(this.rawComment));
         String currentTag = null;
         PrintWriter pw = null;
         StringWriter sw = null;
-        String line;
         try {
+            String line;
             while ((line = lnr.readLine()) != null) {
                 line = stripCommentChars(line);
-                if (line.startsWith("@")) { // tag recognized
-                    // initialize data structures
-                    if (tagNames == null) {
-                        tagNames = new Vector<String>();
-                        tagValues = new Properties();
-                        // finish a prior comment region (if existent)
+                if (line.startsWith("@")) {
+                    if (this.tagNames == null) {
+                        this.tagNames = new Vector<String>();
+                        this.tagValues = new Properties();
                     }
-                    if (pw != null) {
+                    if (pw != null)
                         if (currentTag == null) {
-                            introText = sw.toString();
+                            this.introText = sw.toString();
                         } else {
-                            tagValues.put(currentTag, sw.toString());
-                            // start the new tag
+                            this.tagValues.put(currentTag, sw.toString());
                         }
-                    }
                     sw = new StringWriter();
                     pw = new PrintWriter(sw);
                     int pos = 1;
-                    while ((pos < line.length()) && !(Character.isWhitespace(line.charAt(pos))))
+                    while (pos < line.length() && !Character.isWhitespace(line.charAt(pos)))
                         pos++;
                     currentTag = line.substring(1, pos);
-                    tagNames.add(currentTag);
+                    this.tagNames.addElement(currentTag);
                     line = line.substring(pos).trim();
-                } else { // this continues previous messages
-                    if (pw == null) {
-                        sw = new StringWriter();
-                        pw = new PrintWriter(sw);
-                    } else {
-                        pw.println("");
-                    }
+                } else if (pw == null) {
+                    sw = new StringWriter();
+                    pw = new PrintWriter(sw);
+                } else {
+                    pw.println("");
                 }
                 pw.print(line);
-                // finish a prior comment region (if existent)
             }
-            if (pw != null) {
+            if (pw != null)
                 if (currentTag == null) {
-                    introText = sw.toString();
+                    this.introText = sw.toString();
                 } else {
-                    tagValues.put(currentTag, sw.toString());
+                    this.tagValues.put(currentTag, sw.toString());
                 }
-            }
         } catch (IOException ioe) {
-            // don't know how to handle this!
             ioe.printStackTrace();
         }
-        analyzed = true;
+        this.analyzed = true;
     }
-
-    /**
-     * Returns the introductionary text of the comment. This is the text
-     * starting at the beginning of the comment to the first tag.
-     * 
-     * @return the intro of the comment.
-     */
 
     public String getIntro() {
-        if (!analyzed)
+        if (!this.analyzed)
             parseRawComment();
-        return (introText == null) ? "" : introText;
+        return (this.introText == null) ? "" : this.introText;
     }
-
-    /**
-     * Determines whether or not there are tags contained in the underlying
-     * comment.
-     * 
-     * @return <tt>true</tt> iff the comment contains tags.
-     */
 
     public boolean hasTags() {
-        return getTagCount() > 0;
+        return (getTagCount() > 0);
     }
-
-    /**
-     * determines the number of tags in the underlying comment
-     * 
-     * @return the number of tags specified in the comment
-     */
 
     public int getTagCount() {
-        if (!analyzed)
+        if (!this.analyzed)
             parseRawComment();
-        return (tagNames == null) ? 0 : tagNames.size();
+        return (this.tagNames == null) ? 0 : this.tagNames.size();
     }
 
-    /**
-     * return an iterator of tags contained in the comment in order of their
-     * appearance in the comment.
-     * 
-     * @return an non-empty iterator.
-     */
-
-    public Iterator<String> getTags() {
-        if (!analyzed)
+    public Enumeration getTags() {
+        if (!this.analyzed)
             parseRawComment();
-        if (tagNames == null) {
-            return Collections.<String>emptyList().iterator();
-        } else {
-            return tagNames.iterator();
-        }
+        if (this.tagNames == null)
+            return EMPTY_ENUMERATION;
+        return this.tagNames.elements();
     }
-
-    /**
-     * returns the text for the given tag or <tt>null</tt> if that tag is not
-     * defined.
-     * 
-     * @param tag
-     *            the name of the tag
-     * @return the value of that tag or <tt>null</tt>
-     */
 
     public String getTagValue(String tag) {
         String result = null;
         if (tag != null) {
-            if (!analyzed)
+            if (!this.analyzed)
                 parseRawComment();
-            if (tagValues != null) {
-                result = tagValues.getProperty(tag, null);
-            }
+            if (this.tagValues != null)
+                result = this.tagValues.getProperty(tag, null);
         }
         return result;
     }

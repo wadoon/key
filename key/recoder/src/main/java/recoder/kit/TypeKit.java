@@ -1,72 +1,24 @@
-// This file is part of the RECODER library and protected by the LGPL
-
 package recoder.kit;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import recoder.ProgramFactory;
-import recoder.abstraction.ArrayType;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.ClassTypeContainer;
-import recoder.abstraction.Member;
 import recoder.abstraction.Package;
-import recoder.abstraction.ParameterizedType;
-import recoder.abstraction.PrimitiveType;
-import recoder.abstraction.Type;
-import recoder.abstraction.TypeArgument;
-import recoder.abstraction.TypeArgument.WildcardMode;
+import recoder.abstraction.*;
 import recoder.convenience.TreeWalker;
-import recoder.java.Identifier;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.ConstructorDeclaration;
-import recoder.java.declaration.DeclarationSpecifier;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.FieldSpecification;
-import recoder.java.declaration.Implements;
-import recoder.java.declaration.InterfaceDeclaration;
-import recoder.java.declaration.MemberDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.Throws;
-import recoder.java.declaration.TypeArgumentDeclaration;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.java.declaration.VariableSpecification;
+import recoder.java.*;
+import recoder.java.declaration.*;
+import recoder.java.declaration.modifier.VisibilityModifier;
 import recoder.java.reference.FieldReference;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-import recoder.service.CrossReferenceSourceInfo;
-import recoder.service.NameInfo;
-import recoder.service.ProgramModelInfo;
-import recoder.service.SourceInfo;
+import recoder.service.*;
 import recoder.util.Debug;
 
-/**
- * this class implements basic functions for type handling.
- * 
- * @author Uwe Assmann
- * @author Andreas Ludwig
- * @author Rainer Neumann
- * @author Dirk Heuzeroth
- */
+import java.util.ArrayList;
+import java.util.List;
+
 public class TypeKit {
-
-    private TypeKit() {
-        // singleton
-    }
-
-    /**
-     * Factory method that creates a new type reference fitting to the
-     * constructor declaration. The reference is not prefixed as its use context
-     * is unknown. This method is useful for creating factory classes.
-     * 
-     * @param decl
-     *            a constructor declaration.
-     * @return the newly created type reference, parent links are valid.
-     */
     public static TypeReference createTypeReference(ConstructorDeclaration decl) {
         ProgramFactory f = decl.getFactory();
         TypeReference result = f.createTypeReference(f.createIdentifier(decl.getName()));
@@ -74,372 +26,187 @@ public class TypeKit {
         return result;
     }
 
-    /**
-     * Factory method that creates a type reference with prefices
-     * (UncollatedReferenceQualifiers) from a qualified name.
-     * 
-     * @param f
-     *            the program factory to use.
-     * @param qualifiedName
-     *            a qualified (= potentially dotted) name.
-     * @return a type reference to the given type; parent links of the reference
-     *         are made valid.
-     */
     public static TypeReference createTypeReference(ProgramFactory f, String qualifiedName) {
-    	int idx = qualifiedName.indexOf('[');
-    	int dim = 0;
-    	if (idx > -1) {
-    		dim = (qualifiedName.length() - idx) / 2;
-        	qualifiedName = qualifiedName.substring(0,idx);
-    	}
-        TypeReference tr = MiscKit.createUncollatedReferenceQualifier(f, qualifiedName).toTypeReference();
-        tr.setDimensions(dim);
-        return tr;
+        return MiscKit.createUncollatedReferenceQualifier(f, qualifiedName).toTypeReference();
     }
 
     public static ASTList<TypeArgumentDeclaration> makeTypeArgRef(ProgramFactory f, List<? extends TypeArgument> tas) {
-    	ASTList<TypeArgumentDeclaration> res = new ASTArrayList<TypeArgumentDeclaration>(tas.size());
-    	for (TypeArgument ta : tas) {
-    		TypeReference tr = null;
-    		if (ta.getWildcardMode() != WildcardMode.Any)
-    			tr = createTypeReference(f, ta.getTypeName());
-    		if (ta.getTypeArguments() != null)
-    			tr.setTypeArguments(makeTypeArgRef(f, ta.getTypeArguments()));
-    		res.add(new TypeArgumentDeclaration(tr, ta.getWildcardMode()));
-    	}
-    	return res;
+        ASTArrayList aSTArrayList = new ASTArrayList(tas.size());
+        for (TypeArgument ta : tas) {
+            TypeReference tr = createTypeReference(f, ta.getTypeName());
+            if (ta.getTypeArguments() != null)
+                tr.setTypeArguments(makeTypeArgRef(f, ta.getTypeArguments()));
+            aSTArrayList.add(new TypeArgumentDeclaration(tr, ta.getWildcardMode()));
+        }
+        return (ASTList<TypeArgumentDeclaration>) aSTArrayList;
     }
-    
-    public static TypeReference createTypeReference(ProgramFactory f, Type t, int dim, boolean addTypeArgs) {
-    	while (dim-- > 0)
-    		t = t.createArrayType();
-    	return createTypeReference(f, t, addTypeArgs);
-    }
- 
+
     public static TypeReference createTypeReference(ProgramFactory f, Type t, boolean addTypeArgs) {
         TypeReference result = null;
-        if (t instanceof PrimitiveType) {
+        if (t instanceof recoder.abstraction.PrimitiveType) {
             result = f.createTypeReference(f.createIdentifier(t.getName()));
         } else if (t instanceof ParameterizedType) {
-        	ParameterizedType pt = ((ParameterizedType)t);
-        	result = createTypeReference(f, pt.getGenericType());
-        	if (addTypeArgs)
-        		result.setTypeArguments(makeTypeArgRef(f, pt.getAllTypeArgs()));
-        } else if (t instanceof ArrayType) {
-            result = createTypeReference(f, ((ArrayType) t).getBaseType());
-            result.setDimensions(result.getDimensions() + 1);
+            ParameterizedType pt = (ParameterizedType) t;
+            result = createTypeReference(f, pt.getGenericType());
+            if (addTypeArgs)
+                result.setTypeArguments(makeTypeArgRef(f, pt.getTypeArgs()));
         } else if (t instanceof ClassType) {
             result = f.createTypeReference(f.createIdentifier(t.getName()));
             ClassTypeContainer ctc = ((ClassType) t).getContainer();
             if (ctc instanceof Package) {
                 result.setReferencePrefix(PackageKit.createPackageReference(f, (Package) ctc));
             } else if (ctc instanceof ClassType) {
-                result.setReferencePrefix(createTypeReference(f, (ClassType) ctc));
+                result.setReferencePrefix(createTypeReference(f, (Type) ctc));
             }
-        } 
+        } else if (t instanceof ArrayType) {
+            result = createTypeReference(f, ((ArrayType) t).getBaseType());
+            result.setDimensions(result.getDimensions() + 1);
+        }
         result.makeParentRoleValid();
         return result;
     }
-    
-    /**
-     * Factory method that creates a new type reference derived by the name of
-     * the given type.
-     * 
-     * @param f
-     *            the program factory to be used.
-     * @param t
-     *            the type which shall be referenced.
-     * @return a type reference to the given type; parent links of the reference
-     *         are made valid.
-     */
+
     public static TypeReference createTypeReference(ProgramFactory f, Type t) {
-    	return createTypeReference(f, t, false);
-    }
-    
-    /**
-     * Factory method that creates a new type reference derived by the name of
-     * the given type.
-     * 
-     * @param f
-     *            the program factory to be used.
-     * @param t
-     *            the type which shall be referenced.
-     * @param dim
-     * 			  the dimension of the type (note that if t is already an array type,
-     * 			  the dimension will be increased by dim)
-     * @return a type reference to the given type; parent links of the reference
-     *         are made valid.
-     */
-    public static TypeReference createTypeReference(ProgramFactory f, Type t, int dim) {
-    	while (dim-- > 0)
-    		t = t.createArrayType();
-    	return createTypeReference(f, t);
+        return createTypeReference(f, t, false);
     }
 
-    /**
-     * Factory method that creates a new type reference derived by the name of
-     * the given type and tries to minimize its qualification using the given
-     * context for the type reference. The context should describe the position
-     * the type reference will be inserted into, usually a statement container.
-     * 
-     * @param si
-     *            the source info to be used.
-     * @param t
-     *            the type which shall be referenced.
-     * @param context
-     *            a program element from which the type shall be addressed (may
-     *            not be <CODE>null</CODE>).
-     * @return a minimal type reference to the given type; parent links of the
-     *         reference are made valid.
-     */
     public static TypeReference createTypeReference(SourceInfo si, Type t, ProgramElement context) {
         TypeReference result = null;
         ProgramFactory f = context.getFactory();
-        if (t instanceof PrimitiveType) {
+        if (t instanceof recoder.abstraction.PrimitiveType) {
             result = f.createTypeReference(f.createIdentifier(t.getName()));
-        } else if (t instanceof ArrayType) {
-            result = createTypeReference(si, ((ArrayType) t).getBaseType(), context);
-            result.setDimensions(result.getDimensions() + 1);
         } else if (t instanceof ClassType) {
             result = f.createTypeReference(f.createIdentifier(t.getName()));
             ClassTypeContainer ctc = ((ClassType) t).getContainer();
-            if (ctc != null && si.getType(t.getName(), context) != t) {
+            if (ctc != null && si.getType(t.getName(), context) != t)
                 if (ctc instanceof Package) {
                     result.setReferencePrefix(PackageKit.createPackageReference(f, (Package) ctc));
                 } else if (ctc instanceof ClassType) {
-                    result.setReferencePrefix(createTypeReference(f, (ClassType) ctc));
+                    result.setReferencePrefix(createTypeReference(f, (Type) ctc));
                 }
-            }
-        } 
+        } else if (t instanceof ArrayType) {
+            result = createTypeReference(si, ((ArrayType) t).getBaseType(), context);
+            result.setDimensions(result.getDimensions() + 1);
+        }
         result.makeAllParentRolesValid();
         return result;
     }
 
-    /**
-     * creates an abstract super class (interface) for the given class.
-     * 
-     * @param concrete
-     *            public class to abstractify
-     */
-    public static InterfaceDeclaration createAbstractSuperClass(NameInfo ni, ClassDeclaration cdecl,
-            String abstractsupername) throws NameClashException {
-        // assert that c is a public class and not an interface
-        /*
-         * Problems may still occur with nested classes, especially anonymous
-         * classes.
-         */
+    public static InterfaceDeclaration createAbstractSuperClass(NameInfo ni, ClassDeclaration cdecl, String abstractsupername) throws NameClashException {
         String message = "Sorry, only public classes which are neither interfaces nor enums can be transformed.";
-        Debug.assertBoolean(cdecl.isPublic() && !cdecl.isInterface() && !cdecl.isEnumType(), message);
-
-        if (ni.getType(abstractsupername) != null) {
-            // problem: abstractsupername already is a type
+        Debug.assertBoolean((cdecl.isPublic() && !cdecl.isInterface() && !cdecl.isEnumType()), message);
+        if (ni.getType(abstractsupername) != null)
             throw new NameClashException("Error: Name " + abstractsupername + "is already declared.");
-        }
-        /*
-         * Iterate through members directly defined in the class cdecl. - Put
-         * the signature of every non-static public method that does not
-         * override an inherited method into a newly created interface that then
-         * has to be implemented by the class cdecl. - Put every static final
-         * field with initalizers into the newly created interface. - Put every
-         * public interface and public class declarations of cdecl into the
-         * newly created interface.
-         */
         ProgramFactory pf = cdecl.getFactory();
-
-        ASTList<MemberDeclaration> imembers = new ASTArrayList<MemberDeclaration>(1);
+        ASTArrayList aSTArrayList = new ASTArrayList(1);
         ASTList<MemberDeclaration> cmems = cdecl.getMembers();
         if (cmems != null) {
             for (int i = 0, s = cmems.size(); i < s; i++) {
                 MemberDeclaration cmemd = cmems.get(i);
-
-                if (!cmemd.isPublic()) {
-                    continue;
-                }
-                if (cmemd instanceof FieldDeclaration) {
-                    if (!((FieldDeclaration) cmemd).isFinal() || !cmemd.isStatic()) {
-                        continue;
-                    }
-                    FieldDeclaration d = (FieldDeclaration) cmemd.deepClone();
-
-                    List<FieldSpecification> vars = d.getFieldSpecifications();
-                    for (int j = 0, z = vars.size(); j < z; j++) {
-                        if (vars.get(j).getInitializer() == null) {
-                            vars.remove(j);
-                            j -= 1;
-                            z -= 1;
+                if (cmemd.isPublic())
+                    if (cmemd instanceof FieldDeclaration) {
+                        if (((FieldDeclaration) cmemd).isFinal() && cmemd.isStatic()) {
+                            FieldDeclaration d = (FieldDeclaration) cmemd.deepClone();
+                            ASTList<FieldSpecification> aSTList = d.getFieldSpecifications();
+                            for (int j = 0, z = aSTList.size(); j < z; j++) {
+                                if (aSTList.get(j).getInitializer() == null) {
+                                    aSTList.remove(j);
+                                    j--;
+                                    z--;
+                                }
+                            }
+                            if (aSTList.size() > 0)
+                                aSTArrayList.add(d);
                         }
+                    } else if (cmemd instanceof MethodDeclaration) {
+                        MethodDeclaration md = (MethodDeclaration) cmemd;
+                        if (!md.isStatic() && md.isPublic() && !(md instanceof ConstructorDeclaration))
+                            aSTArrayList.add(MethodKit.createAbstractMethodDeclaration(md, true));
+                    } else if (cmemd instanceof TypeDeclaration) {
+                        aSTArrayList.add(cmemd.deepClone());
                     }
-                    if (vars.size() > 0) {
-                        imembers.add(d);
-                    }
-                } else if (cmemd instanceof MethodDeclaration) {
-                    MethodDeclaration md = (MethodDeclaration) cmemd;
-
-                    if (!md.isStatic() && md.isPublic() && !(md instanceof ConstructorDeclaration)
-                    //!!!!!!!!!!!!!!!!!! Die folgende Methode gibt es noch
-                    // nicht !!!!!!!!!!!!!
-                    // && !cdecl.overridesInherited(md)
-                    ) {
-                        imembers.add(MethodKit.createAbstractMethodDeclaration(md, true));
-                    } else
-                        continue;
-                } else if (cmemd instanceof TypeDeclaration) {
-                    imembers.add((TypeDeclaration) cmemd.deepClone());
-                } else
-                    continue;
             }
-            if (!imembers.isEmpty()) {
+            if (!aSTArrayList.isEmpty()) {
+                ASTArrayList aSTArrayList1;
                 Identifier iid = pf.createIdentifier(abstractsupername);
-
-                // Copy class modifiers into newly created interface
-                DeclarationSpecifier vis = cdecl.getVisibilityModifier();
+                VisibilityModifier visibilityModifier = cdecl.getVisibilityModifier();
                 ASTList<DeclarationSpecifier> imods = null;
-                if (vis != null) {
-                    imods = new ASTArrayList<DeclarationSpecifier>(1);
-                    imods.add((DeclarationSpecifier) vis.deepClone());
+                if (visibilityModifier != null) {
+                    aSTArrayList1 = new ASTArrayList(1);
+                    aSTArrayList1.add(visibilityModifier.deepClone());
                 }
-                InterfaceDeclaration idecl = pf.createInterfaceDeclaration(imods, // modifiers
-                        iid, // name of the new interface
-                        null, // the interface does not extend others
-                        imembers); // the extracted field and method
-                // declarations
-
-                // !!!!!!!!!!!!! Folgenden Teil zur Modifikation von cdecl
-                // besser in eine eigene kit-Methode verschieben, damit ohne
-                // Seiteneffekte gearbeitet werden kann. Ausserdem wird das
-                // erweitern von implements- und extends-Listen sicher haeufiger
-                // benoetigt. !!!!!!!!!!!!!!!!!!!!!!!!
-
-                // extend "extends list" of cdecl by idecl
-                ASTList<TypeReference> itypes = new ASTArrayList<TypeReference>(1);
+                InterfaceDeclaration idecl = pf.createInterfaceDeclaration(aSTArrayList1, iid, null, aSTArrayList);
+                ASTArrayList aSTArrayList2 = new ASTArrayList(1);
                 TypeReference iref = pf.createTypeReference(iid);
-
                 Implements impl = cdecl.getImplementedTypes();
                 if (impl == null) {
                     impl = new Implements(iref);
                 } else {
-                    itypes = impl.getSupertypes();
-                    itypes.add(iref);
-                    impl.setSupertypes(itypes);
+                    ASTList aSTList = impl.getSupertypes();
+                    aSTList.add(iref);
+                    impl.setSupertypes(aSTList);
                 }
                 cdecl.setImplementedTypes(impl);
-
                 return idecl;
-            } else {
-                // System.out.println("Sorry, no members of "+cdecl.getName() +"
-                // can be abstractified!\n");
-                return null;
             }
-        } else {
-            // System.out.println("Sorry, the class "+cdecl.getName()+" contains
-            // no members!\n");
             return null;
         }
+        return null;
     }
 
-    /**
-     * Create an interface from a class declaration. This is done by omission of
-     * all elements that cannot be transformed. The following members are kept:
-     * <UL>
-     * <LI>Public FieldDeclarations that are final and static and are
-     * initialized (in a list of specifications, only the variables that have
-     * initializers are kept),
-     * <LI>public MethodDeclarations that are no ConstructorDeclarations, and
-     * <EM>not</EM> static,
-     * <LI>public InterfaceDeclarations and ClassDeclarations (weird, but
-     * admissible).
-     * </UL>
-     * The interface does not extend any of the interfaces implemented by the
-     * class declaration by default. The name of the returned declaration
-     * corresponds to "Abstract" + decl.getName(), which can be changed
-     * afterwards.
-     */
     public static InterfaceDeclaration createInterfaceDeclaration(ClassDeclaration decl) {
         ProgramFactory factory = decl.getFactory();
         InterfaceDeclaration res = factory.createInterfaceDeclaration();
         res.setIdentifier(factory.createIdentifier("Abstract" + decl.getName()));
-        DeclarationSpecifier vis = decl.getVisibilityModifier();
-        if (vis != null) {
-        	ASTList<DeclarationSpecifier> imods = new ASTArrayList<DeclarationSpecifier>(1);
-            imods.add((DeclarationSpecifier) vis.deepClone());
-            res.setDeclarationSpecifiers(imods);
+        VisibilityModifier visibilityModifier = decl.getVisibilityModifier();
+        if (visibilityModifier != null) {
+            ASTArrayList aSTArrayList1 = new ASTArrayList(1);
+            aSTArrayList1.add(visibilityModifier.deepClone());
+            res.setDeclarationSpecifiers(aSTArrayList1);
         }
-        ASTList<MemberDeclaration> imembers = new ASTArrayList<MemberDeclaration>();
-        res.setMembers(imembers);
-        List<MemberDeclaration> cmems = decl.getMembers();
-        if (cmems == null) {
+        ASTArrayList aSTArrayList = new ASTArrayList();
+        res.setMembers(aSTArrayList);
+        ASTList<MemberDeclaration> aSTList = decl.getMembers();
+        if (aSTList == null)
             return res;
-        }
-        for (int i = 0, s = cmems.size(); i < s; i += 1) {
-            MemberDeclaration cmemd = cmems.get(i);
-            if (!cmemd.isPublic()) {
-                continue;
-            }
-            if (cmemd instanceof FieldDeclaration) {
-                if (!((FieldDeclaration) cmemd).isFinal() || !cmemd.isStatic()) {
-                    continue;
-                }
-                FieldDeclaration d = (FieldDeclaration) cmemd.deepClone();
-                List<FieldSpecification> vars = d.getFieldSpecifications();
-                for (int j = 0, z = vars.size(); j < z; j += 1) {
-                    if (vars.get(j).getInitializer() == null) {
-                        vars.remove(j);
-                        j -= 1;
-                        z -= 1;
+        for (int i = 0, s = aSTList.size(); i < s; i++) {
+            MemberDeclaration cmemd = aSTList.get(i);
+            if (cmemd.isPublic())
+                if (cmemd instanceof FieldDeclaration) {
+                    if (((FieldDeclaration) cmemd).isFinal() && cmemd.isStatic()) {
+                        FieldDeclaration d = (FieldDeclaration) cmemd.deepClone();
+                        ASTList<FieldSpecification> aSTList1 = d.getFieldSpecifications();
+                        for (int j = 0, z = aSTList1.size(); j < z; j++) {
+                            if (aSTList1.get(j).getInitializer() == null) {
+                                aSTList1.remove(j);
+                                j--;
+                                z--;
+                            }
+                        }
+                        if (aSTList1.size() > 0)
+                            aSTArrayList.add(d);
                     }
+                } else if (cmemd instanceof MethodDeclaration) {
+                    if (!(cmemd instanceof ConstructorDeclaration) && !cmemd.isStatic())
+                        aSTArrayList.add(MethodKit.createAbstractMethodDeclaration((MethodDeclaration) cmemd, true));
+                } else if (cmemd instanceof TypeDeclaration) {
+                    aSTArrayList.add(cmemd.deepClone());
                 }
-                if (vars.size() > 0) {
-                    imembers.add(d);
-                }
-            } else if (cmemd instanceof MethodDeclaration) {
-                if (cmemd instanceof ConstructorDeclaration || cmemd.isStatic()) {
-                    continue;
-                }
-                imembers.add(MethodKit.createAbstractMethodDeclaration((MethodDeclaration) cmemd, true));
-            } else if (cmemd instanceof TypeDeclaration) {
-                imembers.add((TypeDeclaration) cmemd.deepClone());
-            }
         }
         return res;
     }
 
-    /**
-     * Create a simple adapter class for a class declaration. If the class is
-     * <p>
-     * class c {
-     * <p>
-     * m(int i, int i2) { ..}
-     * <p>
-     * m2(int i, int i2) { ..}
-     * <p>}
-     * <p>
-     * the created class is
-     * <p>
-     * class cAdapter {
-     * <p>
-     * m(int i, int i2) { delegatingObject.m(i,i2); }
-     * <p>
-     * m2(int i, int i2) { delegatingObject.m2(i,i2); }
-     * <p>}
-     * 
-     * @deprecated needs rework
-     */
     public static ClassDeclaration createAdapterClass(String adapterName, ClassDeclaration classDecl) {
         ProgramFactory factory = classDecl.getFactory();
-        ReferencePrefix delegationObject = new FieldReference(factory.createIdentifier("delegationObject"
-                + classDecl.getName()));
-        ClassDeclaration adapterClass = factory.createClassDeclaration(new ASTArrayList<DeclarationSpecifier>(), factory
-                .createIdentifier(adapterName), factory.createExtends(), factory.createImplements(),
-                new ASTArrayList<MemberDeclaration>());
-
-        // Create an adapter interface with delegating methods
+        FieldReference fieldReference = new FieldReference(factory.createIdentifier("delegationObject" + classDecl.getName()));
+        ClassDeclaration adapterClass = factory.createClassDeclaration(new ASTArrayList(), factory.createIdentifier(adapterName), factory.createExtends(), factory.createImplements(), new ASTArrayList());
         for (int i2 = 0; i2 < classDecl.getMembers().size(); i2++) {
             MemberDeclaration member = classDecl.getMembers().get(i2);
             if (member instanceof MethodDeclaration) {
                 MethodDeclaration method = (MethodDeclaration) member;
                 if (method.isPublic()) {
                     Debug.info(2, "adapting public method " + method.getName());
-                    MethodDeclaration clone = MethodKit.createAdapterMethod(delegationObject, method);
+                    MethodDeclaration clone = MethodKit.createAdapterMethod(fieldReference, method);
                     if (clone != null)
                         adapterClass.getMembers().add(clone);
                 }
@@ -447,189 +214,124 @@ public class TypeKit {
         }
         return adapterClass;
     }
-   
-    /**
-     * @deprecated still untested.
-     */
-    public static List<TypeReference> getInfluencedReferences(CrossReferenceSourceInfo xr, String newTypeName,
-            NonTerminalProgramElement context) {
-        Debug.assertNonnull(xr, newTypeName, context);
-        // check from the point of view of a scope defining element
-        context = MiscKit.getScopeDefiningElement(context);
-        Type t = xr.getType(newTypeName, context);
-        if (t == null) {
-            // the type is void or new, hence there are no references
-            return new ArrayList<TypeReference>(0);
-        }
-        List<TypeReference> list = xr.getReferences(t);
-        if (list.isEmpty()) {
-            return list;
-        }
-        // a new type is only visible in its scope
-        // all references from outside do not change
-        List<TypeReference> result = new ArrayList<TypeReference>();
-        for (int i = list.size() - 1; i >= 0; i -= 1) {
-            TypeReference tr = list.get(i);
-            if (MiscKit.contains(context, tr)) {
-                result.add(tr);
+
+    public static boolean rename(ChangeHistory ch, CrossReferenceSourceInfo xr, NameInfo ni, TypeDeclaration type, String newName) {
+        Debug.assertNonnull(xr, ni, type, newName);
+        Debug.assertNonnull(type.getName());
+        if (!newName.equals(type.getName())) {
+            List<TypeReference> refs = new ArrayList<TypeReference>();
+            refs.addAll(xr.getReferences(type));
+            List<? extends Constructor> cons = type.getConstructors();
+            ArrayType arrayType = ni.getArrayType(type);
+            while (arrayType != null) {
+                refs.addAll(xr.getReferences(arrayType));
+                arrayType = ni.getArrayType(arrayType);
             }
+            MiscKit.rename(ch, type, newName);
+            if (cons != null)
+                for (int i = cons.size() - 1; i >= 0; i--) {
+                    Constructor con = cons.get(i);
+                    if (con instanceof ConstructorDeclaration)
+                        MiscKit.rename(ch, (NamedProgramElement) con, newName);
+                }
+            if (refs != null)
+                for (int i = refs.size() - 1; i >= 0; i--)
+                    MiscKit.rename(ch, refs.get(i), newName);
+            return true;
+        }
+        return false;
+    }
+
+    public static List<TypeReference> getInfluencedReferences(CrossReferenceSourceInfo xr, String newTypeName, NonTerminalProgramElement context) {
+        Debug.assertNonnull(xr, newTypeName, context);
+        ScopeDefiningElement scopeDefiningElement = MiscKit.getScopeDefiningElement(context);
+        Type t = xr.getType(newTypeName, scopeDefiningElement);
+        if (t == null)
+            return new ArrayList<TypeReference>(0);
+        List<TypeReference> list = xr.getReferences(t);
+        if (list.isEmpty())
+            return list;
+        List<TypeReference> result = new ArrayList<TypeReference>();
+        for (int i = list.size() - 1; i >= 0; i--) {
+            TypeReference tr = list.get(i);
+            if (MiscKit.contains(scopeDefiningElement, tr))
+                result.add(tr);
         }
         return result;
     }
 
-    /**
-     * Query that retrieves all references to a given type that are contained
-     * within the given tree. The specified flag defines the strategy to use:
-     * either the cross reference information is filtered, or the cross
-     * reference information is collected from the tree. The filtering mode is
-     * faster if the tree contains more nodes than there are global references
-     * to the given type.
-     * 
-     * @param xr
-     *            the cross referencer to use.
-     * @param t
-     *            a type.
-     * @param root
-     *            the root of an arbitrary syntax tree.
-     * @param scanTree
-     *            flag indicating the search strategy; if <CODE>true</CODE>,
-     *            local cross reference information is build, otherwise the
-     *            global cross reference information is filtered.
-     * @return the list of references to the given type in the given tree, can
-     *         be empty but not <CODE>null</CODE>.
-     */
-    public static List<TypeReference> getReferences(CrossReferenceSourceInfo xr, Type t,
-            NonTerminalProgramElement root, boolean scanTree) {
+    public static List<TypeReference> getReferences(CrossReferenceSourceInfo xr, Type t, NonTerminalProgramElement root, boolean scanTree) {
         Debug.assertNonnull(xr, t, root);
         List<TypeReference> result = new ArrayList<TypeReference>();
         if (scanTree) {
             TreeWalker tw = new TreeWalker(root);
             while (tw.next(TypeReference.class)) {
                 TypeReference tr = (TypeReference) tw.getProgramElement();
-                if (xr.getType(tr) == t) {
+                if (xr.getType(tr) == t)
                     result.add(tr);
-                }
             }
         } else {
-        	List<TypeReference> refs = xr.getReferences(t);
-            for (int i = 0, s = refs.size(); i < s; i += 1) {
+            List<TypeReference> refs = xr.getReferences(t);
+            for (int i = 0, s = refs.size(); i < s; i++) {
                 TypeReference tr = refs.get(i);
-                if (MiscKit.contains(root, tr)) {
+                if (MiscKit.contains(root, tr))
                     result.add(tr);
-                }
             }
         }
         return result;
     }
 
-    /**
-     * Query that collects all members of a class type, a method, or a package.
-     * For a package, this includes all class types of that package, for a class
-     * type, this includes all defined constructors, fields, methods, and inner
-     * types, and for a method, this includes all inner types.
-     * 
-     * @param ct
-     *            the class type to collect members from.
-     * @return a mutable list of all members of the given class type.
-     */
     public static List<Member> getMembers(ClassTypeContainer ctc) {
-    	List<Member> result = new ArrayList<Member>();
-    	List<? extends Member> mlist;
+        List<Member> result = new ArrayList<Member>();
         if (ctc instanceof ClassType) {
             ClassType ct = (ClassType) ctc;
-            mlist = ct.getConstructors();
-            if (mlist != null) {
-                result.addAll(mlist);
-            }
-            mlist = ct.getFields();
-            if (mlist != null) {
-                result.addAll(mlist);
-            }
-            mlist = ct.getMethods();
-            if (mlist != null) {
-                result.addAll(mlist);
-            }
+            List<? extends Member> list = ct.getConstructors();
+            if (list != null)
+                result.addAll(list);
+            list = ct.getFields();
+            if (list != null)
+                result.addAll(list);
+            list = ct.getMethods();
+            if (list != null)
+                result.addAll(list);
         }
-        mlist = ctc.getTypes();
-        if (mlist != null) {
+        List<? extends Member> mlist = ctc.getTypes();
+        if (mlist != null)
             result.addAll(mlist);
-        }
         return result;
     }
 
-    /**
-     * Query returing the super class of the given class type. If the class type
-     * is an interface or has no explicit extended type, java.lang.Object will
-     * be reported (also for java.lang.Object itself).
-     * 
-     * @param ni
-     *            the name info service to use.
-     * @param ct
-     *            the class type to get the super class from.
-     * @return the super class.
-     */
     public static ClassType getSuperClass(NameInfo ni, ClassType ct) {
         if (!ct.isInterface()) {
             List<? extends ClassType> ctl = ct.getSupertypes();
-            for (int i = 0; i < ctl.size(); i += 1) {
+            for (int i = 0; i < ctl.size(); i++) {
                 ct = ctl.get(i);
-                if (!ct.isInterface()) {
+                if (!ct.isInterface())
                     return ct;
-                }
             }
         }
         return ni.getJavaLangObject();
     }
 
-    /**
-     * Query comparing the visibility of two members.
-     * 
-     * @param x
-     *            the first member.
-     * @param y
-     *            the second member.
-     * @return <CODE>true</CODE> if the first member is less visible than the
-     *         second (in the order "private" - "" (package) - "protected" -
-     *         "public" where applicable), <CODE>false</CODE> if it is as
-     *         least as visible.
-     */
     public static boolean isLessVisible(Member x, Member y) {
-        if (x.isPublic()) {
+        if (x.isPublic())
             return false;
-        }
-        if (y.isPublic()) {
+        if (y.isPublic())
             return true;
-        }
-        if (x.isProtected()) {
+        if (x.isProtected())
             return false;
-        }
-        if (y.isProtected()) {
+        if (y.isProtected())
             return true;
-        }
-        return x.isPrivate() && !y.isPrivate();
+        return (x.isPrivate() && !y.isPrivate());
     }
 
-    /**
-     * Checks if for each class type in the first type list there is a super
-     * type in the second. This is useful to check if a exception lists is less
-     * or equally strict that the other.
-     * 
-     * @param tsi
-     *            the type system info to use.
-     * @param x
-     *            a class list, may not be <CODE>null</CODE>.
-     * @param y
-     *            a class list, may not be <CODE>null</CODE>.
-     * @return <CODE>true</CODE> if the first list of class types is covered
-     *         by the second one, <CODE>false</CODE> otherwise.
-     */
     public static boolean isCovered(ProgramModelInfo pmi, List<? extends ClassType> x, List<? extends ClassType> y) {
         Debug.assertNonnull(x, y);
         boolean found = true;
-        for (int i = x.size() - 1; (i >= 0) && found; i -= 1) {
+        for (int i = x.size() - 1; i >= 0 && found; i--) {
             ClassType ct = x.get(i);
             found = false;
-            for (int j = y.size() - 1; j >= 0; j -= 1) {
+            for (int j = y.size() - 1; j >= 0; j--) {
                 if (pmi.isSubtype(ct, y.get(j))) {
                     found = true;
                     break;
@@ -639,80 +341,35 @@ public class TypeKit {
         return found;
     }
 
-    /**
-     * Query that checks if the given member is admissible within an interface.
-     * Admissible are public final static completely-initialized fields, public
-     * non-static non-constructor body-less methods, and public interface and
-     * class declarations. This method does not criticize the use of redundant
-     * modifiers such as abstract or static.
-     * 
-     * @param member
-     *            a potential interface member.
-     * @return <CODE>true</CODE> if the given member could become a member of
-     *         an interface, <CODE>false</CODE> otherwise.
-     */
     public static boolean isValidInterfaceMember(MemberDeclaration member) {
-        if (!member.isPublic()) {
+        if (!member.isPublic())
             return false;
-        }
         if (member instanceof FieldDeclaration) {
-            if (!member.isStatic() || !((FieldDeclaration) member).isFinal()) {
+            if (!member.isStatic() || !((FieldDeclaration) member).isFinal())
                 return false;
-            }
             List<? extends VariableSpecification> vars = ((FieldDeclaration) member).getVariables();
-            for (int j = 0, z = vars.size(); j < z; j += 1) {
-                if (vars.get(j).getInitializer() == null) {
+            for (int j = 0, z = vars.size(); j < z; j++) {
+                if (vars.get(j).getInitializer() == null)
                     return false;
-                }
             }
             return true;
         }
-        if (member instanceof MethodDeclaration) {
-            return !(member instanceof ConstructorDeclaration) && !member.isStatic()
-                    && ((MethodDeclaration) member).getBody() == null;
-        }
-        if (member instanceof TypeDeclaration) {
-            return true;
-        }
-        return false;
+        if (member instanceof MethodDeclaration)
+            return (!(member instanceof ConstructorDeclaration) && !member.isStatic() && ((MethodDeclaration) member).getBody() == null);
+        return member instanceof TypeDeclaration;
     }
 
-    /**
-     * Gets all types in the given list that are subtypes of other types in the
-     * list.
-     * 
-     * @param pmi
-     *            the program model info service to use.
-     * @param list
-     *            a list of class types.
-     * @return a list of class types that have supertypes in the list.
-     * @see #removeCoveredSubtypes
-     * @since 0.71
-     */
     public static List<? extends ClassType> getCoveredSubtypes(ProgramModelInfo pmi, List<? extends ClassType> list) {
         List<ClassType> copy = new ArrayList<ClassType>();
         copy.addAll(list);
         return removeCoveredSubtypes(pmi, copy);
     }
 
-    /**
-     * Removes types in the given list that are subtypes of other types in the
-     * list and returns the removed types in a new list.
-     * 
-     * @param pmi
-     *            the program model info service to use.
-     * @param list
-     *            a mutable list of class types.
-     * @return a set of class types that have supertypes in the list and that
-     *         have been removed.
-     * @since 0.71
-     * @see #getCoveredSubtypes
-     */
     public static List<ClassType> removeCoveredSubtypes(ProgramModelInfo pmi, List<ClassType> list) {
         List<ClassType> removed = new ArrayList<ClassType>();
-        for (int i = list.size() - 1; i >= 0; i -= 1) {
+        for (int i = list.size() - 1; i >= 0; i--) {
             ClassType ct = list.get(i);
-            for (int j = list.size() - 1; j >= 0; j -= 1) {
+            for (int j = list.size() - 1; j >= 0; j--) {
                 if (j != i) {
                     ClassType ct2 = list.get(j);
                     if (pmi.isSubtype(ct, ct2)) {
@@ -726,60 +383,42 @@ public class TypeKit {
         return removed;
     }
 
-    /**
-     * Query that returns all redundant super interfaces of the specified type
-     * declaration. This does not cover redundant extensions of <CODE>
-     * java.lang.Object</CODE>, but does cover double extensions or
-     * implementations of interfaces as well as transitive interface
-     * inheritance.
-     * 
-     * @param si
-     *            the source info service to use.
-     * @param td
-     *            the type declaration to check for inheritance redundancy.
-     * 
-     * @since 0.71
-     */
     public static List<TypeReference> getRedundantSuperInterfaces(SourceInfo si, TypeDeclaration td) {
-        // get all super interface references
+        ASTList<TypeReference> aSTList;
         ClassType superclass = null;
         List<TypeReference> superinterfaces = new ArrayList<TypeReference>(0);
         if (td instanceof InterfaceDeclaration) {
             InterfaceDeclaration id = (InterfaceDeclaration) td;
-            if (id.getExtendedTypes() != null) {
-                superinterfaces = id.getExtendedTypes().getSupertypes();
-            }
+            if (id.getExtendedTypes() != null)
+                aSTList = id.getExtendedTypes().getSupertypes();
         } else {
             ClassDeclaration cd = (ClassDeclaration) td;
-            if (cd.getImplementedTypes() != null) {
-                superinterfaces = cd.getImplementedTypes().getSupertypes();
-            }
-            if (cd.getExtendedTypes() != null) {
+            if (cd.getImplementedTypes() != null)
+                aSTList = cd.getImplementedTypes().getSupertypes();
+            if (cd.getExtendedTypes() != null)
                 superclass = (ClassType) si.getType(cd.getExtendedTypes().getSupertypes().get(0));
-            }
         }
-
         List<TypeReference> redundantReferences = new ArrayList<TypeReference>();
         List<ClassType> types = new ArrayList<ClassType>();
-        for (int i = 0; i < superinterfaces.size(); i += 1) {
-            TypeReference tr = superinterfaces.get(i);
+        int i;
+        for (i = 0; i < aSTList.size(); i++) {
+            TypeReference tr = aSTList.get(i);
             types.add((ClassType) si.getType(tr));
         }
-        for (int i = superinterfaces.size() - 1; i >= 0; i -= 1) {
-            TypeReference tr = superinterfaces.get(i);
+        for (i = aSTList.size() - 1; i >= 0; i--) {
+            TypeReference tr = aSTList.get(i);
             ClassType ct = types.get(i);
-            if (superclass != null) {
-                if (si.isSubtype(superclass, ct)) {
-                    redundantReferences.add(tr);
-                    continue;
-                }
-            }
-            for (int j = superinterfaces.size() - 1; j >= 0; j -= 1) {
-                if (i != j) {
-                    ClassType st = types.get(j);
-                    if (si.isSubtype(st, ct)) {
-                        redundantReferences.add(tr);
-                        break;
+            if (superclass != null &&
+                    si.isSubtype(superclass, ct)) {
+                redundantReferences.add(tr);
+            } else {
+                for (int j = aSTList.size() - 1; j >= 0; j--) {
+                    if (i != j) {
+                        ClassType st = types.get(j);
+                        if (si.isSubtype(st, ct)) {
+                            redundantReferences.add(tr);
+                            break;
+                        }
                     }
                 }
             }
@@ -787,33 +426,20 @@ public class TypeKit {
         return redundantReferences;
     }
 
-    /**
-     * Query that returns all redundant exceptions of the specified throws
-     * clause. This does not cover redundant extensions of <CODE>
-     * java.lang.RuntimeException</CODE> or subclasses, but does cover double
-     * declarations as well as transitive exceptions.
-     * 
-     * @param si
-     *            the source info service to use.
-     * @param t
-     *            the throws clause to check for redundancy.
-     * 
-     * @since 0.71
-     */
     public static List<TypeReference> getRedundantExceptions(SourceInfo si, Throws t) {
-    	List<TypeReference> exceptions = t.getExceptions();
+        ASTList<TypeReference> aSTList = t.getExceptions();
         List<TypeReference> redundantReferences = new ArrayList<TypeReference>();
-        List<ClassType> types = new ArrayList<ClassType>(exceptions.size());
-        for (int i = 0; i < exceptions.size(); i += 1) {
-            types.add((ClassType) si.getType(exceptions.get(i)));
-        }
-        for (int i = exceptions.size() - 1; i >= 0; i -= 1) {
+        List<ClassType> types = new ArrayList<ClassType>(aSTList.size());
+        int i;
+        for (i = 0; i < aSTList.size(); i++)
+            types.add((ClassType) si.getType(aSTList.get(i)));
+        for (i = aSTList.size() - 1; i >= 0; i--) {
             ClassType ct = types.get(i);
-            for (int j = exceptions.size() - 1; j >= 0; j -= 1) {
+            for (int j = aSTList.size() - 1; j >= 0; j--) {
                 if (i != j) {
                     ClassType st = types.get(j);
                     if (si.isSubtype(ct, st)) {
-                        redundantReferences.add(exceptions.get(i));
+                        redundantReferences.add(aSTList.get(i));
                         break;
                     }
                 }
@@ -821,5 +447,4 @@ public class TypeKit {
         }
         return redundantReferences;
     }
-
 }

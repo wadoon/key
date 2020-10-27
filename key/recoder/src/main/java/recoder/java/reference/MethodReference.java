@@ -1,103 +1,34 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.java.reference;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.Identifier;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
-import recoder.java.StatementContainer;
+import recoder.java.*;
 import recoder.java.declaration.TypeArgumentDeclaration;
 import recoder.java.expression.ExpressionStatement;
 import recoder.list.generic.ASTList;
 
-/**
- * Method reference.
- * 
- * @author <TT>AutoDoc</TT>
- */
+public class MethodReference extends JavaNonTerminalProgramElement implements MemberReference, ReferencePrefix, ReferenceSuffix, ExpressionStatement, TypeReferenceContainer, NameReference {
+    private static final long serialVersionUID = -3016310919182753074L;
 
-public class MethodReference extends JavaNonTerminalProgramElement implements MemberReference, ReferencePrefix,
-        ReferenceSuffix, ExpressionStatement, TypeReferenceContainer, NameReference {
+    protected ExpressionContainer expressionParent;
 
-    /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -3016310919182753074L;
+    protected StatementContainer statementParent;
 
-	/**
-     * Expression parent.
-     */
+    protected ReferenceSuffix qualifierParent;
 
-	private ExpressionContainer expressionParent;
+    protected ReferencePrefix accessPath;
 
-    /**
-     * Statement parent.
-     */
+    protected Identifier name;
 
-	private StatementContainer statementParent;
+    protected ASTList<Expression> arguments;
 
-    /**
-     * Qualifier parent.
-     */
-
-	private ReferenceSuffix qualifierParent;
-
-    /**
-     * Access path.
-     */
-
-	private ReferencePrefix accessPath;
-
-    /**
-     * Name.
-     */
-
-	private Identifier name;
-
-    /**
-     * Arguments.
-     */
-
-	private ASTList<Expression> arguments;
-    
-    /**
-     * Type arguments for explicit generic invocation.
-     */
-	private ASTList<TypeArgumentDeclaration> typeArguments;
-
-    /**
-     * Method reference.
-     */
+    protected ASTList<TypeArgumentDeclaration> typeArguments;
 
     public MethodReference() {
-        // nothing to do
     }
-
-    /**
-     * Method reference.
-     * 
-     * @param name
-     *            an identifier.
-     */
 
     public MethodReference(Identifier name) {
         setIdentifier(name);
         makeParentRoleValid();
     }
-
-    /**
-     * Method reference.
-     * 
-     * @param accessPath
-     *            a reference prefix.
-     * @param name
-     *            an identifier.
-     */
 
     public MethodReference(ReferencePrefix accessPath, Identifier name) {
         setReferencePrefix(accessPath);
@@ -105,31 +36,11 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
         makeParentRoleValid();
     }
 
-    /**
-     * Method reference.
-     * 
-     * @param name
-     *            an identifier.
-     * @param args
-     *            an expression mutable list.
-     */
-
     public MethodReference(Identifier name, ASTList<Expression> args) {
         setIdentifier(name);
         setArguments(args);
         makeParentRoleValid();
     }
-
-    /**
-     * Method reference.
-     * 
-     * @param accessPath
-     *            a reference prefix.
-     * @param name
-     *            an identifier.
-     * @param args
-     *            an expression mutable list.
-     */
 
     public MethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args) {
         setReferencePrefix(accessPath);
@@ -137,9 +48,8 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
         setArguments(args);
         makeParentRoleValid();
     }
-    
-    public MethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args,
-    		ASTList<TypeArgumentDeclaration> typeArgs) {
+
+    public MethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args, ASTList<TypeArgumentDeclaration> typeArgs) {
         setReferencePrefix(accessPath);
         setIdentifier(name);
         setArguments(args);
@@ -147,444 +57,245 @@ public class MethodReference extends JavaNonTerminalProgramElement implements Me
         makeParentRoleValid();
     }
 
-    /**
-     * Method reference.
-     * 
-     * @param proto
-     *            a method reference.
-     */
-
     protected MethodReference(MethodReference proto) {
         super(proto);
-        if (proto.accessPath != null) {
-            accessPath = (ReferencePrefix) proto.accessPath.deepClone();
-        }
-        if (proto.name != null) {
-            name =proto.name.deepClone();
-        }
-        if (proto.arguments != null) {
-            arguments = proto.arguments.deepClone();
-        }
+        if (proto.accessPath != null)
+            this.accessPath = (ReferencePrefix) proto.accessPath.deepClone();
+        if (proto.name != null)
+            this.name = proto.name.deepClone();
+        if (proto.arguments != null)
+            this.arguments = proto.arguments.deepClone();
         makeParentRoleValid();
     }
-
-    /**
-     * Deep clone.
-     * 
-     * @return the object.
-     */
 
     public MethodReference deepClone() {
         return new MethodReference(this);
     }
 
-    /**
-     * Make parent role valid.
-     */
-
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (accessPath != null) {
-            accessPath.setReferenceSuffix(this);
-        }
-        if (name != null) {
-            name.setParent(this);
-        }
-        if (arguments != null) {
-            for (int i = arguments.size() - 1; i >= 0; i -= 1) {
-                arguments.get(i).setExpressionContainer(this);
-            }
-        }
-        if (typeArguments != null) {
-        	for (TypeArgumentDeclaration ta: typeArguments)
-        		ta.setParent(this);
-        }
+        if (this.accessPath != null)
+            this.accessPath.setReferenceSuffix(this);
+        if (this.name != null)
+            this.name.setParent(this);
+        if (this.arguments != null)
+            for (int i = this.arguments.size() - 1; i >= 0; i--)
+                this.arguments.get(i).setExpressionContainer(this);
+        if (this.typeArguments != null)
+            for (TypeArgumentDeclaration ta : this.typeArguments)
+                ta.setParent(this);
     }
 
     public SourceElement getFirstElement() {
-        return (accessPath == null) ? getChildAt(0).getFirstElement() : accessPath.getFirstElement();
+        return (this.accessPath == null) ? getChildAt(0).getFirstElement() : this.accessPath.getFirstElement();
     }
-
-    /**
-     * Get AST parent.
-     * 
-     * @return the non terminal program element.
-     */
 
     public NonTerminalProgramElement getASTParent() {
-        if (statementParent != null) {
-            return statementParent;
-        } else if (expressionParent != null) {
-            return expressionParent;
-        } else {
-            return qualifierParent;
-        }
+        if (this.statementParent != null)
+            return this.statementParent;
+        if (this.expressionParent != null)
+            return this.expressionParent;
+        return this.qualifierParent;
     }
-
-    /**
-     * Get reference prefix.
-     * 
-     * @return the reference prefix.
-     */
 
     public ReferencePrefix getReferencePrefix() {
-        return accessPath;
+        return this.accessPath;
     }
-
-    /**
-     * Set reference prefix.
-     * 
-     * @param qualifier
-     *            a reference prefix.
-     */
 
     public void setReferencePrefix(ReferencePrefix qualifier) {
-        accessPath = qualifier;
+        this.accessPath = qualifier;
     }
-
-    /**
-     * Get reference suffix.
-     * 
-     * @return the reference suffix.
-     */
 
     public ReferenceSuffix getReferenceSuffix() {
-        return qualifierParent;
+        return this.qualifierParent;
     }
-
-    /**
-     * Set reference suffix.
-     * 
-     * @param path
-     *            a reference suffix.
-     */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
-        qualifierParent = path;
-        expressionParent = null;
-        statementParent = null;
+        this.qualifierParent = path;
+        this.expressionParent = null;
+        this.statementParent = null;
     }
-
-    /**
-     * Get statement container.
-     * 
-     * @return the statement container.
-     */
 
     public StatementContainer getStatementContainer() {
-        return statementParent;
+        return this.statementParent;
     }
-
-    /**
-     * Get expression container.
-     * 
-     * @return the expression container.
-     */
-
-    public ExpressionContainer getExpressionContainer() {
-        return expressionParent;
-    }
-
-    /**
-     * Set expression container.
-     * 
-     * @param parent
-     *            an expression container.
-     */
-
-    public void setExpressionContainer(ExpressionContainer parent) {
-        expressionParent = parent;
-        statementParent = null;
-        qualifierParent = null;
-    }
-
-    /**
-     * Set statement container.
-     * 
-     * @param parent
-     *            a statement container.
-     */
 
     public void setStatementContainer(StatementContainer parent) {
-        statementParent = parent;
-        expressionParent = null;
-        qualifierParent = null;
+        this.statementParent = parent;
+        this.expressionParent = null;
+        this.qualifierParent = null;
     }
 
-    /**
-     * Returns the number of children of this node.
-     * 
-     * @return an int giving the number of children of this node
-     */
+    public ExpressionContainer getExpressionContainer() {
+        return this.expressionParent;
+    }
+
+    public void setExpressionContainer(ExpressionContainer parent) {
+        this.expressionParent = parent;
+        this.statementParent = null;
+        this.qualifierParent = null;
+    }
 
     public int getChildCount() {
         int result = 0;
-        if (accessPath != null)
+        if (this.accessPath != null)
             result++;
-        if (name != null)
+        if (this.name != null)
             result++;
-        if (arguments != null)
-            result += arguments.size();
-        if (typeArguments != null)
-        	result += typeArguments.size();
+        if (this.arguments != null)
+            result += this.arguments.size();
+        if (this.typeArguments != null)
+            result += this.typeArguments.size();
         return result;
     }
 
-    /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
-     * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
-     */
-
     public ProgramElement getChildAt(int index) {
-        if (accessPath != null) {
+        if (this.accessPath != null) {
             if (index == 0)
-                return accessPath;
+                return this.accessPath;
             index--;
         }
-        if (name != null) {
+        if (this.name != null) {
             if (index == 0)
-                return name;
+                return this.name;
             index--;
         }
-        if (arguments != null) {
-        	int len = arguments.size();
-        	if (len > index)
-        		return arguments.get(index);
-        	index -= len;
+        if (this.arguments != null) {
+            int len = this.arguments.size();
+            if (len > index)
+                return this.arguments.get(index);
+            index -= len;
         }
-        if (typeArguments != null) {
-        	int len = typeArguments.size();
-        	if (len > index)
-        		return typeArguments.get(index);
-        	index -= len;
+        if (this.typeArguments != null) {
+            int len = this.typeArguments.size();
+            if (len > index)
+                return this.typeArguments.get(index);
+            index -= len;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
-        // role 0: prefix
-        // role 1: name
-        // role 2 (IDX): parameters
-    	// role 3 (IDX): type arguments
-        if (accessPath == child) {
+        if (this.accessPath == child)
             return 0;
-        }
-        if (name == child) {
+        if (this.name == child)
             return 1;
+        if (this.arguments != null) {
+            int index = this.arguments.indexOf(child);
+            if (index >= 0)
+                return index << 4 | 0x2;
         }
-        if (arguments != null) {
-            int index = arguments.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 2;
-            }
-        }
-        if (typeArguments != null) {
-        	int index = typeArguments.indexOf(child);
-        	if (index >= 0) {
-        		return (index << 4) | 3;
-        	}
+        if (this.typeArguments != null) {
+            int index = this.typeArguments.indexOf(child);
+            if (index >= 0)
+                return index << 4 | 0x3;
         }
         return -1;
     }
 
-    /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
-     * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
-     */
-
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
+        if (p == null)
             throw new NullPointerException();
-        }
-        int count;
-        if (accessPath == p) {
+        if (this.accessPath == p) {
             ReferencePrefix r = (ReferencePrefix) q;
-            accessPath = r;
-            if (r != null) {
+            this.accessPath = r;
+            if (r != null)
                 r.setReferenceSuffix(this);
-            }
             return true;
         }
-        if (name == p) {
+        if (this.name == p) {
             Identifier r = (Identifier) q;
-            name = r;
-            if (r != null) {
+            this.name = r;
+            if (r != null)
                 r.setParent(this);
-            }
             return true;
         }
-        count = (arguments == null) ? 0 : arguments.size();
+        int count = (this.arguments == null) ? 0 : this.arguments.size();
         for (int i = 0; i < count; i++) {
-            if (arguments.get(i) == p) {
+            if (this.arguments.get(i) == p) {
                 if (q == null) {
-                    arguments.remove(i);
+                    this.arguments.remove(i);
                 } else {
                     Expression r = (Expression) q;
-                    arguments.set(i, r);
+                    this.arguments.set(i, r);
                     r.setExpressionContainer(this);
                 }
                 return true;
             }
         }
-        if (typeArguments != null) {
-        	int idx = typeArguments.indexOf(p);
-        	if (idx != -1) {
-        		if (q == null) {
-        			typeArguments.remove(idx);
-        		} else {
-        			TypeArgumentDeclaration tad = (TypeArgumentDeclaration) q;
-        			typeArguments.set(idx, tad);
-        			tad.setParent(this);
-        		}
-        	}
+        if (this.typeArguments != null) {
+            int idx = this.typeArguments.indexOf(p);
+            if (idx != -1)
+                if (q == null) {
+                    this.typeArguments.remove(idx);
+                } else {
+                    TypeArgumentDeclaration tad = (TypeArgumentDeclaration) q;
+                    this.typeArguments.set(idx, tad);
+                    tad.setParent(this);
+                }
         }
         return false;
     }
 
-    /**
-     * Get the number of type references in this container.
-     * 
-     * @return the number of type references.
-     */
-
     public int getTypeReferenceCount() {
-        return (accessPath instanceof TypeReference) ? 1 : 0;
+        return (this.accessPath instanceof TypeReference) ? 1 : 0;
     }
-
-    /*
-     * Return the type reference at the specified index in this node's "virtual"
-     * type reference array. @param index an index for a type reference. @return
-     * the type reference with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
-     */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (accessPath instanceof TypeReference && index == 0) {
-            return (TypeReference) accessPath;
-        }
+        if (this.accessPath instanceof TypeReference && index == 0)
+            return (TypeReference) this.accessPath;
         throw new ArrayIndexOutOfBoundsException();
     }
-
-    /**
-     * Get the number of expressions in this container.
-     * 
-     * @return the number of expressions.
-     */
 
     public int getExpressionCount() {
         int result = 0;
-        if (accessPath instanceof Expression)
-            result += 1;
-        if (arguments != null) {
-            result += arguments.size();
-        }
+        if (this.accessPath instanceof Expression)
+            result++;
+        if (this.arguments != null)
+            result += this.arguments.size();
         return result;
     }
 
-    /*
-     * Return the expression at the specified index in this node's "virtual"
-     * expression array. @param index an index for an expression. @return the
-     * expression with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
-     */
-
     public Expression getExpressionAt(int index) {
-        if (accessPath instanceof Expression) {
-            if (index == 0) {
-                return (Expression) accessPath;
-            }
-            index -= 1;
+        if (this.accessPath instanceof Expression) {
+            if (index == 0)
+                return (Expression) this.accessPath;
+            index--;
         }
-        if (arguments != null) {
-            return arguments.get(index);
-        }
+        if (this.arguments != null)
+            return this.arguments.get(index);
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /**
-     * Get name.
-     * 
-     * @return the string.
-     */
-
     public final String getName() {
-        return (name == null) ? null : name.getText();
+        return (this.name == null) ? null : this.name.getText();
     }
-
-    /**
-     * Get identifier.
-     * 
-     * @return the identifier.
-     */
 
     public Identifier getIdentifier() {
-        return name;
+        return this.name;
     }
-
-    /**
-     * Set identifier.
-     * 
-     * @param id
-     *            an identifier.
-     */
 
     public void setIdentifier(Identifier id) {
-        name = id;
+        this.name = id;
     }
-
-    /**
-     * Get arguments.
-     * 
-     * @return the expression mutable list.
-     */
 
     public ASTList<Expression> getArguments() {
-        return arguments;
+        return this.arguments;
     }
 
-    /**
-     * Set arguments.
-     * 
-     * @param list
-     *            an expression mutable list.
-     */
-
     public void setArguments(ASTList<Expression> list) {
-        arguments = list;
+        this.arguments = list;
     }
 
     public void accept(SourceVisitor v) {
         v.visitMethodReference(this);
     }
-    
-    public void setTypeArguments(ASTList<TypeArgumentDeclaration> typeArguments) {
-    	this.typeArguments = typeArguments;
-    }
-    
+
     public ASTList<TypeArgumentDeclaration> getTypeArguments() {
-    	return typeArguments;
-    }
-    
-    @Override
-    public String toString() {
-    	return "<MethodReference> " + name.getText() + "(" + (arguments == null ? 0 : arguments.size()) + ")";
+        return this.typeArguments;
     }
 
+    public void setTypeArguments(ASTList<TypeArgumentDeclaration> typeArguments) {
+        this.typeArguments = typeArguments;
+    }
 }

@@ -2,9 +2,8 @@ package recoder.list.generic;
 
 import java.util.List;
 
-import recoder.java.SourceElement;
+public interface ASTList<E extends recoder.java.SourceElement> extends List<E> {
+    ASTList<E> deepClone();
 
-public interface ASTList<E extends SourceElement> extends List<E> {
-	ASTList<E> deepClone();
-	void trimToSize();
+    void trimToSize();
 }

@@ -1,153 +1,111 @@
-/*
- * Created on 27.05.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- */
 package recoder.java.declaration;
 
 import recoder.abstraction.AnnotationProperty;
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.Identifier;
-import recoder.java.ProgramElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTList;
 
-/**
- * @author gutzmann
- *
- */
 public class AnnotationPropertyDeclaration extends MethodDeclaration implements AnnotationProperty, ExpressionContainer {
-    /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -1319877992238107401L;
-	
-	private Expression defaultValue;
-    
-    /**
-     * 
-     */
+    private static final long serialVersionUID = -1319877992238107401L;
+
+    protected Expression defaultValue;
+
     public AnnotationPropertyDeclaration() {
-        super();
         makeParentRoleValid();
     }
 
-    /**
-     * @param modifiers
-     * @param returnType
-     * @param name
-     * @param parameters
-     * @param exceptions
-     */
-    public AnnotationPropertyDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType,
-            Identifier name, Expression defaultValue) {
+    public AnnotationPropertyDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType, Identifier name, Expression defaultValue) {
         super(modifiers, returnType, name, null, null);
         this.defaultValue = defaultValue;
         makeParentRoleValid();
     }
 
-    /**
-     * @param proto
-     */
     protected AnnotationPropertyDeclaration(AnnotationPropertyDeclaration proto) {
         super(proto);
         if (proto.defaultValue != null) {
-            defaultValue = proto.defaultValue.deepClone();
-            defaultValue.setExpressionContainer(this);
+            this.defaultValue = proto.defaultValue.deepClone();
+            this.defaultValue.setExpressionContainer(this);
         }
     }
 
-    /* (non-Javadoc)
-     * @see recoder.abstraction.AnnotationProperty#getDefaultValue()
-     */
     public Object getDefaultValue() {
-        return AnnotationElementValuePair.expressionToJavaObject(defaultValue);
+        return AnnotationElementValuePair.expressionToJavaObject(this.defaultValue);
     }
-    
-    public Expression getDefaultValueExpression() {
-    	return defaultValue;
-    }
-    
+
     public void setDefaultValue(Expression e) {
-        defaultValue = e;
+        this.defaultValue = e;
     }
-    
+
+    public Expression getDefaultValueExpression() {
+        return this.defaultValue;
+    }
+
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (defaultValue != null)
-            defaultValue.setExpressionContainer(this);
+        if (this.defaultValue != null)
+            this.defaultValue.setExpressionContainer(this);
     }
 
-    /* (non-Javadoc)
-     * @see recoder.java.ExpressionContainer#getExpressionCount()
-     */
     public int getExpressionCount() {
-        return defaultValue == null ? 0 : 1;
+        return (this.defaultValue == null) ? 0 : 1;
     }
 
-    /* (non-Javadoc)
-     * @see recoder.java.ExpressionContainer#getExpressionAt(int)
-     */
     public Expression getExpressionAt(int index) {
-        if (index == 0 && defaultValue != null)
-            return defaultValue;
+        if (index == 0 && this.defaultValue != null)
+            return this.defaultValue;
         throw new ArrayIndexOutOfBoundsException(index);
     }
-    
+
     public void accept(SourceVisitor v) {
         v.visitAnnotationPropertyDeclaration(this);
     }
-    
+
     public AnnotationPropertyDeclaration deepClone() {
         return new AnnotationPropertyDeclaration(this);
     }
-    
+
     public ProgramElement getChildAt(int index) {
-        if (index == super.getChildCount() && defaultValue != null)
-            return defaultValue;
-        return super.getChildAt(index); // might throw ArrayIndexOutOfBoundsException
+        if (index == super.getChildCount() && this.defaultValue != null)
+            return this.defaultValue;
+        return super.getChildAt(index);
     }
-    
+
     public int getChildCount() {
-        return super.getChildCount() + (defaultValue == null ?  0 : 1);
+        return super.getChildCount() + ((this.defaultValue == null) ? 0 : 1);
     }
-    
+
     public int getChildPositionCode(ProgramElement child) {
-    	// role 0-7: see MethodDeclaration
-        // role 8: default value
-        if (child == defaultValue)
+        if (child == this.defaultValue)
             return 8;
         return super.getChildPositionCode(child);
     }
-    
+
     public boolean isPrivate() {
         return false;
     }
-    
+
     public boolean isProtected() {
         return false;
     }
-    
+
     public boolean isPublic() {
         return true;
     }
-    
+
     public boolean isVarArgMethod() {
         return false;
     }
-    
+
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (p == null)
             throw new NullPointerException();
-        if (p == defaultValue) {
+        if (p == this.defaultValue) {
             Expression r = (Expression) q;
-            defaultValue = r;
-            if (r != null) {
+            this.defaultValue = r;
+            if (r != null)
                 r.setExpressionContainer(this);
-            }
-            return true;        }
+            return true;
+        }
         return super.replaceChild(p, q);
     }
 }

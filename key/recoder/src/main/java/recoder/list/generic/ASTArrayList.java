@@ -1,44 +1,37 @@
 package recoder.list.generic;
 
+import recoder.java.SourceElement;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import recoder.java.SourceElement;
-
 public class ASTArrayList<E extends SourceElement> extends ArrayList<E> implements ASTList<E> {
+    private static final long serialVersionUID = 3179494289054893052L;
 
-	/**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 3179494289054893052L;
+    public ASTArrayList() {
+    }
 
-	public ASTArrayList() {
-		super();
-	}
+    public ASTArrayList(Collection<E> c) {
+        super(c);
+    }
 
-	public ASTArrayList(Collection<E> c) {
-		super(c);
-	}
+    public ASTArrayList(int initialCapacity) {
+        super(initialCapacity);
+    }
 
-	public ASTArrayList(int initialCapacity) {
-		super(initialCapacity);
-	}
-	
-	public ASTArrayList(E initialItem) {
-		this(1);
-		add(initialItem);
-	}
-	
-	public ASTArrayList<E> deepClone() {
-		ASTArrayList<E> result = new ASTArrayList<E>(size());
-		Iterator<E> i = iterator();
-		while (i.hasNext()) {
-			@SuppressWarnings("unchecked")
-			E deepClone = (E)i.next().deepClone();
-			result.add(deepClone);
-		}
-		return result;
-	}
+    public ASTArrayList(E initialItem) {
+        this(1);
+        add(initialItem);
+    }
 
+    public ASTArrayList<E> deepClone() {
+        ASTArrayList<E> result = new ASTArrayList(size());
+        Iterator<E> i = iterator();
+        while (i.hasNext()) {
+            SourceElement sourceElement = i.next().deepClone();
+            result.add((E) sourceElement);
+        }
+        return result;
+    }
 }

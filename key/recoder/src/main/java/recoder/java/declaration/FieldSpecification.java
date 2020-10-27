@@ -1,11 +1,8 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.java.declaration;
-
-import java.util.List;
 
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Field;
+import recoder.abstraction.Member;
 import recoder.convenience.Naming;
 import recoder.java.Expression;
 import recoder.java.Identifier;
@@ -13,191 +10,91 @@ import recoder.java.SourceVisitor;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
 
+import java.util.List;
+
 public class FieldSpecification extends VariableSpecification implements Field {
-
-    /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -8228158502939901347L;
-
-	/**
-     * Field specification.
-     */
+    private static final long serialVersionUID = -8228158502939901347L;
 
     public FieldSpecification() {
-        // nothing to do here
     }
-
-    /**
-     * Field specification.
-     * 
-     * @param name
-     *            an identifier.
-     */
 
     public FieldSpecification(Identifier name) {
         super(name);
     }
 
-    /**
-     * Field specification.
-     * 
-     * @param name
-     *            an identifier.
-     * @param init
-     *            an expression.
-     */
-
     public FieldSpecification(Identifier name, Expression init) {
         super(name, init);
     }
-
-    /**
-     * Field specification.
-     * 
-     * @param name
-     *            an identifier.
-     * @param dimensions
-     *            an int value.
-     * @param init
-     *            an expression.
-     */
 
     public FieldSpecification(Identifier name, int dimensions, Expression init) {
         super(name, dimensions, init);
     }
 
-    /**
-     * Field specification.
-     * 
-     * @param proto
-     *            a field specification.
-     */
-
     protected FieldSpecification(FieldSpecification proto) {
         super(proto);
-    }
-
-    /**
-     * Deep clone.
-     * 
-     * @return the object.
-     */
-
-    public FieldSpecification deepClone() {
-        return new FieldSpecification(this);
-    }
-
-    /**
-     * Set parent.
-     * 
-     * @param parent
-     *            must be a field declaration.
-     */
-
-    public void setParent(VariableDeclaration parent) {
-        setParent((FieldDeclaration) parent);
-    }
-
-    /**
-     * Set parent.
-     * 
-     * @param parent
-     *            a field declaration.
-     */
-
-    public void setParent(FieldDeclaration parent) {
-        super.setParent(parent);
-    }
-
-    /**
-     * Test whether the declaration is private.
-     */
-
-    public boolean isPrivate() {
-        return parent.isPrivate();
-    }
-
-    /**
-     * Test whether the declaration is protected.
-     */
-
-    public boolean isProtected() {
-        return parent.isProtected();
-    }
-
-    /**
-     * Test whether the declaration is public.
-     */
-
-    public boolean isPublic() {
-        return parent.isPublic();
-    }
-
-    /**
-     * Test whether the declaration is static.
-     */
-
-    public boolean isStatic() {
-        return parent.isStatic();
-    }
-
-    /**
-     * Test whether the declaration is transient.
-     */
-
-    public boolean isTransient() {
-        return parent.isTransient();
-    }
-
-    /**
-     * Test whether the declaration is volatile.
-     */
-
-    public boolean isVolatile() {
-        return parent.isVolatile();
     }
 
     private static void updateModel() {
         factory.getServiceConfiguration().getChangeHistory().updateModel();
     }
 
+    public FieldSpecification deepClone() {
+        return new FieldSpecification(this);
+    }
+
+    public void setParent(VariableDeclaration parent) {
+        setParent((FieldDeclaration) parent);
+    }
+
+    public void setParent(FieldDeclaration parent) {
+        super.setParent(parent);
+    }
+
+    public boolean isPrivate() {
+        return this.parent.isPrivate();
+    }
+
+    public boolean isProtected() {
+        return this.parent.isProtected();
+    }
+
+    public boolean isPublic() {
+        return this.parent.isPublic();
+    }
+
+    public boolean isStatic() {
+        return this.parent.isStatic();
+    }
+
+    public boolean isTransient() {
+        return this.parent.isTransient();
+    }
+
+    public boolean isVolatile() {
+        return this.parent.isVolatile();
+    }
+
     public ClassType getContainingClassType() {
-        /*
-         * ProgramElement context = getASTParent(); while (context != null) {
-         * context = context.getASTParent(); if (context instanceof ClassType) {
-         * return (ClassType)context; } } return null;
-         */
-        if (service == null) {
+        if (this.service == null) {
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        return service.getContainingClassType(this);
+        return this.service.getContainingClassType(this);
     }
 
     public String getFullName() {
         return Naming.getFullName(this);
-    }
-    
-    public String getBinaryName() {
-    	return getContainingClassType().getBinaryName() + "." + getName();
     }
 
     public void accept(SourceVisitor v) {
         v.visitFieldSpecification(this);
     }
 
-    /**
-     * get annotations of enclosing declaration
-     */
     public List<AnnotationUseSpecification> getAnnotations() {
-        return parent.getAnnotations();
+        return this.parent.getAnnotations();
     }
-    
-    /**
-     * get type arguments of parent's type reference 
-     */
+
     public ASTList<TypeArgumentDeclaration> getTypeArguments() {
-    	return getParent().getTypeReference().getTypeArguments();
+        return getParent().getTypeReference().getTypeArguments();
     }
 }

@@ -1,88 +1,78 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.bytecode;
+
+import recoder.abstraction.Package;
+import recoder.abstraction.*;
+import recoder.convenience.Naming;
 
 import java.util.List;
 
-import recoder.abstraction.ClassType;
-import recoder.abstraction.ClassTypeContainer;
-import recoder.abstraction.Method;
-import recoder.abstraction.Package;
-import recoder.abstraction.Type;
-import recoder.convenience.Naming;
-
 public class MethodInfo extends MemberInfo implements Method {
-
     protected String[] paramtypes;
 
     protected String returntype;
 
     protected String[] exceptions;
-    
-    protected AnnotationUseInfo paramAnnotations[][];
-    
-    protected List<TypeArgumentInfo> paramTypeArgs[];
-    
+
+    protected AnnotationUseInfo[][] paramAnnotations;
+
+    protected List<TypeArgumentInfo>[] paramTypeArgs;
+
     protected List<TypeParameterInfo> typeParms;
-    
-    public MethodInfo(int accessFlags, String returntype, String name, String[] paramtypes, String[] exceptions,
-            ClassFile cf) {
+
+    public MethodInfo(int accessFlags, String returntype, String name, String[] paramtypes, String[] exceptions, ClassFile cf) {
         super(accessFlags, name, cf);
-        if (returntype != null) {
+        if (returntype != null)
             this.returntype = returntype.intern();
-        }
         this.paramtypes = paramtypes;
-        for (int i = 0; i < paramtypes.length; i++) {
+        int i;
+        for (i = 0; i < paramtypes.length; i++)
             paramtypes[i] = paramtypes[i].intern();
-        }
         this.exceptions = exceptions;
-        if (exceptions != null) {
-            for (int i = 0; i < exceptions.length; i++) {
+        if (exceptions != null)
+            for (i = 0; i < exceptions.length; i++)
                 exceptions[i] = exceptions[i].intern();
-            }
-        }
     }
 
     public final String[] getParameterTypeNames() {
-        return paramtypes;
+        return this.paramtypes;
     }
-    
+
     public final AnnotationUseInfo[] getAnnotationsForParam(int paramNum) {
-    	if (paramAnnotations == null)
-    		return null;
-    	return paramAnnotations[paramNum];
+        if (this.paramAnnotations == null)
+            return null;
+        return this.paramAnnotations[paramNum];
     }
-    
+
     public final List<TypeArgumentInfo> getTypeArgumentsForParam(int paramNum) {
-    	if (paramTypeArgs == null)
-    		return null;
-    	return paramTypeArgs[paramNum];
+        if (this.paramTypeArgs == null)
+            return null;
+        return this.paramTypeArgs[paramNum];
     }
-    
+
     public final List<TypeArgumentInfo> getTypeArgumentsForReturnType() {
-    	if (paramTypeArgs == null)
-    		return null;
-    	return paramTypeArgs[paramTypeArgs.length-1];
+        if (this.paramTypeArgs == null)
+            return null;
+        return this.paramTypeArgs[this.paramTypeArgs.length - 1];
     }
 
     public final String[] getExceptionsInfo() {
-        return exceptions;
+        return this.exceptions;
     }
 
     public final String getTypeName() {
-        return returntype;
+        return this.returntype;
     }
 
     public Type getReturnType() {
-        return service.getReturnType(this);
+        return this.service.getReturnType(this);
     }
 
     public List<Type> getSignature() {
-        return service.getSignature(this);
+        return this.service.getSignature(this);
     }
 
     public List<ClassType> getExceptions() {
-        return service.getExceptions(this);
+        return this.service.getExceptions(this);
     }
 
     public ClassTypeContainer getContainer() {
@@ -90,33 +80,22 @@ public class MethodInfo extends MemberInfo implements Method {
     }
 
     public Package getPackage() {
-        return service.getPackage(this);
+        return this.service.getPackage(this);
     }
 
     public List<? extends ClassType> getTypes() {
-        return service.getTypes(this);
+        return this.service.getTypes(this);
     }
 
     public String getFullName() {
         return Naming.getFullName(this);
     }
-    
-	public String getBinaryName() {
-		return getContainingClassType().getBinaryName() + "." + getName();
-	}
 
-    
     public boolean isVarArgMethod() {
-        return (accessFlags & VARARGS) != 0;
+        return ((this.accessFlags & 0x80) != 0);
     }
 
-	public List<TypeParameterInfo> getTypeParameters() {
-		return typeParms;
-	}
-	
-	@Override
-	public String toString() {
-		return "%BC%" + getName() + "(" + getSignature().size() + ")";
-	}
-    
+    public List<TypeParameterInfo> getTypeParameters() {
+        return this.typeParms;
+    }
 }

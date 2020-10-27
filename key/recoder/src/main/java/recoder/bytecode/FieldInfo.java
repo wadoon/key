@@ -1,19 +1,16 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.bytecode;
-
-import java.util.List;
 
 import recoder.abstraction.Field;
 import recoder.abstraction.Type;
 import recoder.convenience.Naming;
 
-public class FieldInfo extends MemberInfo implements Field {
+import java.util.List;
 
+public class FieldInfo extends MemberInfo implements Field {
     protected String type;
 
     protected String constantValue;
-    
+
     protected List<TypeArgumentInfo> typeArgs;
 
     public FieldInfo(int accessFlags, String name, String type, ClassFile cf, String constantValue, List<TypeArgumentInfo> typeArgs) {
@@ -24,28 +21,22 @@ public class FieldInfo extends MemberInfo implements Field {
     }
 
     public final String getTypeName() {
-        return type;
+        return this.type;
     }
 
-    // can be null
     public final String getConstantValue() {
-        return constantValue;
+        return this.constantValue;
     }
 
     public Type getType() {
-        return service.getType(this);
+        return this.service.getType(this);
     }
 
     public String getFullName() {
         return Naming.getFullName(this);
     }
-    
-    
-	public String getBinaryName() {
-		return getContainingClassType().getBinaryName() + "." + getName();
-	}
-    
+
     public List<TypeArgumentInfo> getTypeArguments() {
-    	return typeArgs;
+        return this.typeArgs;
     }
 }

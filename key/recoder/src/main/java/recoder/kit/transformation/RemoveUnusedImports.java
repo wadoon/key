@@ -1,11 +1,9 @@
 package recoder.kit.transformation;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.java.CompilationUnit;
 import recoder.java.Import;
+import recoder.java.ProgramElement;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
 import recoder.kit.UnitKit;
@@ -13,121 +11,65 @@ import recoder.service.CrossReferenceSourceInfo;
 import recoder.util.ProgressListener;
 import recoder.util.ProgressListenerManager;
 
-/**
- * Transformation that removes all superfluous import statements from a
- * compilation unit.
- * 
- * @see recoder.kit.UnitKit#getUnnecessaryImports
- * 
- * @since 0.71
- * @author AL
- */
+import java.util.ArrayList;
+import java.util.List;
+
 public class RemoveUnusedImports extends TwoPassTransformation {
+    private final List<CompilationUnit> units;
 
-    private List<CompilationUnit> units;
+    private final List<Import> imports;
 
-    private List<Import> imports;
+    private final ProgressListenerManager listeners = new ProgressListenerManager(this);
 
-    private ProgressListenerManager listeners = new ProgressListenerManager(this);
-
-    /**
-     * Creates a new transformation object that removes unused import statements
-     * from all compilation units in the source file repository.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     */
     public RemoveUnusedImports(CrossReferenceServiceConfiguration sc) {
         this(sc, sc.getSourceFileRepository().getCompilationUnits());
     }
 
-    /**
-     * Creates a new transformation object that removes unused import
-     * statements.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     * @param cu
-     *            a compilation unit that shall be stripped of imports.
-     */
     public RemoveUnusedImports(CrossReferenceServiceConfiguration sc, CompilationUnit cu) {
-    	super(sc);
-    	ArrayList<CompilationUnit> al = new ArrayList<CompilationUnit>(1);
-    	al.add(cu);
+        super(sc);
+        ArrayList<CompilationUnit> al = new ArrayList<CompilationUnit>(1);
+        al.add(cu);
         this.units = al;
-        imports = new ArrayList<Import>();
+        this.imports = new ArrayList<Import>();
     }
 
-    /**
-     * Creates a new transformation object that removes unused import
-     * statements.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     * @param list
-     *            the compilation units that shall be stripped of imports.
-     */
     public RemoveUnusedImports(CrossReferenceServiceConfiguration sc, List<CompilationUnit> list) {
         super(sc);
-        if (list == null) {
+        if (list == null)
             throw new IllegalArgumentException("Missing units");
-        }
         this.units = list;
-        imports = new ArrayList<Import>();
+        this.imports = new ArrayList<Import>();
     }
 
-    /**
-     * Adds a progress listener for the analysis phase.
-     */
     public void addProgressListener(ProgressListener l) {
-        listeners.addProgressListener(l);
+        this.listeners.addProgressListener(l);
     }
 
     public void removeProgressListener(ProgressListener l) {
-        listeners.removeProgressListener(l);
+        this.listeners.removeProgressListener(l);
     }
 
-    /**
-     * Returns {@link #EQUIVALENCE}or {@link #IDENTITY}.
-     * 
-     * @return the problem report.
-     */
     public ProblemReport analyze() {
-        listeners.fireProgressEvent(0, units.size(), "Checking Imports");
+        this.listeners.fireProgressEvent(0, this.units.size(), "Checking Imports");
         CrossReferenceSourceInfo xrsi = getCrossReferenceSourceInfo();
-        for (int i = 0; i < units.size(); i += 1) {
-
-            imports.addAll(UnitKit.getUnnecessaryImports(xrsi, units.get(i)));
-            listeners.fireProgressEvent(i + 1);
+        for (int i = 0; i < this.units.size(); i++) {
+            this.imports.addAll(UnitKit.getUnnecessaryImports(xrsi, this.units.get(i)));
+            this.listeners.fireProgressEvent(i + 1);
         }
-        return setProblemReport(imports.isEmpty() ? IDENTITY : EQUIVALENCE);
+        return setProblemReport(this.imports.isEmpty() ? IDENTITY : EQUIVALENCE);
     }
 
-    /**
-     * Removes the unnecessary import statements.
-     */
     public void transform() {
         super.transform();
-        for (int i = imports.size() - 1; i >= 0; i -= 1) {
-            detach(imports.get(i));
-        }
+        for (int i = this.imports.size() - 1; i >= 0; i--)
+            detach(this.imports.get(i));
     }
 
-    /**
-     * Returns the list of redundant imports.
-     * 
-     * @return the list of imports that are/were superfluous.
-     */
     public List<Import> getImportList() {
-        return imports;
+        return this.imports;
     }
 
-    /**
-     * Returns the compilation units.
-     * 
-     * @return the compilation units.
-     */
     public List<CompilationUnit> getCompilationUnits() {
-        return units;
+        return this.units;
     }
 }

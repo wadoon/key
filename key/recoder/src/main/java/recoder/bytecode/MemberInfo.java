@@ -1,14 +1,11 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.bytecode;
-
-import java.util.List;
 
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Member;
 
-public abstract class MemberInfo extends ByteCodeElement implements Member {
+import java.util.List;
 
+public abstract class MemberInfo extends ByteCodeElement implements Member {
     protected ClassFile parent;
 
     List<AnnotationUseInfo> annotations;
@@ -17,28 +14,24 @@ public abstract class MemberInfo extends ByteCodeElement implements Member {
         super(accessFlags, name);
         setParent(parent);
     }
-    
-    void setAnnotations(List<AnnotationUseInfo> annotations) {
-        this.annotations = annotations;
+
+    public ClassFile getParent() {
+        return this.parent;
     }
 
     public void setParent(ClassFile parent) {
         this.parent = parent;
     }
 
-    public ClassFile getParent() {
-        return parent;
+    public ClassType getContainingClassType() {
+        return this.service.getContainingClassType(this);
     }
 
-    public ClassType getContainingClassType() {
-        return service.getContainingClassType(this);
-    }
-    
-    /**
-     * @return a list of annotations
-     */
     public List<AnnotationUseInfo> getAnnotations() {
-        return annotations;
+        return this.annotations;
+    }
+
+    void setAnnotations(List<AnnotationUseInfo> annotations) {
+        this.annotations = annotations;
     }
 }
-

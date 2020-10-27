@@ -1,86 +1,18 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.service;
 
-import recoder.abstraction.ClassType;
-import recoder.abstraction.Constructor;
-import recoder.abstraction.Field;
-import recoder.abstraction.Method;
-import recoder.abstraction.Type;
-import recoder.bytecode.AnnotationUseInfo;
-import recoder.bytecode.ClassFile;
-import recoder.bytecode.ConstructorInfo;
-import recoder.bytecode.FieldInfo;
-import recoder.bytecode.MethodInfo;
+import recoder.abstraction.*;
+import recoder.bytecode.*;
 
-/**
- * Implements queries for program model elements with bytecode representations.
- */
 public interface ByteCodeInfo extends ProgramModelInfo {
+    void register(ClassFile paramClassFile);
 
-    /**
-     * Registers a new class file for the service.
-     * 
-     * @param cf
-     *            the new class file.
-     */
-    void register(ClassFile cf);
+    ClassFile getClassFile(ClassType paramClassType);
 
-    /**
-     * Returns the bytecode counterpart of the given classtype. Returns <CODE>
-     * null</CODE>, if the given type is not a class file.
-     * 
-     * @param ct
-     *            a class type.
-     * @param the
-     *            corresponding class file, or <CODE>null</CODE>, if the
-     *            given type has no bytecode representation.
-     */
-    ClassFile getClassFile(ClassType ct);
+    MethodInfo getMethodInfo(Method paramMethod);
 
-    /**
-     * Returns the bytecode counterpart of the given method. Returns <CODE>null
-     * </CODE>, if the given method is not a method info.
-     * 
-     * @param m
-     *            a method.
-     * @param the
-     *            corresponding bytecode element, or <CODE>null</CODE>, if
-     *            the given method has no bytecode representation.
-     */
-    MethodInfo getMethodInfo(Method m);
+    ConstructorInfo getConstructorInfo(Constructor paramConstructor);
 
-    /**
-     * Returns the bytecode counterpart of the given constructor. Returns <CODE>
-     * null</CODE>, if the given constructor is not a constructor info.
-     * 
-     * @param c
-     *            a constructor.
-     * @param the
-     *            corresponding bytecode element, or <CODE>null</CODE>, if
-     *            the given constructor has no bytecode representation.
-     */
-    ConstructorInfo getConstructorInfo(Constructor c);
+    FieldInfo getFieldInfo(Field paramField);
 
-    /**
-     * Returns the bytecode counterpart of the given field. Returns <CODE>null
-     * </CODE>, if the given field is not a field info.
-     * 
-     * @param f
-     *            a field.
-     * @param the
-     *            corresponding field info, or <CODE>null</CODE>, if the
-     *            given field has no bytecode representation.
-     */
-    FieldInfo getFieldInfo(Field f);
-    
-
-    /**
-     * Returns the (annotation) type of the given annotation use.
-     * @param au an annotation use
-     * @return the type of the referenced annotation type
-     */
-    Type getAnnotationType(AnnotationUseInfo au);
-    
+    Type getAnnotationType(AnnotationUseInfo paramAnnotationUseInfo);
 }
-

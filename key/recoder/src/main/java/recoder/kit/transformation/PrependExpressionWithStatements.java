@@ -1,141 +1,83 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.kit.transformation;
 
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.java.Expression;
-import recoder.java.ProgramElement;
-import recoder.java.Statement;
-import recoder.java.StatementContainer;
-import recoder.kit.Problem;
+import recoder.java.*;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
 
-/**
- * Transformation that prepends a given expression (such as a method or variable
- * reference) with a statement or a list of statements.
- * 
- * @author AL
- */
+import java.util.Collection;
+
 public class PrependExpressionWithStatements extends TwoPassTransformation {
+    private final Expression expression;
 
-    private Expression expression;
-
-    private ASTList<Statement> statements;
+    private final ASTList<Statement> statements;
 
     private ShiftPreceedingStatementExpressions shifter;
 
-    /**
-     * Creates a new transformation object that inserts the given statements
-     * such that no state changes take place between the statements and the
-     * evaluation of the expression.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     * @param x
-     *            the expression that shall be prepended.
-     * @param statements
-     *            the statements to prepend.
-     */
     public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x, ASTList<Statement> statements) {
         super(sc);
-        if (x == null) {
+        if (x == null)
             throw new IllegalArgumentException("Missing expression");
-        }
-        if (statements == null) {
+        if (statements == null)
             throw new IllegalArgumentException("Missing statements");
-        }
         this.expression = x;
         this.statements = statements;
     }
 
-    /**
-     * Creates a new transformation object that inserts the given statement such
-     * that no state changes take place between the statement and the evaluation
-     * of the expression.
-     * 
-     * @param sc
-     *            the service configuration to use.
-     * @param x
-     *            the expression that shall be prepended.
-     * @param statement
-     *            the statement to prepend.
-     */
     public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x, Statement statement) {
-        this(sc, x, new ASTArrayList<Statement>(statement));
+        this(sc, x, (ASTList<Statement>) new ASTArrayList(statement));
     }
 
-    /**
-     * 
-     * @return the problem report, may be
-     *         {@link recoder.kit.Transformation#IDENTITY}, or
-     *         {@link recoder.kit.Transformation#EQUIVALENCE}.
-     */
     public ProblemReport analyze() {
-        if (statements.isEmpty()) {
+        if (this.statements.isEmpty())
             return setProblemReport(IDENTITY);
-        }
-        shifter = new ShiftPreceedingStatementExpressions(getServiceConfiguration(), expression);
-        ProblemReport report = shifter.analyze();
-        if (report instanceof Problem) {
+        this.shifter = new ShiftPreceedingStatementExpressions(getServiceConfiguration(), this.expression);
+        ProblemReport report = this.shifter.analyze();
+        if (report instanceof recoder.kit.Problem)
             return setProblemReport(report);
-        }
         if (report == IDENTITY) {
-            Statement parent = (Statement) shifter.getTopMostParent();
+            Statement parent = (Statement) this.shifter.getTopMostParent();
             StatementContainer grandpa = parent.getStatementContainer();
             int i = 0;
-            for (int s = grandpa.getStatementCount(); i < s; i += 1) {
-                if (grandpa.getStatementAt(i) == parent) {
-                    break;
-                }
-            }
-            int j = statements.size();
+            for (int s = grandpa.getStatementCount(); i < s &&
+                    grandpa.getStatementAt(i) != parent; i++)
+                ;
+            int j = this.statements.size();
             if (i >= j) {
-                for (--j, --i; j >= 0; --j, --i) {
-                    if (!ProgramElement.STRUCTURAL_EQUALITY.equals(statements.get(j), grandpa
-                            .getStatementAt(i))) {
-                        break;
-                    }
+                j--;
+                i--;
+                while (j >= 0 &&
+                        ProgramElement.STRUCTURAL_EQUALITY.equals(this.statements.get(j), grandpa.getStatementAt(i))) {
+                    j--;
+                    i--;
                 }
-                if (j < 0) {
+                if (j < 0)
                     return setProblemReport(report);
-                }
             }
         }
         return setProblemReport(NO_PROBLEM);
     }
 
-    /**
-     * 
-     * @exception IllegalStateException
-     *                if the analysis has not been called.
-     * @see #analyze()
-     * @see recoder.kit.transformation.ShiftPreceedingStatementExpressions
-     * @see recoder.kit.transformation.PrepareStatementList
-     */
     public void transform() {
         super.transform();
-        shifter.transform();
-        Statement statement = shifter.getEnclosingStatement();
-        // this is a syntactic transformation!
+        this.shifter.transform();
+        Statement statement = this.shifter.getEnclosingStatement();
         PrepareStatementList preparer = new PrepareStatementList(getServiceConfiguration(), statement, true);
         preparer.execute();
         ASTList<Statement> body = preparer.getStatementList();
-        // the statement might have been cloned
         statement = preparer.getStatement();
         int position = body.indexOf(statement);
-        body.addAll(position, statements);
+        body.addAll(position, this.statements);
         ChangeHistory ch = getChangeHistory();
         StatementContainer parent = statement.getStatementContainer();
-        for (int i = 0; i < statements.size(); i += 1) {
-            Statement s = statements.get(i);
+        for (int i = 0; i < this.statements.size(); i++) {
+            Statement s = this.statements.get(i);
             s.setStatementContainer(parent);
-            if (isVisible()) {
+            if (isVisible())
                 ch.attached(s);
-            }
         }
     }
 }

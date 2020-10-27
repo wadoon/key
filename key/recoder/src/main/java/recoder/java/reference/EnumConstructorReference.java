@@ -1,218 +1,174 @@
-/*
- * Created on 17.08.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- * 
- */
 package recoder.java.reference;
 
-import recoder.java.Expression;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceVisitor;
-import recoder.java.StatementContainer;
-import recoder.java.declaration.ClassDeclaration;
-import recoder.java.declaration.EnumConstantSpecification;
-import recoder.java.declaration.TypeArgumentDeclaration;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.java.declaration.TypeDeclarationContainer;
+import recoder.java.*;
+import recoder.java.declaration.*;
 import recoder.list.generic.ASTList;
 
-/**
- * 
- * @author Tobias Gutzmann
- */
-public class EnumConstructorReference extends JavaNonTerminalProgramElement implements ConstructorReference,
-		TypeDeclarationContainer {
+public class EnumConstructorReference extends JavaNonTerminalProgramElement implements ConstructorReference, TypeDeclarationContainer {
+    private static final long serialVersionUID = 346152574064180781L;
 
-	/**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 346152574064180781L;
+    protected ClassDeclaration classDeclaration;
 
-	private ClassDeclaration classDeclaration;
-	
-	private ASTList<Expression> args;
-	
-	private EnumConstantSpecification parent;
+    protected ASTList<Expression> args;
 
-	public EnumConstructorReference() {
-		super();
-	}
-	
-	public EnumConstructorReference(ASTList<Expression> args, ClassDeclaration anonymousClass) {
-		this.args = args;
-		this.classDeclaration = anonymousClass;
-		makeParentRoleValid();
-	}
-	
-	protected EnumConstructorReference(EnumConstructorReference proto) {
-		super(proto);
-		if (proto.classDeclaration != null)
-			classDeclaration = proto.classDeclaration.deepClone();
-		if (proto.args != null)
-			args = proto.args.deepClone();
-	}
+    protected EnumConstantSpecification parent;
 
-	public void accept(SourceVisitor v) {
-		v.visitEnumConstructorReference(this);
-	}
+    public EnumConstructorReference() {
+    }
 
-	public EnumConstructorReference deepClone() {
-		return new EnumConstructorReference(this);
-	}
+    public EnumConstructorReference(ASTList<Expression> args, ClassDeclaration anonymousClass) {
+        this.args = args;
+        this.classDeclaration = anonymousClass;
+        makeParentRoleValid();
+    }
 
-	/**
-	 * Inherited through ConstructorReference.
-	 * However, this kind of ConstructorReference cannot appear as a statement.
-	 * Always returns <code>null</code>
-	 * @returns <code>null</code> 
-	 */
-	public StatementContainer getStatementContainer() {
-		return null;
-	}
+    protected EnumConstructorReference(EnumConstructorReference proto) {
+        super(proto);
+        if (proto.classDeclaration != null)
+            this.classDeclaration = proto.classDeclaration.deepClone();
+        if (proto.args != null)
+            this.args = proto.args.deepClone();
+    }
 
-	/**
-	 * @throws UnsupportedOperationException
-	 * @see getStatementContainer()
-	 */
-	public void setStatementContainer(StatementContainer c) {
-		throw new UnsupportedOperationException();
-	}
+    public void accept(SourceVisitor v) {
+        v.visitEnumConstructorReference(this);
+    }
 
-	public int getTypeDeclarationCount() {
-		return classDeclaration == null ? 0 : 1;
-	}
+    public EnumConstructorReference deepClone() {
+        return new EnumConstructorReference(this);
+    }
 
-	public TypeDeclaration getTypeDeclarationAt(int index) {
-		if (classDeclaration != null && index == 0)
-			return classDeclaration;
-		throw new ArrayIndexOutOfBoundsException(index);
-	}
+    public StatementContainer getStatementContainer() {
+        return null;
+    }
 
-	public ProgramElement getChildAt(int index) {
-		if (args != null) {
-			int l = args.size();
-			if (index < l)
-				return args.get(index);
-			index -= l;
-		}
-		if (classDeclaration != null) {
-			if (index == 0)
-				return classDeclaration;
-			index--;
-		}
-		throw new ArrayIndexOutOfBoundsException();
-	}
+    public void setStatementContainer(StatementContainer c) {
+        throw new UnsupportedOperationException();
+    }
 
-	public int getChildCount() {
-		return getTypeDeclarationCount() + (args == null ? 0 : args.size());
-	}
+    public int getTypeDeclarationCount() {
+        return (this.classDeclaration == null) ? 0 : 1;
+    }
 
-	@Override
-	public void makeParentRoleValid() {
-		super.makeParentRoleValid();
-		if (classDeclaration != null)
-			classDeclaration.setParent(this);
-		if (args != null) {
-			for(int i=0, max=args.size(); i<max; i++) {
-				Expression e = args.get(i);
-				e.setExpressionContainer(this);
-			}
-		}
-	}
+    public TypeDeclaration getTypeDeclarationAt(int index) {
+        if (this.classDeclaration != null && index == 0)
+            return this.classDeclaration;
+        throw new ArrayIndexOutOfBoundsException(index);
+    }
 
-	public boolean replaceChild(ProgramElement p, ProgramElement q) {
-		if (p == null) throw new NullPointerException();
-		if (p == classDeclaration) {
-			classDeclaration = (ClassDeclaration)q;
-			if (q != null)
-				classDeclaration.setParent(this);
-			return true;
-		}
-		int idx;
-		if (args != null && (idx = args.indexOf(p)) != -1) {
-			if (q == null) {
-				args.remove(idx);
-			} else {
-				Expression s = (Expression)q;
-				args.set(idx, s);
-				s.setExpressionContainer(this);
-			}
-			return true;
-		}
-		return false;
-	}
+    public ProgramElement getChildAt(int index) {
+        if (this.args != null) {
+            int l = this.args.size();
+            if (index < l)
+                return this.args.get(index);
+            index -= l;
+        }
+        if (this.classDeclaration != null) {
+            if (index == 0)
+                return this.classDeclaration;
+            index--;
+        }
+        throw new ArrayIndexOutOfBoundsException();
+    }
 
-	public int getChildPositionCode(ProgramElement child) {
-		// role 0 		: classDeclaration
-		// role 1(idx)  : arg
-		if (child == classDeclaration)
-			return 0;
-		if (args != null) {
-			int idx = args.indexOf(child);
-			if (idx != -1)
-				return (idx << 4) | 1;
-		}
-		return -1;
-	}
+    public int getChildCount() {
+        return getTypeDeclarationCount() + ((this.args == null) ? 0 : this.args.size());
+    }
 
-	/**
-	 * @return Returns the classDeclaration.
-	 */
-	public final ClassDeclaration getClassDeclaration() {
-		return classDeclaration;
-	}
+    public void makeParentRoleValid() {
+        super.makeParentRoleValid();
+        if (this.classDeclaration != null)
+            this.classDeclaration.setParent(this);
+        if (this.args != null)
+            for (int i = 0, max = this.args.size(); i < max; i++) {
+                Expression e = this.args.get(i);
+                e.setExpressionContainer(this);
+            }
+    }
 
-	/**
-	 * @param classDeclaration The classDeclaration to set.
-	 */
-	public final void setClassDeclaration(ClassDeclaration classDeclaration) {
-		this.classDeclaration = classDeclaration;
-	}
+    public boolean replaceChild(ProgramElement p, ProgramElement q) {
+        if (p == null)
+            throw new NullPointerException();
+        if (p == this.classDeclaration) {
+            this.classDeclaration = (ClassDeclaration) q;
+            if (q != null)
+                this.classDeclaration.setParent(this);
+            return true;
+        }
+        int idx;
+        if (this.args != null && (idx = this.args.indexOf(p)) != -1) {
+            if (q == null) {
+                this.args.remove(idx);
+            } else {
+                Expression s = (Expression) q;
+                this.args.set(idx, s);
+                s.setExpressionContainer(this);
+            }
+            return true;
+        }
+        return false;
+    }
 
-	public ASTList<Expression> getArguments() {
-		return args;
-	}
+    public int getChildPositionCode(ProgramElement child) {
+        if (child == this.classDeclaration)
+            return 0;
+        if (this.args != null) {
+            int idx = this.args.indexOf(child);
+            if (idx != -1)
+                return idx << 4 | 0x1;
+        }
+        return -1;
+    }
 
-	public void setArguments(ASTList<Expression> list) {
-		this.args = list;
-	}
+    public final ClassDeclaration getClassDeclaration() {
+        return this.classDeclaration;
+    }
 
-	public NonTerminalProgramElement getASTParent() {
-		return parent;
-	}
-	
-	public void setParent(EnumConstantSpecification parent) {
-		this.parent = parent;
-	}
+    public final void setClassDeclaration(ClassDeclaration classDeclaration) {
+        this.classDeclaration = classDeclaration;
+    }
 
-	public int getExpressionCount() {
-		return args == null ? 0 : args.size();
-	}
+    public ASTList<Expression> getArguments() {
+        return this.args;
+    }
 
-	public Expression getExpressionAt(int index) {
-		if (args == null) throw new ArrayIndexOutOfBoundsException(index);
-		return args.get(index);
-	}
+    public void setArguments(ASTList<Expression> list) {
+        this.args = list;
+    }
 
-	public ASTList<TypeArgumentDeclaration> getTypeArguments() {
-		return null;
-	}
-	
-	public ProgramElement getFirstElement() {
-		if (args != null && args.size() > 0)
-			return args.get(0);
-		return this;
-	}
-	
-	public ProgramElement getLastElement() {
-		if (classDeclaration != null)
-			return classDeclaration;
-		if (args != null && args.size() > 0)
-			return args.get(args.size()-1);
-		return this;
-	}
-	
+    public NonTerminalProgramElement getASTParent() {
+        return this.parent;
+    }
+
+    public void setParent(EnumConstantSpecification parent) {
+        this.parent = parent;
+    }
+
+    public int getExpressionCount() {
+        return (this.args == null) ? 0 : this.args.size();
+    }
+
+    public Expression getExpressionAt(int index) {
+        if (this.args == null)
+            throw new ArrayIndexOutOfBoundsException(index);
+        return this.args.get(index);
+    }
+
+    public ASTList<TypeArgumentDeclaration> getTypeArguments() {
+        return null;
+    }
+
+    public ProgramElement getFirstElement() {
+        if (this.args != null && this.args.size() > 0)
+            return this.args.get(0);
+        return this;
+    }
+
+    public ProgramElement getLastElement() {
+        if (this.classDeclaration != null)
+            return this.classDeclaration;
+        if (this.args != null && this.args.size() > 0)
+            return this.args.get(this.args.size() - 1);
+        return this;
+    }
 }

@@ -1,9 +1,3 @@
-/*
- * Created on 27.10.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- * 
- */
 package recoder.java.declaration;
 
 import recoder.ModelException;
@@ -14,102 +8,73 @@ import recoder.java.SourceVisitor;
 import recoder.java.reference.EnumConstructorReference;
 import recoder.list.generic.ASTList;
 
-/**
- * @author Tobias Gutzmann
- *
- */
 public class EnumConstantSpecification extends FieldSpecification implements EnumConstant {
-	/**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -40018491975119655L;
-	
-	/**
-	 * a reference to the enum type.
-	 * Note that this must always be set, even if no parantheses are present in the concrete syntax.
-	 * 
-	 */
-	private EnumConstructorReference ref;
-	
-	/**
-	 * 
-	 */
-	public EnumConstantSpecification() {
-		super();
-	}
-	
-	public void accept(SourceVisitor v) {
-		v.visitEnumConstantSpecification(this);
-	}
+    private static final long serialVersionUID = -40018491975119655L;
 
-	/**
-	 * @param name
-	 */
-	public EnumConstantSpecification(Identifier name) {
-		super(name);
-	}
+    protected EnumConstructorReference ref;
 
-	/**
-	 * @param name
-	 * @param init
-	 */
-	public EnumConstantSpecification(Identifier name, EnumConstructorReference ref) {
-		super(name);
-		this.ref = ref;
-		makeParentRoleValid();
-	}
+    public EnumConstantSpecification() {
+    }
 
-	/**
-	 * @param proto
-	 */
-	public EnumConstantSpecification(EnumConstantSpecification proto) {
-		super(proto);
-		if (proto.ref != null)
-			ref = proto.ref.deepClone();
-	}
-	
+    public EnumConstantSpecification(Identifier name) {
+        super(name);
+    }
+
+    public EnumConstantSpecification(Identifier name, EnumConstructorReference ref) {
+        super(name);
+        this.ref = ref;
+        makeParentRoleValid();
+    }
+
+    public EnumConstantSpecification(EnumConstantSpecification proto) {
+        super(proto);
+        if (proto.ref != null)
+            this.ref = proto.ref.deepClone();
+    }
+
+    public void accept(SourceVisitor v) {
+        v.visitEnumConstantSpecification(this);
+    }
+
     public EnumConstantSpecification deepClone() {
         return new EnumConstantSpecification(this);
     }
-    
+
     public EnumConstantDeclaration getParent() {
-    	return (EnumConstantDeclaration)parent;
-    }
-    
-    public void makeParentRoleValid() {
-    	super.makeParentRoleValid();
-    	if (ref != null) ref.setParent(this);
-    }
-    
-    @Override
-    public int getChildCount() {
-    	return super.getChildCount() + (ref == null ? 0 : 1);
-    }
-    
-    @Override
-    public ProgramElement getChildAt(int pos) {
-    	if (pos == super.getChildCount() && ref != null) {
-   			return ref;
-    	}
-    	return super.getChildAt(pos);
-    }
-    
-    public EnumConstructorReference getConstructorReference() {
-    	return ref;
-    }
-    
-    public void setConstructorReference(EnumConstructorReference ref) {
-    	this.ref = ref;
-    }
-    
-    @Override
-    public void validate() throws ModelException {
-    	super.validate();
-    	if (ref == null) throw new ModelException("EnumConstructorReference not set in " + getFullName());
+        return (EnumConstantDeclaration) this.parent;
     }
 
-    @Override
+    public void makeParentRoleValid() {
+        super.makeParentRoleValid();
+        if (this.ref != null)
+            this.ref.setParent(this);
+    }
+
+    public int getChildCount() {
+        return super.getChildCount() + ((this.ref == null) ? 0 : 1);
+    }
+
+    public ProgramElement getChildAt(int pos) {
+        if (pos == super.getChildCount() && this.ref != null)
+            return this.ref;
+        return super.getChildAt(pos);
+    }
+
+    public EnumConstructorReference getConstructorReference() {
+        return this.ref;
+    }
+
+    public void setConstructorReference(EnumConstructorReference ref) {
+        this.ref = ref;
+    }
+
+    public void validate() throws ModelException {
+        super.validate();
+        if (this.ref == null)
+            throw new ModelException("EnumConstructorReference not set in " + getFullName());
+    }
+
     public ASTList<TypeArgumentDeclaration> getTypeArguments() {
-    	return null;
+        return null;
     }
 }

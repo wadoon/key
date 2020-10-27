@@ -1,314 +1,257 @@
-// This file is part of the RECODER library and protected by the LGPL
-
 package recoder.kit;
-
-import java.util.List;
 
 import recoder.ProgramFactory;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Member;
+import recoder.bytecode.AccessFlags;
 import recoder.java.Declaration;
+import recoder.java.ProgramElement;
 import recoder.java.declaration.DeclarationSpecifier;
 import recoder.java.declaration.MemberDeclaration;
 import recoder.java.declaration.Modifier;
 import recoder.java.declaration.TypeDeclaration;
-import recoder.java.declaration.modifier.Abstract;
-import recoder.java.declaration.modifier.Final;
-import recoder.java.declaration.modifier.Native;
-import recoder.java.declaration.modifier.Private;
-import recoder.java.declaration.modifier.Protected;
-import recoder.java.declaration.modifier.Public;
-import recoder.java.declaration.modifier.Static;
-import recoder.java.declaration.modifier.StrictFp;
-import recoder.java.declaration.modifier.Synchronized;
-import recoder.java.declaration.modifier.Transient;
-import recoder.java.declaration.modifier.VisibilityModifier;
-import recoder.java.declaration.modifier.Volatile;
+import recoder.java.declaration.modifier.*;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.service.ChangeHistory;
 import recoder.service.SourceInfo;
 import recoder.util.Debug;
 
-/**
- * this class implements basic functions for modifier handling.
- * 
- * @author Andreas Ludwig
- * @author Rainer Neumann
- */
-public class ModifierKit implements recoder.bytecode.AccessFlags {
-
-    private ModifierKit() {
-    	super();
-    }
-
-    /**
-     * The virtual "package" modifier code.
-     */
-    public final static int PACKAGE = INTERFACE;
+public class ModifierKit implements AccessFlags {
+    public static final int PACKAGE = 512;
 
     public static Modifier createModifier(ProgramFactory f, int code) {
         Debug.assertNonnull(f);
         switch (code) {
-        case PACKAGE:
-            return null;
-        case PUBLIC:
-            return f.createPublic();
-        case PROTECTED:
-            return f.createProtected();
-        case PRIVATE:
-            return f.createPrivate();
-        case STATIC:
-            return f.createStatic();
-        case FINAL:
-            return f.createFinal();
-        case ABSTRACT:
-            return f.createAbstract();
-        case SYNCHRONIZED:
-            return f.createSynchronized();
-        case TRANSIENT:
-            return f.createTransient();
-        case STRICT:
-            return f.createStrictFp();
-        case VOLATILE:
-            return f.createVolatile();
-        case NATIVE:
-            return f.createNative();
-        default:
-            throw new IllegalArgumentException("Unsupported modifier code " + code);
+            case 512:
+                return null;
+            case 1:
+                return f.createPublic();
+            case 4:
+                return f.createProtected();
+            case 2:
+                return f.createPrivate();
+            case 8:
+                return f.createStatic();
+            case 16:
+                return f.createFinal();
+            case 1024:
+                return f.createAbstract();
+            case 32:
+                return f.createSynchronized();
+            case 128:
+                return f.createTransient();
+            case 2048:
+                return f.createStrictFp();
+            case 64:
+                return f.createVolatile();
+            case 256:
+                return f.createNative();
         }
+        throw new IllegalArgumentException("Unsupported modifier code " + code);
     }
 
     public static int getCode(Modifier m) {
-        if (m == null) {
-            return PACKAGE;
-        }
+        if (m == null)
+            return 512;
         if (m instanceof VisibilityModifier) {
-            if (m instanceof Public) {
-                return PUBLIC;
-            } else if (m instanceof Protected) {
-                return PROTECTED;
-            } else if (m instanceof Private) {
-                return PRIVATE;
-            }
-        } else if (m instanceof Static) {
-            return STATIC;
-        } else if (m instanceof Final) {
-            return FINAL;
-        } else if (m instanceof Abstract) {
-            return ABSTRACT;
-        } else if (m instanceof Synchronized) {
-            return SYNCHRONIZED;
-        } else if (m instanceof Transient) {
-            return TRANSIENT;
-        } else if (m instanceof StrictFp) {
-            return STRICT;
-        } else if (m instanceof Volatile) {
-            return VOLATILE;
-        } else if (m instanceof Native) {
-            return NATIVE;
+            if (m instanceof Public)
+                return 1;
+            if (m instanceof Protected)
+                return 4;
+            if (m instanceof Private)
+                return 2;
+        } else {
+            if (m instanceof Static)
+                return 8;
+            if (m instanceof Final)
+                return 16;
+            if (m instanceof Abstract)
+                return 1024;
+            if (m instanceof Synchronized)
+                return 32;
+            if (m instanceof Transient)
+                return 128;
+            if (m instanceof StrictFp)
+                return 2048;
+            if (m instanceof Volatile)
+                return 64;
+            if (m instanceof Native)
+                return 256;
         }
         throw new IllegalArgumentException("Unknown Modifier " + m.getClass().getName());
     }
 
     public static VisibilityModifier getVisibilityModifier(Declaration decl) {
         Debug.assertNonnull(decl);
-        List<DeclarationSpecifier> mods = decl.getDeclarationSpecifiers();
-        if (mods == null) {
+        ASTList<DeclarationSpecifier> aSTList = decl.getDeclarationSpecifiers();
+        if (aSTList == null)
             return null;
-        }
-        for (int i = 0; i < mods.size(); i += 1) {
-            DeclarationSpecifier res = mods.get(i);
-            if (res instanceof VisibilityModifier) {
+        for (int i = 0; i < aSTList.size(); i++) {
+            DeclarationSpecifier res = aSTList.get(i);
+            if (res instanceof VisibilityModifier)
                 return (VisibilityModifier) res;
-            }
         }
         return null;
     }
 
-    private static boolean containsModifier(Declaration decl, Class<? extends Modifier> mod) {
+    private static boolean containsModifier(Declaration decl, Class mod) {
         Debug.assertNonnull(decl, mod);
-        List<DeclarationSpecifier> mods = decl.getDeclarationSpecifiers();
-        if (mods == null) {
+        ASTList<DeclarationSpecifier> aSTList = decl.getDeclarationSpecifiers();
+        if (aSTList == null)
             return false;
-        }
-        for (int i = 0; i < mods.size(); i += 1) {
-            DeclarationSpecifier res = mods.get(i);
-            if (mod.isInstance(res)) {
+        for (int i = 0; i < aSTList.size(); i++) {
+            DeclarationSpecifier res = aSTList.get(i);
+            if (mod.isInstance(res))
                 return true;
-            }
         }
         return false;
     }
 
-    // does not check vadility, but replaces an existing visibility modifier
-    // if there is one. Understands the PACKAGE_VISIBILITY pseudo modifier.
-    // obeys the standard JavaDOC modifier order convention:
-    // VisibilityModifier as first, then abstract or (static - final)
-    // all others go to the last position
-    /**
-     * @deprecated replaced by recoder.kit.transformation.Modify
-     */
     private static DeclarationSpecifier modify(ChangeHistory ch, int code, Declaration decl) {
+        ASTArrayList aSTArrayList;
+        VisibilityModifier visibilityModifier6;
+        Public public_;
+        VisibilityModifier visibilityModifier5;
+        Protected protected_;
+        VisibilityModifier visibilityModifier4;
+        Private private_;
+        VisibilityModifier visibilityModifier3;
+        Static static_;
+        VisibilityModifier visibilityModifier2;
+        Final final_;
+        VisibilityModifier visibilityModifier1;
+        Abstract abstract_;
+        Synchronized synchronized_;
+        Transient transient_;
+        StrictFp strictFp;
+        Volatile volatile_;
+        Native native_;
         Debug.assertNonnull(decl);
         ASTList<DeclarationSpecifier> mods = decl.getDeclarationSpecifiers();
         ProgramFactory fact = decl.getFactory();
-        DeclarationSpecifier m;
         int insertPos = 0;
         switch (code) {
-        case PACKAGE:
-            if (code == PACKAGE) {
-                m = getVisibilityModifier(decl);
-                if (m != null) {
-                    MiscKit.remove(ch, m);
+            case 512:
+                if (code == 512) {
+                    VisibilityModifier visibilityModifier = getVisibilityModifier(decl);
+                    if (visibilityModifier != null)
+                        MiscKit.remove(ch, visibilityModifier);
+                    return null;
                 }
-                return null;
-            }
-        case PUBLIC:
-            m = getVisibilityModifier(decl);
-            if (m instanceof Public) {
-                return null;
-            }
-            if (m != null) {
-                MiscKit.remove(ch, m);
-            }
-            if (mods == null) {
-                decl.setDeclarationSpecifiers(mods = new ASTArrayList<DeclarationSpecifier>());
-            }
-            m = fact.createPublic();
-            insertPos = 0;
-            break;
-        case PROTECTED:
-            m = getVisibilityModifier(decl);
-            if (m instanceof Protected) {
-                return null;
-            }
-            if (m != null) {
-                MiscKit.remove(ch, m);
-            }
-            if (mods == null) {
-                decl.setDeclarationSpecifiers(mods = new ASTArrayList<DeclarationSpecifier>());
-            }
-            m = fact.createProtected();
-            insertPos = 0;
-            break;
-        case PRIVATE:
-            m = getVisibilityModifier(decl);
-            if (m instanceof Private) {
-                return null;
-            }
-            if (m != null) {
-                MiscKit.remove(ch, m);
-            }
-            if (mods == null) {
-                decl.setDeclarationSpecifiers(mods = new ASTArrayList<DeclarationSpecifier>());
-            }
-            m = fact.createPrivate();
-            insertPos = 0;
-            break;
-        case STATIC:
-            if (containsModifier(decl, Static.class)) {
-                return null;
-            }
-            m = getVisibilityModifier(decl);
-            insertPos = (m == null) ? 0 : 1;
-            m = fact.createStatic();
-            break;
-        case FINAL:
-            if (containsModifier(decl, Final.class)) {
-                return null;
-            }
-            m = getVisibilityModifier(decl);
-            insertPos = (m == null) ? 0 : 1;
-            if (containsModifier(decl, Static.class)) {
-                insertPos += 1;
-            }
-            m = fact.createFinal();
-            break;
-        case ABSTRACT:
-            if (containsModifier(decl, Abstract.class)) {
-                return null;
-            }
-            m = getVisibilityModifier(decl);
-            insertPos = (m == null) ? 0 : 1;
-            m = fact.createAbstract();
-            break;
-        case SYNCHRONIZED:
-            if (containsModifier(decl, Synchronized.class)) {
-                return null;
-            }
-            insertPos = (mods == null) ? 0 : mods.size();
-            m = fact.createSynchronized();
-            break;
-        case TRANSIENT:
-            if (containsModifier(decl, Transient.class)) {
-                return null;
-            }
-            insertPos = (mods == null) ? 0 : mods.size();
-            m = fact.createTransient();
-            break;
-        case STRICT:
-            if (containsModifier(decl, StrictFp.class)) {
-                return null;
-            }
-            insertPos = (mods == null) ? 0 : mods.size();
-            m = fact.createStrictFp();
-            break;
-        case VOLATILE:
-            if (containsModifier(decl, Volatile.class)) {
-                return null;
-            }
-            insertPos = (mods == null) ? 0 : mods.size();
-            m = fact.createVolatile();
-            break;
-        case NATIVE:
-            if (containsModifier(decl, Native.class)) {
-                return null;
-            }
-            insertPos = (mods == null) ? 0 : mods.size();
-            m = fact.createNative();
-            break;
-        default:
-            throw new IllegalArgumentException("Unsupported modifier code " + code);
+            case 1:
+                visibilityModifier6 = getVisibilityModifier(decl);
+                if (visibilityModifier6 instanceof Public)
+                    return null;
+                if (visibilityModifier6 != null)
+                    MiscKit.remove(ch, visibilityModifier6);
+                if (mods == null)
+                    decl.setDeclarationSpecifiers(aSTArrayList = new ASTArrayList());
+                public_ = fact.createPublic();
+                insertPos = 0;
+                break;
+            case 4:
+                visibilityModifier5 = getVisibilityModifier(decl);
+                if (visibilityModifier5 instanceof Protected)
+                    return null;
+                if (visibilityModifier5 != null)
+                    MiscKit.remove(ch, visibilityModifier5);
+                if (aSTArrayList == null)
+                    decl.setDeclarationSpecifiers(aSTArrayList = new ASTArrayList());
+                protected_ = fact.createProtected();
+                insertPos = 0;
+                break;
+            case 2:
+                visibilityModifier4 = getVisibilityModifier(decl);
+                if (visibilityModifier4 instanceof Private)
+                    return null;
+                if (visibilityModifier4 != null)
+                    MiscKit.remove(ch, visibilityModifier4);
+                if (aSTArrayList == null)
+                    decl.setDeclarationSpecifiers(aSTArrayList = new ASTArrayList());
+                private_ = fact.createPrivate();
+                insertPos = 0;
+                break;
+            case 8:
+                if (containsModifier(decl, Static.class))
+                    return null;
+                visibilityModifier3 = getVisibilityModifier(decl);
+                insertPos = (visibilityModifier3 == null) ? 0 : 1;
+                static_ = fact.createStatic();
+                break;
+            case 16:
+                if (containsModifier(decl, Final.class))
+                    return null;
+                visibilityModifier2 = getVisibilityModifier(decl);
+                insertPos = (visibilityModifier2 == null) ? 0 : 1;
+                if (containsModifier(decl, Static.class))
+                    insertPos++;
+                final_ = fact.createFinal();
+                break;
+            case 1024:
+                if (containsModifier(decl, Abstract.class))
+                    return null;
+                visibilityModifier1 = getVisibilityModifier(decl);
+                insertPos = (visibilityModifier1 == null) ? 0 : 1;
+                abstract_ = fact.createAbstract();
+                break;
+            case 32:
+                if (containsModifier(decl, Synchronized.class))
+                    return null;
+                insertPos = (aSTArrayList == null) ? 0 : aSTArrayList.size();
+                synchronized_ = fact.createSynchronized();
+                break;
+            case 128:
+                if (containsModifier(decl, Transient.class))
+                    return null;
+                insertPos = (aSTArrayList == null) ? 0 : aSTArrayList.size();
+                transient_ = fact.createTransient();
+                break;
+            case 2048:
+                if (containsModifier(decl, StrictFp.class))
+                    return null;
+                insertPos = (aSTArrayList == null) ? 0 : aSTArrayList.size();
+                strictFp = fact.createStrictFp();
+                break;
+            case 64:
+                if (containsModifier(decl, Volatile.class))
+                    return null;
+                insertPos = (aSTArrayList == null) ? 0 : aSTArrayList.size();
+                volatile_ = fact.createVolatile();
+                break;
+            case 256:
+                if (containsModifier(decl, Native.class))
+                    return null;
+                insertPos = (aSTArrayList == null) ? 0 : aSTArrayList.size();
+                native_ = fact.createNative();
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported modifier code " + code);
         }
-        mods.add(insertPos, m);
-        m.setParent(decl); // make parent role valid
-        if (ch != null) {
-            ch.attached(m);
-        }
-        return m;
+        aSTArrayList.add(insertPos, native_);
+        native_.setParent(decl);
+        if (ch != null)
+            ch.attached(native_);
+        return native_;
     }
 
-    // mdecl must be a valid recoder.abstraction.Member (not a class
-    // initializer)
-    // returns true if nothing was to be done
-    // does not check if private would be sufficient dealing with multiple
-    // inner types; this case rarely occurs and will be handled by assigning
-    // package visibility -- which also is what a byte code compiler would
-    // generate anyway.
-    /**
-     * @deprecated will be replaced; does not make visible redefined members
-     */
     public static boolean makeVisible(ChangeHistory ch, SourceInfo si, MemberDeclaration mdecl, ClassType ct) {
+        int minimumNeeded;
         Debug.assertNonnull(si, mdecl, ct);
         Debug.assertBoolean(mdecl instanceof Member);
-        if (si.isVisibleFor((Member) mdecl, ct)) {
+        if (si.isVisibleFor((Member) mdecl, ct))
             return true;
-        }
-        int minimumNeeded;
         TypeDeclaration mt = mdecl.getMemberParent();
         if (mt == ct) {
-            minimumNeeded = PRIVATE;
+            minimumNeeded = 2;
         } else if (mt.getPackage() == ct.getPackage()) {
-            minimumNeeded = PACKAGE;
+            minimumNeeded = 512;
         } else if (si.isSubtype(mt, ct)) {
-            minimumNeeded = PROTECTED;
+            minimumNeeded = 4;
         } else {
-            minimumNeeded = PUBLIC;
+            minimumNeeded = 1;
         }
         modify(ch, minimumNeeded, mdecl);
         return false;
     }
-
 }
-

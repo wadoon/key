@@ -1,5 +1,3 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.bytecode;
 
 import recoder.ModelException;
@@ -7,15 +5,13 @@ import recoder.abstraction.ProgramModelElement;
 import recoder.service.ProgramModelInfo;
 
 public abstract class ByteCodeElement implements ProgramModelElement {
-
     protected int accessFlags;
 
-    private String name;
+    protected String name;
 
     protected ProgramModelInfo service;
 
     public ByteCodeElement() {
-    	super();
     }
 
     public ByteCodeElement(int accessFlags) {
@@ -27,12 +23,8 @@ public abstract class ByteCodeElement implements ProgramModelElement {
         this.accessFlags = accessFlags;
     }
 
-    /**
-     * Returns the name of the byte code element. Strings are interned so that
-     * they can be compared by identity.
-     */
     public final String getName() {
-        return name;
+        return this.name;
     }
 
     final void setName(String name) {
@@ -42,7 +34,7 @@ public abstract class ByteCodeElement implements ProgramModelElement {
     public abstract String getTypeName();
 
     public final int getAccessFlags() {
-        return accessFlags;
+        return this.accessFlags;
     }
 
     public void setAccessFlags(int accessFlags) {
@@ -50,43 +42,43 @@ public abstract class ByteCodeElement implements ProgramModelElement {
     }
 
     public boolean isAbstract() {
-        return (accessFlags & ABSTRACT) != 0;
+        return ((this.accessFlags & 0x400) != 0);
     }
 
     public boolean isFinal() {
-        return (accessFlags & FINAL) != 0;
+        return ((this.accessFlags & 0x10) != 0);
     }
 
     public boolean isStatic() {
-        return (accessFlags & STATIC) != 0;
+        return ((this.accessFlags & 0x8) != 0);
     }
 
     public boolean isPrivate() {
-        return (accessFlags & PRIVATE) != 0;
+        return ((this.accessFlags & 0x2) != 0);
     }
 
     public boolean isProtected() {
-        return (accessFlags & PROTECTED) != 0;
+        return ((this.accessFlags & 0x4) != 0);
     }
 
     public boolean isPublic() {
-        return (accessFlags & PUBLIC) != 0;
+        return ((this.accessFlags & 0x1) != 0);
     }
 
     public boolean isStrictFp() {
-        return (accessFlags & STRICT) != 0;
+        return ((this.accessFlags & 0x800) != 0);
     }
 
     public boolean isNative() {
-        return (accessFlags & NATIVE) != 0;
+        return ((this.accessFlags & 0x100) != 0);
     }
 
     public boolean isSynchronized() {
-        return (accessFlags & SYNCHRONIZED) != 0;
+        return ((this.accessFlags & 0x20) != 0);
     }
 
     public ProgramModelInfo getProgramModelInfo() {
-        return service;
+        return this.service;
     }
 
     public void setProgramModelInfo(ProgramModelInfo service) {
@@ -94,7 +86,5 @@ public abstract class ByteCodeElement implements ProgramModelElement {
     }
 
     public void validate() throws ModelException {
-    	// not checked yet
     }
-
 }

@@ -1,36 +1,17 @@
-/*
- * Created on 15.08.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- * 
- */
 package recoder.abstraction;
 
 import java.util.List;
 
-/**
- * @author Tobias Gutzmann
- *
- */
 public class ImplicitEnumValueOf extends ImplicitEnumMethod {
+    public ImplicitEnumValueOf(ClassType ownerClass) {
+        super(ownerClass);
+    }
 
-	/**
-	 * @param ownerClass
-	 */
-	public ImplicitEnumValueOf(ClassType ownerClass) {
-		super(ownerClass);
-	}
+    public String getName() {
+        return "valueOf";
+    }
 
-	private static final String VALUEOF_NAME = "valueOf".intern();
-	/* (non-Javadoc)
-	 * @see recoder.NamedModelElement#getName()
-	 */
-	public String getName() {
-		return VALUEOF_NAME;
-	}
-
-	public List<? extends TypeParameter> getTypeParameters() {
-		return null;
-	}
-
+    public List<? extends TypeParameter> getTypeParameters() {
+        return null;
+    }
 }

@@ -1,5 +1,3 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.java.declaration;
 
 import recoder.java.Identifier;
@@ -7,43 +5,17 @@ import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.list.generic.ASTList;
 
-/**
- * Interface declaration.
- * 
- * @author <TT>AutoDoc</TT>
- */
-
 public class InterfaceDeclaration extends TypeDeclaration {
+    private static final long serialVersionUID = -9140653869908200337L;
 
-    /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -9140653869908200337L;
+    protected Extends extending;
 
-	/**
-     * Extending.
-     */
-
-	private Extends extending;
-
-    /**
-     * Type Parameters (Java 5)
-     */
-	private ASTList<TypeParameterDeclaration> typeParameters;
-
-    
-    /**
-     * Interface declaration.
-     */
+    protected ASTList<TypeParameterDeclaration> typeParameters;
 
     public InterfaceDeclaration() {
-        // nothing to do
     }
 
-    /** Construct a new outer or member interface class. */
-
-    public InterfaceDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name, Extends extended,
-    		ASTList<MemberDeclaration> members, ASTList<TypeParameterDeclaration> typeParameters) {
+    public InterfaceDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name, Extends extended, ASTList<MemberDeclaration> members, ASTList<TypeParameterDeclaration> typeParameters) {
         super(modifiers, name);
         setExtendedTypes(extended);
         setMembers(members);
@@ -51,313 +23,197 @@ public class InterfaceDeclaration extends TypeDeclaration {
         makeParentRoleValid();
     }
 
-    public InterfaceDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name, Extends extended,
-    		ASTList<MemberDeclaration> members) {
-    	this(modifiers, name, extended, members, null);
+    public InterfaceDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name, Extends extended, ASTList<MemberDeclaration> members) {
+        this(modifiers, name, extended, members, null);
     }
-
-    /**
-     * Interface declaration.
-     * 
-     * @param proto
-     *            an interface declaration.
-     */
 
     protected InterfaceDeclaration(InterfaceDeclaration proto) {
         super(proto);
-        if (proto.extending != null) {
-            extending = proto.extending.deepClone();
-        }
-        if (proto.typeParameters != null) {
-        	typeParameters = proto.typeParameters.deepClone();
-        }
+        if (proto.extending != null)
+            this.extending = proto.extending.deepClone();
+        if (proto.typeParameters != null)
+            this.typeParameters = proto.typeParameters.deepClone();
         makeParentRoleValid();
     }
-
-    /**
-     * Deep clone.
-     * 
-     * @return the object.
-     */
 
     public InterfaceDeclaration deepClone() {
         return new InterfaceDeclaration(this);
     }
 
-    /**
-     * Make parent role valid.
-     */
-
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (extending != null) {
-            extending.setParent(this);
-        }
-        if (typeParameters != null) {
-        	for (TypeParameterDeclaration tp : typeParameters) {
-        		tp.setParent(this);
-        	}
-        }
+        if (this.extending != null)
+            this.extending.setParent(this);
+        if (this.typeParameters != null)
+            for (TypeParameterDeclaration tp : this.typeParameters)
+                tp.setParent(this);
     }
-
-    /**
-     * Returns the number of children of this node.
-     * 
-     * @return an int giving the number of children of this node
-     */
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null)
-            result += declarationSpecifiers.size();
-        if (name != null)
+        if (this.declarationSpecifiers != null)
+            result += this.declarationSpecifiers.size();
+        if (this.name != null)
             result++;
-        if (extending != null)
+        if (this.extending != null)
             result++;
-        if (members != null)
-            result += members.size();
-        if (typeParameters != null)
-        	result += typeParameters.size();
+        if (this.members != null)
+            result += this.members.size();
+        if (this.typeParameters != null)
+            result += this.typeParameters.size();
         return result;
     }
 
-    /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
-     * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
-     */
-
     public ProgramElement getChildAt(int index) {
-        int len;
-        if (declarationSpecifiers != null) {
-            len = declarationSpecifiers.size();
-            if (len > index) {
-                return declarationSpecifiers.get(index);
-            }
+        if (this.declarationSpecifiers != null) {
+            int len = this.declarationSpecifiers.size();
+            if (len > index)
+                return this.declarationSpecifiers.get(index);
             index -= len;
         }
-        if (name != null) {
+        if (this.name != null) {
             if (index == 0)
-                return name;
+                return this.name;
             index--;
         }
-        if (typeParameters != null) {
-        	len = typeParameters.size();
-        	if (len > index)
-        		return typeParameters.get(index);
-        	index -= len;
+        if (this.typeParameters != null) {
+            int len = this.typeParameters.size();
+            if (len > index)
+                return this.typeParameters.get(index);
+            index -= len;
         }
-        if (extending != null) {
+        if (this.extending != null) {
             if (index == 0)
-                return extending;
+                return this.extending;
             index--;
         }
-        if (members != null) {
-            len = members.size();
-            if (len > index) {
-                return members.get(index);
-            }
+        if (this.members != null) {
+            int len = this.members.size();
+            if (len > index)
+                return this.members.get(index);
             index -= len;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
-        // role 0 (IDX): modifier
-        // role 1: identifier
-        // role 2: extends
-        // role 3: implements (no occurance in interfaces)
-        // role 4 (IDX): members
-    	// role 5 (IDX): type parameters
-        if (declarationSpecifiers != null) {
-            int index = declarationSpecifiers.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 0;
-            }
+        if (this.declarationSpecifiers != null) {
+            int index = this.declarationSpecifiers.indexOf(child);
+            if (index >= 0)
+                return index << 4 | 0x0;
         }
-        if (name == child)
+        if (this.name == child)
             return 1;
-        if (extending == child)
+        if (this.extending == child)
             return 2;
-        if (members != null) {
-            int index = members.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 4;
-            }
+        if (this.members != null) {
+            int index = this.members.indexOf(child);
+            if (index >= 0)
+                return index << 4 | 0x4;
         }
-        if (typeParameters != null) {
-        	int index = typeParameters.size();
-        	if (index >= 0) {
-        		return (index <<4 ) | 5;
-        	}
+        if (this.typeParameters != null) {
+            int index = this.typeParameters.size();
+            if (index >= 0)
+                return index << 4 | 0x5;
         }
         return -1;
     }
 
-    /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
-     * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
-     */
-
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
+        if (p == null)
             throw new NullPointerException();
-        }
-        int count;
-        count = (declarationSpecifiers == null) ? 0 : declarationSpecifiers.size();
-        for (int i = 0; i < count; i++) {
-            if (declarationSpecifiers.get(i) == p) {
+        int count = (this.declarationSpecifiers == null) ? 0 : this.declarationSpecifiers.size();
+        int i;
+        for (i = 0; i < count; i++) {
+            if (this.declarationSpecifiers.get(i) == p) {
                 if (q == null) {
-                    declarationSpecifiers.remove(i);
+                    this.declarationSpecifiers.remove(i);
                 } else {
                     DeclarationSpecifier r = (DeclarationSpecifier) q;
-                    declarationSpecifiers.set(i, r);
+                    this.declarationSpecifiers.set(i, r);
                     r.setParent(this);
                 }
                 return true;
             }
         }
-        if (name == p) {
+        if (this.name == p) {
             Identifier r = (Identifier) q;
-            name = r;
-            if (r != null) {
+            this.name = r;
+            if (r != null)
                 r.setParent(this);
-            }
             return true;
         }
-        if (extending == p) {
+        if (this.extending == p) {
             Extends r = (Extends) q;
-            extending = r;
-            if (r != null) {
+            this.extending = r;
+            if (r != null)
                 r.setParent(this);
-            }
             return true;
         }
-        count = (members == null) ? 0 : members.size();
-        for (int i = 0; i < count; i++) {
-            if (members.get(i) == p) {
+        count = (this.members == null) ? 0 : this.members.size();
+        for (i = 0; i < count; i++) {
+            if (this.members.get(i) == p) {
                 if (q == null) {
-                    members.remove(i);
+                    this.members.remove(i);
                 } else {
                     MemberDeclaration r = (MemberDeclaration) q;
-                    members.set(i, r);
+                    this.members.set(i, r);
                     r.setMemberParent(this);
                 }
                 return true;
             }
         }
-        if (typeParameters != null) {
-        	int idx = typeParameters.indexOf(p);
-        	if (idx != -1) {
-        		if (q == null) {
-        			typeParameters.remove(idx);
-        		} else {
-        			TypeParameterDeclaration r = (TypeParameterDeclaration)q;
-        			typeParameters.set(idx, r);
-        			r.setParent(this);
-        		}
-        		return true;
-        	}
+        if (this.typeParameters != null) {
+            int idx = this.typeParameters.indexOf(p);
+            if (idx != -1) {
+                if (q == null) {
+                    this.typeParameters.remove(idx);
+                } else {
+                    TypeParameterDeclaration r = (TypeParameterDeclaration) q;
+                    this.typeParameters.set(idx, r);
+                    r.setParent(this);
+                }
+                return true;
+            }
         }
         return false;
     }
 
-    /**
-     * Get extended types.
-     * 
-     * @return the extends.
-     */
-
     public Extends getExtendedTypes() {
-        return extending;
+        return this.extending;
     }
-
-    /**
-     * Set extended types.
-     * 
-     * @param spec
-     *            an extends.
-     */
 
     public void setExtendedTypes(Extends spec) {
-        extending = spec;
+        this.extending = spec;
     }
-
-    /**
-     * Interfaces are always abstract.
-     */
 
     public boolean isAbstract() {
         return true;
     }
 
-    /**
-     * Interfaces are never native.
-     */
-
     public boolean isNative() {
         return false;
     }
-
-    /**
-     * Interfaces are never protected.
-     */
 
     public boolean isProtected() {
         return false;
     }
 
-    /**
-     * Interfaces are never private.
-     */
-
     public boolean isPrivate() {
         return false;
     }
-
-    /**
-     * Interfaces are never strictfp.
-     */
 
     public boolean isStrictFp() {
         return false;
     }
 
-    /**
-     * Interfaces are never synchronized.
-     */
-
     public boolean isSynchronized() {
         return false;
     }
 
-    /**
-     * Interfaces are never transient.
-     */
-
     public boolean isTransient() {
         return false;
     }
-
-    /**
-     * Interfaces are never volatile.
-     */
 
     public boolean isVolatile() {
         return false;
@@ -366,11 +222,11 @@ public class InterfaceDeclaration extends TypeDeclaration {
     public boolean isInterface() {
         return true;
     }
-    
+
     public boolean isOrdinaryInterface() {
         return true;
     }
-    
+
     public boolean isAnnotationType() {
         return false;
     }
@@ -386,20 +242,12 @@ public class InterfaceDeclaration extends TypeDeclaration {
     public void accept(SourceVisitor v) {
         v.visitInterfaceDeclaration(this);
     }
-    
-    public void setTypeParameters(ASTList<TypeParameterDeclaration> typeParameters) {
-    	this.typeParameters = typeParameters;
-    }
-    
+
     public ASTList<TypeParameterDeclaration> getTypeParameters() {
-    	return typeParameters;
+        return this.typeParameters;
     }
 
-    /**
-     * Interfaces are never inner.
-     * @return false
-     */
-	public boolean isInner() {
-		return false; // never ever
-	}
+    public void setTypeParameters(ASTList<TypeParameterDeclaration> typeParameters) {
+        this.typeParameters = typeParameters;
+    }
 }

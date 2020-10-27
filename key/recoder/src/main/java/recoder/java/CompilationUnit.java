@@ -1,11 +1,4 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.java;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import recoder.abstraction.ClassType;
 import recoder.io.DataLocation;
@@ -14,194 +7,91 @@ import recoder.java.declaration.TypeDeclarationContainer;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
 
-/**
- * A node representing a single source file containing {@link TypeDeclaration}s
- * and an optional {@link PackageSpecification}and an optional set of
- * {@link Import}s. In Java, any source file may contain at most one public
- * class type definition.
- * 
- * @author AL
- * @author <TT>AutoDoc</TT>
- */
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CompilationUnit extends JavaNonTerminalProgramElement implements TypeDeclarationContainer, TypeScope {
-
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = -1511486506045179278L;
-
-	/**
-     * Current data location.
-     */
-
-	private DataLocation location;
-
-    /**
-     * Original data location.
-     */
-
-    private DataLocation originalLocation;
-
-    /**
-     * Package spec.
-     */
-
-    private PackageSpecification packageSpec;
-
-    /**
-     * Imports.
-     */
-
-    private ASTList<Import> imports;
-
-    /**
-     * Type declarations.
-     */
-
-    private ASTList<TypeDeclaration> typeDeclarations;
-
-    /**
-     * Undefined scope tag.
-     */
-
-    private final static Map<String, ClassType> UNDEFINED_SCOPE = new HashMap<String, ClassType>(0);
-
-    /**
-     * Scope table.
-     */
-
-	private Map<String, ClassType> name2type = UNDEFINED_SCOPE;
-
-    /**
-     * Compilation unit.
-     */
+    protected static final Map UNDEFINED_SCOPE = new HashMap<Object, Object>(1);
+    private static final long serialVersionUID = -1511486506045179278L;
+    protected DataLocation location;
+    protected DataLocation originalLocation;
+    protected PackageSpecification packageSpec;
+    protected ASTList<Import> imports;
+    protected ASTList<TypeDeclaration> typeDeclarations;
+    protected Map<String, ClassType> name2type = UNDEFINED_SCOPE;
 
     public CompilationUnit() {
         makeParentRoleValid();
     }
 
-    /**
-     * Compilation unit.
-     * 
-     * @param pkg
-     *            a package specification.
-     * @param imports
-     *            an import mutable list.
-     * @param typeDeclarations
-     *            a type declaration mutable list.
-     */
-
-    public CompilationUnit(PackageSpecification pkg, ASTList<Import> imports,
-    		ASTList<TypeDeclaration> typeDeclarations) {
+    public CompilationUnit(PackageSpecification pkg, ASTList<Import> imports, ASTList<TypeDeclaration> typeDeclarations) {
         setPackageSpecification(pkg);
         setImports(imports);
         setDeclarations(typeDeclarations);
         makeParentRoleValid();
     }
 
-    /**
-     * Compilation unit. Does not copy the data location.
-     * 
-     * @param proto
-     *            a compilation unit.
-     */
-
     protected CompilationUnit(CompilationUnit proto) {
         super(proto);
-        if (proto.packageSpec != null) {
-            packageSpec = proto.packageSpec.deepClone();
-        }
-        if (proto.imports != null) {
-            imports = proto.imports.deepClone();
-        }
-        if (proto.typeDeclarations != null) {
-            typeDeclarations = proto.typeDeclarations.deepClone();
-        }
+        if (proto.packageSpec != null)
+            this.packageSpec = proto.packageSpec.deepClone();
+        if (proto.imports != null)
+            this.imports = proto.imports.deepClone();
+        if (proto.typeDeclarations != null)
+            this.typeDeclarations = proto.typeDeclarations.deepClone();
         makeParentRoleValid();
     }
-
-    /**
-     * Deep clone.
-     * 
-     * @return the object.
-     */
 
     public CompilationUnit deepClone() {
         return new CompilationUnit(this);
     }
 
-    /**
-     * Make parent role valid.
-     */
-
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (packageSpec != null) {
-            packageSpec.setParent(this);
-        }
-        if (imports != null) {
-            for (int i = imports.size() - 1; i >= 0; i -= 1) {
-                imports.get(i).setParent(this);
-            }
-        }
-        if (typeDeclarations != null) {
-            for (int i = typeDeclarations.size() - 1; i >= 0; i -= 1) {
-                typeDeclarations.get(i).setParent(this);
-            }
-        }
+        if (this.packageSpec != null)
+            this.packageSpec.setParent(this);
+        if (this.imports != null)
+            for (int i = this.imports.size() - 1; i >= 0; i--)
+                this.imports.get(i).setParent(this);
+        if (this.typeDeclarations != null)
+            for (int i = this.typeDeclarations.size() - 1; i >= 0; i--)
+                this.typeDeclarations.get(i).setParent(this);
     }
 
-    /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
-     * 
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
-     * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
-     */
-
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null) {
+        if (p == null)
             throw new NullPointerException();
-        }
-        int count;
-        if (packageSpec == p) {
+        if (this.packageSpec == p) {
             PackageSpecification r = (PackageSpecification) q;
-            packageSpec = r;
-            if (r != null) {
+            this.packageSpec = r;
+            if (r != null)
                 r.setParent(this);
-            }
             return true;
         }
-        count = (imports == null) ? 0 : imports.size();
-        for (int i = 0; i < count; i++) {
-            if (imports.get(i) == p) {
+        int count = (this.imports == null) ? 0 : this.imports.size();
+        int i;
+        for (i = 0; i < count; i++) {
+            if (this.imports.get(i) == p) {
                 if (q == null) {
-                    imports.remove(i);
+                    this.imports.remove(i);
                 } else {
                     Import r = (Import) q;
-                    imports.set(i, r);
+                    this.imports.set(i, r);
                     r.setParent(this);
                 }
                 return true;
             }
         }
-        count = (typeDeclarations == null) ? 0 : typeDeclarations.size();
-        for (int i = 0; i < count; i++) {
-            if (typeDeclarations.get(i) == p) {
+        count = (this.typeDeclarations == null) ? 0 : this.typeDeclarations.size();
+        for (i = 0; i < count; i++) {
+            if (this.typeDeclarations.get(i) == p) {
                 if (q == null) {
-                    typeDeclarations.remove(i);
+                    this.typeDeclarations.remove(i);
                 } else {
                     TypeDeclaration r = (TypeDeclaration) q;
-                    typeDeclarations.set(i, r);
+                    this.typeDeclarations.set(i, r);
                     r.setParent(this);
                 }
                 return true;
@@ -215,233 +105,114 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
     }
 
     public SourceElement getLastElement() {
-        return (typeDeclarations != null && !typeDeclarations.isEmpty()) ? typeDeclarations.get(
-                typeDeclarations.size() - 1).getLastElement() : this;
+        return (this.typeDeclarations != null && !this.typeDeclarations.isEmpty()) ? this.typeDeclarations.get(this.typeDeclarations.size() - 1).getLastElement() : this;
     }
-
-    /**
-     * Get name of the unit. The name is empty if no data location is set;
-     * otherwise, the name of the current data location is returned.
-     * 
-     * @return the name of this compilation unit.
-     * @see #getDataLocation()
-     */
 
     public String getName() {
-        return (location == null) ? "" : location.toString();
+        return (this.location == null) ? "" : this.location.toString();
     }
-
-    /** A compilation unit has no syntactical parent */
 
     public NonTerminalProgramElement getASTParent() {
         return null;
     }
 
-    /**
-     * Returns the number of children of this node.
-     * 
-     * @return an int giving the number of children of this node
-     */
-
     public int getChildCount() {
         int result = 0;
-        if (packageSpec != null)
+        if (this.packageSpec != null)
             result++;
-        if (imports != null)
-            result += imports.size();
-        if (typeDeclarations != null)
-            result += typeDeclarations.size();
+        if (this.imports != null)
+            result += this.imports.size();
+        if (this.typeDeclarations != null)
+            result += this.typeDeclarations.size();
         return result;
     }
 
-    /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
-     * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
-     */
-
     public ProgramElement getChildAt(int index) {
-        int len;
-        if (packageSpec != null) {
+        if (this.packageSpec != null) {
             if (index == 0)
-                return packageSpec;
+                return this.packageSpec;
             index--;
         }
-        if (imports != null) {
-            len = imports.size();
-            if (len > index) {
-                return imports.get(index);
-            }
+        if (this.imports != null) {
+            int len = this.imports.size();
+            if (len > index)
+                return this.imports.get(index);
             index -= len;
         }
-        if (typeDeclarations != null) {
-            return typeDeclarations.get(index);
-        }
+        if (this.typeDeclarations != null)
+            return this.typeDeclarations.get(index);
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
-        // role 0: package spec
-        // role 1 (IDX): import
-        // role 2 (IDX): declarations
-        if (child == packageSpec) {
+        if (child == this.packageSpec)
             return 0;
+        if (this.imports != null) {
+            int index = this.imports.indexOf(child);
+            if (index >= 0)
+                return index << 4 | 0x1;
         }
-        if (imports != null) {
-            int index = imports.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 1;
-            }
-        }
-        if (typeDeclarations != null) {
-            int index = typeDeclarations.indexOf(child);
-            if (index >= 0) {
-                return (index << 4) | 2;
-            }
+        if (this.typeDeclarations != null) {
+            int index = this.typeDeclarations.indexOf(child);
+            if (index >= 0)
+                return index << 4 | 0x2;
         }
         return -1;
     }
 
-    /**
-     * Gets the current data location.
-     * 
-     * @return the data location.
-     */
-
     public DataLocation getDataLocation() {
-        return location;
+        return this.location;
     }
 
-    /**
-     * Sets the current data location. If the data location has been <CODE>null
-     * </CODE>, the location also becomes the new original location.
-     * 
-     * @param location
-     *            a data location.
-     */
-
     public void setDataLocation(DataLocation location) {
-        if (this.location == null) {
-            originalLocation = location;
-        }
+        if (this.location == null)
+            this.originalLocation = location;
         this.location = location;
     }
 
-    /**
-     * Gets the original data location.
-     * 
-     * @return the original data location.
-     */
-
     public DataLocation getOriginalDataLocation() {
-        return originalLocation;
+        return this.originalLocation;
     }
-
-    /**
-     * Get imports.
-     * 
-     * @return the import mutable list.
-     */
 
     public ASTList<Import> getImports() {
-        return imports;
+        return this.imports;
     }
-
-    /**
-     * Set imports.
-     * 
-     * @param list
-     *            an import mutable list.
-     */
 
     public void setImports(ASTList<Import> list) {
-        imports = list;
+        this.imports = list;
     }
-
-    /**
-     * Get package specification.
-     * 
-     * @return the package specification.
-     */
 
     public PackageSpecification getPackageSpecification() {
-        return packageSpec;
+        return this.packageSpec;
     }
-
-    /**
-     * Set package specification.
-     * 
-     * @param p
-     *            a package specification.
-     */
 
     public void setPackageSpecification(PackageSpecification p) {
-        packageSpec = p;
+        this.packageSpec = p;
     }
-
-    /**
-     * Get the number of type declarations in this container.
-     * 
-     * @return the number of type declarations.
-     */
 
     public int getTypeDeclarationCount() {
-        return (typeDeclarations != null) ? typeDeclarations.size() : 0;
+        return (this.typeDeclarations != null) ? this.typeDeclarations.size() : 0;
     }
 
-    /*
-     * Return the type declaration at the specified index in this node's
-     * "virtual" type declaration array. @param index an index for a type
-     * declaration. @return the type declaration with the given index.
-     * @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of
-     * bounds.
-     */
-
     public TypeDeclaration getTypeDeclarationAt(int index) {
-        if (typeDeclarations != null) {
-            return typeDeclarations.get(index);
-        }
+        if (this.typeDeclarations != null)
+            return this.typeDeclarations.get(index);
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /**
-     * Get declarations.
-     * 
-     * @return the type declaration mutable list.
-     */
-
     public ASTList<TypeDeclaration> getDeclarations() {
-        return typeDeclarations;
+        return this.typeDeclarations;
     }
-
-    /**
-     * Set declarations.
-     * 
-     * @param list
-     *            a type declaration mutable list.
-     */
 
     public void setDeclarations(ASTList<TypeDeclaration> list) {
-        typeDeclarations = list;
+        this.typeDeclarations = list;
     }
-
-    /**
-     * Gets the primary type declaration of the compilation unit. The primary
-     * declaration is the first declaration of the unit, or the single public
-     * declaration. If there is no unambiguous primary declaration, this method
-     * returns <CODE>null</CODE>.
-     */
 
     public TypeDeclaration getPrimaryTypeDeclaration() {
         TypeDeclaration res = null;
-        int s = typeDeclarations.size();
-        for (int i = 0; i < s; i += 1) {
-            TypeDeclaration t = typeDeclarations.get(i);
+        int s = this.typeDeclarations.size();
+        for (int i = 0; i < s; i++) {
+            TypeDeclaration t = this.typeDeclarations.get(i);
             if (t.isPublic()) {
                 if (res == null || !res.isPublic()) {
                     res = t;
@@ -449,60 +220,53 @@ public class CompilationUnit extends JavaNonTerminalProgramElement implements Ty
                     res = null;
                     break;
                 }
-            } else {
-                if (res == null) {
-                    res = t;
-                }
+            } else if (res == null) {
+                res = t;
             }
         }
         return res;
     }
 
     public boolean isDefinedScope() {
-        return name2type != UNDEFINED_SCOPE;
+        return (this.name2type != UNDEFINED_SCOPE);
     }
 
     public void setDefinedScope(boolean defined) {
         if (!defined) {
-            name2type = UNDEFINED_SCOPE;
+            this.name2type = UNDEFINED_SCOPE;
         } else {
-            name2type = null;
+            this.name2type = null;
         }
     }
 
     public List<ClassType> getTypesInScope() {
-        if (name2type == null || name2type.isEmpty()) {
+        if (this.name2type == null || this.name2type.isEmpty())
             return new ArrayList<ClassType>(0);
-        }
         List<ClassType> res = new ArrayList<ClassType>();
-        for(ClassType ct : name2type.values()) {
+        for (ClassType ct : this.name2type.values())
             res.add(ct);
-        }
         return res;
     }
 
     public ClassType getTypeInScope(String name) {
         Debug.assertNonnull(name);
-        if (name2type == null || name2type == UNDEFINED_SCOPE) {
+        if (this.name2type == null || this.name2type == UNDEFINED_SCOPE)
             return null;
-        }
-        return name2type.get(name);
+        return this.name2type.get(name);
     }
 
     public void addTypeToScope(ClassType type, String name) {
         Debug.assertNonnull(type, name);
-        if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            name2type = new HashMap<String, ClassType>();
-        }
-        name2type.put(name, type);
+        if (this.name2type == null || this.name2type == UNDEFINED_SCOPE)
+            this.name2type = new HashMap<String, ClassType>();
+        this.name2type.put(name, type);
     }
 
     public void removeTypeFromScope(String name) {
         Debug.assertNonnull(name);
-        if (name2type == null || name2type == UNDEFINED_SCOPE) {
+        if (this.name2type == null || this.name2type == UNDEFINED_SCOPE)
             return;
-        }
-        name2type.remove(name);
+        this.name2type.remove(name);
     }
 
     public void accept(SourceVisitor v) {

@@ -1,29 +1,19 @@
-// This file is part of the RECODER library and protected by the LGPL
-
 package recoder.kit;
-
-import java.util.List;
 
 import recoder.abstraction.ClassType;
 
+import java.util.List;
 
-/**
- * Problem report indicating that certain class types have no source
- * representation.
- */
 public class MissingTypeDeclarations extends MissingSources {
+    private static final long serialVersionUID = 6106584488830182556L;
 
-    /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 6106584488830182556L;
-	private List<ClassType> nonTypeDeclarations;
+    private final List<ClassType> nonTypeDeclarations;
 
     public MissingTypeDeclarations(List<ClassType> nonTypeDeclarations) {
         this.nonTypeDeclarations = nonTypeDeclarations;
     }
 
     public List<ClassType> getNonTypeDeclarations() {
-        return nonTypeDeclarations;
+        return this.nonTypeDeclarations;
     }
 }

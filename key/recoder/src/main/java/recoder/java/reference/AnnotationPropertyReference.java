@@ -1,130 +1,100 @@
-/*
- * Created on 10.06.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- * 
- */
 package recoder.java.reference;
 
-import recoder.java.Expression;
-import recoder.java.Identifier;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 import recoder.java.declaration.AnnotationElementValuePair;
 
-/**
- * @author ich
- *
- */
 public class AnnotationPropertyReference extends JavaNonTerminalProgramElement implements MemberReference {
-	/**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 5822661522219760793L;
+    private static final long serialVersionUID = 5822661522219760793L;
 
-	private Identifier ident;
-	
-	private AnnotationElementValuePair parent;
-	
-	public AnnotationPropertyReference() {
-		super();
-	}
-	
-	public AnnotationPropertyReference(Identifier ident) {
-		super();
-		this.ident = ident;
-		makeParentRoleValid();
-	}
+    protected Identifier ident;
 
-	public AnnotationPropertyReference(AnnotationPropertyReference proto) {
-		super(proto);
-		this.ident = proto.ident.deepClone();
-		makeParentRoleValid();
-	}
+    protected AnnotationElementValuePair parent;
 
-	/* (non-Javadoc)
-	 * @see recoder.java.ProgramElement#getASTParent()
-	 */
-	public NonTerminalProgramElement getASTParent() {
-		return parent;
-	}
-	
-	public AnnotationElementValuePair getParent() {
-		return parent;
-	}
-	
-	public void setParent(AnnotationElementValuePair parent) {
-		this.parent = parent;
-	}
+    public AnnotationPropertyReference() {
+    }
 
-	/* (non-Javadoc)
-	 * @see recoder.java.SourceElement#accept(recoder.java.SourceVisitor)
-	 */
-	public void accept(SourceVisitor v) {
-		v.visitAnnotationPropertyReference(this);
+    public AnnotationPropertyReference(Identifier ident) {
+        this.ident = ident;
+        makeParentRoleValid();
+    }
 
-	}
-	/* (non-Javadoc)
-	 * @see recoder.java.SourceElement#deepClone()
-	 */
-	public AnnotationPropertyReference deepClone() {
-		return new AnnotationPropertyReference(this);
-	}
-	public int getChildCount() {
-		return ident == null ? 0 : 1; 
-	}
+    public AnnotationPropertyReference(AnnotationPropertyReference proto) {
+        super(proto);
+        this.ident = proto.ident.deepClone();
+        makeParentRoleValid();
+    }
 
-	public ProgramElement getChildAt(int index) {
-		if (ident != null && index == 0)
-			return ident;
-		throw new ArrayIndexOutOfBoundsException(index);
-	}
+    public NonTerminalProgramElement getASTParent() {
+        return this.parent;
+    }
 
-	public int getChildPositionCode(ProgramElement child) {
-		// 0: identifier
-		return child == ident ? 0 : -1;
-	}
+    public AnnotationElementValuePair getParent() {
+        return this.parent;
+    }
 
-	public boolean replaceChild(ProgramElement p, ProgramElement q) {
-		if (p == ident) {
-			ident = (Identifier)q;
-			if (ident != null)
-				ident.setParent(this);
-			return true;
-		}
-		return false;
-	}
+    public void setParent(AnnotationElementValuePair parent) {
+        this.parent = parent;
+    }
 
-	public Identifier getIdentifier() {
-		return ident;
-	}
-	
-	public void setIdentifier(Identifier ident) {
-		this.ident = ident;
-	}
-	
-	public void makeParentRoleValid() {
-		super.makeParentRoleValid();
-		if (ident != null)
-			ident.setParent(this);
-	}
+    public void accept(SourceVisitor v) {
+        v.visitAnnotationPropertyReference(this);
+    }
 
-	public int getExpressionCount() {
-		return 0;
-	}
+    public AnnotationPropertyReference deepClone() {
+        return new AnnotationPropertyReference(this);
+    }
 
-	public Expression getExpressionAt(int index) {
-		throw new IndexOutOfBoundsException();
-	}
-	
-	public SourceElement getFirstElement() {
-		return ident;
-	}
-	public SourceElement getLastElement() {
-		return ident;
-	}
-	
+    public int getChildCount() {
+        return (this.ident == null) ? 0 : 1;
+    }
+
+    public ProgramElement getChildAt(int index) {
+        if (this.ident != null && index == 0)
+            return this.ident;
+        throw new ArrayIndexOutOfBoundsException(index);
+    }
+
+    public int getChildPositionCode(ProgramElement child) {
+        return (child == this.ident) ? 0 : -1;
+    }
+
+    public boolean replaceChild(ProgramElement p, ProgramElement q) {
+        if (p == this.ident) {
+            this.ident = (Identifier) q;
+            if (this.ident != null)
+                this.ident.setParent(this);
+            return true;
+        }
+        return false;
+    }
+
+    public Identifier getIdentifier() {
+        return this.ident;
+    }
+
+    public void setIdentifier(Identifier ident) {
+        this.ident = ident;
+    }
+
+    public void makeParentRoleValid() {
+        super.makeParentRoleValid();
+        if (this.ident != null)
+            this.ident.setParent(this);
+    }
+
+    public int getExpressionCount() {
+        return 0;
+    }
+
+    public Expression getExpressionAt(int index) {
+        throw new IndexOutOfBoundsException();
+    }
+
+    public SourceElement getFirstElement() {
+        return this.ident;
+    }
+
+    public SourceElement getLastElement() {
+        return this.ident;
+    }
 }

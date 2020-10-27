@@ -1,17 +1,9 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.convenience;
 
 import recoder.ModelElement;
 import recoder.java.ProgramElement;
 
-/**
- * Walks a syntax tree in iterator-like fashion.
- * 
- * @author AL
- */
 public abstract class AbstractTreeWalker implements ProgramElementWalker, Cloneable {
-
     ProgramElement[] stack;
 
     int count;
@@ -19,81 +11,49 @@ public abstract class AbstractTreeWalker implements ProgramElementWalker, Clonea
     ProgramElement current;
 
     protected AbstractTreeWalker(int initialStackCapacity) {
-        stack = new ProgramElement[initialStackCapacity];
+        this.stack = new ProgramElement[initialStackCapacity];
     }
 
     public AbstractTreeWalker(ProgramElement root) {
-        stack = new ProgramElement[16];
+        this.stack = new ProgramElement[16];
         reset(root);
     }
 
     public AbstractTreeWalker(ProgramElement root, int initialStackCapacity) {
-        stack = new ProgramElement[Math.max(8, initialStackCapacity)];
+        this.stack = new ProgramElement[Math.max(8, initialStackCapacity)];
         reset(root);
     }
 
-    /**
-     * Reset the walker reusing existing objects.
-     */
     protected void reset(ProgramElement root) {
-        while (count > 0) {
-            stack[--count] = null;
-        }
-        stack[count++] = current = root;
+        while (this.count > 0)
+            this.stack[--this.count] = null;
+        this.stack[this.count++] = this.current = root;
     }
 
-    /**
-     * Proceed to the next occurrence of an object of the given class or a
-     * subclass thereof. If there is no such object, the walk is finished.
-     */
-    public boolean next(Class<? extends ModelElement> c) {
+    public boolean next(Class c) {
         while (next()) {
-            if (c.isInstance(current)) {
+            if (c.isInstance(this.current))
                 return true;
-            }
         }
         return false;
     }
 
-    /**
-     * Proceed to the next occurrence of an object accepted by the given filter.
-     * If there is no such object, the walk is finished.
-     */
     public boolean next(ModelElementFilter filter) {
         while (next()) {
-            if (filter.accept(current)) {
+            if (filter.accept(this.current))
                 return true;
-            }
         }
         return false;
     }
 
-    /**
-     * Proceeds to the next element, if available. Returns true, if there is
-     * one, false otherwise.
-     * 
-     * @return true if the iterator points to an object.
-     */
-    public abstract boolean next();
-
-    /**
-     * Returns the current ProgramElement of the iteration, or null if there is
-     * no more element.
-     * 
-     * @return the current ProgramElement, or <CODE>null</CODE>.
-     * @see #next()
-     */
     public final ProgramElement getProgramElement() {
-        return current;
+        return this.current;
     }
 
-    /**
-     * Creates a new walker pointing to the same position as the current one.
-     */
     public AbstractTreeWalker clone() {
         try {
             AbstractTreeWalker here = (AbstractTreeWalker) super.clone();
-            here.stack = stack.clone();
+            here.stack = this.stack.clone();
             return here;
         } catch (CloneNotSupportedException cnse) {
             return null;
@@ -101,29 +61,25 @@ public abstract class AbstractTreeWalker implements ProgramElementWalker, Clonea
     }
 
     public boolean equals(Object x) {
-        if (!(x instanceof AbstractTreeWalker)) {
+        if (!(x instanceof AbstractTreeWalker))
             return false;
-        }
         AbstractTreeWalker atw = (AbstractTreeWalker) x;
-        if (atw.current != current) {
+        if (atw.current != this.current)
             return false;
-        }
-        if (atw.count != count) {
+        if (atw.count != this.count)
             return false;
-        }
-        if (atw.stack == null) {
-            return stack == null;
-        }
-        for (int i = 0; i < count; i += 1) {
-            if (atw.stack[i] != stack[i]) {
+        if (atw.stack == null)
+            return (this.stack == null);
+        for (int i = 0; i < this.count; i++) {
+            if (atw.stack[i] != this.stack[i])
                 return false;
-            }
         }
         return true;
     }
 
     public int hashCode() {
-        return System.identityHashCode(current);
+        return System.identityHashCode(this.current);
     }
-}
 
+    public abstract boolean next();
+}

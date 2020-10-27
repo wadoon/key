@@ -1,108 +1,47 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.java.expression.literal;
 
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Literal;
 
-/**
- * Float literal.
- * 
- * @author <TT>AutoDoc</TT>
- */
-
 public class FloatLiteral extends Literal {
+    private static final long serialVersionUID = 9215865599908556320L;
 
-    /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = 9215865599908556320L;
-	
-	/**
-     * Textual representation of the value.
-     */
-
-	private String value;
-
-    /**
-     * Float literal.
-     */
+    protected String value;
 
     public FloatLiteral() {
         setValue("0.0F");
     }
 
-    /**
-     * Float literal.
-     * 
-     * @param value
-     *            a float value.
-     */
-
     public FloatLiteral(float value) {
         setValue("" + value + 'F');
     }
-
-    /**
-     * Float literal.
-     * 
-     * @param value
-     *            a string.
-     */
 
     public FloatLiteral(String value) {
         setValue((value.endsWith("F") || value.endsWith("f")) ? value : (value + 'F'));
     }
 
-    /**
-     * Float literal.
-     * 
-     * @param proto
-     *            a float literal.
-     */
-
     protected FloatLiteral(FloatLiteral proto) {
         super(proto);
-        value = proto.value;
+        this.value = proto.value;
     }
-
-    /**
-     * Deep clone.
-     * 
-     * @return the object.
-     */
 
     public FloatLiteral deepClone() {
         return new FloatLiteral(this);
     }
 
-    /**
-     * Set value.
-     * 
-     * @param str
-     *            a string value.
-     */
-
-    public void setValue(String str) {
-        // unchecked
-        this.value = str.intern();
+    public String getValue() {
+        return this.value;
     }
 
-    /**
-     * Get value.
-     * 
-     * @return the string.
-     */
-
-    public String getValue() {
-        return value;
+    public void setValue(String str) {
+        this.value = str.intern();
     }
 
     public void accept(SourceVisitor v) {
         v.visitFloatLiteral(this);
     }
 
-	public Object getEquivalentJavaType() {
-		return Float.valueOf(value);
-	}
+    public Object getEquivalentJavaType() {
+        return Float.valueOf(this.value);
+    }
 }

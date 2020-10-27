@@ -1,13 +1,11 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.kit.pattern;
 
 import recoder.ModelElement;
 import recoder.ModelException;
 import recoder.ParserException;
 import recoder.ProgramFactory;
+import recoder.java.Expression;
 import recoder.java.Identifier;
-import recoder.java.Statement;
 import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.ConstructorDeclaration;
 import recoder.java.declaration.MethodDeclaration;
@@ -15,136 +13,79 @@ import recoder.kit.MethodKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
-/**
- * Not done yet: Should use semantical entities instead of syntactical
- * ~Declarations.
- */
 public class FactoryMethod implements DesignPattern {
-
     private MethodDeclaration producer;
 
     private ConstructorDeclaration product;
 
-    /**
-     * Creates a new factory method using the given constructor. Given a
-     * constructor of the form
-     * 
-     * <PRE>
-     * 
-     * [Modifiers] [Typename] ([Parameters]>) [Exceptions]
-     * 
-     * </PRE>
-     * 
-     * the created producer looks like
-     * 
-     * <PRE>
-     * 
-     * [Modifiers] [Typename] create[Typename]([Arguments]) [Exceptions] {
-     * return new [Typename]([Arguments]); }
-     * 
-     * </PRE>
-     * 
-     * where the [Arguments] have the same names as in the [Parameters] list.
-     */
     public FactoryMethod(ConstructorDeclaration product) {
-        if (product == null) {
+        if (product == null)
             throw new IllegalArgumentException("A factory method requires a product method");
-        }
         this.product = product;
         createProducer();
     }
 
-    /**
-     * Creates a factory method using the default constructor of the product.
-     */
     public FactoryMethod(ClassDeclaration product) {
-        if (product == null) {
+        if (product == null)
             throw new IllegalArgumentException("A factory method requires a product");
-        }
         try {
             this.product = product.getFactory().parseConstructorDeclaration("public " + product.getName() + "(){}");
         } catch (ParserException pe) {
-            System.err.println(pe); // this should never happen
+            System.err.println(pe);
         }
         createProducer();
     }
 
     public MethodDeclaration getProducer() {
-        return producer;
+        return this.producer;
     }
 
     public ConstructorDeclaration getProduct() {
-        return product;
+        return this.product;
     }
 
     protected void createProducer() {
-        ProgramFactory factory = product.getFactory();
+        ProgramFactory factory = this.product.getFactory();
         ConstructorDeclaration clone = null;
         try {
-            clone = factory.parseConstructorDeclaration(product.toSource());
+            clone = factory.parseConstructorDeclaration(this.product.toSource());
         } catch (ParserException pe) {
-            System.err.println(pe); // this should never happen
+            System.err.println(pe);
         }
         Identifier name = clone.getIdentifier();
-        producer = factory.createMethodDeclaration(clone.getDeclarationSpecifiers(), factory.createTypeReference(name), factory
-                .createIdentifier("create" + name.getText()), clone.getParameters(), clone.getThrown());
-        ASTList<Statement> statements = new ASTArrayList<Statement>(1);
-        statements.add(factory.createReturn(MethodKit.createNew(clone)));
-        producer.setBody(factory.createStatementBlock(statements));
+        this.producer = factory.createMethodDeclaration(clone.getDeclarationSpecifiers(), factory.createTypeReference(name), factory.createIdentifier("create" + name.getText()), clone.getParameters(), clone.getThrown());
+        ASTArrayList aSTArrayList = new ASTArrayList(1);
+        aSTArrayList.add(factory.createReturn(MethodKit.createNew(clone)));
+        this.producer.setBody(factory.createStatementBlock(aSTArrayList));
     }
 
-    /**
-     * The validation ensures that a producer exists and that the return value
-     * of the producer matches the product.
-     */
     public void validate() throws ModelException {
-        if (producer == null) {
+        if (this.producer == null)
             throw new InconsistentPatternException("Factory Method pattern requires a producer");
-        }
-        if (product == null) {
+        if (this.product == null)
             throw new InconsistentPatternException("Factory Method pattern requires a product");
-        }
-        if (!producer.getReturnType().getName().equals(product.getMemberParent().getName())) {
-            // could be allowed to create subtypes of return type
+        if (!this.producer.getReturnType().getName().equals(this.product.getMemberParent().getName()))
             throw new InconsistentPatternException("Factory Method producer must create correct product type");
-        }
     }
 
-    /**
-     * Get total number of participants.
-     * 
-     * @return the number of participants.
-     */
     public int getParticipantCount() {
         int res = 0;
-        if (producer != null)
-            res += 1;
-        if (product != null)
-            res += 1;
+        if (this.producer != null)
+            res++;
+        if (this.product != null)
+            res++;
         return res;
     }
 
-    /**
-     * Get a participants by its index.
-     * 
-     * @param index
-     *            an index of a participant.
-     * @return the participant.
-     * @exception IndexOutOfBoundsException,
-     *                if the index is not in bounds.
-     */
     public ModelElement getParticipantAt(int index) {
-        if (producer != null) {
-            if (index == 0) {
-                return producer;
-            }
-            index -= 1;
+        if (this.producer != null) {
+            if (index == 0)
+                return this.producer;
+            index--;
         }
-        if (product != null) {
-            if (index == 0) {
-                return product;
-            }
-        }
+        if (this.product != null &&
+                index == 0)
+            return this.product;
         throw new ArrayIndexOutOfBoundsException();
     }
 }

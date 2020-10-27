@@ -1,27 +1,10 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder;
 
-import recoder.io.ClassFileRepository;
-import recoder.io.DefaultClassFileRepository;
-import recoder.io.DefaultSourceFileRepository;
-import recoder.io.ProjectSettings;
-import recoder.io.SourceFileRepository;
+import recoder.io.*;
 import recoder.java.JavaProgramFactory;
-import recoder.service.ByteCodeInfo;
-import recoder.service.ChangeHistory;
-import recoder.service.ConstantEvaluator;
-import recoder.service.DefaultByteCodeInfo;
-import recoder.service.DefaultConstantEvaluator;
-import recoder.service.DefaultImplicitElementInfo;
-import recoder.service.DefaultNameInfo;
-import recoder.service.DefaultSourceInfo;
-import recoder.service.ImplicitElementInfo;
-import recoder.service.NameInfo;
-import recoder.service.SourceInfo;
+import recoder.service.*;
 
 public class DefaultServiceConfiguration extends ServiceConfiguration {
-
     protected ProjectSettings makeProjectSettings() {
         return new ProjectSettings(this);
     }
@@ -62,4 +45,3 @@ public class DefaultServiceConfiguration extends ServiceConfiguration {
         return new DefaultConstantEvaluator(this);
     }
 }
-

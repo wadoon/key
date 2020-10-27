@@ -1,232 +1,137 @@
-/*
- * Created on 15.11.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- * 
- */
 package recoder.java.declaration;
 
-import recoder.abstraction.ClassType;
-import recoder.abstraction.ParameterizedType;
 import recoder.abstraction.TypeArgument;
-import recoder.abstraction.TypeParameter;
 import recoder.convenience.Naming;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.Reference;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
-import recoder.java.reference.MethodReference;
+import recoder.java.*;
+import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
-import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.list.generic.ASTList;
 
-/**
- * This class represents a TypeArgument, as e.g. given in variable declarations.
- * 
- * @author Tobias Gutzmann
- *
- */
 public class TypeArgumentDeclaration extends JavaNonTerminalProgramElement implements TypeReferenceContainer, TypeArgument {
-	/**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -8369885569636132718L;
+    private static final long serialVersionUID = -8369885569636132718L;
 
-	private TypeReference typeReference;
-	
-	// the wildcard mode 
-	private WildcardMode wildcardMode;
-	
-	// either a TypeReference, a URQ, or a MethodReference 
-	private Reference parent;
+    protected TypeReference typeReference;
 
-	/**
-	 * 
-	 */
-	public TypeArgumentDeclaration() {
-		this(null, WildcardMode.Any);
-	}
+    protected TypeArgument.WildcardMode wildcardMode;
 
-	/**
-	 * @param proto
-	 */
-	protected TypeArgumentDeclaration(TypeArgumentDeclaration proto) {
-		super(proto);
-		this.wildcardMode = proto.wildcardMode;
-		if (proto.typeReference != null)
-			this.typeReference = proto.typeReference.deepClone();
-		makeParentRoleValid();
-	}
-	
-	public TypeArgumentDeclaration(TypeReference tr) {
-		this(tr, WildcardMode.None);
-	}
-	
-	public TypeArgumentDeclaration(TypeReference tr, WildcardMode wm) {
-		this.typeReference = tr;
-		this.wildcardMode = wm;
-		makeParentRoleValid();
-	}
+    protected Reference parent;
 
-	/* (non-Javadoc)
-	 * @see recoder.java.reference.TypeReferenceContainer#getTypeReferenceCount()
-	 */
-	public int getTypeReferenceCount() {
-		return typeReference == null ? 0 : 1;
-	}
+    public TypeArgumentDeclaration() {
+        this(null, TypeArgument.WildcardMode.Any);
+    }
 
-	/* (non-Javadoc)
-	 * @see recoder.java.reference.TypeReferenceContainer#getTypeReferenceAt(int)
-	 */
-	public TypeReference getTypeReferenceAt(int index) {
-		if (index == 0 && typeReference != null)
-			return typeReference;
-		throw new ArrayIndexOutOfBoundsException(index);
-	}
+    protected TypeArgumentDeclaration(TypeArgumentDeclaration proto) {
+        super(proto);
+        this.wildcardMode = proto.wildcardMode;
+        if (proto.typeReference != null)
+            this.typeReference = proto.typeReference.deepClone();
+        makeParentRoleValid();
+    }
 
-	/* (non-Javadoc)
-	 * @see recoder.java.NonTerminalProgramElement#getChildCount()
-	 */
-	public int getChildCount() {
-		return getTypeReferenceCount();
-	}
+    public TypeArgumentDeclaration(TypeReference tr) {
+        this(tr, TypeArgument.WildcardMode.None);
+    }
 
-	/* (non-Javadoc)
-	 * @see recoder.java.NonTerminalProgramElement#getChildAt(int)
-	 */
-	public ProgramElement getChildAt(int index) {
-		return getTypeReferenceAt(index);
-	}
+    public TypeArgumentDeclaration(TypeReference tr, TypeArgument.WildcardMode wm) {
+        this.typeReference = tr;
+        this.wildcardMode = wm;
+        makeParentRoleValid();
+    }
 
-	/* (non-Javadoc)
-	 * @see recoder.java.NonTerminalProgramElement#getChildPositionCode(recoder.java.ProgramElement)
-	 */
-	public int getChildPositionCode(ProgramElement child) {
-		// 0: typeReference
-		if (child == typeReference)
-			return 0;
-		return -1;
-	}
+    public int getTypeReferenceCount() {
+        return (this.typeReference == null) ? 0 : 1;
+    }
 
-	/* (non-Javadoc)
-	 * @see recoder.java.NonTerminalProgramElement#replaceChild(recoder.java.ProgramElement, recoder.java.ProgramElement)
-	 */
-	public boolean replaceChild(ProgramElement p, ProgramElement q) {
-		if (p == null)
-			throw new NullPointerException();
-		if (p == typeReference) {
-			typeReference = (TypeReference)q;
-			if (typeReference != null)
-				typeReference.setParent(this);
-			return true;
-		}
-		return false;
-	}
+    public TypeReference getTypeReferenceAt(int index) {
+        if (index == 0 && this.typeReference != null)
+            return this.typeReference;
+        throw new ArrayIndexOutOfBoundsException(index);
+    }
 
-	/* (non-Javadoc)
-	 * @see recoder.java.ProgramElement#getASTParent()
-	 */
-	public NonTerminalProgramElement getASTParent() {
-		return (NonTerminalProgramElement)parent;
-	}
-	
-	public Reference getParent() {
-		return parent;
-	}
-	
-	/**
-	 * 
-	 * @param tr either a TypeReference, a URQ, or an MethodReference 
-	 * @throws IllegalArgumentException if <code>tr</code> isn't of type 
-	 *  TypeReference, URQ, or MethodReference 
-	 */
-	public void setParent(Reference tr) {
-		parent = tr;
-		if (!(tr instanceof TypeReference || tr instanceof UncollatedReferenceQualifier ||
-				tr instanceof MethodReference))
-			throw new IllegalArgumentException();
-	}
+    public int getChildCount() {
+        return getTypeReferenceCount();
+    }
 
-	/* (non-Javadoc)
-	 * @see recoder.java.SourceElement#accept(recoder.java.SourceVisitor)
-	 */
-	public void accept(SourceVisitor v) {
-		v.visitTypeArgument(this);
-	}
+    public ProgramElement getChildAt(int index) {
+        return getTypeReferenceAt(index);
+    }
 
-	/* (non-Javadoc)
-	 * @see recoder.java.SourceElement#deepClone()
-	 */
-	public TypeArgumentDeclaration deepClone() {
-		return new TypeArgumentDeclaration(this);
-	}
-	
-	public void makeParentRoleValid() {
-		super.makeParentRoleValid();
-		if (typeReference != null)
-			typeReference.setParent(this);
-	}
-	
-	public WildcardMode getWildcardMode() {
-		return wildcardMode;
-	}
+    public int getChildPositionCode(ProgramElement child) {
+        if (child == this.typeReference)
+            return 0;
+        return -1;
+    }
 
-	public String getTypeName() {
-		return Naming.toPathName(typeReference);
-	}
+    public boolean replaceChild(ProgramElement p, ProgramElement q) {
+        if (p == null)
+            throw new NullPointerException();
+        if (p == this.typeReference) {
+            this.typeReference = (TypeReference) q;
+            if (this.typeReference != null)
+                this.typeReference.setParent(this);
+            return true;
+        }
+        return false;
+    }
 
-	/**
-	 * Returns type reference's type arguments, or null if wildcardMode == WildcardMode.Any
-	 */
-	public ASTList<TypeArgumentDeclaration> getTypeArguments() {
-		if (wildcardMode == WildcardMode.Any)
-			return null;
-		// otherwise, type reference must be set. Leave at it is for now for error detection
-		return typeReference.getTypeArguments();
-	}
-	
-	public void setWildcardMode(WildcardMode wm) {
-		this.wildcardMode = wm;
-	}
-	
-	public TypeReference getTypeReference() {
-		return typeReference;
-	}
-	
-	public void setTypeReference(TypeReference tr) {
-		this.typeReference = tr;
-	}
+    public NonTerminalProgramElement getASTParent() {
+        return (NonTerminalProgramElement) this.parent;
+    }
 
-	@Override
-	public SourceElement getFirstElement() {
-		if (wildcardMode != WildcardMode.None)
-			return this;
-		return typeReference == null ? this : typeReference.getFirstElement();
-	}
-	
-	public boolean semanticalEquality(TypeArgument tad) {
-		return TypeArgument.EqualsImpl.equals(this, tad);
-	}
-	
-	public TypeParameter getTargetedTypeParameter() {
-		// TODO 0.90 clean up! Does this belong here?
-		// TypeReference, a URQ, or a MethodReference
-		if (parent instanceof TypeReference) {
-			int idx = ((TypeReference)parent).getTypeArguments().indexOf(this);
-			ClassType t = (ClassType)getFactory().getServiceConfiguration().getSourceInfo().getType(parent);
-			assert t instanceof ParameterizedType;
-			return ((ParameterizedType)t).getGenericType().getTypeParameters().get(idx);
-		} 
-		return null;
-	}
-	
-	// TODO 0.90
-	public String getFullSignature() {
-		return TypeArgument.DescriptionImpl.getFullDescription(this);
-	}
+    public Reference getParent() {
+        return this.parent;
+    }
 
+    public void setParent(Reference tr) {
+        this.parent = tr;
+        if (!(tr instanceof TypeReference) && !(tr instanceof recoder.java.reference.UncollatedReferenceQualifier) && !(tr instanceof recoder.java.reference.MethodReference))
+            throw new IllegalArgumentException();
+    }
 
+    public void accept(SourceVisitor v) {
+        v.visitTypeArgument(this);
+    }
+
+    public TypeArgumentDeclaration deepClone() {
+        return new TypeArgumentDeclaration(this);
+    }
+
+    public void makeParentRoleValid() {
+        super.makeParentRoleValid();
+        if (this.typeReference != null)
+            this.typeReference.setParent(this);
+    }
+
+    public TypeArgument.WildcardMode getWildcardMode() {
+        return this.wildcardMode;
+    }
+
+    public void setWildcardMode(TypeArgument.WildcardMode wm) {
+        this.wildcardMode = wm;
+    }
+
+    public String getTypeName() {
+        return Naming.toPathName(this.typeReference);
+    }
+
+    public ASTList<TypeArgumentDeclaration> getTypeArguments() {
+        if (this.wildcardMode == TypeArgument.WildcardMode.Any)
+            return null;
+        return this.typeReference.getTypeArguments();
+    }
+
+    public TypeReference getTypeReference() {
+        return this.typeReference;
+    }
+
+    public void setTypeReference(TypeReference tr) {
+        this.typeReference = tr;
+    }
+
+    public SourceElement getFirstElement() {
+        if (this.wildcardMode != TypeArgument.WildcardMode.None)
+            return this;
+        return (this.typeReference == null) ? this : this.typeReference.getFirstElement();
+    }
 }

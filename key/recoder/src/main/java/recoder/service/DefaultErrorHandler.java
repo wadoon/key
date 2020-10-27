@@ -1,13 +1,12 @@
 package recoder.service;
 
-import java.util.EventObject;
-
 import recoder.ModelElement;
 import recoder.ModelException;
 import recoder.java.ProgramElement;
 
-public class DefaultErrorHandler implements ErrorHandler {
+import java.util.EventObject;
 
+public class DefaultErrorHandler implements ErrorHandler {
     private int errorCount = 0;
 
     private int errorThreshold;
@@ -20,69 +19,38 @@ public class DefaultErrorHandler implements ErrorHandler {
         setErrorThreshold(errorThreshold);
     }
 
-    /**
-     * Returns the current error count.
-     */
     protected int getErrorCount() {
-        return errorCount;
+        return this.errorCount;
     }
 
     public int getErrorThreshold() {
-        return errorThreshold;
+        return this.errorThreshold;
     }
 
     public void setErrorThreshold(int maxCount) {
-        if (maxCount < 0) {
+        if (maxCount < 0)
             throw new IllegalArgumentException("Threshold should be >= 0");
-        }
-        errorThreshold = maxCount;
+        this.errorThreshold = maxCount;
     }
 
-    /**
-     * Redefine this method to indicate that the specified element refers to
-     * unavailable code. This suppresses corresponding unresolved reference
-     * errors. The default implementation returns <CODE>false</CODE>.
-     */
     protected boolean isReferingUnavailableCode(ModelElement me) {
         return false;
     }
 
-    /**
-     * Redefine this method to indicate that the specified element belongs to a
-     * code template. This suppresses corresponding unresolved reference errors.
-     * The default implementation returns <CODE>false</CODE>.
-     */
     protected boolean isTemplateCode(ProgramElement pe) {
         return false;
     }
 
-    /**
-     * Redefine this method to filter exceptions that are not considered as an
-     * error. The default implementation checks for
-     * {@link recoder.service.UnresolvedReferenceException}s and returns <CODE>
-     * true</CODE> if the cause is either part of an incomplete model or
-     * contained in template code.
-     * 
-     * @see #isReferingUnavailableCode
-     * @see #isTemplateCode
-     */
     protected boolean isIgnorable(Exception e) {
         if (e instanceof UnresolvedReferenceException) {
             ProgramElement unresolvedReference = ((UnresolvedReferenceException) e).getUnresolvedReference();
-            if (isReferingUnavailableCode(unresolvedReference)) {
+            if (isReferingUnavailableCode(unresolvedReference))
                 return true;
-            }
-            if (isTemplateCode(unresolvedReference)) {
-                return true;
-            }
+            return isTemplateCode(unresolvedReference);
         }
         return false;
     }
 
-    /**
-     * Issues a warning message when the specified exception is ignored. The
-     * default implementation writes a note to stderr.
-     */
     protected void warningMessage(Exception e) {
         String className = e.getClass().getName();
         className = className.substring(className.lastIndexOf('.') + 1);
@@ -91,26 +59,16 @@ public class DefaultErrorHandler implements ErrorHandler {
         System.err.println();
     }
 
-    /**
-     * Issues an error message when the specified exception is not ignored, but
-     * the system will continue to find further errors. The default
-     * implementation writes a note to stderr.
-     */
     protected void errorMessage(Exception e) {
         String className = e.getClass().getName();
         className = className.substring(className.lastIndexOf('.') + 1);
-        System.err.println("*** " + errorCount + ": " + className);
+        System.err.println("*** " + this.errorCount + ": " + className);
         System.err.println(e.getMessage());
         System.err.println();
     }
 
-    /**
-     * Called when too many errors occurred or the model update has finished and
-     * there were non-ignorable errors. The default implementation writes a
-     * message to stderr and throws a model exception.
-     */
     protected void exitAction() {
-        String msg = "" + errorCount + " errors have occured - aborting.";
+        String msg = "" + this.errorCount + " errors have occured - aborting.";
         System.err.println(msg);
         throw new ModelException(msg);
     }
@@ -119,22 +77,18 @@ public class DefaultErrorHandler implements ErrorHandler {
         if (isIgnorable(e)) {
             warningMessage(e);
         } else {
-            errorCount += 1;
+            this.errorCount++;
             errorMessage(e);
-            if (errorCount > errorThreshold) {
+            if (this.errorCount > this.errorThreshold)
                 exitAction();
-            }
         }
     }
 
     public void modelUpdating(EventObject event) {
-    	// ignore
     }
 
     public void modelUpdated(EventObject event) {
-        if (errorCount > 0) {
+        if (this.errorCount > 0)
             exitAction();
-        }
     }
 }
-

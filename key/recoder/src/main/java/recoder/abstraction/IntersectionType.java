@@ -1,239 +1,167 @@
-/*
- * Created on 04.01.2006
- *
- * This file is part of the RECODER library and protected by the LGPL.
- * 
- */
 package recoder.abstraction;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import recoder.ModelException;
 import recoder.service.ProgramModelInfo;
 
-/**
- * Represents an intersection type, which was introduced in java 5.
- * See JLS, 3rd edition, §4.9 for details.
- * @author Tobias Gutzmann
- *
- */
+import java.util.ArrayList;
+import java.util.List;
+
 public class IntersectionType implements ClassType {
-	private List<ClassType> types;
-	private ProgramModelInfo pmi;
-	
-	/**
-	 * 
-	 */
-	public IntersectionType(List<ClassType> types, ProgramModelInfo pmi) {
-		super();
-		this.types = types;
-		this.pmi = pmi;
-	}
+    private final List<Type> types;
 
-	public String getFullName() {
-		StringBuilder res = new StringBuilder();
-		for (int i = 0; i < types.size(); i++) {
-			if (i != 0)
-				res.append(" & ");
-			res.append(types.get(i).getFullName());
-		}
-		return res.toString();
-	}
-	
-    public String getBinaryName() {
-		StringBuilder res = new StringBuilder();
-		for (int i = 0; i < types.size(); i++) {
-			if (i != 0)
-				res.append(" & ");
-			res.append(types.get(i).getBinaryName());
-		}
-		return res.toString();
-	}
-	
-    public ArrayType getArrayType() {
-    	return null;
-    }
-    
-    public ArrayType createArrayType() {
-    	throw new UnsupportedOperationException();
+    private ProgramModelInfo pmi;
+
+    public IntersectionType(List<Type> types, ProgramModelInfo pmi) {
+        this.types = types;
+        this.pmi = pmi;
     }
 
-	/* (non-Javadoc)
-	 * @see recoder.abstraction.ProgramModelElement#getProgramModelInfo()
-	 */
-	public ProgramModelInfo getProgramModelInfo() {
-		return pmi;
-	}
-
-	/* (non-Javadoc)
-	 * @see recoder.abstraction.ProgramModelElement#setProgramModelInfo(recoder.service.ProgramModelInfo)
-	 */
-	public void setProgramModelInfo(ProgramModelInfo pmi) {
-		this.pmi = pmi;
-	}
-
-	/* (non-Javadoc)
-	 * @see recoder.NamedModelElement#getName()
-	 */
-	public String getName() {
-		StringBuilder res = new StringBuilder();
-		for (int i = 0; i < types.size(); i++) {
-			if (i != 0)
-				res.append(" & ");
-			res.append(types.get(i).getName());
-		}
-		return res.toString().intern();
-	}
-
-	public void validate() throws ModelException {
-		// nothing to do
-	}
-
-	public boolean isInterface() {
-		return false;
-	}
-
-	public boolean isOrdinaryInterface() {
-		return false;
-	}
-
-	public boolean isAnnotationType() {
-		return false;
-	}
-
-	public boolean isEnumType() {
-		return false;
-	}
-
-	public boolean isOrdinaryClass() {
-		return false;
-	}
-
-	public boolean isAbstract() {
-		return true; // kinda is ?!
-	}
-
-	public List<ClassType> getSupertypes() {
-		// TODO move this to ImplicitElementInfo...
-		List<ClassType> res = new ArrayList<ClassType>();
-		boolean addedObject = false;
-		for (int i = 0; i < types.size(); i++) {
-			Type t = types.get(i);
-			// TODO 0.90 why the check below ?? Was it because of arrays?
-			if (t instanceof ClassType) {
-				res.add((ClassType)t);
-				// TODO 0.90 this shouldn't be neccessary longer (Array handling)?
-				if (t.getFullName().equals("java.lang.Object"))
-					addedObject = true;
-			}
-			if (t instanceof ArrayType && !addedObject) {
-				res.add(pmi.getServiceConfiguration().getNameInfo().getJavaLangObject());
-				addedObject = true;
-			}
-		}
-		return res;
-	}
-
-	public List<ClassType> getAllSupertypes() {
-		return pmi.getAllSubtypes(this);
-	}
-
-	public List<? extends Field> getFields() {
-		return null;
-	}
-
-	public List<Field> getAllFields() {
-		return pmi.getAllFields(this);
-	}
-
-	public List<Method> getMethods() {
-		// TODO 0.90 - not implemented in service yet !
-		return pmi.getMethods(this);
-	}
-
-	public List<Method> getAllMethods() {
-		return pmi.getAllMethods(this);
-	}
-
-	public List<Constructor> getConstructors() {
-		return null;
-	}
-
-	public List<ClassType> getAllTypes() {
-		return null;
-	}
-
-	public List<? extends TypeParameter> getTypeParameters() {
-		return null;
-	}
-
-	public boolean isFinal() {
-		return false;
-	}
-
-	public boolean isStatic() {
-		return false;
-	}
-
-	public boolean isPrivate() {
-		return false;
-	}
-
-	public boolean isProtected() {
-		return false;
-	}
-
-	public boolean isPublic() {
-		return false;
-	}
-
-	public boolean isStrictFp() {
-		return false;
-	}
-
-	public ClassType getContainingClassType() {
-		return null;
-	}
-
-	public List<? extends AnnotationUse> getAnnotations() {
-		return null;
-	}
-
-	public List<? extends ClassType> getTypes() {
-		return null;
-	}
-
-	public Package getPackage() {
-		return null;
-	}
-
-	public ClassTypeContainer getContainer() {
-		return null;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		// TODO 0.90
-		return super.equals(o);
-	}
-	
-    public String getFullSignature() {
-    	StringBuilder res = new StringBuilder(150);
-		for (int i = 0; i < types.size(); i++) {
-			if (i != 0)
-				res.append(" & ");
-			res.append(types.get(i).getFullSignature());
-		}
-		return res.toString();
+    public String getFullName() {
+        StringBuffer res = new StringBuffer();
+        for (int i = 0; i < this.types.size(); i++) {
+            if (i != 0)
+                res.append(" & ");
+            res.append(this.types.get(i).getFullName());
+        }
+        return res.toString();
     }
-    
-	public ErasedType getErasedType() {
-		throw new UnsupportedOperationException();
-	}
 
-	public boolean isInner() {
-		return false;
-	}
+    public ProgramModelInfo getProgramModelInfo() {
+        return this.pmi;
+    }
 
+    public void setProgramModelInfo(ProgramModelInfo pmi) {
+        this.pmi = pmi;
+    }
+
+    public String getName() {
+        StringBuffer res = new StringBuffer();
+        for (int i = 0; i < this.types.size(); i++) {
+            if (i != 0)
+                res.append(" & ");
+            res.append(this.types.get(i).getName());
+        }
+        return res.toString();
+    }
+
+    public void validate() throws ModelException {
+    }
+
+    public boolean isInterface() {
+        return false;
+    }
+
+    public boolean isOrdinaryInterface() {
+        return false;
+    }
+
+    public boolean isAnnotationType() {
+        return false;
+    }
+
+    public boolean isEnumType() {
+        return false;
+    }
+
+    public boolean isOrdinaryClass() {
+        return false;
+    }
+
+    public boolean isAbstract() {
+        return true;
+    }
+
+    public List<ClassType> getSupertypes() {
+        List<ClassType> res = new ArrayList<ClassType>();
+        boolean addedObject = false;
+        for (int i = 0; i < this.types.size(); i++) {
+            Type t = this.types.get(i);
+            if (t instanceof ClassType) {
+                res.add((ClassType) t);
+                if (t.getFullName().equals("java.lang.Object"))
+                    addedObject = true;
+            }
+            if (t instanceof ArrayType && !addedObject) {
+                res.add(this.pmi.getServiceConfiguration().getNameInfo().getJavaLangObject());
+                addedObject = true;
+            }
+        }
+        return res;
+    }
+
+    public List<ClassType> getAllSupertypes() {
+        return this.pmi.getAllSubtypes(this);
+    }
+
+    public List<? extends Field> getFields() {
+        return null;
+    }
+
+    public List<Field> getAllFields() {
+        return this.pmi.getAllFields(this);
+    }
+
+    public List<Method> getMethods() {
+        return null;
+    }
+
+    public List<Method> getAllMethods() {
+        return this.pmi.getAllMethods(this);
+    }
+
+    public List<Constructor> getConstructors() {
+        return null;
+    }
+
+    public List<ClassType> getAllTypes() {
+        return null;
+    }
+
+    public List<? extends TypeParameter> getTypeParameters() {
+        return null;
+    }
+
+    public boolean isFinal() {
+        return false;
+    }
+
+    public boolean isStatic() {
+        return false;
+    }
+
+    public boolean isPrivate() {
+        return false;
+    }
+
+    public boolean isProtected() {
+        return false;
+    }
+
+    public boolean isPublic() {
+        return false;
+    }
+
+    public boolean isStrictFp() {
+        return false;
+    }
+
+    public ClassType getContainingClassType() {
+        return null;
+    }
+
+    public List<? extends AnnotationUse> getAnnotations() {
+        return null;
+    }
+
+    public List<? extends ClassType> getTypes() {
+        return null;
+    }
+
+    public Package getPackage() {
+        return null;
+    }
+
+    public ClassTypeContainer getContainer() {
+        return null;
+    }
 }

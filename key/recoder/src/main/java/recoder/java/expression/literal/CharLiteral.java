@@ -1,116 +1,52 @@
-// This file is part of the RECODER library and protected by the LGPL.
-
 package recoder.java.expression.literal;
 
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Literal;
 
-/**
- * Char literal.
- * 
- * @author <TT>AutoDoc</TT>
- */
-
 public class CharLiteral extends Literal {
+    private static final long serialVersionUID = -558509934440205638L;
 
-    /**
-	 * serialization id
-	 */
-	private static final long serialVersionUID = -558509934440205638L;
-	private String value;
-
-    /**
-     * Char literal.
-     */
+    protected String value;
 
     public CharLiteral() {
-    	// nothing to do
     }
-
-    /**
-     * Char literal.
-     * 
-     * @param value
-     *            a char value.
-     */
 
     public CharLiteral(char value) {
         setValue(value);
     }
 
-    /**
-     * Char literal.
-     * 
-     * @param value
-     *            a string.
-     */
-
     public CharLiteral(String value) {
         setValue(value);
     }
 
-    /**
-     * Char literal.
-     * 
-     * @param proto
-     *            a char literal.
-     */
-
     protected CharLiteral(CharLiteral proto) {
         super(proto);
-        value = proto.value;
+        this.value = proto.value;
     }
-
-    /**
-     * Deep clone.
-     * 
-     * @return the object.
-     */
 
     public CharLiteral deepClone() {
         return new CharLiteral(this);
     }
 
-    /**
-     * Set value.
-     * 
-     * @param c
-     *            a char value.
-     */
+    public String getValue() {
+        return this.value;
+    }
 
     public void setValue(char c) {
         setValue("'" + c + "'");
     }
 
-    /**
-     * Set value.
-     * 
-     * @param str
-     *            a string value.
-     */
-
     public void setValue(String str) {
-        if (!str.startsWith("'") || !str.endsWith("'")) {
-            throw new IllegalArgumentException("Bad char literal " + value);
-        }
+        if (!str.startsWith("'") || !str.endsWith("'"))
+            throw new IllegalArgumentException("Bad char literal " + this.value);
         this.value = str.intern();
-    }
-
-    /**
-     * Get value.
-     * 
-     * @return the string.
-     */
-
-    public String getValue() {
-        return value;
     }
 
     public void accept(SourceVisitor v) {
         v.visitCharLiteral(this);
     }
 
-	public Object getEquivalentJavaType() {
-		return Character.valueOf(value.charAt(0));
-	}
+    public Object getEquivalentJavaType() {
+        return Character.valueOf(this.value.charAt(0));
+    }
 }
