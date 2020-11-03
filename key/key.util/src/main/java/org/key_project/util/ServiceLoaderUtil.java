@@ -35,9 +35,14 @@ import java.util.stream.Stream;
 public final class ServiceLoaderUtil {
     private static final String PREFIX = "META-INF/services/";
 
+    private ServiceLoaderUtil() {}
+
     /**
      * Backport of {@link ServiceLoader#stream()} for Java8.
+     * <p>
      * weigl: Should be replaced by if we upgrade.
+     * </p>
+     * @deprecated
      */
     @Deprecated
     public static <S> Stream<Class<S>> stream(Class<S> c) {
@@ -46,18 +51,7 @@ public final class ServiceLoaderUtil {
         try {
             Enumeration<URL> iter = cloader.getResources(PREFIX + c.getName());
             while (iter.hasMoreElements()) {
-                try (BufferedReader br = new BufferedReader(
-                        new InputStreamReader(iter.nextElement().openStream()))) {
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        line = line.trim();
-                        if (line.isEmpty() || line.startsWith("#"))
-                            continue;
-                        classes.add(line);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                readServiceImplementations(classes, iter.nextElement());
             }
             return classes.stream()
                     .map(it -> {
@@ -73,5 +67,20 @@ public final class ServiceLoaderUtil {
             e.printStackTrace();
         }
         return Stream.empty();
+    }
+
+    private static void readServiceImplementations(Set<String> classes, URL iter) {
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(iter.openStream()))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#"))
+                    continue;
+                classes.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

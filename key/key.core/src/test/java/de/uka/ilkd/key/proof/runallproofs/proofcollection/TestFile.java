@@ -10,7 +10,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -19,6 +18,8 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
+import de.uka.ilkd.key.scripts.ScriptEngine;
+import de.uka.ilkd.key.scripts.ScriptEngineFacade;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 
@@ -262,8 +263,13 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
             env.getProofControl().startAndWaitForAutoMode(loadedProof);
         } else {
             // ... script
-            ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
-            pse.execute(env.getUi(), env.getLoadedProof());
+            ScriptEngine pse = ScriptEngineFacade.createEngineFor("MU");
+            assert pse != null;
+            pse.script(script.first)
+                    .origin(script.second)
+                    .ui(env.getUi())
+                    .proof(env.getLoadedProof())
+                    .execute();
         }
     }
 

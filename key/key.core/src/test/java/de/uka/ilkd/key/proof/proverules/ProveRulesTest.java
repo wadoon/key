@@ -2,13 +2,14 @@ package de.uka.ilkd.key.proof.proverules;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.scripts.ScriptEngine;
+import de.uka.ilkd.key.scripts.ScriptEngineFacade;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
@@ -88,8 +89,13 @@ public class ProveRulesTest {
 
       Pair<String, Location> script = env.getProofScript();
       if(script != null) {
-    	  ProofScriptEngine pse = new ProofScriptEngine(script.first, script.second);
-          pse.execute(env.getUi(), proof);
+         ScriptEngine pse = ScriptEngineFacade.createEngineFor("MU");
+         assert pse != null;
+         pse.script(script.first)
+                 .origin(script.second)
+                 .ui(env.getUi())
+                 .proof(proof)
+                 .execute();
       }
 
       assertTrue("Taclet proof of taclet " + tacletName + " did not close.",
