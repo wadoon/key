@@ -14,9 +14,13 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.util.Locatable;
 
-public class SLTranslationException extends ProofInputException {
+import java.net.MalformedURLException;
+
+public class SLTranslationException extends ProofInputException implements Locatable {
 
     private static final long serialVersionUID = 1L;
 
@@ -70,4 +74,8 @@ public class SLTranslationException extends ProofInputException {
       return pos.getColumn();
    }
 
+   @Override
+   public Location getLocation() throws MalformedURLException {
+      return new Location(getFileName(), getLine(), getColumn());
+   }
 }

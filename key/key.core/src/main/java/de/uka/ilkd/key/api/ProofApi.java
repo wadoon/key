@@ -29,9 +29,9 @@ public class ProofApi {
         this.env = currentEnv;
     }
 
-    public ScriptApi getScriptApi() {
+    /*public ScriptApi getScriptApi() {
         return new ScriptApi(this);
-    }
+    }*/
 
     public KeYEnvironment<?> getEnv() {
         return env;

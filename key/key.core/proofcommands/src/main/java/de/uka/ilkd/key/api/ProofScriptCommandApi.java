@@ -14,7 +14,9 @@ import java.util.ServiceLoader;
  * @version 1 (21.04.17)
  */
 public class ProofScriptCommandApi {
-    private Map<String, ProofScriptCommand> commandMap = new HashMap<>();
+    public static ProofScriptCommandApi INSTANCE = new ProofScriptCommandApi();
+
+    private Map<String, ProofScriptCommand<?>> commandMap = new HashMap<>();
 
     public ProofScriptCommandApi() {
         initialize();
@@ -32,7 +34,7 @@ public class ProofScriptCommandApi {
      *
      * @return a collection of proof script commands
      */
-    public Collection<ProofScriptCommand> getScriptCommands() {
+    public Collection<ProofScriptCommand<?>> getScriptCommands() {
         return commandMap.values();
     }
 

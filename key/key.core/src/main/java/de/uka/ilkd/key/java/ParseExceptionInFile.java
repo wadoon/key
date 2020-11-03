@@ -1,6 +1,11 @@
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.ExceptionTools;
+import de.uka.ilkd.key.util.Locatable;
 import recoder.parser.ParseException;
+
+import java.net.MalformedURLException;
 
 /**
  * This exception extends recoder's {@link ParseException} by a filename.
@@ -12,7 +17,7 @@ import recoder.parser.ParseException;
  * @author mulbrich
  *
  */
-public class ParseExceptionInFile extends ParseException {
+public class ParseExceptionInFile extends ParseException implements Locatable {
     private static final long serialVersionUID = -4228093987853508329L;
     private final String filename;
 
@@ -28,5 +33,21 @@ public class ParseExceptionInFile extends ParseException {
 
     public String getFilename() {
         return filename;
+    }
+
+    @Override
+    public Location getLocation() throws MalformedURLException {
+        // This kind of exception has a filename but no line/col information
+        // Retrieve the latter from the cause. location remains null if
+        // no line/col is available in cause.
+        Location location = null;
+        if(getCause() != null) {
+            location = ExceptionTools.getLocation(getCause());
+            if(location != null) {
+                String filename = getFilename();
+                location = new Location(filename, location.getLine(), location.getColumn());
+            }
+        }
+        return location;
     }
 }

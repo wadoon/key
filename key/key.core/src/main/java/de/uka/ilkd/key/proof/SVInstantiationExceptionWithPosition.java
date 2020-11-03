@@ -14,14 +14,21 @@
 package de.uka.ilkd.key.proof;
 
 
-/** 
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.Locatable;
+import org.jetbrains.annotations.Nullable;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+/**
  * Represents an exception with position information. The row position is
  * absolut this means, if in a table it is the row of the table, but the column
  * position is relative to the text and does not describe the column of the
  * table. (has to be changed)
  */
 public abstract class SVInstantiationExceptionWithPosition 
-    extends SVInstantiationException {
+    extends SVInstantiationException implements Locatable {
 
     /**
      * 
@@ -63,9 +70,14 @@ public abstract class SVInstantiationExceptionWithPosition
 	    errmsg += column <= 0 ? "" : ("\nColumn: " + getColumn());	
 	}
 	return errmsg;
-    }    
+    }
 
-    /**
+	@Override
+	public @Nullable Location getLocation() throws MalformedURLException {
+		return new Location((URL) null, getRow(), getColumn());
+    }
+
+	/**
      * Returns a string representation of this exception.
      */
     public String toString() {

@@ -1,6 +1,7 @@
 package org.key_project.script.ui;
 
 import de.uka.ilkd.key.api.KeYApi;
+import de.uka.ilkd.key.api.ProofScriptCommandApi;
 import lombok.NonNull;
 import org.fife.ui.autocomplete.AutoCompletion;
 import org.fife.ui.autocomplete.BasicCompletion;
@@ -97,7 +98,7 @@ public class ScriptUtils {
                 provider.addCompletion(new BasicCompletion(provider, e.getScriptCommandName(), "Macro: " + e.getName(),
                         e.getDescription())));
 
-        KeYApi.getScriptCommandApi().getScriptCommands().forEach(e ->
+        ProofScriptCommandApi.INSTANCE.getScriptCommands().forEach(e ->
                 provider.addCompletion(new BasicCompletion(provider, e.getName(), "Command: " + e.getName(),
                         e.getDocumentation())));
         return provider;

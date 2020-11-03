@@ -24,9 +24,9 @@ public class ValueInjectorTest {
 
         ValueInjector.injection(null, pp, args);
 
-        Assert.assertEquals(true, pp.b);
-        Assert.assertEquals(42, pp.i);
-        Assert.assertEquals("blubb", pp.s);
+        assertEquals(true, pp.b);
+        assertEquals(42, pp.i);
+        assertEquals("blubb", pp.s);
 
     }
 

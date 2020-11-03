@@ -13,10 +13,13 @@
 
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.util.Locatable;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
 
-public class KeYSemanticException extends RecognitionException {
+import java.net.MalformedURLException;
+
+public class KeYSemanticException extends RecognitionException implements Locatable {
     /**
      * 
      */
@@ -76,5 +79,10 @@ public class KeYSemanticException extends RecognitionException {
     public String toString() {
 	return filename+"("+this.getLine()+", "+this.getColumn()+"): "
 	    +getMessage();
+    }
+
+    @Override
+    public Location getLocation() throws MalformedURLException {
+        return new Location(getFilename(), getLine(), getColumn() + 1);
     }
 }

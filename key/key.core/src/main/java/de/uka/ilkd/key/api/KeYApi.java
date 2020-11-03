@@ -17,11 +17,10 @@ import java.util.List;
  *
  * @author Sarah Grebing
  * @author Alexander Weigl
- * @see ProofScriptCommandApi
  */
 public abstract class KeYApi {
     private static final ProofMacroApi proofMacroApi = new ProofMacroApi();
-    private static final ProofScriptCommandApi scriptCommandApi = new ProofScriptCommandApi();
+    //private static final ProofScriptCommandApi scriptCommandApi = new ProofScriptCommandApi();
 
     /**
      * Create a new KeY API and create the sub APIs
@@ -38,12 +37,11 @@ public abstract class KeYApi {
     }
 
 
-    /**
+    /*
      * @return non-null
-     */
     public static ProofScriptCommandApi getScriptCommandApi() {
         return scriptCommandApi;
-    }
+    }*/
 
     /**
      * @return a non-null references to the macro api

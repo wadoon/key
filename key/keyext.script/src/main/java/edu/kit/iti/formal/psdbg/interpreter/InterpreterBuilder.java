@@ -2,6 +2,7 @@ package edu.kit.iti.formal.psdbg.interpreter;
 
 import de.uka.ilkd.key.api.KeYApi;
 import de.uka.ilkd.key.api.ProofApi;
+import de.uka.ilkd.key.api.ProofScriptCommandApi;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
@@ -97,10 +98,10 @@ public class InterpreterBuilder {
     }
 
     public InterpreterBuilder scriptCommands() {
-        return scriptCommands(KeYApi.getScriptCommandApi().getScriptCommands());
+        return scriptCommands(new ProofScriptCommandApi().getScriptCommands());
     }
 
-    public InterpreterBuilder scriptCommands(Collection<ProofScriptCommand> commands) {
+    public InterpreterBuilder scriptCommands(Collection<ProofScriptCommand<?>> commands) {
         commands.forEach(m -> pmc.getCommands().put(m.getName(), m));
         return this;
     }

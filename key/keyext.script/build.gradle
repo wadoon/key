@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     implementation project(":key.core")
+    implementation project(":key.core:proofcommands")
 
     compileOnly "org.projectlombok:lombok:1.18.14"
     annotationProcessor "org.projectlombok:lombok:1.18.14"
