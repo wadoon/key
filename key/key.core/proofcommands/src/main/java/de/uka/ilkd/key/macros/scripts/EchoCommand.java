@@ -29,9 +29,9 @@ public class EchoCommand extends AbstractCommand<EchoCommand.Parameters> {
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState state)
             throws ScriptException, InterruptedException {
-        final Observer obs = state.getObserver();
+        final EngineState.BeforeCommandHook obs = state.getObserver();
         if (obs != null) {
-            obs.update(null, args.message);
+            obs.beforeCommand(args.message);
         }
     }
 

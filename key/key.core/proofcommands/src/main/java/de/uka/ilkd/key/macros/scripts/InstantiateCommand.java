@@ -26,6 +26,8 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import static java.lang.String.format;
+
 /**
  * instantiate var=a occ=2 with="a_8" hide
  * <p>
@@ -60,12 +62,9 @@ public class InstantiateCommand
             computeFormula(params, goal);
         }
 
-        assert params.formula != null;
+        if (params.formula == null) throw new IllegalArgumentException();
 
         TacletApp theApp = findTacletApp(params, state);
-        if (theApp == null) {
-            throw new ScriptException("No taclet application found");
-        }
 
         SchemaVariable sv = theApp.uninstantiatedVars().iterator().next();
 
@@ -183,8 +182,7 @@ public class InstantiateCommand
         }
 
         throw new ScriptException(
-                "Variable '" + params.var + "' has no occurrence no. '"
-                        + params.occ + "'.");
+                format("Variable '%s' has no occurrence no. '%d'.", params.var, params.occ));
     }
 
     private Term stripUpdates(Term term) {
@@ -194,62 +192,7 @@ public class InstantiateCommand
         return term;
     }
 
-    /*
-    public Parameters createArguments(EngineState state,
-            Map<String, String> args) throws ScriptException {
-        Parameters params = new Parameters();
 
-        //
-        // var="a"
-        params.var = args.get("var");
-
-        //
-        // formula="toplevel formula in which it appears"
-        // formula="\forall int a; phi(a)"
-        String formStr = args.get("formula");
-        if (formStr != null) {
-            try {
-                params.formula = toTerm(proof, state, formStr, Sort.FORMULA);
-            }
-            catch (Exception e) {
-                throw new ScriptException(e);
-            }
-        }
-
-        //
-        // occurrence number;
-        String occStr = args.get("occ");
-        if (occStr != null) {
-            try {
-                params.occ = Integer.parseInt(occStr);
-            }
-            catch (NumberFormatException e) {
-                throw new ScriptException(e);
-            }
-        }
-
-        //
-        // instantiation
-        String withStr = args.get("with");
-        if (withStr != null) {
-            try {
-                params.with = toTerm(proof, state, withStr, null);
-            }
-            catch (ParserException e) {
-                throw new ScriptException(e);
-            }
-        }
-        else {
-            throw new ScriptException("'with' must be specified");
-        }
-
-        //
-        // hide
-        params.hide = args.containsKey("#2") && args.get("#2").equals("hide");
-
-        return params;
-    }
-*/
     @Override public String getName() {
         return "instantiate";
     }

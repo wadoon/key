@@ -1,14 +1,5 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.io.File;
-import java.io.StringReader;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Observer;
-import java.util.Optional;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -21,20 +12,29 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
+import org.jetbrains.annotations.Nullable;
+import org.key_project.util.collection.ImmutableList;
+
+import java.io.File;
+import java.io.StringReader;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Optional;
 
 /**
  * @author Alexander Weigl
  * @version 1 (28.03.17)
  */
 public class EngineState {
-    private final static DefaultTermParser PARSER = new DefaultTermParser();
-    //private final Map<String, Object> arbitraryVariables = new HashMap<>();
+    private static final DefaultTermParser PARSER = new DefaultTermParser();
     private final Proof proof;
-    private AbbrevMap abbrevMap = new AbbrevMap();
-    /**
-     * nullable
-     */
-    private Observer observer;
+    private final AbbrevMap abbrevMap = new AbbrevMap();
+
+    public interface BeforeCommandHook {
+        void beforeCommand(String cmd);
+    }
+
+    private @Nullable BeforeCommandHook observer;
     private File baseFileName = new File(".");
     private ValueInjector valueInjector = ValueInjector.createDefault();
     private Goal goal;
@@ -45,7 +45,7 @@ public class EngineState {
      * only shows explicit echo messages.
      */
     private boolean echoOn = true;
-    
+
     /**
      * If set to true, an already closed proof leads to an exception if another goal
      * should be picked. Otherwise, script execution terminates without an
@@ -81,18 +81,13 @@ public class EngineState {
      * Returns the first open goal, which has to be automatic iff checkAutomatic
      * is true.
      *
-     * @param checkAutomatic
-     *            Set to true if the returned {@link Goal} should be automatic.
+     * @param checkAutomatic Set to true if the returned {@link Goal} should be automatic.
      * @return the first open goal, which has to be automatic iff checkAutomatic
-     *         is true.
-     *
-     * @throws ProofAlreadyClosedException
-     *             If the proof is already closed when calling this method.
-     * @throws ScriptException
-     *             If there is no such {@link Goal}, or something else goes
-     *             wrong.
+     * is true.
+     * @throws ProofAlreadyClosedException If the proof is already closed when calling this method.
+     * @throws ScriptException             If there is no such {@link Goal}, or something else goes
+     *                                     wrong.
      */
-    @SuppressWarnings("unused")
     public Goal getFirstOpenGoal(boolean checkAutomatic)
             throws ScriptException {
         if (proof.closed()) {
@@ -117,21 +112,16 @@ public class EngineState {
         }
 
         newGoal = findGoalFromRoot(rootNodeForSearch, checkAutomatic);
-        lastSetGoalNode = newGoal.node();
-
         if (newGoal == null) {
-            throw new ScriptException(
-                    "There must be an open goal at this point");
+            throw new ScriptException("There must be an open goal at this point");
         }
-
+        lastSetGoalNode = newGoal.node();
         return newGoal;
     }
 
     /**
      * @return The first open and automatic {@link Goal}.
-     *
-     * @throws ScriptException
-     *             If there is no such {@link Goal}.
+     * @throws ScriptException If there is no such {@link Goal}.
      */
     public Goal getFirstOpenAutomaticGoal() throws ScriptException {
         return getFirstOpenGoal(true);
@@ -152,12 +142,12 @@ public class EngineState {
     }
 
     private Goal findGoalFromRoot(final Node rootNode, boolean checkAutomatic) {
-        final Deque<Node> choices = new LinkedList<Node>();
+        final Deque<Node> choices = new LinkedList<>();
 
         Goal result = null;
         Node node = rootNode;
 
-        loop: while (node != null) {
+        while (node != null) {
             if (node.isClosed()) {
                 return null;
             }
@@ -165,66 +155,60 @@ public class EngineState {
             int childCount = node.childrenCount();
 
             switch (childCount) {
-            case 0:
-                result = getGoal(proof.openGoals(), node);
-                if (!checkAutomatic || result.isAutomatic()) {
-                    // We found our goal
-                    break loop;
-                }
-                node = choices.pollLast();
-                break;
+                case 0:
+                    result = getGoal(proof.openGoals(), node);
+                    if (!checkAutomatic || (result != null && result.isAutomatic())) {
+                        return result; // We found our goal
+                    }
+                    node = choices.pollLast();
+                    break;
 
-            case 1:
-                node = node.child(0);
-                break;
+                case 1:
+                    node = node.child(0);
+                    break;
 
-            default:
-                Node next = null;
-                for (int i = 0; i < childCount; i++) {
-                    Node child = node.child(i);
-                    if (!child.isClosed()) {
-                        if (next == null) {
-                            next = child;
-                        } else {
-                            choices.add(child);
+                default:
+                    Node next = null;
+                    for (int i = 0; i < childCount; i++) {
+                        Node child = node.child(i);
+                        if (!child.isClosed()) {
+                            if (next == null) {
+                                next = child;
+                            } else {
+                                choices.add(child);
+                            }
                         }
                     }
-                }
-                assert next != null;
-                node = next;
-                break;
+                    assert next != null;
+                    node = next;
+                    break;
             }
         }
 
         return result;
     }
 
-    public Term toTerm(String string, Sort sort)
-            throws ParserException, ScriptException {
+    public Term toTerm(String string, Sort sort) throws ParserException, ScriptException {
         StringReader reader = new StringReader(string);
         Services services = proof.getServices();
-        Term formula = PARSER.parse(reader, sort, services,
+        return PARSER.parse(reader, sort, services,
                 getFirstOpenAutomaticGoal().getLocalNamespaces(), abbrevMap);
-        return formula;
     }
 
-    public Sort toSort(String sortName)
-            throws ParserException, ScriptException {
+    public Sort toSort(String sortName) throws ScriptException {
         return (getFirstOpenAutomaticGoal() == null
                 ? getProof().getServices().getNamespaces()
                 : getFirstOpenAutomaticGoal().getLocalNamespaces()).sorts()
-                        .lookup(sortName);
+                .lookup(sortName);
     }
 
-    public Sequent toSequent(String sequent)
-            throws ParserException, ScriptException {
+    public Sequent toSequent(String sequent) throws ParserException, ScriptException {
         StringReader reader = new StringReader(sequent);
         Services services = proof.getServices();
 
-        Sequent seq = PARSER.parseSeq(reader, services,
+        return PARSER.parseSeq(reader, services,
                 getFirstOpenAutomaticGoal().getLocalNamespaces(),
                 getAbbreviations());
-        return seq;
     }
 
     public int getMaxAutomaticSteps() {
@@ -243,11 +227,11 @@ public class EngineState {
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
     }
 
-    public Observer getObserver() {
+    public BeforeCommandHook getObserver() {
         return observer;
     }
 
-    public void setObserver(Observer observer) {
+    public void setObserver(BeforeCommandHook observer) {
         this.observer = observer;
     }
 

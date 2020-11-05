@@ -33,6 +33,7 @@ import javax.swing.text.Document;
 
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.macros.scripts.EngineState;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.Location;
@@ -54,12 +55,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object>
     private JDialog monitor;
     private JTextArea logArea;
 
-    private final Observer observer = new Observer() {
-        @Override
-        public void update(Observable o, Object arg) {
-            publish(arg);
-        }
-    };
+    private final EngineState.BeforeCommandHook observer = this::publish;
 
     public ProofScriptWorker(KeYMediator mediator, File file)
             throws IOException {

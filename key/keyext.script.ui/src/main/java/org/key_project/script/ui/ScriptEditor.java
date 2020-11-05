@@ -180,7 +180,6 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
      * @param keyDataDebuggerFramework
      */
     public void onRunSucceed(DebuggerFramework<KeyData> keyDataDebuggerFramework) {
-
         window.setStatusLine("Interpreting finished");
         editor.setEditable(true);
         enableGui();
