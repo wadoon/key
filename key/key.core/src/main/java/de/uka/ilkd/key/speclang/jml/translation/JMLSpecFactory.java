@@ -120,7 +120,7 @@ public class JMLSpecFactory {
         for (LocationVariable heap : allHeaps) {
             Term invariant;
             ImmutableList<LabeledParserRuleContext> originalInvariant
-                    = originalInvariants.get(heap.name());
+                    = originalInvariants.get(heap.name().toString());
             if (originalInvariant == null || originalInvariant.isEmpty()) {
                 invariant = null;
             } else {
