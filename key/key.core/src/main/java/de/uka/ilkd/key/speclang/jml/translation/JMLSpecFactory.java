@@ -53,7 +53,6 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.*;
@@ -82,14 +81,14 @@ public class JMLSpecFactory {
      * Used to check that there is only one represents clause per type and field.
      */
     private final Set<Pair<KeYJavaType, IObserverFunction>> modelFields;
-    private JmlIO jmlIo = new JmlIO();
+    private final JmlIO jmlIo = new JmlIO();
 
 
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
     public JMLSpecFactory(Services services) {
-        assert services != null;
+        if (services == null) throw new AssertionError();
         this.services = services;
         this.tb = services.getTermBuilder();
         cf = new ContractFactory(services);
@@ -116,7 +115,7 @@ public class JMLSpecFactory {
                                                                          ProgramVariable selfVar, ImmutableList<ProgramVariable> allVars,
                                                                          final ImmutableList<LocationVariable> allHeaps,
                                                                          final Map<LocationVariable, Term> atPres, final Services services, final TermBuilder tb) {
-        Map<LocationVariable, Term> invariants = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> invariants = new LinkedHashMap<>();
         for (LocationVariable heap : allHeaps) {
             Term invariant;
             ImmutableList<LabeledParserRuleContext> originalInvariant
@@ -488,14 +487,17 @@ public class JMLSpecFactory {
                 !translateStrictlyPure(pm, progVars.selfVar, progVars.paramVars, mod));
         if (heap == savedHeap && mod.isEmpty()) {
             clauses.assignables.put(heap, null);
-        } else if (!clauses.hasMod.get(heap)) {
-            final ImmutableList<LabeledParserRuleContext> assignableNothing = ImmutableSLList
-                    .<LabeledParserRuleContext>nil().append(getAssignableNothing());
-            clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
-                    progVars.paramVars, progVars.atPres, progVars.atBefores, assignableNothing));
         } else {
-            clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
-                    progVars.paramVars, progVars.atPres, progVars.atBefores, mod));
+            final Boolean hasMod = clauses.hasMod.get(heap);
+            if (hasMod==null || !hasMod) {
+                final ImmutableList<LabeledParserRuleContext> assignableNothing = ImmutableSLList
+                        .<LabeledParserRuleContext>nil().append(getAssignableNothing());
+                clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
+                        progVars.paramVars, progVars.atPres, progVars.atBefores, assignableNothing));
+            } else {
+                clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
+                        progVars.paramVars, progVars.atPres, progVars.atBefores, mod));
+            }
         }
     }
 
@@ -509,13 +511,11 @@ public class JMLSpecFactory {
     /**
      * register abbreviations in contracts (aka. old clauses). creates update terms.
      *
-     * @throws SLTranslationException
      */
     private ImmutableList<Term> registerAbbreviationVariables(TextualJMLSpecCase textualSpecCase,
                                                               KeYJavaType inClass,
                                                               ProgramVariableCollection progVars,
-                                                              ContractClauses clauses)
-            throws SLTranslationException {
+                                                              ContractClauses clauses) {
         for (Triple<LabeledParserRuleContext, LabeledParserRuleContext, LabeledParserRuleContext> abbrv : textualSpecCase.getAbbreviations()) {
             final KeYJavaType abbrKJT = services.getJavaInfo().getKeYJavaType(abbrv.first.first.getText());
             final ProgramElementName abbrVarName = new ProgramElementName(abbrv.second.first.getText());
@@ -543,7 +543,7 @@ public class JMLSpecFactory {
                                                                    ProgramVariable selfVar,
                                                                    ImmutableList<ProgramVariable> paramVars,
                                                                    ProgramVariable resultVar, ProgramVariable excVar,
-                                                                   ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
+                                                                   ImmutableList<LabeledParserRuleContext> originalClauses) {
         if (originalClauses.isEmpty()) {
             return ImmutableSLList.nil();
         } else {
@@ -599,7 +599,7 @@ public class JMLSpecFactory {
 
     private Term translateOrClauses(IProgramMethod pm, ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars,
-                                    ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
+                                    ImmutableList<LabeledParserRuleContext> originalClauses) {
         Term result = tb.ff();
         for (LabeledParserRuleContext expr : originalClauses) {
             Term translated = jmlIo
@@ -650,10 +650,10 @@ public class JMLSpecFactory {
                                              ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
                                              ProgramVariable excVar, Map<LocationVariable, Term> atPres,
                                              Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
-                                             ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
+                                             ImmutableList<LabeledParserRuleContext> originalClauses) {
         LabeledParserRuleContext[] array = new LabeledParserRuleContext[originalClauses.size()];
         originalClauses.toArray(array);
-        Map<Label, Term> result = new LinkedHashMap<Label, Term>();
+        Map<Label, Term> result = new LinkedHashMap<>();
         for (int i = array.length - 1; i >= 0; i--) {
             Pair<Label, Term> translation = jmlIo
                     .clear()
@@ -674,7 +674,7 @@ public class JMLSpecFactory {
                                                 ImmutableList<ProgramVariable> paramVars, ProgramVariable resultVar,
                                                 ProgramVariable excVar, Map<LocationVariable, Term> atPres,
                                                 Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
-                                                ImmutableList<LabeledParserRuleContext> originalClauses) throws SLTranslationException {
+                                                ImmutableList<LabeledParserRuleContext> originalClauses) {
         LabeledParserRuleContext[] array = new LabeledParserRuleContext[originalClauses.size()];
         originalClauses.toArray(array);
         Map<Label, Term> result = new LinkedHashMap<Label, Term>();
