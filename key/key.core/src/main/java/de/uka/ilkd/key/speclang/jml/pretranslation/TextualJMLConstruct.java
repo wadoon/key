@@ -16,9 +16,9 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.ImmutableList;
@@ -128,7 +128,6 @@ public abstract class TextualJMLConstruct {
         List<String> hs = new ArrayList<String>();
         while (t.startsWith("<") && !t.startsWith("<inv>")) {
             for (Name heapName : HeapLDT.VALID_HEAP_NAMES) {
-                // final String hName = heapName.toString();
                 for (String hName : new String[]{heapName.toString(),
                         heapName.toString() + "AtPre"}) {
                     String h = "<" + hName + ">";

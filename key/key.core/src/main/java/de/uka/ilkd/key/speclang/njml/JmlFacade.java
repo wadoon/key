@@ -21,8 +21,8 @@ public class JmlFacade {
     public static JmlLexer createLexer(PositionedString ps) {
         CharStream result = CharStreams.fromString(ps.text, ps.fileName);
         JmlLexer lexer = createLexer(result);
-        lexer._tokenStartCharPositionInLine = ps.pos.getColumn();
-        lexer._tokenStartLine = 1 + ps.pos.getLine();
+        lexer.getInterpreter().setCharPositionInLine(ps.pos.getColumn());
+        lexer.getInterpreter().setLine(ps.pos.getLine());
         return lexer;
     }
 

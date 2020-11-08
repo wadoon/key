@@ -110,13 +110,12 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitEnsures_clause(JmlParser.Ensures_clauseContext ctx) {
         assert methodContract != null;
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
+        final boolean isFree = ctx.ENSURES().getText().endsWith("_free");
+        final LabeledParserRuleContext ctx2 = new LabeledParserRuleContext(ctx, isFree
+                ? OriginTermLabel.SpecType.ENSURES_FREE : OriginTermLabel.SpecType.ENSURES);
         for (Name heap : heaps) {
             methodContract.addClause(
-                    ctx.ENSURES().getText().endsWith("_free")
-                            ? ENSURES_FREE
-                            : ENSURES,
-                    heap,
-                    ctx);
+                    isFree ? ENSURES_FREE : ENSURES, heap, ctx2);
         }
         return null;
     }

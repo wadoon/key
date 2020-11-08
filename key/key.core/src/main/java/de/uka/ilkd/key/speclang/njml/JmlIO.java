@@ -250,8 +250,8 @@ public class JmlIO {
         Term term = translateTerm(expr.first);
         OriginTermLabel origin = new OriginTermLabel(new OriginTermLabel.Origin(type));
         if (expr.second != null)
-            return services.getTermBuilder().addLabel(term,
-                    new ImmutableArray<>(origin, expr.second));
+            return services.getTermBuilder().addLabel(term, expr.second);
+                    //new ImmutableArray<>(origin, expr.second));
         else
             return services.getTermBuilder().addLabel(term, origin);
     }
