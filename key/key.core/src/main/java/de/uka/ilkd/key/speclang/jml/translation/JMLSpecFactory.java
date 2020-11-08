@@ -147,11 +147,11 @@ public class JMLSpecFactory {
                                                                              ProgramVariable selfVar, ImmutableList<ProgramVariable> allVars,
                                                                              final ImmutableList<LocationVariable> allHeaps,
                                                                              final Map<LocationVariable, Term> atPres, final Services services, final TermBuilder tb) {
-        Map<LocationVariable, Term> freeInvariants = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> freeInvariants = new LinkedHashMap<>();
         for (LocationVariable heap : allHeaps) {
             Term freeInvariant;
             ImmutableList<LabeledParserRuleContext> originalFreeInvariant
-                    = originalFreeInvariants.get(heap.name());
+                    = originalFreeInvariants.get(heap.name().toString());
             if (originalFreeInvariant == null || originalFreeInvariant.isEmpty()) {
                 freeInvariant = null;
             } else {
