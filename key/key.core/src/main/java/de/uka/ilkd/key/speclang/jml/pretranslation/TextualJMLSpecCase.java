@@ -156,15 +156,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public TextualJMLSpecCase addClause(Clause clause, ParserRuleContext ctx) {
-        return addClause(clause, new LabeledParserRuleContext(ctx, null));
+        return addClause(clause, new LabeledParserRuleContext(ctx));
     }
 
     public TextualJMLSpecCase addClause(ClauseHd clause, ParserRuleContext ctx) {
-        return addClause(clause, null, new LabeledParserRuleContext(ctx, null));
+        return addClause(clause, null, new LabeledParserRuleContext(ctx));
     }
 
     public TextualJMLSpecCase addClause(ClauseHd clause, @Nullable Name heapName, ParserRuleContext ctx) {
-        return addClause(clause, heapName, new LabeledParserRuleContext(ctx, null));
+        return addClause(clause, heapName, new LabeledParserRuleContext(ctx));
     }
 
     /**

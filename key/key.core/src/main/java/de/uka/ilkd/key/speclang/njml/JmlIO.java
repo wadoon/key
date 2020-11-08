@@ -104,7 +104,9 @@ public class JmlIO {
      * @return
      */
     public Pair<IObserverFunction, Term> translateRepresents(LabeledParserRuleContext clause) {
-        return translateRepresents(clause.first); //TODO weigl handle label?
+        //TODO no represents label
+        Pair<IObserverFunction, Term> p = translateRepresents(clause.first);
+        return new Pair<>(p.first, p.second);
     }
 
     /**

@@ -180,7 +180,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     : format("%s != null", varName);
             ParserRuleContext ps = JmlFacade.parseExpr(nonNullString);
             result = result.add(
-                    new LabeledParserRuleContext(ps, ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                    new LabeledParserRuleContext(ps/*, ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)*/));
         }
         return result;
     }
@@ -490,7 +490,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                         "\\result", resultType, false, fileName,
                         pm.getStartPosition(), services);
                 for (LabeledParserRuleContext nonNull : resultNonNull) {
-                    specCase.addClause(ENSURES, nonNull.first);
+                    specCase.addClause(ENSURES, nonNull);
                 }
             }
 

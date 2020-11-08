@@ -774,7 +774,6 @@ public class JMLSpecFactory {
                                           ImmutableList<LabeledParserRuleContext> assignableClauses) throws SLTranslationException {
 
         for (LabeledParserRuleContext expr : assignableClauses) {
-            assert expr.first != null;
             Term translated = jmlIo
                     .clear()
                     .classType(pm.getContainerType())
@@ -1736,11 +1735,12 @@ public class JMLSpecFactory {
         // TODO: add static invariant
         for (ParameterDeclaration p : pm.getMethodDeclaration().getParameters()) {
             if (!JMLInfoExtractor.parameterIsNullable(pm, p)) {
-                final ImmutableSet<LabeledParserRuleContext> nonNullPositionedString = JMLSpecExtractor.createNonNullPositionedString(
-                        p.getVariableSpecification().getName(),
-                        p.getVariableSpecification().getProgramVariable().getKeYJavaType(), false,
-                        originalSpec.first.start.getTokenSource().getSourceName(),
-                        new Position(originalSpec.first.start.getLine(), originalSpec.first.start.getCharPositionInLine()), services);
+                final ImmutableSet<LabeledParserRuleContext> nonNullPositionedString =
+                        JMLSpecExtractor.createNonNullPositionedString(
+                                p.getVariableSpecification().getName(),
+                                p.getVariableSpecification().getProgramVariable().getKeYJavaType(), false,
+                                originalSpec.first.start.getTokenSource().getSourceName(),
+                                new Position(originalSpec.first.start.getLine(), originalSpec.first.start.getCharPositionInLine()), services);
                 res = res.append(nonNullPositionedString);
             }
         }
