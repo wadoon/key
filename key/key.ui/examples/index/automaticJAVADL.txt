@@ -49,15 +49,15 @@ tempDir = ../../key.core.test/runallproofs_tmp
 /*
  * If the fork mode is not set to noFork, the launched subprocesses are terminated as
  * soon as the timeout specified here has elapsed. No timeout occurs if not specified.
- *
+ * 
  * Timeout per subprocess in seconds
  */
 forkTimeout = 2000
 
 /*
- * If the fork mode is not set to noFork, the launched subprocesses
+ * If the fork mode is not set to noFork, the launched subprocesses 
  * get the specified amount of heap memory.
- *
+ * 
  * Heap memory for subprocesses (like 500m or 2G)
  */
 # forkMemory = 1000m
