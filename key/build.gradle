@@ -199,7 +199,7 @@ subprojects {
 
     publishing {
         publications {
-            mavenJava(MavenPublication) {
+            gpr(MavenPublication) {
                 from components.java
                 artifact sourcesJar
                 artifact javadocJar
@@ -231,8 +231,12 @@ subprojects {
         }
         repositories {
             maven {
-                name = "bintray-snapshots"
-                url = "https://dl.bintray.com/key/stable-snapshots"
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/KeYProject/key")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+                }
             }
         }
     }
