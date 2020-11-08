@@ -160,6 +160,7 @@ merge_point_statement:
 loop_specification
   : loop_invariant
     ( loop_invariant
+    | determines_clause
     | loop_separates_clause
     | loop_determines_clause
     | assignable_clause

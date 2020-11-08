@@ -78,14 +78,10 @@ verboseOutput = true
 # # Tests for information flow
 
 group ToyVoting {
-  provable "./InformationFlow/ToyVoting/Voter(Voter__insecure_voting()).JML normal_behavior operation contract.0.key"
-  provable "./InformationFlow/ToyVoting/Voter(Voter__publishVoterParticipation()).JML normal_behavior operation contract.0.key"
-  provable "./InformationFlow/ToyVoting/Voter(Voter__isValid(int)).JML normal_behavior operation contract.0.key"
-  provable "./InformationFlow/ToyVoting/Voter(Voter__sendVote(int)).JML normal_behavior operation contract.0.key"
-  provable "./InformationFlow/ToyVoting/Voter(Voter__inputVote()).JML normal_behavior operation contract.0.key"
   provable "./InformationFlow/ToyVoting/Voter(Voter__secure_voting()).JML normal_behavior operation contract.0.key"
 }
 
+/*
 group ConditionalConfidential {
   provable "./InformationFlow/ConditionalConfidential/CCExample(CCExample__hasAccessRight(CCExample.User)).JML normal_behavior operation contract.0.key"
   provable "./InformationFlow/ConditionalConfidential/CCExample(CCExample__getConfidentialData(CCExample.User)).JML normal_behavior operation contract.0.key"
@@ -603,3 +599,4 @@ group SimpleEvoting_fullmacro {
 }
 
 # End -- please do not remove this line.
+*/

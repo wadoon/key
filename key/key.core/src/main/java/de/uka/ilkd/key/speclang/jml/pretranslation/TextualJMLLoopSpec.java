@@ -34,14 +34,11 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     private LabeledParserRuleContext variant = null;
     private ArrayList<Entry> clauses = new ArrayList<>(16);
 
-    public enum Clause {
-        INFORMATION_FLOW
-    }
-
     /**
      * Heap-dependent clauses
      */
     public enum ClauseHd {
+        INFORMATION_FLOW,
         ASSIGNABLE,
         INVARIANT,
         INVARIANT_FREE
@@ -51,10 +48,10 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         super(mods);
     }
 
-    public TextualJMLLoopSpec addClause(Clause clause, LabeledParserRuleContext ctx) {
+    /*public TextualJMLLoopSpec addClause(Clause clause, LabeledParserRuleContext ctx) {
         clauses.add(new Entry(clause, ctx));
         return this;
-    }
+    }*/
 
     public TextualJMLLoopSpec addClause(ClauseHd clause, LabeledParserRuleContext ctx) {
         return addClause(clause, null, ctx);
@@ -97,7 +94,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
 
     public ImmutableList<LabeledParserRuleContext> getInfFlowSpecs() {
-        return getList(Clause.INFORMATION_FLOW);
+        return getList(ClauseHd.INFORMATION_FLOW);
     }
 
     public Map<String, ImmutableList<LabeledParserRuleContext>> getInvariants() {
