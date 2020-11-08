@@ -379,12 +379,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitStoreRefUnion(JmlParser.StoreRefUnionContext ctx) {
-        return tb.union((Iterable<Term>) requireNonNull(accept(ctx.storeRefList())));
+        final ImmutableList<Term> seq = requireNonNull(accept(ctx.storeRefList()));
+        if(seq.size()==1) return seq.head();
+        else return tb.union(seq);
     }
 
 
     @Override
-    public Object visitStoreRefList(JmlParser.StoreRefListContext ctx) {
+    public ImmutableList<Term> visitStoreRefList(JmlParser.StoreRefListContext ctx) {
         ImmutableList<Term> result = ImmutableSLList.nil();
         for (JmlParser.StorerefContext context : ctx.storeref()) {
             result = result.append((Term) accept(context));

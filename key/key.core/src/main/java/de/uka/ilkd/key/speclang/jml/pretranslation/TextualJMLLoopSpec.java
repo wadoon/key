@@ -21,6 +21,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ASSIGNABLE;
 
@@ -31,6 +32,7 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
  */
 public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     private LabeledParserRuleContext variant = null;
+    private ArrayList<Entry> clauses = new ArrayList<>(16);
 
     public enum Clause {
         INFORMATION_FLOW
@@ -45,15 +47,12 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         INVARIANT_FREE
     }
 
-    private Map<Object, List<LabeledParserRuleContext>> clauses = new HashMap<>();
-    private Map<LabeledParserRuleContext, Name> heaps = new HashMap<>();
-
     public TextualJMLLoopSpec(ImmutableList<String> mods) {
         super(mods);
     }
 
     public TextualJMLLoopSpec addClause(Clause clause, LabeledParserRuleContext ctx) {
-        clauses.computeIfAbsent(clause, it -> new ArrayList<>()).add(ctx);
+        clauses.add(new Entry(clause, ctx));
         return this;
     }
 
@@ -64,9 +63,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     public TextualJMLLoopSpec addClause(ClauseHd clause, @Nullable Name heapName, LabeledParserRuleContext ctx) {
         if (heapName == null)
             heapName = HeapLDT.BASE_HEAP_NAME;
-
-        clauses.computeIfAbsent(clause, it -> new ArrayList<>()).add(ctx);
-        heaps.put(ctx, heapName);
+        clauses.add(new Entry(clause, ctx, heapName));
         return this;
     }
 
@@ -77,7 +74,9 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
 
     private ImmutableList<LabeledParserRuleContext> getList(Object key) {
-        return ImmutableList.fromList(clauses.getOrDefault(key, new ArrayList<>()));
+        final List<LabeledParserRuleContext> seq =
+                clauses.stream().filter(it -> it.clauseType.equals(key)).map(it -> it.ctx).collect(Collectors.toList());
+        return ImmutableList.fromList(seq);
     }
 
     public ImmutableList<LabeledParserRuleContext> getAssignable() {
@@ -106,13 +105,14 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
 
     private Map<String, ImmutableList<LabeledParserRuleContext>> getMapInit(ClauseHd clause) {
-        ImmutableList<LabeledParserRuleContext> seq = getList(clause);
         Name defaultHeap = HeapLDT.BASE_HEAP_NAME;
         Map<String, ImmutableList<LabeledParserRuleContext>> map = new HashMap<>();
-        for (LabeledParserRuleContext context : seq) {
-            String h = heaps.getOrDefault(context, defaultHeap).toString();
-            ImmutableList<LabeledParserRuleContext> l = map.getOrDefault(h, ImmutableSLList.nil());
-            map.put(h, l.append(context));
+        for (Entry entry : clauses) {
+            if (clause.equals(entry.clauseType)) {
+                String h = (entry.heap != null ? entry.heap : defaultHeap).toString();
+                ImmutableList<LabeledParserRuleContext> l = map.getOrDefault(h, ImmutableSLList.nil());
+                map.put(h, l.append(entry.ctx));
+            }
         }
 
         for (Name h : HeapLDT.VALID_HEAP_NAMES) {
@@ -124,13 +124,20 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
 
     private Map<String, ImmutableList<LabeledParserRuleContext>> getMap(ClauseHd clause) {
-        ImmutableList<LabeledParserRuleContext> seq = getList(clause);
         Name defaultHeap = HeapLDT.BASE_HEAP_NAME;
         Map<String, ImmutableList<LabeledParserRuleContext>> map = new HashMap<>();
-        for (LabeledParserRuleContext context : seq) {
-            String h = heaps.getOrDefault(context, defaultHeap).toString();
-            ImmutableList<LabeledParserRuleContext> l = map.getOrDefault(h, ImmutableSLList.nil());
-            map.put(h, l.append(context));
+        for (Entry entry : clauses) {
+            if (clause.equals(entry.clauseType)) {
+                String h = (entry.heap != null ? entry.heap : defaultHeap).toString();
+                ImmutableList<LabeledParserRuleContext> l = map.getOrDefault(h, ImmutableSLList.nil());
+                map.put(h, l.append(entry.ctx));
+            }
+        }
+
+        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
+            if (!map.containsKey(h.toString())) {
+                map.put(h.toString(), ImmutableSLList.nil());
+            }
         }
         return map;
     }
@@ -186,7 +193,6 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return "TextualJMLLoopSpec{" +
                 "variant=" + variant +
                 ", clauses=" + clauses +
-                ", heaps=" + heaps +
                 '}';
     }
 
@@ -196,12 +202,27 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         if (o == null || getClass() != o.getClass()) return false;
         TextualJMLLoopSpec that = (TextualJMLLoopSpec) o;
         return variant.equals(that.variant) &&
-                clauses.equals(that.clauses) &&
-                heaps.equals(that.heaps);
+                clauses.equals(that.clauses);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(variant, clauses, heaps);
+        return Objects.hash(variant, clauses);
+    }
+
+    static class Entry {
+        final Object clauseType;
+        final LabeledParserRuleContext ctx;
+        final Name heap;
+
+        Entry(Object clauseType, LabeledParserRuleContext ctx, Name heap) {
+            this.clauseType = clauseType;
+            this.ctx = ctx;
+            this.heap = heap;
+        }
+
+        Entry(Object clauseType, LabeledParserRuleContext ctx) {
+            this(clauseType, ctx, null);
+        }
     }
 }

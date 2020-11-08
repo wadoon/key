@@ -112,7 +112,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private final Behavior behavior;
     private ArrayList<Entry> clauses = new ArrayList<>(16);
 
-    private static class Entry {
+    static class Entry {
         final Object clauseType;
         final LabeledParserRuleContext ctx;
         final Name heap;
