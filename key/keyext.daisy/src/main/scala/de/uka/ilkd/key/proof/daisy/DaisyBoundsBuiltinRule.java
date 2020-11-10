@@ -19,6 +19,14 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
     public static final DaisyBoundsBuiltinRule INSTANCE = new DaisyBoundsBuiltinRule();
     public static final Name NAME = new Name("Daisy Bounds Rule");
 
+    /**
+     * Finds bounds on floating point variables on the sequent,
+     * i.e., terms of the form "x cmp c" where x is a float variable,
+     * cmp a comparator and c a floating point literal.
+     * @param sequent the current sequent
+     * @param services
+     * @return a list of terms representing bounds on fp variables
+     */
     private List<Term> gatherPreconditions(Sequent sequent, Services services) {
         List<Term> res = new ArrayList<>();
         FloatLDT floatLDT = new FloatLDT(services);
@@ -27,6 +35,16 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
             Operator op = sf.formula().op();
             if (isFloatCmp(op, floatLDT) && isFloatLitCmp(sf.formula(), floatLDT)) {
                 res.add(sf.formula());
+            }
+        }
+        TermFactory tf = new TermFactory();
+        TermBuilder tb = new TermBuilder(tf, services);
+        ImmutableList<SequentFormula> succFormulas = sequent.succedent().asList();
+        for (SequentFormula sf : succFormulas) {
+            Operator op = sf.formula().op();
+            if (isFloatCmp(op, floatLDT) && isFloatLitCmp(sf.formula(), floatLDT)) {
+                Term negated = tb.not(sf.formula());
+                res.add(negated);
             }
         }
         return res;
