@@ -97,10 +97,10 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
         FloatLDT floatLDT = new FloatLDT(services);
         if (pio == null) return false;
         Operator op = pio.subTerm().op();
-        boolean res = (op == floatLDT.getJavaAdd()
-                || op == floatLDT.getJavaSub()
-                || op == floatLDT.getJavaMul()
-                || op == floatLDT.getJavaDiv());
+        boolean res = (op == floatLDT.getAddIEEE()
+                || op == floatLDT.getSubIEEE()
+                || op == floatLDT.getMulIEEE()
+                || op == floatLDT.getDivIEEE());
         return res;
     }
 
