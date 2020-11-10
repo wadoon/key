@@ -1,15 +1,10 @@
 package de.uka.ilkd.key.strategy.normalization;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.feature.BinaryFeature;
+import de.uka.ilkd.key.strategy.normalization.simple.SimpleFormulaNormalization;
 import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
 public class NormalizedAllFeature extends BinaryTermFeature {
 

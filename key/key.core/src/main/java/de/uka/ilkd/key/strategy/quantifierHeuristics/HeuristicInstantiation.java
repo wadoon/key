@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -25,7 +24,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.normalization.SimpleFormulaNormalization;
+import de.uka.ilkd.key.strategy.normalization.simple.SimpleFormulaNormalization;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 
@@ -56,8 +55,7 @@ public class HeuristicInstantiation implements TermGenerator {
         final Term qf = pos.sequentFormula ().formula ();
         if(app instanceof TacletApp) {
             SimpleFormulaNormalization sfn =
-                    new SimpleFormulaNormalization(goal.node(), goal.proof().getServices().getTermBuilder(),
-                    goal.proof().getServices().getTermFactory(), false, false);
+                    new SimpleFormulaNormalization(goal, false, false);
             Term nf;
             try {
                 nf = sfn.getNormalized(qf);

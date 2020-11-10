@@ -35,7 +35,7 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
 import de.uka.ilkd.key.strategy.normalization.NormalizedAllFeature;
-import de.uka.ilkd.key.strategy.normalization.SimpleFormulaNormalization;
+import de.uka.ilkd.key.strategy.normalization.simple.SimpleFormulaNormalization;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;

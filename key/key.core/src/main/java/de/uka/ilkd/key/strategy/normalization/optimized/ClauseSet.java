@@ -1,48 +1,60 @@
-package de.uka.ilkd.key.strategy.normalization;
+package de.uka.ilkd.key.strategy.normalization.optimized;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+/**
+ * A Simple Clause Set is a set of objects of type {@link Clause} that is an implicit conjunction of all
+ * contained clauses.
+ */
 public class ClauseSet {
 
-    private final ImmutableSet<Clause> clauses;
+    private final HashSet<Clause> clauses;
 
-    public ClauseSet(ImmutableSet<Clause> clauses) {
+    private final int hashCode;
+
+    ClauseSet(Clause clause) {
+        this.clauses = new HashSet<Clause>();
+        this.clauses.add(clause);
+        this.hashCode =  clauses.hashCode();
+    }
+
+    private ClauseSet(HashSet<Clause> clauses) {
         this.clauses = clauses;
+        this.hashCode = clauses.hashCode();
+    }
+
+    public HashSet<Clause> getClauses() {
+        // this class is immutable so return only a copy of the clauseset
+        return new HashSet<Clause>(clauses);
     }
 
     public ClauseSet and(ClauseSet clauseSet) {
-        return new ClauseSet(clauseSet.clauses.union(clauses));
+        HashSet<Clause> result = getClauses();
+        result.addAll(clauseSet.getClauses());
+        return new ClauseSet(result);
     }
 
     public ClauseSet or(ClauseSet cs) {
-        // TODO evaluate clauses, (A) & (!A) --> FALSE (could be removed then)
-
-        LinkedHashSet<Clause> clauseSet = new LinkedHashSet<>();
+        HashSet<Clause> clauseSet = new HashSet<>();
         for (Clause cl_a : clauses) {
             for (Clause cl_b : cs.clauses) {
                 clauseSet.add(cl_a.or(cl_b));
             }
         }
-        return new ClauseSet(DefaultImmutableSet.fromSet(clauseSet));
+        return new ClauseSet(clauseSet);
     }
 
     public ClauseSet or(Clause clause) {
-        LinkedHashSet<Clause> tempSet = new LinkedHashSet<>();
+        HashSet<Clause> result = new HashSet<Clause>();
         for(Clause cl : clauses) {
-            tempSet.add(cl.or(clause));
+            result.add(cl.or(clause));
         }
-        return new ClauseSet(DefaultImmutableSet.fromSet(tempSet));
-    }
-
-    public ImmutableSet<Clause> getClauses() {
-        return clauses;
+        return new ClauseSet(result);
     }
 
     public Term toTerm(TermBuilder termBuilder){
@@ -53,7 +65,12 @@ public class ClauseSet {
         return "ClauseSet: "  + print(clauses);
     }
 
-    private String print(ImmutableSet<Clause> clauses) {
+    @Override
+    public int hashCode() {
+        return hashCode;
+    }
+
+    private String print(HashSet<Clause> clauses) {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         for(Clause clause: clauses) {

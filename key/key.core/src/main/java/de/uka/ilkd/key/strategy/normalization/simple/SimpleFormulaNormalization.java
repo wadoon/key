@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.strategy.normalization;
+package de.uka.ilkd.key.strategy.normalization.simple;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -6,9 +6,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Statistics;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -52,20 +51,23 @@ public class SimpleFormulaNormalization {
      * @param skolemizeEX skolemize existential quantifiers
      * @param renameFirst rename first quantified variable
      */
-    public SimpleFormulaNormalization(Node node, TermBuilder termBuilder, TermFactory termFactory,
-                                      boolean skolemizeEX,
+    public SimpleFormulaNormalization(Goal goal,
+                                      boolean skolemizeEx,
                                       boolean renameFirst) {
-        this.node = node;
-        this.termBuilder = termBuilder;
-        this.termFactory = termFactory;
-        this.skolemizeEx = skolemizeEX;
+        this.node = goal.node();
+        this.termBuilder = goal.proof().getServices().getTermBuilder();
+        this.termFactory = goal.proof().getServices().getTermFactory();
+        this.skolemizeEx = skolemizeEx;
         this.renameFirst = renameFirst;
     }
 
-    public SimpleFormulaNormalization(TermBuilder termBuilder, TermFactory termFactory,
-                                      boolean skolemizeEX,
+    public SimpleFormulaNormalization(TermBuilder termBuilder, TermFactory termFactory, boolean skolemizeEx,
                                       boolean renameFirst) {
-        this(null, termBuilder, termFactory, skolemizeEX, renameFirst);
+        this.node = null;
+        this.termBuilder = termBuilder;
+        this.termFactory = termFactory;
+        this.skolemizeEx = skolemizeEx;
+        this.renameFirst = renameFirst;
     }
 
     private static Term lastFormula;
@@ -132,7 +134,7 @@ public class SimpleFormulaNormalization {
     }
 
     private QuantifiedClauseSet normalize(Term term, boolean polarity,
-                                         HashMap<Term, Term> replaceMap, LinkedHashSet<Term> boundVars, boolean first) {
+                                          HashMap<Term, Term> replaceMap, LinkedHashSet<Term> boundVars, boolean first) {
         int subs = term.subs().size();
         Operator op = term.op();
 
@@ -207,10 +209,10 @@ public class SimpleFormulaNormalization {
                                     .or(normalize(b, true, replaceMap, boundVars, first)));
                 }
                 else {
-                    // !(a <-> b) --> (a & !b) | (!a & b)
+                    // !(a <-> b) --> (a | b) & (!a | !b)
                     return normalize(a, true, replaceMap, boundVars, first)
-                            .and(normalize(b, false, replaceMap, boundVars, first))
-                            .or(normalize(a, false, replaceMap, boundVars, first).and(
+                            .or(normalize(b, true, replaceMap, boundVars, first))
+                            .and(normalize(a, false, replaceMap, boundVars, first).and(
                                     normalize(b, true, replaceMap, boundVars, first)));
                 }
             }
