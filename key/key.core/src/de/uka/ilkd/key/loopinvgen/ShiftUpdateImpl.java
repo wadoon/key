@@ -1,15 +1,11 @@
 package de.uka.ilkd.key.loopinvgen;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.EventUpdate;
-import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 
 public class ShiftUpdateImpl {
@@ -27,21 +23,63 @@ public class ShiftUpdateImpl {
 		tb = services.getTermBuilder();
 	}
 
-	public Sequent shiftUpdate() {
-		if(inSeq.succedent().get(0).formula().op() instanceof EventUpdate) {
-			outSeq = shiftEventUpdate(inSeq);
-		}
-		else if(inSeq.succedent().get(0).formula().op() instanceof UpdateSV) {
-			outSeq = shiftNormalUpdate(inSeq);
-		}
-		return outSeq;
+	public void shiftUpdate(Goal g, PosInOccurrence pos) {
+	    
+	    Term loopFormula = pos.sequentFormula().formula();
+
+	    g.removeFormula(pos);
+	    g.addFormula(new SequentFormula(UpdateApplication.getTarget(loopFormula)), pos.isInAntec(), true);
+
+	    
+	    ImmutableList<Term> updateList = ImmutableSLList.nil();
+	    updateList = updateList.prepend(UpdateApplication.getUpdate(loopFormula));
+	    
+	    
+	    while (!updateList.isEmpty()) {
+	        final Term update = updateList.head();
+	        updateList = updateList.tail();
+	        
+	        if (update.op() instanceof ElementaryUpdate) {
+	            shiftElementaryUpdate(update, g, pos);
+	        } else if (update.op() instanceof EventUpdate) {
+	            shiftEventUpdate(update,g,pos);
+	        } else if (update.op() == UpdateJunctor.SKIP) {
+	            // intentionally empty
+	        } else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
+	            updateList = updateList.prepend(update.sub(1)).prepend(update.sub(0));
+	        }	        
+	    }	  
 	}
+	
+	
+	private void shiftElementaryUpdate(Term update, Goal g, PosInOccurrence pos) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    private void shiftEventUpdate(Term update, Goal g, PosInOccurrence pos) {
+        Term term4EventUpdate;
+        
+        if (update.sub(0).toString().equals("read")) 
+            term4EventUpdate = tb.rPred(update.sub(1), tb.add(update.sub(2), tb.zTerm(1)));
+        else if(update.sub(0).toString().equals("write"))
+            term4EventUpdate = tb.wPred(update.sub(1), tb.add(update.sub(2), tb.zTerm(1)));
+        else 
+            throw new RuntimeException("Unknown event update");
+        
+        g.addFormula(new SequentFormula(term4EventUpdate), true, true);
+	}
+	
 	
 	private Sequent shiftEventUpdate(Sequent inSq) {
 		Term accPred = null;
+		
 		Term eUpd= ((Term)inSq.succedent().getFirst().formula().op());
-
+				
+		
 		inSq.succedent().remove(0);
+		
+		
 		
 		if(eUpd.sub(0).toString().equals("read")) 
 			accPred = tb.rPred(eUpd.sub(1), tb.add(eUpd.sub(2), tb.zTerm(1)));
