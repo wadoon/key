@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.loopinvgen;
+/* package de.uka.ilkd.key.loopinvgen;
 
 import java.util.Set;
 
@@ -92,3 +92,4 @@ public class PredicateRefinement {
 }
 
     
+*/

@@ -1,5 +1,6 @@
-package de.uka.ilkd.key.loopinvgen;
-
+/*
+ package de.uka.ilkd.key.loopinvgen;
+ 
 import java.lang.reflect.Array;
 import java.text.DateFormat.Field;
 import java.util.ArrayList;
@@ -227,4 +228,4 @@ public class ReadProof {
 //		return null;
 //	}
 
-}
+}*/

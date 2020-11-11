@@ -7,49 +7,51 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleAbortException;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.logic.op.*;
 
 public class ShiftUpdateRule implements BuiltInRule {
 
+    public final static BuiltInRule SHIFT_RULE = new ShiftUpdateRule(); 
+    private final static Name SHIFT_UPDATE_NAME = new Name("Shift Update"); 
+    
+    
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
             RuleApp ruleApp) throws RuleAbortException {
-        // TODO Auto-generated method stub
-        return null;
+        final ImmutableList<Goal> newGoals = goal.split(1);
+        final Goal newGoal = newGoals.head();
+        
+        ShiftUpdateImpl worker = new ShiftUpdateImpl(newGoal);
+        worker.shiftUpdate(newGoal, ruleApp.posInOccurrence());
+        
+        return newGoals;
     }
 
     @Override
     public Name name() {
-        // TODO Auto-generated method stub
-        return null;
+        return SHIFT_UPDATE_NAME;
     }
 
     @Override
     public String displayName() {
-        // TODO Auto-generated method stub
-        return null;
+        return SHIFT_UPDATE_NAME.toString();
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {        
+        return pio != null && pio.sequentFormula().formula().op() == UpdateApplication.UPDATE_APPLICATION;
     }
 
     @Override
     public boolean isApplicableOnSubTerms() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos,
             TermServices services) {
-        // TODO Auto-generated method stub
-        return null;
+        return new DefaultBuiltInRuleApp(this, pos);
     }
 
 }
