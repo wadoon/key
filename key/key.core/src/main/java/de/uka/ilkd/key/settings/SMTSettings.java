@@ -13,223 +13,212 @@
 
 package de.uka.ilkd.key.settings;
 
-
-
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
+public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings {
+    private final ProofDependentSMTSettings pdSettings;
+    private final ProofIndependentSMTSettings piSettings;
+    private final Proof proof;
+    private LinkedList<Taclet> taclets = null;
 
 
-public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
-        private final ProofDependentSMTSettings pdSettings;
-        private final ProofIndependentSMTSettings piSettings;
-        private final Proof proof;
-        private LinkedList<Taclet> taclets = null;
-        
+    public SMTSettings(ProofDependentSMTSettings pdSettings,
+                       ProofIndependentSMTSettings piSettings, Proof proof) {
+        super();
+        this.pdSettings = pdSettings;
+        this.piSettings = piSettings;
+        this.proof = proof;
 
-        public SMTSettings(ProofDependentSMTSettings pdSettings,
-                        ProofIndependentSMTSettings piSettings, Proof proof) {
-                super();
-                this.pdSettings = pdSettings;
-                this.piSettings = piSettings;
-                this.proof   = proof;
-                
+    }
+
+    public void copy(SMTSettings settings) {
+        pdSettings.copy(settings.pdSettings);
+        piSettings.copy(settings.piSettings);
+        taclets = settings.taclets;
+    }
+
+    public ProofDependentSMTSettings getPdSettings() {
+        return pdSettings;
+    }
+
+    public ProofIndependentSMTSettings getPiSettings() {
+        return piSettings;
+    }
+
+    public Proof getProof() {
+        return proof;
+    }
+
+
+    @Override
+    public int getMaxConcurrentProcesses() {
+
+        return piSettings.maxConcurrentProcesses;
+    }
+
+    @Override
+    public int getMaxNumberOfGenerics() {
+
+        return pdSettings.maxGenericSorts;
+    }
+
+    @Override
+    public String getSMTTemporaryFolder() {
+        return PathConfig.getKeyConfigDir()
+                + File.separator + "smt_formula";
+    }
+
+    @Override
+    public Collection<Taclet> getTaclets() {
+        if (taclets == null) {
+            taclets = new LinkedList<>();
+            if (proof == null) {
+                return taclets;
+            }
+
+            for (Taclet taclet : proof.getInitConfig().activatedTaclets()) {
+                if (pdSettings.supportedTaclets.contains(taclet.name().toString(), true)) {
+                    taclets.add(taclet);
+                }
+            }
         }
-        
-        public void copy(SMTSettings settings){
-                pdSettings.copy(settings.pdSettings);
-                piSettings.copy(settings.piSettings);
-                taclets = settings.taclets;
-        }
-        
-        public ProofDependentSMTSettings getPdSettings() {
-                return pdSettings;
-        }
-        
-        public ProofIndependentSMTSettings getPiSettings() {
-                return piSettings;
-        }
+        return taclets;
+    }
 
-        public Proof getProof() {
-                return proof;
-        }
+    @Override
+    public long getTimeout() {
+
+        return piSettings.timeout;
+    }
 
 
+    @Override
+    public boolean instantiateNullAssumption() {
 
-        @Override
-        public int getMaxConcurrentProcesses() {
-                
-                return piSettings.maxConcurrentProcesses;
-        }
+        return pdSettings.useNullInstantiation;
+    }
 
-        @Override
-        public int getMaxNumberOfGenerics() {
-               
-                return pdSettings.maxGenericSorts;
-        }
+    @Override
+    public boolean makesUseOfTaclets() {
 
-        @Override
-        public String getSMTTemporaryFolder() {
-              return   PathConfig.getKeyConfigDir()
-              + File.separator + "smt_formula";
-        }
+        return !getTaclets().isEmpty();
 
-        @Override
-        public Collection<Taclet> getTaclets() {
-             if(taclets == null){
-                     taclets = new LinkedList<Taclet>();
-                     if(proof == null){
-                             return taclets;
-                     }
-                     
-                     for(Taclet taclet : proof.getInitConfig().activatedTaclets()){
-                             if(pdSettings.supportedTaclets.contains(taclet.name().toString(),true)){
-                                     taclets.add(taclet);
-                             }
-                     }
-             }
-             return taclets;  
-        }
+    }
 
-        @Override
-        public long getTimeout() {
-                
-                return piSettings.timeout;
-        }
-        
-       
 
-        @Override
-        public boolean instantiateNullAssumption() {
-                
-                return pdSettings.useNullInstantiation;
-        }
+    @Override
+    public boolean useAssumptionsForBigSmallIntegers() {
 
-        @Override
-        public boolean makesUseOfTaclets() {
-              
-              return !getTaclets().isEmpty();
+        return pdSettings.useConstantsForIntegers;
+    }
 
-        }
-        
-        
+    @Override
+    public boolean useBuiltInUniqueness() {
 
-        @Override
-        public boolean useAssumptionsForBigSmallIntegers() {
-               
-                return pdSettings.useConstantsForIntegers;
-        }
+        return pdSettings.useBuiltInUniqueness;
+    }
 
-        @Override
-        public boolean useBuiltInUniqueness() {
-               
-                return pdSettings.useBuiltInUniqueness;
-        }
+    @Override
+    public boolean useExplicitTypeHierarchy() {
 
-        @Override
-        public boolean useExplicitTypeHierarchy() {
-           
-                return pdSettings.useExplicitTypeHierarchy;
-        }
+        return pdSettings.useExplicitTypeHierarchy;
+    }
 
-        @Override
-        public boolean useUninterpretedMultiplicationIfNecessary() {
-                
-                return pdSettings.useUIMultiplication;
-        }
-        
-        public SupportedTaclets getSupportedTaclets(){
-                return pdSettings.supportedTaclets;
-        }
-        
-        public int getModeOfProgressDialog(){
-                return piSettings.modeOfProgressDialog;
-        }
-        
-        public boolean storeSMTTranslationToFile(){
-                return piSettings.storeSMTTranslationToFile;
-        }
-        
-        public boolean storeTacletTranslationToFile(){
-                return piSettings.storeTacletTranslationToFile;
-        }
-        
-        public String getPathForTacletTranslation(){
-                return piSettings.pathForTacletTranslation;
-        }
-        
-        public String getPathForSMTTranslation(){
-                return piSettings.pathForSMTTranslation;
-        }
-        
-        public void fireSettingsChanged(){
-                piSettings.fireSettingsChanged();
-                pdSettings.fireSettingsChanged();
-        }
-        
-        public void addListener(SettingsListener listener){
-                piSettings.addSettingsListener(listener);
-                pdSettings.addSettingsListener(listener);
-        }
+    @Override
+    public boolean useUninterpretedMultiplicationIfNecessary() {
 
-        @Override
-        public long getMaximumInteger() {
-                 return pdSettings.maxInteger;
-        }
+        return pdSettings.useUIMultiplication;
+    }
 
-        @Override
-        public long getMinimumInteger() {
-                return pdSettings.minInteger;
-        }
+    public SupportedTaclets getSupportedTaclets() {
+        return pdSettings.supportedTaclets;
+    }
 
-		@Override
-		public String getLogic() {
-			return "AUFLIA";
-		}
+    public int getModeOfProgressDialog() {
+        return piSettings.modeOfProgressDialog;
+    }
 
-		@Override
-		public boolean checkForSupport() {
-			return piSettings.checkForSupport;
-		}
+    public boolean storeSMTTranslationToFile() {
+        return piSettings.storeSMTTranslationToFile;
+    }
 
-		@Override
-		public long getIntBound() {
-			return piSettings.intBound;
-		}
+    public boolean storeTacletTranslationToFile() {
+        return piSettings.storeTacletTranslationToFile;
+    }
 
-		@Override
-		public long getHeapBound() {
-			return piSettings.heapBound;
-		}
+    public String getPathForTacletTranslation() {
+        return piSettings.pathForTacletTranslation;
+    }
 
-		@Override
-		public long getSeqBound() {
-			return piSettings.seqBound;
-		}
+    public String getPathForSMTTranslation() {
+        return piSettings.pathForSMTTranslation;
+    }
 
-		@Override
-		public long getObjectBound() {
-			return piSettings.objectBound;
-		}
+    public void fireSettingsChanged() {
+        piSettings.fireSettingsChanged();
+        pdSettings.fireSettingsChanged();
+    }
 
-		@Override
-		public long getLocSetBound() {
-			return piSettings.locsetBound;
-		}
+    public void addListener(SettingsListener listener) {
+        piSettings.addSettingsListener(listener);
+        pdSettings.addSettingsListener(listener);
+    }
 
-		@Override
-		public boolean invarianForall() {
-			return pdSettings.invariantForall;
-		}
+    @Override
+    public long getMaximumInteger() {
+        return pdSettings.maxInteger;
+    }
 
-        
+    @Override
+    public long getMinimumInteger() {
+        return pdSettings.minInteger;
+    }
 
-        
-       
-        
+    @Override
+    public String getLogic() {
+        return "AUFLIA";
+    }
+
+    @Override
+    public boolean checkForSupport() {
+        return piSettings.checkForSupport;
+    }
+
+    @Override
+    public long getIntBound() {
+        return piSettings.intBound;
+    }
+
+    @Override
+    public long getHeapBound() {
+        return piSettings.heapBound;
+    }
+
+    @Override
+    public long getSeqBound() {
+        return piSettings.seqBound;
+    }
+
+    @Override
+    public long getObjectBound() {
+        return piSettings.objectBound;
+    }
+
+    @Override
+    public long getLocSetBound() {
+        return piSettings.locsetBound;
+    }
+
+    @Override
+    public boolean invarianForall() {
+        return pdSettings.invariantForall;
+    }
+
+
 }

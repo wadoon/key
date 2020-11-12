@@ -16,10 +16,10 @@ import static de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider.BUNDLE;
  * @version 1 (08.04.19)
  */
 class SolverOptions extends SettingsPanel implements SettingsProvider {
-    private static final String infoSolverName = "infoSolverName";
-    private static final String infoSolverParameters = "infoSolverParameters";
-    private static final String infoSolverCommand = "infoSolverCommand";
-    private static final String infoSolverSupport = "infoSolverSupport";
+    private static final String INFO_SOLVER_NAME = "infoSolverName";
+    private static final String INFO_SOLVER_PARAMETERS = "infoSolverParameters";
+    private static final String INFO_SOLVER_COMMAND = "infoSolverCommand";
+    private static final String INFO_SOLVER_SUPPORT = "infoSolverSupport";
     private static final String[] solverSupportText = {
             BUNDLE.getString("SOLVER_SUPPORTED"),
             BUNDLE.getString("SOLVER_MAY_SUPPORTED"),
@@ -35,8 +35,6 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     private final JTextField solverSupported;
     private final JTextField solverName;
     private final JTextField solverInstalled;
-
-    private ProofIndependentSMTSettings settings;
 
     public SolverOptions(SolverType solverType) {
         this.setName(solverType.getName());
@@ -56,8 +54,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         JButton toDefaultButton = new JButton("Set parameters to default.");
         toDefaultButton.addActionListener(arg0 -> {
             solverParameters.setText(solverType.getDefaultSolverParameters());
-            settings.setParameters(solverType, solverParameters.getText());
-
+            //settings.setParameters(solverType, solverParameters.getText());
         });
         addRowWithHelp(null, new JLabel(), toDefaultButton);
         return toDefaultButton;
@@ -65,13 +62,13 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     private String createSupportedVersionText() {
         String[] versions = solverType.getSupportedVersions();
-        String result = versions.length > 1 ? "The following versions are supported: " :
-                "The following version is supported: ";
+        StringBuilder result = new StringBuilder(versions.length > 1 ? "The following versions are supported: " :
+                "The following version is supported: ");
         for (int i = 0; i < versions.length; i++) {
-            result += versions[i];
-            result += i < versions.length - 1 ? ", " : "";
+            result.append(versions[i]);
+            result.append(i < versions.length - 1 ? ", " : "");
         }
-        return result;
+        return result.toString();
     }
 
     private String getSolverSupportText() {
@@ -85,7 +82,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     protected JTextField createSolverSupported() {
 
         JTextField txt = addTextField("Support", getSolverSupportText(),
-                BUNDLE.getString(infoSolverSupport) + createSupportedVersionText(), null);
+                BUNDLE.getString(INFO_SOLVER_SUPPORT) + createSupportedVersionText(), null);
         txt.setEditable(false);
         return txt;
     }
@@ -102,14 +99,14 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     protected JTextField createSolverParameters() {
-        return addTextField("Parameters", solverType.getSolverParameters(), BUNDLE.getString(infoSolverParameters),
-                e -> settings.setParameters(solverType, solverParameters.getText()));
+        return addTextField("Parameters", solverType.getSolverParameters(), BUNDLE.getString(INFO_SOLVER_PARAMETERS),
+                e -> {});
     }
 
     public JTextField createSolverCommand() {
         return addTextField("Command",
                 solverType.getSolverCommand(),
-                BUNDLE.getString(infoSolverCommand), e -> settings.setCommand(solverType, solverCommand.getText()));
+                BUNDLE.getString(INFO_SOLVER_COMMAND), e -> {});
     }
 
 
@@ -121,14 +118,12 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
             info = info + (versionString.startsWith("version") ? " (" : " (version ") + versionString + ")";
         }
         JTextField txt = addTextField("Installed", info, "", null);
-        //txt.setBackground(this.getBackground());
         txt.setEditable(false);
         return txt;
     }
 
     protected JTextField createSolverName() {
-        JTextField txt = addTextField("Name", solverType.getName(), BUNDLE.getString(infoSolverName), null);
-        //txt.setBackground(this.getBackground());
+        JTextField txt = addTextField("Name", solverType.getName(), BUNDLE.getString(INFO_SOLVER_NAME), null);
         txt.setEditable(false);
         return txt;
     }
@@ -145,11 +140,10 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     private void setSmtSettings(ProofIndependentSMTSettings clone) {
-        settings = clone;
-        solverCommand.setText(settings.getCommand(solverType));
-        solverParameters.setText(settings.getParameters(solverType));
-
+        solverCommand.setText(clone.getCommand(solverType));
+        solverParameters.setText(clone.getParameters(solverType));
         solverName.setText(solverType.getName());
+
         final boolean installed = solverType.isInstalled(true);
         String info = installed ? "yes" : "no";
         if (installed) {
@@ -161,9 +155,13 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     @Override
     public void applySettings(MainWindow window) {
-        solverType.setSolverCommand(settings.getCommand(solverType));
-        solverType.setSolverParameters(settings.getParameters(solverType));
-        SettingsManager.getSmtPiSettings().copy(settings);
-        setSmtSettings(SettingsManager.getSmtPiSettings().clone());
+        String command = solverCommand.getText();
+        String params = solverParameters.getText();
+        solverType.setSolverCommand(command);
+        solverType.setSolverParameters(params);
+        SettingsManager.getSmtPiSettings().setCommand(solverType, command);
+        SettingsManager.getSmtPiSettings().setParameters(solverType, params);
+        
+        setSmtSettings(SettingsManager.getSmtPiSettings().clone()); // refresh gui
     }
 }

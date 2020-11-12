@@ -19,18 +19,18 @@ import java.util.ResourceBundle;
  */
 public class SMTSettingsProvider extends SettingsPanel implements SettingsProvider {
     //de/uka/ilkd/key/gui/smt/settings/messages.xml
-    public final static ResourceBundle BUNDLE
+    public static final ResourceBundle BUNDLE
             = ResourceBundle.getBundle("de.uka.ilkd.key.gui.smt.settings.messages");
 
-    public final static String PROGRESS_MODE_USER = "PROGRESS_MODE_USER";
-    public final static String PROGRESS_MODE_CLOSE = "PROGRESS_MODE_CLOSE";
-    public final static String PROGRESS_MODE_CLOSE_FIRST = "PROGRESS_MODE_CLOSE_FIRST";
-    private final static String infoBound = "infoBound";
-    private final static String infoSaveToFilePanel = "infoSaveToFilePanel";
-    private final static String infoProgressModeBox = "infoProgressModeBox";
-    private static final String infoCheckForSupport = "infoCheckForSupport";
-    private final static String infoMaxProcesses = "infoMaxProcesses";
-    private final static String infoTimeoutField = "infoTimeoutField";
+    public static final String PROGRESS_MODE_USER = "PROGRESS_MODE_USER";
+    public static final String PROGRESS_MODE_CLOSE = "PROGRESS_MODE_CLOSE";
+    public static final String PROGRESS_MODE_CLOSE_FIRST = "PROGRESS_MODE_CLOSE_FIRST";
+    private static final String INFO_BOUND = "infoBound";
+    private static final String INFO_SAVE_TO_FILE_PANEL = "infoSaveToFilePanel";
+    private static final String INFO_PROGRESS_MODE_BOX = "infoProgressModeBox";
+    private static final String INFO_CHECK_FOR_SUPPORT = "infoCheckForSupport";
+    private static final String INFO_MAX_PROCESSES = "infoMaxProcesses";
+    private static final String INFO_TIMEOUT_FIELD = "infoTimeoutField";
 
     private final JTextField saveToFilePanel;
 
@@ -38,7 +38,6 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     private final JSpinner maxProcesses;
     private final JSpinner timeoutField;
     private final JSpinner intBoundField;
-    //private JTextField heapBoundField;
     private final JSpinner seqBoundField;
     private final JSpinner objectBoundField;
     private final JSpinner locsetBoundField;
@@ -61,8 +60,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
         getChildren().add(new TranslationOptions());
         getChildren().add(new TacletTranslationOptions());
-        //getChildren().add(new DefaultSettingsProvider("Selection",
-        //        new TacletTranslationSelection(smtSettings).getSelectionTree()));
+
         for (SolverType options : SolverTypes.ALL_SOLVERS) {
             getChildren().add(new SolverOptions(options));
         }
@@ -97,39 +95,39 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     }
 
     private JSpinner createLocSetBoundField() {
-        return addNumberField("Locset bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(infoBound),
+        return addNumberField("Locset bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
                 e -> settings.locsetBound = e);
     }
 
     private JSpinner createMaxProcesses() {
         return addNumberField("Concurrent processes:",
                 0, Integer.MAX_VALUE, 1,
-                BUNDLE.getString(infoMaxProcesses),
+                BUNDLE.getString(INFO_MAX_PROCESSES),
                 e -> settings.maxConcurrentProcesses = e);
     }
 
     private JSpinner createTimeoutField() {
-        return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(infoTimeoutField),
+        return addNumberField("Timeout:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_TIMEOUT_FIELD),
                 e -> settings.timeout = e * 1000);
     }
 
     private JSpinner createIntBoundField() {
-        return addNumberField("Integer bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(infoBound),
+        return addNumberField("Integer bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
                 e -> settings.intBound = e);
     }
 
     private JSpinner createSeqBoundField() {
-        return addNumberField("Seq bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(infoBound),
+        return addNumberField("Seq bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
                 e -> settings.seqBound = e);
     }
 
     private JSpinner createObjectBoundField() {
-        return addNumberField("Object bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(infoBound),
+        return addNumberField("Object bound:", 0, Integer.MAX_VALUE, 1, BUNDLE.getString(INFO_BOUND),
                 e -> settings.objectBound = e);
     }
 
     private JComboBox<String> getProgressModeBox() {
-        return addComboBox(BUNDLE.getString(infoProgressModeBox), 0,
+        return addComboBox(BUNDLE.getString(INFO_PROGRESS_MODE_BOX), 0,
                 e -> settings.modeOfProgressDialog = progressModeBox.getSelectedIndex(),
                 getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_USER),
                 getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE));
@@ -137,14 +135,14 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
     private JCheckBox createSolverSupportCheck() {
         return addCheckBox("Check for support when a solver is started.",
-                BUNDLE.getString(infoCheckForSupport),
+                BUNDLE.getString(INFO_CHECK_FOR_SUPPORT),
                 false,
                 e -> settings.checkForSupport = solverSupportCheck.isSelected());
     }
 
     private JTextField getSaveToFilePanel() {
         return addFileChooserPanel("Store translation to file:",
-                "", BUNDLE.getString(infoSaveToFilePanel),
+                "", BUNDLE.getString(INFO_SAVE_TO_FILE_PANEL),
                 true, e -> {
                     settings.pathForSMTTranslation = saveToFilePanel.getText();
                     //TODO settings.storeSMTTranslationToFile = saveToFilePanel.isSelected();
