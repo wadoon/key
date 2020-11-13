@@ -959,13 +959,13 @@ public class TermBuilder {
     
     public Term rPred(Term locSet, Term ts) {
     	Function rPred = services.getNamespaces().functions().lookup("rPred");
-    	assert rPred != null : "Did not find dependency predicate noW";
+    	assert rPred != null : "Did not find dependency predicate rPred";
     	return this.func(rPred, locSet, ts);
     }
     
     public Term wPred(Term locSet, Term ts) {
     	Function wPred = services.getNamespaces().functions().lookup("wPred");
-    	assert wPred != null : "Did not find dependency predicate noW";
+    	assert wPred != null : "Did not find dependency predicate wPred";
     	return this.func(wPred, locSet, ts);
     }
     

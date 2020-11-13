@@ -4,8 +4,8 @@
 	<classpathentry kind="src" path="genSrc"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/recoderKey.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/key.util"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/key.util"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="C:/Users/Asma/Documents/KeYCoding/key/key/key.core/lib/commons-math3-62.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

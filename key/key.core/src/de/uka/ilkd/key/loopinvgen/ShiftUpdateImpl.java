@@ -51,9 +51,36 @@ public class ShiftUpdateImpl {
 	    }	  
 	}
 	
-	
+	//update: a:=t
 	private void shiftElementaryUpdate(Term update, Goal g, PosInOccurrence pos) {
-        // TODO Auto-generated method stub
+        ElementaryUpdate eU = (ElementaryUpdate) update.op();
+        Term target = (Term) eU.lhs();
+
+        //////////Defininf u' update: a:=a'//////////
+        
+        //Defining a fresh constant symbol a'
+        final Name freshConsSymb = new Name(tb.newName(eU.lhs().name().toString(), services.getNamespaces()));
+    	final Function freshConsFunc = new Function(freshConsSymb, eU.lhs().sort(), true);
+    	services.getNamespaces().functions().addSafely(freshConsFunc);
+    	final Term freshCons = tb.func(freshConsFunc);
+    	//Assigning it to a: a := a'
+        Term u_prime = tb.elementary(target, freshCons);
+        
+        //then it has to be applied to all of the left side
+        Term u_prime_target = (Term)goal.sequent().antecedent();
+        Term u_prime_application = tb.apply(u_prime, u_prime_target);
+        //First remove the antecedent then:
+        // Ask Richard how to replace the whole antecident with the new one?
+        g.addFormula((SequentFormula)u_prime_application, true, true);
+        //////////////////////////////////////////////////
+        
+        
+        //////////Defining upd which is not an update but an assignment: a={u'}{u}a//////////
+        
+        
+        
+        //then it has to be added to the left side
+        //////////////////////////////
         
     }
 
