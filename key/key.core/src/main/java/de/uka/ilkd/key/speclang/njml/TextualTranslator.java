@@ -393,6 +393,13 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitProofcommand(JmlParser.ProofcommandContext ctx) {
+        TextualJMLProofCommand cmd = new TextualJMLProofCommand(ctx);
+        constructs = constructs.append(cmd);
+        return null;
+    }
+
+    @Override
     public Object visitMerge_point_statement(JmlParser.Merge_point_statementContext ctx) {
         TextualJMLMergePointDecl mergePointDecl = new TextualJMLMergePointDecl(mods, ctx);
         constructs = constructs.append(mergePointDecl);

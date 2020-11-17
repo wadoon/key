@@ -122,7 +122,7 @@ import java.util.stream.Collectors;
         }
 }
 
-tokens {BODY, COMMENT, STRING_LITERAL}
+tokens {BODY, COMMENT, STRING_LITERAL, COMMAND}
 
 MODEL_BEHAVIOUR: 'model_' BEHAVIOR ;
 ABSTRACT: 'abstract';
@@ -228,6 +228,9 @@ SIGNALS_ONLY: 'signals_only' Pred -> pushMode(expr);
 WHEN: 'when' Pred -> pushMode(expr);
 WORKING_SPACE: 'working_space' Pred -> pushMode(expr);
 WRITABLE: 'writable' -> pushMode(expr);
+
+JML_CMD_START: '//!' ~[\n\r]* -> type(COMMAND);
+JML_CMD_START_ML: '/*!' .*? '*/' -> type(COMMAND);
 
 JML_ML_END: '*/' -> channel(HIDDEN);
 WS: (' ' | '\t' | '\n' | '\r' | '@')+ -> channel(HIDDEN);
@@ -393,6 +396,7 @@ WORKINGSPACE: '\\working_space';
 // ONLY_CALLED: '\\only_called';
 // ONLY_CAPTURED: '\\only_captured';
 
+E_JML_CMD_START: '//!' ~[\n\r]* -> type(COMMAND);
 
 E_JML_SL_START: '//@' -> type(JML_SL_START), channel(HIDDEN);
 E_JML_ML_START: '/*@' -> type(JML_ML_START), channel(HIDDEN);

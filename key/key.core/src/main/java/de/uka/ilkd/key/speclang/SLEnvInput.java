@@ -246,8 +246,8 @@ public final class SLEnvInput extends AbstractEnvInput {
                                          final SpecificationRepository specRepos,
                                          final IProgramMethod pm,
                                          final ImmutableSet<SpecificationElement>
-                                                    methodSpecs)
-                                      throws ProofInputException {
+                                                 methodSpecs)
+            throws ProofInputException {
         //merge point statements
         final JavaASTCollector mpsCollector =
                 new JavaASTCollector(pm.getBody(), MergePointStatement.class);
@@ -257,12 +257,32 @@ public final class SLEnvInput extends AbstractEnvInput {
                     specExtractor.extractMergeContracts(pm,
                             (MergePointStatement) mps,
                             ((Contract) methodSpecs.iterator().next())
-                            .getOrigVars().params);
+                                    .getOrigVars().params);
 
             mergeContracts
-            .forEach(mc -> specRepos.addMergeContract(mc));
+                    .forEach(mc -> specRepos.addMergeContract(mc));
         }
     }
+
+    private void addProofCommandStatement(SpecExtractor specExtractor,
+                                         final SpecificationRepository specRepos,
+                                         final IProgramMethod pm)
+            throws ProofInputException {
+        //merge point statements
+        /*final JavaASTCollector mpsCollector = new JavaASTCollector(pm.getBody(), MergePointStatement.class);
+        mpsCollector.start();
+        for (ProgramElement mps : mpsCollector.getNodes()) {
+            final ImmutableSet<MergeContract> mergeContracts = //
+                    specExtractor.extractMergeContracts(pm,
+                            (MergePointStatement) mps,
+                            ((Contract) methodSpecs.iterator().next())
+                                    .getOrigVars().params);
+
+            mergeContracts
+                    .forEach(mc -> specRepos.addMergeContract(mc));
+        }*/
+    }
+
 
     private void addLabeledBlockContracts(SpecExtractor specExtractor,
                                           final SpecificationRepository specRepos,
@@ -346,6 +366,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 addLoopContracts(specExtractor, specRepos, kjt, pm);
                 addBlockAndLoopContracts(specExtractor, specRepos, pm);
                 addMergePointStatements(specExtractor, specRepos, pm, methodSpecs);
+                addProofCommandStatement(specExtractor, specRepos, pm);
                 addLabeledBlockContracts(specExtractor, specRepos, pm);
                 addLabeledLoopContracts(specExtractor, specRepos, pm);
             }

@@ -215,6 +215,10 @@ public class JMLSpecFactory {
         return symbDatas;
     }
 
+    public ImmutableSet<ProofCommandStatement> createCommands(IProgramMethod method, TextualJMLConstruct[] construct) {
+        return null;
+    }
+
     // -------------------------------------------------------------------------
     // internal classes
     // -------------------------------------------------------------------------

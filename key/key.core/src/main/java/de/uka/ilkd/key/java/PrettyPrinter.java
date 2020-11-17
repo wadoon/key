@@ -3244,4 +3244,20 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
+    public void printProofCommand(ProofCommandStatement proofCommand) throws IOException {
+        markStart(0, proofCommand);
+
+        if(proofCommand.getCommand().contains("\n")){
+            write("/*! ");
+            write(proofCommand.getCommand());
+            write("*/\n");
+        }
+        else {
+            write("//! ");
+            write(proofCommand.getCommand());
+            write("\n");
+        }
+        // Mark statement end ...
+        markEnd(0, proofCommand);
+    }
 }

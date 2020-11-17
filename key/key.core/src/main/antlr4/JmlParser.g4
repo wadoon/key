@@ -20,7 +20,10 @@ methodlevel_element
   | loop_specification | assert_statement | assume_statement | nowarn_pragma
   | debug_statement | block_specification | block_loop_specification
   | assert_statement | assume_statement
+  | proofcommand
  ;
+
+proofcommand: COMMAND;
 
 modifiers: modifier+;
 modifier

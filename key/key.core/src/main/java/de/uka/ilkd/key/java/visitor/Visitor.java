@@ -414,4 +414,6 @@ public interface Visitor {
 
     void performActionOnCcatchBreakWildcardParameterDeclaration(
             CcatchBreakWildcardParameterDeclaration ccatchBreakWildcardParameterDeclaration);
+
+    default void performActionOnProofCommand(ProofCommandStatement proofCommand){}
 }

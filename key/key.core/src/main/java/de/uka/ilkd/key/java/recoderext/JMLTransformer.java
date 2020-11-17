@@ -439,6 +439,23 @@ public final class JMLTransformer extends RecoderModelTransformer {
         }
     }
 
+    private void transformProofCommand(TextualJMLProofCommand txt, Comment[] originalComments) {
+        if (originalComments.length <= 0)
+            throw new IllegalArgumentException();
+
+        // determine parent, child index
+        StatementBlock astParent = (StatementBlock) originalComments[0].getParent().getASTParent();
+        int childIndex = astParent.getIndexOfChild(originalComments[0].getParent());
+
+        // create MPS, attach to AST
+        ProofCommandStatement mps = new ProofCommandStatement(txt.getCommand());
+        Position startPosition = astParent.getChildAt(childIndex).getStartPosition();
+        final de.uka.ilkd.key.java.Position pos =
+                new de.uka.ilkd.key.java.Position(startPosition.getLine(), startPosition.getColumn());
+        updatePositionInformation(mps, pos);
+        doAttach(mps, astParent, childIndex);
+    }
+
     private void transformMergePointDecl(TextualJMLMergePointDecl stat,
                                          Comment[] originalComments) throws SLTranslationException {
         assert originalComments.length > 0;
@@ -569,6 +586,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 transformSetStatement((TextualJMLSetStatement) c, comments);
             } else if (c instanceof TextualJMLMergePointDecl) {
                 transformMergePointDecl((TextualJMLMergePointDecl) c, comments);
+            } else if (c instanceof TextualJMLProofCommand) {
+                transformProofCommand((TextualJMLProofCommand) c, comments);
             }
         }
     }

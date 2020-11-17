@@ -602,6 +602,14 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 (TextualJMLMergePointDecl) constructs[0], methodParams);
     }
 
+    public ImmutableSet<ProofCommandStatement> extractCommands(IProgramMethod method) {
+        final TextualJMLConstruct[] constructs = Arrays
+                .stream(parseMethodLevelComments(method.getComments(), getFileName(method)))
+                .filter(c -> c instanceof TextualJMLMergePointDecl)
+                .toArray(TextualJMLConstruct[]::new);
+        return jsf.createCommands(method, constructs);
+    }
+
     private ImmutableSet<BlockContract> createBlockContracts(
             final IProgramMethod method, final List<Label> labels,
             final StatementBlock block, final Comment[] comments)
