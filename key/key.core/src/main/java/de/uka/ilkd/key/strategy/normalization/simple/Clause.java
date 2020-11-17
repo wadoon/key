@@ -11,13 +11,15 @@ import java.util.stream.StreamSupport;
 class Clause {
 
     private final HashSet<Literal> literals;
+    private final int hashCode;
 
     Clause(Literal literal) {
         this(new HashSet<Literal>(Arrays.asList(literal)));
     }
 
-    private Clause(HashSet<Literal> literals) {
-        this.literals = literals;
+    public Clause(HashSet<Literal> literals) {
+        this.literals = new HashSet<Literal>(literals);
+        this.hashCode = this.literals.hashCode();
     }
 
     public HashSet<Literal> getLiterals() {
@@ -38,6 +40,19 @@ class Clause {
 
     public Term toTerm(TermBuilder builder) {
         return builder.or(StreamSupport.stream(literals.spliterator(), false).map(literal -> literal.toTerm(builder)).collect(Collectors.toList()));
+    }
+
+    @Override
+    public int hashCode() {
+        return hashCode;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj) return true;
+        if(!(obj instanceof Clause)) return false;
+        Clause other = (Clause) obj;
+        return this.literals.equals(other.literals);
     }
 
     public String toString() {

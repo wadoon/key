@@ -35,7 +35,7 @@ public class Statistics {
     public final int operationContractApps;
     public final int blockLoopContractApps;
     public final int loopInvApps;
-    public final long normTimeInMillis;
+    public final long normTimeInNanos;
     public final long autoModeTimeInMillis;
     public final long timeInMillis;
     public final float timePerStepInMillis;
@@ -89,7 +89,7 @@ public class Statistics {
         this.operationContractApps = operationContractApps;
         this.blockLoopContractApps = blockLoopContractApps;
         this.loopInvApps = loopInvApps;
-        this.normTimeInMillis = normTimeInMillis;
+        this.normTimeInNanos = normTimeInMillis;
         this.autoModeTimeInMillis = autoModeTimeInMillis;
         this.timeInMillis = timeInMillis;
         this.timePerStepInMillis = timePerStepInMillis;
@@ -124,7 +124,7 @@ public class Statistics {
         this.loopInvApps = tmp.inv;
         this.bg_norm_calls = tmp.bg_norm_calls;
         this.bg_norm_execs = tmp.bg_norm_execs;
-        this.normTimeInMillis = tmp.bg_norm_exec_ms;
+        this.normTimeInNanos = tmp.bg_norm_exec_ns;
         this.autoModeTimeInMillis = startNode.proof().getAutoModeTime();
         this.timeInMillis = (System.currentTimeMillis() - startNode.proof().creationTime);
         timePerStepInMillis = nodes <= 1 ? .0f : (autoModeTimeInMillis / (float)(nodes - 1));
@@ -156,7 +156,7 @@ public class Statistics {
                               side.blockLoopContractApps,
                               side.loopInvApps,
                               side.autoModeTimeInMillis,
-                              side.normTimeInMillis,
+                              side.normTimeInNanos,
                               System.currentTimeMillis() - creationTime,
                               side.timePerStepInMillis);
     }
@@ -195,7 +195,7 @@ public class Statistics {
         if (time >= 10000L) {
             summaryList.add(new Pair<String, String>("Automode time", time + "ms"));
         }
-        summaryList.add(new Pair<String, String>("Normalization Time", stat.normTimeInMillis + "ms"));
+        summaryList.add(new Pair<String, String>("Normalization Time", (stat.normTimeInNanos/1000000) + "ms"));
         if (stat.nodes > 0) {
             String avgTime = "" + (stat.timePerStepInMillis);
             // round to 3 digits after point
@@ -311,7 +311,7 @@ public class Statistics {
         int contr = 0; // functional contract apps
         int block = 0; // block and loop contract apps
         int inv = 0; // loop invariants
-        int bg_norm_exec_ms = 0; // ms of bg norm execution
+        int bg_norm_exec_ns = 0; // ms of bg norm execution
 
         /**
          * Increment numbers of rule applications according to given node
@@ -330,7 +330,7 @@ public class Statistics {
             NodeInfo info = node.getNodeInfo();
             bg_norm_calls += info.bg_norm_calls;
             bg_norm_execs += info.bg_norm_execs;
-            bg_norm_exec_ms += info.bg_norm_ms;
+            bg_norm_exec_ns += info.bg_norm_ns;
             heur_call += info.heur_call;
             heur_ms += info.heur_inst_ms;
 

@@ -6,23 +6,25 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.strategy.normalization.Quantification;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 
 class QuantifiedClauseSet {
 
     private final ClauseSet clauseSet;
-    private final LinkedList<Quantification> quantifications;
+    private final List<Quantification> quantifications;
+    private final Map<Term, Term> skolemMap;
 
-    public QuantifiedClauseSet(LinkedList<Quantification> quantifications, ClauseSet clauseSet) {
+    public QuantifiedClauseSet(List<Quantification> quantifications, ClauseSet clauseSet,
+                               Map<Term, Term> skolemMap) {
         this.quantifications = new LinkedList<Quantification>(quantifications);
         this.clauseSet = clauseSet;
+        this.skolemMap = skolemMap;
     }
 
     public QuantifiedClauseSet(Literal literal) {
         this.clauseSet = new ClauseSet(new Clause(literal));
         this.quantifications = new LinkedList<Quantification>();
+        this.skolemMap = new HashMap<Term, Term>();
     }
 
     public QuantifiedClauseSet(Quantifier quantifier, QuantifiableVariable qv,
@@ -30,6 +32,30 @@ class QuantifiedClauseSet {
         this.clauseSet = sub.clauseSet;
         this.quantifications = new LinkedList<Quantification>(Arrays.asList(new Quantification(quantifier, qv)));
         this.quantifications.addAll(sub.quantifications);
+        this.skolemMap = new HashMap<>(sub.skolemMap);
+    }
+
+    public static QuantifiedClauseSet all(QuantifiableVariable qv, QuantifiedClauseSet sub) {
+        List<Quantification> quantifications = new LinkedList<Quantification>();
+        quantifications.add(new Quantification(Quantifier.ALL, qv));
+        quantifications.addAll(sub.quantifications);
+        return new QuantifiedClauseSet(quantifications, sub.clauseSet, sub.skolemMap);
+    }
+
+    public static QuantifiedClauseSet exists(QuantifiableVariable qv, Term qvt, Term skFun, QuantifiedClauseSet sub) {
+        List<Quantification> quantifications = new LinkedList<Quantification>();
+        quantifications.add(new Quantification(Quantifier.EX, qv));
+        quantifications.addAll(sub.quantifications);
+        Map<Term, Term> skMap = new HashMap<>(sub.skolemMap);
+        skMap.put(qvt, skFun);
+        return new QuantifiedClauseSet(quantifications, sub.clauseSet, sub.skolemMap);
+    }
+
+    public QuantifiedClauseSet(Term var, Term skFun, QuantifiedClauseSet sub) {
+        this.clauseSet = sub.clauseSet;
+        this.quantifications = new LinkedList<Quantification>(sub.quantifications);
+        this.skolemMap = new HashMap<>(sub.skolemMap);
+        skolemMap.put(var, skFun);
     }
 
     public QuantifiedClauseSet and(QuantifiedClauseSet qcs) {
@@ -44,14 +70,18 @@ class QuantifiedClauseSet {
         LinkedList<Quantification> quantifications = new LinkedList<Quantification>(this.quantifications);
         // TODO error message if duplicate of quantified  variable
         quantifications.addAll(qcs.quantifications);
-        return new QuantifiedClauseSet(quantifications, merge.and(clauseSet));
+        HashMap<Term, Term> skolemMap = new HashMap<Term, Term>(this.skolemMap);
+        skolemMap.putAll(qcs.skolemMap);
+        return new QuantifiedClauseSet(quantifications, merge, skolemMap);
     }
 
     public ClauseSet getClauseSet() {
         return clauseSet;
     }
 
-    public LinkedList<Quantification> getQuantifications() {
+    public Map<Term, Term> getSkolemMap() { return skolemMap;}
+
+    public List<Quantification> getQuantifications() {
         return quantifications;
     }
 

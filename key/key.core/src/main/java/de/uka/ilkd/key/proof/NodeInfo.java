@@ -481,7 +481,7 @@ public class NodeInfo {
 
     public int bg_norm_calls = 0;
     public int bg_norm_execs = 0;
-    public long bg_norm_ms = 0;
+    public long bg_norm_ns = 0;
     public int heur_call = 0;
     public long heur_inst_ms = 0;
 
@@ -493,8 +493,8 @@ public class NodeInfo {
         bg_norm_execs++;
     }
 
-    public void addNormTime(long ms) {
-        bg_norm_ms += ms;
+    public void addNormTime(long ns) {
+        bg_norm_ns += ns;
     }
 
     public void addHeurInst(long ms) {

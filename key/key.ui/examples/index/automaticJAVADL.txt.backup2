@@ -32,7 +32,7 @@ statisticsFile = ../../key.core.test/testresults/runallproofs/runStatistics.csv
  *                 perGroup - one subprocess is created for each group
  *                 perFile - one subprocess is created for each file
  */
-forkMode = noFork
+forkMode = perGroup
 
 /*
  * Enable or disable proof reloading.
@@ -83,7 +83,7 @@ forkTimeout = 2000
  * By naming a comma separated list of groups here, the
  * test can be restricted to these groups (for debugging).
  */
-runOnlyOn = formnorm
+#runOnlyOn = formnorm
 
 keySettings = "#Proof-Settings-Config-File
 #Mon Aug 03 16:58:18 CEST 2009
@@ -112,7 +112,7 @@ keySettings = "#Proof-Settings-Config-File
 [StrategyProperty]BACKGROUND_NORMALIZATION_OPTIONS_KEY=BACKGROUND_NORMALIZATION_ENABLED
 [StrategyProperty]NORMALIZATION_RULES_OPTIONS_KEY=NORMALIZATION_RULES_EXPENSIVE
 [DecisionProcedure]Timeout=60
-[Strategy]Timeout=400
+[Strategy]Timeout=40000
 [Strategy]MaximumNumberOfAutomaticApplications=10000
 [SMTSettings]integersMaximum=2147483645
 [SMTSettings]integersMinimum=-2147483645
@@ -131,8 +131,14 @@ keySettings = "#Proof-Settings-Config-File
 #-------------------------------------------------------------------------------------------
 group formnorm {
    provable ./newBook/09.list_modelfield/ArrayList.add.key
+   provable ./newBook/09.list_modelfield/ArrayList.remFirst.key
    provable ./heap/javacard/arrayFillNonAtomic.key
+   provable ./heap/coincidence_count/project.key
+   provable ./heap/verifyThis11_1_Maximum/project.key
+   provable ./heap/fm12_01_LRS/lcp.key
+   provable ./heap/SemanticSlicing/project.key
    provable ./heap/information_flow/ArrayList_contains.key
+   provable ./heap/information_flow/ArrayList_get.key
    provable ./heap/list/ArrayList_add.key
    provable ./heap/list/ArrayList_concatenate.key
    provable ./heap/list/ArrayList_contains_dep.key
@@ -157,13 +163,21 @@ group formnorm {
    provable ./heap/list_ghost/ArrayList_enlarge.key
    provable ./heap/list_recursiveSpec/ListOperationsNonNull_getNextNN_normal_behavior.key
    provable ./heap/list_recursiveSpec/ListOperationsNonNull_setValueAt_normal_behavior.key
+   provable ./heap/list_recursiveSpec/ListOperationsNonNull_remove_normal_behavior.key
    provable ./heap/list_seq/SimplifiedLinkedList.remove.key
+   provable ./heap/list_seq/ArrayList.add.key
+   provable ./heap/list_seq/ArrayList.contains.key
+   provable ./heap/list_seq/ArrayList.enlarge.key
    provable ./heap/list_seq/ArrayList.get.key
+   provable ./heap/list_seq/ArrayList.remove.0.key
    provable ./heap/list_seq/ArrayList.remove.1.key
    provable ./heap/observer/ExampleSubject_addObserver.key
    provable ./heap/observer/ExampleSubject_change.key
    provable ./heap/observer/ExampleSubject_inv.key
+   provable ./heap/removeDups/arrayPart.key
    provable ./heap/removeDups/contains.key
+   provable ./heap/removeDups/removeDup.key
+   provable ./heap/saddleback_search/Saddleback_search.key
    provable ./heap/simple/dependencies.key
    provable ./heap/simple/loop2.key
    provable ./heap/simple/selection_sort.key
@@ -181,7 +195,7 @@ group formnorm {
    provable ./heap/vstte10_03_LinkedList/Node_cons.key
    provable ./heap/vstte10_03_LinkedList/Node_search.key
    provable ./heap/vstte10_04_Queens/Queens_isConsistent.key
-   provable ./heap/vstte10_04_Queens/Queens_nQueens.key
+   #provable ./heap/vstte10_04_Queens/Queens_nQueens.key
    provable ./heap/WeideEtAl_02_BinarySearch/BinarySearch_search.key
    provable ./standard_key/arith/check_jdiv.key
    provable ./standard_key/arith/check_jdiv_instantiated.key
@@ -189,12 +203,14 @@ group formnorm {
    provable ./standard_key/java_dl/arrayMax.key
    provable ./standard_key/java_dl/deepNonNull/deepNonNull0.key
    provable ./standard_key/java_dl/deepNonNull/deepNonNull1.key
+   provable ./standard_key/java_dl/deepNonNull/deepNonNull3.key
    provable ./standard_key/java_dl/java5/for_ReferenceArray.key
    provable ./standard_key/java_dl/jml-information-flow.key
    provable ./standard_key/java_dl/polishFlagSort.key
    provable ./standard_key/java_dl/quantifiedQuery.key
    provable ./standard_key/java_dl/reverseArray.key
    provable ./standard_key/java_dl/reverseArray2.key
+   provable ./standard_key/java_dl/symmArray.key
    provable ./standard_key/pred_log/count.key
    provable ./standard_key/pred_log/count2.key
    provable ./standard_key/pred_log/count3.key

@@ -82,7 +82,7 @@ public class StatisticsFile implements Serializable {
 
          }, new LongColumn("t_FNorm (ms)") {
             @Override
-            long getLongValueFromStatistics(Statistics statistics) { return statistics.normTimeInMillis;}
+            long getLongValueFromStatistics(Statistics statistics) { return (statistics.normTimeInNanos/1000000);}
 
          }, new LongColumn("H_inst (call)") {
             @Override

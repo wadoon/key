@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -68,6 +69,8 @@ public class HeuristicInstantiation implements TermGenerator {
             final Instantiation ia = Instantiation.create ( nf, goal );
             final QuantifiableVariable var =
                     qf.varsBoundHere ( 0 ).last ();
+            //System.out.println("Instances for " + var.name().toString() + ": " + ia.getSubstitution().stream().map
+            // (term -> term.toString()).collect(Collectors.joining(",")));
             return new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices());
         }else {
             throw new RuntimeException("Ruleapp is not a taclet app.");

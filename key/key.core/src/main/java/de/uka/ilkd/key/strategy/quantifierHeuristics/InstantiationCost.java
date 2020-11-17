@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.normalization.simple.SimpleFormulaNormalization;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 /**
@@ -42,7 +43,16 @@ public class InstantiationCost implements Feature {
 	 */
 	public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Projection is only applicable to rules with find";
-
+		SimpleFormulaNormalization sfn =
+				new SimpleFormulaNormalization(goal, false, false);
+//		Term formula;
+//		try {
+//			formula = sfn.getNormalized(pos.sequentFormula ().formula ());
+//		}catch (Exception e) {
+//			System.out.println("Could not normalize: " + e.toString());
+//			formula = pos.sequentFormula ().formula ();
+//			//return EMPTY;
+//		}
         final Term formula = pos.sequentFormula ().formula ();
         final Term instance = varInst.toTerm ( app, pos, goal );
 

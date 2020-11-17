@@ -34,7 +34,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
-import de.uka.ilkd.key.strategy.normalization.NormalizedAllFeature;
 import de.uka.ilkd.key.strategy.normalization.simple.SimpleFormulaNormalization;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
@@ -599,7 +598,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         if (quantifierInstantiatedEnabled() && normalizationRulesEnabled()) {
                 setupFormulaNormalisation(d, numbers, locSetLDT);
-                if(normalizationRulesExpensive()) { // TODO  change to delayed
+                if(normalizationRulesExpensive()) {
                     raiseNormalizationCost(d, numbers, locSetLDT);
                 }
         } else {
@@ -1414,14 +1413,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             // Adding 100 for depth of quantifier
             Feature countAllQuant = add(sum(fml, SubtermGenerator.leftTraverse(FocusProjection.create(0),
                     op(Quantifier.ALL)), longConst(100)), longConst(-100));
-            Feature instantiateFeature = new PrintFeature(SumFeature.createSum(
+            Feature instantiateFeature = SumFeature.createSum(
                     new Feature[] {
                             // infty cost if pos not in antec
                             FocusInAntecFeature.INSTANCE,
                             formulaNormalizationEnabled() ? countAllQuant : longConst(0),
                             applyTF(FocusProjection.create(0),
                                     add(formulaNormalizationEnabled() ?
-                                                    NormalizedAllFeature.getInstance()
+                                                    longTermConst(0)
+                                                    //NormalizedAllFeature.getInstance()
                                                     : ff.quantifiedClauseSet,
                                             instQuantifiersWithQueries() ?
                                                     longTermConst(0)
@@ -1430,7 +1430,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                     HeuristicInstantiation.INSTANCE,
                                     add(instantiate("t", varInst),
                                             branchPrediction,
-                                            longConst(10)))}));
+                                            longConst(10)))});
 
             bindRuleSet(
                 d,

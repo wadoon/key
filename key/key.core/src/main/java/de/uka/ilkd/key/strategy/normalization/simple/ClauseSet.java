@@ -3,6 +3,7 @@ package de.uka.ilkd.key.strategy.normalization.simple;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -14,22 +15,20 @@ import java.util.stream.StreamSupport;
 class ClauseSet {
 
     private final HashSet<Clause> clauses;
+    private final int hashCode;
 
     ClauseSet(Clause clause) {
-        this.clauses = new HashSet<Clause>();
-        this.clauses.add(clause);
+        this.clauses = new HashSet<Clause>(Collections.singleton(clause));
+        this.hashCode = this.clauses.hashCode();
     }
 
-    private ClauseSet(HashSet<Clause> clauses) {
-        this.clauses = clauses;
+    public ClauseSet(HashSet<Clause> clauses) {
+        this.clauses = new HashSet<Clause>(clauses);
+        this.hashCode = this.clauses.hashCode();
     }
 
     public HashSet<Clause> getClauses() {
         // this class is immutable so return only a copy of the clauseset
-        return copyClauses();
-    }
-
-    public HashSet<Clause> copyClauses() {
         return new HashSet<Clause>(clauses);
     }
 
@@ -39,7 +38,7 @@ class ClauseSet {
      * @return
      */
     public ClauseSet and(ClauseSet clauseSet) {
-        HashSet<Clause> conjunction = copyClauses();
+        HashSet<Clause> conjunction = new HashSet<Clause>(clauses);
         conjunction.addAll(clauseSet.getClauses());
         return new ClauseSet(conjunction);
     }
@@ -73,6 +72,19 @@ class ClauseSet {
 
     public String toString() {
         return "ClauseSet: "  + print(clauses);
+    }
+
+    @Override
+    public int hashCode() {
+        return hashCode;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this) return true;
+        if(!(obj instanceof ClauseSet)) return false;
+        ClauseSet other = (ClauseSet) obj;
+        return this.clauses.equals(other.clauses);
     }
 
     private String print(HashSet<Clause> clauses) {
