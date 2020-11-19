@@ -85,14 +85,14 @@ object DaisyAPI {
     val op: Operator = floatExpr.op()
     val subTerms = floatExpr.subs()
 
-    if (op == floatLDT.getJavaAdd)
-      Plus(merge(lets, subTerms.get(0), varIds, services), merge(lets, subTerms.get(1), varIds, services))
-    else if (op == floatLDT.getJavaSub)
-      Minus(merge(lets, subTerms.get(0), varIds, services), merge(lets, subTerms.get(1), varIds, services))
-    else if (op == floatLDT.getJavaMul)
-      Times(merge(lets, subTerms.get(0), varIds, services), merge(lets, subTerms.get(1), varIds, services))
-    else if (op == floatLDT.getJavaDiv)
-      Division(merge(lets, subTerms.get(0), varIds, services), merge(lets, subTerms.get(1), varIds, services))
+    if (op == floatLDT.getAddIEEE)
+      Plus(merge(lets, subTerms.get(1), varIds, services), merge(lets, subTerms.get(2), varIds, services))
+    else if (op == floatLDT.getSubIEEE)
+      Minus(merge(lets, subTerms.get(1), varIds, services), merge(lets, subTerms.get(2), varIds, services))
+    else if (op == floatLDT.getMulIEEE)
+      Times(merge(lets, subTerms.get(1), varIds, services), merge(lets, subTerms.get(2), varIds, services))
+    else if (op == floatLDT.getDivIEEE)
+      Division(merge(lets, subTerms.get(1), varIds, services), merge(lets, subTerms.get(2), varIds, services))
     // if variable
     else if (!op.isRigid && op.arity() == 0) {
       val varName = op.name().asInstanceOf[ProgramElementName].getProgramName
