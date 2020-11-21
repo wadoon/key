@@ -1,13 +1,16 @@
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.java.ProofCommandStatement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.merge.MergeRule;
+import de.uka.ilkd.key.proof.NodeInfo;
+import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
+
+import java.util.List;
 
 /**
  * @author Alexander Weigl
@@ -21,9 +24,29 @@ public class ProofCommandStatementRule implements BuiltInRule {
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        Term term = pio.subTerm();
-        //check for proof command statement
+        SourceElement activeStatement = getProofCommand(pio);
+        if (activeStatement == null) return false;
+        if (activeStatement instanceof ProofCommandStatement) {
+            ProofCommandStatement cmd = (ProofCommandStatement) activeStatement;
+            String name = cmd.getCommand();
+            switch (name.trim()) {
+                case "ignore":
+                    return true;
+            }
+
+        }
         return false;
+    }
+
+    @Nullable
+    private SourceElement getProofCommand(PosInOccurrence pio) {
+        final Term term = pio.subTerm();
+        if (term == null) return null;
+        final JavaBlock javaBlock = term.javaBlock();
+        if (javaBlock == null) return null;
+
+        @Nullable SourceElement activeStatement = NodeInfo.computeActiveStatement(javaBlock.program().getFirstElement());
+        return activeStatement;
     }
 
     @Override
@@ -33,11 +56,67 @@ public class ProofCommandStatementRule implements BuiltInRule {
 
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        return null;
+        return new IBuiltInRuleApp() {
+            @Override
+            public BuiltInRule rule() {
+                return ProofCommandStatementRule.INSTANCE;
+            }
+
+            @Override
+            public IBuiltInRuleApp tryToInstantiate(Goal goal) {
+                return null;
+            }
+
+            @Override
+            public IBuiltInRuleApp forceInstantiate(Goal goal) {
+                return null;
+            }
+
+            @Override
+            public List<LocationVariable> getHeapContext() {
+                return null;
+            }
+
+            @Override
+            public boolean isSufficientlyComplete() {
+                return false;
+            }
+
+            @Override
+            public ImmutableList<PosInOccurrence> ifInsts() {
+                return null;
+            }
+
+            @Override
+            public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+                return null;
+            }
+
+            @Override
+            public IBuiltInRuleApp replacePos(PosInOccurrence newPos) {
+                return null;
+            }
+
+            @Override
+            public PosInOccurrence posInOccurrence() {
+                return pos;
+            }
+
+            @Override
+            public ImmutableList<Goal> execute(Goal goal, Services services) {
+                return ProofCommandStatementRule.this.apply(goal, services, this);
+            }
+
+            @Override
+            public boolean complete() {
+                return true;
+            }
+        };
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)  {
+        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
         return null;
     }
 
