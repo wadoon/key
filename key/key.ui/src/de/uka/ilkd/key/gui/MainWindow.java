@@ -150,7 +150,7 @@ public final class MainWindow extends JFrame  {
     private LemmaGenerationBatchModeAction lemmaGenerationBatchModeAction;
     
     /** Actions for loop invariant generation */
-    private LoopInvariantAction liAction;
+//    private LoopInvariantAction liAction;
 
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
@@ -427,7 +427,7 @@ public final class MainWindow extends JFrame  {
         toolBar.addSeparator();
         toolBar.add(createHeatmapToggle());
         toolBar.add(createHeatmapMenuOpener());
-        toolBar.add(new LoopInvariantAction(this));
+//        toolBar.add(new LoopInvariantAction(this));
 
         return toolBar;
     }
