@@ -31,12 +31,12 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public final class DropEffectlessElementariesCondition 
+public final class DropEffectlessElementariesCondition
 						implements VariableCondition {
     private final UpdateSV u;
     private final SchemaVariable x;
     private final SchemaVariable result;
-    
+
     public DropEffectlessElementariesCondition(UpdateSV u,
 	                               	       SchemaVariable x,
 	                               	       SchemaVariable x2) {
@@ -44,10 +44,10 @@ public final class DropEffectlessElementariesCondition
 	this.x = x;
 	this.result = x2;
     }
-    
-    
+
+
     private static Term dropEffectlessElementariesHelper(
-	    				Term update, 
+	    				Term update, Term target,
 	    				Set<LocationVariable> relevantVars, TermServices services) {
 	if(update.op() instanceof ElementaryUpdate) {
 	    ElementaryUpdate eu = (ElementaryUpdate) update.op();
@@ -60,6 +60,8 @@ public final class DropEffectlessElementariesCondition
 //	            return TB.skip();
 //	        }
 		return null;
+	    } else if ((!(target.op() instanceof LocationVariable)) &&!target.isRigid()) {
+	        return null;
 	    } else {
 		return services.getTermBuilder().skip();
 	    }
@@ -68,8 +70,8 @@ public final class DropEffectlessElementariesCondition
             Term sub1 = update.sub(1);
             // first descend to the second sub-update to keep relevantVars in
             // good order
-	    Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
-	    Term newSub0 = dropEffectlessElementariesHelper(sub0, relevantVars, services);
+	    Term newSub1 = dropEffectlessElementariesHelper(sub1, target, relevantVars, services);
+	    Term newSub0 = dropEffectlessElementariesHelper(sub0, target, relevantVars, services);
 	    if(newSub0 == null && newSub1 == null) {
 		return null;
 	    } else {
@@ -80,35 +82,35 @@ public final class DropEffectlessElementariesCondition
 	} else if(update.op() == UpdateApplication.UPDATE_APPLICATION) {
 	    Term sub0 = update.sub(0);
 	    Term sub1 = update.sub(1);
-	    Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
+	    Term newSub1 = dropEffectlessElementariesHelper(sub1, target, relevantVars, services);
 	    return newSub1 == null ? null : services.getTermBuilder().apply(sub0, newSub1, null);
 	} else {
 	    return null;
 	}
-    }    
-    
-    
-    private static Term dropEffectlessElementaries(Term update, 
+    }
+
+
+    private static Term dropEffectlessElementaries(Term update,
 	    					   Term target,
 	    					   Services services) {
-	TermProgramVariableCollector collector 
+	TermProgramVariableCollector collector
 		= services.getFactory().create(services);
 	target.execPostOrder(collector);
 	Set<LocationVariable> varsInTarget = collector.result();
-	Term simplifiedUpdate = dropEffectlessElementariesHelper(update, 
-							         varsInTarget, services); 
-	return simplifiedUpdate == null 
-	       ? null 
-	       : services.getTermBuilder().apply(simplifiedUpdate, target, null); 
+	Term simplifiedUpdate = dropEffectlessElementariesHelper(update, target,
+							         varsInTarget, services);
+	return simplifiedUpdate == null
+	       ? null
+	       : services.getTermBuilder().apply(simplifiedUpdate, target, null);
     }
-    
-    
+
+
 
 
    @Override
-    public MatchConditions check(SchemaVariable var, 
-	    		  	 SVSubstitute instCandidate, 
-	    		  	 MatchConditions mc, 
+    public MatchConditions check(SchemaVariable var,
+	    		  	 SVSubstitute instCandidate,
+	    		  	 MatchConditions mc,
 	    		  	 Services services) {
 	SVInstantiations svInst = mc.getInstantiations();
 	Term uInst      = (Term) svInst.getInstantiation(u);
@@ -117,9 +119,9 @@ public final class DropEffectlessElementariesCondition
 	if(uInst == null || xInst == null) {
 	    return mc;
 	}
-	
-	Term properResultInst = dropEffectlessElementaries(uInst, 
-						           xInst, 
+
+	Term properResultInst = dropEffectlessElementaries(uInst,
+						           xInst,
 						           services);
 	if(properResultInst == null) {
 	    return null;
@@ -132,11 +134,11 @@ public final class DropEffectlessElementariesCondition
 	    return null;
 	}
     }
-    
-    
+
+
     @Override
     public String toString () {
-        return "\\dropEffectlessElementaries(" 
+        return "\\dropEffectlessElementaries("
                + u + ", " + x + ", " + result + ")";
     }
 }

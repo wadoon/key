@@ -33,7 +33,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
@@ -872,7 +871,7 @@ public abstract class TacletApp implements RuleApp {
 	    				  boolean interesting,
 	    				  Services services) {
 	final Function c
-		= new Function(new Name(instantiation), sort, true, new Sort[0]);
+		= new Function(new Name(instantiation), sort, true, sv.isRigid(), new Sort[0]);
 	return addInstantiation(sv, services.getTermBuilder().func(c), interesting, services);
     }
 

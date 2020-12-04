@@ -86,12 +86,14 @@ public class Function extends AbstractSortedOperator {
                     Sort[] argSorts,
                     Boolean[] whereToBind,
                     boolean unique,
+                    boolean rigid,
                     boolean isSkolemConstant) {
         this(name,
              sort,
              new ImmutableArray<Sort>(argSorts),
              whereToBind == null ? null : new ImmutableArray<Boolean>(whereToBind),
              unique,
+             rigid,
              isSkolemConstant);
     }
 
@@ -107,8 +109,8 @@ public class Function extends AbstractSortedOperator {
 	this(name, sort, argSorts, null, false);
     }
 
-    public Function(Name name, Sort sort, boolean isSkolemConstant, Sort ... argSorts) {
-        this(name, sort, argSorts, null, false, isSkolemConstant);
+    public Function(Name name, Sort sort, boolean isSkolemConstant, boolean rigid, Sort ... argSorts) {
+        this(name, sort, argSorts, null, false, rigid, isSkolemConstant);
     }
 
     public Function(Name name, Sort sort) {
