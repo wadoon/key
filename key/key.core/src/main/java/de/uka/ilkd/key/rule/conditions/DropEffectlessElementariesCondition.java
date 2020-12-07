@@ -16,9 +16,11 @@ package de.uka.ilkd.key.rule.conditions;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -60,7 +62,7 @@ public final class DropEffectlessElementariesCondition
 //	            return TB.skip();
 //	        }
 		return null;
-	    } else if ((!(target.op() instanceof LocationVariable)) &&!target.isRigid()) {
+	    } else if (containsNonRigidFuncSymbs(target)) {
 	        return null;
 	    } else {
 		return services.getTermBuilder().skip();
@@ -87,6 +89,25 @@ public final class DropEffectlessElementariesCondition
 	} else {
 	    return null;
 	}
+    }
+
+    /**
+     * Checks whether the given {@link Term} contains non-rigid <strong>function or
+     * predicate</strong> symbols. {@link LocationVariable}s are non-rigid, but not
+     * considered by this method. <br>
+     *
+     * Note: A non-rigid predicate in a .key file can be declared, e.g., using
+     * <code>\nonRigid P;</code> in the <code>\predicaters { ... } </code> block.
+     *
+     * @param term The {@link Term} to check.
+     * @return true iff the given {@link Term} contains non-rigid predicate of
+     * function symbols.
+     */
+    private static boolean containsNonRigidFuncSymbs(final Term term) {
+        final OpCollector opColl = new OpCollector();
+        term.execPostOrder(opColl);
+        return opColl.ops().stream()
+                .anyMatch(op -> !op.isRigid() && (op instanceof Function));
     }
 
 
