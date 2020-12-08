@@ -9,7 +9,7 @@
 //import de.uka.ilkd.key.logic.sort.Sort;
 //import de.uka.ilkd.key.loopinvgen.ConstructAllCompPreds;
 //import de.uka.ilkd.key.loopinvgen.ConstructAllDepPreds;
-//import de.uka.ilkd.key.loopinvgen.ReadProof;
+////import de.uka.ilkd.key.loopinvgen.ReadProof;
 ////import de.uka.ilkd.key.loopinvgen.DependenceLoopInvGenerator;
 //import de.uka.ilkd.key.proof.Goal;
 //

@@ -80,9 +80,9 @@ public class ShiftUpdateImpl {
 		Term u_prime_on_u_on_a = tb.apply(u_prime, u_on_a);
 		Term a_ass_up_u_a = tb.equals(target, u_prime_on_u_on_a);
 		System.out.println("upd is: " + a_ass_up_u_a.toString());
-		
+
 		// then it has to be added to the left side
-		goal.sequent().addFormula(new SequentFormula(a_ass_up_u_a), true, false);//WHY IT DOESN'T ADD?????
+		goal.addFormula(new SequentFormula(a_ass_up_u_a), true, false);
 		System.out.println("antc is: " + goal.sequent().antecedent().toString());
 	}
 
@@ -99,26 +99,4 @@ public class ShiftUpdateImpl {
 		g.addFormula(new SequentFormula(term4EventUpdate), true, true);
 	}
 
-	private Sequent shiftEventUpdate(Sequent inSq) {
-		Term accPred = null;
-
-		Term eUpd = ((Term) inSq.succedent().getFirst().formula().op());
-
-		inSq.succedent().remove(0);
-
-		if (eUpd.sub(0).toString().equals("read"))
-			accPred = tb.rPred(eUpd.sub(1), tb.add(eUpd.sub(2), tb.zTerm(1)));
-		else if (eUpd.sub(0).toString().equals("write"))
-			accPred = tb.wPred(eUpd.sub(1), tb.add(eUpd.sub(2), tb.zTerm(1)));
-
-		inSq.addFormula((SequentFormula) accPred, true, false);
-		return inSq;
-	}
-
-	private Sequent shiftNormalUpdate(Sequent inSq) {
-		Sequent outSq = null;
-
-		return outSq;
-
-	}
 }
