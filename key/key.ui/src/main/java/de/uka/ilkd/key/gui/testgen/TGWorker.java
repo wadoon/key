@@ -17,12 +17,12 @@ import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.smt.testgen.AbstractTestGenerator;
+import de.uka.ilkd.key.smt.testgen.BaseTestGenerator;
 import de.uka.ilkd.key.smt.testgen.StopRequest;
 
 public class TGWorker extends SwingWorker<Void, Void> implements InterruptListener, StopRequest {
 	private final TGInfoDialog tgInfoDialog;
-	private boolean stop;
+	private volatile boolean stop;
 	private final MainWindowTestGenerator testGenerator;
 	private Proof originalProof;
 
@@ -37,9 +37,9 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
     * <p>
     * <b>This class provides only the user interface and no test generation 
     * logic which is implemented by the 
-    * {@link AbstractTestGenerator}</b>.
+    * {@link BaseTestGenerator}</b>.
     */
-   public static class MainWindowTestGenerator extends AbstractTestGenerator {
+   public static class MainWindowTestGenerator extends BaseTestGenerator {
       /**
        * Defines if created {@link Proof}s are visible in the {@link MainWindow} or not.
        */
