@@ -92,16 +92,15 @@ public class Main {
                   // Show proof result
                   boolean closed = proof.openGoals().isEmpty();
                   System.out.println("Contract '" + contract.getDisplayName() + "' of " + contract.getTarget() + " is " + (closed ? "verified" : "still open") + ".");
-               }
-               catch (ProofInputException e) {
-                  System.out.println("Exception at '" + contract.getDisplayName() + "' of " + contract.getTarget() + ":");
+              } catch (ProofInputException e) {
+                  System.out
+                          .println("Exception at '" + contract.getDisplayName() + "' of " + contract.getTarget() + ":");
                   e.printStackTrace();
-               }
-               finally {
+              } finally {
                   if (proof != null) {
-                     proof.dispose(); // Ensure always that all instances of Proof are disposed
+                      proof.dispose(); // Ensure always that all instances of Proof are disposed
                   }
-               }
+              }
             }
          }
          finally {
