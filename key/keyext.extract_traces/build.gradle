@@ -15,7 +15,7 @@ mainClassName = 'org.key_project.sed.extract_traces.Main'
 task execClassVeri(type: JavaExec) {
     description = "Run the main class with JavaExecTask"
     classpath = sourceSets.main.runtimeClasspath
-    main = "org.key_project.sed.extract_traces.Main"
+    main = "org.key_project.cocos.ClassVeri"
     args '/home/lukas/key/git/BreastCancerScreening/src/main/java/breastScreening'
     args 'breastScreening.ScreeningBatch'
 }
