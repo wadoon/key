@@ -98,11 +98,8 @@ public class BaseTestGenerator {
         selectProof(ui, originalProof);
         final Proof proof = originalProof;
 
-        //create special smt settings for test case generation
-        final ProofIndependentSMTSettings piSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().clone();
-        piSettings.setMaxConcurrentProcesses(settings.getNumberOfProcesses());
-        final ProofDependentSMTSettings pdSettings = proof.getSettings().getSMTSettings().clone();
-        pdSettings.invariantForall = settings.invariantForAll();
+        final ProofIndependentSMTSettings piSettings = getProofIndependentSMTSettings(settings);
+        final ProofDependentSMTSettings pdSettings = getProofDependentSMTSettings(settings, proof);
         // invoke z3 for counterexamples
         final SMTSettings smtsettings = new SMTSettings(pdSettings, piSettings, proof);
         launcher = new SolverLauncher(smtsettings);
@@ -130,7 +127,22 @@ public class BaseTestGenerator {
     }
 
     @NotNull
-    private Collection<SMTProblem> blastProof(@NotNull StopRequest stopRequest, @NotNull TestGenerationLog log, Proof proof) {
+    public ProofDependentSMTSettings getProofDependentSMTSettings(TestGenerationSettings settings, Proof proof) {
+        final ProofDependentSMTSettings pdSettings = proof.getSettings().getSMTSettings().clone();
+        pdSettings.invariantForall = settings.invariantForAll();
+        return pdSettings;
+    }
+
+    @NotNull
+    public ProofIndependentSMTSettings getProofIndependentSMTSettings(TestGenerationSettings settings) {
+        //create special smt settings for test case generation
+        final ProofIndependentSMTSettings piSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().clone();
+        piSettings.setMaxConcurrentProcesses(settings.getNumberOfProcesses());
+        return piSettings;
+    }
+
+    @NotNull
+    public Collection<SMTProblem> blastProof(@NotNull StopRequest stopRequest, @NotNull TestGenerationLog log, Proof proof) {
         Collection<SMTProblem> ret = Collections.emptyList();
         if (stopRequest.shouldStop()) {
             return ret;
@@ -159,7 +171,7 @@ public class BaseTestGenerator {
         return ret;
     }
 
-    protected TestGenerationSettings getTestGenerationSettings() {
+    public TestGenerationSettings getTestGenerationSettings() {
         return ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
     }
 
