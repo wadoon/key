@@ -1,0 +1,100 @@
+plugins {
+    id("application")
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+    id "org.jetbrains.kotlin.jvm" version "1.4.20"
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.4.20'
+    id 'antlr'
+}
+
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+ext.kotlin_version = '1.4.20'
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        suppressWarnings = false
+        jvmTarget = "11"
+    }
+}
+
+dependencies {
+    compile project(":key.ui")
+    compile project(":key.core")
+    compile project(":key.util")
+
+    implementation 'com.github.ajalt:clikt:2.8.0'
+
+    compile group: 'com.miglayout', name: 'miglayout-javafx', version: '5.2'
+
+    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.5'
+    //compile group: 'com.jfoenix', name: 'jfoenix', version: '9.0.10'
+
+    compile 'org.kordamp.ikonli:ikonli-antdesignicons-pack:12.0.0'
+    compile 'org.kordamp.ikonli:ikonli-fontawesome5-pack:12.0.0'
+    compile 'org.kordamp.ikonli:ikonli-javafx:12.0.0'
+
+    compileOnly 'org.projectlombok:lombok:1.18.16'
+
+    //compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8-1.4.0-rc'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
+    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.26'
+    testCompile 'com.google.truth:truth:1.0.1'
+
+    compile group: 'org.antlr', name: 'antlr4-runtime', version:'4.8-1'
+    antlr group: 'org.antlr', name: 'antlr4', version:'4.8-1'
+
+    /*
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0-RC1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0-RC1'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.7.0-RC1'
+    testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test-junit', version: '1.4.0'
+    */
+}
+
+
+javafx {
+    version = "15.0.1"
+    modules = ['javafx.controls']
+}
+
+mainClassName = "org.key_project.ide.KeyIde"
+
+repositories {
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+
+    maven {
+        url "https://dl.bintray.com/kordamp/maven"
+    }
+}
+
+//https://github.com/gradle/gradle/issues/2565
+generateGrammarSource {
+    outputs.cacheIf { true }
+    outputDirectory = file("build/generated-src/antlr/main/")
+    sourceSets.main.java.srcDirs += outputDirectory
+    final PARSER_PACKAGE_NAME = 'org.key_project.ide.parser'
+    arguments += ["-visitor", "-no-listener", "-package", PARSER_PACKAGE_NAME]
+
+    doLast {
+        def parserFilePattern = '*.java'
+        def outputPath = generateGrammarSource.outputDirectory.canonicalPath
+        def parserPackagePath = "${outputPath}/${PARSER_PACKAGE_NAME.replace('.', '/')}"
+        file(parserPackagePath).mkdirs()
+        copy {
+            from outputPath
+            into parserPackagePath
+            include parserFilePattern
+        }
+        delete fileTree(outputPath) {
+            include parserFilePattern
+        }
+    }
+}
