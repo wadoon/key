@@ -118,6 +118,25 @@
     -fx-font-weight: bold;
 }
 
+.tool-bar {
+    -fx-padding: 0 0 0 0;
+}
+
+.vertical-multi-pane {
+}
+
+.horizontal-multi-pane {
+}
+
+.horizontal-multi-pane .toggle-button {
+    -fx-padding: 4 4 4 4;
+}
+
+.vertical-multi-pane .toggle-button {
+    -fx-rotate: -90deg;
+    -fx-padding: 4 4 4 4;
+}
+
 /*
 @mixin rebase($rebase03,$rebase02,$rebase01,$rebase00,$rebase0,$rebase1,$rebase2,$rebase3)
 {

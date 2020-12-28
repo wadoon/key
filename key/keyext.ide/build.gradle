@@ -52,6 +52,8 @@ dependencies {
 
     implementation 'no.tornado:tornadofx:1.7.20'
 
+    //compile 'net.raumzeitfalle.fx:scenic-view:11.0.2'
+
     /*
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0-RC1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0-RC1'
@@ -63,7 +65,8 @@ dependencies {
 
 javafx {
     version = "15.0.1"
-    modules = ['javafx.controls']
+    //modules = ['javafx.controls']
+    modules = ['javafx.web', 'javafx.controls', 'javafx.fxml', 'javafx.swing']
 }
 
 mainClassName = "org.key_project.ide.KeyIde"
