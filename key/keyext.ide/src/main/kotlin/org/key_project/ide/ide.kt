@@ -1,86 +1,58 @@
 package org.key_project.ide
 
-import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.arguments.multiple
-import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.types.file
 import javafx.application.Application
+import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import javafx.event.ActionEvent
+import javafx.event.Event
 import javafx.event.EventHandler
 import javafx.geometry.Orientation
 import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.cell.TextFieldTreeCell
-import javafx.scene.layout.BorderPane
-import javafx.scene.layout.HBox
-import javafx.scene.layout.VBox
-import javafx.scene.text.Font
+import javafx.scene.layout.*
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import javafx.util.StringConverter
+import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular
+import org.kordamp.ikonli.javafx.FontIcon
+import tornadofx.getValue
+import tornadofx.readonlyColumn
+import tornadofx.setValue
 import java.awt.Desktop
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.exists
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import kotlin.reflect.KProperty
 
-class Context {
-    private val map = HashMap<Class<*>, Any>()
-    inline fun <reified T : Any> register(obj: T) = register(obj, T::class.java)
-    fun <T : Any> register(obj: T, clazz: Class<T>) = obj.also { map[clazz] = it }
-    inline fun <reified T : Any> get(): T = get(T::class.java)
-    fun <T : Any> get(clazz: Class<T>): T = map[clazz] as T
-
-    interface ReadOnlyProp<T> {
-        operator fun getValue(self: Any, property: KProperty<*>): T
-    }
-
-    inline fun <reified T : Any> ref() = object : ReadOnlyProp<T> {
-        override operator fun getValue(self: Any, property: KProperty<*>): T {
-            return get(T::class.java)
-        }
-    }
-}
-
-
-class Arguments : CliktCommand() {
-    val projectDir by option("-p").file()
-    val files by argument().file().multiple()
-
-    @ExperimentalPathApi
-    override fun run() {
-    }
-}
 
 @ExperimentalPathApi
 class IdeApp : Application() {
     val appData = ApplicationData().also { it.load() }
     val userConfig = UserConfig().also { it.load() }
     val recentFiles = RecentFiles().also { it.load() }
+    val themeManager = ThemeManager(userConfig, appData)
 
     val context = Context()
 
     override fun start(primaryStage: Stage) {
-        val args = Arguments()
-        args.main(getParameters().raw)
-        context.register(args)
         context.register(appData)
         context.register(userConfig)
         context.register(recentFiles)
         val main = MainScene(context)
-        main.scene.stylesheets.addAll(
-            javaClass.getResource("/css/style.css").toExternalForm()
-        )
+
+        main.root.styleClass.addAll("root", "dark")
+        themeManager.installCss(main.scene)
+
         primaryStage.scene = main.scene
 
         primaryStage.x = appData.posX
@@ -94,19 +66,42 @@ class IdeApp : Application() {
         appData.windowHeight.bind(primaryStage.heightProperty())
         */
         primaryStage.title = ConfigurationPaths.applicationName
+
+        val projectDir = parameters.named["p"]
+        projectDir?.let {
+            val p = Paths.get(it)
+            if (p.exists())
+                main.fileNavigator.rootFile = p
+        }
+
+        for (file in parameters.unnamed) {
+            if (file == "%") {
+                main.addEditorTabPane()
+                continue
+            }
+            val p = Paths.get(file)
+            if (p.exists()) main.open(p)
+        }
+
+
         primaryStage.show()
     }
 
     override fun stop() {
-        appData.store()
-        userConfig.store()
-        recentFiles.store()
+        appData.save()
+        userConfig.save()
+        recentFiles.save()
     }
 }
 
 interface Controller {
     val ui: Node
 }
+
+interface TabbedPane {
+    val tab: Tab
+}
+
 
 @OptIn(ExperimentalPathApi::class)
 class MainScene(val context: Context) {
@@ -118,41 +113,75 @@ class MainScene(val context: Context) {
 
     val root = BorderPane()
     val scene = Scene(root, 300.0, 300.0)
-    val left = SplitPane()
-    val center = SplitPane()
-    val editorTabPanes = arrayListOf(createEditorTabPane())
-    val statusBar = Label("")
+    val paneNavigation = SplitPane()
+    val hSplit = SplitPane()
+    val vSplit = SplitPane()
+    val paneTool = MultiTabPane()
+    val statusBar = StatusBar(context)
+    val problems = IssueList(context)
+
     val openEditors = arrayListOf<Editor>()
+    val editorTabPanes: List<TabPane>
+        get() = hSplit.items.filterIsInstance<TabPane>()
+
+    val currentEditorProperty = SimpleObjectProperty<Editor>(this, "currentEditor", null)
+    var currentEditor by currentEditorProperty
 
     init {
-        context.register<MainScene>(this)
+        context.register(this)
+
+        paneNavigation.orientation = Orientation.VERTICAL
+        vSplit.orientation = Orientation.VERTICAL
+
         root.top = menu.ui
-        root.center = center
-        left.items.setAll(outline.ui, fileNavigator.ui)
-        left.orientation = Orientation.VERTICAL
-        center.items.add(left)
-        center.items.addAll(editorTabPanes)
+        root.bottom = statusBar.ui
+        vSplit.items.setAll(hSplit, paneTool.ui)
+        root.center = vSplit
+        paneNavigation.items.setAll(outline.ui, fileNavigator.ui)
+        hSplit.items.add(paneNavigation)
+        hSplit.items.addAll(editorTabPanes)
+
+        paneNavigation.maxWidthProperty().bind(hSplit.widthProperty().multiply(0.25));
 
         val appData = context.get<ApplicationData>()
-        fileNavigator.rootFile.value = Paths.get(appData.lastNavigatorPath)
+        fileNavigator.rootFile = Paths.get(appData.lastNavigatorPath)
 
-        val args = context.get<Arguments>()
-        args.projectDir?.let {
-            fileNavigator.rootFile.value = it.toPath()
-        }
+        hSplit.items.add(createEditorTabPane())
 
-        for (file in args.files) {
-            open(file.toPath())
-        }
+        //paneTool.tabClosingPolicy = TabPane.TabClosingPolicy.ALL_TABS
+        /*paneTool.tabs.addListener(ChangeListener({ _, _, _ ->
+            vSplit.setDividerPosition(0,1)
+        })*/
+
+        paneTool.ui.centerProperty().addListener(object : javafx.beans.value.ChangeListener<Node> {
+            var dividerPosition = 0.0
+            override fun changed(observable: ObservableValue<out Node>?, oldValue: Node?, newValue: Node?) {
+                val idx = vSplit.dividers.lastIndex
+                if (newValue == null) {
+                    dividerPosition = vSplit.dividerPositions.last()
+                    vSplit.setDividerPosition(idx, scene.height)
+                } else {
+                    vSplit.setDividerPosition(idx, dividerPosition)
+                }
+            }
+        })
+        addToolPanel(problems)
+
+        SplitPane.setResizableWithParent(paneTool.ui, false)
+        SplitPane.setResizableWithParent(paneNavigation, false)
+    }
+
+    private fun addToolPanel(tab: TabbedPane) {
+        paneTool.tabs.add(tab.tab)
     }
 
     fun publishMessage(status: String, graphic: Node? = null) {
-        statusBar.text = status
+        statusBar.message = status
         statusBar.graphic = graphic
     }
 
-    private fun createEditorTabPane(): TabPane {
-        return TabPane()
+    private fun createEditorTabPane(): TabPane = TabPane().also { tabPane ->
+        tabPane.tabs.addListener(ListChangeListener { onHandleEmptyTabs(tabPane) })
     }
 
     fun createCodeEditor() {
@@ -160,33 +189,69 @@ class MainScene(val context: Context) {
     }
 
     fun addEditorTab(editor: Editor) {
-        val tabPanel = editorTabPanes.first()
+        val tabPanel = editorTabPanes.last()
+        addEditorTab(editor, tabPanel)
+    }
+
+    fun addEditorTab(editor: Editor, tabPanel: TabPane) {
         val tab = Tab(editor.title.value, editor.ui)
+        tab.onCloseRequest = EventHandler { evt -> onTabCloseRequest(evt, editor) }
         tabPanel.tabs.add(tab)
         editor.title.addListener { _, _, new -> tab.text = new }
         openEditors.add(editor)
-        editor.ui.focusedProperty().addListener { obs, _, new -> if (new) currentEditor.value = editor }
-        currentEditor.value = editor
+        editor.ui.focusedProperty().addListener { obs, _, new -> if (new) currentEditor = editor }
+        currentEditor = editor
         editor.ui.requestFocus()
     }
 
-    val currentEditor = SimpleObjectProperty<Editor>(this, "currentEditor", null)
+    private fun onTabCloseRequest(evt: Event, editor: Editor) {
+        if (editor.dirty && !showTabCloseConfirmation()) {
+            evt.consume()
+        }
+    }
 
-    fun close() {}
+    private fun showTabCloseConfirmation(): Boolean {
+        val alert = Alert(Alert.AlertType.CONFIRMATION)
+        alert.contentText = "Text is edited and not saved. Close anway?"
+        val resp = alert.showAndWait()
+        val cancel = resp.isEmpty || (resp.isPresent && resp.get() != ButtonType.OK)
+        return !cancel
+    }
 
-    fun saveAs(editor: Editor? = currentEditor.value) =
+    private fun onHandleEmptyTabs(tabPane: TabPane) {
+        if (tabPane.tabs.isEmpty() && editorTabPanes.size > 2) {
+            hSplit.items.remove(tabPane)
+        }
+    }
+
+    fun closeEditorTab(editor: Editor? = currentEditor) {}
+
+
+    fun close() {
+        closeEditorTab()
+    }
+
+    fun exit() {
+        scene.window.onCloseRequest
+    }
+
+    private fun onCloseRequest() {
+
+    }
+
+    fun saveAs(editor: Editor? = currentEditor) =
         editor?.also {
             val fileChooser = FileChooser()
             fileChooser.showSaveDialog(scene.window)?.let { new ->
-                editor.filename.value = new.toPath()
+                editor.filename = new.toPath()
                 save(editor)
             }
         }
 
-    fun save(editor: Editor? = currentEditor.value) {
+    fun save(editor: Editor? = currentEditor) {
         editor?.also { editor ->
-            editor.filename.value?.also { filename ->
-                filename.writeText(editor.ui.text)
+            editor.filename?.also { filename ->
+                filename.writeText(editor.editor.text)
             }
         }
     }
@@ -205,43 +270,217 @@ class MainScene(val context: Context) {
             recentFiles.add(f)
         }
         val editor = Editor(context)
-        editor.filename.value = f
-        editor.ui.insertText(0, f.readText())
+        editor.filename = f
+        editor.editor.insertText(0, f.readText())
         addEditorTab(editor)
     }
 
-    fun editorToTheRight(editor: Editor? = currentEditor.value) {
-        if (editor == null) return
-        val tabPane = editorTabPanes.find { it.tabs.any { tab -> tab.content == editor.ui } }
+    fun addEditorTabPane(): TabPane {
+        val oldDividers = hSplit.dividerPositions.copyOf(hSplit.dividerPositions.size + 1)
+        val pane = createEditorTabPane().also { hSplit.items.add(it) }
+        val newDividiers = hSplit.dividerPositions.copyOf()
+        oldDividers[oldDividers.lastIndex] = newDividiers.last()
+        hSplit.setDividerPositions(*oldDividers)
+        return pane
+    }
+
+    fun editorToTheRight(editor: Editor? = currentEditor) {
+        val (tabPane, tab) = getTabPane(editor)
         if (tabPane != null) {
             val tabIndex = editorTabPanes.indexOf(tabPane)
             if (tabPane == editorTabPanes.last()) {
-                createEditorTabPane().also { editorTabPanes.add(it); center.items.add(it) }
+                addEditorTabPane()
             }
             val target = editorTabPanes[tabIndex + 1]
-            val tab = tabPane.tabs.find { it.content == editor.ui }!!
             tabPane.tabs.remove(tab)
             target.tabs.add(tab)
         }
     }
 
-    fun editorToTheLeft(editor: Editor? = currentEditor.value) {
-        val tabPane = editorTabPanes.find { it.tabs.any { it.content == editor } }
+    fun editorToTheLeft(editor: Editor? = currentEditor) {
+        val (tabPane, tab) = getTabPane(editor)
         if (tabPane != null) {
             val tabIndex = editorTabPanes.indexOf(tabPane)
             if (tabPane == editorTabPanes.first()) {
-                createEditorTabPane().also { editorTabPanes.add(0, it) }
+                createEditorTabPane().also { hSplit.items.add(1, it) }
             }
             val target = editorTabPanes[tabIndex - 1]
-            val tab = tabPane.tabs.find { it.content == editor }!!
             tabPane.tabs.remove(tab)
             target.tabs.add(tab)
         }
     }
+
+    private fun getTabPane(editor: Editor?): Pair<TabPane?, Tab?> {
+        editorTabPanes.forEach { pane ->
+            pane.tabs.forEach { tab ->
+                if (tab.content == editor?.ui) {
+                    return pane to tab
+                }
+            }
+        }
+        return null to null
+    }
+
 }
 
-internal fun createHeaderLabel(text: String) = Label(text).also {
-    it.font = Font(it.font.name, it.font.size + 6)
+class MultiTabPane : Controller {
+    override val ui = BorderPane()
+    val content = SplitPane()
+    val buttonBar = HBox()
+    val tabs = SimpleListProperty<Tab>(this, "tabs", FXCollections.observableArrayList())
+    private val buttons = FXCollections.observableArrayList<ToggleButton>()
+
+    init {
+        ui.center = content
+        ui.bottom = buttonBar
+
+        buttons.addListener(ListChangeListener { _ -> buttonBar.children.setAll(buttons) })
+
+        tabs.addListener(ListChangeListener { chg ->
+            val states = buttons.map { it.isSelected }
+            buttons.setAll(tabs.mapIndexed { idx, it ->
+                createToggleButton(it, states.getOrNull(idx) ?: false)
+            })
+        })
+
+        hideContentIfEmpty()
+    }
+
+    private fun createToggleButton(tab: Tab, selected: Boolean = false) = ToggleButton().also {
+        it.textProperty().bind(tab.textProperty())
+        it.graphicProperty().bind(tab.graphicProperty())
+        it.isSelected = selected
+        it.selectedProperty().addListener { _, _, selected -> onSelectionChange(tab, selected) }
+    }
+
+    private fun onSelectionChange(tab: Tab, selected: Boolean?) {
+        val selected = selected ?: false
+        if (selected) {
+            if (tab.content !in content.items)
+                content.items.add(tab.content)
+        } else {
+            content.items.remove(tab.content)
+        }
+        hideContentIfEmpty()
+    }
+
+    private fun hideContentIfEmpty() {
+        if (content.items.isEmpty()) {
+            ui.center = null //hide content
+        } else {
+            ui.center = content
+        }
+    }
+
+    /*inner class SelectionModel : MultipleSelectionModel<Tab>() {
+        private val selectedTabs = SimpleListProperty<Tab>(this, "selectedTabs")
+        private val indices = SimpleListProperty<Int>(this, "indices")
+
+        init {
+            indices.addListener(ListChangeListener {
+                selectedTabs.setAll(
+                    tabs.filterIndexed {idx,t-> idx in indices}.toMutableList())
+            })
+        }
+
+        override fun clearAndSelect(index: Int) {
+            indices.clear()
+            indices.add(index)
+        }
+
+        override fun select(index: Int) {
+            if (index !in indices)
+                indices.add(index)
+        }
+
+        override fun select(obj: Tab?) {
+            if (obj == null) return
+            val idx = tabs.indexOf(obj)
+            if (idx >= 0) select(idx)
+        }
+
+        override fun clearSelection(index: Int) {
+            indices.remove(index)
+        }
+
+        override fun clearSelection() {
+            indices.clear()
+        }
+
+        override fun isSelected(index: Int): Boolean = index in indices
+
+        override fun isEmpty(): Boolean = indices.isEmpty()
+
+        override fun selectPrevious() {}
+
+        override fun selectNext() {}
+
+        override fun selectFirst() {
+            select(0)
+        }
+
+        override fun selectLast() {
+            select(tabs.lastIndex)
+        }
+
+        override fun getSelectedIndices(): ObservableList<Int> {
+            return indices
+        }
+
+        override fun getSelectedItems(): ObservableList<Tab> {
+            return selectedTabs
+        }
+
+        override fun selectIndices(index: Int, vararg indices: Int) {
+            select(index)
+            indices.forEach { select(it) }
+        }
+
+        override fun selectAll() {
+            tabs.forEachIndexed { idx, _ -> select(idx) }
+        }
+    }
+*/
+}
+
+class IssueList(context: Context) : Controller, TabbedPane, TitledPanel("Issues") {
+    //val view = TreeTableView<IssueEntry>()
+    val view = TableView<IssueEntry>()
+    override val tab: Tab = Tab().also { it.content = ui }
+
+    init {
+        context.register(this)
+
+        tab.text = "Issues"
+        tab.graphic = FontIcon(FontAwesomeRegular.BELL)
+        ui.center = view
+        lblHeader.graphic = FontIcon(FontAwesomeRegular.BELL)
+
+        view.readonlyColumn("Title", IssueEntry::title)
+        view.readonlyColumn("Category", IssueEntry::category)
+        view.readonlyColumn("Offset", IssueEntry::offset)
+    }
+}
+
+data class IssueEntry(val title: String, val category: String, val offset: Int) {
+    //val children = mutableListOf<IssueEntry>()
+}
+
+class StatusBar(context: Context) : Controller {
+    val lblMessage = Label()
+    val lblLineRow = Label()
+    val lblError = Label()
+    override val ui: HBox = HBox(10.0, lblMessage, lblLineRow, lblError)
+
+    val messageProperty = lblMessage.textProperty()
+    var message: String by messageProperty
+
+    val graphicProperty = lblMessage.graphicProperty()
+    var graphic by graphicProperty
+
+    init {
+        context.register(this)
+    }
 }
 
 class IdeMenu(val ctx: Context) {
@@ -305,13 +544,23 @@ class IdeMenu(val ctx: Context) {
 }
 
 abstract class TitledPanel(header: String) {
-    val ui
-        get() = root
-    val root = BorderPane()
+    val ui = BorderPane()
     val buttonBox = HBox()
-
+    val lblHeader = createHeaderLabel(header)
+    //val btnMenu = Button()
     init {
-        root.top = VBox(createHeaderLabel(header), buttonBox, Separator())
+        //btnMenu.graphic = FontIcon(AntDesignIconsFilled.ENVIRONMENT)
+        //buttonBox.children.add(btnMenu)
+
+        val spacer = Region()
+        HBox.setHgrow(spacer, Priority.ALWAYS)
+
+        ui.top = HBox(lblHeader, spacer, buttonBox)
+        ui.styleClass.add("titled-panel")
+    }
+
+    protected fun createHeaderLabel(text: String) = Label(text).also {
+        it.styleClass.add("title")
     }
 }
 
@@ -320,11 +569,12 @@ class FileNavigator(ctx: Context) : TitledPanel("Navigator") {
     private val main by ctx.ref<MainScene>()
 
     //properties
-    val rootFile = SimpleObjectProperty(this, "rootFile", Paths.get(".").normalize().toAbsolutePath())
+    val rootFileProperty = SimpleObjectProperty(this, "rootFile", Paths.get(".").normalize().toAbsolutePath())
+    var rootFile by rootFileProperty
     //end properties
 
     //ui
-    val treeFile = TreeView(SimpleFileTreeItem(rootFile.value))
+    val treeFile = TreeView(SimpleFileTreeItem(rootFile))
     val contextMenu: ContextMenu = ContextMenu()
     //end
 
@@ -336,8 +586,6 @@ class FileNavigator(ctx: Context) : TitledPanel("Navigator") {
             main.open(it.value)
         }
     }
-
-
     private val actionNewFile = config.createItem("tree-new-file") {
         markFolderUnderMouse(it)
         treeFile.selectionModel.selectedItem?.let { item ->
@@ -384,7 +632,7 @@ class FileNavigator(ctx: Context) : TitledPanel("Navigator") {
     private val actionDeleteFile = config.createItem("tree-delete-file") {}
     private val actionGoUp = config.createItem("go-up") {
         markFolderUnderMouse(it)
-        (treeFile.root.value as? Path)?.let { file ->
+        treeFile.root.value?.let { file ->
             treeFile.root = SimpleFileTreeItem(file.parent.toAbsolutePath())
             treeFile.root.isExpanded = true
         }
@@ -448,10 +696,10 @@ class FileNavigator(ctx: Context) : TitledPanel("Navigator") {
         treeFile.contextMenu = contextMenu
         treeFile.isEditable = false
         treeFile.isShowRoot = true
-        rootFile.addListener { _, _, new ->
+        rootFileProperty.addListener { _, _, new ->
             treeFile.root = SimpleFileTreeItem(new)
         }
-        root.center = treeFile
+        ui.center = treeFile
         treeFile.setCellFactory { tv ->
             TextFieldTreeCell(object : StringConverter<Path>() {
                 override fun toString(obj: Path?): String = obj?.fileName.toString() ?: ""
@@ -461,7 +709,6 @@ class FileNavigator(ctx: Context) : TitledPanel("Navigator") {
         treeFile.root.isExpanded = true
     }
 }
-
 
 class SimpleFileTreeItem(f: Path) : TreeItem<Path>(f) {
     private var isFirstTimeChildren = true
@@ -503,7 +750,7 @@ class FileOutline(ctx: Context) : TitledPanel("Outline") {
 
     init {
         ctx.register(this)
-        root.center = outlineTree
+        ui.center = outlineTree
     }
 }
 
