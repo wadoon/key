@@ -118,23 +118,17 @@
     -fx-font-weight: bold;
 }
 
-.tool-bar {
+.side-pane > .tool-bar {
     -fx-padding: 0 0 0 0;
 }
 
-.vertical-multi-pane {
-}
-
-.horizontal-multi-pane {
-}
-
-.horizontal-multi-pane .toggle-button {
+.side-pane > .tool-bar .toggle-button {
     -fx-padding: 4 4 4 4;
 }
 
-.vertical-multi-pane .toggle-button {
+
+.side-pane > .tool-bar:vertical .toggle-button {
     -fx-rotate: -90deg;
-    -fx-padding: 4 4 4 4;
 }
 
 /*

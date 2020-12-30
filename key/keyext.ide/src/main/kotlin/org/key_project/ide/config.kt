@@ -79,8 +79,8 @@ abstract class Configuration(
             properties.load(path.bufferedReader())
     }
 
-    fun load(resource: URL?) {
-        resource?.openStream()?.use {
+    fun load(resource: URL) {
+        resource.openStream()?.use {
             properties.load(it)
         }
     }
@@ -227,6 +227,7 @@ class ThemeManager(
     val themeCss = if (userConfig.theme == "dark") darkCss else lightCss
 
     fun installCss(scene: Scene) {
+        println(userConfig.theme)
         addAndWatchForChanges(scene, baseCss, FileUpdateMonitor, 0)
         addAndWatchForChanges(scene, themeCss, FileUpdateMonitor, 1)
         /*if (appearancePreferences.shouldOverrideDefaultFontSize()) {

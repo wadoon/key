@@ -8,7 +8,6 @@ import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.event.Event
 import javafx.event.EventHandler
-import javafx.geometry.Dimension2D
 import javafx.geometry.Orientation
 import javafx.scene.Group
 import javafx.scene.Node
@@ -22,7 +21,6 @@ import javafx.stage.FileChooser
 import tornadofx.View
 import tornadofx.getValue
 import tornadofx.setValue
-import tornadofx.usePrefSize
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.ExperimentalPathApi
@@ -48,18 +46,18 @@ class MainScene(val context: Context) : View() {
 
     override val root = BorderPane()
     val scene = Scene(root, 300.0, 300.0)
-    val hSplit = SplitPane()
-    val vSplit = SplitPane()
 
-    val paneNavigation = MultiTabPane(Orientation.VERTICAL)
-    val paneTool = MultiTabPane(Orientation.HORIZONTAL)
+    val editors = SplitPane()
+
+    val paneNavigation = MultiTabPane(MultiTabPane.Position.LEFT)
+    val paneTool = MultiTabPane(MultiTabPane.Position.DOWN)
 
     val statusBar = StatusBar(context)
     val problems = IssueList(context)
 
     val openEditors = arrayListOf<Editor>()
     val editorTabPanes: List<TabPane>
-        get() = hSplit.items.filterIsInstance<TabPane>()
+        get() = editors.items.filterIsInstance<TabPane>()
 
     val currentEditorProperty = SimpleObjectProperty<Editor>(this, "currentEditor", null)
     var currentEditor by currentEditorProperty
@@ -67,25 +65,21 @@ class MainScene(val context: Context) : View() {
     init {
         context.register(this)
 
-        paneNavigation.orientation = Orientation.VERTICAL
-        vSplit.orientation = Orientation.VERTICAL
+        editors.orientation = Orientation.HORIZONTAL
+
+        paneNavigation.tabs.setAll(outline.tab, fileNavigator.tab)
+        editors.items.addAll(editorTabPanes)
+
 
         root.top = menu.ui
         root.bottom = statusBar.ui
-        vSplit.items.setAll(hSplit, paneTool.ui)
-        root.center = vSplit
-
-        paneNavigation.tabs.setAll(outline.tab, fileNavigator.tab)
-
-        hSplit.items.add(paneNavigation.ui)
-        hSplit.items.addAll(editorTabPanes)
-
-        //paneNavigation.ui.maxWidthProperty().bind(hSplit.widthProperty().multiply(0.25));
+        paneNavigation.content = paneTool.ui
+        paneTool.content = editors
+        root.center = paneNavigation.ui
 
         val appData = context.get<ApplicationData>()
         fileNavigator.rootFile = Paths.get(appData.lastNavigatorPath)
-
-        hSplit.items.add(createEditorTabPane())
+        editors.items.add(createEditorTabPane())
 
         //paneTool.tabClosingPolicy = TabPane.TabClosingPolicy.ALL_TABS
         /*paneTool.tabs.addListener(ChangeListener({ _, _, _ ->
@@ -95,9 +89,6 @@ class MainScene(val context: Context) : View() {
 //        paneTool.ui.centerProperty().addListener()
 
         addToolPanel(problems)
-
-        SplitPane.setResizableWithParent(paneTool.ui, false)
-        SplitPane.setResizableWithParent(paneNavigation.ui, false)
     }
 
     private fun addToolPanel(tab: TabbedPane) {
@@ -149,7 +140,7 @@ class MainScene(val context: Context) : View() {
 
     private fun onHandleEmptyTabs(tabPane: TabPane) {
         if (tabPane.tabs.isEmpty() && editorTabPanes.size > 2) {
-            hSplit.items.remove(tabPane)
+            editors.items.remove(tabPane)
         }
     }
 
@@ -205,11 +196,11 @@ class MainScene(val context: Context) : View() {
     }
 
     fun addEditorTabPane(): TabPane {
-        val oldDividers = hSplit.dividerPositions.copyOf(hSplit.dividerPositions.size + 1)
-        val pane = createEditorTabPane().also { hSplit.items.add(it) }
-        val newDividiers = hSplit.dividerPositions.copyOf()
+        val oldDividers = editors.dividerPositions.copyOf(editors.dividerPositions.size + 1)
+        val pane = createEditorTabPane().also { editors.items.add(it) }
+        val newDividiers = editors.dividerPositions.copyOf()
         oldDividers[oldDividers.lastIndex] = newDividiers.last()
-        hSplit.setDividerPositions(*oldDividers)
+        editors.setDividerPositions(*oldDividers)
         return pane
     }
 
@@ -231,7 +222,7 @@ class MainScene(val context: Context) : View() {
         if (tabPane != null) {
             val tabIndex = editorTabPanes.indexOf(tabPane)
             if (tabPane == editorTabPanes.first()) {
-                createEditorTabPane().also { hSplit.items.add(1, it) }
+                createEditorTabPane().also { editors.items.add(1, it) }
             }
             val target = editorTabPanes[tabIndex - 1]
             tabPane.tabs.remove(tab)
@@ -364,22 +355,65 @@ open class TitledPanel(header: String) {
     }
 }
 
-class MultiTabPane(orientation: Orientation) : Controller {
-    override val ui = BorderPane()
-    val content = SplitPane()
-    var buttonBar = ToolBar()
-    private val buttons = FXCollections.observableArrayList<ToggleButton>()
 
+class MultiTabPane(position: Position) : Controller {
+    enum class Position() {
+        LEFT {
+            override fun reformat(pane: MultiTabPane) {
+                with(pane) {
+                    toolButtons.orientation = Orientation.VERTICAL
+                    center.orientation = Orientation.HORIZONTAL
+                    toolPanels.orientation = Orientation.VERTICAL
+                    center.items.setAll(toolPanels, content)
+
+                    //ui.center = toolPanels
+                    ui.bottom = Group()
+                    ui.bottom.maxHeight(0.0)
+                    ui.left = toolButtons
+                    ui.center = center
+                    SplitPane.setResizableWithParent(toolPanels, false)
+                }
+            }
+        },
+        DOWN {
+            override fun reformat(pane: MultiTabPane) {
+                with(pane) {
+                    toolButtons.orientation = Orientation.HORIZONTAL
+                    center.orientation = Orientation.VERTICAL
+                    toolPanels.orientation = Orientation.HORIZONTAL
+
+                    center.items.setAll(content, toolPanels)
+
+                    ui.center = center
+                    ui.left = null
+                    ui.bottom = toolButtons
+                    SplitPane.setResizableWithParent(toolPanels, false)
+                }
+            }
+        };
+
+        abstract fun reformat(pane: MultiTabPane)
+    }
+
+    override val ui = BorderPane()
+    private val toolPanels = SplitPane()
+    private val toolButtons = ToolBar()
+    private val center = SplitPane()
+
+
+    private val buttons = FXCollections.observableArrayList<ToggleButton>()
     private var lastOpenedSize: Region = Region()
 
     //properties
-    var orientationProperty = content.orientationProperty()
-        .also {
-            it.set(orientation)
-            buttonBar.orientationProperty().bind(it)
-            it.addListener { _, _, new -> reformat(new) }
-        }
-    var orientation by orientationProperty
+    val contentProperty = SimpleObjectProperty<Node>().also {
+        it.addListener { _ -> position.reformat(this) }
+    }
+    var content: Node by contentProperty
+
+    var positionProperty = SimpleObjectProperty<Position>(this, "position", position).also {
+        it.addListener { _, _, new -> new.reformat(this) }
+    }
+    var position by positionProperty
     val tabs = SimpleListProperty<Tab>(this, "tabs", FXCollections.observableArrayList())
     //
 
@@ -397,9 +431,9 @@ class MultiTabPane(orientation: Orientation) : Controller {
     }*/
 
     init {
-        reformat(orientation)
+        ui.styleClass.add("side-pane")
 
-        buttons.addListener(ListChangeListener { _ -> buttonBar.items.setAll(buttons.map { Group(it) }) })
+        buttons.addListener(ListChangeListener { _ -> toolButtons.items.setAll(buttons.map { Group(it) }) })
 
         tabs.addListener(ListChangeListener { chg ->
             val states = buttons.map { it.isSelected }
@@ -408,24 +442,7 @@ class MultiTabPane(orientation: Orientation) : Controller {
             })
         })
 
-        hideContentIfEmpty()
-    }
-
-    private fun reformat(orientation: Orientation) {
-        if (orientation == Orientation.HORIZONTAL) {
-            ui.center = content
-            ui.left = Group()
-            ui.bottom = buttonBar
-            ui.styleClass.remove("vertical-multi-pane")
-            ui.styleClass.add("horizontal-multi-pane")
-        } else {
-            ui.center = content
-            ui.bottom = Group()
-            ui.bottom.maxHeight(0.0)
-            ui.left = buttonBar
-            ui.styleClass.add("vertical-multi-pane")
-            ui.styleClass.remove("horizontal-multi-pane")
-        }
+        position.reformat(this)
         hideContentIfEmpty()
     }
 
@@ -439,26 +456,26 @@ class MultiTabPane(orientation: Orientation) : Controller {
     private fun onSelectionChange(tab: Tab, selected: Boolean?) {
         val selected = selected ?: false
         if (selected) {
-            if (tab.content !in content.items)
-                content.items.add(tab.content)
+            if (tab.content !in toolPanels.items)
+                toolPanels.items.add(tab.content)
         } else {
-            content.items.remove(tab.content)
+            toolPanels.items.remove(tab.content)
         }
         hideContentIfEmpty()
     }
 
     private fun hideContentIfEmpty() {
-        if (content.items.isEmpty()) {
+        /*if (toolPanels.items.isEmpty()) {
             ui.center = Region()
-            lastOpenedSize.prefWidth = content.width
-            lastOpenedSize.prefHeight = content.height
+            lastOpenedSize.prefWidth = toolPanels.width
+            lastOpenedSize.prefHeight = toolPanels.height
 
             if (orientation == Orientation.VERTICAL)
-                ui.maxWidth = buttonBar.width
+                ui.maxWidth = toolButtons.width
             else
-                ui.maxHeight = buttonBar.height
+                ui.maxHeight = toolButtons.height
         } else {
-            ui.center = content
+            ui.center = toolPanels
             if (orientation == Orientation.VERTICAL)
                 ui.maxWidth = -1.0
             else
@@ -466,7 +483,7 @@ class MultiTabPane(orientation: Orientation) : Controller {
 
             ui.center.minWidth(lastOpenedSize.prefWidth)
             ui.center.minHeight(lastOpenedSize.prefHeight)
-        }
+        }*/
     }
 
     /*inner class SelectionModel : MultipleSelectionModel<Tab>() {
@@ -539,182 +556,3 @@ class MultiTabPane(orientation: Orientation) : Controller {
     }
 */
 }
-
-
-/*
-class MultiTabPane(orientation: Orientation) : Controller {
-    override val ui = BorderPane()
-    val content = SplitPane()
-    var buttonBar = ToolBar()
-    private val buttons = FXCollections.observableArrayList<ToggleButton>()
-
-    private var lastOpenedSize: Region = Region()
-
-    //properties
-    var orientationProperty = content.orientationProperty()
-        .also {
-            it.set(orientation)
-            buttonBar.orientationProperty().bind(it)
-            it.addListener { _, _, new -> reformat(new) }
-        }
-    var orientation by orientationProperty
-    val tabs = SimpleListProperty<Tab>(this, "tabs", FXCollections.observableArrayList())
-    //
-
-    /*class MultiTabHandler(val splitPane: SplitPane) : ChangeListener<Node> {
-        var dividerPosition = 0.0
-        override fun changed(observable: ObservableValue<out Node>?, oldValue: Node?, newValue: Node?) {
-            val idx = vSplit.dividers.lastIndex
-            if (newValue == null) {
-                dividerPosition = vSplit.dividerPositions.last()
-                vSplit.setDividerPosition(idx, scene.height)
-            } else {
-                vSplit.setDividerPosition(idx, dividerPosition)
-            }
-        }
-    }*/
-
-    init {
-        reformat(orientation)
-
-        buttons.addListener(ListChangeListener { _ -> buttonBar.items.setAll(buttons.map { Group(it) }) })
-
-        tabs.addListener(ListChangeListener { chg ->
-            val states = buttons.map { it.isSelected }
-            buttons.setAll(tabs.mapIndexed { idx, it ->
-                createToggleButton(it, states.getOrNull(idx) ?: false)
-            })
-        })
-
-        hideContentIfEmpty()
-    }
-
-    private fun reformat(orientation: Orientation) {
-        if (orientation == Orientation.HORIZONTAL) {
-            ui.center = content
-            ui.left = Group()
-            ui.bottom = buttonBar
-            ui.styleClass.remove("vertical-multi-pane")
-            ui.styleClass.add("horizontal-multi-pane")
-        } else {
-            ui.center = content
-            ui.bottom = Group()
-            ui.bottom.maxHeight(0.0)
-            ui.left = buttonBar
-            ui.styleClass.add("vertical-multi-pane")
-            ui.styleClass.remove("horizontal-multi-pane")
-        }
-        hideContentIfEmpty()
-    }
-
-    private fun createToggleButton(tab: Tab, selected: Boolean = false) = ToggleButton().also {
-        it.textProperty().bind(tab.textProperty())
-        it.graphicProperty().bind(tab.graphicProperty())
-        it.isSelected = selected
-        it.selectedProperty().addListener { _, _, selected -> onSelectionChange(tab, selected) }
-    }
-
-    private fun onSelectionChange(tab: Tab, selected: Boolean?) {
-        val selected = selected ?: false
-        if (selected) {
-            if (tab.content !in content.items)
-                content.items.add(tab.content)
-        } else {
-            content.items.remove(tab.content)
-        }
-        hideContentIfEmpty()
-    }
-
-    private fun hideContentIfEmpty() {
-        if (content.items.isEmpty()) {
-            ui.center = Region()
-            lastOpenedSize.prefWidth = content.width
-            lastOpenedSize.prefHeight = content.height
-
-            if (orientation == Orientation.VERTICAL)
-                ui.maxWidth = buttonBar.width
-            else
-                ui.maxHeight = buttonBar.height
-        } else {
-            ui.center = content
-            if (orientation == Orientation.VERTICAL)
-                ui.maxWidth = -1.0
-            else
-                ui.maxHeight = -1.0
-
-            ui.center.minWidth(lastOpenedSize.prefWidth)
-            ui.center.minHeight(lastOpenedSize.prefHeight)
-        }
-    }
-
-    /*inner class SelectionModel : MultipleSelectionModel<Tab>() {
-        private val selectedTabs = SimpleListProperty<Tab>(this, "selectedTabs")
-        private val indices = SimpleListProperty<Int>(this, "indices")
-
-        init {
-            indices.addListener(ListChangeListener {
-                selectedTabs.setAll(
-                    tabs.filterIndexed {idx,t-> idx in indices}.toMutableList())
-            })
-        }
-
-        override fun clearAndSelect(index: Int) {
-            indices.clear()
-            indices.add(index)
-        }
-
-        override fun select(index: Int) {
-            if (index !in indices)
-                indices.add(index)
-        }
-
-        override fun select(obj: Tab?) {
-            if (obj == null) return
-            val idx = tabs.indexOf(obj)
-            if (idx >= 0) select(idx)
-        }
-
-        override fun clearSelection(index: Int) {
-            indices.remove(index)
-        }
-
-        override fun clearSelection() {
-            indices.clear()
-        }
-
-        override fun isSelected(index: Int): Boolean = index in indices
-
-        override fun isEmpty(): Boolean = indices.isEmpty()
-
-        override fun selectPrevious() {}
-
-        override fun selectNext() {}
-
-        override fun selectFirst() {
-            select(0)
-        }
-
-        override fun selectLast() {
-            select(tabs.lastIndex)
-        }
-
-        override fun getSelectedIndices(): ObservableList<Int> {
-            return indices
-        }
-
-        override fun getSelectedItems(): ObservableList<Tab> {
-            return selectedTabs
-        }
-
-        override fun selectIndices(index: Int, vararg indices: Int) {
-            select(index)
-            indices.forEach { select(it) }
-        }
-
-        override fun selectAll() {
-            tabs.forEachIndexed { idx, _ -> select(idx) }
-        }
-    }
-*/
-}
- */

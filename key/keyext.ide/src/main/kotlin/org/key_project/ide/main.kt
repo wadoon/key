@@ -32,15 +32,16 @@ class IdeApp : App(MainScene::class) {
 
     val context = Context()
 
-    init {
-    }
+    init {}
 
     override fun start(stage: Stage) {
         context.register(appData)
         context.register(userConfig)
         context.register(recentFiles)
         val main = MainScene(context)
-        main.root.styleClass.addAll("root", "dark")
+
+        main.root.styleClass.addAll("root", userConfig.theme)
+
         themeManager.installCss(main.scene)
         stage.hookGlobalShortcuts()
 
