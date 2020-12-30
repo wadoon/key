@@ -1,7 +1,6 @@
 package org.key_project.ide
 
 import javafx.application.Application
-import javafx.scene.Scene
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCodeCombination
 import javafx.stage.Modality
