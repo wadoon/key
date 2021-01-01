@@ -1,5 +1,5 @@
 class For implements Iterable {
-
+  //@invariant true;
   int[] a;
   Trivial it;
   For f;

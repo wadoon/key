@@ -3,18 +3,12 @@ package org.key_project.ide
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
-import javafx.scene.Node
-import javafx.scene.control.TreeItem
-import org.antlr.v4.runtime.*
+import org.antlr.v4.runtime.CharStreams
 import org.fxmisc.flowless.VirtualizedScrollPane
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
 import org.fxmisc.richtext.model.StyleSpans
 import org.fxmisc.richtext.model.StyleSpansBuilder
-import org.key_project.ide.parser.JavaJMLLexer
-import org.key_project.ide.parser.KeYLexer
-import org.key_project.ide.parser.KeYParser
-import org.key_project.ide.parser.KeYParserBaseVisitor
 import org.reactfx.EventStreams
 import tornadofx.getValue
 import tornadofx.setValue
@@ -26,7 +20,10 @@ import kotlin.io.path.extension
 
 @OptIn(ExperimentalPathApi::class)
 object Editors {
+    @JvmStatic
     fun getLanguageForFilename(file: Path) = getEditorForSuffix(file.extension)
+
+    @JvmStatic
     fun getEditorForSuffix(suffix: String): Language? =
         when (suffix) {
             "key" -> KeyLanguage
@@ -36,6 +33,7 @@ object Editors {
 }
 
 
+@Suppress("MemberVisibilityCanBePrivate")
 open class Editor(val ctx: Context) : Controller {
     val editor = CodeArea("")
     val scrollPane = VirtualizedScrollPane(editor)
@@ -57,7 +55,7 @@ open class Editor(val ctx: Context) : Controller {
     )
 
     init {
-        editor.paragraphGraphicFactory = LineNumberFactory.get(editor) //{ String.format("%03d", it) }
+        editor.paragraphGraphicFactory = LineNumberFactory.get(editor)
         editor.isLineHighlighterOn = true
 
         filenameProperty.addListener { _, _, new ->
@@ -84,20 +82,26 @@ open class Editor(val ctx: Context) : Controller {
         val text = editor.text
         language?.let { language ->
             if (text.isNotEmpty()) {
-                language.computeOutline(CharStreams.fromString(editor.text), this)?.let { root ->
+                val seq = arrayListOf<IssueEntry>()
+                val p = language.contextFactory(CharStreams.fromString(editor.text), IssueErrorListener(seq))
+
+                language.computeOutline(p, this)?.let { root ->
                     ctx.get<FileOutline>().outlineTree.root = root
                 }
 
-                language.computeIssues(filename, editor.text, this).let { root ->
-                    ctx.get<IssueList>().view.items.setAll(root)
+                language.computeIssues(p, filename, this).let { root ->
+                    seq.addAll(root)
                 }
+
+                ctx.get<IssueList>().view.items.setAll(seq)
             }
         }
     }
 
     private fun onTextLightComputation() {
         language?.also { lang ->
-            editor.setStyleSpans(0, computeHighlighting(lang))
+            if (editor.text.isNotBlank())
+                editor.setStyleSpans(0, computeHighlighting(lang))
         }
     }
 

@@ -104,8 +104,10 @@ class FileNavigator(ctx: Context) : TitledPanel("Files"){
     private val actionExpandSubTree = config.createItem("expand-tree") {
         markFolderUnderMouse(it)
     }
-    private val actionOpenExplorer = config.createItem("open-in-explorer") {
-        markFolderUnderMouse(it)
+    private val actionOpenExplorer = config.createItem("open-in-explorer", this::openExplorer)
+
+    fun openExplorer(evt: ActionEvent) {
+        markFolderUnderMouse(evt)
         (treeFile.selectionModel.selectedItem)?.let { file ->
             try {
                 Desktop.getDesktop()?.browseFileDirectory(file.value.toFile())
@@ -115,16 +117,18 @@ class FileNavigator(ctx: Context) : TitledPanel("Files"){
         }
     }
 
-    private val actionOpenSystem = config.createItem("xdg-open") {
-        markFolderUnderMouse(it)
-        (treeFile.selectionModel.selectedItem)?.let { file ->
-            try {
-                Desktop.getDesktop()?.open(file.value.toFile())
-            } catch (e: UnsupportedOperationException) {
-                ProcessBuilder("explorer", "/select,${file.value}").start()
+    private val actionOpenSystem = config.createItem("xdg-open", this::openSystem)
+
+    fun openSystem(evt:ActionEvent): (ActionEvent) -> Unit = {
+            markFolderUnderMouse(evt)
+            (treeFile.selectionModel.selectedItem)?.let { file ->
+                try {
+                    Desktop.getDesktop()?.open(file.value.toFile())
+                } catch (e: UnsupportedOperationException) {
+                    ProcessBuilder("explorer", "/select,${file.value}").start()
+                }
             }
         }
-    }
 
     init {
         contextMenu.items.setAll(

@@ -37,7 +37,7 @@ object ConfigurationPaths {
             else -> ""
         }
     }
-    val applicationName = "key-ide"
+    const val applicationName = "key-ide"
     val configFolder = Paths.get(PathConfig.getKeyConfigDir())
     val userConfig = configFolder.resolve("key-ide-config.properties")
     val appData = configFolder.resolve("key-ide-data.properties")
@@ -79,7 +79,7 @@ abstract class Configuration(
             properties.load(path.bufferedReader())
     }
 
-    fun load(resource: URL) {
+    fun loadUrl(resource: URL) {
         resource.openStream()?.use {
             properties.load(it)
         }
@@ -116,7 +116,7 @@ class RecentFiles {
     }
 
     fun save() {
-        logger.info {"Store recent-files to ${ConfigurationPaths.recentFiles}"}
+        logger.info { "Store recent-files to ${ConfigurationPaths.recentFiles}" }
         val lines = files.map { it.toAbsolutePath().toString() }
         ConfigurationPaths.recentFiles.writeLines(lines)
     }
@@ -144,12 +144,12 @@ class UserConfig() : Configuration() {
     }
 
     fun load() {
-        load(javaClass.getResource("/user-config.default.properties"))
+        loadUrl(javaClass.getResource("/user-config.default.properties"))
         load(ConfigurationPaths.userConfig)
     }
 
     fun save() {
-        logger.info {"Store user config to ${ConfigurationPaths.userConfig}"}
+        logger.info { "Store user config to ${ConfigurationPaths.userConfig}" }
         save(ConfigurationPaths.userConfig)
     }
 }
@@ -162,18 +162,24 @@ interface FileUpdateListener {
 }
 
 object FileUpdateMonitor : Runnable {
-    var  isActive: Boolean = true
+    var isActive: Boolean = true
     var watchService = FileSystems.getDefault().newWatchService()
 
-    private val monitor = Thread(null, this, "file-watcher").also { it.isDaemon=true; it.start() }
+    private val monitor = Thread(null, this, "file-watcher").also { it.isDaemon = true; it.start() }
 
     private val watchKeys = HashMap<Path, WatchKey>()
     private val listeners = HashMap<WatchKey, (Path) -> Unit>()
     private val paths = HashMap<WatchKey, Path>()
 
     fun addListener(file: Path, listener: (Path) -> Unit) {
-        if(Files.isRegularFile(file)) {
-            addListener(file.parent, listener)
+        if (Files.isRegularFile(file)) {
+            val watchKey = file.parent.register(
+                watchService,
+                ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY
+            )
+            watchKeys[file] = watchKey
+            listeners[watchKey] = listener
+            paths[watchKey] = file
             return
         }
 
@@ -184,11 +190,11 @@ object FileUpdateMonitor : Runnable {
     }
 
     fun removeListener(listener: (Path) -> Unit) {
-
+        TODO()
     }
 
     fun removeListener(path: Path) {
-
+        TODO()
     }
 
     /**
@@ -200,7 +206,7 @@ object FileUpdateMonitor : Runnable {
 
     override fun run() {
         while (!monitor.isInterrupted) {
-            var key: WatchKey? = null
+            var key: WatchKey?
             do {
                 key = watchService.take()
                 if (key != null) {
@@ -229,30 +235,34 @@ class ThemeManager(
     fun installCss(scene: Scene) {
         println(userConfig.theme)
         addAndWatchForChanges(scene, baseCss, FileUpdateMonitor, 0)
-        addAndWatchForChanges(scene, themeCss, FileUpdateMonitor, 1)
-        /*if (appearancePreferences.shouldOverrideDefaultFontSize()) {
-            scene.root.style = "-fx-font-size: " + appearancePreferences.getMainFontSize().toString() + "pt;"
-        }*/
+        //addAndWatchForChanges(scene, themeCss, FileUpdateMonitor, 1)
     }
 
     private fun addAndWatchForChanges(scene: Scene, cssFile: URL, fileUpdateMonitor: FileUpdateMonitor, index: Int) {
         scene.stylesheets.add(index, cssFile.toExternalForm())
+        installWatcher(cssFile, fileUpdateMonitor) {
+            Platform.runLater {
+                logger.info { "Reload css file $cssFile" }
+                scene.stylesheets.remove(cssFile.toExternalForm())
+                scene.stylesheets.add(index, cssFile.toExternalForm())
+            }
+        }
+    }
+
+    private fun installWatcher(
+        cssFile: URL, fileUpdateMonitor: FileUpdateMonitor,
+        block: () -> Unit
+    ) {
+        val cssUri = cssFile.toURI()
+        if (cssUri.toString().contains("jrt")) return;
         try {
-            val cssUri = cssFile.toURI()
-            if (!cssUri.toString().contains("jrt")) {
-                logger.debug { "CSS URI: $cssUri"}
-                val cssPath: Path = Path.of(cssUri).toAbsolutePath()
-                logger.debug {"Enabling live reloading of $cssPath"}
-                fileUpdateMonitor.addListener(cssPath) { _ ->
-                    logger.debug { "Reload css file $cssFile"}
-                    Platform.runLater {
-                        scene.stylesheets.remove(cssFile.toExternalForm())
-                        scene.stylesheets.add(index, cssFile.toExternalForm())
-                    }
-                }
+            val cssPath: Path = Path.of(cssUri).toAbsolutePath()
+            logger.info { "Enabling live reloading of $cssPath" }
+            fileUpdateMonitor.addListener(cssPath) { _ ->
+                block()
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            logger.error(e){}
         }
     }
 }
