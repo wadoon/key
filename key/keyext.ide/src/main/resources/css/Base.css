@@ -79,6 +79,10 @@
     -fx-fill: -editor-fg;
 }
 
+.styled-text-area .nearly-invisible {
+    -fx-fill: -solarized-base03;
+}
+
 .styled-text-area .error-char {
     -fx-background: -editor-error-char;
 }

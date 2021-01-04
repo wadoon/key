@@ -26,8 +26,9 @@ abstract class Language {
     protected var control: Set<Int> = setOf()
     protected var operators: Set<Int> = setOf()
     protected var errorChar: Int = -2
+    protected var nearlyInvisible: Set<Int> = setOf()
 
-    fun getStyleClass(tokenType: Int) =
+    open fun getStyleClass(tokenType: Int) =
         when (tokenType) {
             in separators -> "separator"
             in structural -> "structural"
@@ -40,6 +41,7 @@ abstract class Language {
             in control -> "control"
             in operators -> "operators"
             in ignore -> ""
+            in nearlyInvisible -> "nearly-invisible"
             else -> {
                 System.err.println("token type $tokenType (${javaClass.name}) is not registered for syntax highlighting.")
                 ""
@@ -374,7 +376,8 @@ object JavaLanguage : Language() {
         )
         identifiers = setOf(JavaJMLLexer.IDENTIFIER)
         comments = setOf(JavaJMLLexer.LINE_COMMENT, JavaJMLLexer.COMMENT_START)
-        ignore = setOf(JavaJMLLexer.WS, JavaJMLLexer.WS_CONTRACT, JavaJMLLexer.WS_CONTRACT_IGNORE)
+        nearlyInvisible = setOf(JavaJMLLexer.WS_CONTRACT, JavaJMLLexer.WS_CONTRACT_IGNORE)
+        ignore = setOf(JavaJMLLexer.WS, JavaJMLLexer.WS_CONTRACT_IGNORE)
     }
 }
 

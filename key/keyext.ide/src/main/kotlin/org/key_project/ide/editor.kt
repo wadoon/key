@@ -3,6 +3,7 @@ package org.key_project.ide
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.scene.control.ScrollPane
 import org.antlr.v4.runtime.CharStreams
 import org.fxmisc.flowless.VirtualizedScrollPane
 import org.fxmisc.richtext.CodeArea
@@ -36,7 +37,7 @@ object Editors {
 @Suppress("MemberVisibilityCanBePrivate")
 open class Editor(val ctx: Context) : Controller {
     val editor = CodeArea("")
-    val scrollPane = VirtualizedScrollPane(editor)
+    val scrollPane =VirtualizedScrollPane(editor)
     override val ui = scrollPane
 
     val dirtyProperty = SimpleBooleanProperty(this, "dirty", false)
@@ -56,7 +57,7 @@ open class Editor(val ctx: Context) : Controller {
 
     init {
         editor.paragraphGraphicFactory = LineNumberFactory.get(editor)
-        editor.isLineHighlighterOn = true
+        //editor. = true
 
         filenameProperty.addListener { _, _, new ->
             language = Editors.getLanguageForFilename(new)
