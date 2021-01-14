@@ -318,9 +318,10 @@ project("keyext.daisy") {
     apply plugin: 'application'
     dependencies {
         compile project(":key.core")
-        compile files("$rootDir/keyext.daisy/lib/fatDaisy_2.11-0.1.jar")
+        compile files("$rootDir/keyext.daisy/lib/daisy_2.13-0.1.jar")
+        
         runtime project(":key.ui")
-        compile 'org.scala-lang:scala-library:2.12.7'
+        compile 'org.scala-lang:scala-library:2.13.3'
     }
 
     application {

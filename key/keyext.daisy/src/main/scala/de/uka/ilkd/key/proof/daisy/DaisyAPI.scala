@@ -3,11 +3,12 @@ package de.uka.ilkd.key.proof.daisy
 import java.util
 
 import daisy.analysis.DataflowPhase
+import daisy.analysis.DataflowPhase.evalRange
 import daisy.lang.Identifiers.{FreshIdentifier, Identifier}
-import daisy.lang.Trees.{BooleanLiteral, Division, Expr, Minus, Plus, RealLiteral, Times, Variable}
+import daisy.lang.Trees.{Division, Expr, Minus, Plus, RealLiteral, Times, Variable}
 import daisy.lang.Types
 import daisy.lang.Types.RealType
-import daisy.tools.{Interval, Rational}
+import daisy.tools.{FloatInterval, Rational}
 import de.uka.ilkd.key.java.Services
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral
 import de.uka.ilkd.key.ldt.FloatLDT
@@ -15,6 +16,8 @@ import de.uka.ilkd.key.logic.op.Operator
 import de.uka.ilkd.key.logic.{ProgramElementName, Term}
 import de.uka.ilkd.key.util.Pair
 import org.key_project.util.ExtList
+import scala.language.postfixOps
+
 import scala.collection.JavaConverters._
 
 
@@ -26,20 +29,20 @@ object DaisyAPI {
     DataflowPhase.rangeMethod = "interval"
 
     val daisyInputValMap = convertPreCondsToInputIntervals(preconditions, services)
-    val daisyExpression = merge(lets, floatExpr, daisyInputValMap.keys.toList, services)
+    val daisyExpression = convertToDaisyExpr(lets, floatExpr, daisyInputValMap.keys.toList, services)
 
-    val range: Interval = DataflowPhase.computeRange(daisyInputValMap, daisyExpression, BooleanLiteral(true)) _1
+    val range: FloatInterval = evalRange[FloatInterval](daisyExpression, daisyInputValMap,FloatInterval.apply)._1
 
-    new Pair[java.lang.Float, java.lang.Float](range.xlo.toFloat, range.xhi.toFloat)
+    new Pair[java.lang.Float, java.lang.Float](range.xlo, range.xhi)
   }
 
-  def convertPreCondsToInputIntervals(preconditions: util.List[Term], services: Services): Map[Identifier, Interval] = {
+  def convertPreCondsToInputIntervals(preconditions: util.List[Term], services: Services): Map[Identifier, FloatInterval] = {
 
-    var daisyInputValMap = Map[Identifier, Interval]()
-    var preConds = Map[String, (Option[Rational], Option[Rational])]()
+    var daisyInputValMap = Map[Identifier, FloatInterval]()
+    var preConds = Map[String, (Option[Float], Option[Float])]()
     val floatLDT = new FloatLDT(services)
 
-    def updatePreCondsMap(key: String, fl: Rational): Unit = {
+    def updatePreCondsMap(key: String, fl: Float): Unit = {
 
       if (!preConds.isDefinedAt(key))
         preConds += key -> (Some(fl), None)
@@ -58,10 +61,9 @@ object DaisyAPI {
       val varName = termDetails.asScala.filter(p => !p.asInstanceOf[Term].isRigid).toList.head.asInstanceOf[Term].op().name().asInstanceOf[ProgramElementName].getProgramName
       val literal = termDetails.asScala.filter(p => p.asInstanceOf[Term].isRigid).toList.head.asInstanceOf[Term]
 
-      val fl: Double = floatLDT.translateTerm(literal, new ExtList, services).asInstanceOf[FloatLiteral].getValue.toDouble
-      val fr: Rational = Rational.fromDouble(fl)
+      val fl: Float = floatLDT.translateTerm(literal, new ExtList, services).asInstanceOf[FloatLiteral].getValue.toFloat
 
-      updatePreCondsMap(varName, fr)
+      updatePreCondsMap(varName, fl)
     }
 
     for (item <- preConds) {
@@ -70,7 +72,7 @@ object DaisyAPI {
       val varLowerBound = item._2._1
       val varUpperBound = item._2._2
       if (varUpperBound isDefined)
-        daisyInputValMap += varId -> Interval(varLowerBound.get, varUpperBound.get)
+        daisyInputValMap += varId -> FloatInterval(varLowerBound.get, varUpperBound.get)
       else throw new IllegalArgumentException("Upper or lower bound not given")
 
     }
@@ -79,20 +81,20 @@ object DaisyAPI {
   }
 
   //TODO  add support for let expressions
-  def merge(lets: util.List[Term], floatExpr: Term, varIds: List[Identifier], services: Services): Expr = {
+  def convertToDaisyExpr(lets: util.List[Term], floatExpr: Term, varIds: List[Identifier], services: Services): Expr = {
 
     val floatLDT = new FloatLDT(services)
     val op: Operator = floatExpr.op()
     val subTerms = floatExpr.subs()
 
     if (op == floatLDT.getAddIEEE)
-      Plus(merge(lets, subTerms.get(1), varIds, services), merge(lets, subTerms.get(2), varIds, services))
+      Plus(convertToDaisyExpr(lets, subTerms.get(1), varIds, services), convertToDaisyExpr(lets, subTerms.get(2), varIds, services))
     else if (op == floatLDT.getSubIEEE)
-      Minus(merge(lets, subTerms.get(1), varIds, services), merge(lets, subTerms.get(2), varIds, services))
+      Minus(convertToDaisyExpr(lets, subTerms.get(1), varIds, services), convertToDaisyExpr(lets, subTerms.get(2), varIds, services))
     else if (op == floatLDT.getMulIEEE)
-      Times(merge(lets, subTerms.get(1), varIds, services), merge(lets, subTerms.get(2), varIds, services))
+      Times(convertToDaisyExpr(lets, subTerms.get(1), varIds, services), convertToDaisyExpr(lets, subTerms.get(2), varIds, services))
     else if (op == floatLDT.getDivIEEE)
-      Division(merge(lets, subTerms.get(1), varIds, services), merge(lets, subTerms.get(2), varIds, services))
+      Division(convertToDaisyExpr(lets, subTerms.get(1), varIds, services), convertToDaisyExpr(lets, subTerms.get(2), varIds, services))
     // if variable
     else if (!op.isRigid && op.arity() == 0) {
       val varName = op.name().asInstanceOf[ProgramElementName].getProgramName
@@ -116,17 +118,16 @@ object DaisyAPI {
     val xId = daisy.lang.Identifiers.FreshIdentifier("x", Types.RealType, true)
     val yId = daisy.lang.Identifiers.FreshIdentifier("y", Types.RealType, true)
 
-    val interval = Interval(Rational.fromReal(1.0), Rational.fromReal(2.0))
+    val interval = FloatInterval(1.0f, 2.0f)
     val intervalsMap = Map(xId -> interval, yId -> interval)
 
     val expr: Expr = Plus(Variable(xId), Variable(yId))
 
     DataflowPhase.rangeMethod = "interval"
 
-    val range: Interval = DataflowPhase.computeRange(intervalsMap,
-      expr, BooleanLiteral(true)) _1
+    val range: FloatInterval = evalRange[FloatInterval](expr, intervalsMap,FloatInterval.apply) _1
 
-    new Pair[java.lang.Float, java.lang.Float](range.xlo.toFloat, range.xhi.toFloat)
+    new Pair[java.lang.Float, java.lang.Float](range.xlo, range.xhi)
   }
 }
 
