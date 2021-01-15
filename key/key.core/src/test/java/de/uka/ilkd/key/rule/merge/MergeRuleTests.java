@@ -34,8 +34,13 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
+import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.ProofStarter;
 import junit.framework.TestCase;
+import org.junit.Test;
+
+import java.io.File;
+import java.util.Iterator;
 
 /**
  * Test suite for the {@link MergeRule}.

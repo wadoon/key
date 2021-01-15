@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
+import org.jetbrains.annotations.Nullable;
 
 
 /**
@@ -40,7 +41,7 @@ public interface SpecificationElement {
     /**
      * Returns the visibility of the invariant (null for default visibility)
      */
-    public VisibilityModifier getVisibility();
+    public @Nullable VisibilityModifier getVisibility();
 
 
     /**
