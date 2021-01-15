@@ -23,11 +23,7 @@ import java.util.Date;
  * @author kai
  */
 @SuppressWarnings("serial")
-public class RunAllProofsDirectories implements Serializable {
+public final class RunAllProofsDirectories {
     public static final File EXAMPLE_DIR = FindResources.getExampleDirectory();
     public static final File RUNALLPROOFS_DIR = FindResources.getTestResultForRunAllProofs();
-    public RunAllProofsDirectories(Date runStart) {
-        RUNALLPROOFS_DIR.mkdirs();
-    }
-
 }

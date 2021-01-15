@@ -2,6 +2,7 @@ package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -19,16 +20,16 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     final FunctionPerformanceData computeCostData;
     final FunctionPerformanceData instantiateAppData;
 
-    final DataRecordingTestFile dataRecordingTestFile;
+    final DataRecordingProofTest dataRecordingTestFile;
 
-    DataRecordingStrategy(Proof proof, DataRecordingTestFile dataRecordingTestFile) throws IOException {
+    DataRecordingStrategy(Proof proof, DataRecordingProofTest dataRecordingTestFile) throws IOException {
         super(proof, proof.getInitConfig().getSettings().getStrategySettings().getActiveStrategyProperties());
         this.dataRecordingTestFile = dataRecordingTestFile;
 
-        File computeCostDataDir = dataRecordingTestFile.directories.computeCostDataDir;
+        File computeCostDataDir = ProfilingDirectories.computeCostDataDir;
         computeCostData = new FunctionPerformanceData(computeCostDataDir, dataRecordingTestFile);
 
-        File instantiateAppDataDir = dataRecordingTestFile.directories.instantiateAppDataDir;
+        File instantiateAppDataDir = ProfilingDirectories.instantiateAppDataDir;
         instantiateAppData = new FunctionPerformanceData(instantiateAppDataDir, dataRecordingTestFile);
     }
 

@@ -1,6 +1,5 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
-//
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
@@ -15,6 +14,7 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofGroup;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 import org.antlr.runtime.RecognitionException;
 import org.junit.AfterClass;
@@ -39,23 +39,19 @@ import java.util.Collections;
  */
 @RunWith(Parameterized.class)
 public class RunAllProofsInfFlow extends RunAllProofsTest {
-
     private static final String SKIP_INF_FLOW_PROPERTY = "key.runallproofs.skipInfFlow";
     public static final String INDEX_FILE = "index/automaticInfFlow.txt";
-    private static ProofCollection proofCollection;
+    private static ProofCollection proofCollection = ProofCollections.getInfFlowCollection();
 
-    public RunAllProofsInfFlow(RunAllProofsTestUnit unit) {
+    public RunAllProofsInfFlow(ProofGroup unit) {
         super(unit);
     }
 
     @Parameters(name = "{0}")
-    public static Collection<RunAllProofsTestUnit[]> data() throws IOException, RecognitionException {
-
+    public static Collection<ProofGroup[]> data() throws IOException, RecognitionException {
         if (Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY)) {
             return Collections.emptyList();
         }
-
-        proofCollection = parseIndexFile(INDEX_FILE);
         return data(proofCollection);
     }
 

@@ -13,21 +13,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Executes KeY prover for a list of {@link TestFile}s in a separate process.
+ * Executes KeY prover for a list of {@link ProofTest}s in a separate process.
  *
  * @author Kai Wallisch
  */
-public abstract class ForkedTestFileRunner implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    private static final String FORK_TIMEOUT_KEY = "forkTimeout";
-
-    private static final String FORK_DEBUG_PORT = "forkDebugPort";
-
+public abstract class ForkedTestFileRunner {
     private static Path getLocationOfSerializedTestFiles(Path tempDirectory) {
         return Paths.get(tempDirectory.toString(), "TestFiles.serialized");
     }
@@ -44,9 +38,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
      * Converts a {@link Serializable} object into a byte array and stores it in
      * a file at given location.
      */
-    private static void writeObject(Path path, Serializable s)
-            throws IOException {
-
+    private static void writeObject(Path path, Serializable s) throws IOException {
         try (ObjectOutputStream objectOutputStream =
                      new ObjectOutputStream(Files.newOutputStream(path))) {
             objectOutputStream.writeObject(s);
@@ -66,27 +58,26 @@ public abstract class ForkedTestFileRunner implements Serializable {
     }
 
     /**
-     * Process a single {@link TestFile} in a separate subprocess.
+     * Process a single {@link ProofTest} in a separate subprocess.
      */
-    public static TestResult processTestFile(TestFile testFile,
+    public static TestResult processTestFile(ProofTest proofTest,
                                              Path pathToTempDir) throws Exception {
-        return processTestFiles(Arrays.asList(testFile), pathToTempDir).get(0);
+        return processTestFiles(Arrays.asList(proofTest), pathToTempDir).get(0);
     }
 
     /**
-     * Process a list of {@link TestFile}s in a separate subprocess.
-     *
-     * @param testName Name of the test used as prefix for test folder.
+     * Process a list of {@link ProofTest}s in a separate subprocess.
+     * @param proofTests
+     * @param pathToTempDir of the test used as prefix for test folder.
      */
-    public static List<TestResult> processTestFiles(List<TestFile> testFiles,
-                                                    Path pathToTempDir) throws Exception {
-        if (testFiles.isEmpty()) {
+    public static List<TestResult> processTestFiles(List<ProofTest> proofTests, Path pathToTempDir) throws Exception {
+        if (proofTests.isEmpty()) {
             return new ArrayList<>();
         }
-        ProofCollectionSettings settings = testFiles.get(0).getSettings();
+        ProofCollectionSettings settings = proofTests.get(0).getSettings();
 
         writeObject(getLocationOfSerializedTestFiles(pathToTempDir),
-                testFiles.toArray(new TestFile[testFiles.size()]));
+                proofTests.toArray(new ProofTest[proofTests.size()]));
 
         ProcessBuilder pb = new ProcessBuilder(
                 "java", "-classpath", System.getProperty("java.class.path"),
@@ -96,12 +87,12 @@ public abstract class ForkedTestFileRunner implements Serializable {
         List<String> command = pb.command();
 
         // TODO make sure no injection happens here?
-        String forkMemory = settings.get("forkMemory");
+        String forkMemory = settings.getForkMemory();
         if (forkMemory != null) {
             command.add("-Xmx" + forkMemory);
         }
 
-        String debugPort = settings.get(FORK_DEBUG_PORT);
+        String debugPort = settings.getForkDebugPort();
         if (debugPort != null) {
             String suspend = "n";
             if (debugPort.startsWith("wait:")) {
@@ -146,7 +137,6 @@ public abstract class ForkedTestFileRunner implements Serializable {
         assertTrue("File containing serialized test results not present.",
                 testResultsFile.toFile().exists());
         TestResult[] array = ForkedTestFileRunner.readObject(testResultsFile, TestResult[].class);
-
         return Arrays.asList(array);
     }
 
@@ -162,20 +152,14 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     + tempDirectory);
         }
 
-        boolean error = false;
         try {
-            TestFile[] testFiles =
+            ProofTest[] proofTests =
                     ForkedTestFileRunner.readObject(
-                            getLocationOfSerializedTestFiles(tempDirectory), TestFile[].class);
-            installTimeoutWatchdog(testFiles[0].getSettings(), tempDirectory);
+                            getLocationOfSerializedTestFiles(tempDirectory), ProofTest[].class);
+            installTimeoutWatchdog(proofTests[0].getSettings(), tempDirectory);
             ArrayList<TestResult> testResults = new ArrayList<>();
-            for (TestFile testFile : testFiles) {
-                try {
-                    testResults.add(testFile.runKey());
-                } catch (Exception e) {
-                    error = true;
-                    e.printStackTrace();
-                }
+            for (ProofTest proofTest : proofTests) {
+                testResults.add(proofTest.runKey());
             }
             writeObject(getLocationOfSerializedTestResults(tempDirectory),
                     testResults.toArray(new TestResult[testResults.size()]));
@@ -190,9 +174,6 @@ public abstract class ForkedTestFileRunner implements Serializable {
                 writeObject(getLocationOfSerializedException(tempDirectory), subst);
             }
         }
-
-        if (error)
-            fail("Exception during the execution of proofs. See log for more details.");
     }
 
     /**
@@ -207,25 +188,11 @@ public abstract class ForkedTestFileRunner implements Serializable {
      * @param tempDirectory
      */
     private static void installTimeoutWatchdog(ProofCollectionSettings settings, final Path tempDirectory) {
-
-        String timeoutString = settings.get(FORK_TIMEOUT_KEY);
-        if (timeoutString == null) {
-            return;
-        }
-
-        final boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
-
-        final int timeout;
-        try {
-            timeout = Integer.parseInt(timeoutString);
-        } catch (NumberFormatException ex) {
-            throw new RuntimeException("The setting forkTimeout requires an integer, not " +
-                    timeoutString, ex);
-        }
+        final boolean verbose = settings.isVerbose();
+        final int timeout = settings.getForkTimeout();
 
         if (timeout <= 0) {
-            throw new RuntimeException("The setting forkTimeout requires a positive integer, not " +
-                    timeoutString);
+            throw new IllegalArgumentException("The setting forkTimeout requires a positive integer");
         }
 
         Thread t = new Thread("Timeout watchdog") {

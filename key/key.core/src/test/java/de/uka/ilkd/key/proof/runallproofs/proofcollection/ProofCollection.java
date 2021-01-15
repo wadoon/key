@@ -1,90 +1,79 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
+import java.util.*;
 
 /**
- * Data structure for parse results of {@link ProofCollectionParser}. Method
+ * Method
  * {@link #createRunAllProofsTestUnits()} can be used to create a {@link List}
- * of {@link RunAllProofsTestUnit}s from an object of this class.
- * 
- * @author Kai Wallisch
+ * of {@link ProofGroup}s from an object of this class.
  *
+ * @author Kai Wallisch
  */
-public final class ProofCollection {
+public class ProofCollection {
+    private final List<ProofGroup> units = new LinkedList<>();
+    private ProofCollectionSettings settings = new ProofCollectionSettings();
 
-   private final List<ProofCollectionUnit> units = new LinkedList<>();
-   private final ProofCollectionSettings settings;
+    public ProofGroup addGroup(String name) {
+        ProofGroup g = new ProofGroup(name, getSettings());
+        units.add(g);
+        return g;
+    }
 
-   ProofCollection(ProofCollectionSettings settings) {
-      this.settings = settings;
-   }
+    public ProofGroup loadable(String file) {
+        return addGroup(new File(file).getName())
+                .loadable(file);
+    }
 
-   void add(ProofCollectionUnit unit) {
-      units.add(unit);
-   }
+    public ProofGroup provable(String file) {
+        return addGroup(new File(file).getName())
+                .provable(file);
+    }
 
-   /**
-    * Create list of {@link RunAllProofsTestUnit}s from list of
-    * {@link ProofCollectionUnit}s.
-    * 
-    * @return A list of {@link RunAllProofsTestUnit}s.
-    * @throws IOException
-    *            Names of {@link SingletonProofCollectionUnit}s are determined
-    *            by their corresponding file names. In case file name can't be
-    *            read {@link IOException} may be thrown.
-    */
-   public List<RunAllProofsTestUnit> createRunAllProofsTestUnits()
-         throws IOException {
+    public ProofGroup notprovable(String file) {
+        return addGroup(new File(file).getName())
+                .notprovable(file);
+    }
 
-      List<String> activeGroups = settings.getRunOnlyOn();
+    /**
+     * Create list of {@link ProofGroup}s from list of
+     * {@link Group}s.
+     *
+     * @return A list of {@link ProofGroup}s.
+     */
+    public List<ProofGroup> createRunAllProofsTestUnits() {
+        List<String> activeGroups = settings.getRunOnlyOn();
+        List<ProofGroup> ret = new LinkedList<>();
+        Set<String> testCaseNames = new LinkedHashSet<>();
 
-      List<RunAllProofsTestUnit> ret = new LinkedList<>();
-      Set<String> testCaseNames = new LinkedHashSet<>();
-      for (ProofCollectionUnit proofCollectionUnit : units) {
-
-         if(activeGroups != null && !activeGroups.contains(proofCollectionUnit.getName())) {
-            continue;
-         }
-
-         final String proposedTestCaseName = proofCollectionUnit.getName();
-         String testCaseName = proposedTestCaseName;
-         int counter = 0;
-         while (testCaseNames.contains(testCaseName)) {
-            counter++;
-            testCaseName = proposedTestCaseName + "#" + counter;
-         }
-         testCaseNames.add(testCaseName);
-
-         RunAllProofsTestUnit testUnit = proofCollectionUnit
-               .createRunAllProofsTestUnit(testCaseName);
-         ret.add(testUnit);
-      }
-
-      Set<String> enabledTestCaseNames = settings.getEnabledTestCaseNames();
-      if (enabledTestCaseNames == null) {
-         return ret;
-      }
-      else {
-         Iterator<RunAllProofsTestUnit> iterator = ret.iterator();
-         while (iterator.hasNext()) {
-            RunAllProofsTestUnit unit = iterator.next();
-            if (!enabledTestCaseNames.contains(unit.getTestName())) {
-               iterator.remove();
+        for (ProofGroup group : units) {
+            if (activeGroups != null && !activeGroups.contains(group.getGroupName())) {
+                continue;
             }
-         }
-         return ret;
-      }
-   }
 
-   public ProofCollectionSettings getSettings() {
-      return settings;
-   }
+            final String proposedTestCaseName = group.getGroupName();
+            String testCaseName = proposedTestCaseName;
+            int counter = 0;
+            while (testCaseNames.contains(testCaseName)) {
+                counter++;
+                testCaseName = proposedTestCaseName + "#" + counter;
+            }
+            testCaseNames.add(testCaseName);
+            group.setGroupName(testCaseName);
+            ret.add(group);
+        }
 
+        Set<String> enabledTestCaseNames = settings.getEnabledTestCaseNames();
+        if (enabledTestCaseNames == null) {
+            return ret;
+        } else {
+            ret.removeIf(unit -> !enabledTestCaseNames.contains(unit.getGroupName()));
+            return ret;
+        }
+    }
+
+    public ProofCollectionSettings getSettings() {
+        return settings;
+    }
 }

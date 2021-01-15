@@ -14,12 +14,12 @@ public class FunctionPerformanceData {
 
     private final Map<Integer, NodeData> nodeId2NodeData = new HashMap<>();
     private final File dataDir;
-    private final DataRecordingTestFile dataRecordingTestFile;
+    private final DataRecordingProofTest dataRecordingTestFile;
     
     public int totalInvocations = 0;
     public long totalDuration = 0;
 
-    public FunctionPerformanceData(File dataDir, DataRecordingTestFile dataRecordingTestFile) {
+    public FunctionPerformanceData(File dataDir, DataRecordingProofTest dataRecordingTestFile) {
         this.dataRecordingTestFile = dataRecordingTestFile;
         this.dataDir = dataDir;
     }

@@ -14,14 +14,11 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
-import org.antlr.runtime.*;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofGroup;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.key_project.util.testcategories.Slow;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,25 +66,20 @@ import static org.junit.Assert.assertTrue;
  * define test cases for different run-all-proof scenarios.
  *
  * @author Martin Hentschel
- * @see RunAllProofsTestSuite
  * @see ListRunAllProofsTestCases
  */
 @Category(Slow.class)
 public abstract class RunAllProofsTest {
 
-   public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
-
-   public static final String IGNORE_KEY = "ignore";
-
-   private final RunAllProofsTestUnit unit;
+   private final ProofGroup unit;
 
    /**
     * Constructor.
     *
     * @param unit
-    *           {@link RunAllProofsTestUnit} whose test will be executed.
+    *           {@link ProofGroup} whose test will be executed.
     */
-   public RunAllProofsTest(RunAllProofsTestUnit unit) {
+   public RunAllProofsTest(ProofGroup unit) {
       this.unit = unit;
    }
 
@@ -99,7 +91,7 @@ public abstract class RunAllProofsTest {
     */
    @Test
    public void testWithKeYAutoMode() throws Exception {
-      TestResult report = unit.runTest();
+      TestResult report = unit.runTests();
       assertTrue(report.message, report.success);
    }
 
@@ -108,7 +100,7 @@ public abstract class RunAllProofsTest {
      * parameterized test case mechanism for to create several test cases from a
      * set of data. {@link Object#toString()} of first constructor parameter is
      * used to determine name of individual test cases, see {@link
-     * RunAllProofsTestUnit#toString()} for further information.
+     * ProofGroup#toString()} for further information.
      *
      * @param proofCollection
      *            The file name of the index file which parsed to produce test
@@ -119,47 +111,17 @@ public abstract class RunAllProofsTest {
      *             file
      */
 
-   public static List<RunAllProofsTestUnit[]> data(ProofCollection proofCollection) throws IOException {
-
+   public static List<ProofGroup[]> data(ProofCollection proofCollection) throws IOException {
       /*
        * Create list of constructor parameters that will be returned by this
        * method. Suitable constructor is automatically determined by JUnit.
        */
-      List<RunAllProofsTestUnit[]> data = new LinkedList<>();
-      List<RunAllProofsTestUnit> units = proofCollection.createRunAllProofsTestUnits();
-      for (RunAllProofsTestUnit unit : units) {
-         data.add(new RunAllProofsTestUnit[] { unit });
+      List<ProofGroup[]> data = new LinkedList<>();
+      List<ProofGroup> units = proofCollection.createRunAllProofsTestUnits();
+      for (ProofGroup unit : units) {
+         data.add(new ProofGroup[] { unit });
       }
 
       return data;
-   }
-
-   /**
-    * Uses {@link ProofCollectionParser} to parse the given file and returns a
-    * parse result that is received from main parser entry point.
-    */
-   public static ProofCollection parseIndexFile(final String index) throws IOException {
-      return parseIndexFile(index, new Function<TokenStream, ProofCollectionParser>() {
-         @Override
-         public ProofCollectionParser apply(TokenStream t) {
-            return new ProofCollectionParser(t);
-         }
-      });
-   }
-
-   public static ProofCollection parseIndexFile(final String index,
-            Function<TokenStream, ProofCollectionParser> stream2Parser) throws IOException {
-      File automaticJAVADL = new File(RunAllProofsDirectories.EXAMPLE_DIR, index);
-      CharStream charStream = new ANTLRFileStream(automaticJAVADL.getAbsolutePath());
-      ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
-      TokenStream tokenStream = new CommonTokenStream(lexer);
-      ProofCollectionParser parser = stream2Parser.apply(tokenStream);
-      try {
-         return parser.parserEntryPoint();
-      } catch (RecognitionException e) {
-         String msg = parser.getErrorMessage(e, parser.getTokenNames());
-         throw new IOException("Cannot parse " + automaticJAVADL +
-                               " at line " + e.line + ": " + msg, e);
-      }
    }
 }
