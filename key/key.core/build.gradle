@@ -1,10 +1,9 @@
 plugins {
     id 'ca.coglinc.javacc' version '2.4.0'
-    id 'antlr'
+    //id 'antlr' // weigl: does not work well with antlr4
 }
 
 repositories { jcenter() }
-
 configurations { antlr4 }
 
 dependencies {
@@ -16,7 +15,7 @@ dependencies {
     compile group: 'antlr', name: 'antlr', version: '2.7.7'
 
     javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    antlr group: 'org.antlr', name: 'antlr', version: '3.5.2'   // use ANTLR version 3
+    //antlr group: 'org.antlr', name: 'antlr', version: '3.5.2'   // use ANTLR version 3
 
     antlr4 "org.antlr:antlr4:4.7.1"
     compile "org.antlr:antlr4-runtime:4.7.1"
@@ -28,18 +27,6 @@ def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
 def javaCCOutputDirMain = file("$javaCCOutputDir/main")
 
 sourceSets.main.java.srcDirs(javaCCOutputDirMain, "$projectDir/build/generated-src/antlr4/main/")
-
-// Generate code from ANTLR grammars.
-generateGrammarSource {
-    maxHeapSize = "64m"
-    arguments += ["-visitor", "-listener", "-long-messages"]
-}
-
-// Generate code from ANTLR grammars in testing.
-generateTestGrammarSource {
-    maxHeapSize = "64m"
-    arguments += ["-visitor", "-listener", "-long-messages"]
-}
 
 // Generate code from JavaCC grammars.
 compileJavacc {
@@ -128,6 +115,19 @@ task generateRunAllProofs(type: JavaExec) {
 }
 sourceSets.test.java.srcDir "$buildDir/generated-src/rap-unittests/test"
 
+task dbgKeyLexer(type: JavaExec) {
+    main = "de.uka.ilkd.key.nparser.DebugKeyLexer"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+}
+
+task dbgJmlLexer(type: JavaExec) {
+    main = "de.uka.ilkd.key.speclang.njml.DebugJmlLexer"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+}
+
+task ptest(type: Test) { group "verification"}
 
 //Generation of the three version files within the resources by executing `git'.
 task generateVersionFiles() {
@@ -151,8 +151,8 @@ task generateVersionFiles() {
 // @AW: Say something here. From POV this explain by itself.
 processResources.dependsOn generateVersionFiles
 
-def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
-task runAntlr4(type: JavaExec) {
+task antlr4Key(type: JavaExec) {
+    def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
     //see incremental task api, prevents rerun if nothing has changed.
     inputs.dir "src/main/antlr4/"
     outputs.dir "$projectDir/build/generated/antlr4/main/"
@@ -167,18 +167,12 @@ task runAntlr4(type: JavaExec) {
         println("create $antlr4Output")
     }
 }
-compileJava.dependsOn runAntlr4
+compileJava.dependsOn antlr4Key
 
-task debugLexer(type: JavaExec) {
-    main = "de.uka.ilkd.key.nparser.DebugKeyLexer"
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
-}
 
-task ptest(type: Test) { group "verification"}
 
-def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/speclang/njml"
-task runAntlr4(type: JavaExec) {
+task antlr4Jml(type: JavaExec) {
+    def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/speclang/njml"
     //see incremental task api, prevents rerun if nothing has changed.
     inputs.dir "src/main/antlr4/"
     outputs.dir "build/generated/antlr4/main/"
@@ -193,15 +187,6 @@ task runAntlr4(type: JavaExec) {
         println("create $antlr4Output")
     }
 }
-compileJava.dependsOn runAntlr4
+compileJava.dependsOn antlr4Jml
 
-task debugLexer(type: JavaExec) {
-    main = "de.uka.ilkd.key.speclang.njml.DebugJmlLexer"
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
-}
 
-task ptest(type: Test) { group "verification"}
-
-// @AW: Delete? weigl: depends: If want that gradle check validates everything then not.
-// check.dependsOn << testProofRules << testRunAllProofs
