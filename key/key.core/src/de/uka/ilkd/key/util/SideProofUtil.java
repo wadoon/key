@@ -68,7 +68,8 @@ public static ProofEnvironment cloneProofEnvironmentWithOwnOneStepSimplifier(fin
       for (BuiltInRule rule : initConfig.builtInRules()) {
          RuleJustification origJusti = sourceJustiInfo.getJustification(rule);
          if (origJusti == null) {
-            assert rule instanceof OneStepSimplifier;
+        	 //TODO When implementing the tests uncomment this:
+            // assert rule instanceof OneStepSimplifier;
             origJusti = AxiomJustification.INSTANCE;
          }
          initConfig.getJustifInfo().addJustification(rule, origJusti);

@@ -9,6 +9,7 @@
 //import de.uka.ilkd.key.logic.sort.Sort;
 //import de.uka.ilkd.key.loopinvgen.ConstructAllCompPreds;
 //import de.uka.ilkd.key.loopinvgen.ConstructAllDepPreds;
+//import de.uka.ilkd.key.loopinvgen.CurrentLIG;
 ////import de.uka.ilkd.key.loopinvgen.ReadProof;
 ////import de.uka.ilkd.key.loopinvgen.DependenceLoopInvGenerator;
 //import de.uka.ilkd.key.proof.Goal;
@@ -26,18 +27,7 @@
 //		
 //		Goal g = mediator.getSelectedGoal();
 //		if (g != null) {
-//			// loop invariant generation
-//			ReadProof lig = new ReadProof(g);
-//			lig.getLoopFormula();
-//			lig.getArray();
-////			lig.getLoopBody();
-//
-//			Sort[] a = null;//How can I initialize it?
-//			//ConstructAllDepPreds cap = new ConstructAllDepPreds(g, a, 0, 4, 9);
-////			ConstructAllCompPreds cacp = new ConstructAllCompPreds(0, 4, 9);
-////			ArrayList<ComparativeOperator> co = cacp.consAllCompPreds();
-////			if(co != null)
-////				System.out.println(co);
+//			CurrentLIG clig = new CurrentLIG(g.sequent(), g.proof().getServices());
 //		}
 //		
 //	}

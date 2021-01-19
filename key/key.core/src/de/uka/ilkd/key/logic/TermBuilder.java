@@ -927,49 +927,57 @@ public class TermBuilder {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
     //TODO: defining an ADT and then removing these. Input Should not be an array.
     
-    public Term noRaW(Term[] locSet) {
+    public Term noRaW(Term locSet) {
     	Function noRaW = services.getNamespaces().functions().lookup("noRaW");
     	assert noRaW != null : "Did not find dependency predicate noRaW";
-    	return this.func(noRaW, locSet);
+    	return func(noRaW, locSet);
     }
     
-    public Term noWaR(Term[] locSet) {
+    public Term noWaR(Term locSet) {
     	Function noWaR = services.getNamespaces().functions().lookup("noWaR");
     	assert noWaR != null : "Did not find dependency predicate noWaR";
-    	return this.func(noWaR, locSet);
+    	return func(noWaR, locSet);
     }
     
-    public Term noWaW(Term[] locSet) {
+    public Term noWaW(Term locSet) {
     	Function noWaW = services.getNamespaces().functions().lookup("noWaW");
     	assert noWaW != null : "Did not find dependency predicate noWaW";
-    	return this.func(noWaW, locSet);
+    	return func(noWaW, locSet);
     }
     
-    public Term noR(Term[] locSet) {
+    public Term noR(Term locSet) {
     	Function noR = services.getNamespaces().functions().lookup("noR");
     	assert noR != null : "Did not find dependency predicate noR";
-    	return this.func(noR, locSet);
+    	return func(noR, locSet);
     }
     
-    public Term noW(Term[] locSet) {
+    public Term noW(Term locSet) {
     	Function noW = services.getNamespaces().functions().lookup("noW");
     	assert noW != null : "Did not find dependency predicate noW";
-    	return this.func(noW, locSet);
+    	return func(noW, locSet);
     }
     
     public Term rPred(Term locSet, Term ts) {
     	Function rPred = services.getNamespaces().functions().lookup("rPred");
     	assert rPred != null : "Did not find dependency predicate rPred";
-    	return this.func(rPred, locSet, ts);
+    	return func(rPred, locSet, ts);
     }
     
     public Term wPred(Term locSet, Term ts) {
     	Function wPred = services.getNamespaces().functions().lookup("wPred");
     	assert wPred != null : "Did not find dependency predicate wPred";
-    	return this.func(wPred, locSet, ts);
+    	return func(wPred, locSet, ts);
     }
     
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // in pretty print: left - right
+    public Term subtract(Term left, Term right) {
+      final IntegerLDT integerLDT = services.getTypeConverter()
+                    .getIntegerLDT();
+      return func(integerLDT.getSub(), left, right);
+    }
+    
+    
     
     public Term elementary(UpdateableOperator lhs, Term rhs) {
         ElementaryUpdate eu = ElementaryUpdate.getInstance(lhs);

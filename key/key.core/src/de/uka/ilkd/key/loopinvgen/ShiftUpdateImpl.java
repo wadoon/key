@@ -90,9 +90,9 @@ public class ShiftUpdateImpl {
 		Term term4EventUpdate;
 
 		if (update.sub(0).toString().equals("read"))
-			term4EventUpdate = tb.rPred(update.sub(1), tb.add(update.sub(2), tb.zTerm(1)));
+			term4EventUpdate = tb.rPred(update.sub(1), update.sub(2));
 		else if (update.sub(0).toString().equals("write"))
-			term4EventUpdate = tb.wPred(update.sub(1), tb.add(update.sub(2), tb.zTerm(1)));
+			term4EventUpdate = tb.wPred(update.sub(1), update.sub(2));
 		else
 			throw new RuntimeException("Unknown event update");
 
