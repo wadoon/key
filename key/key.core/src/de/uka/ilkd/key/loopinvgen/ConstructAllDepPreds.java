@@ -34,10 +34,12 @@ public class ConstructAllDepPreds {
 
 		sub.add(tb.arrayRange(arr, l, tb.subtract(h, tb.one())));
 		sub.add(tb.arrayRange(arr, l, h));
-		sub.add(tb.arrayRange(arr, tb.subtract(l, tb.one()), h));
-		sub.add(tb.arrayRange(arr, tb.subtract(l, tb.one()), tb.subtract(h, tb.one())));
+		sub.add(tb.arrayRange(arr, tb.add(l, tb.one()), h));
+		sub.add(tb.arrayRange(arr, tb.add(l, tb.one()), tb.subtract(h, tb.one())));
+//		System.out.println("sub arrays: " + sub.toString());
+//		sub.add(tb.singleton(arr, l));
+//		sub.add(tb.singleton(arr, h));
 		
-		//System.out.println("sub arrays: " + sub.toString());
 		return sub;
 	}
 
@@ -71,22 +73,25 @@ public class ConstructAllDepPreds {
 			depPredList.addAll(predCons(t));
 		}
 
-		Set<Term> sub3 = subArrCons(a, l, l);
-		for (Term t : sub3) {
-			depPredList.addAll(predCons(t));
-		}
+//		Set<Term> sub3 = subArrCons(a, l, l);
+//		for (Term t : sub3) {
+//			depPredList.addAll(predCons(t));
+//		}
 
-		Set<Term> sub4 = subArrCons(a, i, i);
-		for (Term t : sub4) {
-			depPredList.addAll(predCons(t));
-		}
+//		Set<Term> sub4 = subArrCons(a, i, i);
+//		for (Term t : sub4) {
+//			depPredList.addAll(predCons(t));
+//		}
 
-		Set<Term> sub5 = subArrCons(a, h, h);
-		for (Term t: sub5) {
-			depPredList.addAll(predCons(t));
-		}
+//		Set<Term> sub5 = subArrCons(a, h, h);
+//		for (Term t: sub5) {
+//			depPredList.addAll(predCons(t));
+//		}
+		
+		
+		
 //		System.out.println("dep pred list: " + depPredList);
-//		System.out.println("dep pred list size: " + depPredList.size());
+		System.out.println("dep pred list size: " + depPredList.size());
 		return depPredList;
 	}
 }

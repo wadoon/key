@@ -53,14 +53,21 @@ public class CurrentLIG {
 	public void mainAlg(Sequent seq) {	
 		System.out.println("Init");
 			getLow(seq);
+			System.out.println("low: "+ low);
 			getIndexAndHigh(seq);
+			System.out.println("index: "+ index);
+			System.out.println("high: "+ high);
 			getLocSet(seq);
+			System.out.println("array: " + array);
 			
 			ConstructAllCompPreds cac = new ConstructAllCompPreds(services, low, index, high);
 			compPreds = cac.cons();
 			System.out.println("Comp Preds: " + compPreds.size());
 			ConstructAllDepPreds cad = new ConstructAllDepPreds(services, array, low, index, high);
 			depPreds = cad.cons();
+//			for(Term t : depPreds) {
+//				System.out.println("Name: " + t.op().name() + "          sub(0): "+ t.sub(0));
+//			}
 		/*
 		 * first unwind
 		 * then shift
@@ -71,17 +78,17 @@ public class CurrentLIG {
 	public void mainAlg2(Sequent newSeq) {
 		PredicateRefinement pr = new PredicateRefinement(services, newSeq, compPreds, depPreds);
 		 pr.readAndRefineAntecedentPredicates(newSeq);
-		 newCompPreds = pr.compList;
+		 newCompPreds = pr.refinedCompList;
 		 newDepPreds = pr.refinedDepList;
-//		 if(newCompPreds.equals(compPreds) && newDepPreds.equals(depPreds)) {
-////			 Term loopInv = tb.add(tb.and(newCompPreds), tb.and(newDepPreds));
-////			 System.out.println("Loop Invariant: " + loopInv.toString());
-//			 System.out.println("Loop Inv. is the conjunction of: " + newCompPreds.toString() + " and " + newDepPreds.toString());
-//			 System.out.println("Number of LI predicates: " + newCompPreds.size() + " plus "+ newDepPreds.size());
-//		 } else {
-//			 compPreds = newCompPreds;
-//			 depPreds = newDepPreds;
-//		 }
+		 if(newCompPreds.equals(compPreds) && newDepPreds.equals(depPreds)) {
+//			 Term loopInv = tb.add(tb.and(newCompPreds), tb.and(newDepPreds));
+//			 System.out.println("Loop Invariant: " + loopInv.toString());
+			 System.out.println("Loop Inv. is the conjunction of: " + newCompPreds.toString() + " and " + newDepPreds.toString());
+			 System.out.println("Number of LI predicates: " + newCompPreds.size() + " plus "+ newDepPreds.size());
+		 } else {
+			 compPreds = newCompPreds;
+			 depPreds = newDepPreds;
+		 }
 	}
 
 	
@@ -94,7 +101,7 @@ public class CurrentLIG {
 			oldComp = newComp;
 			oldDep = newDep;
 			PredicateRefinement pr = new PredicateRefinement(services, seq, oldComp, oldDep);
-			newComp = pr.compList;
+			newComp = pr.refinedCompList;
 			
 		}
 			

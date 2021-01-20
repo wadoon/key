@@ -341,22 +341,23 @@ public class TestPredicateConstruction {
 //		System.out.println("Seq1: " + seq.toString());
 		CurrentLIG cur = new CurrentLIG(services);
 		cur.mainAlg(seq);
-		String[] arrLeft = {//"rPred(arrayRange(a,Z(1(#)),i), timestamp - 1)"
+		String[] arrLeft = {"rPred(arrayRange(a,Z(1(#)),i), timestamp)"
 //				,"rPred({(a,arr(1+i))}, timestamp)"
 //				, "wPred({(a,arr(i))}, timestamp)"
-				"i < a.length"
-				, "0 < a.length"
 				, "i < a.length"
+//				, "0 < a.length"
+//				, "i < a.length"
 //				, "wPred(arrayRange(a,Z(0(#)),sub(i,Z(1(#)))), timestamp - 1)"
-//				+ "rPred(arrayRange(a,Z(1(#)),i), timestamp - 1)"
-//				 ,"x = TRUE"
+//				, "rPred(arrayRange(a,Z(1(#)),i), timestamp - 1)"
+//				 "x = TRUE"
 //				 ,"wellFormed(heap)"
-//						, "i=2"
+						, "i=5"
+						, "i>0"
 //				, "timestamp= 1 + timestamp_0"
 //				, "x_1 = 0"
 //						 ,"a.length = x_2"
-//				+ "\\if (0 < a.length) \\then (TRUE) \\else (FALSE) = x,"
-//				+ "x_arr = {x_arr:=x_arr_0}{x_arr:=a}x_arr,"
+//				, "\\if (0 < a.length) \\then (TRUE) \\else (FALSE) = x"
+//				, "x_arr = {x_arr:=x_arr_0}{x_arr:=a}x_arr,"
 //				+ "x_3 = {x_3:=x_3_0}{x_3:=i}x_3,"
 //				+ "x_arr_1 = {x_arr_1:=x_arr_1_0}{x_arr_1:=a}x_arr_1,"
 //				+ "x_5 = {x_5:=x_5_0}{x_5:=1 + i}x_5,"
@@ -368,9 +369,9 @@ public class TestPredicateConstruction {
 		try {
 			for(String fml: arrLeft) {
 				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+				
 			}
-			
-		
+			System.out.println(seq.toString());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
@@ -380,8 +381,6 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return;
 		}
-//		seq = seq.addFormula(new SequentFormula(formulaLeft), true, true).sequent();
-//		System.out.println("Seq: " + seq.toString());
 		cur.mainAlg2(seq);
 	}
 
