@@ -155,7 +155,7 @@ task antlr4Key(type: JavaExec) {
     def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
     //see incremental task api, prevents rerun if nothing has changed.
     inputs.dir "src/main/antlr4/"
-    outputs.dir "$projectDir/build/generated/antlr4/main/"
+    outputs.dir antlr4Output
     classpath = configurations.antlr4
     main = "org.antlr.v4.Tool"
     args = ["-visitor",
@@ -175,7 +175,7 @@ task antlr4Jml(type: JavaExec) {
     def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/speclang/njml"
     //see incremental task api, prevents rerun if nothing has changed.
     inputs.dir "src/main/antlr4/"
-    outputs.dir "build/generated/antlr4/main/"
+    outputs.dir antlr4Output
     classpath = configurations.antlr4
     main = "org.antlr.v4.Tool"
     args = ["-visitor",
