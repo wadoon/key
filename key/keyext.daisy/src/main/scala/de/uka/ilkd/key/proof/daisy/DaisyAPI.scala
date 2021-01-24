@@ -3,10 +3,9 @@ package de.uka.ilkd.key.proof.daisy
 import java.util
 
 import daisy.analysis.DataflowPhase
-import daisy.analysis.DataflowPhase.evalRange
 import daisy.lang.Identifiers.{FreshIdentifier, Identifier}
-import daisy.lang.Trees.{Division, Expr, Minus, Plus, RealLiteral, Times, Variable}
-import daisy.lang.Types
+import daisy.lang.Trees._
+import daisy.lang.{Trees, Types}
 import daisy.lang.Types.RealType
 import daisy.tools.{FloatInterval, Rational}
 import de.uka.ilkd.key.java.Services
@@ -16,8 +15,8 @@ import de.uka.ilkd.key.logic.op.Operator
 import de.uka.ilkd.key.logic.{ProgramElementName, Term}
 import de.uka.ilkd.key.util.Pair
 import org.key_project.util.ExtList
-import scala.language.postfixOps
 
+import scala.language.postfixOps
 import scala.collection.JavaConverters._
 
 
@@ -31,7 +30,7 @@ object DaisyAPI {
     val daisyInputValMap = convertPreCondsToInputIntervals(preconditions, services)
     val daisyExpression = convertToDaisyExpr(lets, floatExpr, daisyInputValMap.keys.toList, services)
 
-    val range: FloatInterval = evalRange[FloatInterval](daisyExpression, daisyInputValMap,FloatInterval.apply)._1
+    val range: FloatInterval = FloatInterval.floatEvalRange(daisyExpression, daisyInputValMap)
 
     new Pair[java.lang.Float, java.lang.Float](range.xlo, range.xhi)
   }
@@ -102,8 +101,8 @@ object DaisyAPI {
     }
     // if literal
     else if (op.name().toString == "FP") {
-      val fl: Double = floatLDT.translateTerm(floatExpr, new ExtList, services).asInstanceOf[FloatLiteral].getValue.toDouble
-      RealLiteral(Rational.fromDouble(fl))
+      val fl: Float = floatLDT.translateTerm(floatExpr, new ExtList, services).asInstanceOf[FloatLiteral].getValue.toFloat
+      Trees.FloatLiteral(fl)
     }
     else throw new IllegalArgumentException("Operation " + op + " not supported")
   }
@@ -125,7 +124,7 @@ object DaisyAPI {
 
     DataflowPhase.rangeMethod = "interval"
 
-    val range: FloatInterval = evalRange[FloatInterval](expr, intervalsMap,FloatInterval.apply) _1
+    val range: FloatInterval = FloatInterval.floatEvalRange(expr, intervalsMap)
 
     new Pair[java.lang.Float, java.lang.Float](range.xlo, range.xhi)
   }
