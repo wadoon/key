@@ -36,7 +36,7 @@ public class TestPredicateConstruction {
 	private final NamespaceSet nss;
 	private final Services services;
 
-	private String pathToTestKeYFile = "/Users/bubel/Documents/Work/Development/key/devel/key/key.core/src/de/uka/ilkd/key/loopinvgen/test.key";//"C:\\Users\\Asma\\git\\LIG_3\\key\\key\\key.core\\src\\de\\uka\\ilkd\\key\\loopinvgen\\test.key";
+	private String pathToTestKeYFile = "C:\\Users\\Asma\\git\\LIG_3\\key\\key\\key.core\\src\\de\\uka\\ilkd\\key\\loopinvgen\\test.key";
 
 	TestPredicateConstruction() {
 		services = HelperClassParsingTests.createServices(new File(pathToTestKeYFile));
