@@ -5,6 +5,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -35,9 +36,9 @@ public class PredicateRefinement {
 	private Set<Term> compList = new HashSet<Term>();
 	public Set<Term> refinedCompList = new HashSet<Term>();
 	private final Services services;
-	private final Name noRaW, noWaR, noWaW, noW, noR, rPred, wPred;
 	private final TermBuilder tb;
 	private final IntegerLDT intLDT;
+	private final DependenciesLDT depLDT;
 	private final Set<Operator> CompOps = new HashSet<>();
 
 	public PredicateRefinement(Services s, Sequent sequent, Set<Term> compPredList, Set<Term> depPredList) {
@@ -46,13 +47,7 @@ public class PredicateRefinement {
 		compList = compPredList;
 		depList = depPredList;
 
-		noRaW = new Name("noRaW");
-		noWaR = new Name("noWaR");
-		noWaW = new Name("noWaW");
-		noW = new Name("noW");
-		noR = new Name("noR");
-		rPred = new Name("rPred");
-		wPred = new Name("wPred");
+		depLDT = services.getTypeConverter().getDependenciesLDT();
 
 		intLDT = services.getTypeConverter().getIntegerLDT();
 		Function lt = intLDT.getLessThan();
@@ -73,14 +68,14 @@ public class PredicateRefinement {
 		Semisequent ante = seq.antecedent();
 		for (SequentFormula sf : ante) {
 			for (Operator f : CompOps) {
-				if (sf.formula().op().equals(f)) {
+				if (sf.formula().op() == f) {
 //					System.out.println("comp pred spotted: " + sf);
 					delCompPred(sf);
 					break;
 				}
 			}
 
-			if (sf.formula().op().name().equals(rPred) || sf.formula().op().name().equals(wPred)) {
+			if (sf.formula().op() == depLDT.getRPred() || sf.formula().op() == depLDT.getWPred()) {
 //				System.out.println("Dep pred spotted: " + sf);
 				delDepPred(seq, sf);
 			}
@@ -96,7 +91,7 @@ public class PredicateRefinement {
 //		System.out.println("LH: " + lh + " Op: " + lh.op().getClass() + " Arity: " + lh.op().arity() + " Sort: " + lh.sort());
 		Term rh = sf.formula().sub(1);
 //		System.out.println("RH: " + rh+ " Op: " + lh.op().getClass() + " Arity: " + lh.op().arity()+ " Sort: " + rh.sort());
-		if (isProgOrLogVars(lh) && isProgOrLogVars(lh) && !rh.sort().name().toString().equals("boolean")) {
+		if (isProgOrLogVars(lh) && isProgOrLogVars(lh) && rh.sort() != services.getTypeConverter().getBooleanType().getSort()) {
 //			System.out.println("Prog or Log vars");
 
 			Term eq = tb.equals(lh, rh);
@@ -140,16 +135,16 @@ public class PredicateRefinement {
 	}
 
 	private void delDepPred(Sequent seq, SequentFormula sf) {
-		Name name = sf.formula().op().name();
+		Operator op = sf.formula().op();
 		Term locSet = sf.formula().sub(0);
 		Set<Term> toDelete = new HashSet<Term>();
 
 		for (Term t : depList) {
 			if (proofSubSet(seq, t.sub(0), locSet)) {
-				if (name.equals(rPred) && t.op().name().equals(noR)) {
+				if (op == depLDT.getRPred() && t.op() == depLDT.getNoR()) {
 					toDelete.add(t);
 //					System.out.println("delDepPred Method: Dep pred " + t + " is going to be deleted.");
-				} else if (name.equals(wPred) && t.op().name().equals(noW)) {
+				} else if (op == depLDT.getWPred() && t.op() == depLDT.getNoW()) {
 					toDelete.add(t);
 //					System.out.println("delDepPred Method:  Dep pred " + t + " is going to be deleted.");
 				}
@@ -163,17 +158,17 @@ public class PredicateRefinement {
 		Set<Term> toDelete = new HashSet<Term>();
 
 		for (Term t1 : dependencePredicatesSet) {
-			if (t1.op().name().equals(noR)) {
+			if (t1.op() == depLDT.getNoR()) {
 				for (Term t2 : dependencePredicatesSet) {
-					if ((t2.op().name().equals(noRaW) || t2.op().name().equals(noWaR))
+					if ((t2.op()==depLDT.getNoRaW() || t2.op()== depLDT.getNoWaR())
 							&& proofSubSet(seq, t2.sub(0), t1.sub(0))) {
 						toDelete.add(t2);
 //						System.out.println("delPredRefine1: Dep pred " + t2 + " is going to be deleted.");
 					}
 				}
-			} else if (t1.op().name().equals(noW)) {
+			} else if (t1.op() == depLDT.getNoW()) {
 				for (Term t2 : dependencePredicatesSet) {
-					if ((t2.op().name().equals(noRaW) || t2.op().name().equals(noWaR) || t2.op().name().equals(noWaW))
+					if ((t2.op() == depLDT.getNoRaW() || t2.op() == depLDT.getNoWaR() || t2.op() == depLDT.getNoWaW())
 							&& proofSubSet(seq, t2.sub(0), t1.sub(0))) {
 						toDelete.add(t2);
 //						System.out.println("delPredRefine1: Dep pred " + t2 + " is going to be deleted.");
@@ -203,9 +198,9 @@ public class PredicateRefinement {
 		Semisequent ante = seq.antecedent();
 
 		for (SequentFormula sf1 : ante) {
-			if (sf1.formula().op().name().equals(rPred)) {
+			if (sf1.formula().op() == depLDT.getRPred()) {
 				for (SequentFormula sf2 : ante) {
-					if (sf2.formula().op().name().equals(wPred)) {
+					if (sf2.formula().op() == depLDT.getWPred()) {
 						proofNonEmptyIntersection(seq, sf2.formula().sub(0), sf1.formula().sub(0));
 //						if (proofNonEmptyIntersection(seq, sf2.formula().sub(0), sf1.formula().sub(0))) {
 //							System.out.println("Timestamps: " + sf2.formula().sub(1) + "   " + sf1.formula().sub(1));
@@ -479,19 +474,22 @@ public class PredicateRefinement {
 			return false;
 		}
 
-		final StrategyProperties sp = services.getProof().getActiveStrategyFactory().getSettingsDefinition()
+		final StrategyProperties sp = ps.getProof().getActiveStrategyFactory().getSettingsDefinition()
 				.getDefaultPropertiesFactory().createDefaultStrategyProperties();
 		sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_OFF);
 		ps.setStrategyProperties(sp);
+
+		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+		
 		ps.setMaxRuleApplications(10000);
 		ps.setTimeout(-1);
 //		System.out.println("strategy prop. " + sp);
 		
 		final ApplyStrategyInfo info = ps.start();
 		System.out.println("rules: "+ ps.getProof().getStatistics());
-		if (!info.getProof().closed()) {
-			System.out.println("Open Goals: " + info.getProof().openGoals());
-		}
+//		if (!info.getProof().closed()) {
+//			System.out.println("Open Goals: " + info.getProof().openGoals());
+//		}
 		return info.getProof().closed();
 	}
 
