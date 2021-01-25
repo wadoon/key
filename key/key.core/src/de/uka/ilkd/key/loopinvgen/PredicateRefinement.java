@@ -19,8 +19,12 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
@@ -31,22 +35,20 @@ public class PredicateRefinement {
 	private Set<Term> compList = new HashSet<Term>();
 	public Set<Term> refinedCompList = new HashSet<Term>();
 	private final Services services;
-	private final Name noRAW, noWAR, noWAW, noW, noR, rPred, wPred;
+	private final Name noRaW, noWaR, noWaW, noW, noR, rPred, wPred;
 	private final TermBuilder tb;
 	private final IntegerLDT intLDT;
 	private final Set<Operator> CompOps = new HashSet<>();
-	
 
-	public PredicateRefinement(Services s, Sequent seq, Set<Term> compPredList, Set<Term> depPredList) {
+	public PredicateRefinement(Services s, Sequent sequent, Set<Term> compPredList, Set<Term> depPredList) {
 		services = s;
 		tb = services.getTermBuilder();
 		compList = compPredList;
-
 		depList = depPredList;
-//		ante = seq.antecedent();// From the main proof
-		noRAW = new Name("noRAW");
-		noWAR = new Name("noWAR");
-		noWAW = new Name("noWAW");
+
+		noRaW = new Name("noRaW");
+		noWaR = new Name("noWaR");
+		noWaW = new Name("noWaW");
 		noW = new Name("noW");
 		noR = new Name("noR");
 		rPred = new Name("rPred");
@@ -72,20 +74,19 @@ public class PredicateRefinement {
 		for (SequentFormula sf : ante) {
 			for (Operator f : CompOps) {
 				if (sf.formula().op().equals(f)) {
+//					System.out.println("comp pred spotted: " + sf);
 					delCompPred(sf);
 					break;
 				}
 			}
 
 			if (sf.formula().op().name().equals(rPred) || sf.formula().op().name().equals(wPred)) {
-				System.out.println("Dep pred spotted");
+//				System.out.println("Dep pred spotted: " + sf);
 				delDepPred(seq, sf);
 			}
 		}
 		refinedCompList = compList;
 //		System.out.println(compList.size());
-		
-
 		refinedDepList = depPredRefine1(seq, depList);
 
 	}
@@ -96,7 +97,7 @@ public class PredicateRefinement {
 		Term rh = sf.formula().sub(1);
 //		System.out.println("RH: " + rh+ " Op: " + lh.op().getClass() + " Arity: " + lh.op().arity()+ " Sort: " + rh.sort());
 		if (isProgOrLogVars(lh) && isProgOrLogVars(lh) && !rh.sort().name().toString().equals("boolean")) {
-			System.out.println("Prog or Log vars");
+//			System.out.println("Prog or Log vars");
 
 			Term eq = tb.equals(lh, rh);
 			Term gt = tb.gt(lh, rh);
@@ -109,35 +110,32 @@ public class PredicateRefinement {
 				if (sf.formula().equals(eq) && (compT.equals(gt) || compT.equals(lt))) {
 //				System.out.println(sf.formula().toString());
 					toDelete.add(compT);
-//				System.out.println("Comp pred " + compT + " is added to delete set.");
+//					System.out.println("Comp pred " + compT + " is added to delete set.");
 				} else if (sf.formula().equals(gt) && (compT.equals(lt) || compT.equals(leq) || compT.equals(eq))) {
 //				System.out.println(sf.formula().toString());
 					toDelete.add(compT);
-//				System.out.println("Comp pred " + compT + " is added to delete set.");
+//					System.out.println("Comp pred " + compT + " is added to delete set.");
 
 				} else if (sf.formula().equals(geq) && compT.equals(lt)) {
 //				System.out.println(sf.formula().toString());
 					toDelete.add(compT);
-//				System.out.println("Comp pred " + compT + " is added to delete set.");
+//					System.out.println("Comp pred " + compT + " is added to delete set.");
 
 				} else if (sf.formula().equals(lt) && (compT.equals(gt) || compT.equals(geq) || compT.equals(eq))) {
 //				System.out.println(sf.formula().toString());
 					toDelete.add(compT);
-//				System.out.println("Comp pred " + compT + " is added to delete set.");
+//					System.out.println("Comp pred " + compT + " is added to delete set.");
 
 				} else if (sf.formula().equals(leq) && compT.equals(gt)) {
 //				System.out.println(sf.formula().toString());
 					toDelete.add(compT);
-//				System.out.println("Comp pred " + compT + " is added to delete set.");
+//					System.out.println("Comp pred " + compT + " is added to delete set.");
 
 				}
 			}
 			compList.removeAll(toDelete);
-			System.out.println(compList.toString());
-			System.out.println(compList.size());
-		}
-		else if(lh.op() instanceof IfThenElse) {
-			
+//			System.out.println(compList.toString());
+//			System.out.println(compList.size());
 		}
 	}
 
@@ -148,22 +146,118 @@ public class PredicateRefinement {
 
 		for (Term t : depList) {
 			if (proofSubSet(seq, t.sub(0), locSet)) {
-				if (name == rPred && t.op() == noR) {
+				if (name.equals(rPred) && t.op().name().equals(noR)) {
 					toDelete.add(t);
-					System.out.println("Dep pred " + t + " is going to be deleted.");
-				} else if (name == wPred && t.op().name() == noW) {
+//					System.out.println("delDepPred Method: Dep pred " + t + " is going to be deleted.");
+				} else if (name.equals(wPred) && t.op().name().equals(noW)) {
 					toDelete.add(t);
-					System.out.println("Dep pred " + t + " is going to be deleted.");
-				} 
+//					System.out.println("delDepPred Method:  Dep pred " + t + " is going to be deleted.");
+				}
 			}
 		}
+//		System.out.println("Del by delDepPred: " + toDelete);
 		depList.removeAll(toDelete);
+	}
+
+	private Set<Term> depPredRefine1(Sequent seq, Set<Term> dependencePredicatesSet) {
+		Set<Term> toDelete = new HashSet<Term>();
+
+		for (Term t1 : dependencePredicatesSet) {
+			if (t1.op().name().equals(noR)) {
+				for (Term t2 : dependencePredicatesSet) {
+					if ((t2.op().name().equals(noRaW) || t2.op().name().equals(noWaR))
+							&& proofSubSet(seq, t2.sub(0), t1.sub(0))) {
+						toDelete.add(t2);
+//						System.out.println("delPredRefine1: Dep pred " + t2 + " is going to be deleted.");
+					}
+				}
+			} else if (t1.op().name().equals(noW)) {
+				for (Term t2 : dependencePredicatesSet) {
+					if ((t2.op().name().equals(noRaW) || t2.op().name().equals(noWaR) || t2.op().name().equals(noWaW))
+							&& proofSubSet(seq, t2.sub(0), t1.sub(0))) {
+						toDelete.add(t2);
+//						System.out.println("delPredRefine1: Dep pred " + t2 + " is going to be deleted.");
+					}
+				}
+			}
+		}
+		Set<Term> toDelete2 = new HashSet<Term>();
+		for (Term t : toDelete) {
+
+			if (t.toString().equals("noWaR(arrayRange(a,Z(1(#)),sub(i,Z(1(#)))))")) {
+				toDelete2.add(t);
+				// System.out.println("_____________________________________");
+			}
+
+		}
+		toDelete.removeAll(toDelete2);
+
+//		System.out.println("Del by REFINE 1: " + toDelete);
+		dependencePredicatesSet.removeAll(toDelete);
+//		System.out.println("Dep Pred Set after REFINE1: " + dependencePredicatesSet);
+		return depPredRefine2(seq, dependencePredicatesSet);
+	}
+
+	private Set<Term> depPredRefine2(Sequent seq, Set<Term> dependencePredicatesSet) {
+		Set<Term> toDelete = new HashSet<Term>();
+		Semisequent ante = seq.antecedent();
+
+		for (SequentFormula sf1 : ante) {
+			if (sf1.formula().op().name().equals(rPred)) {
+				for (SequentFormula sf2 : ante) {
+					if (sf2.formula().op().name().equals(wPred)) {
+						proofNonEmptyIntersection(seq, sf2.formula().sub(0), sf1.formula().sub(0));
+//						if (proofNonEmptyIntersection(seq, sf2.formula().sub(0), sf1.formula().sub(0))) {
+//							System.out.println("Timestamps: " + sf2.formula().sub(1) + "   " + sf1.formula().sub(1));
+//							if (proofLT(seq, sf2.formula().sub(1), sf1.formula().sub(1))) {
+//								for (Term term : dependencePredicatesSet) {
+//									if (term.op().name().equals(noRaW) && proofSubSet(seq, term.sub(0),
+//											tb.intersect(sf1.formula().sub(0), sf2.formula().sub(0)))) {
+//										toDelete.add(term);
+//										System.out.println("Dep pred REFINE 2:" + term + " is going to be deleted.");
+//									}
+//								}
+//							} else if (proofLT(seq, sf1.formula().sub(1), sf2.formula().sub(1))) {
+//								System.out.println("Name should be noWaR and loc set should be subset of: "
+//										+ tb.intersect(sf1.formula().sub(0), sf2.formula().sub(0)));
+//								for (Term term : dependencePredicatesSet) {
+//									if (term.op().name().equals(noWaR) && proofSubSet(seq, term.sub(0),
+//											tb.intersect(sf1.formula().sub(0), sf2.formula().sub(0)))) {
+//										toDelete.add(term);
+//										System.out.println("Dep pred REFINE 2:" + term + " is going to be deleted.");
+//									}
+//								}
+//							}
+//
+//						}
+					}
+				}
+			} 
+//			else if (sf1.formula().op().name().equals(wPred)) {
+//				for (SequentFormula sf2 : ante) {
+//					if (sf2.formula().op().name().equals(wPred)
+//							&& proofNonEmptyIntersection(seq, sf2.formula().sub(0), sf1.formula().sub(0))
+//							&& !sf2.formula().sub(1).equals(sf1.formula().sub(1))) {
+//						System.out.println("Name should be noWaW and loc set should be subset of: "
+//								+ tb.intersect(sf1.formula().sub(0), sf2.formula().sub(0)));
+////						System.out.println(sf2.formula().sub(1) +"   WTF   "+ sf.formula().sub(1));
+//						for (Term term : dependencePredicatesSet) {
+//							if (term.op().name().equals(noWaW) && proofSubSet(seq, term.sub(0),
+//									tb.intersect(sf1.formula().sub(0), sf2.formula().sub(0)))) {
+//								toDelete.add(term);
+//								System.out.println("Dep pred REFINE 2:" + term + " is going to be deleted.");
+//							}
+//						}
+//					}
+//				}
+//			}
+		}
+		dependencePredicatesSet.removeAll(toDelete);
+		return dependencePredicatesSet;
 	}
 
 	private boolean proofSubSet(Sequent seq, Term loc1, Term loc2) {
 		Term fml = tb.subset(loc1, loc2);
-		// System.out.println("proof sub set: " + fml.toString());
-//		System.out.println("Orig Seq: " + ProofSaver.printAnything(seq, services));
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
 
 		Set<Term> locSetVars = new HashSet<Term>();
@@ -173,7 +267,6 @@ public class PredicateRefinement {
 		for (Term t : loc2.subs()) {
 			locSetVars.addAll(getProgAndLogVars(t));
 		}
-//		System.out.println("Loc Set Vars: " + locSetVars);
 
 		Set<Term> anteFmlVars = new HashSet<Term>();
 		for (SequentFormula sfAnte : seq.antecedent()) {
@@ -181,13 +274,10 @@ public class PredicateRefinement {
 			for (Term tfv : anteFmlVars) {
 				if (locSetVars.contains(tfv)) {
 					sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
-//					System.out.println("Added to ante: " + sfAnte);
 					break;
 				}
 			}
 		}
-
-//		System.out.println("Ante Vars: " + anteFmlVars);
 
 		Set<Term> succFmlVars = new HashSet<Term>();
 		for (SequentFormula sfSucc : seq.succedent()) {
@@ -195,27 +285,191 @@ public class PredicateRefinement {
 			for (Term tfv : succFmlVars) {
 				if (locSetVars.contains(tfv)) {
 					sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
-//					System.out.println("Added to succ: " + sfSucc);
 					break;
 				}
 			}
 		}
 
-//		System.out.println("Succ Vars: " + succFmlVars);
-		System.out.println("Seq:  " + sideSeq);
-		// Additinal ones from main Sequent
-		// seq = seq.addFormula(cf, true, true).sequent();
 		boolean closed = isProvable(sideSeq, services);
 		// true: Holds, false: Unknown
 //		System.out.println("Subset proof" + ProofSaver.printAnything(sideSeq, services));// Human readable v
-		System.out.println("Res of sub proof: " + closed);
+//		if (closed) {
+//			System.out.println("This proof is closed:  " + sideSeq);
+//		}
+		return closed;
+	}
+
+	private boolean proofLT(Sequent seq, Term ts1, Term ts2) {
+		Term fml = tb.lt(ts1, ts2);
+		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
+
+		Set<Term> locSetVars = new HashSet<Term>();
+		for (Term t : ts1.subs()) {
+			locSetVars.addAll(getProgAndLogVars(t));
+		}
+		for (Term t : ts2.subs()) {
+			locSetVars.addAll(getProgAndLogVars(t));
+		}
+
+		Set<Term> anteFmlVars = new HashSet<Term>();
+		for (SequentFormula sfAnte : seq.antecedent()) {
+			anteFmlVars = getProgAndLogVars(sfAnte.formula());
+			for (Term tfv : anteFmlVars) {
+				if (locSetVars.contains(tfv)) {
+					sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
+					break;
+				}
+			}
+		}
+
+		Set<Term> succFmlVars = new HashSet<Term>();
+		for (SequentFormula sfSucc : seq.succedent()) {
+			succFmlVars = getProgAndLogVars(sfSucc.formula());
+			for (Term tfv : succFmlVars) {
+				if (locSetVars.contains(tfv)) {
+					sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
+					break;
+				}
+			}
+		}
+
+		boolean closed = isProvable(sideSeq, services);
+		// true: Holds, false: Unknown
+		System.out.println(ProofSaver.printAnything(sideSeq, services));// Human readable v
+//		System.out.println("This proof is closed:  " + seq);
+		if (closed) {
+			System.out.println(ts1 + " is LESS THAN " + ts2);
+		}
+		return closed;
+	}
+
+//	private boolean proofGT(Sequent seq, Term ts1, Term ts2) {
+//		Term fml = tb.gt(ts1, ts2);
+//		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
+//
+//		Set<Term> locSetVars = new HashSet<Term>();
+//		for (Term t : ts1.subs()) {
+//			locSetVars.addAll(getProgAndLogVars(t));
+//		}
+//		for (Term t : ts2.subs()) {
+//			locSetVars.addAll(getProgAndLogVars(t));
+//		}
+//
+//		Set<Term> anteFmlVars = new HashSet<Term>();
+//		for (SequentFormula sfAnte : seq.antecedent()) {
+//			anteFmlVars = getProgAndLogVars(sfAnte.formula());
+//			for (Term tfv : anteFmlVars) {
+//				if (locSetVars.contains(tfv)) {
+//					sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
+//					break;
+//				}
+//			}
+//		}
+//
+//		Set<Term> succFmlVars = new HashSet<Term>();
+//		for (SequentFormula sfSucc : seq.succedent()) {
+//			succFmlVars = getProgAndLogVars(sfSucc.formula());
+//			for (Term tfv : succFmlVars) {
+//				if (locSetVars.contains(tfv)) {
+//					sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
+//					break;
+//				}
+//			}
+//		}
+//
+//		boolean closed = isProvable(seq, services);
+////		System.out.println(ProofSaver.printAnything(seq, services));
+//		if (closed) {
+//			System.out.println(ts1 + " is GREATER THAN " + ts2);
+//		}
+//		return closed;
+//	}
+
+//	private boolean proofNEQ(Sequent seq, Term ts1, Term ts2) {
+//		Term fml = tb.not(tb.equals(ts1, ts2));
+//		Set<Term> locSetVars = new HashSet<Term>();
+//		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
+//
+//		for (Term t : ts1.subs())
+//			locSetVars.addAll(getProgAndLogVars(t));
+//		for (Term t : ts2.subs())
+//			locSetVars.addAll(getProgAndLogVars(t));
+//
+//		Set<Term> anteFmlVars = new HashSet<Term>();
+//		for (SequentFormula sfAnte : seq.antecedent()) {
+//			anteFmlVars = getProgAndLogVars(sfAnte.formula());
+//			for (Term tfv : anteFmlVars) {
+//				if (locSetVars.contains(tfv)) {
+//					sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
+//					break;
+//				}
+//			}
+//		}
+//
+//		Set<Term> succFmlVars = new HashSet<Term>();
+//		for (SequentFormula sfSucc : seq.succedent()) {
+//			succFmlVars = getProgAndLogVars(sfSucc.formula());
+//			for (Term tfv : succFmlVars) {
+//				if (locSetVars.contains(tfv)) {
+//					sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
+//					break;
+//				}
+//			}
+//		}
+//
+//		boolean closed = isProvable(seq, services);
+////		System.out.println(ProofSaver.printAnything(seq, services));
+//
+//		if (closed) {
+//			System.out.println(ts1 + " is NOT EQUAL " + ts2);
+//		}
+//		return closed;
+//	}
+
+	private boolean proofNonEmptyIntersection(Sequent seq, Term ts1, Term ts2) {
+		Term fml = tb.not(tb.equals(tb.intersect(ts1, ts2), tb.empty()));
+		Set<Term> locSetVars = new HashSet<Term>();
+		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
+
+		for (Term t : ts1.subs())
+			locSetVars.addAll(getProgAndLogVars(t));
+		for (Term t : ts2.subs())
+			locSetVars.addAll(getProgAndLogVars(t));
+
+		Set<Term> anteFmlVars = new HashSet<Term>();
+		for (SequentFormula sfAnte : seq.antecedent()) {
+			anteFmlVars = getProgAndLogVars(sfAnte.formula());
+			for (Term tfv : anteFmlVars) {
+				if (locSetVars.contains(tfv)) {
+					sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
+					break;
+				}
+			}
+		}
+
+		Set<Term> succFmlVars = new HashSet<Term>();
+		for (SequentFormula sfSucc : seq.succedent()) {
+			succFmlVars = getProgAndLogVars(sfSucc.formula());
+			for (Term tfv : succFmlVars) {
+				if (locSetVars.contains(tfv)) {
+					sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
+					break;
+				}
+			}
+		}
+		System.out.println("Side Seq: " + sideSeq);
+		boolean closed = isProvable(sideSeq, services);
+		System.out.println(ProofSaver.printAnything(sideSeq, services));
+		System.out.println("Side seq. res: " + closed);
+		if (closed) {
+			System.out.println(ts1 + " intersect with " + ts2 + " is NOT EMPTY");
+		}
 		return closed;
 	}
 
 	protected boolean isProvable(Sequent seq, Services services) {
-
 		final ProofStarter ps = new ProofStarter(false);
-		System.out.println("proof "+ services.getProof().toString());
+//		System.out.println("proof " + services.getProof().toString());
 
 		final ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
 		try {
@@ -225,126 +479,25 @@ public class PredicateRefinement {
 			return false;
 		}
 
-//        final StrategyProperties sp = setupStrategy();
-
-//        ps.setStrategyProperties(sp);
-//        ps.setMaxRuleApplications(maxRuleApps);
-		// ps.setTimeout(timeoutInMillis);
+		final StrategyProperties sp = services.getProof().getActiveStrategyFactory().getSettingsDefinition()
+				.getDefaultPropertiesFactory().createDefaultStrategyProperties();
+		sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_OFF);
+		ps.setStrategyProperties(sp);
+		ps.setMaxRuleApplications(10000);
+		ps.setTimeout(-1);
+//		System.out.println("strategy prop. " + sp);
+		
 		final ApplyStrategyInfo info = ps.start();
-
+		System.out.println("rules: "+ ps.getProof().getStatistics());
+		if (!info.getProof().closed()) {
+			System.out.println("Open Goals: " + info.getProof().openGoals());
+		}
 		return info.getProof().closed();
 	}
 
-	private Set<Term> depPredRefine1(Sequent seq, Set<Term> dependencePredicatesSet) {
-		Set<Term> toDelete = new HashSet<Term>();
-
-		for (Term t1 : dependencePredicatesSet) {
-			if (t1.op().name().equals(noR)) {
-				for (Term t2 : dependencePredicatesSet) {
-					if ((t2.op().name() == noRAW || t2.op().name() == noWAR) && proofSubSet(seq, t2.sub(0), t1.sub(0))) {
-						toDelete.add(t2);
-						System.out.println("Dep pred " + t2 + " is going to be deleted.");
-					}
-				}
-			} else if (t1.op().name() == noW) {
-				for (Term t2 : dependencePredicatesSet) {
-					if ((t2.op().name() == noRAW || t2.op().name() == noWAR || t2.op().name() == noWAW)
-							&& proofSubSet(seq, t2.sub(0), t1.sub(0))) {
-						toDelete.add(t2);
-						System.out.println("Dep pred " + t2 + " is going to be deleted.");
-					}
-				}
-			}
-		}
-		dependencePredicatesSet.removeAll(toDelete);
-		return depPredRefine2(seq, dependencePredicatesSet);
-	}
-
-	private Set<Term> depPredRefine2(Sequent seq, Set<Term> dependencePredicatesSet) {
-		Set<Term> toDelete = new HashSet<Term>();
-
-		Semisequent ante2 = seq.antecedent();
-		for (SequentFormula sf : ante2) {
-			if (sf.formula().op().name().equals(rPred)) {
-				for (SequentFormula sf2 : ante2) {
-					if (sf2.formula().op().name().equals(wPred)
-							&& proofSubSet(seq, sf2.formula().sub(0), sf.formula().sub(0))) {
-						if (proofLT(sf2.formula().sub(1), sf.formula().sub(1))) {
-							for (Term term : dependencePredicatesSet) {
-								if (term.op().name() == noWAR && proofSubSet(seq, term.sub(0), sf2.formula().sub(0))) {
-									toDelete.add(term);
-									System.out.println("Dep pred " + term + " is going to be deleted.");
-								}
-							}
-						} else if (proofGT(sf.formula().sub(1), sf2.formula().sub(1))) {
-							for (Term term : dependencePredicatesSet) {
-								if (term.op().name() == noRAW && proofSubSet(seq, term.sub(0), sf2.formula().sub(0))) {
-									toDelete.add(term);
-									System.out.println("Dep pred " + term + " is going to be deleted.");
-								}
-							}
-						}
-					}
-				}
-			} else if (sf.formula().op().name().equals(wPred)) {
-				for (SequentFormula sf2 : ante2) {
-					if (sf2.formula().op().name().equals(wPred)
-							&& proofSubSet(seq, sf2.formula().sub(0), sf.formula().sub(0))) {
-						if (proofNEQ(sf2.formula().sub(1), sf.formula().sub(1))) {
-							for (Term term : dependencePredicatesSet) {
-								if (term.op().name() == noWAW && proofSubSet(seq, term.sub(0), sf2.formula().sub(0))) {
-									toDelete.add(term);
-									System.out.println("Dep pred " + term + " is going to be deleted.");
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		dependencePredicatesSet.removeAll(toDelete);
-		return dependencePredicatesSet;
-	}
-
-	private boolean proofLT(Term ts1, Term ts2) {
-		Term fml = tb.lt(ts1, ts2);
-		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
-		// Additinal ones from main Sequent
-		// seq = seq.addFormula(cf, true, true).sequent();
-		boolean closed = isProvable(seq, services);
-		// true: Holds, false: Unknown
-//		System.out.println(ProofSaver.printAnything(seq, services));// Human readable v
-		return closed;
-	}
-
-	private boolean proofGT(Term ts1, Term ts2) {
-		Term fml = tb.gt(ts1, ts2);
-		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
-		boolean closed = isProvable(seq, services);
-//		System.out.println(ProofSaver.printAnything(seq, services));
-		return closed;
-	}
-
-	private boolean proofNEQ(Term sub, Term sub2) {
-		Term fml = tb.not(tb.equals(sub, sub2));
-		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
-		boolean closed = isProvable(seq, services);
-//		System.out.println(ProofSaver.printAnything(seq, services));
-		return closed;
-	}
-
-//	public Term predConj(Set<Term> refinedDepPreds, Set<ComparativeOperator> refinedCompPreds) {
-//	Set<Term> allPreds = refinedDepPreds;
-//	for (ComparativeOperator cp : refinedCompPreds) {
-//		allPreds.add((Term) cp);
+//	Term expr2term(Expression expr) {
+//		return this.services.getTypeConverter().convertToLogicElement(expr);
 //	}
-//	
-//	return tb.and(allPreds); //basically LIG of one branch
-//}
-
-	Term expr2term(Expression expr) {// Does it work here?
-		return this.services.getTypeConverter().convertToLogicElement(expr);
-	}
 
 	private Set<Term> getProgAndLogVars(Term term) {
 
@@ -352,7 +505,8 @@ public class PredicateRefinement {
 		if (!term.containsJavaBlockRecursive()) {
 			if (term.op() instanceof ProgramVariable)
 				res.add(term);
-			else if (term.op() instanceof Function && term.sort() != Sort.FORMULA && (term.arity() == 0 || term.arity() == 1))
+			else if (term.op() instanceof Function && term.sort() != Sort.FORMULA
+					&& (term.arity() == 0 || term.arity() == 1) && term.freeVars().isEmpty())
 				res.add(term);
 
 			else
@@ -366,13 +520,12 @@ public class PredicateRefinement {
 
 		if (!term.containsJavaBlockRecursive()) {
 			if (term.op() instanceof ProgramVariable) {
-				
-				return true;}
-			else if (term.op() instanceof Function && term.sort() != Sort.FORMULA &&  (term.arity() == 0 || term.arity() == 1)) {
-				System.out.println(term.toString());
 				return true;
-			}
-			else
+			} else if (term.op() instanceof Function && term.sort() != Sort.FORMULA
+					&& (term.arity() == 0 || term.arity() == 1) && term.freeVars().isEmpty()) {
+//				System.out.println(term.toString());
+				return true;
+			} else
 				for (Term sub : term.subs())
 					isProgOrLogVars(sub);
 		}

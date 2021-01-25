@@ -41,70 +41,68 @@ public class CurrentLIG {
 	private TermBuilder tb;
 	private Term low, high, index;
 	private Term array;
-    private Set<Term> compPreds = null, depPreds= null, newCompPreds= null, newDepPreds= null;
-    
-    
-    public CurrentLIG(Services s) {
+	private Set<Term> compPreds = null, depPreds = null, newCompPreds = null, newDepPreds = null;
+
+	public CurrentLIG(Services s) {
 		this.services = s;
 		tb = services.getTermBuilder();
 
-	}	
-	
-	public void mainAlg(Sequent seq) {	
-		System.out.println("Init");
-			getLow(seq);
-			System.out.println("low: "+ low);
-			getIndexAndHigh(seq);
-			System.out.println("index: "+ index);
-			System.out.println("high: "+ high);
-			getLocSet(seq);
-			System.out.println("array: " + array);
-			
-			ConstructAllCompPreds cac = new ConstructAllCompPreds(services, low, index, high);
-			compPreds = cac.cons();
-			System.out.println("Comp Preds: " + compPreds.size());
-			ConstructAllDepPreds cad = new ConstructAllDepPreds(services, array, low, index, high);
-			depPreds = cad.cons();
+	}
+
+	public void mainAlg(Sequent seq) {
+//		System.out.println("Init");
+		getLow(seq);
+//		System.out.println("low: " + low);
+		getIndexAndHigh(seq);
+//		System.out.println("index: " + index);
+//		System.out.println("high: " + high);
+		getLocSet(seq);
+//		System.out.println("array: " + array);
+
+		ConstructAllCompPreds cac = new ConstructAllCompPreds(services, low, index, high);
+		compPreds = cac.cons();
+//			System.out.println("Comp Preds: " + compPreds.size());
+		ConstructAllDepPreds cad = new ConstructAllDepPreds(services, array, low, index, high);
+		depPreds = cad.cons();
 //			for(Term t : depPreds) {
 //				System.out.println("Name: " + t.op().name() + "          sub(0): "+ t.sub(0));
 //			}
 		/*
-		 * first unwind
-		 * then shift
+		 * first unwind then shift
 		 */
 
 	}
-	
+
 	public void mainAlg2(Sequent newSeq) {
 		PredicateRefinement pr = new PredicateRefinement(services, newSeq, compPreds, depPreds);
-		 pr.readAndRefineAntecedentPredicates(newSeq);
-		 newCompPreds = pr.refinedCompList;
-		 newDepPreds = pr.refinedDepList;
-		 if(newCompPreds.equals(compPreds) && newDepPreds.equals(depPreds)) {
+		pr.readAndRefineAntecedentPredicates(newSeq);
+		newCompPreds = pr.refinedCompList;
+		newDepPreds = pr.refinedDepList;
+		if (newCompPreds.equals(compPreds) && newDepPreds.equals(depPreds)) {
 //			 Term loopInv = tb.add(tb.and(newCompPreds), tb.and(newDepPreds));
 //			 System.out.println("Loop Invariant: " + loopInv.toString());
-			 System.out.println("Loop Inv. is the conjunction of: " + newCompPreds.toString() + " and " + newDepPreds.toString());
-			 System.out.println("Number of LI predicates: " + newCompPreds.size() + " plus "+ newDepPreds.size());
-		 } else {
-			 compPreds = newCompPreds;
-			 depPreds = newDepPreds;
-		 }
+//			System.out.println(
+//					"Loop Inv. is the conjunction of: " + newCompPreds.toString() + " and " + newDepPreds.toString());
+			System.out.println("Number of LI predicates: " + newCompPreds.size() + " plus " + newDepPreds.size());
+		} else {
+			compPreds = newCompPreds;
+			depPreds = newDepPreds;
+		}
 	}
 
-	
-
-	private Term fixedPoint(Services s, Sequent seq, Set<Term> oldComp, Set<Term> newComp, Set<Term> oldDep, Set<Term> newDep) {
+	private Term fixedPoint(Services s, Sequent seq, Set<Term> oldComp, Set<Term> newComp, Set<Term> oldDep,
+			Set<Term> newDep) {
 		Term loopInv = null;
-		if(oldComp.equals(newComp) && oldDep.equals(newDep)) {
-			loopInv = tb.and(tb.and(newComp),tb.and(newDep));
+		if (oldComp.equals(newComp) && oldDep.equals(newDep)) {
+			loopInv = tb.and(tb.and(newComp), tb.and(newDep));
 		} else {
 			oldComp = newComp;
 			oldDep = newDep;
 			PredicateRefinement pr = new PredicateRefinement(services, seq, oldComp, oldDep);
 			newComp = pr.refinedCompList;
-			
+
 		}
-			
+
 		return loopInv;
 	}
 
@@ -120,13 +118,13 @@ public class CurrentLIG {
 			}
 		}
 	}
-	
+
 	Term expr2term(Expression expr) {
 		return this.services.getTypeConverter().convertToLogicElement(expr);
 	}
-	
+
 	void getIndexAndHigh(Sequent seq) {
-		Expression high = null, index =null;
+		Expression high = null, index = null;
 		for (SequentFormula sf : seq.succedent()) {
 			Term formula = skipUpdates(sf.formula());
 			if (formula.op() == Modality.DIA) {
@@ -163,21 +161,22 @@ public class CurrentLIG {
 		pvc.start();
 		return pvc.result();
 	}
-	
+
 	private void findArray(Set<LocationVariable> set) {
 		for (LocationVariable v : set) {
 			if (v.sort() instanceof ArraySort) {
-				//System.out.println(v + " is an array with element sort " + ((ArraySort) v.sort()).elementSort());
-				//KeYJavaType kjt = v.getKeYJavaType(services);
+				// System.out.println(v + " is an array with element sort " + ((ArraySort)
+				// v.sort()).elementSort());
+				// KeYJavaType kjt = v.getKeYJavaType(services);
 				// kjt.getSort(); // logic sort
 				// kjt.getJavaType(); // Java type
-				//System.out.println(v + " is of KeY sort " + kjt.getSort());
-				//System.out.println(v + " is of java type " + kjt.getJavaType());
+				// System.out.println(v + " is of KeY sort " + kjt.getSort());
+				// System.out.println(v + " is of java type " + kjt.getJavaType());
 				array = tb.var(v);
 			}
 		}
 	}
-	
+
 	void getLocSet(Sequent seq) {
 		// How to find the targeted location set (the array)?
 		for (SequentFormula sf : seq.succedent()) {
@@ -189,7 +188,6 @@ public class CurrentLIG {
 			}
 		}
 	}
-	
 
 	// only for tests
 	Term low() {

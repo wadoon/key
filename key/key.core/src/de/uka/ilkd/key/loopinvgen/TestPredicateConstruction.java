@@ -321,7 +321,6 @@ public class TestPredicateConstruction {
 	}
 	
 	public void testCase8() {
-		Term formulaLeft;
 		Term formulaRight;
 
 		try {
@@ -333,6 +332,7 @@ public class TestPredicateConstruction {
 			if (e.getCause() != null) {
 				System.out.println(e.getCause().getMessage());
 			}
+			System.out.println("?????????????????????????????????");
 			e.printStackTrace();
 			return;
 		}
@@ -341,18 +341,17 @@ public class TestPredicateConstruction {
 //		System.out.println("Seq1: " + seq.toString());
 		CurrentLIG cur = new CurrentLIG(services);
 		cur.mainAlg(seq);
-		String[] arrLeft = {"rPred(arrayRange(a,Z(1(#)),i), timestamp)"
-//				,"rPred({(a,arr(1+i))}, timestamp)"
-//				, "wPred({(a,arr(i))}, timestamp)"
-				, "i < a.length"
-//				, "0 < a.length"
-//				, "i < a.length"
-//				, "wPred(arrayRange(a,Z(0(#)),sub(i,Z(1(#)))), timestamp - 1)"
-//				, "rPred(arrayRange(a,Z(1(#)),i), timestamp - 1)"
+		String[] arrLeft = {//"rPred({(a,arr(1+i))}, timestamp - 1)"
+				//, "wPred({(a,arr(i))}, timestamp)"
+				"i < a.length"
+//				, "1 < a.length"
+				, "wPred(arrayRange(a,Z(0(#)),sub(i,Z(1(#)))), timestamp)"
+				, "rPred(arrayRange(a,Z(1(#)),i), timestamp - 1)"
+				, "timestamp=6"
 //				 "x = TRUE"
 //				 ,"wellFormed(heap)"
 						, "i=5"
-						, "i>0"
+//						, "i>0"
 //				, "timestamp= 1 + timestamp_0"
 //				, "x_1 = 0"
 //						 ,"a.length = x_2"
@@ -378,6 +377,7 @@ public class TestPredicateConstruction {
 			if (e.getCause() != null) {
 				System.out.println(e.getCause().getMessage());
 			}
+			
 			e.printStackTrace();
 			return;
 		}

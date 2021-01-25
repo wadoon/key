@@ -41,15 +41,15 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 public class HelperClassParsingTests {
-    private static final Profile profile = new JavaProfile() {
-            //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
-	    @Override
-      public RuleCollection getStandardRules() {
-                return new RuleCollection(
-                                RuleSourceFactory.fromDefaultLocation(ldtFile), 
-                                ImmutableSLList.<BuiltInRule>nil());
-            }
-        };
+    private static final Profile profile = JavaProfile.getDefaultProfile(); //{
+//            //we do not want normal standard rules, but ruleSetsDeclarations is needed for string library (HACK)
+//	    @Override
+//      public RuleCollection getStandardRules() {
+//                return new RuleCollection(
+//                                RuleSourceFactory.fromDefaultLocation(ldtFile), 
+//                                ImmutableSLList.<BuiltInRule>nil());
+//            }
+//        };
     
     public HelperClassParsingTests() {
         
@@ -71,7 +71,7 @@ public class HelperClassParsingTests {
             result = pi.startProver(po, po);
 
         } catch (Exception e) {
-            System.err.println("Exception occurred while parsing "+file+"\n");
+//            System.err.println("Exception occurred while parsing "+file+"\n");
             e.printStackTrace();
             System.exit(-1);
         }
