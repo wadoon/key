@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
-import de.uka.ilkd.key.loopinvgen.ShiftUpdateRule;
+//import de.uka.ilkd.key.loopinvgen.ShiftUpdateRule;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -146,8 +146,8 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(getOneStepSimpilifier())
                                    .prepend(QueryExpand.INSTANCE)
                                    .prepend(MergeRule.INSTANCE)
-                                   .prepend(LoopContractApplyHeadRule.INSTANCE)
-                                   .prepend(ShiftUpdateRule.SHIFT_RULE);
+                                   .prepend(LoopContractApplyHeadRule.INSTANCE);
+//                                   .prepend(ShiftUpdateRule.SHIFT_RULE);
 
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact
         // that Contract insertion rule is the FIRST element of this list!
