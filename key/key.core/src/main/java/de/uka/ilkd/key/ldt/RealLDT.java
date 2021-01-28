@@ -34,12 +34,40 @@ import de.uka.ilkd.key.logic.op.Function;
  */
 public final class RealLDT extends LDT {
 
-    public static final Name NAME = new Name("real");
+  public static final Name NAME = new Name("real");
+  public static final Name REALLIT_NAME = new Name("R");//TODO?
+
+  private final Function realLit;
+  private final Function rlt;
+  private final Function rlgt;
+  private final Function rge;
+  private final Function rgt;
+
+  private final Function rNeg;
+  private final Function rAdd;
+  private final Function rMul;
+  private final Function rSub;
+  private final Function rDiv;
 
 
-    public RealLDT(TermServices services) {
-	super(NAME, services);
-    }
+  public RealLDT(TermServices services) {
+
+    super(NAME, services);
+
+    realLit = addFunction(services, REALLIT_NAME.toString());
+
+    rlt = addFunction(services, "rlt");
+    rlgt = addFunction(services, "rlgt");
+    rge = addFunction(services, "rge");
+    rgt = addFunction(services, "rgt");
+
+    rNeg = addFunction(services, "rAdd");
+    rAdd = addFunction(services, "rAdd");
+    rSub = addFunction(services, "rAdd");
+    rMul = addFunction(services, "rAdd");
+    rDiv = addFunction(services, "rAdd");
+
+  }
 
 
     @Override
@@ -71,7 +99,7 @@ public final class RealLDT extends LDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {
+    public Term translateLiteral(Literal lit, Services services) {  //TODO implement
         // return skolem term
         final Function sk = new Function(new Name(""+NAME+lit),targetSort());
         return services.getTermBuilder().func(sk);
@@ -107,4 +135,35 @@ public final class RealLDT extends LDT {
 	    return null;
 	}
     }
+
+  public Function getRealSymbol() {
+    return realLit;
+  }
+
+  public Function getRlt() { return rlt; }
+  public Function getRlgt() {
+    return rlgt;
+  }
+  public Function getRgt() {
+    return rgt;
+  }
+  public Function getRge() {
+    return rge;
+  }
+
+  public Function getRNeg() {
+    return rNeg;
+  }
+  public Function getRAdd() {
+    return rAdd;
+  }
+  public Function getRSub() {
+    return rSub;
+  }
+  public Function getrMul() {
+    return rMul;
+  }
+  public Function getrDiv() {
+    return rDiv;
+  }
 }
