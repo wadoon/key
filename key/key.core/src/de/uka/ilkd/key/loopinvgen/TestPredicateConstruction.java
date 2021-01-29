@@ -214,22 +214,13 @@ public class TestPredicateConstruction {
 		cur.mainAlg(seq);
 
 		try {
-			formulaLeft = parse("rPred({(a,arr(1+i))}, timestamp),"
-					+ "x = TRUE,"
-					+ "wellFormed(heap),"
-							+ "i=0,"
-					+ "timestamp= 1 + timestamp_0,"
-					+ "x_1 = 0,"
-							+ "a.length = x_2,"
+			formulaLeft = parse("rPred({(a,arr(1+i))}, timestamp)," + "x = TRUE," + "wellFormed(heap)," + "i=0,"
+					+ "timestamp= 1 + timestamp_0," + "x_1 = 0," + "a.length = x_2,"
 					+ "\\if (0 < a.length) \\then (TRUE) \\else (FALSE) = x,"
-					+ "x_arr = {x_arr:=x_arr_0}{x_arr:=a}x_arr,"
-					+ "x_3 = {x_3:=x_3_0}{x_3:=i}x_3,"
-					+ "x_arr_1 = {x_arr_1:=x_arr_1_0}{x_arr_1:=a}x_arr_1,"
-					+ "x_5 = {x_5:=x_5_0}{x_5:=1 + i}x_5,"
-					+ "x_4 = {x_4:=x_4_0}{x_4:=a[1+i]}x_4,"
-					+ "heap = {heap:=heap_1}{heap:=heap[a[i] := a[1 +i]]}heap,"
-					+ "x_6 = {x_6:=x_6_0}{x_6:=1 + i}x_6,"
-					+ "i = {i:=i_2}{i:=1 + i}i");
+					+ "x_arr = {x_arr:=x_arr_0}{x_arr:=a}x_arr," + "x_3 = {x_3:=x_3_0}{x_3:=i}x_3,"
+					+ "x_arr_1 = {x_arr_1:=x_arr_1_0}{x_arr_1:=a}x_arr_1," + "x_5 = {x_5:=x_5_0}{x_5:=1 + i}x_5,"
+					+ "x_4 = {x_4:=x_4_0}{x_4:=a[1+i]}x_4," + "heap = {heap:=heap_1}{heap:=heap[a[i] := a[1 +i]]}heap,"
+					+ "x_6 = {x_6:=x_6_0}{x_6:=1 + i}x_6," + "i = {i:=i_2}{i:=1 + i}i");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
@@ -268,10 +259,8 @@ public class TestPredicateConstruction {
 		Term formula;
 
 		try {
-			formula = parse("{i:=0}\\<{" + 
-		"			while (i<a.length) {a[i] = a[i+1];" + 
-					"			i++;}" + 
-					"		}\\>true");
+			formula = parse("{i:=0}\\<{" + "			while (i<a.length) {a[i] = a[i+1];" + "			i++;}"
+					+ "		}\\>true");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
@@ -286,10 +275,10 @@ public class TestPredicateConstruction {
 		System.out.println(seq.toString());
 		CurrentLIG cur = new CurrentLIG(services);
 		cur.mainAlg(seq);
-		
+
 		Term formula1, formula2;
 		try {
-			formula1 = parse("i>0"); 
+			formula1 = parse("i>0");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
@@ -299,12 +288,10 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return;
 		}
-		
+
 		try {
-			formula2 =parse(" \\<{" + 
-					"			while (i<a.length) {a[i] = a[i+1];"	+ 
-					"			i++;}" + 
-					"		}\\>true");
+			formula2 = parse(
+					" \\<{" + "			while (i<a.length) {a[i] = a[i+1];" + "			i++;}" + "		}\\>true");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
@@ -316,15 +303,15 @@ public class TestPredicateConstruction {
 		}
 		Sequent seq2 = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula1), true, true).sequent();
 		seq2 = seq2.addFormula(new SequentFormula(formula2), false, true).sequent();
-		//System.out.println("seq2 " + seq2.toString());
+		// System.out.println("seq2 " + seq2.toString());
 		cur.mainAlg2(seq2);
 	}
-	
+
 	public void testCase8() {
 		Term formulaRight;
 
 		try {
-			formulaRight = parse("{i:=0}\\<{" + "			while (i<a.length) {a[i] = a[i+1];" + "			i++;}"
+			formulaRight = parse("{i:=3}\\<{" + "			while (i<a.length) {a[i] = a[i+1];" + "			i++;}"
 					+ "		}\\>true");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -340,25 +327,22 @@ public class TestPredicateConstruction {
 //		System.out.println("Seq1: " + seq.toString());
 		CurrentLIG cur = new CurrentLIG(services);
 		cur.mainAlg(seq);
-		String[] arrLeft = {"rPred({(a,arr(1+i))}, timestamp)"
-				, "wPred({(a,arr(i))}, timestamp)"
-				,"i < a.length"
-//				, "1 < a.length"
-				, "wPred(arrayRange(a,Z(0(#)),sub(i,Z(1(#)))), timestamp-1)"
-				, "rPred(arrayRange(a,Z(1(#)),i), timestamp - 1)"
-//				,"rPred({(a,arr(i))}, timestamp-1)"
-//				, "wPred({(a,arr(i-1))}, timestamp-1)"
+		String[] arrLeft = { "rPred({(a,arr(1+i))}, timestamp)", "wPred({(a,arr(i))}, timestamp)", "i < a.length",
+				"a.length = 10"
+//				, "0 < a.length"
+//				, "4<a.length"
+//				, "wPred(arrayRange(a,Z(0(#)),sub(i,Z(1(#)))), timestamp-1)"
+//				, "rPred(arrayRange(a,Z(1(#)),i), timestamp - 1)"
+				, "rPred({(a,arr(i))}, timestamp-1)", "wPred({(a,arr(i-1))}, timestamp-1)"
 //				
-//				,"rPred({(a,arr(i-1))}, timestamp-2)"
-//				, "wPred({(a,arr(i-2))}, timestamp-2)"
+				, "rPred({(a,arr(i-1))}, timestamp-2)", "wPred({(a,arr(i-2))}, timestamp-2)"
 //
-//				,"rPred({(a,arr(i-2))}, timestamp-3)"
-//				, "wPred({(a,arr(i-3))}, timestamp-3)"
+				, "rPred({(a,arr(i-2))}, timestamp-3)", "wPred({(a,arr(i-3))}, timestamp-3)"
 
 				, "timestamp=6"
 //				 "x = TRUE"
 //				 ,"wellFormed(heap)"
-						, "i=3"
+				, "i=3"
 //						, "i>0"
 //				, "timestamp= 1 + timestamp_0"
 //				, "x_1 = 0"
@@ -372,26 +356,25 @@ public class TestPredicateConstruction {
 //				+ "heap = {heap:=heap_1}{heap:=heap[a[i] := a[1 +i]]}heap,"
 //				+ "x_6 = {x_6:=x_6_0}{x_6:=1 + i}x_6,"
 //				+ "i = {i:=i_2}{i:=1 + i}i"
-						 };
+		};
 		try {
-			for(String fml: arrLeft) {
+			for (String fml : arrLeft) {
 				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
-				
+
 			}
-			System.out.println(seq.toString());
+			System.out.println("Sequent: " + seq.toString());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
 			if (e.getCause() != null) {
 				System.out.println(e.getCause().getMessage());
 			}
-			
+
 			e.printStackTrace();
 			return;
 		}
 		cur.mainAlg2(seq);
 	}
-
 
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();

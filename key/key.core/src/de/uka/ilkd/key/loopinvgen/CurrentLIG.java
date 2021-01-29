@@ -50,23 +50,14 @@ public class CurrentLIG {
 	}
 
 	public void mainAlg(Sequent seq) {
-//		System.out.println("Init");
 		getLow(seq);
-//		System.out.println("low: " + low);
 		getIndexAndHigh(seq);
-//		System.out.println("index: " + index);
-//		System.out.println("high: " + high);
 		getLocSet(seq);
-//		System.out.println("array: " + array);
 
 		ConstructAllCompPreds cac = new ConstructAllCompPreds(services, low, index, high);
 		compPreds = cac.cons();
-//			System.out.println("Comp Preds: " + compPreds.size());
 		ConstructAllDepPreds cad = new ConstructAllDepPreds(services, array, low, index, high);
 		depPreds = cad.cons();
-//			for(Term t : depPreds) {
-//				System.out.println("Name: " + t.op().name() + "          sub(0): "+ t.sub(0));
-//			}
 		/*
 		 * first unwind then shift
 		 */
@@ -79,32 +70,33 @@ public class CurrentLIG {
 		newCompPreds = pr.refinedCompList;
 		newDepPreds = pr.refinedDepList;
 		if (newCompPreds.equals(compPreds) && newDepPreds.equals(depPreds)) {
-//			 Term loopInv = tb.add(tb.and(newCompPreds), tb.and(newDepPreds));
-//			 System.out.println("Loop Invariant: " + loopInv.toString());
-//			System.out.println(
-//					"Loop Inv. is the conjunction of: " + newCompPreds.toString() + " and " + newDepPreds.toString());
+			System.out.println(
+					"Loop Inv. is the conjunction of: " + newCompPreds + " and " + newDepPreds);
 			System.out.println("Number of LI predicates: " + newCompPreds.size() + " plus " + newDepPreds.size());
 		} else {
 			compPreds = newCompPreds;
 			depPreds = newDepPreds;
+			System.out.println(compPreds.size() + " plus "+ depPreds.size());
+			System.out.println("again");
+			mainAlg2(newSeq);
 		}
 	}
 
-	private Term fixedPoint(Services s, Sequent seq, Set<Term> oldComp, Set<Term> newComp, Set<Term> oldDep,
-			Set<Term> newDep) {
-		Term loopInv = null;
-		if (oldComp.equals(newComp) && oldDep.equals(newDep)) {
-			loopInv = tb.and(tb.and(newComp), tb.and(newDep));
-		} else {
-			oldComp = newComp;
-			oldDep = newDep;
-			PredicateRefinement pr = new PredicateRefinement(services, seq, oldComp, oldDep);
-			newComp = pr.refinedCompList;
-
-		}
-
-		return loopInv;
-	}
+//	private Term fixedPoint(Services s, Sequent seq, Set<Term> oldComp, Set<Term> newComp, Set<Term> oldDep,
+//			Set<Term> newDep) {
+//		Term loopInv = null;
+//		if (oldComp.equals(newComp) && oldDep.equals(newDep)) {
+//			loopInv = tb.and(tb.and(newComp), tb.and(newDep));
+//		} else {
+//			oldComp = newComp;
+//			oldDep = newDep;
+//			PredicateRefinement pr = new PredicateRefinement(services, seq, oldComp, oldDep);
+//			newComp = pr.refinedCompList;
+//
+//		}
+//
+//		return loopInv;
+//	}
 
 	void getLow(Sequent seq) {
 		for (SequentFormula sf : seq.succedent()) {

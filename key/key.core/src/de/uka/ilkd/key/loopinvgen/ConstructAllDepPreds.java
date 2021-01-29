@@ -31,7 +31,7 @@ public class ConstructAllDepPreds {
 
 	private Set<Term> subArrCons(Term arr, Term l, Term h) {
 		Set<Term> sub = new HashSet<>();
-
+	
 		sub.add(tb.arrayRange(arr, l, tb.subtract(h, tb.one())));
 		sub.add(tb.arrayRange(arr, l, h));
 		sub.add(tb.arrayRange(arr, tb.add(l, tb.one()), h));
@@ -91,7 +91,7 @@ public class ConstructAllDepPreds {
 		
 		
 //		System.out.println("dep pred list: " + depPredList);
-		System.out.println("dep pred list size: " + depPredList.size());
+//		System.out.println("dep pred list size: " + depPredList.size());
 		return depPredList;
 	}
 }
