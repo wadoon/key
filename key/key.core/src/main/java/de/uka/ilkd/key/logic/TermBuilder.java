@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.logic;
 
 import java.io.StringReader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1195,7 +1197,7 @@ public class TermBuilder {
      * @return Term in Z-/C-Notation representing the given number
      * @throws NumberFormatException if <code>numberString</code> is not a number
      */
-    private Term numberTerm(String numberString, boolean containsChar) {
+    private Term numberTerm(String numberString) {
         if (numberString == null || numberString.isEmpty()) {
             throw new NumberFormatException(numberString + " is not a number.");
         }
@@ -1253,13 +1255,14 @@ public class TermBuilder {
         if (negate) {
             numberLiteralTerm = func(intLDT.getNegativeNumberSign(), numberLiteralTerm);
         }
-        // chars get a surrounding C, ints a surrounding Z
-        numberLiteralTerm = func(containsChar ? intLDT.getCharSymbol() : intLDT.getNumberSymbol(),
-                numberLiteralTerm);
+
+        // return the raw number literal term ('C', 'Z' or 'R' must still be added)
         return numberLiteralTerm;
     }
 
     /**
+     * Get term for an integeral literal.
+     *
      * @param numberString
      *            String representing an integer with radix 10, may be negative
      * @return Term in Z-Notation representing the given number
@@ -1267,17 +1270,20 @@ public class TermBuilder {
      *             if <code>numberString</code> is not a number
      */
     public Term zTerm(String numberString) {
-        return numberTerm(numberString, false);
+        return func(services.getTypeConverter().getIntegerLDT().getNumberSymbol(),
+                numberTerm(numberString));
     }
 
     /**
+     * Get term for an integeral literal.
      * @param number
      *            an integer
      * @return Term in Z-Notation representing the given number
      */
     public Term zTerm(long number) {
-        return zTerm("" + number);
+        return zTerm(Long.toString(number));
     }
+
 
     /**
      * @param numberString String containing the value of the char as a decimal number
@@ -1286,7 +1292,28 @@ public class TermBuilder {
      *             if <code>numberString</code> is not a number
      */
     public Term cTerm(String numberString) {
-        return numberTerm(numberString, true);
+        return func(services.getTypeConverter().getIntegerLDT().getCharSymbol(),
+                numberTerm(numberString));
+    }
+
+    /**
+     * Create a real literal value from a big decimal.
+     *
+     * The same value (say 50) can be represented as R(5(#), 1(#)) or as
+     * R(0(5(#)), 0(#)). For normalised {@link BigDecimal}s
+     * ({@link BigDecimal#stripTrailingZeros()}), it is unique.
+     *
+     * @param value a non-null value
+     * @return a term representing the value
+     */
+    public Term rTerm(BigDecimal value) {
+        BigInteger mantissa = value.unscaledValue();
+        int exponent = -value.scale();
+
+        Term mTerm = numberTerm(mantissa.toString());
+        Term eTerm = numberTerm(Integer.toString(exponent));
+        return func(services.getTypeConverter().getRealLDT().getRealSymbol(),
+                mTerm, eTerm);
     }
 
     public Term add(Term t1, Term t2) {
@@ -2338,4 +2365,5 @@ public class TermBuilder {
             return tf.createTerm(Junctor.OR, t1, t2);
         }
     }
+
 }

@@ -26,6 +26,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.RealLDT;
 import de.uka.ilkd.key.logic.Name;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+
 /**
  *  JML \real literal.
  *  @author bruns
@@ -33,51 +36,57 @@ import de.uka.ilkd.key.logic.Name;
 
 public class RealLiteral extends Literal {
 
-    /**
- *      Textual representation of the value.
-     */
-
-    protected final String value;
+    public static final String REAL_SUFFIX = "r";
 
     /**
- *      Double literal.
+     * Textual representation of the literal.
      */
+    private final String string;
+
+    /**
+     * Value representation of the literal.
+     */
+    private final BigDecimal value;
 
     public RealLiteral() {
-        this.value="0.0";
+        this(0);
     }
 
     public RealLiteral (int value){
-        this(""+value+".0");
+        this(value + REAL_SUFFIX);
     }
+
     public RealLiteral(double value) {
-        this.value="" + value;
+        this(value + REAL_SUFFIX);
     }
 
     public RealLiteral(java.math.BigDecimal value) {
-        this.value = ""+value;
+        this(value + REAL_SUFFIX);
     }
 
-    public RealLiteral(ExtList children, String value) {
-	super(children);
-        this.value=value;
+    public RealLiteral(String string) {
+        if (!string.toLowerCase().endsWith("r")) {
+            throw new NumberFormatException(string);
+        }
+        this.value = new BigDecimal(string.substring(0, string.length()-1)).stripTrailingZeros();
+        this.string = string;
     }
 
     public RealLiteral(ExtList children){
+        this(children, "0.0r");
+    }
+
+    public RealLiteral(ExtList children, String string) {
         super(children);
-        value = "0.0";
+        if (!string.toLowerCase().endsWith("r")) {
+            throw new NumberFormatException(string);
+        }
+        this.value = new BigDecimal(string.substring(0, string.length()-1)).stripTrailingZeros();
+        this.string = string;
     }
 
     /**
- *      Double literal.
- *      @param value a string.
-     */
-
-    public RealLiteral(String value) {
-        this.value=value;
-    }
-
-    /** tests if equals
+     * tests if this is semantically equal to another element
      */
     public boolean equalsModRenaming(	SourceElement o,
 										NameAbstractionTable nat) {
@@ -89,34 +98,35 @@ public class RealLiteral extends Literal {
 
     @Override
     public int computeHashCode() {
-        return 17 * super.computeHashCode() + getValue().hashCode();
+        return 17 * super.computeHashCode() + getString().hashCode();
     }
 
-    /**
- *      Get value.
- *      @return the string.
-     */
-
-    public String getValue() {
+    public BigDecimal getValue() {
         return value;
+    }
+
+    public String getString() {
+        return string;
     }
 
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      * @param v the Visitor
      */
+    @Override
     public void visit(Visitor v) {
-//	v.performActionOnDoubleLiteral(this);
+        v.performActionOnRealLiteral(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-//        p.printDoubleLiteral(this);
+    @Override
+    protected void prettyPrintMain(PrettyPrinter w) throws IOException {
+        w.printRealLiteral(this);
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
     }
-    
+
     @Override
     public Name getLDTName() {
         return RealLDT.NAME;

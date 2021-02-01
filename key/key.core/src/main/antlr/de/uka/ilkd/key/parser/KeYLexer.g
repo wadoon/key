@@ -624,8 +624,14 @@ ML_COMMENT
 	}
 	;
 
-// A single Digit that is followed by a ( is an ident, otherwise it's a number
+REAL_LITERAL
+:   ( DIGIT* '.' DIGIT+ | DIGIT+ '.'? )
+    (('e'|'E')('+'|'-')? DIGIT+)?
+    ('r'|'R')
+    ;
 
+
+// A single digit that is followed by a ( is an ident, otherwise it's a number
 DIGIT_DISPATCH
 :
     (DIGIT (' ' | '\t' | '\r' | '\n')* LPAREN) => DIGIT {$type = IDENT;}

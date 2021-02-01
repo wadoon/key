@@ -48,6 +48,7 @@ options {
   import org.antlr.runtime.*;
 
   import java.io.*;
+  import java.math.BigDecimal;
   import java.util.HashSet;
   import java.util.Iterator;
   import java.util.LinkedHashMap;
@@ -3540,8 +3541,17 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
                                       toZNotation(""+intVal, functions()).sub(0));
         }
     | 
-        ((MINUS)? NUM_LITERAL) => (MINUS {neg = "-";})? number=NUM_LITERAL
-        { a = toZNotation(neg+number.getText(), functions());}    
+      ((MINUS)? NUM_LITERAL) => (MINUS {neg = "-";})? number=NUM_LITERAL
+        { a = toZNotation(neg+number.getText(), functions());}
+    | ((MINUS)? REAL_LITERAL) => (MINUS {neg = "-";})? number=REAL_LITERAL
+        {  String n = number.getText();
+           // strip 'R'
+           n = n.substring(0, n.length() - 1);
+           // make BigDecimal
+           BigDecimal bigdec = new BigDecimal(n).stripTrailingZeros();
+           // And let term builder create a term from that.
+           a = getServices().getTermBuilder().rTerm(bigdec);
+        }
     | AT a = abbreviation
     | varfuncid = funcpred_name
         ( (~LBRACE | LBRACE bound_variables) =>

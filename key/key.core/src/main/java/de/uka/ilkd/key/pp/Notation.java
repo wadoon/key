@@ -655,9 +655,30 @@ public abstract class Notation {
 	    }
 	}
     }
-    
 
-  
+
+    /**
+     * The standard concrete syntax for the real literal indicator `R'.
+     */
+    static final class RealLiteral extends Notation {
+        public RealLiteral() {
+            super(1000);
+        }
+
+        // TODO (MU): This is still rather preliminary,
+        // have something better...
+        public void print(Term t, LogicPrinter sp) throws IOException {
+
+            String mantissa = NumLiteral.printNumberTerm(t.sub(0));
+            String exponent = NumLiteral.printNumberTerm(t.sub(1));
+
+            if (exponent.equals("0")) {
+                sp.printConstant(mantissa + "r");
+            } else {
+                sp.printConstant(mantissa + "e" + exponent + "r");
+            }
+        }
+    }
 
     /**
      * The standard concrete syntax for sequence singletons.

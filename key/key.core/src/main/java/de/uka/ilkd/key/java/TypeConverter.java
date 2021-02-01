@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.ldt.RealLDT;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -150,6 +151,11 @@ public final class TypeConverter {
 
     public BooleanLDT getBooleanLDT() {
         return (BooleanLDT) getLDT(BooleanLDT.NAME);
+    }
+
+
+    public RealLDT getRealLDT() {
+        return (RealLDT) getLDT(RealLDT.NAME);
     }
 
     public LocSetLDT getLocSetLDT() {

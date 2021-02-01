@@ -105,6 +105,8 @@ public interface Visitor {
 
     void performActionOnFloatLiteral(FloatLiteral x);
 
+    void performActionOnRealLiteral(RealLiteral x);
+
     void performActionOnPackageSpecification(PackageSpecification x);
 
     void performActionOnTypeReference(TypeReference x);

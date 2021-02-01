@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.ldt;
 
+import de.uka.ilkd.key.java.expression.literal.RealLiteral;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -30,7 +31,7 @@ import de.uka.ilkd.key.logic.op.Function;
  * Complete this class if you want to add support for the JML \real type.
  *
  * At the moment this class contains only stubs.
- * @author bruns
+ * @author Daniel Bruns, Rosa Abbasi
  */
 public final class RealLDT extends LDT {
 
@@ -99,10 +100,10 @@ public final class RealLDT extends LDT {
 
 
     @Override
-    public Term translateLiteral(Literal lit, Services services) {  //TODO implement
-        // return skolem term
-        final Function sk = new Function(new Name(""+NAME+lit),targetSort());
-        return services.getTermBuilder().func(sk);
+    public Term translateLiteral(Literal lit, Services services) {
+        assert lit instanceof RealLiteral : "Must be a \\real literal";
+        RealLiteral rlit = (RealLiteral) lit;
+        return services.getTermBuilder().rTerm(rlit.getValue());
     }
 
 
