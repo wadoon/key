@@ -185,28 +185,28 @@ public class TaskTree extends JPanel {
      * @param proof The {@link Proof} to check.
      * @return {@code true} proof is available in model, {@code false} proof is not available in model.
      */
+    // Revised implementation to fix #1548
     public boolean containsProof(Proof proof) {
-       boolean contains = false;
-       int i = 0;
-       while (!contains && i < model.getChildCount(model.getRoot())) {
-          Object rootChild = model.getChild(model.getRoot(), i);
-          if (rootChild instanceof EnvNode) {
-             EnvNode envNode = (EnvNode)rootChild;
-             int j = 0;
-             while (!contains && j < envNode.getChildCount()) {
-                Object envChild = envNode.getChildAt(j);
-                if (envChild instanceof TaskTreeNode) {
-                   TaskTreeNode taskChild = (TaskTreeNode)envChild;
-                   contains = taskChild.proof() == proof;
-                }
-                j++;
-             }
-          }
-          i++;
-       }
-       return contains;
+        return true; //containsProof(proof, model.getRoot());
     }
-    
+
+    private boolean containsProof(Proof proof, Object node) {
+        for (int i = 0; i < model.getChildCount(node); i++) {
+            Object child = model.getChild(node, i);
+            if (child instanceof TaskTreeNode) {
+                TaskTreeNode taskTreeNode = (TaskTreeNode) child;
+                if (taskTreeNode.proof() == proof) {
+                    return true;
+                }
+            }
+            boolean recursive = containsProof(proof, child);
+            if (recursive) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Removes the given proof from the model.
      * @param proof The proof to remove.
