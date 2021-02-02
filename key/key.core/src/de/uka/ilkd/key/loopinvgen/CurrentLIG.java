@@ -37,49 +37,77 @@ import de.uka.ilkd.key.proof.Goal;
 
 public class CurrentLIG {
 
-	private Services services;
-	private TermBuilder tb;
+	private final Sequent seq;
+	private final Services services;
+	private final TermBuilder tb;
 	private Term low, high, index;
 	private Term array;
 	private Set<Term> compPreds = null, depPreds = null, newCompPreds = null, newDepPreds = null;
 
-	public CurrentLIG(Services s) {
-		this.services = s;
+	public CurrentLIG(Services s, Sequent seq) {
+		services = s;
 		tb = services.getTermBuilder();
+		this.seq = seq;
 
 	}
 
-	public void mainAlg(Sequent seq) {
+	public void mainAlg() {
 		getLow(seq);
 		getIndexAndHigh(seq);
 		getLocSet(seq);
 
 		ConstructAllCompPreds cac = new ConstructAllCompPreds(services, low, index, high);
-		compPreds = cac.cons();
+		Set<Term> compPreds = cac.cons();
+		System.out.println("Comp Preds size: " + compPreds.size());
 		ConstructAllDepPreds cad = new ConstructAllDepPreds(services, array, low, index, high);
-		depPreds = cad.cons();
+		Set<Term> depPreds = cad.cons();
 		/*
 		 * first unwind then shift
 		 */
-
+		mainAlg2(seq, compPreds, depPreds);
 	}
 
-	public void mainAlg2(Sequent newSeq) {
-		PredicateRefinement pr = new PredicateRefinement(services, newSeq, compPreds, depPreds);
-		pr.readAndRefineAntecedentPredicates(newSeq);
-		newCompPreds = pr.refinedCompList;
-		newDepPreds = pr.refinedDepList;
-		if (newCompPreds.equals(compPreds) && newDepPreds.equals(depPreds)) {
-			System.out.println(
-					"Loop Inv. is the conjunction of: " + newCompPreds + " and " + newDepPreds);
-			System.out.println("Number of LI predicates: " + newCompPreds.size() + " plus " + newDepPreds.size());
+	private void mainAlg2(Sequent seq, Set<Term> compPreds, Set<Term> depPreds) {
+		Set<Term> oldCompPred = new HashSet<>();
+		Set<Term> oldDepPred = new HashSet<>();
+		
+		oldCompPred.addAll(compPreds);
+		oldDepPred.addAll(depPreds);
+		
+		PredicateRefinement pr = new PredicateRefinement(services, seq, compPreds, depPreds);
+		pr.readAndRefineAntecedentPredicates();
+		
+		Set<Term> newCompPreds = pr.refinedCompList;
+//		System.out.println("New Comp Preds size: " + newCompPreds.size());
+//		System.out.println("New Comp Preds: " + newCompPreds);
+		Set<Term> newDepPreds = pr.refinedDepList;
+//		System.out.println("New Dep Preds: " + newDepPreds);
+
+//		if (newCompPreds.equals(compPreds) && newDepPreds.equals(depPreds)) {
+//			System.out.println(
+//					"Loop Inv. is the conjunction of: " + newCompPreds + " and " + newDepPreds);
+//			System.out.println("Number of LI predicates: " + newCompPreds.size() + " plus " + newDepPreds.size());
+//		} else {
+//			compPreds = newCompPreds;
+//			depPreds = newDepPreds;
+//			System.out.println(compPreds.size() + " plus "+ depPreds.size());
+//			System.out.println("again");
+//			mainAlg2(newSeq);
+//		}
+		// Testing the Comp Preds
+		if (newCompPreds.equals(oldCompPred) && newDepPreds.equals(oldDepPred)) {
+			System.out.println("LIG is the conjunction of: "+ newCompPreds + " of size " + newCompPreds.size() + " and " + newDepPreds + " of size " + newDepPreds.size() );
 		} else {
-			compPreds = newCompPreds;
-			depPreds = newDepPreds;
-			System.out.println(compPreds.size() + " plus "+ depPreds.size());
-			System.out.println("again");
-			mainAlg2(newSeq);
+			oldCompPred.removeAll(oldCompPred);
+			oldCompPred.addAll(newCompPreds);
+			
+			oldDepPred.removeAll(oldDepPred);
+			oldDepPred.addAll(newDepPreds);
+			
+			System.out.println("Fixed point hasn't reached.");
+			mainAlg2(seq, newCompPreds, depPreds);
 		}
+
 	}
 
 //	private Term fixedPoint(Services s, Sequent seq, Set<Term> oldComp, Set<Term> newComp, Set<Term> oldDep,
@@ -194,4 +222,20 @@ public class CurrentLIG {
 		return this.index;
 	}
 
+//	void setValue(final Set<Term> val)
+//    {
+//        compPreds = newCompPreds;
+//        newCompPreds    = val;
+//    }
+//
+//    Set<Term> get()
+//    {
+//        return (newCompPreds);
+//    }
+//
+//    Set<Term> getOld()
+//    {
+//        return (compPreds);
+//    }
+	
 }

@@ -32,11 +32,18 @@ public class ConstructAllCompPreds {
 		this.high = high;
 	}
 
-	private Set<Term> consCompPreds(Term lh, Term rh) {
+	private Set<Term> consCompPredsLessEq(Term lh, Term rh) {
 		Set<Term> list = new HashSet<>();
 
 		list.add(tb.lt(lh, rh));
 		list.add(tb.leq(lh, rh));
+		list.add(tb.equals(lh, rh));
+
+		return list;
+	}
+	private Set<Term> consCompPredsGreatEq(Term lh, Term rh) {
+		Set<Term> list = new HashSet<>();
+
 		list.add(tb.gt(lh, rh));
 		list.add(tb.geq(lh, rh));
 		list.add(tb.equals(lh, rh));
@@ -46,13 +53,18 @@ public class ConstructAllCompPreds {
 
 	Set<Term> cons() {
 		
-		compPredList.addAll(consCompPreds(this.low, this.idx));
-		compPredList.addAll(consCompPreds(this.low, this.high));
-		compPredList.addAll(consCompPreds(this.idx, this.high));
+		compPredList.addAll(consCompPredsLessEq(this.low, this.idx));
+		compPredList.addAll(consCompPredsGreatEq(this.idx, this.low));
+		compPredList.addAll(consCompPredsLessEq(this.low, this.high));
+		compPredList.addAll(consCompPredsGreatEq(this.high, this.low));
+		compPredList.addAll(consCompPredsLessEq(this.idx, this.high));
+		compPredList.addAll(consCompPredsGreatEq(this.high, this.idx));
 		
 //		System.out.println("Comparison predicates: " + compPredList.toString());
 //		System.out.println("Comparison predicates number: " + compPredList.size());
+	
 		return compPredList;
 
 	}
+	
 }

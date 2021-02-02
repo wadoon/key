@@ -210,8 +210,8 @@ public class TestPredicateConstruction {
 
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formulaRight), false, true).sequent();
 //		System.out.println("Seq1: " + seq.toString());
-		CurrentLIG cur = new CurrentLIG(services);
-		cur.mainAlg(seq);
+//		CurrentLIG cur = new CurrentLIG(services);
+//		cur.mainAlg(seq);
 
 		try {
 			formulaLeft = parse("rPred({(a,arr(1+i))}, timestamp)," + "x = TRUE," + "wellFormed(heap)," + "i=0,"
@@ -232,7 +232,7 @@ public class TestPredicateConstruction {
 		}
 		seq = seq.addFormula(new SequentFormula(formulaLeft), true, true).sequent();
 //		System.out.println("Seq: " + seq.toString());
-		cur.mainAlg2(seq);
+//		cur.mainAlg2(seq);
 	}
 
 //	public void testCase6() {
@@ -273,8 +273,8 @@ public class TestPredicateConstruction {
 
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
 		System.out.println(seq.toString());
-		CurrentLIG cur = new CurrentLIG(services);
-		cur.mainAlg(seq);
+//		CurrentLIG cur = new CurrentLIG(services);
+//		cur.mainAlg(seq);
 
 		Term formula1, formula2;
 		try {
@@ -304,7 +304,7 @@ public class TestPredicateConstruction {
 		Sequent seq2 = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula1), true, true).sequent();
 		seq2 = seq2.addFormula(new SequentFormula(formula2), false, true).sequent();
 		// System.out.println("seq2 " + seq2.toString());
-		cur.mainAlg2(seq2);
+//		cur.mainAlg2(seq2);
 	}
 
 	public void testCase8() {
@@ -325,12 +325,10 @@ public class TestPredicateConstruction {
 
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formulaRight), false, true).sequent();
 //		System.out.println("Seq1: " + seq.toString());
-		CurrentLIG cur = new CurrentLIG(services);
-		cur.mainAlg(seq);
-		String[] arrLeft = { "rPred({(a,arr(1+i))}, timestamp)", "wPred({(a,arr(i))}, timestamp)", "i < a.length",
-				"a.length = 10"
-//				, "0 < a.length"
-//				, "4<a.length"
+		
+		String[] arrLeft = { "rPred({(a,arr(1+i))}, timestamp)", "wPred({(a,arr(i))}, timestamp)"
+				, "i < a.length"
+//				, "3<a.length"
 //				, "wPred(arrayRange(a,Z(0(#)),sub(i,Z(1(#)))), timestamp-1)"
 //				, "rPred(arrayRange(a,Z(1(#)),i), timestamp - 1)"
 				, "rPred({(a,arr(i))}, timestamp-1)", "wPred({(a,arr(i-1))}, timestamp-1)"
@@ -339,7 +337,7 @@ public class TestPredicateConstruction {
 //
 				, "rPred({(a,arr(i-2))}, timestamp-3)", "wPred({(a,arr(i-3))}, timestamp-3)"
 
-				, "timestamp=6"
+//				, "timestamp=6"
 //				 "x = TRUE"
 //				 ,"wellFormed(heap)"
 				, "i=3"
@@ -373,7 +371,9 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return;
 		}
-		cur.mainAlg2(seq);
+		CurrentLIG cur = new CurrentLIG(services, seq);
+		cur.mainAlg();
+//		cur.mainAlg2(seq);
 	}
 
 	public static void main(String[] args) {
