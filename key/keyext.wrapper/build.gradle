@@ -1,0 +1,21 @@
+plugins {
+    id 'application'
+}
+
+
+dependencies {
+    compile project(":key.core")
+    compile project(":key.core.symbolic_execution")
+}
+
+mainClassName = "org.key_project.cocos.ClassVeri"
+
+
+
+task execClassVeri(type: JavaExec) {
+    description = "Run the main class with JavaExecTask"
+    classpath = sourceSets.main.runtimeClasspath
+    main = "org.key_project.cocos.ClassVeri"
+    args 'demo/'
+    args 'Account'
+}
