@@ -186,6 +186,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
 	if (method == null) {
 	    resolveMethod(services);
         }
+System.out.println(methodReference.getName());
         return method.getBody();
     }
 

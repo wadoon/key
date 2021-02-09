@@ -671,6 +671,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                 final Term invTerm,
                                                 Term reachableState,
                                                 Goal initGoal) {
+System.out.println("Hello from WhileInvariantRule");
         initGoal.setBranchLabel("Invariant Initially Valid");
         initGoal.changeFormula(initFormula(termLabelState, inst, invTerm,
                                            reachableState, services, initGoal),

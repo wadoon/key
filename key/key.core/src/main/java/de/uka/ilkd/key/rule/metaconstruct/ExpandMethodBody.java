@@ -37,6 +37,9 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import java.io.PrintWriter;
+import java.io.IOException;
 
 /**
  * Replaces the MethodBodyStatement shortcut with the full body, performs prefix
@@ -55,10 +58,11 @@ public class ExpandMethodBody extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-
+System.out.println("well hello from transform!!");
         MethodBodyStatement mbs = (MethodBodyStatement) pe;
         // MethodReference mr = mbs.getMethodReference();
-
+try{mbs.prettyPrint(new PrettyPrinter(new PrintWriter(System.out)));}
+catch(IOException e){e.printStackTrace();}
         IProgramMethod pm = mbs.getProgramMethod(services);
         // mr.method(services, mbs.getBodySource());
 

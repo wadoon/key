@@ -204,6 +204,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     private void constructInitiallyGoal(Services services, RuleApp ruleApp,
             final TermLabelState termLabelState, Goal initiallyGoal,
             final Instantiation inst, final Term invTerm, Term reachableState) {
+System.out.println("Hello from LoopScopeInvariantRule");
         initiallyGoal.setBranchLabel("Invariant Initially Valid");
         initiallyGoal
                 .changeFormula(

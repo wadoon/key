@@ -84,20 +84,24 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public String visitContractDefinition(SolidityParser.ContractDefinitionContext ctx) { 
-		StringBuffer inheritanceList = new StringBuffer("Address");
+		StringBuffer inheritanceList = new StringBuffer();
 
-		if (ctx.inheritanceSpecifier().size() == 1) {
+//		if (ctx.inheritanceSpecifier().size() == 1) {
 			for (InheritanceSpecifierContext ictx : ctx.inheritanceSpecifier()) {
-				inheritanceList.append(",");
 				inheritanceList.append(ictx.getText());		
+				inheritanceList.append(",");
 			}
-		} else if (ctx.inheritanceSpecifier().size() > 1) {
+			if (ctx.inheritanceSpecifier().size() > 0) {
+				inheritanceList.setCharAt(inheritanceList.length()-1,' ');
+			}
+		/*} else if (ctx.inheritanceSpecifier().size() > 1) {
 			error("Multi-inheritance not supported.");
-		}
+		}*/
 
 		StringBuffer contract = 
-				new StringBuffer(
-						"class " + ctx.identifier().getText() + " extends " + inheritanceList + " {\n"
+	ctx.inheritanceSpecifier().size() > 0 ?			new StringBuffer(
+						"class " + ctx.identifier().getText() + " extends Address implements " + inheritanceList + " {\n" ): new StringBuffer(
+						"class " + ctx.identifier().getText() + " extends Address {\n" 
 						);
 
 

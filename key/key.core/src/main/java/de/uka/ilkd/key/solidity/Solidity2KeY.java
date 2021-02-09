@@ -32,13 +32,12 @@ public class Solidity2KeY {
 		SolidityTranslationVisitor visitor = new SolidityTranslationVisitor();
 		SourceUnitContext solidityAST = parser.sourceUnit();
 		visitor.visit(solidityAST);
-		//System.out.println(visitor.getOutput());
 		return visitor.getOutput();
 	}
 	
 	public static void main(String[] args) {
 		Solidity2KeY s = 
-				new Solidity2KeY("/Users/bubel/Documents/Work/Development Projects/coreKeY/key/key/key.ui/examples/solidity/auction-single.sol"); 
+				new Solidity2KeY("~/key/key/key.ui/examples/solidity/auction/auction-single-transfer-spec.sol"); 
 				//new Solidity2KeY("/Users/bubel/Documents/Work/Development Projects/coreKeY/key/key/key.core/src/main/java/de/uka/ilkd/key/solidity/contract-single-player-pre-post.sol");
 		try {
 			System.out.println(s.translate());
