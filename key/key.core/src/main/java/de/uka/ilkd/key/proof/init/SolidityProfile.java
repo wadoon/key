@@ -36,6 +36,8 @@ import de.uka.ilkd.key.rule.label.TermLabelPolicy;
 import de.uka.ilkd.key.rule.label.TermLabelRefactoring;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 
 /**
  * This profile sets up KeY for verification of JavaCard programs.
@@ -152,6 +154,7 @@ public class SolidityProfile extends AbstractProfile {
     protected ImmutableList<BuiltInRule> initBuiltInRules() {
         ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
 
+        builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE);
         builtInRules = builtInRules.prepend(getOneStepSimpilifier());
 
         return builtInRules;
@@ -238,6 +241,6 @@ public class SolidityProfile extends AbstractProfile {
      */
     @Override
     public boolean isSpecificationInvolvedInRuleApp(RuleApp app) {
-        return false;
+        return app instanceof LoopInvariantBuiltInRuleApp;
     }
 }
