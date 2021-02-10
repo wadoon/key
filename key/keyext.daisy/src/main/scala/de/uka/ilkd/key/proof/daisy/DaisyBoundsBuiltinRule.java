@@ -122,13 +122,9 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
         List<Term> letExprs = gatherLetExprs(seq, services);
         Term expr = ((DaisyBoundsRuleApp) ra).getExpr();
         Pair<Float, Float> bounds = daisyComputeBounds(precs, letExprs, expr, services);
-        Float lower = bounds.first;
-        FloatLiteral lowerLit = new FloatLiteral(lower);
-        Float upper = bounds.second;
-        FloatLiteral upperLit = new FloatLiteral(upper);
         FloatLDT floatLDT = new FloatLDT(services);
-        Term lowerTerm = floatLDT.translateLiteral(lowerLit, services);
-        Term upperTerm = floatLDT.translateLiteral(upperLit, services);
+        Term lowerTerm = floatToTerm(bounds.first, services);
+        Term upperTerm = floatToTerm(bounds.second, services);
 
         final ImmutableList<Goal> result = goal.split(1);
         final Goal resultGoal = result.head();
@@ -141,6 +137,13 @@ public class DaisyBoundsBuiltinRule implements BuiltInRule {
         resultGoal.addFormula(new SequentFormula(resUpper), true, false);
 
         return result;
+    }
+
+    private Term floatToTerm(Float f, Services services) {
+        FloatLiteral lit = new FloatLiteral(f);
+        FloatLDT floatLDT = new FloatLDT(services);
+        return floatLDT.translateLiteral(lit, services);
+
     }
 
     @Override

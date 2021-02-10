@@ -170,12 +170,14 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
 	assert lit instanceof FloatLiteral : "Literal '"+lit+"' is not a float literal.";
 	String s = ((FloatLiteral)lit).getValue();
 	final boolean negative = (s.charAt(0) == '-');
-	
+	if (negative) {
+	    // remove the "-" because it gets re-added later
+        s = s.substring(1);
+    }
 
 	int floatBits = Float.floatToIntBits(Float.parseFloat(s));
 	String bitString = Integer.toBinaryString(floatBits);
 	int number = Integer.parseInt(bitString, 2);
-
 
 	IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 	Term intTerm, fractionTerm;
