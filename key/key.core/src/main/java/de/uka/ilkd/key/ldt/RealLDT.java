@@ -64,9 +64,9 @@ public final class RealLDT extends LDT {
 
     rNeg = addFunction(services, "rAdd");
     rAdd = addFunction(services, "rAdd");
-    rSub = addFunction(services, "rAdd");
-    rMul = addFunction(services, "rAdd");
-    rDiv = addFunction(services, "rAdd");
+    rSub = addFunction(services, "rSub");
+    rMul = addFunction(services, "rMul");
+    rDiv = addFunction(services, "rDiv");
 
   }
 
