@@ -45,6 +45,7 @@ public class FieldConstantHandler implements SMTHandler {
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         this.services = services;
+        masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }
 
     @Override
@@ -55,7 +56,7 @@ public class FieldConstantHandler implements SMTHandler {
                 && op instanceof Function
                 && ((Function)op).isUnique()
                 && (op.name().toString().contains("::$") || op.name().toString().contains("::<"))
-                || op == heapLDT.getArr() || op == heapLDT.getLength();
+                || op == heapLDT.getArr();
     }
 
     @Override
@@ -67,20 +68,15 @@ public class FieldConstantHandler implements SMTHandler {
         Operator op = term.op();
 
         if (op == heapLDT.getArr()) {
-            trans.addFromSnippets("arr");
+            trans.introduceSymbol("arr");
             return trans.handleAsFunctionCall("arr", term);
-        }
-
-        if (op == heapLDT.getLength()) {
-            trans.addFromSnippets("length");
-            return trans.handleAsFunctionCall("length", term);
         }
 
         if (!trans.isKnownSymbol(smtName)) {
             Map<String, Object> state = trans.getTranslationState();
             Integer curVal = (Integer) state.getOrDefault(CONSTANT_COUNTER_PROPERTY, 2);
 
-            trans.addFromSnippets("fieldIdentifier");
+            trans.introduceSymbol("fieldIdentifier");
 
             trans.addDeclaration(new SExpr("declare-const", smtName, "U"));
 
@@ -89,7 +85,7 @@ public class FieldConstantHandler implements SMTHandler {
             trans.addAxiom(new SExpr("assert",
                     new SExpr("=",
                             new SExpr("fieldIdentifier", smtName),
-                            new SExpr("-", Type.INT, curVal.toString()))));
+                            new SExpr("-", IntegerOpHandler.INT, curVal.toString()))));
 
             state.put(CONSTANT_COUNTER_PROPERTY, curVal + 1);
             trans.addKnownSymbol(smtName);

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -42,6 +43,7 @@ public class SMTBeautifier {
                 for (Element child : children) {
                     result += child.length();
                 }
+                result += 2 + children.size(); // "(", ")" and spaces
             }
             return result;
         }
@@ -55,6 +57,19 @@ public class SMTBeautifier {
             }
         }
 
+        public boolean hasComments() {
+            return isComment() ||
+                   (children != null && children.stream().anyMatch(Element::hasComments));
+        }
+
+        public boolean isComment() {
+            return (head != null && head.startsWith(";"));
+        }
+
+        public boolean lastChildIsComment() {
+            return children != null && !children.isEmpty() &&
+                    children.get(children.size() - 1).isComment();
+        }
     }
 
     /**
@@ -89,10 +104,14 @@ public class SMTBeautifier {
     public static String indent(String smtCode, int lineLength) {
         MutableInt pos = new MutableInt();
         StringBuilder sb = new StringBuilder();
-        while (pos.val < smtCode.length()) {
-            Element element = parse(smtCode, pos);
+        Element element = parse(smtCode, pos);
+//        System.err.println(smtCode);
+        while (element != null) {
+//            System.err.println(element);
             sb.append(prettyPrint(element, 1, lineLength)).append("\n");
+            element = parse(smtCode, pos);
         }
+//        System.err.println(sb);
         return sb.toString();
     }
 
@@ -126,8 +145,8 @@ public class SMTBeautifier {
                         pos.val++;
                     }
                     result = new Element();
+                    result.head = s.substring(start, pos.val);
                     pos.val++;
-                    result.head = s.substring(start, Math.min(s.length() - 1, pos.val));
                     return result;
 
                 default:
@@ -142,7 +161,8 @@ public class SMTBeautifier {
             }
             pos.val ++;
         }
-        return new Element();
+        // no further element
+        return null;
     }
 
     private static Element parseParen(String s, MutableInt pos) {
@@ -152,7 +172,7 @@ public class SMTBeautifier {
         pos.val ++;
         while (pos.val < s.length() && s.charAt(pos.val) != ')') {
             result.children.add(parse(s, pos));
-            while(pos.val < s.length() && Character.isSpaceChar(s.charAt(pos.val))) {
+            while(pos.val < s.length() && Character.isWhitespace(s.charAt(pos.val))) {
                 pos.val ++;
             }
         }
@@ -163,16 +183,17 @@ public class SMTBeautifier {
     private static CharSequence prettyPrint(Element element, int indent, int lineLength) {
         if (element.head == null) {
             StringBuilder sb = new StringBuilder("(");
-            boolean breakLines = (element.length() < lineLength);
+            boolean oneLine = (element.length() < lineLength) && !element.hasComments();
             boolean first = true;
             for (Element child : element.children) {
                 if (first) {
                     first = false;
                 } else {
-                    if(breakLines) {
+                    if(oneLine) {
                         sb.append(" ");
                     } else {
                         sb.append("\n");
+                        // newer Java verion: sb.append("  ".repeat(indent));
                         for (int i = 0; i < indent; i++) {
                             sb.append("  ");
                         }
@@ -180,10 +201,19 @@ public class SMTBeautifier {
                 }
                 sb.append(prettyPrint(child, indent + 1, lineLength));
             }
+            if (element.lastChildIsComment()) {
+                // was a bug: if comment at end of SExpr, the ")" would be in comment
+                sb.append("\n");
+                // new Java version: sb.append("  ".repeat(indent));
+                for (int i = 0; i < indent; i++) {
+                    sb.append("  ");
+                }
+            }
             sb.append(")");
             return sb;
 
         } else {
+            assert element.children == null : "Either head or children must be null";
             return element.head;
         }
 
