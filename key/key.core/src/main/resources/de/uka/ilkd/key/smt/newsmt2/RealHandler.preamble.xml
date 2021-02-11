@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+    <comment>These are the preamble snippets needed for handling the Real sort</comment>
+
+    <entry key="axioms">
+        (assert (forall ((r Real)) (= (u2r (r2u r)) r)))
+        (assert (forall ((x U)) (! (=> (= (typeof x) sort_real)  (= (r2u (u2r x)) x)) :pattern ((typeof x)))))
+        (assert (forall ((x U)) (! (=> (instanceof x sort_real)  (= (typeof x ) sort_real)) :pattern ((instanceof x sort_real)))))
+        (assert (forall ((r Real)) (! (= (typeof (r2u r)) sort_real) :pattern ((typeof (r2u r))))))
+    </entry>
+
+    <entry key="decls">
+        (declare-fun u2r (U) Real)
+        (declare-fun r2u (Real) U)
+        (declare-const sort_real T)
+    </entry>
+
+</properties>
