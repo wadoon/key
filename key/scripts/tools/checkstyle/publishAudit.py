@@ -21,7 +21,7 @@ URL, PID, TOKEN, SHA, BID, JID = getenv("CI_PROJECT_URL", "CI_PROJECT_ID",
                                         "CI_COMMENT_TOKEN", "CI_COMMIT_SHA",
                                         "CI_BUILD_ID", "CI_JOB_ID")
 
-MR_IID = getenv("CI_MERGE_REQUEST_IID")
+MR_IID = os.environ.get("CI_MERGE_REQUEST_IID", "")
 
 everythingIsFine = True
 
