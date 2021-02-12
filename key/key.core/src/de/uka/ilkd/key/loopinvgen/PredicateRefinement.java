@@ -3,6 +3,7 @@ package de.uka.ilkd.key.loopinvgen;
 import java.util.HashSet;
 import java.util.Set;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -10,10 +11,13 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -63,32 +67,45 @@ public class PredicateRefinement {
 	}
 
 	public void readAndRefineAntecedentPredicates() {
+		System.out.println("****************************************************");
 		Semisequent ante = seq.antecedent();
 		for (SequentFormula sf : ante) {
-			for (Operator f : CompOps) {
-				if (sf.formula().op().equals(f)) {
-//					System.out.println("sf: " + sf);
-					delCompPred(sf);
-					break;
-				}
-			}
-
-			if (sf.formula().op().equals(depLDT.getRPred()) || sf.formula().op().equals(depLDT.getWPred())) {
-				delDepPred(sf);
-			}
+			detectFormula(sf.formula());
 		}
 //		System.out.println("depList size after delDepPred: " + depList.size());
 //		refinedCompList = delRepetitiveCompPred(applyTransitivity(compList));
-		refinedCompList = applyTransitivity(compList);
-//		refinedCompList = compList;
+//		refinedCompList = applyTransitivity(compList);
+		refinedCompList = compList;
 		refinedDepList = depPredRefineSubSet(delEmptyLocSet(depList));
 	}
 
-	private void delCompPred(SequentFormula sf) {
-		Term lh = sf.formula().sub(0);
-		Term rh = sf.formula().sub(1);
+	void detectFormula(Term sf) {
+		for (Operator f : CompOps) {
+			if (sf.op().equals(f)) {
+//				System.out.println("sf: " + sf);
+				delCompPred(sf);
+				break;
+			}
+		}
+
+		if (sf.op().equals(depLDT.getRPred()) || sf.op().equals(depLDT.getWPred())) {
+			delDepPred(sf);
+		}
+		
+		else if(sf.op() instanceof UpdateApplication) {
+			Term belowupdate = UpdateApplication.getTarget(sf);
+			detectFormula(belowupdate);
+		}
+	}
+	
+	
+	private void delCompPred(Term sf) {
+		Term lh = sf.sub(0);
+		System.out.println("LH: "+ lh+ "   "+lh.sort());
+		Term rh = sf.sub(1);
+		System.out.println("RH: " +rh+"   "+rh.sort());
 		if (isProgOrLogVars(lh) && isProgOrLogVars(rh)
-				&& rh.sort() != services.getTypeConverter().getBooleanType().getSort()) {
+				&& rh.sort() != services.getTypeConverter().getBooleanType().getSort() /*&& !(rh.sort() instanceof ArraySort) && !(lh.sort() instanceof ArraySort)*/) {
 
 			Term l_eq_r = tb.equals(lh, rh);
 			Term r_eq_l = tb.equals(rh, lh);
@@ -105,36 +122,36 @@ public class PredicateRefinement {
 
 			for (Term compT : compList) {
 				// l == r || r == l
-				if ((sf.formula().equals(l_eq_r) || sf.formula().equals(r_eq_l)) && (compT.equals(l_gt_r)
+				if ((sf.equals(l_eq_r) || sf.equals(r_eq_l)) && (compT.equals(l_gt_r)
 						|| compT.equals(l_lt_r) || compT.equals(r_gt_l) || compT.equals(r_lt_l))) {
 					toDelete.add(compT);
-//					System.out.println(compT + " is deleted because of: " + sf);
+					System.out.println(compT + " is deleted because of: " + sf);
 				}
 				// l > r || r < l
-				else if ((sf.formula().equals(l_gt_r) || sf.formula().equals(r_lt_l))
+				else if ((sf.equals(l_gt_r) || sf.equals(r_lt_l))
 						&& (compT.equals(l_lt_r) || compT.equals(l_leq_r) || compT.equals(l_eq_r)
 								|| compT.equals(r_eq_l) || compT.equals(r_gt_l) || compT.equals(r_geq_l))) {
 					toDelete.add(compT);
-//					System.out.println(compT + " is deleted because of: " + sf);
+					System.out.println(compT + " is deleted because of: " + sf);
 				}
 				// l >= r || r <= l
-				else if ((sf.formula().equals(r_leq_l) || sf.formula().equals(l_geq_r))
+				else if ((sf.equals(r_leq_l) || sf.equals(l_geq_r))
 						&& (compT.equals(r_gt_l) || compT.equals(l_lt_r))) {
 					toDelete.add(compT);
-//					System.out.println(compT + " is deleted because of: " + sf);
+					System.out.println(compT + " is deleted because of: " + sf);
 				}
 				// l < r || r > l
-				else if ((sf.formula().equals(l_lt_r) || sf.formula().equals(r_gt_l))
+				else if ((sf.equals(l_lt_r) || sf.equals(r_gt_l))
 						&& (compT.equals(l_gt_r) || compT.equals(l_geq_r) || compT.equals(l_eq_r)
 								|| compT.equals(r_eq_l) || compT.equals(r_lt_l) || compT.equals(r_leq_l))) {
 					toDelete.add(compT);
-//					System.out.println(compT + " is deleted because of: " + sf);
+					System.out.println(compT + " is deleted because of: " + sf);
 				}
 				// l <= r || r >= l
-				else if ((sf.formula().equals(l_leq_r) || sf.formula().equals(r_geq_l))
+				else if ((sf.equals(l_leq_r) || sf.equals(r_geq_l))
 						&& (compT.equals(r_lt_l) || compT.equals(l_gt_r))) {
 					toDelete.add(compT);
-//					System.out.println(compT + " is deleted because of: " + sf);
+					System.out.println(compT + " is deleted because of: " + sf);
 				}
 			}
 			compList.removeAll(toDelete);
@@ -143,6 +160,7 @@ public class PredicateRefinement {
 	}
 
 	private Set<Term> applyTransitivity(Set<Term> compPredsList) {
+		System.out.println(" applyTransitivity");
 		Set<Term> toAdd = new HashSet<>();
 		Set<Term> toDelete = new HashSet<>();
 //	Set<Term> toDelete = new HashSet<>();
@@ -237,6 +255,7 @@ public class PredicateRefinement {
 //	}
 
 	private boolean compPredsRels(Operator op1, Operator op2, Term t) {
+		System.out.println("compPredsRels");
 		if (op1.equals(gt) && op2.equals(gt) && (!t.op().equals(gt)) || !t.op().equals(geq)) { // a > b & b > c ==> a > c
 			return true;
 		} else if (op1.equals(lt) && op2.equals(lt) && (!t.op().equals(lt)) || !t.op().equals(leq)) { // a < b & b < c ==> a < c
@@ -260,9 +279,9 @@ public class PredicateRefinement {
 	}
 	
 	
-	private void delDepPred(SequentFormula sf) {
-		Operator op = sf.formula().op();
-		Term locSet = sf.formula().sub(0);
+	private void delDepPred(Term sf) {
+		Operator op = sf.op();
+		Term locSet = sf.sub(0);
 		Set<Term> toDelete = new HashSet<Term>();
 
 		for (Term t : depList) {

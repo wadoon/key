@@ -256,6 +256,7 @@ public class TestPredicateConstruction {
 //}
 
 	public void testCase7() {
+
 		Term formula;
 
 		try {
@@ -270,15 +271,14 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return;
 		}
-
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
-		System.out.println(seq.toString());
-//		CurrentLIG cur = new CurrentLIG(services);
-//		cur.mainAlg(seq);
 
-		Term formula1, formula2;
+		String[] arrLeft = { "i>=0", "a!=null", "i <= a.length" };
 		try {
-			formula1 = parse("i>0");
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
@@ -288,23 +288,10 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return;
 		}
+		System.out.println("Seq to find LI " + seq.toString());
 
-		try {
-			formula2 = parse(
-					" \\<{" + "			while (i<a.length) {a[i] = a[i+1];" + "			i++;}" + "		}\\>true");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			System.out.println(e.getMessage());
-			if (e.getCause() != null) {
-				System.out.println(e.getCause().getMessage());
-			}
-			e.printStackTrace();
-			return;
-		}
-		Sequent seq2 = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula1), true, true).sequent();
-		seq2 = seq2.addFormula(new SequentFormula(formula2), false, true).sequent();
-		// System.out.println("seq2 " + seq2.toString());
-//		cur.mainAlg2(seq2);
+		CurrentLIG cur = new CurrentLIG(services, seq);
+		cur.mainAlg();
 	}
 
 	public void testCase8() {
@@ -325,9 +312,8 @@ public class TestPredicateConstruction {
 
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formulaRight), false, true).sequent();
 //		System.out.println("Seq1: " + seq.toString());
-		
-		String[] arrLeft = { "rPred({(a,arr(1+i))}, timestamp)", "wPred({(a,arr(i))}, timestamp)"
-				, "i < a.length"
+
+		String[] arrLeft = { "rPred({(a,arr(1+i))}, timestamp)", "wPred({(a,arr(i))}, timestamp)", "i < a.length"
 //				, "3<a.length"
 //				, "wPred(arrayRange(a,Z(0(#)),sub(i,Z(1(#)))), timestamp-1)"
 //				, "rPred(arrayRange(a,Z(1(#)),i), timestamp - 1)"
@@ -379,7 +365,7 @@ public class TestPredicateConstruction {
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 
-		tpc.testCase8();
+		tpc.testCase7();
 	}
 
 }

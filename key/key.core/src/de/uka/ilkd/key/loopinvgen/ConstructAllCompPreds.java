@@ -33,7 +33,7 @@ public class ConstructAllCompPreds {
 	}
 
 	private Set<Term> consCompPredsLessEq(Term lh, Term rh) {
-		Set<Term> list = new HashSet<>();
+		Set<Term> list = new HashSet<Term>();
 
 		list.add(tb.lt(lh, rh));
 		list.add(tb.leq(lh, rh));
