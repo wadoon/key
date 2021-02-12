@@ -17,11 +17,9 @@ def getenv(*args):
 
 rawReport = sys.argv[1]
 SERVER = "https://git.key-project.org/"
-URL, PID, TOKEN, SHA, BID, JID = getenv("CI_PROJECT_URL", "CI_PROJECT_ID",
+URL, PID, TOKEN, SHA, BID, JID, MR_IID = getenv("CI_PROJECT_URL", "CI_PROJECT_ID",
                                         "CI_COMMENT_TOKEN", "CI_COMMIT_SHA",
-                                        "CI_BUILD_ID", "CI_JOB_ID")
-
-MR_IID = os.environ.get("CI_MERGE_REQUEST_IID", "")
+                                        "CI_BUILD_ID", "CI_JOB_ID", "CI_MERGE_REQUEST_IID")
 
 everythingIsFine = True
 
