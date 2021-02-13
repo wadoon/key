@@ -27,6 +27,10 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 public class BuiltInRuleAppIndex {
 
+    /* This change should only trigger checkstyle, remove before merge !!! , weigl */
+    public static final int afdsa_fdsaf =                                                                                                                                                                                      1;
+
+    
     private final BuiltInRuleIndex index;
 
     private NewRuleListener  newRuleListener =
@@ -35,7 +39,7 @@ public class BuiltInRuleAppIndex {
     public BuiltInRuleAppIndex(BuiltInRuleIndex index) {
 	this.index = index;
     }
-    
+
     
     public BuiltInRuleAppIndex(BuiltInRuleIndex index,
 			       NewRuleListener  p_newRuleListener) {
