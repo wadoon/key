@@ -157,22 +157,16 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                 dataOfSolvers.put(SolverType.Z3_SOLVER, new SolverData(SolverType.Z3_SOLVER));
                 dataOfSolvers.put(SolverType.Z3_NEW_TL_SOLVER, new SolverData(SolverType.Z3_NEW_TL_SOLVER));
                 dataOfSolvers.put(SolverType.Z3_CE_SOLVER, new SolverData(SolverType.Z3_CE_SOLVER));
-                dataOfSolvers.put(SolverType.Z3_FP_SOLVER, new SolverData(SolverType.Z3_FP_SOLVER));
-                dataOfSolvers.put(SolverType.MATHSAT_FP_SOLVER, new SolverData(SolverType.MATHSAT_FP_SOLVER));
                 dataOfSolvers.put(SolverType.MATHSAT_SOLVER, new SolverData(SolverType.MATHSAT_SOLVER));
                 dataOfSolvers.put(SolverType.YICES_SOLVER, new SolverData(SolverType.YICES_SOLVER));
                 dataOfSolvers.put(SolverType.SIMPLIFY_SOLVER, new SolverData(SolverType.SIMPLIFY_SOLVER));
                 dataOfSolvers.put(SolverType.CVC3_SOLVER, new SolverData(SolverType.CVC3_SOLVER));
                 dataOfSolvers.put(SolverType.CVC4_SOLVER, new SolverData(SolverType.CVC4_SOLVER));
-                dataOfSolvers.put(SolverType.CVC4_FP_SOLVER, new SolverData(SolverType.CVC4_FP_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Z3",1,SolverType.Z3_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Z3",1,SolverType.Z3_NEW_TL_SOLVER));
-                solverUnions.add(new SolverTypeCollection("Z3 (FP)",1,SolverType.Z3_FP_SOLVER));
-                solverUnions.add(new SolverTypeCollection("mathsat (FP)",1,SolverType.MATHSAT_FP_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Yices",1,SolverType.YICES_SOLVER));
                 solverUnions.add(new SolverTypeCollection("CVC3",1,SolverType.CVC3_SOLVER));
                 solverUnions.add(new SolverTypeCollection("CVC4",1,SolverType.CVC4_SOLVER));
-                solverUnions.add(new SolverTypeCollection("CVC4",1,SolverType.CVC4_FP_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Simplify",1,SolverType.SIMPLIFY_SOLVER));
                 solverUnions.add(new SolverTypeCollection("MathSAT", 1, SolverType.MATHSAT_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Multiple Solvers",2,
@@ -182,15 +176,17 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                                 SolverType.CVC3_SOLVER,
                                 SolverType.CVC4_SOLVER,
                                 SolverType.SIMPLIFY_SOLVER,
-                                SolverType.Z3_FP_SOLVER,
-                                SolverType.MATHSAT_SOLVER,
-                                SolverType.CVC4_FP_SOLVER));
+                                SolverType.MATHSAT_SOLVER));
         }
 
 
 
 
         public String getCommand(SolverType type){
+                return dataOfSolvers.get(type).solverCommand;
+        }
+
+        public String getParameters(SolverType type) {
                 return dataOfSolvers.get(type).solverParameters;
         }
 
@@ -217,7 +213,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
 
 
-        public void readSettings(Object sender, Properties props){
+        public void readSettings(Properties props){
                 timeout = SettingsConverter.read(props, TIMEOUT, timeout);
                 showResultsAfterExecution = SettingsConverter.read(props,SHOW_SMT_RES_DIA,showResultsAfterExecution);
                 pathForSMTTranslation    = SettingsConverter.read(props, PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
@@ -241,7 +237,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
     
 
 
-        public void writeSettings(Object sender, Properties props){
+        public void writeSettings(Properties props){
                 SettingsConverter.store(props,TIMEOUT,timeout);
                 SettingsConverter.store(props,SHOW_SMT_RES_DIA,showResultsAfterExecution);
                 SettingsConverter.store(props,PROGRESS_DIALOG_MODE,modeOfProgressDialog);

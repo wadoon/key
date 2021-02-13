@@ -77,15 +77,15 @@ lexer grammar KeYJMLLexer;
     EXCEPTION            : '\\exception';
     EXISTS               : '\\exists';
     FORALL               : '\\forall';
-    FP_ABS               : '\\fp_abs';
-    FP_INFINITE          : '\\fp_infinite';
-    FP_NAN               : '\\fp_nan';
-    FP_NEGATIVE          : '\\fp_negative';
+    FP_ABS               : '\\fp_abs';  //KeY extension, not official JML
+    FP_INFINITE          : '\\fp_infinite';   //KeY extension, not official JML
+    FP_NAN               : '\\fp_nan';   //KeY extension, not official JML
+    FP_NEGATIVE          : '\\fp_negative';   //KeY extension, not official JML
     FP_NICE              : '\\fp_nice'; //KeY syntactic sugar
-    FP_NORMAL            : '\\fp_normal';
-    FP_POSITIVE          : '\\fp_positive';
-    FP_SUBNORMAL         : '\\fp_subnormal';
-    FP_ZERO              : '\\fp_zero';
+    FP_NORMAL            : '\\fp_normal';   //KeY extension, not official JML
+    FP_POSITIVE          : '\\fp_positive';   //KeY extension, not official JML
+    FP_SUBNORMAL         : '\\fp_subnormal';   //KeY extension, not official JML
+    FP_ZERO              : '\\fp_zero';   //KeY extension, not official JML
     FREE                 : '\\free';  //KeY extension, not official JML
     FRESH                : '\\fresh';
     INDEX                : '\\index';
@@ -168,11 +168,8 @@ BITWISENOT : '~';
 COLON : ':';
 COMMA : ',';
 DIV : '/';
-
 DOT : '.' ;
 DOTDOT : '..';
-
-
 EQUAL_SINGLE : '=';
 EQV_ANTIV: '<==>' | '<=!=>';
 EQ_NEQ : '==' | '!=';
@@ -396,6 +393,8 @@ FLOAT_LITERAL
     :   NonIntegerNumber FloatSuffix
     ;
 
+// TODO @Real. Extend here.
+
 DOUBLE_LITERAL
     :  /*  MU2018: DIGITS was removed, the following was not accessible.
         *  It is strange anyway ...
@@ -409,7 +408,8 @@ DOUBLE_LITERAL
 CHAR_LITERAL:
         '\''
                 (~('\''|'\\') |
-                 ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"' | OCT_CHAR))
+                 ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"' | OCT_CHAR
+                 | 'u' HEXDIGIT HEXDIGIT HEXDIGIT HEXDIGIT )) //add for safety
                  // note: unicode escapes are processed earlier
                 )
       '\''

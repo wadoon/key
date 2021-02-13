@@ -18,8 +18,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class FloatHandler implements SMTHandler {
+
+    public static final Type FLOAT = new Type("Double", "d2u", "u2d");
+    public static final Type DOUBLE = new Type("Float", "f2u", "u2f");
 
     private final Map<Operator, SMTTermFloatOp.Op> fpOperators = new HashMap<>();
     private final Map<Operator, SMTTermFloatOp.Op> mathOperators = new HashMap<>();
@@ -28,9 +32,10 @@ public class FloatHandler implements SMTHandler {
     private DoubleLDT doubleLDT;
     private Services services;
     private boolean disableSqrtAxiomatizing;
+    private Properties snippets;
 
     @Override
-    public void init(Services services) throws IOException {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) throws IOException {
 
         this.services = services;
         floatLDT = services.getTypeConverter().getFloatLDT();
@@ -96,26 +101,24 @@ public class FloatHandler implements SMTHandler {
         mathOperators.put(doubleLDT.getPowDouble(), SMTTermFloatOp.Op.POWDOUBLE);
         mathOperators.put(doubleLDT.getExpDouble(), SMTTermFloatOp.Op.EXPDOUBLE);
         mathOperators.put(doubleLDT.getAtanDouble(), SMTTermFloatOp.Op.ATANDOUBLE);
+
+        masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }
 
     @Override
-    public boolean canHandle(Term term) {
+    public boolean canHandle(Operator op) {
 
-        Operator op = term.op();
-
-        if (fpOperators.containsKey(op) ||mathOperators.containsKey(op) || fpLiterals.contains(op) || op == doubleLDT.getRoundingModeRNE()
-            || op == doubleLDT.getRoundingModeRTN() || op == doubleLDT.getRoundingModeRTP())
-
-            return true;
-
-        return false;
+        return fpOperators.containsKey(op) || mathOperators.containsKey(op)
+                || fpLiterals.contains(op) || op == doubleLDT.getRoundingModeRNE()
+                || op == doubleLDT.getRoundingModeRTN()
+                || op == doubleLDT.getRoundingModeRTP();
     }
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
 
-        trans.addFromSnippets("float");
-        trans.addFromSnippets("double");
+        trans.introduceSymbol("float");
+        trans.introduceSymbol("double");
 
         Operator op = term.op();
         if (fpOperators.containsKey(op) || mathOperators.containsKey(op)) {
@@ -125,7 +128,7 @@ public class FloatHandler implements SMTHandler {
             }else {
                 fpop = mathOperators.get(op);
                 if(!disableSqrtAxiomatizing || fpop != SMTTermFloatOp.Op.SQRTDOUBLE){
-                    trans.addFromSnippets(fpop.getOpName());
+                    trans.introduceSymbol(fpop.getOpName());
                 }else {
                     fpop = SMTTermFloatOp.Op.FPSQRT;
                 }
@@ -133,8 +136,8 @@ public class FloatHandler implements SMTHandler {
             String opName = fpop.getOpName();
             SExpr.Type exprType;
             if (fpop.getImageSort().equals(SMTSort.BOOL)) exprType = SExpr.Type.BOOL;
-            else if (fpop.getImageSort().equals(SMTSort.DOUBLE)) exprType = SExpr.Type.DOUBLE;
-            else exprType = SExpr.Type.FLOAT;
+            else if (fpop.getImageSort().equals(SMTSort.DOUBLE)) exprType = DOUBLE;
+            else exprType = FLOAT;
 
             ImmutableArray<Term> subs = term.subs();
 
@@ -142,8 +145,8 @@ public class FloatHandler implements SMTHandler {
             /// DIRTIEST HACK EVER
             ///
             // No function from the double family ever returns float.
-            if(exprType == Type.FLOAT && subs.last().sort().name().toString().equals("double")) {
-                exprType = Type.DOUBLE;
+            if(exprType == FLOAT && subs.last().sort().name().toString().equals("double")) {
+                exprType = DOUBLE;
             }
 
             List<SExpr> translatedSubs = new LinkedList<>();
@@ -156,9 +159,9 @@ public class FloatHandler implements SMTHandler {
                 if (subOp instanceof ProgramVariable ||((Function)subOp).isSkolemConstant()|| services.getTypeConverter().getHeapLDT().isSelectOp(subOp)) {
 
                     if (termType.equals("float"))
-                        translatedSubs.add(trans.translate(t, SExpr.Type.FLOAT));
+                        translatedSubs.add(trans.translate(t, FLOAT));
                     else if (termType.equals("double"))
-                        translatedSubs.add(trans.translate(t, SExpr.Type.DOUBLE));
+                        translatedSubs.add(trans.translate(t, DOUBLE));
 
                 } else
                     translatedSubs.add(trans.translate(t));
@@ -169,9 +172,9 @@ public class FloatHandler implements SMTHandler {
 
             String lit = op.name().toString();
             if (lit.equals("DFP")) {
-                return new SExpr(NumberTranslation.translateDoubleToSMTLIB(term, services), SExpr.Type.DOUBLE);
+                return new SExpr(NumberTranslation.translateDoubleToSMTLIB(term, services), DOUBLE);
             } else { // lit.equals("FP")
-                return new SExpr(NumberTranslation.translateFloatToSMTLIB(term, services), SExpr.Type.FLOAT);
+                return new SExpr(NumberTranslation.translateFloatToSMTLIB(term, services), FLOAT);
             }
 
         } else if (op == doubleLDT.getRoundingModeRNE()) {

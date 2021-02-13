@@ -3,19 +3,19 @@ package de.uka.ilkd.key.parser.messages;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.parser.Location;
@@ -33,6 +33,7 @@ import de.uka.ilkd.key.util.ExceptionTools;
  * @author Kai Wallisch
  */
 @RunWith(Parameterized.class)
+@Ignore("See issue #1500")
 public class ParserMessageTest {
    private final String docFile = "key/doc/README.parserMessageTest";
 
@@ -59,10 +60,9 @@ public class ParserMessageTest {
       return data;
    }
 
-   public ParserMessageTest(String testName, File sourceDir) throws IOException {
+   public ParserMessageTest(String testName, File sourceDir) throws Exception {
 
       // retrieve the Java file contained in the given source directory:
-      File javaFile = null;
       for (File file : sourceDir.listFiles()) {
          if (file.getName().endsWith(".java")) {
             assertEquals("Found multiple Java files in directory " + sourceDir
@@ -100,13 +100,13 @@ public class ParserMessageTest {
       assertTrue("Cannot recover error location from Exception: " + exception,
             location != null);
 
-      assertTrue("Couldn't recreate filename from received exception.",
-            location.getFilename() != null
-                  && location.getFilename().length() > 0);
+      assertTrue("Couldn't recreate file URL from received exception.",
+            location.getFileURL() != null);
 
       assertEquals("Filename retrieved from parser message "
-            + "doesn't match filename of originally parsed file.", javaFile,
-            new File(location.getFilename()));
+            + "doesn't match filename of originally parsed file.",
+              javaFile.getAbsoluteFile(),
+              Paths.get(location.getFileURL().toURI()));
    }
 
    @Test

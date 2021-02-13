@@ -12,6 +12,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SMTCommand
         extends AbstractCommand<SMTCommand.SMTCommandArguments> {
@@ -101,7 +102,7 @@ public class SMTCommand
         return new SolverTypeCollection(value, 1, types);
     }
 
-    static class SMTCommandArguments {
+    public static class SMTCommandArguments {
         @Option("solver")
         public String solver = "Z3";
 

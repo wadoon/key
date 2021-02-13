@@ -46,6 +46,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
@@ -94,7 +95,7 @@ public class HeatmapOptionsDialog extends JDialog {
         "terms_newest" };
 
     /** Button names */
-    private static final String[] BUTTON_NAMES = { "No Heatmaps", "Sequent formulae up to age",
+    private static final String[] BUTTON_NAMES = { "No heatmaps", "Sequent formulae up to age",
         "Newest sequent formulae", "Terms up to age", "Newest terms" };
 
     /** Descriptions for heatmap options */
@@ -121,8 +122,7 @@ public class HeatmapOptionsDialog extends JDialog {
     private static final int NUMRADIOBUTTONS = 5;
 
     /** question mark icon */
-    private static final Icon HELPICON = IconFactory
-        .scaleIcon(IconFactory.getImage("images/questionIcon.png"), 20, 20);
+    private static final Icon HELPICON = IconFactory.HELP.get(20);
 
     /**
      * Opens a dialog for choosing if and how to display heatmap highlighting.
@@ -294,7 +294,7 @@ public class HeatmapOptionsDialog extends JDialog {
      * @param radioButtons
      *            the radio buttons shown on the panel
      * @param bg
-     *            the backgropund color
+     *            the background color
      * @return a panel with all the radio buttons and explanations
      */
     private JPanel setupRadioPanel(JRadioButton[] radioButtons, Color bg, JDialog parent) {
@@ -303,7 +303,7 @@ public class HeatmapOptionsDialog extends JDialog {
         for (int i = 0; i < NUMRADIOBUTTONS; i++) {
             JPanel p = new JPanel();
             p.setLayout(new BorderLayout());
-            JLabel dis = new JLabel("Disable Heatmaps");
+            JLabel dis = new JLabel("Disable heatmaps");
             dis.setAlignmentX(.5f);
             JLabel sf = new JLabel("Highlight sequent formulae");
             sf.setAlignmentX(.5f);

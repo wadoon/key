@@ -226,7 +226,13 @@ lexer grammar KeYLexer;
 
         // Keywords for varcond and related stuff
 	SAME_OBSERVER : '\\sameObserver';
+    STORE_STMT_IN : '\\storeStmtIn' ;
+    STORE_TERM_IN : '\\storeTermIn' ;
 	VARCOND : '\\varcond';
+	HAS_INVARIANT : '\\hasInvariant';
+	GET_INVARIANT : '\\getInvariant';
+	GET_FREE_INVARIANT : '\\getFreeInvariant';
+	GET_VARIANT : '\\getVariant';
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
         DEPENDINGON : '\\dependingOn';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
@@ -240,6 +246,7 @@ lexer grammar KeYLexer;
 	FINAL : '\\final';
 	ELEMSORT : '\\elemSort';
 	HASLABEL : '\\hasLabel';
+	IS_LABELED : '\\isLabeled';
 	HASSUBFORMULAS : '\\hasSubFormulas';
 	ISARRAY:'\\isArray';
 	ISARRAYLENGTH:'\\isArrayLength';
@@ -267,6 +274,7 @@ lexer grammar KeYLexer;
 	SAME : '\\same';
 	STATIC : '\\static';
         STATICMETHODREFERENCE : '\\staticMethodReference';
+        MAXEXPANDMETHOD : '\\mayExpandMethod';
 	STRICT    : '\\strict';
 	TYPEOF : '\\typeof';
 	INSTANTIATE_GENERIC : '\\instantiateGeneric';
@@ -458,7 +466,7 @@ NOT_EQUALS
 	;
 
 SEQARROW
-:	'==>'
+:	'==>' | '\u27F9'
 	;
 
 EXP
@@ -617,27 +625,25 @@ ML_COMMENT
 	}
 	;
 
-// A single Digit that is followed by a ( is an ident, otherwise it's a number
+// This is used by floats, doubles and reals with different suffixes
+fragment RATIONAL_LITERAL
+:   ( DIGIT* '.' DIGIT+ | DIGIT+ '.'? )
+    (('e'|'E')('+'|'-')? DIGIT+)?
+    ;
 
-/*FLOAT_DISPATCH
-:
-    FLOAT_LITERAL {$type = FLOAT_LITERAL;}
-  | DOUBLE_LITERAL {$type = DOUBLE_LITERAL;}
-;*/
-
-//fragment
 FLOAT_LITERAL
 :
-    (DIGIT)+ '.' (DIGIT)+ 'f'
-;
+    RATIONAL_LITERAL ('f'|'F');
 
-//fragment
 DOUBLE_LITERAL
 :
-    (DIGIT)+ '.' (DIGIT)+
-    | '0' 'x' (DIGIT)+ 'p' (MINUS)? (DIGIT)+
-;
+    RATIONAL_LITERAL ('d'|'D');
 
+// discontinued syntax. Is this used anywhere?
+//   | '0' 'x' (DIGIT)+ 'p' (MINUS)? (DIGIT)+
+
+
+// A single Digit that is followed by a ( is an ident, otherwise it's a number
 DIGIT_DISPATCH
 :
     (DIGIT (' ' | '\t' | '\r' | '\n')* LPAREN) => DIGIT {$type = IDENT;}

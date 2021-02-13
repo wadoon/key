@@ -3,6 +3,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.BooleanLDT;
@@ -13,6 +14,12 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
+/**
+ * This SMT translation handler takes care of
+ * the builtin Boolean connectives.
+ *
+ * @author Jonas Schiffl
+ */
 public class BooleanConnectiveHandler implements SMTHandler {
 
     private final Map<Operator, String> supportedOperators = new HashMap<>();
@@ -27,18 +34,21 @@ public class BooleanConnectiveHandler implements SMTHandler {
     }
 
     @Override
-    public void init(Services services) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         BooleanLDT ldt = services.getTypeConverter().getBooleanLDT();
         Operator logicFalse = ldt.getFalseConst();
         supportedOperators.put(logicFalse, "false");
 
         Operator logicTrue = ldt.getTrueConst();
         supportedOperators.put(logicTrue, "true");
+
+        masterHandler.addDeclaration(new VerbatimSMT(handlerSnippets.getProperty("bool.decls")));
+        masterHandler.addAxiom(new VerbatimSMT(handlerSnippets.getProperty("bool.axioms")));
+        masterHandler.addKnownSymbol("sort_boolean");
     }
 
     @Override
-    public boolean canHandle(Term term) {
-        Operator op = term.op();
+    public boolean canHandle(Operator op) {
         return supportedOperators.containsKey(op);
     }
 

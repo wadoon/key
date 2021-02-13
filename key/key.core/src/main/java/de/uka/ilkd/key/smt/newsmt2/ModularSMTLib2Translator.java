@@ -6,88 +6,44 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.smt.IllegalFormulaException;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
-/*
-    This class provides a translation from a KeY sequent to the SMT-LIB 2 language,
-    a common input language for modern SMT solvers. It aims to be modular and therefore
-    easily extendable. Special handlers are used for different terms. New handlers need
-    to be registered in the file "de.uka.ilkd.key.smt.newsmt2.SMTHandler" in the
-    /key/key.core/src/main/resources/META-INF/services/ directory.
+/**
+ * This class provides a translation from a KeY sequent to the SMT-LIB 2 language, a common input
+ * language for modern SMT solvers.
+ *
+ * It aims to be modular and therefore easily extendable. Special handlers are used for different
+ * terms. New handlers need to be registered in the file "de.uka.ilkd.key.smt.newsmt2.SMTHandler" in
+ * the /key/key.core/src/main/resources/META-INF/services/ directory.
+ *
+ * @author Jonas Schiffl
+ * @author Mattias Ulbrich
  */
-
 public class ModularSMTLib2Translator implements SMTTranslator {
 
-    static final String SORT_PREFIX = "sort_";
-
-    private List<Throwable> exceptions = Collections.emptyList();
-
-    private List<Throwable> tacletExceptions = Collections.emptyList();
-
-    // REVIEW MU: Eventually switch to StringBuilder which is faster
     @Override
-    public StringBuffer translateProblem(Term problem, Services services, SMTSettings settings) {
+    public CharSequence translateProblem(Sequent sequent, Services services, SMTSettings settings) {
 
         MasterHandler master;
         try {
             master = new MasterHandler(services);
         } catch (IOException ex) {
-            exceptions = Collections.singletonList(ex);
-            // Review MU: This should not be reported as exceptions only ...
-            return new StringBuffer("error while translating");
+            throw new RuntimeException(ex);
         }
 
-        List<Term> sequentAsserts = smashProblem(problem, services);
-        List<SExpr> results = new LinkedList<>();
-        for (Term t : sequentAsserts) {
-            results.add(master.translate(t, Type.BOOL));
-        }
+        List<Term> sequentAsserts = getTermsFromSequent(sequent, services);
+        List<SExpr> sequentSMTAsserts = makeSMTAsserts(master, sequentAsserts);
 
-//        SExpr result = master.translate(problem, Type.BOOL);
-        exceptions = master.getExceptions();
-
-//        postProcess(result);
-
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append("; --- Preamble");
-        for (Writable w : master.getOptions()) {
-            w.appendTo(sb);
-        }
+        sb.append(SMTHandlerServices.getInstance().getPreamble());
 
-        sb.append("; --- Declarations");
-
-        if (problem.arity() != 0) {
-            master.addSort(Sort.ANY);
-            addAllSorts(problem, master);
-        }
-
-        List<SExpr> sortExprs = new LinkedList<>();
-        for (Sort s : master.getSorts()) {
-            if (s != Sort.ANY && !(TypeManager.isSpecialSort(s))) {
-                master.addDeclaration(new SExpr("declare-const", SExpr.sortExpr(s).toString(), "T"));
-            }
-            sortExprs.add(SExpr.sortExpr(s));
-        }
-        if (master.getSorts().size() > 1) {
-            master.addDeclaration(new SExpr("assert", Type.BOOL,
-                    new SExpr("distinct", Type.BOOL, sortExprs)));
-        }
-        sb.append("\n");
-
-        // TODO js: this setting has a different meaning in the old translation. Review when reviewing settings in general
-        if (services.getProof().getSettings().getSMTSettings().useExplicitTypeHierarchy) {
-            TypeManager tm = new TypeManager();
-            tm.createSortTypeHierarchy(master);
-        }
-
+        sb.append("; --- Declarations\n");
+        extractSortDeclarations(sequent, services, master, sequentAsserts);
         for (Writable decl : master.getDeclarations()) {
             decl.appendTo(sb);
             sb.append("\n");
@@ -100,7 +56,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
 
         sb.append("\n; --- Sequent\n");
-        for (SExpr ass : results) {
+        for (SExpr ass : sequentSMTAsserts) {
             SExpr assertion = new SExpr("assert", ass);
             assertion.appendTo(sb);
             sb.append("\n");
@@ -108,28 +64,53 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         sb.append("\n(check-sat)");
 
+        if(!master.getUnknownValues().isEmpty()) {
+            sb.append("\n\n; --- Translation of unknown values\n");
+            for (Term t : master.getUnknownValues().keySet()) {
+                sb.append("; " + master.getUnknownValues().get(t).toString() + " :  " + t.toString() + "\n");
+            }
+        }
 
         // any exceptions?
+        List<Throwable> exceptions = master.getExceptions();
         for (Throwable t : exceptions) {
-            sb.append("\n" + "; " + t.toString());
+            sb.append("\n; " + t.toString().replace("\n", "\n;"));
+            t.printStackTrace();
+        }
+
+        // TODO Find a concept for exceptions here
+        if(!exceptions.isEmpty()) {
+            System.err.println("Exception while translating:");
+            System.err.println(sb);
+            throw new RuntimeException(exceptions.get(0));
         }
 
         return sb;
     }
 
-    /**
-     * Adds all sorts contained in the given problem to the master handler.
-     *
-     * @param problem the given problem
-     * @param master  the master handler of the problem
+    /*
+     * precompute the information on the required sources from the translation.
      */
-    private void addAllSorts(Term problem, MasterHandler master) {
-        Sort s = problem.sort();
-        master.addSort(s);
-        for (Term t : problem.subs()) {
-            addAllSorts(t, master);
-        }
+    private void extractSortDeclarations(Sequent sequent, Services services, MasterHandler master, List<Term> sequentAsserts) {
+        TypeManager tm = new TypeManager(services);
+        tm.handle(master);
     }
+
+    /*
+     * extract a sequent into an SMT collection.
+     *
+     * The translation adds elements to the lists in the master handler
+     * on the way.
+     */
+    private List<SExpr> makeSMTAsserts(MasterHandler master, List<Term> sequentAsserts) {
+        List<SExpr> sequentSMTAsserts = new LinkedList<>();
+        for (Term t : sequentAsserts) {
+            sequentSMTAsserts.add(master.translate(t, Type.BOOL));
+        }
+        return sequentSMTAsserts;
+    }
+
+
 
     private static String readResource(String s) {
         BufferedReader r = new BufferedReader(
@@ -149,44 +130,39 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
     }
 
-    //just testing: break the top-level seq formula into single assertions
-    private List<Term> smashProblem(Term problem, Services s) {
-        TermBuilder tb = s.getTermBuilder();
+    /*
+     * Turn a sequent to a collection of formulas. Antecedent positive, succedent negated.
+     */
+    private List<Term> getTermsFromSequent(Sequent seq, Services serv) {
+        TermBuilder tb = serv.getTermBuilder();
         List<Term> res = new LinkedList<>();
-        if (problem.op() == Junctor.IMP) {
-            Term left = problem.sub(0);
-            Term right = problem.sub(1);
-            while (left.op() == Junctor.AND) {
-                res.add(left.sub(1));
-                left = left.sub(0);
-            }
-            res.add(left);
-            while (right.op() == Junctor.OR) {
-                res.add(tb.not(right.sub(1)));
-                right = right.sub(0);
-            }
-            res.add(tb.not(right));
-        } else { //TODO js make sure this includes all cases
-            res.add(tb.not(problem));
+        for (SequentFormula sf : seq.antecedent()) {
+            res.add(sf.formula());
+        }
+        for (SequentFormula sf : seq.succedent()) {
+            res.add(tb.not(sf.formula()));
         }
         return res;
     }
 
-    private void postProcess(SExpr result) {
-        // TODO: remove (u2i (i2u x)) --->  x
-    }
+    /**
+     * remove obvious identities from SMT code.
+     *
+     * @param result, a non-null SExpr
+     * @return an equivalent smt code with some simplifications
+     */
+    private SExpr postProcess(SExpr result) {
+        // remove (u2i (i2u x)) --->  x
+        if(result.getName().equals("u2i") && result.getChildren().get(0).getName().equals("i2u")) {
+            return postProcess(result.getChildren().get(0).getChildren().get(0));
+        }
 
+        // remove (u2b (b2u x)) --->  x
+        if(result.getName().equals("u2b") && result.getChildren().get(0).getName().equals("b2u")) {
+            return postProcess(result.getChildren().get(0).getChildren().get(0));
+        }
 
-    @Override
-    public Collection<Throwable> getExceptionsOfTacletTranslation() {
-        return tacletExceptions;
-    }
-
-
-    @Override
-    public ArrayList<StringBuffer> translateTaclets(Services services, SMTSettings settings) throws IllegalFormulaException {
-        // not yet implemented. maybe adapt the existing method from abstractsmttranslator
-        return null;
+        return result.map(this::postProcess);
     }
 
 }

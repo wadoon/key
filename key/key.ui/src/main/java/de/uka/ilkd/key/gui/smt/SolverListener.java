@@ -34,6 +34,7 @@ import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
@@ -68,8 +69,14 @@ public class SolverListener implements SolverLauncherListener {
         private Timer timer = new Timer();
         private final SMTSettings settings;
         private final Proof smtProof;
-        private final static Color RED = new Color(180, 43, 43);
-        private final static Color GREEN = new Color(43, 180, 43);
+        private final static ColorSettings.ColorProperty RED =
+                ColorSettings.define("[solverListener]red", "",
+                new Color(180, 43, 43));
+
+        private final static ColorSettings.ColorProperty GREEN =
+                ColorSettings.define("[solverListener]green", "",
+                        new Color(43, 180, 43));
+
         private static int FILE_ID = 0;
 
         private static final int RESOLUTION = 1000;
@@ -316,7 +323,7 @@ public class SolverListener implements SolverLauncherListener {
                         i++;
                 }
 
-                boolean problemContainsUpdOrDL = false;
+                boolean problemContainsModalityOrQuery = false;
                 String names[] = new String[smtproblems.size()]; //never read
                 int x = 0,y=0;
                 for (SMTProblem problem : smtproblems) {
@@ -328,8 +335,8 @@ public class SolverListener implements SolverLauncherListener {
                         }
                         names[x] = problem.getName();
                         x++;
-                        if (containsModalityOrQueryOrUpdate(problem.getTerm())) {
-                            problemContainsUpdOrDL = true;
+                        if (containsModalityOrQuery(problem.getTerm())) {
+                            problemContainsModalityOrQuery = true;
                         }
                 }
 
@@ -348,8 +355,8 @@ public class SolverListener implements SolverLauncherListener {
                 	}
                 }
 
-                if (problemContainsUpdOrDL) {
-                    progressDialog.addInformation("One or more proof goals contain heap updates, method calls," +
+                if (problemContainsModalityOrQuery) {
+                    progressDialog.addInformation("One or more proof goals contain method calls" +
                             " and/or modalities. The SMT translation of these will be incomplete," +
                                     " and the result will likely be unhelpful.",
                             new Color(200,150,0), null);
@@ -510,7 +517,7 @@ public class SolverListener implements SolverLauncherListener {
                 switch (reason) {
                 case Exception:
                         progressModel.setProgress(0,x,y);
-                        progressModel.setTextColor(RED,x,y);
+                        progressModel.setTextColor(RED.get(),x,y);
                         progressModel.setText("Exception!",x,y);
                
             
@@ -535,13 +542,12 @@ public class SolverListener implements SolverLauncherListener {
                 String timeInfo = " (" + problem.getTimeInSecAsString() + ")";
 
                 progressModel.setProgress(0,x,y);
-                progressModel.setTextColor(GREEN,x,y);
+                progressModel.setTextColor(GREEN.get(),x,y);
                 if(problem.solver.getType()==SolverType.Z3_CE_SOLVER){
                 	progressModel.setText("No Counterexample.",x,y);
         		}
                 else{
                 	progressModel.setText("Valid" + timeInfo ,x,y);
-
                 }
 
 
@@ -551,13 +557,13 @@ public class SolverListener implements SolverLauncherListener {
                 String timeInfo = " (" + problem.getTimeInSecAsString() + ")";
             if(problem.solver.getType()==SolverType.Z3_CE_SOLVER){
                 progressModel.setProgress(0,x,y);
-                progressModel.setTextColor(RED,x,y);
+                progressModel.setTextColor(RED.get(),x,y);
                 progressModel.setText("Counter Example" + timeInfo,x,y);
             } else {
                 progressModel.setProgress(0, x, y);
                 Color c = new Color(200, 150, 0);
                 progressModel.setTextColor(c, x, y);
-                progressModel.setText("Counter Example" + timeInfo, x, y);
+                progressModel.setText("Possible Counter Example" + timeInfo, x, y);
             }
         }
 
@@ -737,10 +743,10 @@ public class SolverListener implements SolverLauncherListener {
      * @param term The {@link Term} to check.
      * @return {@code true} contains at least one modality or query, {@code false} contains no modalities and no queries.
      */
-    public static boolean containsModalityOrQueryOrUpdate(Term term) {
+    public static boolean containsModalityOrQuery(Term term) {
         ContainsModalityOrQueryVisitor visitor = new ContainsModalityOrQueryVisitor();
         term.execPostOrder(visitor);
-        return visitor.isContainsModQueryOrUpd();
+        return visitor.containsModOrQuery();
     }
 
     /**
@@ -752,7 +758,7 @@ public class SolverListener implements SolverLauncherListener {
         /**
          * The result.
          */
-        boolean containsModQueryOrUpd = false;
+        boolean containsModQuery = false;
 
         /**
          * {@inheritDoc}
@@ -760,12 +766,8 @@ public class SolverListener implements SolverLauncherListener {
         @Override
         public void visit(Term visited) {
             if (visited.op() instanceof Modality
-                || visited.op() instanceof IProgramMethod
-                || visited.op() instanceof ElementaryUpdate
-                || visited.op() instanceof UpdateJunctor
-                || visited.op() instanceof UpdateSV
-                || visited.op() instanceof UpdateApplication) {
-                containsModQueryOrUpd = true;
+                || visited.op() instanceof IProgramMethod) {
+                containsModQuery = true;
             }
         }
 
@@ -774,8 +776,8 @@ public class SolverListener implements SolverLauncherListener {
          * @return {@code true} contains at least one modality, query, or update; {@code false} contains no modalities,
          * no queries, and no updates.
          */
-        public boolean isContainsModQueryOrUpd() {
-            return containsModQueryOrUpd;
+        public boolean containsModOrQuery() {
+            return containsModQuery;
         }
     }
 

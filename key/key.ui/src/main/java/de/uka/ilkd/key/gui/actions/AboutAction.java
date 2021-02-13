@@ -18,7 +18,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.UnicodeHelper;
@@ -43,14 +43,23 @@ public class AboutAction extends MainWindowAction {
     }
 
     public void showAbout() {
-	JOptionPane pane = new JOptionPane(
-	        KeYConstants.COPYRIGHT.replace("and", "\n"+UnicodeHelper.emSpaces(8)+"and")
-	        + "\n\nWWW: http://key-project.org/"
-	        + "\n\nVersion " + KeYConstants.VERSION
-	                , JOptionPane.INFORMATION_MESSAGE,
-	        JOptionPane.DEFAULT_OPTION, IconFactory.key22Logo(108, 68));
-	JDialog dialog = pane.createDialog(mainWindow, "The KeY Project");
-	dialog.setVisible(true);
+
+    	JOptionPane.showMessageDialog(mainWindow, new Object[] {
+				IconFactory.keyVersionLogo(),
+				KeYConstants.COPYRIGHT.replace("and", "\n"+UnicodeHelper.emSpaces(8)+"and")
+						+ "\n\nWWW: http://key-project.org/"
+						+ "\n\nVersion " + KeYConstants.VERSION},
+				"The KeY Project",
+				JOptionPane.INFORMATION_MESSAGE);
+
+//	JOptionPane pane = new JOptionPane(
+//	        KeYConstants.COPYRIGHT.replace("and", "\n"+UnicodeHelper.emSpaces(8)+"and")
+//	        + "\n\nWWW: http://key-project.org/"
+//	        + "\n\nVersion " + KeYConstants.VERSION
+//	                , JOptionPane.INFORMATION_MESSAGE,
+//	        JOptionPane.DEFAULT_OPTION, IconFactory.keyVersionLogo(108, 68));
+//	JDialog dialog = pane.createDialog(mainWindow, "The KeY Project");
+//	dialog.setVisible(true);
     }
 
 }

@@ -1,3 +1,10 @@
+
+# Notes on the transition of floats to the master branch.
+
+* Make mathsat an extension point?
+* Check NumberTranslation
+* SMTSOlverImplementation
+
 # Notes on  verification of floating-point programs in KeY
 
 In order to analyze programs containing basic floating-point arithmetic: 

@@ -1,93 +1,128 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
-import java.net.URL;
+import java.lang.invoke.CallSite;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+import de.uka.ilkd.key.smt.newsmt2.SMTHandler.Capability;
 
 public class MasterHandler {
 
-    /** Services for smt settings */
-    private Services services;
+    /** the services object associated with this particular translation */
+    private final Services services;
 
     /** Exceptions that occur during translation */
-    private List<Throwable> exceptions = new ArrayList<>();
+    private final List<Throwable> exceptions = new ArrayList<>();
 
     /** The different handlers */
-    private List<SMTHandler> handlers = new ArrayList<>();
+    private final List<SMTHandler> handlers;
 
-    /** All declarations */
-    private List<Writable> declarations = new ArrayList<>();
+    /** All declarations (declare-fun ...), (declare-const ...) */
+    private final List<Writable> declarations = new ArrayList<>();
 
-    /** All axioms */
-    private List<Writable> axioms = new ArrayList<>();
-
-    /** All options */
-    private List<Writable> options = new ArrayList<>();
+    /** All axioms (assert ...)*/
+    private final List<Writable> axioms = new ArrayList<>();
 
     /** A list of known symbols */
-    private Set<String> knownSymbols  = new HashSet<>();
+    private final Set<String> knownSymbols = new HashSet<>();
 
-    /** Properties files */
-    private Properties snippets = new Properties();
+    /** A list of untranslatable values*/
+    private final Map<Term, SExpr> unknownValues = new HashMap<>();
 
-    /** A set of sorts occurring in a problem */
-    private HashSet<Sort> sorts = new HashSet<>();
+    /** The collected set of sorts occurring in the problem */
+    private final Set<Sort> sorts = new HashSet<>();
 
-    /** Global state, i.e. a counter for the number of distinct field variables */
-    private Map<String, Object> translationState = new HashMap<>();
+    /** Global state, e.g., a counter for the number of distinct field variables
+     * Handlers can make use of this to store translation-specific data.
+     */
+    private final Map<String, Object> translationState = new HashMap<>();
+
+    /**
+     * A map from a logic operator to the handler which can work on it.
+     * If a handler is in this map, it has promised to deal with all terms
+     * with the operator as toplevel operator.
+     */
+    private final Map<Operator, SMTHandler> handlerMap = new IdentityHashMap<>();
+
+    public void addDeclarationsAndAxioms(Properties snippets) {
+        String decls = snippets.getProperty("decls");
+        if (decls != null) {
+            addDeclaration(new VerbatimSMT(decls));
+        }
+
+        String axioms = snippets.getProperty("axioms");
+        if (axioms != null) {
+            addAxiom(new VerbatimSMT(axioms));
+        }
+
+        for (Entry<Object, Object> en : snippets.entrySet()) {
+            String key = (String) en.getKey();
+            if(key.endsWith(".decls") || key.endsWith(".axioms")) {
+                translationState.put(key, en.getValue());
+            }
+        }
+    }
+
+    @FunctionalInterface
+    public interface SymbolIntroducer {
+        void introduce(MasterHandler masterHandler, String name) throws SMTTranslationException;
+    }
 
     public MasterHandler(Services services) throws IOException {
         this.services = services;
-
-        for (SMTHandler smtHandler : ServiceLoader.load(SMTHandler.class)) {
-            smtHandler.init(services);
-            URL snippetResources = smtHandler.getSnippetResource();
-            if(snippetResources != null) {
-                try {
-                    snippets.loadFromXML(snippetResources.openStream());
-                } catch (IOException e) {
-                    throw new IOException("Error while reading snippet resource " + snippetResources, e);
-                }
-            }
-            handlers.add(smtHandler);
-        }
-        snippets.loadFromXML(getClass().getResourceAsStream("preamble.xml"));
-
-        if (snippets.containsKey("opts")) {
-            VerbatimSMT opts = new VerbatimSMT(snippets.getProperty("opts"));
-            addOption(opts);
-        }
-        //TODO js,mu: which of these are strictly always necessary, which can be loaded on demand?
-        addFromSnippets("general");
-        addFromSnippets("bool");
-        addFromSnippets("int");
-        addFromSnippets("instanceof");
-        addFromSnippets("types");
-        addFromSnippets("null");
+        handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, this);
     }
 
+    /**
+     * Translate a single term to an SMTLib S-Expression.
+     *
+     * This method may modify the state of the handler (by adding symbols e.g.).
+     *
+     * It tries to find a {@link SMTHandler} that can deal with the argument
+     * and delegates to that.
+     *
+     * A default translation is triggered if no handler can be found.
+     *
+     * @param problem the non-null term to translate
+     * @return the S-Expression representing the translation
+     */
     public SExpr translate(Term problem) {
+
         try {
+            SMTHandler cached = handlerMap.get(problem.op());
+            if (cached != null) {
+                // There is a handler that promised to handle this operator ...
+                return cached.handle(this, problem);
+            }
+
             for (SMTHandler smtHandler : handlers) {
-                if(smtHandler.canHandle(problem)) {
-                    return smtHandler.handle(this, problem);
+                Capability response = smtHandler.canHandle(problem);
+                switch(response) {
+                    case YES_THIS_INSTANCE:
+                        // handle this but do not cache.
+                        return smtHandler.handle(this, problem);
+                    case YES_THIS_OPERATOR:
+                        // handle it and cache it for future instances of the op.
+                        handlerMap.put(problem.op(), smtHandler);
+                        return smtHandler.handle(this, problem);
                 }
             }
+
             return handleAsUnknownValue(problem);
         } catch(Exception ex) {
             exceptions.add(ex);
@@ -95,13 +130,32 @@ public class MasterHandler {
         }
     }
 
+    /**
+     * Translate a single term to an SMTLib S-Expression.
+     *
+     * The result is ensured to have the SExpr-Type given as argument.
+     * If the type coercion fails, then the translation falls back to
+     * translating the argument as an unknown function.
+     *
+     * This method may modify the state of the handler (by adding symbols e.g.).
+     *
+     * It tries to find a {@link SMTHandler} that can deal with the argument
+     * and delegates to that.
+     *
+     * A default translation is triggered if no handler can be found.
+     *
+     * @param problem the non-null term to translate
+     * @return the S-Expression representing the translation
+     */
     public SExpr translate(Term problem, Type type)  {
         try {
-            return coerce(translate(problem), type);
+            return SExprs.coerce(translate(problem), type);
         }  catch(Exception ex) {
+            // Fall back to an unknown value despite the exception.
+            // The result will still be valid SMT code then.
             exceptions.add(ex);
             try {
-                return coerce(handleAsUnknownValue(problem), type);
+                return SExprs.coerce(handleAsUnknownValue(problem), type);
             } catch (SMTTranslationException e) {
                 // This can actually never happen since a universe element is translated
                 throw new Error(e);
@@ -115,32 +169,60 @@ public class MasterHandler {
      * @return a generic translation as unknown value
      */
     private SExpr handleAsUnknownValue(Term problem) {
-        String pr = "KeY_"+problem.toString();
-        if(!isKnownSymbol(pr)) {
-            addKnownSymbol(pr);
-            addDeclaration(new SExpr("declare-const", pr, "U"));
+        if (unknownValues.containsKey(problem)) {
+            return unknownValues.get(problem);
         }
-        return new SExpr(pr, Type.UNIVERSE);
+        int number = unknownValues.size();
+        SExpr abbr = new SExpr("unknown_" + number, Type.UNIVERSE);
+        SExpr e = new SExpr("declare-const", Type.UNIVERSE, abbr.toString(), "U");
+        addAxiom(e);
+        unknownValues.put(problem, abbr);
+        return abbr;
     }
 
     /**
      * Treats the given term as a function call.
+     *
+     * This means that an expression of the form
+     * <pre>
+     *     (functionName t1 ... tn)
+     * </pre>
+     * is returned where t1, ..., tn are the smt-translations of the subterms of
+     * term.
+     *
      * @param functionName the name of the function
      * @param term the term to be translated
      * @return an expression with the name functionName and subterms as children
      */
     SExpr handleAsFunctionCall(String functionName, Term term) {
-        addFromSnippets(functionName);
+        return handleAsFunctionCall(functionName, Type.UNIVERSE, term);
+    }
+
+    /**
+     * Treats the given term as a function call.
+     *
+     * This means that an expression of the form
+     * <pre>
+     *     (functionName t1 ... tn)
+     * </pre>
+     * is returned where t1, ..., tn are the smt-translations of the subterms of
+     * term.
+     *
+     * @param functionName the name of the function
+     * @param term the term to be translated
+     * @return an expression with the name functionName and subterms as children
+     */
+    SExpr handleAsFunctionCall(String functionName, Type type, Term term) {
         List<SExpr> children = new ArrayList<>();
         for (int i = 0; i < term.arity(); i++) {
             children.add(translate(term.sub(i), Type.UNIVERSE));
         }
-        return new SExpr(functionName, Type.UNIVERSE, children);
+        return new SExpr(functionName, type, children);
     }
 
     /**
      * Decides whether a symbol is already known to the master handler.
-     * @param pr the string to test
+     * @param pr the SMT symbol name to test
      * @return true iff the name is already known
      */
     boolean isKnownSymbol(String pr) {
@@ -148,6 +230,7 @@ public class MasterHandler {
     }
 
     void addKnownSymbol(String symbol) {
+        assert !knownSymbols.contains(symbol) : symbol + " already known";
         knownSymbols.add(symbol);
     }
 
@@ -156,80 +239,7 @@ public class MasterHandler {
     }
 
     public List<SExpr> translate(Iterable<Term> terms, Type type) throws SMTTranslationException {
-        return coerce(translate(terms), type);
-    }
-
-    private List<SExpr> coerce(List<SExpr> exprs, Type type) throws SMTTranslationException {
-        ListIterator<SExpr> it = exprs.listIterator();
-        while(it.hasNext()) {
-            it.set(coerce(it.next(), type));
-        }
-        return exprs;
-    }
-
-    /**
-     * Takes an SExpression and converts it to the given type, if possible.
-     * @param exp the SExpression to convert
-     * @param type the desired type
-     * @return The same SExpr, but with the desired type
-     * @throws SMTTranslationException if an impossible conversion is attempted
-     */
-    SExpr coerce(SExpr exp, Type type) throws SMTTranslationException {
-        switch(type) {
-        case BOOL:
-            switch(exp.getType()) {
-            case BOOL:
-                return exp;
-            case UNIVERSE:
-                return new SExpr("u2b", Type.BOOL, exp);
-            default:
-                throw new SMTTranslationException("Cannot convert to bool: " + exp);
-            }
-        case INT:
-            switch(exp.getType()) {
-            case INT:
-                return exp;
-            case UNIVERSE:
-                return new SExpr("u2i", Type.INT, exp);
-            default:
-                throw new SMTTranslationException("Cannot convert to int: " + exp);
-            }
-        case FLOAT:
-            switch(exp.getType()) {
-                case FLOAT:
-                    return exp;
-                case UNIVERSE:
-                    return new SExpr("u2f", Type.FLOAT, exp);
-                default:
-                    throw new SMTTranslationException("Cannot convert to float: " + exp);
-            }
-        case DOUBLE:
-            switch(exp.getType()) {
-                case DOUBLE:
-                    return exp;
-                case UNIVERSE:
-                    return new SExpr("u2d", Type.FLOAT, exp);
-                default:
-                    throw new SMTTranslationException("Cannot convert to double: " + exp);
-            }
-        case UNIVERSE:
-            switch(exp.getType()) {
-            case UNIVERSE:
-                return exp;
-            case INT:
-                return new SExpr("i2u", Type.UNIVERSE, exp);
-            case BOOL:
-                return new SExpr("b2u", Type.UNIVERSE, exp);
-            case FLOAT:
-                return new SExpr("f2u", Type.UNIVERSE, exp);
-            case DOUBLE:
-                return new SExpr("d2u", Type.UNIVERSE, exp);
-            default:
-                throw new SMTTranslationException("Cannot convert to universe: " + exp);
-            }
-        default:
-            throw new SMTTranslationException("Cannot convert into " + type);
-        }
+        return SExprs.coerce(translate(terms), type);
     }
 
     public List<SExpr> translate(Iterable<Term> terms) {
@@ -260,29 +270,46 @@ public class MasterHandler {
         sorts.add(s);
     }
 
-    public HashSet<Sort> getSorts() {
+    public Set<Sort> getSorts() {
         return sorts;
     }
 
-    public List<Writable> getOptions() {
-        return options;
+    public Map<Term, SExpr> getUnknownValues() {
+        return unknownValues;
     }
 
-    public void addOption(Writable w) {
-        options.add(w);
-    }
-
-    void addFromSnippets(String functionName) {
+    void introduceSymbol(String functionName) throws SMTTranslationException {
         if (isKnownSymbol(functionName)) {
             return;
         }
 
-        if (snippets.containsKey(functionName + ".decls")) {
-            VerbatimSMT decl = new VerbatimSMT(snippets.getProperty(functionName + ".decls"));
+        if (translationState.containsKey(functionName + ".intro")) {
+            SymbolIntroducer introducer =
+                    (SymbolIntroducer) translationState.get(functionName + ".intro");
+            introducer.introduce(this, functionName);
+        }
+
+        // Handle it locally.
+        // mark it known to avoid cyclic inclusion (if not already registered)
+        if(!isKnownSymbol(functionName)) {
+            addKnownSymbol(functionName);
+        }
+
+        if (translationState.containsKey(functionName + ".decls")) {
+            String decls = (String) translationState.get(functionName + ".decls");
+            VerbatimSMT decl = new VerbatimSMT(decls);
             addDeclaration(decl);
         }
 
         //TODO js since many axioms are all-quantified, this is a cheap way to disable quantifiers
+        // TODO Refactor this!!!
+
+        if (translationState.containsKey(functionName + ".axioms")) {
+            String axioms = (String) translationState.get(functionName + ".axioms");
+            VerbatimSMT ax = new VerbatimSMT(axioms);
+            addAxiom(ax);
+        }
+        /*
         if (services.getProof().getSettings().getSMTSettings().enableQuantifiers) {
             if (functionName == "float" ) {
                 VerbatimSMT ax = new VerbatimSMT(snippets.getProperty(functionName + ".axioms"));
@@ -292,16 +319,27 @@ public class MasterHandler {
                 addAxiom(ax);
             }
         }
+*/
 
-        addKnownSymbol(functionName);
-
-        String[] deps = snippets.getProperty(functionName + ".deps", "").trim().split(", *");
-        for (String dep : deps) {
-            addFromSnippets(dep);
+        if (translationState.containsKey(functionName + ".deps")) {
+            String entry = (String) translationState.get(functionName + ".deps");
+            String[] deps = entry.trim().split(", *");
+            for (String dep : deps) {
+                introduceSymbol(dep);
+            }
         }
+
     }
 
     Map<String, Object> getTranslationState() {
         return translationState;
+    }
+
+    /**
+     * @deprecated Use SExprs.coerce
+     */
+    @Deprecated
+    public SExpr coerce(SExpr sExpr, Type type) throws SMTTranslationException {
+        return SExprs.coerce(sExpr, type);
     }
 }

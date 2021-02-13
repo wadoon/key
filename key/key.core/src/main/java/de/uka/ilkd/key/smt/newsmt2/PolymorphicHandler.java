@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.List;
+import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -13,13 +14,13 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 public class PolymorphicHandler implements SMTHandler {
 
     @Override
-    public void init(Services services) {
+    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets) {
         // nothing to be done
+        // there are also no snippets.
     }
 
     @Override
-    public boolean canHandle(Term term) {
-        Operator op = term.op();
+    public boolean canHandle(Operator op) {
         return op == Equality.EQUALS || op == IfThenElse.IF_THEN_ELSE;
     }
 
@@ -28,16 +29,16 @@ public class PolymorphicHandler implements SMTHandler {
         Operator op = term.op();
         if(op == Equality.EQUALS) {
             List<SExpr> children = trans.translate(term.subs());
-            children.set(0, trans.coerce(children.get(0), Type.UNIVERSE));
-            children.set(1, trans.coerce(children.get(1), Type.UNIVERSE));
+            children.set(0, SExprs.coerce(children.get(0), Type.UNIVERSE));
+            children.set(1, SExprs.coerce(children.get(1), Type.UNIVERSE));
             return new SExpr("=", Type.BOOL, children);
         }
 
         if(op == IfThenElse.IF_THEN_ELSE) {
             List<SExpr> children = trans.translate(term.subs());
-            children.set(0, trans.coerce(children.get(0), Type.BOOL));
-            children.set(1, trans.coerce(children.get(1), Type.UNIVERSE));
-            children.set(2, trans.coerce(children.get(2), Type.UNIVERSE));
+            children.set(0, SExprs.coerce(children.get(0), Type.BOOL));
+            children.set(1, SExprs.coerce(children.get(1), Type.UNIVERSE));
+            children.set(2, SExprs.coerce(children.get(2), Type.UNIVERSE));
             return new SExpr("ite", Type.UNIVERSE, children);
         }
 

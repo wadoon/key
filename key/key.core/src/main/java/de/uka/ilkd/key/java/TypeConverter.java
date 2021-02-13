@@ -468,6 +468,7 @@ public final class TypeConverter {
     }
 
 
+    // TODO Adapt for @Reals
     /**
      * performs binary numeric promotion on the argument types
      */

@@ -132,7 +132,6 @@ public abstract class LDT implements Named {
         Map<Name, LDT> ret = new TreeMap<Name, LDT>();
         
         ret.put(IntegerLDT.NAME, new IntegerLDT(s));
-        ret.put(FloatLDT.NAME, new FloatLDT(s));
         ret.put(BooleanLDT.NAME, new BooleanLDT(s));
         ret.put(LocSetLDT.NAME, new LocSetLDT(s));
         ret.put(HeapLDT.NAME, new HeapLDT(s));

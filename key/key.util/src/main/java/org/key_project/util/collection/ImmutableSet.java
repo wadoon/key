@@ -61,6 +61,14 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     }
 
     /**
+     * Builds a single set with the given obj.
+     */
+    static <T> ImmutableSet<T> singleton(T obj) {
+        ImmutableSet<T> result = DefaultImmutableSet.nil();
+        return result.add(obj);
+    }
+
+    /**
      * @return a {@code Set} containing the same elements as this {@code ImmutableSet}
      */
     Set<T> toSet();
