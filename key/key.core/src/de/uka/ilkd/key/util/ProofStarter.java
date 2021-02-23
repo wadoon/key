@@ -206,7 +206,7 @@ public class ProofStarter {
 
     public void setStrategyProperties(StrategyProperties sp) {
        final Profile profile = proof.getInitConfig().getProfile();
-       StrategyFactory factory = strategy != null ?
+       final StrategyFactory factory = strategy != null ?
                                  profile.getStrategyFactory(strategy.name()) :
                                  profile.getDefaultStrategyFactory();
        setStrategy(factory.create(proof, sp));
@@ -230,7 +230,7 @@ public class ProofStarter {
            
            if (strategy == null) {
               StrategyFactory factory = profile.getDefaultStrategyFactory();
-              StrategyProperties sp = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();;
+              StrategyProperties sp = factory.getSettingsDefinition().getDefaultPropertiesFactory().createDefaultStrategyProperties();
               strategy = factory.create(proof, sp);
            }
 

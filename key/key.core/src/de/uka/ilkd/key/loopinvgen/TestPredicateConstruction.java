@@ -260,7 +260,7 @@ public class TestPredicateConstruction {
 		Term formula;
 
 		try {
-			formula = parse("{i:=0}\\<{" + "			while (i<a.length) {a[i] = a[i+1];" + "			i++;}"
+			formula = parse("{i:=0}\\<{" + "			while (i<a.length-1) {a[i] = a[i+1];" + "			i++;}"
 					+ "		}\\>true");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -273,7 +273,7 @@ public class TestPredicateConstruction {
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
 
-		String[] arrLeft = { "i>=0", "a!=null", "i <= a.length" };
+		String[] arrLeft = { /*"i=0", */"a!=null","a.length=10"};
 		try {
 			for (String fml : arrLeft) {
 				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
@@ -288,7 +288,7 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return;
 		}
-		System.out.println("Seq to find LI " + seq.toString());
+//		System.out.println("Seq to find LI " + seq.toString());
 
 		CurrentLIG cur = new CurrentLIG(services, seq);
 		cur.mainAlg();

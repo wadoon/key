@@ -21,7 +21,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import recoder.service.ConstantEvaluator;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -68,6 +67,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.CharListLDT;
+import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LDT;
@@ -87,6 +87,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
+import recoder.service.ConstantEvaluator;
 
 public final class TypeConverter {
 
@@ -175,6 +176,10 @@ public final class TypeConverter {
     public CharListLDT getCharListLDT() {
 	return (CharListLDT) getLDT(CharListLDT.NAME);
     }
+    
+    public DependenciesLDT getDependenciesLDT() {
+    	return (DependenciesLDT) getLDT(DependenciesLDT.NAME);
+        }
 
     private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {
 

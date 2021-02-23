@@ -3851,6 +3851,7 @@ varexp[TacletBuilder b]
     | varcond_onlyEventUpdates[b]
     | varcond_noEventUpdate[b]
     | varcond_applyEventOnRigid[b]
+    | varcond_noDependenceLDT[b]
   ) 
   | 
   ( (NOT_ {negated = true;} )? 
@@ -4315,6 +4316,18 @@ varcond_applyEventOnRigid [TacletBuilder b]
                                                              (SchemaVariable)x2));
    }
 ;
+
+varcond_noDependenceLDT [TacletBuilder b]
+:
+   NO_DEPENDENCE_LDT
+   LPAREN
+     x = varId
+   RPAREN
+   {
+            b.addVariableCondition(new NoDependenceLDT((SchemaVariable)x));
+   }
+;
+
 
 varcond_label [TacletBuilder b, boolean negated]
 :

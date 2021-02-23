@@ -3,7 +3,7 @@ package de.uka.ilkd.key.loopinvgen.Examples;
 public class arrShift {
 	int a[];
 	int i = 0;
-	int n = a.length;
+//	int n = a.length;
 	/*@
 	 @ public normal_behavior
      @ requires true;

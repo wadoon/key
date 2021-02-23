@@ -3,6 +3,7 @@ package de.uka.ilkd.key.loopinvgen;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer.Formula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -22,6 +23,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -37,59 +39,74 @@ public class CurrentLIG {
 	private Term low, high, index;
 	private Term array;
 	private final RuleApplication ruleApp;
+	private Set<Term> oldCompPred = new HashSet<>();
+	private Set<Term> oldDepPred = new HashSet<>();
+
 	public CurrentLIG(Services s, Sequent sequent) {
 		seq = sequent;
 		ruleApp = new RuleApplication(s, seq);
 //		services = proof.getServices();// New service after unwind
 		services = ruleApp.services;
 		tb = services.getTermBuilder();
+
 	}
 
 	public void mainAlg() {
 		getLow(seq);
 		getIndexAndHigh(seq);
 		getLocSet(seq);
+		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
+		ImmutableList<Goal> goalsAfterUnwind = null;
 
+		Goal currentGoal = goalsAfterShift.head();
+		SequentFormula currentIndexFormula = null;
 		ConstructAllCompPreds cac = new ConstructAllCompPreds(services, low, index, high);
 		Set<Term> compPreds = cac.cons();
 		ConstructAllDepPreds cad = new ConstructAllDepPreds(services, array, low, index, high);
 		Set<Term> depPreds = cad.cons();
 
-		Set<Term> oldCompPred = new HashSet<>();
-		Set<Term> oldDepPred = new HashSet<>();
-		oldCompPred.addAll(compPreds);
-		oldDepPred.addAll(depPreds);
-
-//		applyShiftRule(proof.openGoals().head());
-		ImmutableList<Goal> goalsAfterShift =ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
-		ImmutableList<Goal> goalsAfterUnwind = null;
-		Goal currentGoal = null;
-		int i =0;
 		do {
-			i++;
+			oldCompPred.removeAll(oldCompPred);
+			oldCompPred.addAll(compPreds);
+			oldDepPred.removeAll(oldDepPred);
+			oldDepPred.addAll(depPreds);
+
+//			System.out.println("NEW: " + depPreds);
+//			System.out.println("OLD: " + oldDepPred);
+			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
+
 			goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
 			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
-//			pr.readAndRefineAntecedentPredicates();
-//			compPreds = pr.refinedCompList;
-//			depPreds = pr.refinedDepList;
-//			System.out.println("Seq: "+ g.sequent());
-			PredicateRefinement pr = new PredicateRefinement(services, currentGoal.sequent(), compPreds, depPreds);
+
+			PredicateRefinement pr = new PredicateRefinement(services, currentGoal.sequent(), compPreds, depPreds,
+					currentIndexFormula);
 			pr.readAndRefineAntecedentPredicates();
-//			System.out.println("Fixed point hasn't reached.");
-			oldCompPred.removeAll(oldCompPred);
-//			System.out.println(oldCompPred);
-			oldCompPred.addAll(compPreds);
-//			System.out.println(oldCompPred);
-			
-			oldDepPred.removeAll(oldDepPred);
-			oldDepPred.addAll(depPreds);
-		} while (!compPreds.equals(oldCompPred) || !depPreds.equals(oldDepPred) || i< 3);
-		System.out.println("LIG is the conjunction of: " + compPreds + "  size " + compPreds.size() + " and "
-				+ depPreds + " of size " + depPreds.size());
+
+			compPreds = pr.refinedCompList;
+			depPreds = pr.refinedDepList;
+//			System.out.println("DP: " + depPreds);
+
+		} while (!compPreds.equals(oldCompPred) || !depPreds.equals(oldDepPred));
+		
+		System.out.println("LIG is the conjunction of: " + compPreds + "  size " + compPreds.size() + " and " + depPreds
+				+ " of size " + depPreds.size());
 	}
 
-	
+	private SequentFormula currentIndexEq(Sequent seq2, Term index2) {
+		for (SequentFormula sf : seq2.antecedent()) {
+			Term formula = sf.formula();
+			if (formula.op() instanceof Equality) {
+				Term current_i = formula.sub(0);
+				if (current_i.equals(index2)) {
+					System.out.println("i's formula: " + sf);
+					return sf;
+				}
+			}
+		}
+		return null;
+	}
+
 	void getLow(Sequent seq) {
 		for (SequentFormula sf : seq.succedent()) {
 			Term formula = sf.formula();
@@ -135,7 +152,7 @@ public class CurrentLIG {
 	Term expr2term(Expression expr) {
 		return this.services.getTypeConverter().convertToLogicElement(expr);
 	}
-	
+
 	private Term skipUpdates(Term formula) {
 		return formula.op() instanceof UpdateApplication ? UpdateApplication.getTarget(formula) : formula;
 	}
@@ -157,7 +174,7 @@ public class CurrentLIG {
 			}
 		}
 	}
-	
+
 	private void findArray(Set<LocationVariable> set) {
 		for (LocationVariable v : set) {
 			if (v.sort() instanceof ArraySort) {

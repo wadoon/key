@@ -88,11 +88,11 @@ public class RuleApplication {
 				IBuiltInRuleApp bApp = findShiftUpdateRuleApp(
 						g.ruleAppIndex().getBuiltInRules(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
 				if (bApp != null) {
-					System.out.println("Goal of taclet shiftUpdate" + " is: " + g);
+//					System.out.println("Goal of taclet shiftUpdate" + " is: " + g);
 					return g;
 				}
 			}
-			System.out.println("Taclet shiftUpdate" + " is not applicable at " + g);
+//			System.out.println("Taclet shiftUpdate" + " is not applicable at " + g);
 		}
 		return null;
 	}
@@ -141,7 +141,7 @@ public class RuleApplication {
 			for (SequentFormula sf : g.sequent().succedent()) {
 				ImmutableList<TacletApp> tApp = findLoopUnwindTaclet(sf, g);
 				if (!tApp.isEmpty()) {
-					System.out.println("Goal of taclet loopUnwind" + " is: " + g);
+//					System.out.println("Goal of taclet loopUnwind" + " is: " + g);
 					return g;
 				}
 			}
