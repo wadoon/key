@@ -620,7 +620,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      *         names even if they are not unique in whole KeY application.
      */
     protected boolean isMakeNamesUnique() {
-        return true;
+        return false;
     }
 
     /**
