@@ -99,7 +99,7 @@ public class CurrentLIG {
 			if (formula.op() instanceof Equality) {
 				Term current_i = formula.sub(0);
 				if (current_i.equals(index2)) {
-					System.out.println("i's formula: " + sf);
+//					System.out.println("i's formula: " + sf);
 					return sf;
 				}
 			}

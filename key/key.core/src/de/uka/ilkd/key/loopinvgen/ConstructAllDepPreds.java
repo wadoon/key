@@ -25,21 +25,19 @@ public class ConstructAllDepPreds {
 		this.i = index;
 		this.h = high;
 
-		// services.getTypeConverter().getLocSetLDT().getArrayRange();
+//		 services.getTypeConverter().getLocSetLDT().getArrayRange();
 
 	}
 
 	private Set<Term> subArrCons(Term arr, Term l, Term h) {
 		Set<Term> sub = new HashSet<>();
-	
+
 		sub.add(tb.arrayRange(arr, l, tb.subtract(h, tb.one())));
 		sub.add(tb.arrayRange(arr, l, h));
 		sub.add(tb.arrayRange(arr, tb.add(l, tb.one()), h));
 		sub.add(tb.arrayRange(arr, tb.add(l, tb.one()), tb.subtract(h, tb.one())));
 //		System.out.println("sub arrays: " + sub.toString());
-//		sub.add(tb.singleton(arr, l));
-//		sub.add(tb.singleton(arr, h));
-		
+
 		return sub;
 	}
 
@@ -51,7 +49,7 @@ public class ConstructAllDepPreds {
 		depPreds.add(tb.noRaW(subArr));
 		depPreds.add(tb.noWaR(subArr));
 		depPreds.add(tb.noWaW(subArr));
-		
+
 //		System.out.println("dependence predicates: " + depPreds.toString());
 		return depPreds;
 	}
@@ -59,39 +57,30 @@ public class ConstructAllDepPreds {
 	Set<Term> cons() {
 
 		Set<Term> sub0 = subArrCons(a, l, h);
-		for (Term t: sub0) {
+		for (Term t : sub0) {
 			depPredList.addAll(predCons(t));
 		}
 
 		Set<Term> sub1 = subArrCons(a, l, i);
-		for (Term t: sub1) {
+		for (Term t : sub1) {
 			depPredList.addAll(predCons(t));
 		}
 
 		Set<Term> sub2 = subArrCons(a, i, h);
-		for (Term t: sub2) {
+		for (Term t : sub2) {
 			depPredList.addAll(predCons(t));
 		}
 
-//		Set<Term> sub3 = subArrCons(a, l, l);
-//		for (Term t : sub3) {
-//			depPredList.addAll(predCons(t));
-//		}
-
-//		Set<Term> sub4 = subArrCons(a, i, i);
-//		for (Term t : sub4) {
-//			depPredList.addAll(predCons(t));
-//		}
-
-//		Set<Term> sub5 = subArrCons(a, h, h);
-//		for (Term t: sub5) {
-//			depPredList.addAll(predCons(t));
-//		}
+		depPredList.addAll(predCons(tb.singleton(a, tb.arr(l))));
+		depPredList.addAll(predCons(tb.singleton(a, tb.arr(i))));
+		depPredList.addAll(predCons(tb.singleton(a, tb.arr(h))));
 		
+		//TODO: Not sure if this part is needed:
+//		depPredList.addAll(predCons(tb.singleton(a, tb.arr(tb.add(l, tb.one())))));
+//		depPredList.addAll(predCons(tb.singleton(a, tb.arr(tb.subtract(i, tb.one())))));
+//		depPredList.addAll(predCons(tb.singleton(a, tb.arr(tb.add(i, tb.one())))));
+//		depPredList.addAll(predCons(tb.singleton(a, tb.arr(tb.subtract(i, tb.one())))));
 		
-		
-//		System.out.println("dep pred list: " + depPredList);
-//		System.out.println("dep pred list size: " + depPredList.size());
 		return depPredList;
 	}
 }
