@@ -20,7 +20,7 @@ public class Rotation {
     /*@
       @ public normal_behaviour
       @  requires (\forall int i; 0 <= i && i < vec.length;
-      @   vec[i] > 1.0r && vec[i] < 2.0r) && vec.length == 2;
+      @   vec[i] > 1.0 && vec[i] < 2.0) && vec.length == 2;
       @  ensures  \fp_err(\result[0]) < 0.000000000000001r && \fp_err(\result[1]) < 0.000000000000001r;
       @*/
     public static double[] computeError(double[] vec) {
