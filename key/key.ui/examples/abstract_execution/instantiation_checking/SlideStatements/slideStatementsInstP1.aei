@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:aeInstantiationModel xmlns:ns2="http://www.key-project.org/abstractexecution" preCondition="" postCondition="\result_1==\result_2">
+    <program>/*@ ae_constraint
+  @   \disjoint(frameA, frameB) &amp;&amp;
+  @   \disjoint(frameA, footprintB) &amp;&amp;
+  @   \disjoint(frameB, footprintA) &amp;&amp;
+  @
+  @   \disjoint(frameB, hasToFrameB) &amp;&amp;
+  @   \disjoint(frameA, hasToFrameB) &amp;&amp;
+  @   \disjoint(footprintA, hasToFrameB) &amp;&amp;
+  @
+  @   \mutex(returnsA(\value(footprintA)), returnsB(\value(footprintB))) &amp;&amp;
+  @   \mutex(returnsA(\value(footprintA)), throwsExcB(\value(footprintB))) &amp;&amp;
+  @   \mutex(throwsExcA(\value(footprintA)), throwsExcB(\value(footprintB))) &amp;&amp;
+  @   \mutex(throwsExcA(\value(footprintA)), returnsB(\value(footprintB))) &amp;&amp;
+  @
+  @   (throwsExcA(\value(footprintA)) || returnsA(\value(footprintA)) ==&gt; \disjoint(frameB, relevant)) &amp;&amp;
+  @   (throwsExcA(\value(footprintA)) || returnsA(\value(footprintA)) ==&gt; \disjoint(hasToFrameB, relevant)) &amp;&amp;
+  @   (throwsExcB(\value(footprintB)) || returnsB(\value(footprintB)) ==&gt; \disjoint(frameA, relevant));
+  @*/
+
+//@ assignable frameA;
+//@ accessible footprintA;
+//@ exceptional_behavior requires throwsExcA(\value(footprintA));
+/*@ return_behavior
+  @   requires returnsA(\value(footprintA));
+  @   ensures resultA(\value(footprintA)); */
+//@ break_behavior requires false;
+//@ continue_behavior requires false;
+\abstract_statement A;
+
+//@ assignable frameB, \hasTo(hasToFrameB);
+//@ accessible footprintB;
+//@ exceptional_behavior requires throwsExcB(\value(footprintB));
+//@ return_behavior requires returnsB(\value(footprintB));
+//@ break_behavior requires false;
+//@ continue_behavior requires false;
+\abstract_statement B;</program>
+    <methodLevelContext></methodLevelContext>
+    <locationSets>
+        <locationSet funcName="relevant">
+            <relevantOne>0</relevantOne>
+            <relevantTwo>0</relevantTwo>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
+        <locationSet funcName="frameA">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
+        <locationSet funcName="footprintA">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
+        <locationSet funcName="frameB">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
+        <locationSet funcName="hasToFrameB">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
+        <locationSet funcName="footprintB">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+            <resultSortName>LocSet</resultSortName>
+        </locationSet>
+    </locationSets>
+    <functions/>
+    <predicates>
+        <predicate predName="throwsExcA">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="throwsExcB">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="returnsA">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="returnsB">
+            <argSort>any</argSort>
+        </predicate>
+        <predicate predName="resultA">
+            <argSort>any</argSort>
+        </predicate>
+    </predicates>
+    <programVariables>
+        <programVariable typeName="int" varName="a">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="b">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="d">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="w">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="x">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="y">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="z">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="int" varName="result">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+        <programVariable typeName="java.lang.Throwable" varName="exc">
+            <relevantOne>-1</relevantOne>
+            <relevantTwo>-1</relevantTwo>
+        </programVariable>
+    </programVariables>
+    <predicateInstantiations>
+        <predicateInst>
+	        <declaration predName="returnsA">
+	            <argSort>any</argSort>
+	        </declaration>
+            <instantiation>w = 17</instantiation>
+            <instArgSort>int</instArgSort>
+            <instArgSort>int</instArgSort>
+        </predicateInst>
+        <predicateInst>
+	        <declaration predName="returnsB">
+	            <argSort>any</argSort>
+	        </declaration>
+            <instantiation>false</instantiation>
+	        <instArgSort>int</instArgSort>
+	        <instArgSort>int</instArgSort>
+	        <instArgSort>int</instArgSort>
+        </predicateInst>
+        <predicateInst>
+	        <declaration predName="throwsExcA">
+	            <argSort>any</argSort>
+	        </declaration>
+            <instantiation>false</instantiation><!-- possible: throwsExcA(y, w) -->
+            <instArgSort>int</instArgSort>
+            <instArgSort>int</instArgSort>
+        </predicateInst>
+        <predicateInst>
+	        <declaration predName="throwsExcB">
+	            <argSort>any</argSort>
+	        </declaration>
+            <instantiation>false</instantiation>
+	        <instArgSort>int</instArgSort>
+	        <instArgSort>int</instArgSort>
+	        <instArgSort>int</instArgSort>
+        </predicateInst>
+        <predicateInst>
+        	<declaration predName="resultA">
+            	<argSort>any</argSort>
+        	</declaration>
+            <!--<instantiation>((java.lang.Integer) result).intValue() = w</instantiation>-->
+            <instantiation>result = w</instantiation>
+	        <instArgSort>int</instArgSort>
+	        <instArgSort>int</instArgSort>
+        </predicateInst>
+    </predicateInstantiations>
+    <functionInstantiations>
+        <functionInst>
+            <declaration funcName="relevant">
+                <relevantOne>-1</relevantOne>
+                <relevantTwo>-1</relevantTwo>
+                <resultSortName>LocSet</resultSortName>
+            </declaration>
+            <instantiation>union(singletonPV(PV(y)), singletonPV(PV(z)))</instantiation>
+            <resultSort>LocSet</resultSort>
+        </functionInst>
+        <functionInst>
+            <declaration funcName="frameA">
+                <relevantOne>-1</relevantOne>
+                <relevantTwo>-1</relevantTwo>
+                <resultSortName>LocSet</resultSortName>
+            </declaration>
+            <instantiation>union(singletonPV(PV(x)), union(singletonPV(PV(y)), singletonPV(PV(z))))</instantiation>
+            <resultSort>LocSet</resultSort>
+        </functionInst>
+        <functionInst>
+            <declaration funcName="footprintA">
+                <relevantOne>-1</relevantOne>
+                <relevantTwo>-1</relevantTwo>
+                <resultSortName>LocSet</resultSortName>
+            </declaration>
+            <instantiation>union(singletonPV(PV(y)), singletonPV(PV(w)))</instantiation>
+            <resultSort>LocSet</resultSort>
+        </functionInst>
+        <functionInst>
+            <declaration funcName="frameB">
+                <relevantOne>-1</relevantOne>
+                <relevantTwo>-1</relevantTwo>
+                <resultSortName>LocSet</resultSortName>
+            </declaration>
+            <instantiation>empty</instantiation>
+            <resultSort>LocSet</resultSort>
+        </functionInst>
+        <functionInst>
+            <declaration funcName="hasToFrameB">
+                <relevantOne>-1</relevantOne>
+                <relevantTwo>-1</relevantTwo>
+                <resultSortName>LocSet</resultSortName>
+            </declaration>
+            <instantiation>singletonPV(PV(a))</instantiation>
+            <resultSort>LocSet</resultSort>
+        </functionInst>
+        <functionInst>
+            <declaration funcName="footprintB">
+                <relevantOne>-1</relevantOne>
+                <relevantTwo>-1</relevantTwo>
+                <resultSortName>LocSet</resultSortName>
+            </declaration>
+            <instantiation>union(singletonPV(PV(b)), union(singletonPV(PV(d)), singletonPV(PV(a))))</instantiation>
+            <resultSort>LocSet</resultSort>
+        </functionInst>
+    </functionInstantiations>
+    <apeInstantiations>
+        <apeInst apeLineNumber="28">
+            <instantiation>x = y++; z = w; if (w == 17) { return z; }</instantiation>
+        </apeInst>
+        <apeInst apeLineNumber="36">
+            <instantiation>a = b + 17; int c = 2*d+a;</instantiation>
+        </apeInst>
+    </apeInstantiations>
+</ns2:aeInstantiationModel>

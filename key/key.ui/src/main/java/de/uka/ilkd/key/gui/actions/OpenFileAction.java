@@ -23,7 +23,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.refinity.dialogs.RefinityWindow;
-import de.uka.ilkd.key.abstractexecution.refinity.model.AERelationalModel;
+import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;

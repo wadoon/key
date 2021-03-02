@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.TermServices;
 
@@ -38,7 +39,7 @@ class UninstantiatedNoPosTacletApp extends NoPosTacletApp {
         final MatchConditions initMatchCond = //
                 MatchConditions.EMPTY_MATCHCONDITIONS.setSeqFor(pos);
         if ( taclet() instanceof RewriteTaclet )
-            return ((RewriteTaclet) taclet()).checkPrefix(pos, initMatchCond);
+            return ((RewriteTaclet) taclet()).checkPrefix(pos, initMatchCond, (Services) services);
 
         return initMatchCond;
     }

@@ -5,6 +5,8 @@ package java.lang;
 
 public final class Integer implements java.lang.Comparable
 {
+   private final int value;
+
    public final static int MIN_VALUE = -2147483648;
    public final static int MAX_VALUE = 2147483647;
    public final static java.lang.Class TYPE;
@@ -19,12 +21,31 @@ public final class Integer implements java.lang.Comparable
    public static int parseInt(java.lang.String arg0) throws java.lang.NumberFormatException;
    public static java.lang.Integer valueOf(java.lang.String arg0, int arg1) throws java.lang.NumberFormatException;
    public static java.lang.Integer valueOf(java.lang.String arg0) throws java.lang.NumberFormatException;
-   public static java.lang.Integer valueOf(int arg0);
-   public Integer(int arg0);
+   
+   /*@ public normal_behavior
+     @ ensures \result.value == arg0 &&
+     @         \fresh(\result) &&
+     @         \typeof(\result) == \type(Integer);
+     @*/
+   public static java.lang.Integer valueOf(int arg0) {
+       return new java.lang.Integer(arg0);
+   }
+   
+   public Integer(int arg0) {
+       this.value = arg0;
+   }
+   
    public Integer(java.lang.String arg0) throws java.lang.NumberFormatException;
    public byte byteValue();
    public short shortValue();
-   public int intValue();
+   
+   /*@ public normal_behavior
+     @ ensures \result == value;
+     @*/
+   public int intValue() {
+       return value;
+   }
+   
    public long longValue();
 //   public float floatValue();
 //   public double doubleValue();

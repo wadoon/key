@@ -321,7 +321,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         assert services != null;
 
         final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services),
-                services.getTermFactory(), services.getProof());
+                services.getTermFactory());
         return replacer.replace(term);
     }
 
@@ -1441,8 +1441,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                                     var(remembranceVariable.getValue()));
                         }
                     }
-                    mbyTerm = measuredBy(new OpReplacer(replacementMap, services.getTermFactory(),
-                            services.getProof())
+                    mbyTerm = measuredBy(new OpReplacer(replacementMap, services.getTermFactory())
                             .replace(measuredBy));
                 } else {
                     mbyTerm = measuredByEmpty();
@@ -2131,7 +2130,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                     }
                 }
                 return new OpReplacer(
-                        replacementMap, services.getTermFactory(), services.getProof())
+                        replacementMap, services.getTermFactory())
                         .replace(formula);
             }
         }

@@ -3785,6 +3785,7 @@ MethodBodyStatement MethodBodyStatement() :
   UncollatedReferenceQualifier qn;
   MethodReference methRef;
   MethodBodyStatement result;
+  boolean direct;
 }
 {
 
@@ -3798,7 +3799,9 @@ MethodBodyStatement MethodBodyStatement() :
 
   tmp = Expression()
 
-  "@" bodySource = Type()
+  ("@" { direct = false; } | "#" { direct = true; })
+  
+  bodySource = Type()
 
   ";"
 
@@ -3811,7 +3814,9 @@ MethodBodyStatement MethodBodyStatement() :
     {
         throw new ParseException("Expected a method reference.");
     }
-    result = factory.createMethodBodyStatement(bodySource, resVar, methRef);
+    result = direct ? 
+        factory.createDirectMethodBodyStatement(bodySource, resVar, methRef) :
+        factory.createMethodBodyStatement(bodySource, resVar, methRef);
     checkConstruction(result);
     setPostfixInfo(result);
     return result;

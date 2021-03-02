@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.abstractexecution.rule.metaconstruct;
 
-import java.util.Map;
 import java.util.Optional;
 
 import org.key_project.util.collection.ImmutableSet;
@@ -37,7 +36,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.AuxiliaryContract.Variables;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.util.LinkedHashMap;
 
 /**
  * Term transformer for linking a completion type specifier in the context of
@@ -48,16 +46,6 @@ import de.uka.ilkd.key.util.LinkedHashMap;
  * @author Dominic Steinhoefel
  */
 public class AbstractRetrieveAEPostconditionTransformer extends AbstractTermTransformer {
-    private final static Map<PreconditionType, Behavior> BEHAVIOR_TYPES_MAP = new LinkedHashMap<>();
-
-    static {
-        BEHAVIOR_TYPES_MAP.put(PreconditionType.RETURN, Behavior.RETURN_BEHAVIOR);
-        BEHAVIOR_TYPES_MAP.put(PreconditionType.EXC, Behavior.EXCEPTIONAL_BEHAVIOR);
-        BEHAVIOR_TYPES_MAP.put(PreconditionType.NORMAL, Behavior.NORMAL_BEHAVIOR);
-        BEHAVIOR_TYPES_MAP.put(PreconditionType.BREAK, Behavior.BREAK_BEHAVIOR);
-        BEHAVIOR_TYPES_MAP.put(PreconditionType.CONT, Behavior.CONTINUE_BEHAVIOR);
-    }
-
     public AbstractRetrieveAEPostconditionTransformer(Name name, int arity) {
         super(name, arity);
     }
@@ -78,7 +66,8 @@ public class AbstractRetrieveAEPostconditionTransformer extends AbstractTermTran
 
         final PreconditionType preconditionType = AbstractPreconditionTransformer
                 .getPreconditionType(term.sub(1), services);
-        final Behavior contractType = BEHAVIOR_TYPES_MAP.get(preconditionType);
+        final Behavior contractType = AbstractUpdateFactory
+                .getBlockContractBehaviorForPreconditionType(preconditionType);
         assert contractType != null;
 
         final Operator returnsSV = term.sub(2).op();
@@ -130,20 +119,19 @@ public class AbstractRetrieveAEPostconditionTransformer extends AbstractTermTran
      * Returns the original {@link Term} if <code>preconditonType</code> is any
      * other type. In that case, nothing has to replaced.
      * 
-     * @param t                The {@link Term} in which to replace.
-     * @param returnsPV        The {@link LocationVariable} to insert instead of the
-     *                         returns flag.
-     * @param resultPV         The {@link LocationVariable} to insert instead of the
-     *                         result flag.
-     * @param excPV            The {@link LocationVariable} to insert instead of the
-     *                         exc flag.
-     * @param maybeBreaksSV    The {@link LocationVariable} to insert instead of the
-     *                         breaks flag.
+     * @param t The {@link Term} in which to replace.
+     * @param returnsPV The {@link LocationVariable} to insert instead of the
+     * returns flag.
+     * @param resultPV The {@link LocationVariable} to insert instead of the result
+     * flag.
+     * @param excPV The {@link LocationVariable} to insert instead of the exc flag.
+     * @param maybeBreaksSV The {@link LocationVariable} to insert instead of the
+     * breaks flag.
      * @param maybeContinuesSV The {@link LocationVariable} to insert instead of the
-     *                         continues flag.
-     * @param contract         The {@link BlockContract} for getting the placeholder
-     *                         variables.
-     * @param services         The {@link Services} object.
+     * continues flag.
+     * @param contract The {@link BlockContract} for getting the placeholder
+     * variables.
+     * @param services The {@link Services} object.
      * @return The replaced {@link Term}.
      */
     private static Term replaceSpecialVars(Term t, ProgramVariable returnsPV,

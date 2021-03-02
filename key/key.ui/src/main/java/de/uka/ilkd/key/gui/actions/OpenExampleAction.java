@@ -17,7 +17,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Optional;
 
-import de.uka.ilkd.key.abstractexecution.refinity.model.AERelationalModel;
+import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.KeYFileChooser;

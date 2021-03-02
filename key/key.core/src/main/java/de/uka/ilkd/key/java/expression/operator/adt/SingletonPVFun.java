@@ -56,6 +56,6 @@ public class SingletonPVFun extends Operator {
 
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_PROGVAR);
     }
 }

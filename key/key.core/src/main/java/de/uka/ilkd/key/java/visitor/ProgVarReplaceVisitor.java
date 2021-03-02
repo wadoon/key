@@ -528,7 +528,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         final Term newMeasuredBy;
         {
             final OpReplacer replacer = //
-                    new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
+                    new OpReplacer(replaceMap, services.getTermFactory());
             newMeasuredBy = replacer.replace(oldContract.getMby());
         }
         
@@ -622,7 +622,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 oldContract.getInfFlowSpecs());
 
         OpReplacer replacer = new OpReplacer(
-                replaceMap, services.getTermFactory(), services.getProof());
+                replaceMap, services.getTermFactory());
 
         if (!changed) {
             return oldContract;

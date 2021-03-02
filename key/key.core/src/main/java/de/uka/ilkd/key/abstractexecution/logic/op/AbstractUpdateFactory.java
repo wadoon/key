@@ -1,11 +1,11 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2019 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ import org.key_project.util.collection.UniqueArrayList;
 import de.uka.ilkd.key.abstractexecution.java.AbstractProgramElement;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.ComplementLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.IrrelevantAssignable;
@@ -42,6 +44,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.ProgVarLDT;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -51,6 +54,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -142,6 +146,42 @@ public class AbstractUpdateFactory {
         }
     };
 
+    private final static Map<PreconditionType, Behavior> BEHAVIOR_TYPES_MAP = new LinkedHashMap<>();
+    private final static Map<Behavior, PreconditionType> BEHAVIOR_TYPES_REV_MAP = new LinkedHashMap<>();
+
+    static {
+        BEHAVIOR_TYPES_MAP.put(PreconditionType.RETURN, Behavior.RETURN_BEHAVIOR);
+        BEHAVIOR_TYPES_MAP.put(PreconditionType.EXC, Behavior.EXCEPTIONAL_BEHAVIOR);
+        BEHAVIOR_TYPES_MAP.put(PreconditionType.NORMAL, Behavior.NORMAL_BEHAVIOR);
+        BEHAVIOR_TYPES_MAP.put(PreconditionType.BREAK, Behavior.BREAK_BEHAVIOR);
+        BEHAVIOR_TYPES_MAP.put(PreconditionType.CONT, Behavior.CONTINUE_BEHAVIOR);
+
+        for (Entry<PreconditionType, Behavior> entry : BEHAVIOR_TYPES_MAP.entrySet()) {
+            BEHAVIOR_TYPES_REV_MAP.put(entry.getValue(), entry.getKey());
+        }
+    }
+
+    /**
+     * Returns the block contract behavior for an AE precondition type.
+     * 
+     * @param pt The {@link PreconditionType}.
+     * @return The requested block contract behavior.
+     */
+    public static Behavior getBlockContractBehaviorForPreconditionType(final PreconditionType pt) {
+        return BEHAVIOR_TYPES_MAP.get(pt);
+    }
+
+    /**
+     * Returns the AE precondition type for a block contract behavior.
+     * 
+     * @param pt The {@link Behavior}.
+     * @return The requested {@link PreconditionType}.
+     */
+    public static PreconditionType getPreconditionTypeForBlockContractBehavior(
+            final Behavior behavior) {
+        return BEHAVIOR_TYPES_REV_MAP.get(behavior);
+    }
+
     /**
      * Constructor. NOTE: You should not use this constructor, but instead access
      * {@link Services#abstractUpdateFactory()}, since this factory caches
@@ -156,17 +196,16 @@ public class AbstractUpdateFactory {
      * Returns abstract update operator for the passed
      * {@link AbstractProgramElement} and left-hand side.
      *
-     * @param phs              The {@link AbstractProgramElement} for which this
-     *                         {@link AbstractUpdate} should be created.
-     * @param lhs              The update's left-hand side. Should be a
-     *                         {@link SetLDT} term.
-     * @param rhs              The right-hand side for the abstract update; needed
-     *                         to extract the argument sorts for the operator.
+     * @param phs The {@link AbstractProgramElement} for which this
+     * {@link AbstractUpdate} should be created.
+     * @param lhs The update's left-hand side. Should be a {@link SetLDT} term.
+     * @param rhs The right-hand side for the abstract update; needed to extract the
+     * argument sorts for the operator.
      * @param executionContext An optional runtime instance {@link LocationVariable}
-     *                         to normalize self terms (because otherwise, there
-     *                         might be different such terms around).
+     * to normalize self terms (because otherwise, there might be different such
+     * terms around).
      * @return The {@link AbstractUpdate} for the given
-     *         {@link AbstractProgramElement} and left-hand side.
+     * {@link AbstractProgramElement} and left-hand side.
      */
     public AbstractUpdate getInstance(AbstractProgramElement phs, Term lhs, Term rhs,
             Optional<ExecutionContext> executionContext) {
@@ -186,12 +225,12 @@ public class AbstractUpdateFactory {
      * Returns abstract update operator for the passed
      * {@link AbstractProgramElement} and left-hand side.
      *
-     * @param phs      The {@link AbstractProgramElement} for which this
-     *                 {@link AbstractUpdate} should be created.
-     * @param numArgs  The update's left-hand side.
+     * @param phs The {@link AbstractProgramElement} for which this
+     * {@link AbstractUpdate} should be created.
+     * @param numArgs The update's left-hand side.
      * @param argSorts The number of arguments of the abstract update.
      * @return The {@link AbstractUpdate} for the given
-     *         {@link AbstractProgramElement} and left-hand side.
+     * {@link AbstractProgramElement} and left-hand side.
      */
     public AbstractUpdate getInstance(AbstractProgramElement phs,
             UniqueArrayList<AbstractUpdateLoc> assignables, final int numArgs) {
@@ -217,7 +256,7 @@ public class AbstractUpdateFactory {
      * Returns the irrelevant assignable for the position-th position in abstrUpd.
      *
      * @param abstrUpd The {@link AbstractUpdate} for which to create the irrelevant
-     *                 assignable function.
+     * assignable function.
      * @param position The position for which to create the irrelevant assignable.
      * @return The created (or cached) assignable.
      */
@@ -251,7 +290,7 @@ public class AbstractUpdateFactory {
      * {@link PVLoc}, otherwise will fail.
      *
      * @param abstrUpd The {@link AbstractUpdate} for which to create the
-     *                 characteristic function.
+     * characteristic function.
      * @param position The position for which to create the function.
      * @return The created (or cached) function.
      */
@@ -287,7 +326,7 @@ public class AbstractUpdateFactory {
     /**
      * @param loc The {@link AbstractUpdateLoc} to check.
      * @return true iff we can create a characteristic function for the given
-     *         location.
+     * location.
      */
     private static boolean characteristicFunctionCreatedSupportedFor(final AbstractUpdateLoc loc) {
         final AbstractUpdateLoc unwrappedLoc = AbstractExecutionUtils.unwrapHasTo(loc);
@@ -298,12 +337,12 @@ public class AbstractUpdateFactory {
      * Returns abstract path condition operator for the passed
      * {@link AbstractProgramElement} and argument sorts.
      *
-     * @param phs      The {@link AbstractProgramElement} for which this abstract
-     *                 path condition operator should be created.
+     * @param phs The {@link AbstractProgramElement} for which this abstract path
+     * condition operator should be created.
      * @param argSorts argument sorts for the operator (corresponding to right-hand
-     *                 side/accessibles)
+     * side/accessibles)
      * @return The abstract path condition operator for the passed
-     *         {@link AbstractProgramElement} and argument sorts.
+     * {@link AbstractProgramElement} and argument sorts.
      * @deprecated abstract path conditions are no longer used.
      */
     @Deprecated
@@ -326,15 +365,14 @@ public class AbstractUpdateFactory {
      * Returns abstract precondition operator for the passed
      * {@link AbstractProgramElement}, precondition type and argument sorts.
      *
-     * @param phs              The {@link AbstractProgramElement} for which this
-     *                         abstract precondition operator should be created.
+     * @param phs The {@link AbstractProgramElement} for which this abstract
+     * precondition operator should be created.
      * @param preconditionType The {@link PreconditionType} for which to create the
-     *                         precondition.
-     * @param argSorts         argument sorts for the operator (corresponding to
-     *                         right-hand side/accessibles)
+     * precondition.
+     * @param argSorts argument sorts for the operator (corresponding to right-hand
+     * side/accessibles)
      * @return The abstract precondition operator for the passed
-     *         {@link AbstractProgramElement}, {@link PreconditionType} and argument
-     *         sorts.
+     * {@link AbstractProgramElement}, {@link PreconditionType} and argument sorts.
      */
     public Function getAbstractPreconditionInstance(AbstractProgramElement phs,
             PreconditionType preconditionType, final int numArgs) {
@@ -368,10 +406,10 @@ public class AbstractUpdateFactory {
      * {@link AbstractProgramElement}, but with a different assignable set defined
      * by the supplied substitutions.
      *
-     * @param abstrUpd   The original {@link AbstractUpdate}.
+     * @param abstrUpd The original {@link AbstractUpdate}.
      * @param replaceMap The replacement map for assignable locations.
      * @return A new {@link AbstractUpdate} with the left-hand side changed
-     *         according to replaceMap.
+     * according to replaceMap.
      */
     public AbstractUpdate changeAssignables(final AbstractUpdate abstrUpd,
             final Map<? extends AbstractUpdateLoc, ? extends AbstractUpdateLoc> replaceMap) {
@@ -414,8 +452,8 @@ public class AbstractUpdateFactory {
      * @param replMap The replace map.
      *
      * @return A new {@link AbstractUpdate} of this one with the
-     *         {@link ProgramVariable}s in the assignables replaced according to the
-     *         supplied map.
+     * {@link ProgramVariable}s in the assignables replaced according to the
+     * supplied map.
      */
     public AbstractUpdate changeAssignablePVs(AbstractUpdate abstrUpd,
             Map<ProgramVariable, ProgramVariable> replMap) {
@@ -432,14 +470,13 @@ public class AbstractUpdateFactory {
      * representing. Throws a {@link RuntimeException} if the given {@link Term} is
      * not directly representing any locations (i.e., is not a LocSet term).
      *
-     * @param t                The {@link Term} to extract all
-     *                         {@link AbstractUpdateLoc}s from.
+     * @param t The {@link Term} to extract all {@link AbstractUpdateLoc}s from.
      * @param executionContext An optional runtime instance {@link LocationVariable}
-     *                         to normalize self terms (because otherwise, there
-     *                         might be different such terms around).
-     * @param services         The {@link Services} object.
+     * to normalize self terms (because otherwise, there might be different such
+     * terms around).
+     * @param services The {@link Services} object.
      * @return All {@link AbstractUpdateLoc}s from the given {@link Term} or null if
-     *         the {@link Term} does not represent {@link AbstractUpdateLoc}s.
+     * the {@link Term} does not represent {@link AbstractUpdateLoc}s.
      */
     public static Set<AbstractUpdateLoc> abstrUpdateLocsFromUnionTerm(Term t,
             Optional<ExecutionContext> executionContext, Services services) {
@@ -462,20 +499,20 @@ public class AbstractUpdateFactory {
      * NOTE: t may not be a union {@link Term}! For this purpose, please use
      * {@link #abstrUpdateLocsFromUnionTerm(Term, Optional, Services)}.
      *
-     * @param t                The {@link Term} to extract all
-     *                         {@link AbstractUpdateLoc}s from.
+     * @param t The {@link Term} to extract all {@link AbstractUpdateLoc}s from.
      * @param executionContext An optional runtime instance {@link LocationVariable}
-     *                         to normalize self terms (because otherwise, there
-     *                         might be different such terms around).
-     * @param services         The {@link Services} object.
+     * to normalize self terms (because otherwise, there might be different such
+     * terms around).
+     * @param services The {@link Services} object.
      * @return All {@link AbstractUpdateLoc}s from the given {@link Term} or null if
-     *         the {@link Term} does not represent {@link AbstractUpdateLoc}s.
+     * the {@link Term} does not represent {@link AbstractUpdateLoc}s.
      */
     public static AbstractUpdateLoc abstrUpdateLocFromTerm(Term t,
             Optional<ExecutionContext> executionContext, Services services) {
         t = MiscTools.simplifyUpdatesInTerm(t, services);
 
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        final ProgVarLDT pvLDT = services.getTypeConverter().getProgVarLDT();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
         final Operator op = t.op();
@@ -484,11 +521,11 @@ public class AbstractUpdateFactory {
             return new IrrelevantAssignable(t);
         } else if (op instanceof LocationVariable) {
             return new PVLoc((LocationVariable) op);
-        } else if (op instanceof Function && (Function) op == locSetLDT.getPV()) {
+        } else if (op instanceof Function && (Function) op == pvLDT.getPvConstructor()) {
             return new PVLoc((LocationVariable) t.sub(0).op());
-        } else if (t.op() == locSetLDT.getAllLocs()) {
+        } else if (op == locSetLDT.getAllLocs()) {
             return new AllLocsLoc(locSetLDT.getAllLocs());
-        } else if (t.op() == locSetLDT.getEmpty()) {
+        } else if (op == locSetLDT.getEmpty()) {
             return new EmptyLoc(locSetLDT.getEmpty());
         } else if (op == locSetLDT.getSingletonPV()) {
             return abstrUpdateLocFromTerm(t.sub(0), executionContext, services);
@@ -502,9 +539,12 @@ public class AbstractUpdateFactory {
             return new ParametricSkolemLoc((Function) t.op(), t.subs().toArray(new Term[0]));
         } else if (isHeapOp(op, locSetLDT, heapLDT)) {
             return abstrUpdateAssgnLocsFromHeapTerm(t, executionContext, services);
+        } else if (op == locSetLDT.getSetMinus() && t.sub(0).op() == locSetLDT.getAllLocs()) {
+            return new ComplementLoc<AbstractUpdateLoc>(
+                    abstrUpdateLocFromTerm(t.sub(1), executionContext, services));
         } else {
-            throw new RuntimeException(
-                    String.format("Unsupported term %s, cannot convert into Abstract Update AST", t));
+            throw new RuntimeException(String
+                    .format("Unsupported term %s, cannot convert into Abstract Update AST", t));
         }
     }
 
@@ -519,10 +559,10 @@ public class AbstractUpdateFactory {
      * 
      * Returns null if it {@link Term} operator is unexpected.
      *
-     * @param t                The {@link Term} to transform.
+     * @param t The {@link Term} to transform.
      * @param executionContext The optional runtime instance for self variable
-     *                         transformation.
-     * @param services         The {@link Services} object.
+     * transformation.
+     * @param services The {@link Services} object.
      * @return The contained {@link AbstractUpdateLoc}s.
      */
     private static AbstractUpdateLoc abstrUpdateAssgnLocsFromHeapTerm(Term t,
@@ -558,16 +598,14 @@ public class AbstractUpdateFactory {
      * it to the given executionContext if the {@link KeYJavaType}s of the variable
      * and the instance are the same.
      *
-     * @param objTerm          The objTerm to normalize.
+     * @param objTerm The objTerm to normalize.
      * @param executionContext An optional runtime instance {@link LocationVariable}
-     *                         to normalize self terms (because otherwise, there
-     *                         might be different such terms around). For an empty
-     *                         optional, we return objTerm.
-     * @param services         The {@link Services} object (for the
-     *                         {@link TermBuilder}).
+     * to normalize self terms (because otherwise, there might be different such
+     * terms around). For an empty optional, we return objTerm.
+     * @param services The {@link Services} object (for the {@link TermBuilder}).
      * @return The original objTemr if executionContext if empty, the objTerm is not
-     *         a "self" term, or the types of the objTerm and the executionContext
-     *         are different, or otherwise a {@link Term} with the runtime instance.
+     * a "self" term, or the types of the objTerm and the executionContext are
+     * different, or otherwise a {@link Term} with the runtime instance.
      */
     public static Term normalizeSelfVar(Term objTerm, Optional<ExecutionContext> executionContext,
             Services services) {
@@ -594,12 +632,12 @@ public class AbstractUpdateFactory {
      * for whether they're just an ordinary variable incidentally named that way. At
      * the time being, we found no better way. (DS, 2020-03-24)
      * 
-     * @param term             The {@link Term} in which to replace.
+     * @param term The {@link Term} in which to replace.
      * @param executionContext The {@link Optional} {@link ExecutionContext} to
-     *                         retrieve the "this" reference.
-     * @param services         The {@link Services} object.
+     * retrieve the "this" reference.
+     * @param services The {@link Services} object.
      * @return The given {@link Term} with replaced "self" variables, if the
-     *         {@link ExecutionContext} exists.
+     * {@link ExecutionContext} exists.
      */
     public static Term normalizeSelfVarInTerm(Term term,
             Optional<ExecutionContext> executionContext, final Services services) {
@@ -613,7 +651,7 @@ public class AbstractUpdateFactory {
      * 
      * @see #targetSortForPreconditionType
      * @param preconditionType The {@link PreconditionType} for which to return the
-     *                         target sort.
+     * target sort.
      * @return The target sort for the given precondition type.
      */
     private Sort getTargetSortForPrecondtionType(PreconditionType preconditionType) {

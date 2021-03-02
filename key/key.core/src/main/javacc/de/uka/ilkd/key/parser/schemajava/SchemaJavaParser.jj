@@ -561,6 +561,7 @@ TOKEN :
 		    | < ISSTATIC: "#isstatic" >
 		    | < MERGEPOINT : "merge_point" >
 		    | < EVALARGS: "#evaluate-arguments" >
+		    | < EXPANDDIRECTMETHODBODY : "#expand-direct-method-body" >
 		    | < REPLACEARGS: "#replace" >
 		    | < LONG: "long" >
 		    | < LOOPSCOPE: "loop-scope" >
@@ -4363,6 +4364,18 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
 		  result.setChild(stat);
 		  result.setSV(sv);
 		  result.setName("#expand-method-body");
+		  return result;
+	      }
+	   )
+	  |
+	  (
+	   <EXPANDDIRECTMETHODBODY> "(" stat = Statement() ("," sv = VariableSV() )?  ")" ";"
+	      {
+		  result = factory.createRKeYMetaConstruct();
+		  setPrefixInfo(result);
+		  result.setChild(stat);
+		  result.setSV(sv);
+		  result.setName("#expand-direct-method-body");
 		  return result;
 	      }
 	   )

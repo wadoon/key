@@ -48,37 +48,20 @@ public class OpReplacer {
      */
     private final ReplacementMap<? extends SVSubstitute, ? extends SVSubstitute> map;
 
-    /**
-     * <p> Creates an {@code OpReplacer}. </p>
-     *
-     * <p> If there is a proof currently loaded, you may want to use
-     * {@link #OpReplacer(Map, TermFactory, Proof)} as it correctly deals with
-     * {@link OriginTermLabels} and other proof-dependent features. </p>
-     *
-     * @param map map mapping from the operators/terms to be replaced to the ones to
-     * replace them with
-     * @param tf a term factory.
-     */
-    public OpReplacer(
-            Map<? extends SVSubstitute, ? extends SVSubstitute> map, TermFactory tf) {
-        this(map, tf, null);
-    }
-
      /**
       * Creates an {@code OpReplacer}.
       *
       * @param map map mapping from the operators/terms to be replaced to the ones to
       *     replace them with.
-      * @param tf a term factory.
-      * @param proof the currently loaded proof
+     * @param tf a term factory.
       */
     public OpReplacer(
-            Map<? extends SVSubstitute, ? extends SVSubstitute> map, TermFactory tf, Proof proof) {
+            Map<? extends SVSubstitute, ? extends SVSubstitute> map, TermFactory tf) {
         assert map != null;
 
         this.map = map instanceof ReplacementMap
                 ? (ReplacementMap<? extends SVSubstitute, ? extends SVSubstitute>) map
-                : ReplacementMap.create(tf, proof, map);
+                : ReplacementMap.create(tf, map);
 
         this.tf = tf;
     }
@@ -151,7 +134,7 @@ public class OpReplacer {
     public static Term replace(Term toReplace, Term with, Term in, TermFactory tf, Proof proof) {
         Map<Term, Term> map = new LinkedHashMap<Term, Term>();
         map.put(toReplace, with);
-        OpReplacer or = new OpReplacer(map, tf, proof);
+        OpReplacer or = new OpReplacer(map, tf);
         return or.replace(in);
     }
 
@@ -172,7 +155,7 @@ public class OpReplacer {
                                           Proof proof) {
         Map<Term, Term> map = new LinkedHashMap<Term, Term>();
         map.put(toReplace, with);
-        OpReplacer or = new OpReplacer(map, tf, proof);
+        OpReplacer or = new OpReplacer(map, tf);
         return or.replace(in);
     }
 
@@ -190,7 +173,7 @@ public class OpReplacer {
             Operator toReplace, Operator with, Term in, TermFactory tf, Proof proof) {
         Map<Operator, Operator> map = new LinkedHashMap<Operator, Operator>();
         map.put(toReplace, with);
-        OpReplacer or = new OpReplacer(map, tf, proof);
+        OpReplacer or = new OpReplacer(map, tf);
         return or.replace(in);
     }
 

@@ -17,7 +17,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
@@ -25,6 +24,7 @@ import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -80,22 +80,11 @@ public class RewriteTaclet extends FindTaclet {
 
     /**
      * If this flag is set, the taclet may not be applied if the focus term is
-     * in the scope of an abstract update. This, for instance, is relevant for
-     * pull out rules, because there, updates cannot always be completely removed
-     * and re-substituting pulled out terms is not allowed in an update scope.
-     * This can lead to situations where proofs cannot be closed although they
-     * theoretically should be.
+     * inside a PV application: in the sequent "x = 17 ==> PV(x) = t", PV(x) must
+     * not be replaced by PV(17), since it points to the *location* x and not
+     * its value.
      */
-    public static final int NOT_IN_ABSTRACT_UPDATE_SCOPE = 16;
-
-    /**
-     * If this flag is set, the taclet must be applied only if the focus term is
-     * in the scope of an abstract update. This, for instance, is relevant for
-     * heap simplification rules, because we forbid pulling out heap expressions
-     * in abstract update scope and therefore have to allow their in-place
-     * simplifications, which in general, however, would blow up the proof.
-     */
-    public static final int IN_ABSTRACT_UPDATE_SCOPE = 32;
+    public static final int NOT_IN_PV_SCOPE = 16;
     
     /**
      * encodes restrictions on the state where a rewrite taclet is applicable
@@ -200,15 +189,19 @@ public class RewriteTaclet extends FindTaclet {
     }
 
     /**
-     * For taclets with <code>getSameUpdatePrefix ()</code>, collect
-     * the updates above <code>p_pos</code> and add them to the update
-     * context of the instantiations object <code>p_mc</code>.
+     * For taclets with <code>getSameUpdatePrefix ()</code>, collect the updates
+     * above <code>p_pos</code> and add them to the update context of the
+     * instantiations object <code>p_mc</code>.
+     * 
+     * @param services The {@link Services} object. NOTE (DS, 2020-06-23): That's
+     * ugly. In fact, I only need one particular function from the LocSet LDT.
+     * All callers have a {@link TermServices}, which I then cast to {@link Services}
+     * again; this contradicts the intended decoupling of the TermServices interface...
      * @return the new instantiations with the additional updates, or
-     * <code>null</code>, if program modalities appear above
-     * <code>p_pos</code>
+     * <code>null</code>, if program modalities appear above <code>p_pos</code>
      */
     public MatchConditions checkPrefix(PosInOccurrence p_pos,
-                                       MatchConditions p_mc) {
+                                       MatchConditions p_mc, Services services) {
 	int polarity = p_pos.isInAntec() ? -1 : 1;  // init polarity
 	SVInstantiations svi = p_mc.getInstantiations ();
 	// this is assumed to hold
@@ -220,16 +213,8 @@ public class RewriteTaclet extends FindTaclet {
 	while ( it.next () != -1 ) {
 	    final Term t = it.getSubTerm ();
 	    op = t.op ();
-//            inAbstractUpdateScope |= op instanceof UpdateApplication
-//                    && AbstractExecutionUtils.containsAbstractUpdate(
-//                            UpdateApplication.getUpdate(t));
 	    if (op instanceof Transformer) {
 	        return null;
-//            }
-//            else if (((getApplicationRestriction()
-//                    & NOT_IN_ABSTRACT_UPDATE_SCOPE) != 0
-//                    && inAbstractUpdateScope)) {
-//                return null;
             } else if (op instanceof UpdateApplication
                     && it.getChild() == UpdateApplication.targetPos()
                     && getApplicationRestriction() != NONE) {
@@ -240,6 +225,11 @@ public class RewriteTaclet extends FindTaclet {
 	            Term update = UpdateApplication.getUpdate(t);
 	            svi = svi.addUpdate(update, t.getLabels());
 	        }
+            } else if (op == services.getTypeConverter().getProgVarLDT().getPvConstructor()
+                    && it.hasNext()
+                    && (getApplicationRestriction() & NOT_IN_PV_SCOPE) != 0) {
+                // inapplicable to subterms of PV
+                return null;
             } else if (getApplicationRestriction() != NONE
                     && (op instanceof Modality
                             || op instanceof ModalOperatorSV)) {
@@ -297,10 +287,6 @@ public class RewriteTaclet extends FindTaclet {
 	StringBuffer res = super.toStringFind ( sb );
 	if ((getApplicationRestriction() & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
             res.append("\\sameUpdateLevel");
-        }
-        if ((getApplicationRestriction()
-                & RewriteTaclet.NOT_IN_ABSTRACT_UPDATE_SCOPE) != 0) {
-            res.append("\\notInAbstractUpdateScope");
         }
         if ((getApplicationRestriction()
                 & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {

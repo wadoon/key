@@ -110,6 +110,25 @@ public final class MiscTools {
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
+    
+    /**
+     * Returns the first Throwable object of type T in the cause hierarchy of exc,
+     * or an empty optional if we cannot find such an object. If exc itself has type
+     * T, it is directly returned.
+     * 
+     * @param cl The type to find.
+     * @param exc The exception object to start with.
+     * @return An empty optional or a Throwable of type T.
+     */
+    public static <T extends Throwable> Optional<T> findExceptionCauseOfClass(final Class<T> cl,
+            final Throwable exc) {
+        Throwable currExc = exc;
+        while (!cl.isInstance(currExc) && currExc.getCause() != null) {
+            currExc = currExc.getCause();
+        }
+
+        return cl.isInstance(currExc) ? Optional.of(cl.cast(currExc)) : Optional.empty();
+    }
 
     /**
      * Returns the {@link LoopSpecification} for the program in the given term,

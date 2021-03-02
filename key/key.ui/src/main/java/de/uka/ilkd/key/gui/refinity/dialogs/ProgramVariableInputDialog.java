@@ -90,7 +90,7 @@ public class ProgramVariableInputDialog extends JDialog {
                     
                     final ProgramVariableDeclaration val = maybeVal.get();
 
-                    val.checkAndRegister(services);
+                    val.checkAndRegisterSave(services);
 
                     instance.value = val;
                     instance.setVisible(false);

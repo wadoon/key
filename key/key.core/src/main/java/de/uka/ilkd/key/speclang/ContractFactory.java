@@ -855,7 +855,7 @@ public class ContractFactory {
                 map.put(tb.var(h), tb.var(atPreVars.get(h)));
             }
         }
-        return new OpReplacer(map, services.getTermFactory(), services.getProof()).replace(t);
+        return new OpReplacer(map, services.getTermFactory()).replace(t);
     }
 
     /** replace in original the variables used for self and parameters */
@@ -897,7 +897,7 @@ public class ContractFactory {
                 map.put(it1.next(), it2.next());
             }
         }
-        OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
+        OpReplacer or = new OpReplacer(map, services.getTermFactory());
         original = or.replace(original);
         return original;
     }

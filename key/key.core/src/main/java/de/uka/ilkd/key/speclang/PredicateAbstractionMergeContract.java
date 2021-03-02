@@ -114,7 +114,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
             Map<LocationVariable, Term> atPres, Services services) {
         final Map<Term, Term> replaceMap = getReplaceMap(atPres, services);
         final OpReplacer or = new OpReplacer(replaceMap,
-                services.getTermFactory(), services.getProof());
+                services.getTermFactory());
 
         return abstractionPredicates.stream().map(pred -> {
             final Term newPred = or

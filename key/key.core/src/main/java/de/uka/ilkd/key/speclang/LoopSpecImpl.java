@@ -240,7 +240,7 @@ public final class LoopSpecImpl implements LoopSpecification {
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalInvariants.get(heap));
     }
 
@@ -255,7 +255,7 @@ public final class LoopSpecImpl implements LoopSpecification {
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalFreeInvariants.get(heap));
     }
 
@@ -270,7 +270,7 @@ public final class LoopSpecImpl implements LoopSpecification {
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalModifies.get(heap));
     }
 
@@ -279,7 +279,7 @@ public final class LoopSpecImpl implements LoopSpecification {
         assert (selfTerm == null) == (originalSelfTerm == null);
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalModifies.get(baseHeap));
     }
 
@@ -290,7 +290,7 @@ public final class LoopSpecImpl implements LoopSpecification {
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replaceInfFlowSpec(originalInfFlowSpecs.get(heap));
     }
 
@@ -311,7 +311,7 @@ public final class LoopSpecImpl implements LoopSpecification {
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
-        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
+        OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         return or.replace(originalVariant);
     }
 
@@ -451,7 +451,7 @@ public final class LoopSpecImpl implements LoopSpecification {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> inverseReplaceMap = getInverseReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(
-                inverseReplaceMap, services.getTermFactory(), services.getProof());
+                inverseReplaceMap, services.getTermFactory());
 
         Map<LocationVariable, Term> newInvariants = new LinkedHashMap<LocationVariable, Term>();
         for (LocationVariable heap : invariants.keySet()) {

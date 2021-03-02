@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.abstractexecution.refinity.model.AERelationalModel;
+import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
 import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.java.IOUtil;
 import org.xml.sax.SAXException;

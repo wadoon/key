@@ -156,8 +156,7 @@ public class Services implements TermServices {
     	this.specRepos = new SpecificationRepository(this);
     	cee = new ConstantExpressionEvaluator(this);
     	typeconverter = new TypeConverter(this);
-    	javainfo = new JavaInfo(new KeYProgModelInfo(this, typeconverter,
-    	                                             new KeYRecoderExcHandler()), this);
+    	javainfo = new JavaInfo(new KeYProgModelInfo(typeconverter, new KeYRecoderExcHandler()), this);
     	nameRecorder = new NameRecorder();
         this.abstractUpdateFactory = new AbstractUpdateFactory(this);
     }
@@ -177,7 +176,7 @@ public class Services implements TermServices {
     	cee = new ConstantExpressionEvaluator(this);
     	typeconverter = new TypeConverter(this);
     	javainfo = new JavaInfo
-    			(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
+    			(new KeYProgModelInfo(crsc, rec2key, typeconverter), this);
     	nameRecorder = new NameRecorder();
         this.abstractUpdateFactory = new AbstractUpdateFactory(this);
     }

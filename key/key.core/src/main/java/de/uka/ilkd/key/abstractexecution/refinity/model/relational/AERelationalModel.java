@@ -1,22 +1,23 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2010 Universitaet Karlsruhe (TH), Germany
-//                         Universitaet Koblenz-Landau, Germany
-//                         Chalmers University of Technology, Sweden
+// Universitaet Koblenz-Landau, Germany
+// Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2019 Karlsruhe Institute of Technology, Germany
-//                         Technical University Darmstadt, Germany
-//                         Chalmers University of Technology, Sweden
+// Technical University Darmstadt, Germany
+// Chalmers University of Technology, Sweden
 //
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.refinity.model;
+package de.uka.ilkd.key.abstractexecution.refinity.model.relational;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,6 +44,10 @@ import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.abstractexecution.refinity.model.FunctionDeclaration;
+import de.uka.ilkd.key.abstractexecution.refinity.model.NullarySymbolDeclaration;
+import de.uka.ilkd.key.abstractexecution.refinity.model.PredicateDeclaration;
+import de.uka.ilkd.key.abstractexecution.refinity.model.ProgramVariableDeclaration;
 import de.uka.ilkd.key.java.Services;
 
 /**
@@ -54,7 +59,7 @@ import de.uka.ilkd.key.java.Services;
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class AERelationalModel {
     private static final String AE_MODEL_FILE_ENDING = ".aer";
-    private static final String SCHEMA_PATH = "/de/uka/ilkd/key/refinity/aerSchema1.xsd";
+    private static final String SCHEMA_PATH = "/de/uka/ilkd/key/refinity/relational/schema1.xsd";
 
     @XmlElement(name = "programOne")
     private String programOne = "";
@@ -248,13 +253,18 @@ public class AERelationalModel {
         return new String(stream.toByteArray());
     }
 
+    public void saveToFile(File file) throws IOException, JAXBException {
+        Files.write(file.toPath(), toXml().getBytes());
+        setFile(file);
+    }
+
     /**
      * Parses an {@link AERelationalModel} from the given XML string.
      * 
      * @param xml The XML code.
      * @return The {@link AERelationalModel}.
      * @throws JAXBException If a problem occurred while unmarshalling.
-     * @throws SAXException  If there is a validation error (XSD format not met).
+     * @throws SAXException If there is a validation error (XSD format not met).
      */
     public static AERelationalModel fromXml(String xml) throws JAXBException, SAXException {
         final JAXBContext jaxbContext = JAXBContext.newInstance(AERelationalModel.class);
@@ -267,13 +277,27 @@ public class AERelationalModel {
     }
 
     /**
+     * Reads an {@link AERelationalModel} form the given path.
+     * 
+     * @param path The path from which to read.
+     * @return The parsed {@link AERelationalModel}.
+     * @throws JAXBException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public static AERelationalModel fromPath(final Path path)
+            throws JAXBException, SAXException, IOException {
+        return fromXml(Files.readAllLines(path).stream().collect(Collectors.joining("\n")));
+    }
+
+    /**
      * Returns true an {@link AERelationalModel} if the given file has the
      * {@link #AE_MODEL_FILE_ENDING} and can be loaded and parsed as
      * {@link AERelationalModel} XML file.
      * 
      * @param file The file to check.
      * @return An {@link AERelationalModel} iff the file could be verified to be an
-     *         {@link AERelationalModel} file, otherwise an empty {@link Optional}.
+     * {@link AERelationalModel} file, otherwise an empty {@link Optional}.
      */
     public static Optional<AERelationalModel> isRelationalModelFile(File file) {
         if (!fileHasAEModelEnding(file)) {
@@ -319,7 +343,7 @@ public class AERelationalModel {
      */
     public void fillNamespacesFromModel(final Services services) {
         getAbstractLocationSets().forEach(loc -> loc.checkAndRegister(services));
-        getProgramVariableDeclarations().forEach(pv -> pv.checkAndRegister(services));
+        getProgramVariableDeclarations().forEach(pv -> pv.checkAndRegisterSave(services));
         getPredicateDeclarations().forEach(pred -> pred.checkAndRegister(services));
         getFunctionDeclarations().forEach(pred -> pred.checkAndRegister(services));
     }

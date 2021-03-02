@@ -15,7 +15,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-class FieldPrinter {
+public class FieldPrinter {
 
     protected final LogicPrinter lp;
 
@@ -119,7 +119,7 @@ class FieldPrinter {
      * @return Returns true iff the given parameter represents a field constant.
      * @param fieldTerm The target field.
      */
-    protected static boolean isJavaFieldConstant(Term fieldTerm, HeapLDT heapLDT, Services services) {
+    public static boolean isJavaFieldConstant(Term fieldTerm, HeapLDT heapLDT, Services services) {
         String name = fieldTerm.op().name().toString();
         if(name.contains("::$") && isFieldConstant(fieldTerm, heapLDT)) {
             String pvName = name.replace("::$", "::");

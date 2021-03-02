@@ -9,8 +9,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-import de.uka.ilkd.key.abstractexecution.refinity.ProofBundleConverter;
-import de.uka.ilkd.key.abstractexecution.refinity.model.AERelationalModel;
+import de.uka.ilkd.key.abstractexecution.refinity.model.relational.AERelationalModel;
+import de.uka.ilkd.key.abstractexecution.refinity.relational.RelationalProofBundleConverter;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
@@ -256,7 +256,7 @@ public class TestFile<Directories extends RunAllProofsDirectories> implements Se
                             + keyFile.getAbsolutePath());
                 }
                 
-                final ProofBundleConverter pbc = new ProofBundleConverter(maybeModel.get(), proofFile);
+                final RelationalProofBundleConverter pbc = new RelationalProofBundleConverter(maybeModel.get(), proofFile);
                 proofFile = new File(keyFile.getAbsolutePath() + ".zproof");
                 pbc.save(proofFile);
             }

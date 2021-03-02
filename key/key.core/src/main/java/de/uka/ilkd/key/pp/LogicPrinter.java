@@ -449,8 +449,8 @@ public class LogicPrinter {
         if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
             layouter.brk().print("\\sameUpdateLevel");
         }
-        if ((applicationRestriction & RewriteTaclet.NOT_IN_ABSTRACT_UPDATE_SCOPE) != 0) {
-            layouter.brk().print("\\notInAbstractUpdateScope");
+        if ((applicationRestriction & RewriteTaclet.NOT_IN_PV_SCOPE) != 0) {
+            layouter.brk().print("\\notInPVScope");
         }
         if ((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
             layouter.brk().print("\\inSequentState");

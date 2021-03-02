@@ -103,6 +103,7 @@ options {
   import de.uka.ilkd.key.ldt.SeqLDT;
   import de.uka.ilkd.key.ldt.IntegerLDT;
   import de.uka.ilkd.key.ldt.LocSetLDT;
+  import de.uka.ilkd.key.ldt.ProgVarLDT;
   
   import de.uka.ilkd.key.abstractexecution.rule.conditions.*;
 }
@@ -1320,11 +1321,8 @@ options {
             if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
                 mod = "\"\\sameUpdateLevel\"";
             }
-            if ((applicationRestriction & RewriteTaclet.NOT_IN_ABSTRACT_UPDATE_SCOPE) != 0) {
-                mod = "\"\\notInAbstractUpdateScope\"";
-            }
-            if ((applicationRestriction & RewriteTaclet.IN_ABSTRACT_UPDATE_SCOPE) != 0) {
-                mod = "\"\\inAbstractUpdateScope\"";
+            if ((applicationRestriction & RewriteTaclet.NOT_IN_PV_SCOPE) != 0) {
+                mod = "\"\\notInPVScope\"";
             }
             if ((applicationRestriction & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
                 if (mod != "") mod += " and ";
@@ -3681,7 +3679,8 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
 	                }
 	                
 	                final LocSetLDT locSetLDT = getServices().getTypeConverter().getLocSetLDT();
-	                if (varfuncid.equals("singletonPV") && args[0].sort() != locSetLDT.getProgVarSort()) {
+                    final ProgVarLDT pvLDT = getServices().getTypeConverter().getProgVarLDT();
+	                if (varfuncid.equals("singletonPV") && args[0].sort() != pvLDT.getProgVarSort()) {
 	                    final Operator pv = args[0].op();
 	                    if (!(pv instanceof LocationVariable)) {
                             semanticError(
@@ -3691,7 +3690,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
 	                    }
 	                    
                         args[0] = getTermFactory().createTerm(
-                            locSetLDT.getPV(),
+                            pvLDT.getPvConstructor(),
                             getTermFactory().createTerm(pv),
                             new ImmutableArray<>());
 	                }
@@ -3850,8 +3849,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
         ( FIND LPAREN find = termorseq RPAREN 
             (   SAMEUPDATELEVEL { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
               | INSEQUENTSTATE { applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE; }
-              | INABSTRACTUPDATESCOPE { applicationRestriction |= RewriteTaclet.IN_ABSTRACT_UPDATE_SCOPE; }
-              | NOTINABSTRACTUPDATESCOPE { applicationRestriction |= RewriteTaclet.NOT_IN_ABSTRACT_UPDATE_SCOPE; }
+              | NOTINPVSCOPE { applicationRestriction |= RewriteTaclet.NOT_IN_PV_SCOPE; }
               | ANTECEDENTPOLARITY { applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY; }
               | SUCCEDENTPOLARITY { applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY; }
             )*

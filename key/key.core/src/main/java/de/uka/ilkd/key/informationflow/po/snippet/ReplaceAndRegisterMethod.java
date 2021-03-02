@@ -180,7 +180,7 @@ abstract class ReplaceAndRegisterMethod {
             replaceMap.put(qv, new LogicVariable(qv.name(), qv.sort()));
         }
         final OpReplacer op = new OpReplacer(
-                replaceMap, services.getTermFactory(), services.getProof());
+                replaceMap, services.getTermFactory());
         term = TermLabel.removeIrrelevantLabels(term, services.getTermFactory());
         return op.replace(term);
     }

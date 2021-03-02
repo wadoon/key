@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
+import de.uka.ilkd.key.java.expression.operator.adt.SingletonPVFun;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
@@ -48,7 +49,7 @@ public class ProgVarLDT extends LDT {
         pvConstructor = addFunction(services, "PV");
     }
 
-    public Sort getFieldSort() {
+    public Sort getProgVarSort() {
         return progVarSort;
     }
 
@@ -70,7 +71,7 @@ public class ProgVarLDT extends LDT {
     @Override
     public boolean isResponsible(Operator op, Term sub, TermServices services,
             ExecutionContext ec) {
-        return false;
+        return op instanceof SingletonPVFun;
     }
 
     @Override
@@ -80,6 +81,10 @@ public class ProgVarLDT extends LDT {
 
     @Override
     public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+        if (op instanceof SingletonPVFun) {
+            return pvConstructor;
+        }
+        assert false;
         return null;
     }
 
