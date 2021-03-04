@@ -13,7 +13,6 @@ public class ShiftUpdateImpl {
 	private final Goal goal;
 	private final Services services;
 	private final TermBuilder tb;
-	private Name rPred, wPred;
 
 	public ShiftUpdateImpl(Goal g) {
 		goal = g;

@@ -273,7 +273,7 @@ public class TestPredicateConstruction {
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
 
-		String[] arrLeft = { /*"i=0", */"a!=null","a.length=10"};
+		String[] arrLeft = { /* "i=0", */"a!=null", "a.length=10" };
 		try {
 			for (String fml : arrLeft) {
 				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
@@ -290,7 +290,7 @@ public class TestPredicateConstruction {
 		}
 //		System.out.println("Seq to find LI " + seq.toString());
 
-		CurrentLIG cur = new CurrentLIG(services, seq);
+		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
 		cur.mainAlg();
 	}
 
@@ -357,15 +357,125 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return;
 		}
-		CurrentLIG cur = new CurrentLIG(services, seq);
+		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
 		cur.mainAlg();
 //		cur.mainAlg2(seq);
+	}
+
+	public void testCase9_P() {
+
+		Term formula;
+
+		try {
+			formula = parse("{i:=0}\\<{" + "			while (i<a.length-1) {a[i] = a[i+1];" + "			i++;}"
+					+ "		}\\>true");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
+
+		String[] arrLeft = { /* "i=0", */"a!=null" };
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+
+		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
+		cur.mainAlg();
+	}
+
+	public void testCase9_N() {
+
+		Term formula;
+
+		try {
+			formula = parse("{i:=1}\\<{" + "			while (i<=a.length-1) {a[i] = a[i-1];" + "			i++;}"
+					+ "		}\\>true");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
+
+		String[] arrLeft = { /* "i=0", */"a!=null" };
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+
+		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
+		cur.mainAlg();
+	}
+
+	public void testCase10() {
+
+		Term formula;
+
+		try {
+			formula = parse("{i:=0}\\<{" + "			while (i<=a.length-1) {a[i] = b[i];" + "			i++;}"
+					+ "		}\\>true");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
+
+		String[] arrLeft = { /* "i=0", */"a!=null", "b!=null" };
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
+		cur.mainAlg();
 	}
 
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 
-		tpc.testCase7();
+		tpc.testCase9_P();
 	}
 
 }

@@ -3,7 +3,6 @@ package de.uka.ilkd.key.loopinvgen;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer.Formula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -29,20 +28,19 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.proof.Goal;
-import jdk.nashorn.internal.ir.annotations.Immutable;
 
-public class CurrentLIG {
+public class LIGMultipleArrays {
 
 	private final Sequent seq;
 	private final Services services;
 	private final TermBuilder tb;
 	private Term low, high, index;
-	private Term array;
+	private Set<Term> arrays = new HashSet<>();
 	private final RuleApplication ruleApp;
 	private Set<Term> oldCompPred = new HashSet<>();
 	private Set<Term> oldDepPred = new HashSet<>();
 
-	public CurrentLIG(Services s, Sequent sequent) {
+	public LIGMultipleArrays(Services s, Sequent sequent) {
 		seq = sequent;
 		ruleApp = new RuleApplication(s, seq);
 //		services = proof.getServices();// New service after unwind
@@ -55,15 +53,21 @@ public class CurrentLIG {
 		getLow(seq);
 		getIndexAndHigh(seq);
 		getLocSet(seq);
+		
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
 		ImmutableList<Goal> goalsAfterUnwind = null;
-
+		
 		Goal currentGoal = goalsAfterShift.head();
 		SequentFormula currentIndexFormula = null;
+		
 		ConstructAllCompPreds cac = new ConstructAllCompPreds(services, low, index, high);
 		Set<Term> compPreds = cac.cons();
-		ConstructAllDepPreds cad = new ConstructAllDepPreds(services, array, low, index, high);
-		Set<Term> depPreds = cad.cons();
+
+		Set<Term> depPreds = new HashSet<>();
+		for(Term arr:arrays) {
+			ConstructAllDepPreds cad = new ConstructAllDepPreds(services, arr, low, index, high);
+			depPreds.addAll(cad.cons());
+		}
 
 		do {
 			oldCompPred.removeAll(oldCompPred);
@@ -88,7 +92,9 @@ public class CurrentLIG {
 //			System.out.println("DP: " + depPreds);
 
 		} while (!compPreds.equals(oldCompPred) || !depPreds.equals(oldDepPred));
-		
+		PredicateListCompression plc = new PredicateListCompression(services, currentGoal.sequent(), currentIndexFormula);
+		//Compression is not mandetory
+		plc.compression(depPreds, compPreds);
 		System.out.println("LIG is the conjunction of: " + compPreds + "  size " + compPreds.size() + " and " + depPreds
 				+ " of size " + depPreds.size());
 	}
@@ -185,7 +191,7 @@ public class CurrentLIG {
 				// kjt.getJavaType(); // Java type
 				// System.out.println(v + " is of KeY sort " + kjt.getSort());
 				// System.out.println(v + " is of java type " + kjt.getJavaType());
-				array = tb.var(v);
+				arrays.add(tb.var(v));
 			}
 		}
 	}

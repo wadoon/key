@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.loopinvgen;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
