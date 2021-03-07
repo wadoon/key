@@ -385,7 +385,7 @@ public class ProofCollectionSettings implements Serializable {
     }
 
     public ProofCollectionSettings setGlobalKeYSettings(String settings) {
-        this.settings.put(KEY_SETTINGS_KEY, settings);
+        //this.settings.put(KEY_SETTINGS_KEY, settings);
         return this;
     }
 }
