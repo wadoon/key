@@ -345,4 +345,7 @@ public class StatisticsFile implements Serializable {
             boolean proofClosed);
    }
 
+   public File getStatisticsFile() {
+      return statisticsFile;
+   }
 }
