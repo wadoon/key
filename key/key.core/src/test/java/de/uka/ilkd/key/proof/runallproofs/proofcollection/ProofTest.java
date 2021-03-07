@@ -7,7 +7,6 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -296,6 +295,10 @@ public class ProofTest implements Serializable {
 
     public ProofCollectionSettings getSettings() {
         return settings;
+    }
+
+    public TestProperty getTestProperty() {
+        return testProperty;
     }
 
     /**

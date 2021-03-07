@@ -25,6 +25,14 @@ public final class ProofGroup {
     private final ProofCollectionSettings settings;
     private final List<ProofTest> proofTests = new LinkedList<>();
 
+    public ProofCollectionSettings getSettings() {
+        return settings;
+    }
+
+    public List<ProofTest> getProofTests() {
+        return proofTests;
+    }
+
     /**
      * Method {@link Object#toString()} is used by class {@link RunAllProofsTest}
      * to determine the name of a test case. It is overridden here so that test

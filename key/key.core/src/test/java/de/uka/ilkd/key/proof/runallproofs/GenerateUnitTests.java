@@ -2,7 +2,8 @@ package de.uka.ilkd.key.proof.runallproofs;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofGroup;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofTest;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,9 +37,9 @@ public class GenerateUnitTests {
     /**
      * List of considered proofs collections.
      */
-    private final static String[] collections = new String[]{
-            RunAllProofsFunctional.INDEX_FILE,
-            RunAllProofsInfFlow.INDEX_FILE
+    private final static ProofCollection[] collections = new ProofCollection[]{
+            ProofCollections.getJavaDlProofCollection(),
+            ProofCollections.getInfFlowCollection()
     };
 
     public static void main(String[] args) throws IOException {
@@ -53,10 +54,9 @@ public class GenerateUnitTests {
         File out = new File(outputFolder);
         out.mkdirs();
 
-        for (String index : collections) {
-            log("Index file: %s", index);
-            ProofCollection col = RunAllProofsTest.parseIndexFile(index);
-            for (RunAllProofsTestUnit unit : col.createRunAllProofsTestUnits()) {
+        for (ProofCollection col: collections) {
+            //log("Index file: %s", col.);
+            for (ProofGroup unit : col.createRunAllProofsTestUnits()) {
                 createUnitClass(col, unit);
             }
         }
@@ -99,9 +99,9 @@ public class GenerateUnitTests {
      * @param unit
      * @throws IOException if the file is not writable
      */
-    private static void createUnitClass(ProofCollection col, RunAllProofsTestUnit unit) throws IOException {
+    private static void createUnitClass(ProofCollection col, ProofGroup unit) throws IOException {
         String packageName = "de.uka.ilkd.key.proof.runallproofs";
-        String name = unit.getTestName();
+        String name = unit.getGroupName();
         String className = name
                 .replaceAll("\\.java", "")
                 .replaceAll("\\.key", "")
@@ -135,7 +135,7 @@ public class GenerateUnitTests {
         Set<String> usedMethodNames = new TreeSet<>();
         int clashCounter = 0;
 
-        for (TestFile<?> file : unit.getTestFiles()) {
+        for (ProofTest file : unit.getProofTests()) {
             File keyFile = file.getKeYFile();
             String testName = keyFile.getName()
                     .replaceAll("\\.java", "")
@@ -159,7 +159,7 @@ public class GenerateUnitTests {
                 case PROVABLE:
                     methods.append("assertProvability(\"").append(keyFile.getAbsolutePath()).append("\");");
                     break;
-                case NOTPROVABLE:
+                case NOT_PROVABLE:
                     methods.append("assertUnProvability(\"").append(keyFile.getAbsolutePath()).append("\");");
                     break;
                 case LOADABLE:
