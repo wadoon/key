@@ -59,133 +59,133 @@ public final class ProofCollections {
                 .setReloadEnabled(true)
                 .setTempDir("runallproofs_tmp");
 
-        c.addGroup("newBook")
-                .provable("newBook/09.list_modelfield/ArrayList.add.key")
-                .provable("newBook/09.list_modelfield/ArrayList.remFirst.key")
-                .provable("newBook/09.list_modelfield/ArrayList.empty.key")
-                .provable("newBook/09.list_modelfield/ArrayList.size.key")
-                .provable("newBook/09.list_modelfield/ArrayList.get.key");
-        c.addGroup("oldBook")
-                .provable("./standard_key/BookExamples/02FirstOrderLogic/Ex2.58.key")
-                .provable("./standard_key/BookExamples/03DynamicLogic/Sect3.3.1.key");
-        c.addGroup("comprehensions")
-                .provable("heap/comprehensions/general_sum.key")
-                .provable("heap/comprehensions/sum0.key")
-                .provable("heap/comprehensions/sum1.key")
-                .provable("heap/comprehensions/sum2.key")
-                .provable("heap/comprehensions/sum3.key")
-                .provable("heap/comprehensions/segsum.key")
-                .provable("heap/comprehensions/bsum_negative.key")
-                .provable("heap/comprehensions/bsum_neg2.key")
-                .provable("heap/comprehensions/bsumSplit.key")
-                .provable("heap/comprehensions/bprodSplit.key")
-                .notprovable("heap/comprehensions/bsumSplitInvalid.key");
-        c.addGroup("performance")
-                .provable("performance-test/Disjoint(Disjoint__disjoint_08()).JML_operation_contract.0.key")
-                .provable("performance-test/Disjoint(Disjoint__disjoint2_08()).JML_operation_contract.0.key")
-                .provable("performance-test/AccessChain1(AccessChain1__foo_08()).JML_operation_contract.0.key")
-                .provable("performance-test/AccessChain4(AccessChain4__foo_08()).JML_operation_contract.0.key")
-                .provable("performance-test/Disjoint(Disjoint__xZero_08()).JML_operation_contract.0.key")
-                .provable("performance-test/Dynamic(Dynamic__foo_08()).JML_operation_contract.0.key")
-                .provable("performance-test/DynamicGhost(DynamicGhost__dynamicGhost_08()).JML_normal_behavior_operation_contract.0.key")
-                .provable("performance-test/GhostFrame(GhostFrame__foo_08()).JML_operation_contract.0.key")
-                .provable("performance-test/Modelfield(Modelfield__foo_08()).JML_operation_contract.0.key");
-        c.addGroup("performancePOConstruction")
-                .provable("performance-test/Test(Test__a0(int)).JML_normal_behavior_operation_contract.0.key")
-                .provable("performance-test/Test(Test__a1(int)).JML_normal_behavior_operation_contract.0.key")
-                .provable("performance-test/Test(Test__f1(int)).JML_normal_behavior_operation_contract.0.key");
-        c.addGroup("applicationRestrictions")
-                .provable("heap/polarity_tests/wellformed1.key")
-                .notprovable("./heap/polarity_tests/wellformed2.key")
-                .provable("heap/polarity_tests/wellformed3.key")
-                .notprovable("./heap/polarity_tests/wellformed4.key")
-                .provable("heap/polarity_tests/wellformed5.key")
-                .notprovable("./heap/polarity_tests/wellformed6.key")
-                .provable("heap/polarity_tests/wellformed7.key")
-                .notprovable("./heap/polarity_tests/wellformed8.key")
-                .provable("heap/polarity_tests/wellformed9.key")
-                .notprovable("./heap/polarity_tests/wellformed10.key")
-                .notprovable("./heap/polarity_tests/wellformed11.key");
-        addBlockContracts(c);
+//        c.addGroup("newBook")
+//                .provable("newBook/09.list_modelfield/ArrayList.add.key")
+//                .provable("newBook/09.list_modelfield/ArrayList.remFirst.key")
+//                .provable("newBook/09.list_modelfield/ArrayList.empty.key")
+//                .provable("newBook/09.list_modelfield/ArrayList.size.key")
+//                .provable("newBook/09.list_modelfield/ArrayList.get.key");
+//        c.addGroup("oldBook")
+//                .provable("./standard_key/BookExamples/02FirstOrderLogic/Ex2.58.key")
+//                .provable("./standard_key/BookExamples/03DynamicLogic/Sect3.3.1.key");
+//        c.addGroup("comprehensions")
+//                .provable("heap/comprehensions/general_sum.key")
+//                .provable("heap/comprehensions/sum0.key")
+//                .provable("heap/comprehensions/sum1.key")
+//                .provable("heap/comprehensions/sum2.key")
+//                .provable("heap/comprehensions/sum3.key")
+//                .provable("heap/comprehensions/segsum.key")
+//                .provable("heap/comprehensions/bsum_negative.key")
+//                .provable("heap/comprehensions/bsum_neg2.key")
+//                .provable("heap/comprehensions/bsumSplit.key")
+//                .provable("heap/comprehensions/bprodSplit.key")
+//                .notprovable("heap/comprehensions/bsumSplitInvalid.key");
+//        c.addGroup("performance")
+//                .provable("performance-test/Disjoint(Disjoint__disjoint_08()).JML_operation_contract.0.key")
+//                .provable("performance-test/Disjoint(Disjoint__disjoint2_08()).JML_operation_contract.0.key")
+//                .provable("performance-test/AccessChain1(AccessChain1__foo_08()).JML_operation_contract.0.key")
+//                .provable("performance-test/AccessChain4(AccessChain4__foo_08()).JML_operation_contract.0.key")
+//                .provable("performance-test/Disjoint(Disjoint__xZero_08()).JML_operation_contract.0.key")
+//                .provable("performance-test/Dynamic(Dynamic__foo_08()).JML_operation_contract.0.key")
+//                .provable("performance-test/DynamicGhost(DynamicGhost__dynamicGhost_08()).JML_normal_behavior_operation_contract.0.key")
+//                .provable("performance-test/GhostFrame(GhostFrame__foo_08()).JML_operation_contract.0.key")
+//                .provable("performance-test/Modelfield(Modelfield__foo_08()).JML_operation_contract.0.key");
+//        c.addGroup("performancePOConstruction")
+//                .provable("performance-test/Test(Test__a0(int)).JML_normal_behavior_operation_contract.0.key")
+//                .provable("performance-test/Test(Test__a1(int)).JML_normal_behavior_operation_contract.0.key")
+//                .provable("performance-test/Test(Test__f1(int)).JML_normal_behavior_operation_contract.0.key");
+//        c.addGroup("applicationRestrictions")
+//                .provable("heap/polarity_tests/wellformed1.key")
+//                .notprovable("./heap/polarity_tests/wellformed2.key")
+//                .provable("heap/polarity_tests/wellformed3.key")
+//                .notprovable("./heap/polarity_tests/wellformed4.key")
+//                .provable("heap/polarity_tests/wellformed5.key")
+//                .notprovable("./heap/polarity_tests/wellformed6.key")
+//                .provable("heap/polarity_tests/wellformed7.key")
+//                .notprovable("./heap/polarity_tests/wellformed8.key")
+//                .provable("heap/polarity_tests/wellformed9.key")
+//                .notprovable("./heap/polarity_tests/wellformed10.key")
+//                .notprovable("./heap/polarity_tests/wellformed11.key");
+//        addBlockContracts(c);
+//
+//        addJavaCard(c);
+//
+//        addList(c);
+//
+//        c.addGroup("list_ghost")
+//                .provable("./heap/list_ghost/ArrayList_add.key")
+//                .provable("./heap/list_ghost/ArrayList_ArrayList.key")
+//                .provable("./heap/list_ghost/ArrayList_enlarge.key")
+//                .provable("./heap/list_ghost/ArrayList_get_dep.key")
+//                .provable("./heap/list_ghost/ArrayList_get_exceptional.key")
+//                .provable("./heap/list_ghost/ArrayList_get_normal.key")
+//                .provable("./heap/list_ghost/ArrayList_inv.key")
+//                .provable("./heap/list_ghost/ArrayList_size_dep.key")
+//                .provable("./heap/list_ghost/ArrayList_size.key");
+//
+//        c.addGroup("list_recursive")
+//                .provable("./heap/list_recursiveSpec/ListOperationsNonNull_getNextNN_normal_behavior.key")
+//                .provable("./heap/list_recursiveSpec/ListOperationsNonNull_setValueAt_normal_behavior.key")
+//                .provable("./heap/list_recursiveSpec/ListOperationsNonNull_remove_normal_behavior.key");
+//
+//        c.addGroup("list_seq")
+//                .provable("./heap/list_seq/SimplifiedLinkedList.remove.key")
+//                .provable("./heap/list_seq/ArrayList.ArrayList.key")
+//                .provable("./heap/list_seq/ArrayList.add.key")
+//                .provable("./heap/list_seq/ArrayList.contains.key")
+//                .provable("./heap/list_seq/ArrayList.enlarge.key")
+//                .provable("./heap/list_seq/ArrayList.get.key")
+//                .provable("./heap/list_seq/ArrayList.newArray.key")
+//                .provable("./heap/list_seq/ArrayList.remove.0.key")
+//                .provable("./heap/list_seq/ArrayList.remove.1.key");
+//
+//        c.addGroup("observer")
+//                .provable("./heap/observer/ExampleObserver_ExampleObserver.key")
+//                .provable("./heap/observer/ExampleObserver_inv.key")
+//                .provable("./heap/observer/ExampleObserver_subject.key")
+//                .provable("./heap/observer/ExampleObserver_update.key")
+//                .provable("./heap/observer/ExampleObserver_upToDate.key")
+//                .provable("./heap/observer/ExampleObserver_value.key")
+//                .provable("./heap/observer/ExampleSubject_addObserver.key")
+//                .provable("./heap/observer/ExampleSubject_change.key")
+//                .provable("./heap/observer/ExampleSubject_ExampleSubject.key")
+//                .provable("./heap/observer/ExampleSubject_footprint.key")
+//                .provable("./heap/observer/ExampleSubject_inv.key")
+//                .provable("./heap/observer/ExampleSubject_notifyObservers.key")
+//                .provable("./heap/observer/ExampleSubject_value_dep.key")
+//                .provable("./heap/observer/ExampleSubject_value.key");
+//
+//        c.addGroup("removeDups")
+//                .provable("./heap/removeDups/arrayPart.key")
+//                .provable("./heap/removeDups/contains.key")
+//                .provable("./heap/removeDups/removeDup.key").provable("./heap/saddleback_search/Saddleback_search.key");
+//
+//        c.addGroup("quicksort")
+//                .localSettings("[Choice]DefaultChoices=moreSeqRules-moreSeqRules:on")
+//                .directory("heap/quicksort/")
+//                .provable("toplevel.key")
+//                .provable("sort.key")
+//                .provable("split.key");
 
-        addJavaCard(c);
-
-        addList(c);
-
-        c.addGroup("list_ghost")
-                .provable("./heap/list_ghost/ArrayList_add.key")
-                .provable("./heap/list_ghost/ArrayList_ArrayList.key")
-                .provable("./heap/list_ghost/ArrayList_enlarge.key")
-                .provable("./heap/list_ghost/ArrayList_get_dep.key")
-                .provable("./heap/list_ghost/ArrayList_get_exceptional.key")
-                .provable("./heap/list_ghost/ArrayList_get_normal.key")
-                .provable("./heap/list_ghost/ArrayList_inv.key")
-                .provable("./heap/list_ghost/ArrayList_size_dep.key")
-                .provable("./heap/list_ghost/ArrayList_size.key");
-
-        c.addGroup("list_recursive")
-                .provable("./heap/list_recursiveSpec/ListOperationsNonNull_getNextNN_normal_behavior.key")
-                .provable("./heap/list_recursiveSpec/ListOperationsNonNull_setValueAt_normal_behavior.key")
-                .provable("./heap/list_recursiveSpec/ListOperationsNonNull_remove_normal_behavior.key");
-
-        c.addGroup("list_seq")
-                .provable("./heap/list_seq/SimplifiedLinkedList.remove.key")
-                .provable("./heap/list_seq/ArrayList.ArrayList.key")
-                .provable("./heap/list_seq/ArrayList.add.key")
-                .provable("./heap/list_seq/ArrayList.contains.key")
-                .provable("./heap/list_seq/ArrayList.enlarge.key")
-                .provable("./heap/list_seq/ArrayList.get.key")
-                .provable("./heap/list_seq/ArrayList.newArray.key")
-                .provable("./heap/list_seq/ArrayList.remove.0.key")
-                .provable("./heap/list_seq/ArrayList.remove.1.key");
-
-        c.addGroup("observer")
-                .provable("./heap/observer/ExampleObserver_ExampleObserver.key")
-                .provable("./heap/observer/ExampleObserver_inv.key")
-                .provable("./heap/observer/ExampleObserver_subject.key")
-                .provable("./heap/observer/ExampleObserver_update.key")
-                .provable("./heap/observer/ExampleObserver_upToDate.key")
-                .provable("./heap/observer/ExampleObserver_value.key")
-                .provable("./heap/observer/ExampleSubject_addObserver.key")
-                .provable("./heap/observer/ExampleSubject_change.key")
-                .provable("./heap/observer/ExampleSubject_ExampleSubject.key")
-                .provable("./heap/observer/ExampleSubject_footprint.key")
-                .provable("./heap/observer/ExampleSubject_inv.key")
-                .provable("./heap/observer/ExampleSubject_notifyObservers.key")
-                .provable("./heap/observer/ExampleSubject_value_dep.key")
-                .provable("./heap/observer/ExampleSubject_value.key");
-
-        c.addGroup("removeDups")
-                .provable("./heap/removeDups/arrayPart.key")
-                .provable("./heap/removeDups/contains.key")
-                .provable("./heap/removeDups/removeDup.key").provable("./heap/saddleback_search/Saddleback_search.key");
-
-        c.addGroup("quicksort")
-                .localSettings("[Choice]DefaultChoices=moreSeqRules-moreSeqRules:on")
-                .directory("heap/quicksort/")
-                .provable("toplevel.key")
-                .provable("sort.key")
-                .provable("split.key");
-
-        addSimpleTests(c);
-        SmansEtAl(c);
-        addVACID0(c);
-        addVSTTE10(c);
-        addWeideEtAl(c);
+        //addSimpleTests(c);
+        //SmansEtAl(c);
+        //addVACID0(c);
+        //addVSTTE10(c);
+        //addWeideEtAl(c);
         // this file contains Unicode symbols for logic operators
         addArithmetic(c);
-        addArrays(c);
-        addJavaDl(c);
-        addFol(c);
-        addStrings(c);
+        //addArrays(c);
+        //addJavaDl(c);
+        //addFol(c);
+        //addStrings(c);
         c.addGroup("simple_info_flow")
                 .notprovable("./heap/information_flow/UpdateAbstraction_ex7_1_insecure.key")
                 .notprovable("./heap/information_flow/UpdateAbstraction_ex7_2_insecure.key");
-        addModelMethods(c);
+        //addModelMethods(c);
         //addWelldefinedness(c);
-        addPermissionHeap(c);
-        addReloadedExamples(c);
-        addCompletionScope(c);
+        //addPermissionHeap(c);
+        //addReloadedExamples(c);
+        //addCompletionScope(c);
         return c;
     }
 
@@ -504,6 +504,7 @@ public final class ProofCollections {
                 .provable("./standard_key/arith/divByZero.key")
                 .provable("./standard_key/arith/divisionAssoc.key")
                 .provable("./standard_key/arith/divisionBy2.key")
+                .withSettings(SETTINGS)
                 .provable("./standard_key/arith/euclidean/gcdHelp-post.key")
                 .provable("./standard_key/arith/gemplusDecimal/add.key")
                 .provable("./standard_key/arith/jdivevenodd.key")
