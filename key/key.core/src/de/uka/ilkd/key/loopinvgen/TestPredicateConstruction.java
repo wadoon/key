@@ -5,19 +5,31 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.antlr.runtime.RecognitionException;
+import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.statement.EmptyStatement;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
+import de.uka.ilkd.key.java.visitor.JavaASTWalker;
+import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -78,6 +90,7 @@ public class TestPredicateConstruction {
 
 	protected KeYParserF getParser(String s) {
 		Recoder2KeY r2k = new Recoder2KeY(services, services.getNamespaces());
+		
 		return new KeYParserF(ParserMode.TERM, getLexer(s), r2k, services, nss, new AbbrevMap());
 	}
 
@@ -477,7 +490,12 @@ public class TestPredicateConstruction {
 
 		Term formula;
 
+		Recoder2KeY r2k = new Recoder2KeY(services, nss);
+		
+		//// a bit of a lengthy parsing
+		
 		try {
+			
 			formula = parse("{i:=0}\\<{while (i<=a.length-1) {"
 //							+ "				a[i] = 1;"
 							+ "				if(a[i]> 0){"
@@ -486,7 +504,7 @@ public class TestPredicateConstruction {
 //							+ "				else {"
 //							+ " 				a[i] = 0;"
 //							+ "				}"
-							+ "				//@ merge_point(i);\n"
+							+ "				; // this is just a comment, the semicolon is replaced by a merge_point(i);\n"
 //							+ "        //@ merge_proc \"MergeByIfThenElse\";\n"
 							+ "			i++;}"
 							+ "		}\\>true");
@@ -498,8 +516,24 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return;
 		}
+		
+		MergePointInline inlineMergePoints = new MergePointInline(formula.sub(1).javaBlock().program(), false, services);
+		ProgramElement s = inlineMergePoints.inline();
+		
+		if (!(s instanceof StatementBlock)) {
+			s = new StatementBlock((Statement)s);
+		}
+		
+		// recreate formula
+		formula = tb.apply(formula.sub(0), tb.dia(JavaBlock.createJavaBlock((StatementBlock)s), tb.tt()));
+		
+		System.out.println("Formula with merge point: "+ProofSaver.printAnything(formula, services));
+
+		//////////////////////////
+		
+		
+		
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
-		System.out.println(ProofSaver.printAnything(formula, services));
 		String[] arrLeft = { /* "i=0", */"a!=null", "b!=null", "cond!=null" };
 		try {
 			for (String fml : arrLeft) {
@@ -605,4 +639,34 @@ public class TestPredicateConstruction {
 		tpc.testCase11_Condition();;
 	}
 
+	
+	
+	public class MergePointInline extends CreatingASTVisitor { 
+		
+		public MergePointInline(ProgramElement root, boolean preservesPos, Services services) {
+			super(root, preservesPos, services);
+		}
+		
+		public ProgramElement inline()
+	    {
+	        stack.push(new ExtList());
+	        walk(root());
+	        ExtList el = stack.peek();
+	        return el.get(ProgramElement.class);
+	    }
+
+	    protected void doAction(ProgramElement element)
+	    {
+	        if (element instanceof EmptyStatement) {
+	        	LocationVariable newIndexVar = new LocationVariable(new ProgramElementName(tb.newName("#mpIndex", nss)), 
+	        			services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT));	            
+	        	addChild(new MergePointStatement(newIndexVar));
+	            changed();
+	        }
+	        else {
+	            super.doAction(element);
+	        }
+	    }
+	};
+	
 }
