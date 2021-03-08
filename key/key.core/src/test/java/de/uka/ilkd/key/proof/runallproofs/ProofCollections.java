@@ -11,6 +11,44 @@ import org.key_project.util.helper.FindResources;
  * @version 1 (8/14/20)
  */
 public final class ProofCollections {
+    final static String SETTINGS = "#Proof-Settings-Config-File\n" +
+            "#Mon Aug 03 16:58:18 CEST 2009\n" +
+            "[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT\n" +
+            "[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT\n" +
+            "# The 'Defaults' are ON for the following:\n" +
+            "[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF\n" +
+            "[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF\n" +
+            "[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF\n" +
+            "[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER\n" +
+            "[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF\n" +
+            "[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_SCOPE_INV_TACLET\n" +
+            "[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF\n" +
+            "[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF\n" +
+            "[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS\n" +
+            "[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED\n" +
+            "# The 'Defaults' are NONE for the following.\n" +
+            "[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS\n" +
+            "[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT\n" +
+            "[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON\n" +
+            "[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE\n" +
+            "[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF\n" +
+            "[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT_INTERNAL\n" +
+            "[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE\n" +
+            "[StrategyProperty]OSS_OPTIONS_KEY=OSS_ON\n" +
+            "[DecisionProcedure]Timeout=60\n" +
+            "[Strategy]Timeout=-1\n" +
+            "[Strategy]MaximumNumberOfAutomaticApplications=10000\n" +
+            "[SMTSettings]integersMaximum=2147483645\n" +
+            "[SMTSettings]integersMinimum=-2147483645\n" +
+            "[SMTSettings]invariantForall=false\n" +
+            "[SMTSettings]UseBuiltUniqueness=false\n" +
+            "[SMTSettings]explicitTypeHierarchy=false\n" +
+            "[SMTSettings]instantiateHierarchyAssumptions=true\n" +
+            "[SMTSettings]useUninterpretedMultiplication=true\n" +
+            "[SMTSettings]SelectedTaclets=\n" +
+            "[Choice]DefaultChoices=assertions-assertions:on , intRules-intRules:arithmeticSemanticsIgnoringOF , initialisation-initialisation:disableStaticInitialisation , programRules-programRules:Java , runtimeExceptions-runtimeExceptions:ban , JavaCard-JavaCard:on , Strings-Strings:on , modelFields-modelFields:showSatisfiability , bigint-bigint:on , sequences-sequences:on , reach-reach:on , integerSimplificationRules-integerSimplificationRules:full , wdOperator-wdOperator:L , wdChecks-wdChecks:off , permissions-permissions:off , moreSeqRules-moreSeqRules:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal:off , javaLoopTreatment-javaLoopTreatment:efficient" +
+            "[Strategy]ActiveStrategy=JavaCardDLStrategy\n";
+
     public static ProofCollection getJavaDlProofCollection() {
         ProofCollection c = new ProofCollection();
         c.getSettings()
@@ -19,44 +57,7 @@ public final class ProofCollections {
                 .setForkMode(ForkMode.PERGROUP)
                 .setForkTimeout(2000)
                 .setReloadEnabled(true)
-                .setTempDir("runallproofs_tmp")
-                .setGlobalKeYSettings("#Proof-Settings-Config-File\n" +
-                        "#Mon Aug 03 16:58:18 CEST 2009\n" +
-                        "[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT\n" +
-                        "[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT\n" +
-                        "# The 'Defaults' are ON for the following:\n" +
-                        "[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF\n" +
-                        "[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF\n" +
-                        "[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF\n" +
-                        "[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER\n" +
-                        "[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF\n" +
-                        "[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_SCOPE_INV_TACLET\n" +
-                        "[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF\n" +
-                        "[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF\n" +
-                        "[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS\n" +
-                        "[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED\n" +
-                        "# The 'Defaults' are NONE for the following.\n" +
-                        "[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS\n" +
-                        "[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT\n" +
-                        "[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON\n" +
-                        "[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE\n" +
-                        "[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF\n" +
-                        "[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT_INTERNAL\n" +
-                        "[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE\n" +
-                        "[StrategyProperty]OSS_OPTIONS_KEY=OSS_ON\n" +
-                        "[DecisionProcedure]Timeout=60\n" +
-                        "[Strategy]Timeout=-1\n" +
-                        "[Strategy]MaximumNumberOfAutomaticApplications=10000\n" +
-                        "[SMTSettings]integersMaximum=2147483645\n" +
-                        "[SMTSettings]integersMinimum=-2147483645\n" +
-                        "[SMTSettings]invariantForall=false\n" +
-                        "[SMTSettings]UseBuiltUniqueness=false\n" +
-                        "[SMTSettings]explicitTypeHierarchy=false\n" +
-                        "[SMTSettings]instantiateHierarchyAssumptions=true\n" +
-                        "[SMTSettings]useUninterpretedMultiplication=true\n" +
-                        "[SMTSettings]SelectedTaclets=\n" +
-                        "[Choice]DefaultChoices=assertions-assertions:on , intRules-intRules:arithmeticSemanticsIgnoringOF , initialisation-initialisation:disableStaticInitialisation , programRules-programRules:Java , runtimeExceptions-runtimeExceptions:ban , JavaCard-JavaCard:on , Strings-Strings:on , modelFields-modelFields:showSatisfiability , bigint-bigint:on , sequences-sequences:on , reach-reach:on , integerSimplificationRules-integerSimplificationRules:full , wdOperator-wdOperator:L , wdChecks-wdChecks:off , permissions-permissions:off , moreSeqRules-moreSeqRules:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal:off , javaLoopTreatment-javaLoopTreatment:efficient" +
-                        "[Strategy]ActiveStrategy=JavaCardDLStrategy\n");
+                .setTempDir("runallproofs_tmp");
 
         c.addGroup("newBook")
                 .provable("newBook/09.list_modelfield/ArrayList.add.key")
@@ -510,6 +511,7 @@ public final class ProofCollections {
                 .provable("./standard_key/arith/mod1.key")
                 .provable("./standard_key/arith/mod2.key")
                 .provable("./standard_key/arith/mod7.key")
+                .withSettings(SETTINGS)
                 .provable("./standard_key/arith/overflow_hija.key")
                 .provable("./standard_key/arith/poly_division0.key")
                 .provable("./standard_key/arith/poly_division1.key")

@@ -161,13 +161,15 @@ public final class ProofGroup {
     private String localDirectory = "";
 
     public ProofGroup provable(String fileName) {
-        ProofTest file = new ProofTest(ProofTest.TestProperty.PROVABLE, localDirectory + fileName, settings);
+        ProofTest file = new ProofTest(ProofTest.TestProperty.PROVABLE, localDirectory + fileName,
+                new ProofCollectionSettings(settings));
         proofTests.add(file);
         return this;
     }
 
     public ProofGroup notprovable(String fileName) {
-        ProofTest file = new ProofTest(ProofTest.TestProperty.NOT_PROVABLE, localDirectory + fileName, settings);
+        ProofTest file = new ProofTest(ProofTest.TestProperty.NOT_PROVABLE, localDirectory + fileName,
+                new ProofCollectionSettings(settings));
         proofTests.add(file);
         return this;
     }
@@ -178,7 +180,8 @@ public final class ProofGroup {
     }
 
     public ProofGroup loadable(String fileName) {
-        ProofTest file = new ProofTest(ProofTest.TestProperty.PROVABLE, localDirectory + fileName, settings);
+        ProofTest file = new ProofTest(ProofTest.TestProperty.PROVABLE, localDirectory + fileName,
+                new ProofCollectionSettings(settings));
         proofTests.add(file);
         return this;
     }
@@ -190,5 +193,15 @@ public final class ProofGroup {
 
     public void setGroupName(String name) {
         groupName = name;
+    }
+
+    /**
+     * Applies the given settings on the last added test
+     * @return
+     */
+    public ProofGroup withSettings(String s) {
+        ProofTest last = proofTests.get(proofTests.size() - 1);
+        last.getSettings().setLocalKeYSettings(s);
+        return this;
     }
 }
