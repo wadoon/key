@@ -13,7 +13,7 @@ public class DualTypeTest {
 
     /*@ public normal_behaviour
       @  requires true;
-      @  ensures 5.r = 50e-1r;
+      @  ensures 5.r == 50e-1r;
       @*/
     void m2() {
     }
