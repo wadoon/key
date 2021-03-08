@@ -163,9 +163,13 @@ public class LIGMultipleArrays {
 		return formula.op() instanceof UpdateApplication ? UpdateApplication.getTarget(formula) : formula;
 	}
 
+
 	Set<LocationVariable> extractProgramVariable(Statement s) {
-		ProgramVariableCollector pvc = new ProgramVariableCollector(s, services);
+		ProgramVariableCollectorWithArrayIndices pvc = new ProgramVariableCollectorWithArrayIndices(s, services);
 		pvc.start();
+//		System.out.println(pvc.result());
+//		System.out.println("my array: " + pvc.array());
+//		System.out.println(pvc.index());
 		return pvc.result();
 	}
 
@@ -191,6 +195,7 @@ public class LIGMultipleArrays {
 				// kjt.getJavaType(); // Java type
 				// System.out.println(v + " is of KeY sort " + kjt.getSort());
 				// System.out.println(v + " is of java type " + kjt.getJavaType());
+//				System.out.println("old array: " + v);
 				arrays.add(tb.var(v));
 			}
 		}
