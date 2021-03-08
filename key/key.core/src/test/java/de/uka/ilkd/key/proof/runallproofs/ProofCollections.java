@@ -59,133 +59,133 @@ public final class ProofCollections {
                 .setReloadEnabled(true)
                 .setTempDir("runallproofs_tmp");
 
-//        c.addGroup("newBook")
-//                .provable("newBook/09.list_modelfield/ArrayList.add.key")
-//                .provable("newBook/09.list_modelfield/ArrayList.remFirst.key")
-//                .provable("newBook/09.list_modelfield/ArrayList.empty.key")
-//                .provable("newBook/09.list_modelfield/ArrayList.size.key")
-//                .provable("newBook/09.list_modelfield/ArrayList.get.key");
-//        c.addGroup("oldBook")
-//                .provable("./standard_key/BookExamples/02FirstOrderLogic/Ex2.58.key")
-//                .provable("./standard_key/BookExamples/03DynamicLogic/Sect3.3.1.key");
-//        c.addGroup("comprehensions")
-//                .provable("heap/comprehensions/general_sum.key")
-//                .provable("heap/comprehensions/sum0.key")
-//                .provable("heap/comprehensions/sum1.key")
-//                .provable("heap/comprehensions/sum2.key")
-//                .provable("heap/comprehensions/sum3.key")
-//                .provable("heap/comprehensions/segsum.key")
-//                .provable("heap/comprehensions/bsum_negative.key")
-//                .provable("heap/comprehensions/bsum_neg2.key")
-//                .provable("heap/comprehensions/bsumSplit.key")
-//                .provable("heap/comprehensions/bprodSplit.key")
-//                .notprovable("heap/comprehensions/bsumSplitInvalid.key");
-//        c.addGroup("performance")
-//                .provable("performance-test/Disjoint(Disjoint__disjoint_08()).JML_operation_contract.0.key")
-//                .provable("performance-test/Disjoint(Disjoint__disjoint2_08()).JML_operation_contract.0.key")
-//                .provable("performance-test/AccessChain1(AccessChain1__foo_08()).JML_operation_contract.0.key")
-//                .provable("performance-test/AccessChain4(AccessChain4__foo_08()).JML_operation_contract.0.key")
-//                .provable("performance-test/Disjoint(Disjoint__xZero_08()).JML_operation_contract.0.key")
-//                .provable("performance-test/Dynamic(Dynamic__foo_08()).JML_operation_contract.0.key")
-//                .provable("performance-test/DynamicGhost(DynamicGhost__dynamicGhost_08()).JML_normal_behavior_operation_contract.0.key")
-//                .provable("performance-test/GhostFrame(GhostFrame__foo_08()).JML_operation_contract.0.key")
-//                .provable("performance-test/Modelfield(Modelfield__foo_08()).JML_operation_contract.0.key");
-//        c.addGroup("performancePOConstruction")
-//                .provable("performance-test/Test(Test__a0(int)).JML_normal_behavior_operation_contract.0.key")
-//                .provable("performance-test/Test(Test__a1(int)).JML_normal_behavior_operation_contract.0.key")
-//                .provable("performance-test/Test(Test__f1(int)).JML_normal_behavior_operation_contract.0.key");
-//        c.addGroup("applicationRestrictions")
-//                .provable("heap/polarity_tests/wellformed1.key")
-//                .notprovable("./heap/polarity_tests/wellformed2.key")
-//                .provable("heap/polarity_tests/wellformed3.key")
-//                .notprovable("./heap/polarity_tests/wellformed4.key")
-//                .provable("heap/polarity_tests/wellformed5.key")
-//                .notprovable("./heap/polarity_tests/wellformed6.key")
-//                .provable("heap/polarity_tests/wellformed7.key")
-//                .notprovable("./heap/polarity_tests/wellformed8.key")
-//                .provable("heap/polarity_tests/wellformed9.key")
-//                .notprovable("./heap/polarity_tests/wellformed10.key")
-//                .notprovable("./heap/polarity_tests/wellformed11.key");
-//        addBlockContracts(c);
-//
-//        addJavaCard(c);
-//
-//        addList(c);
-//
-//        c.addGroup("list_ghost")
-//                .provable("./heap/list_ghost/ArrayList_add.key")
-//                .provable("./heap/list_ghost/ArrayList_ArrayList.key")
-//                .provable("./heap/list_ghost/ArrayList_enlarge.key")
-//                .provable("./heap/list_ghost/ArrayList_get_dep.key")
-//                .provable("./heap/list_ghost/ArrayList_get_exceptional.key")
-//                .provable("./heap/list_ghost/ArrayList_get_normal.key")
-//                .provable("./heap/list_ghost/ArrayList_inv.key")
-//                .provable("./heap/list_ghost/ArrayList_size_dep.key")
-//                .provable("./heap/list_ghost/ArrayList_size.key");
-//
-//        c.addGroup("list_recursive")
-//                .provable("./heap/list_recursiveSpec/ListOperationsNonNull_getNextNN_normal_behavior.key")
-//                .provable("./heap/list_recursiveSpec/ListOperationsNonNull_setValueAt_normal_behavior.key")
-//                .provable("./heap/list_recursiveSpec/ListOperationsNonNull_remove_normal_behavior.key");
-//
-//        c.addGroup("list_seq")
-//                .provable("./heap/list_seq/SimplifiedLinkedList.remove.key")
-//                .provable("./heap/list_seq/ArrayList.ArrayList.key")
-//                .provable("./heap/list_seq/ArrayList.add.key")
-//                .provable("./heap/list_seq/ArrayList.contains.key")
-//                .provable("./heap/list_seq/ArrayList.enlarge.key")
-//                .provable("./heap/list_seq/ArrayList.get.key")
-//                .provable("./heap/list_seq/ArrayList.newArray.key")
-//                .provable("./heap/list_seq/ArrayList.remove.0.key")
-//                .provable("./heap/list_seq/ArrayList.remove.1.key");
-//
-//        c.addGroup("observer")
-//                .provable("./heap/observer/ExampleObserver_ExampleObserver.key")
-//                .provable("./heap/observer/ExampleObserver_inv.key")
-//                .provable("./heap/observer/ExampleObserver_subject.key")
-//                .provable("./heap/observer/ExampleObserver_update.key")
-//                .provable("./heap/observer/ExampleObserver_upToDate.key")
-//                .provable("./heap/observer/ExampleObserver_value.key")
-//                .provable("./heap/observer/ExampleSubject_addObserver.key")
-//                .provable("./heap/observer/ExampleSubject_change.key")
-//                .provable("./heap/observer/ExampleSubject_ExampleSubject.key")
-//                .provable("./heap/observer/ExampleSubject_footprint.key")
-//                .provable("./heap/observer/ExampleSubject_inv.key")
-//                .provable("./heap/observer/ExampleSubject_notifyObservers.key")
-//                .provable("./heap/observer/ExampleSubject_value_dep.key")
-//                .provable("./heap/observer/ExampleSubject_value.key");
-//
-//        c.addGroup("removeDups")
-//                .provable("./heap/removeDups/arrayPart.key")
-//                .provable("./heap/removeDups/contains.key")
-//                .provable("./heap/removeDups/removeDup.key").provable("./heap/saddleback_search/Saddleback_search.key");
-//
-//        c.addGroup("quicksort")
-//                .localSettings("[Choice]DefaultChoices=moreSeqRules-moreSeqRules:on")
-//                .directory("heap/quicksort/")
-//                .provable("toplevel.key")
-//                .provable("sort.key")
-//                .provable("split.key");
+        c.addGroup("newBook")
+                .provable("newBook/09.list_modelfield/ArrayList.add.key")
+                .provable("newBook/09.list_modelfield/ArrayList.remFirst.key")
+                .provable("newBook/09.list_modelfield/ArrayList.empty.key")
+                .provable("newBook/09.list_modelfield/ArrayList.size.key")
+                .provable("newBook/09.list_modelfield/ArrayList.get.key");
+        c.addGroup("oldBook")
+                .provable("./standard_key/BookExamples/02FirstOrderLogic/Ex2.58.key")
+                .provable("./standard_key/BookExamples/03DynamicLogic/Sect3.3.1.key");
+        c.addGroup("comprehensions")
+                .provable("heap/comprehensions/general_sum.key")
+                .provable("heap/comprehensions/sum0.key")
+                .provable("heap/comprehensions/sum1.key")
+                .provable("heap/comprehensions/sum2.key")
+                .provable("heap/comprehensions/sum3.key")
+                .provable("heap/comprehensions/segsum.key")
+                .provable("heap/comprehensions/bsum_negative.key")
+                .provable("heap/comprehensions/bsum_neg2.key")
+                .provable("heap/comprehensions/bsumSplit.key")
+                .provable("heap/comprehensions/bprodSplit.key")
+                .notprovable("heap/comprehensions/bsumSplitInvalid.key");
+        c.addGroup("performance")
+                .provable("performance-test/Disjoint(Disjoint__disjoint_08()).JML_operation_contract.0.key")
+                .provable("performance-test/Disjoint(Disjoint__disjoint2_08()).JML_operation_contract.0.key")
+                .provable("performance-test/AccessChain1(AccessChain1__foo_08()).JML_operation_contract.0.key")
+                .provable("performance-test/AccessChain4(AccessChain4__foo_08()).JML_operation_contract.0.key")
+                .provable("performance-test/Disjoint(Disjoint__xZero_08()).JML_operation_contract.0.key")
+                .provable("performance-test/Dynamic(Dynamic__foo_08()).JML_operation_contract.0.key")
+                .provable("performance-test/DynamicGhost(DynamicGhost__dynamicGhost_08()).JML_normal_behavior_operation_contract.0.key")
+                .provable("performance-test/GhostFrame(GhostFrame__foo_08()).JML_operation_contract.0.key")
+                .provable("performance-test/Modelfield(Modelfield__foo_08()).JML_operation_contract.0.key");
+        c.addGroup("performancePOConstruction")
+                .provable("performance-test/Test(Test__a0(int)).JML_normal_behavior_operation_contract.0.key")
+                .provable("performance-test/Test(Test__a1(int)).JML_normal_behavior_operation_contract.0.key")
+                .provable("performance-test/Test(Test__f1(int)).JML_normal_behavior_operation_contract.0.key");
+        c.addGroup("applicationRestrictions")
+                .provable("heap/polarity_tests/wellformed1.key")
+                .notprovable("./heap/polarity_tests/wellformed2.key")
+                .provable("heap/polarity_tests/wellformed3.key")
+                .notprovable("./heap/polarity_tests/wellformed4.key")
+                .provable("heap/polarity_tests/wellformed5.key")
+                .notprovable("./heap/polarity_tests/wellformed6.key")
+                .provable("heap/polarity_tests/wellformed7.key")
+                .notprovable("./heap/polarity_tests/wellformed8.key")
+                .provable("heap/polarity_tests/wellformed9.key")
+                .notprovable("./heap/polarity_tests/wellformed10.key")
+                .notprovable("./heap/polarity_tests/wellformed11.key");
+        addBlockContracts(c);
 
-        //addSimpleTests(c);
-        //SmansEtAl(c);
-        //addVACID0(c);
-        //addVSTTE10(c);
-        //addWeideEtAl(c);
+        addJavaCard(c);
+
+        addList(c);
+
+        c.addGroup("list_ghost")
+                .provable("./heap/list_ghost/ArrayList_add.key")
+                .provable("./heap/list_ghost/ArrayList_ArrayList.key")
+                .provable("./heap/list_ghost/ArrayList_enlarge.key")
+                .provable("./heap/list_ghost/ArrayList_get_dep.key")
+                .provable("./heap/list_ghost/ArrayList_get_exceptional.key")
+                .provable("./heap/list_ghost/ArrayList_get_normal.key")
+                .provable("./heap/list_ghost/ArrayList_inv.key")
+                .provable("./heap/list_ghost/ArrayList_size_dep.key")
+                .provable("./heap/list_ghost/ArrayList_size.key");
+
+        c.addGroup("list_recursive")
+                .provable("./heap/list_recursiveSpec/ListOperationsNonNull_getNextNN_normal_behavior.key")
+                .provable("./heap/list_recursiveSpec/ListOperationsNonNull_setValueAt_normal_behavior.key")
+                .provable("./heap/list_recursiveSpec/ListOperationsNonNull_remove_normal_behavior.key");
+
+        c.addGroup("list_seq")
+                .provable("./heap/list_seq/SimplifiedLinkedList.remove.key")
+                .provable("./heap/list_seq/ArrayList.ArrayList.key")
+                .provable("./heap/list_seq/ArrayList.add.key")
+                .provable("./heap/list_seq/ArrayList.contains.key")
+                .provable("./heap/list_seq/ArrayList.enlarge.key")
+                .provable("./heap/list_seq/ArrayList.get.key")
+                .provable("./heap/list_seq/ArrayList.newArray.key")
+                .provable("./heap/list_seq/ArrayList.remove.0.key")
+                .provable("./heap/list_seq/ArrayList.remove.1.key");
+
+        c.addGroup("observer")
+                .provable("./heap/observer/ExampleObserver_ExampleObserver.key")
+                .provable("./heap/observer/ExampleObserver_inv.key")
+                .provable("./heap/observer/ExampleObserver_subject.key")
+                .provable("./heap/observer/ExampleObserver_update.key")
+                .provable("./heap/observer/ExampleObserver_upToDate.key")
+                .provable("./heap/observer/ExampleObserver_value.key")
+                .provable("./heap/observer/ExampleSubject_addObserver.key")
+                .provable("./heap/observer/ExampleSubject_change.key")
+                .provable("./heap/observer/ExampleSubject_ExampleSubject.key")
+                .provable("./heap/observer/ExampleSubject_footprint.key")
+                .provable("./heap/observer/ExampleSubject_inv.key")
+                .provable("./heap/observer/ExampleSubject_notifyObservers.key")
+                .provable("./heap/observer/ExampleSubject_value_dep.key")
+                .provable("./heap/observer/ExampleSubject_value.key");
+
+        c.addGroup("removeDups")
+                .provable("./heap/removeDups/arrayPart.key")
+                .provable("./heap/removeDups/contains.key")
+                .provable("./heap/removeDups/removeDup.key").provable("./heap/saddleback_search/Saddleback_search.key");
+
+        c.addGroup("quicksort")
+                .localSettings("[Choice]DefaultChoices=moreSeqRules-moreSeqRules:on")
+                .directory("heap/quicksort/")
+                .provable("toplevel.key")
+                .provable("sort.key")
+                .provable("split.key");
+
+        addSimpleTests(c);
+        SmansEtAl(c);
+        addVACID0(c);
+        addVSTTE10(c);
+        addWeideEtAl(c);
         // this file contains Unicode symbols for logic operators
         addArithmetic(c);
-        //addArrays(c);
-        //addJavaDl(c);
-        //addFol(c);
-        //addStrings(c);
+        addArrays(c);
+        addJavaDl(c);
+        addFol(c);
+        addStrings(c);
         c.addGroup("simple_info_flow")
                 .notprovable("./heap/information_flow/UpdateAbstraction_ex7_1_insecure.key")
                 .notprovable("./heap/information_flow/UpdateAbstraction_ex7_2_insecure.key");
-        //addModelMethods(c);
-        //addWelldefinedness(c);
-        //addPermissionHeap(c);
-        //addReloadedExamples(c);
-        //addCompletionScope(c);
+        addModelMethods(c);
+        addWelldefinedness(c);
+        addPermissionHeap(c);
+        addReloadedExamples(c);
+        addCompletionScope(c);
         return c;
     }
 
@@ -871,6 +871,99 @@ public final class ProofCollections {
                 .loadable("./heap/verifyThis17_1_PairInsertionSort/sort.proof.gz");
     }
 
+    private static void addMiniExamples(ProofCollection c) {
+        c.addGroup("MiniExamples_fullmacro")
+                .notprovable("./InformationFlow/MiniExamples/mini.AliasingExamples(mini.AliasingExamples__insecure_1(mini.AliasingExamples,mini.AliasingExamples,int)).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.AliasingExamples(mini.AliasingExamples__secure_1(mini.AliasingExamples,mini.AliasingExamples,int)).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_6()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_5()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_4()).Non-interference contract.0.m.key")
+                .notprovable("./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_3()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_2()).Non-interference contract.0.m.key")
+                .notprovable("./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_1()).Non-interference contract.0.m.key")
+                .notprovable("./InformationFlow/MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).Non-interference contract.1.m.key")
+                .notprovable("./InformationFlow/MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_8()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_parameter(int)).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_7()).Non-interference contract.0.m.key")
+                .notprovable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_2()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_6()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_5()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_4()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_3()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_2()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_1()).Non-interference contract.0.m.key")
+                .notprovable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_1()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_6()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_5()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_4()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_3()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_2()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).Non-interference contract.1.m.key")
+                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).Non-interference contract.0.m.key")
+                .notprovable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_2()).Non-interference contract.0.m.key")
+                .notprovable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_1()).Non-interference contract.0.m.key");
+    }
+
+    private static void addNewObjects(ProofCollection c) {
+        c.addGroup("NewObjects_fullmacro")
+                .provable("./InformationFlow/NewObjects/object.AmtoftBanerjee3(object.AmtoftBanerjee3__m()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_2()).Non-interference contract.0.m.key")
+                .notprovable("./InformationFlow/NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).Non-interference contract.1.m.key")
+                .provable("./InformationFlow/NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__getQ()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/NewObjects/object.Naumann(object.Naumann__Pair_m(int,int)).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_while_i((Ljava.lang.Object)).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_method_call()).Non-interference contract.0.m.key")
+                .notprovable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).Non-interference contract.1.m.key")
+                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_if_two_object_creation()).Non-interference contract.0.m.key")
+                .notprovable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_two_object_creation()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_two_object_creation()).Non-interference contract.0.m.key")
+                .notprovable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).Non-interference contract.1.m.key")
+                .notprovable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_3()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_2()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__expensive(int)).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__cexp(int)).Non-interference contract.0.m.key");
+    }
+
+    private static void addSimpleEvoting(ProofCollection c) {
+        c.addGroup("SimpleEvoting_fullmacro")
+                .provable("./InformationFlow/SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutputMessage((B)).Non-interference contract.0.m.key")
+                // .provable( "./InformationFlow/SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage((B)).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutput(int)).Non-interference contract.0.m.key")
+                .notprovable("./InformationFlow/SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput(int)).Non-interference contract.0.m.key")
+                .notprovable("./InformationFlow/SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).Non-interference contract.1.m.key")
+                .provable("./InformationFlow/SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/SimpleEvoting/simple_evoting.SMTEnv(simple_evoting.SMTEnv__send(int,int,int,simple_evoting.Server,int)).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/SimpleEvoting/simple_evoting.NetworkClient(simple_evoting.NetworkClient__send((B,simple_evoting.Server,int)).Non-interference contract.0.m.key")
+                // .provable( "./InformationFlow/SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__publishResult()).Non-interference contract.0.m.key")
+                // .provable( "./InformationFlow/SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__main()).Non-interference contract.0.m.key")
+                .provable("./InformationFlow/SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).Non-interference contract.1.m.key")
+                .provable("./InformationFlow/SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).Non-interference contract.0.m.key");
+    }
+
+    /**
+     * Completion scopes / Exec statement tests
+     */
+    private static void addCompletionScope(ProofCollection c) {
+        c.addGroup("completionScopes")
+                .provable("./completionscopes/testCcatchReturnVal.key")
+                .provable("./completionscopes/testMultCcatchClauses.key")
+                .provable("./completionscopes/testNestedExec.key")
+                .provable("./completionscopes/testCcatchBreakLabel.key")
+                .provable("./completionscopes/testCcatchContinueLabel.key")
+                .provable("./completionscopes/testCcatchBreakLabelWildcard.key")
+                .provable("./completionscopes/testCcatchContinueLabelWildcard.key")
+                .provable("./completionscopes/testCcatchBreakLabelNonmatchingNested.key");
+
+    }
+
+
     public static ProofCollection getInfFlowCollection() {
         ProofCollection c = new ProofCollection();
         c.getSettings().setBaseDirectory("../")
@@ -881,10 +974,6 @@ public final class ProofCollections {
                 .setTempDir("build/tmp/runallproofs_infflow_tmp")
                 .setForkTimeout(1000)
                 .setVerbose(true);
-
-        //  forkMemory = 1000m
-        //  runOnlyOn = group1,group2
-        //  //  Tests for information flow
 
         c.addGroup("ToyVoting")
                 .provable("./InformationFlow/ToyVoting/Voter(Voter__insecure_voting()).JML normal_behavior operation contract.0.key")
@@ -1341,99 +1430,7 @@ public final class ProofCollections {
         return c;
     }
 
-    private static void addMiniExamples(ProofCollection c) {
-        c.addGroup("MiniExamples_fullmacro")
-                .notprovable("./InformationFlow/MiniExamples/mini.AliasingExamples(mini.AliasingExamples__insecure_1(mini.AliasingExamples,mini.AliasingExamples,int)).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.AliasingExamples(mini.AliasingExamples__secure_1(mini.AliasingExamples,mini.AliasingExamples,int)).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_6()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_5()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_4()).Non-interference contract.0.m.key")
-                .notprovable("./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_3()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_2()).Non-interference contract.0.m.key")
-                .notprovable("./InformationFlow/MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_1()).Non-interference contract.0.m.key")
-                .notprovable("./InformationFlow/MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).Non-interference contract.1.m.key")
-                .notprovable("./InformationFlow/MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_8()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_parameter(int)).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_7()).Non-interference contract.0.m.key")
-                .notprovable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_2()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_6()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_5()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_4()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_3()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_2()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_1()).Non-interference contract.0.m.key")
-                .notprovable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_1()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_6()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_5()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_4()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_3()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_2()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).Non-interference contract.1.m.key")
-                .provable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).Non-interference contract.0.m.key")
-                .notprovable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_2()).Non-interference contract.0.m.key")
-                .notprovable("./InformationFlow/MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_1()).Non-interference contract.0.m.key");
-    }
-
-    private static void addNewObjects(ProofCollection c) {
-        c.addGroup("NewObjects_fullmacro")
-                .provable("./InformationFlow/NewObjects/object.AmtoftBanerjee3(object.AmtoftBanerjee3__m()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_2()).Non-interference contract.0.m.key")
-                .notprovable("./InformationFlow/NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).Non-interference contract.1.m.key")
-                .provable("./InformationFlow/NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__getQ()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/NewObjects/object.Naumann(object.Naumann__Pair_m(int,int)).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_while_i((Ljava.lang.Object)).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_method_call()).Non-interference contract.0.m.key")
-                .notprovable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).Non-interference contract.1.m.key")
-                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_if_two_object_creation()).Non-interference contract.0.m.key")
-                .notprovable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_two_object_creation()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_two_object_creation()).Non-interference contract.0.m.key")
-                .notprovable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).Non-interference contract.1.m.key")
-                .notprovable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_3()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_2()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__expensive(int)).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__cexp(int)).Non-interference contract.0.m.key");
-    }
-
-    private static void addSimpleEvoting(ProofCollection c) {
-        c.addGroup("SimpleEvoting_fullmacro")
-                .provable("./InformationFlow/SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutputMessage((B)).Non-interference contract.0.m.key")
-                // .provable( "./InformationFlow/SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage((B)).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutput(int)).Non-interference contract.0.m.key")
-                .notprovable("./InformationFlow/SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput(int)).Non-interference contract.0.m.key")
-                .notprovable("./InformationFlow/SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).Non-interference contract.1.m.key")
-                .provable("./InformationFlow/SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/SimpleEvoting/simple_evoting.SMTEnv(simple_evoting.SMTEnv__send(int,int,int,simple_evoting.Server,int)).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/SimpleEvoting/simple_evoting.NetworkClient(simple_evoting.NetworkClient__send((B,simple_evoting.Server,int)).Non-interference contract.0.m.key")
-                // .provable( "./InformationFlow/SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__publishResult()).Non-interference contract.0.m.key")
-                // .provable( "./InformationFlow/SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__main()).Non-interference contract.0.m.key")
-                .provable("./InformationFlow/SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).Non-interference contract.1.m.key")
-                .provable("./InformationFlow/SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).Non-interference contract.0.m.key");
-    }
-
-    /**
-     * Completion scopes / Exec statement tests
-     */
-    private static void addCompletionScope(ProofCollection c) {
-        c.addGroup("completionScopes")
-                .provable("./completionscopes/testCcatchReturnVal.key")
-                .provable("./completionscopes/testMultCcatchClauses.key")
-                .provable("./completionscopes/testNestedExec.key")
-                .provable("./completionscopes/testCcatchBreakLabel.key")
-                .provable("./completionscopes/testCcatchContinueLabel.key")
-                .provable("./completionscopes/testCcatchBreakLabelWildcard.key")
-                .provable("./completionscopes/testCcatchContinueLabelWildcard.key")
-                .provable("./completionscopes/testCcatchBreakLabelNonmatchingNested.key");
-
-    }
-
-    /*public static ProofCollection getPerformanceCollection() {
+  /*public static ProofCollection getPerformanceCollection() {
         ProofCollection c = new ProofCollection();
         c.addGroup("performance")
                 .provable("./performance-test/AccessChain1(AccessChain1__foo_01()).JML_operation_contract.0.key")
