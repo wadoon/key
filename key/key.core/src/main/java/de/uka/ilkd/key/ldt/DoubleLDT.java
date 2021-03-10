@@ -93,6 +93,15 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
     private final Function powDouble;
     private final Function expDouble;
     private final Function atanDouble;
+    private final Function cbrtDouble;
+    private final Function coshDouble;
+    private final Function expm1Double;
+    private final Function hypotDouble;
+    private final Function logDouble;
+    private final Function log10Double;
+    private final Function log1pDouble;
+    private final Function sinhDouble;
+    private final Function tanhDouble;
 
     public DoubleLDT(TermServices services) {
 	super(NAME, services);
@@ -149,6 +158,15 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
   powDouble       = addFunction(services, "powDouble");
   expDouble       = addFunction(services, "expDouble");
   atanDouble      = addFunction(services, "atanDouble");
+  cbrtDouble      = addFunction(services, "cbrtDouble");
+  coshDouble      = addFunction(services, "coshDouble");
+  expm1Double      = addFunction(services, "expm1Double");
+  hypotDouble      = addFunction(services, "hypotDouble");
+  logDouble      = addFunction(services, "logDouble");
+  log10Double      = addFunction(services, "log10Double");
+  log1pDouble      = addFunction(services, "log1pDouble");
+  sinhDouble      = addFunction(services, "sinhDouble");
+  tanhDouble      = addFunction(services, "tanhDouble");
     }
 
     @Override
@@ -467,4 +485,40 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
     public Function getExpDouble() { return expDouble; }
 
     public Function getAtanDouble() {return atanDouble; }
+
+    public Function getCbrtDouble() {
+        return cbrtDouble;
+    }
+
+    public Function getCoshDouble() {
+        return coshDouble;
+    }
+
+    public Function getExpm1Double() {
+        return expm1Double;
+    }
+
+    public Function getHypotDouble() {
+        return hypotDouble;
+    }
+
+    public Function getLogDouble() {
+        return logDouble;
+    }
+
+    public Function getLog10Double() {
+        return log10Double;
+    }
+
+    public Function getLog1pDouble() {
+        return log1pDouble;
+    }
+
+    public Function getSinhDouble() {
+        return sinhDouble;
+    }
+
+    public Function getTanhDouble() {
+        return tanhDouble;
+    }
 }

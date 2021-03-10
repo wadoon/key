@@ -68,18 +68,87 @@
         (declare-fun cosDouble (Float64) Float64)
     </entry>
 
+    <entry key="asinDouble.axioms">
+
+        <!-- If the argument is NaN or its absolute value is greater than 1, then the result is NaN.-->
+        (assert (forall ((a Float64)) (=> (or (fp.isNaN a)(fp.lt a (fp #b1 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000))(fp.gt a (fp #b0 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)))(fp.isNaN (asinDouble a)) )))
+
+        <!-- If the argument is zero, then the result is a zero with the same sign as the argument.-->
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (asinDouble a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (asinDouble
+        a) (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+        <!-- If the argument is between -1 and 1 then the returned angle is in the range -pi/2 through pi/2-->
+        (assert (forall ((a Float64)) (=> (and (fp.geq a (fp #b1 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)) (fp.leq a (fp #b0 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000))) (and (fp.geq (asinDouble
+        a) (fp #b1 #b01111111111
+        #b1001001000011111101101010100010001000010110100011000)) (fp.leq (asinDouble
+        a) (fp #b0 #b01111111111
+        #b1001001000011111101101010100010001000010110100011000))))))
+
+    </entry>
+
     <entry key="asinDouble.decls">
         (declare-fun asinDouble (Float64) Float64)
+    </entry>
+
+    <entry key="acosDouble.axioms">
+
+        <!-- If the argument is NaN or its absolute value is greater than 1, then the result is NaN.-->
+        (assert (forall ((a Float64)) (=> (or (fp.isNaN a)(fp.lt a (fp #b1 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)) (fp.gt a (fp #b0 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)))(fp.isNaN (acosDouble a)))))
+
+        <!-- If the argument is between -1 and 1 then the returned angle is in the range 0.0 through pi -->
+        (assert (forall ((a Float64)) (=> (and (fp.geq a
+        (fp #b1 #b01111111111 #b0000000000000000000000000000000000000000000000000000)) (fp.leq a
+        (fp #b0 #b01111111111 #b0000000000000000000000000000000000000000000000000000)))
+        (and (fp.geq (acosDouble a) (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+        (fp.leq (acosDouble a) (fp #b0 #b10000000000 #b1001001000011111101101010100010001000010110100011000))))))
     </entry>
 
     <entry key="acosDouble.decls">
         (declare-fun acosDouble (Float64) Float64)
     </entry>
 
+    <entry key="tanDouble.axioms">
+
+        <!-- If the argument is NaN or an infinity, then the result is NaN-->
+        (assert (forall ((a Float64)) (=> (or (fp.isNaN a) (fp.isInfinite a)) (fp.isNaN (tanDouble a)))))
+
+        <!-- If the argument is zero, then the result is a zero with the same sign as the argument.-->
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (tanDouble a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (tanDouble
+        a) (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+    </entry>
     <entry key="tanDouble.decls">
         (declare-fun tanDouble (Float64) Float64)
     </entry>
 
+    <entry key="atan2Double.axioms">
+
+        <!-- If either argument is NaN, then the result is NaN-->
+        (assert (forall ((a1 Float64)(a2 Float64)) (=> (or (fp.isNaN a1) (fp.isInfinite a2)) (fp.isNaN (atan2Double a1 a2)))))
+
+        <!-- If neither argument is NaN, then the returned angle is in the range of -pi through pi -->
+        (assert (forall ((a1 Float64)(a2 Float64)) (=> (and (not (fp.isNaN a1)) (not (fp.isInfinite a2))) (and (fp.geq (atan2Double a1 a2)
+        (fp #b1 #b10000000000
+        #b1001001000011111101101010100010001000010110100011000))(fp.leq (atan2Double a1 a2) (fp #b0 #b10000000000
+        #b1001001000011111101101010100010001000010110100011000))))))
+
+    </entry>
     <entry key="atan2Double.decls">
         (declare-fun atan2Double (Float64 Float64) Float64)
     </entry>
@@ -119,11 +188,160 @@
         (declare-fun sqrtDouble (Float64) Float64)
     </entry>
 
+    <entry key="powDouble.axioms">
 
+        <!-- If the second argument is positive or negative zero, then the result is 1.0.-->
+        (assert (forall ((a1 Float64)(a2 Float64)) (=> (or (fp.eq a2 (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)) (fp.eq a2 (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))) (fp.eq (powDouble a1 a2)(fp #b0 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+        <!-- If the second argument is 1.0 and the first argument is not a NaN, then the result is the same as the first argument.-->
+        (assert (forall ((a1 Float64)(a2 Float64)) (=> (and (fp.eq a2 (fp #b0 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)) (not (fp.isNaN a1))) (fp.eq (powDouble a1 a2) a1))))
+
+        <!-- If the second argument is NaN, then the result is NaN.-->
+        (assert (forall ((a1 Float64)(a2 Float64)) (=> (fp.isNaN a2) (fp.isNaN (powDouble a1 a2)))))
+
+        <!-- If the first argument is NaN and the second argument is nonzero, then the result is NaN.-->
+        (assert (forall ((a1 Float64)(a2 Float64)) (=> (and (not (fp.eq a2 (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))) (fp.isNaN a1)) (fp.isNaN (powDouble a1 a2)))))
+
+        <!-- If the absolute value of the first argument is greater than 1 and the second argument is positive infinity, or
+        the absolute value of the first argument is less than 1 and the second argument is negative infinity,
+        then the result is positive infinity.-->
+        (assert (forall ((a1 Float64)(a2 Float64)) (=>
+        (or
+            (and
+                (or
+                 (fp.geq a1 (fp #b0 #b01111111111 #b0000000000000000000000000000000000000000000000000000))
+                 (fp.leq a1 (fp #b1 #b01111111111 #b0000000000000000000000000000000000000000000000000000))
+                )
+                (and
+                 (fp.isInfinite a2)
+                 (fp.gt a2 (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+                )
+            )
+            (and
+                (fp.lt a1 (fp #b0 #b01111111111 #b0000000000000000000000000000000000000000000000000000))
+                (and
+                 (fp.gt a1 (fp #b1 #b01111111111 #b0000000000000000000000000000000000000000000000000000))
+                 (fp.isInfinite a2)
+                 (fp.lt a2 (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+                )
+            )
+        )
+        (and
+            (fp.isInfinite (powDouble a1 a2))
+            (fp.gt (powDouble a1 a2) (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+        )
+        )))
+
+        <!-- If the absolute value of the first argument is greater than 1 and the second argument is negative infinity, or
+        the absolute value of the first argument is less than 1 and the second argument is positive infinity,
+        then the result is positive zero.-->
+        (assert (forall ((a1 Float64)(a2 Float64)) (=>
+        (or
+            (and
+              (or
+                (fp.geq a1 (fp #b0 #b01111111111 #b0000000000000000000000000000000000000000000000000000))
+                (fp.leq a1 (fp #b1 #b01111111111 #b0000000000000000000000000000000000000000000000000000))
+              )
+              (and
+                (fp.isInfinite a2)
+                (fp.lt a2 (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+              )
+            )
+            (and
+                (and
+                    (fp.lt a1 (fp #b0 #b01111111111 #b0000000000000000000000000000000000000000000000000000))
+                    (fp.gt a1 (fp #b1 #b01111111111 #b0000000000000000000000000000000000000000000000000000))
+                )
+                (and
+                    (fp.isInfinite a2)
+                    (fp.gt a2 (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+                )
+            )
+        )
+        (fp.eq (powDouble a1 a2) (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+        )))
+
+        <!-- If the absolute value of the first argument equals 1 and the second argument is infinite, then the result is NaN.-->
+        (assert (forall ((a1 Float64)(a2 Float64)) (=>
+        (and
+            (or
+                (fp.geq a1 (fp #b0 #b01111111111 #b0000000000000000000000000000000000000000000000000000))
+                (fp.leq a1 (fp #b1 #b01111111111 #b0000000000000000000000000000000000000000000000000000))
+            )
+            (fp.isInfinite a2)
+        )
+        (fp.isNaN (powDouble a1 a2)))))
+
+        <!-- the first argument is positive zero and the second argument is greater than zero, or
+        the first argument is positive infinity and the second argument is less than zero,
+        then the result is positive zero.-->
+        (assert (forall ((a1 Float64)(a2 Float64)) (=>
+        (or
+            (and
+                (fp.eq a1 (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+                (fp.gt a2 (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+            )
+            (and
+                (fp.lt a2 (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+                (and
+                    (fp.isInfinite a1)
+                    (fp.gt a1 (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+                )
+            )
+        )
+        (fp.eq (powDouble a1 a2) (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+        )))
+
+        <!-- the first argument is positive zero and the second argument is less than zero, or
+        the first argument is positive infinity and the second argument is greater than zero,
+        then the result is positive infinity.-->
+        (assert (forall ((a1 Float64)(a2 Float64)) (=>
+        (or
+            (and
+                (fp.eq a1 (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+                (fp.lt a2 (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+            )
+            (and
+                (and
+                   (fp.isInfinite a1)
+                  (fp.gt a1 (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+                )
+                (fp.gt a2 (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+            )
+        )
+        (and
+            (fp.isInfinite (powDouble a1 a2))
+            (fp.gt (powDouble a1 a2) (fp #b0 #b00000000000 #b0000000000000000000000000000000000000000000000000000))
+        )
+        )))
+
+    </entry>
     <entry key="powDouble.decls">
         (declare-fun powDouble (Float64 Float64) Float64)
     </entry>
 
+    <entry key="expDouble.axioms">
+
+        <!-- If the argument is NaN, the result is NaN.-->
+        (assert (forall ((a Float64)) (=> (fp.isNaN a)(fp.isNaN (expDouble a)))))
+
+        <!-- If the argument is positive infinity, then the result is positive infinity-->
+        (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.gt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(and (fp.isInfinite (expDouble a))(fp.gt (expDouble
+        a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+        <!-- If the argument is negative infinity, then the result is positive zero.-->
+        (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.lt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(fp.eq (expDouble a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+    </entry>
     <entry key="expDouble.decls">
         (declare-fun expDouble (Float64) Float64)
     </entry>
@@ -151,5 +369,288 @@
         (declare-fun atanDouble (Float64) Float64)
     </entry>
 
+    <entry key="cbrtDouble.axioms">
+
+        <!-- If the argument is NaN, the result is NaN.-->
+        (assert (forall ((a Float64)) (=> (fp.isNaN a)(fp.isNaN (cbrtDouble a)))))
+
+        <!-- If the argument is positive infinity, then the result is positive infinity-->
+        (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.gt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(and (fp.isInfinite (cbrtDouble a))(fp.gt (cbrtDouble
+        a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+        <!-- If the argument is negative infinity, then the result is negative infinity-->
+        (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.lt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(and (fp.isInfinite (cbrtDouble a))(fp.lt (cbrtDouble
+        a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+
+        <!-- If the argument is zero, then the result is a zero with the same sign as the argument.-->
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (cbrtDouble a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (cbrtDouble a) (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+        <!-- cbrtDouble is not NaN -->
+        (assert (forall ((a Float64)) (=> (and (not (fp.isNaN a)) (not (fp.isInfinite a)))(not (fp.isNaN (cbrtDouble a))))))
+
+    </entry>
+    <entry key="cbrtDouble.decls">
+        (declare-fun cbrtDouble (Float64) Float64)
+    </entry>
+
+    <entry key="coshDouble.axioms">
+
+        <!-- If the argument is NaN, the result is NaN.-->
+        (assert (forall ((a Float64)) (=> (fp.isNaN a)(fp.isNaN (coshDouble a)))))
+
+        <!-- If the argument is infinite, then the result is positive infinity.-->
+        (assert (forall ((a Float64)) (=> (fp.isInfinite a) (and (fp.isInfinite (coshDouble a))(fp.gt (coshDouble
+        a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+        <!-- If the argument is zero, then the result is 1.0.-->
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (coshDouble a) (fp #b0 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)))))
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (coshDouble a) (fp #b0 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+        <!-- coshDouble is not NaN -->
+        (assert (forall ((a Float64)) (=> (and (not (fp.isNaN a)) (not (fp.isInfinite a)))(not (fp.isNaN (coshDouble a))))))
+
+    </entry>
+    <entry key="coshDouble.decls">
+        (declare-fun coshDouble (Float64) Float64)
+    </entry>
+
+    <entry key="expm1Double.axioms">
+
+        <!-- If the argument is NaN, the result is NaN.-->
+        (assert (forall ((a Float64)) (=> (fp.isNaN a)(fp.isNaN (expm1Double a)))))
+
+        <!-- If the argument is positive infinity, then the result is positive infinity-->
+        (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.gt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(and (fp.isInfinite (expm1Double a))(fp.gt (expm1Double
+        a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+        <!-- If the argument is negative infinity, then the result is -1.0 -->
+        (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.lt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(fp.eq (expm1Double a) (fp #b1 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+        <!-- If the argument is zero, then the result is a zero with the same sign as the argument.-->
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (expm1Double a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (expm1Double a) (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+        <!-- expm1Double is not NaN -->
+        (assert (forall ((a Float64)) (=> (and (not (fp.isNaN a)) (not (fp.isInfinite a)))(not (fp.isNaN (expm1Double a))))))
+
+    </entry>
+    <entry key="expm1Double.decls">
+        (declare-fun expm1Double (Float64) Float64)
+    </entry>
+
+    <entry key="hypotDouble.axioms">
+
+        <!-- If either argument is infinite, then the result is positive infinity.-->
+        (assert (forall ((a1 Float64)(a2 Float64)) (=> (or (fp.isInfinite a1) (fp.isInfinite a2))(and (fp.isInfinite (hypotDouble a1 a2))(fp.gt (hypotDouble
+        a1 a2) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+        <!-- If either argument is NaN and neither argument is infinite, then the result is NaN.-->
+        (assert (forall ((a1 Float64)(a2 Float64)) (=> (and (or (fp.isNaN a1)(fp.isNaN a2))(and (not (fp.isInfinite a1))(not (fp.isInfinite a2))))(fp.isNaN (hypotDouble a1 a2)))))
+
+        <!-- hypotDouble is not NaN -->
+        (assert (forall ((a1 Float64)(a2 Float64)) (=> (and (not (fp.isNaN a1)) (not (fp.isInfinite a1))(not (fp.isNaN a2)) (not (fp.isInfinite a2)))(not (fp.isNaN (hypotDouble a1 a2))))))
+
+    </entry>
+    <entry key="hypotDouble.decls">
+        (declare-fun hypotDouble (Float64 Float64) Float64)
+    </entry>
+
+    <entry key="logDouble.axioms">
+
+        <!-- If the argument is NaN or less than zero, then the result is NaN.-->
+        (assert (forall ((a Float64)) (=> (or (fp.isNaN a)(fp.lt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(fp.isNaN (logDouble a)))))
+
+        <!-- If the argument is positive infinity, then the result is positive infinity-->
+        (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.gt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(and (fp.isInfinite (logDouble a))(fp.gt (logDouble
+        a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+        <!-- If the argument is positive zero or negative zero, then the result is negative infinity.-->
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(and (fp.isInfinite (logDouble a))(fp.lt (logDouble
+        a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(and (fp.isInfinite (logDouble a))(fp.lt (logDouble
+        a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+        <!-- logDouble is not NaN -->
+        (assert (forall ((a Float64)) (=> (and (not (fp.isNaN a)) (not (fp.isInfinite a)) (fp.gt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(not (fp.isNaN (logDouble a))))))
+
+
+    </entry>
+    <entry key="logDouble.decls">
+        (declare-fun logDouble (Float64) Float64)
+    </entry>
+
+    <entry key="log10Double.axioms">
+
+    <!-- If the argument is NaN or less than zero, then the result is NaN.-->
+    (assert (forall ((a Float64)) (=> (or (fp.isNaN a)(fp.lt a (fp #b0 #b00000000000
+    #b0000000000000000000000000000000000000000000000000000)))(fp.isNaN (log10Double a)))))
+
+    <!-- If the argument is positive infinity, then the result is positive infinity-->
+    (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.gt a (fp #b0 #b00000000000
+    #b0000000000000000000000000000000000000000000000000000)))(and (fp.isInfinite (logDouble a))(fp.gt (log10Double
+    a) (fp #b0 #b00000000000
+    #b0000000000000000000000000000000000000000000000000000))))))
+
+    <!-- If the argument is positive zero or negative zero, then the result is negative infinity.-->
+    (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000
+    #b0000000000000000000000000000000000000000000000000000))(and (fp.isInfinite (log10Double a))(fp.lt (log10Double
+    a) (fp #b0 #b00000000000
+    #b0000000000000000000000000000000000000000000000000000))))))
+    (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b00000000000
+    #b0000000000000000000000000000000000000000000000000000))(and (fp.isInfinite (log10Double a))(fp.lt (log10Double
+    a) (fp #b0 #b00000000000
+    #b0000000000000000000000000000000000000000000000000000))))))
+
+    <!-- log10Double is not NaN -->
+    (assert (forall ((a Float64)) (=> (and (not (fp.isNaN a)) (not (fp.isInfinite a)) (fp.gt a (fp #b0 #b00000000000
+    #b0000000000000000000000000000000000000000000000000000)))(not (fp.isNaN (log10Double a))))))
+
+    </entry>
+    <entry key="log10Double.decls">
+        (declare-fun log10Double (Float64) Float64)
+    </entry>
+
+    <entry key="log1pDouble.axioms">
+
+        <!-- If the argument is NaN or less than -1, then the result is NaN.-->
+        (assert (forall ((a Float64)) (=> (or (fp.isNaN a)(fp.lt a (fp #b1 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)))(fp.isNaN (log1pDouble a)))))
+
+        <!-- If the argument is positive infinity, then the result is positive infinity-->
+        (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.gt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(and (fp.isInfinite (log1pDouble a))(fp.gt (log1pDouble
+        a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+        <!-- If the argument is negative one, then the result is negative infinity.-->
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000))(and (fp.isInfinite (log1pDouble a))(fp.lt (log1pDouble
+        a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+        <!-- If the argument is zero, then the result is a zero with the same sign as the argument.-->
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (log1pDouble a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (log1pDouble a) (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+        <!-- log1pDouble is not NaN -->
+        (assert (forall ((a Float64)) (=> (and (not (fp.isNaN a)) (not (fp.isInfinite a)) (fp.gt a (fp #b1 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)))(not (fp.isNaN (log1pDouble a))))))
+
+    </entry>
+    <entry key="log1pDouble.decls">
+        (declare-fun log1pDouble (Float64) Float64)
+    </entry>
+
+    <entry key="sinhDouble.axioms">
+
+        <!-- If the argument is NaN, the result is NaN.-->
+        (assert (forall ((a Float64)) (=> (or (fp.isNaN a)(fp.lt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(fp.isNaN (sinhDouble a)))))
+
+        <!-- If the argument is positive infinity, then the result is positive infinity-->
+        (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.gt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(and (fp.isInfinite (sinhDouble a))(fp.gt (sinhDouble
+        a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+        <!-- If the argument is negative infinity, then the result is negative infinity-->
+        (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.lt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(and (fp.isInfinite (sinhDouble a))(fp.lt (sinhDouble
+        a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+
+        <!-- If the argument is zero, then the result is a zero with the same sign as the argument.-->
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (sinhDouble a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (sinhDouble a) (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+        <!-- sinhDouble is not NaN -->
+        (assert (forall ((a Float64)) (=> (and (not (fp.isNaN a)) (not (fp.isInfinite a)))(not (fp.isNaN (sinhDouble a))))))
+
+
+    </entry>
+    <entry key="sinhDouble.decls">
+        (declare-fun sinhDouble (Float64) Float64)
+    </entry>
+
+    <entry key="tanhDouble.axioms">
+        <!-- If the argument is NaN, the result is NaN.-->
+        (assert (forall ((a Float64)) (=> (or (fp.isNaN a)(fp.lt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(fp.isNaN (tanhDouble a)))))
+
+        <!-- If the argument is zero, then the result is a zero with the same sign as the argument.-->
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (tanhDouble a) (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+        (assert (forall ((a Float64)) (=> (fp.eq a (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000))(fp.eq (tanhDouble
+        a) (fp #b1 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+        <!-- If the argument is positive infinity, then the result is +1.0.-->
+        (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.gt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(fp.eq (tanhDouble
+        a) (fp #b0 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+        <!-- If the argument is negative infinity, then the result is -1.0.-->
+        (assert (forall ((a Float64)) (=> (and (fp.isInfinite a) (fp.lt a (fp #b0 #b00000000000
+        #b0000000000000000000000000000000000000000000000000000)))(fp.eq (tanhDouble
+        a) (fp #b1 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000)))))
+
+        <!-- tanhDouble is not NaN -->
+        (assert (forall ((a Float64)) (=> (not (fp.isNaN a)) (not (fp.isNaN (tanhDouble a))))))
+
+        <!-- tanhDouble is between -1.0 and 1.0 -->
+        (assert (forall ((a Float64)) (=> (not (fp.isNaN a)) (and (fp.leq (tanhDouble a) (fp #b0 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000))(fp.geq (tanhDouble a) (fp #b1 #b01111111111
+        #b0000000000000000000000000000000000000000000000000000))))))
+
+    </entry>
+    <entry key="tanhDouble.decls">
+        (declare-fun tanhDouble (Float64) Float64)
+    </entry>
 </properties>
+
 

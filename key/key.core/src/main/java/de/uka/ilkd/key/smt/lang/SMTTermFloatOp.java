@@ -62,6 +62,16 @@ public class SMTTermFloatOp extends SMTTerm{
 		public static final Op EXPDOUBLE = new Op("expDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
 		public static final Op ATANDOUBLE = new Op("atanDouble" , SMTSort.DOUBLE, SMTSort.DOUBLE);
 		public static final Op FPMOD = new Op("fp.rem", SMTSort.DOUBLE, SMTSort.DOUBLE);
+		public static final Op CBRTDOUBLE = new Op("cbrtDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
+		public static final Op COSHDOUBLE = new Op("coshDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
+		public static final Op EXPM1DOUBLE = new Op("expm1Double", SMTSort.DOUBLE, SMTSort.DOUBLE);
+		public static final Op HYPOTDOUBLE = new Op("hypotDouble", SMTSort.DOUBLE, SMTSort.DOUBLE, SMTSort.DOUBLE);
+		public static final Op LOGDOUBLE = new Op("logDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
+		public static final Op LOG10DOUBLE = new Op("log10Double", SMTSort.DOUBLE, SMTSort.DOUBLE);
+		public static final Op LOG1PDOUBLE = new Op("log1pDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
+		public static final Op SINHDOUBLE = new Op("sinhDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
+		public static final Op TANHDOUBLE = new Op("tanhDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
+
 
 		private static Op unaryFloatPred(String name) {
 			return new Op("fp." + name, SMTSort.FLOAT, SMTSort.BOOL);

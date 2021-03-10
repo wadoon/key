@@ -96,6 +96,15 @@ public class FloatHandler implements SMTHandler {
         mathOperators.put(doubleLDT.getPowDouble(), SMTTermFloatOp.Op.POWDOUBLE);
         mathOperators.put(doubleLDT.getExpDouble(), SMTTermFloatOp.Op.EXPDOUBLE);
         mathOperators.put(doubleLDT.getAtanDouble(), SMTTermFloatOp.Op.ATANDOUBLE);
+        mathOperators.put(doubleLDT.getCbrtDouble(), SMTTermFloatOp.Op.CBRTDOUBLE);
+        mathOperators.put(doubleLDT.getCoshDouble(), SMTTermFloatOp.Op.COSHDOUBLE);
+        mathOperators.put(doubleLDT.getExpm1Double(), SMTTermFloatOp.Op.EXPM1DOUBLE);
+        mathOperators.put(doubleLDT.getHypotDouble(), SMTTermFloatOp.Op.HYPOTDOUBLE);
+        mathOperators.put(doubleLDT.getLogDouble(), SMTTermFloatOp.Op.LOGDOUBLE);
+        mathOperators.put(doubleLDT.getLog10Double(), SMTTermFloatOp.Op.LOG10DOUBLE);
+        mathOperators.put(doubleLDT.getLog1pDouble(), SMTTermFloatOp.Op.LOG1PDOUBLE);
+        mathOperators.put(doubleLDT.getSinhDouble(), SMTTermFloatOp.Op.SINHDOUBLE);
+        mathOperators.put(doubleLDT.getTanhDouble(), SMTTermFloatOp.Op.TANHDOUBLE);
     }
 
     @Override
