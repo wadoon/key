@@ -477,7 +477,11 @@ public class MergeRule implements BuiltInRule {
 
         } // end for (LocationVariable v : progVars)
 
-        // Construct weakened symbolic state
+        // TODO: This here is WRONG, we need to merge the eventupdates from state1 and state2
+        System.out.println(MergeRuleUtils.getEventUpdates(state1.first));
+        newElementaryUpdates = newElementaryUpdates.append(MergeRuleUtils.getEventUpdates(state1.first));
+        
+        // Construct weakened symbolic state        
         Term newSymbolicState = tb.parallel(newElementaryUpdates);
 
         // Note: We apply the symbolic state to the new constraints to enable

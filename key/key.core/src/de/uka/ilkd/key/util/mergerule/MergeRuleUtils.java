@@ -54,6 +54,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.EventUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -216,6 +217,8 @@ public class MergeRuleUtils {
                     .add((LocationVariable) ((ElementaryUpdate) u.op()).lhs());
             return result;
 
+        } else if (u.op() instanceof EventUpdate) {
+        	return DefaultImmutableSet.nil();
         } else if (u.op() instanceof UpdateJunctor) {
 
             ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
@@ -230,6 +233,31 @@ public class MergeRuleUtils {
 
         }
     }
+    
+    /**
+     * Returns all event updates of a parallel update.
+     * 
+     * @param u
+     *            Parallel update to get elementary updates from.
+     * @return Elementary updates of the supplied parallel update.
+     */
+    public static LinkedList<Term> getEventUpdates(Term u) {
+        LinkedList<Term> result = new LinkedList<Term>();
+
+        if (u.op() instanceof ElementaryUpdate) {
+        	// do nothing
+        } else if (u.op() instanceof EventUpdate) {
+        	result.add(u);
+        } else if (u.op() instanceof UpdateJunctor) {
+            for (Term sub : u.subs()) {
+                result.addAll(getEventUpdates(sub));
+            }
+        } else {
+            throw new IllegalArgumentException("Expected an update!");
+        }
+
+        return result;
+    }
 
     /**
      * Returns all elementary updates of a parallel update.
@@ -243,6 +271,8 @@ public class MergeRuleUtils {
 
         if (u.op() instanceof ElementaryUpdate) {
             result.add(u);
+        } else if (u.op() instanceof EventUpdate) {
+          // do nothing
         } else if (u.op() instanceof UpdateJunctor) {
             for (Term sub : u.subs()) {
                 result.addAll(getElementaryUpdates(sub));
@@ -666,6 +696,8 @@ public class MergeRuleUtils {
     public static boolean isUpdateNormalForm(Term u) {
         if (u.op() instanceof ElementaryUpdate) {
             return true;
+        } else if (u.op() instanceof EventUpdate) {
+        	return true;
         } else if (u.op() instanceof UpdateJunctor) {
             boolean result = true;
             for (Term sub : u.subs()) {
