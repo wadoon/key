@@ -778,32 +778,59 @@ options {
         }
     }
 
-    private Term toZNotation(String number, Namespace<Function> functions) {
-	String s = number;
-        final boolean negative = (s.charAt(0) == '-');
-	if (negative) {
-	    s = number.substring(1, s.length());
+	private Term toZNotation(String number) {
+		return getTermFactory().createTerm(
+				functions().lookup(new Name("Z")), toNum(number));
 	}
-        if(s.startsWith("0x")) {
-	  try {
-	    BigInteger bi = new BigInteger(s.substring(2),16);
-	    s = bi.toString();
-	  } catch(NumberFormatException nfe) {
-	    Debug.fail("Not a hexadecimal constant (BTW, this should not have happened).");
-	  }
+
+	private Term toCNotation(String number) {
+		return getTermFactory().createTerm(
+				functions().lookup(new Name("C")), toNum(number));
 	}
-        Term result = getTermFactory().createTerm((Function)functions.lookup(new Name("#")));
 
-        for(int i = 0; i<s.length(); i++){
-            result = getTermFactory().createTerm((Function)functions.lookup(new Name(s.substring(i,i+1))), result);
-        }
+	private Term toFPNotation(String number) {
+		String decBitString = Integer.toUnsignedString(Float.floatToIntBits(Float.parseFloat(number)));
+		return getTermFactory().createTerm(
+				functions().lookup(new Name("FP")),
+				toNum(decBitString),
+				toNum("0")); // soon to disappear
+	}
 
-       	if (negative) {
-  	    result = getTermFactory().createTerm((Function) functions.lookup(new Name("neglit")), result);
-        }
-	return getTermFactory().createTerm
-            ((Function) functions.lookup(new Name("Z")), result); 
-    }
+	private Term toDFPNotation(String number) {
+		String decBitString = Long.toUnsignedString(Double.doubleToLongBits(Double.parseDouble(number)));
+		return getTermFactory().createTerm(
+				functions().lookup(new Name("DFP")),
+				toNum(decBitString),
+				toNum("0")); // soon to disappear
+	}
+
+	private Term toNum(String number) {
+
+		String s = number;
+		final boolean negative = (s.charAt(0) == '-');
+		if (negative) {
+			s = number.substring(1, s.length());
+		}
+		if(s.startsWith("0x")) {
+			try {
+				BigInteger bi = new BigInteger(s.substring(2),16);
+				s = bi.toString();
+			} catch(NumberFormatException nfe) {
+				Debug.fail("Not a hexadecimal constant (BTW, this should not have happened).");
+			}
+		}
+		Term result = getTermFactory().createTerm(functions().lookup(new Name("#")));
+
+		for(int i = 0; i<s.length(); i++){
+			result = getTermFactory().createTerm(functions().lookup(new Name(s.substring(i,i+1))), result);
+		}
+
+		if (negative) {
+			result = getTermFactory().createTerm(functions().lookup(new Name("neglit")), result);
+		}
+
+		return result;
+	}
 
     private String getTypeList(ImmutableList<ProgramVariable> vars) {
 	StringBuffer result = new StringBuffer("");
@@ -3172,9 +3199,9 @@ array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = n
 	:
   	LBRACKET 
 	(   STAR {
-           	rangeFrom = toZNotation("0", functions());
+           	rangeFrom = toZNotation("0");
            	Term lt = getServices().getTermBuilder().dotLength(arrayReference);
-           	Term one = toZNotation("1", functions());
+           	Term one = toZNotation("1");
   	   		rangeTo = getTermFactory().createTerm
            		((Function) functions().lookup(new Name("sub")), lt, one); 
         } 
@@ -3602,20 +3629,17 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
                     semanticError("'"+s+"' is not a valid character.");
                 }       
             }
-            a = getTermFactory().createTerm((Function) functions().lookup(new Name("C")), 
-                                      toZNotation(""+intVal, functions()).sub(0));
+            a = toCNotation(Integer.toString(intVal));
         }
     | 
         ((MINUS)? NUM_LITERAL) => (MINUS {neg = "-";})? number=NUM_LITERAL
-        { a = toZNotation(neg+number.getText(), functions());}    
+        { a = toZNotation(neg+number.getText());}
     |
         ((MINUS)? FLOAT_LITERAL) => (MINUS {neg = "-";})? fl=FLOAT_LITERAL
-        { a = getServices().getTypeConverter().convertToLogicElement(
-		new FloatLiteral(neg+fl.getText())); }
+        { a = toFPNotation(neg + fl.getText()); }
     |
         ((MINUS)? DOUBLE_LITERAL) => (MINUS {neg = "-";})? fl=DOUBLE_LITERAL
-        { a = getServices().getTypeConverter().convertToLogicElement(
-		new DoubleLiteral(neg+fl.getText())); }
+        { a = toDFPNotation(neg + fl.getText()); }
     | AT a = abbreviation
     | varfuncid = funcpred_name
         ( (~LBRACE | LBRACE bound_variables) =>
