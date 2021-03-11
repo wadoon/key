@@ -24,9 +24,7 @@ import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -162,14 +160,21 @@ class Pipe<T> {
 	
 	
 	public void close() {
-		stdoutReceiver.interrupt();
-		stderrReceiver.interrupt();
-		process.destroy();
+		// They may be null if not yet started ...
+		if(stdoutReceiver != null)
+			stdoutReceiver.interrupt();
+		if(stderrReceiver != null)
+			stderrReceiver.interrupt();
+		if(process != null)
+			process.destroy();
 	}
 
-	public void join()  throws InterruptedException {
-		stdoutReceiver.join();
-		stderrReceiver.join();
+	public void join() throws InterruptedException {
+		// They may be null if not yet started ...
+		if(stdoutReceiver != null)
+			stdoutReceiver.join();
+		if(stderrReceiver != null)
+			stderrReceiver.join();
 	}
 
 	public synchronized void sendMessage(String message) throws IOException {
