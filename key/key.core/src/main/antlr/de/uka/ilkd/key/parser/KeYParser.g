@@ -791,16 +791,16 @@ options {
 		String decBitString = Integer.toUnsignedString(Float.floatToIntBits(Float.parseFloat(number)));
 		return getTermFactory().createTerm(
 				functions().lookup(new Name("FP")),
-				toNum(decBitString),
-				toNum("0")); // soon to disappear
+				toNum(decBitString)
+				); // toNum("0")); // soon to disappear
 	}
 
 	private Term toDFPNotation(String number) {
 		String decBitString = Long.toUnsignedString(Double.doubleToLongBits(Double.parseDouble(number)));
 		return getTermFactory().createTerm(
 				functions().lookup(new Name("DFP")),
-				toNum(decBitString),
-				toNum("0")); // soon to disappear
+				toNum(decBitString)
+				); // toNum("0")); // soon to disappear
 	}
 
 	private Term toNum(String number) {

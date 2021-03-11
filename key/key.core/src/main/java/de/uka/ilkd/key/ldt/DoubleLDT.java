@@ -30,7 +30,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 
-public final class DoubleLDT extends LDT implements IFloatingPointLDT {
+public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
     public static final Name NAME = new Name("double");
     public static final Name DOUBLELIT_NAME = new Name("DFP");
@@ -54,10 +54,10 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
     private final Function javaMinDouble;
     private final Function javaMaxDouble;
 
-    private final Function addDoubleIEEE;
-    private final Function subDoubleIEEE;
-    private final Function mulDoubleIEEE;
-    private final Function divDoubleIEEE;
+    private final Function addDouble;
+    private final Function subDouble;
+    private final Function mulDouble;
+    private final Function divDouble;
     private final Function doubleAbs;
 
     private final Function isNormal;
@@ -68,20 +68,6 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
     private final Function isInfinite;
     private final Function isNegative;
     private final Function isPositive;
-
-    private final Function roundingModeRNE;
-    private final Function roundingModeRTN;
-    private final Function roundingModeRTP;
-
-    //Predicates that may not be abstracted, but only translated by SMT
-    private final Function lessThan2;
-    private final Function greaterThan2;
-    private final Function greaterOrEquals2;
-    private final Function lessOrEquals2;
-
-    private final Function intervalMin;
-    private final Function intervalMax;
-    private final Function toInterval;
 
     private final Function sinDouble;
     private final Function cosDouble;
@@ -95,67 +81,55 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
     private final Function atanDouble;
 
     public DoubleLDT(TermServices services) {
-	super(NAME, services);
+        super(NAME, services);
 
-	doubleLit	      = addFunction(services, DOUBLELIT_NAME.toString());
-	javaUnaryMinusDouble  = addFunction(services, NEGATIVE_LITERAL.toString());
-	lessThan	    = addFunction(services, "javaLtDouble");
-	greaterThan	    = addFunction(services, "javaGtDouble");
-	lessOrEquals	    = addFunction(services, "javaLeqDouble");
-	greaterOrEquals	    = addFunction(services, "javaGeqDouble");
-	eqDouble		    = addFunction(services, "javaEqDouble");
-	javaAddDouble	    = addFunction(services, "javaAddDouble");
-	javaSubDouble	    = addFunction(services, "javaSubDouble");
-	javaMulDouble	    = addFunction(services, "javaMulDouble");
-	javaDivDouble	    = addFunction(services, "javaDivDouble");
-	javaModDouble	    = addFunction(services, "javaModDouble");
-	javaMaxDouble	    = addFunction(services, "javaMaxDouble");
-	javaMinDouble	    = addFunction(services, "javaMinDouble");
+        doubleLit             = addFunction(services, DOUBLELIT_NAME.toString());
+        javaUnaryMinusDouble  = addFunction(services, NEGATIVE_LITERAL.toString());
+        lessThan              = addFunction(services, "ltDouble");
+        greaterThan           = addFunction(services, "gtDouble");
+        lessOrEquals          = addFunction(services, "leqDouble");
+        greaterOrEquals       = addFunction(services, "geqDouble");
+        eqDouble              = addFunction(services, "eqDouble");
+        javaAddDouble         = addFunction(services, "javaAddDouble");
+        javaSubDouble         = addFunction(services, "javaSubDouble");
+        javaMulDouble         = addFunction(services, "javaMulDouble");
+        javaDivDouble         = addFunction(services, "javaDivDouble");
+        javaModDouble         = addFunction(services, "javaModDouble");
+        javaMaxDouble         = addFunction(services, "javaMaxDouble");
+        javaMinDouble         = addFunction(services, "javaMinDouble");
 
-	addDoubleIEEE	    = addFunction(services, "addDoubleIEEE");
-	subDoubleIEEE	    = addFunction(services, "subDoubleIEEE");
-	mulDoubleIEEE	    = addFunction(services, "mulDoubleIEEE");
-	divDoubleIEEE	    = addFunction(services, "divDoubleIEEE");
-	doubleAbs	    = addFunction(services, "doubleAbs");
+        addDouble             = addFunction(services, "addDouble");
+        subDouble             = addFunction(services, "subDouble");
+        mulDouble             = addFunction(services, "mulDouble");
+        divDouble             = addFunction(services, "divDouble");
+        doubleAbs             = addFunction(services, "doubleAbs");
 
-	isNormal	    = addFunction(services, "doubleIsNormal");
-	isSubnormal	    = addFunction(services, "doubleIsSubnormal");
-	isNaN		    = addFunction(services, "doubleIsNaN");
-	isZero		    = addFunction(services, "doubleIsZero");
-	isNice		    = addFunction(services, "doubleIsNice");
-	isInfinite	    = addFunction(services, "doubleIsInfinite");
-	isPositive	    = addFunction(services, "doubleIsPositive");
-	isNegative	    = addFunction(services, "doubleIsNegative");
-	roundingModeRNE	    = addFunction(services, "RNE");
-	roundingModeRTN	    = addFunction(services, "RTN");
-	roundingModeRTP	    = addFunction(services, "RTP");
+        isNormal              = addFunction(services, "doubleIsNormal");
+        isSubnormal           = addFunction(services, "doubleIsSubnormal");
+        isNaN                 = addFunction(services, "doubleIsNaN");
+        isZero                = addFunction(services, "doubleIsZero");
+        isNice                = addFunction(services, "doubleIsNice");
+        isInfinite            = addFunction(services, "doubleIsInfinite");
+        isPositive            = addFunction(services, "doubleIsPositive");
+        isNegative            = addFunction(services, "doubleIsNegative");
 
-	lessThan2	    = addFunction(services, "interLtD");
-	greaterThan2	    = addFunction(services, "interGtD");
-	lessOrEquals2	    = addFunction(services, "interLeqD");
-	greaterOrEquals2    = addFunction(services, "interGeqD");
-
-	intervalMin	    = addFunction(services, "ivMinD");
-	intervalMax	    = addFunction(services, "ivMaxD");
-	toInterval	    = addFunction(services, "DTI");
-
-	sinDouble       = addFunction(services, "sinDouble");
-  cosDouble       = addFunction(services, "cosDouble");
-  acosDouble       = addFunction(services, "acosDouble");
-  asinDouble       = addFunction(services, "asinDouble");
-  tanDouble       = addFunction(services, "tanDouble");
-  atan2Double       = addFunction(services, "atan2Double");
-  sqrtDouble       = addFunction(services, "sqrtDouble");
-  powDouble       = addFunction(services, "powDouble");
-  expDouble       = addFunction(services, "expDouble");
-  atanDouble      = addFunction(services, "atanDouble");
+        sinDouble             = addFunction(services, "sinDouble");
+        cosDouble             = addFunction(services, "cosDouble");
+        acosDouble            = addFunction(services, "acosDouble");
+        asinDouble            = addFunction(services, "asinDouble");
+        tanDouble             = addFunction(services, "tanDouble");
+        atan2Double           = addFunction(services, "atan2Double");
+        sqrtDouble            = addFunction(services, "sqrtDouble");
+        powDouble             = addFunction(services, "powDouble");
+        expDouble             = addFunction(services, "expDouble");
+        atanDouble            = addFunction(services, "atanDouble");
     }
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	                         Term[] subs,
-	                         Services services,
-	                         ExecutionContext ec) {
+                                 Term[] subs,
+                                 Services services,
+                                 ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
         } else if (subs.length == 2) {
@@ -166,14 +140,14 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	                         Term left,
-	                         Term right,
-	                         Services services,
-	                         ExecutionContext ec) {
+                                 Term left,
+                                 Term right,
+                                 Services services,
+                                 ExecutionContext ec) {
         if(left != null
-           && left.sort().extendsTrans(targetSort())
-           && right != null
-           && right.sort().extendsTrans(targetSort())) {
+                && left.sort().extendsTrans(targetSort())
+                && right != null
+                && right.sort().extendsTrans(targetSort())) {
             if(getFunctionFor(op, services, ec) != null) {
                 return true;
             }
@@ -183,9 +157,9 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	                         Term sub,
-	                         TermServices services,
-	                         ExecutionContext ec) {
+                                 Term sub,
+                                 TermServices services,
+                                 ExecutionContext ec) {
         if(sub != null && sub.sort().extendsTrans(targetSort())) {
             if(op instanceof Negative) {
                 return true;
@@ -197,25 +171,25 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-   assert lit instanceof DoubleLiteral : "Literal '"+lit+"' is not a double literal.";
-	String s = ((DoubleLiteral)lit).getValue();
-	final boolean negative = (s.charAt(0) == '-');
+        assert lit instanceof DoubleLiteral : "Literal '"+lit+"' is not a double literal.";
+        String s = ((DoubleLiteral)lit).getValue();
+        final boolean negative = (s.charAt(0) == '-');
 
 
-	long doubleBits = Double.doubleToLongBits(Double.parseDouble(s));
+        long doubleBits = Double.doubleToLongBits(Double.parseDouble(s));
         // String bitString = Long.toBinaryString(doubleBits);
         // long number = Long.parseLong(bitString, 2);
         long number = doubleBits;
 
-	IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-	Term intTerm, fractionTerm;
+        IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+        Term intTerm, fractionTerm;
 
         intTerm = services.getTermBuilder().zTerm(number).sub(0);
 
         // Set the second number to 0 for now
-	fractionTerm = intLDT.translateLiteral(new LongLiteral(0), services).sub(0);
+        fractionTerm = intLDT.translateLiteral(new LongLiteral(0), services).sub(0);
 
-	return services.getTermFactory().createTerm(doubleLit, intTerm, fractionTerm);
+        return services.getTermFactory().createTerm(doubleLit, intTerm, fractionTerm);
     }
 
     @Override
@@ -235,8 +209,8 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 
     @Override
     public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
-	    			   Services services,
-	    			   ExecutionContext ec) {
+                                   Services services,
+                                   ExecutionContext ec) {
         if (op instanceof Negative) {
             return getJavaUnaryMinus();
         } else {
@@ -246,7 +220,7 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 
     @Override
     public boolean hasLiteralFunction(Function f) {
-	return containsFunction(f) && (f.arity()==0);
+        return containsFunction(f) && (f.arity()==0);
     }
 
     private static boolean isNumberLiteral(Operator f) {
@@ -305,83 +279,83 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 
     @Override
     public final Type getType(Term t) {
-	if(t.sort() == targetSort()) {
-	    return PrimitiveType.JAVA_DOUBLE;
-	} else {
-	    return null;
-	}
+        if(t.sort() == targetSort()) {
+            return PrimitiveType.JAVA_DOUBLE;
+        } else {
+            return null;
+        }
     }
 
     public Function getDoubleSymbol() {
-	return doubleLit;
+        return doubleLit;
     }
 
     public Function getLessThan() {
-	return lessThan;
+        return lessThan;
     }
 
     public Function getGreaterThan() {
-	return greaterThan;
+        return greaterThan;
     }
 
     public Function getLessOrEquals() {
-	return lessOrEquals;
+        return lessOrEquals;
     }
 
     public Function getGreaterOrEquals() {
-	return greaterOrEquals;
+        return greaterOrEquals;
     }
 
     public Function getEquals() {
-	return eqDouble;
+        return eqDouble;
     }
 
     public Function getJavaUnaryMinus() {
-	return javaUnaryMinusDouble;
+        return javaUnaryMinusDouble;
     }
 
     public Function getJavaAdd() {
-	return javaAddDouble;
+        return javaAddDouble;
     }
 
     public Function getJavaSub() {
-	return javaSubDouble;
+        return javaSubDouble;
     }
 
     public Function getJavaMul() {
-	return javaMulDouble;
+        return javaMulDouble;
     }
 
     public Function getJavaDiv() {
-	return javaDivDouble;
+        return javaDivDouble;
     }
 
     public Function getJavaMod() {
-	return javaModDouble;
+        return javaModDouble;
     }
 
     public Function getJavaMin() {
-	return javaMinDouble;
+        return javaMinDouble;
     }
 
     public Function getJavaMax() {
-	return javaMaxDouble;
+        return javaMaxDouble;
     }
 
     public Function getIsNormal() {
-	return isNormal;
+        return isNormal;
     }
 
     public Function getIsSubnormal() {
-	return isSubnormal;
+        return isSubnormal;
     }
 
     public Function getIsNaN() {
-	return isNaN;
+        return isNaN;
     }
 
     public Function getIsZero() {
-	return isZero;
+        return isZero;
     }
 
     @Override
@@ -390,95 +364,74 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
     }
 
     public Function getIsInfinite() {
-	return isInfinite;
+        return isInfinite;
     }
 
     public Function getIsPositive() {
-	return isPositive;
+        return isPositive;
     }
 
     public Function getIsNegative() {
-	return isNegative;
+        return isNegative;
     }
 
     public Function getAddIEEE() {
-	return addDoubleIEEE;
+        return addDouble;
     }
 
     public Function getSubIEEE() {
-	return subDoubleIEEE;
+        return subDouble;
     }
 
     public Function getMulIEEE() {
-	return mulDoubleIEEE;
+        return mulDouble;
     }
 
     public Function getDivIEEE() {
-	return divDoubleIEEE;
+        return divDouble;
     }
 
     public Function getAbs() {
-	return doubleAbs;
+        return doubleAbs;
     }
 
-    public Function getRoundingModeRNE() {
-	return roundingModeRNE;
+    public Function getSinDouble() {
+        return sinDouble;
     }
 
-    public Function getRoundingModeRTN() {
-	return roundingModeRTN;
+    public Function getCosDouble() {
+        return cosDouble;
     }
 
-    public Function getRoundingModeRTP() {
-	return roundingModeRTP;
+    public Function getAcosDouble() {
+        return acosDouble;
     }
 
-    //Predicates that have been simplified as intervals
-    public Function getLessThan2() {
-	return lessThan2;
+    public Function getAsinDouble() {
+        return asinDouble;
     }
 
-    public Function getGreaterThan2() {
-	return greaterThan2;
+    public Function getTanDouble() {
+        return tanDouble;
     }
 
-    public Function getLessOrEquals2() {
-	return lessOrEquals2;
+    public Function getAtan2Double() {
+        return atan2Double;
     }
 
-    public Function getGreaterOrEquals2() {
-	return greaterOrEquals2;
+    public Function getSqrtDouble() {
+        return sqrtDouble;
     }
 
-    public Function getIntervalMin() {
-	return intervalMin;
+    public Function getPowDouble() {
+        return powDouble;
     }
 
-    public Function getIntervalMax() {
-	return intervalMax;
+    public Function getExpDouble() {
+        return expDouble;
     }
 
-    public Function getToInterval() {
-	return toInterval;
+    public Function getAtanDouble() {
+        return atanDouble;
     }
-
-    public Function getSinDouble() { return sinDouble; }
-
-    public Function getCosDouble() { return cosDouble; }
-
-    public Function getAcosDouble() { return acosDouble; }
-
-    public Function getAsinDouble() { return asinDouble; }
-
-    public Function getTanDouble() { return tanDouble; }
-
-    public Function getAtan2Double() { return atan2Double; }
-
-    public Function getSqrtDouble() { return sqrtDouble; }
-
-    public Function getPowDouble() { return powDouble; }
-
-    public Function getExpDouble() { return expDouble; }
-
-    public Function getAtanDouble() {return atanDouble; }
 }

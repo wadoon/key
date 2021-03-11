@@ -15,7 +15,7 @@ package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.logic.op.Function;
 
-public interface IFloatingPointLDT {
+public interface FloatingPointLDT {
 
     public Function getLessThan();
     public Function getGreaterThan();
@@ -43,5 +43,4 @@ public interface IFloatingPointLDT {
     public Function getMulIEEE();
     public Function getDivIEEE();
     public Function getAbs();
-    public Function getRoundingModeRNE();
 }

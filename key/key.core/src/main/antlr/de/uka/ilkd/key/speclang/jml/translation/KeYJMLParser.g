@@ -2013,7 +2013,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 
             for (int i = 0; i < 2; i++) {
                 boolean isDouble = i == 1;
-                IFloatingPointLDT ldt = isDouble ? doubleLDT : floatLDT;
+                FloatingPointLDT ldt = isDouble ? doubleLDT : floatLDT;
                 KeYJavaType fptype = isDouble ?
                   javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_DOUBLE) :
                   javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_FLOAT);

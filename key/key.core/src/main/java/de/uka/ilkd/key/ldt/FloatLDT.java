@@ -38,7 +38,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 
-public final class FloatLDT extends LDT implements IFloatingPointLDT {
+public final class FloatLDT extends LDT implements FloatingPointLDT {
 
     public static final Name NAME = new Name("float");
     public static final Name FLOATLIT_NAME = new Name("FP");
@@ -68,10 +68,6 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
     private final Function divFloatIEEE;
     private final Function floatAbs;
 
-
-    private final Function castLongToFloat;
-    private final Function castFloatToLong;
-
     private final Function isNormal;
     private final Function isSubnormal;
     private final Function isNaN;
@@ -81,52 +77,45 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
     private final Function isNegative;
     private final Function isPositive;
 
-    private final Function roundingModeRNE;
-
-
     public FloatLDT(TermServices services) {
-	super(NAME, services);
+        super(NAME, services);
 
-	floatLit	    = addFunction(services, FLOATLIT_NAME.toString());
-	javaUnaryMinusFloat = addFunction(services, NEGATIVE_LITERAL.toString());
-	lessThan	    = addFunction(services, "javaLtFloat");
-	greaterThan	    = addFunction(services, "javaGtFloat");
-	lessOrEquals	    = addFunction(services, "javaLeqFloat");
-	greaterOrEquals	    = addFunction(services, "javaGeqFloat");
-	eqFloat		    = addFunction(services, "javaEqFloat");
-	javaAddFloat	    = addFunction(services, "javaAddFloat");
-	javaSubFloat	    = addFunction(services, "javaSubFloat");
-	javaMulFloat	    = addFunction(services, "javaMulFloat");
-	javaDivFloat	    = addFunction(services, "javaDivFloat");
-	javaModFloat	    = addFunction(services, "javaModFloat");
-	javaMaxFloat	    = addFunction(services, "javaMaxFloat");
-	javaMinFloat	    = addFunction(services, "javaMinFloat");
+        floatLit            = addFunction(services, FLOATLIT_NAME.toString());
+        javaUnaryMinusFloat = addFunction(services, NEGATIVE_LITERAL.toString());
+        lessThan            = addFunction(services, "ltFloat");
+        greaterThan         = addFunction(services, "gtFloat");
+        lessOrEquals        = addFunction(services, "leqFloat");
+        greaterOrEquals     = addFunction(services, "geqFloat");
+        eqFloat             = addFunction(services, "eqFloat");
+        javaAddFloat        = addFunction(services, "javaAddFloat");
+        javaSubFloat        = addFunction(services, "javaSubFloat");
+        javaMulFloat        = addFunction(services, "javaMulFloat");
+        javaDivFloat        = addFunction(services, "javaDivFloat");
+        javaModFloat        = addFunction(services, "javaModFloat");
+        javaMaxFloat        = addFunction(services, "javaMaxFloat");
+        javaMinFloat        = addFunction(services, "javaMinFloat");
 
-	addFloatIEEE	    = addFunction(services, "addFloatIEEE");
-	subFloatIEEE	    = addFunction(services, "subFloatIEEE");
-	mulFloatIEEE	    = addFunction(services, "mulFloatIEEE");
-	divFloatIEEE	    = addFunction(services, "divFloatIEEE");
-	floatAbs	    = addFunction(services, "floatAbs");
+        addFloatIEEE        = addFunction(services, "addFloat");
+        subFloatIEEE        = addFunction(services, "subFloat");
+        mulFloatIEEE        = addFunction(services, "mulFloat");
+        divFloatIEEE        = addFunction(services, "divFloat");
+        floatAbs            = addFunction(services, "floatAbs");
 
-	isNormal	    = addFunction(services, "floatIsNormal");
-	isSubnormal	    = addFunction(services, "floatIsSubnormal");
-	isNaN		    = addFunction(services, "floatIsNaN");
-	isZero		    = addFunction(services, "floatIsZero");
-	isNice		    = addFunction(services, "floatIsNice");
-	isInfinite	    = addFunction(services, "floatIsInfinite");
-	isPositive	    = addFunction(services, "floatIsPositive");
-	isNegative	    = addFunction(services, "floatIsNegative");
-	roundingModeRNE	    = addFunction(services, "RNE");
-
-	castLongToFloat	    = addFunction(services, "castLongToFloat");
-	castFloatToLong	    = addFunction(services, "castFloatToLong");
+        isNormal            = addFunction(services, "floatIsNormal");
+        isSubnormal         = addFunction(services, "floatIsSubnormal");
+        isNaN               = addFunction(services, "floatIsNaN");
+        isZero              = addFunction(services, "floatIsZero");
+        isNice              = addFunction(services, "floatIsNice");
+        isInfinite          = addFunction(services, "floatIsInfinite");
+        isPositive          = addFunction(services, "floatIsPositive");
+        isNegative          = addFunction(services, "floatIsNegative");
     }
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	                         Term[] subs,
-	                         Services services,
-	                         ExecutionContext ec) {
+                                 Term[] subs,
+                                 Services services,
+                                 ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
         } else if (subs.length == 2) {
@@ -137,65 +126,58 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	                         Term left,
-	                         Term right,
-	                         Services services,
-	                         ExecutionContext ec) {
-        if(left != null
-           && left.sort().extendsTrans(targetSort())
-           && right != null
-           && right.sort().extendsTrans(targetSort())) {
-            if(getFunctionFor(op, services, ec) != null) {
-                return true;
-            }
-        }
-        return false;
+                                 Term left,
+                                 Term right,
+                                 Services services,
+                                 ExecutionContext ec) {
+        return left != null
+                && left.sort().extendsTrans(targetSort())
+                && right != null
+                && right.sort().extendsTrans(targetSort())
+                && getFunctionFor(op, services, ec) != null;
     }
 
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	                         Term sub,
-	                         TermServices services,
-	                         ExecutionContext ec) {
-        if(sub != null && sub.sort().extendsTrans(targetSort())) {
-            if(op instanceof Negative) {
-                return true;
-            }
-        }
-        return false;
+                                 Term sub,
+                                 TermServices services,
+                                 ExecutionContext ec) {
+        return sub != null
+                && sub.sort().extendsTrans(targetSort())
+                && op instanceof Negative;
     }
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-	assert lit instanceof FloatLiteral : "Literal '"+lit+"' is not a float literal.";
-	String s = ((FloatLiteral)lit).getValue();
-	final boolean negative = (s.charAt(0) == '-');
-	
-
-	int floatBits = Float.floatToIntBits(Float.parseFloat(s));
-	String bitString = Integer.toBinaryString(floatBits);
-	int number = Integer.parseInt(bitString, 2);
+        assert lit instanceof FloatLiteral : "Literal '"+lit+"' is not a float literal.";
+        String s = ((FloatLiteral)lit).getValue();
+        final boolean negative = (s.charAt(0) == '-');
 
 
-	IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
-	Term intTerm, fractionTerm;
+        int floatBits = Float.floatToIntBits(Float.parseFloat(s));
+        String bitString = Integer.toBinaryString(floatBits);
+        int number = Integer.parseInt(bitString, 2);
 
-	if (negative) {
-	    intTerm = intLDT.translateLiteral(new IntLiteral("-" + number), services).sub(0);
-	} else {
-	    intTerm = intLDT.translateLiteral(new IntLiteral(number), services).sub(0);
-	}
 
-	//Set the second number to 0 for now
-	fractionTerm = intLDT.translateLiteral(new IntLiteral(0), services).sub(0);
+        IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+        Term intTerm, fractionTerm;
 
-	return services.getTermFactory().createTerm(floatLit, intTerm, fractionTerm);
+        if (negative) {
+            intTerm = intLDT.translateLiteral(new IntLiteral("-" + number), services).sub(0);
+        } else {
+            intTerm = intLDT.translateLiteral(new IntLiteral(number), services).sub(0);
+        }
+
+        //Set the second number to 0 for now
+        fractionTerm = intLDT.translateLiteral(new IntLiteral(0), services).sub(0);
+
+        return services.getTermFactory().createTerm(floatLit, intTerm, fractionTerm);
     }
 
     @Override
     public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
-	    			   Services services,
-	    			   ExecutionContext ec) {
+                                   Services services,
+                                   ExecutionContext ec) {
         if (op instanceof GreaterThan) {
             return getGreaterThan();
         } else if (op instanceof LessThan) {
@@ -238,113 +220,113 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
 
     @Override
     public boolean hasLiteralFunction(Function f) {
-	return containsFunction(f) && (f.arity()==0);
+        return containsFunction(f) && (f.arity()==0);
     }
 
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-	if(!containsFunction((Function) t.op())) {
-	    return null;
-	}
+        if(!containsFunction((Function) t.op())) {
+            return null;
+        }
 
-	Function f = (Function)t.op();
-	IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+        Function f = (Function)t.op();
+        IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 
-	if(f == floatLit) {
-	    //Use IntegerLDT to translate the Integer & Fraction to literals
-	    IntLiteral il1 = (IntLiteral)intLDT.translateTerm(t.sub(0),
-		children, services);
-	    long bits = il1.getValue();
-        assert bits == (int) bits :
-                "At this point, we assumed that the long would be an int.";
-	    Float f1 = Float.intBitsToFloat((int) bits);
+        if(f == floatLit) {
+            //Use IntegerLDT to translate the Integer & Fraction to literals
+            IntLiteral il1 = (IntLiteral)intLDT.translateTerm(t.sub(0),
+                    children, services);
+            long bits = il1.getValue();
+            assert bits == (int) bits :
+                    "At this point, we assumed that the long would be an int.";
+            Float f1 = Float.intBitsToFloat((int) bits);
 
-	    return new FloatLiteral(f1.toString());
-	}
-	throw new RuntimeException("FloatLDT: Cannot convert term to program: "+t);
+            return new FloatLiteral(f1.toString());
+        }
+        throw new RuntimeException("FloatLDT: Cannot convert term to program: "+t);
     }
 
 
     @Override
     public final Type getType(Term t) {
-	if(t.sort() == targetSort()) {
-	    return PrimitiveType.JAVA_FLOAT;
-	} else {
-	    return null;
-	}
+        if(t.sort() == targetSort()) {
+            return PrimitiveType.JAVA_FLOAT;
+        } else {
+            return null;
+        }
     }
 
     public Function getFloatSymbol() {
-	return floatLit;
+        return floatLit;
     }
 
     public Function getLessThan() {
-	return lessThan;
+        return lessThan;
     }
 
     public Function getGreaterThan() {
-	return greaterThan;
+        return greaterThan;
     }
 
     public Function getLessOrEquals() {
-	return lessOrEquals;
+        return lessOrEquals;
     }
 
     public Function getGreaterOrEquals() {
-	return greaterOrEquals;
+        return greaterOrEquals;
     }
 
     public Function getEquals() {
-	return eqFloat;
+        return eqFloat;
     }
 
     public Function getJavaUnaryMinus() {
-	return javaUnaryMinusFloat;
+        return javaUnaryMinusFloat;
     }
 
     public Function getJavaAdd() {
-	return javaAddFloat;
+        return javaAddFloat;
     }
 
     public Function getJavaSub() {
-	return javaSubFloat;
+        return javaSubFloat;
     }
 
     public Function getJavaMul() {
-	return javaMulFloat;
+        return javaMulFloat;
     }
 
     public Function getJavaDiv() {
-	return javaDivFloat;
+        return javaDivFloat;
     }
 
     public Function getJavaMod() {
-	return javaModFloat;
+        return javaModFloat;
     }
 
     public Function getJavaMin() {
-	return javaMinFloat;
+        return javaMinFloat;
     }
 
     public Function getJavaMax() {
-	return javaMaxFloat;
+        return javaMaxFloat;
     }
 
     public Function getIsNormal() {
-	return isNormal;
+        return isNormal;
     }
 
     public Function getIsSubnormal() {
-	return isSubnormal;
+        return isSubnormal;
     }
 
     public Function getIsNaN() {
-	return isNaN;
+        return isNaN;
     }
 
     public Function getIsZero() {
-	return isZero;
+        return isZero;
     }
 
     @Override
@@ -353,46 +335,35 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
     }
 
     public Function getIsInfinite() {
-	return isInfinite;
+        return isInfinite;
     }
 
     public Function getIsPositive() {
-	return isPositive;
+        return isPositive;
     }
 
     public Function getIsNegative() {
-	return isNegative;
+        return isNegative;
     }
 
     public Function getAddIEEE() {
-	return addFloatIEEE;
+        return addFloatIEEE;
     }
 
     public Function getSubIEEE() {
-	return subFloatIEEE;
+        return subFloatIEEE;
     }
 
     public Function getMulIEEE() {
-	return mulFloatIEEE;
+        return mulFloatIEEE;
     }
 
     public Function getDivIEEE() {
-	return divFloatIEEE;
+        return divFloatIEEE;
     }
 
     public Function getAbs() {
-	return floatAbs;
+        return floatAbs;
     }
 
-    public Function getCastLongToFloat() {
-	return castLongToFloat;
-    }
-
-    public Function getCastFloatToLong() {
-	return castFloatToLong;
-    }
-
-    public Function getRoundingModeRNE() {
-	return roundingModeRNE;
-    }
 }
