@@ -24,7 +24,7 @@ import de.uka.ilkd.key.ldt.FloatLDT;
 
 public class SMTTermFloatOp extends SMTTerm{
 
-	private static SMTSort ROUNDMODESORT = new SMTSort("RoundingMode");
+	public static final SMTSort ROUNDMODESORT = new SMTSort("RoundingMode");
 
 	public static class Op {
 
@@ -48,8 +48,6 @@ public class SMTTermFloatOp extends SMTTerm{
 		public static final Op FPSUB	= new Op("fp.sub", ROUNDMODESORT, SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.FLOAT);
 		public static final Op FPMUL	= new Op("fp.mul", ROUNDMODESORT, SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.FLOAT);
 		public static final Op FPDIV	= new Op("fp.div", ROUNDMODESORT, SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.FLOAT);
-		public static final Op CASTLONGTOFLOAT  = new Op("(_ to_fp 8 24) RNE", SMTSort.INT, SMTSort.FLOAT);
-		public static final Op CASTFLOATTOLONG  = new Op("(_ fp.to_sbv 64) RTZ", SMTSort.FLOAT, SMTSort.INT);
 		public static final Op SINDOUBLE = new Op("sinDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
 		public static final Op COSDOUBLE = new Op("cosDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
 		public static final Op ACOSDOUBLE = new Op("acosDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
@@ -62,11 +60,6 @@ public class SMTTermFloatOp extends SMTTerm{
 		public static final Op EXPDOUBLE = new Op("expDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
 		public static final Op ATANDOUBLE = new Op("atanDouble" , SMTSort.DOUBLE, SMTSort.DOUBLE);
 		public static final Op FPMOD = new Op("fp.rem", SMTSort.DOUBLE, SMTSort.DOUBLE);
-
-		private static Op unaryFloatPred(String name) {
-			return new Op("fp." + name, SMTSort.FLOAT, SMTSort.BOOL);
-		}
-
 
 		private final int arity;
 		private final String op;
@@ -96,6 +89,10 @@ public class SMTTermFloatOp extends SMTTerm{
 			return imageSort;
 		}
 
+		public List<SMTSort> getDomainSorts() {
+			return Collections.unmodifiableList(domainSorts);
+		}
+
 		@Override
 		public boolean equals (Object other) {
 			if (other == null)
@@ -114,7 +111,6 @@ public class SMTTermFloatOp extends SMTTerm{
 				this.imageSort.equals(otherop.imageSort);
 		}
 	}
-
 
 	private Op operator;
 	private List<SMTTerm> subs;

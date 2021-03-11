@@ -88,6 +88,8 @@ public final class NumberTranslation {
 	}
     }
 
+	// TODO This introduces a dependency to newsmt2. Perhaps move?
+
     /** Translate a float literal of sort "float" in FP notation to
      * an SMTLIB fp literal
      *
@@ -122,6 +124,7 @@ public final class NumberTranslation {
 	 * @param term an application of DFP
 	 * @return An sexpr containing the translated literal
 	 */
+
 	public static SExpr translateDoubleToSMTLIB(Term term, Services services) {
 
 		long repr = intFromTerm(term.sub(0), services);
@@ -130,7 +133,7 @@ public final class NumberTranslation {
 		String exp = "#b" + extractBits(repr, 52, 11);
 		String mantissa = "#b" + extractBits(repr, 0, 52);
 
-		SExpr result = new SExpr("fp", sign, exp, mantissa);
+		SExpr result = new SExpr("fp", FloatHandler.DOUBLE, sign, exp, mantissa);
 		return result;
 	}
 
