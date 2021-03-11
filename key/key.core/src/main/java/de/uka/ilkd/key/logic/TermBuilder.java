@@ -1189,13 +1189,13 @@ public class TermBuilder {
     }
 
     /**
-     * Creates Z-/C-terms for ints/chars.
+     * Creates terms to be used in Z/C/FP/DFP/R notations.
+     * The result does not have such a constructor applied yet.
      * @param numberString a string containing the number in a decimal representation
-     * @param containsChar true iff the number represents a char
-     * @return Term in Z-/C-Notation representing the given number
+     * @return Term in "number" notation representing the given number
      * @throws NumberFormatException if <code>numberString</code> is not a number
      */
-    private Term numberTerm(String numberString, boolean containsChar) {
+    private Term numberTerm(String numberString) {
         if (numberString == null || numberString.isEmpty()) {
             throw new NumberFormatException(numberString + " is not a number.");
         }
@@ -1225,13 +1225,14 @@ public class TermBuilder {
         if (negate) {
             numberLiteralTerm = func(intLDT.getNegativeNumberSign(), numberLiteralTerm);
         }
-        // chars get a surrounding C, ints a surrounding Z
-        numberLiteralTerm = func(containsChar ? intLDT.getCharSymbol() : intLDT.getNumberSymbol(),
-                numberLiteralTerm);
+
+        // return the raw number literal term ('C', 'Z' or 'R' must still be added)
         return numberLiteralTerm;
     }
 
     /**
+     * Get term for an integer literal.
+     *
      * @param numberString
      *            String representing an integer with radix 10, may be negative
      * @return Term in Z-Notation representing the given number
@@ -1239,16 +1240,19 @@ public class TermBuilder {
      *             if <code>numberString</code> is not a number
      */
     public Term zTerm(String numberString) {
-        return numberTerm(numberString, false);
+        return func(services.getTypeConverter().getIntegerLDT().getNumberSymbol(),
+                numberTerm(numberString));
     }
 
     /**
+     * Get term for an integer literal.
+     *
      * @param number
      *            an integer
      * @return Term in Z-Notation representing the given number
      */
     public Term zTerm(long number) {
-        return zTerm("" + number);
+        return zTerm(Long.toString(number));
     }
 
     /**
@@ -1258,7 +1262,42 @@ public class TermBuilder {
      *             if <code>numberString</code> is not a number
      */
     public Term cTerm(String numberString) {
-        return numberTerm(numberString, true);
+        return func(services.getTypeConverter().getIntegerLDT().getCharSymbol(),
+                numberTerm(numberString));
+    }
+
+    /**
+     * Create a floating point literal value from a float value.
+     *
+     * @param value any float value (even NaN)
+     * @return a term representing the value
+     */
+    public Term fpTerm(float value) {
+        int bitPattern = Float.floatToIntBits(value);
+        String patternStr = Integer.toUnsignedString(bitPattern);
+        Term numberTerm = numberTerm(patternStr);
+        // NOTE: The following needs to be removed in future since
+        // FP will only take one argument soon.
+        Term redundantZero = numberTerm("0");
+        return func(services.getTypeConverter().getFloatLDT().getFloatSymbol(),
+                numberTerm, redundantZero);
+    }
+
+    /**
+     * Create a double floating point literal value from a double value.
+     *
+     * @param value any double value (even NaN)
+     * @return a term representing the value
+     */
+    public Term dfpTerm(double value) {
+        long bitPattern = Double.doubleToLongBits(value);
+        String patternStr = Long.toUnsignedString(bitPattern);
+        Term numberTerm = numberTerm(patternStr);
+        // NOTE: The following needs to be removed in future since
+        // FP will only take one argument soon.
+        Term redundantZero = numberTerm("0");
+        return func(services.getTypeConverter().getDoubleLDT().getDoubleSymbol(),
+                numberTerm, redundantZero);
     }
 
     public Term add(Term t1, Term t2) {
