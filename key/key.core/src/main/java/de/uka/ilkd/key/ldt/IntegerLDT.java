@@ -577,17 +577,9 @@ public final class IntegerLDT extends LDT {
             // return null;
             throw new RuntimeException("This term is not a literal: " + t);
         }
-        StringBuffer sb = new StringBuffer("");
         Function f = (Function)t.op();
-
-        // negative literals
-        boolean negative = f == neglit;
-        if (negative) {
-            t = t.sub(0);
-            f = (Function)t.op();
-        }
-
         if(isNumberLiteral(f) || f == numbers || f == charID) {
+            StringBuffer sb = new StringBuffer("");
             Term it = t;
             if (f == charID || f == numbers) {
                 it = it.sub(0);
@@ -600,9 +592,6 @@ public final class IntegerLDT extends LDT {
             }
             // numbers must end with a sharp
             assert f == sharp;
-            if (negative) {
-                sb.insert(0, '-');
-            }
             return sb.toString();
         }
         throw new RuntimeException("IntegerLDT: Cannot convert term to program: " + t);
