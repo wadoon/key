@@ -221,6 +221,20 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
         }
     }
 
+    @Override
+    public Function getFunctionFor(String op, Services services) {
+        switch (op) {
+            case "gt": return getGreaterThan();
+            case "geq": return getGreaterOrEquals();
+            case "lt": return getLessThan();
+            case "leq": return getLessOrEquals();
+            case "div": return getDivIEEE();
+            case "mul": return getMulIEEE();
+            case "add": return getAddIEEE();
+            case "sub": return getSubIEEE();
+        }
+        return null;
+    }
 
     @Override
     public boolean hasLiteralFunction(Function f) {

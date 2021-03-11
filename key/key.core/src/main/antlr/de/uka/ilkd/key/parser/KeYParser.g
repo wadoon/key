@@ -62,6 +62,7 @@ options {
   import org.key_project.util.collection.ImmutableList;
   import org.key_project.util.collection.ImmutableSLList;
   import org.key_project.util.collection.ImmutableSet;
+  import de.uka.ilkd.key.ldt.LDT;
   import de.uka.ilkd.key.logic.*;
   import de.uka.ilkd.key.logic.op.*;
   import de.uka.ilkd.key.logic.sort.*;
@@ -92,8 +93,6 @@ options {
   import de.uka.ilkd.key.java.SchemaRecoder2KeY;
   import de.uka.ilkd.key.java.StatementBlock;
   import de.uka.ilkd.key.java.declaration.VariableDeclaration;
-  import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
-  import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
   import de.uka.ilkd.key.java.recoderext.*;
 
   import de.uka.ilkd.key.pp.AbbrevMap;
@@ -2744,43 +2743,18 @@ strong_arith_op returns [String op_name = null]
 logicTermReEntry returns [Term _logic_term_re_entry = null]
 @after { _logic_term_re_entry = a; }
 :
-   a = weak_arith_op_term ((relation_op) => op_name = relation_op a1=weak_arith_op_term {
-
-      // TODO @Reals. ADD REAL CODE HERE!
-      // make this at least switches.
-      // Better would be lookup tables in LDTs.
-
-      if (a.sort().name().equals(FloatLDT.NAME)) {
-	if (op_name.equals("lt")) {
-	  op_name = "javaLtFloat";
-	} else if (op_name.equals("gt")) {
-	  op_name = "javaGtFloat";
-	} else if (op_name.equals("leq")) {
-	  op_name = "javaLeqFloat";
-	} else if (op_name.equals("geq")) {
-	  op_name = "javaGeqFloat";
-	}
-      } else if (a.sort().name().equals(DoubleLDT.NAME)) {
-	if (op_name.equals("lt")) {
-	  op_name = "javaLtDouble";
-	} else if (op_name.equals("gt")) {
-	  op_name = "javaGtDouble";
-	} else if (op_name.equals("leq")) {
-	  op_name = "javaLeqDouble";
-	} else if (op_name.equals("geq")) {
-	  op_name = "javaGeqDouble";
-	}
-      }
-
-      
-
-     Function op = (Function) functions().lookup(new Name(op_name));
-     if(op == null) {
-       semanticError("Function symbol '"+op_name+"' not found.");
-     }
-
-                 a = getTermFactory().createTerm(op, a, a1);
-              })?
+   a = weak_arith_op_term
+      ((relation_op) => op_name = relation_op a1=weak_arith_op_term {
+          LDT ldt = parserConfig.services().getTypeConverter().getLDTFor(a.sort());
+          if(ldt == null) {
+              semanticError("Cannot resolve symbol '"+op_name+"' for sort " + a.sort());
+          }
+          Function op = ldt.getFunctionFor(op_name, services);
+          if(op == null) {
+              semanticError("Cannot resolve symbol '"+op_name+"' for sort " + a.sort());
+          }
+          a = getTermFactory().createTerm(op, a, a1);
+      })?
 ;
         catch [TermCreationException ex] {
               raiseException

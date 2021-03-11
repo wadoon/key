@@ -128,11 +128,11 @@ public final class TypeConverter {
         //doubleLDT = getDoubleLDT();
     }
 
-    public ImmutableList<LDT> getModels() {
+    public ImmutableList<LDT> getLDTs() {
         return models;
     }
 
-    public LDT getModelFor(Sort s) {
+    public LDT getLDTFor(Sort s) {
 	for(LDT ldt : models) {
 	    if(s.equals(ldt.targetSort())) {
 		return ldt;

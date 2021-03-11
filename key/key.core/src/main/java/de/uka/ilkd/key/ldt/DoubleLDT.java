@@ -218,6 +218,20 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 	return services.getTermFactory().createTerm(doubleLit, intTerm, fractionTerm);
     }
 
+    @Override
+    public Function getFunctionFor(String op, Services services) {
+        switch (op) {
+            case "gt": return getGreaterThan();
+            case "geq": return getGreaterOrEquals();
+            case "lt": return getLessThan();
+            case "leq": return getLessOrEquals();
+            case "div": return getDivIEEE();
+            case "mul": return getMulIEEE();
+            case "add": return getAddIEEE();
+            case "sub": return getSubIEEE();
+        }
+        return null;
+    }
 
     @Override
     public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,

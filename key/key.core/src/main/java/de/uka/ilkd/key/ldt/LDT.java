@@ -232,13 +232,34 @@ public abstract class LDT implements Named {
      */ 
     public abstract Term translateLiteral(Literal lit, Services services);
 
-    /** returns the function symbol for the given operation 
-     * @return  the function symbol for the given operation 
+    /**
+     * returns the function symbol for the given <em>Java</em> operator.
+     *
+     * @return  the function symbol for the given operation, null if
+     * not supported in general or not supported for this particular
+     * operator.
      */
     public abstract Function getFunctionFor(
 	    		de.uka.ilkd.key.java.expression.Operator op, 
 	    		Services services, 
 	    		ExecutionContext ec);
+
+    /**
+     * returns the function symbol for the given operator name.
+     *
+     * This is used for parsing. Operator names are the polymorphic
+     * operators available in KeY.
+     *
+     * Amongst them are: &lt;, &gt; +, -, *, ...
+     *
+     * @return  the function symbol for the given operation, null if
+     * not supported in general or not supported for this particular
+     * operator.
+     */
+    public Function getFunctionFor(String opName, Services services) {
+        // default implementation is "not supported"
+        return null;
+    }
 
     public abstract boolean hasLiteralFunction(Function f);
 
