@@ -63,7 +63,7 @@ public class SExpr implements Writable {
 
     /** The regular expression used to check if |...| escapes are needed. */
     private static final Pattern EXTRACHAR_PATTERN =
-        Pattern.compile("[^-A-Za-z0-9+/*=%?!.$_~&^<>@]");
+        Pattern.compile("[^-#A-Za-z0-9+/*=%?!.$_~&^<>@]");
 
     /** The string name of the atom used in this sexpr. */
     private final String name;

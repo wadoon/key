@@ -169,12 +169,10 @@ public class FloatHandler implements SMTHandler {
             return new SExpr(opName, exprType, translatedSubs);
 
         } else if (fpLiterals.contains(op)) {
-
-            String lit = op.name().toString();
-            if (lit.equals("DFP")) {
-                return new SExpr(NumberTranslation.translateDoubleToSMTLIB(term, services), DOUBLE);
-            } else { // lit.equals("FP")
-                return new SExpr(NumberTranslation.translateFloatToSMTLIB(term, services), FLOAT);
+            if (op == services.getTypeConverter().getDoubleLDT().getDoubleSymbol()) {
+                return NumberTranslation.translateDoubleToSMTLIB(term, services);
+            } else {
+                return NumberTranslation.translateFloatToSMTLIB(term, services);
             }
 
         } else if (op == doubleLDT.getRoundingModeRNE()) {

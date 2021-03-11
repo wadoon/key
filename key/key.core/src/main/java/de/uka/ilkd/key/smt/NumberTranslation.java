@@ -14,8 +14,12 @@
 package de.uka.ilkd.key.smt;
 
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
+import de.uka.ilkd.key.smt.newsmt2.FloatHandler;
+import de.uka.ilkd.key.smt.newsmt2.SExpr;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Services;
@@ -87,62 +91,58 @@ public final class NumberTranslation {
     /** Translate a float literal of sort "float" in FP notation to
      * an SMTLIB fp literal
      *
-     * @param term term with sort "float"
+     * @param term an application of FP
      * @return A string containing the translated literal
      */
-    public static String translateFloatToSMTLIB(Term term, Services services) {
-	FloatLDT floatLDT = services.getTypeConverter().getFloatLDT();
-	String asString = ((FloatLiteral)floatLDT.translateTerm(
-			  term, new ExtList(), services)).getValue();
+    public static SExpr translateFloatToSMTLIB(Term term, Services services) {
 
-	Float f = new Float(asString);
-	int floatBits = Float.floatToIntBits(f);
+		long repr = intFromTerm(term.sub(0), services);
+		assert repr <= 0xffff_ffffL;
 
-	String floatString, sign, m, e;
+		String sign = "#b" + extractBits(repr, 31, 1);
+		String exp = "#b" + extractBits(repr, 23, 8);
+		String mantissa = "#b" + extractBits(repr, 0, 23);
 
-	//Specific to the float32 format right now
-	int msize	  = 8;
-	floatString = Integer.toBinaryString(floatBits);
-	int numLeadingZeroes = 32 - floatString.length();
-	if (numLeadingZeroes > 0) {
-	    String zeroes = "00000000000000000000000000000000";
-	    String padding = zeroes.substring(0, numLeadingZeroes);
-	    floatString = padding + floatString;
+		SExpr result = new SExpr("fp", FloatHandler.FLOAT, sign, exp, mantissa);
+		return result;
 	}
-	sign	  = "#b" + floatString.substring(0, 1);
-	e		  = "#b" + floatString.substring(1, msize+1);
-	m		  = "#b" + floatString.substring(msize+1, floatString.length());
 
-	return ("(fp " + sign + " " + e + " " + m + ")");
-    }
-
-    /** Translate a double literal of sort "double" in DFP notation to
-     * an SMTLIB fp literal
-     *
-     * @param term term with sort "double"
-     * @return A string containing the translated literal
-     */
-    public static String translateDoubleToSMTLIB(Term term, Services services) {
-	DoubleLDT doubleLDT = services.getTypeConverter().getDoubleLDT();
-	long doubleBits = doubleLDT.longBits(term, services.getTypeConverter().getIntegerLDT());
-
-	String doubleString, sign, m, e;
-
-	//Specific to the double64 format right now
-	int msize	  = 11;
-	doubleString = Long.toBinaryString(doubleBits);
-	int numLeadingZeroes = 64 - doubleString.length();
-	if (numLeadingZeroes > 0) {
-	    String zeroes = "00000000000000000000000000000000";
-	    zeroes = zeroes + zeroes;
-	    String padding = zeroes.substring(0, numLeadingZeroes);
-	    doubleString = padding + doubleString;
+	private static long intFromTerm(Term term, Services services) {
+		if(term.op() == services.getTypeConverter().getIntegerLDT().getNumberTerminator()) {
+			return 0L;
+		} else {
+			int digit = Integer.parseInt(term.op().name().toString());
+			return 10 * intFromTerm(term.sub(0), services) + digit;
+		}
 	}
-	sign	  = "#b" + doubleString.substring(0, 1);
-	e		  = "#b" + doubleString.substring(1, msize+1);
-	m		  = "#b" + doubleString.substring(msize+1, doubleString.length());
 
-	return ("(fp " + sign + " " + e + " " + m + ")");
-    }
+	/** Translate a double literal of sort "double" in DFP notation to
+	 * an SMTLIB fp literal
+	 *
+	 * @param term an application of DFP
+	 * @return An sexpr containing the translated literal
+	 */
+	public static SExpr translateDoubleToSMTLIB(Term term, Services services) {
+
+		long repr = intFromTerm(term.sub(0), services);
+
+		String sign = "#b" + extractBits(repr, 63, 1);
+		String exp = "#b" + extractBits(repr, 52, 11);
+		String mantissa = "#b" + extractBits(repr, 0, 52);
+
+		SExpr result = new SExpr("fp", sign, exp, mantissa);
+		return result;
+	}
+
+	private static String extractBits(long value, int fromBit, int count) {
+		StringBuilder sb = new StringBuilder();
+		value = value >>> fromBit;
+		for (int i = 0; i < count; i++) {
+			sb.insert(0, (value & 1) == 1 ? "1" : "0");
+			value >>>= 1;
+		}
+		return sb.toString();
+	}
+
 
 }
