@@ -32,6 +32,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -186,6 +187,10 @@ public class ExceptionDialog extends JDialog {
          * NOTE (DS, 2020-10-01): location can point to a directory (if no file was
          * given in the underlying exception), then getting the line won't work. I
          * added a check for that.
+         *
+         * MU 2021: This additional check may throw a "FileSystemNotFoundException"
+         * if the location is within a "jar:..." URL (which may be the case for
+         * the rules .key files when invoked from the jars.
          */
         try {
             if(Location.isValidLocation(location) &&
@@ -210,7 +215,7 @@ public class ExceptionDialog extends JDialog {
                     e.printStackTrace();
                 }
             }
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException|FileSystemNotFoundException e) {
             System.err.println("Wrong URI given in location " + location);
             e.printStackTrace();
         }
