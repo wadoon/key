@@ -389,11 +389,18 @@ DoubleSuffix
     :   'd' | 'D'
     ;
 
+fragment
+RealSuffix
+    :   'r' | 'R'
+    ;
+
 FLOAT_LITERAL
     :   NonIntegerNumber FloatSuffix
     ;
 
-// TODO @Real. Extend here.
+REAL_LITERAL
+    :   NonIntegerNumber RealSuffix
+    ;
 
 DOUBLE_LITERAL
     :  /*  MU2018: DIGITS was removed, the following was not accessible.

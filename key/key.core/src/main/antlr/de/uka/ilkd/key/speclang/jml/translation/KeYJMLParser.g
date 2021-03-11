@@ -22,6 +22,7 @@ options {
     import de.uka.ilkd.key.java.expression.Literal;
     import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
     import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+    import de.uka.ilkd.key.java.expression.literal.RealLiteral;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.ldt.*;
     import de.uka.ilkd.key.logic.*;
@@ -1662,6 +1663,15 @@ floatliteral returns [SLExpression result=null] throws SLTranslationException
         result = new SLExpression(services.getTypeConverter().convertToLogicElement(
 		                  new DoubleLiteral(fs)),
                                   javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_DOUBLE));
+    }
+  |
+    r=REAL_LITERAL
+    {
+        String fs = d.getText();
+
+         result = new SLExpression(services.getTypeConverter().convertToLogicElement(
+                      new RealLiteral(fs)),
+                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_REAL));
     }
 ;
 
