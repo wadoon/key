@@ -465,6 +465,10 @@ public final class TypeConverter {
         if ((t1 == PrimitiveType.JAVA_REAL && isNumericalType(t2)
                 || (isNumericalType(t1) && t2 == PrimitiveType.JAVA_REAL)))
                 return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
+        else if ((t1 == PrimitiveType.JAVA_DOUBLE || t2 == PrimitiveType.JAVA_DOUBLE))
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
+        else if (t1 == PrimitiveType.JAVA_FLOAT || t2 == PrimitiveType.JAVA_FLOAT)
+            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
         else if ((t1 == PrimitiveType.JAVA_BOOLEAN &&
                 t2 == PrimitiveType.JAVA_BOOLEAN)) {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
