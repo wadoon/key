@@ -141,7 +141,7 @@ public class MasterHandlerTest {
                 case "irrelevant":
                     break;
                 default:
-                    fail("Unexpected expecataion: " + expectation);
+                    fail("Unexpected expectation: " + expectation);
             }
 
             for (String line : response) {
