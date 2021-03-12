@@ -658,95 +658,112 @@ public abstract class Notation {
 	}
     }
 
-    /**
+	/**
      * The standard concrete syntax for the float literal indicator `FP'.
      */
     static final class FloatLiteral extends Notation {
-	public FloatLiteral() {
-	    super(120);
-	}
 
-	public static String printFloatTerm(Term floatTerm) {
+        private final static int EXP_MASK = 0x7f80_0000;
 
-	    final StringBuffer number = new StringBuffer();
+        public FloatLiteral() {
+            super(120);
+        }
 
-	    if (floatTerm.op().name().toString().equals(
-		  FloatLDT.NEGATIVE_LITERAL)) {
-		number.append("-");
-		floatTerm = floatTerm.sub(0);
-	    }
+        public static String printFloatTerm(Term floatTerm) {
 
-	    if (!floatTerm.op().name().equals(FloatLDT.FLOATLIT_NAME)) {
-		return null;
-	    }
+            if (!floatTerm.op().name().equals(FloatLDT.FLOATLIT_NAME)) {
+                return null;
+            }
 
-	    Term t1 = floatTerm.sub(0);
+            try {
+                int bits = extractValue(floatTerm.sub(0));
+                float f = Float.intBitsToFloat(bits);
+                if (Float.isNaN(f)) {
+                    return "floatNaN";
+				} else if (f == Float.POSITIVE_INFINITY) {
+					return "floatInf";
+				} else if (f == Float.NEGATIVE_INFINITY) {
+					return "-floatInf";
+                } else {
+                    return f + "f";
+                }
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
 
-	    try {
-	      int bits = Integer.parseInt(NumLiteral.printNumberTerm(t1));
-	      Float f = Float.intBitsToFloat(bits);
-	      return f.toString();
-	    } catch (NumberFormatException e) {
-		return null;
-	    }
-	}
+        private static int extractValue(Term t) {
+            if (t.op().name().toString().equals("#")) {
+                return 0;
+            } else {
+                int digit = Integer.parseInt(t.op().name().toString());
+				int result = digit + 10 * extractValue(t.sub(0));
+				return result;
+            }
+        }
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    final String number = printFloatTerm(t);
-	    if (number != null) {
-		sp.printConstant(number);
-	    } else {
-		sp.printFunctionTerm(t);
-	    }
-	}
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            final String number = printFloatTerm(t);
+            if (number != null) {
+                sp.printConstant(number);
+            } else {
+                sp.printFunctionTerm(t);
+            }
+        }
     }
 
     /**
      * The standard concrete syntax for the double literal indicator `DFP'.
      */
     static final class DoubleLiteral extends Notation {
-	public DoubleLiteral() {
-	    super(120);
-	}
+        public DoubleLiteral() {
+            super(120);
+        }
 
-	public static String printDoubleTerm(Term doubleTerm) {
+        public static String printDoubleTerm(Term doubleTerm) {
 
-	    final StringBuffer number = new StringBuffer();
+            if (!doubleTerm.op().name().equals(DoubleLDT.DOUBLELIT_NAME)) {
+                return null;
+            }
 
-	    if (doubleTerm.op().name().toString().equals(
-		  DoubleLDT.NEGATIVE_LITERAL)) {
-		number.append("-");
-		doubleTerm = doubleTerm.sub(0);
-	    }
+            try {
+                long bits = extractValue(doubleTerm.sub(0));
+                double f = Double.longBitsToDouble(bits);
+                if (Double.isNaN(f)) {
+                    return "floatNaN";
+                } else if (f == Double.POSITIVE_INFINITY) {
+					return "doubleInf";
+				} else if (f == Double.NEGATIVE_INFINITY) {
+					return "-doubleInf";
+                } else {
+                    return f + "d";
+                }
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
 
-	    if (!doubleTerm.op().name().equals(DoubleLDT.DOUBLELIT_NAME)) {
-		return null;
-	    }
+        private static long extractValue(Term t) {
+            if (t.op().name().toString().equals("#")) {
+                return 0L;
+            } else {
+                int digit = Integer.parseInt(t.op().name().toString());
+                return digit + 10 * extractValue(t.sub(0));
+            }
+        }
 
-	    Term t1 = doubleTerm.sub(0);
-
-	    try {
-	      long bits = Long.parseLong(NumLiteral.printNumberTerm(t1));
-	      Double f = Double.longBitsToDouble(bits);
-	      return f.toString();
-	    } catch (NumberFormatException e) {
-		return null;
-	    }
-	}
-
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    final String number = printDoubleTerm(t);
-	    if (number != null) {
-		sp.printConstant(number);
-	    } else {
-		sp.printFunctionTerm(t);
-	    }
-	}
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            final String number = printDoubleTerm(t);
+            if (number != null) {
+                sp.printConstant(number);
+            } else {
+                sp.printFunctionTerm(t);
+            }
+        }
     }
 
-  
 
-    /**
+	/**
      * The standard concrete syntax for sequence singletons.
      */
     public static final class SeqSingletonNotation extends Notation {
