@@ -1218,6 +1218,25 @@ options {
         }
     }
 
+    private Term makeBinaryTerm(String opName, Term a, Term a1) throws RecognitionException {
+        LDT ldt = parserConfig.services().getTypeConverter().getLDTFor(a.sort());
+        if (ldt != null) {
+            Function op = ldt.getFunctionFor(opName, services);
+            if (op == null) {
+                semanticError("Cannot resolve symbol '" + opName + "' for sort " + a.sort());
+            } else {
+                a = getTermFactory().createTerm(op, a, a1);
+                return a;
+            }
+        }
+        Function op = (Function) functions().lookup(new Name(opName));
+        if(op == null) {
+            semanticError("Function symbol '" + opName + "' not found.");
+        }
+        a = getTermFactory().createTerm(op, a, a1);
+        return a;
+    }
+
     private boolean isStaticAttribute() throws RecognitionException/*KeYSemanticException*/ {	
         if(inSchemaMode()) return false;
         final JavaInfo javaInfo = getJavaInfo();
@@ -2745,15 +2764,7 @@ logicTermReEntry returns [Term _logic_term_re_entry = null]
 :
    a = weak_arith_op_term
       ((relation_op) => op_name = relation_op a1=weak_arith_op_term {
-          LDT ldt = parserConfig.services().getTypeConverter().getLDTFor(a.sort());
-          if(ldt == null) {
-              semanticError("Cannot resolve symbol '"+op_name+"' for sort " + a.sort());
-          }
-          Function op = ldt.getFunctionFor(op_name, services);
-          if(op == null) {
-              semanticError("Cannot resolve symbol '"+op_name+"' for sort " + a.sort());
-          }
-          a = getTermFactory().createTerm(op, a, a1);
+         a = makeBinaryTerm(op_name, a, a1);
       })?
 ;
         catch [TermCreationException ex] {
@@ -2771,25 +2782,7 @@ weak_arith_op_term returns [Term _weak_arith_op_term = null]
 
 
    a = strong_arith_op_term ((weak_arith_op)=> op_name = weak_arith_op a1=strong_arith_op_term {
-      if (a.sort().name().equals(FloatLDT.NAME)) {
-	if (op_name.equals("add")) {
-	  op_name = "javaAddFloat";
-	} else if (op_name.equals("sub")) {
-	  op_name = "javaSubFloat";
-        }
-      } else if (a.sort().name().equals(DoubleLDT.NAME)) {
-	if (op_name.equals("add")) {
-	  op_name = "javaAddDouble";
-	} else if (op_name.equals("sub")) {
-	  op_name = "javaSubDouble";
-        }
-      }
-
-       Function op = (Function) functions().lookup(new Name(op_name));
-       if(op == null) {
-	 semanticError("Function symbol '"+op_name+"' not found.");
-       }
-      a = getTermFactory().createTerm(op, a, a1);
+          a = makeBinaryTerm(op_name, a, a1);
     })*
 ;
         catch [TermCreationException ex] {
@@ -2801,27 +2794,8 @@ strong_arith_op_term returns [Term _strong_arith_op_term = null]
 @after { _strong_arith_op_term = a; }
 :
    a = term110 ( (strong_arith_op) => op_name = strong_arith_op a1=term110 {
-                  Function op = null;
-
-                  if (a.sort().name().equals(FloatLDT.NAME)) {
-                    if (op_name.equals("mul")) {
-                      op_name = "javaMulFloat";
-                    } else if (op_name.equals("div")) {
-                      op_name = "javaDivFloat";
-                    }
-                  } else if (a.sort().name().equals(DoubleLDT.NAME)) {
-                    if (op_name.equals("mul")) {
-                      op_name = "javaMulDouble";
-                    } else if (op_name.equals("div")) {
-                      op_name = "javaDivDouble";
-                    }
-                  }
-                   op = (Function) functions().lookup(new Name(op_name)); 
-                   if(op == null) {
-                     semanticError("Function symbol '"+op_name+"' not found.");
-                   }
-                  a = getTermFactory().createTerm(op, a, a1);
-                })*
+         a = makeBinaryTerm(op_name, a, a1);
+   })*
 ;
         catch [TermCreationException ex] {
               raiseException
