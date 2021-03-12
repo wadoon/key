@@ -1071,59 +1071,22 @@ relationalexpr returns [SLExpression ret=null] throws SLTranslationException
 :
 	result=shiftexpr
 	(
-     (
-	    lt=LT right=shiftexpr 
-	    // allow range predicates of the shape 0 < x < 23 (JML extension)
-	    ( LT right2=shiftexpr )?
-	    {
-		f = intLDT.getLessThan();
-		opToken = lt;
-	    }
-	|
-	    gt=GT right=shiftexpr
-	    {
-		f = intLDT.getGreaterThan();
-		opToken = gt;
-	    }
-	|
-	    leq=LEQ right=shiftexpr
-	    // allow range predicates of the shape 0 <= x < 23 (JML extension)
-	    ( LT right2=shiftexpr )?
-	    {
-		f = intLDT.getLessOrEquals();
-		opToken = leq;
-	    }
-	|
-	    geq=GEQ right=shiftexpr
-	    {
-		f = intLDT.getGreaterOrEquals();
-		opToken = geq;
-	    }
-     ) {
-     if (right.getType().getSort() == floatLDT.targetSort()) {
-                    if (f == intLDT.getLessThan()) {
-                        f = floatLDT.getLessThan();
-                    } else if (f == intLDT.getGreaterThan()) {
-                        f = floatLDT.getGreaterThan();
-                    } else if (f == intLDT.getLessOrEquals()) {
-                        f = floatLDT.getLessOrEquals();
-                    } else if (f == intLDT.getGreaterOrEquals()) {
-                        f = floatLDT.getGreaterOrEquals();
-                    }
-                    } else if (right.getType().getSort().equals(doubleLDT.targetSort())) {
-                    if (f == intLDT.getLessThan()) {
-                        f = doubleLDT.getLessThan();
-                    } else if (f == intLDT.getGreaterThan()) {
-                        f = doubleLDT.getGreaterThan();
-                    } else if (f == intLDT.getLessOrEquals()) {
-                        f = doubleLDT.getLessOrEquals();
-                    } else if (f == intLDT.getGreaterOrEquals()) {
-                        f = doubleLDT.getGreaterOrEquals();
-                    }
-                }
+	    lt=(LT|LEQ) right=shiftexpr
+	    { result = translator.translate(lt.getText(), SLExpression.class, result, right, services); }
 
-       }
-     |
+	    // allow range predicates of the shape 0 <= x < 23 (JML extension)
+	    ( lt2=(LT|LEQ) right2=shiftexpr
+	    { result = translator.translate(lt2.getText() + "-chained", SLExpression.class, result, right, services); }
+	    )*
+	|
+	    gt=(GT|GEQ) right=shiftexpr
+        { result = translator.translate(gt.getText(), SLExpression.class, result, right, services); }
+
+        // allow range predicates of the shape 23 > x >= 2 (JML extension)
+        ( gt2=(GT|GEQ) right2=shiftexpr
+        { result = translator.translate(gt2.getText() + "-chained", SLExpression.class, result, right, services); }
+        )*
+	|
 	    llt=LOCKSET_LT right=postfixexpr
 	    {
 	        addIgnoreWarning("Lockset ordering is not supported",llt);

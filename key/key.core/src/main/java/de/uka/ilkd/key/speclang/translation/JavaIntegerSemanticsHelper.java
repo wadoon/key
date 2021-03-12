@@ -17,9 +17,14 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.ldt.DoubleLDT;
+import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.RealLDT;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
@@ -27,11 +32,14 @@ import de.uka.ilkd.key.logic.op.Function;
  */
 public class JavaIntegerSemanticsHelper extends SemanticsHelper {
 
-    private final TermBuilder tb; 
+    private final TermBuilder tb;
 
     private final SLTranslationExceptionManager excManager;
     private final TypeConverter tc;
     private final IntegerLDT integerLDT;
+    private final FloatLDT floatLDT;
+    private final DoubleLDT doubleLDT;
+    private final RealLDT realLDT;
 
 
     //-------------------------------------------------------------------------
@@ -39,18 +47,22 @@ public class JavaIntegerSemanticsHelper extends SemanticsHelper {
     //-------------------------------------------------------------------------
 
     public JavaIntegerSemanticsHelper(Services services,
-			    SLTranslationExceptionManager excManager) {
-	assert services != null;
-	assert excManager != null;
+                                      SLTranslationExceptionManager excManager) {
+        assert services != null;
+        assert excManager != null;
 
-	this.excManager = excManager;
-	this.tc = services.getTypeConverter();
-	this.tb = services.getTermBuilder();
-	this.integerLDT = services.getTypeConverter().getIntegerLDT();
+        this.excManager = excManager;
+        this.tc = services.getTypeConverter();
+        this.tb = services.getTermBuilder();
+        this.integerLDT = services.getTypeConverter().getIntegerLDT();
+        this.floatLDT = services.getTypeConverter().getFloatLDT();
+        this.doubleLDT = services.getTypeConverter().getDoubleLDT();
+        this.realLDT = null; // bound to fail. FIXME with the code below.
+        // TODO ADD THIS WHEN AVAILABLE this.realLDT = services.getTypeConverter().getRealLDT();
     }
-    
-    
-    
+
+
+
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
@@ -58,110 +70,128 @@ public class JavaIntegerSemanticsHelper extends SemanticsHelper {
     private void raiseError(String message) throws SLTranslationException {
         throw excManager.createException(message);
     }
-    
+
     private void raiseError(String message, Exception e) throws SLTranslationException {
         throw excManager.createException(message, e);
     }
-    
-    
+
+
     private KeYJavaType getPromotedType(SLExpression a, SLExpression b) {
         KeYJavaType result = tc.getPromotedType(a.getType(), b.getType());
         assert result != null;
         return result;
     }
-    
-    
+
     private KeYJavaType getPromotedType(SLExpression a) {
         KeYJavaType result = tc.getPromotedType(a.getType());
         assert result != null;
         return result;
     }
 
+    private Term promote(Term term, KeYJavaType resultType) {
+        Sort targetSort = resultType.getSort();
+        if (term.sort() != targetSort) {
+            return tb.cast(targetSort, term);
+        } else {
+            return term;
+        }
+    }
+
     private boolean isBigint(KeYJavaType resultType) {
         return resultType.getJavaType() == PrimitiveType.JAVA_BIGINT;
     }
-
-
 
     private boolean isLong(KeYJavaType resultType) {
         return resultType.getJavaType() == PrimitiveType.JAVA_LONG;
     }
 
-    
-    
+    private boolean isFloat(KeYJavaType resultType) {
+        return resultType.getJavaType() == PrimitiveType.JAVA_FLOAT;
+    }
+
+    private boolean isDouble(KeYJavaType resultType) {
+        return resultType.getJavaType() == PrimitiveType.JAVA_DOUBLE;
+    }
+
+    private boolean isReal(KeYJavaType resultType) {
+        throw new Error("to be implemented for reals");
+    }
+
+
+
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
 
     public boolean isIntegerTerm(SLExpression a) throws SLTranslationException {
-	assert a.isTerm();
-	return a.getTerm().sort() == integerLDT.targetSort();
+        assert a.isTerm();
+        return a.getTerm().sort() == integerLDT.targetSort();
     }
 
 
-    public SLExpression buildPromotedOrExpression(SLExpression a, 
-	    				          SLExpression b)
-	    throws SLTranslationException {
+    public SLExpression buildPromotedOrExpression(SLExpression a,
+                                                  SLExpression b)
+            throws SLTranslationException {
         assert a != null;
         assert b != null;
-	try {
-	    KeYJavaType resultType = getPromotedType(a, b);
-	    Function or = null;
-	    if (isLong(resultType))
-	        or = integerLDT.getJavaBitwiseOrLong();
-	    else if (isBigint(resultType))
-	        raiseError("Bitwise operations are not allowed for \\bigint.");
-	    else
-	        or = integerLDT.getJavaBitwiseOrInt();
-	    return new SLExpression(tb.func(or, a.getTerm(), b.getTerm()), 
-		                    resultType);
-	} catch (RuntimeException e) {
+        try {
+            KeYJavaType resultType = getPromotedType(a, b);
+            Function or = null;
+            if (isLong(resultType))
+                or = integerLDT.getJavaBitwiseOrLong();
+            else if (isBigint(resultType))
+                raiseError("Bitwise operations are not allowed for \\bigint.");
+            else
+                or = integerLDT.getJavaBitwiseOrInt();
+            return new SLExpression(tb.func(or, a.getTerm(), b.getTerm()),
+                    resultType);
+        } catch (RuntimeException e) {
             raiseError("Error in or-expression " + a + " | " + b + ".",e);
             return null; //unreachable
         }
     }
 
 
-    public SLExpression buildPromotedAndExpression(SLExpression a, 
-	    				           SLExpression b)
-	    throws SLTranslationException {
+    public SLExpression buildPromotedAndExpression(SLExpression a,
+                                                   SLExpression b)
+            throws SLTranslationException {
         assert a != null;
         assert b != null;
-	try {
-	    KeYJavaType resultType = getPromotedType(a, b);
-	    Function and = null;
-	    if (isLong(resultType))
-	        and = integerLDT.getJavaBitwiseAndLong();
-	    else if (isBigint(resultType))
-            raiseError("Bitwise operations are not allowed for \\bigint.");
-	    else
-	        and = integerLDT.getJavaBitwiseAndInt();
-	    return new SLExpression(tb.func(and, a.getTerm(), b.getTerm()),
-		                    resultType);
-	} catch (RuntimeException e) {
+        try {
+            KeYJavaType resultType = getPromotedType(a, b);
+            Function and = null;
+            if (isLong(resultType))
+                and = integerLDT.getJavaBitwiseAndLong();
+            else if (isBigint(resultType))
+                raiseError("Bitwise operations are not allowed for \\bigint.");
+            else
+                and = integerLDT.getJavaBitwiseAndInt();
+            return new SLExpression(tb.func(and, a.getTerm(), b.getTerm()),
+                    resultType);
+        } catch (RuntimeException e) {
             raiseError("Error in and-expression " + a + " & " + b + ".",e);
             return null; //unreachable
         }
     }
 
 
-    public SLExpression buildPromotedXorExpression(SLExpression a, 
-	    					   SLExpression b)
-	    throws SLTranslationException {
+    public SLExpression buildPromotedXorExpression(SLExpression a,
+                                                   SLExpression b)
+            throws SLTranslationException {
         assert a != null;
         assert b != null;
-	try {
-	    KeYJavaType resultType = getPromotedType(a, b);
-	    Function xor = null;
-	    if (isLong(resultType))
-	        xor = integerLDT.getJavaBitwiseXOrLong();
-	    else if (isBigint(resultType))
-            raiseError("Bitwise operations are not allowed for \\bigint.");
-	    else
-	        xor = integerLDT.getJavaBitwiseXOrInt();
-	    return new SLExpression(tb.func(xor, a.getTerm(), b.getTerm()),
-		                    resultType);
-	} catch (RuntimeException e) {
+        try {
+            KeYJavaType resultType = getPromotedType(a, b);
+            Function xor = null;
+            if (isLong(resultType))
+                xor = integerLDT.getJavaBitwiseXOrLong();
+            else if (isBigint(resultType))
+                raiseError("Bitwise operations are not allowed for \\bigint.");
+            else
+                xor = integerLDT.getJavaBitwiseXOrInt();
+            return new SLExpression(tb.func(xor, a.getTerm(), b.getTerm()),
+                    resultType);
+        } catch (RuntimeException e) {
             raiseError("Error in xor-expression " + a + " ^ " + b + ".",e);
             return null; //unreachable
         }
@@ -169,15 +199,15 @@ public class JavaIntegerSemanticsHelper extends SemanticsHelper {
 
 
     public SLExpression buildPromotedNegExpression(SLExpression a)
-	    throws SLTranslationException {
+            throws SLTranslationException {
         assert a != null;
-	try {
-	    if (isBigint(a.getType()))
-	        raiseError("Bitwise operations are not allowed for \\bigint.");
-	    Function neg = integerLDT.getJavaBitwiseNegation();
-	    return new SLExpression(tb.func(neg, a.getTerm()),
-		                    a.getType());
-	} catch (RuntimeException e) {
+        try {
+            if (isBigint(a.getType()))
+                raiseError("Bitwise operations are not allowed for \\bigint.");
+            Function neg = integerLDT.getJavaBitwiseNegation();
+            return new SLExpression(tb.func(neg, a.getTerm()),
+                    a.getType());
+        } catch (RuntimeException e) {
             raiseError("Error in neg-expression " + a + ".",e);
             return null; //unreachable
         }
@@ -185,7 +215,7 @@ public class JavaIntegerSemanticsHelper extends SemanticsHelper {
 
 
     public SLExpression buildAddExpression(SLExpression a, SLExpression b)
-    throws SLTranslationException {
+            throws SLTranslationException {
         assert a != null;
         assert b != null;
         try {
@@ -195,19 +225,26 @@ public class JavaIntegerSemanticsHelper extends SemanticsHelper {
                 add = integerLDT.getJavaAddLong();
             else if (isBigint(resultType))
                 add = integerLDT.getAdd();
+            else if (isReal(resultType))
+                add = null; // FIXME realLDT.getAdd();
+            else if (isFloat(resultType))
+                add = floatLDT.getJavaAdd();
+            else if (isDouble(resultType))
+                add = doubleLDT.getJavaAdd();
             else
                 add = integerLDT.getJavaAddInt();
-            return new SLExpression(tb.func(add, a.getTerm(), b.getTerm()),
+            return new SLExpression(tb.func(add,
+                    promote(a.getTerm(), resultType),
+                    promote(b.getTerm(), resultType)),
                     resultType);
         } catch (RuntimeException e) {
-            raiseError("Error in additive expression " + a + " + " + b + ":",e);
+            raiseError("Error in additive expression " + a + " + " + b + ":", e);
             return null; //unreachable
         }
     }
 
-
     public SLExpression buildSubExpression(SLExpression a, SLExpression b)
-    throws SLTranslationException {
+            throws SLTranslationException {
         assert a != null;
         assert b != null;
         try {
@@ -229,7 +266,7 @@ public class JavaIntegerSemanticsHelper extends SemanticsHelper {
 
 
     public SLExpression buildMultExpression(SLExpression a, SLExpression b)
-    throws SLTranslationException {
+            throws SLTranslationException {
         assert a != null;
         assert b != null;
         try {
@@ -252,7 +289,7 @@ public class JavaIntegerSemanticsHelper extends SemanticsHelper {
 
 
     public SLExpression buildDivExpression(SLExpression a, SLExpression b)
-    throws SLTranslationException {
+            throws SLTranslationException {
         try {
             KeYJavaType resultType = getPromotedType(a, b);
             Function div;
@@ -273,7 +310,7 @@ public class JavaIntegerSemanticsHelper extends SemanticsHelper {
 
 
     public SLExpression buildModExpression(SLExpression a, SLExpression b)
-    throws SLTranslationException {
+            throws SLTranslationException {
         assert a != null;
         assert b != null;
         try {
@@ -286,12 +323,12 @@ public class JavaIntegerSemanticsHelper extends SemanticsHelper {
         } catch (RuntimeException e) {
             raiseError("Error in modulo expression " + a + " % " + b + ".",e);
             return null; //unreachable            
-        }        
+        }
     }
 
 
     public SLExpression buildRightShiftExpression(SLExpression a, SLExpression b)
-    throws SLTranslationException {
+            throws SLTranslationException {
         assert a != null;
         assert b != null;
         try {
@@ -307,14 +344,14 @@ public class JavaIntegerSemanticsHelper extends SemanticsHelper {
             return new SLExpression(tb.func(shift, a.getTerm(), b.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
-            raiseError("Error in shift-right expression " + a + " >> " 
+            raiseError("Error in shift-right expression " + a + " >> "
                     + b + ".",e);
             return null; //unreachable            
         }
     }
 
     public SLExpression buildLeftShiftExpression(SLExpression a, SLExpression b)
-    throws SLTranslationException {
+            throws SLTranslationException {
         assert a != null;
         assert b != null;
         try {
@@ -329,16 +366,16 @@ public class JavaIntegerSemanticsHelper extends SemanticsHelper {
             return new SLExpression(tb.func(shift, a.getTerm(), b.getTerm()),
                     resultType);
         } catch (RuntimeException e) {
-            raiseError("Error in shift-left expression " + a + " << " 
+            raiseError("Error in shift-left expression " + a + " << "
                     + b + ".",e);
             return null; //unreachable            
         }
     }
 
 
-    public SLExpression buildUnsignedRightShiftExpression(SLExpression a, 
-            SLExpression b)
-    throws SLTranslationException {
+    public SLExpression buildUnsignedRightShiftExpression(SLExpression a,
+                                                          SLExpression b)
+            throws SLTranslationException {
         assert a != null;
         assert b != null;
         try {
@@ -360,8 +397,8 @@ public class JavaIntegerSemanticsHelper extends SemanticsHelper {
     }
 
 
-    public SLExpression buildUnaryMinusExpression(SLExpression a) 
-    throws SLTranslationException {
+    public SLExpression buildUnaryMinusExpression(SLExpression a)
+            throws SLTranslationException {
         assert a != null;
         try {
             KeYJavaType resultType = getPromotedType(a);
@@ -383,26 +420,26 @@ public class JavaIntegerSemanticsHelper extends SemanticsHelper {
 
     public SLExpression buildPromotedUnaryPlusExpression(SLExpression a)
             throws SLTranslationException {
-	return a;
+        return a;
     }
-    
-    
-    public SLExpression buildCastExpression(KeYJavaType resultType, 
-	    				    SLExpression a) 
+
+
+    public SLExpression buildCastExpression(KeYJavaType resultType,
+                                            SLExpression a)
             throws SLTranslationException {
         assert a != null;
         try {
-	    Function cast = integerLDT.getJavaCast(resultType.getJavaType());
-	    if (cast != null)
-            return new SLExpression(tb.func(cast, a.getTerm()), resultType);
-	    else { // there is no cast to \bigint
-	        if (! isBigint(resultType))
-	            raiseError("Cannot cast expression "+a+" to "+resultType+".");
-	        return new SLExpression(a.getTerm(), resultType);
-	    }
+            Function cast = integerLDT.getJavaCast(resultType.getJavaType());
+            if (cast != null)
+                return new SLExpression(tb.func(cast, a.getTerm()), resultType);
+            else { // there is no cast to \bigint
+                if (! isBigint(resultType))
+                    raiseError("Cannot cast expression "+a+" to "+resultType+".");
+                return new SLExpression(a.getTerm(), resultType);
+            }
         } catch (RuntimeException e) {
             raiseError("Error in cast expression -" + a + ".",e);
             return null; //unreachable            
         }
-    }    
+    }
 }

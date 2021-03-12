@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.speclang.translation.*;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
@@ -81,7 +82,7 @@ public final class JMLTranslator {
      */
     private final TermBuilder tb;
     private final String fileName;
-    private TermServices services;                          // to be used in future
+    private Services services;                          // to be used in future
     private SLTranslationExceptionManager excManager;
     private List<PositionedString> warnings = new ArrayList<PositionedString>();
 
@@ -187,6 +188,17 @@ public final class JMLTranslator {
         SHIFT_LEFT ("<<"),
         SHIFT_RIGHT (">>"),
         UNSIGNED_SHIFT_RIGHT (">>>"),
+
+        // comparison
+        LT ("<"),
+        LT_CHAINED("<-chained"),
+        LEQ ("<="),
+        LEQ_CHAINED("<=-chained"),
+        GT (">"),
+        GT_CHAINED(">-chained"),
+        GEQ (">="),
+        GEQ_CHAINED(">=-chained"),
+
         BREAKS ("breaks"),
         CONTINUES ("continues"),
         RETURNS ("returns"),
@@ -221,13 +233,13 @@ public final class JMLTranslator {
         }
     }
 
-    public JMLTranslator(SLTranslationExceptionManager excManager, TermServices services) {
-        this(excManager,null,services);
+    public JMLTranslator(SLTranslationExceptionManager excManager, Services services) {
+        this(excManager, null, services);
     }
 
     public JMLTranslator(SLTranslationExceptionManager excManager,
                          String fileName,
-                         TermServices services) {
+                         Services services) {
         this.excManager = excManager;
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -1371,6 +1383,34 @@ public final class JMLTranslator {
 
         });
 
+        translationMethods.put(JMLKeyWord.GT, new JMLArithmeticOperationTranslationMethod() {
+            @Override
+            protected String opName() {
+                return "gt";
+            }
+
+            @Override
+            protected SLExpression translate(SemanticsHelper helper, SLExpression left, SLExpression right) throws SLTranslationException {
+                throw new Error("implement me!");
+                //return helper.buildGreaterThan(...);
+            }
+        });
+
+        JMLArithmeticOperationTranslationMethod XXX_NOT_YET_DONE = new JMLArithmeticOperationTranslationMethod() {
+            protected String opName() { return "error"; }
+            protected SLExpression translate(SemanticsHelper helper, SLExpression left, SLExpression right) throws SLTranslationException {
+                throw new Error("not yet implemented"); }
+        };
+
+        translationMethods.put(JMLKeyWord.GEQ, XXX_NOT_YET_DONE);
+        translationMethods.put(JMLKeyWord.LT, XXX_NOT_YET_DONE);
+        translationMethods.put(JMLKeyWord.LEQ, XXX_NOT_YET_DONE);
+
+        translationMethods.put(JMLKeyWord.LT_CHAINED, new ChainedComparisonTranslation(JMLKeyWord.LT));
+        translationMethods.put(JMLKeyWord.LEQ_CHAINED, new ChainedComparisonTranslation(JMLKeyWord.LEQ));
+        translationMethods.put(JMLKeyWord.GT_CHAINED, new ChainedComparisonTranslation(JMLKeyWord.GT));
+        translationMethods.put(JMLKeyWord.GEQ_CHAINED, new ChainedComparisonTranslation(JMLKeyWord.GEQ));
+
         translationMethods.put(JMLKeyWord.CAST, new JMLTranslationMethod(){
 
             @Override
@@ -2497,7 +2537,6 @@ public final class JMLTranslator {
      * Translation methods for (binary) arithmetic operations.
      * Contains checks whether \bigint or Java integer semantics should be used.
      * @author bruns
-     *
      */
     private abstract class JMLArithmeticOperationTranslationMethod implements JMLTranslationMethod {
 
@@ -2526,30 +2565,64 @@ public final class JMLTranslator {
         }
 
         @Override
-        public SLExpression translate (SLTranslationExceptionManager man, Object ... params ) throws SLTranslationException{
+        public SLExpression translate (SLTranslationExceptionManager man, Object ... params ) throws SLTranslationException {
             checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
             SLExpression e1 = (SLExpression) params[1];
             SLExpression e2 = (SLExpression) params[2];
             SLExpression result;
-            if (e1.getType().getJavaType() == PrimitiveType.JAVA_FLOAT  || e2.getType().getJavaType() == PrimitiveType.JAVA_FLOAT ||
-                e1.getType().getJavaType() == PrimitiveType.JAVA_DOUBLE || e2.getType().getJavaType() == PrimitiveType.JAVA_DOUBLE) {
-                checkNotType(e1, man);
-                checkNotType(e2, man);
-                JavaFloatSemanticsHelper jfsh = new JavaFloatSemanticsHelper((Services) params[0], man);
-                result = translate(jfsh, e1, e2);
-            } else {
-                checkNotType(e1, man);
-                checkNotType(e2, man);
-                bigint = ((Services)params[0]).getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
-                JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper((Services)params[0],man);
-                result = translate(jish, e1, e2);
-            }
+            checkNotType(e1, man);
+            checkNotType(e2, man);
+            JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper((Services)params[0],man);
+            result = translate(jish, e1, e2);
             return result;
         }
 
         protected abstract String opName();
-        protected abstract SLExpression translate(SemanticsHelper Helper, SLExpression left, SLExpression right) throws SLTranslationException;
+        protected abstract SLExpression translate(SemanticsHelper helper, SLExpression left, SLExpression right) throws SLTranslationException;
     }
+
+    /**
+     * This class reduces chained comparisons a < b < c to the usual
+     * operations.
+     */
+    private class ChainedComparisonTranslation extends JMLArithmeticOperationTranslationMethod {
+
+        // that is the basis keyword to whose translation we refer.
+        private final JMLKeyWord keyword;
+
+        ChainedComparisonTranslation(JMLKeyWord keyword) {
+            this.keyword = keyword;
+        }
+
+        @Override
+        protected String opName() {
+            return keyword + "-chained";
+        }
+
+        @Override
+        protected SLExpression translate(SemanticsHelper helper, SLExpression left, SLExpression right) throws SLTranslationException {
+            Term term = left.getTerm();
+            // from chaining a < b < c < d there may already be a conjunction.
+            // Extract c < d from this chain
+            if (term.op() == Junctor.AND) {
+                term = term.sub(1);
+            }
+
+            // If this is boolean now, take the right argument (if it exists)
+            if (term.sort() == Sort.FORMULA && term.arity() == 2) {
+                term = term.sub(1);
+            }
+
+            // Now ... that is our left argument and we go for the translation
+            SLExpression comparison = JMLTranslator.this.translate(keyword, services, term, right);
+
+            // Chain that with the rest
+            SLExpression result = new SLExpression(tb.and(left.getTerm(), comparison.getTerm()), comparison.getType());
+
+            return result;
+        }
+    }
+
 
     /*
      Translate a function name together with a list of arguments to a JDL term.
