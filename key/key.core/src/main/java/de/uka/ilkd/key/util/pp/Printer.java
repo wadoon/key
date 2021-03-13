@@ -74,7 +74,7 @@ class Printer {
 
     /** end a block */
     void closeBlock() {
-	pop();
+        pop();
     }
 
     /**
@@ -147,7 +147,7 @@ class Printer {
 	try {
 	    marginStack.remove(marginStack.size()-1);
 	} catch (IndexOutOfBoundsException e) {
-	    throw new UnbalancedBlocksException();
+	    //throw new UnbalancedBlocksException();
 	}
     }
 
@@ -156,7 +156,8 @@ class Printer {
 	try {
 	    return marginStack.get(marginStack.size()-1).intValue();
 	} catch (IndexOutOfBoundsException e) {
-	    throw new UnbalancedBlocksException();
+    return 0;
+//	    throw new UnbalancedBlocksException();
 	}
     }
 

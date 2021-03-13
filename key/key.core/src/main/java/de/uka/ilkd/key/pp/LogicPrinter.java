@@ -763,9 +763,9 @@ public class LogicPrinter {
             layouter.end();
         } catch (IOException e) {
             throw new RuntimeException("IO Exception in pretty printer:\n" + e);
-        } catch (UnbalancedBlocksException e) {
+        } /*catch (UnbalancedBlocksException e) {
             throw new RuntimeException("Unbalanced blocks in pretty printer:\n" + e);
-        }
+        }*/
     }
 
     public void printSequent(Sequent seq, boolean finalbreak) {
