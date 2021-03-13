@@ -29,6 +29,6 @@ public class Object {
     
     public final void require(boolean b);
     
-public int push(Message m, long l);    
+    public void push(Object o);    
 
 }

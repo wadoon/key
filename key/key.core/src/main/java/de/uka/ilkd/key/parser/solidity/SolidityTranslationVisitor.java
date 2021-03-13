@@ -773,10 +773,17 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 */
 	@Override public String visitFunctionCallExpression(SolidityParser.FunctionCallExpressionContext ctx) { 
 		String fctName = visit(ctx.expression());
+        String comparableName = fctName;
+
+        // handle calls to member functions
+        int dotPos = fctName.indexOf('.');
+        if (dotPos != -1) {
+            comparableName = fctName.substring(dotPos+1);
+        }
 
 		StringBuffer arguments;
-		switch(fctName) {
-		case "require":case "assert": 
+		switch(comparableName) {
+		case "require":case "assert":case "push":
 			arguments = new StringBuffer();
 			break;
 		default: arguments = new StringBuffer("msg,");		
