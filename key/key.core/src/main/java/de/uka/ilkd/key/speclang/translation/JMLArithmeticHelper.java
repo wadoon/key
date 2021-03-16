@@ -30,7 +30,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 /**
  * Helper class for sl-parsers dealing with Java's type promotion for integers.
  */
-public class JavaIntegerSemanticsHelper extends SemanticsHelper {
+public class JMLArithmeticHelper {
 
     private final TermBuilder tb;
 
@@ -46,8 +46,8 @@ public class JavaIntegerSemanticsHelper extends SemanticsHelper {
     //constructors
     //-------------------------------------------------------------------------
 
-    public JavaIntegerSemanticsHelper(Services services,
-                                      SLTranslationExceptionManager excManager) {
+    public JMLArithmeticHelper(Services services,
+                               SLTranslationExceptionManager excManager) {
         assert services != null;
         assert excManager != null;
 
@@ -441,5 +441,31 @@ public class JavaIntegerSemanticsHelper extends SemanticsHelper {
             raiseError("Error in cast expression -" + a + ".",e);
             return null; //unreachable            
         }
+    }
+
+    public static boolean hasFloatingPoint(SLExpression a, SLExpression b, Services services) {
+        Sort floatSort = services.getTypeConverter().getFloatLDT().targetSort();
+        Sort doubleSort = services.getTypeConverter().getDoubleLDT().targetSort();
+        Sort aSort = a.getTerm().sort();
+        Sort bSort = b.getTerm().sort();
+        return aSort == floatSort || aSort == doubleSort || bSort == floatSort || bSort == doubleSort;
+    }
+
+    public SLExpression buildEqualityExpression(SLExpression a, SLExpression b) throws SLTranslationException {
+            assert a != null;
+            assert b != null;
+            try {
+                KeYJavaType promotedType = getPromotedType(a, b);
+                Function eq;
+                if (isFloat(promotedType)) {
+                    eq = floatLDT.getEquals();
+                } else eq = doubleLDT.getEquals();
+                Term termA = promote(a.getTerm(), promotedType);
+                Term termB = promote(b.getTerm(), promotedType);
+                Term result = tb.func(eq, termA, termB);
+                return new SLExpression(result);
+            } catch (RuntimeException e) {
+                throw new SLTranslationException("Error in equality expression " + a + " == " + b + ".", e);
+            }
     }
 }

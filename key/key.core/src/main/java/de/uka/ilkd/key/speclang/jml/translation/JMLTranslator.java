@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.speclang.translation.*;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
@@ -573,7 +572,7 @@ public final class JMLTranslator {
                 warnings.add(new PositionedString("The keyword \\bsum is deprecated and will be removed in the future.\n" +
                 		"Please use the standard \\sum syntax."));
                 final SLExpression bsumExpr = new SLExpression(resultTerm, promo);
-                final JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper(services, excManager);
+                final JMLArithmeticHelper jish = new JMLArithmeticHelper(services, excManager);
                 // cast to specific JML type (fixes bug #1347)
                 return jish.buildCastExpression(promo, bsumExpr);
             }
@@ -1258,12 +1257,12 @@ public final class JMLTranslator {
         translationMethods.put(JMLKeyWord.SHIFT_RIGHT, new JMLArithmeticOperationTranslationMethod(){
 
             @Override
-            public SLExpression translate(SemanticsHelper intHelper, SLExpression a, SLExpression e)
+            public SLExpression translate(JMLArithmeticHelper arithmeticHelper, SLExpression a, SLExpression e)
             throws SLTranslationException {
                 checkNotBigint(a);
                 checkNotBigint(e);
 
-                return intHelper.buildRightShiftExpression(a, e);
+                return arithmeticHelper.buildRightShiftExpression(a, e);
             }
 
             @Override
@@ -1276,12 +1275,12 @@ public final class JMLTranslator {
         translationMethods.put(JMLKeyWord.SHIFT_LEFT, new JMLArithmeticOperationTranslationMethod(){
 
             @Override
-            public SLExpression translate(SemanticsHelper intHelper, SLExpression result, SLExpression e)
+            public SLExpression translate(JMLArithmeticHelper arithmeticHelper, SLExpression result, SLExpression e)
             throws SLTranslationException {
                 checkNotBigint(result);
                 checkNotBigint(e);
 
-                return intHelper.buildLeftShiftExpression(result, e);
+                return arithmeticHelper.buildLeftShiftExpression(result, e);
             }
 
             @Override
@@ -1294,12 +1293,12 @@ public final class JMLTranslator {
         translationMethods.put(JMLKeyWord.UNSIGNED_SHIFT_RIGHT, new JMLArithmeticOperationTranslationMethod(){
 
             @Override
-            public SLExpression translate(SemanticsHelper intHelper, SLExpression result, SLExpression e)
+            public SLExpression translate(JMLArithmeticHelper arithmeticHelper, SLExpression result, SLExpression e)
             throws SLTranslationException {
                 checkNotBigint(result);
                 checkNotBigint(e);
 
-                return intHelper.buildUnsignedRightShiftExpression(result, e);
+                return arithmeticHelper.buildUnsignedRightShiftExpression(result, e);
             }
 
             @Override
@@ -1316,7 +1315,7 @@ public final class JMLTranslator {
             }
 
             @Override
-            protected SLExpression translate(SemanticsHelper helper, SLExpression left,
+            protected SLExpression translate(JMLArithmeticHelper helper, SLExpression left,
                     SLExpression right) throws SLTranslationException {
                     return helper.buildAddExpression(left, right);
             }
@@ -1331,7 +1330,7 @@ public final class JMLTranslator {
             }
 
             @Override
-            protected SLExpression translate(SemanticsHelper helper, SLExpression left,
+            protected SLExpression translate(JMLArithmeticHelper helper, SLExpression left,
                     SLExpression right) throws SLTranslationException {
                 return helper.buildSubExpression(left, right);
             }
@@ -1346,7 +1345,7 @@ public final class JMLTranslator {
             }
 
             @Override
-            protected SLExpression translate(SemanticsHelper helper, SLExpression left,
+            protected SLExpression translate(JMLArithmeticHelper helper, SLExpression left,
                                              SLExpression right) throws SLTranslationException {
                 return helper.buildMultExpression(left, right);
             }
@@ -1361,7 +1360,7 @@ public final class JMLTranslator {
             }
 
             @Override
-            protected SLExpression translate(SemanticsHelper helper, SLExpression left,
+            protected SLExpression translate(JMLArithmeticHelper helper, SLExpression left,
                                              SLExpression right) throws SLTranslationException {
                 return helper.buildDivExpression(left, right);
             }
@@ -1376,7 +1375,7 @@ public final class JMLTranslator {
             }
 
             @Override
-            protected SLExpression translate(SemanticsHelper helper, SLExpression left,
+            protected SLExpression translate(JMLArithmeticHelper helper, SLExpression left,
                                              SLExpression right) throws SLTranslationException {
                 return helper.buildModExpression(left, right);
             }
@@ -1390,7 +1389,7 @@ public final class JMLTranslator {
             }
 
             @Override
-            protected SLExpression translate(SemanticsHelper helper, SLExpression left, SLExpression right) throws SLTranslationException {
+            protected SLExpression translate(JMLArithmeticHelper helper, SLExpression left, SLExpression right) throws SLTranslationException {
                 throw new Error("implement me!");
                 //return helper.buildGreaterThan(...);
             }
@@ -1398,7 +1397,7 @@ public final class JMLTranslator {
 
         JMLArithmeticOperationTranslationMethod XXX_NOT_YET_DONE = new JMLArithmeticOperationTranslationMethod() {
             protected String opName() { return "error"; }
-            protected SLExpression translate(SemanticsHelper helper, SLExpression left, SLExpression right) throws SLTranslationException {
+            protected SLExpression translate(JMLArithmeticHelper helper, SLExpression left, SLExpression right) throws SLTranslationException {
                 throw new Error("not yet implemented"); }
         };
 
@@ -1416,9 +1415,9 @@ public final class JMLTranslator {
             @Override
             public Object translate(SLTranslationExceptionManager excManager,
                     Object... params) throws SLTranslationException {
-                checkParameters(params, Services.class, JavaIntegerSemanticsHelper.class, KeYJavaType.class, SLExpression.class);
+                checkParameters(params, Services.class, JMLArithmeticHelper.class, KeYJavaType.class, SLExpression.class);
                 Services services = (Services)params[0];
-                JavaIntegerSemanticsHelper intHelper = (JavaIntegerSemanticsHelper)params[1];
+                JMLArithmeticHelper arithmeticHelper = (JMLArithmeticHelper)params[1];
                 KeYJavaType type = (KeYJavaType)params[2];
                 SLExpression result = (SLExpression)params[3];
 
@@ -1436,8 +1435,8 @@ public final class JMLTranslator {
                         if (type != services.getTypeConverter().getBooleanType()){
                             throw excManager.createException("Cannot cast from boolean to "+type+".");
                         }
-                    } else if(intHelper.isIntegerTerm(result)) {
-                        result = intHelper.buildCastExpression(type, result);
+                    } else if(arithmeticHelper.isIntegerTerm(result)) {
+                        result = arithmeticHelper.buildCastExpression(type, result);
                     } else {result = new SLExpression(
                             tb.cast(type.getSort(), result.getTerm()),
                             type);
@@ -2400,7 +2399,7 @@ public final class JMLTranslator {
                         upperBound(t1, lv),
                         t2);
             }
-            final JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper(services, excManager);
+            final JMLArithmeticHelper jish = new JMLArithmeticHelper(services, excManager);
             // cast to specific JML type (fixes bug #1347)
             return jish.buildCastExpression(resultType, new SLExpression(t, resultType));
         }
@@ -2462,9 +2461,9 @@ public final class JMLTranslator {
 
             if (a.isTerm() && b.isTerm()) {
 
-                if (JavaFloatSemanticsHelper.hasFloatingPoint(a, b, services)) {
-                    JavaFloatSemanticsHelper fh = new JavaFloatSemanticsHelper(services, excManager);
-                    return fh.buildEqualityExpression(a, b);
+                if (JMLArithmeticHelper.hasFloatingPoint(a, b, services)) {
+                    JMLArithmeticHelper helper = new JMLArithmeticHelper(services, excManager);
+                    return helper.buildEqualityExpression(a, b);
                 } else {
                     return new SLExpression(buildEqualityTerm(a.getTerm(),
                             b.getTerm(),
@@ -2572,13 +2571,13 @@ public final class JMLTranslator {
             SLExpression result;
             checkNotType(e1, man);
             checkNotType(e2, man);
-            JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper((Services)params[0],man);
+            JMLArithmeticHelper jish = new JMLArithmeticHelper((Services)params[0],man);
             result = translate(jish, e1, e2);
             return result;
         }
 
         protected abstract String opName();
-        protected abstract SLExpression translate(SemanticsHelper helper, SLExpression left, SLExpression right) throws SLTranslationException;
+        protected abstract SLExpression translate(JMLArithmeticHelper helper, SLExpression left, SLExpression right) throws SLTranslationException;
     }
 
     /**
@@ -2600,7 +2599,7 @@ public final class JMLTranslator {
         }
 
         @Override
-        protected SLExpression translate(SemanticsHelper helper, SLExpression left, SLExpression right) throws SLTranslationException {
+        protected SLExpression translate(JMLArithmeticHelper helper, SLExpression left, SLExpression right) throws SLTranslationException {
             Term term = left.getTerm();
             // from chaining a < b < c < d there may already be a conjunction.
             // Extract c < d from this chain
