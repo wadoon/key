@@ -91,8 +91,7 @@ options {
 
     // Helper objects
     private JMLResolverManager resolverManager;
-    private JavaIntegerSemanticsHelper intHelper;
-    private JavaFloatSemanticsHelper floatHelper;
+    private JMLArithmeticHelper helper;
 
     private KeYJMLParser(KeYJMLLexer lexer,
                          String fileName,
@@ -130,8 +129,7 @@ options {
         this.atPres         = atPres;
         this.atBefores      = atBefores;
 
-        intHelper = new JavaIntegerSemanticsHelper(services, excManager);
-        floatHelper = new JavaFloatSemanticsHelper(services, excManager);
+        helper = new JMLArithmeticHelper(services, excManager);
         // initialize helper objects
         this.resolverManager = new JMLResolverManager(this.javaInfo,
                                                       specInClass,
@@ -998,8 +996,8 @@ inclusiveorexpr returns [SLExpression ret=null] throws SLTranslationException
     (
         INCLUSIVEOR expr=exclusiveorexpr
         {
-           if(intHelper.isIntegerTerm(result)) {
-               result = intHelper.buildPromotedOrExpression(result,expr);
+           if(helper.isIntegerTerm(result)) {
+               result = helper.buildPromotedOrExpression(result,expr);
            } else {
                result = new SLExpression(tb.or(tb.convertToFormula(result.getTerm()),
                                                tb.convertToFormula(expr.getTerm())));
@@ -1016,8 +1014,8 @@ exclusiveorexpr returns [SLExpression ret=null] throws SLTranslationException
     (
         XOR expr=andexpr
         {
-           if(intHelper.isIntegerTerm(result)) {
-               result = intHelper.buildPromotedXorExpression(result,expr);
+           if(helper.isIntegerTerm(result)) {
+               result = helper.buildPromotedXorExpression(result,expr);
            } else {
                Term resultFormula = tb.convertToFormula(result.getTerm());
                Term exprFormula = tb.convertToFormula(expr.getTerm());
@@ -1042,8 +1040,8 @@ andexpr returns [SLExpression ret=null] throws SLTranslationException
     (
         AND expr=equalityexpr
         {
-           if (intHelper.isIntegerTerm(result)) {
-               result = intHelper.buildPromotedAndExpression(result, expr);
+           if (helper.isIntegerTerm(result)) {
+               result = helper.buildPromotedAndExpression(result, expr);
            } else {
                result = new SLExpression(tb.and(tb.convertToFormula(result.getTerm()),
                                                 tb.convertToFormula(expr.getTerm())));
@@ -1242,7 +1240,7 @@ multexpr returns [SLExpression ret=null] throws SLTranslationException
 	    assert e.isTerm();
 
         result = translator.<SLExpression>translate(mult.getText(), SLExpression.class, services, result, e);
-//	    result = intHelper.buildMulExpression(result, e);
+//	    result = helper.buildMulExpression(result, e);
 	}
     |
 	div=DIV e=unaryexpr
@@ -1259,7 +1257,7 @@ multexpr returns [SLExpression ret=null] throws SLTranslationException
 	    assert e.isTerm();
 
         result = translator.<SLExpression>translate(div.getText(), SLExpression.class, services, result, e);
-//	    result = intHelper.buildDivExpression(result, e);
+//	    result = helper.buildDivExpression(result, e);
 	}
     |
     mod=MOD e=unaryexpr
@@ -1276,7 +1274,7 @@ multexpr returns [SLExpression ret=null] throws SLTranslationException
         assert e.isTerm();
 
         result = translator.<SLExpression>translate(mod.getText(), SLExpression.class, services, result, e);
-//      result = intHelper.buildModExpression(result, e);
+//      result = helper.buildModExpression(result, e);
     }
     )*
 ;
@@ -1292,7 +1290,7 @@ unaryexpr returns [SLExpression ret=null] throws SLTranslationException
         }
         assert result.isTerm();
 
-        result = intHelper.buildPromotedUnaryPlusExpression(result);
+        result = helper.buildPromotedUnaryPlusExpression(result);
     }
     | (MINUS DECLITERAL) => MINUS declit=DECLITERAL
     {
@@ -1319,9 +1317,9 @@ unaryexpr returns [SLExpression ret=null] throws SLTranslationException
 	    assert result.isTerm();
         if (result.getType().getJavaType() == PrimitiveType.JAVA_FLOAT
             || result.getType().getJavaType() == PrimitiveType.JAVA_DOUBLE) {
-            result = floatHelper.buildUnaryMinusExpression(result);
+            result = helper.buildUnaryMinusExpression(result);
         } else {
-	        result = intHelper.buildUnaryMinusExpression(result);
+	        result = helper.buildUnaryMinusExpression(result);
 	    }
 	}
     |
@@ -1337,7 +1335,7 @@ castexpr returns  [SLExpression ret = null] throws SLTranslationException
 :
 LPAREN rtype=typespec RPAREN result=unaryexpr
 {
-    ret = translator.translate(JMLTranslator.JMLKeyWord.CAST, services, intHelper, rtype, result);
+    ret = translator.translate(JMLTranslator.JMLKeyWord.CAST, services, helper, rtype, result);
 }
 ;
 
@@ -1368,7 +1366,7 @@ unaryexprnotplusminus returns [SLExpression ret=null] throws SLTranslationExcept
             raiseError("Cannot negate type " + e.getType().getName() + ".");
         }
 
-        result = intHelper.buildPromotedNegExpression(e);
+        result = helper.buildPromotedNegExpression(e);
     }
 
     |
