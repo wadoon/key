@@ -250,13 +250,21 @@ public class JMLArithmeticHelper {
         try {
             KeYJavaType resultType = getPromotedType(a, b);
             Function sub;
-            if (isLong(resultType)) {
+            if (isLong(resultType))
                 sub = integerLDT.getJavaSubLong();
-            } else if (isBigint(resultType))
+            else if (isBigint(resultType))
                 sub = integerLDT.getSub();
+            else if (isReal(resultType))
+                sub = null; // FIXME realLDT.getSub();
+            else if (isFloat(resultType))
+            sub = floatLDT.getJavaSub();
+            else if (isDouble(resultType))
+            sub = doubleLDT.getJavaSub();
             else
                 sub = integerLDT.getJavaSubInt();
-            return new SLExpression(tb.func(sub, a.getTerm(), b.getTerm()),
+            return new SLExpression(tb.func(sub,
+                    promote(a.getTerm(), resultType),
+                    promote(b.getTerm(), resultType)),
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in subtract expression " + a + " - " + b + ".",e);
@@ -276,9 +284,17 @@ public class JMLArithmeticHelper {
                 mul = integerLDT.getJavaMulLong();
             else if (isBigint(resultType))
                 mul = integerLDT.getMul();
+            else if (isReal(resultType))
+                mul = null; // FIXME realLDT.getmul();
+            else if (isFloat(resultType))
+                mul = floatLDT.getJavaMul();
+            else if (isDouble(resultType))
+                mul = doubleLDT.getJavaMul();
             else
                 mul = integerLDT.getJavaMulInt();
-            return new SLExpression(tb.func(mul, a.getTerm(), b.getTerm()),
+            return new SLExpression(tb.func(mul,
+                    promote(a.getTerm(), resultType),
+                    promote(b.getTerm(), resultType)),
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in multiplicative expression " + a + " * "
@@ -286,7 +302,6 @@ public class JMLArithmeticHelper {
             return null; //unreachable            
         }
     }
-
 
     public SLExpression buildDivExpression(SLExpression a, SLExpression b)
             throws SLTranslationException {
@@ -297,10 +312,17 @@ public class JMLArithmeticHelper {
                 div = integerLDT.getJavaDivLong();
             else if (isBigint(resultType))
                 div = integerLDT.getJDivision();
+            else if (isReal(resultType))
+                div = null; // FIXME realLDT.getdiv();
+            else if (isFloat(resultType))
+                div = floatLDT.getJavaDiv();
+            else if (isDouble(resultType))
+                div = doubleLDT.getJavaDiv();
             else
                 div = integerLDT.getJavaDivInt();
-
-            return new SLExpression(tb.func(div, a.getTerm(), b.getTerm()),
+            return new SLExpression(tb.func(div,
+                    promote(a.getTerm(), resultType),
+                    promote(b.getTerm(), resultType)),
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in division expression " + a + " / " + b + ".",e);
@@ -407,6 +429,12 @@ public class JMLArithmeticHelper {
                 minus = integerLDT.getJavaUnaryMinusLong();
             else if (isBigint(resultType))
                 minus = integerLDT.getNegativeNumberSign();
+            else if (isReal(resultType))
+                minus = null; // FIXME realLDT.getminus();
+            else if (isFloat(resultType))
+                minus = floatLDT.getJavaUnaryMinus();
+            else if (isDouble(resultType))
+                minus = doubleLDT.getJavaUnaryMinus();
             else
                 minus = integerLDT.getJavaUnaryMinusInt();
             return new SLExpression(tb.func(minus, a.getTerm()),
