@@ -13,13 +13,7 @@
 
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import de.uka.ilkd.key.speclang.translation.*;
 import org.antlr.runtime.RecognitionException;
@@ -1382,28 +1376,24 @@ public final class JMLTranslator {
 
         });
 
-        translationMethods.put(JMLKeyWord.GT, new JMLArithmeticOperationTranslationMethod() {
-            @Override
-            protected String opName() {
-                return "gt";
-            }
+        List<Pair<String, JMLKeyWord>> cmpOps = new ArrayList<>(Arrays.asList(
+                new Pair<>("gt", JMLKeyWord.GT),
+                new Pair<>("lt", JMLKeyWord.LT),
+                new Pair<>("geq", JMLKeyWord.GEQ),
+                new Pair<>("leq", JMLKeyWord.LEQ)));
+        for (Pair<String, JMLKeyWord> p : cmpOps) {
+            translationMethods.put(p.second, new JMLArithmeticOperationTranslationMethod() {
+                @Override
+                protected String opName() {
+                    return p.first;
+                }
 
-            @Override
-            protected SLExpression translate(JMLArithmeticHelper helper, SLExpression left, SLExpression right) throws SLTranslationException {
-                throw new Error("implement me!");
-                //return helper.buildGreaterThan(...);
-            }
-        });
-
-        JMLArithmeticOperationTranslationMethod XXX_NOT_YET_DONE = new JMLArithmeticOperationTranslationMethod() {
-            protected String opName() { return "error"; }
-            protected SLExpression translate(JMLArithmeticHelper helper, SLExpression left, SLExpression right) throws SLTranslationException {
-                throw new Error("not yet implemented"); }
-        };
-
-        translationMethods.put(JMLKeyWord.GEQ, XXX_NOT_YET_DONE);
-        translationMethods.put(JMLKeyWord.LT, XXX_NOT_YET_DONE);
-        translationMethods.put(JMLKeyWord.LEQ, XXX_NOT_YET_DONE);
+                @Override
+                protected SLExpression translate(JMLArithmeticHelper helper, SLExpression left, SLExpression right) throws SLTranslationException {
+                    return helper.buildComparisonExpression(left, right, p.first);
+                }
+            });
+        }
 
         translationMethods.put(JMLKeyWord.LT_CHAINED, new ChainedComparisonTranslation(JMLKeyWord.LT));
         translationMethods.put(JMLKeyWord.LEQ_CHAINED, new ChainedComparisonTranslation(JMLKeyWord.LEQ));

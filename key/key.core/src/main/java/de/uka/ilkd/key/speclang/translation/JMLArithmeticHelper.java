@@ -17,10 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.RealLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -32,6 +29,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public class JMLArithmeticHelper {
 
+    Services services;
     private final TermBuilder tb;
 
     private final SLTranslationExceptionManager excManager;
@@ -51,6 +49,7 @@ public class JMLArithmeticHelper {
         assert services != null;
         assert excManager != null;
 
+        this.services = services;
         this.excManager = excManager;
         this.tc = services.getTypeConverter();
         this.tb = services.getTermBuilder();
@@ -213,6 +212,32 @@ public class JMLArithmeticHelper {
         }
     }
 
+    public SLExpression buildComparisonExpression(SLExpression a, SLExpression b, String opStr)
+            throws SLTranslationException {
+        assert a != null;
+        assert b != null;
+        try {
+            KeYJavaType resultType = getPromotedType(a, b);
+            Function fun;
+            LDT ldt;
+            if (isReal(resultType))
+                ldt = realLDT;
+            else if (isFloat(resultType))
+                ldt = floatLDT;
+            else if (isDouble(resultType))
+                ldt = doubleLDT;
+            else // int, long, or bigint does not matter
+                ldt = integerLDT;
+            fun = ldt.getFunctionFor(opStr, services);
+            return new SLExpression(tb.func(fun,
+                    promote(a.getTerm(), resultType),
+                    promote(b.getTerm(), resultType)),
+                    resultType);
+        } catch (RuntimeException e) {
+            raiseError("Error in comparison expression " + a + " + " + b + ":", e);
+            return null; //unreachable
+        }
+    }
 
     public SLExpression buildAddExpression(SLExpression a, SLExpression b)
             throws SLTranslationException {
@@ -496,4 +521,5 @@ public class JMLArithmeticHelper {
                 throw new SLTranslationException("Error in equality expression " + a + " == " + b + ".", e);
             }
     }
+
 }
