@@ -13,6 +13,13 @@
 
 package de.uka.ilkd.key.rule.merge;
 
+import java.io.File;
+import java.util.Iterator;
+
+import de.uka.ilkd.key.util.HelperClassForTests;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -332,7 +339,7 @@ public class MergeRuleTests extends TestCase {
     /**
      * Loads the given proof file. Checks if the proof file exists and the proof
      * is not null, and fails if the proof could not be loaded.
-     * @param directory TODO
+     * @param directory
      * @param proofFileName
      *            The file name of the proof file to load.
      *

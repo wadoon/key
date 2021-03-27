@@ -9,14 +9,13 @@ configurations { antlr4 }
 
 dependencies {
     compile project(':key.util')
-
-    compile name: 'recoderKey'
-    compile group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    compile group: 'org.antlr', name: 'antlr-runtime', version: '3.5.2'
+    compile group: group, name: 'recoderkey', version: '1.0'
+    compile group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
+    compile group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
     compile group: 'antlr', name: 'antlr', version: '2.7.7'
 
-    javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    antlr group: 'org.antlr', name: 'antlr', version: '3.5.2'   // use ANTLR version 3
+    javacc  group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
+    antlr   group: 'org.antlr', name:'antlr', version:'3.5.2'   // use ANTLR version 3
 
     antlr4 "org.antlr:antlr4:4.7.1"
     compile "org.antlr:antlr4-runtime:4.7.1"
@@ -102,7 +101,6 @@ testFast {
     }
 }
 
-
 task testProveRules(type: Test) {
     description 'Proves KeY taclet rules tagged as lemma'
     group "verification"
@@ -112,7 +110,7 @@ task testProveRules(type: Test) {
 task testRunAllProofs(type: Test) {
     description 'Proof/reload all keyfiles tagged for regression testing'
     group "verification"
-    filter {
+    filter { 
         // TODO does not exist any more: includeTestsMatching "RunAllProofsTestSuite"
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"
@@ -141,8 +139,38 @@ task generateVersionFiles() {
 // @AW: Say something here. From POV this explain by itself.
 processResources.dependsOn generateVersionFiles
 
-def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/speclang/njml"
-task runAntlr4(type: JavaExec) {
+def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
+task runAntlr4Key(type: JavaExec) {
+    //see incremental task api, prevents rerun if nothing has changed.
+    inputs.dir "src/main/antlr4/"
+    outputs.dir "$projectDir/build/generated/antlr4/main/"
+    classpath = configurations.antlr4
+    main = "org.antlr.v4.Tool"
+    args = ["-visitor",
+            "-Xexact-output-dir", "-o", antlr4Output,
+            "-package", "de.uka.ilkd.key.nparser",
+            "src/main/antlr4/KeYLexer.g4", "src/main/antlr4/KeYParser.g4"]
+    doFirst {
+        file(antlr4Output).mkdirs()
+        println("create $antlr4Output")
+    }
+}
+compileJava.dependsOn runAntlr4Key
+
+task debugKeyLexer(type: JavaExec) {
+    main = "de.uka.ilkd.key.nparser.DebugKeyLexer"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+}
+
+
+
+
+// @AW: Say something here. From POV this explain by itself.
+processResources.dependsOn generateVersionFiles
+
+def antlr4OutputJml = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/speclang/njml"
+task runAntlr4Jml(type: JavaExec) {
     //see incremental task api, prevents rerun if nothing has changed.
     inputs.dir "src/main/antlr4/"
     outputs.dir "build/generated/antlr4/main/"
@@ -157,13 +185,14 @@ task runAntlr4(type: JavaExec) {
         println("create $antlr4Output")
     }
 }
-compileJava.dependsOn runAntlr4
+compileJava.dependsOn runAntlr4Jml
 
-task debugLexer(type: JavaExec) {
+task debugJmlLexer(type: JavaExec) {
     main = "de.uka.ilkd.key.speclang.njml.DebugJmlLexer"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
 }
+
 
 task ptest(type: Test) { group "verification"}
 
