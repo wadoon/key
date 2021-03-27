@@ -140,7 +140,7 @@ task generateVersionFiles() {
 processResources.dependsOn generateVersionFiles
 
 def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
-task runAntlr4(type: JavaExec) {
+task runAntlr4Key(type: JavaExec) {
     //see incremental task api, prevents rerun if nothing has changed.
     inputs.dir "src/main/antlr4/"
     outputs.dir "$projectDir/build/generated/antlr4/main/"
@@ -155,9 +155,9 @@ task runAntlr4(type: JavaExec) {
         println("create $antlr4Output")
     }
 }
-compileJava.dependsOn runAntlr4
+compileJava.dependsOn runAntlr4Key
 
-task debugLexer(type: JavaExec) {
+task debugKeyLexer(type: JavaExec) {
     main = "de.uka.ilkd.key.nparser.DebugKeyLexer"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
@@ -169,8 +169,8 @@ task debugLexer(type: JavaExec) {
 // @AW: Say something here. From POV this explain by itself.
 processResources.dependsOn generateVersionFiles
 
-def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/speclang/njml"
-task runAntlr4(type: JavaExec) {
+def antlr4OutputJml = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/speclang/njml"
+task runAntlr4Jml(type: JavaExec) {
     //see incremental task api, prevents rerun if nothing has changed.
     inputs.dir "src/main/antlr4/"
     outputs.dir "build/generated/antlr4/main/"
@@ -185,9 +185,9 @@ task runAntlr4(type: JavaExec) {
         println("create $antlr4Output")
     }
 }
-compileJava.dependsOn runAntlr4
+compileJava.dependsOn runAntlr4Jml
 
-task debugLexer(type: JavaExec) {
+task debugJmlLexer(type: JavaExec) {
     main = "de.uka.ilkd.key.speclang.njml.DebugJmlLexer"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
