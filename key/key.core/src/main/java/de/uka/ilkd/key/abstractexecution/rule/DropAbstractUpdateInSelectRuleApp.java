@@ -17,6 +17,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.ProgVarLDT;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -153,6 +156,8 @@ public class DropAbstractUpdateInSelectRuleApp extends DefaultBuiltInRuleApp {
             final AbstractUpdate abstrUpd, final Term o, final Term f, final Goal goal,
             final Services services) {
         final TermBuilder tb = services.getTermBuilder();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final ProgVarLDT progVarLDT = services.getTypeConverter().getProgVarLDT();
         ImmutableList<PosInOccurrence> result = ImmutableSLList.<PosInOccurrence>nil();
 
         final List<Term> frames = abstrUpd.getAllAssignables().stream()
@@ -170,8 +175,7 @@ public class DropAbstractUpdateInSelectRuleApp extends DefaultBuiltInRuleApp {
             final boolean triviallyIrrelevant = frameLocs.stream()
                     .map(AbstractExecutionUtils::unwrapHasTo)
                     .allMatch(loc -> loc instanceof EmptyLoc || loc instanceof IrrelevantAssignable
-                            || (loc instanceof PVLoc && ((PVLoc) loc).getVar() != services
-                                    .getTypeConverter().getHeapLDT().getHeap())
+                            || (loc instanceof PVLoc && ((PVLoc) loc).getVar() != heapLDT.getHeap())
                             || (loc instanceof FieldLoc
                                     && ((FieldLoc) loc).getFieldTerm().op() != f.op()));
 
@@ -179,9 +183,17 @@ public class DropAbstractUpdateInSelectRuleApp extends DefaultBuiltInRuleApp {
                 continue;
             }
 
-            // Look for "==> elementOf(o,f,frame)"
+            // Look for "==> elementOf(o,f,frame)", or
+            // "==> pvElementOf(PV(o), frame)" if f is "<created>" or "<initialized>"
 
-            final Term elementOfFor = tb.elementOf(o, f, frame);
+            final Term elementOfFor;
+            if (f.op() == heapLDT.getCreated() || f.op() == heapLDT.getInitialized()) {
+                assert o.op() instanceof ProgramVariable;
+                elementOfFor = tb.pvElementOf(tb.func(progVarLDT.getPvConstructor(), o), frame);
+            } else {
+                elementOfFor = tb.elementOf(o, f, frame);
+            }
+
             final Optional<PosInOccurrence> foundInSucc = lookForFor(elementOfFor, goal, false);
             if (foundInSucc.isPresent()) {
                 result = result.append(foundInSucc.get());
@@ -189,7 +201,7 @@ public class DropAbstractUpdateInSelectRuleApp extends DefaultBuiltInRuleApp {
             }
 
             final Optional<PosInOccurrence> foundInAntec = //
-                    lookForFor(tb.not(tb.elementOf(o, f, frame)), goal, true);
+                    lookForFor(tb.not(elementOfFor), goal, true);
             if (foundInAntec.isPresent()) {
                 result = result.append(foundInAntec.get());
                 continue;
