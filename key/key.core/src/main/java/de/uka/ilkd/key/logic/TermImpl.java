@@ -520,10 +520,16 @@ class TermImpl implements Term {
         final TermImpl t = (TermImpl) o;
 
         if (!(op.equals(t.op)
-                && subs.equals(t.subs)
+                && subs.size() == t.subs.size()
                 && boundVars.equals(t.boundVars)
                 && javaBlock.equals(t.javaBlock))) {
             return false;
+        }
+
+        for (int i = 0; i < subs.size(); i++) {
+            if (!(subs.get(i).equalsModIrrelevantTermLabels(t.subs.get(i)))) {
+                return false;
+            }
         }
 
         Term other = (Term) o;
