@@ -955,6 +955,17 @@ public class TermBuilder {
 
             final Term fullRhs = store(heapTerm, objectTerm, fieldTerm, rhs);
             return elementary(heapLDT.getHeap(), fullRhs);
+        } else if (lhs.op() == UpdateApplication.UPDATE_APPLICATION) {
+            // #1536 A nested updates like
+            //      { {a:=1} b :=a}
+            // should be parsed as (see KeY-Book, Sec. 3.4.1, Def. 3.8)
+            //      { {a:=1} (b :=a)}
+            // but is parsed as:
+            //      { ({a:=1} b) :=a}
+            // The latter is (currently) not supported, hence the exception.
+            throw new TermCreationException("lhs cannot have a nested update. "
+                           + "If you have a nested update like '{{a:=1} b:=a}', "
+                           + "replace it with the bracketed version '{{a:=1} (b:=a)}'.");
         } else {
             throw new TermCreationException("Not a legal lhs: " + lhs);
         }
@@ -1615,7 +1626,8 @@ public class TermBuilder {
     }
 
     public Term getBaseHeap() {
-        return var(services.getTypeConverter().getHeapLDT().getHeap());
+        return var((ProgramVariable) services.getNamespaces().programVariables().lookup(HeapLDT.BASE_HEAP_NAME));
+        //return var(services.getTypeConverter().getHeapLDT().getHeap());
     }
 
     public Term dot(Sort asSort, Term o, Function f) {
@@ -1643,7 +1655,8 @@ public class TermBuilder {
     }
 
     public Term arr(Term idx) {
-        return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
+        return func(services.getNamespaces().functions().lookup("arr"), idx);
+        //return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
 
     /**
@@ -1802,9 +1815,10 @@ public class TermBuilder {
         if (ref.sort() instanceof ArraySort) {
             elementSort = ((ArraySort) ref.sort()).elementSort();
         } else {
-            throw new TermCreationException("Tried to build an array access "
-                    + "on an inacceptable sort: " + ref.sort().getClass() + "\n"
-                    + "(" + ref + "[" + idx + "])");
+            throw new TermCreationException(
+                    String.format("Tried to build an array access on an inacceptable sort: " +
+                            "Sort: %s : %s with %s[%s] ",
+                            ref.sort(), ref.sort().getClass().getSimpleName(), ref, idx));
         }
 
         return select(elementSort, getBaseHeap(), ref, arr(idx));
