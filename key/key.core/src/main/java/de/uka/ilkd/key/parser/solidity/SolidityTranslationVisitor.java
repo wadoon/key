@@ -6,9 +6,40 @@ import de.uka.ilkd.key.parser.solidity.SolidityParser.ConstructorDefinitionConte
 import de.uka.ilkd.key.parser.solidity.SolidityParser.ContractDefinitionContext;
 import de.uka.ilkd.key.parser.solidity.SolidityParser.InheritanceSpecifierContext;
 
+import java.util.*;
+
 public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	// Generated from key.core/src/main/antlr/de/uka/ilkd/key/parser/Solidity.g4 by ANTLR 4.7.1
-	public String output;
+
+    private class ContractInfo {
+        // contract types
+        public static final int UNDEFINED = 1;
+        public static final int CONTRACT = 1;
+        public static final int INTERFACE = 2;
+        public static final int LIBRARY = 3;
+
+        // maps are { identifier => output string}
+        Map<String,String> functionHeaders = new HashMap<>();
+        Map<String,String> variables = new HashMap<>();
+        Map<String,String> enums = new HashMap<>();
+
+        List<String> inherits = new LinkedList<>();
+        int type;
+        String name;
+
+        public String toString() {
+            return functionHeaders + "\n" +
+            variables + "\n" +
+            enums + "\n" +
+            inherits + "\n" +
+            name + "\n" + 
+            type + "\n";
+        }
+    }
+
+    private Map<String,ContractInfo> contractMap = new HashMap<>();
+    private ContractInfo currentContractInfo;
+	public String output = "";
 	/**
 	 * {@inheritDoc}
 	 *
@@ -84,10 +115,23 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public String visitContractDefinition(SolidityParser.ContractDefinitionContext ctx) { 
+        currentContractInfo = new ContractInfo();
+        currentContractInfo.name= ctx.identifier().getText();
+        // TODO parse type
+        currentContractInfo.type = ContractInfo.CONTRACT;
+		if (ctx.ContractKeyword() != null) {
+            currentContractInfo.type = ContractInfo.CONTRACT;
+        } else if (ctx.InterfaceKeyword() != null) {
+            currentContractInfo.type = ContractInfo.INTERFACE;
+        } else if (ctx.LibraryKeyword() != null) {
+            currentContractInfo.type = ContractInfo.LIBRARY;
+        }
+        contractMap.put(ctx.identifier().getText(), currentContractInfo);
 		StringBuffer inheritanceList = new StringBuffer();
 
 //		if (ctx.inheritanceSpecifier().size() == 1) {
 			for (InheritanceSpecifierContext ictx : ctx.inheritanceSpecifier()) {
+                currentContractInfo.inherits.add(ictx.getText());
 				inheritanceList.append(ictx.getText());		
 				inheritanceList.append(",");
 			}
@@ -100,16 +144,49 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 		StringBuffer contract = 
 	ctx.inheritanceSpecifier().size() > 0 ?			new StringBuffer(
-						"class " + ctx.identifier().getText() + " extends Address implements " + inheritanceList + " {\n" ): new StringBuffer(
-						"class " + ctx.identifier().getText() + " extends Address {\n" 
+						"class " + ctx.identifier().getText() + "Impl extends " + ctx.identifier().getText() + "Base {\n") : new StringBuffer( //Address implements " + inheritanceList + " {\n" ): new StringBuffer(
+						"class " + ctx.identifier().getText() + "Impl extends " + ctx.identifier().getText() + "Base {\n" //Address {\n" 
 						);
 
-
 		ctx.contractPart().stream().forEach(part -> contract.append(visit(part) + "\n"));
+        System.out.println(currentContractInfo);
 
-		output = contract.append("}\n").toString();
+        output += makeBaseClass();
+		output += contract.append("}\n").toString();
+//        output += makeInterface();
+//System.out.println(makeBaseClass());
+System.out.println(makeInterface());
 		return getOutput();
 	}
+
+    private String makeBaseClass() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("abstract class " + currentContractInfo.name + "Base extends Address ");
+        if (currentContractInfo.inherits.size() > 0) {
+            sb.append("implements ");
+            currentContractInfo.inherits.forEach(c -> sb.append(c + ", "));
+            sb.deleteCharAt(sb.length()-1);
+        }
+        sb.append(" {\n");
+        currentContractInfo.inherits.forEach(c -> {
+            ContractInfo ci = contractMap.get(c);
+            if (ci.type == ContractInfo.CONTRACT) {
+                ci.variables.forEach((var,str) -> sb.append(str + ";\n"));
+                ci.functionHeaders.forEach((func,str) -> sb.append(str + " {}\n"));
+            }
+        });
+//        currentContractInfo.variables.forEach();
+        sb.append("}\n");
+        return sb.toString();
+    }
+
+    private String makeInterface() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("interface " + currentContractInfo.name + " {\n");
+        currentContractInfo.functionHeaders.forEach((func,str) -> sb.append(str + ";\n"));
+        sb.append("}\n");
+        return sb.toString();
+    }
 
 	private String error(String string) throws RuntimeException {
 		throw new RuntimeException(string);
@@ -157,6 +234,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		if (ctx.expression() != null && !ctx.expression().isEmpty()) {
 			output += " = " + visit(ctx.expression());
 		}
+        currentContractInfo.variables.put(ctx.identifier().getText(), output);
 		return output + ";"; 
 	}
 
@@ -318,7 +396,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 		StringBuffer body = new StringBuffer(visit(ctx.block()));
 		if (mods.length() > 0) body.insert(body.indexOf("{") + 1, "\n" + mods);
-
+        currentContractInfo.functionHeaders.put(fctName, modifier + " " + returnType + " " + fctName + "(" + parameters + ")" );
 		return modifier + " " + returnType + " " + fctName + "(" + parameters + ")" + body;
 	}
 	/**

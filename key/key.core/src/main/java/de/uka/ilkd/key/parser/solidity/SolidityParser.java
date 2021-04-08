@@ -1,6 +1,6 @@
-// Generated from key.core/src/main/antlr/de/uka/ilkd/key/parser/Solidity.g4 by ANTLR 4.7.1
+// Generated from Solidity.g4 by ANTLR 4.9
 
-  package de.uka.ilkd.key.parser.solidity;
+package de.uka.ilkd.key.parser.solidity;
 
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class SolidityParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.7.1", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.9", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -29,15 +29,15 @@ public class SolidityParser extends Parser {
 		T__52=53, T__53=54, T__54=55, T__55=56, T__56=57, T__57=58, T__58=59, 
 		T__59=60, T__60=61, T__61=62, T__62=63, T__63=64, T__64=65, T__65=66, 
 		T__66=67, T__67=68, T__68=69, T__69=70, T__70=71, T__71=72, T__72=73, 
-		T__73=74, T__74=75, T__75=76, T__76=77, Int=78, Uint=79, Byte=80, Fixed=81, 
-		Ufixed=82, VersionLiteral=83, BooleanLiteral=84, DecimalNumber=85, HexNumber=86, 
-		NumberUnit=87, HexLiteral=88, ReservedKeyword=89, AnonymousKeyword=90, 
-		BreakKeyword=91, ConstantKeyword=92, ContinueKeyword=93, ExternalKeyword=94, 
-		IndexedKeyword=95, InternalKeyword=96, PayableKeyword=97, PrivateKeyword=98, 
-		PublicKeyword=99, PureKeyword=100, ViewKeyword=101, Identifier=102, StringLiteral=103, 
-		PLUS=104, MINUS=105, MULT=106, DIV=107, MOD=108, LSL=109, LSR=110, AND=111, 
-		OR=112, TRUE=113, FALSE=114, BAND=115, BOR=116, NOT=117, INC=118, DEC=119, 
-		WS=120, COMMENT=121, LINE_COMMENT=122;
+		T__73=74, T__74=75, Int=76, Uint=77, Byte=78, Fixed=79, Ufixed=80, VersionLiteral=81, 
+		BooleanLiteral=82, DecimalNumber=83, HexNumber=84, NumberUnit=85, HexLiteral=86, 
+		ReservedKeyword=87, AnonymousKeyword=88, BreakKeyword=89, ConstantKeyword=90, 
+		ContinueKeyword=91, ContractKeyword=92, ExternalKeyword=93, IndexedKeyword=94, 
+		InterfaceKeyword=95, InternalKeyword=96, LibraryKeyword=97, PayableKeyword=98, 
+		PrivateKeyword=99, PublicKeyword=100, PureKeyword=101, ViewKeyword=102, 
+		Identifier=103, StringLiteral=104, PLUS=105, MINUS=106, MULT=107, DIV=108, 
+		MOD=109, LSL=110, LSR=111, AND=112, OR=113, TRUE=114, FALSE=115, BAND=116, 
+		BOR=117, NOT=118, INC=119, DEC=120, WS=121, COMMENT=122, LINE_COMMENT=123;
 	public static final int
 		RULE_sourceUnit = 0, RULE_pragmaDirective = 1, RULE_pragmaName = 2, RULE_pragmaValue = 3, 
 		RULE_version = 4, RULE_versionOperator = 5, RULE_versionConstraint = 6, 
@@ -68,63 +68,74 @@ public class SolidityParser extends Parser {
 		RULE_assemblyFor = 77, RULE_assemblyIf = 78, RULE_assemblyLiteral = 79, 
 		RULE_subAssembly = 80, RULE_tupleExpression = 81, RULE_elementaryTypeNameExpression = 82, 
 		RULE_numberLiteral = 83, RULE_identifier = 84;
-	public static final String[] ruleNames = {
-		"sourceUnit", "pragmaDirective", "pragmaName", "pragmaValue", "version", 
-		"versionOperator", "versionConstraint", "importDeclaration", "importDirective", 
-		"contractDefinition", "inheritanceSpecifier", "contractPart", "stateVariableDeclaration", 
-		"usingForDeclaration", "structDefinition", "constructorDefinition", "modifierDefinition", 
-		"modifierInvocation", "functionDefinition", "returnParameters", "modifierList", 
-		"eventDefinition", "enumValue", "enumDefinition", "parameterList", "parameter", 
-		"eventParameterList", "eventParameter", "functionTypeParameterList", "functionTypeParameter", 
-		"variableDeclaration", "typeName", "userDefinedTypeName", "mapping", "functionTypeName", 
-		"storageLocation", "stateMutability", "block", "statement", "placeHolderStatement", 
-		"expressionStatement", "ifStatement", "whileStatement", "simpleStatement", 
-		"forStatement", "inlineAssemblyStatement", "doWhileStatement", "continueStatement", 
-		"breakStatement", "returnStatement", "throwStatement", "emitStatement", 
-		"variableDeclarationStatement", "variableDeclarationList", "identifierList", 
-		"elementaryTypeName", "expression", "primaryExpression", "expressionList", 
-		"nameValueList", "nameValue", "functionCallArguments", "functionCall", 
-		"assemblyBlock", "assemblyItem", "assemblyExpression", "assemblyCall", 
-		"assemblyLocalDefinition", "assemblyAssignment", "assemblyIdentifierOrList", 
-		"assemblyIdentifierList", "assemblyStackAssignment", "labelDefinition", 
-		"assemblySwitch", "assemblyCase", "assemblyFunctionDefinition", "assemblyFunctionReturns", 
-		"assemblyFor", "assemblyIf", "assemblyLiteral", "subAssembly", "tupleExpression", 
-		"elementaryTypeNameExpression", "numberLiteral", "identifier"
-	};
+	private static String[] makeRuleNames() {
+		return new String[] {
+			"sourceUnit", "pragmaDirective", "pragmaName", "pragmaValue", "version", 
+			"versionOperator", "versionConstraint", "importDeclaration", "importDirective", 
+			"contractDefinition", "inheritanceSpecifier", "contractPart", "stateVariableDeclaration", 
+			"usingForDeclaration", "structDefinition", "constructorDefinition", "modifierDefinition", 
+			"modifierInvocation", "functionDefinition", "returnParameters", "modifierList", 
+			"eventDefinition", "enumValue", "enumDefinition", "parameterList", "parameter", 
+			"eventParameterList", "eventParameter", "functionTypeParameterList", 
+			"functionTypeParameter", "variableDeclaration", "typeName", "userDefinedTypeName", 
+			"mapping", "functionTypeName", "storageLocation", "stateMutability", 
+			"block", "statement", "placeHolderStatement", "expressionStatement", 
+			"ifStatement", "whileStatement", "simpleStatement", "forStatement", "inlineAssemblyStatement", 
+			"doWhileStatement", "continueStatement", "breakStatement", "returnStatement", 
+			"throwStatement", "emitStatement", "variableDeclarationStatement", "variableDeclarationList", 
+			"identifierList", "elementaryTypeName", "expression", "primaryExpression", 
+			"expressionList", "nameValueList", "nameValue", "functionCallArguments", 
+			"functionCall", "assemblyBlock", "assemblyItem", "assemblyExpression", 
+			"assemblyCall", "assemblyLocalDefinition", "assemblyAssignment", "assemblyIdentifierOrList", 
+			"assemblyIdentifierList", "assemblyStackAssignment", "labelDefinition", 
+			"assemblySwitch", "assemblyCase", "assemblyFunctionDefinition", "assemblyFunctionReturns", 
+			"assemblyFor", "assemblyIf", "assemblyLiteral", "subAssembly", "tupleExpression", 
+			"elementaryTypeNameExpression", "numberLiteral", "identifier"
+		};
+	}
+	public static final String[] ruleNames = makeRuleNames();
 
-	private static final String[] _LITERAL_NAMES = {
-		null, "'pragma'", "';'", "'^'", "'~'", "'>='", "'>'", "'<'", "'<='", "'='", 
-		"'as'", "'import'", "'from'", "'{'", "','", "'}'", "'contract'", "'interface'", 
-		"'library'", "'is'", "'('", "')'", "'using'", "'for'", "'struct'", "'constructor'", 
-		"'modifier'", "'function'", "'returns'", "'event'", "'enum'", "'['", "']'", 
-		"'.'", "'mapping'", "'=>'", "'memory'", "'storage'", "'calldata'", "'_;'", 
-		"'if'", "'else'", "'while'", "'assembly'", "'do'", "'return'", "'throw'", 
-		"'emit'", "'var'", "'address'", "'bool'", "'string'", "'byte'", "'new'", 
-		"'after'", "'delete'", "'**'", "'=='", "'!='", "'?'", "':'", "'|='", "'^='", 
-		"'&='", "'<<='", "'>>='", "'+='", "'-='", "'*='", "'/='", "'%='", "'let'", 
-		"':='", "'=:'", "'switch'", "'case'", "'default'", "'->'", null, null, 
-		null, null, null, null, null, null, null, null, null, null, "'anonymous'", 
-		"'break'", "'constant'", "'continue'", "'external'", "'indexed'", "'internal'", 
-		"'payable'", "'private'", "'public'", "'pure'", "'view'", null, null, 
-		"'+'", "'-'", "'*'", "'/'", "'%'", "'<<'", "'>>'", "'&&'", "'||'", "'true'", 
-		"'false'", "'&'", "'|'", "'!'", "'++'", "'--'"
-	};
-	private static final String[] _SYMBOLIC_NAMES = {
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, null, null, null, "Int", "Uint", "Byte", "Fixed", "Ufixed", 
-		"VersionLiteral", "BooleanLiteral", "DecimalNumber", "HexNumber", "NumberUnit", 
-		"HexLiteral", "ReservedKeyword", "AnonymousKeyword", "BreakKeyword", "ConstantKeyword", 
-		"ContinueKeyword", "ExternalKeyword", "IndexedKeyword", "InternalKeyword", 
-		"PayableKeyword", "PrivateKeyword", "PublicKeyword", "PureKeyword", "ViewKeyword", 
-		"Identifier", "StringLiteral", "PLUS", "MINUS", "MULT", "DIV", "MOD", 
-		"LSL", "LSR", "AND", "OR", "TRUE", "FALSE", "BAND", "BOR", "NOT", "INC", 
-		"DEC", "WS", "COMMENT", "LINE_COMMENT"
-	};
+	private static String[] makeLiteralNames() {
+		return new String[] {
+			null, "'pragma'", "';'", "'^'", "'~'", "'>='", "'>'", "'<'", "'<='", 
+			"'='", "'as'", "'import'", "'from'", "'{'", "','", "'}'", "'is'", "'('", 
+			"')'", "'using'", "'for'", "'struct'", "'constructor'", "'modifier'", 
+			"'function'", "'returns'", "'event'", "'enum'", "'['", "']'", "'.'", 
+			"'mapping'", "'=>'", "'memory'", "'storage'", "'calldata'", "'_;'", "'if'", 
+			"'else'", "'while'", "'assembly'", "'do'", "'return'", "'throw'", "'emit'", 
+			"'var'", "'address'", "'address payable'", "'bool'", "'string'", "'byte'", 
+			"'new'", "'after'", "'delete'", "'**'", "'=='", "'!='", "'?'", "':'", 
+			"'|='", "'^='", "'&='", "'<<='", "'>>='", "'+='", "'-='", "'*='", "'/='", 
+			"'%='", "'let'", "':='", "'=:'", "'switch'", "'case'", "'default'", "'->'", 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			"'anonymous'", "'break'", "'constant'", "'continue'", "'contract'", "'external'", 
+			"'indexed'", "'interface'", "'internal'", "'library'", "'payable'", "'private'", 
+			"'public'", "'pure'", "'view'", null, null, "'+'", "'-'", "'*'", "'/'", 
+			"'%'", "'<<'", "'>>'", "'&&'", "'||'", "'true'", "'false'", "'&'", "'|'", 
+			"'!'", "'++'", "'--'"
+		};
+	}
+	private static final String[] _LITERAL_NAMES = makeLiteralNames();
+	private static String[] makeSymbolicNames() {
+		return new String[] {
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, null, null, null, null, null, null, null, null, 
+			null, null, null, null, "Int", "Uint", "Byte", "Fixed", "Ufixed", "VersionLiteral", 
+			"BooleanLiteral", "DecimalNumber", "HexNumber", "NumberUnit", "HexLiteral", 
+			"ReservedKeyword", "AnonymousKeyword", "BreakKeyword", "ConstantKeyword", 
+			"ContinueKeyword", "ContractKeyword", "ExternalKeyword", "IndexedKeyword", 
+			"InterfaceKeyword", "InternalKeyword", "LibraryKeyword", "PayableKeyword", 
+			"PrivateKeyword", "PublicKeyword", "PureKeyword", "ViewKeyword", "Identifier", 
+			"StringLiteral", "PLUS", "MINUS", "MULT", "DIV", "MOD", "LSL", "LSR", 
+			"AND", "OR", "TRUE", "FALSE", "BAND", "BOR", "NOT", "INC", "DEC", "WS", 
+			"COMMENT", "LINE_COMMENT"
+		};
+	}
+	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
 	/**
@@ -174,6 +185,7 @@ public class SolidityParser extends Parser {
 		super(input);
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
+
 	public static class SourceUnitContext extends ParserRuleContext {
 		public TerminalNode EOF() { return getToken(SolidityParser.EOF, 0); }
 		public List<PragmaDirectiveContext> pragmaDirective() {
@@ -223,7 +235,7 @@ public class SolidityParser extends Parser {
 			setState(175);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__10) | (1L << T__15) | (1L << T__16) | (1L << T__17))) != 0)) {
+			while (_la==T__0 || _la==T__10 || ((((_la - 92)) & ~0x3f) == 0 && ((1L << (_la - 92)) & ((1L << (ContractKeyword - 92)) | (1L << (InterfaceKeyword - 92)) | (1L << (LibraryKeyword - 92)))) != 0)) {
 				{
 				setState(173);
 				_errHandler.sync(this);
@@ -240,9 +252,9 @@ public class SolidityParser extends Parser {
 					importDirective();
 					}
 					break;
-				case T__15:
-				case T__16:
-				case T__17:
+				case ContractKeyword:
+				case InterfaceKeyword:
+				case LibraryKeyword:
 					{
 					setState(172);
 					contractDefinition();
@@ -660,6 +672,7 @@ public class SolidityParser extends Parser {
 		public IdentifierContext identifier(int i) {
 			return getRuleContext(IdentifierContext.class,i);
 		}
+		public TerminalNode MULT() { return getToken(SolidityParser.MULT, 0); }
 		public List<ImportDeclarationContext> importDeclaration() {
 			return getRuleContexts(ImportDeclarationContext.class);
 		}
@@ -812,6 +825,9 @@ public class SolidityParser extends Parser {
 		public IdentifierContext identifier() {
 			return getRuleContext(IdentifierContext.class,0);
 		}
+		public TerminalNode ContractKeyword() { return getToken(SolidityParser.ContractKeyword, 0); }
+		public TerminalNode InterfaceKeyword() { return getToken(SolidityParser.InterfaceKeyword, 0); }
+		public TerminalNode LibraryKeyword() { return getToken(SolidityParser.LibraryKeyword, 0); }
 		public List<InheritanceSpecifierContext> inheritanceSpecifier() {
 			return getRuleContexts(InheritanceSpecifierContext.class);
 		}
@@ -852,7 +868,7 @@ public class SolidityParser extends Parser {
 			{
 			setState(243);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__15) | (1L << T__16) | (1L << T__17))) != 0)) ) {
+			if ( !(((((_la - 92)) & ~0x3f) == 0 && ((1L << (_la - 92)) & ((1L << (ContractKeyword - 92)) | (1L << (InterfaceKeyword - 92)) | (1L << (LibraryKeyword - 92)))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -865,10 +881,10 @@ public class SolidityParser extends Parser {
 			setState(254);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==T__18) {
+			if (_la==T__15) {
 				{
 				setState(245);
-				match(T__18);
+				match(T__15);
 				setState(246);
 				inheritanceSpecifier();
 				setState(251);
@@ -895,7 +911,7 @@ public class SolidityParser extends Parser {
 			setState(260);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__21) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << T__26) | (1L << T__28) | (1L << T__29) | (1L << T__33) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (Identifier - 78)))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__18) | (1L << T__20) | (1L << T__21) | (1L << T__22) | (1L << T__23) | (1L << T__25) | (1L << T__26) | (1L << T__30) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (Identifier - 76)))) != 0)) {
 				{
 				{
 				setState(257);
@@ -962,10 +978,10 @@ public class SolidityParser extends Parser {
 			setState(277);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==T__19) {
+			if (_la==T__16) {
 				{
 				setState(266);
-				match(T__19);
+				match(T__16);
 				setState(267);
 				expression(0);
 				setState(272);
@@ -985,7 +1001,7 @@ public class SolidityParser extends Parser {
 					_la = _input.LA(1);
 				}
 				setState(275);
-				match(T__20);
+				match(T__17);
 				}
 			}
 
@@ -1179,12 +1195,12 @@ public class SolidityParser extends Parser {
 			setState(293);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (((((_la - 92)) & ~0x3f) == 0 && ((1L << (_la - 92)) & ((1L << (ConstantKeyword - 92)) | (1L << (InternalKeyword - 92)) | (1L << (PrivateKeyword - 92)) | (1L << (PublicKeyword - 92)))) != 0)) {
+			while (((((_la - 90)) & ~0x3f) == 0 && ((1L << (_la - 90)) & ((1L << (ConstantKeyword - 90)) | (1L << (InternalKeyword - 90)) | (1L << (PrivateKeyword - 90)) | (1L << (PublicKeyword - 90)))) != 0)) {
 				{
 				{
 				setState(290);
 				_la = _input.LA(1);
-				if ( !(((((_la - 92)) & ~0x3f) == 0 && ((1L << (_la - 92)) & ((1L << (ConstantKeyword - 92)) | (1L << (InternalKeyword - 92)) | (1L << (PrivateKeyword - 92)) | (1L << (PublicKeyword - 92)))) != 0)) ) {
+				if ( !(((((_la - 90)) & ~0x3f) == 0 && ((1L << (_la - 90)) & ((1L << (ConstantKeyword - 90)) | (1L << (InternalKeyword - 90)) | (1L << (PrivateKeyword - 90)) | (1L << (PublicKeyword - 90)))) != 0)) ) {
 				_errHandler.recoverInline(this);
 				}
 				else {
@@ -1231,6 +1247,7 @@ public class SolidityParser extends Parser {
 		public IdentifierContext identifier() {
 			return getRuleContext(IdentifierContext.class,0);
 		}
+		public TerminalNode MULT() { return getToken(SolidityParser.MULT, 0); }
 		public TypeNameContext typeName() {
 			return getRuleContext(TypeNameContext.class,0);
 		}
@@ -1260,11 +1277,11 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(303);
-			match(T__21);
+			match(T__18);
 			setState(304);
 			identifier();
 			setState(305);
-			match(T__22);
+			match(T__19);
 			setState(308);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
@@ -1275,13 +1292,14 @@ public class SolidityParser extends Parser {
 				}
 				break;
 			case T__11:
-			case T__26:
-			case T__33:
+			case T__23:
+			case T__30:
+			case T__44:
+			case T__45:
+			case T__46:
 			case T__47:
 			case T__48:
 			case T__49:
-			case T__50:
-			case T__51:
 			case Int:
 			case Uint:
 			case Byte:
@@ -1348,7 +1366,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(312);
-			match(T__23);
+			match(T__20);
 			setState(313);
 			identifier();
 			setState(314);
@@ -1356,7 +1374,7 @@ public class SolidityParser extends Parser {
 			setState(325);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__26) | (1L << T__33) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (Identifier - 78)))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__23) | (1L << T__30) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (Identifier - 76)))) != 0)) {
 				{
 				setState(315);
 				variableDeclaration();
@@ -1365,7 +1383,7 @@ public class SolidityParser extends Parser {
 				setState(322);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__26) | (1L << T__33) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (Identifier - 78)))) != 0)) {
+				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__23) | (1L << T__30) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (Identifier - 76)))) != 0)) {
 					{
 					{
 					setState(317);
@@ -1432,7 +1450,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(329);
-			match(T__24);
+			match(T__21);
 			setState(330);
 			parameterList();
 			setState(331);
@@ -1489,13 +1507,13 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(334);
-			match(T__25);
+			match(T__22);
 			setState(335);
 			identifier();
 			setState(337);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==T__19) {
+			if (_la==T__16) {
 				{
 				setState(336);
 				parameterList();
@@ -1555,14 +1573,14 @@ public class SolidityParser extends Parser {
 			setState(347);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==T__19) {
+			if (_la==T__16) {
 				{
 				setState(342);
-				match(T__19);
+				match(T__16);
 				setState(344);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__19) | (1L << T__30) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52) | (1L << T__53) | (1L << T__54))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (BooleanLiteral - 78)) | (1L << (DecimalNumber - 78)) | (1L << (HexNumber - 78)) | (1L << (HexLiteral - 78)) | (1L << (Identifier - 78)) | (1L << (StringLiteral - 78)) | (1L << (PLUS - 78)) | (1L << (MINUS - 78)) | (1L << (NOT - 78)) | (1L << (INC - 78)) | (1L << (DEC - 78)))) != 0)) {
+				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__16) | (1L << T__27) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (BooleanLiteral - 76)) | (1L << (DecimalNumber - 76)) | (1L << (HexNumber - 76)) | (1L << (HexLiteral - 76)) | (1L << (Identifier - 76)) | (1L << (StringLiteral - 76)) | (1L << (PLUS - 76)) | (1L << (MINUS - 76)) | (1L << (NOT - 76)) | (1L << (INC - 76)) | (1L << (DEC - 76)))) != 0)) {
 					{
 					setState(343);
 					expressionList();
@@ -1570,7 +1588,7 @@ public class SolidityParser extends Parser {
 				}
 
 				setState(346);
-				match(T__20);
+				match(T__17);
 				}
 			}
 
@@ -1630,7 +1648,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(349);
-			match(T__26);
+			match(T__23);
 			setState(351);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
@@ -1648,7 +1666,7 @@ public class SolidityParser extends Parser {
 			setState(356);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==T__27) {
+			if (_la==T__24) {
 				{
 				setState(355);
 				returnParameters();
@@ -1716,7 +1734,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(362);
-			match(T__27);
+			match(T__24);
 			setState(363);
 			parameterList();
 			}
@@ -1790,7 +1808,7 @@ public class SolidityParser extends Parser {
 			setState(373);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==T__11 || ((((_la - 92)) & ~0x3f) == 0 && ((1L << (_la - 92)) & ((1L << (ConstantKeyword - 92)) | (1L << (ExternalKeyword - 92)) | (1L << (InternalKeyword - 92)) | (1L << (PayableKeyword - 92)) | (1L << (PrivateKeyword - 92)) | (1L << (PublicKeyword - 92)) | (1L << (PureKeyword - 92)) | (1L << (ViewKeyword - 92)) | (1L << (Identifier - 92)))) != 0)) {
+			while (_la==T__11 || ((((_la - 90)) & ~0x3f) == 0 && ((1L << (_la - 90)) & ((1L << (ConstantKeyword - 90)) | (1L << (ExternalKeyword - 90)) | (1L << (InternalKeyword - 90)) | (1L << (PayableKeyword - 90)) | (1L << (PrivateKeyword - 90)) | (1L << (PublicKeyword - 90)) | (1L << (PureKeyword - 90)) | (1L << (ViewKeyword - 90)) | (1L << (Identifier - 90)))) != 0)) {
 				{
 				setState(371);
 				_errHandler.sync(this);
@@ -1891,7 +1909,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(376);
-			match(T__28);
+			match(T__25);
 			setState(377);
 			identifier();
 			setState(378);
@@ -2002,7 +2020,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(386);
-			match(T__29);
+			match(T__26);
 			setState(387);
 			identifier();
 			setState(388);
@@ -2082,11 +2100,11 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(401);
-			match(T__19);
+			match(T__16);
 			setState(410);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__26) | (1L << T__33) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (Identifier - 78)))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__23) | (1L << T__30) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (Identifier - 76)))) != 0)) {
 				{
 				setState(402);
 				parameter();
@@ -2110,7 +2128,7 @@ public class SolidityParser extends Parser {
 			}
 
 			setState(412);
-			match(T__20);
+			match(T__17);
 			}
 		}
 		catch (RecognitionException re) {
@@ -2165,7 +2183,7 @@ public class SolidityParser extends Parser {
 			setState(416);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__35) | (1L << T__36) | (1L << T__37))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__32) | (1L << T__33) | (1L << T__34))) != 0)) {
 				{
 				setState(415);
 				storageLocation();
@@ -2229,11 +2247,11 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(421);
-			match(T__19);
+			match(T__16);
 			setState(430);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__26) | (1L << T__33) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (Identifier - 78)))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__23) | (1L << T__30) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (Identifier - 76)))) != 0)) {
 				{
 				setState(422);
 				eventParameter();
@@ -2257,7 +2275,7 @@ public class SolidityParser extends Parser {
 			}
 
 			setState(432);
-			match(T__20);
+			match(T__17);
 			}
 		}
 		catch (RecognitionException re) {
@@ -2374,11 +2392,11 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(441);
-			match(T__19);
+			match(T__16);
 			setState(450);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__26) | (1L << T__33) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (Identifier - 78)))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__23) | (1L << T__30) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (Identifier - 76)))) != 0)) {
 				{
 				setState(442);
 				functionTypeParameter();
@@ -2402,7 +2420,7 @@ public class SolidityParser extends Parser {
 			}
 
 			setState(452);
-			match(T__20);
+			match(T__17);
 			}
 		}
 		catch (RecognitionException re) {
@@ -2454,7 +2472,7 @@ public class SolidityParser extends Parser {
 			setState(456);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__35) | (1L << T__36) | (1L << T__37))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__32) | (1L << T__33) | (1L << T__34))) != 0)) {
 				{
 				setState(455);
 				storageLocation();
@@ -2515,7 +2533,7 @@ public class SolidityParser extends Parser {
 			setState(460);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__35) | (1L << T__36) | (1L << T__37))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__32) | (1L << T__33) | (1L << T__34))) != 0)) {
 				{
 				setState(459);
 				storageLocation();
@@ -2594,11 +2612,12 @@ public class SolidityParser extends Parser {
 			setState(469);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
+			case T__44:
+			case T__45:
+			case T__46:
 			case T__47:
 			case T__48:
 			case T__49:
-			case T__50:
-			case T__51:
 			case Int:
 			case Uint:
 			case Byte:
@@ -2616,13 +2635,13 @@ public class SolidityParser extends Parser {
 				userDefinedTypeName();
 				}
 				break;
-			case T__33:
+			case T__30:
 				{
 				setState(467);
 				mapping();
 				}
 				break;
-			case T__26:
+			case T__23:
 				{
 				setState(468);
 				functionTypeName();
@@ -2646,11 +2665,11 @@ public class SolidityParser extends Parser {
 					setState(471);
 					if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
 					setState(472);
-					match(T__30);
+					match(T__27);
 					setState(474);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__19) | (1L << T__30) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52) | (1L << T__53) | (1L << T__54))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (BooleanLiteral - 78)) | (1L << (DecimalNumber - 78)) | (1L << (HexNumber - 78)) | (1L << (HexLiteral - 78)) | (1L << (Identifier - 78)) | (1L << (StringLiteral - 78)) | (1L << (PLUS - 78)) | (1L << (MINUS - 78)) | (1L << (NOT - 78)) | (1L << (INC - 78)) | (1L << (DEC - 78)))) != 0)) {
+					if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__16) | (1L << T__27) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (BooleanLiteral - 76)) | (1L << (DecimalNumber - 76)) | (1L << (HexNumber - 76)) | (1L << (HexLiteral - 76)) | (1L << (Identifier - 76)) | (1L << (StringLiteral - 76)) | (1L << (PLUS - 76)) | (1L << (MINUS - 76)) | (1L << (NOT - 76)) | (1L << (INC - 76)) | (1L << (DEC - 76)))) != 0)) {
 						{
 						setState(473);
 						expression(0);
@@ -2658,7 +2677,7 @@ public class SolidityParser extends Parser {
 					}
 
 					setState(476);
-					match(T__31);
+					match(T__28);
 					}
 					} 
 				}
@@ -2722,7 +2741,7 @@ public class SolidityParser extends Parser {
 					{
 					{
 					setState(483);
-					match(T__32);
+					match(T__29);
 					setState(484);
 					identifier();
 					}
@@ -2778,17 +2797,17 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(490);
-			match(T__33);
+			match(T__30);
 			setState(491);
-			match(T__19);
+			match(T__16);
 			setState(492);
 			elementaryTypeName();
 			setState(493);
-			match(T__34);
+			match(T__31);
 			setState(494);
 			typeName(0);
 			setState(495);
-			match(T__20);
+			match(T__17);
 			}
 		}
 		catch (RecognitionException re) {
@@ -2850,7 +2869,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(497);
-			match(T__26);
+			match(T__23);
 			setState(498);
 			functionTypeParameterList();
 			setState(504);
@@ -2898,7 +2917,7 @@ public class SolidityParser extends Parser {
 			case 1:
 				{
 				setState(507);
-				match(T__27);
+				match(T__24);
 				setState(508);
 				functionTypeParameterList();
 				}
@@ -2946,7 +2965,7 @@ public class SolidityParser extends Parser {
 			{
 			setState(511);
 			_la = _input.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__35) | (1L << T__36) | (1L << T__37))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__32) | (1L << T__33) | (1L << T__34))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -3000,7 +3019,7 @@ public class SolidityParser extends Parser {
 			{
 			setState(513);
 			_la = _input.LA(1);
-			if ( !(((((_la - 92)) & ~0x3f) == 0 && ((1L << (_la - 92)) & ((1L << (ConstantKeyword - 92)) | (1L << (PayableKeyword - 92)) | (1L << (PureKeyword - 92)) | (1L << (ViewKeyword - 92)))) != 0)) ) {
+			if ( !(((((_la - 90)) & ~0x3f) == 0 && ((1L << (_la - 90)) & ((1L << (ConstantKeyword - 90)) | (1L << (PayableKeyword - 90)) | (1L << (PureKeyword - 90)) | (1L << (ViewKeyword - 90)))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -3059,7 +3078,7 @@ public class SolidityParser extends Parser {
 			setState(519);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__12) | (1L << T__19) | (1L << T__22) | (1L << T__26) | (1L << T__30) | (1L << T__33) | (1L << T__38) | (1L << T__39) | (1L << T__41) | (1L << T__42) | (1L << T__43) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52) | (1L << T__53) | (1L << T__54))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (BooleanLiteral - 78)) | (1L << (DecimalNumber - 78)) | (1L << (HexNumber - 78)) | (1L << (HexLiteral - 78)) | (1L << (BreakKeyword - 78)) | (1L << (ContinueKeyword - 78)) | (1L << (Identifier - 78)) | (1L << (StringLiteral - 78)) | (1L << (PLUS - 78)) | (1L << (MINUS - 78)) | (1L << (NOT - 78)) | (1L << (INC - 78)) | (1L << (DEC - 78)))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__12) | (1L << T__16) | (1L << T__19) | (1L << T__23) | (1L << T__27) | (1L << T__30) | (1L << T__35) | (1L << T__36) | (1L << T__38) | (1L << T__39) | (1L << T__40) | (1L << T__41) | (1L << T__42) | (1L << T__43) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (BooleanLiteral - 76)) | (1L << (DecimalNumber - 76)) | (1L << (HexNumber - 76)) | (1L << (HexLiteral - 76)) | (1L << (BreakKeyword - 76)) | (1L << (ContinueKeyword - 76)) | (1L << (Identifier - 76)) | (1L << (StringLiteral - 76)) | (1L << (PLUS - 76)) | (1L << (MINUS - 76)) | (1L << (NOT - 76)) | (1L << (INC - 76)) | (1L << (DEC - 76)))) != 0)) {
 				{
 				{
 				setState(516);
@@ -3151,21 +3170,21 @@ public class SolidityParser extends Parser {
 			setState(537);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case T__39:
+			case T__36:
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(524);
 				ifStatement();
 				}
 				break;
-			case T__41:
+			case T__38:
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(525);
 				whileStatement();
 				}
 				break;
-			case T__22:
+			case T__19:
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(526);
@@ -3179,14 +3198,14 @@ public class SolidityParser extends Parser {
 				block();
 				}
 				break;
-			case T__42:
+			case T__39:
 				enterOuterAlt(_localctx, 5);
 				{
 				setState(528);
 				inlineAssemblyStatement();
 				}
 				break;
-			case T__43:
+			case T__40:
 				enterOuterAlt(_localctx, 6);
 				{
 				setState(529);
@@ -3207,28 +3226,28 @@ public class SolidityParser extends Parser {
 				breakStatement();
 				}
 				break;
-			case T__44:
+			case T__41:
 				enterOuterAlt(_localctx, 9);
 				{
 				setState(532);
 				returnStatement();
 				}
 				break;
-			case T__45:
+			case T__42:
 				enterOuterAlt(_localctx, 10);
 				{
 				setState(533);
 				throwStatement();
 				}
 				break;
-			case T__46:
+			case T__43:
 				enterOuterAlt(_localctx, 11);
 				{
 				setState(534);
 				emitStatement();
 				}
 				break;
-			case T__38:
+			case T__35:
 				enterOuterAlt(_localctx, 12);
 				{
 				setState(535);
@@ -3237,18 +3256,19 @@ public class SolidityParser extends Parser {
 				break;
 			case T__3:
 			case T__11:
-			case T__19:
-			case T__26:
+			case T__16:
+			case T__23:
+			case T__27:
 			case T__30:
-			case T__33:
+			case T__44:
+			case T__45:
+			case T__46:
 			case T__47:
 			case T__48:
 			case T__49:
 			case T__50:
 			case T__51:
 			case T__52:
-			case T__53:
-			case T__54:
 			case Int:
 			case Uint:
 			case Byte:
@@ -3313,7 +3333,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(539);
-			match(T__38);
+			match(T__35);
 			}
 		}
 		catch (RecognitionException re) {
@@ -3409,13 +3429,13 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(544);
-			match(T__39);
+			match(T__36);
 			setState(545);
-			match(T__19);
+			match(T__16);
 			setState(546);
 			expression(0);
 			setState(547);
-			match(T__20);
+			match(T__17);
 			setState(548);
 			statement();
 			setState(551);
@@ -3424,7 +3444,7 @@ public class SolidityParser extends Parser {
 			case 1:
 				{
 				setState(549);
-				match(T__40);
+				match(T__37);
 				setState(550);
 				statement();
 				}
@@ -3476,13 +3496,13 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(553);
-			match(T__41);
+			match(T__38);
 			setState(554);
-			match(T__19);
+			match(T__16);
 			setState(555);
 			expression(0);
 			setState(556);
-			match(T__20);
+			match(T__17);
 			setState(557);
 			statement();
 			}
@@ -3599,26 +3619,27 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(563);
-			match(T__22);
-			setState(564);
 			match(T__19);
+			setState(564);
+			match(T__16);
 			setState(567);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T__3:
 			case T__11:
-			case T__19:
-			case T__26:
+			case T__16:
+			case T__23:
+			case T__27:
 			case T__30:
-			case T__33:
+			case T__44:
+			case T__45:
+			case T__46:
 			case T__47:
 			case T__48:
 			case T__49:
 			case T__50:
 			case T__51:
 			case T__52:
-			case T__53:
-			case T__54:
 			case Int:
 			case Uint:
 			case Byte:
@@ -3652,7 +3673,7 @@ public class SolidityParser extends Parser {
 			setState(570);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__19) | (1L << T__30) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52) | (1L << T__53) | (1L << T__54))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (BooleanLiteral - 78)) | (1L << (DecimalNumber - 78)) | (1L << (HexNumber - 78)) | (1L << (HexLiteral - 78)) | (1L << (Identifier - 78)) | (1L << (StringLiteral - 78)) | (1L << (PLUS - 78)) | (1L << (MINUS - 78)) | (1L << (NOT - 78)) | (1L << (INC - 78)) | (1L << (DEC - 78)))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__16) | (1L << T__27) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (BooleanLiteral - 76)) | (1L << (DecimalNumber - 76)) | (1L << (HexNumber - 76)) | (1L << (HexLiteral - 76)) | (1L << (Identifier - 76)) | (1L << (StringLiteral - 76)) | (1L << (PLUS - 76)) | (1L << (MINUS - 76)) | (1L << (NOT - 76)) | (1L << (INC - 76)) | (1L << (DEC - 76)))) != 0)) {
 				{
 				setState(569);
 				expression(0);
@@ -3664,7 +3685,7 @@ public class SolidityParser extends Parser {
 			setState(574);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__19) | (1L << T__30) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52) | (1L << T__53) | (1L << T__54))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (BooleanLiteral - 78)) | (1L << (DecimalNumber - 78)) | (1L << (HexNumber - 78)) | (1L << (HexLiteral - 78)) | (1L << (Identifier - 78)) | (1L << (StringLiteral - 78)) | (1L << (PLUS - 78)) | (1L << (MINUS - 78)) | (1L << (NOT - 78)) | (1L << (INC - 78)) | (1L << (DEC - 78)))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__16) | (1L << T__27) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (BooleanLiteral - 76)) | (1L << (DecimalNumber - 76)) | (1L << (HexNumber - 76)) | (1L << (HexLiteral - 76)) | (1L << (Identifier - 76)) | (1L << (StringLiteral - 76)) | (1L << (PLUS - 76)) | (1L << (MINUS - 76)) | (1L << (NOT - 76)) | (1L << (INC - 76)) | (1L << (DEC - 76)))) != 0)) {
 				{
 				setState(573);
 				expression(0);
@@ -3672,7 +3693,7 @@ public class SolidityParser extends Parser {
 			}
 
 			setState(576);
-			match(T__20);
+			match(T__17);
 			setState(577);
 			statement();
 			}
@@ -3720,7 +3741,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(579);
-			match(T__42);
+			match(T__39);
 			setState(581);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
@@ -3779,17 +3800,17 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(585);
-			match(T__43);
+			match(T__40);
 			setState(586);
 			statement();
 			setState(587);
-			match(T__41);
+			match(T__38);
 			setState(588);
-			match(T__19);
+			match(T__16);
 			setState(589);
 			expression(0);
 			setState(590);
-			match(T__20);
+			match(T__17);
 			setState(591);
 			match(T__1);
 			}
@@ -3806,6 +3827,7 @@ public class SolidityParser extends Parser {
 	}
 
 	public static class ContinueStatementContext extends ParserRuleContext {
+		public TerminalNode ContinueKeyword() { return getToken(SolidityParser.ContinueKeyword, 0); }
 		public ContinueStatementContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -3849,6 +3871,7 @@ public class SolidityParser extends Parser {
 	}
 
 	public static class BreakStatementContext extends ParserRuleContext {
+		public TerminalNode BreakKeyword() { return getToken(SolidityParser.BreakKeyword, 0); }
 		public BreakStatementContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -3922,11 +3945,11 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(599);
-			match(T__44);
+			match(T__41);
 			setState(601);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__19) | (1L << T__30) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52) | (1L << T__53) | (1L << T__54))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (BooleanLiteral - 78)) | (1L << (DecimalNumber - 78)) | (1L << (HexNumber - 78)) | (1L << (HexLiteral - 78)) | (1L << (Identifier - 78)) | (1L << (StringLiteral - 78)) | (1L << (PLUS - 78)) | (1L << (MINUS - 78)) | (1L << (NOT - 78)) | (1L << (INC - 78)) | (1L << (DEC - 78)))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__16) | (1L << T__27) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (BooleanLiteral - 76)) | (1L << (DecimalNumber - 76)) | (1L << (HexNumber - 76)) | (1L << (HexLiteral - 76)) | (1L << (Identifier - 76)) | (1L << (StringLiteral - 76)) | (1L << (PLUS - 76)) | (1L << (MINUS - 76)) | (1L << (NOT - 76)) | (1L << (INC - 76)) | (1L << (DEC - 76)))) != 0)) {
 				{
 				setState(600);
 				expression(0);
@@ -3975,7 +3998,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(605);
-			match(T__45);
+			match(T__42);
 			setState(606);
 			match(T__1);
 			}
@@ -4021,7 +4044,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(608);
-			match(T__46);
+			match(T__43);
 			setState(609);
 			functionCall();
 			setState(610);
@@ -4084,7 +4107,7 @@ public class SolidityParser extends Parser {
 			case 1:
 				{
 				setState(612);
-				match(T__47);
+				match(T__44);
 				setState(613);
 				identifierList();
 				}
@@ -4098,11 +4121,11 @@ public class SolidityParser extends Parser {
 			case 3:
 				{
 				setState(615);
-				match(T__19);
+				match(T__16);
 				setState(616);
 				variableDeclarationList();
 				setState(617);
-				match(T__20);
+				match(T__17);
 				}
 				break;
 			}
@@ -4169,7 +4192,7 @@ public class SolidityParser extends Parser {
 			setState(628);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__26) | (1L << T__33) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (Identifier - 78)))) != 0)) {
+			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__23) | (1L << T__30) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (Identifier - 76)))) != 0)) {
 				{
 				setState(627);
 				variableDeclaration();
@@ -4187,7 +4210,7 @@ public class SolidityParser extends Parser {
 				setState(632);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__26) | (1L << T__33) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (Identifier - 78)))) != 0)) {
+				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__23) | (1L << T__30) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (Identifier - 76)))) != 0)) {
 					{
 					setState(631);
 					variableDeclaration();
@@ -4248,7 +4271,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(639);
-			match(T__19);
+			match(T__16);
 			setState(646);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,67,_ctx);
@@ -4286,7 +4309,7 @@ public class SolidityParser extends Parser {
 			}
 
 			setState(652);
-			match(T__20);
+			match(T__17);
 			}
 		}
 		catch (RecognitionException re) {
@@ -4334,7 +4357,7 @@ public class SolidityParser extends Parser {
 			{
 			setState(654);
 			_la = _input.LA(1);
-			if ( !(((((_la - 48)) & ~0x3f) == 0 && ((1L << (_la - 48)) & ((1L << (T__47 - 48)) | (1L << (T__48 - 48)) | (1L << (T__49 - 48)) | (1L << (T__50 - 48)) | (1L << (T__51 - 48)) | (1L << (Int - 48)) | (1L << (Uint - 48)) | (1L << (Byte - 48)) | (1L << (Fixed - 48)) | (1L << (Ufixed - 48)))) != 0)) ) {
+			if ( !(((((_la - 45)) & ~0x3f) == 0 && ((1L << (_la - 45)) & ((1L << (T__44 - 45)) | (1L << (T__45 - 45)) | (1L << (T__46 - 45)) | (1L << (T__47 - 45)) | (1L << (T__48 - 45)) | (1L << (T__49 - 45)) | (1L << (Int - 45)) | (1L << (Uint - 45)) | (1L << (Byte - 45)) | (1L << (Fixed - 45)) | (1L << (Ufixed - 45)))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -4411,6 +4434,7 @@ public class SolidityParser extends Parser {
 		}
 	}
 	public static class NotExpressionContext extends ExpressionContext {
+		public TerminalNode NOT() { return getToken(SolidityParser.NOT, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
@@ -4524,6 +4548,7 @@ public class SolidityParser extends Parser {
 		public ExpressionContext expression(int i) {
 			return getRuleContext(ExpressionContext.class,i);
 		}
+		public TerminalNode AND() { return getToken(SolidityParser.AND, 0); }
 		public AndExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -4569,6 +4594,7 @@ public class SolidityParser extends Parser {
 		public ExpressionContext expression(int i) {
 			return getRuleContext(ExpressionContext.class,i);
 		}
+		public TerminalNode BAND() { return getToken(SolidityParser.BAND, 0); }
 		public BitwiseAndExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -4766,6 +4792,7 @@ public class SolidityParser extends Parser {
 		public ExpressionContext expression(int i) {
 			return getRuleContext(ExpressionContext.class,i);
 		}
+		public TerminalNode OR() { return getToken(SolidityParser.OR, 0); }
 		public OrExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -4810,6 +4837,7 @@ public class SolidityParser extends Parser {
 		public ExpressionContext expression(int i) {
 			return getRuleContext(ExpressionContext.class,i);
 		}
+		public TerminalNode BOR() { return getToken(SolidityParser.BOR, 0); }
 		public BitwiseOrExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
@@ -4938,7 +4966,7 @@ public class SolidityParser extends Parser {
 				_prevctx = _localctx;
 
 				setState(657);
-				match(T__52);
+				match(T__50);
 				setState(658);
 				typeName(0);
 				}
@@ -4949,11 +4977,11 @@ public class SolidityParser extends Parser {
 				_ctx = _localctx;
 				_prevctx = _localctx;
 				setState(659);
-				match(T__19);
+				match(T__16);
 				setState(660);
 				expression(0);
 				setState(661);
-				match(T__20);
+				match(T__17);
 				}
 				break;
 			case 3:
@@ -5003,7 +5031,7 @@ public class SolidityParser extends Parser {
 				_prevctx = _localctx;
 				setState(667);
 				_la = _input.LA(1);
-				if ( !(_la==T__53 || _la==T__54) ) {
+				if ( !(_la==T__51 || _la==T__52) ) {
 				_errHandler.recoverInline(this);
 				}
 				else {
@@ -5066,7 +5094,7 @@ public class SolidityParser extends Parser {
 						setState(676);
 						if (!(precpred(_ctx, 14))) throw new FailedPredicateException(this, "precpred(_ctx, 14)");
 						setState(677);
-						match(T__55);
+						match(T__53);
 						setState(678);
 						expression(15);
 						}
@@ -5080,7 +5108,7 @@ public class SolidityParser extends Parser {
 						setState(680);
 						((MultiplicativeExpressionContext)_localctx).binop = _input.LT(1);
 						_la = _input.LA(1);
-						if ( !(((((_la - 106)) & ~0x3f) == 0 && ((1L << (_la - 106)) & ((1L << (MULT - 106)) | (1L << (DIV - 106)) | (1L << (MOD - 106)))) != 0)) ) {
+						if ( !(((((_la - 107)) & ~0x3f) == 0 && ((1L << (_la - 107)) & ((1L << (MULT - 107)) | (1L << (DIV - 107)) | (1L << (MOD - 107)))) != 0)) ) {
 							((MultiplicativeExpressionContext)_localctx).binop = (Token)_errHandler.recoverInline(this);
 						}
 						else {
@@ -5200,7 +5228,7 @@ public class SolidityParser extends Parser {
 						setState(701);
 						((EqualityExpressionContext)_localctx).binop = _input.LT(1);
 						_la = _input.LA(1);
-						if ( !(_la==T__56 || _la==T__57) ) {
+						if ( !(_la==T__54 || _la==T__55) ) {
 							((EqualityExpressionContext)_localctx).binop = (Token)_errHandler.recoverInline(this);
 						}
 						else {
@@ -5243,11 +5271,11 @@ public class SolidityParser extends Parser {
 						setState(709);
 						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
 						setState(710);
-						match(T__58);
+						match(T__56);
 						setState(711);
 						expression(0);
 						setState(712);
-						match(T__59);
+						match(T__57);
 						setState(713);
 						expression(4);
 						}
@@ -5261,7 +5289,7 @@ public class SolidityParser extends Parser {
 						setState(716);
 						((AssignmentExpressionContext)_localctx).binop = _input.LT(1);
 						_la = _input.LA(1);
-						if ( !(((((_la - 9)) & ~0x3f) == 0 && ((1L << (_la - 9)) & ((1L << (T__8 - 9)) | (1L << (T__60 - 9)) | (1L << (T__61 - 9)) | (1L << (T__62 - 9)) | (1L << (T__63 - 9)) | (1L << (T__64 - 9)) | (1L << (T__65 - 9)) | (1L << (T__66 - 9)) | (1L << (T__67 - 9)) | (1L << (T__68 - 9)) | (1L << (T__69 - 9)))) != 0)) ) {
+						if ( !(((((_la - 9)) & ~0x3f) == 0 && ((1L << (_la - 9)) & ((1L << (T__8 - 9)) | (1L << (T__58 - 9)) | (1L << (T__59 - 9)) | (1L << (T__60 - 9)) | (1L << (T__61 - 9)) | (1L << (T__62 - 9)) | (1L << (T__63 - 9)) | (1L << (T__64 - 9)) | (1L << (T__65 - 9)) | (1L << (T__66 - 9)) | (1L << (T__67 - 9)))) != 0)) ) {
 							((AssignmentExpressionContext)_localctx).binop = (Token)_errHandler.recoverInline(this);
 						}
 						else {
@@ -5299,11 +5327,11 @@ public class SolidityParser extends Parser {
 						setState(720);
 						if (!(precpred(_ctx, 23))) throw new FailedPredicateException(this, "precpred(_ctx, 23)");
 						setState(721);
-						match(T__30);
+						match(T__27);
 						setState(722);
 						expression(0);
 						setState(723);
-						match(T__31);
+						match(T__28);
 						}
 						break;
 					case 16:
@@ -5313,11 +5341,11 @@ public class SolidityParser extends Parser {
 						setState(725);
 						if (!(precpred(_ctx, 22))) throw new FailedPredicateException(this, "precpred(_ctx, 22)");
 						setState(726);
-						match(T__19);
+						match(T__16);
 						setState(727);
 						functionCallArguments();
 						setState(728);
-						match(T__20);
+						match(T__17);
 						}
 						break;
 					case 17:
@@ -5327,7 +5355,7 @@ public class SolidityParser extends Parser {
 						setState(730);
 						if (!(precpred(_ctx, 21))) throw new FailedPredicateException(this, "precpred(_ctx, 21)");
 						setState(731);
-						match(T__32);
+						match(T__29);
 						setState(732);
 						identifier();
 						}
@@ -5431,19 +5459,20 @@ public class SolidityParser extends Parser {
 				identifier();
 				}
 				break;
-			case T__19:
-			case T__30:
+			case T__16:
+			case T__27:
 				enterOuterAlt(_localctx, 6);
 				{
 				setState(743);
 				tupleExpression();
 				}
 				break;
+			case T__44:
+			case T__45:
+			case T__46:
 			case T__47:
 			case T__48:
 			case T__49:
-			case T__50:
-			case T__51:
 			case Int:
 			case Uint:
 			case Byte:
@@ -5646,7 +5675,7 @@ public class SolidityParser extends Parser {
 			setState(766);
 			identifier();
 			setState(767);
-			match(T__59);
+			match(T__57);
 			setState(768);
 			expression(0);
 			}
@@ -5717,17 +5746,18 @@ public class SolidityParser extends Parser {
 				break;
 			case T__3:
 			case T__11:
-			case T__19:
-			case T__20:
-			case T__30:
+			case T__16:
+			case T__17:
+			case T__27:
+			case T__44:
+			case T__45:
+			case T__46:
 			case T__47:
 			case T__48:
 			case T__49:
 			case T__50:
 			case T__51:
 			case T__52:
-			case T__53:
-			case T__54:
 			case Int:
 			case Uint:
 			case Byte:
@@ -5749,7 +5779,7 @@ public class SolidityParser extends Parser {
 				setState(776);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__19) | (1L << T__30) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52) | (1L << T__53) | (1L << T__54))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (BooleanLiteral - 78)) | (1L << (DecimalNumber - 78)) | (1L << (HexNumber - 78)) | (1L << (HexLiteral - 78)) | (1L << (Identifier - 78)) | (1L << (StringLiteral - 78)) | (1L << (PLUS - 78)) | (1L << (MINUS - 78)) | (1L << (NOT - 78)) | (1L << (INC - 78)) | (1L << (DEC - 78)))) != 0)) {
+				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__16) | (1L << T__27) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (BooleanLiteral - 76)) | (1L << (DecimalNumber - 76)) | (1L << (HexNumber - 76)) | (1L << (HexLiteral - 76)) | (1L << (Identifier - 76)) | (1L << (StringLiteral - 76)) | (1L << (PLUS - 76)) | (1L << (MINUS - 76)) | (1L << (NOT - 76)) | (1L << (INC - 76)) | (1L << (DEC - 76)))) != 0)) {
 					{
 					setState(775);
 					expressionList();
@@ -5808,11 +5838,11 @@ public class SolidityParser extends Parser {
 			setState(780);
 			expression(0);
 			setState(781);
-			match(T__19);
+			match(T__16);
 			setState(782);
 			functionCallArguments();
 			setState(783);
-			match(T__20);
+			match(T__17);
 			}
 		}
 		catch (RecognitionException re) {
@@ -5864,7 +5894,7 @@ public class SolidityParser extends Parser {
 			setState(789);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__12) | (1L << T__19) | (1L << T__22) | (1L << T__26) | (1L << T__39) | (1L << T__42) | (1L << T__44) | (1L << T__48) | (1L << T__51))) != 0) || ((((_la - 71)) & ~0x3f) == 0 && ((1L << (_la - 71)) & ((1L << (T__70 - 71)) | (1L << (T__72 - 71)) | (1L << (T__73 - 71)) | (1L << (DecimalNumber - 71)) | (1L << (HexNumber - 71)) | (1L << (HexLiteral - 71)) | (1L << (BreakKeyword - 71)) | (1L << (ContinueKeyword - 71)) | (1L << (Identifier - 71)) | (1L << (StringLiteral - 71)))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__12) | (1L << T__16) | (1L << T__19) | (1L << T__23) | (1L << T__36) | (1L << T__39) | (1L << T__41) | (1L << T__45) | (1L << T__49))) != 0) || ((((_la - 69)) & ~0x3f) == 0 && ((1L << (_la - 69)) & ((1L << (T__68 - 69)) | (1L << (T__70 - 69)) | (1L << (T__71 - 69)) | (1L << (DecimalNumber - 69)) | (1L << (HexNumber - 69)) | (1L << (HexLiteral - 69)) | (1L << (BreakKeyword - 69)) | (1L << (ContinueKeyword - 69)) | (1L << (Identifier - 69)) | (1L << (StringLiteral - 69)))) != 0)) {
 				{
 				{
 				setState(786);
@@ -6126,9 +6156,9 @@ public class SolidityParser extends Parser {
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T__11:
-			case T__44:
-			case T__48:
-			case T__51:
+			case T__41:
+			case T__45:
+			case T__49:
 			case Identifier:
 				enterOuterAlt(_localctx, 1);
 				{
@@ -6200,22 +6230,22 @@ public class SolidityParser extends Parser {
 			setState(821);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case T__44:
+			case T__41:
 				{
 				setState(817);
-				match(T__44);
+				match(T__41);
 				}
 				break;
-			case T__48:
+			case T__45:
 				{
 				setState(818);
-				match(T__48);
+				match(T__45);
 				}
 				break;
-			case T__51:
+			case T__49:
 				{
 				setState(819);
-				match(T__51);
+				match(T__49);
 				}
 				break;
 			case T__11:
@@ -6234,11 +6264,11 @@ public class SolidityParser extends Parser {
 			case 1:
 				{
 				setState(823);
-				match(T__19);
+				match(T__16);
 				setState(825);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__44) | (1L << T__48) | (1L << T__51))) != 0) || ((((_la - 85)) & ~0x3f) == 0 && ((1L << (_la - 85)) & ((1L << (DecimalNumber - 85)) | (1L << (HexNumber - 85)) | (1L << (HexLiteral - 85)) | (1L << (Identifier - 85)) | (1L << (StringLiteral - 85)))) != 0)) {
+				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__11) | (1L << T__41) | (1L << T__45) | (1L << T__49))) != 0) || ((((_la - 83)) & ~0x3f) == 0 && ((1L << (_la - 83)) & ((1L << (DecimalNumber - 83)) | (1L << (HexNumber - 83)) | (1L << (HexLiteral - 83)) | (1L << (Identifier - 83)) | (1L << (StringLiteral - 83)))) != 0)) {
 					{
 					setState(824);
 					assemblyExpression();
@@ -6262,7 +6292,7 @@ public class SolidityParser extends Parser {
 					_la = _input.LA(1);
 				}
 				setState(834);
-				match(T__20);
+				match(T__17);
 				}
 				break;
 			}
@@ -6313,16 +6343,16 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(837);
-			match(T__70);
+			match(T__68);
 			setState(838);
 			assemblyIdentifierOrList();
 			setState(841);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==T__71) {
+			if (_la==T__69) {
 				{
 				setState(839);
-				match(T__71);
+				match(T__69);
 				setState(840);
 				assemblyExpression();
 				}
@@ -6376,7 +6406,7 @@ public class SolidityParser extends Parser {
 			setState(843);
 			assemblyIdentifierOrList();
 			setState(844);
-			match(T__71);
+			match(T__69);
 			setState(845);
 			assemblyExpression();
 			}
@@ -6433,15 +6463,15 @@ public class SolidityParser extends Parser {
 				identifier();
 				}
 				break;
-			case T__19:
+			case T__16:
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(848);
-				match(T__19);
+				match(T__16);
 				setState(849);
 				assemblyIdentifierList();
 				setState(850);
-				match(T__20);
+				match(T__17);
 				}
 				break;
 			default:
@@ -6553,7 +6583,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(862);
-			match(T__72);
+			match(T__70);
 			setState(863);
 			identifier();
 			}
@@ -6601,7 +6631,7 @@ public class SolidityParser extends Parser {
 			setState(865);
 			identifier();
 			setState(866);
-			match(T__59);
+			match(T__57);
 			}
 		}
 		catch (RecognitionException re) {
@@ -6652,13 +6682,13 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(868);
-			match(T__73);
+			match(T__71);
 			setState(869);
 			assemblyExpression();
 			setState(873);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==T__74 || _la==T__75) {
+			while (_la==T__72 || _la==T__73) {
 				{
 				{
 				setState(870);
@@ -6715,22 +6745,22 @@ public class SolidityParser extends Parser {
 			setState(882);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case T__74:
+			case T__72:
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(876);
-				match(T__74);
+				match(T__72);
 				setState(877);
 				assemblyLiteral();
 				setState(878);
 				assemblyBlock();
 				}
 				break;
-			case T__75:
+			case T__73:
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(880);
-				match(T__75);
+				match(T__73);
 				setState(881);
 				assemblyBlock();
 				}
@@ -6790,11 +6820,11 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(884);
-			match(T__26);
+			match(T__23);
 			setState(885);
 			identifier();
 			setState(886);
-			match(T__19);
+			match(T__16);
 			setState(888);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
@@ -6806,11 +6836,11 @@ public class SolidityParser extends Parser {
 			}
 
 			setState(890);
-			match(T__20);
+			match(T__17);
 			setState(892);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			if (_la==T__76) {
+			if (_la==T__74) {
 				{
 				setState(891);
 				assemblyFunctionReturns();
@@ -6863,7 +6893,7 @@ public class SolidityParser extends Parser {
 			{
 			{
 			setState(896);
-			match(T__76);
+			match(T__74);
 			setState(897);
 			assemblyIdentifierList();
 			}
@@ -6919,7 +6949,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(899);
-			match(T__22);
+			match(T__19);
 			setState(902);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
@@ -6930,9 +6960,9 @@ public class SolidityParser extends Parser {
 				}
 				break;
 			case T__11:
-			case T__44:
-			case T__48:
-			case T__51:
+			case T__41:
+			case T__45:
+			case T__49:
 			case DecimalNumber:
 			case HexNumber:
 			case HexLiteral:
@@ -6958,9 +6988,9 @@ public class SolidityParser extends Parser {
 				}
 				break;
 			case T__11:
-			case T__44:
-			case T__48:
-			case T__51:
+			case T__41:
+			case T__45:
+			case T__49:
 			case DecimalNumber:
 			case HexNumber:
 			case HexLiteral:
@@ -7022,7 +7052,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(911);
-			match(T__39);
+			match(T__36);
 			setState(912);
 			assemblyExpression();
 			setState(913);
@@ -7073,7 +7103,7 @@ public class SolidityParser extends Parser {
 			{
 			setState(915);
 			_la = _input.LA(1);
-			if ( !(((((_la - 85)) & ~0x3f) == 0 && ((1L << (_la - 85)) & ((1L << (DecimalNumber - 85)) | (1L << (HexNumber - 85)) | (1L << (HexLiteral - 85)) | (1L << (StringLiteral - 85)))) != 0)) ) {
+			if ( !(((((_la - 83)) & ~0x3f) == 0 && ((1L << (_la - 83)) & ((1L << (DecimalNumber - 83)) | (1L << (HexNumber - 83)) | (1L << (HexLiteral - 83)) | (1L << (StringLiteral - 83)))) != 0)) ) {
 			_errHandler.recoverInline(this);
 			}
 			else {
@@ -7127,7 +7157,7 @@ public class SolidityParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(917);
-			match(T__42);
+			match(T__39);
 			setState(918);
 			identifier();
 			setState(919);
@@ -7179,16 +7209,16 @@ public class SolidityParser extends Parser {
 			setState(947);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case T__19:
+			case T__16:
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(921);
-				match(T__19);
+				match(T__16);
 				{
 				setState(923);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__19) | (1L << T__30) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52) | (1L << T__53) | (1L << T__54))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (BooleanLiteral - 78)) | (1L << (DecimalNumber - 78)) | (1L << (HexNumber - 78)) | (1L << (HexLiteral - 78)) | (1L << (Identifier - 78)) | (1L << (StringLiteral - 78)) | (1L << (PLUS - 78)) | (1L << (MINUS - 78)) | (1L << (NOT - 78)) | (1L << (INC - 78)) | (1L << (DEC - 78)))) != 0)) {
+				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__16) | (1L << T__27) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (BooleanLiteral - 76)) | (1L << (DecimalNumber - 76)) | (1L << (HexNumber - 76)) | (1L << (HexLiteral - 76)) | (1L << (Identifier - 76)) | (1L << (StringLiteral - 76)) | (1L << (PLUS - 76)) | (1L << (MINUS - 76)) | (1L << (NOT - 76)) | (1L << (INC - 76)) | (1L << (DEC - 76)))) != 0)) {
 					{
 					setState(922);
 					expression(0);
@@ -7206,7 +7236,7 @@ public class SolidityParser extends Parser {
 					setState(927);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__19) | (1L << T__30) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52) | (1L << T__53) | (1L << T__54))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (BooleanLiteral - 78)) | (1L << (DecimalNumber - 78)) | (1L << (HexNumber - 78)) | (1L << (HexLiteral - 78)) | (1L << (Identifier - 78)) | (1L << (StringLiteral - 78)) | (1L << (PLUS - 78)) | (1L << (MINUS - 78)) | (1L << (NOT - 78)) | (1L << (INC - 78)) | (1L << (DEC - 78)))) != 0)) {
+					if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__16) | (1L << T__27) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (BooleanLiteral - 76)) | (1L << (DecimalNumber - 76)) | (1L << (HexNumber - 76)) | (1L << (HexLiteral - 76)) | (1L << (Identifier - 76)) | (1L << (StringLiteral - 76)) | (1L << (PLUS - 76)) | (1L << (MINUS - 76)) | (1L << (NOT - 76)) | (1L << (INC - 76)) | (1L << (DEC - 76)))) != 0)) {
 						{
 						setState(926);
 						expression(0);
@@ -7221,18 +7251,18 @@ public class SolidityParser extends Parser {
 				}
 				}
 				setState(934);
-				match(T__20);
+				match(T__17);
 				}
 				break;
-			case T__30:
+			case T__27:
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(935);
-				match(T__30);
+				match(T__27);
 				setState(944);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__19) | (1L << T__30) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52) | (1L << T__53) | (1L << T__54))) != 0) || ((((_la - 78)) & ~0x3f) == 0 && ((1L << (_la - 78)) & ((1L << (Int - 78)) | (1L << (Uint - 78)) | (1L << (Byte - 78)) | (1L << (Fixed - 78)) | (1L << (Ufixed - 78)) | (1L << (BooleanLiteral - 78)) | (1L << (DecimalNumber - 78)) | (1L << (HexNumber - 78)) | (1L << (HexLiteral - 78)) | (1L << (Identifier - 78)) | (1L << (StringLiteral - 78)) | (1L << (PLUS - 78)) | (1L << (MINUS - 78)) | (1L << (NOT - 78)) | (1L << (INC - 78)) | (1L << (DEC - 78)))) != 0)) {
+				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__3) | (1L << T__11) | (1L << T__16) | (1L << T__27) | (1L << T__44) | (1L << T__45) | (1L << T__46) | (1L << T__47) | (1L << T__48) | (1L << T__49) | (1L << T__50) | (1L << T__51) | (1L << T__52))) != 0) || ((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (Int - 76)) | (1L << (Uint - 76)) | (1L << (Byte - 76)) | (1L << (Fixed - 76)) | (1L << (Ufixed - 76)) | (1L << (BooleanLiteral - 76)) | (1L << (DecimalNumber - 76)) | (1L << (HexNumber - 76)) | (1L << (HexLiteral - 76)) | (1L << (Identifier - 76)) | (1L << (StringLiteral - 76)) | (1L << (PLUS - 76)) | (1L << (MINUS - 76)) | (1L << (NOT - 76)) | (1L << (INC - 76)) | (1L << (DEC - 76)))) != 0)) {
 					{
 					setState(936);
 					expression(0);
@@ -7256,7 +7286,7 @@ public class SolidityParser extends Parser {
 				}
 
 				setState(946);
-				match(T__31);
+				match(T__28);
 				}
 				break;
 			default:
@@ -7489,7 +7519,7 @@ public class SolidityParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3|\u03c0\4\2\t\2\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3}\u03c0\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
@@ -7556,9 +7586,9 @@ public class SolidityParser extends Parser {
 		"U\3V\3V\3V\2\4@rW\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\62"+
 		"\64\668:<>@BDFHJLNPRTVXZ\\^`bdfhjlnprtvxz|~\u0080\u0082\u0084\u0086\u0088"+
 		"\u008a\u008c\u008e\u0090\u0092\u0094\u0096\u0098\u009a\u009c\u009e\u00a0"+
-		"\u00a2\u00a4\u00a6\u00a8\u00aa\2\23\3\2\5\13\3\2\22\24\5\2^^bbde\3\2&"+
-		"(\5\2^^ccfg\4\2\62\66PT\3\2xy\3\2jk\3\289\3\2ln\3\2op\3\2\7\n\3\2;<\4"+
-		"\2\13\13?H\5\2WXZZii\3\2WX\4\2\16\16hh\2\u0416\2\u00b1\3\2\2\2\4\u00b6"+
+		"\u00a2\u00a4\u00a6\u00a8\u00aa\2\23\3\2\5\13\5\2^^aacc\5\2\\\\bbef\3\2"+
+		"#%\5\2\\\\ddgh\4\2/\64NR\3\2yz\3\2kl\3\2\66\67\3\2mo\3\2pq\3\2\7\n\3\2"+
+		"9:\4\2\13\13=F\5\2UVXXjj\3\2UV\4\2\16\16ii\2\u0416\2\u00b1\3\2\2\2\4\u00b6"+
 		"\3\2\2\2\6\u00bb\3\2\2\2\b\u00bf\3\2\2\2\n\u00c1\3\2\2\2\f\u00c5\3\2\2"+
 		"\2\16\u00c8\3\2\2\2\20\u00cc\3\2\2\2\22\u00f3\3\2\2\2\24\u00f5\3\2\2\2"+
 		"\26\u010b\3\2\2\2\30\u0121\3\2\2\2\32\u0123\3\2\2\2\34\u0131\3\2\2\2\36"+
@@ -7589,31 +7619,31 @@ public class SolidityParser extends Parser {
 		"\5\16\b\2\u00c2\u00c4\5\16\b\2\u00c3\u00c2\3\2\2\2\u00c3\u00c4\3\2\2\2"+
 		"\u00c4\13\3\2\2\2\u00c5\u00c6\t\2\2\2\u00c6\r\3\2\2\2\u00c7\u00c9\5\f"+
 		"\7\2\u00c8\u00c7\3\2\2\2\u00c8\u00c9\3\2\2\2\u00c9\u00ca\3\2\2\2\u00ca"+
-		"\u00cb\7U\2\2\u00cb\17\3\2\2\2\u00cc\u00cf\5\u00aaV\2\u00cd\u00ce\7\f"+
+		"\u00cb\7S\2\2\u00cb\17\3\2\2\2\u00cc\u00cf\5\u00aaV\2\u00cd\u00ce\7\f"+
 		"\2\2\u00ce\u00d0\5\u00aaV\2\u00cf\u00cd\3\2\2\2\u00cf\u00d0\3\2\2\2\u00d0"+
-		"\21\3\2\2\2\u00d1\u00d2\7\r\2\2\u00d2\u00d5\7i\2\2\u00d3\u00d4\7\f\2\2"+
+		"\21\3\2\2\2\u00d1\u00d2\7\r\2\2\u00d2\u00d5\7j\2\2\u00d3\u00d4\7\f\2\2"+
 		"\u00d4\u00d6\5\u00aaV\2\u00d5\u00d3\3\2\2\2\u00d5\u00d6\3\2\2\2\u00d6"+
-		"\u00d7\3\2\2\2\u00d7\u00f4\7\4\2\2\u00d8\u00db\7\r\2\2\u00d9\u00dc\7l"+
+		"\u00d7\3\2\2\2\u00d7\u00f4\7\4\2\2\u00d8\u00db\7\r\2\2\u00d9\u00dc\7m"+
 		"\2\2\u00da\u00dc\5\u00aaV\2\u00db\u00d9\3\2\2\2\u00db\u00da\3\2\2\2\u00dc"+
 		"\u00df\3\2\2\2\u00dd\u00de\7\f\2\2\u00de\u00e0\5\u00aaV\2\u00df\u00dd"+
 		"\3\2\2\2\u00df\u00e0\3\2\2\2\u00e0\u00e1\3\2\2\2\u00e1\u00e2\7\16\2\2"+
-		"\u00e2\u00e3\7i\2\2\u00e3\u00f4\7\4\2\2\u00e4\u00e5\7\r\2\2\u00e5\u00e6"+
+		"\u00e2\u00e3\7j\2\2\u00e3\u00f4\7\4\2\2\u00e4\u00e5\7\r\2\2\u00e5\u00e6"+
 		"\7\17\2\2\u00e6\u00eb\5\20\t\2\u00e7\u00e8\7\20\2\2\u00e8\u00ea\5\20\t"+
 		"\2\u00e9\u00e7\3\2\2\2\u00ea\u00ed\3\2\2\2\u00eb\u00e9\3\2\2\2\u00eb\u00ec"+
 		"\3\2\2\2\u00ec\u00ee\3\2\2\2\u00ed\u00eb\3\2\2\2\u00ee\u00ef\7\21\2\2"+
-		"\u00ef\u00f0\7\16\2\2\u00f0\u00f1\7i\2\2\u00f1\u00f2\7\4\2\2\u00f2\u00f4"+
+		"\u00ef\u00f0\7\16\2\2\u00f0\u00f1\7j\2\2\u00f1\u00f2\7\4\2\2\u00f2\u00f4"+
 		"\3\2\2\2\u00f3\u00d1\3\2\2\2\u00f3\u00d8\3\2\2\2\u00f3\u00e4\3\2\2\2\u00f4"+
-		"\23\3\2\2\2\u00f5\u00f6\t\3\2\2\u00f6\u0100\5\u00aaV\2\u00f7\u00f8\7\25"+
+		"\23\3\2\2\2\u00f5\u00f6\t\3\2\2\u00f6\u0100\5\u00aaV\2\u00f7\u00f8\7\22"+
 		"\2\2\u00f8\u00fd\5\26\f\2\u00f9\u00fa\7\20\2\2\u00fa\u00fc\5\26\f\2\u00fb"+
 		"\u00f9\3\2\2\2\u00fc\u00ff\3\2\2\2\u00fd\u00fb\3\2\2\2\u00fd\u00fe\3\2"+
 		"\2\2\u00fe\u0101\3\2\2\2\u00ff\u00fd\3\2\2\2\u0100\u00f7\3\2\2\2\u0100"+
 		"\u0101\3\2\2\2\u0101\u0102\3\2\2\2\u0102\u0106\7\17\2\2\u0103\u0105\5"+
 		"\30\r\2\u0104\u0103\3\2\2\2\u0105\u0108\3\2\2\2\u0106\u0104\3\2\2\2\u0106"+
 		"\u0107\3\2\2\2\u0107\u0109\3\2\2\2\u0108\u0106\3\2\2\2\u0109\u010a\7\21"+
-		"\2\2\u010a\25\3\2\2\2\u010b\u0117\5B\"\2\u010c\u010d\7\26\2\2\u010d\u0112"+
+		"\2\2\u010a\25\3\2\2\2\u010b\u0117\5B\"\2\u010c\u010d\7\23\2\2\u010d\u0112"+
 		"\5r:\2\u010e\u010f\7\20\2\2\u010f\u0111\5r:\2\u0110\u010e\3\2\2\2\u0111"+
 		"\u0114\3\2\2\2\u0112\u0110\3\2\2\2\u0112\u0113\3\2\2\2\u0113\u0115\3\2"+
-		"\2\2\u0114\u0112\3\2\2\2\u0115\u0116\7\27\2\2\u0116\u0118\3\2\2\2\u0117"+
+		"\2\2\u0114\u0112\3\2\2\2\u0115\u0116\7\24\2\2\u0116\u0118\3\2\2\2\u0117"+
 		"\u010c\3\2\2\2\u0117\u0118\3\2\2\2\u0118\27\3\2\2\2\u0119\u0122\5\32\16"+
 		"\2\u011a\u0122\5\34\17\2\u011b\u0122\5\36\20\2\u011c\u0122\5 \21\2\u011d"+
 		"\u0122\5\"\22\2\u011e\u0122\5&\24\2\u011f\u0122\5,\27\2\u0120\u0122\5"+
@@ -7624,77 +7654,77 @@ public class SolidityParser extends Parser {
 		"\u0128\3\2\2\2\u0128\u012a\3\2\2\2\u0129\u0127\3\2\2\2\u012a\u012d\5\u00aa"+
 		"V\2\u012b\u012c\7\13\2\2\u012c\u012e\5r:\2\u012d\u012b\3\2\2\2\u012d\u012e"+
 		"\3\2\2\2\u012e\u012f\3\2\2\2\u012f\u0130\7\4\2\2\u0130\33\3\2\2\2\u0131"+
-		"\u0132\7\30\2\2\u0132\u0133\5\u00aaV\2\u0133\u0136\7\31\2\2\u0134\u0137"+
-		"\7l\2\2\u0135\u0137\5@!\2\u0136\u0134\3\2\2\2\u0136\u0135\3\2\2\2\u0137"+
-		"\u0138\3\2\2\2\u0138\u0139\7\4\2\2\u0139\35\3\2\2\2\u013a\u013b\7\32\2"+
+		"\u0132\7\25\2\2\u0132\u0133\5\u00aaV\2\u0133\u0136\7\26\2\2\u0134\u0137"+
+		"\7m\2\2\u0135\u0137\5@!\2\u0136\u0134\3\2\2\2\u0136\u0135\3\2\2\2\u0137"+
+		"\u0138\3\2\2\2\u0138\u0139\7\4\2\2\u0139\35\3\2\2\2\u013a\u013b\7\27\2"+
 		"\2\u013b\u013c\5\u00aaV\2\u013c\u0147\7\17\2\2\u013d\u013e\5> \2\u013e"+
 		"\u0144\7\4\2\2\u013f\u0140\5> \2\u0140\u0141\7\4\2\2\u0141\u0143\3\2\2"+
 		"\2\u0142\u013f\3\2\2\2\u0143\u0146\3\2\2\2\u0144\u0142\3\2\2\2\u0144\u0145"+
 		"\3\2\2\2\u0145\u0148\3\2\2\2\u0146\u0144\3\2\2\2\u0147\u013d\3\2\2\2\u0147"+
 		"\u0148\3\2\2\2\u0148\u0149\3\2\2\2\u0149\u014a\7\21\2\2\u014a\37\3\2\2"+
-		"\2\u014b\u014c\7\33\2\2\u014c\u014d\5\62\32\2\u014d\u014e\5*\26\2\u014e"+
-		"\u014f\5L\'\2\u014f!\3\2\2\2\u0150\u0151\7\34\2\2\u0151\u0153\5\u00aa"+
+		"\2\u014b\u014c\7\30\2\2\u014c\u014d\5\62\32\2\u014d\u014e\5*\26\2\u014e"+
+		"\u014f\5L\'\2\u014f!\3\2\2\2\u0150\u0151\7\31\2\2\u0151\u0153\5\u00aa"+
 		"V\2\u0152\u0154\5\62\32\2\u0153\u0152\3\2\2\2\u0153\u0154\3\2\2\2\u0154"+
 		"\u0155\3\2\2\2\u0155\u0156\5L\'\2\u0156#\3\2\2\2\u0157\u015d\5\u00aaV"+
-		"\2\u0158\u015a\7\26\2\2\u0159\u015b\5v<\2\u015a\u0159\3\2\2\2\u015a\u015b"+
-		"\3\2\2\2\u015b\u015c\3\2\2\2\u015c\u015e\7\27\2\2\u015d\u0158\3\2\2\2"+
-		"\u015d\u015e\3\2\2\2\u015e%\3\2\2\2\u015f\u0161\7\35\2\2\u0160\u0162\5"+
+		"\2\u0158\u015a\7\23\2\2\u0159\u015b\5v<\2\u015a\u0159\3\2\2\2\u015a\u015b"+
+		"\3\2\2\2\u015b\u015c\3\2\2\2\u015c\u015e\7\24\2\2\u015d\u0158\3\2\2\2"+
+		"\u015d\u015e\3\2\2\2\u015e%\3\2\2\2\u015f\u0161\7\32\2\2\u0160\u0162\5"+
 		"\u00aaV\2\u0161\u0160\3\2\2\2\u0161\u0162\3\2\2\2\u0162\u0163\3\2\2\2"+
 		"\u0163\u0164\5\62\32\2\u0164\u0166\5*\26\2\u0165\u0167\5(\25\2\u0166\u0165"+
 		"\3\2\2\2\u0166\u0167\3\2\2\2\u0167\u016a\3\2\2\2\u0168\u016b\7\4\2\2\u0169"+
 		"\u016b\5L\'\2\u016a\u0168\3\2\2\2\u016a\u0169\3\2\2\2\u016b\'\3\2\2\2"+
-		"\u016c\u016d\7\36\2\2\u016d\u016e\5\62\32\2\u016e)\3\2\2\2\u016f\u0176"+
-		"\5$\23\2\u0170\u0176\5J&\2\u0171\u0176\7`\2\2\u0172\u0176\7e\2\2\u0173"+
-		"\u0176\7b\2\2\u0174\u0176\7d\2\2\u0175\u016f\3\2\2\2\u0175\u0170\3\2\2"+
+		"\u016c\u016d\7\33\2\2\u016d\u016e\5\62\32\2\u016e)\3\2\2\2\u016f\u0176"+
+		"\5$\23\2\u0170\u0176\5J&\2\u0171\u0176\7_\2\2\u0172\u0176\7f\2\2\u0173"+
+		"\u0176\7b\2\2\u0174\u0176\7e\2\2\u0175\u016f\3\2\2\2\u0175\u0170\3\2\2"+
 		"\2\u0175\u0171\3\2\2\2\u0175\u0172\3\2\2\2\u0175\u0173\3\2\2\2\u0175\u0174"+
 		"\3\2\2\2\u0176\u0179\3\2\2\2\u0177\u0175\3\2\2\2\u0177\u0178\3\2\2\2\u0178"+
-		"+\3\2\2\2\u0179\u0177\3\2\2\2\u017a\u017b\7\37\2\2\u017b\u017c\5\u00aa"+
-		"V\2\u017c\u017e\5\66\34\2\u017d\u017f\7\\\2\2\u017e\u017d\3\2\2\2\u017e"+
+		"+\3\2\2\2\u0179\u0177\3\2\2\2\u017a\u017b\7\34\2\2\u017b\u017c\5\u00aa"+
+		"V\2\u017c\u017e\5\66\34\2\u017d\u017f\7Z\2\2\u017e\u017d\3\2\2\2\u017e"+
 		"\u017f\3\2\2\2\u017f\u0180\3\2\2\2\u0180\u0181\7\4\2\2\u0181-\3\2\2\2"+
-		"\u0182\u0183\5\u00aaV\2\u0183/\3\2\2\2\u0184\u0185\7 \2\2\u0185\u0186"+
+		"\u0182\u0183\5\u00aaV\2\u0183/\3\2\2\2\u0184\u0185\7\35\2\2\u0185\u0186"+
 		"\5\u00aaV\2\u0186\u0188\7\17\2\2\u0187\u0189\5.\30\2\u0188\u0187\3\2\2"+
 		"\2\u0188\u0189\3\2\2\2\u0189\u018e\3\2\2\2\u018a\u018b\7\20\2\2\u018b"+
 		"\u018d\5.\30\2\u018c\u018a\3\2\2\2\u018d\u0190\3\2\2\2\u018e\u018c\3\2"+
 		"\2\2\u018e\u018f\3\2\2\2\u018f\u0191\3\2\2\2\u0190\u018e\3\2\2\2\u0191"+
-		"\u0192\7\21\2\2\u0192\61\3\2\2\2\u0193\u019c\7\26\2\2\u0194\u0199\5\64"+
+		"\u0192\7\21\2\2\u0192\61\3\2\2\2\u0193\u019c\7\23\2\2\u0194\u0199\5\64"+
 		"\33\2\u0195\u0196\7\20\2\2\u0196\u0198\5\64\33\2\u0197\u0195\3\2\2\2\u0198"+
 		"\u019b\3\2\2\2\u0199\u0197\3\2\2\2\u0199\u019a\3\2\2\2\u019a\u019d\3\2"+
 		"\2\2\u019b\u0199\3\2\2\2\u019c\u0194\3\2\2\2\u019c\u019d\3\2\2\2\u019d"+
-		"\u019e\3\2\2\2\u019e\u019f\7\27\2\2\u019f\63\3\2\2\2\u01a0\u01a2\5@!\2"+
+		"\u019e\3\2\2\2\u019e\u019f\7\24\2\2\u019f\63\3\2\2\2\u01a0\u01a2\5@!\2"+
 		"\u01a1\u01a3\5H%\2\u01a2\u01a1\3\2\2\2\u01a2\u01a3\3\2\2\2\u01a3\u01a5"+
 		"\3\2\2\2\u01a4\u01a6\5\u00aaV\2\u01a5\u01a4\3\2\2\2\u01a5\u01a6\3\2\2"+
-		"\2\u01a6\65\3\2\2\2\u01a7\u01b0\7\26\2\2\u01a8\u01ad\58\35\2\u01a9\u01aa"+
+		"\2\u01a6\65\3\2\2\2\u01a7\u01b0\7\23\2\2\u01a8\u01ad\58\35\2\u01a9\u01aa"+
 		"\7\20\2\2\u01aa\u01ac\58\35\2\u01ab\u01a9\3\2\2\2\u01ac\u01af\3\2\2\2"+
 		"\u01ad\u01ab\3\2\2\2\u01ad\u01ae\3\2\2\2\u01ae\u01b1\3\2\2\2\u01af\u01ad"+
 		"\3\2\2\2\u01b0\u01a8\3\2\2\2\u01b0\u01b1\3\2\2\2\u01b1\u01b2\3\2\2\2\u01b2"+
-		"\u01b3\7\27\2\2\u01b3\67\3\2\2\2\u01b4\u01b6\5@!\2\u01b5\u01b7\7a\2\2"+
+		"\u01b3\7\24\2\2\u01b3\67\3\2\2\2\u01b4\u01b6\5@!\2\u01b5\u01b7\7`\2\2"+
 		"\u01b6\u01b5\3\2\2\2\u01b6\u01b7\3\2\2\2\u01b7\u01b9\3\2\2\2\u01b8\u01ba"+
 		"\5\u00aaV\2\u01b9\u01b8\3\2\2\2\u01b9\u01ba\3\2\2\2\u01ba9\3\2\2\2\u01bb"+
-		"\u01c4\7\26\2\2\u01bc\u01c1\5<\37\2\u01bd\u01be\7\20\2\2\u01be\u01c0\5"+
+		"\u01c4\7\23\2\2\u01bc\u01c1\5<\37\2\u01bd\u01be\7\20\2\2\u01be\u01c0\5"+
 		"<\37\2\u01bf\u01bd\3\2\2\2\u01c0\u01c3\3\2\2\2\u01c1\u01bf\3\2\2\2\u01c1"+
 		"\u01c2\3\2\2\2\u01c2\u01c5\3\2\2\2\u01c3\u01c1\3\2\2\2\u01c4\u01bc\3\2"+
-		"\2\2\u01c4\u01c5\3\2\2\2\u01c5\u01c6\3\2\2\2\u01c6\u01c7\7\27\2\2\u01c7"+
+		"\2\2\u01c4\u01c5\3\2\2\2\u01c5\u01c6\3\2\2\2\u01c6\u01c7\7\24\2\2\u01c7"+
 		";\3\2\2\2\u01c8\u01ca\5@!\2\u01c9\u01cb\5H%\2\u01ca\u01c9\3\2\2\2\u01ca"+
 		"\u01cb\3\2\2\2\u01cb=\3\2\2\2\u01cc\u01ce\5@!\2\u01cd\u01cf\5H%\2\u01ce"+
 		"\u01cd\3\2\2\2\u01ce\u01cf\3\2\2\2\u01cf\u01d0\3\2\2\2\u01d0\u01d1\5\u00aa"+
 		"V\2\u01d1?\3\2\2\2\u01d2\u01d3\b!\1\2\u01d3\u01d8\5p9\2\u01d4\u01d8\5"+
 		"B\"\2\u01d5\u01d8\5D#\2\u01d6\u01d8\5F$\2\u01d7\u01d2\3\2\2\2\u01d7\u01d4"+
 		"\3\2\2\2\u01d7\u01d5\3\2\2\2\u01d7\u01d6\3\2\2\2\u01d8\u01e1\3\2\2\2\u01d9"+
-		"\u01da\f\4\2\2\u01da\u01dc\7!\2\2\u01db\u01dd\5r:\2\u01dc\u01db\3\2\2"+
-		"\2\u01dc\u01dd\3\2\2\2\u01dd\u01de\3\2\2\2\u01de\u01e0\7\"\2\2\u01df\u01d9"+
-		"\3\2\2\2\u01e0\u01e3\3\2\2\2\u01e1\u01df\3\2\2\2\u01e1\u01e2\3\2\2\2\u01e2"+
-		"A\3\2\2\2\u01e3\u01e1\3\2\2\2\u01e4\u01e9\5\u00aaV\2\u01e5\u01e6\7#\2"+
-		"\2\u01e6\u01e8\5\u00aaV\2\u01e7\u01e5\3\2\2\2\u01e8\u01eb\3\2\2\2\u01e9"+
-		"\u01e7\3\2\2\2\u01e9\u01ea\3\2\2\2\u01eaC\3\2\2\2\u01eb\u01e9\3\2\2\2"+
-		"\u01ec\u01ed\7$\2\2\u01ed\u01ee\7\26\2\2\u01ee\u01ef\5p9\2\u01ef\u01f0"+
-		"\7%\2\2\u01f0\u01f1\5@!\2\u01f1\u01f2\7\27\2\2\u01f2E\3\2\2\2\u01f3\u01f4"+
-		"\7\35\2\2\u01f4\u01fa\5:\36\2\u01f5\u01f9\7b\2\2\u01f6\u01f9\7`\2\2\u01f7"+
-		"\u01f9\5J&\2\u01f8\u01f5\3\2\2\2\u01f8\u01f6\3\2\2\2\u01f8\u01f7\3\2\2"+
-		"\2\u01f9\u01fc\3\2\2\2\u01fa\u01f8\3\2\2\2\u01fa\u01fb\3\2\2\2\u01fb\u01ff"+
-		"\3\2\2\2\u01fc\u01fa\3\2\2\2\u01fd\u01fe\7\36\2\2\u01fe\u0200\5:\36\2"+
-		"\u01ff\u01fd\3\2\2\2\u01ff\u0200\3\2\2\2\u0200G\3\2\2\2\u0201\u0202\t"+
-		"\5\2\2\u0202I\3\2\2\2\u0203\u0204\t\6\2\2\u0204K\3\2\2\2\u0205\u0209\7"+
-		"\17\2\2\u0206\u0208\5N(\2\u0207\u0206\3\2\2\2\u0208\u020b\3\2\2\2\u0209"+
+		"\u01da\f\4\2\2\u01da\u01dc\7\36\2\2\u01db\u01dd\5r:\2\u01dc\u01db\3\2"+
+		"\2\2\u01dc\u01dd\3\2\2\2\u01dd\u01de\3\2\2\2\u01de\u01e0\7\37\2\2\u01df"+
+		"\u01d9\3\2\2\2\u01e0\u01e3\3\2\2\2\u01e1\u01df\3\2\2\2\u01e1\u01e2\3\2"+
+		"\2\2\u01e2A\3\2\2\2\u01e3\u01e1\3\2\2\2\u01e4\u01e9\5\u00aaV\2\u01e5\u01e6"+
+		"\7 \2\2\u01e6\u01e8\5\u00aaV\2\u01e7\u01e5\3\2\2\2\u01e8\u01eb\3\2\2\2"+
+		"\u01e9\u01e7\3\2\2\2\u01e9\u01ea\3\2\2\2\u01eaC\3\2\2\2\u01eb\u01e9\3"+
+		"\2\2\2\u01ec\u01ed\7!\2\2\u01ed\u01ee\7\23\2\2\u01ee\u01ef\5p9\2\u01ef"+
+		"\u01f0\7\"\2\2\u01f0\u01f1\5@!\2\u01f1\u01f2\7\24\2\2\u01f2E\3\2\2\2\u01f3"+
+		"\u01f4\7\32\2\2\u01f4\u01fa\5:\36\2\u01f5\u01f9\7b\2\2\u01f6\u01f9\7_"+
+		"\2\2\u01f7\u01f9\5J&\2\u01f8\u01f5\3\2\2\2\u01f8\u01f6\3\2\2\2\u01f8\u01f7"+
+		"\3\2\2\2\u01f9\u01fc\3\2\2\2\u01fa\u01f8\3\2\2\2\u01fa\u01fb\3\2\2\2\u01fb"+
+		"\u01ff\3\2\2\2\u01fc\u01fa\3\2\2\2\u01fd\u01fe\7\33\2\2\u01fe\u0200\5"+
+		":\36\2\u01ff\u01fd\3\2\2\2\u01ff\u0200\3\2\2\2\u0200G\3\2\2\2\u0201\u0202"+
+		"\t\5\2\2\u0202I\3\2\2\2\u0203\u0204\t\6\2\2\u0204K\3\2\2\2\u0205\u0209"+
+		"\7\17\2\2\u0206\u0208\5N(\2\u0207\u0206\3\2\2\2\u0208\u020b\3\2\2\2\u0209"+
 		"\u0207\3\2\2\2\u0209\u020a\3\2\2\2\u020a\u020c\3\2\2\2\u020b\u0209\3\2"+
 		"\2\2\u020c\u020d\7\21\2\2\u020dM\3\2\2\2\u020e\u021c\5T+\2\u020f\u021c"+
 		"\5V,\2\u0210\u021c\5Z.\2\u0211\u021c\5L\'\2\u0212\u021c\5\\/\2\u0213\u021c"+
@@ -7704,73 +7734,73 @@ public class SolidityParser extends Parser {
 		"\3\2\2\2\u021b\u0212\3\2\2\2\u021b\u0213\3\2\2\2\u021b\u0214\3\2\2\2\u021b"+
 		"\u0215\3\2\2\2\u021b\u0216\3\2\2\2\u021b\u0217\3\2\2\2\u021b\u0218\3\2"+
 		"\2\2\u021b\u0219\3\2\2\2\u021b\u021a\3\2\2\2\u021cO\3\2\2\2\u021d\u021e"+
-		"\7)\2\2\u021eQ\3\2\2\2\u021f\u0220\5r:\2\u0220\u0221\7\4\2\2\u0221S\3"+
-		"\2\2\2\u0222\u0223\7*\2\2\u0223\u0224\7\26\2\2\u0224\u0225\5r:\2\u0225"+
-		"\u0226\7\27\2\2\u0226\u0229\5N(\2\u0227\u0228\7+\2\2\u0228\u022a\5N(\2"+
+		"\7&\2\2\u021eQ\3\2\2\2\u021f\u0220\5r:\2\u0220\u0221\7\4\2\2\u0221S\3"+
+		"\2\2\2\u0222\u0223\7\'\2\2\u0223\u0224\7\23\2\2\u0224\u0225\5r:\2\u0225"+
+		"\u0226\7\24\2\2\u0226\u0229\5N(\2\u0227\u0228\7(\2\2\u0228\u022a\5N(\2"+
 		"\u0229\u0227\3\2\2\2\u0229\u022a\3\2\2\2\u022aU\3\2\2\2\u022b\u022c\7"+
-		",\2\2\u022c\u022d\7\26\2\2\u022d\u022e\5r:\2\u022e\u022f\7\27\2\2\u022f"+
+		")\2\2\u022c\u022d\7\23\2\2\u022d\u022e\5r:\2\u022e\u022f\7\24\2\2\u022f"+
 		"\u0230\5N(\2\u0230W\3\2\2\2\u0231\u0234\5j\66\2\u0232\u0234\5R*\2\u0233"+
-		"\u0231\3\2\2\2\u0233\u0232\3\2\2\2\u0234Y\3\2\2\2\u0235\u0236\7\31\2\2"+
-		"\u0236\u0239\7\26\2\2\u0237\u023a\5X-\2\u0238\u023a\7\4\2\2\u0239\u0237"+
+		"\u0231\3\2\2\2\u0233\u0232\3\2\2\2\u0234Y\3\2\2\2\u0235\u0236\7\26\2\2"+
+		"\u0236\u0239\7\23\2\2\u0237\u023a\5X-\2\u0238\u023a\7\4\2\2\u0239\u0237"+
 		"\3\2\2\2\u0239\u0238\3\2\2\2\u023a\u023c\3\2\2\2\u023b\u023d\5r:\2\u023c"+
 		"\u023b\3\2\2\2\u023c\u023d\3\2\2\2\u023d\u023e\3\2\2\2\u023e\u0240\7\4"+
 		"\2\2\u023f\u0241\5r:\2\u0240\u023f\3\2\2\2\u0240\u0241\3\2\2\2\u0241\u0242"+
-		"\3\2\2\2\u0242\u0243\7\27\2\2\u0243\u0244\5N(\2\u0244[\3\2\2\2\u0245\u0247"+
-		"\7-\2\2\u0246\u0248\7i\2\2\u0247\u0246\3\2\2\2\u0247\u0248\3\2\2\2\u0248"+
-		"\u0249\3\2\2\2\u0249\u024a\5\u0080A\2\u024a]\3\2\2\2\u024b\u024c\7.\2"+
-		"\2\u024c\u024d\5N(\2\u024d\u024e\7,\2\2\u024e\u024f\7\26\2\2\u024f\u0250"+
-		"\5r:\2\u0250\u0251\7\27\2\2\u0251\u0252\7\4\2\2\u0252_\3\2\2\2\u0253\u0254"+
-		"\7_\2\2\u0254\u0255\7\4\2\2\u0255a\3\2\2\2\u0256\u0257\7]\2\2\u0257\u0258"+
-		"\7\4\2\2\u0258c\3\2\2\2\u0259\u025b\7/\2\2\u025a\u025c\5r:\2\u025b\u025a"+
+		"\3\2\2\2\u0242\u0243\7\24\2\2\u0243\u0244\5N(\2\u0244[\3\2\2\2\u0245\u0247"+
+		"\7*\2\2\u0246\u0248\7j\2\2\u0247\u0246\3\2\2\2\u0247\u0248\3\2\2\2\u0248"+
+		"\u0249\3\2\2\2\u0249\u024a\5\u0080A\2\u024a]\3\2\2\2\u024b\u024c\7+\2"+
+		"\2\u024c\u024d\5N(\2\u024d\u024e\7)\2\2\u024e\u024f\7\23\2\2\u024f\u0250"+
+		"\5r:\2\u0250\u0251\7\24\2\2\u0251\u0252\7\4\2\2\u0252_\3\2\2\2\u0253\u0254"+
+		"\7]\2\2\u0254\u0255\7\4\2\2\u0255a\3\2\2\2\u0256\u0257\7[\2\2\u0257\u0258"+
+		"\7\4\2\2\u0258c\3\2\2\2\u0259\u025b\7,\2\2\u025a\u025c\5r:\2\u025b\u025a"+
 		"\3\2\2\2\u025b\u025c\3\2\2\2\u025c\u025d\3\2\2\2\u025d\u025e\7\4\2\2\u025e"+
-		"e\3\2\2\2\u025f\u0260\7\60\2\2\u0260\u0261\7\4\2\2\u0261g\3\2\2\2\u0262"+
-		"\u0263\7\61\2\2\u0263\u0264\5~@\2\u0264\u0265\7\4\2\2\u0265i\3\2\2\2\u0266"+
-		"\u0267\7\62\2\2\u0267\u026e\5n8\2\u0268\u026e\5> \2\u0269\u026a\7\26\2"+
-		"\2\u026a\u026b\5l\67\2\u026b\u026c\7\27\2\2\u026c\u026e\3\2\2\2\u026d"+
-		"\u0266\3\2\2\2\u026d\u0268\3\2\2\2\u026d\u0269\3\2\2\2\u026e\u0271\3\2"+
-		"\2\2\u026f\u0270\7\13\2\2\u0270\u0272\5r:\2\u0271\u026f\3\2\2\2\u0271"+
-		"\u0272\3\2\2\2\u0272\u0273\3\2\2\2\u0273\u0274\7\4\2\2\u0274k\3\2\2\2"+
-		"\u0275\u0277\5> \2\u0276\u0275\3\2\2\2\u0276\u0277\3\2\2\2\u0277\u027e"+
-		"\3\2\2\2\u0278\u027a\7\20\2\2\u0279\u027b\5> \2\u027a\u0279\3\2\2\2\u027a"+
-		"\u027b\3\2\2\2\u027b\u027d\3\2\2\2\u027c\u0278\3\2\2\2\u027d\u0280\3\2"+
-		"\2\2\u027e\u027c\3\2\2\2\u027e\u027f\3\2\2\2\u027fm\3\2\2\2\u0280\u027e"+
-		"\3\2\2\2\u0281\u0288\7\26\2\2\u0282\u0284\5\u00aaV\2\u0283\u0282\3\2\2"+
-		"\2\u0283\u0284\3\2\2\2\u0284\u0285\3\2\2\2\u0285\u0287\7\20\2\2\u0286"+
-		"\u0283\3\2\2\2\u0287\u028a\3\2\2\2\u0288\u0286\3\2\2\2\u0288\u0289\3\2"+
-		"\2\2\u0289\u028c\3\2\2\2\u028a\u0288\3\2\2\2\u028b\u028d\5\u00aaV\2\u028c"+
-		"\u028b\3\2\2\2\u028c\u028d\3\2\2\2\u028d\u028e\3\2\2\2\u028e\u028f\7\27"+
-		"\2\2\u028fo\3\2\2\2\u0290\u0291\t\7\2\2\u0291q\3\2\2\2\u0292\u0293\b:"+
-		"\1\2\u0293\u0294\7\67\2\2\u0294\u02a5\5@!\2\u0295\u0296\7\26\2\2\u0296"+
-		"\u0297\5r:\2\u0297\u0298\7\27\2\2\u0298\u02a5\3\2\2\2\u0299\u029a\t\b"+
-		"\2\2\u029a\u02a5\5r:\25\u029b\u029c\t\t\2\2\u029c\u02a5\5r:\24\u029d\u029e"+
-		"\t\n\2\2\u029e\u02a5\5r:\23\u029f\u02a0\7w\2\2\u02a0\u02a5\5r:\22\u02a1"+
-		"\u02a2\7\6\2\2\u02a2\u02a5\5r:\21\u02a3\u02a5\5t;\2\u02a4\u0292\3\2\2"+
-		"\2\u02a4\u0295\3\2\2\2\u02a4\u0299\3\2\2\2\u02a4\u029b\3\2\2\2\u02a4\u029d"+
-		"\3\2\2\2\u02a4\u029f\3\2\2\2\u02a4\u02a1\3\2\2\2\u02a4\u02a3\3\2\2\2\u02a5"+
-		"\u02e1\3\2\2\2\u02a6\u02a7\f\20\2\2\u02a7\u02a8\7:\2\2\u02a8\u02e0\5r"+
+		"e\3\2\2\2\u025f\u0260\7-\2\2\u0260\u0261\7\4\2\2\u0261g\3\2\2\2\u0262"+
+		"\u0263\7.\2\2\u0263\u0264\5~@\2\u0264\u0265\7\4\2\2\u0265i\3\2\2\2\u0266"+
+		"\u0267\7/\2\2\u0267\u026e\5n8\2\u0268\u026e\5> \2\u0269\u026a\7\23\2\2"+
+		"\u026a\u026b\5l\67\2\u026b\u026c\7\24\2\2\u026c\u026e\3\2\2\2\u026d\u0266"+
+		"\3\2\2\2\u026d\u0268\3\2\2\2\u026d\u0269\3\2\2\2\u026e\u0271\3\2\2\2\u026f"+
+		"\u0270\7\13\2\2\u0270\u0272\5r:\2\u0271\u026f\3\2\2\2\u0271\u0272\3\2"+
+		"\2\2\u0272\u0273\3\2\2\2\u0273\u0274\7\4\2\2\u0274k\3\2\2\2\u0275\u0277"+
+		"\5> \2\u0276\u0275\3\2\2\2\u0276\u0277\3\2\2\2\u0277\u027e\3\2\2\2\u0278"+
+		"\u027a\7\20\2\2\u0279\u027b\5> \2\u027a\u0279\3\2\2\2\u027a\u027b\3\2"+
+		"\2\2\u027b\u027d\3\2\2\2\u027c\u0278\3\2\2\2\u027d\u0280\3\2\2\2\u027e"+
+		"\u027c\3\2\2\2\u027e\u027f\3\2\2\2\u027fm\3\2\2\2\u0280\u027e\3\2\2\2"+
+		"\u0281\u0288\7\23\2\2\u0282\u0284\5\u00aaV\2\u0283\u0282\3\2\2\2\u0283"+
+		"\u0284\3\2\2\2\u0284\u0285\3\2\2\2\u0285\u0287\7\20\2\2\u0286\u0283\3"+
+		"\2\2\2\u0287\u028a\3\2\2\2\u0288\u0286\3\2\2\2\u0288\u0289\3\2\2\2\u0289"+
+		"\u028c\3\2\2\2\u028a\u0288\3\2\2\2\u028b\u028d\5\u00aaV\2\u028c\u028b"+
+		"\3\2\2\2\u028c\u028d\3\2\2\2\u028d\u028e\3\2\2\2\u028e\u028f\7\24\2\2"+
+		"\u028fo\3\2\2\2\u0290\u0291\t\7\2\2\u0291q\3\2\2\2\u0292\u0293\b:\1\2"+
+		"\u0293\u0294\7\65\2\2\u0294\u02a5\5@!\2\u0295\u0296\7\23\2\2\u0296\u0297"+
+		"\5r:\2\u0297\u0298\7\24\2\2\u0298\u02a5\3\2\2\2\u0299\u029a\t\b\2\2\u029a"+
+		"\u02a5\5r:\25\u029b\u029c\t\t\2\2\u029c\u02a5\5r:\24\u029d\u029e\t\n\2"+
+		"\2\u029e\u02a5\5r:\23\u029f\u02a0\7x\2\2\u02a0\u02a5\5r:\22\u02a1\u02a2"+
+		"\7\6\2\2\u02a2\u02a5\5r:\21\u02a3\u02a5\5t;\2\u02a4\u0292\3\2\2\2\u02a4"+
+		"\u0295\3\2\2\2\u02a4\u0299\3\2\2\2\u02a4\u029b\3\2\2\2\u02a4\u029d\3\2"+
+		"\2\2\u02a4\u029f\3\2\2\2\u02a4\u02a1\3\2\2\2\u02a4\u02a3\3\2\2\2\u02a5"+
+		"\u02e1\3\2\2\2\u02a6\u02a7\f\20\2\2\u02a7\u02a8\78\2\2\u02a8\u02e0\5r"+
 		":\21\u02a9\u02aa\f\17\2\2\u02aa\u02ab\t\13\2\2\u02ab\u02e0\5r:\20\u02ac"+
 		"\u02ad\f\16\2\2\u02ad\u02ae\t\t\2\2\u02ae\u02e0\5r:\17\u02af\u02b0\f\r"+
 		"\2\2\u02b0\u02b1\t\f\2\2\u02b1\u02e0\5r:\16\u02b2\u02b3\f\f\2\2\u02b3"+
-		"\u02b4\7u\2\2\u02b4\u02e0\5r:\r\u02b5\u02b6\f\13\2\2\u02b6\u02b7\7\5\2"+
-		"\2\u02b7\u02e0\5r:\f\u02b8\u02b9\f\n\2\2\u02b9\u02ba\7v\2\2\u02ba\u02e0"+
+		"\u02b4\7v\2\2\u02b4\u02e0\5r:\r\u02b5\u02b6\f\13\2\2\u02b6\u02b7\7\5\2"+
+		"\2\u02b7\u02e0\5r:\f\u02b8\u02b9\f\n\2\2\u02b9\u02ba\7w\2\2\u02ba\u02e0"+
 		"\5r:\13\u02bb\u02bc\f\t\2\2\u02bc\u02bd\t\r\2\2\u02bd\u02e0\5r:\n\u02be"+
 		"\u02bf\f\b\2\2\u02bf\u02c0\t\16\2\2\u02c0\u02e0\5r:\t\u02c1\u02c2\f\7"+
-		"\2\2\u02c2\u02c3\7q\2\2\u02c3\u02e0\5r:\b\u02c4\u02c5\f\6\2\2\u02c5\u02c6"+
-		"\7r\2\2\u02c6\u02e0\5r:\7\u02c7\u02c8\f\5\2\2\u02c8\u02c9\7=\2\2\u02c9"+
-		"\u02ca\5r:\2\u02ca\u02cb\7>\2\2\u02cb\u02cc\5r:\6\u02cc\u02e0\3\2\2\2"+
+		"\2\2\u02c2\u02c3\7r\2\2\u02c3\u02e0\5r:\b\u02c4\u02c5\f\6\2\2\u02c5\u02c6"+
+		"\7s\2\2\u02c6\u02e0\5r:\7\u02c7\u02c8\f\5\2\2\u02c8\u02c9\7;\2\2\u02c9"+
+		"\u02ca\5r:\2\u02ca\u02cb\7<\2\2\u02cb\u02cc\5r:\6\u02cc\u02e0\3\2\2\2"+
 		"\u02cd\u02ce\f\4\2\2\u02ce\u02cf\t\17\2\2\u02cf\u02e0\5r:\5\u02d0\u02d1"+
-		"\f\33\2\2\u02d1\u02e0\t\b\2\2\u02d2\u02d3\f\31\2\2\u02d3\u02d4\7!\2\2"+
-		"\u02d4\u02d5\5r:\2\u02d5\u02d6\7\"\2\2\u02d6\u02e0\3\2\2\2\u02d7\u02d8"+
-		"\f\30\2\2\u02d8\u02d9\7\26\2\2\u02d9\u02da\5|?\2\u02da\u02db\7\27\2\2"+
-		"\u02db\u02e0\3\2\2\2\u02dc\u02dd\f\27\2\2\u02dd\u02de\7#\2\2\u02de\u02e0"+
+		"\f\33\2\2\u02d1\u02e0\t\b\2\2\u02d2\u02d3\f\31\2\2\u02d3\u02d4\7\36\2"+
+		"\2\u02d4\u02d5\5r:\2\u02d5\u02d6\7\37\2\2\u02d6\u02e0\3\2\2\2\u02d7\u02d8"+
+		"\f\30\2\2\u02d8\u02d9\7\23\2\2\u02d9\u02da\5|?\2\u02da\u02db\7\24\2\2"+
+		"\u02db\u02e0\3\2\2\2\u02dc\u02dd\f\27\2\2\u02dd\u02de\7 \2\2\u02de\u02e0"+
 		"\5\u00aaV\2\u02df\u02a6\3\2\2\2\u02df\u02a9\3\2\2\2\u02df\u02ac\3\2\2"+
 		"\2\u02df\u02af\3\2\2\2\u02df\u02b2\3\2\2\2\u02df\u02b5\3\2\2\2\u02df\u02b8"+
 		"\3\2\2\2\u02df\u02bb\3\2\2\2\u02df\u02be\3\2\2\2\u02df\u02c1\3\2\2\2\u02df"+
 		"\u02c4\3\2\2\2\u02df\u02c7\3\2\2\2\u02df\u02cd\3\2\2\2\u02df\u02d0\3\2"+
 		"\2\2\u02df\u02d2\3\2\2\2\u02df\u02d7\3\2\2\2\u02df\u02dc\3\2\2\2\u02e0"+
 		"\u02e3\3\2\2\2\u02e1\u02df\3\2\2\2\u02e1\u02e2\3\2\2\2\u02e2s\3\2\2\2"+
-		"\u02e3\u02e1\3\2\2\2\u02e4\u02ec\7V\2\2\u02e5\u02ec\5\u00a8U\2\u02e6\u02ec"+
-		"\7Z\2\2\u02e7\u02ec\7i\2\2\u02e8\u02ec\5\u00aaV\2\u02e9\u02ec\5\u00a4"+
+		"\u02e3\u02e1\3\2\2\2\u02e4\u02ec\7T\2\2\u02e5\u02ec\5\u00a8U\2\u02e6\u02ec"+
+		"\7X\2\2\u02e7\u02ec\7j\2\2\u02e8\u02ec\5\u00aaV\2\u02e9\u02ec\5\u00a4"+
 		"S\2\u02ea\u02ec\5\u00a6T\2\u02eb\u02e4\3\2\2\2\u02eb\u02e5\3\2\2\2\u02eb"+
 		"\u02e6\3\2\2\2\u02eb\u02e7\3\2\2\2\u02eb\u02e8\3\2\2\2\u02eb\u02e9\3\2"+
 		"\2\2\u02eb\u02ea\3\2\2\2\u02ecu\3\2\2\2\u02ed\u02f2\5r:\2\u02ee\u02ef"+
@@ -7780,82 +7810,82 @@ public class SolidityParser extends Parser {
 		"\3\2\2\2\u02f9\u02fc\3\2\2\2\u02fa\u02f8\3\2\2\2\u02fa\u02fb\3\2\2\2\u02fb"+
 		"\u02fe\3\2\2\2\u02fc\u02fa\3\2\2\2\u02fd\u02ff\7\20\2\2\u02fe\u02fd\3"+
 		"\2\2\2\u02fe\u02ff\3\2\2\2\u02ffy\3\2\2\2\u0300\u0301\5\u00aaV\2\u0301"+
-		"\u0302\7>\2\2\u0302\u0303\5r:\2\u0303{\3\2\2\2\u0304\u0306\7\17\2\2\u0305"+
+		"\u0302\7<\2\2\u0302\u0303\5r:\2\u0303{\3\2\2\2\u0304\u0306\7\17\2\2\u0305"+
 		"\u0307\5x=\2\u0306\u0305\3\2\2\2\u0306\u0307\3\2\2\2\u0307\u0308\3\2\2"+
 		"\2\u0308\u030d\7\21\2\2\u0309\u030b\5v<\2\u030a\u0309\3\2\2\2\u030a\u030b"+
 		"\3\2\2\2\u030b\u030d\3\2\2\2\u030c\u0304\3\2\2\2\u030c\u030a\3\2\2\2\u030d"+
-		"}\3\2\2\2\u030e\u030f\5r:\2\u030f\u0310\7\26\2\2\u0310\u0311\5|?\2\u0311"+
-		"\u0312\7\27\2\2\u0312\177\3\2\2\2\u0313\u0317\7\17\2\2\u0314\u0316\5\u0082"+
+		"}\3\2\2\2\u030e\u030f\5r:\2\u030f\u0310\7\23\2\2\u0310\u0311\5|?\2\u0311"+
+		"\u0312\7\24\2\2\u0312\177\3\2\2\2\u0313\u0317\7\17\2\2\u0314\u0316\5\u0082"+
 		"B\2\u0315\u0314\3\2\2\2\u0316\u0319\3\2\2\2\u0317\u0315\3\2\2\2\u0317"+
 		"\u0318\3\2\2\2\u0318\u031a\3\2\2\2\u0319\u0317\3\2\2\2\u031a\u031b\7\21"+
 		"\2\2\u031b\u0081\3\2\2\2\u031c\u032e\5\u00aaV\2\u031d\u032e\5\u0080A\2"+
 		"\u031e\u032e\5\u0084C\2\u031f\u032e\5\u0088E\2\u0320\u032e\5\u008aF\2"+
 		"\u0321\u032e\5\u0090I\2\u0322\u032e\5\u0092J\2\u0323\u032e\5\u0094K\2"+
 		"\u0324\u032e\5\u0098M\2\u0325\u032e\5\u009cO\2\u0326\u032e\5\u009eP\2"+
-		"\u0327\u032e\7]\2\2\u0328\u032e\7_\2\2\u0329\u032e\5\u00a2R\2\u032a\u032e"+
-		"\5\u00a8U\2\u032b\u032e\7i\2\2\u032c\u032e\7Z\2\2\u032d\u031c\3\2\2\2"+
+		"\u0327\u032e\7[\2\2\u0328\u032e\7]\2\2\u0329\u032e\5\u00a2R\2\u032a\u032e"+
+		"\5\u00a8U\2\u032b\u032e\7j\2\2\u032c\u032e\7X\2\2\u032d\u031c\3\2\2\2"+
 		"\u032d\u031d\3\2\2\2\u032d\u031e\3\2\2\2\u032d\u031f\3\2\2\2\u032d\u0320"+
 		"\3\2\2\2\u032d\u0321\3\2\2\2\u032d\u0322\3\2\2\2\u032d\u0323\3\2\2\2\u032d"+
 		"\u0324\3\2\2\2\u032d\u0325\3\2\2\2\u032d\u0326\3\2\2\2\u032d\u0327\3\2"+
 		"\2\2\u032d\u0328\3\2\2\2\u032d\u0329\3\2\2\2\u032d\u032a\3\2\2\2\u032d"+
 		"\u032b\3\2\2\2\u032d\u032c\3\2\2\2\u032e\u0083\3\2\2\2\u032f\u0332\5\u0086"+
 		"D\2\u0330\u0332\5\u00a0Q\2\u0331\u032f\3\2\2\2\u0331\u0330\3\2\2\2\u0332"+
-		"\u0085\3\2\2\2\u0333\u0338\7/\2\2\u0334\u0338\7\63\2\2\u0335\u0338\7\66"+
+		"\u0085\3\2\2\2\u0333\u0338\7,\2\2\u0334\u0338\7\60\2\2\u0335\u0338\7\64"+
 		"\2\2\u0336\u0338\5\u00aaV\2\u0337\u0333\3\2\2\2\u0337\u0334\3\2\2\2\u0337"+
-		"\u0335\3\2\2\2\u0337\u0336\3\2\2\2\u0338\u0345\3\2\2\2\u0339\u033b\7\26"+
+		"\u0335\3\2\2\2\u0337\u0336\3\2\2\2\u0338\u0345\3\2\2\2\u0339\u033b\7\23"+
 		"\2\2\u033a\u033c\5\u0084C\2\u033b\u033a\3\2\2\2\u033b\u033c\3\2\2\2\u033c"+
 		"\u0341\3\2\2\2\u033d\u033e\7\20\2\2\u033e\u0340\5\u0084C\2\u033f\u033d"+
 		"\3\2\2\2\u0340\u0343\3\2\2\2\u0341\u033f\3\2\2\2\u0341\u0342\3\2\2\2\u0342"+
-		"\u0344\3\2\2\2\u0343\u0341\3\2\2\2\u0344\u0346\7\27\2\2\u0345\u0339\3"+
-		"\2\2\2\u0345\u0346\3\2\2\2\u0346\u0087\3\2\2\2\u0347\u0348\7I\2\2\u0348"+
-		"\u034b\5\u008cG\2\u0349\u034a\7J\2\2\u034a\u034c\5\u0084C\2\u034b\u0349"+
+		"\u0344\3\2\2\2\u0343\u0341\3\2\2\2\u0344\u0346\7\24\2\2\u0345\u0339\3"+
+		"\2\2\2\u0345\u0346\3\2\2\2\u0346\u0087\3\2\2\2\u0347\u0348\7G\2\2\u0348"+
+		"\u034b\5\u008cG\2\u0349\u034a\7H\2\2\u034a\u034c\5\u0084C\2\u034b\u0349"+
 		"\3\2\2\2\u034b\u034c\3\2\2\2\u034c\u0089\3\2\2\2\u034d\u034e\5\u008cG"+
-		"\2\u034e\u034f\7J\2\2\u034f\u0350\5\u0084C\2\u0350\u008b\3\2\2\2\u0351"+
-		"\u0357\5\u00aaV\2\u0352\u0353\7\26\2\2\u0353\u0354\5\u008eH\2\u0354\u0355"+
-		"\7\27\2\2\u0355\u0357\3\2\2\2\u0356\u0351\3\2\2\2\u0356\u0352\3\2\2\2"+
+		"\2\u034e\u034f\7H\2\2\u034f\u0350\5\u0084C\2\u0350\u008b\3\2\2\2\u0351"+
+		"\u0357\5\u00aaV\2\u0352\u0353\7\23\2\2\u0353\u0354\5\u008eH\2\u0354\u0355"+
+		"\7\24\2\2\u0355\u0357\3\2\2\2\u0356\u0351\3\2\2\2\u0356\u0352\3\2\2\2"+
 		"\u0357\u008d\3\2\2\2\u0358\u035d\5\u00aaV\2\u0359\u035a\7\20\2\2\u035a"+
 		"\u035c\5\u00aaV\2\u035b\u0359\3\2\2\2\u035c\u035f\3\2\2\2\u035d\u035b"+
 		"\3\2\2\2\u035d\u035e\3\2\2\2\u035e\u008f\3\2\2\2\u035f\u035d\3\2\2\2\u0360"+
-		"\u0361\7K\2\2\u0361\u0362\5\u00aaV\2\u0362\u0091\3\2\2\2\u0363\u0364\5"+
-		"\u00aaV\2\u0364\u0365\7>\2\2\u0365\u0093\3\2\2\2\u0366\u0367\7L\2\2\u0367"+
+		"\u0361\7I\2\2\u0361\u0362\5\u00aaV\2\u0362\u0091\3\2\2\2\u0363\u0364\5"+
+		"\u00aaV\2\u0364\u0365\7<\2\2\u0365\u0093\3\2\2\2\u0366\u0367\7J\2\2\u0367"+
 		"\u036b\5\u0084C\2\u0368\u036a\5\u0096L\2\u0369\u0368\3\2\2\2\u036a\u036d"+
 		"\3\2\2\2\u036b\u0369\3\2\2\2\u036b\u036c\3\2\2\2\u036c\u0095\3\2\2\2\u036d"+
-		"\u036b\3\2\2\2\u036e\u036f\7M\2\2\u036f\u0370\5\u00a0Q\2\u0370\u0371\5"+
-		"\u0080A\2\u0371\u0375\3\2\2\2\u0372\u0373\7N\2\2\u0373\u0375\5\u0080A"+
+		"\u036b\3\2\2\2\u036e\u036f\7K\2\2\u036f\u0370\5\u00a0Q\2\u0370\u0371\5"+
+		"\u0080A\2\u0371\u0375\3\2\2\2\u0372\u0373\7L\2\2\u0373\u0375\5\u0080A"+
 		"\2\u0374\u036e\3\2\2\2\u0374\u0372\3\2\2\2\u0375\u0097\3\2\2\2\u0376\u0377"+
-		"\7\35\2\2\u0377\u0378\5\u00aaV\2\u0378\u037a\7\26\2\2\u0379\u037b\5\u008e"+
+		"\7\32\2\2\u0377\u0378\5\u00aaV\2\u0378\u037a\7\23\2\2\u0379\u037b\5\u008e"+
 		"H\2\u037a\u0379\3\2\2\2\u037a\u037b\3\2\2\2\u037b\u037c\3\2\2\2\u037c"+
-		"\u037e\7\27\2\2\u037d\u037f\5\u009aN\2\u037e\u037d\3\2\2\2\u037e\u037f"+
+		"\u037e\7\24\2\2\u037d\u037f\5\u009aN\2\u037e\u037d\3\2\2\2\u037e\u037f"+
 		"\3\2\2\2\u037f\u0380\3\2\2\2\u0380\u0381\5\u0080A\2\u0381\u0099\3\2\2"+
-		"\2\u0382\u0383\7O\2\2\u0383\u0384\5\u008eH\2\u0384\u009b\3\2\2\2\u0385"+
-		"\u0388\7\31\2\2\u0386\u0389\5\u0080A\2\u0387\u0389\5\u0084C\2\u0388\u0386"+
+		"\2\u0382\u0383\7M\2\2\u0383\u0384\5\u008eH\2\u0384\u009b\3\2\2\2\u0385"+
+		"\u0388\7\26\2\2\u0386\u0389\5\u0080A\2\u0387\u0389\5\u0084C\2\u0388\u0386"+
 		"\3\2\2\2\u0388\u0387\3\2\2\2\u0389\u038a\3\2\2\2\u038a\u038d\5\u0084C"+
 		"\2\u038b\u038e\5\u0080A\2\u038c\u038e\5\u0084C\2\u038d\u038b\3\2\2\2\u038d"+
 		"\u038c\3\2\2\2\u038e\u038f\3\2\2\2\u038f\u0390\5\u0080A\2\u0390\u009d"+
-		"\3\2\2\2\u0391\u0392\7*\2\2\u0392\u0393\5\u0084C\2\u0393\u0394\5\u0080"+
+		"\3\2\2\2\u0391\u0392\7\'\2\2\u0392\u0393\5\u0084C\2\u0393\u0394\5\u0080"+
 		"A\2\u0394\u009f\3\2\2\2\u0395\u0396\t\20\2\2\u0396\u00a1\3\2\2\2\u0397"+
-		"\u0398\7-\2\2\u0398\u0399\5\u00aaV\2\u0399\u039a\5\u0080A\2\u039a\u00a3"+
-		"\3\2\2\2\u039b\u039d\7\26\2\2\u039c\u039e\5r:\2\u039d\u039c\3\2\2\2\u039d"+
+		"\u0398\7*\2\2\u0398\u0399\5\u00aaV\2\u0399\u039a\5\u0080A\2\u039a\u00a3"+
+		"\3\2\2\2\u039b\u039d\7\23\2\2\u039c\u039e\5r:\2\u039d\u039c\3\2\2\2\u039d"+
 		"\u039e\3\2\2\2\u039e\u03a5\3\2\2\2\u039f\u03a1\7\20\2\2\u03a0\u03a2\5"+
 		"r:\2\u03a1\u03a0\3\2\2\2\u03a1\u03a2\3\2\2\2\u03a2\u03a4\3\2\2\2\u03a3"+
 		"\u039f\3\2\2\2\u03a4\u03a7\3\2\2\2\u03a5\u03a3\3\2\2\2\u03a5\u03a6\3\2"+
-		"\2\2\u03a6\u03a8\3\2\2\2\u03a7\u03a5\3\2\2\2\u03a8\u03b6\7\27\2\2\u03a9"+
-		"\u03b2\7!\2\2\u03aa\u03af\5r:\2\u03ab\u03ac\7\20\2\2\u03ac\u03ae\5r:\2"+
-		"\u03ad\u03ab\3\2\2\2\u03ae\u03b1\3\2\2\2\u03af\u03ad\3\2\2\2\u03af\u03b0"+
-		"\3\2\2\2\u03b0\u03b3\3\2\2\2\u03b1\u03af\3\2\2\2\u03b2\u03aa\3\2\2\2\u03b2"+
-		"\u03b3\3\2\2\2\u03b3\u03b4\3\2\2\2\u03b4\u03b6\7\"\2\2\u03b5\u039b\3\2"+
-		"\2\2\u03b5\u03a9\3\2\2\2\u03b6\u00a5\3\2\2\2\u03b7\u03b8\5p9\2\u03b8\u00a7"+
-		"\3\2\2\2\u03b9\u03bb\t\21\2\2\u03ba\u03bc\7Y\2\2\u03bb\u03ba\3\2\2\2\u03bb"+
-		"\u03bc\3\2\2\2\u03bc\u00a9\3\2\2\2\u03bd\u03be\t\22\2\2\u03be\u00ab\3"+
-		"\2\2\2h\u00af\u00b1\u00bf\u00c3\u00c8\u00cf\u00d5\u00db\u00df\u00eb\u00f3"+
-		"\u00fd\u0100\u0106\u0112\u0117\u0121\u0127\u012d\u0136\u0144\u0147\u0153"+
-		"\u015a\u015d\u0161\u0166\u016a\u0175\u0177\u017e\u0188\u018e\u0199\u019c"+
-		"\u01a2\u01a5\u01ad\u01b0\u01b6\u01b9\u01c1\u01c4\u01ca\u01ce\u01d7\u01dc"+
-		"\u01e1\u01e9\u01f8\u01fa\u01ff\u0209\u021b\u0229\u0233\u0239\u023c\u0240"+
-		"\u0247\u025b\u026d\u0271\u0276\u027a\u027e\u0283\u0288\u028c\u02a4\u02df"+
-		"\u02e1\u02eb\u02f2\u02fa\u02fe\u0306\u030a\u030c\u0317\u032d\u0331\u0337"+
-		"\u033b\u0341\u0345\u034b\u0356\u035d\u036b\u0374\u037a\u037e\u0388\u038d"+
-		"\u039d\u03a1\u03a5\u03af\u03b2\u03b5\u03bb";
+		"\2\2\u03a6\u03a8\3\2\2\2\u03a7\u03a5\3\2\2\2\u03a8\u03b6\7\24\2\2\u03a9"+
+		"\u03b2\7\36\2\2\u03aa\u03af\5r:\2\u03ab\u03ac\7\20\2\2\u03ac\u03ae\5r"+
+		":\2\u03ad\u03ab\3\2\2\2\u03ae\u03b1\3\2\2\2\u03af\u03ad\3\2\2\2\u03af"+
+		"\u03b0\3\2\2\2\u03b0\u03b3\3\2\2\2\u03b1\u03af\3\2\2\2\u03b2\u03aa\3\2"+
+		"\2\2\u03b2\u03b3\3\2\2\2\u03b3\u03b4\3\2\2\2\u03b4\u03b6\7\37\2\2\u03b5"+
+		"\u039b\3\2\2\2\u03b5\u03a9\3\2\2\2\u03b6\u00a5\3\2\2\2\u03b7\u03b8\5p"+
+		"9\2\u03b8\u00a7\3\2\2\2\u03b9\u03bb\t\21\2\2\u03ba\u03bc\7W\2\2\u03bb"+
+		"\u03ba\3\2\2\2\u03bb\u03bc\3\2\2\2\u03bc\u00a9\3\2\2\2\u03bd\u03be\t\22"+
+		"\2\2\u03be\u00ab\3\2\2\2h\u00af\u00b1\u00bf\u00c3\u00c8\u00cf\u00d5\u00db"+
+		"\u00df\u00eb\u00f3\u00fd\u0100\u0106\u0112\u0117\u0121\u0127\u012d\u0136"+
+		"\u0144\u0147\u0153\u015a\u015d\u0161\u0166\u016a\u0175\u0177\u017e\u0188"+
+		"\u018e\u0199\u019c\u01a2\u01a5\u01ad\u01b0\u01b6\u01b9\u01c1\u01c4\u01ca"+
+		"\u01ce\u01d7\u01dc\u01e1\u01e9\u01f8\u01fa\u01ff\u0209\u021b\u0229\u0233"+
+		"\u0239\u023c\u0240\u0247\u025b\u026d\u0271\u0276\u027a\u027e\u0283\u0288"+
+		"\u028c\u02a4\u02df\u02e1\u02eb\u02f2\u02fa\u02fe\u0306\u030a\u030c\u0317"+
+		"\u032d\u0331\u0337\u033b\u0341\u0345\u034b\u0356\u035d\u036b\u0374\u037a"+
+		"\u037e\u0388\u038d\u039d\u03a1\u03a5\u03af\u03b2\u03b5\u03bb";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

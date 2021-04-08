@@ -1,4 +1,4 @@
-// Generated from key.core/src/main/antlr/de/uka/ilkd/key/parser/Solidity.g4 by ANTLR 4.7.1
+// Generated from Solidity.g4 by ANTLR 4.9
 
 package de.uka.ilkd.key.parser.solidity;
 
