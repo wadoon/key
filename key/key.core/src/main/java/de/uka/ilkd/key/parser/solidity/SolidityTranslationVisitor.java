@@ -23,12 +23,14 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
         Map<String,String> variables = new HashMap<>();
         Map<String,String> enums = new HashMap<>();
 
+        List<String> constructorHeaders = new LinkedList<>();
         List<String> is = new LinkedList<>();
         int type;
         String name;
 
         public String toString() {
-            return functionHeaders + "\n" +
+            return constructorHeaders + "\n" +
+            functionHeaders + "\n" +
             variables + "\n" +
             enums + "\n" +
             is + "\n" +
@@ -156,7 +158,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
     private String makeBaseClass() {
         StringBuilder sb = new StringBuilder();
-        sb.append("abstract class " + currentContractInfo.name + "Base extends Address {\n");
+        sb.append("abstract class " + currentContractInfo.name + "Base extends Address implements " + currentContractInfo.name + " {\n");
 
         // add state variables and functions of all derived contracts
         currentContractInfo.is.forEach(c -> {
@@ -165,6 +167,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
                 ci.variables.forEach((var,str) -> sb.append(str + ";\n"));
                 ci.enums.forEach((e,str) -> sb.append(str + "\n"));
                 ci.functionHeaders.forEach((func,str) -> sb.append(str + " {}\n"));
+                ci.constructorHeaders.forEach(cHeader -> sb.append(cHeader + "{}\n"));
             }
         });
 
@@ -328,7 +331,8 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		StringBuffer body = new StringBuffer(visit(ctx.block()));
 		if (mods.length() > 0) body.insert(body.indexOf("{") + 1, "\n" + mods);
 
-		return modifier + " " + ((ContractDefinitionContext)ctx.getParent().getParent()).identifier().getText() + "(" + parameters + ")" + body;
+        currentContractInfo.constructorHeaders.add(modifier + " void " + currentContractInfo.name + "Impl(" + parameters + ")" );
+		return modifier + " " + currentContractInfo.name + "Impl(" + parameters + ")" + body;
 	}
 
 	/**
@@ -359,6 +363,11 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 */
 	@Override public String visitModifierInvocation(SolidityParser.ModifierInvocationContext ctx) { 
 		String modName = visit(ctx.identifier());
+        // hack: if "modifier" is really a parent constructor
+        if (currentContractInfo.is.contains(modName)) {
+            modName += "Impl";
+        }
+
 		StringBuffer arguments = new StringBuffer("msg");
 
 		if (ctx.expressionList() != null && !ctx.expressionList().isEmpty()) {			
