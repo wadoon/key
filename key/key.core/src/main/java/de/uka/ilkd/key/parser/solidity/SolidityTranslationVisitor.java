@@ -23,7 +23,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
         Map<String,String> variables = new HashMap<>();
         Map<String,String> enums = new HashMap<>();
 
-        List<String> inherits = new LinkedList<>();
+        List<String> is = new LinkedList<>();
         int type;
         String name;
 
@@ -31,7 +31,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
             return functionHeaders + "\n" +
             variables + "\n" +
             enums + "\n" +
-            inherits + "\n" +
+            is + "\n" +
             name + "\n" + 
             type + "\n";
         }
@@ -131,7 +131,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 //		if (ctx.inheritanceSpecifier().size() == 1) {
 			for (InheritanceSpecifierContext ictx : ctx.inheritanceSpecifier()) {
-                currentContractInfo.inherits.add(ictx.getText());
+                currentContractInfo.is.add(ictx.getText());
 				inheritanceList.append(ictx.getText());		
 				inheritanceList.append(",");
 			}
@@ -142,48 +142,64 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			error("Multi-inheritance not supported.");
 		}*/
 
-		StringBuffer contract = 
-	ctx.inheritanceSpecifier().size() > 0 ?			new StringBuffer(
-						"class " + ctx.identifier().getText() + "Impl extends " + ctx.identifier().getText() + "Base {\n") : new StringBuffer( //Address implements " + inheritanceList + " {\n" ): new StringBuffer(
-						"class " + ctx.identifier().getText() + "Impl extends " + ctx.identifier().getText() + "Base {\n" //Address {\n" 
-						);
+        StringBuffer contract = new StringBuffer("class " + ctx.identifier().getText() + "Impl extends " + ctx.identifier().getText() + "Base {\n"); 
 
 		ctx.contractPart().stream().forEach(part -> contract.append(visit(part) + "\n"));
         System.out.println(currentContractInfo);
 
+        output += makeInterface();
         output += makeBaseClass();
 		output += contract.append("}\n").toString();
-//        output += makeInterface();
-//System.out.println(makeBaseClass());
-System.out.println(makeInterface());
+
 		return getOutput();
 	}
 
     private String makeBaseClass() {
         StringBuilder sb = new StringBuilder();
-        sb.append("abstract class " + currentContractInfo.name + "Base extends Address ");
-        if (currentContractInfo.inherits.size() > 0) {
-            sb.append("implements ");
-            currentContractInfo.inherits.forEach(c -> sb.append(c + ", "));
-            sb.deleteCharAt(sb.length()-1);
-        }
-        sb.append(" {\n");
-        currentContractInfo.inherits.forEach(c -> {
+        sb.append("abstract class " + currentContractInfo.name + "Base extends Address {\n");
+
+        // add state variables and functions of all derived contracts
+        currentContractInfo.is.forEach(c -> {
             ContractInfo ci = contractMap.get(c);
             if (ci.type == ContractInfo.CONTRACT) {
                 ci.variables.forEach((var,str) -> sb.append(str + ";\n"));
+                ci.enums.forEach((e,str) -> sb.append(str + "\n"));
                 ci.functionHeaders.forEach((func,str) -> sb.append(str + " {}\n"));
             }
         });
-//        currentContractInfo.variables.forEach();
+
         sb.append("}\n");
         return sb.toString();
     }
 
     private String makeInterface() {
         StringBuilder sb = new StringBuilder();
-        sb.append("interface " + currentContractInfo.name + " {\n");
+        sb.append("interface " + currentContractInfo.name);
+
+        // build extends list
+        if (currentContractInfo.is.size() > 0) {
+            sb.append(" extends");
+            currentContractInfo.is.forEach(c -> {
+                if (contractMap.get(c).type != ContractInfo.LIBRARY) {
+                    sb.append(" " + c + ",");
+                }
+            });
+            sb.deleteCharAt(sb.length()-1);
+        }
+        sb.append(" {\n");
+
+        // add own functions
         currentContractInfo.functionHeaders.forEach((func,str) -> sb.append(str + ";\n"));
+
+        // add inherited functions
+        if (currentContractInfo.is.size() > 0) {
+            currentContractInfo.is.forEach(c -> {
+                if (contractMap.get(c).type != ContractInfo.LIBRARY) {
+                    contractMap.get(c).functionHeaders.forEach((func,str) -> sb.append(str + ";\n"));
+                }
+            });
+        }
+
         sb.append("}\n");
         return sb.toString();
     }
@@ -446,6 +462,7 @@ System.out.println(makeInterface());
 		ctx.enumValue().stream().forEach(v -> enumDef.append(visit(v.identifier())+","));		
 		enumDef.deleteCharAt(enumDef.length()-1);
 		enumDef.append("}");
+        currentContractInfo.enums.put(ctx.identifier().getText(),enumDef.toString());
 		return enumDef.toString(); 
 	}
 	/**
