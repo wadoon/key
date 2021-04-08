@@ -160,15 +160,30 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
         StringBuilder sb = new StringBuilder();
         sb.append("abstract class " + currentContractInfo.name + "Base extends Address implements " + currentContractInfo.name + " {\n");
 
+        Map<String,String> collisions = new HashMap<>();
         // add state variables and functions of all derived contracts
         currentContractInfo.is.forEach(c -> {
             ContractInfo ci = contractMap.get(c);
             if (ci.type == ContractInfo.CONTRACT) {
                 ci.variables.forEach((var,str) -> sb.append(str + ";\n"));
                 ci.enums.forEach((e,str) -> sb.append(str + "\n"));
-                ci.functionHeaders.forEach((func,str) -> sb.append(str + " {}\n"));
+                ci.functionHeaders.forEach((func,str) -> {
+                    for (String d : currentContractInfo.is) {
+                        if (!d.equals(c) && 
+                                contractMap.get(d).functionHeaders.containsKey(func)) {
+                            // we have colliding methods
+                            collisions.put(func,str); // ok to do several times, last one will be fine
+                            str = str.replaceFirst(func, "__" + c + "__" + func);
+                        }
+                    }
+                    sb.append(str + " {}\n");
+                });
                 ci.constructorHeaders.forEach(cHeader -> sb.append(cHeader + "{}\n"));
             }
+        });
+
+        collisions.forEach((func,body) -> {
+            sb.append(body + " {}\n");
         });
 
         sb.append("}\n");
@@ -421,6 +436,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 		StringBuffer body = new StringBuffer(visit(ctx.block()));
 		if (mods.length() > 0) body.insert(body.indexOf("{") + 1, "\n" + mods);
+
         currentContractInfo.functionHeaders.put(fctName, modifier + " " + returnType + " " + fctName + "(" + parameters + ")" );
 		return modifier + " " + returnType + " " + fctName + "(" + parameters + ")" + body;
 	}
