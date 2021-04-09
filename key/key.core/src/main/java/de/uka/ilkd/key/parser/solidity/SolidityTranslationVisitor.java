@@ -944,7 +944,13 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public String visitDotExpression(SolidityParser.DotExpressionContext ctx) { 
-		return visit(ctx.expression()) + "." + visit(ctx.identifier()); 
+		String exp = visit(ctx.expression());
+        String ident = visit(ctx.identifier()); 
+        // if this is an explicit call to derived contract's function
+        if (contractMap.containsKey(exp)) {
+            return "__" + exp + "__" + ident;
+        }
+        return exp + "." + ident;
 	}
 	/**
 	 * {@inheritDoc}
