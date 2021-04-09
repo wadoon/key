@@ -140,14 +140,27 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 			inheritanceList.setCharAt(inheritanceList.length()-1,' ');
 		}
 
-        StringBuffer contract = new StringBuffer("class " + ctx.identifier().getText() + "Impl extends " + ctx.identifier().getText() + "Base {\n"); 
+        final StringBuffer contract = new StringBuffer();
+        if (currentContractInfo.type == ContractInfo.CONTRACT) {
+            contract.append("class " + ctx.identifier().getText() + "Impl extends " + ctx.identifier().getText() + "Base {\n"); 
+   		    ctx.contractPart().stream().forEach(part -> contract.append(visit(part) + "\n"));
+    
+        } else if (currentContractInfo.type == ContractInfo.INTERFACE) {
+            contract.append("interface " + ctx.identifier().getText());
+            if (currentContractInfo.is.size() > 0) {
+                currentContractInfo.is.forEach(c -> contract.append(" " + c + ","));
+                contract.setCharAt(contract.length()-1,' ');
+            }
+            contract.append(" {\n");
+   		    ctx.contractPart().stream().forEach(part -> contract.append(visit(part) + ";\n"));
+        }
 
-		ctx.contractPart().stream().forEach(part -> contract.append(visit(part) + "\n"));
 
-        output += makeInterface();
-        output += makeBaseClass();
-		output += contract.append("}\n").toString();
-
+        if (currentContractInfo.type == ContractInfo.CONTRACT) {
+            output += makeInterface();
+            output += makeBaseClass();
+        }
+        output += contract.append("}\n").toString();
 		return getOutput();
 	}
 
@@ -428,9 +441,12 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 
 		ctx.modifierList().modifierInvocation().stream().
 		forEach(inv -> mods.append(visit(inv) + ";\n"));
-
-		StringBuffer body = new StringBuffer(visit(ctx.block()));
-		if (mods.length() > 0) body.insert(body.indexOf("{") + 1, "\n" + mods);
+        
+        StringBuffer body = new StringBuffer();
+        if (ctx.block() != null) {
+    		body = new StringBuffer(visit(ctx.block()));
+    		if (mods.length() > 0) body.insert(body.indexOf("{") + 1, "\n" + mods);
+        }
 
         currentContractInfo.functionHeaders.put(fctName, modifier + " " + returnType + " " + fctName + "(" + parameters + ")" );
 		return modifier + " " + returnType + " " + fctName + "(" + parameters + ")" + body;
