@@ -97,7 +97,7 @@ returnParameters
 
 modifierList
   : ( modifierInvocation | stateMutability | ExternalKeyword
-    | PublicKeyword | InternalKeyword | PrivateKeyword )* ;
+    | PublicKeyword | InternalKeyword | PrivateKeyword | VirtualKeyword | OverrideKeyword)* ;
 
 eventDefinition
   : 'event' identifier eventParameterList AnonymousKeyword? ';' ;
@@ -433,11 +433,13 @@ IndexedKeyword : 'indexed' ;
 InterfaceKeyword : 'interface' ;
 InternalKeyword : 'internal' ;
 LibraryKeyword: 'library' ;
+OverrideKeyword : 'override' ;
 PayableKeyword : 'payable' ;
 PrivateKeyword : 'private' ;
 PublicKeyword : 'public' ;
 PureKeyword : 'pure' ;
 ViewKeyword : 'view' ;
+VirtualKeyword : 'virtual' ;
 
 Identifier
   : IdentifierStart IdentifierPart* ;
