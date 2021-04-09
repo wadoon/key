@@ -97,7 +97,8 @@ returnParameters
 
 modifierList
   : ( modifierInvocation | stateMutability | ExternalKeyword
-    | PublicKeyword | InternalKeyword | PrivateKeyword | VirtualKeyword | OverrideKeyword)* ;
+    | PublicKeyword | InternalKeyword | PrivateKeyword | VirtualKeyword |
+    OverrideKeyword identifierList?)* ;
 
 eventDefinition
   : 'event' identifier eventParameterList AnonymousKeyword? ';' ;
