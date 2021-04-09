@@ -118,7 +118,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 */
 	@Override public String visitContractDefinition(SolidityParser.ContractDefinitionContext ctx) { 
         currentContractInfo = new ContractInfo();
-        currentContractInfo.name= ctx.identifier().getText();
+        currentContractInfo.name = ctx.identifier().getText();
         // TODO parse type
         currentContractInfo.type = ContractInfo.CONTRACT;
 		if (ctx.ContractKeyword() != null) {
@@ -131,18 +131,14 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
         contractMap.put(ctx.identifier().getText(), currentContractInfo);
 		StringBuffer inheritanceList = new StringBuffer();
 
-//		if (ctx.inheritanceSpecifier().size() == 1) {
-			for (InheritanceSpecifierContext ictx : ctx.inheritanceSpecifier()) {
-                currentContractInfo.is.add(ictx.getText());
-				inheritanceList.append(ictx.getText());		
-				inheritanceList.append(",");
-			}
-			if (ctx.inheritanceSpecifier().size() > 0) {
-				inheritanceList.setCharAt(inheritanceList.length()-1,' ');
-			}
-		/*} else if (ctx.inheritanceSpecifier().size() > 1) {
-			error("Multi-inheritance not supported.");
-		}*/
+		for (InheritanceSpecifierContext ictx : ctx.inheritanceSpecifier()) {
+            currentContractInfo.is.add(ictx.getText());
+			inheritanceList.append(ictx.getText());		
+			inheritanceList.append(",");
+		}
+		if (ctx.inheritanceSpecifier().size() > 0) {
+			inheritanceList.setCharAt(inheritanceList.length()-1,' ');
+		}
 
         StringBuffer contract = new StringBuffer("class " + ctx.identifier().getText() + "Impl extends " + ctx.identifier().getText() + "Base {\n"); 
 
