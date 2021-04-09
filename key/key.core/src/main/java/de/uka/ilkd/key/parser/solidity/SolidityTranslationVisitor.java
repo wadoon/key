@@ -147,7 +147,6 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
         StringBuffer contract = new StringBuffer("class " + ctx.identifier().getText() + "Impl extends " + ctx.identifier().getText() + "Base {\n"); 
 
 		ctx.contractPart().stream().forEach(part -> contract.append(visit(part) + "\n"));
-        System.out.println(currentContractInfo);
 
         output += makeInterface();
         output += makeBaseClass();
