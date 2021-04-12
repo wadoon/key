@@ -164,7 +164,7 @@ public class TermLabelMenu extends JMenu {
         private static final long serialVersionUID = 8766949321781919880L;
 
         private DisplayLabelsCheckBox(MainWindow mainWindow) {
-            super(mainWindow, LABEL, true);
+            super(mainWindow, LABEL, false);
             setTooltip(TOOL_TIP);
             setName("DisplayLabelsCheckBox");
             setSelected(visibleTermLabels.isShowLabels());
