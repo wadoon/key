@@ -46,8 +46,8 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  *      disjoint(locSet1, locSet3) &
  *      disjoint(locSet2, locSet3)
  *    ->
- *        {heap:={U_P(locSet1, locSet2:=footprint)}heap}value(locSet3)
- *      = value(locSet3)
+ *        {heap:={U_P(locSet1, locSet2:=footprint)}heap}value(locSet3)
+ *      = value(locSet3)
  * </code>
  * 
  * @author Dominic Steinhoefel

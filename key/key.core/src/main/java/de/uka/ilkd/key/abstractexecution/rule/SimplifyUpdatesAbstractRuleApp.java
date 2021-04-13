@@ -255,15 +255,16 @@ public class SimplifyUpdatesAbstractRuleApp extends DefaultBuiltInRuleApp {
     }
 
     /**
-     * Returns a SKIP update or an empty optional if dropping the abstract update is
-     * not possible. Abstract updates cannot be "simplified", either they're
-     * relevant or not.
-     * 
-     * Like {@link #dropElementary(Term, Term, Set, Services, TermBuilder)}, but for
-     * the much more complex setting of an abstract update.
+     * Returns a SKIP update, a simplified abstract update (if individual frame elements
+     * are irrelevant and can be dropped) or an empty optional if dropping the abstract update is
+     * not possible..
+     *
+     * Like {@link #maybeDropElementaryUpdate(Term, Term, Set, Set, Goal, Services)}, but for
+     * the more complex setting of an abstract update.
      * 
      * @param update               The abstract update to check.
      * @param target               The target formula, for extracting locations.
+     * @param relevantLocations    The relevant locations for the target.
      * @param overwrittenLocations A set of locations that are overwritten and
      *                             therefore definitely irrelevant.
      * @param goal                 The goal in which the {@link Rule} should be
