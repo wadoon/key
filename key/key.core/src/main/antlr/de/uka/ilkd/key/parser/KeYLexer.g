@@ -234,6 +234,7 @@ lexer grammar KeYLexer;
     INSTANTIATE_VARS_FRESH : '\\instantiateVarsFresh' ;
     NEW_PV : '\\newPV' ;
     STORE_RESULT_VAR_IN : '\\storeResultVarIn' ;
+    STORE_ABSTRACT_UPDATE_FRAME : '\\storeAbstractUpdateFrame' ;
     STORE_STMT_IN : '\\storeStmtIn' ;
     STORE_TERM_IN : '\\storeTermIn' ;
     FRESH_ABSTRACT_PROGRAM : '\\freshAbstractProgram' ;

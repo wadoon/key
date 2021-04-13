@@ -3970,6 +3970,7 @@ varexp[TacletBuilder b]
     | varcond_newPV[b]
     | varcond_initializeExpression[b]
     | varcond_storeResultVarIn[b]
+    | varcond_storeAbstractUpdateFrame[b]
     | varcond_storeTermIn[b]
     | varcond_storeStmtIn[b]
     | varcond_storeContextLabelsIn[b]
@@ -4152,6 +4153,14 @@ varcond_storeResultVarIn[TacletBuilder b]
    STORE_RESULT_VAR_IN LPAREN sv=varId RPAREN 
    {
       b.addVariableCondition(new StoreResultVarInCondition((ProgramSV) sv));
+   }
+;
+
+varcond_storeAbstractUpdateFrame[TacletBuilder b]
+:
+   STORE_ABSTRACT_UPDATE_FRAME LPAREN updateSV=varId COMMA resultSV=varId RPAREN
+   {
+      b.addVariableCondition(new StoreAbstractUpdateFrameCondition((SchemaVariable) updateSV, (SchemaVariable) resultSV));
    }
 ;
 
