@@ -584,7 +584,7 @@ public class SolverListener implements SolverLauncherListener {
                 for (SMTSolver solver : problem.getSolvers()) {
                         if (settings.storeSMTTranslationToFile()) {
                                 storeSMTTranslation(solver, problem.getGoal(),
-                                                solver.getTranslation());
+                                                solver.getTranslation(), problem.getName());
                         }
                         if (settings.makesUseOfTaclets()
                                         && settings
@@ -604,11 +604,11 @@ public class SolverListener implements SolverLauncherListener {
                 storeToFile(translation.toString(), path);
         }
 
-        private void storeSMTTranslation(SMTSolver solver, Goal goal,
-                        String problemString) {
+        public void storeSMTTranslation(SMTSolver solver, Goal goal,
+                        String problemString, String goalName) {
                 String path = settings.getPathForSMTTranslation();
                 
-                String fileName = goal.proof().name()+"_"+goal.getTime()+"_"+solver.name()+".smt";
+                String fileName = goal.proof().name()+"_"+goalName+"_"+solver.name()+".smt";
                 path = path+File.separator+fileName;              
                 path = finalizePath(path, solver, goal);
                 storeToFile(problemString, path);
