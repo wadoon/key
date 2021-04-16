@@ -29,6 +29,9 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<Result> {
     }
     public SoliditySpecPreVisitor() {
         vars.put("msg","Message");
+        vars.put("all_addresses","logical");
+        vars.put("balance","int");
+        vars.put("this","");
     }
 
 	@Override public Result visitElementaryTypeName(SolidityParser.ElementaryTypeNameContext ctx) {

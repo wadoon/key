@@ -130,6 +130,9 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<Result> {
         if (type != null) {
             return new Result(type, ident);
         } else {
+            if (ident.equals("this")) {
+                return new Result("","this");
+            }
             type = vars.get(ident);
             if (("enum").equals(vars.get(type))) {
                 type = contractName + "." + type;
@@ -240,7 +243,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<Result> {
    
     public Result returnFromNetGross(Result r, String func) {
         Result ret = new Result("int",null);
-        ret.output = "int::select(" + HEAP_PLACEHOLDER_STRING + "," + func + ",address(" + r.output + "))";
+        ret.output = "int::select(" + HEAP_PLACEHOLDER_STRING + "," + func + "," + (!r.output.equals("all_addresses") ? "address" : "") + "(" + r.output + "))";
         return ret;
     }
 	@Override public Result visitEquivalenceExpression(SolidityParser.EquivalenceExpressionContext ctx) {
@@ -268,9 +271,13 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<Result> {
         } else if (r.type.equals("Message")) {    // assuming either msg.sender or msg.value
             type = ident.equals("sender") ? "Address" : "int";
             output = "(" + type + "::select(" + HEAP_PLACEHOLDER_STRING + ",msg,java.lang.Message::$" + ident + "))";
+        } else if (r.output.equals("this") && ident.equals("balance")) {
+            type = vars.get(ident); 
+            output = "(" + type + "::select(" + HEAP_PLACEHOLDER_STRING + ",self,java.lang.Address::$" + ident + "))";
         } else {
             throw new RuntimeException("unsupported expression in dot expression");
         }
+
         return new Result(type, output);
     }
 
@@ -315,6 +322,8 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<Result> {
     }
 
     public String injectFieldPrefix(String str) {
+        if (str.equals("balance")) 
+            return "java.lang.Address::$balance";
         return contractName + "::$" + str;
     }
 
@@ -433,7 +442,8 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<Result> {
             sb.append("&\nmsg.value = 0 ");
         }
         for (String var : vars.keySet()) {
-            if (!(("enum").equals(vars.get(var)) || ("Message").equals(vars.get(var)))) {
+            if (!(("enum").equals(vars.get(var)) || ("Message").equals(vars.get(var)) || ("logical").equals(vars.get(var)) 
+                    || ("this").equals(var))) {
                 sb.append("&\nself." + var + "!= null " );
             }
         }
