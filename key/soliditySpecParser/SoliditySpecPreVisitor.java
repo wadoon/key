@@ -112,8 +112,8 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<Result> {
         funcs.put(funcName, new FunctionInfo(payable, ctx.start.getLine()));
         List<SolidityParser.ParameterContext> pars = ctx.parameterList().parameter();
         for (SolidityParser.ParameterContext p : pars) {
-            funcs.get(funcName).parameters.put(p.identifier().Identifier().getText(),solidityToJavaType(p.typeName().getText()));
-            funcs.get(funcName).parameterOrder.add(p.identifier().Identifier().getText());
+            funcs.get(funcName).parameters.put(p.identifier().getText(),solidityToJavaType(p.typeName().getText()));
+            funcs.get(funcName).parameterOrder.add(p.identifier().getText());
         }
         return new Result("","");
     }

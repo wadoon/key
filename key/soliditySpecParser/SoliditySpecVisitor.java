@@ -125,7 +125,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<Result> {
     }
     
     @Override public Result visitIdentifier(SolidityParser.IdentifierContext ctx) { 
-        String ident = ctx.Identifier().getText();
+        String ident = ctx.Identifier() != null ? ctx.Identifier().getText() : ctx.getText();
         String type = SoliditySpecPreVisitor.funcs.get(functionFromLineNo(startLineNo)).parameters.get(ident);
         if (type != null) {
             return new Result(type, ident);
