@@ -61,7 +61,7 @@ contract MultiAuction {
 
   /*@ only_if state == State.AUCTION_OPEN;
       on_success net(msg.sender) == 0;
-      assignable balances[msg.sender];
+      assignable balances[msg.sender],net(msg.sender);
    */
   function withdraw() public  {
     // A bidder can withdraw all her money (but she will stay in the array bidders)
