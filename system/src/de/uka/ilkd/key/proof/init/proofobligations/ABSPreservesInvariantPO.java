@@ -63,11 +63,9 @@ public class ABSPreservesInvariantPO extends ABSAbstractPO {
         Decl decl = method.getMethodSig().getContextDecl();
         
         if (decl instanceof InterfaceDecl) {
-            this.thisType = 
-            	((InterfaceDecl)decl).getDirectSuperTypes().iterator().next().qualifiedName();
+            this.thisType = decl.qualifiedName();
         } else if (decl instanceof ClassDecl) {
-            this.thisType = 
-            	((ClassDecl)decl).getDirectSuperTypes().iterator().next().qualifiedName();
+            this.thisType = ((ClassDecl)decl).getDirectSuperTypes().iterator().next().qualifiedName();
 	} else {
             throw new IllegalStateException("Method declared solely in a class are not yet supported.");
         }
