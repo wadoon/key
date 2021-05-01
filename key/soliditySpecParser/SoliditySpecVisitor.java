@@ -12,25 +12,33 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 
-class SMLExpr {
-    String type; String output;
-    SMLExpr(String t, String o) {
-        type = t; output = o;
-    }
-    public String toString() {
-        return type + " " + output;
-    }
-}
+public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor.SMLExpr> {
 
-public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
+    static class SMLExpr {
+        String type; String output;
+        SMLExpr(String t, String o) {
+            type = t; output = o;
+        }
+        public String toString() {
+            return type + " " + output;
+        }
+    }
 
-    private Environment env;
-    
-    public String invariant;
+    enum SMLStatementType {
+        CONTRACT_INVARIANT,
+        LIBRARY_INVARIANT,
+        ASSUMES,
+        ON_SUCCESS,
+        ONLY_IF,
+        ASSIGNABLE
+    }
+
     public FunctionProofObligations pos = new FunctionProofObligations();
-
+    private Environment env;
+    public String invariant;
     private String contractName;
     private String function;
+    private SMLStatementType stmtType;
 
     public SoliditySpecVisitor(String contractName, String function, Environment env) {
         super();
@@ -40,6 +48,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
     }
 
     @Override public SMLExpr visitSpecOnlyIf(SolidityParser.SpecOnlyIfContext ctx) {
+        stmtType = SMLStatementType.ONLY_IF;
         SMLExpr r = visitChildren(ctx);
         r.output = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.OLD_HEAP, r.output);
         pos.onlyIf = r.output;
@@ -49,6 +58,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
     @Override public SMLExpr visitSpecAssumes(SolidityParser.SpecAssumesContext ctx) { return visitChildren(ctx); }
 
 	@Override public SMLExpr visitSpecAssignable(SolidityParser.SpecAssignableContext ctx) {
+        stmtType = SMLStatementType.ASSIGNABLE;
         List<SolidityParser.ExpressionContext> expressions = ctx.expression();
         for (SolidityParser.ExpressionContext ec : expressions) {
             SMLExpr r = visit(ec);
@@ -70,6 +80,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
     }
 
     @Override public SMLExpr visitSpecOnSuccess(SolidityParser.SpecOnSuccessContext ctx) { 
+        stmtType = SMLStatementType.ON_SUCCESS;
         SMLExpr r = visitChildren(ctx);
         r.output = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP, r.output);
         pos.onSuccess = r.output;
@@ -77,6 +88,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
     }
 
     @Override public SMLExpr visitSpecClassInvariant(SolidityParser.SpecClassInvariantContext ctx) {
+        stmtType = SMLStatementType.CONTRACT_INVARIANT;
         SMLExpr r = visitChildren(ctx);
         invariant = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP_H, r.output); // assuming only one invariant per contract
         r.output = invariant;
@@ -150,10 +162,12 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
     }
 
     @Override public SMLExpr visitForallExpression(SolidityParser.ForallExpressionContext ctx) {
-        env.cumulativeLogicalVars.put(ctx.Identifier().getText(), SpecCompilerUtils.solidityToJavaType(ctx.typeName().getText()));
+        String logicalVarType = SpecCompilerUtils.solidityToJavaType(ctx.typeName().getText());
+        env.cumulativeLogicalVars.put(ctx.Identifier().getText(), logicalVarType);
         env.vars.put(ctx.Identifier().getText(), "logical");
         SMLExpr r = visit(ctx.expression());
         SMLExpr ret = new SMLExpr(r.type, "(\\forall " + 
+            (stmtType == SMLStatementType.ON_SUCCESS ? logicalVarType + " ": "") + 
             ctx.Identifier().getText() + "; " + 
             r.output + ")");
         env.vars.remove(ctx.Identifier().getText());
@@ -161,10 +175,12 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
     }
 
     @Override public SMLExpr visitExistsExpression(SolidityParser.ExistsExpressionContext ctx) {
-        env.cumulativeLogicalVars.put(ctx.Identifier().getText(), SpecCompilerUtils.solidityToJavaType(ctx.typeName().getText()));
+        String logicalVarType = SpecCompilerUtils.solidityToJavaType(ctx.typeName().getText());
+        env.cumulativeLogicalVars.put(ctx.Identifier().getText(), logicalVarType);
         env.vars.put(ctx.Identifier().getText(), "logical");
         SMLExpr r = visit(ctx.expression());
         SMLExpr ret = new SMLExpr(r.type, "(\\exists " + 
+            (stmtType == SMLStatementType.ON_SUCCESS ? logicalVarType + " ": "") + 
             ctx.Identifier().getText() + "; " + 
             r.output + ")");
         env.vars.remove(ctx.Identifier().getText());
