@@ -4,7 +4,7 @@ Compile:
 javac Solidity*.java
 
 Run:
-java SoliditySpecVisitor [.sol file] [function name]
+java SoliditySpecCompiler [.sol file] [function name]
 
 A .key-formatted file with proof obligations for [function name] will be printed to stdout. For constructor proof obligations, use [contract name] + "Impl".
 
