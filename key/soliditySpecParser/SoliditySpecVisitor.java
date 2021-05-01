@@ -23,7 +23,6 @@ class SMLExpr {
 }
 
 public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
-    public static final String HEAP_PLACEHOLDER_STRING = "__heap__";
 
     private Environment env;
     
@@ -42,7 +41,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
 
     @Override public SMLExpr visitSpecOnlyIf(SolidityParser.SpecOnlyIfContext ctx) {
         SMLExpr r = visitChildren(ctx);
-        r.output = injectHeap(SpecCompilerUtils.HeapType.OLD_HEAP, r.output);
+        r.output = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.OLD_HEAP, r.output);
         pos.onlyIf = r.output;
         return r;
     }
@@ -53,7 +52,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
         List<SolidityParser.ExpressionContext> expressions = ctx.expression();
         for (SolidityParser.ExpressionContext ec : expressions) {
             SMLExpr r = visit(ec);
-            String beforeHeap = r.output.substring(0, r.output.indexOf(HEAP_PLACEHOLDER_STRING));
+            String beforeHeap = r.output.substring(0, r.output.indexOf(SpecCompilerUtils.HEAP_PLACEHOLDER_STRING));
             // find number of opening parentheses in removed string
             int numParentheses = 0;
             for (int ind=0; ind!=-1 && ind<beforeHeap.length(); ) {
@@ -63,7 +62,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
                     ind++;
                 }
             }
-            r.output = r.output.substring(r.output.indexOf(HEAP_PLACEHOLDER_STRING)+HEAP_PLACEHOLDER_STRING.length()+1);
+            r.output = r.output.substring(r.output.indexOf(SpecCompilerUtils.HEAP_PLACEHOLDER_STRING)+SpecCompilerUtils.HEAP_PLACEHOLDER_STRING.length()+1);
             r.output = r.output.substring(0,r.output.length()-numParentheses); // remove trailing parentheses 
             pos.assignable.add(r.output);
         }
@@ -72,14 +71,14 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
 
     @Override public SMLExpr visitSpecOnSuccess(SolidityParser.SpecOnSuccessContext ctx) { 
         SMLExpr r = visitChildren(ctx);
-        r.output = injectHeap(SpecCompilerUtils.HeapType.HEAP, r.output);
+        r.output = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP, r.output);
         pos.onSuccess = r.output;
         return r;
     }
 
     @Override public SMLExpr visitSpecClassInvariant(SolidityParser.SpecClassInvariantContext ctx) {
         SMLExpr r = visitChildren(ctx);
-        invariant = injectHeap(SpecCompilerUtils.HeapType.HEAP_H, r.output); // assuming only one invariant per contract
+        invariant = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP_H, r.output); // assuming only one invariant per contract
         r.output = invariant;
         return r;
     }
@@ -91,7 +90,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
         String type = r1.type.substring(0,r1.type.length()-2);
         String intCast = !("int").equals(r2.type) ? "(int)" : "";
         String res = "(" + type + 
-            "::select(" + HEAP_PLACEHOLDER_STRING + "," + r1.output + ", arr(" + intCast +  r2.output + ")))"; 
+            "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + "," + r1.output + ", arr(" + intCast +  r2.output + ")))"; 
         return new SMLExpr(type,res);
     }
 
@@ -113,7 +112,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
                 type = contractName + "." + type;
             }
             String access = !type.equals("logical") ? 
-                "(" + type + "::select(" + HEAP_PLACEHOLDER_STRING + ",self," +
+                "(" + type + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + ",self," +
                 injectFieldPrefix(ident) + "))" :
                 ident;
             return new SMLExpr(type, access);
@@ -198,7 +197,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
    
     public SMLExpr returnFromNetGross(SMLExpr r, String func) {
         SMLExpr ret = new SMLExpr("int",null);
-        ret.output = "int::select(" + HEAP_PLACEHOLDER_STRING + "," + func + "," + (!r.output.equals("all_addresses") ? "address" : "") + "(" + r.output + "))";
+        ret.output = "int::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + "," + func + "," + (!r.output.equals("all_addresses") ? "address" : "") + "(" + r.output + "))";
         return ret;
     }
 	@Override public SMLExpr visitEquivalenceExpression(SolidityParser.EquivalenceExpressionContext ctx) {
@@ -215,17 +214,17 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
         String output = null;
         if (r.type.equals("enum")) {
             type = r.type;
-            output = typeOutput + "::select(" + HEAP_PLACEHOLDER_STRING + ",null," + typeOutput + "::$" + ident + ")";
+            output = typeOutput + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + ",null," + typeOutput + "::$" + ident + ")";
         } else if (ident.equals("length") || ident.equals("arr_length")) {
             type = "int";
-            output = "(" + "int" + "::select(" + HEAP_PLACEHOLDER_STRING + "," + r.output + "," + ident + "))";
+            output = "(" + "int" + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + "," + r.output + "," + ident + "))";
             
         } else if (r.type.equals("Message")) {    // assuming either msg.sender or msg.value
             type = ident.equals("sender") ? "Address" : "int";
-            output = "(" + type + "::select(" + HEAP_PLACEHOLDER_STRING + ",msg,java.lang.Message::$" + ident + "))";
+            output = "(" + type + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + ",msg,java.lang.Message::$" + ident + "))";
         } else if (r.output.equals("this") && ident.equals("balance")) {
             type = env.vars.get(ident); 
-            output = "(" + type + "::select(" + HEAP_PLACEHOLDER_STRING + ",self,java.lang.Address::$" + ident + "))";
+            output = "(" + type + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + ",self,java.lang.Address::$" + ident + "))";
         } else {
             throw new RuntimeException("unsupported expression in dot expression");
         }
@@ -255,7 +254,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
 
 	@Override public SMLExpr visitOldExpression(SolidityParser.OldExpressionContext ctx) {
         SMLExpr r = visitChildren(ctx);
-        r.output = injectHeap(SpecCompilerUtils.HeapType.OLD_HEAP, r.output);
+        r.output = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.OLD_HEAP, r.output);
         return r;
     }
 
@@ -268,10 +267,6 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SMLExpr> {
         } else {
             return next;
         }
-    }
-
-    public static String injectHeap(SpecCompilerUtils.HeapType heap, String str) {
-        return str.replaceAll(HEAP_PLACEHOLDER_STRING,heap.toString());
     }
 
     public String injectFieldPrefix(String str) {

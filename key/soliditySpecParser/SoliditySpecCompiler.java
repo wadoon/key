@@ -2,10 +2,6 @@ import java.util.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CharStream;
@@ -13,79 +9,32 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 
 public class SoliditySpecCompiler {
-    private static final String CONTRACT_NAME_PLACEHOLDER = "__contract_name_placeholder__";
-    private static final String PROGRAM_VARIABLES_PLACEHOLDER = "__program_variables_placeholder__";
-    private static final String SCHEMA_VARIABLES_PLACEHOLDER = "__schema_variables_placeholder__";
-    private static final String INVARIANT_PLACEHOLDER = "__invariant_placeholder__";
-    private static final String ASSUMPTION_PLACEHOLDER = "__assumption_placeholder__";
-    private static final String FUNCTION_PLACEHOLDER = "__function_placeholder__";
-    private static final String POSTCONDITION_PLACEHOLDER = "__postcondition_placeholder__";
-    private static final String VARCOND_PLACEHOLDER = "__varcond_placeholder__";
-    private static final String HEAP_UPDATE_PLACEHOLDER = "__heap_update_placeholder__";
-
     private String invariant;
     private Map<String,FunctionProofObligations> posMap = new HashMap<>();
 
     private String contractName;
     private Environment env;
     
-    public static void main(String[] args) throws IOException {
-        SoliditySpecCompiler ssc = new SoliditySpecCompiler();
-
-        // first pass (reads Solidity code)
-        SoliditySpecPreVisitor sspv = new SoliditySpecPreVisitor();
-        sspv.parse(args[0]);
-        ssc.contractName = sspv.contractName;
-        ssc.env = sspv.env;
-        // second pass (reads specification)
-        CharStream c = CharStreams.fromStream(new File(args[0]).toURI().toURL().openStream());
-        SolidityLexer lexer = new SolidityLexer(c);
-        Token t = null;
-        while ((t = lexer.nextToken()).getType() != Token.EOF) {
-            if (t.getChannel() == 2 || t.getChannel() == 3) {
-                String toParse = t.getChannel() == 2 ? t.getText().substring(3,t.getText().length()-2) : t.getText().substring(3);
-                SolidityParser parser = new SolidityParser(new CommonTokenStream(new SolidityLexer(CharStreams.fromString(toParse,"dummy"))));
-                SolidityParser.SpecDefinitionContext solidityAST = parser.specDefinition();
-                String function = ssc.functionFromLineNo(t.getLine());
-                SoliditySpecVisitor visitor = new SoliditySpecVisitor(ssc.contractName, function, ssc.env);
-                visitor.visit(solidityAST);
-                if (visitor.invariant != null) {
-                    ssc.invariant = visitor.invariant;
-                } else {
-                    ssc.posMap.put(function, visitor.pos);
-                }
-            }
+    private String makeKeYFileString(String function) {
+        if (!env.funcs.containsKey(function)) {
+            throw new IllegalArgumentException("Could not find function " + function);
         }
-        String funcName = args[1];
-        if (!ssc.env.funcs.containsKey(funcName)) {
-            System.out.println("Could not find function " + funcName);
-            System.exit(-1);
-        }
-        boolean funcPayable = ssc.env.funcs.get(funcName).payable;
-        boolean forConstructor = funcName.equals(ssc.contractName);
-        String output = loadTemplate();
-        output = output.replace(INVARIANT_PLACEHOLDER, ssc.invariant != null ? ssc.invariant : "true")
-                       .replace(CONTRACT_NAME_PLACEHOLDER,ssc.contractName)
-                       .replace(PROGRAM_VARIABLES_PLACEHOLDER, ssc.makeProgramVariables(funcName))
-                       .replace(SCHEMA_VARIABLES_PLACEHOLDER, ssc.makeSchemaVariables())
-                       .replace(VARCOND_PLACEHOLDER, ssc.makeVarcond())
-                       .replace(ASSUMPTION_PLACEHOLDER, ssc.makeAssumption(funcPayable,forConstructor))
-                       .replace(HEAP_UPDATE_PLACEHOLDER, ssc.makeHeapUpdate(funcName, funcPayable, forConstructor))
-                       .replace(FUNCTION_PLACEHOLDER, ssc.makeFunctionCall(funcName,forConstructor))
-                       .replace(POSTCONDITION_PLACEHOLDER, ssc.makePostCondition(funcName,forConstructor));
-        System.out.println(output);
+        boolean funcPayable = env.funcs.get(function).payable;
+        boolean forConstructor = function.equals(contractName);
+        String output = SpecCompilerUtils.loadTemplate();
+        output = output.replace(SpecCompilerUtils.INVARIANT_PLACEHOLDER, invariant != null ? invariant : "true")
+                       .replace(SpecCompilerUtils.CONTRACT_NAME_PLACEHOLDER,contractName)
+                       .replace(SpecCompilerUtils.PROGRAM_VARIABLES_PLACEHOLDER, makeProgramVariablesString(function))
+                       .replace(SpecCompilerUtils.SCHEMA_VARIABLES_PLACEHOLDER, makeSchemaVariablesString())
+                       .replace(SpecCompilerUtils.VARCOND_PLACEHOLDER, makeVarcondString())
+                       .replace(SpecCompilerUtils.ASSUMPTION_PLACEHOLDER, makeAssumptionString(funcPayable,forConstructor))
+                       .replace(SpecCompilerUtils.HEAP_UPDATE_PLACEHOLDER, makeHeapUpdateString(function, funcPayable, forConstructor))
+                       .replace(SpecCompilerUtils.FUNCTION_PLACEHOLDER, makeFunctionCallString(function,forConstructor))
+                       .replace(SpecCompilerUtils.POSTCONDITION_PLACEHOLDER, makePostConditionString(function,forConstructor));
+        return output;
     }
 
-    private static String loadTemplate() {
-        try {
-            return Files.readString(Path.of("include/template.key"));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "error";
-        }
-    }
-
-    private String makeProgramVariables(String func) {
+    private String makeProgramVariablesString(String func) {
         Map<String,String> parameters = env.funcs.get(func).parameters;
         if (parameters.size() == 0) {
             return "";
@@ -99,7 +48,7 @@ public class SoliditySpecCompiler {
         }
     }
 
-    private String makeSchemaVariables() {
+    private String makeSchemaVariablesString() {
         StringBuilder sb = new StringBuilder();
         for(Map.Entry<String,String> e : env.cumulativeLogicalVars.entrySet()) {
             sb.append("\\schemaVar \\variable " + e.getValue() + " " + e.getKey() + ";\n");
@@ -107,7 +56,7 @@ public class SoliditySpecCompiler {
         return sb.toString();
     }
 
-    private String makeVarcond() {
+    private String makeVarcondString() {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String,String> e : env.cumulativeLogicalVars.entrySet()) {
             sb.append("\\notFreeIn(" + e.getKey() + "," + SpecCompilerUtils.HeapType.HEAP_H.toString() + ",self),");
@@ -120,7 +69,7 @@ public class SoliditySpecCompiler {
         return "\\varcond(" + sb.toString() + ")";
     }
 
-    private String makeAssumption(boolean payable, boolean forConstructor) {
+    private String makeAssumptionString(boolean payable, boolean forConstructor) {
         StringBuilder sb = new StringBuilder();
         if (!forConstructor) {
             sb.append("&\nCInv(heap,self) ");
@@ -160,7 +109,7 @@ public class SoliditySpecCompiler {
         return sb.toString();
     }
 
-    private String makeHeapUpdate(String func, boolean payable, boolean forConstructor) {
+    private String makeHeapUpdateString(String func, boolean payable, boolean forConstructor) {
         String parString = "";
         for (String p : env.funcs.get(func).parameterOrder) {
             parString = parString + " || _" + p + " := " + p;
@@ -175,7 +124,7 @@ public class SoliditySpecCompiler {
             parString;
     }
 
-    private String makeFunctionCall(String func, boolean forConstructor) {
+    private String makeFunctionCallString(String func, boolean forConstructor) {
         List<String> parameters = env.funcs.get(func).parameterOrder;
         String parString = "";
         for (String p : parameters) {
@@ -187,16 +136,18 @@ public class SoliditySpecCompiler {
         return "self." + func + "(msg" + parString + ")@" + contractName + ";";
     }
 
-    private String makePostCondition(String func, boolean forConstructor) {
+    private String makePostConditionString(String func, boolean forConstructor) {
         String ret = "";
         // only_if:s
         if (posMap.get(func).onlyIf != null) {
             ret = " & " + posMap.get(func).onlyIf;
         }
+        // on_success
         if (posMap.get(func).onSuccess != null) {
             ret = ret + " & " + posMap.get(func).onSuccess;
         }
-        if (!forConstructor) { // assignable stuff
+        //assignable stuff
+        if (!forConstructor) { 
             String elementOfString = "";
             List<String> objFields = posMap.get(func).assignable;
             if (objFields != null) {
@@ -216,15 +167,12 @@ public class SoliditySpecCompiler {
                     sb.append(')');
                 }
                 elementOfString = "elementOf(o,f," + sb.toString() + ") | ";
-                elementOfString = injectHeap(SpecCompilerUtils.HeapType.OLD_HEAP, elementOfString);
+                elementOfString = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.OLD_HEAP, elementOfString);
             }
-            ret = ret + "& (\\forall Field f; \\forall java.lang.Object o; (" + elementOfString + " !o = null & !o.<created>@savedHeap = TRUE | o.f = o.f@savedHeap))";
+            ret = ret + "& (\\forall Field f; \\forall java.lang.Object o; (" + elementOfString +
+                    " !o = null & !o.<created>@savedHeap = TRUE | o.f = o.f@savedHeap))";
         }
         return ret; 
-    }
-
-    public static String injectHeap(SpecCompilerUtils.HeapType heap, String str) {
-        return str.replaceAll(SoliditySpecVisitor.HEAP_PLACEHOLDER_STRING,heap.toString());
     }
 
     private String functionFromLineNo(int line) {
@@ -239,4 +187,41 @@ public class SoliditySpecCompiler {
         }
         return currentFunction;
     }
+
+    public void collectProofObligations(String fileName) throws IOException {
+        // first pass (reads Solidity code)
+        SoliditySpecPreVisitor sspv = new SoliditySpecPreVisitor();
+        sspv.parse(fileName);
+        contractName = sspv.contractName;
+        env = sspv.env;
+        // second pass (reads specification)
+        CharStream c = CharStreams.fromStream(new File(fileName).toURI().toURL().openStream());
+        SolidityLexer lexer = new SolidityLexer(c);
+        Token t = null;
+        while ((t = lexer.nextToken()).getType() != Token.EOF) {
+            if (t.getChannel() == 2 || t.getChannel() == 3) {
+                String toParse = t.getChannel() == 2 ?
+                        t.getText().substring(3,t.getText().length()-2) : t.getText().substring(3);
+                SolidityParser parser = new SolidityParser(
+                    new CommonTokenStream(new SolidityLexer(CharStreams.fromString(toParse,"dummy"))));
+                SolidityParser.SpecDefinitionContext solidityAST = parser.specDefinition();
+                String function = functionFromLineNo(t.getLine());
+                SoliditySpecVisitor visitor = new SoliditySpecVisitor(contractName, function, env);
+                visitor.visit(solidityAST);
+                if (visitor.invariant != null) {
+                    invariant = visitor.invariant;
+                } else {
+                    posMap.put(function, visitor.pos);
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        SoliditySpecCompiler ssc = new SoliditySpecCompiler();
+        ssc.collectProofObligations(args[0]);
+        String funcToVerify = args[1];
+        System.out.println(ssc.makeKeYFileString(funcToVerify));
+    }
+
 }
