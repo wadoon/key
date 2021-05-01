@@ -8,7 +8,7 @@ import java.net.URI;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-public class SoliditySpecPreVisitor extends SolidityBaseVisitor<Result> {
+public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
     public Environment env = new Environment();
     public String contractName; 
 
@@ -19,53 +19,53 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<Result> {
         env.vars.put("this","");
     }
 
-	@Override public Result visitElementaryTypeName(SolidityParser.ElementaryTypeNameContext ctx) {
-        return new Result(SpecCompilerUtils.solidityToJavaType(ctx.getText()), "");
+	@Override public String visitElementaryTypeName(SolidityParser.ElementaryTypeNameContext ctx) {
+        return SpecCompilerUtils.solidityToJavaType(ctx.getText());
     }
 
-	@Override public Result visitUserDefinedTypeName(SolidityParser.UserDefinedTypeNameContext ctx) { 
+	@Override public String visitUserDefinedTypeName(SolidityParser.UserDefinedTypeNameContext ctx) { 
         String subtype = ctx.identifier(1) != null ?
             ctx.identifier(1).Identifier().getText() : null;
-        return new Result(subtype == null ? ctx.identifier(0).Identifier().getText() : 
-                ctx.identifier(0).Identifier().getText() + "." + subtype, "");
+        return subtype == null ? ctx.identifier(0).Identifier().getText() : 
+                ctx.identifier(0).Identifier().getText() + "." + subtype;
     
     }
 
-	@Override public Result visitTypeName(SolidityParser.TypeNameContext ctx) {
+	@Override public String visitTypeName(SolidityParser.TypeNameContext ctx) {
         if (ctx.typeName() != null) { // this is an array
-            Result typeName = visit(ctx.typeName());
-            return new Result(typeName.type + "[]", "");
+            String typeName = visit(ctx.typeName());
+            return typeName + "[]";
         } else {
             return visitChildren(ctx);
         }
     }
 
-	@Override public Result visitMapping(SolidityParser.MappingContext ctx) {
-        Result key = visit(ctx.elementaryTypeName());
-        Result value = visit(ctx.typeName());
-        return new Result(value.type + "[]", "");
+	@Override public String visitMapping(SolidityParser.MappingContext ctx) {
+        String key = visit(ctx.elementaryTypeName());
+        String value = visit(ctx.typeName());
+        return value + "[]";
     }
 
-    @Override public Result visitStateVariableDeclaration(SolidityParser.StateVariableDeclarationContext ctx) { 
-        Result typeRes = visit(ctx.typeName());
+    @Override public String visitStateVariableDeclaration(SolidityParser.StateVariableDeclarationContext ctx) { 
+        String typeRes = visit(ctx.typeName());
 //		env.vars.put(ctx.getText(), 
 //			ctx.getRuleIndex());
-        env.vars.put(ctx.identifier().Identifier().getText(), typeRes.type);
+        env.vars.put(ctx.identifier().Identifier().getText(), typeRes);
 //        System.out.println(typeRes.type + " " + ctx.identifier().Identifier().getText());
 		return null;
 	}
 
-	@Override public Result visitEnumDefinition(SolidityParser.EnumDefinitionContext ctx) {
+	@Override public String visitEnumDefinition(SolidityParser.EnumDefinitionContext ctx) {
         env.vars.put(ctx.identifier().Identifier().getText(),"enum"); //uncertain if needed
-        return new Result("enum", "");
+        return "enum";
     }
 
-	@Override public Result visitContractDefinition(SolidityParser.ContractDefinitionContext ctx) {
+	@Override public String visitContractDefinition(SolidityParser.ContractDefinitionContext ctx) {
         contractName = ctx.identifier().Identifier().getText() + "Impl";
         return visitChildren(ctx);
     }
 
-	@Override public Result visitFunctionDefinition(SolidityParser.FunctionDefinitionContext ctx) {
+	@Override public String visitFunctionDefinition(SolidityParser.FunctionDefinitionContext ctx) {
         String funcName = ctx.identifier().Identifier().getText();
         boolean payable = false;
         for (SolidityParser.StateMutabilityContext smc : ctx.modifierList().stateMutability()) {
@@ -80,10 +80,10 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<Result> {
             env.funcs.get(funcName).parameters.put(p.identifier().getText(),SpecCompilerUtils.solidityToJavaType(p.typeName().getText()));
             env.funcs.get(funcName).parameterOrder.add(p.identifier().getText());
         }
-        return new Result("","");
+        return "";
     }
 
-	@Override public Result visitConstructorDefinition(SolidityParser.ConstructorDefinitionContext ctx) {
+	@Override public String visitConstructorDefinition(SolidityParser.ConstructorDefinitionContext ctx) {
         String funcName = contractName;
         boolean payable = false;
         for (SolidityParser.StateMutabilityContext smc : ctx.modifierList().stateMutability()) {
@@ -98,7 +98,7 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<Result> {
             env.funcs.get(funcName).parameters.put(p.identifier().Identifier().getText(),SpecCompilerUtils.solidityToJavaType(p.typeName().getText()));
             env.funcs.get(funcName).parameterOrder.add(p.identifier().Identifier().getText());
         }
-        return new Result("","");
+        return "";
     }
 
     public void parse(String file) throws IOException {
