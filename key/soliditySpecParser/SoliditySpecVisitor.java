@@ -36,13 +36,13 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
     public FunctionProofObligations pos = new FunctionProofObligations();
     private Environment env;
     public String invariant;
-    private String contractName;
+    private String contractNameInPOs;
     private String function;
     private SMLStatementType stmtType;
 
-    public SoliditySpecVisitor(String contractName, String function, Environment env) {
+    public SoliditySpecVisitor(String contractNameInPOs, String function, Environment env) {
         super();
-        this.contractName = contractName;
+        this.contractNameInPOs = contractNameInPOs;
         this.function = function;
         this.env = env;
     }
@@ -121,7 +121,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
             }
             type = env.vars.get(ident);
             if (("enum").equals(env.vars.get(type))) {
-                type = contractName + "." + type;
+                type = contractNameInPOs + "." + type;
             }
             String access = !type.equals("logical") ? 
                 "(" + type + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + ",self," +
@@ -225,7 +225,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
 	@Override public SMLExpr visitDotExpression(SolidityParser.DotExpressionContext ctx) {
         SMLExpr r = visit(ctx.expression());
         String ident = ctx.identifier().Identifier().getText();
-        String typeOutput = contractName + "." + ctx.expression().getText();
+        String typeOutput = contractNameInPOs + "." + ctx.expression().getText();
         String type = null;
         String output = null;
         if (r.type.equals("enum")) {
@@ -288,7 +288,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
     public String injectFieldPrefix(String str) {
         if (str.equals("balance")) 
             return "java.lang.Address::$balance";
-        return contractName + "::$" + str;
+        return contractNameInPOs + "::$" + str;
     }
 
 }

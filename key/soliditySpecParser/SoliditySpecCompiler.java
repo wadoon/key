@@ -13,8 +13,15 @@ public class SoliditySpecCompiler {
     private Map<String,FunctionProofObligations> posMap = new HashMap<>();
 
     private String contractName;
+    private String contractNameInPOs;
+    private int contractStartLine;
     private Environment env;
     
+    public SoliditySpecCompiler(String contractName) {
+        this.contractName = contractName;
+        contractNameInPOs = contractName + "Impl";
+    }
+
     private String makeKeYFileString(String function) {
         if (!env.funcs.containsKey(function)) {
             throw new IllegalArgumentException("Could not find function " + function);
@@ -23,7 +30,7 @@ public class SoliditySpecCompiler {
         boolean forConstructor = function.equals(contractName);
         String output = SpecCompilerUtils.loadTemplate();
         output = output.replace(SpecCompilerUtils.INVARIANT_PLACEHOLDER, invariant != null ? invariant : "true")
-                       .replace(SpecCompilerUtils.CONTRACT_NAME_PLACEHOLDER,contractName)
+                       .replace(SpecCompilerUtils.CONTRACT_NAME_PLACEHOLDER,contractNameInPOs)
                        .replace(SpecCompilerUtils.PROGRAM_VARIABLES_PLACEHOLDER, makeProgramVariablesString(function))
                        .replace(SpecCompilerUtils.SCHEMA_VARIABLES_PLACEHOLDER, makeSchemaVariablesString())
                        .replace(SpecCompilerUtils.VARCOND_PLACEHOLDER, makeVarcondString())
@@ -133,7 +140,7 @@ public class SoliditySpecCompiler {
         if (forConstructor) {
             func = "<init>";
         }
-        return "self." + func + "(msg" + parString + ")@" + contractName + ";";
+        return "self." + func + "(msg" + parString + ")@" + contractNameInPOs + ";";
     }
 
     private String makePostConditionString(String func, boolean forConstructor) {
@@ -188,12 +195,27 @@ public class SoliditySpecCompiler {
         return currentFunction;
     }
 
+    private boolean specIsInContract(int startLine) {
+        if (startLine < contractStartLine) {
+            return false;
+        }
+        int maxLine = 0;
+        for (Map.Entry<String,Environment.FunctionInfo> e: env.funcs.entrySet()) {
+            if (e.getValue().lineNo > maxLine) {
+                maxLine = e.getValue().lineNo;
+            }
+        }
+        return startLine >= contractStartLine && startLine <= maxLine;
+    }
+
     public void collectProofObligations(String fileName) throws IOException {
+
         // first pass (reads Solidity code)
-        SoliditySpecPreVisitor sspv = new SoliditySpecPreVisitor();
+        SoliditySpecPreVisitor sspv = new SoliditySpecPreVisitor(contractName);
         sspv.parse(fileName);
-        contractName = sspv.contractName;
-        env = sspv.env;
+        env = sspv.getEnvironment();
+        contractStartLine = sspv.getContractStartLine();
+
         // second pass (reads specification)
         CharStream c = CharStreams.fromStream(new File(fileName).toURI().toURL().openStream());
         SolidityLexer lexer = new SolidityLexer(c);
@@ -205,23 +227,24 @@ public class SoliditySpecCompiler {
                 SolidityParser parser = new SolidityParser(
                     new CommonTokenStream(new SolidityLexer(CharStreams.fromString(toParse,"dummy"))));
                 SolidityParser.SpecDefinitionContext solidityAST = parser.specDefinition();
-                String function = functionFromLineNo(t.getLine());
-                SoliditySpecVisitor visitor = new SoliditySpecVisitor(contractName, function, env);
-                visitor.visit(solidityAST);
-                if (visitor.invariant != null) {
-                    invariant = visitor.invariant;
-                } else {
-                    posMap.put(function, visitor.pos);
+                if (specIsInContract(t.getLine())) {
+                    String function = functionFromLineNo(t.getLine());
+                    SoliditySpecVisitor visitor = new SoliditySpecVisitor(contractNameInPOs, function, env);
+                    visitor.visit(solidityAST);
+                    if (visitor.invariant != null) {
+                        invariant = visitor.invariant;
+                    } else {
+                        posMap.put(function, visitor.pos);
+                    }
                 }
             }
         }
     }
 
     public static void main(String[] args) throws IOException {
-        SoliditySpecCompiler ssc = new SoliditySpecCompiler();
+        SoliditySpecCompiler ssc = new SoliditySpecCompiler(args[1]);
         ssc.collectProofObligations(args[0]);
-        String funcToVerify = args[1];
-        System.out.println(ssc.makeKeYFileString(funcToVerify));
+        System.out.println(ssc.makeKeYFileString(args[2]));
     }
 
 }

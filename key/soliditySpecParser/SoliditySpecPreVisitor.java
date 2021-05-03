@@ -9,14 +9,25 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
-    public Environment env = new Environment();
-    public String contractName; 
+    private Environment env = new Environment();
+    private String contractName; 
+    private int contractStartLine;
 
-    public SoliditySpecPreVisitor() {
+    public SoliditySpecPreVisitor(String contractName) {
         env.vars.put("msg","Message");
         env.vars.put("all_addresses","logical");
         env.vars.put("balance","int");
         env.vars.put("this","");
+
+        this.contractName = contractName;
+    }
+
+    public Environment getEnvironment() {
+        return env;
+    }
+
+    public int getContractStartLine() {
+        return contractStartLine;
     }
 
 	@Override public String visitElementaryTypeName(SolidityParser.ElementaryTypeNameContext ctx) {
@@ -61,8 +72,13 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
     }
 
 	@Override public String visitContractDefinition(SolidityParser.ContractDefinitionContext ctx) {
-        contractName = ctx.identifier().Identifier().getText() + "Impl";
-        return visitChildren(ctx);
+        String currentContractName = ctx.identifier().Identifier().getText();
+        if (contractName.equals(currentContractName)) {
+            contractStartLine = ctx.start.getLine();
+            return visitChildren(ctx);
+        } else {
+            return null;
+        }
     }
 
 	@Override public String visitFunctionDefinition(SolidityParser.FunctionDefinitionContext ctx) {
@@ -107,12 +123,4 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
 		SolidityParser.SourceUnitContext solidityAST = parser.sourceUnit();
 		visit(solidityAST);
     }
-
-	public static void main(String[] args) throws IOException {
-		SolidityLexer lexer = new SolidityLexer(CharStreams.fromStream(new File(args[0]).toURI().toURL().openStream()));
-		SolidityParser parser = new SolidityParser(new CommonTokenStream(lexer));
-		SoliditySpecPreVisitor visitor = new SoliditySpecPreVisitor();
-		SolidityParser.SourceUnitContext solidityAST = parser.sourceUnit();
-		visitor.visit(solidityAST);
-	}
 }

@@ -4,9 +4,9 @@ Compile:
 javac Solidity*.java
 
 Run:
-java SoliditySpecCompiler [.sol file] [function name]
+java SoliditySpecCompiler [.sol file] [contract name] [function name]
 
-A .key-formatted file with proof obligations for [function name] will be printed to stdout. For constructor proof obligations, use [contract name] + "Impl".
+A .key-formatted file with proof obligations for [function name] will be printed to stdout. For constructor proof obligations, use [contract name] as function name.
 
-Only accepts one class. LOTS of other limitations at the moment.
+LOTS of limitations at the moment.
 
