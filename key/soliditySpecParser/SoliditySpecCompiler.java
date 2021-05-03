@@ -87,7 +87,7 @@ public class SoliditySpecCompiler {
             sb.append("&\nmsg.value = 0 ");
         }
         for (String var : env.vars.keySet()) {
-            if (!(("enum").equals(env.vars.get(var)) || ("Message").equals(env.vars.get(var)) || ("logical").equals(env.vars.get(var)) 
+            if (!(("Message").equals(env.vars.get(var)) || ("logical").equals(env.vars.get(var)) 
                     || ("this").equals(var))) {
                 sb.append("&\nself." + var + "!= null " );
             }
@@ -211,7 +211,7 @@ public class SoliditySpecCompiler {
     public void collectProofObligations(String fileName) throws IOException {
 
         // first pass (reads Solidity code)
-        SoliditySpecPreVisitor sspv = new SoliditySpecPreVisitor(contractName);
+        SoliditySpecPreVisitor sspv = new SoliditySpecPreVisitor(contractName, contractNameInPOs);
         sspv.parse(fileName);
         env = sspv.getEnvironment();
         contractStartLine = sspv.getContractStartLine();

@@ -11,15 +11,17 @@ import org.antlr.v4.runtime.CommonTokenStream;
 public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
     private Environment env = new Environment();
     private String contractName; 
+    private String contractNameInPOs; 
     private int contractStartLine;
 
-    public SoliditySpecPreVisitor(String contractName) {
+    public SoliditySpecPreVisitor(String contractName, String contractNameInPOs) {
         env.vars.put("msg","Message");
         env.vars.put("all_addresses","logical");
         env.vars.put("balance","int");
         env.vars.put("this","");
 
         this.contractName = contractName;
+        this.contractNameInPOs = contractNameInPOs;
     }
 
     public Environment getEnvironment() {
@@ -35,11 +37,15 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
     }
 
 	@Override public String visitUserDefinedTypeName(SolidityParser.UserDefinedTypeNameContext ctx) { 
+        String type = ctx.identifier(0).Identifier().getText();
         String subtype = ctx.identifier(1) != null ?
             ctx.identifier(1).Identifier().getText() : null;
-        return subtype == null ? ctx.identifier(0).Identifier().getText() : 
-                ctx.identifier(0).Identifier().getText() + "." + subtype;
-    
+        if (subtype != null) {
+            return type + "." + subtype;
+        } else {
+            return env.enums.containsKey(type) ?
+                env.enums.get(type) : type;
+        }
     }
 
 	@Override public String visitTypeName(SolidityParser.TypeNameContext ctx) {
@@ -67,8 +73,9 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
 	}
 
 	@Override public String visitEnumDefinition(SolidityParser.EnumDefinitionContext ctx) {
-        env.vars.put(ctx.identifier().Identifier().getText(),"enum"); //uncertain if needed
-        return "enum";
+        String enumTypeName = ctx.identifier().Identifier().getText();
+        env.enums.put(enumTypeName, contractNameInPOs +  "." + enumTypeName);
+        return contractNameInPOs + "." + enumTypeName;
     }
 
 	@Override public String visitContractDefinition(SolidityParser.ContractDefinitionContext ctx) {

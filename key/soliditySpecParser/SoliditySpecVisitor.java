@@ -115,13 +115,13 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         String type = env.funcs.get(function).parameters.get(ident);
         if (type != null) { // identifier is function parameter
             return new SMLExpr(type, ident);
+        } else if (ident.equals("this")) {
+            return new SMLExpr("","this");
         } else {
-            if (ident.equals("this")) {
-                return new SMLExpr("","this");
-            }
-            type = env.vars.get(ident);
-            if (("enum").equals(env.vars.get(type))) {
-                type = contractNameInPOs + "." + type;
+            if (env.enums.containsKey(ident)) {
+                type = env.enums.get(ident);
+            } else {
+                type = env.vars.get(ident);
             }
             String access = !type.equals("logical") ? 
                 "(" + type + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + ",self," +
@@ -225,16 +225,14 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
 	@Override public SMLExpr visitDotExpression(SolidityParser.DotExpressionContext ctx) {
         SMLExpr r = visit(ctx.expression());
         String ident = ctx.identifier().Identifier().getText();
-        String typeOutput = contractNameInPOs + "." + ctx.expression().getText();
         String type = null;
         String output = null;
-        if (r.type.equals("enum")) {
+        if (env.enums.containsValue(r.type)) {
             type = r.type;
-            output = typeOutput + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + ",null," + typeOutput + "::$" + ident + ")";
+            output = r.type + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + ",null," + r.type + "::$" + ident + ")";
         } else if (ident.equals("length") || ident.equals("arr_length")) {
             type = "int";
             output = "(" + "int" + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + "," + r.output + "," + ident + "))";
-            
         } else if (r.type.equals("Message")) {    // assuming either msg.sender or msg.value
             type = ident.equals("sender") ? "Address" : "int";
             output = "(" + type + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + ",msg,java.lang.Message::$" + ident + "))";
