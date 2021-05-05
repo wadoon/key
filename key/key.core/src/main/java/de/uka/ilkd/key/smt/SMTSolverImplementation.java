@@ -25,7 +25,10 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.smt.SolverCommunication.Message;
+import de.uka.ilkd.key.smt.processcomm.AbstractSolverSocket;
+import de.uka.ilkd.key.smt.processcomm.ExternalProcessLauncher;
+import de.uka.ilkd.key.smt.processcomm.SolverCommunication;
+import de.uka.ilkd.key.smt.processcomm.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
@@ -224,9 +227,9 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 processLauncher.sendMessage(type.modifyProblem(problemString));
 
                 //JS: Debug start
-                String filename = "/tmp/SolverOutput_" + socket.name + "_" + problem.getName().replaceAll(" ", "");
+                String filename = "/tmp/SolverOutput_" + socket.getName() + "_" + problem.getName().replaceAll(" ", "");
                 BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
-                writer.write(socket.name + " says: \n");
+                writer.write(socket.getName() + " says: \n");
                 Message msg = processLauncher.getPipe().readMessage();
                 //JS: Debug end
                 while (msg != null) {

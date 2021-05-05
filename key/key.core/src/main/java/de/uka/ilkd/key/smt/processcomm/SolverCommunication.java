@@ -11,7 +11,9 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.smt;
+package de.uka.ilkd.key.smt.processcomm;
+
+import de.uka.ilkd.key.smt.SMTSolverResult;
 
 import java.util.Collections;
 import java.util.Iterator;

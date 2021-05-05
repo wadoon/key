@@ -11,12 +11,11 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.smt;
+package de.uka.ilkd.key.smt.processcomm;
 
 
-import de.uka.ilkd.key.api.ScriptResults;
-import de.uka.ilkd.key.smt.SolverCommunication.Message;
-import de.uka.ilkd.key.smt.SolverCommunication.MessageType;
+import de.uka.ilkd.key.smt.processcomm.SolverCommunication.Message;
+import de.uka.ilkd.key.smt.processcomm.SolverCommunication.MessageType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,9 +23,7 @@ import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -38,7 +35,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author Benjamin Niedermann (original)
  * @author Mattias Ulbrich (ovrhaul)
  */
-class Pipe<T> {
+public final class Pipe {
 	/**
 	 * The workers of the pipe. One worker is responsible for sending messages, while the other two workers
 	 * handle messages which are received.
@@ -61,14 +58,14 @@ class Pipe<T> {
 	/**
 	 * User specific data.
 	 */
-	private final T session;
+	private final SolverCommunication session;
 	private OutputStreamWriter outputWriter;
 	private BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
 	private Exception thrownException;
     private Process process;
 
 
-    public Pipe(T session, String [] messageDelimiters) {
+    public Pipe(SolverCommunication session, String [] messageDelimiters) {
 		this.session = session;
 		this.messageDelimiters = messageDelimiters;
 	}
@@ -200,7 +197,7 @@ class Pipe<T> {
 		return stderrReceiver.alive && stdoutReceiver.alive;
 	}
 
-	public T getSession() {
+	public SolverCommunication getSession() {
 		return session;
 	}
 	

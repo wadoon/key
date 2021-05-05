@@ -11,12 +11,11 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.smt;
+package de.uka.ilkd.key.smt.processcomm;
 
-import de.uka.ilkd.key.smt.SolverCommunication.Message;
+import de.uka.ilkd.key.smt.processcomm.SolverCommunication.Message;
 
 import java.io.IOException;
-import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -31,10 +30,10 @@ public class ExternalProcessLauncher<T> {
 
 	private Process process;
 
-	private final Pipe<T> pipe;
+	private final Pipe pipe;
 
-	public ExternalProcessLauncher(T session, String[] messageDelimiters) {
-		pipe = new Pipe<T>(session, messageDelimiters);
+	public ExternalProcessLauncher(SolverCommunication session, String[] messageDelimiters) {
+		pipe = new Pipe(session, messageDelimiters);
 	}
 
     /**
@@ -58,7 +57,7 @@ public class ExternalProcessLauncher<T> {
 	 * Call this method only after the pipe has been stopped. It is not thread safe!
 	 * @return
 	 */
-    T getCommunication(){
+    SolverCommunication getCommunication(){
     	return pipe.getSession();
     }
 	
@@ -72,7 +71,7 @@ public class ExternalProcessLauncher<T> {
 		pipe.close();
 	}
 
-	public Pipe<T> getPipe() {
+	public Pipe getPipe() {
 		return pipe;
 	}
 

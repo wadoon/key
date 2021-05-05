@@ -1,7 +1,10 @@
-package de.uka.ilkd.key.smt;
+package de.uka.ilkd.key.smt.processcomm;
 
-import de.uka.ilkd.key.smt.SolverCommunication.Message;
-import de.uka.ilkd.key.smt.SolverCommunication.MessageType;
+import de.uka.ilkd.key.smt.ModelExtractor;
+import de.uka.ilkd.key.smt.SMTSolverResult;
+import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.processcomm.SolverCommunication.Message;
+import de.uka.ilkd.key.smt.processcomm.SolverCommunication.MessageType;
 
 import java.io.IOException;
 
@@ -38,7 +41,7 @@ public abstract class AbstractSolverSocket {
 		return query;
 	}
 
-	public abstract void messageIncoming(Pipe<SolverCommunication> pipe, Message message) throws IOException;
+	public abstract void messageIncoming(Pipe pipe, Message message) throws IOException;
 
 	public static AbstractSolverSocket createSocket(SolverType type, ModelExtractor query){
 		String name = type.getName();
@@ -75,7 +78,9 @@ public abstract class AbstractSolverSocket {
 	    
     }
 
-
+	public String getName() {
+		return name;
+	}
 }
 
 class Z3Socket extends AbstractSolverSocket{
@@ -84,7 +89,7 @@ class Z3Socket extends AbstractSolverSocket{
 		super(name, query);	    
 	}
 
-	public void messageIncoming(Pipe<SolverCommunication> pipe, Message message) throws IOException {
+	public void messageIncoming(Pipe pipe, Message message) throws IOException {
 		SolverCommunication sc = pipe.getSession();
 		String msg = message.getContent().trim();
 		if(message.getType() == MessageType.Error || msg.startsWith("(error")) {
@@ -142,7 +147,7 @@ class Z3CESocket extends AbstractSolverSocket{
 
 
 	@Override
-	public void messageIncoming(Pipe<SolverCommunication> pipe, Message message) throws IOException {
+	public void messageIncoming(Pipe pipe, Message message) throws IOException {
 		SolverCommunication sc = pipe.getSession();
 		String msg = message.getContent().trim();
 
@@ -224,7 +229,7 @@ class CVC3Socket extends AbstractSolverSocket{
 		super(name, query);
 	}
 
-	public void messageIncoming(Pipe<SolverCommunication> pipe, Message message) throws IOException {
+	public void messageIncoming(Pipe pipe, Message message) throws IOException {
 		SolverCommunication sc = pipe.getSession();
 		String msg = message.getContent().replace('-', ' ').trim();
 		sc.addMessage(msg);
@@ -253,7 +258,7 @@ class CVC4Socket extends AbstractSolverSocket{
         super(name, query);
     }
 
-	public void messageIncoming(Pipe<SolverCommunication> pipe, Message message) throws IOException {
+	public void messageIncoming(Pipe pipe, Message message) throws IOException {
         SolverCommunication sc = pipe.getSession();
 		String msg = message.getContent().trim();
         if ("".equals(msg)) return;
@@ -294,7 +299,7 @@ class SimplifySocket extends AbstractSolverSocket{
 	}
 
 	@Override
-	public void messageIncoming(Pipe<SolverCommunication> pipe, Message message) {
+	public void messageIncoming(Pipe pipe, Message message) {
 		SolverCommunication sc = pipe.getSession();
 		sc.addMessage(message.getContent());
 
@@ -322,7 +327,7 @@ class YICESSocket extends AbstractSolverSocket{
 	}
 
 	@Override
-	public void messageIncoming(Pipe<SolverCommunication> pipe, Message message) {
+	public void messageIncoming(Pipe pipe, Message message) {
 		SolverCommunication sc = pipe.getSession();
 		String msg = message.getContent().replaceAll("\n","");
 		sc.addMessage(msg);
