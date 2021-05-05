@@ -1,0 +1,29 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.5.0"
+}
+
+configurations { antlr4 }
+
+dependencies {
+    antlr4 "org.antlr:antlr4:4.7.1"
+    compile "org.antlr:antlr4-runtime:4.7.1"
+}
+
+def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/adt"
+task runAntlr4(type: JavaExec) {
+    //see incremental task api, prevents rerun if nothing has changed.
+    inputs.dir "src/main/antlr4/"
+    outputs.dir "$projectDir/build/generated/antlr4/main/"
+    classpath = configurations.antlr4
+    main = "org.antlr.v4.Tool"
+    args = ["-visitor",
+            "-Xexact-output-dir", "-o", antlr4Output,
+            "-package", "de.uka.ilkd.key.adt",
+            "src/main/antlr4/ADTLang.g4"]
+    doFirst {
+        file(antlr4Output).mkdirs()
+        println("create $antlr4Output")
+    }
+}
+compileJava.dependsOn runAntlr4
+sourceSets.main.java.srcDirs("$projectDir/build/generated-src/antlr4/main/")

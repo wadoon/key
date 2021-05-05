@@ -1,0 +1,6 @@
+theory {
+  type List = Nil | Cons(any, List)
+
+  fun length(Nil : List) = 0;
+  fun length(Cons(a,b) : List) = length(b) + 1;
+}
