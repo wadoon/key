@@ -92,7 +92,7 @@ import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
  * <code>solver.getException</code>.
  */
 
-public class SolverLauncher implements SolverListener {
+public final class SolverLauncher implements SolverListener {
 
     /* ############### Public Interface #################### */
     /**
