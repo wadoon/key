@@ -4,3 +4,23 @@ theory {
   fun length(Nil : List) = 0;
   fun length(Cons(a,b) : List) = length(b) + 1;
 }
+
+theory {
+  type Map = Nil | Cons(any, any, Map)
+
+  fun get(Nil : Map, key : any) = null
+  fun get(Cons(a,b,c), key : any) =
+    if a == key then
+      b
+    else
+      get(c, key)
+
+  fun set(map, key : any, value : any) = Cons(key, value, map)
+
+  fun int(Nil : Map, key : any) = false
+  fun get(Cons(a,b,c), key : any) =
+    if a == key then
+      true
+    else
+      get(c, key)
+}

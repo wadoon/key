@@ -18,7 +18,7 @@ constructor: name=id ( '(' a+=id (',' a+=id)* ')' )?;
 function:
   'fun' name=id '(' arg (',' arg)* ')' '=' expression ';';
 
-arg: constructor ':' id;
+arg: (constructor|var=id) ':' t=id;
 
 expression :
       expression relop expression
