@@ -62,7 +62,9 @@ public class FileChooserPanel extends JPanel{
             add(box);
             if(withSelection){
                     box = Box.createHorizontalBox();
-                    box.add(getSaveToFileBox());
+                JCheckBox activated = getSaveToFileBox();
+                activated.setSelected(enabled);
+                box.add(activated);
                     box.add(Box.createHorizontalGlue());
                     add(box);
                     setActivationMode(enabled);

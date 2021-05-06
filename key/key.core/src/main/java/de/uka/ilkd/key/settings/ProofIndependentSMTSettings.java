@@ -32,6 +32,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         private static final String TIMEOUT="[SMTSettings]SolverTimeout";
 
 
+        private static final String STORE_SMT_TRANSLATION_TO_FILE = "[SMTSettings]storeSMTToFile";
         private static final String PATH_FOR_SMT_TRANSLATION = "[SMTSettings]pathForSMTTranslation";
 
         private static final String PATH_FOR_TACLET_TRANSLATION = "[SMTSettings]pathForTacletTranslation";
@@ -63,7 +64,6 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         public final static int    PROGRESS_MODE_USER = 0;
         public final static int    PROGRESS_MODE_CLOSE = 1;
         public final static int    PROGRESS_MODE_CLOSE_FIRST = 2;
-
 
 
         private final HashMap<SolverType,SolverData> dataOfSolvers =
@@ -100,9 +100,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         private ProofIndependentSMTSettings(ProofIndependentSMTSettings data) {
                 copy(data);
         }
-        
-        
-        
+
         public int getMaxConcurrentProcesses() {
 			return maxConcurrentProcesses;
 		}
@@ -221,6 +219,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                 timeout = SettingsConverter.read(props, TIMEOUT, timeout);
                 showResultsAfterExecution = SettingsConverter.read(props,SHOW_SMT_RES_DIA,showResultsAfterExecution);
                 pathForSMTTranslation    = SettingsConverter.read(props, PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
+                storeSMTTranslationToFile = SettingsConverter.read(props, STORE_SMT_TRANSLATION_TO_FILE, storeSMTTranslationToFile);
                 pathForTacletTranslation = SettingsConverter.read(props, PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
                 modeOfProgressDialog     = SettingsConverter.read(props,PROGRESS_DIALOG_MODE,modeOfProgressDialog);
                 maxConcurrentProcesses   = SettingsConverter.read(props,MAX_CONCURRENT_PROCESSES,maxConcurrentProcesses);
@@ -245,6 +244,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                 SettingsConverter.store(props,TIMEOUT,timeout);
                 SettingsConverter.store(props,SHOW_SMT_RES_DIA,showResultsAfterExecution);
                 SettingsConverter.store(props,PROGRESS_DIALOG_MODE,modeOfProgressDialog);
+                SettingsConverter.store(props,STORE_SMT_TRANSLATION_TO_FILE,storeSMTTranslationToFile);
                 SettingsConverter.store(props,PATH_FOR_SMT_TRANSLATION,pathForSMTTranslation);
                 SettingsConverter.store(props,PATH_FOR_TACLET_TRANSLATION,pathForTacletTranslation);
                 SettingsConverter.store(props,ACTIVE_SOLVER,activeSolver);
