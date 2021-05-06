@@ -51,17 +51,17 @@ class Translator : ADTLangBaseVisitor<Unit>() {
         ctx.constructor().forEach { it.accept(this) }
 
         var decls = ""
-        var cidx = 0;
+        var cidx = 0
         val deconstructed =
             ctx.constructor().joinToString("\n&") {
-                ++cidx;
+                ++cidx
                 val baseName = it.name.text
                 val args = it.a.map { it.text }
                 if (args.isEmpty()) {
                     "{ \\subst lv; $baseName } phi"
                 } else {
-                    val parameterNames = args.mapIndexed { idx, it ->
-                        "x_${cidx}_${idx}";
+                    val parameterNames = args.mapIndexed { idx, _ ->
+                        "x_${cidx}_${idx}"
                     }
                     parameterNames.zip(args).forEach { (v, s) ->
                         decls += "\\schemaVar \\variable $s $v;\n"
@@ -103,19 +103,42 @@ ${currentSort}_induction {
         declaredTypes.computeIfAbsent(currentSort) { hashMapOf() }[name] = args
     }
 
-    var ruleIdx = 0;
+    var ruleIdx = 0
     override fun visitFunction(ctx: ADTLangParser.FunctionContext) {
-        ++ruleIdx;
+        ++ruleIdx
         val ruleName = ctx.name.text + ruleIdx
 
-        axioms.append("""
-$ruleName { length(nil) = 0 };
-        """.trimIndent())
+        val quant = ctx.arg().flatMap {
+            val type = it.t.text
+            if (it.`var` != null) {
+                listOf("\\forall $type ${it.`var`.text};")
+            } else {
+                val constructorName = it.constructor().name.text
+                val type = getType(type, constructorName)
+                val args = it.constructor().a.map { it.text }
+                args.zip(type).map { (n, t) ->
+                    "\\forall $t $n;"
+                }
+            }
+        }
+
+        val funcName = ctx.name.text
+        val args = ctx.arg().map { it.`var`?.text ?: it.constructor().text }
+            .joinToString(", ")
+        axioms.append(
+            """
+                
+$ruleName { ${quant.joinToString(" ")} $funcName($args) = ${ctx.expression().text} };
+        """.trimIndent()
+        )
         /*
-        length_cons {
-            \forall List l; \forall any a; length(cons(a, l)) = 1 + length(l)
-        };*/
-        super.visitFunction(ctx)
+length_cons {
+    \forall List l; \forall any a; length(cons(a, l)) = 1 + length(l)
+};*/
+    }
+
+    private fun getType(type: String, constructorName: String): List<String> {
+        return declaredTypes[type]?.get(constructorName)!!
     }
 
 
