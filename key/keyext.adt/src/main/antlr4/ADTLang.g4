@@ -21,7 +21,8 @@ function:
 arg: (constructor|var=id) ':' t=id;
 
 expression :
-      expression relop expression
+      'if' expression 'then' expression 'else' expression
+   |  expression relop expression
    |  expression  POW expression
    |  expression  (TIMES | DIV)  expression
    |  expression  (PLUS | MINUS) expression
