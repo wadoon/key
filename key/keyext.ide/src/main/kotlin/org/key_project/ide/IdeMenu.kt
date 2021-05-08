@@ -15,7 +15,7 @@ class IdeMenu(val ctx: Context) {
     val recentFiles = Menu("Recent files")
     val ui = MenuBar(file, edit, view, tools)
 
-    val main by ctx.ref<MainScene>()
+    val main by ctx.ref<MainView>()
 
     init {
         val rf = ctx.get<RecentFiles>().files

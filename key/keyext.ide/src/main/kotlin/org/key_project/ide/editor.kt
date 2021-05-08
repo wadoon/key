@@ -3,7 +3,6 @@ package org.key_project.ide
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
-import javafx.scene.control.ScrollPane
 import org.antlr.v4.runtime.CharStreams
 import org.fxmisc.flowless.VirtualizedScrollPane
 import org.fxmisc.richtext.CodeArea
@@ -16,10 +15,8 @@ import tornadofx.setValue
 import java.nio.file.Path
 import java.time.Duration
 import java.util.*
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.extension
 
-@OptIn(ExperimentalPathApi::class)
 object Editors {
     @JvmStatic
     fun getLanguageForFilename(file: Path) = getEditorForSuffix(file.extension)
@@ -34,11 +31,10 @@ object Editors {
 }
 
 
-@Suppress("MemberVisibilityCanBePrivate")
-open class Editor(val ctx: Context) : Controller {
+class Editor(val ctx: Context)  {
     val editor = CodeArea("")
     val scrollPane =VirtualizedScrollPane(editor)
-    override val ui = scrollPane
+    val ui = scrollPane
 
     val dirtyProperty = SimpleBooleanProperty(this, "dirty", false)
     var dirty by dirtyProperty
@@ -68,7 +64,7 @@ open class Editor(val ctx: Context) : Controller {
             onTextLightComputation()
         }
 
-        languageProperty.addListener { _, _, new ->
+        languageProperty.addListener { _, _, _ ->
             onTextLightComputation()
             onTextChangeHeavyComputation()
         }

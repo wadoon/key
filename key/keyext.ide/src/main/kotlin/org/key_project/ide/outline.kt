@@ -1,15 +1,13 @@
 package org.key_project.ide
 
-import javafx.scene.control.Tab
 import javafx.scene.control.TreeView
+import tornadofx.View
 
-class FileOutline(ctx: Context) : TitledPanel("Outline") {
-    val tab: Tab = Tab("Outline")
+class FileOutline(ctx: Context) : View("Outline") {
     val outlineTree = TreeView<OutlineEntry>()
+    override val root = outlineTree
     init {
         ctx.register(this)
-        ui.center = outlineTree
-        tab.content = ui
     }
 }
 

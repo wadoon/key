@@ -4,10 +4,11 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.event.ActionEvent
-import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.control.cell.TextFieldTreeCell
 import javafx.util.StringConverter
+import tornadofx.View
+import tornadofx.borderpane
 import tornadofx.getValue
 import tornadofx.setValue
 import java.awt.Desktop
@@ -16,10 +17,13 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-class FileNavigator(ctx: Context) : TitledPanel("Files"){
-    private val config = ctx.get<UserConfig>()
-    private val main by ctx.ref<MainScene>()
-    val tab: Tab = Tab("Files")
+class FileNavigator(ctx: Context) : View("Files") {
+    private val config0 = ctx.get<UserConfig>()
+    private val main by ctx.ref<MainView>()
+
+    override val root = borderpane {
+        center = treeFile
+    }
 
     //properties
     val rootFileProperty = SimpleObjectProperty(this, "rootFile", Paths.get(".").normalize().toAbsolutePath())
@@ -33,13 +37,13 @@ class FileNavigator(ctx: Context) : TitledPanel("Files"){
 
     private fun markFolderUnderMouse(event: ActionEvent) {}
 
-    private val actionOpenFile = config.createItem("tree-open-file") {
+    private val actionOpenFile = config0.createItem("tree-open-file") {
         markFolderUnderMouse(it)
         treeFile.selectionModel.selectedItem?.let {
             main.open(it.value)
         }
     }
-    private val actionNewFile = config.createItem("tree-new-file") {
+    private val actionNewFile = config0.createItem("tree-new-file") {
         markFolderUnderMouse(it)
         treeFile.selectionModel.selectedItem?.let { item ->
             val path = item.value!!
@@ -60,7 +64,7 @@ class FileNavigator(ctx: Context) : TitledPanel("Files"){
             }
         }
     }
-    private val actionNewDirectory = config.createItem("tree-new-directory") {
+    private val actionNewDirectory = config0.createItem("tree-new-directory") {
         markFolderUnderMouse(it)
         treeFile.selectionModel.selectedItem?.let { item ->
             val path = item.value!!
@@ -81,30 +85,30 @@ class FileNavigator(ctx: Context) : TitledPanel("Files"){
             }
         }
     }
-    private val actionRenameFile = config.createItem("tree-rename-file") { }
-    private val actionDeleteFile = config.createItem("tree-delete-file") {}
-    private val actionGoUp = config.createItem("go-up") {
+    private val actionRenameFile = config0.createItem("tree-rename-file") { }
+    private val actionDeleteFile = config0.createItem("tree-delete-file") {}
+    private val actionGoUp = config0.createItem("go-up") {
         markFolderUnderMouse(it)
         treeFile.root.value?.let { file ->
             treeFile.root = SimpleFileTreeItem(file.parent.toAbsolutePath())
             treeFile.root.isExpanded = true
         }
     }
-    private val actionGoInto = config.createItem("go-into") {
+    private val actionGoInto = config0.createItem("go-into") {
         markFolderUnderMouse(it)
         (treeFile.selectionModel.selectedItem)?.let { file ->
             treeFile.root = SimpleFileTreeItem(file.value.toAbsolutePath())
             treeFile.root.isExpanded = true
         }
     }
-    private val actionRefresh = config.createItem("refresh") { refresh() }
+    private val actionRefresh = config0.createItem("refresh") { refresh() }
 
     private fun refresh() {}
 
-    private val actionExpandSubTree = config.createItem("expand-tree") {
+    private val actionExpandSubTree = config0.createItem("expand-tree") {
         markFolderUnderMouse(it)
     }
-    private val actionOpenExplorer = config.createItem("open-in-explorer", this::openExplorer)
+    private val actionOpenExplorer = config0.createItem("open-in-explorer", this::openExplorer)
 
     fun openExplorer(evt: ActionEvent) {
         markFolderUnderMouse(evt)
@@ -117,7 +121,7 @@ class FileNavigator(ctx: Context) : TitledPanel("Files"){
         }
     }
 
-    private val actionOpenSystem = config.createItem("xdg-open", this::openSystem)
+    private val actionOpenSystem = config0.createItem("xdg-open", this::openSystem)
 
     fun openSystem(evt:ActionEvent): (ActionEvent) -> Unit = {
             markFolderUnderMouse(evt)
@@ -156,7 +160,7 @@ class FileNavigator(ctx: Context) : TitledPanel("Files"){
         rootFileProperty.addListener { _, _, new ->
             treeFile.root = SimpleFileTreeItem(new)
         }
-        ui.center = treeFile
+
         treeFile.setCellFactory { tv ->
             TextFieldTreeCell(object : StringConverter<Path>() {
                 override fun toString(obj: Path?): String = obj?.fileName.toString() ?: ""
@@ -164,7 +168,6 @@ class FileNavigator(ctx: Context) : TitledPanel("Files"){
             })
         }
         treeFile.root.isExpanded = true
-        tab.content = ui
     }
 }
 

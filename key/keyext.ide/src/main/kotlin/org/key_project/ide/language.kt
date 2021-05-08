@@ -4,6 +4,7 @@ import javafx.scene.Node
 import javafx.scene.control.TreeItem
 import org.antlr.v4.runtime.*
 import org.key_project.ide.parser.*
+import de.uka.ilkd.key.nparser.*
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*

@@ -6,10 +6,10 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular
 import org.kordamp.ikonli.javafx.FontIcon
 import tornadofx.readonlyColumn
 
-class IssueList(context: Context) : Controller, TabbedPane, TitledPanel("Issues") {
+class IssueList(context: Context) : TitledPanel("Issues") {
     //val view = TreeTableView<IssueEntry>()
     val view = TableView<IssueEntry>()
-    override val tab: Tab = Tab().also { it.content = ui }
+    val tab: Tab = Tab().also { it.content = ui }
 
     init {
         context.register(this)

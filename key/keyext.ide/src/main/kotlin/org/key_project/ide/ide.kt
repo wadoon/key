@@ -2,14 +2,12 @@ package org.key_project.ide
 
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
-import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.event.Event
 import javafx.event.EventHandler
 import javafx.geometry.Orientation
-import javafx.scene.Group
+import javafx.geometry.Side
 import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.control.*
@@ -22,37 +20,42 @@ import javafx.stage.Stage
 import tornadofx.*
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
-interface Controller {
-    val ui: Node
-}
+class MainView() : View() {
+    val context = ROOT_CONTEXT
 
-interface TabbedPane {
-    val tab: Tab
-}
-
-
-@OptIn(ExperimentalPathApi::class)
-class MainScene(val context: Context) : View() {
     //region controllers
     val menu = IdeMenu(context)
     val fileNavigator = FileNavigator(context)
     val outline = FileOutline(context)
+    val statusBar = StatusBar(context)
+    val problems = IssueList(context)
     //endregion
-
-    override val root = BorderPane()
-    val scene = Scene(root, 300.0, 300.0)
 
     val editors = SplitPane()
 
-    val paneNavigation = SidePane(SidePane.Position.LEFT)
-    val paneTool = SidePane(SidePane.Position.DOWN)
+    val paneNavigation = drawer(multiselect = true) {
+        item("Files", null, expanded = true, showHeader = true) {
+            this.add(fileNavigator)
+        }
 
-    val statusBar = StatusBar(context)
-    val problems = IssueList(context)
+        item("Outline") {
+            this.add(outline)
+        }
+    }
+
+    val paneTool = drawer(side = Side.BOTTOM) {
+
+    }
+
+
+    override val root = borderpane {
+        center = editors
+        left = paneNavigation
+        bottom = paneTool
+    }
 
     val openEditors = arrayListOf<Editor>()
     val editorTabPanes: List<TabPane>
@@ -66,15 +69,15 @@ class MainScene(val context: Context) : View() {
 
         editors.orientation = Orientation.HORIZONTAL
 
-        paneNavigation.tabs.setAll(outline.tab, fileNavigator.tab)
+        //paneNavigation.tabs.setAll(outline.tab, fileNavigator.tab)
         editors.items.addAll(editorTabPanes)
 
 
         root.top = menu.ui
         root.bottom = statusBar.ui
-        paneNavigation.content = paneTool.ui
-        paneTool.content = editors
-        root.center = paneNavigation.ui
+        //paneNavigation.content = paneTool.ui
+        //paneTool.content = editors
+        //root.center = paneNavigation.ui
 
         val appData = context.get<ApplicationData>()
         fileNavigator.rootFile = Paths.get(appData.lastNavigatorPath)
@@ -87,11 +90,11 @@ class MainScene(val context: Context) : View() {
 
 //        paneTool.ui.centerProperty().addListener()
 
-        addToolPanel(problems)
+        //addToolPanel(problems)
     }
 
-    private fun addToolPanel(tab: TabbedPane) {
-        paneTool.tabs.add(tab.tab)
+    private fun addToolPanel() {
+        //paneTool.tabs.add(tab.tab)
     }
 
     fun publishMessage(status: String, graphic: Node? = null) {
@@ -145,15 +148,7 @@ class MainScene(val context: Context) : View() {
 
     fun closeEditorTab(editor: Editor? = currentEditor) {}
 
-    fun exit() {
-        scene.window.onCloseRequest
-    }
-
-    private fun onCloseRequest() {
-
-    }
-
-    fun newWindow(): MainScene {
+    fun newWindow(): MainView {
         val stage = Stage()
         val ctx = Context()
 
@@ -161,11 +156,12 @@ class MainScene(val context: Context) : View() {
         ctx.register(context.get<ApplicationData>())
         ctx.register(context.get<RecentFiles>())
 
-        val main = MainScene(context)
+        val main = MainView()
         main.root.styleClass.addAll("root", context.get<UserConfig>().theme)
-        context.get<ThemeManager>().installCss(main.scene)
+        val scene = Scene(main.root, 400.0, 400.0)
+        context.get<ThemeManager>().installCss(scene)
         stage.hookGlobalShortcuts()
-        stage.scene = main.scene
+        stage.scene = scene
         stage.show()
         return main
     }
@@ -173,7 +169,7 @@ class MainScene(val context: Context) : View() {
     fun saveAs(editor: Editor? = currentEditor) =
         editor?.also {
             val fileChooser = FileChooser()
-            fileChooser.showSaveDialog(scene.window)?.let { new ->
+            fileChooser.showSaveDialog(currentWindow)?.let { new ->
                 editor.filename = new.toPath()
                 save(editor)
             }
@@ -189,7 +185,7 @@ class MainScene(val context: Context) : View() {
 
     fun open() {
         val fc = FileChooser()
-        fc.showOpenDialog(scene.window)?.let { file ->
+        fc.showOpenDialog(currentWindow)?.let { file ->
             open(file.toPath())
         }
     }
@@ -270,7 +266,7 @@ class MainScene(val context: Context) : View() {
 
     fun newWindow(currentEditor: Editor?) {
         val mainScene = newWindow()
-        if(currentEditor!=null) {
+        if (currentEditor != null) {
             val (p, t) = getTabPane(currentEditor)
             p?.tabs?.remove(t)
             mainScene.addEditorTab(currentEditor)
@@ -278,11 +274,11 @@ class MainScene(val context: Context) : View() {
     }
 }
 
-class StatusBar(context: Context) : Controller {
+class StatusBar(context: Context) {
     val lblMessage = Label()
     val lblLineRow = Label()
     val lblError = Label()
-    override val ui: HBox = HBox(10.0, lblMessage, lblLineRow, lblError)
+    val ui: HBox = HBox(10.0, lblMessage, lblLineRow, lblError)
 
     val messageProperty = lblMessage.textProperty()
     var message: String by messageProperty
@@ -294,7 +290,6 @@ class StatusBar(context: Context) : Controller {
         context.register<StatusBar>(this)
     }
 }
-
 
 open class TitledPanel(header: String) {
     val ui = BorderPane()
