@@ -4,7 +4,7 @@ class Environment {
     public Map<String,String> vars = new HashMap<>();
     public Map<String,String> cumulativeLogicalVars = new HashMap<>();
     public Map<String,Environment.FunctionInfo> funcs = new HashMap<>();
-    public Map<String,String> enums = new HashMap<>();
+    public Set<String> enums = new HashSet<>();
 
     public static class FunctionInfo {
         public boolean payable;

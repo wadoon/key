@@ -211,7 +211,7 @@ public class SoliditySpecCompiler {
     public void collectProofObligations(String fileName) throws IOException {
 
         // first pass (reads Solidity code)
-        SoliditySpecPreVisitor sspv = new SoliditySpecPreVisitor(contractName, contractNameInPOs);
+        SoliditySpecPreVisitor sspv = new SoliditySpecPreVisitor(contractName);
         sspv.parse(fileName);
         env = sspv.getEnvironment();
         contractStartLine = sspv.getContractStartLine();

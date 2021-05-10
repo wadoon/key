@@ -39,6 +39,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
     private String contractNameInPOs;
     private String function;
     private SMLStatementType stmtType;
+    private Map<String,String> enumToKeYType = new HashMap<>();
 
     public SoliditySpecVisitor(String contractNameInPOs, String function, Environment env) {
         super();
@@ -118,8 +119,9 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         } else if (ident.equals("this")) {
             return new SMLExpr("","this");
         } else {
-            if (env.enums.containsKey(ident)) {
-                type = env.enums.get(ident);
+            if (env.enums.contains(ident) || env.enums.contains(env.vars.get(ident))) {
+                type = contractNameInPOs + "." + (env.enums.contains(ident) ? ident : env.vars.get(ident));
+                enumToKeYType.put(ident, type);
             } else {
                 type = env.vars.get(ident);
             }
@@ -227,7 +229,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         String ident = ctx.identifier().Identifier().getText();
         String type = null;
         String output = null;
-        if (env.enums.containsValue(r.type)) {
+        if (enumToKeYType.containsValue(r.type)) {
             type = r.type;
             output = r.type + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + ",null," + r.type + "::$" + ident + ")";
         } else if (ident.equals("length") || ident.equals("arr_length")) {

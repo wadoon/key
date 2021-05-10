@@ -11,17 +11,15 @@ import org.antlr.v4.runtime.CommonTokenStream;
 public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
     private Environment env = new Environment();
     private String contractName; 
-    private String contractNameInPOs; 
     private int contractStartLine;
 
-    public SoliditySpecPreVisitor(String contractName, String contractNameInPOs) {
+    public SoliditySpecPreVisitor(String contractName)  {
         env.vars.put("msg","Message");
         env.vars.put("all_addresses","logical");
         env.vars.put("balance","int");
         env.vars.put("this","");
 
         this.contractName = contractName;
-        this.contractNameInPOs = contractNameInPOs;
     }
 
     public Environment getEnvironment() {
@@ -43,8 +41,7 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
         if (subtype != null) {
             return type + "." + subtype;
         } else {
-            return env.enums.containsKey(type) ?
-                env.enums.get(type) : type;
+            return type;
         }
     }
 
@@ -74,8 +71,8 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
 
 	@Override public String visitEnumDefinition(SolidityParser.EnumDefinitionContext ctx) {
         String enumTypeName = ctx.identifier().Identifier().getText();
-        env.enums.put(enumTypeName, contractNameInPOs +  "." + enumTypeName);
-        return contractNameInPOs + "." + enumTypeName;
+        env.enums.add(enumTypeName);
+        return enumTypeName;
     }
 
 	@Override public String visitContractDefinition(SolidityParser.ContractDefinitionContext ctx) {
