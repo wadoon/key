@@ -153,13 +153,15 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
             }
             contract.append(" {\n");
    		    ctx.contractPart().stream().forEach(part -> contract.append(visit(part) + ";\n"));
+        } else if (currentContractInfo.type == ContractInfo.LIBRARY) {
+            contract.append("class " + ctx.identifier().getText() + " {\n"); 
+   		    ctx.contractPart().stream().forEach(part -> contract.append(visit(part) + "\n"));
         }
-
 
         if (currentContractInfo.type == ContractInfo.CONTRACT) {
             output += makeInterface();
             output += makeBaseClass();
-        }
+        } 
         output += contract.append("}\n").toString();
 		return getOutput();
 	}
@@ -206,9 +208,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
         if (currentContractInfo.is.size() > 0) {
             sb.append(" extends");
             currentContractInfo.is.forEach(c -> {
-                if (contractMap.get(c).type != ContractInfo.LIBRARY) {
-                    sb.append(" " + c + ",");
-                }
+                sb.append(" " + c + ",");
             });
             sb.deleteCharAt(sb.length()-1);
         }
@@ -220,9 +220,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
         // add inherited functions
         if (currentContractInfo.is.size() > 0) {
             currentContractInfo.is.forEach(c -> {
-                if (contractMap.get(c).type != ContractInfo.LIBRARY) {
-                    contractMap.get(c).functionHeaders.forEach((func,str) -> sb.append(str + ";\n"));
-                }
+                contractMap.get(c).functionHeaders.forEach((func,str) -> sb.append(str + ";\n"));
             });
         }
 
@@ -448,8 +446,10 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
     		if (mods.length() > 0) body.insert(body.indexOf("{") + 1, "\n" + mods);
         }
 
-        currentContractInfo.functionHeaders.put(fctName, modifier + " " + returnType + " " + fctName + "(" + parameters + ")" );
-		return modifier + " " + returnType + " " + fctName + "(" + parameters + ")" + body;
+        String fctHeader = modifier + (currentContractInfo.type == ContractInfo.LIBRARY ? " static " : " ") 
+            + returnType + " " + fctName + "(" + parameters + ")"; 
+        currentContractInfo.functionHeaders.put(fctName, fctHeader);
+		return fctHeader + " " + body;
 	}
 	/**
 	 * {@inheritDoc}
@@ -958,7 +958,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		String exp = visit(ctx.expression());
         String ident = visit(ctx.identifier()); 
         // if this is an explicit call to derived contract's function
-        if (contractMap.containsKey(exp)) {
+        if (contractMap.containsKey(exp) && contractMap.get(exp).type != ContractInfo.LIBRARY) {
             return "__" + exp + "__" + ident;
         }
         return exp + "." + ident;
