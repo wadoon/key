@@ -19,7 +19,7 @@ public class SoliditySpecCompiler {
     
     public SoliditySpecCompiler(String contractName) {
         this.contractName = contractName;
-        contractNameInPOs = contractName + "Impl";
+        this.contractNameInPOs = "contractNameInPOs NOT SET";
     }
 
     private String makeKeYFileString(String function) {
@@ -215,6 +215,10 @@ public class SoliditySpecCompiler {
         sspv.parse(fileName);
         env = sspv.getEnvironment();
         contractStartLine = sspv.getContractStartLine();
+        contractNameInPOs = env.unitType == Environment.UnitType.CONTRACT ? contractName + "Impl" : contractName;
+        if (env.unitType == Environment.UnitType.INTERFACE) {
+            throw new UnsupportedOperationException("Interfaces not yet supported.");
+        }
 
         // second pass (reads specification)
         CharStream c = CharStreams.fromStream(new File(fileName).toURI().toURL().openStream());

@@ -50,7 +50,7 @@ importDirective
   | 'import' '{' importDeclaration ( ',' importDeclaration )* '}' 'from' StringLiteral ';' ;
 
 contractDefinition
-  : ( 'contract' | 'interface' | 'library' ) identifier
+  : (ContractKeyword | InterfaceKeyword | LibraryKeyword) identifier
     ( 'is' inheritanceSpecifier (',' inheritanceSpecifier )* )?
     '{' contractPart* '}' ;
 
@@ -449,14 +449,18 @@ AnonymousKeyword : 'anonymous' ;
 BreakKeyword : 'break' ;
 ConstantKeyword : 'constant' ;
 ContinueKeyword : 'continue' ;
+ContractKeyword : 'contract';
 ExternalKeyword : 'external' ;
 IndexedKeyword : 'indexed' ;
+InterfaceKeyword : 'interface'; 
 InternalKeyword : 'internal' ;
+LibraryKeyword : 'library'; 
 PayableKeyword : 'payable' ;
 PrivateKeyword : 'private' ;
 PublicKeyword : 'public' ;
 PureKeyword : 'pure' ;
 ViewKeyword : 'view' ;
+
 
 Identifier
   : IdentifierStart IdentifierPart* ;

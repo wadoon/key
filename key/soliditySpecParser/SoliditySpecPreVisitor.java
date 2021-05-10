@@ -78,6 +78,13 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
 	@Override public String visitContractDefinition(SolidityParser.ContractDefinitionContext ctx) {
         String currentContractName = ctx.identifier().Identifier().getText();
         if (contractName.equals(currentContractName)) {
+            if (ctx.ContractKeyword() != null) {
+                env.unitType = Environment.UnitType.CONTRACT;
+            } else if (ctx.InterfaceKeyword() != null) {
+                env.unitType = Environment.UnitType.INTERFACE;
+            } else if (ctx.LibraryKeyword() != null) {
+                env.unitType = Environment.UnitType.LIBRARY;
+            }
             contractStartLine = ctx.start.getLine();
             return visitChildren(ctx);
         } else {

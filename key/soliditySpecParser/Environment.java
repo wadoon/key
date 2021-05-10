@@ -1,10 +1,13 @@
 import java.util.*;
 
 class Environment {
+    public enum UnitType {CONTRACT, INTERFACE, LIBRARY}
+
     public Map<String,String> vars = new HashMap<>();
     public Map<String,String> cumulativeLogicalVars = new HashMap<>();
     public Map<String,Environment.FunctionInfo> funcs = new HashMap<>();
     public Set<String> enums = new HashSet<>();
+    public UnitType unitType;
 
     public static class FunctionInfo {
         public boolean payable;
