@@ -45,6 +45,12 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
         }
     }
 
+    private void addInstanceOfUserType(String instance, String userType) {
+        for (Map.Entry<String,String> e : env.userTypes.get(userType).members.entrySet()) {
+            env.vars.put(instance + "." + e.getKey(), e.getValue());
+        }
+    }
+
 	@Override public String visitTypeName(SolidityParser.TypeNameContext ctx) {
         if (ctx.typeName() != null) { // this is an array
             String typeName = visit(ctx.typeName());
@@ -62,11 +68,12 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
 
     @Override public String visitStateVariableDeclaration(SolidityParser.StateVariableDeclarationContext ctx) { 
         String typeRes = visit(ctx.typeName());
-//		env.vars.put(ctx.getText(), 
-//			ctx.getRuleIndex());
-        env.vars.put(ctx.identifier().Identifier().getText(), typeRes);
-//        System.out.println(typeRes.type + " " + ctx.identifier().Identifier().getText());
-		return null;
+        if (env.userTypes.containsKey(typeRes)) {
+            addInstanceOfUserType(ctx.identifier().Identifier().getText(), typeRes);
+        } else {
+            env.vars.put(ctx.identifier().Identifier().getText(), typeRes);
+        }
+		return "";
 	}
 
 	@Override public String visitEnumDefinition(SolidityParser.EnumDefinitionContext ctx) {
@@ -104,12 +111,16 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
         env.funcs.put(funcName, new Environment.FunctionInfo(payable, ctx.start.getLine()));
         List<SolidityParser.ParameterContext> pars = ctx.parameterList().parameter();
         for (SolidityParser.ParameterContext p : pars) {
-            env.funcs.get(funcName).parameters.put(p.identifier().getText(),SpecCompilerUtils.solidityToJavaType(p.typeName().getText()));
-            env.funcs.get(funcName).parameterOrder.add(p.identifier().getText());
+            String typeName = visit(p.typeName());
+            String ident = p.identifier().getText();
+            if (env.userTypes.containsKey(typeName)) {
+                addInstanceOfUserType(ident,typeName);
+            }
+            env.funcs.get(funcName).parameters.put(ident, typeName);
+            env.funcs.get(funcName).parameterOrder.add(ident);
         }
         if (ctx.returnParameters() != null) {
-            env.funcs.get(funcName).returnType = SpecCompilerUtils.solidityToJavaType(
-                ctx.returnParameters().parameterList().parameter(0).getText());
+            env.funcs.get(funcName).returnType = visit(ctx.returnParameters().parameterList().parameter(0).typeName());
         }
         return "";
     }
@@ -126,9 +137,18 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
         env.funcs.put(funcName, new Environment.FunctionInfo(payable, ctx.start.getLine()));
         List<SolidityParser.ParameterContext> pars = ctx.parameterList().parameter();
         for (SolidityParser.ParameterContext p : pars) {
-            env.funcs.get(funcName).parameters.put(p.identifier().Identifier().getText(),SpecCompilerUtils.solidityToJavaType(p.typeName().getText()));
+            env.funcs.get(funcName).parameters.put(p.identifier().Identifier().getText(),visit(p.typeName()));
             env.funcs.get(funcName).parameterOrder.add(p.identifier().Identifier().getText());
         }
+        return "";
+    }
+
+	@Override public String visitStructDefinition(SolidityParser.StructDefinitionContext ctx) {
+        Environment.UserType ut = new Environment.UserType();
+        for(SolidityParser.VariableDeclarationContext vctx : ctx.variableDeclaration()) {
+           ut.members.put(vctx.identifier().getText(), visit(vctx.typeName())); 
+        }
+        env.userTypes.put(ctx.identifier().getText(), ut);
         return "";
     }
 

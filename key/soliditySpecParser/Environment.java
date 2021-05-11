@@ -7,6 +7,7 @@ class Environment {
     public Map<String,String> cumulativeLogicalVars = new HashMap<>();
     public Map<String,Environment.FunctionInfo> funcs = new HashMap<>();
     public Set<String> enums = new HashSet<>();
+    public Map<String,UserType> userTypes = new HashMap<>();
     public UnitType unitType;
 
     public static class FunctionInfo {
@@ -23,6 +24,10 @@ class Environment {
         public String toString() {
             return "payable " + payable + " line no " + lineNo;
         }
+    }
+
+    public static class UserType {
+        public Map<String,String> members = new HashMap<>();
     }
 }
 
