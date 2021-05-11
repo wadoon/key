@@ -7,7 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class SpecCompilerUtils {
-    public static final String TEMPLATE_FILE = "include/template.key";
+    public static final String LIBRARY_TEMPLATE_FILE = "include/template_interface.key";
+    public static final String CONTRACT_TEMPLATE_FILE = "include/template_contract.key";
 
     public static final String HEAP_PLACEHOLDER_STRING = "__heap__";
     public static final String CONTRACT_NAME_PLACEHOLDER = "__contract_name_placeholder__";
@@ -51,7 +52,7 @@ public class SpecCompilerUtils {
 
     public static String loadTemplate() {
         try {
-            return Files.readString(Path.of(TEMPLATE_FILE));
+            return Files.readString(Path.of(CONTRACT_TEMPLATE_FILE));
         } catch (IOException e) {
             e.printStackTrace();
             return "error";
