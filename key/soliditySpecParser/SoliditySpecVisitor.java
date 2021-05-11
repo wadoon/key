@@ -280,6 +280,14 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         return r;
     }
 
+	@Override public SMLExpr visitResultExpression(SolidityParser.ResultExpressionContext ctx) {
+        String type = env.funcs.get(function).returnType;
+        if (type == null) {
+            throw new IllegalArgumentException("Referring to result of a void function");
+        }
+        return new SMLExpr(type, "_result");
+    }
+
     // this was implemented somewhat arbitrarily, don't know if it should be changed
     @Override public SMLExpr aggregateResult(SMLExpr agg, SMLExpr next) {
         if (agg == null) {

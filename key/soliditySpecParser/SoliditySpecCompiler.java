@@ -102,7 +102,8 @@ public class SoliditySpecCompiler {
         if (forConstructor) {
             sb.append("&\nmsg.sender != " + SELF_PLACEHOLDER + " ");
             sb.append("&\n(\\forall Address a; int::select(heap,net,address(a))=0) ");
-            // assumptions for state variable values
+            // Assumptions for state variable values
+            // This is very hard-coded. Sorry.
             for (Map.Entry<String,String> p : env.vars.entrySet()) {
                 if (!(("enum").equals(p.getValue()) || ("Message").equals(env.vars.get(p.getValue())))) {
                     if (("boolean[]").equals(p.getValue())) {
