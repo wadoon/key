@@ -315,7 +315,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public String visitStructDefinition(SolidityParser.StructDefinitionContext ctx) {
-		StringBuffer structDef = new StringBuffer("class "+visit(ctx.identifier()) + "{\n");
+		StringBuffer structDef = new StringBuffer("static class "+visit(ctx.identifier()) + "{\n");
 		ctx.variableDeclaration().stream().forEach(v -> structDef.append(visit(v)).append(";\n"));
 		structDef.append("}");
 		return structDef.toString(); 
