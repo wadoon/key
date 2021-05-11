@@ -35,7 +35,7 @@ public class SoliditySpecCompiler {
                        .replace(SpecCompilerUtils.PROGRAM_VARIABLES_PLACEHOLDER, makeProgramVariablesString(function))
                        .replace(SpecCompilerUtils.SCHEMA_VARIABLES_PLACEHOLDER, makeSchemaVariablesString())
                        .replace(SpecCompilerUtils.VARCOND_PLACEHOLDER, makeVarcondString())
-                       .replace(SpecCompilerUtils.ASSUMPTION_PLACEHOLDER, makeAssumptionString(funcPayable,forConstructor))
+                       .replace(SpecCompilerUtils.ASSUMPTION_PLACEHOLDER, makeAssumptionString(function, funcPayable, forConstructor))
                        .replace(SpecCompilerUtils.HEAP_UPDATE_PLACEHOLDER, makeHeapUpdateString(function, funcPayable, forConstructor))
                        .replace(SpecCompilerUtils.FUNCTION_PLACEHOLDER, makeFunctionCallString(function,forConstructor))
                        .replace(SpecCompilerUtils.POSTCONDITION_PLACEHOLDER, makePostConditionString(function,forConstructor));
@@ -80,7 +80,7 @@ public class SoliditySpecCompiler {
         return "\\varcond(" + sb.toString() + ")";
     }
 
-    private String makeAssumptionString(boolean payable, boolean forConstructor) {
+    private String makeAssumptionString(String func, boolean payable, boolean forConstructor) {
         StringBuilder sb = new StringBuilder();
         if (!forConstructor && env.unitType == Environment.UnitType.CONTRACT) {
             sb.append("&\nCInv(heap," + SELF_PLACEHOLDER + ") ");
@@ -95,6 +95,9 @@ public class SoliditySpecCompiler {
                     || ("this").equals(var))) {
                 sb.append("&\n" + SELF_PLACEHOLDER + "." + var + "!= null " );
             }
+        }
+        if (posMap.get(func).assumes != null) {
+            sb.append("&\n" + posMap.get(func).assumes + " ");
         }
         if (forConstructor) {
             sb.append("&\nmsg.sender != " + SELF_PLACEHOLDER + " ");

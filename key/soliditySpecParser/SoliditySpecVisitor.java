@@ -56,7 +56,13 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         return r;
     }
 
-    @Override public SMLExpr visitSpecAssumes(SolidityParser.SpecAssumesContext ctx) { return visitChildren(ctx); }
+    @Override public SMLExpr visitSpecAssumes(SolidityParser.SpecAssumesContext ctx) { 
+        stmtType = SMLStatementType.ASSUMES;
+        SMLExpr r = visitChildren(ctx);
+        r.output = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP, r.output);
+        pos.assumes = r.output;
+        return r;
+    }
 
 	@Override public SMLExpr visitSpecAssignable(SolidityParser.SpecAssignableContext ctx) {
         stmtType = SMLStatementType.ASSIGNABLE;
