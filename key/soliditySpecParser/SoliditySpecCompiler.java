@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 
 public class SoliditySpecCompiler {
+    private final String SELF_PLACEHOLDER = "__self__";
     private String invariant;
     private Map<String,FunctionProofObligations> posMap = new HashMap<>();
 
@@ -28,7 +29,7 @@ public class SoliditySpecCompiler {
         }
         boolean funcPayable = env.funcs.get(function).payable;
         boolean forConstructor = function.equals(contractName);
-        String output = SpecCompilerUtils.loadTemplate();
+        String output = SpecCompilerUtils.loadTemplate(env.unitType);
         output = output.replace(SpecCompilerUtils.INVARIANT_PLACEHOLDER, invariant != null ? invariant : "true")
                        .replace(SpecCompilerUtils.CONTRACT_NAME_PLACEHOLDER,contractNameInPOs)
                        .replace(SpecCompilerUtils.PROGRAM_VARIABLES_PLACEHOLDER, makeProgramVariablesString(function))
@@ -38,6 +39,7 @@ public class SoliditySpecCompiler {
                        .replace(SpecCompilerUtils.HEAP_UPDATE_PLACEHOLDER, makeHeapUpdateString(function, funcPayable, forConstructor))
                        .replace(SpecCompilerUtils.FUNCTION_PLACEHOLDER, makeFunctionCallString(function,forConstructor))
                        .replace(SpecCompilerUtils.POSTCONDITION_PLACEHOLDER, makePostConditionString(function,forConstructor));
+        output = output.replaceAll(SELF_PLACEHOLDER, env.unitType == Environment.UnitType.CONTRACT ? "self" : "caller");
         return output;
     }
 
@@ -68,7 +70,7 @@ public class SoliditySpecCompiler {
     private String makeVarcondString() {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String,String> e : env.cumulativeLogicalVars.entrySet()) {
-            sb.append("\\notFreeIn(" + e.getKey() + "," + SpecCompilerUtils.HeapType.HEAP_H.toString() + ",self),");
+            sb.append("\\notFreeIn(" + e.getKey() + "," + SpecCompilerUtils.HeapType.HEAP_H.toString() + "," + SELF_PLACEHOLDER + "),");
         }
         if (sb.length() > 0) {
             sb.deleteCharAt(sb.length()-1);
@@ -80,8 +82,8 @@ public class SoliditySpecCompiler {
 
     private String makeAssumptionString(boolean payable, boolean forConstructor) {
         StringBuilder sb = new StringBuilder();
-        if (!forConstructor) {
-            sb.append("&\nCInv(heap,self) ");
+        if (!forConstructor && env.unitType == Environment.UnitType.CONTRACT) {
+            sb.append("&\nCInv(heap," + SELF_PLACEHOLDER + ") ");
         }
         if (payable) {
             sb.append("&\nmsg.value >= 0 ");
@@ -91,24 +93,25 @@ public class SoliditySpecCompiler {
         for (String var : env.vars.keySet()) {
             if (!(("Message").equals(env.vars.get(var)) || ("logical").equals(env.vars.get(var)) 
                     || ("this").equals(var))) {
-                sb.append("&\nself." + var + "!= null " );
+                sb.append("&\n" + SELF_PLACEHOLDER + "." + var + "!= null " );
             }
         }
         if (forConstructor) {
+            sb.append("&\nmsg.sender != " + SELF_PLACEHOLDER + " ");
             sb.append("&\n(\\forall Address a; int::select(heap,net,address(a))=0) ");
             // assumptions for state variable values
             for (Map.Entry<String,String> p : env.vars.entrySet()) {
                 if (!(("enum").equals(p.getValue()) || ("Message").equals(env.vars.get(p.getValue())))) {
                     if (("boolean[]").equals(p.getValue())) {
                         // bool array (mappings)
-                        sb.append("&\n(\\forall int i; self." + p.getKey() + "[i] = FALSE) ");
+                        sb.append("&\n(\\forall int i; " + SELF_PLACEHOLDER + "." + p.getKey() + "[i] = FALSE) ");
                     } else if (("int[]").equals(p.getValue())) {
                         // int array (mappings)
-                        sb.append("&\n(\\forall int i; self." + p.getKey() + "[i] = 0) ");
+                        sb.append("&\n(\\forall int i; " + SELF_PLACEHOLDER + "." + p.getKey() + "[i] = 0) ");
                     } else if (("Address[]").equals(p.getValue())) {
                         // address array (really array)
                         // arrName.arr_length = 0
-                        sb.append("&\nint::select(heap,self." + p.getKey() + ",arr_length) = 0 ");
+                        sb.append("&\nint::select(heap," + SELF_PLACEHOLDER + "." + p.getKey() + ",arr_length) = 0 ");
                     }
                     // enums
                     // save default value during first pass
@@ -139,18 +142,21 @@ public class SoliditySpecCompiler {
         for (String p : parameters) {
             parString = parString + ",_" + p;
         }
+        String assignment = env.funcs.get(func).returnType != null ? "_result = " : "";
         if (forConstructor) {
             func = "<init>";
         }
-        String assignment = env.funcs.get(func).returnType != null ? "_result = " : "";
-        return assignment + "self." + func + "(msg" + parString + ")@" + contractNameInPOs + ";";
+        return assignment + "" + SELF_PLACEHOLDER + "." + func + "(msg" + parString + ")@" + contractNameInPOs + ";";
     }
 
     private String makePostConditionString(String func, boolean forConstructor) {
         String ret = "";
+        if (env.unitType == Environment.UnitType.CONTRACT) {
+            ret = "CInv(heap," + SELF_PLACEHOLDER + ")\n";
+        } 
         // only_if:s
         if (posMap.get(func).onlyIf != null) {
-            ret = " & " + posMap.get(func).onlyIf;
+            ret = ret + " & " + posMap.get(func).onlyIf;
         }
         // on_success
         if (posMap.get(func).onSuccess != null) {
@@ -181,6 +187,9 @@ public class SoliditySpecCompiler {
             }
             ret = ret + "& (\\forall Field f; \\forall java.lang.Object o; (" + elementOfString +
                     " !o = null & !o.<created>@savedHeap = TRUE | o.f = o.f@savedHeap))";
+        }
+        if (env.unitType != Environment.UnitType.CONTRACT) {
+            ret = ret.replaceFirst("&","");
         }
         return ret; 
     }
