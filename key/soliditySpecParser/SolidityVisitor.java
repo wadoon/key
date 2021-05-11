@@ -618,12 +618,12 @@ public interface SolidityVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitOnlyIfExpression(SolidityParser.OnlyIfExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code returnExpression}
+	 * Visit a parse tree produced by the {@code resultExpression}
 	 * labeled alternative in {@link SolidityParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitReturnExpression(SolidityParser.ReturnExpressionContext ctx);
+	T visitResultExpression(SolidityParser.ResultExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ternaryExpression}
 	 * labeled alternative in {@link SolidityParser#expression}.

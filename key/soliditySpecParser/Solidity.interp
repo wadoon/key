@@ -82,7 +82,7 @@ null
 'gross_from'
 'gross_to'
 '\\old'
-'\\return'
+'\\result'
 'let'
 ':='
 '=:'

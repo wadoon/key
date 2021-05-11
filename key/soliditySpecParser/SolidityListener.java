@@ -1033,17 +1033,17 @@ public interface SolidityListener extends ParseTreeListener {
 	 */
 	void exitOnlyIfExpression(SolidityParser.OnlyIfExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code returnExpression}
+	 * Enter a parse tree produced by the {@code resultExpression}
 	 * labeled alternative in {@link SolidityParser#expression}.
 	 * @param ctx the parse tree
 	 */
-	void enterReturnExpression(SolidityParser.ReturnExpressionContext ctx);
+	void enterResultExpression(SolidityParser.ResultExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code returnExpression}
+	 * Exit a parse tree produced by the {@code resultExpression}
 	 * labeled alternative in {@link SolidityParser#expression}.
 	 * @param ctx the parse tree
 	 */
-	void exitReturnExpression(SolidityParser.ReturnExpressionContext ctx);
+	void exitResultExpression(SolidityParser.ResultExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code ternaryExpression}
 	 * labeled alternative in {@link SolidityParser#expression}.

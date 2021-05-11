@@ -108,7 +108,7 @@ public class SolidityParser extends Parser {
 			"'new'", "'after'", "'delete'", "'**'", "'=='", "'!='", "'?'", "':'", 
 			"'|='", "'^='", "'&='", "'<<='", "'>>='", "'+='", "'-='", "'*='", "'/='", 
 			"'%='", "'->'", "'<->'", "'<-'", "'\\forall'", "'\\exists'", "'net'", 
-			"'gross_from'", "'gross_to'", "'\\old'", "'\\return'", "'let'", "':='", 
+			"'gross_from'", "'gross_to'", "'\\old'", "'\\result'", "'let'", "':='", 
 			"'=:'", "'switch'", "'case'", "'default'", null, null, null, null, null, 
 			null, null, null, null, null, null, null, "'anonymous'", "'break'", "'constant'", 
 			"'continue'", "'contract'", "'external'", "'indexed'", "'interface'", 
@@ -5377,19 +5377,19 @@ public class SolidityParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class ReturnExpressionContext extends ExpressionContext {
-		public ReturnExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
+	public static class ResultExpressionContext extends ExpressionContext {
+		public ResultExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof SolidityListener ) ((SolidityListener)listener).enterReturnExpression(this);
+			if ( listener instanceof SolidityListener ) ((SolidityListener)listener).enterResultExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof SolidityListener ) ((SolidityListener)listener).exitReturnExpression(this);
+			if ( listener instanceof SolidityListener ) ((SolidityListener)listener).exitResultExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof SolidityVisitor ) return ((SolidityVisitor<? extends T>)visitor).visitReturnExpression(this);
+			if ( visitor instanceof SolidityVisitor ) return ((SolidityVisitor<? extends T>)visitor).visitResultExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -5654,7 +5654,7 @@ public class SolidityParser extends Parser {
 				break;
 			case 15:
 				{
-				_localctx = new ReturnExpressionContext(_localctx);
+				_localctx = new ResultExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 				setState(739);

@@ -219,7 +219,7 @@ LINE_COMMENT=139
 'gross_from'=80
 'gross_to'=81
 '\\old'=82
-'\\return'=83
+'\\result'=83
 'let'=84
 ':='=85
 '=:'=86

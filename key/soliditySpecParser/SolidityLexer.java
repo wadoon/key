@@ -86,7 +86,7 @@ public class SolidityLexer extends Lexer {
 			"'new'", "'after'", "'delete'", "'**'", "'=='", "'!='", "'?'", "':'", 
 			"'|='", "'^='", "'&='", "'<<='", "'>>='", "'+='", "'-='", "'*='", "'/='", 
 			"'%='", "'->'", "'<->'", "'<-'", "'\\forall'", "'\\exists'", "'net'", 
-			"'gross_from'", "'gross_to'", "'\\old'", "'\\return'", "'let'", "':='", 
+			"'gross_from'", "'gross_to'", "'\\old'", "'\\result'", "'let'", "':='", 
 			"'=:'", "'switch'", "'case'", "'default'", null, null, null, null, null, 
 			null, null, null, null, null, null, null, "'anonymous'", "'break'", "'constant'", 
 			"'continue'", "'contract'", "'external'", "'indexed'", "'interface'", 
@@ -475,8 +475,8 @@ public class SolidityLexer extends Lexer {
 		"\7u\2\2\u02c3\u02c4\7a\2\2\u02c4\u02c5\7v\2\2\u02c5\u02c6\7q\2\2\u02c6"+
 		"\u00a4\3\2\2\2\u02c7\u02c8\7^\2\2\u02c8\u02c9\7q\2\2\u02c9\u02ca\7n\2"+
 		"\2\u02ca\u02cb\7f\2\2\u02cb\u00a6\3\2\2\2\u02cc\u02cd\7^\2\2\u02cd\u02ce"+
-		"\7t\2\2\u02ce\u02cf\7g\2\2\u02cf\u02d0\7v\2\2\u02d0\u02d1\7w\2\2\u02d1"+
-		"\u02d2\7t\2\2\u02d2\u02d3\7p\2\2\u02d3\u00a8\3\2\2\2\u02d4\u02d5\7n\2"+
+		"\7t\2\2\u02ce\u02cf\7g\2\2\u02cf\u02d0\7u\2\2\u02d0\u02d1\7w\2\2\u02d1"+
+		"\u02d2\7n\2\2\u02d2\u02d3\7v\2\2\u02d3\u00a8\3\2\2\2\u02d4\u02d5\7n\2"+
 		"\2\u02d5\u02d6\7g\2\2\u02d6\u02d7\7v\2\2\u02d7\u00aa\3\2\2\2\u02d8\u02d9"+
 		"\7<\2\2\u02d9\u02da\7?\2\2\u02da\u00ac\3\2\2\2\u02db\u02dc\7?\2\2\u02dc"+
 		"\u02dd\7<\2\2\u02dd\u00ae\3\2\2\2\u02de\u02df\7u\2\2\u02df\u02e0\7y\2"+

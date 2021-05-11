@@ -285,7 +285,7 @@ expression
   | 'gross_from' '(' expression ')'            #grossFromExpression
   | 'gross_to' '(' expression ')'              #grossToExpression
   | '\\old' '(' expression ')'                 #oldExpression
-  | '\\return'                                 #returnExpression
+  | '\\result'                                 #resultExpression
 ;
 
 primaryExpression

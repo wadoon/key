@@ -1155,13 +1155,13 @@ public class SolidityBaseListener implements SolidityListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterReturnExpression(SolidityParser.ReturnExpressionContext ctx) { }
+	@Override public void enterResultExpression(SolidityParser.ResultExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitReturnExpression(SolidityParser.ReturnExpressionContext ctx) { }
+	@Override public void exitResultExpression(SolidityParser.ResultExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
