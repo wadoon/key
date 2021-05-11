@@ -107,6 +107,10 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
             env.funcs.get(funcName).parameters.put(p.identifier().getText(),SpecCompilerUtils.solidityToJavaType(p.typeName().getText()));
             env.funcs.get(funcName).parameterOrder.add(p.identifier().getText());
         }
+        if (ctx.returnParameters() != null) {
+            env.funcs.get(funcName).returnType = SpecCompilerUtils.solidityToJavaType(
+                ctx.returnParameters().parameterList().parameter(0).getText());
+        }
         return "";
     }
 

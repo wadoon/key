@@ -14,6 +14,7 @@ class Environment {
         public int lineNo;
         public Map<String,String> parameters = new HashMap<>();
         public List<String> parameterOrder = new LinkedList<>();
+        public String returnType;
         public FunctionInfo(boolean p,int l) {
             payable = p;
             lineNo = l;

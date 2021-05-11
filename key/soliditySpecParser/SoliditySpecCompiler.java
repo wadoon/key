@@ -42,11 +42,13 @@ public class SoliditySpecCompiler {
     }
 
     private String makeProgramVariablesString(String func) {
+        String resultVar = env.funcs.get(func).returnType != null ?
+            env.funcs.get(func).returnType + " _result;\n" : "";
         Map<String,String> parameters = env.funcs.get(func).parameters;
         if (parameters.size() == 0) {
-            return "";
+            return resultVar;
         } else {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder(resultVar);
             for (Map.Entry<String,String> e : parameters.entrySet()) {
                 sb.append(e.getValue() + " " + e.getKey() + ";\n");
                 sb.append(e.getValue() + " _" + e.getKey() + ";\n");
@@ -140,7 +142,8 @@ public class SoliditySpecCompiler {
         if (forConstructor) {
             func = "<init>";
         }
-        return "self." + func + "(msg" + parString + ")@" + contractNameInPOs + ";";
+        String assignment = env.funcs.get(func).returnType != null ? "_result = " : "";
+        return assignment + "self." + func + "(msg" + parString + ")@" + contractNameInPOs + ";";
     }
 
     private String makePostConditionString(String func, boolean forConstructor) {
