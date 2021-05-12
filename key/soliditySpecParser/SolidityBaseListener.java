@@ -363,6 +363,18 @@ public class SolidityBaseListener implements SolidityListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterSpecLibraryInvariant(SolidityParser.SpecLibraryInvariantContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSpecLibraryInvariant(SolidityParser.SpecLibraryInvariantContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterSpecAssignable(SolidityParser.SpecAssignableContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -370,6 +382,18 @@ public class SolidityBaseListener implements SolidityListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitSpecAssignable(SolidityParser.SpecAssignableContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSpecObservesInvariantFor(SolidityParser.SpecObservesInvariantForContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSpecObservesInvariantFor(SolidityParser.SpecObservesInvariantForContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

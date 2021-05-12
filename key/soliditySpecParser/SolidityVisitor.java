@@ -188,12 +188,26 @@ public interface SolidityVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSpecClassInvariant(SolidityParser.SpecClassInvariantContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code specLibraryInvariant}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSpecLibraryInvariant(SolidityParser.SpecLibraryInvariantContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code specAssignable}
 	 * labeled alternative in {@link SolidityParser#specExpression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitSpecAssignable(SolidityParser.SpecAssignableContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code specObservesInvariantFor}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSpecObservesInvariantFor(SolidityParser.SpecObservesInvariantForContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link SolidityParser#parameterList}.
 	 * @param ctx the parse tree

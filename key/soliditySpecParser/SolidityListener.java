@@ -305,6 +305,18 @@ public interface SolidityListener extends ParseTreeListener {
 	 */
 	void exitSpecClassInvariant(SolidityParser.SpecClassInvariantContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code specLibraryInvariant}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterSpecLibraryInvariant(SolidityParser.SpecLibraryInvariantContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code specLibraryInvariant}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitSpecLibraryInvariant(SolidityParser.SpecLibraryInvariantContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code specAssignable}
 	 * labeled alternative in {@link SolidityParser#specExpression}.
 	 * @param ctx the parse tree
@@ -316,6 +328,18 @@ public interface SolidityListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitSpecAssignable(SolidityParser.SpecAssignableContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code specObservesInvariantFor}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void enterSpecObservesInvariantFor(SolidityParser.SpecObservesInvariantForContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code specObservesInvariantFor}
+	 * labeled alternative in {@link SolidityParser#specExpression}.
+	 * @param ctx the parse tree
+	 */
+	void exitSpecObservesInvariantFor(SolidityParser.SpecObservesInvariantForContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link SolidityParser#parameterList}.
 	 * @param ctx the parse tree

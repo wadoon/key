@@ -116,7 +116,10 @@ specExpression
   | 'assumes' expressionStatement		#specAssumes
   | 'on_success' expressionStatement		#specOnSuccess
   | 'class_invariant' expressionStatement	#specClassInvariant
+  | 'invariant_for' typeName Identifier ';'
+    expressionStatement	                    #specLibraryInvariant
   | 'assignable' expression (',' expression)*     #specAssignable
+  | Identifier 'observes_invariant_for' Identifier ';' #specObservesInvariantFor
 ;
 
 parameterList

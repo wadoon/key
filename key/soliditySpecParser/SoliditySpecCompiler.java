@@ -10,27 +10,29 @@ import org.antlr.v4.runtime.Token;
 
 public class SoliditySpecCompiler {
     private final String SELF_PLACEHOLDER = "__self__";
-    private String invariant;
-    private Map<String,FunctionProofObligations> posMap = new HashMap<>();
 
+    private ProofObligations pos = new ProofObligations();
     private String contractName;
+    private String functionName;
     private String contractNameInPOs;
     private int contractStartLine;
     private Environment env;
     
-    public SoliditySpecCompiler(String contractName) {
+    public SoliditySpecCompiler(String contractName, String functionName) {
         this.contractName = contractName;
+        this.functionName = functionName;
         this.contractNameInPOs = "contractNameInPOs NOT SET";
     }
 
-    private String makeKeYFileString(String function) {
+    private String makeKeYFileString() {
+        String function = functionName;
         if (!env.funcs.containsKey(function)) {
             throw new IllegalArgumentException("Could not find function " + function);
         }
         boolean funcPayable = env.funcs.get(function).payable;
         boolean forConstructor = function.equals(contractName);
         String output = SpecCompilerUtils.loadTemplate(env.unitType);
-        output = output.replace(SpecCompilerUtils.INVARIANT_PLACEHOLDER, invariant != null ? invariant : "true")
+        output = output.replace(SpecCompilerUtils.INVARIANT_PLACEHOLDER, pos.invariant != null ? pos.invariant : "true")
                        .replace(SpecCompilerUtils.CONTRACT_NAME_PLACEHOLDER,contractNameInPOs)
                        .replace(SpecCompilerUtils.PROGRAM_VARIABLES_PLACEHOLDER, makeProgramVariablesString(function))
                        .replace(SpecCompilerUtils.SCHEMA_VARIABLES_PLACEHOLDER, makeSchemaVariablesString())
@@ -96,8 +98,8 @@ public class SoliditySpecCompiler {
                 sb.append("&\n" + SELF_PLACEHOLDER + "." + var + "!= null " );
             }
         }
-        if (posMap.get(func).assumes != null) {
-            sb.append("&\n" + posMap.get(func).assumes + " ");
+        if (pos.posMap.get(func).assumes != null) {
+            sb.append("&\n" + pos.posMap.get(func).assumes + " ");
         }
         if (forConstructor) {
             sb.append("&\nmsg.sender != " + SELF_PLACEHOLDER + " ");
@@ -131,7 +133,7 @@ public class SoliditySpecCompiler {
             parString = parString + " || _" + p + " := " + p;
         }
 
-        String mapping = posMap.get(func).isGross ? "gross_from" : "net";
+        String mapping = pos.isGross(func) ? "gross_from" : "net";
         return payable ?
             ( forConstructor ? 
             parString + "|| heap:=store(heap," + mapping + ", address(msg.sender),msg.value)" :
@@ -159,17 +161,17 @@ public class SoliditySpecCompiler {
             ret = "CInv(heap," + SELF_PLACEHOLDER + ")\n";
         } 
         // only_if:s
-        if (posMap.get(func).onlyIf != null) {
-            ret = ret + " & " + posMap.get(func).onlyIf;
+        if (pos.posMap.get(func).onlyIf != null) {
+            ret = ret + " & " + pos.posMap.get(func).onlyIf;
         }
         // on_success
-        if (posMap.get(func).onSuccess != null) {
-            ret = ret + " & " + posMap.get(func).onSuccess;
+        if (pos.posMap.get(func).onSuccess != null) {
+            ret = ret + " & " + pos.posMap.get(func).onSuccess;
         }
         //assignable stuff
         if (!forConstructor) { 
             String elementOfString = "";
-            List<String> objFields = posMap.get(func).assignable;
+            List<String> objFields = pos.posMap.get(func).assignable;
             if (objFields != null) {
                 int listSize = objFields.size();
                 StringBuilder sb = new StringBuilder();
@@ -227,7 +229,7 @@ public class SoliditySpecCompiler {
     public void collectProofObligations(String fileName) throws IOException {
 
         // first pass (reads Solidity code)
-        SoliditySpecPreVisitor sspv = new SoliditySpecPreVisitor(contractName);
+        SoliditySpecPreVisitor sspv = new SoliditySpecPreVisitor(contractName, functionName);
         sspv.parse(fileName);
         env = sspv.getEnvironment();
         contractStartLine = sspv.getContractStartLine();
@@ -235,6 +237,8 @@ public class SoliditySpecCompiler {
         if (env.unitType == Environment.UnitType.INTERFACE) {
             throw new UnsupportedOperationException("Interfaces not yet supported.");
         }
+
+//System.out.println(env.vars);
 
         // second pass (reads specification)
         CharStream c = CharStreams.fromStream(new File(fileName).toURI().toURL().openStream());
@@ -249,22 +253,17 @@ public class SoliditySpecCompiler {
                 SolidityParser.SpecDefinitionContext solidityAST = parser.specDefinition();
                 if (specIsInContract(t.getLine())) {
                     String function = functionFromLineNo(t.getLine());
-                    SoliditySpecVisitor visitor = new SoliditySpecVisitor(contractNameInPOs, function, env);
+                    SoliditySpecVisitor visitor = new SoliditySpecVisitor(contractNameInPOs, function, env, pos);
                     visitor.visit(solidityAST);
-                    if (visitor.invariant != null) {
-                        invariant = visitor.invariant;
-                    } else {
-                        posMap.put(function, visitor.pos);
-                    }
                 }
             }
         }
     }
 
     public static void main(String[] args) throws IOException {
-        SoliditySpecCompiler ssc = new SoliditySpecCompiler(args[1]);
+        SoliditySpecCompiler ssc = new SoliditySpecCompiler(args[1], args[2]);
         ssc.collectProofObligations(args[0]);
-        System.out.println(ssc.makeKeYFileString(args[2]));
+        System.out.println(ssc.makeKeYFileString());
     }
 
 }

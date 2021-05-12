@@ -12,14 +12,16 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
     private Environment env = new Environment();
     private String contractName; 
     private int contractStartLine;
+    private String functionName;
 
-    public SoliditySpecPreVisitor(String contractName)  {
-        env.vars.put("msg","Message");
-        env.vars.put("all_addresses","logical");
-        env.vars.put("balance","int");
-        env.vars.put("this","");
+    public SoliditySpecPreVisitor(String contractName, String functionName)  {
+        env.addVariable("msg","Message");
+        env.addVariable("all_addresses","logical");
+        env.addVariable("balance","int");
+        env.addVariable("this","");
 
         this.contractName = contractName;
+        this.functionName = functionName;
     }
 
     public Environment getEnvironment() {
@@ -45,12 +47,6 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
         }
     }
 
-    private void addInstanceOfUserType(String instance, String userType) {
-        for (Map.Entry<String,String> e : env.userTypes.get(userType).members.entrySet()) {
-            env.vars.put(instance + "." + e.getKey(), e.getValue());
-        }
-    }
-
 	@Override public String visitTypeName(SolidityParser.TypeNameContext ctx) {
         if (ctx.typeName() != null) { // this is an array
             String typeName = visit(ctx.typeName());
@@ -68,11 +64,10 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
 
     @Override public String visitStateVariableDeclaration(SolidityParser.StateVariableDeclarationContext ctx) { 
         String typeRes = visit(ctx.typeName());
-        if (env.userTypes.containsKey(typeRes)) {
-            addInstanceOfUserType(ctx.identifier().Identifier().getText(), typeRes);
-        } else {
-            env.vars.put(ctx.identifier().Identifier().getText(), typeRes);
-        }
+/*        if (env.userTypes.containsKey(contractName + "." + typeRes)) {
+            env.addUserTypeVariableWithMembers(ctx.identifier().Identifier().getText(), contractName + "." + typeRes);
+        } */
+        env.addVariable(ctx.identifier().Identifier().getText(), typeRes);
 		return "";
 	}
 
@@ -113,11 +108,13 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
         for (SolidityParser.ParameterContext p : pars) {
             String typeName = visit(p.typeName());
             String ident = p.identifier().getText();
-            if (env.userTypes.containsKey(typeName)) {
-                addInstanceOfUserType(ident,typeName);
+            env.addFunctionParameter(funcName, ident, typeName);
+            if (functionName.equals(funcName)) { // if this is the function to be verified
+                env.addVariable(ident, typeName);
+/*                if (env.userTypes.containsKey(contractName + "." + typeName)) {
+                    env.addUserTypeVariableWithMembers(ident, contractName + "." + typeName);
+                }*/
             }
-            env.funcs.get(funcName).parameters.put(ident, typeName);
-            env.funcs.get(funcName).parameterOrder.add(ident);
         }
         if (ctx.returnParameters() != null) {
             env.funcs.get(funcName).returnType = visit(ctx.returnParameters().parameterList().parameter(0).typeName());
@@ -137,8 +134,7 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
         env.funcs.put(funcName, new Environment.FunctionInfo(payable, ctx.start.getLine()));
         List<SolidityParser.ParameterContext> pars = ctx.parameterList().parameter();
         for (SolidityParser.ParameterContext p : pars) {
-            env.funcs.get(funcName).parameters.put(p.identifier().Identifier().getText(),visit(p.typeName()));
-            env.funcs.get(funcName).parameterOrder.add(p.identifier().Identifier().getText());
+            env.addFunctionParameter(funcName, p.identifier().Identifier().getText(), visit(p.typeName()));
         }
         return "";
     }
@@ -148,7 +144,7 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
         for(SolidityParser.VariableDeclarationContext vctx : ctx.variableDeclaration()) {
            ut.members.put(vctx.identifier().getText(), visit(vctx.typeName())); 
         }
-        env.userTypes.put(ctx.identifier().getText(), ut);
+        env.addUserType(ctx.identifier().getText(), contractName, ut);
         return "";
     }
 
