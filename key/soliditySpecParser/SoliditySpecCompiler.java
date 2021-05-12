@@ -10,6 +10,8 @@ import org.antlr.v4.runtime.Token;
 
 public class SoliditySpecCompiler {
     private final String SELF_PLACEHOLDER = "__self__";
+    private static final int SPEC_COMMENT_CHANNEL = 2;
+    private static final int SPEC_LINE_COMMENT_CHANNEL = 3;
 
     private ProofObligations pos = new ProofObligations();
     private String contractName;
@@ -245,17 +247,15 @@ public class SoliditySpecCompiler {
         SolidityLexer lexer = new SolidityLexer(c);
         Token t = null;
         while ((t = lexer.nextToken()).getType() != Token.EOF) {
-            if (t.getChannel() == 2 || t.getChannel() == 3) {
-                String toParse = t.getChannel() == 2 ?
-                        t.getText().substring(3,t.getText().length()-2) : t.getText().substring(3);
+            if ((t.getChannel() == SPEC_COMMENT_CHANNEL || t.getChannel() == SPEC_LINE_COMMENT_CHANNEL) && specIsInContract(t.getLine())) {
+                String toParse = t.getChannel() == SPEC_COMMENT_CHANNEL ?
+                        t.getText().substring(SPEC_LINE_COMMENT_CHANNEL,t.getText().length()-2) : t.getText().substring(SPEC_LINE_COMMENT_CHANNEL);
                 SolidityParser parser = new SolidityParser(
                     new CommonTokenStream(new SolidityLexer(CharStreams.fromString(toParse,"dummy"))));
                 SolidityParser.SpecDefinitionContext solidityAST = parser.specDefinition();
-                if (specIsInContract(t.getLine())) {
-                    String function = functionFromLineNo(t.getLine());
-                    SoliditySpecVisitor visitor = new SoliditySpecVisitor(contractNameInPOs, function, env, pos);
-                    visitor.visit(solidityAST);
-                }
+                String function = functionFromLineNo(t.getLine());
+                SoliditySpecVisitor visitor = new SoliditySpecVisitor(contractNameInPOs, function, env, pos);
+                visitor.visit(solidityAST);
             }
         }
     }
