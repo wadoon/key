@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.regex.Matcher;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,24 +36,29 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
 
     private final String __VARIABLE_PLACEHOLDER__ = "__variable_placeholder__";
 
-    public ProofObligations pos;
+    private ProofObligations pos;
     private Environment env;
-    public String libInvariant;
     private String contractNameInPOs;
     private String function;
     private SMLStatementType stmtType;
     private Map<String,String> enumToKeYType = new HashMap<>();
     private String placeHolderType; // for use with library invariants which are really "template" invariants
+    private boolean onlyLibraryInvariant;
 
-    public SoliditySpecVisitor(String contractNameInPOs, String function, Environment env, ProofObligations pos) {
+    public SoliditySpecVisitor(String contractNameInPOs, String function, Environment env,
+            ProofObligations pos, boolean onlyLibraryInvariant) {
         super();
         this.contractNameInPOs = contractNameInPOs;
         this.function = function;
         this.env = env;
         this.pos  = pos;
+        this.onlyLibraryInvariant = onlyLibraryInvariant;
     }
 
     @Override public SMLExpr visitSpecOnlyIf(SolidityParser.SpecOnlyIfContext ctx) {
+        if (onlyLibraryInvariant) {
+            return null;
+        }
         stmtType = SMLStatementType.ONLY_IF;
         SMLExpr r = visitChildren(ctx);
         r.output = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.OLD_HEAP, r.output);
@@ -61,6 +67,9 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
     }
 
     @Override public SMLExpr visitSpecAssumes(SolidityParser.SpecAssumesContext ctx) { 
+        if (onlyLibraryInvariant) {
+            return null;
+        }
         stmtType = SMLStatementType.ASSUMES;
         SMLExpr r = visitChildren(ctx);
         r.output = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP, r.output);
@@ -69,6 +78,9 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
     }
 
 	@Override public SMLExpr visitSpecAssignable(SolidityParser.SpecAssignableContext ctx) {
+        if (onlyLibraryInvariant) {
+            return null;
+        }
         stmtType = SMLStatementType.ASSIGNABLE;
         List<SolidityParser.ExpressionContext> expressions = ctx.expression();
         for (SolidityParser.ExpressionContext ec : expressions) {
@@ -92,6 +104,9 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
     }
 
     @Override public SMLExpr visitSpecOnSuccess(SolidityParser.SpecOnSuccessContext ctx) { 
+        if (onlyLibraryInvariant) {
+            return null;
+        }
         stmtType = SMLStatementType.ON_SUCCESS;
         SMLExpr r = visitChildren(ctx);
         r.output = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP, r.output);
@@ -100,6 +115,9 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
     }
 
     @Override public SMLExpr visitSpecClassInvariant(SolidityParser.SpecClassInvariantContext ctx) {
+        if (onlyLibraryInvariant) {
+            return null;
+        }
         stmtType = SMLStatementType.CONTRACT_INVARIANT;
         SMLExpr r = visitChildren(ctx);
         String invariant = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP_H, r.output); // assuming only one invariant per contract
@@ -108,22 +126,40 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         return r;
     }
 
-/*	@Override public SMLExpr visitSpecLibraryInvariant(SolidityParser.SpecLibraryInvariantContext ctx) {
+	@Override public SMLExpr visitSpecLibraryInvariant(SolidityParser.SpecLibraryInvariantContext ctx) {
         stmtType = SMLStatementType.LIBRARY_INVARIANT;
         String type = ctx.typeName().getText();
         String ident = ctx.Identifier().getText(); 
         env.addVariable(ident, __VARIABLE_PLACEHOLDER__);
         placeHolderType = type;
-        libInvariant = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP_H, visit(ctx.expressionStatement()).output);
+        SMLExpr s = visit(ctx.expressionStatement());
+        pos.setLibraryInvariant(s.output);
         env.removeVariable(ident);
-        return new SMLExpr("boolean", libInvariant);
-    }*/
+        return s; 
+    }
 
-/*	@Override public SMLExpr visitSpecObservesInvariantFor(SolidityParser.SpecObservesInvariantForContext ctx) {
-        // We assume that there is only one lib invariant, no need to parse second identifier
-        SMLExpr ident = visit(ctx.identifier());
-        return ;
-    }*/
+	@Override public SMLExpr visitSpecObservesInvariantFor(SolidityParser.SpecObservesInvariantForContext ctx) {
+        if (onlyLibraryInvariant) {
+            return null;
+        }
+        // We assume that there is only one lib invariant,
+        // no need to parse second identifier
+        SMLExpr ident = visit(ctx.identifier(0));
+        String appliedInvariant = pos.libInvariantTemplate.replaceAll(__VARIABLE_PLACEHOLDER__,
+            Matcher.quoteReplacement(ident.output));
+        // Check if ident is parameter (otherwise it is a state variable)
+        if (env.funcs.get(function).parameters.get(ctx.identifier(0).getText()) != null) {
+            // ctx.identifier(0) is a parameter
+            appliedInvariant = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP, appliedInvariant);
+            pos.addAssumes(function, appliedInvariant);
+            pos.addOnSuccess(function, appliedInvariant);
+        } else {
+            // ctx.identifier(0) is a state variable
+            appliedInvariant = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP_H, appliedInvariant);
+            pos.addInvariant(appliedInvariant);
+        }
+        return new SMLExpr("spec", null);
+    }
 
     @Override public SMLExpr visitArrayAccessExpression(SolidityParser.ArrayAccessExpressionContext ctx) {
         //dont forget implicit this/self
@@ -256,25 +292,11 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         return new SMLExpr("bool","((" + r1.output + ")<->(" + r2.output + "))");
     }
 
-// parameter
-//p :: Outer.Inner            can get type, output
-//p.member :: e.g. int        cac get type, output if "p." in front. t::select(heap, _placeholder_, outer.inner::$member)
-
-// var in lib invariant
-
-//int::select(heap, ArrTest.InnerClass::select(heap, self_25, ArrTest::$c), ArrTest.InnerClass::$a)
-//int::select(heap, __VAR_PLACEHOLDER_STRING__, ArrTest.InnerClass::$a)
-
-//assumption generation
-
-
 	@Override public SMLExpr visitDotExpression(SolidityParser.DotExpressionContext ctx) {
         SMLExpr r = visit(ctx.expression());
         String ident = ctx.identifier().Identifier().getText();
         String type = null;
         String output = null;
-//        System.out.println(r.type);
-//        System.out.println(env.userTypes.entrySet());
         if (enumToKeYType.containsValue(r.type)) {
             type = r.type;
             output = r.type + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + ",null," + r.type + "::$" + ident + ")";

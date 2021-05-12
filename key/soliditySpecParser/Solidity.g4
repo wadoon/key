@@ -119,7 +119,7 @@ specExpression
   | 'invariant_for' typeName Identifier ';'
     expressionStatement	                    #specLibraryInvariant
   | 'assignable' expression (',' expression)*     #specAssignable
-  | Identifier 'observes_invariant_for' Identifier ';' #specObservesInvariantFor
+  | identifier 'observes_invariant_for' identifier ';' #specObservesInvariantFor
 ;
 
 parameterList

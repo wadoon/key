@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
     private Environment env = new Environment();
     private String contractName; 
+    private String currentContractName;
     private int contractStartLine;
     private String functionName;
 
@@ -64,9 +65,6 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
 
     @Override public String visitStateVariableDeclaration(SolidityParser.StateVariableDeclarationContext ctx) { 
         String typeRes = visit(ctx.typeName());
-/*        if (env.userTypes.containsKey(contractName + "." + typeRes)) {
-            env.addUserTypeVariableWithMembers(ctx.identifier().Identifier().getText(), contractName + "." + typeRes);
-        } */
         env.addVariable(ctx.identifier().Identifier().getText(), typeRes);
 		return "";
 	}
@@ -78,8 +76,8 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
     }
 
 	@Override public String visitContractDefinition(SolidityParser.ContractDefinitionContext ctx) {
-        String currentContractName = ctx.identifier().Identifier().getText();
-        if (contractName.equals(currentContractName)) {
+        currentContractName = ctx.identifier().Identifier().getText();
+        if (contractName.equals(currentContractName) || ctx.LibraryKeyword() != null) {
             if (ctx.ContractKeyword() != null) {
                 env.unitType = Environment.UnitType.CONTRACT;
             } else if (ctx.InterfaceKeyword() != null) {
@@ -109,12 +107,6 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
             String typeName = visit(p.typeName());
             String ident = p.identifier().getText();
             env.addFunctionParameter(funcName, ident, typeName);
-            if (functionName.equals(funcName)) { // if this is the function to be verified
-                env.addVariable(ident, typeName);
-/*                if (env.userTypes.containsKey(contractName + "." + typeName)) {
-                    env.addUserTypeVariableWithMembers(ident, contractName + "." + typeName);
-                }*/
-            }
         }
         if (ctx.returnParameters() != null) {
             env.funcs.get(funcName).returnType = visit(ctx.returnParameters().parameterList().parameter(0).typeName());
@@ -144,7 +136,7 @@ public class SoliditySpecPreVisitor extends SolidityBaseVisitor<String> {
         for(SolidityParser.VariableDeclarationContext vctx : ctx.variableDeclaration()) {
            ut.members.put(vctx.identifier().getText(), visit(vctx.typeName())); 
         }
-        env.addUserType(ctx.identifier().getText(), contractName, ut);
+        env.addUserType(ctx.identifier().getText(), currentContractName, ut);
         return "";
     }
 

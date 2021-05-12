@@ -247,14 +247,17 @@ public class SoliditySpecCompiler {
         SolidityLexer lexer = new SolidityLexer(c);
         Token t = null;
         while ((t = lexer.nextToken()).getType() != Token.EOF) {
-            if ((t.getChannel() == SPEC_COMMENT_CHANNEL || t.getChannel() == SPEC_LINE_COMMENT_CHANNEL) && specIsInContract(t.getLine())) {
+            if ((t.getChannel() == SPEC_COMMENT_CHANNEL || t.getChannel() == SPEC_LINE_COMMENT_CHANNEL)) {
                 String toParse = t.getChannel() == SPEC_COMMENT_CHANNEL ?
                         t.getText().substring(SPEC_LINE_COMMENT_CHANNEL,t.getText().length()-2) : t.getText().substring(SPEC_LINE_COMMENT_CHANNEL);
                 SolidityParser parser = new SolidityParser(
                     new CommonTokenStream(new SolidityLexer(CharStreams.fromString(toParse,"dummy"))));
                 SolidityParser.SpecDefinitionContext solidityAST = parser.specDefinition();
                 String function = functionFromLineNo(t.getLine());
-                SoliditySpecVisitor visitor = new SoliditySpecVisitor(contractNameInPOs, function, env, pos);
+                // If this spec is not in the contract to verify, only look for library invariants
+                boolean onlyLibraryInvariant = !specIsInContract(t.getLine());
+                SoliditySpecVisitor visitor = new SoliditySpecVisitor(contractNameInPOs, function, env,
+                    pos, onlyLibraryInvariant);
                 visitor.visit(solidityAST);
             }
         }
