@@ -35,6 +35,8 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
     }
 
     private final String __VARIABLE_PLACEHOLDER__ = "__variable_placeholder__";
+    private final String __QUANT_TYPE_START__ = "__quant_type_start__";
+    private final String __QUANT_TYPE_END__ = "__quant_type_end__";
 
     private ProofObligations pos;
     private Environment env;
@@ -62,6 +64,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         stmtType = SMLStatementType.ONLY_IF;
         SMLExpr r = visitChildren(ctx);
         r.output = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.OLD_HEAP, r.output);
+        r.output = resolveQuantifiesForNonTaclet(r.output);
         pos.addOnlyIf(function, r.output);
         return r;
     }
@@ -73,6 +76,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         stmtType = SMLStatementType.ASSUMES;
         SMLExpr r = visitChildren(ctx);
         r.output = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP, r.output);
+        r.output = resolveQuantifiesForNonTaclet(r.output);
         pos.addAssumes(function, r.output);
         return r;
     }
@@ -98,6 +102,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
             r.output = r.output.substring(r.output.indexOf(SpecCompilerUtils.
                 HEAP_PLACEHOLDER_STRING)+SpecCompilerUtils.HEAP_PLACEHOLDER_STRING.length()+1);
             r.output = r.output.substring(0,r.output.length()-numParentheses); // remove trailing parentheses 
+            r.output = resolveQuantifiesForNonTaclet(r.output);
             pos.addAssignable(function, r.output);
         }
         return new SMLExpr("","");
@@ -110,6 +115,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         stmtType = SMLStatementType.ON_SUCCESS;
         SMLExpr r = visitChildren(ctx);
         r.output = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP, r.output);
+        r.output = resolveQuantifiesForNonTaclet(r.output);
         pos.addOnSuccess(function, r.output);
         return r;
     }
@@ -120,9 +126,9 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         }
         stmtType = SMLStatementType.CONTRACT_INVARIANT;
         SMLExpr r = visitChildren(ctx);
-        String invariant = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP_H, r.output); // assuming only one invariant per contract
-        r.output = invariant;
-        pos.addInvariant(invariant);
+        r.output = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP_H, r.output); // assuming only one invariant per contract
+        r.output = resolveQuantifiesForTaclet(r.output);
+        pos.addInvariant(r.output);
         return r;
     }
 
@@ -151,11 +157,13 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         if (env.funcs.get(function).parameters.get(ctx.identifier(0).getText()) != null) {
             // ctx.identifier(0) is a parameter
             appliedInvariant = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP, appliedInvariant);
+            appliedInvariant = resolveQuantifiesForNonTaclet(appliedInvariant);
             pos.addAssumes(function, appliedInvariant);
             pos.addOnSuccess(function, appliedInvariant);
         } else {
             // ctx.identifier(0) is a state variable
             appliedInvariant = SpecCompilerUtils.injectHeap(SpecCompilerUtils.HeapType.HEAP_H, appliedInvariant);
+            appliedInvariant = resolveQuantifiesForTaclet(appliedInvariant);
             pos.addInvariant(appliedInvariant);
         }
         return new SMLExpr("spec", null);
@@ -237,7 +245,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         env.addVariable(ctx.Identifier().getText(), "logical");
         SMLExpr r = visit(ctx.expression());
         SMLExpr ret = new SMLExpr(r.type, "(\\forall " + 
-            (stmtType == SMLStatementType.ON_SUCCESS ? logicalVarType + " ": "") + 
+            __QUANT_TYPE_START__ + logicalVarType + " " + __QUANT_TYPE_END__ +
             ctx.Identifier().getText() + "; " + 
             r.output + ")");
         env.removeVariable(ctx.Identifier().getText());
@@ -250,7 +258,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         env.addVariable(ctx.Identifier().getText(), "logical");
         SMLExpr r = visit(ctx.expression());
         SMLExpr ret = new SMLExpr(r.type, "(\\exists " + 
-            (stmtType == SMLStatementType.ON_SUCCESS ? logicalVarType + " ": "") + 
+            __QUANT_TYPE_START__ + logicalVarType + " " + __QUANT_TYPE_END__ +
             ctx.Identifier().getText() + "; " + 
             r.output + ")");
         env.removeVariable(ctx.Identifier().getText());
@@ -370,4 +378,11 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         return contractNameInPOs + "::$" + str;
     }
 
+    private String resolveQuantifiesForTaclet(String str) {
+        return str.replaceAll(__QUANT_TYPE_START__ + ".*?" + __QUANT_TYPE_END__, "");
+    }
+
+    private String resolveQuantifiesForNonTaclet(String str) {
+        return str.replaceAll(__QUANT_TYPE_START__,"").replaceAll(__QUANT_TYPE_END__,"");
+    }
 }
