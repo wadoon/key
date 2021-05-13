@@ -290,10 +290,14 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
 		case "uint256[]" : typeName = "int[]";break;
 		case "bytes32[]" : typeName = "int[]";break;
 		case "mapping(address=>uint)": typeName="int[]";break;
+		case "mapping(address=>uint256)": typeName="int[]";break;
 		case "mapping(uint=>uint)": typeName="int[]";break;
+		case "mapping(uint256=>uint256)": typeName="int[]";break;
 		case "mapping(uint=>address)": typeName="Address[]";break;
+		case "mapping(uint256=>address)": typeName="Address[]";break;
 		case "mapping(address=>bool)": typeName="boolean[]";break;
 		case "mapping(uint=>bool)": typeName="boolean[]";break;
+		case "mapping(uint256=>bool)": typeName="boolean[]";break;
 		default: break;		
 		}
 
