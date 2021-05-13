@@ -174,7 +174,7 @@ public class SoliditySpecCompiler {
         if (!forConstructor) { 
             String elementOfString = "";
             List<String> objFields = pos.posMap.get(func).assignable;
-            if (objFields != null) {
+            if (objFields.size() > 0) {
                 int listSize = objFields.size();
                 StringBuilder sb = new StringBuilder();
                 int i=0;
