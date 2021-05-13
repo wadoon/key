@@ -87,6 +87,7 @@ contract MultiAuction {
   function withdraw() public {
     // A bidder can withdraw all her money (but she will stay in the array bidders)
 
+    uint aret = Lib.foo(balances[0],bidders[0],stateAdset);
     require(state == State.AUCTION_OPEN);
     uint tmp = balances[msg.sender];
     balances[msg.sender] = 0;
