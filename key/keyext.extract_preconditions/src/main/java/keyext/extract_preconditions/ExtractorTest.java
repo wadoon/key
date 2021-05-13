@@ -1,6 +1,7 @@
 package keyext.extract_preconditions;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -53,11 +54,12 @@ public class ExtractorTest {
                 e.printStackTrace();
                 return;
             }
+            UserInterfaceControl ui = env.getUi();
 
             List<Proof> unclosedProofs = generateProofs(env);
             for (Proof currentProof : unclosedProofs) {
                 PreconditionExtractor preconditionExtractor =
-                    new PreconditionExtractor(currentProof);
+                    new PreconditionExtractor(currentProof, ui);
                 Term precondition = preconditionExtractor.extract();
                 System.out.println(
                     "Found precondition for " + currentProof.name() + ":\n" +
@@ -65,7 +67,7 @@ public class ExtractorTest {
                 currentProof.dispose();
             }
         } finally {
-            if (env!=null) {
+            if (env != null) {
                 env.dispose();
             }
         }
