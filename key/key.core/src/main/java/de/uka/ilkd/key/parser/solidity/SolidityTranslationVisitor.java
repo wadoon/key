@@ -911,7 +911,7 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
         String comparableName = fctName;
 
         // handle calls to member functions
-        int dotPos = fctName.indexOf('.');
+        int dotPos = fctName.lastIndexOf('.');
         if (dotPos != -1) {
             comparableName = fctName.substring(dotPos+1);
         }
