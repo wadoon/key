@@ -137,7 +137,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
         String type = ctx.typeName().getText();
         String ident = ctx.Identifier().getText(); 
         env.addVariable(ident, __VARIABLE_PLACEHOLDER__);
-        placeHolderType = type;
+        placeHolderType = env.qualify(type);
         SMLExpr s = visit(ctx.expressionStatement());
         pos.setLibraryInvariant(s.output);
         env.removeVariable(ident);
