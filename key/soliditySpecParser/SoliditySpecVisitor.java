@@ -309,6 +309,7 @@ public class SoliditySpecVisitor extends SolidityBaseVisitor<SoliditySpecVisitor
             type = r.type;
             output = r.type + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + ",null," + r.type + "::$" + ident + ")";
         } else if (ident.equals("length") || ident.equals("arr_length")) {
+            ident = "arr_length";
             type = "int";
             output = "(" + "int" + "::select(" + SpecCompilerUtils.HEAP_PLACEHOLDER_STRING + "," + r.output + "," + ident + "))";
         } else if (r.type.equals("Message")) {    // assuming either msg.sender or msg.value
