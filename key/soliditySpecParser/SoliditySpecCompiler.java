@@ -100,6 +100,16 @@ public class SoliditySpecCompiler {
                 sb.append("&\n" + SELF_PLACEHOLDER + "." + var + "!= null " );
             }
         }
+        for (Map.Entry<String, String> e : env.funcs.get(func).parameters.entrySet()) {
+            sb.append("&\n" + e.getKey() + " != null ");
+            if (env.userTypes.containsKey(e.getValue())) {
+                // this should really be done for all depths of the type,
+                // here only for first level
+                for (Map.Entry<String,String> e2 : env.userTypes.get(e.getValue()).members.entrySet()) {
+                    sb.append("&\n" + e.getKey() + "." + e2.getKey() + " != null ");
+                }
+            }
+        }
         if (pos.posMap.get(func).assumes != null) {
             sb.append("&\n" + pos.posMap.get(func).assumes + " ");
         }
