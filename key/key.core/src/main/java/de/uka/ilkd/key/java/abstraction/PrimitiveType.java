@@ -69,7 +69,7 @@ public final class PrimitiveType implements Type {
     public static final PrimitiveType JAVA_FLOAT =
 	new PrimitiveType("float", new FloatLiteral(0.0f), FloatLDT.NAME);
     public static final PrimitiveType JAVA_DOUBLE  =
-	new PrimitiveType("double", new DoubleLiteral(0.0d), DoubleLDT.NAME);
+	new PrimitiveType("dual", new DoubleLiteral(0.0d), DoubleLDT.NAME);
     public static final PrimitiveType JAVA_REAL =
             new PrimitiveType("\\real", new RealLiteral(), RealLDT.NAME);
     public static final PrimitiveType JAVA_BOOLEAN =
