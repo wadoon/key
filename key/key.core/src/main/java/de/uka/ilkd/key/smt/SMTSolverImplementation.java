@@ -16,6 +16,9 @@ package de.uka.ilkd.key.smt;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,9 +31,9 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.processcomm.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.processcomm.ExternalProcessLauncher;
 import de.uka.ilkd.key.smt.processcomm.SolverCommunication;
-import de.uka.ilkd.key.smt.processcomm.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+import de.uka.ilkd.key.util.MiscTools;
 
 final class SMTSolverImplementation implements SMTSolver, Runnable{
  
@@ -45,11 +48,14 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 		/** The SMT problem that is related to this solver */
         private SMTProblem problem;
 
+        private Path output;
+        private Path input;
+
         /** It is possible that a solver has a listener. */
         private SolverListener listener;
 
         /** starts a external process and returns the result */
-        private ExternalProcessLauncher<SolverCommunication> processLauncher;
+        private ExternalProcessLauncher processLauncher;
    
         /**
          * The services object is stored in order to have the possibility to
@@ -62,14 +68,6 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
          * it also contains the final result.
          */
     private final SolverCommunication solverCommunication = new SolverCommunication();
-        
-        /**
-         * This holds information relevant for retrieving information on a model
-         * from an SMT instance.
-         * null in the beginning, is created at translation time.
-         * FIXME: Why is this here? It is currently not being used!
-         */
-        // private ProblemTypeInformation problemTypeInformation = null;
 
         /** The thread that is associated with this solver. */
         private Thread thread;
@@ -108,7 +106,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 this.services = services;
                 this.type = myType;
                 this.socket = AbstractSolverSocket.createSocket(type, query);
-        processLauncher = new ExternalProcessLauncher<>(solverCommunication, type.getDelimiters());
+            processLauncher = new ExternalProcessLauncher(solverCommunication, type.getDelimiters());
 
         }
 
@@ -203,12 +201,14 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                                 
                 // Secondly: Translate the given problem
                 String commands[];
+                String name = MiscTools.toValidFileName(problem.getName()).replace(' ', '_');
                 try {
+                     input = Files.createTempFile("SMTLIB-TL_" + name + "_", ".smt2");
                         commands = translateToCommand(problem.getSequent());
                         // JS: debug start
-                    String filename = "/tmp/SMTLIB-TL_" + problem.getName().replaceAll(" ", "");
-                    System.out.println("SMTLIB translation has been written to file: " + filename);
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+                    //String filename = "/tmp/SMTLIB-TL_" + problem.getName().replaceAll(" ", "");
+                    //System.out.println("SMTLIB translation has been written to file: " + filename);
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(input.toFile()));
                     writer.write(problemString);
                     writer.close();
                     // JS: debug end
@@ -223,31 +223,25 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
             // Thirdly: start the external process.
             try {
-                processLauncher.launch(commands);
-                processLauncher.sendMessage(type.modifyProblem(problemString));
+                output = Files.createTempFile("SMT-output_" + name + "_", ".smt2");
 
-                //JS: Debug start
-                String filename = "/tmp/SolverOutput_" + socket.getName() + "_" + problem.getName().replaceAll(" ", "");
-                BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
-                writer.write(socket.getName() + " says: \n");
-                Message msg = processLauncher.getPipe().readMessage();
+                commands = Arrays.copyOf(commands, commands.length + 2);
+                commands[commands.length - 2] = "--";
+                commands[commands.length - 1] = input.toString();
+                // this call blocks until the process finishes or is destroyed
+                processLauncher.launch(commands, output);
+                //processLauncher.sendMessage(type.modifyProblem(problemString));
+
+                //socket.messageIncoming(null, new Message("success", SolverCommunication.MessageType.Input));
+                /*
+                Message msg = processLauncher.readMessage();
                 //JS: Debug end
                 while (msg != null) {
-                    writer.append(msg.getContent() + "\n");
                     socket.messageIncoming(processLauncher.getPipe(), msg);
                     msg = processLauncher.readMessage();
-                }
-                //JS: Debug start
-                writer.close();
-                System.out.println("Solver answer has been written to file: " + filename);
-                //JS: Debug end
-
-                // uncomment for testing
-                //  Thread.sleep(3000);
-                // uncomment for testing
-                // Random random = new Random();
-                //Thread.sleep(random.nextInt(3000)+1000);
-                //throw new RuntimeException("Test exception");
+                }*/
+                socket.solverOutputWritten(output, solverCommunication);
+                // TODO: the temp files should be deleted somewhere
             } catch (Throwable e) {
                 interruptionOccurred(e);
             } finally {
@@ -355,6 +349,13 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 		processLauncher.stop();
                         thread.interrupt();
                 }
+            // the current implementation does not stop early if an error in the solver occurs, therefore we have
+            // to read the input after the interruption by the timer
+            try {
+                socket.solverOutputWritten(output, solverCommunication);
+            } catch (IOException e) {
+                setReasonOfInterruption(ReasonOfInterruption.Exception, e);
+            }
 
         }
 

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.smt.processcomm;
 import de.uka.ilkd.key.smt.processcomm.SolverCommunication.Message;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 
 /**
@@ -24,42 +25,35 @@ import java.io.IOException;
  * 2. Creates a pipe, that is used for communication.
  * 3. Starts the process and waits until the pipe has been closed or the process has been stopped.
  * Remark: It blocks the invoking thread.
- * The parameter T of the class can be used to define user-specific parameters.
  */
-public class ExternalProcessLauncher<T> {
+public class ExternalProcessLauncher {
 
 	private Process process;
 
-	private final Pipe pipe;
+	//private final Pipe pipe;
 
 	public ExternalProcessLauncher(SolverCommunication session, String[] messageDelimiters) {
-		pipe = new Pipe(session, messageDelimiters);
+		//pipe = new Pipe(session, messageDelimiters);
 	}
 
     /**
      * Main procedure of the class. Starts the external process, then it goes sleeping until 
      * the process has finished its work.
 	 */
-	public void launch(final String [] command) throws IOException {
+	public void launch(final String[] command, Path output) throws IOException, InterruptedException {
         try {
             ProcessBuilder builder = new ProcessBuilder(command);
-            process = builder.start();
+            builder.redirectOutput(output.toFile());
+            builder.redirectError(output.toFile());
+			process = builder.start();
+			process.waitFor();
 
-            pipe.start(process);
+            //pipe.start(process);
         } catch (Exception ex) {
             stop();
             throw ex;
         }
 	}
-	
-
-	/**
-	 * Call this method only after the pipe has been stopped. It is not thread safe!
-	 * @return
-	 */
-    SolverCommunication getCommunication(){
-    	return pipe.getSession();
-    }
 	
     /**
      * Stops the external process: In particular the pipe is closed and the process is destroyed. 
@@ -68,18 +62,18 @@ public class ExternalProcessLauncher<T> {
 		if(process != null){
 			process.destroy();
 		}
-		pipe.close();
+		//pipe.close();
 	}
 
-	public Pipe getPipe() {
-		return pipe;
-	}
-
-	public void sendMessage(String message) throws IOException {
-		pipe.sendMessage(message);
-	}
-
-	public Message readMessage() throws IOException, InterruptedException {
-		return pipe.readMessage();
-	}
+//	public Pipe getPipe() {
+//		return pipe;
+//	}
+//
+//	public void sendMessage(String message) throws IOException {
+//		pipe.sendMessage(message);
+//	}
+//
+//	public Message readMessage() throws IOException, InterruptedException {
+//		return pipe.readMessage();
+//	}
 }

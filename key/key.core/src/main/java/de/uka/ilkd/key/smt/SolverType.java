@@ -139,7 +139,7 @@ public interface SolverType  {
 
             @Override
             public String getDefaultSolverParameters() {
-                return "-in -smt2";
+                return "-smt2";
                 }
 
             @Override
@@ -226,7 +226,7 @@ public interface SolverType  {
 
 		@Override
 		public String getDefaultSolverParameters() {
-			return "-in -smt2";
+			return "-smt2";
 		}
 
 		@Override

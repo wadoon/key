@@ -7,6 +7,11 @@ import de.uka.ilkd.key.smt.processcomm.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.processcomm.SolverCommunication.MessageType;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * The SolverSocket class describes the communication between the KeY and the SMT solver processe.
@@ -21,6 +26,7 @@ public abstract class AbstractSolverSocket {
 	protected static final int WAIT_FOR_DETAILS =1;
 	protected static final int WAIT_FOR_QUERY = 2;
 	protected static final int WAIT_FOR_MODEL = 3;
+	protected static final int WAIT_FOR_PROOF = 4;
 	protected static final int FINISH = 4;
 
     static final String UNKNOWN = "unknown";
@@ -81,6 +87,10 @@ public abstract class AbstractSolverSocket {
 	public String getName() {
 		return name;
 	}
+
+	public void solverOutputWritten(Path output, SolverCommunication sc) throws IOException {
+
+	}
 }
 
 class Z3Socket extends AbstractSolverSocket{
@@ -89,9 +99,41 @@ class Z3Socket extends AbstractSolverSocket{
 		super(name, query);	    
 	}
 
+	@Override
+	public void solverOutputWritten(Path output, SolverCommunication sc) throws IOException {
+		List<String> lines = Files.readAllLines(output, Charset.defaultCharset());
+		for (String l : lines) {
+			sc.addMessage(l);
+		}
+
+		for (String l : lines) {
+			if (l.startsWith("(error")) {
+				if (!l.contains("model is not available")
+						&& !l.contains("proof is not available")) {
+					throw new IOException("Error while executing Z3: " + l);
+				}
+				// the model/proof not available errors are always present and must be ignored
+			}
+
+			switch (l) {
+				case "sat":
+					sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
+					break;
+				case "unsat":
+					sc.setFinalResult(SMTSolverResult.createValidResult(name));
+					break;
+				case "unknown":
+					sc.setFinalResult(SMTSolverResult.createUnknownResult(name));
+					break;
+			}
+		}
+	}
+
 	public void messageIncoming(Pipe pipe, Message message) throws IOException {
 		SolverCommunication sc = pipe.getSession();
-		String msg = message.getContent().trim();
+		// do not trim: destroys indentation
+		//String msg = message.getContent().trim();
+		String msg = message.getContent();
 		if(message.getType() == MessageType.Error || msg.startsWith("(error")) {
 			sc.addMessage(msg);
 			if(msg.indexOf("WARNING:")>-1){
@@ -100,7 +142,7 @@ class Z3Socket extends AbstractSolverSocket{
 			throw new IOException("Error while executing Z3: " + msg);
 		}
 
-		if (!msg.equals("success")) {
+		if (!msg.equals("success") && !msg.equals("endproof")) {
 			sc.addMessage(msg);
 		}
 
@@ -110,9 +152,9 @@ class Z3Socket extends AbstractSolverSocket{
 					sc.setFinalResult(SMTSolverResult.createValidResult(name));
 					// One cannot ask for proofs and models at one time
 					// rather have modesl than proofs (MU, 2013-07-19)
-					// pipe.sendMessage("(get-proof)\n");
-					pipe.sendMessage("(exit)");
-					sc.setState(WAIT_FOR_DETAILS);
+					pipe.sendMessage("(get-proof)\n");
+					pipe.sendMessage("(echo \"endproof\")");
+					sc.setState(WAIT_FOR_PROOF);
 				}
 				if(msg.equals("sat")){
 					sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
@@ -130,7 +172,17 @@ class Z3Socket extends AbstractSolverSocket{
 
 			case WAIT_FOR_DETAILS:
 				if(msg.equals("success")){
-					pipe.close();
+					try {
+						pipe.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				break;
+			case WAIT_FOR_PROOF:
+				if(msg.equals("endproof")){
+					pipe.sendMessage("(exit)\n");
+					sc.setState(WAIT_FOR_DETAILS);
 				}
 				break;
 		}

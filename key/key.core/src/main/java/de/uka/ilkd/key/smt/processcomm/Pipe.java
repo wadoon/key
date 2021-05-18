@@ -194,7 +194,7 @@ public final class Pipe {
 	}
 
 	public boolean isAlive() {
-		return stderrReceiver.alive && stdoutReceiver.alive;
+		return stderrReceiver.alive || stdoutReceiver.alive;
 	}
 
 	public SolverCommunication getSession() {
