@@ -331,6 +331,7 @@ LBLNEG: '\\lblneg';
 LBLPOS: '\\lblpos';
 LOCKSET: '\\lockset';
 LOCSET: '\\locset';  //KeY extension, not official JML
+STOREREF: '\\storeref';  //KeY extension, not official JML
 MAP: '\\map';  //KeY extension, not official JML
 MAPEMPTY: '\\map_empty';  //KeY extension, not official JML
 MAP_GET: '\\map_get';  //KeY extension, not official JML
@@ -356,7 +357,6 @@ PRE: '\\pre';
 PRODUCT: '\\product';
 REACH: '\\reach';
 REACHLOCS: '\\reachLocs';  //KeY extension, not official JML
-LOCSET_OF: '\\locset_of';  //KeY extension, not official JML
 REAL: '\\real';
 RESULT: '\\result';
 SAME: '\\same';

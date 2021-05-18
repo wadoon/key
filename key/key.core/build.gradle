@@ -163,9 +163,6 @@ task debugKeyLexer(type: JavaExec) {
     standardInput = System.in
 }
 
-
-
-
 // @AW: Say something here. From POV this explain by itself.
 processResources.dependsOn generateVersionFiles
 
@@ -177,12 +174,12 @@ task runAntlr4Jml(type: JavaExec) {
     classpath = configurations.antlr4
     main = "org.antlr.v4.Tool"
     args = ["-visitor",
-            "-Xexact-output-dir", "-o", antlr4Output,
+            "-Xexact-output-dir", "-o", antlr4OutputJml,
             "-package", "de.uka.ilkd.key.speclang.njml",
             "src/main/antlr4/JmlLexer.g4", "src/main/antlr4/JmlParser.g4"]
     doFirst {
-        file(antlr4Output).mkdirs()
-        println("create $antlr4Output")
+        file(antlr4OutputJml).mkdirs()
+        println("create $antlr4OutputJml")
     }
 }
 compileJava.dependsOn runAntlr4Jml

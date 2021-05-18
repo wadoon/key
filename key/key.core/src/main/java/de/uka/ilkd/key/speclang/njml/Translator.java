@@ -22,7 +22,6 @@ import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.translation.JMLResolverManager;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.*;
@@ -38,7 +37,10 @@ import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.speclang.njml.JmlFacade.TODO;
@@ -380,7 +382,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitStoreRefUnion(JmlParser.StoreRefUnionContext ctx) {
         final ImmutableList<Term> seq = requireNonNull(accept(ctx.storeRefList()));
-        if(seq.size()==1) return seq.head();
+        if (seq.size() == 1) return seq.head();
         else return tb.union(seq);
     }
 
@@ -1336,10 +1338,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
-    public Object visitPrimaryLocsetOf(JmlParser.PrimaryLocsetOfContext ctx) {
-        Term storeRef = accept(ctx.storeRefUnion());
-        assert storeRef != null;
-        return new SLExpression(storeRef);
+    public Object visitPrimaryCreateLocset(JmlParser.PrimaryCreateLocsetContext ctx) {
+        List<Term> seq = mapOf(ctx.fieldarrayaccess());
+        Term ret;
+        if (seq.isEmpty()) throw new IllegalStateException("empty!");
+        else if (seq.size() == 1) ret = seq.get(0);
+        else ret = tb.union(seq);
+        return new SLExpression(ret, javaInfo.getKeYJavaType(PrimitiveType.JAVA_LOCSET));
     }
 
     @Override
@@ -1462,8 +1467,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitPrimaryignor9(JmlParser.Primaryignor9Context ctx) {
-        Term t = accept(ctx.createLocset());
+    public Object visitPrimaryStoreRef(JmlParser.PrimaryStoreRefContext ctx) {
+        Term t = accept(ctx.storeRefUnion());
         assert t != null;
         return new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
     }

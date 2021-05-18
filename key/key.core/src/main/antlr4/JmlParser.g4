@@ -308,7 +308,6 @@ jmlprimary
   | NOT_ASSIGNED LPAREN storeRefUnion RPAREN                                          #primaryNotAssigned
   | FRESH LPAREN expressionlist RPAREN                                                #primaryFresh
   | REACH LPAREN storeref COMMA expression COMMA expression (COMMA expression)? RPAREN #primaryReach
-  | LOCSET_OF LPAREN storeRefUnion RPAREN                                                   #primaryLocsetOf
   | REACHLOCS LPAREN storeref COMMA expression (COMMA expression)? RPAREN             #primaryReachLocs
   | DURATION LPAREN expression RPAREN                                                 #primaryDuration
   | SPACE LPAREN expression RPAREN                                                    #primarySpace
@@ -327,7 +326,8 @@ jmlprimary
   | VALUES                                                                            #primaryValues
   | STRING_EQUAL LPAREN expression COMMA expression RPAREN                            #primaryStringEq
   | EMPTYSET                                                                          #primaryEmptySet
-  | createLocset                                                                      #primaryignor9
+  | STOREREF LPAREN storeRefUnion RPAREN                                              #primaryStoreRef
+  | (LOCSET | SINGLETON) LPAREN fieldarrayaccess (COMMA fieldarrayaccess)* RPAREN     #primaryCreateLocset
   | UNION LPAREN storeRefUnion RPAREN                                                 #primaryUnion
   | INTERSECT LPAREN storeRefIntersect RPAREN                                         #primaryIntersect
   | SETMINUS LPAREN storeref COMMA storeref RPAREN                                    #primarySetMinux
@@ -340,6 +340,14 @@ jmlprimary
   | NEWELEMSFRESH LPAREN storeref RPAREN                                             #primaryNewElemsfrehs
   | sequence                                                                         #primaryignore10
   ;
+
+fieldarrayaccess: (ident|this_|super_) (fieldarrayaccess_suffix)*;
+fieldarrayaccess_suffix
+    : DOT (ident | inv | this_ | super_)
+    | LBRACKET (expression) RBRACKET
+;
+
+super_: SUPER;
 
 sequence
   : SEQEMPTY                                                              #sequenceEmpty
