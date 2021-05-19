@@ -5,12 +5,16 @@ import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.macros.AbstractProofMacro;
+import de.uka.ilkd.key.macros.FullAutoPilotProofMacro;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
@@ -62,10 +66,15 @@ public class ExtractorTest {
                     new PreconditionExtractor(currentProof, ui);
                 Term precondition = preconditionExtractor.extract();
                 System.out.println(
-                    "Found precondition for " + currentProof.name() + ":\n" +
-                        precondition.toString());
+                    "Found precondition for " + currentProof.name() + ":");
+                System.out
+                    .println(LogicPrinter.quickPrintTerm(precondition, currentProof.getServices()));
                 currentProof.dispose();
             }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             if (env != null) {
                 env.dispose();
@@ -73,6 +82,13 @@ public class ExtractorTest {
         }
     }
 
+    /**
+     * Generates all proofs for the given KeY environment.
+     * Applies FullAutoPilotProofMacro on those proofs
+     *
+     * @param env KeY envirionment
+     * @return List of all proofs with open goals
+     */
     private static List<Proof> generateProofs(KeYEnvironment<?> env) {
         // TODO(steuber): We probably want to adjust this a little? Or make it configurable...
         List<Proof> unclosedProofs = new LinkedList<Proof>();
@@ -119,11 +135,8 @@ public class ExtractorTest {
                 ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
                     .setActiveStrategyProperties(sp);
                 proof.getSettings().getStrategySettings().setMaxSteps(maxSteps);
-                proof.setActiveStrategy(
-                    proof.getServices().getProfile().getDefaultStrategyFactory()
-                        .create(proof, sp));
-                // Start auto mode
-                env.getUi().getProofControl().startAndWaitForAutoMode(proof);
+                AbstractProofMacro autopilot = new FullAutoPilotProofMacro();
+                autopilot.applyTo(env.getUi(), proof.root(), null, null);
                 // Show proof result
                 boolean closed = proof.openGoals().isEmpty();
                 if (!closed) {
@@ -132,6 +145,10 @@ public class ExtractorTest {
             } catch (ProofInputException e) {
                 System.out.println("Exception at '" + contract.getDisplayName() + "' of " +
                     contract.getTarget() + ":");
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 if (proof != null && proof.openGoals().isEmpty()) {
@@ -143,6 +160,12 @@ public class ExtractorTest {
         return unclosedProofs;
     }
 
+    /**
+     * Creates a KeY environment loading the given file
+     * @param location Input File
+     * @return A new KeY environment
+     * @throws ProblemLoaderException FIle could not be loaded
+     */
     private static KeYEnvironment<?> createKeyEnvironment(File location, List<File> classPaths,
                                                           File bootClassPath, List<File> includes)
         throws ProblemLoaderException {

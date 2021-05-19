@@ -3,27 +3,23 @@ package keyext.extract_preconditions;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
-import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
-import de.uka.ilkd.key.macros.TestGenMacro;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
-import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Class allowing the extraction of preconditions for a proof's open goals
+ *
+ * @author steuber
  */
 public class PreconditionExtractor {
     /**
@@ -46,7 +42,6 @@ public class PreconditionExtractor {
      *
      * @param proofParam
      */
-
     public PreconditionExtractor(Proof proofParam, UserInterfaceControl uiParam) {
         assert (!proofParam.closed());
         this.proof = proofParam;
@@ -54,41 +49,89 @@ public class PreconditionExtractor {
         this.ui = uiParam;
     }
 
-    public Term extract() {
+    /**
+     * Method which extracts an overapproximate precondition for the open goals
+     *
+     * @return Term describing the precondition
+     * @throws Exception            If Macros/Strategies throw an exception during processing
+     * @throws InterruptedException If extraction is interrupted
+     */
+    public Term extract() throws Exception, InterruptedException {
         ImmutableList<Term> goalPreconditons = ImmutableSLList.nil();
         for (Goal currentGoal : this.proof.openGoals()) {
             goalPreconditons = goalPreconditons.append(this.extractFromGoal(currentGoal));
         }
         // Goal is missed if any of the preconditions are missed so we need an OR
+        // TODO(steuber): Projection before OR
         return this.proofServices.getTermBuilder().or(goalPreconditons);
     }
 
     /**
-     * Generates ??? for a given goal
+     * Generates a List of terms for a given goal.
+     * <p>
      * Adapted from searchCounterexample in {@link de.uka.ilkd.key.smt.counterexample.AbstractCounterExampleGenerator}
      *
      * @param currentGoal The goal for which a precondition should be found
+     * @return As we apply further Macros/Strategies to the goal before term building,
+     * we could potentially obtain multiple goals and thus multiple terms for a single goal (right?)
+     * @throws Exception            If Macros/Strategies throw an exception during processing
+     * @throws InterruptedException If extraction is interrupted
      */
-    private Term extractFromGoal(Goal currentGoal) {
+    private ImmutableList<Term> extractFromGoal(Goal inputGoal)
+        throws InterruptedException, Exception {
+        Proof proofCopy;
+        proofCopy = this.preprocessGoal(inputGoal);
+        ImmutableList<Term> goalTerms = ImmutableSLList.nil();
+        for (Goal currentGoal : proofCopy.openGoals()) {
+            goalTerms = goalTerms.append(sequentToPreconditionTerm(currentGoal.sequent(),
+                this.proofServices));
+        }
+        return goalTerms;
+    }
+
+    /**
+     * Preprocessing of the a goal:
+     * Applies Macros/Strategies which allow an easy term transformation afterwards
+     *
+     * @param currentGoal Goal to apply macros/strategies on
+     * @return Proof Object for Goal (copy) containing the processed goal.
+     * Important: We must process <b>all</b> new open goals of this new proof object!
+     * @throws Exception            If Macros/Strategies throw an exception during processing
+     * @throws InterruptedException If extraction is interrupted
+     */
+    private Proof preprocessGoal(Goal currentGoal) throws InterruptedException, Exception {
         Proof proofCopy =
             createProof(this.proof, currentGoal.sequent(), "Proof Copy: " + this.proof.name());
-        //final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
-        final TestGenMacro macro = new TestGenMacro();
-        TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
-        final ProverTaskListener ptl = this.ui.getProofControl().getDefaultProverTaskListener();
-        ptl.taskStarted(
-            new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
+        AbstractProofMacro testgenMacro = new TestGenMacro();
+        testgenMacro.applyTo(this.ui, proofCopy.root(), null, null);
+        // Simplification
+        proofCopy.setActiveStrategy(new SimplifierStrategy());
+        this.ui.getProofControl().startAndWaitForAutoMode(proofCopy);
+        return proofCopy;
+    }
 
-        try {
-            info = macro.applyTo(this.ui, proof, ImmutableSLList.singleton(currentGoal), null, ptl);
-        } catch (InterruptedException e) {
-            Debug.out("Semantics blasting interrupted");
-        } finally {
-            ptl.taskFinished(info);
+    /**
+     * Method which transforms a given sequent into a precondition producing counter examples of goal.
+     * This corresponds to the precondition which produces an error at the current goal
+     * I.e. AND a_i => OR b_i becomes (AND a_i) AND (AND NOT(b_i))
+     *
+     * @param s        Sequent to process
+     * @param services Proof services
+     * @return The precondition for the sequent as a term object
+     */
+    private static Term sequentToPreconditionTerm(Sequent s, Services services) {
+        ImmutableList<Term> conjunction = ImmutableSLList.nil();
+
+        final TermBuilder tb = services.getTermBuilder();
+        conjunction = conjunction.append(tb.tt());
+        for (SequentFormula f : s.antecedent()) {
+            conjunction = conjunction.append(f.formula());
         }
-        Term result = SMTProblem.sequentToTerm(proofCopy.root().sequent(),
-            this.proofServices);
-        return result;
+        for (SequentFormula f : s.succedent()) {
+            conjunction = conjunction.append(tb.not(f.formula()));
+        }
+
+        return tb.and(conjunction);
     }
 
     /**
