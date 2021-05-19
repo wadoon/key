@@ -360,6 +360,9 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     private String getBaseNameProposal(Type type) {
 	String result;
+		if (type == null) {
+			return "x"; // default name
+		}
         if(type instanceof ArrayType) {
 	    result = getBaseNameProposal(((ArrayType)type).getBaseType()
 		    					  .getKeYJavaType()
