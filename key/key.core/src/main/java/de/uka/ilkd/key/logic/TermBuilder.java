@@ -1376,13 +1376,17 @@ public class TermBuilder {
         final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
         if (s1.op() == ldt.getEmpty() || s2.op() == ldt.getEmpty()) {
             return empty();
+        } else if (s1.op() == ldt.getAllLocs()) {
+            return s2;
+        } else if (s2.op() == ldt.getAllLocs()) {
+            return s1;
         } else {
             return func(ldt.getIntersect(), s1, s2);
         }
     }
 
     public Term intersect(Term... subTerms) {
-        Term result = empty();
+        Term result = allLocs();
         for (Term sub : subTerms) {
             result = intersect(result, sub);
         }
@@ -1390,7 +1394,7 @@ public class TermBuilder {
     }
 
     public Term intersect(Iterable<Term> subTerms) {
-        Term result = empty();
+        Term result = allLocs();
         for (Term sub : subTerms) {
             result = intersect(result, sub);
         }
