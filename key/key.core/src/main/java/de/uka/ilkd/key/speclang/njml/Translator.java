@@ -31,12 +31,11 @@ import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import javax.annotation.Nonnull;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,8 +127,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
 
     //region accept helpers
-    @Contract("null -> null")
-    private <T> @Nullable T accept(@Nullable ParserRuleContext ctx) {
+    private <T> @org.checkerframework.checker.nullness.qual.Nullable T accept(@Nullable ParserRuleContext ctx) {
         if (ctx == null) return null;
         return (T) ctx.accept(this);
     }
@@ -146,7 +144,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return seq;
     }
 
-    private <T> @Nullable T oneOf(ParserRuleContext @Nullable ... contexts) {
+    private <T> @org.checkerframework.checker.nullness.qual.Nullable T oneOf(ParserRuleContext @Nullable ... contexts) {
         for (ParserRuleContext context : requireNonNull(contexts)) {
             T t = accept(context);
             if (t != null) return t;
@@ -957,7 +955,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return getThisReceiver();
     }
 
-    @NotNull
+    @Nonnull
     private SLExpression getThisReceiver() {
         return new SLExpression(tb.var(selfVar), selfVar.getKeYJavaType());
     }
@@ -1338,8 +1336,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
-    public Object visitPrimaryCreateLocset(JmlParser.PrimaryCreateLocsetContext ctx) {
-        List<Term> seq = mapOf(ctx.fieldarrayaccess());
+    public SLExpression visitPrimaryCreateLocset(JmlParser.PrimaryCreateLocsetContext ctx) {
+        List<SLExpression> aa = mapOf(ctx.fieldarrayaccess());
+        List<Term> seq = aa.stream().map(translator::createStoreRef).collect(Collectors.toList());
         Term ret;
         if (seq.isEmpty()) throw new IllegalStateException("empty!");
         else if (seq.size() == 1) ret = seq.get(0);
@@ -1521,7 +1520,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return createInfiniteUnion(ctx.boundvarmodifiers(), ctx.quantifiedvardecls(), ctx.predicate(), ctx.storeref());
     }
 
-    @NotNull
+    @Nonnull
     private Object createInfiniteUnion(JmlParser.BoundvarmodifiersContext boundvarmodifiers, JmlParser.QuantifiedvardeclsContext quantifiedvardecls, JmlParser.PredicateContext predicate, JmlParser.StorerefContext storeref) {
         Boolean nullable = accept(boundvarmodifiers);
         Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars = accept(quantifiedvardecls);
@@ -1922,7 +1921,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         String label = ctx.lbl == null ? "" : ctx.lbl.getText(); //TODO weigl: right label if omitted
         SLExpression pred = accept(ctx.predornot());
         assert pred != null;
-        @NotNull Pair<Label, Term> t = translator.createBreaks(pred.getTerm(), label);
+        @Nonnull Pair<Label, Term> t = translator.createBreaks(pred.getTerm(), label);
         contractClauses.add(ContractClauses.BREAKS, t.first, t.second);
         return t;
     }
@@ -1932,7 +1931,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         String label = ctx.lbl == null ? "" : ctx.lbl.getText(); //TODO weigl: right label if omitted
         SLExpression pred = accept(ctx.predornot());
         assert pred != null;
-        @NotNull Pair<Label, Term> t = translator.createContinues(pred.getTerm(), label);
+        @Nonnull Pair<Label, Term> t = translator.createContinues(pred.getTerm(), label);
         contractClauses.add(ContractClauses.CONTINUES, t.first, t.second);
         return t;
     }

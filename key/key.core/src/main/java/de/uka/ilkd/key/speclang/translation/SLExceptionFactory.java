@@ -18,7 +18,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
 import org.antlr.runtime.*;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -45,7 +45,7 @@ public class SLExceptionFactory {
     //constructors
     //-------------------------------------------------------------------------
 
-    public SLExceptionFactory(@NotNull Parser parser, String fileName, Position offsetPos) {
+    public SLExceptionFactory(@Nonnull Parser parser, String fileName, Position offsetPos) {
         this.line = parser.input.LT(1).getLine();
         this.column = parser.input.LT(1).getCharPositionInLine();
         this.fileName = fileName;

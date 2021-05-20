@@ -54,9 +54,9 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.antlr.v4.runtime.Token;
-import org.jetbrains.annotations.NotNull;
 import org.key_project.util.collection.*;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -501,7 +501,7 @@ public class JMLSpecFactory {
         }
     }
 
-    @NotNull
+    @Nonnull
     private LabeledParserRuleContext getAssignableNothing() {
         return new LabeledParserRuleContext(
                 JmlFacade.parseClause("assignable \\nothing;"),
@@ -1027,8 +1027,8 @@ public class JMLSpecFactory {
     // public interface
     // -------------------------------------------------------------------------
     public ClassInvariant createJMLClassInvariant(
-            @NotNull KeYJavaType kjt, VisibilityModifier visibility,
-            boolean isStatic, @NotNull LabeledParserRuleContext originalInv) throws SLTranslationException {
+            @Nonnull KeYJavaType kjt, VisibilityModifier visibility,
+            boolean isStatic, @Nonnull LabeledParserRuleContext originalInv) throws SLTranslationException {
         assert kjt != null;
         assert originalInv != null;
 

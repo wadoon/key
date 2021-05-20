@@ -18,8 +18,8 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.util.Triple;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return getList(ENSURES_FREE, toString);
     }
 
-    private ImmutableList<LabeledParserRuleContext> getList(@NotNull ClauseHd clause, @NotNull Name heap) {
+    private ImmutableList<LabeledParserRuleContext> getList(@Nonnull ClauseHd clause, @Nonnull Name heap) {
         List<LabeledParserRuleContext> seq = clauses.stream()
                 .filter(it -> it.clauseType.equals(clause))
                 .filter(it -> Objects.equals(it.heap, heap))
@@ -128,7 +128,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         }
     }
 
-    public TextualJMLSpecCase(ImmutableList<String> mods, @NotNull Behavior behavior) {
+    public TextualJMLSpecCase(ImmutableList<String> mods, @Nonnull Behavior behavior) {
         super(mods);
         assert behavior != null;
         this.behavior = behavior;
@@ -173,14 +173,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      *
      * @param other
      */
-    public @NotNull TextualJMLSpecCase merge(@NotNull TextualJMLSpecCase other) {
+    public @Nonnull TextualJMLSpecCase merge(@Nonnull TextualJMLSpecCase other) {
         TextualJMLSpecCase res = clone();
         res.clauses.addAll(other.clauses);
         return res;
     }
 
     @Override
-    public @NotNull TextualJMLSpecCase clone() {
+    public @Nonnull TextualJMLSpecCase clone() {
         TextualJMLSpecCase res = new TextualJMLSpecCase(getMods(), getBehavior());
         res.name = name;
         res.clauses = new ArrayList<>(clauses);

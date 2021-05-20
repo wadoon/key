@@ -17,8 +17,8 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -70,7 +70,7 @@ public class JmlIO {
      * @param atPres      i do not know
      * @param atBefores   i do not know
      */
-    public JmlIO(@NotNull Services services,
+    public JmlIO(@Nonnull Services services,
                  @Nullable KeYJavaType specInClass,
                  @Nullable ProgramVariable selfVar,
                  @Nullable ImmutableList<ProgramVariable> paramVars,
@@ -285,7 +285,7 @@ public class JmlIO {
      * @return a information flow specification from the given context.
      * @throws ClassCastException if the {@code expr} is not suitable
      */
-    public @NotNull InfFlowSpec translateInfFlow(@NotNull ParserRuleContext expr) {
+    public @Nonnull InfFlowSpec translateInfFlow(@Nonnull ParserRuleContext expr) {
         return (InfFlowSpec) this.interpret(expr);
     }
 

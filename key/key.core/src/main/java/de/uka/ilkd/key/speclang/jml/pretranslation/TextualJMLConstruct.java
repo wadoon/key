@@ -20,7 +20,7 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.ArrayList;
@@ -117,7 +117,7 @@ public abstract class TextualJMLConstruct {
      * @param ps
      * @deprecated
      */
-    protected void addGeneric(Map<String, ImmutableList<LabeledParserRuleContext>> item, @NotNull LabeledParserRuleContext ps) {
+    protected void addGeneric(Map<String, ImmutableList<LabeledParserRuleContext>> item, @Nonnull LabeledParserRuleContext ps) {
         String t = ps.first.getText();
         if (!t.startsWith("<") || t.startsWith("<inv>")) {
             ImmutableList<LabeledParserRuleContext> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());

@@ -5,7 +5,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Interval;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -80,7 +80,7 @@ public class JmlFacade {
     }
 
     static ImmutableList<TextualJMLConstruct> parseClasslevel(JmlLexer lexer) {
-        @NotNull JmlParser p = createParser(lexer);
+        @Nonnull JmlParser p = createParser(lexer);
         Stopwatch sw = Stopwatch.createStarted();
         JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
         TextualTranslator translator = new TextualTranslator();
@@ -102,7 +102,7 @@ public class JmlFacade {
     }
 
     private static ImmutableList<TextualJMLConstruct> parseMethodlevel(JmlLexer lexer) {
-        @NotNull JmlParser p = createParser(lexer);
+        @Nonnull JmlParser p = createParser(lexer);
         Stopwatch sw = Stopwatch.createStarted();
         JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
         TextualTranslator translator = new TextualTranslator();
