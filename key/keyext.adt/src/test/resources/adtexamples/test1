@@ -1,0 +1,12 @@
+spec Strict_Partial_Order =
+%% Let's start with a simple example !
+    sort Elem
+    pred __<__ : Elem * Elem
+%% pred abbreviates predicate
+    forall x, y, z:Elem
+    . not (x < x) %(strict)%
+    . (x < y) => not (y < x) %(asymmetric)%
+    . (x < y) /\ (y < z) => (x < z) %(transitive)%
+    %{ Note that there may exist x, y such that
+       neither x < y nor y < x. }%
+end

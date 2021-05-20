@@ -1,0 +1,8 @@
+spec Natural_Order =
+    Natural
+then
+free {pred __<__ : Nat * Nat
+      forall x, y:Nat
+      . 0 < suc (x)
+      . (x < y) => (suc (x) < suc (y))}
+end

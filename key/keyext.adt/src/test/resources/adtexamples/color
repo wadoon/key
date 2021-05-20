@@ -1,0 +1,4 @@
+spec Color =
+    free type RGB ::= Red | Green | Blue
+    free type CMYK ::= Cyan | Magenta | Yellow | Black
+end
