@@ -1,0 +1,8 @@
+spec Generic_Monoid [sort Elem] =
+    sort Monoid
+    ops inj : Elem ­> Monoid;
+          1 : Monoid;
+          __*__ : Monoid * Monoid ­> Monoid, assoc, unit 1
+    forall x, y:Elem
+    . inj (x) = inj (y) => x = y
+end

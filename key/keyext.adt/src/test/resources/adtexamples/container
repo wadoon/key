@@ -1,0 +1,7 @@
+spec Container [sort Elem] =
+    type Container ::= empty | insert(Elem; Container)
+    pred   __is_in__ : Elem * Container
+    forall e, e':Elem; C:Container
+    . not (e is_in empty)
+    . (e is_in insert (e', C)) <=> e = e' \/ (e is_in C)
+end

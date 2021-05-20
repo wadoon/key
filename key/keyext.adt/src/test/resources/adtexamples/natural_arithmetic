@@ -1,0 +1,11 @@
+spec Natural_Arithmetic =
+    Natural_Order
+then
+    ops 1: Nat = suc (0);
+           __+__ : Nat * Nat -> Nat;
+           __*__ : Nat * Nat -> Nat
+    forall x, y:Nat
+    . x + suc (y) = suc (x + y)
+    . x * 0 = 0
+    . x * suc (y) = (x * y) + x
+end

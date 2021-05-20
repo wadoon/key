@@ -1,0 +1,5 @@
+spec Monoid =
+    sort Monoid
+    ops 1 : Monoid;
+            __*__ : Monoid * Monoid -> Monoid, assoc, unit 1
+end

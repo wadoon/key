@@ -7,6 +7,13 @@ configurations { antlr4 }
 dependencies {
     antlr4 "org.antlr:antlr4:4.7.1"
     compile "org.antlr:antlr4-runtime:4.7.1"
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
+}
+
+test {
+    useJUnitPlatform()
 }
 
 def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/adt"
@@ -19,11 +26,14 @@ task runAntlr4(type: JavaExec) {
     args = ["-visitor",
             "-Xexact-output-dir", "-o", antlr4Output,
             "-package", "de.uka.ilkd.key.adt",
-            "src/main/antlr4/ADTLang.g4"]
+            "src/main/antlr4/ADTLang.g4",
+            "src/main/antlr4/Casl.g4",
+    ]
     doFirst {
         file(antlr4Output).mkdirs()
         println("create $antlr4Output")
     }
 }
 compileJava.dependsOn runAntlr4
+compileKotlin.dependsOn runAntlr4
 sourceSets.main.java.srcDirs("$projectDir/build/generated-src/antlr4/main/")

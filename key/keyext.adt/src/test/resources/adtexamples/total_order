@@ -1,0 +1,6 @@
+spec Total_Order =
+    Strict_Partial_Order
+then
+    forall x, y:Elem
+    . (x < y) \/ (y < x) \/ x = y %(total)%
+end

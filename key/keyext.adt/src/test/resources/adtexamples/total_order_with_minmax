@@ -1,0 +1,13 @@
+spec Total_Order_With_MinMax = Total_Order
+then
+  ops
+    min(x, y :Elem): Elem = x when x < y else y;
+    max(x, y :Elem): Elem = y when min (x, y) = x else x
+end
+
+%[
+abbreviates
+  forall x,y:Elem . min(x,y) = x when x<y else y
+which abbreviates
+  (x<y => min(x,y)=x) /\ (not(x<y) => min(x,y)=y)
+]%

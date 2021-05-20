@@ -1,0 +1,7 @@
+spec Partial_Order =
+    Strict_Partial_Order
+then
+    pred __<=__(x, y :Elem) <=> (x < y) \/ x = y
+end
+
+%display __<=__ %LATEX __\le__

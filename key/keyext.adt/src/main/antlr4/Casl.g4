@@ -1,7 +1,7 @@
 grammar Casl;
 
 /*
-spec Strict Partial Order =
+spec StrictPartialOrder =
   %% Let’s start with a simple example !
   sort Elem
   pred < : Elem × Elem %% pred abbreviates predicate
@@ -33,31 +33,95 @@ var n:Nat
 
 */
 
-basic_spec:  basic_items* ;
-basic_items: sig_items
-    | 'free' 'types' (datatype_decl ';')*
-    | 'generated' 'types' (datatype_decl ';')*
-    | 'generated' '{' sig_items*'}'
-    | 'vars' (var_decl';')*
-    | 'forall' (var_decl ';')*
-       '.' formula ('.' formula)*
-    |       '.' formula ('.' formula)*
+/*******************************************/
+/*3.1.3 Structured Specifications*/
+base_spec
+    : basic_spec
+    | 'free' group_spec
+    | 'closed' group_spec
+    | 'local' spec 'within' spec
+    | group_spec
     ;
 
-sig_items:  'sorts' (sort_item ';')*
-          | 'ops' (op_item ';')*
-          | 'preds' (pred_item ';')*
-          | 'types' (datatype_decl ';')*
+spec: base_spec  ( renaming
+                 | restriction
+                 | ('and' spec)
+                 | ('then' spec)
+                 )?
+    ;
+
+group_spec
+    : '{' spec '}'
+    | spec_name ('[' fit_arg']')*
+    ;
+
+renaming: 'with' symb_map_items (',' symb_map_items)*;
+restriction
+    : 'hide' symb_items (',' symb_items)*
+    | 'reveal' symb_map_items (',' symb_map_items)*
+    ;
+
+spec_defn
+  : 'spec' spec_name some_generics? '=' spec 'end'?;
+
+some_generics: some_params some_imported?;
+some_params: ('[' fit_arg']')+;
+some_imported:'given' group_spec (',' group_spec)*;
+fit_arg
+  : spec ('fit' symb_map_items (',' symb_map_items)*)?
+  | 'view' view_name some_params?
+  ;
+
+view_defn
+  : 'view' view_name  some_generics? ':' view_type
+    ('=' symb_map_items (',' symb_map_items)*)?
+    'end'?
+  ;
+
+view_type: group_spec 'to' group_spec;
+symb_items: symb | some_symb_kind symb (',' symb)*;
+symb_map_items: symb_or_map | some_symb_kind symb_or_map (',' symb_or_map)*;
+some_symb_kind: 'sort'|'sorts'|'op'|'ops'|'pred'|'preds';
+symb: id | id ':' type ;
+type: op_type | pred_type;
+symb_map : symb '|->' symb;
+symb_or_map : symb | symb_map;
+spec_name: id;
+view_name: id;
+
+/*******************************************/
+basic_spec:  basic_items+;
+basic_items: sig_items
+    | ('generated'|'free') ('type'|'types') datatype_decl (';' datatype_decl)* ';'?
+    | 'generated' '{' sig_items*'}' ';'?
+    | ('var'|'vars') var_decl (';' var_decl)* ';'?
+    | 'forall' var_decl (';' var_decl)*
+      ('.'|'·') formula (('.'|'·') formula)*
+      ';'?
+    | ('.'|'·') formula (('.'|'·') formula)* ';'?
+
+    ;
+
+sig_items:  ('sorts'|'sort') sort_item (';' sort_item)* ';'?
+          | ('op'|'ops') op_item (';' op_item)* ';'?
+          | ('pred'|'preds') pred_item  (';' pred_item )* ';'?
+          | ('type'|'types') datatype_decl (';' datatype_decl)* ';'?
           ;
 
-sort_item: sort (',' sort)*;
-op_item: op_name (',' op_name)* ':' op_type
-         | op_name (',' op_name)* ':' op_type ',' op_attr (',' op_attr)*
+sort_item
+    : sort (',' sort)* ('<' sort)?
+    | sort '=' '{' var ':' sort '.' formula '}'
+    | sort ('=' sort)+
+    ;
+
+op_item:   op_name (',' op_name)* ':' op_type (',' op_attr)*
          | op_name op_head '=' term
       ;
 
-op_type: sort ('*' sort)* '->' sort | sort
-        | sort ('*' sort)* '->' '?' sort  | '?' sort
+op_type: sort ('*' sort)* '->' sort
+        | sort
+        | sort ('*' sort)* '->' '?' sort
+        | '?' sort
         ;
 
 op_attr: 'assoc' | 'comm' | 'idem' | 'unit' term;
@@ -73,35 +137,44 @@ pred_item: pred_name (',' pred_name)* ':' pred_type
 
 pred_type: sort ('*' sort)* | '(' ')';
 pred_head: arg_decl (';' arg_decl)*;
-datatype_decl: sort '::=' alternative ('|' alternative);
-alternative: op_name (('(' component (';' component)* ')') '?'?)?;
-component: (op_name (',' op_name) ':' '?'? )? sort;
+datatype_decl: sort '::=' alternative ('|' alternative)*;
+alternative
+    : op_name ( ('(' component (';' component)* ')') '?'?)?
+    | ('sort'|'sorts') sort (',' sort)*
+    |
+    ;
+
+component: (op_name (',' op_name)* ':' '?'? )? sort;
 var_decl: var (',' var)* ':' sort;
-formula: quantifier var_decl(';'var_decl)* '.' formula
-| formula ('/\\' formula)+
-| formula ('\\/' formula)+
-| formula ('=>' formula)
-| formula ('if' formula)
-| formula ('<=>' formula)
-| 'not' formula
-| 'def' formula
-| 'true' | 'false'
-| term ('=e=' term)
-| term ('=' term)
-| mixfix+
+formula
+    : quantifier var_decl(';'var_decl)* '.' formula
+    | term 'in' sort
+    | formula ('/\\' formula)+
+    | formula ('\\/' formula)+
+    | formula ('=>' formula)
+    | formula ('if' formula)
+    | formula ('<=>' formula)
+    | 'not' formula
+    | 'def' formula
+    | 'true' | 'false'
+    | term ('=e=' term)
+    | term ('=' term)
+    | term+
 ;
 
 quantifier: 'forall' | 'exists' | 'exists!';
 terms: term (',' term)*;
-term: mixfix;
-mixfix: token | literal | place | qual_pred_name | qual_var_name | qual_op_name
-      | term ':' sort | term 'when' formula 'else' term
-      | '(' terms ')'
-      | '[' terms ']'
-      | '{' terms '}'
-      | '[' ']'
-      | '{' '}'
-      ;
+term
+    : token | literal | place | qual_pred_name | qual_var_name | qual_op_name
+    | '(' terms ')'
+    | '[' terms ']'
+    | '{' terms '}'
+    | '[' ']'
+    | '{' '}'
+    | term 'as' sort
+    | term ':' sort
+    | term 'when' formula 'else' term
+    ;
 
 qual_var_name :  '(' 'var' var ':' sort ')';
 qual_pred_name :  '(' 'pred' pred_name ':' pred_type ')';
@@ -110,15 +183,19 @@ sort:sort_id;
 op_name:id;
 pred_name:id;
 var:simple_id;
-token: WORDS | DOT_WORDS | DIGIT | SIGNS | QUOTED_CHAR;
-literal: STRING | DIGITS |FRACTION|FLOATING;
+token: WORDS | WORD | DOT_WORDS | signs | NUMBER | QUOTED_CHAR;
+signs: SIGNS | '*';
+literal: STRING | NUMBER |FRACTION|FLOATING;
 place: '__';
-sort_id: WORDS;
-simple_id: WORDS;
+sort_id: WORD | WORDS ('[' id (',' id)']')?;
+simple_id: WORD | WORDS;
 id: mix_token+;
-mix_token: token | place
+mix_token
+      : token
+      | place
       | '[' id? ']'
-      | '{' id? '}' ;
+      | '{' id? '}'
+      ;
 
 
 AND:'and';
@@ -173,6 +250,7 @@ ASSOC:'assoc';
 COMM:'comm';
 IDEM:'idem';
 
+
 COLON: ':';
 QUESTION:':?';
 ASSIGN:'::=';
@@ -180,40 +258,57 @@ EQ:'=';
 IMPL:'=>';
 EQUIV:'<=>';
 DOT:'.';
-//OR:'\\/';
-//AND:'/\\';
+CDOT:'·';
+LPAREN:'(';
+RPAREN:')';
+LBRACE:'{';
+RBRACE:'}';
+RBRACKET:']';
+LBRACKET:'[';
+STAR:'*';
+
 
 MID:'|';
 MAPSTO: '|->';
 EEQ:'=e=';
-
-WORDS: WORD ('_' WORD)+;
+PLACE:'__';
+WORD:'...fsda.fsda.fsda.fsdaklkjsda';
+WORDS: (WORD_CHAR) (WORD_CHAR|DIGIT)*;
+//WORDS: WORD ('_' (WORD|DIGIT))+;
 DOT_WORDS:'.' WORDS;
-WORD: WORD_CHAR+;
+//WORD: WORD_CHAR+;
 
-fragment WORD_CHAR: LETTER | '\'' | DIGIT;
+fragment WORD_CHAR: LETTER | '\'' | '_';
 fragment LETTER: [a-zA-Z];
 fragment DIGIT: [0-9];
 
-SIGNES: SIGN+;
+SIGNS: SIGN+;
 fragment SIGN: '+' | '-' | '*' | '/' | '\\' | '&' | '=' | '<' | '>' |
-         '!'|'?'|':'|'.'|'$'|'@'|'#'|'^'|'~';
-
+                '!'| '?' | ':' | '.' | '$'  | '@' | '#' | '^' | '~'
+                ;
 QUOTED_CHAR: '\'' . '\'';
 
 NUMBER: DIGIT+;
 FRACTION: NUMBER '.' NUMBER;
 FLOATING: (NUMBER|FRACTION) [eE] ('+'|'-')? NUMBER;
 
-STRING_LITERAL:'"' ('\\' . | ~( '"' | '\\') )* '"' ;
-WS:  [ \t\n\r\u00a0]+ -> channel(HIDDEN); //U+00A0 = non breakable whitespace
+STRING:'"' ('\\' . | ~( '"' | '\\') )* '"' ;
+
+COMMENT_LINE: '%%' (~[\n\r])* -> channel(HIDDEN);
+COMMENT_GROUP: '%{' .*? '}%' -> channel(HIDDEN);
+COMMENT_OUT: '%[' .*? ']%' -> channel(HIDDEN);
+
+ANNOTATION_LINE: '%' WORDS (~[\n\r])* -> channel(HIDDEN);
+ANNOTATION_GROUP: '%' WORDS '(' .*? ')%' -> channel(HIDDEN);
+LABEL: '%(' (~[\n\r])* ')%' -> channel(HIDDEN);
+
+WS:  [ \t\n\r\u00a0]+ -> channel(HIDDEN);
 
 
-fragment PATH_CHAR: 
-         [A-Za-z$-_@.&+!*"'(),:~] | ('%' HEX_CHAR HEX_CHAR);
-fragment HEX_CHAR:[A-Fa-f0-9];
+/*fragment PATH_CHAR: [A-Za-z$_@.&+!*"'(),:~-] | ('%' HEX_CHAR HEX_CHAR);
+fragment HEX_CHAR:  [A-Fa-f0-9];
 fragment PATH_WORD: PATH_CHAR+;
 fragment PATH: PATH_WORD ('/' PATH_WORD);
 URL: ('http://'|'ftp://'|'file:///') PATH;
 COMMENT: '%%'(~'\n')* -> channel(HIDDEN);
-         
+       */
