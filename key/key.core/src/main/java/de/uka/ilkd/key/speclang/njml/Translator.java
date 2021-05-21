@@ -1334,6 +1334,61 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return translator.reachLocs(t, e1, e2, e3);
     }
 
+    @Override
+    public Object visitFieldarrayaccess(JmlParser.FieldarrayaccessContext ctx) {
+        SLExpression base = oneOf(ctx.ident(), ctx.super_(), ctx.this_());
+        String backupFullyQualifiedName=fullyQualifiedName;
+        fullyQualifiedName = ctx.start.getText();
+        for (JmlParser.Fieldarrayaccess_suffixContext suffx : ctx.fieldarrayaccess_suffix()) {
+            base = visitFieldarrayaccess_suffix(base, suffx);
+        }
+        fullyQualifiedName = backupFullyQualifiedName;
+        return base;
+    }
+
+    public SLExpression visitFieldarrayaccess_suffix(SLExpression base,
+                                                     JmlParser.Fieldarrayaccess_suffixContext ctx) {
+        if (ctx.DOT() != null) {
+            SLExpression receiver = this.receiver;
+            String lookupName;
+            if (ctx.ident() != null) {
+                String id = ctx.ident().getText();
+                if (receiver == null) {
+                    // Receiver was only a package/classname prefix
+                    lookupName = fullyQualifiedName + "." + id;
+                } else {
+                    lookupName = id;
+                }
+                fullyQualifiedName = fullyQualifiedName + "." + id;
+                try {
+                    return lookupIdentifier(lookupName, receiver, null, ctx.ident().start);
+                } catch (Exception e) {
+                    return lookupIdentifier(fullyQualifiedName, null, null, ctx.ident().start);
+                }
+            }
+            if (ctx.TRANSIENT() != null) {
+                return lookupIdentifier("<transient>", receiver, null, ctx.TRANSIENT().getSymbol());
+            }
+            if (ctx.this_() != null) {
+                SLExpression expr = new SLExpression(
+                        services.getTypeConverter().findThisForSort(receiver.getType().getSort(),
+                                tb.var(selfVar),
+                                javaInfo.getKeYJavaType(selfVar.sort()),
+                                true),
+                        receiver.getType());
+                return expr;
+            }
+            if (ctx.INV() != null) {
+                return translator.createInv(receiver.getTerm(), receiver.getType());
+            }
+        } else {
+            //Array access
+            SLExpression index = accept(ctx.expression());
+            return translator.arrayRef(base, fullyQualifiedName, index, null);
+        }
+        assert false;
+        return null;
+    }
 
     @Override
     public SLExpression visitPrimaryCreateLocset(JmlParser.PrimaryCreateLocsetContext ctx) {

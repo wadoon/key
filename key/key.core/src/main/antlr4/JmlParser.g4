@@ -343,7 +343,7 @@ jmlprimary
 
 fieldarrayaccess: (ident|this_|super_) (fieldarrayaccess_suffix)*;
 fieldarrayaccess_suffix
-    : DOT (ident | inv | this_ | super_)
+    : DOT (ident | inv | this_ | super_ | TRANSIENT | INV)
     | LBRACKET (expression) RBRACKET
 ;
 
