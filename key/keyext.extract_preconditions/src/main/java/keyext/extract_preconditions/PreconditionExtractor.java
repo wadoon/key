@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import keyext.extract_preconditions.projections.AbstractTermProjection;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -38,15 +39,22 @@ public class PreconditionExtractor {
     private UserInterfaceControl ui;
 
     /**
+     * The projection to apply onto the preconditions
+     */
+    private AbstractTermProjection projection;
+
+    /**
      * Generates a precondition extractor
      *
      * @param proofParam
      */
-    public PreconditionExtractor(Proof proofParam, UserInterfaceControl uiParam) {
+    public PreconditionExtractor(Proof proofParam, UserInterfaceControl uiParam,
+                                 AbstractTermProjection projectionParam) {
         assert (!proofParam.closed());
         this.proof = proofParam;
         this.proofServices = proof.getServices();
         this.ui = uiParam;
+        this.projection = projectionParam;
     }
 
     /**
@@ -62,8 +70,13 @@ public class PreconditionExtractor {
             goalPreconditons = goalPreconditons.append(this.extractFromGoal(currentGoal));
         }
         // Goal is missed if any of the preconditions are missed so we need an OR
-        // TODO(steuber): Projection before OR
-        return this.proofServices.getTermBuilder().or(goalPreconditons);
+        ImmutableList<Term> projectedDisjunction = ImmutableSLList.nil();
+        for (Term currentTerm : goalPreconditons) {
+            projectedDisjunction = projectedDisjunction.append(
+                this.projection.projectTerm(currentTerm)
+            );
+        }
+        return this.proofServices.getTermBuilder().or(projectedDisjunction);
     }
 
     /**

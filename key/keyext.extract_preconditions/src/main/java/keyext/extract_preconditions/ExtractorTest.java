@@ -5,6 +5,7 @@ import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FullAutoPilotProofMacro;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -14,10 +15,11 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
+import keyext.extract_preconditions.projections.LeaveOutProjection;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.io.File;
@@ -60,10 +62,15 @@ public class ExtractorTest {
             }
             UserInterfaceControl ui = env.getUi();
 
-            List<Proof> unclosedProofs = generateProofs(env);
-            for (Proof currentProof : unclosedProofs) {
+            List<UnclosedProof> unclosedProofs = generateProofs(env);
+            for (UnclosedProof currentUnclosed : unclosedProofs) {
+                Proof currentProof = currentUnclosed.proof;
                 PreconditionExtractor preconditionExtractor =
-                    new PreconditionExtractor(currentProof, ui);
+                    new PreconditionExtractor(
+                        currentProof,
+                        ui,
+                        new LeaveOutProjection(currentUnclosed.programVariables ,currentProof.getServices())
+                    );
                 Term precondition = preconditionExtractor.extract();
                 System.out.println(
                     "Found precondition for " + currentProof.name() + ":");
@@ -89,9 +96,9 @@ public class ExtractorTest {
      * @param env KeY envirionment
      * @return List of all proofs with open goals
      */
-    private static List<Proof> generateProofs(KeYEnvironment<?> env) {
+    private static List<UnclosedProof> generateProofs(KeYEnvironment<?> env) {
         // TODO(steuber): We probably want to adjust this a little? Or make it configurable...
-        List<Proof> unclosedProofs = new LinkedList<Proof>();
+        List<UnclosedProof> unclosedProofs = new LinkedList<UnclosedProof>();
         // List all specifications of all types in the source location (not classPaths and bootClassPath)
         final List<Contract> proofContracts = new LinkedList<Contract>();
         Set<KeYJavaType> kjts = env.getJavaInfo().getAllKeYJavaTypes();
@@ -140,7 +147,9 @@ public class ExtractorTest {
                 // Show proof result
                 boolean closed = proof.openGoals().isEmpty();
                 if (!closed) {
-                    unclosedProofs.add(proof);
+                    unclosedProofs.add(
+                        new UnclosedProof(proof, contract.getOrigVars().params)
+                    );
                 }
             } catch (ProofInputException e) {
                 System.out.println("Exception at '" + contract.getDisplayName() + "' of " +
@@ -162,6 +171,7 @@ public class ExtractorTest {
 
     /**
      * Creates a KeY environment loading the given file
+     *
      * @param location Input File
      * @return A new KeY environment
      * @throws ProblemLoaderException FIle could not be loaded
@@ -185,5 +195,16 @@ public class ExtractorTest {
         KeYEnvironment<?> env = KeYEnvironment.load(location, classPaths, bootClassPath,
             includes); // env.getLoadedProof() returns performed proof if a *.proof file is loaded
         return env;
+    }
+}
+
+class UnclosedProof {
+    public final Proof proof;
+    public final ImmutableList<ProgramVariable> programVariables;
+
+    public UnclosedProof(Proof proof,
+                  ImmutableList<ProgramVariable> programVariables) {
+        this.proof = proof;
+        this.programVariables = programVariables;
     }
 }
