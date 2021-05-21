@@ -1349,7 +1349,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     public SLExpression visitFieldarrayaccess_suffix(SLExpression base,
                                                      JmlParser.Fieldarrayaccess_suffixContext ctx) {
         if (ctx.DOT() != null) {
-            SLExpression receiver = this.receiver;
+            SLExpression receiver = base;
             String lookupName;
             if (ctx.ident() != null) {
                 String id = ctx.ident().getText();
