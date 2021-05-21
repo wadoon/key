@@ -1,7 +1,7 @@
 public class ExampleSubject extends Subject {
     private int value;
     
-    //@ represents footprint = \locset_of( value );
+    //@ represents footprint = \locset( value );
 
     /*@ public normal_behaviour
       @   ensures \fresh(footprint);
