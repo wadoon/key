@@ -1391,6 +1391,15 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
+    public SLExpression visitPrimaryCreateLocsetSingleton(JmlParser.PrimaryCreateLocsetSingletonContext ctx) {
+        SLExpression e = accept(ctx.expression());
+        Term t = e.getTerm();
+        final Term objTerm = t.sub(1);
+        final Term fieldTerm = t.sub(2);
+        return new SLExpression(tb.singleton(objTerm, fieldTerm));
+    }
+
+    @Override
     public SLExpression visitPrimaryCreateLocset(JmlParser.PrimaryCreateLocsetContext ctx) {
         List<SLExpression> aa = mapOf(ctx.fieldarrayaccess());
         List<Term> seq = aa.stream().map(translator::createStoreRef).collect(Collectors.toList());
