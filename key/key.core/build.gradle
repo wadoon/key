@@ -82,12 +82,6 @@ test {
     }
     // pass debug flag from command line:
     systemProperty "key.test.autosuite.debug", System.getProperty("key.test.autosuite.debug")
-
-    // TODO @AW. That is already in key/build.gradle. Here or there?
-    // useJUnit {
-    //         excludeCategories 'org.key_project.util.testcategories.Performance'
-    //         excludeCategories 'org.key_project.util.testcategories.Interactive'
-    // }
 }
 
 testFast {
@@ -111,7 +105,6 @@ task testRunAllProofs(type: Test) {
     description 'Proof/reload all keyfiles tagged for regression testing'
     group "verification"
     filter { 
-        // TODO does not exist any more: includeTestsMatching "RunAllProofsTestSuite"
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"
     }

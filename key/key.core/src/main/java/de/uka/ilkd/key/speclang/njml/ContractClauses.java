@@ -47,21 +47,4 @@ class ContractClauses {
         List<Pair<Object, Object>> list = clauseData.computeIfAbsent(type, key -> new LinkedList<>());
         return list.stream().map(p -> new Pair<>((K) p.first, (V) p.second)).collect(Collectors.toList());
     }
-
-
-    /*
-    public final Map<Label, Term> breaks = new LinkedHashMap<>();
-    public final Map<Label, Term> continues = new LinkedHashMap<>();
-    public final ImmutableList<Term> abbreviations = ImmutableSLList.nil();
-    public final Map<LocationVariable, Term> requires = new LinkedHashMap<>();
-    public final Map<LocationVariable, Term> requiresFree = new LinkedHashMap<>();
-    public final Map<LocationVariable, Term> assignables = new LinkedHashMap<>();
-    public final Map<ProgramVariable, Term> accessibles = new LinkedHashMap<>();
-    public final Map<LocationVariable, Term> ensures = new LinkedHashMap<>();
-    public final Map<LocationVariable, Term> ensuresFree = new LinkedHashMap<>();
-    public final Map<LocationVariable, Term> axioms = new LinkedHashMap<>();
-    public final Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
-    public final List<InfFlowSpec> infFlowSpecs = new LinkedList<>();
-*/
-
 }

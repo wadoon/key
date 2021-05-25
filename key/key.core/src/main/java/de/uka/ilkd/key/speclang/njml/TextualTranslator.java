@@ -217,17 +217,12 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         final LabeledParserRuleContext ctx2 = new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.DECREASES);
         if (loopContract != null) {
             loopContract.setVariant(ctx2);
-        } else
+        } else {
+            assert methodContract != null;
             methodContract.addClause(DECREASES, ctx2);
+        }
         return null;
     }
-
-    /*    @Override
-    public Object visitDepends_clause(JmlParser.Depends_clauseContext ctx) {
-        TextualJMLDepends depends = new TextualJMLDepends(mods, ctx);
-        constructs = constructs.append(depends);
-        return null;
-    }*/
 
     @Override
     public Object visitInitially_clause(JmlParser.Initially_clauseContext ctx) {
@@ -259,7 +254,6 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitDetermines_clause(JmlParser.Determines_clauseContext ctx) {
-        assert methodContract != null;
         if (methodContract != null)
             methodContract.addClause(INFORMATION_FLOW, ctx);
         else if (loopContract != null) {
@@ -328,6 +322,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private <T> T accept(ParserRuleContext ctx) {
         if (ctx == null) return null;
         return (T) ctx.accept(this);

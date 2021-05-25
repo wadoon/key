@@ -513,7 +513,7 @@ mode body;
 BRACE: '{' ->  more, pushMode(body);
 END_BODY: {_modeStack.peek() != body}? '}' -> popMode, type(BODY);
 END_BRACE: '}' -> more, popMode;
-//S: '"' ~('"') '"' -> more; //TODO refine
+//S: '"' ~('"') '"' -> more;
 //not working, IGNORE: '@' -> skip, more;
 ANY_CHAR: . -> more;
 
