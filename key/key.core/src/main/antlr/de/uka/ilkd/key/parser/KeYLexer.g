@@ -235,6 +235,7 @@ lexer grammar KeYLexer;
     NEW_PV : '\\newPV' ;
     STORE_RESULT_VAR_IN : '\\storeResultVarIn' ;
     STORE_ABSTRACT_UPDATE_FRAME : '\\storeAbstractUpdateFrame' ;
+    GET_ABSTRACT_UPDATE_HEAP_TRANSFORMER : '\\getAbstractUpdateHeapTransformer' ;
     STORE_STMT_IN : '\\storeStmtIn' ;
     STORE_TERM_IN : '\\storeTermIn' ;
     FRESH_ABSTRACT_PROGRAM : '\\freshAbstractProgram' ;

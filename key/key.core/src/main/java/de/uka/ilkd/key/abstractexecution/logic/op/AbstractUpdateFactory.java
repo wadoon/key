@@ -75,7 +75,7 @@ public class AbstractUpdateFactory {
     /**
      * Map from abstract program element (APE) identifiers to function symbols for
      * corresponding abstract path conditions.
-     * 
+     *
      * TODO (DS, 2019-11-07): We might not need abstract path conditions after all,
      * maybe deprecate this.
      */
@@ -93,6 +93,15 @@ public class AbstractUpdateFactory {
      * (has to be a program variable, other things don't make sense) at that place.
      */
     private final Map<String, Map<Integer, Function>> abstrUpdCharacteristicFuncInsts = new LinkedHashMap<>();
+
+    /**
+     * Map from abstract update names to functions modeling the heap effect of abstract
+     * updates. Background: Abstract updates have the same effect on the heap when
+     * called in equivalent contexts. This enables more precise reasoning than simple
+     * anon applications, which would frequently enforce stronger location set disjointness
+     * criteria than necessary.
+     */
+    private final Map<String, Function> abstrUpdHeapTransformers = new LinkedHashMap<>();
 
     /**
      * Map from precondition types to the corresponding target sorts, since there
@@ -115,10 +124,10 @@ public class AbstractUpdateFactory {
     /**
      * Types of abstract preconditions (basically, reasons for completion of a
      * statement).
-     * 
+     *
      * TODO (DS, 2019-11-07): Extend by some mechanism for labeled breaks /
      * continues.
-     * 
+     *
      * @author Dominic Steinhoefel
      */
     public enum PreconditionType {
@@ -163,7 +172,7 @@ public class AbstractUpdateFactory {
 
     /**
      * Returns the block contract behavior for an AE precondition type.
-     * 
+     *
      * @param pt The {@link PreconditionType}.
      * @return The requested block contract behavior.
      */
@@ -173,8 +182,8 @@ public class AbstractUpdateFactory {
 
     /**
      * Returns the AE precondition type for a block contract behavior.
-     * 
-     * @param pt The {@link Behavior}.
+     *
+     * @param behavior The {@link Behavior}.
      * @return The requested {@link PreconditionType}.
      */
     public static PreconditionType getPreconditionTypeForBlockContractBehavior(
@@ -198,7 +207,7 @@ public class AbstractUpdateFactory {
      *
      * @param phs The {@link AbstractProgramElement} for which this
      * {@link AbstractUpdate} should be created.
-     * @param lhs The update's left-hand side. Should be a {@link SetLDT} term.
+     * @param lhs The update's left-hand side.
      * @param rhs The right-hand side for the abstract update; needed to extract the
      * argument sorts for the operator.
      * @param executionContext An optional runtime instance {@link LocationVariable}
@@ -227,8 +236,8 @@ public class AbstractUpdateFactory {
      *
      * @param phs The {@link AbstractProgramElement} for which this
      * {@link AbstractUpdate} should be created.
-     * @param numArgs The update's left-hand side.
-     * @param argSorts The number of arguments of the abstract update.
+     * @param assignables The update's left-hand side.
+     * @param numArgs The number of arguments of the abstract update.
      * @return The {@link AbstractUpdate} for the given
      * {@link AbstractProgramElement} and left-hand side.
      */
@@ -324,6 +333,35 @@ public class AbstractUpdateFactory {
     }
 
     /**
+     * Returns the heap transformer function for an abstract update.
+     *
+     * Background: Abstract updates have the same effect on the heap when
+     * called in equivalent contexts. This enables more precise reasoning than simple
+     * anon applications, which would frequently enforce stronger location set disjointness
+     * criteria than necessary.
+     *
+     * @param abstrUpd The {@link AbstractUpdate} for which to return the
+     * characteristic heap transformer function.
+     */
+    public Function getAbstrUpdHeapTransformerFunction(AbstractUpdate abstrUpd) {
+        final String abstractUpdName = abstrUpd.getUpdateName();
+
+        if (abstrUpdHeapTransformers.get(abstractUpdName) == null) {
+            final String funName = services.getTermBuilder()
+                    .newName("heap_" + abstractUpdName);
+
+            Function result = new Function(new Name(funName),
+                    services.getTypeConverter().getHeapLDT().targetSort(), true, true,
+                    abstrUpd.argSorts().toArray(new Sort[0]));
+            services.getNamespaces().functions().add(result);
+
+            abstrUpdHeapTransformers.put(abstractUpdName, result);
+        }
+
+        return abstrUpdHeapTransformers.get(abstractUpdName);
+    }
+
+    /**
      * @param loc The {@link AbstractUpdateLoc} to check.
      * @return true iff we can create a characteristic function for the given
      * location.
@@ -369,8 +407,7 @@ public class AbstractUpdateFactory {
      * precondition operator should be created.
      * @param preconditionType The {@link PreconditionType} for which to create the
      * precondition.
-     * @param argSorts argument sorts for the operator (corresponding to right-hand
-     * side/accessibles)
+     * @param numArgs number of arguments of this function
      * @return The abstract precondition operator for the passed
      * {@link AbstractProgramElement}, {@link PreconditionType} and argument sorts.
      */
@@ -448,7 +485,7 @@ public class AbstractUpdateFactory {
      * Returns a new {@link AbstractUpdate} of the supplied one with the
      * {@link ProgramVariable}s in the assignables replaced according to the
      * supplied map.
-     * 
+     *
      * @param replMap The replace map.
      *
      * @return A new {@link AbstractUpdate} of this one with the
@@ -494,7 +531,7 @@ public class AbstractUpdateFactory {
      * Converts the given {@link Term} to the {@link AbstractUpdateLoc} it is
      * representing. Throws a {@link RuntimeException} if the given {@link Term} is
      * not directly representing any location (i.e., is not a LocSet term).
-     * 
+     *
      * <p>
      * NOTE: t may not be a union {@link Term}! For this purpose, please use
      * {@link #abstrUpdateLocsFromUnionTerm(Term, Optional, Services)}.
@@ -554,9 +591,9 @@ public class AbstractUpdateFactory {
      * represented set of {@link AbstractUpdateLoc}s. The term has to be of the
      * right form, e.g., a select operation is not allowed, since it is only
      * suitable for the right-hand side of an abstract update (use
-     * {@link #abstrUpdateLocsFromHeapTerm(Term, Optional, Services)} for this).
+     * {@link #abstrUpdateLocsFromUnionTerm(Term, Optional, Services)} for this).
      * LocSet terms, for instance, are allowed.
-     * 
+     *
      * Returns null if it {@link Term} operator is unexpected.
      *
      * @param t The {@link Term} to transform.
@@ -627,11 +664,11 @@ public class AbstractUpdateFactory {
      * Replaces {@link ProgramVariable}s named "self" in the given {@link Term} by
      * the "this" reference supplied in the execution context. If the execution
      * context does not exist, nothing is replaced.
-     * 
+     *
      * NOTE that all variables named "self" are replaced, there are no other checks
      * for whether they're just an ordinary variable incidentally named that way. At
      * the time being, we found no better way. (DS, 2020-03-24)
-     * 
+     *
      * @param term The {@link Term} in which to replace.
      * @param executionContext The {@link Optional} {@link ExecutionContext} to
      * retrieve the "this" reference.
@@ -648,7 +685,7 @@ public class AbstractUpdateFactory {
     /**
      * Returns the target sort for the given precondition type. Initializes the
      * corresponding map if not yet done.
-     * 
+     *
      * @see #targetSortForPreconditionType
      * @param preconditionType The {@link PreconditionType} for which to return the
      * target sort.

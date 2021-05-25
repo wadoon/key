@@ -64,12 +64,11 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
                 (AbstractProgramElement) svInst.getInstantiation(this.abstrProgSV);
 
         final TermBuilder tb = services.getTermBuilder();
-        final Services services1 = services;
 
         final AEFrameSpecs accessibleAndAssignableClause = //
                 AbstractExecutionContractUtils.getAccessibleAndAssignableLocsForNoBehaviorContract(
                         ape, matchCond.getMaybeSeqFor(), executionContext,
-                        goal.getLocalSpecificationRepository(), services1);
+                        goal.getLocalSpecificationRepository(), services);
 
         final Term update = tb.abstractUpdate(ape, accessibleAndAssignableClause.getAssignables(),
                 accessibleAndAssignableClause.getAccesibles());

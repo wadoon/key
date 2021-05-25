@@ -3971,6 +3971,7 @@ varexp[TacletBuilder b]
     | varcond_initializeExpression[b]
     | varcond_storeResultVarIn[b]
     | varcond_storeAbstractUpdateFrame[b]
+    | varcond_getAbstractUpdateHeapTransformer[b]
     | varcond_storeTermIn[b]
     | varcond_storeStmtIn[b]
     | varcond_storeContextLabelsIn[b]
@@ -4161,6 +4162,15 @@ varcond_storeAbstractUpdateFrame[TacletBuilder b]
    STORE_ABSTRACT_UPDATE_FRAME LPAREN updateSV=varId COMMA resultSV=varId RPAREN
    {
       b.addVariableCondition(new StoreAbstractUpdateFrameCondition((SchemaVariable) updateSV, (SchemaVariable) resultSV));
+   }
+;
+
+varcond_getAbstractUpdateHeapTransformer[TacletBuilder b]
+:
+   GET_ABSTRACT_UPDATE_HEAP_TRANSFORMER LPAREN updateSV=varId COMMA resultSV=varId RPAREN
+   {
+      b.addVariableCondition(new GetAbstractUpdateHeapTransformerCondition((SchemaVariable) updateSV,
+                                                                           (SchemaVariable) resultSV));
    }
 ;
 
