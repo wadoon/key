@@ -13,5 +13,10 @@ run {
     //args = ['/home/steuber/Dokumente/Hortus/Univ/KIT/HiWi/Formal-2021-1/KeY/key/key.core.testgen/src/test/resources/testcase/smt/tg/src/Middle.java']
     // keyext.extract_preconditions/src/test/resources/testcases/src/Test1.java
     // args = ['./src/test/resources/testcases/src/Test1.java']
-    args = ['./src/test/resources/testcases/src/ageof/Maturity.java']
+    // args = ['./src/test/resources/testcases/src/ageof/Maturity.java']
+    if (project.hasProperty("file")) {
+        args = [project.getProperty("file")]
+    } else {
+        args = []
+    }
 }

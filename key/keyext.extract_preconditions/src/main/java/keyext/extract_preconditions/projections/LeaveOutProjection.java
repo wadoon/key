@@ -79,7 +79,6 @@ class LeaveOutTermConstructionVisitor implements Visitor {
             Term rv = this.currentDefaultVal();
             this.currentOp.push(cache);
             this.swapTruthValues();
-            System.out.println("Found NOT, returning: "+rv.toString());
             return this.termBuilder.not(rv);
         }
         if (current == Junctor.IMP) {
@@ -91,7 +90,6 @@ class LeaveOutTermConstructionVisitor implements Visitor {
                 return this.ff;
             }
         }
-        System.err.println("WARNING: Reached weird state! (Junctor "+current.toString()+")");
         return this.tt;
     }
 
@@ -124,7 +122,6 @@ class LeaveOutTermConstructionVisitor implements Visitor {
                     }
                 }
                 if (!isParam) {
-                    System.out.println("Rejecting term due to variable "+v.name());
                     includeNode = false;
                     break;
                 }
