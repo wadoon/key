@@ -1,6 +1,5 @@
-package de.uka.ilkd.key.smt;
+package de.uka.ilkd.key.smt.processcomm;
 
-import de.uka.ilkd.key.smt.processcomm.BufferedMessageReader;
 import junit.framework.TestCase;
 
 import java.io.IOException;
