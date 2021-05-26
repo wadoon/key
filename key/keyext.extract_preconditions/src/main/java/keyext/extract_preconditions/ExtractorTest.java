@@ -18,7 +18,9 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
+import keyext.extract_preconditions.projections.AbstractTermProjection;
 import keyext.extract_preconditions.projections.LeaveOutProjection;
+import keyext.extract_preconditions.projections.NoProjection;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -65,11 +67,13 @@ public class ExtractorTest {
             List<UnclosedProof> unclosedProofs = generateProofs(env);
             for (UnclosedProof currentUnclosed : unclosedProofs) {
                 Proof currentProof = currentUnclosed.proof;
+                AbstractTermProjection projection = new LeaveOutProjection(currentUnclosed.programVariables ,currentProof.getServices());
+                // AbstractTermProjection projection = new NoProjection(currentProof.getServices());
                 PreconditionExtractor preconditionExtractor =
                     new PreconditionExtractor(
                         currentProof,
                         ui,
-                        new LeaveOutProjection(currentUnclosed.programVariables ,currentProof.getServices())
+                        projection
                     );
                 Term precondition = preconditionExtractor.extract();
                 System.out.println(

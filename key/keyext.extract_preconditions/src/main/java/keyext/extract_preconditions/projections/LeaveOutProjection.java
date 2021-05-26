@@ -45,6 +45,10 @@ class LeaveOutTermConstructionVisitor implements Visitor {
 
     private ImmutableList<ProgramVariable> programVariables;
 
+    private Term tt;
+
+    private Term ff;
+
     public LeaveOutTermConstructionVisitor(
         ImmutableList<ProgramVariable> programVariablesParam,
         TermBuilder termBuilderParam) {
@@ -53,6 +57,8 @@ class LeaveOutTermConstructionVisitor implements Visitor {
         this.termStorage = new Stack<List<Term>>();
         this.currentOp = new Stack<Operator>();
         this.programVariables = programVariablesParam;
+        this.tt = this.termBuilder.tt();
+        this.ff = this.termBuilder.ff();
     }
 
     public Term getTerm() {
@@ -62,35 +68,43 @@ class LeaveOutTermConstructionVisitor implements Visitor {
     public Term currentDefaultVal() {
         Junctor current = (Junctor) this.currentOp.peek();
         if (current == Junctor.AND) {
-            return this.termBuilder.tt();
+            return this.tt;
         }
         if (current == Junctor.OR) {
-            return this.termBuilder.ff();
+            return this.ff;
         }
         if (current == Junctor.NOT) {
             Operator cache = this.currentOp.pop();
+            this.swapTruthValues();
             Term rv = this.currentDefaultVal();
             this.currentOp.push(cache);
+            this.swapTruthValues();
             System.out.println("Found NOT, returning: "+rv.toString());
             return this.termBuilder.not(rv);
         }
         if (current == Junctor.IMP) {
             if (this.termStorage.peek().size() == 0) {
                 // We are in the first part of implication
-                return this.termBuilder.tt();
+                return this.tt;
             } else {
                 // We are in the second part of the implication
-                return this.termBuilder.ff();
+                return this.ff;
             }
         }
         System.err.println("WARNING: Reached weird state! (Junctor "+current.toString()+")");
-        return this.termBuilder.tt();
+        return this.tt;
     }
 
     @Override
     public boolean visitSubtree(Term visited) {
         // TODO(steuber): What about (visited.op() instanceof Quantifier)?
         return (visited.op() instanceof Junctor);
+    }
+
+    private void swapTruthValues() {
+        Term tmp = this.tt;
+        this.tt = this.ff;
+        this.ff = tmp;
     }
 
     @Override
@@ -133,6 +147,9 @@ class LeaveOutTermConstructionVisitor implements Visitor {
         if (this.visitSubtree(subtreeRoot)) {
             this.termStorage.push(new LinkedList<Term>());
             this.currentOp.push(subtreeRoot.op());
+            if (subtreeRoot.op()==Junctor.NOT) {
+                this.swapTruthValues();
+            }
         }
     }
 
@@ -163,6 +180,9 @@ class LeaveOutTermConstructionVisitor implements Visitor {
                 this.constructedTerm = newTerm;
             } else {
                 this.termStorage.peek().add(newTerm);
+            }
+            if (subtreeRoot.op()==Junctor.NOT) {
+                this.swapTruthValues();
             }
         }
     }
