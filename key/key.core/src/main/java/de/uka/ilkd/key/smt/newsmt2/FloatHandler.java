@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.lang.*;
+import de.uka.ilkd.key.smt.lang.SMTTermFloatOp.Op;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -54,6 +55,7 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(floatLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
         fpOperators.put(floatLDT.getJavaUnaryMinus(), SMTTermFloatOp.Op.FPNEG);
         fpOperators.put(floatLDT.getAbs(), SMTTermFloatOp.Op.FPABS);
+        fpOperators.put(floatLDT.getFloor(), new Op("float_floor", SMTSort.FLOAT, SMTSort.FLOAT));
         fpOperators.put(floatLDT.getJavaMin(), SMTTermFloatOp.Op.FPMIN);
         fpOperators.put(floatLDT.getJavaMax(), SMTTermFloatOp.Op.FPMAX);
         fpOperators.put(floatLDT.getIsNaN(), SMTTermFloatOp.Op.FPISNAN);

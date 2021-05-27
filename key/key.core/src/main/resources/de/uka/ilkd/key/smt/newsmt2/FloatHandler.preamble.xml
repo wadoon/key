@@ -24,6 +24,8 @@
         (declare-fun u2d (U) Float64)
         (declare-fun d2u (Float64) U)
         (declare-const sort_double T)
+
+        (define-fun float_floor ((x Float32)) Float32 (fp.roundToIntegral RTN x))
     </entry>
 
     <entry key="sinDouble.axioms">

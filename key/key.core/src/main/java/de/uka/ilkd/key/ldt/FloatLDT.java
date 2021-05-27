@@ -67,6 +67,7 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
     private final Function mulFloatIEEE;
     private final Function divFloatIEEE;
     private final Function floatAbs;
+    private final Function floatFloor;
 
 
     private final Function castLongToFloat;
@@ -107,6 +108,7 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
 	mulFloatIEEE	    = addFunction(services, "mulFloatIEEE");
 	divFloatIEEE	    = addFunction(services, "divFloatIEEE");
 	floatAbs	    = addFunction(services, "floatAbs");
+	floatFloor      = addFunction(services, "floatFloor");
 
 	isNormal	    = addFunction(services, "floatIsNormal");
 	isSubnormal	    = addFunction(services, "floatIsSubnormal");
@@ -368,6 +370,10 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
 
     public Function getAbs() {
 	return floatAbs;
+    }
+
+    public Function getFloor() {
+        return floatFloor;
     }
 
     public Function getCastLongToFloat() {

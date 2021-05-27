@@ -21,15 +21,15 @@ package de.uka.ilkd.key.proof;
  */
 public final class FormulaTag {
 
-    static int counter = 0;
-    int i;
+    private static int counter = 0;
+    private int number;
 
     FormulaTag() {
-    	i = counter++;
+    	number = counter++;
     }
 
     public String toString () {
-    	return "" + i;
+    	return Integer.toString(number);
     }
 
 }
