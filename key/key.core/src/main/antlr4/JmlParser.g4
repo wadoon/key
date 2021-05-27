@@ -135,12 +135,12 @@ continues_clause: CONTINUES LPAREN (lbl=IDENT)? RPAREN (predornot)? SEMI_TOPLEVE
 returns_clause: RETURNS predornot? SEMI_TOPLEVEL;
 
 name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
-old_clause: OLD modifiers type IDENT INITIALISER ;
+//old_clause: OLD modifiers type IDENT INITIALISER ;
 
 field_declaration: type IDENT (EMPTYBRACKETS)* initialiser? SEMI_TOPLEVEL;
 method_declaration: type IDENT param_list (BODY|SEMI_TOPLEVEL);
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
-param_decl: ((NON_NULL | NULLABLE))? t=IDENT ((AXIOM_NAME_BEGIN AXION_NAME_END | EMPTYBRACKETS))* p=IDENT;
+param_decl: ((NON_NULL | NULLABLE))? t=IDENT ((AXIOM_NAME_BEGIN AXIOM_NAME_END | EMPTYBRACKETS))* p=IDENT;
 history_constraint: CONSTRAINT expression;
 datagroup_clause: (in_group_clause | maps_into_clause);
 monitors_for_clause: MONITORS_FOR expression;

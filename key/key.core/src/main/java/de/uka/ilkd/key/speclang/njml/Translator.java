@@ -2240,11 +2240,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return super.visitName_clause(ctx);
     }
 
-    @Override
-    public Object visitOld_clause(JmlParser.Old_clauseContext ctx) {
-        TODO();
-        return super.visitOld_clause(ctx);
-    }
 
     @Override
     public Object visitField_declaration(JmlParser.Field_declarationContext ctx) {
