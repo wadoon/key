@@ -26,27 +26,30 @@ public class PreconditionExtractor {
     /**
      * The proof under consideration
      */
-    private Proof proof;
+    private final Proof proof;
 
     /**
      * The proof's services
      */
-    private Services proofServices;
+    private final Services proofServices;
 
     /**
      * User Interface Control
      */
-    private UserInterfaceControl ui;
+    private final UserInterfaceControl ui;
 
     /**
      * The projection to apply onto the preconditions
      */
-    private AbstractTermProjection projection;
+    private final AbstractTermProjection projection;
 
     /**
      * Generates a precondition extractor
      *
-     * @param proofParam
+     * @param proofParam The proof to extract preconditions from
+     * @param uiParam The user interface control (necessary for proof processing)
+     * @param projectionParam The projection strategy to use on extracted preconditions
+     *                        (this is done before the generation of the disjunction)
      */
     public PreconditionExtractor(Proof proofParam, UserInterfaceControl uiParam,
                                  AbstractTermProjection projectionParam) {
@@ -84,7 +87,7 @@ public class PreconditionExtractor {
      * <p>
      * Adapted from searchCounterexample in {@link de.uka.ilkd.key.smt.counterexample.AbstractCounterExampleGenerator}
      *
-     * @param currentGoal The goal for which a precondition should be found
+     * @param inputGoal The goal for which a precondition should be found
      * @return As we apply further Macros/Strategies to the goal before term building,
      * we could potentially obtain multiple goals and thus multiple terms for a single goal (right?)
      * @throws Exception            If Macros/Strategies throw an exception during processing
@@ -151,7 +154,7 @@ public class PreconditionExtractor {
      * Creates a copy of the proof, adapted from {@link de.uka.ilkd.key.gui.testgen.CounterExampleAction}
      *
      * @param oldProof Proof that should be copied
-     * @return
+     * @return Creates copy from prove that can be further processed
      */
     private Proof createProof(Proof oldProof, Sequent oldSequent, String proofName) {
         Sequent newSequent = createNewSequent(oldSequent);

@@ -20,7 +20,6 @@ import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import keyext.extract_preconditions.projections.AbstractTermProjection;
 import keyext.extract_preconditions.projections.LeaveOutProjection;
-import keyext.extract_preconditions.projections.NoProjection;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -39,6 +38,11 @@ import java.util.Set;
 public class ExtractorTest {
     private static final int MAX_STEPS = 10000;
 
+    /**
+     * Main method allowing the test of the precondition extraction funtionality
+     *
+     * @param args First parameter: JML file to load
+     */
     public static void main(String[] args) {
         if (args.length <= 0) {
             System.err.println("No file provided");
@@ -67,8 +71,10 @@ public class ExtractorTest {
             List<UnclosedProof> unclosedProofs = generateProofs(env);
             for (UnclosedProof currentUnclosed : unclosedProofs) {
                 Proof currentProof = currentUnclosed.proof;
-                AbstractTermProjection projection = new LeaveOutProjection(currentUnclosed.programVariables ,currentProof.getServices());
-                // AbstractTermProjection projection = new NoProjection(currentProof.getServices());
+                AbstractTermProjection projection =
+                    new LeaveOutProjection(currentUnclosed.programVariables,
+                        currentProof.getServices());
+                //AbstractTermProjection projection = new NoProjection(currentProof.getServices());
                 PreconditionExtractor preconditionExtractor =
                     new PreconditionExtractor(
                         currentProof,
@@ -82,8 +88,6 @@ public class ExtractorTest {
                     .println(LogicPrinter.quickPrintTerm(precondition, currentProof.getServices()));
                 currentProof.dispose();
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -102,9 +106,9 @@ public class ExtractorTest {
      */
     private static List<UnclosedProof> generateProofs(KeYEnvironment<?> env) {
         // TODO(steuber): We probably want to adjust this a little? Or make it configurable...
-        List<UnclosedProof> unclosedProofs = new LinkedList<UnclosedProof>();
+        List<UnclosedProof> unclosedProofs = new LinkedList<>();
         // List all specifications of all types in the source location (not classPaths and bootClassPath)
-        final List<Contract> proofContracts = new LinkedList<Contract>();
+        final List<Contract> proofContracts = new LinkedList<>();
         Set<KeYJavaType> kjts = env.getJavaInfo().getAllKeYJavaTypes();
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
@@ -130,7 +134,7 @@ public class ExtractorTest {
                 StrategyProperties sp =
                     proof.getSettings().getStrategySettings().getActiveStrategyProperties();
                 sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
-                    StrategyProperties.METHOD_CONTRACT);
+                    StrategyProperties.METHOD_EXPAND);
                 sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
                     StrategyProperties.DEP_ON);
                 sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
@@ -158,8 +162,6 @@ public class ExtractorTest {
             } catch (ProofInputException e) {
                 System.out.println("Exception at '" + contract.getDisplayName() + "' of " +
                     contract.getTarget() + ":");
-                e.printStackTrace();
-            } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -192,13 +194,12 @@ public class ExtractorTest {
         // Set Taclet options
         ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
         HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
-        HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
+        HashMap<String, String> newSettings = new HashMap<>(oldSettings);
         newSettings.putAll(MiscTools.getDefaultTacletOptions());
         choiceSettings.setDefaultChoices(newSettings);
         // Load source code
-        KeYEnvironment<?> env = KeYEnvironment.load(location, classPaths, bootClassPath,
-            includes); // env.getLoadedProof() returns performed proof if a *.proof file is loaded
-        return env;
+        return KeYEnvironment.load(location, classPaths, bootClassPath,
+            includes);
     }
 }
 
@@ -207,7 +208,7 @@ class UnclosedProof {
     public final ImmutableList<ProgramVariable> programVariables;
 
     public UnclosedProof(Proof proof,
-                  ImmutableList<ProgramVariable> programVariables) {
+                         ImmutableList<ProgramVariable> programVariables) {
         this.proof = proof;
         this.programVariables = programVariables;
     }

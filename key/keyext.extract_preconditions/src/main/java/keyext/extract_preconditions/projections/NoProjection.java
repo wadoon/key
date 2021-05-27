@@ -6,7 +6,12 @@ import de.uka.ilkd.key.logic.Term;
 /**
  * Projection which has no effect (i.e. leaves everything as is).
  */
-public class NoProjection extends AbstractTermProjection{
+public class NoProjection extends AbstractTermProjection {
+    /**
+     * Constructor for NoProjection Projection Strategy
+     *
+     * @param servicesParam The proof services (necessary for term building etc.)
+     */
     public NoProjection(Services servicesParam) {
         super(servicesParam);
     }
