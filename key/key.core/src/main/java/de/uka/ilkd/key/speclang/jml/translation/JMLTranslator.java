@@ -1369,12 +1369,19 @@ public final class JMLTranslator {
                         // This case might occur since boolean expressions
                         // get converted prematurely (see bug #1121).
                         // Just check whether there is a cast to boolean.
-                        if (type != services.getTypeConverter().getBooleanType()){
-                            throw excManager.createException("Cannot cast from boolean to "+type+".");
+                        if (type != services.getTypeConverter().getBooleanType()) {
+                            throw excManager.createException("Cannot cast from boolean to " + type + ".");
                         }
+                    } else if(type.getSort() ==
+                            services.getTypeConverter().getFloatLDT().targetSort()) {
+                        // FIXME FIXME FIXME ... hard coded hack
+                        result = new SLExpression(
+                                tb.cast(type.getSort(), result.getTerm()),
+                                type);
                     } else if(intHelper.isIntegerTerm(result)) {
                         result = intHelper.buildCastExpression(type, result);
-                    } else {result = new SLExpression(
+                    } else {
+                        result = new SLExpression(
                             tb.cast(type.getSort(), result.getTerm()),
                             type);
                     }
