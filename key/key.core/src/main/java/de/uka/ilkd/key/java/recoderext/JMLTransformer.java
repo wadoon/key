@@ -37,6 +37,7 @@ import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 import static java.lang.String.format;
@@ -632,7 +633,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             // iterate over all type declarations of the compilation unit
             TypeDeclarationCollector tdc = new TypeDeclarationCollector();
             tdc.walk(unit);
-            HashSet<TypeDeclaration> typeDeclarations = tdc.result();
+            Set<TypeDeclaration> typeDeclarations = tdc.result();
             for (TypeDeclaration td : typeDeclarations) {
                 // collect pre-existing operations
                 List<? extends Constructor> constructorList = td
@@ -665,7 +666,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 // iterate over all type declarations of the compilation unit
                 TypeDeclarationCollector tdc = new TypeDeclarationCollector();
                 tdc.walk(unit);
-                HashSet<TypeDeclaration> typeDeclarations = tdc.result();
+                Set<TypeDeclaration> typeDeclarations = tdc.result();
                 for (TypeDeclaration td : typeDeclarations) {
                     // collect pre-existing operations
                     List<? extends Constructor> constructorList = typeDeclaration2Constructores
@@ -731,7 +732,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
         final HashSet<TypeDeclaration> result = new LinkedHashSet<>();
 
-        public void walk(SourceElement s) {
+        public void walk(@Nonnull SourceElement s) {
             s.accept(this);
             if (s instanceof NonTerminalProgramElement) {
                 NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
@@ -741,17 +742,19 @@ public final class JMLTransformer extends RecoderModelTransformer {
             }
         }
 
+        @Override
         public void visitClassDeclaration(ClassDeclaration td) {
             result.add(td);
             super.visitClassDeclaration(td);
         }
 
+        @Override
         public void visitInterfaceDeclaration(InterfaceDeclaration td) {
             result.add(td);
             super.visitInterfaceDeclaration(td);
         }
 
-        public HashSet<TypeDeclaration> result() {
+        public Set<TypeDeclaration> result() {
             return result;
         }
     }
