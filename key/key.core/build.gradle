@@ -132,20 +132,20 @@ task generateVersionFiles() {
 // @AW: Say something here. From POV this explain by itself.
 processResources.dependsOn generateVersionFiles
 
-def antlr4Output = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
+def antlr4OutputKey = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/key/nparser"
 task runAntlr4Key(type: JavaExec) {
     //see incremental task api, prevents rerun if nothing has changed.
     inputs.dir "src/main/antlr4/"
-    outputs.dir "$projectDir/build/generated/antlr4/main/"
+    outputs.dir antlr4OutputKey
     classpath = configurations.antlr4
     main = "org.antlr.v4.Tool"
     args = ["-visitor",
-            "-Xexact-output-dir", "-o", antlr4Output,
+            "-Xexact-output-dir", "-o", antlr4OutputKey,
             "-package", "de.uka.ilkd.key.nparser",
             "src/main/antlr4/KeYLexer.g4", "src/main/antlr4/KeYParser.g4"]
     doFirst {
-        file(antlr4Output).mkdirs()
-        println("create $antlr4Output")
+        file(antlr4OutputKey).mkdirs()
+        println("create $antlr4OutputKey")
     }
 }
 compileJava.dependsOn runAntlr4Key
@@ -163,7 +163,7 @@ def antlr4OutputJml = "$projectDir/build/generated-src/antlr4/main/de/uka/ilkd/k
 task runAntlr4Jml(type: JavaExec) {
     //see incremental task api, prevents rerun if nothing has changed.
     inputs.dir "src/main/antlr4/"
-    outputs.dir "build/generated/antlr4/main/"
+    outputs.dir antlr4OutputJml
     classpath = configurations.antlr4
     main = "org.antlr.v4.Tool"
     args = ["-visitor",
@@ -187,7 +187,7 @@ task ptest(type: Test) { group "verification"}
 
 task generateRAPUnitTests(type:JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
-    mainClass = "de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests"
+    mainClassName = "de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests"
     args("$buildDir/generated-src/rap/")
 }
 sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")
