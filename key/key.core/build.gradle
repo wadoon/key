@@ -187,7 +187,7 @@ task ptest(type: Test) { group "verification"}
 
 task generateRAPUnitTests(type:JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
-    mainClassName = "de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests"
+    mainClass = "de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests"
     args("$buildDir/generated-src/rap/")
 }
 sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")
