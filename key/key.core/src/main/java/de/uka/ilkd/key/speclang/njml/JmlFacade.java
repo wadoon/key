@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.speclang.njml;
 
-import com.google.common.base.Stopwatch;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import org.antlr.v4.runtime.*;
@@ -68,9 +67,7 @@ public class JmlFacade {
 
     public static ParserRuleContext parseTop(PositionedString expr) {
         JmlParser p = createParser(createLexer(expr));
-        Stopwatch sw = Stopwatch.createStarted();
         JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
-        //System.out.println("JmlFacade.parseTop: " + sw.toString());
         return ctx;
     }
 
@@ -81,11 +78,9 @@ public class JmlFacade {
 
     static ImmutableList<TextualJMLConstruct> parseClasslevel(JmlLexer lexer) {
         @Nonnull JmlParser p = createParser(lexer);
-        Stopwatch sw = Stopwatch.createStarted();
         JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
         TextualTranslator translator = new TextualTranslator();
         ctx.accept(translator);
-        //System.out.println("JmlFacade.parseClasslevel: " + sw);
         return translator.constructs;
     }
 
@@ -103,11 +98,9 @@ public class JmlFacade {
 
     private static ImmutableList<TextualJMLConstruct> parseMethodlevel(JmlLexer lexer) {
         @Nonnull JmlParser p = createParser(lexer);
-        Stopwatch sw = Stopwatch.createStarted();
         JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
         TextualTranslator translator = new TextualTranslator();
         ctx.accept(translator);
-        //System.out.println("JmlFacade.parseMethodlevel: " + sw);
         return translator.constructs;
     }
 
