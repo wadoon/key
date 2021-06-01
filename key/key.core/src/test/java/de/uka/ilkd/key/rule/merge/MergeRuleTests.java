@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.rule.merge;
 
 import java.io.File;
+import java.util.Iterator;
 
 import org.junit.Test;
 

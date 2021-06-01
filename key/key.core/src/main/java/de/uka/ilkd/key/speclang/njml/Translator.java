@@ -17,7 +17,6 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.nparser.BuildingIssue;
 import de.uka.ilkd.key.nparser.builder.BuildingException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.ClassAxiom;
@@ -38,7 +37,10 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.speclang.njml.JmlFacade.TODO;
@@ -144,7 +146,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return seq;
     }
 
-    private <T> @org.checkerframework.checker.nullness.qual.Nullable T oneOf(ParserRuleContext @Nullable ... contexts) {
+    private <T> @org.checkerframework.checker.nullness.qual.Nullable T oneOf(ParserRuleContext... contexts) {
         for (ParserRuleContext context : requireNonNull(contexts)) {
             T t = accept(context);
             if (t != null) return t;
@@ -288,7 +290,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return target;
     }
 
-    private @Nullable String accept(@Nullable TerminalNode ident) {
+    private @Nullable
+    String accept(@Nullable TerminalNode ident) {
         if (ident == null) return null;
         return ident.getText();
     }
@@ -2249,13 +2252,28 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public SLExpression visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
-        //preStart(contextThread)
-        // == (\dl_writePermissionObject(contextThread, \permission(this.number)));
         if (ctx.BODY() == null) return new SLExpression(tb.tt());
 
+        String equality = getEqualityExpressionOfModelMethod(ctx);
+        ParserRuleContext equal = JmlFacade.parseExpr(equality);
+        return accept(equal);
+    }
+
+    /**
+     * Translates the given context of a model method into a parsable term of equality.
+     */
+    @Nonnull
+    static String getEqualityExpressionOfModelMethod(@Nonnull JmlParser.Method_declarationContext ctx) {
         String bodyString = ctx.BODY() == null ? ";" : ctx.BODY().getText();
+        bodyString = bodyString.trim();
+
+        // "at"-signs for from the beginning of lines
+        bodyString = bodyString.replaceAll("\n[ ]*@", "");
+
         if (bodyString.charAt(0) != '{' || bodyString.charAt(bodyString.length() - 1) != '}')
-            throw new IllegalStateException();
+            raiseError("The body of the given model method is misformed. " +
+                    "We expected, that the first and last character to be curly braces.", ctx);
+
         bodyString = bodyString.substring(1, bodyString.length() - 1).trim();
         if (!bodyString.startsWith("return "))
             throw new IllegalStateException("return expected, instead: " + bodyString);
@@ -2265,14 +2283,12 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         String paramsString;
         List<JmlParser.Param_declContext> paramDecls = ctx.param_list().param_decl();
-        if (paramDecls.size() > 0)
+        if (!paramDecls.isEmpty())
             paramsString = "(" + paramDecls.stream().map(it -> it.p.getText()).collect(Collectors.joining(",")) + ")";
         else
             paramsString = "()"; //default no params
 
-        String equality = ctx.IDENT() + paramsString + " == (" + bodyString + ")";
-        ParserRuleContext equal = JmlFacade.parseExpr(equality);
-        return accept(equal);
+        return ctx.IDENT() + paramsString + " == (" + bodyString + ")";
     }
 
     @Override
@@ -2438,7 +2454,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return exc.getWarnings();
     }
 
-    private void raiseError(String message, ParserRuleContext ctx) {
+    private static void raiseError(String message, ParserRuleContext ctx) {
         throw new BuildingException(ctx, message);
     }
 

@@ -36,26 +36,6 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
         this.methodDefinition = methodDefinition;
     }
 
-    public String getParsableBody() {
-        //<heap> preStart(contextThread) == (\dl_writePermissionObject(contextThread, \permission(this.number))); (file:/home/weigl/work/key/key/key.core/../key.ui/examples/index/.././heap/permissions/threads/src/Fib.java, 8/24)
-        List<JmlParser.Param_declContext> paramDecls = methodDefinition.param_list().param_decl();
-        String bodyString = methodDefinition.BODY() == null ? ";" : methodDefinition.BODY().getText();
-        String paramsString;
-        if (paramDecls.size() > 0)
-            paramsString = "(" + paramDecls.stream().map(it -> it.p.getText()).collect(Collectors.joining(",")) + ")";
-        else
-            paramsString = "()"; //default no params
-        if (bodyString.charAt(0) != '{' || bodyString.charAt(bodyString.length() - 1) != '}')
-            throw new IllegalStateException();
-        bodyString = bodyString.substring(1, bodyString.length() - 1).trim();
-        if (!bodyString.startsWith("return "))
-            throw new IllegalStateException("return expected, instead: " + bodyString);
-        int beginIndex = bodyString.indexOf(" ") + 1;
-        int endIndex = bodyString.lastIndexOf(";");
-        bodyString = bodyString.substring(beginIndex, endIndex);
-        return this.getMethodName() + paramsString + " == (" + bodyString + ");";
-    }
-
     public String getParsableDeclaration() {
         String m = mods.stream()
                 .map(it -> {
