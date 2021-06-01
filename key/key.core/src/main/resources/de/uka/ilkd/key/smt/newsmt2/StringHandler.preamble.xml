@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+    <comment>These are the preamble snippets needed for handling the string sort</comment>
+
+    <entry key="axioms">
+        (assert (forall ((s String)) (= (u2s (s2u s)) s)))
+        (assert (forall ((x U)) (! (=> (= (typeof x) sort_string)  (= (s2u (u2s x)) x)) :pattern ((typeof x)))))
+        (assert (forall ((x U)) (! (=> (instanceof x sort_string)  (= (typeof x ) sort_string)) :pattern ((instanceof x sort_string)))))
+        (assert (forall ((s String)) (! (= (typeof (s2u s)) sort_string) :pattern ((typeof (s2u s))))))
+    </entry>
+
+    <entry key="decls">
+        (declare-fun u2s (U) String)
+        (declare-fun s2u (String) U)
+        (declare-const sort_string T)
+    </entry>
+
+</properties>
