@@ -275,33 +275,55 @@ public class Maturity2 {
     };
 
 
+    public boolean isMature(int country, int age) {
+        return this.age[country] <= age;
+    }
+
     /*@ requires AFG <= country && country <= CYP;
       @ requires 0 <= age;
       @ ensures \result <==> isMature(country,age);
       @ assignable \strictly_nothing;
       @*/
-    /*public boolean isMatureWrong2(int country, int age) {
+    public boolean isMatureWrong(int country, int age) {
         if (age > 100) {
             assert false;
         }
         if (age == 100) {
-            throw IllegalArgumentException();
+            throw new IllegalArgumentException();
         }
         switch (country) {
         case IRN:
             return age >= 15;
-        case YEM, KGZ, NP, TKM, UZB, VNM:
+        case YEM:
+        case KGZ:
+        case NPL:
+        case TKM:
+        case UZB:
+        case VNM:
             return age >= 16;
-        case DZA, KOR:
+        case DZA:
+        case KOR:
             return age >= 19;
-        case THA, TWN, ARE, NZL,
-            JPN:
+        case THA:
+        case TWN:
+        case ARE:
+        case NZL:
+        case JPN:
             return age >= 20;
-        case BHR, BDI, CIV, GIN, HND, CMR, LSO,
-            NAM, SLE, SGP, SWZ:
+        case BHR:
+        case BDI:
+        case CIV:
+        case GIN:
+        case HND:
+        case CMR:
+        case LSO:
+        case NAM:
+        case SLE:
+        case SGP:
+        case SWZ:
             return age >= 21;
         default:
             return age >= 18;
         }
-    }*/
+    }
 }
