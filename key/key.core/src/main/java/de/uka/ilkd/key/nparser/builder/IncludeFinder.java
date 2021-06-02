@@ -5,6 +5,7 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import java.io.File;
 import java.net.MalformedURLException;

@@ -15,7 +15,7 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.parser.NotDeclException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.util.Debug;
-import org.antlr.v4.runtime.Parser;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import javax.annotation.Nullable;

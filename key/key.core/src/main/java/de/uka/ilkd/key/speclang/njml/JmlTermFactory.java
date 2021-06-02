@@ -40,16 +40,19 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import org.antlr.runtime.Token;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiFunction;
 
 import static java.text.MessageFormat.format;
 
+/**
+ * Old legacy factory methods for constructing KeY terms for JML constructs.
+ */
 public final class JmlTermFactory {
     public Services services;
     public final TermBuilder tb;
@@ -83,64 +86,6 @@ public final class JmlTermFactory {
         this.services = services;
         this.tb = services.getTermBuilder();
         this.intHelper = intHelper;
-
-//        translationMethods.put(JMLKeyWord.NOT_MOD, new JMLPostExpressionTranslationMethod(){
-//
-//            @Override
-//            protected String name() {
-//                return "\\not_modified";
-//            }
-//
-//            /**
-//             * @param services Services
-//             * @param heapAtPre The pre-state heap (since we are in a post-condition)
-//             * @param params Must be of length 1 with a Term (store-ref expression)
-//             */
-//            @Override
-//            protected Term translate(Services services, Term heapAtPre, Object[] params)  {
-//                checkParameters(params, Term.class);
-//                Term t = (Term) params[0];
-//
-//                // collect variables from storereflist
-//                java.util.List<Term> storeRefs = new java.util.ArrayList<Term>();
-//                final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
-//                final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-//                while (t.op() == ldt.getUnion()){
-//                    storeRefs.add(t.sub(0));
-//                    t = t.sub(1);
-//                }
-//                storeRefs.add(t);
-//                // construct equality predicates
-//                Term res = TB.tt();
-//                for (Term sr: storeRefs){
-//                    if (sr.op() == ldt.getSingleton()){
-//                        final Term ref = TB.dot(services, Sort.ANY, sr.sub(0), sr.sub(1));
-//                        res = TB.and(res, TB.equals(ref,convertToOld(services, heapAtPre, ref)));
-//                    } else if (sr.op() == ldt.getEmpty()){
-//                        // do nothing
-//                    } else if (sr.op().equals(ldt.getSetMinus()) && sr.sub(0).op().equals(ldt.getAllLocs()) && sr.sub(1).op().equals(ldt.getFreshLocs())){
-//                        // this is the case for "\everything"
-//                        final JavaInfo ji = services.getJavaInfo();
-//                        final LogicVariable fld = new LogicVariable(new Name("f"), heapLDT.getFieldSort());
-//                        final LogicVariable obj = new LogicVariable(new Name("o"), ji.objectSort());
-//                        final Term objTerm = TB.var(obj);
-//                        final Term fldTerm = TB.var(fld);
-//                        final Term ref = TB.dot(services, Sort.ANY, objTerm, fldTerm);
-//                        final Term fresh = TB.subset(services, TB.singleton(services, objTerm, fldTerm ), TB.freshLocs(services, heapAtPre));
-//                        final Term bodyTerm = TB.or(TB.equals(ref, convertToOld(services, heapAtPre, ref)),fresh);
-//                        res = TB.and(res, TB.all(fld, TB.all(obj, bodyTerm)));
-//                    } else {
-//                        // all other results are not meant to occur
-//                        throw new SLTranslationException("Term "+sr+" is not a valid store-ref expression.");
-//                    }
-//                }
-//                return res;
-//            }
-//
-//        });
-
-
-        // others
     }
 
     //region reach
@@ -280,7 +225,8 @@ public final class JmlTermFactory {
         return new SLExpression(max, type);
     }
 
-    public @Nonnull SLExpression quantifiedNumOf(
+    public @Nonnull
+    SLExpression quantifiedNumOf(
             @Nullable Term t1, Term t2, KeYJavaType declsType,
             boolean nullable,
             Iterable<LogicVariable> qvs,
@@ -300,7 +246,8 @@ public final class JmlTermFactory {
                 unbounded, bounded);
     }
 
-    public @Nonnull SLExpression quantifiedProduct(
+    public @Nonnull
+    SLExpression quantifiedProduct(
             KeYJavaType declsType,
             boolean nullable,
             Iterable<LogicVariable> qvs,
@@ -317,11 +264,12 @@ public final class JmlTermFactory {
                 unbounded, bounded);
     }
 
-    public @Nonnull SLExpression quantifiedSum(KeYJavaType javaType,
-                                               boolean nullable,
-                                               Iterable<LogicVariable> qvs,
-                                               @Nullable Term t1, Term t2,
-                                               KeYJavaType resultType) {
+    public @Nonnull
+    SLExpression quantifiedSum(KeYJavaType javaType,
+                               boolean nullable,
+                               Iterable<LogicVariable> qvs,
+                               @Nullable Term t1, Term t2,
+                               KeYJavaType resultType) {
         BoundedNumericalQuantifier bounded = tb::bsum;
         UnboundedNumericalQuantifier unbounded = (declsType, n, vars, range, body) -> {
             final Term tr = typerestrict(declsType, n, vars);
@@ -446,12 +394,13 @@ public final class JmlTermFactory {
         return null;
     }
 
-    private @Nonnull SLExpression numeralQuantifier(
+    private @Nonnull
+    SLExpression numeralQuantifier(
             KeYJavaType declsType,
             boolean nullable,
             Iterable<LogicVariable> qvs,
             Term t1, Term t2,
-            @Nullable  KeYJavaType resultType,
+            @Nullable KeYJavaType resultType,
             UnboundedNumericalQuantifier unbounded,
             BoundedNumericalQuantifier bounded) {
         Iterator<LogicVariable> it = qvs.iterator();
@@ -468,7 +417,7 @@ public final class JmlTermFactory {
             t = bounded.apply(lv, lowerBound(t1, lv), upperBound(t1, lv), t2);
         }
 
-        if(resultType==null)
+        if (resultType == null)
             resultType = services.getTypeConverter().getKeYJavaType(t2);
 
         final JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper(services, exc);
@@ -1046,11 +995,13 @@ public final class JmlTermFactory {
         return new SLExpression(tb.indexOf(seq, elem), inttype);
     }
 
-    public @Nonnull Term createReturns(@Nullable Term term) {
+    public @Nonnull
+    Term createReturns(@Nullable Term term) {
         return term == null ? tb.tt() : tb.convertToFormula(term);
     }
 
-    public @Nonnull Pair<Label, Term> createContinues(Term term, String label) {
+    public @Nonnull
+    Pair<Label, Term> createContinues(Term term, String label) {
         return createBreaks(term, label);
     }
 
@@ -1110,11 +1061,11 @@ public final class JmlTermFactory {
         if (!lhs.isTerm())
             throw exc.createException0("Left hand side of depends clause should be a term, given:" + lhs);
 
-        if(!(lhs.getTerm().op() instanceof IObserverFunction))
+        if (!(lhs.getTerm().op() instanceof IObserverFunction))
             throw exc.createException0("Left hand side of depends clause should be of type IObserverFunction, given:"
                     + lhs.getTerm().op().getClass());
 
-        if(lhs.getTerm().sub(0).op() != heap) {
+        if (lhs.getTerm().sub(0).op() != heap) {
             throw exc.createException0("Depends clause should be heap dependent of heap "
                     + heap + ", given" + lhs.getTerm().sub(0).op());
         }
@@ -1184,11 +1135,13 @@ public final class JmlTermFactory {
     /**
      * Create a nullary predicate (wrapped in SLExpression) for currently unsupported JML expressions of type boolean.
      */
-    public @Nonnull SLExpression createSkolemExprBool(@Nonnull Token jmlKeyWord) {
+    public @Nonnull
+    SLExpression createSkolemExprBool(@Nonnull Token jmlKeyWord) {
         return createSkolemExprBool(jmlKeyWord.getText());
     }
 
-    public @Nonnull SLExpression createSkolemExprBool(String jmlKeyWord) {
+    public @Nonnull
+    SLExpression createSkolemExprBool(String jmlKeyWord) {
         exc.addUnderspecifiedWarning(jmlKeyWord);
         final Namespace<Function> fns = services.getNamespaces().functions();
         final String shortName = jmlKeyWord.replace("\\", "");
@@ -1206,14 +1159,16 @@ public final class JmlTermFactory {
     /**
      * Get non-critical warnings.
      */
-    public @Nonnull List<PositionedString> getWarnings() {
+    public @Nonnull
+    List<PositionedString> getWarnings() {
         return new ArrayList<PositionedString>(warnings);
     }
 
     /**
      * Get non-critical warnings.
      */
-    public @Nonnull String getWarningsAsString() {
+    public @Nonnull
+    String getWarningsAsString() {
         StringBuffer sb = new StringBuffer();
         for (PositionedString s : warnings) {
             sb.append(s.toString());

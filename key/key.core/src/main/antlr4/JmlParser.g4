@@ -2,6 +2,16 @@ parser grammar JmlParser;
 
 options { tokenVocab=JmlLexer; }
 
+@header {
+  import de.uka.ilkd.key.util.parsing.*;
+}
+
+@members {
+  private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+  public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
+}
+
+
 classlevel_comments: classlevel_comment* EOF;
 classlevel_comment: classlevel_element | modifiers | set_statement;
 classlevel_element0: modifiers? (classlevel_element modifiers?);

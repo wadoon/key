@@ -32,6 +32,7 @@ class ContractClauses {
     static final Clauses<LocationVariable, Term> AXIOMS = new Clauses<>();
     static final Clauses<LocationVariable, Boolean> HAS_MODS = new Clauses<>();
 
+
     @SuppressWarnings("unused")
     static class Clauses<K, V> {}
 

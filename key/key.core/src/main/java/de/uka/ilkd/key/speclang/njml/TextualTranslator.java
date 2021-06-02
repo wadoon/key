@@ -14,7 +14,7 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.Cla
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT_FREE;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.*;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
-import static de.uka.ilkd.key.speclang.njml.JmlFacade.TODO;
+import static de.uka.ilkd.key.speclang.njml.Translator.raiseError;
 
 class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public ImmutableList<TextualJMLConstruct> constructs = ImmutableSLList.nil();
@@ -146,8 +146,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitCaptures_clause(JmlParser.Captures_clauseContext ctx) {
-        //methodContract.addClause(CAPTURES, ctx)
-        TODO();
+        raiseError("Captures clauses are not supported by KeY.", ctx);
         return null;
     }
 
@@ -160,20 +159,20 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitWorking_space_clause(JmlParser.Working_space_clauseContext ctx) {
-        TODO();
-        return super.visitWorking_space_clause(ctx);
+        raiseError("working space clauses are not supported by KeY.", ctx);
+        return null;
     }
 
     @Override
     public Object visitDuration_clause(JmlParser.Duration_clauseContext ctx) {
-        TODO();
-        return super.visitDuration_clause(ctx);
+        raiseError("Duration clauses are not supported by KeY.", ctx);
+        return null;
     }
 
     @Override
     public Object visitWhen_clause(JmlParser.When_clauseContext ctx) {
-        TODO();
-        return super.visitWhen_clause(ctx);
+        raiseError("When clauses are not supported by KeY.", ctx);
+        return null;
     }
 
     @Override
@@ -265,9 +264,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitLoop_determines_clause(JmlParser.Loop_determines_clauseContext ctx) {
-        TODO();
-        //loopContract.addClause(TextualJMLLoopSpec.Clause.INFORMATION_FLOW, ctx);
-        return super.visitLoop_determines_clause(ctx);
+        raiseError("Loop determines clauses are not supported by KeY.", ctx);
+        return null;
     }
 
     @Override
@@ -312,8 +310,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitName_clause(JmlParser.Name_clauseContext ctx) {
-        TODO();
-        return super.visitName_clause(ctx);
+        raiseError("Name clauses are not supported by KeY.", ctx);
+        return null;
     }
 
     private void acceptAll(Iterable<? extends ParserRuleContext> ctxs) {

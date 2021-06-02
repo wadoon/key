@@ -17,12 +17,11 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.antlr.v4.runtime.ParserRuleContext;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
@@ -89,6 +88,7 @@ public class JmlIO {
     }
 
     //region translations
+
     /**
      * @param clause
      * @return
@@ -100,11 +100,14 @@ public class JmlIO {
     }
 
     /**
+     * FIXME weigl: This method does not add the given term label to the returned objects. I am not
+     * if this is currently wanted/needed.
+     *
      * @param clause
      * @return
      */
-    public Pair<IObserverFunction, Term> translateRepresents(LabeledParserRuleContext clause) {
-        //TODO no represents label
+    public @Nonnull
+    Pair<IObserverFunction, Term> translateRepresents(@Nonnull LabeledParserRuleContext clause) {
         Pair<IObserverFunction, Term> p = translateRepresents(clause.first);
         return new Pair<>(p.first, p.second);
     }
@@ -220,7 +223,8 @@ public class JmlIO {
      * @param expr
      * @return
      */
-    public Term translateTerm(ParserRuleContext expr) {
+    public @Nonnull
+    Term translateTerm(@Nonnull ParserRuleContext expr) {
         Object interpret = interpret(expr);
         if (interpret instanceof SLExpression) {
             return ((SLExpression) interpret).getTerm();
@@ -251,7 +255,7 @@ public class JmlIO {
         OriginTermLabel origin = new OriginTermLabel(new OriginTermLabel.Origin(type));
         if (expr.second != null)
             return services.getTermBuilder().addLabel(term, expr.second);
-                    //new ImmutableArray<>(origin, expr.second));
+            //new ImmutableArray<>(origin, expr.second));
         else
             return services.getTermBuilder().addLabel(term, origin);
     }
@@ -285,7 +289,8 @@ public class JmlIO {
      * @return a information flow specification from the given context.
      * @throws ClassCastException if the {@code expr} is not suitable
      */
-    public @Nonnull InfFlowSpec translateInfFlow(@Nonnull ParserRuleContext expr) {
+    public @Nonnull
+    InfFlowSpec translateInfFlow(@Nonnull ParserRuleContext expr) {
         return (InfFlowSpec) this.interpret(expr);
     }
 
@@ -317,16 +322,8 @@ public class JmlIO {
     }
     //endregion
 
-    /*
-     * @return public Object parse(PositionedString expr) {
-     * ParserRuleContext ctx = JmlFacade.parseTop(expr);
-     * return ctx.accept(new Translator(services, specInClass, selfVar, paramVars, resultVar,
-     * excVar, atPres, atBefores));
-     * }
-     */
-
-
     //region builder methods
+
     /**
      * @param selfVar
      * @return

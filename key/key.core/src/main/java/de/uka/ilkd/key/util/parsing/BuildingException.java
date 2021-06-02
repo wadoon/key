@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.nparser.builder;
+package de.uka.ilkd.key.util.parsing;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
