@@ -235,7 +235,8 @@ relationalexpr
 
 st_expr: shiftexpr ST shiftexpr;
 instance_of: shiftexpr INSTANCEOF typespec;
-relational_chain:  shiftexpr ( op+=(LT | GT | LEQ | GEQ) shiftexpr)+;
+relational_chain:  shiftexpr ( (op+=(GT | GEQ) shiftexpr)
+                             | (op+=(LT | LEQ) shiftexpr))+;
 relational_lockset: shiftexpr (LOCKSET_LT|LOCKSET_LEQ) postfixexpr;
 
 shiftexpr: additiveexpr (op+=(SHIFTRIGHT|SHIFTLEFT|UNSIGNEDSHIFTRIGHT) additiveexpr)*;
