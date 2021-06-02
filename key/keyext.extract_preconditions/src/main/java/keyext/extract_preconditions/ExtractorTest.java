@@ -3,6 +3,7 @@ package keyext.extract_preconditions;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -24,10 +25,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Class to try out precondition extraction.
@@ -71,9 +69,13 @@ public class ExtractorTest {
             List<UnclosedProof> unclosedProofs = generateProofs(env);
             for (UnclosedProof currentUnclosed : unclosedProofs) {
                 Proof currentProof = currentUnclosed.proof;
+                Set<Name> blackList = new HashSet<>();
+                blackList.add(new Name("self"));
+                blackList.add(new Name("heap"));
                 AbstractTermProjection projection =
                     new LeaveOutProjection(currentUnclosed.programVariables,
-                        currentProof.getServices());
+                        currentProof.getServices(),
+                        true, blackList);
                 //AbstractTermProjection projection = new NoProjection(currentProof.getServices());
                 PreconditionExtractor preconditionExtractor =
                     new PreconditionExtractor(
@@ -134,7 +136,7 @@ public class ExtractorTest {
                 StrategyProperties sp =
                     proof.getSettings().getStrategySettings().getActiveStrategyProperties();
                 sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
-                    StrategyProperties.METHOD_EXPAND);
+                    StrategyProperties.METHOD_CONTRACT);
                 sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
                     StrategyProperties.DEP_ON);
                 sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,

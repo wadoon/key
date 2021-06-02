@@ -123,6 +123,11 @@ public class PreconditionExtractor {
         // Simplification
         proofCopy.setActiveStrategy(new SimplifierStrategy());
         this.ui.getProofControl().startAndWaitForAutoMode(proofCopy);
+        /*// Blasting
+        for (Goal blastingGoal : proofCopy.openGoals()) {
+            AbstractProofMacro blastingMacro = new SemanticsBlastingMacro();
+            blastingMacro.applyTo(this.ui, blastingGoal.node(), null, null);
+        }*/
         return proofCopy;
     }
 

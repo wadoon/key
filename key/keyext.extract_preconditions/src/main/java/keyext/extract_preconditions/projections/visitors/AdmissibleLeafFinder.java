@@ -14,7 +14,7 @@ import java.util.Set;
  *
  * For each term a new visitor should be generated.
  */
-public class AdmissibleLeafFinder extends DefaultVisitor {
+public class AdmissibleLeafFinder extends VarNameVisitor {
 
     /**
      * Variables allowed within the projection
@@ -48,34 +48,23 @@ public class AdmissibleLeafFinder extends DefaultVisitor {
     }
 
     @Override
-    public boolean visitSubtree(Term visited) {
-        return (visited.op() instanceof Junctor);
-    }
-
-    @Override
-    public void visit(Term visited) {
-        if (!(visited.op() instanceof Junctor)) {
-            FindVarNamesVisitor leafVisitor = new FindVarNamesVisitor();
-            visited.execPostOrder(leafVisitor);
-            Set<ProgramVariable> foundVariables = leafVisitor.getVariables();
-            // TODO(steuber): This check seems fishy. Is this how it is supposed to be done?
-            for (ProgramVariable v : foundVariables) {
-                boolean isParam = false;
-                for (ProgramVariable param : this.allowedVariables) {
-                    if (param.name().equals(v.name())) {
-                        isParam = true;
-                        break;
-                    }
-                }
-                if (!isParam) {
-                    return;
+    public void handleVariables(Set<ProgramVariable> variablesFound) {
+        for (ProgramVariable v : variablesFound) {
+            boolean isParam = false;
+            for (ProgramVariable param : this.allowedVariables) {
+                if (param.name().equals(v.name())) {
+                    isParam = true;
+                    break;
                 }
             }
-            if (foundVariables.size() == 0) {
+            if (!isParam) {
                 return;
             }
-            // If we reach this point we have a node which only had admissible variables...
-            this.isAdmissible = true;
         }
+        if (variablesFound.size() == 0) {
+            return;
+        }
+        // If we reach this point we have a node which only had admissible variables...
+        this.isAdmissible = true;
     }
 }
