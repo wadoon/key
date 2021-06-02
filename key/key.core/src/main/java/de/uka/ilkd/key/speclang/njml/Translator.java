@@ -2269,6 +2269,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         // "at"-signs for from the beginning of lines
         bodyString = bodyString.replaceAll("\n[ ]*@", "");
+        // remove single line comments
+        bodyString = bodyString.replaceAll("//[^\n]*?", "");
+        //remove multiline comments (this is only relevant for model methods with single comments.)
+        bodyString = bodyString.replaceAll("/[*].*?[*]/", "");
 
         if (bodyString.charAt(0) != '{' || bodyString.charAt(bodyString.length() - 1) != '}')
             raiseError("The body of the given model method is misformed. " +
