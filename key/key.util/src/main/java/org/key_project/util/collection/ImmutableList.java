@@ -221,4 +221,9 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
         }
         return result;
     }
+
+    default T get(int idx) {
+        if(idx==0) return head();
+        return take(idx - 1).head();
+    }
 }

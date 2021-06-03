@@ -1004,7 +1004,6 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression curReceiver = receiver;
         SLExpression rangeFrom = accept(ctx.from);
         SLExpression rangeTo = accept(ctx.to);
-        //TODO not handled by code ctx.MULT()
         return termFactory.arrayRef(curReceiver, fullyQualifiedName, rangeFrom, rangeTo);
     }
     //endregion

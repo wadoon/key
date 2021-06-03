@@ -38,6 +38,7 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
+import de.uka.ilkd.key.rule.IntCaseDistinctionRule;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -102,6 +103,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         completions.add(new LoopInvariantRuleCompletion());
         completions.add(new BlockContractInternalCompletion(mainWindow));
         completions.add(new BlockContractExternalCompletion(mainWindow));
+        completions.add(new IntCaseDistinctionCompletion(mainWindow));
         completions.add(MergeRuleCompletion.INSTANCE);
     }
 
