@@ -39,7 +39,7 @@ contract MultiAuction {
   /*@ only_if state == State.AUCTION_OPEN &&
               msg.sender != auctionOwner &&
               msg.value > 0;
-//    on_success balances[msg.sender] == \old(balances[msg.sender]) + msg.value; // do not really need this, can be inferred from invariant 
+      on_success balances[msg.sender] == \old(balances[msg.sender]) + msg.value;
       assignable  balances[msg.sender], bidders[bidders.arr_length], bidders.arr_length, bidded[msg.sender], net(msg.sender);
   */
   function placeOrIncreaseBid() public payable {

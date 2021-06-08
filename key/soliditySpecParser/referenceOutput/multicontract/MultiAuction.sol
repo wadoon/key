@@ -14,6 +14,9 @@ library Lib {
         uint b = a + 5;
         return b;
     }
+    function foo2(AddressSet ads) public returns (uint) {
+        return 1;
+    }
 }
 
 contract MultiAuction {
@@ -84,14 +87,17 @@ contract MultiAuction {
       on_success net(msg.sender) == 0;
       assignable balances[msg.sender],net(msg.sender);
    */
-  function withdraw() public {
+  function withdraw() public returns (uint){
     // A bidder can withdraw all her money (but she will stay in the array bidders)
 
-    uint aret = Lib.foo(balances[0],bidders[0],stateAdset);
+//    Lib.foo(balances[0],bidders[0],stateAdset);
+    uint r = Lib.foo2(stateAdset);
+    r = r + 1;
     require(state == State.AUCTION_OPEN);
     uint tmp = balances[msg.sender];
     balances[msg.sender] = 0;
     msg.sender.transfer(tmp);
+    return r;
   }
 
   function closeAuction() public {
