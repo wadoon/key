@@ -2,6 +2,7 @@ package keyext.extract_preconditions.projections.visitors;
 
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import java.util.HashSet;
@@ -37,7 +38,8 @@ class FindVarNamesVisitor extends DefaultVisitor {
     @Override
     public void visit(Term visited) {
         if (visited.op() instanceof ProgramVariable) {
-            this.foundVariables.add((ProgramVariable) visited.op());
+            ProgramVariable var = (ProgramVariable) visited.op();
+            this.foundVariables.add(var);
         }
     }
 }

@@ -1,6 +1,7 @@
 package keyext.extract_preconditions.projections.visitors;
 
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -27,15 +28,23 @@ public class AdmissibleLeafFinder extends VarNameVisitor {
     private boolean isAdmissible;
 
     /**
+     * Variable Names that will be ignored
+     */
+    private Set<Name> blacklist;
+
+    /**
      * Constructor for the AdmissibleLeafFinder.
      * A new visitor should be generated for each term that is visited.
      * The visitor checks whether there are any leafs which only contain allowedVariables
      *
      * @param allowedVariablesParam Variables allowed in the projection.
+     * @param blacklist
      */
-    public AdmissibleLeafFinder(ImmutableList<ProgramVariable> allowedVariablesParam) {
+    public AdmissibleLeafFinder(ImmutableList<ProgramVariable> allowedVariablesParam,
+                                Set<Name> blacklist) {
         this.isAdmissible = false;
         this.allowedVariables = allowedVariablesParam;
+        this.blacklist = blacklist;
     }
 
     /**
@@ -49,7 +58,12 @@ public class AdmissibleLeafFinder extends VarNameVisitor {
 
     @Override
     public void handleVariables(Set<ProgramVariable> variablesFound) {
+        boolean consideredVariables = false;
         for (ProgramVariable v : variablesFound) {
+            if (this.blacklist.contains(v.name())) {
+                continue;
+            }
+            consideredVariables=true;
             boolean isParam = false;
             for (ProgramVariable param : this.allowedVariables) {
                 if (param.name().equals(v.name())) {
@@ -61,7 +75,7 @@ public class AdmissibleLeafFinder extends VarNameVisitor {
                 return;
             }
         }
-        if (variablesFound.size() == 0) {
+        if (!consideredVariables) { // If all variables were skipped, we must not admit this term
             return;
         }
         // If we reach this point we have a node which only had admissible variables...

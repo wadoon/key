@@ -1,5 +1,6 @@
 package keyext.extract_preconditions.projections.visitors;
 
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.Visitor;
@@ -10,6 +11,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -45,20 +47,26 @@ public class LeaveOutTermConstructionVisitor implements Visitor {
     private final ImmutableList<ProgramVariable> programVariables;
 
     /**
+     * Blacklist of variables that will be ignored by procedure
+     */
+    private final Set<Name> blacklist;
+
+    /**
      * Constructor for the LeaveOutTermConstructionVisitor.
      * Note, that we need a new visitor for each term that is visited.
-     *
      * @param programVariablesParam Program variables that are allowed
+     * @param transitiveBlackList
      * @param termBuilderParam Term Builder (necessary for construction of new term)
      */
     public LeaveOutTermConstructionVisitor(
         ImmutableList<ProgramVariable> programVariablesParam,
-        TermBuilder termBuilderParam) {
+        Set<Name> blacklistParam, TermBuilder termBuilderParam) {
         this.termBuilder = termBuilderParam;
         this.programVariables = programVariablesParam;
         this.constructedTerm = null;
         this.termStorage = new Stack<>();
         this.currentOp = new Stack<>();
+        this.blacklist = blacklistParam;
     }
 
     /**
@@ -143,7 +151,7 @@ public class LeaveOutTermConstructionVisitor implements Visitor {
      * @return true if node should be included
      */
     private boolean shouldIncludeNode(Term visited) {
-        AdmissibleLeafFinder admissibilityVisitor = new AdmissibleLeafFinder(this.programVariables);
+        AdmissibleLeafFinder admissibilityVisitor = new AdmissibleLeafFinder(this.programVariables, this.blacklist);
         visited.execPostOrder(admissibilityVisitor);
 
         return admissibilityVisitor.isAdmissible();

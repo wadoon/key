@@ -69,7 +69,7 @@ public class LeaveOutProjection extends AbstractTermProjection {
             }
         }
         LeaveOutTermConstructionVisitor
-            leaveOutVisitor = new LeaveOutTermConstructionVisitor(allowedVars, this.services.getTermBuilder());
+            leaveOutVisitor = new LeaveOutTermConstructionVisitor(allowedVars, this.transitiveBlackList, this.services.getTermBuilder());
         inputTerm.execPostOrder(leaveOutVisitor);
         return leaveOutVisitor.getTerm();
     }
