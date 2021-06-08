@@ -25,8 +25,7 @@ contract MultiAuction {
               )
             )
         ) &&
-        balances[auctionOwner] == 0 &&
-        (\forall address a; balances[a] >= 0);
+        balances[auctionOwner] == 0;
     */
 
   /*@ on_success auctionOwner == msg.sender &&
