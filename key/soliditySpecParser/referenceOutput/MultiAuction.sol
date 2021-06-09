@@ -26,7 +26,8 @@ contract MultiAuction {
             )
         ) &&
         !(\exists uint i; (i>=0 && i<bidders.arr_length && bidders[i]==auctionOwner)) &&
-        balances[auctionOwner] == 0; 
+        balances[auctionOwner] == 0 &&
+        auctionOwner != this; 
     */
 
   /*@ on_success auctionOwner == msg.sender &&
