@@ -37,10 +37,10 @@ public class ProofObligations {
     }
 
     public boolean isGross(String function) {
-        return posMap.get(function).isGross();
+        return getFPO(function).isGross();
     }
 
     public void setGross(String function, boolean g) {
-        posMap.get(function).setGross(g);
+        getFPO(function).setGross(g);
     }
 }
