@@ -3972,6 +3972,7 @@ varexp[TacletBuilder b]
     | varcond_storeResultVarIn[b]
     | varcond_storeAbstractUpdateFrame[b]
     | varcond_getAbstractUpdateHeapTransformer[b]
+    | varcond_syntacticallySmaller[b]
     | varcond_storeTermIn[b]
     | varcond_storeStmtIn[b]
     | varcond_storeContextLabelsIn[b]
@@ -4171,6 +4172,15 @@ varcond_getAbstractUpdateHeapTransformer[TacletBuilder b]
    {
       b.addVariableCondition(new GetAbstractUpdateHeapTransformerCondition((SchemaVariable) updateSV,
                                                                            (SchemaVariable) resultSV));
+   }
+;
+
+varcond_syntacticallySmaller[TacletBuilder b]
+:
+   SYNTACTICALLY_SMALLER LPAREN locset1=varId COMMA locset2=varId RPAREN
+   {
+      b.addVariableCondition(new SyntacticallySmallerCondition((SchemaVariable) locset1,
+                                                               (SchemaVariable) locset2));
    }
 ;
 
