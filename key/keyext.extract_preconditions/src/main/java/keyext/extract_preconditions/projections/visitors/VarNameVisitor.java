@@ -1,6 +1,7 @@
 package keyext.extract_preconditions.projections.visitors;
 
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -22,7 +23,7 @@ public abstract class VarNameVisitor extends DefaultVisitor {
         if (!(visited.op() instanceof Junctor)) {
             FindVarNamesVisitor leafVisitor = new FindVarNamesVisitor();
             visited.execPostOrder(leafVisitor);
-            Set<ProgramVariable> foundVariables = leafVisitor.getVariables();
+            Set<Name> foundVariables = leafVisitor.getVariables();
             this.handleVariables(foundVariables);
         }
     }
@@ -31,5 +32,5 @@ public abstract class VarNameVisitor extends DefaultVisitor {
      * Method which handles the variables found in the a non junction term
      * @param variablesFound
      */
-    public abstract void handleVariables(Set<ProgramVariable> variablesFound);
+    public abstract void handleVariables(Set<Name> variablesFound);
 }

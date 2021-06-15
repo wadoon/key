@@ -7,12 +7,14 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.macros.*;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import keyext.extract_preconditions.macros.PreconditionSemanticsBlastingMacro;
 import keyext.extract_preconditions.projections.AbstractTermProjection;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -120,14 +122,11 @@ public class PreconditionExtractor {
             createProof(this.proof, currentGoal.sequent(), "Proof Copy: " + this.proof.name());
         AbstractProofMacro testgenMacro = new TestGenMacro();
         testgenMacro.applyTo(this.ui, proofCopy.root(), null, null);
-        // Simplification
-        proofCopy.setActiveStrategy(new SimplifierStrategy());
-        this.ui.getProofControl().startAndWaitForAutoMode(proofCopy);
-        /*// Blasting
+        // Blasting
         for (Goal blastingGoal : proofCopy.openGoals()) {
-            AbstractProofMacro blastingMacro = new SemanticsBlastingMacro();
+            AbstractProofMacro blastingMacro = new PreconditionSemanticsBlastingMacro();
             blastingMacro.applyTo(this.ui, blastingGoal.node(), null, null);
-        }*/
+        }
         return proofCopy;
     }
 

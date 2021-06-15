@@ -20,7 +20,7 @@ public class AdmissibleLeafFinder extends VarNameVisitor {
     /**
      * Variables allowed within the projection
      */
-    private final ImmutableList<ProgramVariable> allowedVariables;
+    private final ImmutableList<Name> allowedVariables;
 
     /**
      * True if term is admissible
@@ -40,7 +40,7 @@ public class AdmissibleLeafFinder extends VarNameVisitor {
      * @param allowedVariablesParam Variables allowed in the projection.
      * @param blacklist
      */
-    public AdmissibleLeafFinder(ImmutableList<ProgramVariable> allowedVariablesParam,
+    public AdmissibleLeafFinder(ImmutableList<Name> allowedVariablesParam,
                                 Set<Name> blacklist) {
         this.isAdmissible = false;
         this.allowedVariables = allowedVariablesParam;
@@ -57,21 +57,14 @@ public class AdmissibleLeafFinder extends VarNameVisitor {
     }
 
     @Override
-    public void handleVariables(Set<ProgramVariable> variablesFound) {
+    public void handleVariables(Set<Name> variablesFound) {
         boolean consideredVariables = false;
-        for (ProgramVariable v : variablesFound) {
-            if (this.blacklist.contains(v.name())) {
+        for (Name curName : variablesFound) {
+            if (this.blacklist.contains(curName)) {
                 continue;
             }
             consideredVariables=true;
-            boolean isParam = false;
-            for (ProgramVariable param : this.allowedVariables) {
-                if (param.name().equals(v.name())) {
-                    isParam = true;
-                    break;
-                }
-            }
-            if (!isParam) {
+            if (!this.allowedVariables.contains(curName)) {
                 return;
             }
         }

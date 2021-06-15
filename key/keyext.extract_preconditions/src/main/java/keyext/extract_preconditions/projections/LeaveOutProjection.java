@@ -18,7 +18,7 @@ import java.util.Set;
  * or atoms are encountered.
  */
 public class LeaveOutProjection extends AbstractTermProjection {
-    private final ImmutableList<ProgramVariable> programVariables;
+    private final ImmutableList<Name> programVariables;
 
     private final boolean isTransitive;
 
@@ -30,7 +30,7 @@ public class LeaveOutProjection extends AbstractTermProjection {
      * @param programVariablesParam The program variables that may appear in the resulting term
      * @param servicesParam The proof services (necessary for term building etc.)
      */
-    public LeaveOutProjection(ImmutableList<ProgramVariable> programVariablesParam,
+    public LeaveOutProjection(ImmutableList<Name> programVariablesParam,
                               Services servicesParam) {
         this(programVariablesParam, servicesParam, false, null);
     }
@@ -44,7 +44,7 @@ public class LeaveOutProjection extends AbstractTermProjection {
      * @param transitive True if transitive closure of programVariablesParam should be used
      * @param varNameBlackList Blacklist of variables to ignore when using transitive closure
      */
-    public LeaveOutProjection(ImmutableList<ProgramVariable> programVariablesParam,
+    public LeaveOutProjection(ImmutableList<Name> programVariablesParam,
                               Services servicesParam,
                               boolean transitive, Set<Name> varNameBlackList){
         super(servicesParam);
@@ -58,14 +58,14 @@ public class LeaveOutProjection extends AbstractTermProjection {
         if(inputTerm.op() instanceof Junctor && (inputTerm.op() == Junctor.TRUE || inputTerm.op() == Junctor.FALSE)) {
             return inputTerm;
         }
-        ImmutableList<ProgramVariable> allowedVars = this.programVariables;
+        ImmutableList<Name> allowedVars = this.programVariables;
         if (this.isTransitive) {
             TransitiveVarNameFinder varNameVisitor = new TransitiveVarNameFinder(allowedVars, this.transitiveBlackList);
             inputTerm.execPostOrder(varNameVisitor);
-            Set<ProgramVariable> allowedVarSet = varNameVisitor.getTransitiveVariableClosure();
+            Set<Name> allowedVarSet = varNameVisitor.getTransitiveVariableClosure();
             allowedVars = ImmutableSLList.nil();
-            for (ProgramVariable var : allowedVarSet) {
-                allowedVars = allowedVars.append(var);
+            for (Name name : allowedVarSet) {
+                allowedVars = allowedVars.append(name);
             }
         }
         LeaveOutTermConstructionVisitor

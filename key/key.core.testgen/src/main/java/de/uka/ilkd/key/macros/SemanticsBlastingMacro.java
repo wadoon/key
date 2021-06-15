@@ -26,12 +26,12 @@ import de.uka.ilkd.key.rule.Rule;
  * @author mihai
  *
  */
-public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
+public class SemanticsBlastingMacro extends AbstractBlastingMacro {
 
 
 	private final SemanticsRuleFilter semanticsFilter;
 	private final EqualityRuleFilter equalityRuleFilter;
-	private final HashSet<String> allowedPullOut;
+	protected final HashSet<String> allowedPullOut;
 	public SemanticsBlastingMacro() {
 		super();
 		semanticsFilter = new SemanticsRuleFilter();

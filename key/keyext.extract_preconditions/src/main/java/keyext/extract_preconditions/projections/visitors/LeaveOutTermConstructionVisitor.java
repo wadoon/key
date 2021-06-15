@@ -44,7 +44,7 @@ public class LeaveOutTermConstructionVisitor implements Visitor {
     /**
      * Allowed program variables
      */
-    private final ImmutableList<ProgramVariable> programVariables;
+    private final ImmutableList<Name> programVariables;
 
     /**
      * Blacklist of variables that will be ignored by procedure
@@ -59,7 +59,7 @@ public class LeaveOutTermConstructionVisitor implements Visitor {
      * @param termBuilderParam Term Builder (necessary for construction of new term)
      */
     public LeaveOutTermConstructionVisitor(
-        ImmutableList<ProgramVariable> programVariablesParam,
+        ImmutableList<Name> programVariablesParam,
         Set<Name> blacklistParam, TermBuilder termBuilderParam) {
         this.termBuilder = termBuilderParam;
         this.programVariables = programVariablesParam;

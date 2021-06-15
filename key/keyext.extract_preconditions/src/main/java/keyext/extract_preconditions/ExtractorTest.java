@@ -21,7 +21,9 @@ import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import keyext.extract_preconditions.projections.AbstractTermProjection;
 import keyext.extract_preconditions.projections.LeaveOutProjection;
+import keyext.extract_preconditions.projections.NoProjection;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.io.File;
@@ -70,8 +72,8 @@ public class ExtractorTest {
             for (UnclosedProof currentUnclosed : unclosedProofs) {
                 Proof currentProof = currentUnclosed.proof;
                 Set<Name> blackList = new HashSet<>();
-                blackList.add(new Name("self"));
-                blackList.add(new Name("heap"));
+                //blackList.add(new Name("self"));
+                //blackList.add(new Name("heap"));
                 AbstractTermProjection projection =
                     new LeaveOutProjection(currentUnclosed.programVariables,
                         currentProof.getServices(),
@@ -207,11 +209,14 @@ public class ExtractorTest {
 
 class UnclosedProof {
     public final Proof proof;
-    public final ImmutableList<ProgramVariable> programVariables;
+    public ImmutableList<Name> programVariables;
 
     public UnclosedProof(Proof proof,
                          ImmutableList<ProgramVariable> programVariables) {
         this.proof = proof;
-        this.programVariables = programVariables;
+        this.programVariables = ImmutableSLList.nil();
+        for (ProgramVariable var : programVariables) {
+            this.programVariables = this.programVariables.append(var.name());
+        }
     }
 }

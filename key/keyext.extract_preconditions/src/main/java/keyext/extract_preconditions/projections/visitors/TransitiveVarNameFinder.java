@@ -13,9 +13,7 @@ import java.util.Set;
  */
 public class TransitiveVarNameFinder extends VarNameVisitor {
 
-    private ImmutableList<ProgramVariable> variablesOfInterest;
-
-    private Set<ProgramVariable> transitiveVariableClosure;
+    private ImmutableList<Name> variablesOfInterest;
 
     private Set<Name> transitiveVarNameClosure;
 
@@ -31,14 +29,12 @@ public class TransitiveVarNameFinder extends VarNameVisitor {
      *                            transitive closure
      * @param transitiveBlackList Variables which should be ignored during computation
      */
-    public TransitiveVarNameFinder(ImmutableList<ProgramVariable> variablesOfInterest,
+    public TransitiveVarNameFinder(ImmutableList<Name> variablesOfInterest,
                                    Set<Name> transitiveBlackList) {
         this.variablesOfInterest = variablesOfInterest;
-        this.transitiveVariableClosure = new HashSet<>();
         this.transitiveVarNameClosure = new HashSet<>();
-        for (ProgramVariable var : this.variablesOfInterest) {
-            this.transitiveVariableClosure.add(var);
-            this.transitiveVarNameClosure.add(var.name());
+        for (Name curName : this.variablesOfInterest) {
+            this.transitiveVarNameClosure.add(curName);
         }
         this.inVisitLoop = false;
         this.transitiveBlackList = transitiveBlackList;
@@ -50,8 +46,8 @@ public class TransitiveVarNameFinder extends VarNameVisitor {
      *
      * @return A set containing the transitive closure of program variables
      */
-    public Set<ProgramVariable> getTransitiveVariableClosure() {
-        return this.transitiveVariableClosure;
+    public Set<Name> getTransitiveVariableClosure() {
+        return this.transitiveVarNameClosure;
     }
 
     /**
@@ -71,27 +67,26 @@ public class TransitiveVarNameFinder extends VarNameVisitor {
         this.inVisitLoop = true;
         int oldSize;
         do {
-            oldSize = this.transitiveVariableClosure.size();
+            oldSize = this.transitiveVarNameClosure.size();
             super.visit(visited);
-        } while(this.transitiveVariableClosure.size()!=oldSize);
+        } while(this.transitiveVarNameClosure.size()!=oldSize);
         this.inVisitLoop = false;
     }
 
     @Override
-    public void handleVariables(Set<ProgramVariable> variablesFound) {
+    public void handleVariables(Set<Name> variablesFound) {
         boolean isParam = false;
-        for (ProgramVariable v : variablesFound) {
-            if (this.transitiveVarNameClosure.contains(v.name())
-                && !this.transitiveBlackList.contains(v.name())) {
+        for (Name curName : variablesFound) {
+            if (this.transitiveVarNameClosure.contains(curName)
+                && !this.transitiveBlackList.contains(curName)) {
                 isParam = true;
                 break;
             }
         }
         if (isParam) {
-            for (ProgramVariable var : variablesFound) {
-                if (!this.transitiveBlackList.contains(var.name())) {
-                    this.transitiveVariableClosure.add(var);
-                    this.transitiveVarNameClosure.add(var.name());
+            for (Name curName : variablesFound) {
+                if (!this.transitiveBlackList.contains(curName)) {
+                    this.transitiveVarNameClosure.add(curName);
                 }
             }
         }
