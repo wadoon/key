@@ -2,6 +2,7 @@ package keyext.extract_preconditions;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -11,12 +12,15 @@ import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FullAutoPilotProofMacro;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import keyext.extract_preconditions.projections.AbstractTermProjection;
@@ -26,6 +30,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.*;
 
@@ -57,18 +63,68 @@ public class ExtractorTest {
         List<File> classPaths = null; // Optionally: Additional specifications for API classes
         File bootClassPath = null; // Optionally: Different default specifications for Java API
         List<File> includes = null; // Optionally: Additional includes to consider
-        KeYEnvironment<?> env = null;
+        final KeYEnvironment<?> env;
         try {
-            try {
-                env = createKeyEnvironment(location, classPaths, bootClassPath, includes);
-            } catch (ProblemLoaderException e) {
-                System.err.println("Failed loading file in KeY:");
-                e.printStackTrace();
-                return;
-            }
-            UserInterfaceControl ui = env.getUi();
+            env = createKeyEnvironment(location, classPaths, bootClassPath, includes);
+        } catch (ProblemLoaderException e) {
+            System.err.println("Failed loading file in KeY:");
+            e.printStackTrace();
+            return;
+        }
 
-            List<UnclosedProof> unclosedProofs = generateProofs(env);
+        List<UnclosedProof> unclosedProofs = generateProofs(env);
+
+        boolean openWindow = getYesNo("Inspect proofs in KeY? (y/n)");
+
+        if (openWindow) {
+            MainWindow mainWindow = MainWindow.getInstance();
+            AbstractMediatorUserInterfaceControl visualUi = mainWindow.getUserInterface();
+            for (UnclosedProof currentUnclosed : unclosedProofs) {
+                visualUi.registerProofAggregate(new SingleProof(
+                    currentUnclosed.proof,
+                    currentUnclosed.proof.name().toString()));
+            }
+            mainWindow.removeWindowListener(mainWindow.getExitMainAction().windowListener);
+            mainWindow.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent e) {
+                    mainWindow.setVisible(false);
+                    extractPreconditions(unclosedProofs, env);
+                    System.exit(0);
+                }
+            });
+        } else {
+            extractPreconditions(unclosedProofs, env);
+        }
+    }
+
+    public static boolean getYesNo(String msg) {
+        Scanner kbd = new Scanner (System.in);
+        boolean yn = false;
+        boolean res = false;
+        while (!yn) {
+            System.out.println(msg);
+            switch (kbd.nextLine()) {
+                case "y":
+                case "yes":
+                    res = true;
+                    yn = true;
+                    break;
+                case "n":
+                case "no":
+                    res = false;
+                    yn = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return res;
+    }
+
+    private static void extractPreconditions(List<UnclosedProof> unclosedProofs, KeYEnvironment<?> env) {
+        UserInterfaceControl ui = env.getUi();
+        try {
             for (UnclosedProof currentUnclosed : unclosedProofs) {
                 Proof currentProof = currentUnclosed.proof;
                 Set<Name> blackList = new HashSet<>();
@@ -92,8 +148,8 @@ public class ExtractorTest {
                     .println(LogicPrinter.quickPrintTerm(precondition, currentProof.getServices()));
                 currentProof.dispose();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception exception) {
+            exception.printStackTrace();
         } finally {
             if (env != null) {
                 env.dispose();

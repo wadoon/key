@@ -1,6 +1,7 @@
 dependencies {
     compile project(":key.core")
     compile project(":key.core.testgen")
+    compile project(":key.ui")
 }
 apply plugin: 'java'
 apply plugin: 'application'
@@ -19,4 +20,5 @@ run {
     } else {
         args = []
     }
+    standardInput = System.in
 }
