@@ -333,14 +333,14 @@ public class TriggersSet {
                 }
             }
 
-            final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-            // matching on equations and inequalities does not seem to have any
-            // positive effect for the time being
-            if (op == Equality.EQUALS ||
-                    op == integerLDT.getLessOrEquals() ||
-                    op == integerLDT.getGreaterOrEquals()) {
-                return false;
-            }
+//            final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
+//            // matching on equations and inequalities does not seem to have any
+//            // positive effect for the time being
+//            if (//op == Equality.EQUALS ||
+//                    op == integerLDT.getLessOrEquals() ||
+//                    op == integerLDT.getGreaterOrEquals()) {
+//                return false;
+//            }
 
             /*
             if ( op == Op.EQUALS ) {
