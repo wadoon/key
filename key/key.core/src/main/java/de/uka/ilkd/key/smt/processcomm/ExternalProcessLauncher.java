@@ -16,7 +16,8 @@ package de.uka.ilkd.key.smt.processcomm;
 import de.uka.ilkd.key.smt.processcomm.SolverCommunication.Message;
 
 import java.io.IOException;
-import java.nio.file.Path;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -28,52 +29,57 @@ import java.nio.file.Path;
  */
 public class ExternalProcessLauncher {
 
-	private Process process;
+    private final SolverCommunication session;
+    private final String[] delimiters;
+    private final AbstractSolverSocket socket;
 
-	//private final Pipe pipe;
+    private BufferedMessageReader bmr;
 
-	public ExternalProcessLauncher(SolverCommunication session, String[] messageDelimiters) {
-		//pipe = new Pipe(session, messageDelimiters);
-	}
+    private Process process;
+
+    public ExternalProcessLauncher(AbstractSolverSocket socket, SolverCommunication session, String[] messageDelimiters) {
+        this.session = session;
+        this.delimiters = messageDelimiters;
+        this.socket = socket;
+    }
 
     /**
      * Main procedure of the class. Starts the external process, then it goes sleeping until 
      * the process has finished its work.
-	 */
-	public void launch(final String[] command, Path output) throws IOException, InterruptedException {
+     */
+    public void launch(final String[] command, String solverInput) throws IOException, InterruptedException {
         try {
             ProcessBuilder builder = new ProcessBuilder(command);
-            builder.redirectOutput(output.toFile());
-            builder.redirectError(output.toFile());
-			process = builder.start();
-			process.waitFor();
 
-            //pipe.start(process);
+            // redirect stderr to stdout
+            builder.redirectErrorStream(true);
+
+            process = builder.start();
+
+            bmr = new BufferedMessageReader(new InputStreamReader(process.getInputStream()),
+                    delimiters);
+
+            // limitation: solverInput has to be given completely at solver start
+            process.getOutputStream().write(solverInput.getBytes(StandardCharsets.UTF_8));
+            process.getOutputStream().flush();
+
+            String message = bmr.readMessage();
+            while (message != null) {
+                socket.messageIncoming(session, new Message(message, SolverCommunication.MessageType.Output));
+                message = bmr.readMessage();
+            }
         } catch (Exception ex) {
             stop();
             throw ex;
         }
-	}
-	
+    }
+
     /**
      * Stops the external process: In particular the pipe is closed and the process is destroyed. 
      */
-	public void stop() {
-		if(process != null){
-			process.destroy();
-		}
-		//pipe.close();
-	}
-
-//	public Pipe getPipe() {
-//		return pipe;
-//	}
-//
-//	public void sendMessage(String message) throws IOException {
-//		pipe.sendMessage(message);
-//	}
-//
-//	public Message readMessage() throws IOException, InterruptedException {
-//		return pipe.readMessage();
-//	}
+    public void stop() {
+        if(process != null){
+            process.destroy();
+        }
+    }
 }

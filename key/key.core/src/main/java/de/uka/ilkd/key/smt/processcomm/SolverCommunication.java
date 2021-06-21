@@ -39,6 +39,9 @@ public class SolverCommunication {
 	/**
 	 * The message type depends on the channel which was used for sending the message.
 	 */
+	// TODO: actually, Input type is never used: the message list does not contain any input, only the solver output.
+	//	 The new implementation without the Pipe class makes no distinction between Output and Error (both of them are
+	//   usually delivered by the SMT solvers via stdout): Probably, this enum could be deleted.
 	public enum MessageType {Input, Output, Error}
 
     public static class Message {

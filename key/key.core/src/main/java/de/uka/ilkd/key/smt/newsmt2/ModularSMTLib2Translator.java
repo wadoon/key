@@ -87,6 +87,9 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             throw new RuntimeException(exceptions.get(0));
         }
 
+        // this is needed to exit the solver, since it is started in interactive mode reading from stdin
+        sb.append("\n(exit)");
+
         return sb;
     }
 

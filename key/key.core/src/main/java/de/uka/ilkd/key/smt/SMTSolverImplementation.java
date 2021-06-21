@@ -13,12 +13,7 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,7 +28,6 @@ import de.uka.ilkd.key.smt.processcomm.ExternalProcessLauncher;
 import de.uka.ilkd.key.smt.processcomm.SolverCommunication;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
-import de.uka.ilkd.key.util.MiscTools;
 
 final class SMTSolverImplementation implements SMTSolver, Runnable{
  
@@ -47,9 +41,6 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
 		/** The SMT problem that is related to this solver */
         private SMTProblem problem;
-
-        private Path output;
-        private Path input;
 
         /** It is possible that a solver has a listener. */
         private SolverListener listener;
@@ -106,7 +97,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 this.services = services;
                 this.type = myType;
                 this.socket = AbstractSolverSocket.createSocket(type, query);
-            processLauncher = new ExternalProcessLauncher(solverCommunication, type.getDelimiters());
+            processLauncher = new ExternalProcessLauncher(socket, solverCommunication, type.getDelimiters());
 
         }
 
@@ -201,17 +192,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                                 
                 // Secondly: Translate the given problem
                 String commands[];
-                String name = MiscTools.toValidFileName(problem.getName()).replace(' ', '_');
                 try {
-                     input = Files.createTempFile("SMTLIB-TL_" + name + "_", ".smt2");
                         commands = translateToCommand(problem.getSequent());
-                        // JS: debug start
-                    //String filename = "/tmp/SMTLIB-TL_" + problem.getName().replaceAll(" ", "");
-                    //System.out.println("SMTLIB translation has been written to file: " + filename);
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(input.toFile()));
-                    writer.write(problemString);
-                    writer.close();
-                    // JS: debug end
                 } catch (Throwable e) {
                     interruptionOccurred(e);
                     listener.processInterrupted(this, problem, e);
@@ -223,25 +205,9 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
 
             // Thirdly: start the external process.
             try {
-                output = Files.createTempFile("SMT-output_" + name + "_", ".smt2");
 
-                commands = Arrays.copyOf(commands, commands.length + 2);
-                commands[commands.length - 2] = "--";
-                commands[commands.length - 1] = input.toString();
-                // this call blocks until the process finishes or is destroyed
-                processLauncher.launch(commands, output);
-                //processLauncher.sendMessage(type.modifyProblem(problemString));
-
-                //socket.messageIncoming(null, new Message("success", SolverCommunication.MessageType.Input));
-                /*
-                Message msg = processLauncher.readMessage();
-                //JS: Debug end
-                while (msg != null) {
-                    socket.messageIncoming(processLauncher.getPipe(), msg);
-                    msg = processLauncher.readMessage();
-                }*/
-                socket.solverOutputWritten(output, solverCommunication);
-                // TODO: the temp files should be deleted somewhere
+                // TODO: what does the method "modifyProblem" method do?
+                processLauncher.launch(commands, type.modifyProblem(problemString));
             } catch (Throwable e) {
                 interruptionOccurred(e);
             } finally {
@@ -349,13 +315,6 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 		processLauncher.stop();
                         thread.interrupt();
                 }
-            // the current implementation does not stop early if an error in the solver occurs, therefore we have
-            // to read the input after the interruption by the timer
-            try {
-                socket.solverOutputWritten(output, solverCommunication);
-            } catch (IOException e) {
-                setReasonOfInterruption(ReasonOfInterruption.Exception, e);
-            }
 
         }
 
