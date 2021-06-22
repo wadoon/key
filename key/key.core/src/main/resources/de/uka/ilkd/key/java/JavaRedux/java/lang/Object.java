@@ -27,7 +27,7 @@ public class Object {
     public final void wait(long ms, int ns)
 	throws java.lang.InterruptedException;
     
-    public final void require(boolean b);
+    public static final void require(boolean b);
     
     public void push(Object o);    
 
