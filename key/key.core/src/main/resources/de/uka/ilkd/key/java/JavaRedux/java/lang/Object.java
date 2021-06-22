@@ -28,6 +28,8 @@ public class Object {
 	throws java.lang.InterruptedException;
     
     public static final void require(boolean b);
+    public static final void require2(boolean b);
+    public static final void require3(boolean b);
     
     public void push(Object o);    
 

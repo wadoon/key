@@ -917,14 +917,25 @@ public class SolidityTranslationVisitor extends SolidityBaseVisitor<String> {
         }
 
 		StringBuffer arguments;
+        boolean skip = false;
 		switch(comparableName) {
+        case "require2":
+            arguments = new StringBuffer("(int)sender != 0,");
+            fctName = "require";
+            skip = true;
+            break;
+        case "require3":
+            arguments = new StringBuffer("(int)recipient != 0,");
+            fctName = "require";
+            skip = true;
+            break;
 		case "require":case "assert":case "push":
 			arguments = new StringBuffer();
 			break;
 		default: arguments = new StringBuffer("msg,");		
 		}
 		
-		if (ctx.functionCallArguments() != null && !ctx.functionCallArguments().isEmpty()) {
+		if (!skip && ctx.functionCallArguments() != null && !ctx.functionCallArguments().isEmpty()) {
 			if (ctx.functionCallArguments().expressionList()!= null && 
 					!ctx.functionCallArguments().expressionList().isEmpty()) {
 				ctx.functionCallArguments().expressionList().expression().stream()
