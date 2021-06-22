@@ -20,6 +20,7 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
+import javax.annotation.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -184,7 +185,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      */
     protected <T> JComboBox<T> addComboBox(String title,
                                            String info, int selectionIndex,
-                                           Validator<T> validator, T... items) {
+                                           @Nullable Validator<T> validator, T... items) {
         JComboBox<T> comboBox = new JComboBox<>(items);
         comboBox.setSelectedIndex(selectionIndex);
         comboBox.addActionListener(e -> {

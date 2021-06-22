@@ -13,6 +13,7 @@
 
 package org.key_project.util.collection;
 
+import javax.annotation.Nonnull;
 
 import java.lang.reflect.Array;
 
@@ -62,6 +63,18 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
     public ImmutableArray(Collection<? extends S> list) {
         content = (S[]) list.toArray();
     }
+
+    /**
+     * creates a new immutable array with the contents of the given collection.
+     *
+     * The order of elements is defined by the collection
+     *
+     * @param seq non-null
+     */
+    public ImmutableArray(@Nonnull Collection<S> seq) {
+        this(new ArrayList<>(seq));
+    }
+
 
     /** gets the element at the specified position
      * @param pos an int describing the position
