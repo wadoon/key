@@ -12,7 +12,6 @@ import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FullAutoPilotProofMacro;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -25,13 +24,11 @@ import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import keyext.extract_preconditions.projections.AbstractTermProjection;
 import keyext.extract_preconditions.projections.LeaveOutProjection;
-import keyext.extract_preconditions.projections.NoProjection;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.awt.event.WindowAdapter;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.util.*;
 
@@ -89,7 +86,13 @@ public class ExtractorTest {
                 @Override
                 public void windowClosing(java.awt.event.WindowEvent e) {
                     mainWindow.setVisible(false);
-                    extractPreconditions(unclosedProofs, env);
+                    List<UnclosedProof> finalUnclosedProofs = new LinkedList<>();
+                    for (UnclosedProof curProof : unclosedProofs) {
+                        if (!curProof.proof.isDisposed()) {
+                            finalUnclosedProofs.add(curProof);
+                        }
+                    }
+                    extractPreconditions(finalUnclosedProofs, env);
                     System.exit(0);
                 }
             });

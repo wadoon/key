@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import keyext.extract_preconditions.macros.PreconditionSemanticsBlastingMacro;
 import keyext.extract_preconditions.projections.AbstractTermProjection;
+import keyext.extract_preconditions.projections.visitors.JunctorSimplificationVisitor;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -81,7 +82,10 @@ public class PreconditionExtractor {
                 this.projection.projectTerm(currentTerm)
             );
         }
-        return this.proofServices.getTermBuilder().or(projectedDisjunction);
+        Term result = this.proofServices.getTermBuilder().or(projectedDisjunction);
+        JunctorSimplificationVisitor simplifier = new JunctorSimplificationVisitor(this.proofServices.getTermBuilder());
+        result.execPostOrder(simplifier);
+        return simplifier.getSimplified();
     }
 
     /**

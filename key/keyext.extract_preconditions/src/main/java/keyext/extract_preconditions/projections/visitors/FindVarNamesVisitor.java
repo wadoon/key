@@ -54,6 +54,10 @@ class FindVarNamesVisitor extends DefaultVisitor {
 
     @Override
     public void visit(Term visited) {
+        if (isBuiltinObjectProperty(visited)) {
+            // We are not interested in those (right?)
+            return;
+        }
         if (visited.op() instanceof ProgramVariable) {
             ProgramVariable var = (ProgramVariable) visited.op();
             this.foundVariables.add(var.name());
@@ -83,5 +87,18 @@ class FindVarNamesVisitor extends DefaultVisitor {
 
     private static boolean isStoreTerm(Term term) {
         return term.op().name().toString().endsWith("store") && term.arity() == 4;
+    }
+
+    // Adopted from FieldPrinter.java
+    protected boolean isBuiltinObjectProperty(Term fieldTerm) {
+        return fieldTerm.op().name().toString().contains("::<")
+            && isFieldConstant(fieldTerm);
+    }
+    protected static boolean isFieldConstant(Term fieldTerm) {
+        return fieldTerm.op() instanceof Function
+            && ((Function) fieldTerm.op()).isUnique()
+            && fieldTerm.sort().name().toString().equals("Field")
+            && fieldTerm.arity() == 0
+            && fieldTerm.boundVars().isEmpty();
     }
 }

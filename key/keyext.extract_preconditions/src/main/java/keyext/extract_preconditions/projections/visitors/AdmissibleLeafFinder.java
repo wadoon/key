@@ -3,6 +3,7 @@ package keyext.extract_preconditions.projections.visitors;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.util.collection.ImmutableList;
