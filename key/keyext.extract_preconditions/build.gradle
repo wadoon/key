@@ -18,7 +18,11 @@ run {
     if (project.hasProperty("file")) {
         args = [project.getProperty("file")]
     } else {
-        args = []
+        if (project.hasProperty("args")){
+            args = Eval.me(project.getProperty("args"))
+        }else {
+            args = []
+        }
     }
     standardInput = System.in
 }
