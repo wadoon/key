@@ -8,15 +8,29 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class StringHandler implements SMTHandler {
 
     public static final Type STRING = new Type("String", "s2u", "u2s");
+    private static final Type INT = IntegerOpHandler.INT;
+    private static final Type BOOL = Type.BOOL;
+
+    private static <T> List<T> reorder(List<T> xs, int... newIndices) {
+        assert newIndices.length == xs.size();
+        List<T> reordered = new ArrayList<>(xs);
+        for (int i = 0; i < newIndices.length; i++) {
+            reordered.set(newIndices[i], xs.get(i));
+        }
+        return reordered;
+    }
 
     @FunctionalInterface
     private interface Translator {
@@ -38,33 +52,61 @@ public class StringHandler implements SMTHandler {
             this.translator = translator;
         }
 
+        private static List<SExpr> charValuesToString(List<SExpr> subs, int... charValueIndices) {
+            List<SExpr> convertedSubs = new ArrayList<>(subs);
+            for (int idx : charValueIndices) {
+                convertedSubs.set(idx, new SExpr("str.from_code", STRING, subs.get(idx)));
+            }
+            return convertedSubs;
+        }
+
+        private static SExpr stringToCharValue(SExpr str) {
+            return new SExpr("str.to_code", INT, Arrays.asList(str));
+        }
+
         private static O strContent() {
             return new O(CharListLDT.STRINGCONTENT_NAME, translatedSubs ->
                 translatedSubs.get(0));
         }
 
+        private static O strPool() {
+            return new O(CharListLDT.STRINGPOOL_NAME, translatedSubs ->
+                    translatedSubs.get(0));
+        }
+
         private static O startsWith(CharListLDT stringLDT) {
             return new O(stringLDT.getClStartsWith(), translatedSubs ->
-                new SExpr("str.prefixof", Type.BOOL, translatedSubs));
+                new SExpr("str.prefixof", BOOL, translatedSubs));
         }
 
         private static O endsWith(CharListLDT stringLDT) {
             return new O(stringLDT.getClEndsWith(), translatedSubs ->
-                new SExpr("str.suffixof", Type.BOOL, translatedSubs));
+                new SExpr("str.suffixof", BOOL, translatedSubs));
         }
 
         private static O indexOf(CharListLDT stringLDT) {
-            return new O(stringLDT.getClIndexOfCl(), translatedSubs -> {
-                SExpr startPos = translatedSubs.get(1);
-                translatedSubs.set(1, translatedSubs.get(2));
-                translatedSubs.set(2, startPos);
-                return new SExpr("str.indexof", IntegerOpHandler.INT, translatedSubs);
-            });
+            return new O(stringLDT.getClIndexOfCl(), translatedSubs ->
+                new SExpr("str.indexof", INT, reorder(translatedSubs, 0, 2, 1)));
+        }
+
+        private static O indexOfChar(CharListLDT stringLDT) {
+            return new O(stringLDT.getClIndexOfChar(), translatedSubs ->
+                new SExpr("str.indexof", INT, charValuesToString(translatedSubs, 1)));
+        }
+
+        private static O replace(CharListLDT stringLDT) {
+            return new O(stringLDT.getClReplace(), translatedSubs ->
+                new SExpr("str.replace_all", STRING, charValuesToString(translatedSubs, 1, 2)));
+        }
+
+        private static O substring(SeqLDT seqLDT) {
+            return new O(seqLDT.getSeqSub(), translatedSubs ->
+                new SExpr("str.substr", STRING, translatedSubs));
         }
 
         private static O length(SeqLDT seqLDT) {
             return new O(seqLDT.getSeqLen(), translatedSubs ->
-                new SExpr("str.len", IntegerOpHandler.INT, translatedSubs));
+                new SExpr("str.len", INT, translatedSubs));
         }
 
         private static O concat(SeqLDT seqLDT) {
@@ -74,7 +116,12 @@ public class StringHandler implements SMTHandler {
 
         private static O equals() {
             return new O(Equality.EQUALS, translatedSubs ->
-                new SExpr("=", Type.BOOL, translatedSubs));
+                new SExpr("=", BOOL, translatedSubs));
+        }
+
+        private static O charAt(SeqLDT seqLDT, IntegerLDT intLDT, Services services) {
+            return new O(seqLDT.getSeqGet(intLDT.targetSort(), services), translatedSubs ->
+                    stringToCharValue(new SExpr("str.at", STRING, translatedSubs)));
         }
 
         private boolean matches(Term t) {
@@ -91,14 +138,32 @@ public class StringHandler implements SMTHandler {
         }
     }
 
+    private static class LeafHandler {
+        private BiFunction<MasterHandler, Term, SExpr> handle;
+        private Function<Term, Boolean> canHandle;
+
+        private LeafHandler(BiFunction<MasterHandler, Term, SExpr> handle, Function<Term, Boolean> canHandle) {
+            this.handle = handle;
+            this.canHandle = canHandle;
+        }
+
+        private SExpr handle(MasterHandler h, Term term) {
+            return handle.apply(h, term);
+        }
+
+        private boolean canHandle(Term term) {
+            return canHandle.apply(term);
+        }
+    }
+
     private static class H {
         private O op;
-        private Type type;
+        private LeafHandler leafHandler;
         private List<H> subHandlers;
 
-        private H(O op, Type type, List<H> subHandlers) {
+        private H(O op, LeafHandler leafHandler, List<H> subHandlers) {
             this.op = op;
-            this.type = type;
+            this.leafHandler = leafHandler;
             this.subHandlers = subHandlers;
         }
 
@@ -106,8 +171,12 @@ public class StringHandler implements SMTHandler {
             return new H(op, null, Arrays.asList(subHandlers));
         }
 
+        private static H leaf(BiFunction<MasterHandler, Term, SExpr> handle, Function<Term, Boolean> canHandle) {
+            return new H(null, new LeafHandler(handle, canHandle), null);
+        }
+
         private static H leaf(Type type) {
-            return new H(null, type, null);
+            return leaf((h, term) -> h.translate(term, type), term -> true);
         }
 
         private static H startsWith(CharListLDT stringLDT) {
@@ -125,8 +194,33 @@ public class StringHandler implements SMTHandler {
         private static H indexOf(CharListLDT stringLDT) {
             return H.inner(O.indexOf(stringLDT),
                     H.inner(O.strContent(), H.leaf(STRING)),
-                    H.leaf(IntegerOpHandler.INT),
+                    H.leaf(INT),
                     H.inner(O.strContent(), H.leaf(STRING)));
+        }
+
+        private static H indexOfChar(CharListLDT stringLDT) {
+            return H.inner(O.indexOfChar(stringLDT),
+                    H.inner(O.strContent(), H.leaf(STRING)),
+                    H.leaf(INT),
+                    H.leaf(INT));
+        }
+
+        private static H replace(CharListLDT stringLDT) {
+            return H.inner(O.equals(),
+                    H.inner(O.strContent(), H.leaf(STRING)),
+                    H.inner(O.replace(stringLDT),
+                            H.inner(O.strContent(), H.leaf(STRING)),
+                            H.leaf(INT),
+                            H.leaf(INT)));
+        }
+
+        private static H substring(SeqLDT seqLDT) {
+            return H.inner(O.equals(),
+                    H.inner(O.strContent(), H.leaf(STRING)),
+                    H.inner(O.substring(seqLDT),
+                            H.inner(O.strContent(), H.leaf(STRING)),
+                            H.leaf(INT),
+                            H.leaf(INT)));
         }
 
         private static H length(SeqLDT seqLDT) {
@@ -142,13 +236,45 @@ public class StringHandler implements SMTHandler {
                             H.inner(O.strContent(), H.leaf(STRING))));
         }
 
+        private static Boolean canHandleLiteralDecl(SeqLDT seqLDT, Term term) {
+            if (term.op().equals(seqLDT.getSeqSingleton())) {
+                return true;
+            }
+            if (!term.op().equals(seqLDT.getSeqConcat())) {
+                return false;
+            }
+            return canHandleLiteralDecl(seqLDT, term.sub(0)) && canHandleLiteralDecl(seqLDT, term.sub(1));
+        }
+
+        private static SExpr handleLiteralDecl(SeqLDT seqLDT, MasterHandler h, Term term) {
+            if (term.op().equals(seqLDT.getSeqSingleton())) {
+                return new SExpr("str.from_code", STRING, h.translate(term.sub(0), INT));
+            }
+            SExpr left = handleLiteralDecl(seqLDT, h, term.sub(0));
+            SExpr right = handleLiteralDecl(seqLDT, h, term.sub(1));
+            return new SExpr("str.++", STRING, left, right);
+        }
+
+
+        private static H literals(SeqLDT seqLDT) {
+            return H.inner(O.strPool(), H.leaf(
+                    (h, term) -> handleLiteralDecl(seqLDT, h, term),
+                    term -> canHandleLiteralDecl(seqLDT, term)));
+        }
+
+        private static H charAt(SeqLDT seqLDT, IntegerLDT intLDT, Services services) {
+            return H.inner(O.charAt(seqLDT, intLDT, services),
+                    H.inner(O.strContent(), H.leaf(STRING)),
+                    H.leaf(INT));
+        }
+
         private boolean isLeaf() {
             return op == null;
         }
 
         private boolean canHandle(Term t) {
             if (isLeaf()) {
-                return true;
+                return leafHandler.canHandle(t);
             }
             if (!op.matches(t)) {
                 return false;
@@ -164,7 +290,7 @@ public class StringHandler implements SMTHandler {
 
         private SExpr handle(MasterHandler h, Term term) throws SMTTranslationException {
             if (isLeaf()) {
-                return h.translate(term, type);
+                return leafHandler.handle(h, term);
             }
             List<SExpr> translatedSubs = new ArrayList<>();
             assert term.subs().size() == subHandlers.size();
@@ -193,16 +319,19 @@ public class StringHandler implements SMTHandler {
                 H.startsWith(stringLDT),
                 H.endsWith(stringLDT),
                 H.indexOf(stringLDT),
+                H.indexOfChar(stringLDT),
+                H.replace(stringLDT),
+                H.substring(seqLDT),
                 H.length(seqLDT),
-                H.concat(seqLDT)));
+                H.concat(seqLDT),
+                H.literals(seqLDT),
+                H.charAt(seqLDT, intLDT, services)));
 
         // List of other unimplemented operators:
-        // clReplace, clIndexOfChar: needs char -> String embedding
         // clLastIndexOfChar, clLastIndexOfCl: no direct smtlib equivalent and no string reversal
         // clContains: no usage in String.key
-        // clTranslateInt, clRemoveZeros, clHashCode: ignore for now
-        // String.get: needs String -> char conversion
-        // String.concat: strContent(result) = ... encoding
+        // compareTo, copyValueOf: Maybe works already, could perhaps be more efficient
+        // clTranslateInt, clRemoveZeros, clHashCode, isEmpty: ignore for now
     }
 
     private Optional<H> findHandler(Term term) {
