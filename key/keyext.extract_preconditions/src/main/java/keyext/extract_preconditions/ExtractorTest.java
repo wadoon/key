@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FullAutoPilotProofMacro;
+import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SingleProof;
@@ -247,6 +248,8 @@ public class ExtractorTest {
                     proof.setActiveStrategy(proof.getServices().getProfile().getDefaultStrategyFactory().create(proof, sp));
                     // Start auto mode
                     env.getUi().getProofControl().startAndWaitForAutoMode(proof);
+                    AbstractProofMacro closeProvable = new TryCloseMacro();
+                    closeProvable.applyTo(env.getUi(), proof.root(), null, null);
                     // Show proof result
                     boolean closed = proof.openGoals().isEmpty();
                     if (!closed) {
