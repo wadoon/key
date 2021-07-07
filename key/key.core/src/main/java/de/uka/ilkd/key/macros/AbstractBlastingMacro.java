@@ -192,7 +192,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         } catch (Exception e) { }
     }
 
-    private class SemanticsBlastingStrategy implements Strategy {
+    protected class SemanticsBlastingStrategy implements Strategy {
 
         @Override
         public Name name() {
