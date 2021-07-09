@@ -213,7 +213,7 @@ public class ExceptionDialog extends JDialog {
                     e.printStackTrace();
                 }
             }
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
             System.err.println("Wrong URI given in location " + location);
             e.printStackTrace();
         }

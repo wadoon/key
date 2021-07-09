@@ -1762,6 +1762,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
     @Override
     public KeYJavaType visitReferencetype(JmlParser.ReferencetypeContext ctx) {
         String typename = accept(ctx.name());
+
+        if(typename.startsWith("\\dl_")) {
+            String sortName = typename.substring(4);
+            Sort sort = services.getNamespaces().sorts().lookup(sortName);
+            return new KeYJavaType(sort);
+        }
+
         try {
             return resolverManager.resolve(null, typename, null).getType();
         } catch (NullPointerException e) {

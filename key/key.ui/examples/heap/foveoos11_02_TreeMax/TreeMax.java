@@ -15,7 +15,7 @@ public final class Tree {
       @                   height > left.height && height > right.height;
       @*/
 
-    /*@ ghost \set values;
+    /*@ ghost \dl_set values;
       @ invariant values == \dl_cup(\dl_single(value),
       @           (left==null)? \dl_emptySet()
       @                       : \dl_cup(left.values,right.values));
