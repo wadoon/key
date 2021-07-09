@@ -2710,7 +2710,7 @@ Expression UnaryExpression() :
   result = PreIncrementExpression()
 |
   result = PreDecrementExpression()
-|
+| LOOKAHEAD(3)
   result = UnaryExpressionNotPlusMinus()
 |
   result = ADTGetter()
