@@ -1998,7 +1998,6 @@ TypeReference PrimitiveType() :
   | "\\seq"
   | "\\free"
   | "\\map"
-  | <SET>
   | <DL_EMBEDDED_FUNCTION>
   )
   {
