@@ -13,45 +13,25 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.Container;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
-
-import org.key_project.util.java.StringUtil;
-
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.util.ExceptionTools;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Dialog to display error messages.
@@ -71,7 +51,7 @@ public class ExceptionDialog extends JDialog {
 
     public static void showDialog(Window parent, Throwable exception) {
         ExceptionDialog dlg = new ExceptionDialog(parent, exception);
-        if(parent!=null) {
+        if (parent != null) {
             dlg.setLocationRelativeTo(parent);
         }
         dlg.setVisible(true);
@@ -104,10 +84,10 @@ public class ExceptionDialog extends JDialog {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 Container contentPane = getContentPane();
-                if (e.getStateChange() == ItemEvent.SELECTED){
+                if (e.getStateChange() == ItemEvent.SELECTED) {
                     contentPane.add(stScroll, new GridBagConstraints(0, 3, 1, 1, 1., 10.,
                             GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                                    0, 0, 0, 0), 0, 0));
+                            0, 0, 0, 0), 0, 0));
                 } else {
                     contentPane.remove(stScroll);
                 }
@@ -125,7 +105,7 @@ public class ExceptionDialog extends JDialog {
         closeButton.addActionListener(closeListener);
         getRootPane().setDefaultButton(closeButton);
 
-        JCheckBox detailsBox  = new JCheckBox("Show Details");
+        JCheckBox detailsBox = new JCheckBox("Show Details");
         detailsBox.setSelected(false);
         detailsBox.addItemListener(detailsBoxListener);
 
@@ -138,7 +118,7 @@ public class ExceptionDialog extends JDialog {
         JButton editSourceFileButton = new JButton("Edit Source File");
         EditSourceFileAction action = new EditSourceFileAction(this, exception);
         editSourceFileButton.addActionListener(action);
-        if(!Location.isValidLocation(location)) {
+        if (!Location.isValidLocation(location)) {
             editSourceFileButton.setEnabled(false);
         }
         bPanel.add(editSourceFileButton);
@@ -180,41 +160,28 @@ public class ExceptionDialog extends JDialog {
         exTextArea.setWrapStyleWord(true);
 
         String orgMsg = exception.getMessage();
-        if(orgMsg == null){
+        if (orgMsg == null) {
             orgMsg = "";
         }
         StringBuilder message = new StringBuilder(orgMsg);
 
-        /*
-         * NOTE (DS, 2020-10-01): location can point to a directory (if no file was
-         * given in the underlying exception), then getting the line won't work. I
-         * added a check for that.
-         */
         try {
-            if(Location.isValidLocation(location) &&
-                    !Paths.get(location.getFileURL().toURI()).toFile().isDirectory()) {
-                try {
-                    // read the content via URLs openStream() method
-                    BufferedReader br = new BufferedReader(new InputStreamReader(
-                            location.getFileURL().openStream()));
-                    List<String> list = br.lines()
-                                          // optimization: read only as far as necessary
-                                          .limit(location.getLine())
-                                          .collect(Collectors.toList());
-                    String line = list.get(location.getLine() - 1);
-                    String pointLine = StringUtil.repeat(" ", location.getColumn() - 1) + "^";
-                    message.append(StringUtil.NEW_LINE).
-                        append(StringUtil.NEW_LINE).
-                        append(line).
-                        append(StringUtil.NEW_LINE).
-                        append(pointLine);
-                } catch (IOException e) {
-                    System.err.println("Creating an error line did not work for " + location);
-                    e.printStackTrace();
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Wrong URI given in location " + location);
+            // read the content via URLs openStream() method
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader(IOUtil.openStream(location.getFileURL().toString())));
+            List<String> list = br.lines()
+                    // optimization: read only as far as necessary
+                    .limit(location.getLine())
+                    .collect(Collectors.toList());
+            String line = list.get(location.getLine() - 1);
+            String pointLine = StringUtil.repeat(" ", location.getColumn() - 1) + "^";
+            message.append(StringUtil.NEW_LINE).
+                    append(StringUtil.NEW_LINE).
+                    append(line).
+                    append(StringUtil.NEW_LINE).
+                    append(pointLine);
+        } catch (IOException e) {
+            System.err.println("Creating an error line did not work for " + location);
             e.printStackTrace();
         }
 
@@ -225,7 +192,11 @@ public class ExceptionDialog extends JDialog {
         exTextArea.setCaretPosition(0);
 
         JScrollPane scroll = new JScrollPane(exTextArea);
-        scroll.setBorder(new TitledBorder(exception.getClass().getName()));
+        scroll.setBorder(new
+
+                TitledBorder(exception.getClass().
+
+                getName()));
         scroll.setPreferredSize(textPaneDim);
 
         return scroll;
@@ -271,22 +242,22 @@ public class ExceptionDialog extends JDialog {
         cp.setLayout(new GridBagLayout());
 
         cp.add(createExcTextAreaScroll(),
-                    new GridBagConstraints(0, 0, 1, 1, 1., 1e-10,
-                    GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                            0, 0, 0, 0), 0, 0));
+                new GridBagConstraints(0, 0, 1, 1, 1., 1e-10,
+                        GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+                        0, 0, 0, 0), 0, 0));
 
         JPanel locationPanel = createLocationPanel();
 
-        if(locationPanel != null) {
+        if (locationPanel != null) {
             cp.add(locationPanel, new GridBagConstraints(0, 1, 1, 1, 1., 0.,
                     GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                            0, 0, 0, 0), 0, 0));
+                    0, 0, 0, 0), 0, 0));
         }
 
         JPanel buttonPanel = createButtonPanel();
         cp.add(buttonPanel, new GridBagConstraints(0, 2, 1, 1, 1., 0.,
                 GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-                        0, 0, 0, 0), 0, 0));
+                0, 0, 0, 0), 0, 0));
 
         // not displayed, only created;
         stTextArea = createStacktraceTextArea();
