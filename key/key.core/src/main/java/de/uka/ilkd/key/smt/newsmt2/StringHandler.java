@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
@@ -17,6 +16,15 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+/**
+ * This handler implements support for String operations by
+ * translating sequence terms to their corresponding
+ * string theory smtlib equivalent if the sequence terms
+ * to translate are structured in the same way as `String.key`
+ * converts them.
+ *
+ * @author Marc Huisinga
+ */
 public class StringHandler implements SMTHandler {
 
     public static final Type STRING = new Type("String", "s2u", "u2s");
@@ -37,7 +45,18 @@ public class StringHandler implements SMTHandler {
         SExpr translate(List<SExpr> translatedSubs);
     }
 
+    // `O` designates an operator in a term that we would like to match against and translate.
+    // `H` represents a full term tree and contains instances of `O` for the inner nodes of the tree.
+    // Together, these classes allow us to declare the structure of the term that we would like to match
+    // against and the corresponding translation for each operator.
+    // This is useful for the `StringHandler` in particular because we need to match against large-ish terms
+    // and would prefer reducing the verbosity.
+    // The short but non-descriptive names `O` and `H` were chosen to keep the term & translation declarations
+    // short and succinct.
     private static class O {
+        // O always contains *either* an `Operator` or a `Name`.
+        // This is necessary because operators can be matched either by their operator or by their name
+        // (e.g. `strContent`).
         private Operator op;
         private Name name;
         private Translator translator;
@@ -52,6 +71,19 @@ public class StringHandler implements SMTHandler {
             this.translator = translator;
         }
 
+        /* TODO:
+           Smtlib supports Unicode characters from planes 0 to 2 as integers, i.e. values that
+           might require two separate characters in Java's encoding.
+           Since KeY uses characters exactly as if they were integers, i.e. two characters always
+           translate to two integers, there is a disparity in encoding between Smtlib and KeY.
+           As of now, we simply ignore this disparity and translate Java characters / KeY integers directly to
+           smtlib integers, but a fully correct implementation should account for this disparity
+           and the fact that Java supports more Unicode planes than Smtlib does.
+           Ignoring this disparity may cause issues when using characters from plane 1 and plane 2;
+           namely two characters that represent a single Unicode code point will be passed to smtlib
+           as if they are two different code points, and if smtlib spits out a Unicode code point
+           that needs to be encoded as two characters, KeY will still treat them together as a single integer.
+        */
         private static List<SExpr> charValuesToString(List<SExpr> subs, int... charValueIndices) {
             List<SExpr> convertedSubs = new ArrayList<>(subs);
             for (int idx : charValueIndices) {
@@ -65,6 +97,7 @@ public class StringHandler implements SMTHandler {
         }
 
         private static O strContent() {
+            // This removes strContent from the tree.
             return new O(CharListLDT.STRINGCONTENT_NAME, translatedSubs ->
                 translatedSubs.get(0));
         }
@@ -125,7 +158,6 @@ public class StringHandler implements SMTHandler {
         }
 
         private boolean matches(Term t) {
-            // I refuse to use the visitor pattern for a sum type with two elements.
             assert (op == null || name == null) && (op != null || name != null);
             if (name == null) {
                 return t.op().equals(op);
@@ -138,7 +170,11 @@ public class StringHandler implements SMTHandler {
         }
     }
 
+    // A generic handler for leafs in `H`. Introduced to deal with
+    // literals, which are encoded by an arbitrarily sized tree
+    // and are matched & translated recursively with a specialized `LeafHandler`.
     private static class LeafHandler {
+        // This type of encoding allows using Lambda expressions to declare the LeafHandler.
         private BiFunction<MasterHandler, Term, SExpr> handle;
         private Function<Term, Boolean> canHandle;
 
@@ -156,7 +192,10 @@ public class StringHandler implements SMTHandler {
         }
     }
 
+    // See comment for `O`.
     private static class H {
+        // Contains *either* an `op` and a list of `subHandlers` if this instance represents an inner node
+        // *or* a `leafHandler` if this instance represents a leaf node.
         private O op;
         private LeafHandler leafHandler;
         private List<H> subHandlers;
@@ -237,6 +276,7 @@ public class StringHandler implements SMTHandler {
         }
 
         private static Boolean canHandleLiteralDecl(SeqLDT seqLDT, Term term) {
+            // Literal leaf nodes are of the form `seqConcat(seqSingleton(...), seqConcat(seqSingleton(...), ...))`.
             if (term.op().equals(seqLDT.getSeqSingleton())) {
                 return true;
             }
@@ -254,7 +294,6 @@ public class StringHandler implements SMTHandler {
             SExpr right = handleLiteralDecl(seqLDT, h, term.sub(1));
             return new SExpr("str.++", STRING, left, right);
         }
-
 
         private static H literals(SeqLDT seqLDT) {
             return H.inner(O.strPool(), H.leaf(
@@ -327,11 +366,28 @@ public class StringHandler implements SMTHandler {
                 H.literals(seqLDT),
                 H.charAt(seqLDT, intLDT, services)));
 
-        // List of other unimplemented operators:
-        // clLastIndexOfChar, clLastIndexOfCl: no direct smtlib equivalent and no string reversal
-        // clContains: no usage in String.key
-        // compareTo, copyValueOf: Maybe works already, could perhaps be more efficient
-        // clTranslateInt, clRemoveZeros, clHashCode, isEmpty: ignore for now
+        // TODO:
+        // - Make matching against sequence terms less fragile (e.g. KeY could destroy the structure
+        //   of a term that "looks like" a String operation by introducing an equality for a subterm).
+        //   We discussed possible changes to KeY where the sequence functions could be polymorphic
+        //   so that we needn't work with the translation, but effectively almost the exact String method call,
+        //   eliminating the fragility of the translation.
+        // - Implement regex functionality, both in KeY and this handler.
+        // - Ensure that String operations can be used in specifications. This is useful.
+        // - Properly evaluate the translation.
+        // - Fix the character translation disparity noted above.
+        // - Implement the rest of the operators noted below.
+        // - Improve performance of compareTo, copyValueOf and the literal encoding by translating all three
+        //   to a simpler smtlib encoding. This should be easy for the former two. For literals, this might be difficult:
+        //   smtlib has a nice way to encode String literals without nested `str.++` and `str.from_code` calls,
+        //   but it requires that we know the real value of the unicode code point, while KeY only translates
+        //   characters by introducing new variables for each used character right now.
+
+        // List of unimplemented operators:
+        // clLastIndexOfChar, clLastIndexOfCl: No direct smtlib equivalent and no string reversal available
+        // clContains: No usage in String.key
+        // compareTo, copyValueOf: Likely works already, could perhaps be more efficient with direct translation
+        // clTranslateInt, clRemoveZeros, clHashCode, isEmpty: Ignore for now
     }
 
     private Optional<H> findHandler(Term term) {
