@@ -18,6 +18,7 @@ import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.util.ExceptionTools;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
 
 import javax.swing.*;
@@ -27,12 +28,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.*;
+import java.net.MalformedURLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Dialog to display error messages.
@@ -52,14 +51,24 @@ public class ExceptionDialog extends JDialog {
 
     public static void showDialog(Window parent, Throwable exception) {
         ExceptionDialog dlg = new ExceptionDialog(parent, exception);
-            dlg.setVisible(true);
-            dlg.dispose();
+        if(parent!=null) {
+            dlg.setLocationRelativeTo(parent);
         }
+        dlg.setVisible(true);
+        dlg.dispose();
+    }
 
     private ExceptionDialog(Window parent, Throwable exception) {
         super(parent, "Parser Messages", Dialog.ModalityType.DOCUMENT_MODAL);
         this.exception = exception;
-        this.location = ExceptionTools.getLocation(exception);
+        try {
+            location = ExceptionTools.getLocation(exception);
+        } catch (MalformedURLException e) {
+            // We must not suppress the dialog here -> catch and print only to error stream
+            location = null;
+            System.err.println("Creating a Location failed for " + exception);
+            e.printStackTrace();
+        }
         init();
     }
 
@@ -104,16 +113,16 @@ public class ExceptionDialog extends JDialog {
 //        bPanel.add(reloadButton); // XXX useful for debugging
 
         JButton sendFeedbackButton = new JButton(new SendFeedbackAction(this, exception));
-           bPanel.add(sendFeedbackButton);
+        bPanel.add(sendFeedbackButton);
 
         JButton editSourceFileButton = new JButton("Edit Source File");
         EditSourceFileAction action = new EditSourceFileAction(this, exception);
         editSourceFileButton.addActionListener(action);
-        if(!action.isValidLocation(location)) {
+        if(!Location.isValidLocation(location)) {
             editSourceFileButton.setEnabled(false);
         }
         bPanel.add(editSourceFileButton);
-        
+
         bPanel.add(closeButton);
         bPanel.add(detailsBox);
 
@@ -156,23 +165,24 @@ public class ExceptionDialog extends JDialog {
         }
         StringBuilder message = new StringBuilder(orgMsg);
 
-        Location loc = location;
-        if(loc != null && loc.getFilename() != null && !"".equals(loc.getFilename())
-                && !"no file".equals(loc.getFilename())) {
-            try {
-                List<String> lines = Files.readAllLines(
-                        Paths.get(loc.getFilename()), Charset.defaultCharset());
-                String line = lines.get(loc.getLine() - 1);
-                String pointLine = StringUtil.createLine(" ", loc.getColumn() - 1) + "^";
-                message.append(StringUtil.NEW_LINE).
+        try {
+            // read the content via URLs openStream() method
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader(IOUtil.openStream(location.getFileURL().toString())));
+            List<String> list = br.lines()
+                    // optimization: read only as far as necessary
+                    .limit(location.getLine())
+                    .collect(Collectors.toList());
+            String line = list.get(location.getLine() - 1);
+            String pointLine = StringUtil.repeat(" ", location.getColumn() - 1) + "^";
+            message.append(StringUtil.NEW_LINE).
                     append(StringUtil.NEW_LINE).
                     append(line).
                     append(StringUtil.NEW_LINE).
                     append(pointLine);
-            } catch (Exception e) {
-                System.err.println("Creating an error line did not work for " + loc);
-                e.printStackTrace();
-            }
+        } catch (IOException e) {
+            System.err.println("Creating an error line did not work for " + location);
+            e.printStackTrace();
         }
 
         exTextArea.setText(message.toString());
@@ -190,39 +200,36 @@ public class ExceptionDialog extends JDialog {
 
     // returns null if no location can be extracted.
     private JPanel createLocationPanel() {
-	Location loc = location;
 
-	if (loc == null) {
-	    return null;
-	}
+        if (location == null) {
+            return null;
+        }
 
-	JPanel lPanel = new JPanel();
-	JTextField fTextField, lTextField, cTextField;
-	fTextField = new JTextField();
-	lTextField = new JTextField();
-	cTextField = new JTextField();
-	fTextField.setEditable(false);
-	lTextField.setEditable(false);
-	cTextField.setEditable(false);
+        JPanel lPanel = new JPanel();
+        JTextField fTextField = new JTextField();
+        JTextField lTextField = new JTextField();
+        JTextField cTextField = new JTextField();
+        fTextField.setEditable(false);
+        lTextField.setEditable(false);
+        cTextField.setEditable(false);
 
+        if (location.getFileURL() != null) {
+            fTextField.setText("URL: " + location.getFileURL());
+            lPanel.add(fTextField);
+        }
 
-	if ( !( loc.getFilename()==null || "".equals(loc.getFilename()))) {
-	    fTextField.setText("File: " + loc.getFilename());
-	    lPanel.add(fTextField);
-	}
+        if (exception instanceof SVInstantiationExceptionWithPosition) {
+            lTextField.setText("Row: " + location.getLine());
+        } else {
+            lTextField.setText("Line: " + location.getLine());
+        }
 
-	if (exception instanceof SVInstantiationExceptionWithPosition) {
-	    lTextField.setText("Row: " + loc.getLine());
-	} else {
-	    lTextField.setText("Line: " + loc.getLine());
-	}
+        lPanel.add(lTextField);
 
-	lPanel.add(lTextField);
+        cTextField.setText("Column: " + location.getColumn());
+        lPanel.add(cTextField);
 
-	cTextField.setText("Column: " + loc.getColumn());
-	lPanel.add(cTextField);
-
-	return lPanel;
+        return lPanel;
     }
 
     private void init() {

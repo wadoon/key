@@ -1,8 +1,12 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.parsing.HasLocation;
 
-public class ScriptException extends Exception {
+import javax.annotation.Nullable;
+import java.net.URL;
+
+public class ScriptException extends Exception implements HasLocation {
 
     private static final long serialVersionUID = -1200219771837971833L;
 
@@ -13,19 +17,19 @@ public class ScriptException extends Exception {
         this.location = null;
     }
 
-    public ScriptException(String message, String file, int line, int col, Throwable cause) {
+    public ScriptException(String message, URL url, int line, int col, Throwable cause) {
         super(message, cause);
-        if(file != null) {
-            this.location = new Location(file, line, col);
+        if (url != null) {
+            this.location = new Location(url, line, col);
         } else {
             this.location = null;
         }
     }
 
-    public ScriptException(String message, String file, int line, int col) {
+    public ScriptException(String message, URL url, int line, int col) {
         super(message);
-        if(file != null) {
-            this.location = new Location(file, line, col);
+        if (url != null) {
+            this.location = new Location(url, line, col);
         } else {
             this.location = null;
         }
@@ -47,6 +51,8 @@ public class ScriptException extends Exception {
         this.location = null;
     }
 
+    @Nullable
+    @Override
     public Location getLocation() {
         return location;
     }

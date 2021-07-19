@@ -23,9 +23,9 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
+import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -44,7 +44,10 @@ import java.util.stream.Collectors;
  * @author Alexander Weigl
  * @version 1 (28.05.19)
  */
-@KeYGuiExtension.Info()
+@KeYGuiExtension.Info(name = "Keyboard Taclet Control",
+        description = "This extension control over the application of taclets via the keyboard.",
+        optional = true
+)
 public class KeyboardTacletExtension implements KeYGuiExtension,
         KeYGuiExtension.LeftPanel {
     private KeyboardTacletPanel panel;
@@ -82,7 +85,7 @@ public class KeyboardTacletExtension implements KeYGuiExtension,
     }
 }
 
-@SuppressWarnings("WeakerAccess")
+//@SuppressWarnings("WeakerAccess")
 class KeyboardTacletPanel extends JPanel implements TabPanel {
     private static final String PROP_MODEL = "taclets";
     private static final Logger LOGGER = LogManager.getLogger(KeyboardTacletPanel.class);

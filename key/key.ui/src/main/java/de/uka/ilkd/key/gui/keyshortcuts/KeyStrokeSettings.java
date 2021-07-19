@@ -107,11 +107,11 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
-    private static <T> void defineDefault(T any, KeyStroke ks) {
+    public static <T> void defineDefault(T any, KeyStroke ks) {
         defineDefault(any.getClass(), ks);
     }
 
-    private static <T> void defineDefault(Class<T> clazz, KeyStroke ks) {
+    public static <T> void defineDefault(Class<T> clazz, KeyStroke ks) {
         DEFAULT_KEYSTROKES.setProperty(clazz.getName(), ks.toString());
     }
 
@@ -151,6 +151,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
 
     public void save() {
         LOGGER.info("Save keyboard shortcuts to: " + SETTINGS_FILE.getAbsolutePath());
+        SETTINGS_FILE.getParentFile().mkdirs();
         try (Writer writer = new FileWriter(SETTINGS_FILE)) {
             properties.store(writer, "KeY's KeyStrokes");
             writer.flush();

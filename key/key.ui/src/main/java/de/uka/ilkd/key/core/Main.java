@@ -15,6 +15,22 @@ package de.uka.ilkd.key.core;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.reflection.ClassLoaderUtil;
+import org.xml.sax.SAXException;
+
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -57,17 +73,6 @@ import java.util.Locale;
  * This has been extracted from MainWindow to keep GUI and control further apart.
  */
 public final class Main {
-    public static final String JUSTIFY_RULES = "--justify-rules";
-    public static final String JKEY_PREFIX = "--jr-";
-    public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
-    //    deprecated
-//    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
-    public static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
-    public static final String JTIMEOUT = JKEY_PREFIX + "timeout";
-    public static final String JPRINT = JKEY_PREFIX + "print";
-    public static final String JSAVE_RESULTS_TO_FILE = JKEY_PREFIX + "saveProofToFile";
-    public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
-    public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX + "signature";
     /**
      * Command line options
      */
@@ -92,33 +97,44 @@ public final class Main {
     private static final String MACRO = "--macro";
     private static final String NO_JMLSPECS = "--no-jmlspecs";
     private static final String TACLET_DIR = "--tacletDir";
+    public static final String JUSTIFY_RULES = "--justify-rules";
     private static final String SAVE_ALL_CONTRACTS = "--save-all";
     private static final String TIMEOUT = "--timeout";
     private static final String EXAMPLES = "--examples";
     private static final String RIFL = "--rifl";
+    public static final String JKEY_PREFIX = "--jr-";
+    public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
+    //    deprecated
+//    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
+    public static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
+    public static final String JTIMEOUT = JKEY_PREFIX + "timeout";
+    public static final String JPRINT = JKEY_PREFIX + "print";
+    public static final String JSAVE_RESULTS_TO_FILE = JKEY_PREFIX + "saveProofToFile";
+    public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
+    public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX + "signature";
     private static final String VERBOSITY = "--verbose";
-    private static final String LOGGING_CONFIG_EXPERIMENTAL = "/log4j2.experimental.yaml";
-    private static final String LOGGING_CONFIG_DEFAULT = "/log4j2.yaml";
-
-    /**
-     * <p>
-     * This flag indicates if the example chooser should be shown
-     * if {@link #examplesDir} is defined (not {@code null}). It is set
-     * in the Eclipse integration to {@code false}, because it is required
-     * to define the path to a different one without showing the chooser.
-     * </p>
-     * <p>
-     * Conclusion: It must be possible to use KeY with a custom examples
-     * directory without show in the chooser on startup.
-     * </p>
-     */
-    public static boolean showExampleChooserIfExamplesDirIsDefined = true;
     /**
      * The {@link KeYDesktop} used by KeY. The default implementation is
      * replaced in Eclipse. For this reason the {@link Desktop} should never
      * be used directly.
      */
     private static KeYDesktop keyDesktop = new DefaultKeYDesktop();
+
+    /**
+     * The user interface modes KeY can operate in.
+     */
+    private enum UiMode {
+        /**
+         * Interactive operation mode.
+         */
+        INTERACTIVE,
+
+        /**
+         * Auto operation mode.
+         */
+        AUTO
+    }
+
     /**
      * Level of verbosity for command line outputs.
      */
@@ -177,7 +193,27 @@ public final class Main {
     private static ProofMacro autoMacro = new SkipMacro();
     private static Logger LOGGER = LogManager.getLogger(Main.class);
 
+    /**
+     * <p>
+     * This flag indicates if the example chooser should be shown
+     * if {@link #examplesDir} is defined (not {@code null}). It is set
+     * in the Eclipse integration to {@code false}, because it is required
+     * to define the path to a different one without showing the chooser.
+     * </p>
+     * <p>
+     * Conclusion: It must be possible to use KeY with a custom examples
+     * directory without show in the chooser on startup.
+     * </p>
+     */
+    public static boolean showExampleChooserIfExamplesDirIsDefined = true;
+
     public static void main(final String[] args) {
+        // Runtime rt = Runtime.getRuntime();
+        // System.out.println ("Total memory: " + (rt.totalMemory() / 1048576.0) + " MB");
+        // System.out.println ("Maximum memory:   " + (rt.maxMemory() / 1048576.0) + " MB");
+        // System.out.println ("Free memory:  " + (rt.freeMemory() / 1048576.0) + " MB");
+        // System.out.println ("Available processors:  " + rt.availableProcessors());
+
         Locale.setDefault(Locale.US);
 
         // this property overrides the default
@@ -221,7 +257,8 @@ public final class Main {
             if (ui instanceof ConsoleUserInterfaceControl) {
                 System.exit(((ConsoleUserInterfaceControl) ui).allProofsSuccessful ? 0 : 1);
             }
-        } else if (Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
+        } else if (Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined
+                    && ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowLoadExamplesDialog()) {
             ui.openExamples();
         }
     }
@@ -277,7 +314,9 @@ public final class Main {
     }
 
     /**
-     * Evaluate the parsed commandline options
+     * Evaluate the commandline options
+     *
+     * @param cl parsed command lines, not null
      */
     public static void evaluateOptions(CommandLine cl) {
         if (cl.isSet(EXPERIMENTAL)) {
@@ -387,6 +426,15 @@ public final class Main {
             } else {
                 LOGGER.info("Not using assertions");
             }
+        }
+
+        if (cl.isSet(EXPERIMENTAL)) {
+            if (verbosity > Verbosity.SILENT) {
+                System.out.println("Running in experimental mode ...");
+            }
+            setEnabledExperimentalFeatures(true);
+        } else {
+            setEnabledExperimentalFeatures(false);
         }
 
         if (cl.isSet(RIFL)) {
@@ -689,20 +737,5 @@ public final class Main {
     public static void setKeyDesktop(KeYDesktop keyDesktop) {
         assert keyDesktop != null;
         Main.keyDesktop = keyDesktop;
-    }
-
-    /**
-     * The user interface modes KeY can operate in.
-     */
-    private enum UiMode {
-        /**
-         * Interactive operation mode.
-         */
-        INTERACTIVE,
-
-        /**
-         * Auto operation mode.
-         */
-        AUTO
     }
 }

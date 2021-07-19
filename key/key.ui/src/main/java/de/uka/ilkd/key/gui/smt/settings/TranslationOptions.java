@@ -14,6 +14,7 @@ import java.awt.*;
  * @version 1 (08.04.19)
  */
 class TranslationOptions extends SettingsPanel implements SettingsProvider {
+    private static final long serialVersionUID = 7299370317491756605L;
     private static final String infoUseExplicitTypeHierarchy = "If this option is selected, the transitive inheritance between classes is modeled by "
             + "assumptions.\n\n"
             + "Example: Let A, B and C  be classes such that C extends B and B extends A.\n"
@@ -104,7 +105,7 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
 
     protected JCheckBox createUseExplicitTypeHierachy() {
-        return addCheckBox("Use a explicit type hierarchy.",
+        return addCheckBox("Use an explicit type hierarchy.",
                 infoUseExplicitTypeHierarchy,
                 false,
                 e -> settings.useExplicitTypeHierarchy = useExplicitTypeHierachy.isSelected());
@@ -131,7 +132,10 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
     protected JSpinner createMaxField() {
         JSpinner max = addNumberField("Maximum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, "", e -> {
-            long result = settings.maxInteger;
+            long result = Integer.MAX_VALUE;
+            if (settings != null) {
+                result = settings.maxInteger;
+            }
             try {
                 result = (long) maxField.getValue();
                 maxField.setForeground(Color.BLACK);
@@ -161,7 +165,7 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
     @Override
     public String getDescription() {
-        return "SMT-Translation";
+        return "SMT Translation";
     }
 
     @Override

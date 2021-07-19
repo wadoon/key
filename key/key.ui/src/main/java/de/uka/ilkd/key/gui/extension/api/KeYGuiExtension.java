@@ -1,5 +1,17 @@
 package de.uka.ilkd.key.gui.extension.api;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.Collection;
+import java.util.List;
+
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.JToolBar;
+
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.GoalList;
 import de.uka.ilkd.key.gui.InfoView;
@@ -11,20 +23,13 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.pp.PosInSequent;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * A marker interface for extension of the KeY GUI.
  * Every extension should implement this interface and should be registered in a service loader file
  * <code>META-INF/services/KeYGuiExtension</code>.
  * <p>
- * This interface comes works in combination with the annotation {@see KeYGuiExtension#Info}
+ * This interface comes in combination with the annotation {@see KeYGuiExtension#Info}
  * <p>
  * Your extension should then implement the extension service interfaces.
  * </p>
@@ -95,7 +100,7 @@ public interface KeYGuiExtension {
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @NotNull List<Action> getMainMenuActions(@NotNull MainWindow mainWindow);
+        @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow);
     }
 
     /**
@@ -122,7 +127,7 @@ public interface KeYGuiExtension {
          * @param window   parent of this extension
          * @param mediator the current mediator
          */
-        @NotNull Collection<TabPanel> getPanels(@NotNull MainWindow window, @NotNull KeYMediator mediator);
+        @Nonnull Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator);
     }
 
     /**
@@ -145,9 +150,9 @@ public interface KeYGuiExtension {
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @NotNull List<Action> getContextActions(@NotNull KeYMediator mediator,
-                                                @NotNull ContextMenuKind kind,
-                                                @NotNull Object underlyingObject);
+        @Nonnull List<Action> getContextActions(@Nonnull KeYMediator mediator,
+                                                @Nonnull ContextMenuKind kind,
+                                                @Nonnull Object underlyingObject);
     }
 
     /**
@@ -162,7 +167,25 @@ public interface KeYGuiExtension {
          * @param mainWindow the parent of the toolbar
          * @return non-null
          */
-        @NotNull JToolBar getToolbar(MainWindow mainWindow);
+        @Nonnull JToolBar getToolbar(MainWindow mainWindow);
+    }
+
+    /**
+     * Extension interface for the tooltips in the sequent view.
+     *
+     * @author lanzinger
+     *
+     * @see SequentView
+     */
+    interface Tooltip {
+
+        /**
+         *
+         * @param mainWindow the main window.
+         * @param pos the position of the term whose info shall be shown.
+         * @return this extension's term information.
+         */
+        List<String> getTooltipStrings(MainWindow mainWindow, PosInSequent pos);
     }
 
     /**
@@ -227,7 +250,7 @@ public interface KeYGuiExtension {
          * @param pos        the position of the term whose info shall be shown.
          * @return this extension's term information.
          */
-        @NotNull List<String> getTermInfoStrings(@NotNull MainWindow mainWindow, @NotNull PosInSequent pos);
+        @Nonnull List<String> getTermInfoStrings(@Nonnull MainWindow mainWindow, @Nonnull PosInSequent pos);
 
         default int getTermLabelPriority() {
             return 0;

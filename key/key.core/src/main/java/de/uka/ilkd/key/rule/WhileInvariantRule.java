@@ -96,20 +96,17 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     public static final String BODY_PRESERVES_INVARIANT_LABEL = "Body Preserves Invariant";
 
-    private static Term lastFocusTerm;
-    private static Instantiation lastInstantiation;
 
 
-    private static InfFlowData prepareSetUpOfInfFlowValidityGoal(final AnonUpdateData anonUpdateData,
+    private static InfFlowData prepareSetUpOfInfFlowValidityGoal(final Goal infFlowGoal,
+                                                                 final AnonUpdateData anonUpdateData,
                                                                  final Term guardTerm,
                                                                  final Instantiation inst,
                                                                  LoopSpecification spec,
                                                                  Services services,
                                                                  LoopInvariantBuiltInRuleApp ruleApp,
-                                                                 final ImmutableSet<ProgramVariable>
-                                                                            localIns,
-                                                                 final ImmutableSet<ProgramVariable>
-                                                                            localOuts,
+            final ImmutableSet<ProgramVariable> localIns,
+            final ImmutableSet<ProgramVariable> localOuts,
                                                                  final Term anonUpdate,
                                                                  final JavaBlock guardJb)
             throws RuleAbortException {
@@ -186,7 +183,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term loopInvApplPredTerm =
                 ifInvariantBuilder.buildContractApplPredTerm();
         final Taclet informationFlowInvariantApp =
-                ifInvariantBuilder.buildTaclet();
+                ifInvariantBuilder.buildTaclet(infFlowGoal);
 
         // return information flow data
         InfFlowData infFlowData = new InfFlowData(instantiationVars, guardAtPre,
@@ -215,11 +212,6 @@ public final class WhileInvariantRule implements BuiltInRule {
                                              Services services) throws RuleAbortException {
         final Term focusTerm = app.posInOccurrence().subTerm();
 
-        if (focusTerm == lastFocusTerm &&
-                lastInstantiation.inv == services.getSpecificationRepository()
-                .getLoopSpec(lastInstantiation.loop)) {
-            return lastInstantiation;
-        }
 
 	//leading update?
 	final Pair<Term, Term> update = applyUpdates(focusTerm, services);
@@ -236,8 +228,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 	// try to get invariant from JML specification
 	LoopSpecification spec = app.getSpec();
-	if (spec == null) // may happen after reloading proof 
+	if (spec == null) { 
 	    throw new RuleAbortException("no invariant found");
+        }
 
 	//collect self, execution context
 	final MethodFrame innermostMethodFrame =
@@ -259,8 +252,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//cache and return result
 	final Instantiation result = new Instantiation(u, progPost, loop, spec, selfTerm,
 	                                               innermostExecutionContext);
-	lastFocusTerm = focusTerm;
-	lastInstantiation = result;
 	return result;
     }
 
@@ -288,27 +279,27 @@ public final class WhileInvariantRule implements BuiltInRule {
     private static AnonUpdateData createAnonUpdate(LocationVariable heap, Term mod,
                                                    LoopSpecification inv, Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
-        final Function loopHeapFunc = new Function(loopHeapName, heapLDT.targetSort(), true);
-        services.getNamespaces().functions().addSafely(loopHeapFunc);
+	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final Name loopHeapName = new Name(tb.newName(heap+"_After_LOOP"));
+	final Function loopHeapFunc = new Function(loopHeapName, heapLDT.targetSort(), true);
+	services.getNamespaces().functions().addSafely(loopHeapFunc);
 
         final Term loopHeap = tb.func(loopHeapFunc);
-        final Name anonHeapName = new Name(tb.newName("anon_" + heap + "_LOOP"));
-        final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
-        services.getNamespaces().functions().addSafely(anonHeapFunc);
+	final Name anonHeapName = new Name(tb.newName("anon_"+heap+"_LOOP"));
+	final Function anonHeapFunc = new Function(anonHeapName,heap.sort());
+	services.getNamespaces().functions().addSafely(anonHeapFunc);
         final Term anonHeapTerm =
                 tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
 
-        // check for strictly pure loops
-        final Term anonUpdate;
-        if (tb.strictlyNothing().equalsModIrrelevantTermLabels(mod)) {
-            anonUpdate = tb.skip();
-        } else {
-            anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
-        }
+	// check for strictly pure loops
+	final Term anonUpdate;
+	if(tb.strictlyNothing().equalsModIrrelevantTermLabels(mod)) {
+	    anonUpdate = tb.skip();
+	} else {
+	    anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
+	}
 
-        return new AnonUpdateData(anonUpdate, loopHeap, tb.getBaseHeap(), anonHeapTerm);
+	return new AnonUpdateData(anonUpdate, loopHeap, tb.getBaseHeap(), anonHeapTerm);
     }
 
     private static boolean checkFocus(final Term progPost) {
@@ -508,7 +499,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         LoopSpecification inv = inst.inv;
         final Term guard = ruleApp.getGuard();
         InfFlowData infFlowData =
-                prepareSetUpOfInfFlowValidityGoal(anonUpdateData, guard,
+                prepareSetUpOfInfFlowValidityGoal(infFlowGoal, anonUpdateData, guard,
                                                   inst, inv, services, ruleApp,
                                                   localIns, localOuts,
                                                   anonUpdate, guardJb);
@@ -549,7 +540,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term invTerm = services.getTermBuilder().tt();
         for(LocationVariable heap : heapContext) {
             final Term i = inst.inv.getInvariant(heap, inst.selfTerm, atPres, services);
-            if(i == null) continue;
+            if(i == null) {
+                continue;
+            }
             if(invTerm == null) {
                 invTerm = i;
             }else{
@@ -565,7 +558,9 @@ public final class WhileInvariantRule implements BuiltInRule {
     	Term freeInvTerm = services.getTermBuilder().tt();
     	for(LocationVariable heap : heapContext) {
     		final Term i = inst.inv.getFreeInvariant(heap, inst.selfTerm, atPres, services);
-    		if(i == null) continue;
+    		if(i == null) {
+                continue;
+            }
     		if(freeInvTerm == null) {
     			freeInvTerm = i;
     		}else{
@@ -807,6 +802,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                          update, localAnonUpdate, services);
         goal.changeFormula(wdInv, pio);
     }
+   
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
@@ -937,14 +933,14 @@ public final class WhileInvariantRule implements BuiltInRule {
             }
             final Term m = mods.get(heap);
             final Term fc;
-            if (tb.strictlyNothing().equalsModIrrelevantTermLabels(m)) {
-                fc = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
-            } else {
+          if (tb.strictlyNothing().equalsModIrrelevantTermLabels(m)) {
+                fc = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap)); 
+            } else{
                 fc = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), m);
             }
-            if (frameCondition == null) {
+            if(frameCondition == null){
                 frameCondition = fc;
-            } else {
+            } else{
                 frameCondition = tb.and(frameCondition, fc);
             }
             if (reachableState == null) {
@@ -1059,11 +1055,17 @@ public final class WhileInvariantRule implements BuiltInRule {
     //-------------------------------------------------------------------------
 
     private static final class Instantiation {
+        /** The update term. */
 	public final Term u;
+        /** The program's post condition. */
 	public final Term progPost;
+        /** The while loop. */
 	public final While loop;
+        /** The invariant's loop specification. */
 	public final LoopSpecification inv;
+        /** The term for the self variable. */
 	public final Term selfTerm;
+        /** The innermost execution context. */
 	public final ExecutionContext innermostExecutionContext;
 
 	public Instantiation(Term u, 

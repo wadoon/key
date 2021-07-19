@@ -33,6 +33,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
+import javax.annotation.Nonnull;
 
 /**
  * Provides a basic implementation of {@link UserInterfaceControl} for 
@@ -93,8 +94,15 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
     */
    public abstract void loadProblem(File file);
 
-   protected ProblemLoader getProblemLoader(File file, List<File> classPath,
-                                            File bootClassPath, List<File> includes,KeYMediator mediator) {
+    /**
+     * Loads the proof with the given filename from the proof bundle with the given path.
+     * @param proofBundle the File with the problem description or the proof
+     * @param proofFilename the filename of the proof in the bundle
+     */
+    public abstract void loadProofFromBundle(File proofBundle, File proofFilename);
+
+   public ProblemLoader getProblemLoader(File file, List<File> classPath,
+                                            File bootClassPath, List<File> includes, KeYMediator mediator) {
        final ProblemLoader pl =
                new ProblemLoader(file, classPath, bootClassPath, includes,
                                  AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);

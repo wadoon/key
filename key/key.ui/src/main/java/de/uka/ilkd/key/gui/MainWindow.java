@@ -13,14 +13,17 @@
 
 package de.uka.ilkd.key.gui;
 
+import bibliothek.gui.dock.StackDockStation;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.SingleCDockable;
 import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
@@ -39,7 +42,7 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.gui.sourceview.SourceView;
+import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
@@ -54,6 +57,7 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
+import javax.annotation.Nonnull;
 
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
@@ -62,6 +66,8 @@ import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.*;
 import java.util.prefs.BackingStoreException;
@@ -108,7 +114,7 @@ public final class MainWindow extends JFrame {
     /**
      * the view to show source code and symbolic execution information
      */
-    private final JComponent sourceView;
+    private final SourceViewFrame sourceViewFrame;
     /**
      * Use this SequentView in case no proof is loaded.
      */
@@ -141,6 +147,10 @@ public final class MainWindow extends JFrame {
             new PreferenceSaver(Preferences.userNodeForPackage(MainWindow.class));
     private final HidePackagePrefixToggleAction hidePackagePrefixToggleAction =
             new HidePackagePrefixToggleAction(this);
+    private final ToggleSequentViewTooltipAction toggleSequentViewTooltipAction =
+            new ToggleSequentViewTooltipAction(this);
+    private final ToggleSourceViewTooltipAction toggleSourceViewTooltipAction =
+            new ToggleSourceViewTooltipAction(this);
     private final TermLabelMenu termLabelMenu;
     public boolean frozen = false;
     JCheckBoxMenuItem saveSMTFile;
@@ -164,6 +174,9 @@ public final class MainWindow extends JFrame {
      * action for opening a KeY file
      */
     private OpenFileAction openFileAction;
+
+    private OpenSingleJavaFileAction openSingleJavaFileAction;
+
     /**
      * action for opening an example
      */
@@ -197,6 +210,8 @@ public final class MainWindow extends JFrame {
     private LemmaGenerationAction loadUserDefinedTacletsForProvingAction;
     private LemmaGenerationAction loadKeYTaclets;
     private LemmaGenerationBatchModeAction lemmaGenerationBatchModeAction;
+
+
     /**
      * actions for changing the selection on the proof tree
      */
@@ -206,6 +221,7 @@ public final class MainWindow extends JFrame {
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
+
     private SingleCDockable dockProofListView;
     private SingleCDockable dockSourceView;
     private SingleCDockable dockSequent;
@@ -225,22 +241,28 @@ public final class MainWindow extends JFrame {
                 HelpFacade.ACTION_OPEN_HELP);
 
         setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
+        setLocationByPlatform(true);
         applyGnomeWorkaround();
+        if (!applyTaskbarIcon()) {
+            applyMacOsWorkaround();
+        }
         setLaF();
-        setIconImage(IconFactory.keyLogo());
+        setIconImages(IconFactory.applicationLogos());
+
+
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         proofListener = new MainProofListener();
         userInterface = new WindowUserInterfaceControl(this);
         mediator = getMainWindowMediator(userInterface);
+        termLabelMenu = new TermLabelMenu(this);
         currentGoalView = new CurrentGoalView(this);
         emptySequent = new EmptySequent(this);
         sequentViewSearchBar = new SequentViewSearchBar(emptySequent);
-        termLabelMenu = new TermLabelMenu(this);
         proofListView = new JScrollPane();
         autoModeAction = new AutoModeAction(this);
         //mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
-        sourceView = SourceView.getSourceView(this);
+        sourceViewFrame = new SourceViewFrame(this);
         proofList = new TaskTree(mediator);
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(mediator);
@@ -261,6 +283,44 @@ public final class MainWindow extends JFrame {
 
         KeYGuiExtensionFacade.getStartupExtensions()
                 .forEach(it -> it.init(this, mediator));
+    }
+
+    /**
+     *
+     */
+    private boolean applyTaskbarIcon() {
+        //https://stackoverflow.com/questions/50403677/changing-the-default-java-coffee-dock-icon-to-something-else
+        try {
+            Image image = IconFactory.keyLogo();
+            Class<?> appClass = Class.forName("java.awt.Taskbar");
+            Method getTaskbar = appClass.getMethod("getTaskbar");
+            Method setIconImage = appClass.getMethod("setIconImage", Image.class);
+            Object taskbar = getTaskbar.invoke(null);//static method
+            setIconImage.invoke(taskbar, image);
+            return true;
+        } catch (ClassNotFoundException | NoSuchMethodException
+                | IllegalAccessException | InvocationTargetException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Set the dock image on MacOS <=10.6.
+     */
+    private boolean applyMacOsWorkaround() {
+        //https://stackoverflow.com/questions/50403677/changing-the-default-java-coffee-dock-icon-to-something-else
+        try {
+            Class<?> appClass = Class.forName("com.apple.eawt.Application");
+            Class<?>[] params = new Class[]{Image.class};
+            Method getApplication = appClass.getMethod("getApplication");
+            Object application = getApplication.invoke(appClass);
+            Method setDockIconImage = appClass.getMethod("setDockIconImage", params);
+            setDockIconImage.invoke(application, IconFactory.keyLogo());
+            return true;
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException | ClassNotFoundException ignored) {
+            return false;
+        }
     }
 
     public static MainWindow getInstance() {
@@ -391,6 +451,7 @@ public final class MainWindow extends JFrame {
 
         // set up actions
         openFileAction = new OpenFileAction(this);
+        openSingleJavaFileAction = new OpenSingleJavaFileAction(this);
         openExampleAction = new OpenExampleAction(this);
         openMostRecentFileAction = new OpenMostRecentFileAction(this);
         editMostRecentFileAction = new EditMostRecentFileAction(this);
@@ -439,7 +500,7 @@ public final class MainWindow extends JFrame {
         //JPanel rightPane = new JPanel();
         //rightPane.setLayout(new BorderLayout());
         //rightPane.add(mainFrame, BorderLayout.CENTER);
-        //rightPane.add(sequentViewSearchBar, BorderLayout.SOUTH);
+        mainFrame.add(sequentViewSearchBar, BorderLayout.SOUTH);
 
         //JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourceView);
         //pane.setResizeWeight(0.5);
@@ -451,12 +512,15 @@ public final class MainWindow extends JFrame {
         //splitPane.setOneTouchExpandable(true);
         //splitPane.setName("splitPane");
         //getContentPane().add(splitPane, BorderLayout.CENTER);
+
+        dockControl.putProperty(StackDockStation.TAB_PLACEMENT, TabPlacement.TOP_OF_DOCKABLE);
+
         getContentPane().add(dockControl.getContentArea());
 
         dockProofListView = DockingHelper.createSingleDock("Loaded Proofs", proofListView,
                 TaskTree.class.getName());
         dockSequent = DockingHelper.createSingleDock("Sequent", mainFrame);
-        dockSourceView = DockingHelper.createSingleDock("Source", sourceView);
+        dockSourceView = DockingHelper.createSingleDock("Source", sourceViewFrame);
 
         Stream<TabPanel> extensionPanels = KeYGuiExtensionFacade.getAllPanels(this);
         Stream<TabPanel> defaultPanels = Stream.of(proofTreeView, infoView,
@@ -470,6 +534,7 @@ public final class MainWindow extends JFrame {
 
         dockProofListView.setVisible(true);
         dockSequent.setVisible(true);
+
         dockSourceView.setVisible(true);
 
         DockingHelper.restoreFactoryDefault(this);
@@ -524,9 +589,6 @@ public final class MainWindow extends JFrame {
         ComplexButton comp = createSMTComponent();
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
-        toolBar.addSeparator();
-        toolBar.add(new CounterExampleAction(this));
-        toolBar.add(new TestGenerationAction(this));
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
         toolBar.add(new PruneProofAction(this));
@@ -691,7 +753,6 @@ public final class MainWindow extends JFrame {
         fileMenu.add(quickLoadAction);
         fileMenu.addSeparator();
         fileMenu.add(proofManagementAction);
-
         fileMenu.add(loadUserDefinedTacletsAction);
         JMenu submenu = new JMenu("Prove");
         fileMenu.add(submenu);
@@ -699,6 +760,10 @@ public final class MainWindow extends JFrame {
         submenu.add(loadUserDefinedTacletsForProvingAction);
         submenu.add(loadKeYTaclets);
         submenu.add(lemmaGenerationBatchModeAction);
+        if(Main.isExperimentalMode()) {
+            RunAllProofsAction runAllProofsAction = new RunAllProofsAction(this);
+            submenu.add(runAllProofsAction);
+        }
         fileMenu.addSeparator();
         fileMenu.add(recentFileMenu.getMenu());
         fileMenu.addSeparator();
@@ -733,6 +798,8 @@ public final class MainWindow extends JFrame {
         view.add(new JCheckBoxMenuItem(new SyntaxHighlightingToggleAction(this)));
         view.add(termLabelMenu);
         view.add(new JCheckBoxMenuItem(hidePackagePrefixToggleAction));
+        view.add(new JCheckBoxMenuItem(toggleSequentViewTooltipAction));
+        view.add(new JCheckBoxMenuItem(toggleSourceViewTooltipAction));
 
         view.addSeparator();
         {
@@ -749,9 +816,9 @@ public final class MainWindow extends JFrame {
 
         view.add(createSelectionMenu());
 
-        JMenuItem hmItem = new JMenuItem("Heatmap Options");
-        hmItem.addActionListener(new HeatmapSettingsAction(this));
-        view.add(hmItem);
+        // JMenuItem hmItem = new JMenuItem("Heatmap Options");
+        // hmItem.addActionListener(new HeatmapSettingsAction(this));
+        // view.add(hmItem);
 
         return view;
     }
@@ -810,10 +877,6 @@ public final class MainWindow extends JFrame {
         proof.add(showActiveSettingsAction);
         proof.add(new ShowProofStatistics(this));
         proof.add(new ShowKnownTypesAction(this));
-        proof.addSeparator();
-        proof.add(new CounterExampleAction(this));
-        proof.add(new TestGenerationAction(this));
-
         return proof;
     }
 
@@ -831,7 +894,7 @@ public final class MainWindow extends JFrame {
         options.add(new JCheckBoxMenuItem(new AutoSave(this)));
         options.add(new MinimizeInteraction(this));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
-        options.add(new JCheckBoxMenuItem(new BundleSavingToggleAction(this)));
+        options.add(new JCheckBoxMenuItem(new EnsureSourceConsistencyToggleAction(this)));
 
         return options;
 
@@ -1161,7 +1224,12 @@ public final class MainWindow extends JFrame {
         return notificationManager;
     }
 
-    protected void addRecentFile(String absolutePath) {
+    /**
+     * A file to the menu of recent opened files.
+     *
+     * @see RecentFileMenu#addRecentFile(String)
+     */
+    public void addRecentFile(@Nonnull String absolutePath) {
         recentFileMenu.addRecentFile(absolutePath);
     }
 
@@ -1175,6 +1243,17 @@ public final class MainWindow extends JFrame {
 
     public void loadProblem(File file, List<File> classPath, File bootClassPath, List<File> includes) {
         getUserInterface().loadProblem(file, classPath, bootClassPath, includes);
+    }
+
+    /**
+     * Loads the proof with the given path from the proof bundle.
+     *
+     * @param proofBundle the path of the proof bundle
+     * @param proofPath   the path of the proof to load
+     *                    (relative to the root of the bundle -> filename only)
+     */
+    public void loadProofFromBundle(File proofBundle, File proofPath) {
+        getUserInterface().loadProofFromBundle(proofBundle, proofPath);
     }
 
     /*
@@ -1218,6 +1297,19 @@ public final class MainWindow extends JFrame {
     public CDockable getDockProofListView() {
         return dockProofListView;
     }
+
+    public SingleCDockable getDockSourceView() {
+        return dockSourceView;
+    }
+
+    public SingleCDockable getDockSequent() {
+        return dockSequent;
+    }
+
+    public SourceViewFrame getSourceViewFrame() {
+        return sourceViewFrame;
+    }
+
     /**
      * Glass pane that only delivers events for the status line (i.e. the abort button)
      * <p>
@@ -1646,14 +1738,4 @@ public final class MainWindow extends JFrame {
         }
 
     }
-
-
-    public SingleCDockable getDockSourceView() {
-        return dockSourceView;
-    }
-
-    public SingleCDockable getDockSequent() {
-        return dockSequent;
-    }
-
 }
