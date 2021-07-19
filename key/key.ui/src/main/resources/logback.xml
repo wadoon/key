@@ -10,10 +10,29 @@
         <encoder>
             <pattern>[%date{HH:mm:ss.SSS}] %highlight(%-5level) %cyan(%logger{0}) - %msg %n</pattern>
         </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
     </appender>
 
     <root level="debug">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE" />
+        <appender-ref ref="FILE"/>
     </root>
+
+    <!--
+        A logger for development, also print to CONSOLE
+    -->
+    <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%relative] %highlight(%-5level) %cyan(%logger{0}): %msg %n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+    </appender>
+    <logger name="key.devel" level="DEBUG">
+        <appender-ref ref="STDERR"/>
+    </logger>
+
 </configuration>

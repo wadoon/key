@@ -179,7 +179,7 @@ public final class Main {
 
     private static ProofMacro autoMacro = new SkipMacro();
 
-    private static Logger LOGGER = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     /**
      * <p>
@@ -196,13 +196,9 @@ public final class Main {
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
 
     public static void main(final String[] args) {
-        // Runtime rt = Runtime.getRuntime();
-        // System.out.println ("Total memory: " + (rt.totalMemory() / 1048576.0) + " MB");
-        // System.out.println ("Maximum memory:   " + (rt.maxMemory() / 1048576.0) + " MB");
-        // System.out.println ("Free memory:  " + (rt.freeMemory() / 1048576.0) + " MB");
-        // System.out.println ("Available processors:  " + rt.availableProcessors());
-
         Locale.setDefault(Locale.US);
+
+        logInformation();
 
         // this property overrides the default
         if (Boolean.getBoolean("key.verbose-ui")) {
@@ -222,17 +218,27 @@ public final class Main {
             AbstractMediatorUserInterfaceControl userInterface = createUserInterface(fileArguments);
             loadCommandLineFiles(userInterface, fileArguments);
         } catch (ExceptionInInitializerError e) {
-            System.err.println("D'oh! It seems that KeY was not built properly!");
-            e.printStackTrace();
+            LOGGER.error("D'oh! It seems that KeY was not built properly!", e);
             System.exit(777);
         } catch (CommandLineException e) {
             printHeader(); // exception before verbosity option could be read
-            if (Debug.ENABLE_DEBUG) {
-                e.printStackTrace();
-            }
+            LOGGER.error("Error in parsing the command: {}", e.getMessage());
             printUsageAndExit(true, e.getMessage(), -1);
         }
 
+    }
+
+    private static void logInformation() {
+        LOGGER.debug("Java Version: {}", System.getProperty("java.version"));
+        LOGGER.debug("Java Runtime: {}", System.getProperty("java.specification.version"));
+        LOGGER.debug("Java VM: {}", System.getProperty("java.vm"));
+        LOGGER.debug("OS: {}", System.getProperty("java.os"));
+        LOGGER.debug("Hardware: {}", System.getProperty("java.hw"));
+        Runtime rt = Runtime.getRuntime();
+        LOGGER.debug("Total memory: " + (rt.totalMemory() / 1048576.0) + " MB");
+        LOGGER.debug("Maximum memory:   " + (rt.maxMemory() / 1048576.0) + " MB");
+        LOGGER.debug("Free memory:  " + (rt.freeMemory() / 1048576.0) + " MB");
+        LOGGER.debug("Available processors:  " + rt.availableProcessors());
     }
 
     public static void loadCommandLineFiles(AbstractMediatorUserInterfaceControl ui, List<File> fileArguments) {
@@ -247,7 +253,7 @@ public final class Main {
                 System.exit(((ConsoleUserInterfaceControl) ui).allProofsSuccessful ? 0 : 1);
             }
         } else if (Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined
-                    && ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowLoadExamplesDialog()) {
+                && ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowLoadExamplesDialog()) {
             ui.openExamples();
         }
     }
@@ -512,8 +518,8 @@ public final class Main {
      */
     private static void printHeader() {
         LOGGER.info("KeY Version " + KeYConstants.VERSION);
-        LOGGER.info(KeYConstants.COPYRIGHT + "\nKeY is protected by the " +
-                "GNU General Public License\n");
+        LOGGER.info(KeYConstants.COPYRIGHT);
+        LOGGER.info("KeY is protected by the GNU General Public License");
     }
 
     /**

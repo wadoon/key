@@ -15,6 +15,13 @@ public class Log {
      */
     public static final Logger GLOG = LoggerFactory.getLogger("key");
 
+    /**
+     * A logger that only prints on the command line. Useful for development,
+     * but is forbidden for production code.
+     */
+    public static final Logger LDEVEL = LoggerFactory.getLogger("key.devel");
+
+
     public static void configureLogging(int verbosity) {
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
                 LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
