@@ -6,8 +6,8 @@ import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.PathConfig;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -35,7 +35,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     public static final File SETTINGS_FILE = new File(PathConfig.getKeyConfigDir(),
             KeyStrokeSettings.SETTINGS_FILENAME);
 
-    private static final Logger LOGGER = LogManager.getLogger(KeyStrokeSettings.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeyStrokeSettings.class);
 
     /**
      * singleton instance
@@ -58,7 +58,6 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
             defineDefault(FinishSymbolicExecutionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0));
             defineDefault(OneStepProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
             defineDefault(HeapSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F9, 0));
-            defineDefault(TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
             defineDefault(UpdateSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F10, 0));
             defineDefault(IntegerSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0));
             defineDefault(QuickSaveAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyStrokeManager.MULTI_KEY_MASK));
@@ -72,7 +71,6 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
             defineDefault(TryCloseMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyStrokeManager.MULTI_KEY_MASK));
             defineDefault(FinishSymbolicExecutionMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyStrokeManager.MULTI_KEY_MASK));
             defineDefault(OneStepProofMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyStrokeManager.MULTI_KEY_MASK));
-            defineDefault(TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyStrokeManager.MULTI_KEY_MASK));
             defineDefault(HeapSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyStrokeManager.MULTI_KEY_MASK));
             defineDefault(UpdateSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyStrokeManager.MULTI_KEY_MASK));
             defineDefault(IntegerSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyStrokeManager.MULTI_KEY_MASK));

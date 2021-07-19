@@ -24,10 +24,10 @@ import de.uka.ilkd.key.ui.MediatorProofControl;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
 import javax.annotation.Nullable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -88,7 +88,7 @@ public class KeyboardTacletExtension implements KeYGuiExtension,
 //@SuppressWarnings("WeakerAccess")
 class KeyboardTacletPanel extends JPanel implements TabPanel {
     private static final String PROP_MODEL = "taclets";
-    private static final Logger LOGGER = LogManager.getLogger(KeyboardTacletPanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeyboardTacletPanel.class);
     private final Services services;
     private final JTextField txtInput = new JTextField();
     private final ActivateAction actionActivate = new ActivateAction();

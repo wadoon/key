@@ -4,8 +4,8 @@ import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeSettings;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.PathConfig;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.File;
@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 public class ColorSettings extends AbstractPropertiesSettings {
     public static final String SETTINGS_FILENAME = "colors.properties";
     public static final File SETTINGS_FILE = new File(PathConfig.getKeyConfigDir(), SETTINGS_FILENAME);
-    private static final Logger LOGGER = LogManager.getLogger(ColorSettings.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
     private static ColorSettings INSTANCE;
 
     private ColorSettings(Properties settings) {

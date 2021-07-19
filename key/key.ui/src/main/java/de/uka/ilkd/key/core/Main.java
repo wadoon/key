@@ -13,24 +13,6 @@
 
 package de.uka.ilkd.key.core;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.reflection.ClassLoaderUtil;
-import org.xml.sax.SAXException;
-
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -45,6 +27,7 @@ import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.ui.ConsoleUserInterfaceControl;
@@ -56,12 +39,16 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.rifl.RIFLTransformer;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import recoder.ParserException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -191,7 +178,8 @@ public final class Main {
     private static boolean saveAllContracts = false;
 
     private static ProofMacro autoMacro = new SkipMacro();
-    private static Logger LOGGER = LogManager.getLogger(Main.class);
+
+    private static Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     /**
      * <p>
@@ -218,7 +206,7 @@ public final class Main {
 
         // this property overrides the default
         if (Boolean.getBoolean("key.verbose-ui")) {
-            verbosity = Verbosity.DEBUG;
+            verbosity = Verbosity.TRACE;
         }
 
         // does no harm on non macs
@@ -228,6 +216,7 @@ public final class Main {
             cl = createCommandLine();
             cl.parse(args);
             evaluateOptions(cl);
+            Log.configureLogging(verbosity);
             fileArguments = cl.getFileArguments();
             fileArguments = preProcessInput(fileArguments);
             AbstractMediatorUserInterfaceControl userInterface = createUserInterface(fileArguments);
@@ -331,7 +320,7 @@ public final class Main {
 
         if (cl.isSet(VERBOSITY)) { // verbosity
             try {
-                verbosity = (byte) cl.getInteger(VERBOSITY, Verbosity.HIGH);
+                verbosity = (byte) cl.getInteger(VERBOSITY, Verbosity.DEBUG);
             } catch (CommandLineException e) {
                 if (Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
@@ -389,13 +378,13 @@ public final class Main {
         }
 
         if (cl.isSet(TIMEOUT)) {
-            if (verbosity >= Verbosity.HIGH) {
+            if (verbosity >= Verbosity.DEBUG) {
                 System.out.println("Timeout is set");
             }
             long timeout = -1;
             try {
                 timeout = cl.getLong(TIMEOUT, -1);
-                if (verbosity >= Verbosity.HIGH) {
+                if (verbosity >= Verbosity.DEBUG) {
                     System.out.println("Timeout is: " + timeout + " ms");
                 }
             } catch (CommandLineException e) {
@@ -507,11 +496,11 @@ public final class Main {
      */
     public static void setEnabledExperimentalFeatures(boolean state) {
         experimentalMode = state;
-        String configuration = experimentalMode ? LOGGING_CONFIG_EXPERIMENTAL : LOGGING_CONFIG_DEFAULT;
+        /*String configuration = experimentalMode ? LOGGING_CONFIG_EXPERIMENTAL : LOGGING_CONFIG_DEFAULT;
         try (final InputStream in = Main.class.getResourceAsStream(configuration)) {
         } catch (IOException e) {
             //LOGGER.log(Level.INFO, e.getMessage(), e);
-        }
+        }*/
     }
 
     public static boolean isExperimentalMode() {
@@ -545,7 +534,7 @@ public final class Main {
                 public void uncaughtException(Thread t, Throwable e) {
                     if (verbosity > Verbosity.SILENT) {
                         LOGGER.error("Auto mode was terminated by an exception:", e);
-                        if (verbosity >= Verbosity.DEBUG) {
+                        if (verbosity >= Verbosity.TRACE) {
                             e.printStackTrace();
                         }
                         final String msg = e.getMessage();
@@ -566,7 +555,7 @@ public final class Main {
 
             /* explicitly enable pruning in closed branches for interactive mode
              * (if not manually disabled) */
-            GeneralSettings.noPruningClosed = cl.isSet(NO_PRUNING_CLOSED) ? true : false;
+            GeneralSettings.noPruningClosed = cl.isSet(NO_PRUNING_CLOSED);
 
             MainWindow mainWindow = MainWindow.getInstance();
 

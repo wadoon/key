@@ -15,6 +15,9 @@ dependencies {
     implementation project(":key.core.symbolic_execution")
     implementation project(":key.removegenerics")
 
+    //implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.31'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+
     implementation 'com.miglayout:miglayout-swing:5.2'
 
     implementation group: group, name: 'docking-frames-common', version: '1.0'

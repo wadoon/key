@@ -101,18 +101,18 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     public ConsoleUserInterfaceControl(boolean verbose, boolean loadOnly) {
-        this(verbose? Verbosity.DEBUG: Verbosity.NORMAL, loadOnly);
+        this(verbose? Verbosity.TRACE : Verbosity.NORMAL, loadOnly);
     }
 
    private void printResults(final int openGoals,
                                   TaskFinishedInfo info,
                                   final Object result2) {
-       if (verbosity >= Verbosity.HIGH) {
+       if (verbosity >= Verbosity.DEBUG) {
            System.out.println("]"); // end progress bar
        }
        if (verbosity > Verbosity.SILENT) {
            System.out.println("[ DONE  ... rule application ]");
-           if (verbosity >= Verbosity.HIGH) {
+           if (verbosity >= Verbosity.DEBUG) {
                System.out.println("\n== Proof "+ (openGoals > 0 ? "open": "closed")+ " ==");
                final Statistics stat = info.getProof().getStatistics();
                System.out.println("Proof steps: "+stat.nodes);
@@ -181,7 +181,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                 if (verbosity > Verbosity.SILENT) {
                     System.out.println(result2);
                 }
-               if (verbosity >= Verbosity.HIGH && result2 instanceof Throwable) {
+               if (verbosity >= Verbosity.DEBUG && result2 instanceof Throwable) {
                    ((Throwable) result2).printStackTrace();
                }
                System.exit(-1);
@@ -220,7 +220,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     public void taskStarted(TaskStartedInfo info) {
         super.taskStarted(info);
         progressMax = info.getSize();
-        if (verbosity >= Verbosity.HIGH) {
+        if (verbosity >= Verbosity.DEBUG) {
             if (TaskKind.Strategy.equals(info.getKind())) {
                 System.out.print(info.getMessage()+" ["); // start progress bar
             } else {
@@ -277,7 +277,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
        // has to be notified that we work in auto mode (CS)
        mediator.setInteractive(false);
        getProofControl().startAndWaitForAutoMode(proof);
-       if (verbosity >= Verbosity.HIGH) { // WARNING: Is never executed since application terminates via System.exit() before.
+       if (verbosity >= Verbosity.DEBUG) { // WARNING: Is never executed since application terminates via System.exit() before.
            System.out.println(proof.getStatistics());
        }
    }
@@ -285,14 +285,14 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     final public void progressStarted(Object sender) {
         // TODO Implement ProblemInitializerListener.progressStarted
-        if(verbosity >= Verbosity.DEBUG) {
+        if(verbosity >= Verbosity.TRACE) {
             System.out.println("ConsoleUserInterfaceControl.progressStarted(" + sender + ")");
         }
     }
 
     @Override
     final public void progressStopped(Object sender) {
-        if(verbosity >= Verbosity.DEBUG) {
+        if(verbosity >= Verbosity.TRACE) {
             System.out.println("ConsoleUserInterfaceControl.progressStopped(" + sender + ")");
         }
     }
@@ -300,7 +300,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     final public void reportException(Object sender, ProofOblInput input, Exception e) {
         // TODO Implement ProblemInitializerListener.reportException
-        if(verbosity >= Verbosity.DEBUG) {
+        if(verbosity >= Verbosity.TRACE) {
             System.out.println("ConsoleUserInterfaceControl.reportException(" + sender + "," + input + "," + e + ")");
             e.printStackTrace();
         }
@@ -309,7 +309,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     final public void reportStatus(Object sender, String status, int progress) {
         // TODO Implement ProblemInitializerListener.reportStatus
-        if(verbosity >= Verbosity.DEBUG) {
+        if(verbosity >= Verbosity.TRACE) {
             System.out.println("ConsoleUserInterfaceControl.reportStatus(" + sender + "," + status + "," + progress + ")");
         }
     }
@@ -317,7 +317,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     final public void reportStatus(Object sender, String status) {
         // TODO Implement ProblemInitializerListener.reportStatus
-        if(verbosity >= Verbosity.DEBUG) {
+        if(verbosity >= Verbosity.TRACE) {
             System.out.println("ConsoleUserInterfaceControl.reportStatus(" + sender + "," + status + ")");
         }
     }
@@ -325,7 +325,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     final public void resetStatus(Object sender) {
         // TODO Implement ProblemInitializerListener.resetStatus
-        if(verbosity >= Verbosity.DEBUG) {
+        if(verbosity >= Verbosity.TRACE) {
             System.out.println("ConsoleUserInterfaceControl.resetStatus(" + sender + ")");
         }
     }
@@ -333,7 +333,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     final public void taskProgress(int position) {
         super.taskProgress(position);
-        if (verbosity >= Verbosity.HIGH && progressMax > 0) {
+        if (verbosity >= Verbosity.DEBUG && progressMax > 0) {
             if ((position*PROGRESS_BAR_STEPS) % progressMax == 0) {
                 System.out.print(PROGRESS_MARK);
             }
@@ -343,7 +343,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     final public void setMaximum(int maximum) {
         // TODO Implement ProgressMonitor.setMaximum
-        if(verbosity >= Verbosity.DEBUG) {
+        if(verbosity >= Verbosity.TRACE) {
             System.out.println("ConsoleUserInterfaceControl.setMaximum(" + maximum + ")");
         }
     }
@@ -351,14 +351,14 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     final public void setProgress(int progress) {
         // TODO Implement ProgressMonitor.setProgress
-        if(verbosity >= Verbosity.DEBUG) {
+        if(verbosity >= Verbosity.TRACE) {
             System.out.println("ConsoleUserInterfaceControl.setProgress(" + progress + ")");
         }
     }
 
     @Override
     public void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal) {
-        if(verbosity >= Verbosity.DEBUG) {
+        if(verbosity >= Verbosity.TRACE) {
          System.out.println("Taclet match completion not supported by console.");
         }
     }
@@ -415,7 +415,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
 
    @Override
    public void notify(NotificationEvent event) {
-      if(verbosity >= Verbosity.DEBUG) {
+      if(verbosity >= Verbosity.TRACE) {
          System.out.println(event);
       }
    }
