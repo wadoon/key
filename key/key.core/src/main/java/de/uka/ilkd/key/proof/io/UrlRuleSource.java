@@ -183,4 +183,17 @@ public class UrlRuleSource extends RuleSource {
         return result;
     }
 
+
+    @Override
+    public CharStream getCharStream() throws IOException {
+        try (ReadableByteChannel channel = Channels.newChannel(getNewStream())) {
+            return CharStreams.fromChannel(
+                    channel,
+                    StandardCharsets.UTF_8,
+                    4096,
+                    CodingErrorAction.REPLACE,
+                    url.toString(),
+                    -1);
+        }
+    }
 }
