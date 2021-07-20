@@ -409,6 +409,42 @@ public final class IOUtil {
     }
 
     /**
+     * Reads {@code length}-bytes from the given input stream at most.
+     * Remove this method in favor of Java 11 with {@code readNBytes}.
+     */
+    public static byte[] readBytesFrom(InputStream input, int length) throws IOException {
+        if (length < 0) {
+            throw new IllegalArgumentException("length < 0");
+        }
+        List<byte[]> bufs = new LinkedList<>();
+
+        byte[] buf = new byte[8192];
+        int read;
+        while ((read = input.read(buf)) != -1) {
+            byte[] b = new byte[read];
+            System.arraycopy(buf, 0, b, 0, read);
+            bufs.add(b);
+        }
+
+        if (bufs.size() == 0) {
+            return new byte[0];
+        }
+
+        if (bufs.size() == 1) {
+            return bufs.get(0);
+        }
+
+        final int sum = bufs.stream().mapToInt(it -> it.length).sum();
+        byte[] ret = new byte[sum];
+        int dest = 0;
+        for (byte[] bytes : bufs) {
+            System.arraycopy(bytes, 0, ret, dest, bytes.length);
+            dest += bytes.length;
+        }
+        return ret;
+    }
+
+    /**
      * A line information returned from {@link IOUtil#computeLineInformation(File)} and
      * {@link IOUtil#computeLineInformation(InputStream)}.
      *
@@ -611,6 +647,7 @@ public final class IOUtil {
          * @throws IOException Occurred Exception
          */
         public void visit(File file) throws IOException;
+
     }
 
     /**
