@@ -418,7 +418,7 @@ public final class IOUtil {
         }
         List<byte[]> bufs = new LinkedList<>();
 
-        byte[] buf = new byte[8192];
+        byte[] buf = new byte[1024];
         int read;
         while ((read = input.read(buf)) != -1) {
             byte[] b = new byte[read];
