@@ -1,6 +1,9 @@
 .gradle/
 
 .idea/
+*.iml
+*.ipr
+*.iws
 
 # Created by https://www.gitignore.io/api/gradle
 # Edit at https://www.gitignore.io/?templates=gradle
