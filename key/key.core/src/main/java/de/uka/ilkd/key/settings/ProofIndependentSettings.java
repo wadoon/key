@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.pp.NotationInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -35,6 +37,7 @@ import de.uka.ilkd.key.pp.NotationInfo;
 public class ProofIndependentSettings {
     public static final ProofIndependentSettings DEFAULT_INSTANCE =
             new ProofIndependentSettings(PathConfig.getProofIndependentSettings());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofIndependentSettings.class);
     private final ProofIndependentSMTSettings smtSettings =
             ProofIndependentSMTSettings.getDefaultSettingsData();
     private final LemmaGeneratorSettings lemmaGeneratorSettings =
@@ -74,7 +77,8 @@ public class ProofIndependentSettings {
             File testFile = new File(filename);
             if(testFile.exists()) {
                 if(Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
-                    System.err.println("The settings in " + filename + " are *not* read.");
+                    LOGGER.info("The settings in {} are *not* read due to flag '{}'", filename,
+                            PathConfig.DISREGARD_SETTINGS_PROPERTY);
                 } else {
                     load(testFile);
                 }

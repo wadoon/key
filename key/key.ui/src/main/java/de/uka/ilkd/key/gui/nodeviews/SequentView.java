@@ -64,12 +64,16 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.Debug;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * Parent class of CurrentGoalView and InnerNodeView.
  */
 public abstract class SequentView extends JEditorPane {
     private static final long serialVersionUID = 6867808795064180589L;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SequentView.class);
 
     public static final Color PERMANENT_HIGHLIGHT_COLOR = new Color(110, 85, 181, 76);
 
@@ -89,6 +93,7 @@ public abstract class SequentView extends JEditorPane {
     //maximum opacity of heatmap color
     private static final float HEATMAP_DEFAULT_START_OPACITY = .7f;
     public static final String PROP_LAST_MOUSE_POSITION = "lastMousePosition";
+
 
     private final MainWindow mainWindow;
 
@@ -287,9 +292,7 @@ public abstract class SequentView extends JEditorPane {
                         .changeHighlight(highlighter, 0, 0);
             }
         } catch (BadLocationException badLocation) {
-            System.err.println("SequentView tried to highlight an area "
-                    + "that does not exist: "+range);
-            badLocation.printStackTrace();
+            LOGGER.warn("SequentView tried to highlight an area that does not exist: {]", range);
         }
     }
 

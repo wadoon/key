@@ -462,7 +462,7 @@ public class ClassInitializeMethodBuilder
      */
     protected void makeExplicit(TypeDeclaration td) {
 	attach(createInitializeMethod(td), td, 0);
-	// for debug 
+	// for debug
 // 	java.io.StringWriter sw = new java.io.StringWriter();
 // 	if (td instanceof ClassDeclaration) {
 // 	    services.getProgramFactory().getPrettyPrinter(sw).visitClassDeclaration((ClassDeclaration)td);

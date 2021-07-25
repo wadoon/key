@@ -333,14 +333,12 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
                 Optional<RuleApp> app = model.getSelectedTacletsApp();
                 app.ifPresent(ruleApp -> {
                     ruleApp.execute(lastGoal, services);
-                    System.out.println("applied");
                 });
             }
 
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                 Optional<RuleApp> app = model.getFirstMatchingTacletApp();
                 app.ifPresent(ruleApp -> ruleApp.execute(lastGoal, services));
-                System.out.println("applied");
             }
         }
     }

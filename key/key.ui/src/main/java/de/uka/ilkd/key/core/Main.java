@@ -331,7 +331,7 @@ public final class Main {
                 if (Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
                 }
-                System.err.println(e.getMessage());
+                LOGGER.warn(e.getMessage());
             }
         }
 
@@ -343,7 +343,7 @@ public final class Main {
             try {
                 java.util.Properties props = System.getProperties();
                 for (Object o : props.keySet()) {
-                    System.out.println("" + o + "=\"" + props.get(o) + "\"");
+                    LOGGER.info("" + o + "=\"" + props.get(o) + "\"");
                 }
             } finally {
                 System.exit(0);
@@ -370,7 +370,7 @@ public final class Main {
                 if (Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
                 }
-                System.err.println(e.getMessage());
+                LOGGER.warn(e.getMessage());
             }
         }
 
@@ -385,19 +385,19 @@ public final class Main {
 
         if (cl.isSet(TIMEOUT)) {
             if (verbosity >= Verbosity.DEBUG) {
-                System.out.println("Timeout is set");
+                LOGGER.info("Timeout is set");
             }
             long timeout = -1;
             try {
                 timeout = cl.getLong(TIMEOUT, -1);
                 if (verbosity >= Verbosity.DEBUG) {
-                    System.out.println("Timeout is: " + timeout + " ms");
+                    LOGGER.info("Timeout is: " + timeout + " ms");
                 }
             } catch (CommandLineException e) {
                 if (Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
                 }
-                System.err.println(e.getMessage());
+                LOGGER.warn(e.getMessage());
             }
 
             if (timeout < -1) {
@@ -425,7 +425,7 @@ public final class Main {
 
         if (cl.isSet(EXPERIMENTAL)) {
             if (verbosity > Verbosity.SILENT) {
-                System.out.println("Running in experimental mode ...");
+                LOGGER.info("Running in experimental mode ...");
             }
             setEnabledExperimentalFeatures(true);
         } else {
@@ -459,23 +459,23 @@ public final class Main {
                     try {
                         autoMacro = m.getClass().getDeclaredConstructor().newInstance();
                     } catch (InstantiationException e) {
-                        System.err.println("Automatic proof macro can not be instantiated!");
+                        LOGGER.warn("Automatic proof macro can not be instantiated!");
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
-                        System.err.println("Automatic proof macro can not be accessed!");
+                        LOGGER.warn("Automatic proof macro can not be accessed!");
                         e.printStackTrace();
                     } catch (InvocationTargetException e) {
-                        System.err.println("Automatic proof macro can not be invoked!");
+                        LOGGER.warn("Automatic proof macro can not be invoked!");
                         e.printStackTrace();
                     } catch (NoSuchMethodException e) {
-                        System.err.println("Automatic proof macro can not be called!");
+                        LOGGER.warn("Automatic proof macro can not be called!");
                         e.printStackTrace();
                     }
                     break;
                 }
             }
             if (macro.equals("") || autoMacro instanceof SkipMacro) {
-                System.err.println("No automatic proof macro specified.");
+                LOGGER.warn("No automatic proof macro specified.");
             }
         }
 
@@ -545,7 +545,7 @@ public final class Main {
                         }
                         final String msg = e.getMessage();
                         if (msg != null) {
-                            System.out.println(msg);
+                            LOGGER.info(msg);
                         }
                     }
                     System.exit(-1);
@@ -574,7 +574,7 @@ public final class Main {
                     if (mostRecentFile.exists()) {
                         fileArguments.add(mostRecentFile);
                     } else {
-                        System.out.println("File does not exist anymore: " + mostRecentFile.toString());
+                        LOGGER.info("File does not exist anymore: " + mostRecentFile.toString());
                     }
                 }
             }
@@ -668,7 +668,7 @@ public final class Main {
         // RIFL to JML transformation
         if (riflFileName != null) {
             if (filesOnStartup.isEmpty()) {
-                System.out.println("[RIFL] No Java file to load from.");
+                LOGGER.info("[RIFL] No Java file to load from.");
                 System.exit(-130826);
             }
             // only use one input file
@@ -680,7 +680,7 @@ public final class Main {
                         RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
 
                 if (verbosity > Verbosity.SILENT) {
-                    System.out.println("[RIFL] Writing transformed Java files to " + fileNameOnStartUp + " ...");
+                    LOGGER.info("[RIFL] Writing transformed Java files to " + fileNameOnStartUp + " ...");
                 }
                 return transformer.getProblemFiles();
             } catch (ParserConfigurationException e) {

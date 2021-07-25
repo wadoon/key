@@ -28,6 +28,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,6 +37,8 @@ import java.util.stream.Collectors;
 import static java.text.MessageFormat.format;
 
 public class TacletPBuilder extends ExpressionBuilder {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TacletPBuilder.class);
 
     private final Stack<TacletBuilder<?>> currentTBuilder = new Stack<>();
 
@@ -280,10 +284,10 @@ public class TacletPBuilder extends ExpressionBuilder {
             }
         }
         if (!applied) {
-            System.err.println("Found name-matching conditions with following type signature:");
+            LOGGER.warn("Found name-matching conditions with following type signature:");
             suitableManipulators.forEach(
-                    it -> System.err.println(Arrays.toString(it.getArgumentTypes())));
-            System.err.format("But you gave %d arguments.\n", arguments.size());
+                    it -> LOGGER.warn(Arrays.toString(it.getArgumentTypes())));
+            LOGGER.warn("But you gave {} arguments.\n", arguments.size());
             semanticError(ctx, "Could not apply the given variable condition: %s", ctx.getText());
         }
         return null;
