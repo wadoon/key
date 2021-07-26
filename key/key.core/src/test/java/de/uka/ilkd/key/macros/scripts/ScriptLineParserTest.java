@@ -19,8 +19,7 @@ public class ScriptLineParserTest {
                 "# some comment\n" +
                 "multiline #comment internal\n command \n with=\"line breaks in \n values\"; \n" +
                 "select formula=\"a;b\"; \n" +
-                "hyphened-command;\n" +
-                "ignored ";
+                "hyphened-command;\n";
 
         ScriptLineParser mlp = new ScriptLineParser(new StringReader(arg));
         Map<String, String> str;
