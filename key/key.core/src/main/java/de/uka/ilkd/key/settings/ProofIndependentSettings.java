@@ -35,13 +35,15 @@ import org.slf4j.LoggerFactory;
  * @see Settings
  */
 public class ProofIndependentSettings {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofIndependentSettings.class);
+
     public static final ProofIndependentSettings DEFAULT_INSTANCE =
             new ProofIndependentSettings(PathConfig.getProofIndependentSettings());
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProofIndependentSettings.class);
+
     private final ProofIndependentSMTSettings smtSettings =
             ProofIndependentSMTSettings.getDefaultSettingsData();
-    private final LemmaGeneratorSettings lemmaGeneratorSettings =
-            new LemmaGeneratorSettings();
+
+    private final LemmaGeneratorSettings lemmaGeneratorSettings = new LemmaGeneratorSettings();
     private final GeneralSettings generalSettings = new GeneralSettings();
     private final ViewSettings viewSettings = new ViewSettings();
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();
