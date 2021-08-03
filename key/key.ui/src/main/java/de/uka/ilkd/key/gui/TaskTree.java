@@ -187,7 +187,7 @@ public class TaskTree extends JPanel {
      */
     // Revised implementation to fix #1548
     public boolean containsProof(Proof proof) {
-        return true; //containsProof(proof, model.getRoot());
+        return containsProof(proof, model.getRoot());
     }
 
     private boolean containsProof(Proof proof, Object node) {
