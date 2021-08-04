@@ -263,7 +263,15 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     private void updateSubscripts() {
         HTMLEditorKit kit = (HTMLEditorKit) getEditorKit();
         MutableAttributeSet superscript = new SimpleAttributeSet();
+        StyleConstants.setFontSize(superscript, 16);
         StyleConstants.setSubscript(superscript, true);
+
+
+        Style regular = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+        MutableAttributeSet invisible = new SimpleAttributeSet();
+        StyleConstants.setFontSize(invisible, 0);
+        StyleConstants.setForeground(invisible, getBackground());
+
 
         try {
             HTMLDocument d = (HTMLDocument) getDocument();
@@ -276,6 +284,8 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
                 d.setCharacterAttributes(
                         start, stop - start /*+1?*/, superscript, false
                 );
+                d.setCharacterAttributes(
+                        start - 1, 1, invisible, false);
             }
             System.out.println(d);
         } catch (BadLocationException e) {
