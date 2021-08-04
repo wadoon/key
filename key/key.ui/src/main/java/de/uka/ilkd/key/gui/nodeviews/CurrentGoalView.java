@@ -13,35 +13,32 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Color;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.dnd.Autoscroll;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DropTarget;
-import java.util.EventObject;
-import java.util.LinkedList;
-
-import javax.swing.SwingUtilities;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ApplyTacletDialog;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
+
+import javax.swing.*;
+import javax.swing.text.*;
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import java.awt.*;
+import java.awt.dnd.Autoscroll;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DropTarget;
+import java.util.EventObject;
+import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This sequent view displays the sequent of an open goal and allows selection
@@ -90,7 +87,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      * creates a viewer for a sequent
      *
      * @param mainWindow the MainWindow allowing access to the current system
-     * status
+     *                   status
      */
     public CurrentGoalView(MainWindow mainWindow) {
         super(mainWindow);
@@ -208,7 +205,6 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     }
 
 
-
     protected DragSource getDragSource() {
         return dragSource;
     }
@@ -258,9 +254,33 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
 
         updateUpdateHighlights();
         updateHeatMapHighlights();
+        updateSubscripts();
         restorePosition();
         addMouseListener(listener);
         updateHidingProperty();
+    }
+
+    private void updateSubscripts() {
+        HTMLEditorKit kit = (HTMLEditorKit) getEditorKit();
+        MutableAttributeSet superscript = new SimpleAttributeSet();
+        StyleConstants.setSubscript(superscript, true);
+
+        try {
+            HTMLDocument d = (HTMLDocument) getDocument();
+            String text = d.getText(0, d.getLength());
+            Pattern underscore = Pattern.compile("\\b.*_([\\d]+)\\b");
+            Matcher matcher = underscore.matcher(text);
+            while (matcher.find()) {
+                int start = matcher.start(1);
+                int stop = matcher.end(1);
+                d.setCharacterAttributes(
+                        start, stop - start /*+1?*/, superscript, false
+                );
+            }
+            System.out.println(d);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
     }
 
     // last highlighted caret position
@@ -286,9 +306,9 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     public void setPrinter(Goal goal) {
         getFilter().setSequent(goal.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(null),
-                                                    getMediator().getNotationInfo(),
-                                                    mediator.getServices(),
-                                                    getVisibleTermLabels()));
+                getMediator().getNotationInfo(),
+                mediator.getServices(),
+                getVisibleTermLabels()));
     }
 
     protected SequentPrintFilter getSequentPrintFilter() {
@@ -308,12 +328,12 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      * selected rule to apply
      *
      * @param taclet the selected Taclet
-     * @param pos the PosInSequent describes the position where to apply the
-     * rule
+     * @param pos    the PosInSequent describes the position where to apply the
+     *               rule
      */
     void selectedTaclet(TacletApp taclet, PosInSequent pos) {
         KeYMediator r = getMediator();
-      // This method delegates the request only to the UserInterfaceControl which implements the functionality.
+        // This method delegates the request only to the UserInterfaceControl which implements the functionality.
         // No functionality is allowed in this method body!
         Goal goal = r.getSelectedGoal();
         Debug.assertTrue(goal != null);
