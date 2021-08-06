@@ -24,7 +24,7 @@ public class CastHandler implements SMTHandler {
     @Override
     public SExpr handle(MasterHandler trans, Term term) {
         SortDependingFunction op = (SortDependingFunction) term.op();
-        SExpr inner = trans.translate(term.sub(0));
+        SExpr inner = trans.translate(term.sub(0), Type.UNIVERSE);
         return new SExpr("cast", Type.UNIVERSE, inner, SExpr.sortExpr(op.getSortDependingOn()));
     }
 
