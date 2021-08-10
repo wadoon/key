@@ -14,15 +14,10 @@
 package de.uka.ilkd.key.proof;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -450,6 +445,11 @@ public class Node {
         return new NodeIterator(children.iterator());
     }
 
+    public Stream<Node> childrenStream() {
+        final Spliterator<Node> spliterator = Spliterators.spliteratorUnknownSize(childrenIterator(), Spliterator.ORDERED);
+        return StreamSupport.stream(spliterator, false);
+    }
+
     /**
      * @return an iterator for all nodes in the subtree.
      */
@@ -749,4 +749,7 @@ public class Node {
         return childrenIterator();
     }
 
+    public Stream<Node> iterateToRoot() {
+        return Stream.iterate(this, ((Predicate<? super Node>) Node::root).negate(), Node::parent);
+    }
 }

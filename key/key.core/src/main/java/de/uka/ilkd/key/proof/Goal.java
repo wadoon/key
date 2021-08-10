@@ -34,10 +34,7 @@ import de.uka.ilkd.key.util.properties.Properties.Property;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial
@@ -805,5 +802,4 @@ public final class Goal {
         }
         return allApps;
     }
-
 }

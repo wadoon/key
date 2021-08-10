@@ -2,7 +2,6 @@ package org.key_project.citool;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import de.uka.ilkd.key.TestSuite;
 import de.uka.ilkd.key.api.KeYApi;
 import de.uka.ilkd.key.api.ProofManagementApi;
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -23,21 +22,29 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.citool.JUnit.TestCaseKind;
+import org.key_project.citool.JUnit.TestSuites;
 import org.key_project.util.collection.ImmutableList;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import static org.key_project.citool.Printer.*;
 
 public class Main {
-
     public static class Arguments {
-        @Parameter// option("--xml-output").file()
+        @Parameter(names = "--xml-output")
         File junitXmlOutput;
 
         @Parameter(names = "--measuring",
@@ -46,7 +53,7 @@ public class Main {
 
         @Parameter(description = "defines additional key files to be included",
                 names = "--includes")
-        List<String> includes;
+        List<File> includes;
 
         @Parameter(names = "--auto-mode-max-step",
                 description = "maximal amount of steps in auto-mode [default:10000]")
@@ -61,32 +68,32 @@ public class Main {
         boolean dryRun = false;
 
         @Parameter(names = {"--classpath", "-cp"}, description = "additional classpaths")
-        List<File> classpath;
+        List<File> classpath = new ArrayList<>();
 
         @Parameter(names = {"--bootClassPath", "-bcp"}, description = "set the bootclasspath")
         File bootClassPath;
 
         @Parameter(names = "--contract", description = "whitelist contracts by their names")
-        List<String> onlyContracts;
+        List<String> onlyContracts = new ArrayList<>();
 
 
         @Parameter(names = "--forbid-contact",
                 description = "forbid contracts by their name")
-        List<String> forbidContracts;
+        List<String> forbidContracts = new ArrayList<>();
 
         @Parameter(description = "key, java or a folder")
-        List<File> inputFile;
+        List<File> inputFile = new ArrayList<>();
 
         @Parameter(names = "--proof-path", description = "folders to look for proofs and script files")
-        List<File> proofPath;
+        List<File> proofPath = new ArrayList<>();
 
     }
 
     public static void main(String[] args) throws IOException {
-        printm("KeY version: ${KeYConstants.VERSION}");
-        printm("KeY internal: ${KeYConstants.INTERNAL_VERSION}");
-        printm("Copyright: ${KeYConstants.COPYRIGHT}");
-        printm("More information at: https://formal.iti.kit.edu/weigl/ci-tool/");
+        printf("KeY version: %s", KeYConstants.VERSION);
+        printf("KeY internal: %s", KeYConstants.INTERNAL_VERSION);
+        printf("KeY Copyright: %s", KeYConstants.COPYRIGHT);
+        printf("More information at: https://formal.iti.kit.edu/weigl/ci-tool/");
 
         Arguments arguments = new Arguments();
         JCommander.newBuilder()
@@ -99,8 +106,52 @@ public class Main {
     }
 }
 
-class Checker {
+class Printer {
+    private static int currentPrintLevel = 0;
     public static final char ESC = (char) 27;
+
+    public static String color(Object s, int c) {
+        return ESC + "[" + c + "m" + s + ESC + "[0m";
+    }
+
+    public static void printBlock(String message, Runnable obj) {
+        printm(message);
+        currentPrintLevel++;
+        obj.run();
+        currentPrintLevel--;
+    }
+
+    public static void printm(String message, int fg) {
+        System.out.print("  ".repeat(currentPrintLevel));
+        System.out.println(color(message, fg));
+    }
+
+    public static void printf(String message, Object... args) {
+        System.out.print("  ".repeat(currentPrintLevel));
+        System.out.format(message, args);
+        System.out.println();
+    }
+
+    public static void printm(String message) {
+        System.out.print("  ".repeat(currentPrintLevel));
+        System.out.println(message);
+    }
+
+    public static void inc() {
+        currentPrintLevel++;
+    }
+
+    public static void dec() {
+        currentPrintLevel--;
+    }
+
+    public static void printerr(String msg, Object... args) {
+        System.err.format(msg, args);
+        System.err.println();
+    }
+}
+
+class Checker {
     public static final int RED = 31;
     public static final int GREEN = 32;
     public static final int YELLOW = 33;
@@ -110,15 +161,9 @@ class Checker {
 
     final Main.Arguments args;
     private ChoiceSettings choiceSettings;
-    private int currentPrintLevel = 0;
 
     Checker(Main.Arguments args) {
         this.args = args;
-    }
-
-    public static String color(Object s, int c) {
-        //TODO
-        return "${ESC}[${c}m$s${ESC}[0m";
     }
 
 
@@ -131,108 +176,101 @@ class Checker {
     }
 
 
-    void printBlock(String message) {
-        printm(message);
-        currentPrintLevel++;
-        f.invoke();
-        currentPrintLevel--;
-    }
-
-    private void printm(String message, int fg) {
-        System.out.print("  ".repeat(currentPrintLevel));
-        System.out.println(color(message, fg));
-    }
-
-    private void printf(String message, Object... args) {
-        System.out.print("  ".repeat(currentPrintLevel));
-        System.out.format(message, args);
-    }
-
-    private void printm(String message) {
-        System.out.print("  ".repeat(currentPrintLevel));
-        System.out.println(message);
-    }
-
     private int errors = 0;
-    private TestSuite testSuites = new TestSuite();
+    private final TestSuites testSuites = new TestSuites();
 
     public void run() throws IOException {
-        testSuites.name = args.inputFile.joinToString(" ");
-        args.inputFile.forEach(it -> run(it));
+        if (args.inputFile == null || args.inputFile.isEmpty()) {
+            printerr("No input files given");
+            System.exit(1);
+        }
+
+        testSuites.name = args.inputFile.stream()
+                .map(File::getName)
+                .collect(Collectors.joining(" "));
+        for (File file : args.inputFile) {
+            try {
+                run(file.getAbsoluteFile());
+            } catch (ProofInputException | ProblemLoaderException e) {
+                e.printStackTrace();
+                System.exit(-1);
+            }
+        }
         if (args.junitXmlOutput != null) {
             try (var it = new BufferedWriter(new FileWriter(args.junitXmlOutput))) {
-                testSuites.writeXml(it);
+                testSuites.writeXml(new JUnit.XmlWriter(it));
             }
         }
         System.exit(errors);
     }
 
-    private void run(String inputFile) {
-        printBlock("[INFO] Start with `$inputFile`") {
-            var pm = KeYApi.loadProof(new File(inputFile),
-                    classpath.map {
-                new File(it);
-            },
-            bootClassPath ?.let {
-                new File(it);
-            },
-            includes.map {
-                new File(it);
-            })
+    private void run(File inputFile) throws ProofInputException, ProblemLoaderException {
+        printf("[INFO] Start with `%s`", inputFile);
+        Printer.inc();
+        var pm = KeYApi.loadProof(
+                inputFile,
+                args.classpath,
+                args.bootClassPath,
+                args.includes);
 
-            var contracts = pm.proofContracts
-                    .filter {
-                it.name in onlyContracts || onlyContracts.isEmpty()
-            }
+        var contracts = pm.getProofContracts().stream()
+                .filter(it -> args.onlyContracts.contains(it.getName()) || args.onlyContracts.isEmpty())
+                .collect(Collectors.toList());
 
-            printm("[INFO] Found: ${contracts.size}")
-            var successful = 0;
-            var ignored = 0;
-            var failure = 0;
+        printf("[INFO] Found: %s", contracts.size());
+        var successful = 0;
+        var ignored = 0;
+        var failure = 0;
+        var error = 0;
 
-            val testSuite = testSuites.newTestSuite(inputFile);
-            ProofSettings.DEFAULT_SETTINGS.properties.forEach({
-                    (t, u) ->
-                            testSuite.properties[t.toString()] = u;
-            });
+        var testSuite = testSuites.newTestSuite(inputFile.toString());
+        ProofSettings.DEFAULT_SETTINGS.getProperties().forEach((t, u) ->
+                testSuite.properties.put(t.toString(), u));
 
-            for (var c : contracts) {
-                var testCase = testSuite.newTestCase(c.name);
-                printBlock("[INFO] Contract: `${c.name}`") {
-                    var filename = MiscTools.toValidFileName(c.name);
-                    when {
-                        c.name in forbidContracts -> {
-                            printm(" [INFO] Contract excluded by `--forbid-contract`")
-                            testCase.result = TestCaseKind.Skipped("Contract excluded by `--forbid-contract`.")
-                            ignored++;
-                        }
-                        dryRun -> {
-                            printm("[INFO] Contract skipped by `--dry-run`")
-                            testCase.result = TestCaseKind.Skipped("Contract skipped by `--dry-run`.")
-                            ignored++
-                        }
-                        else ->{
-                            var b = runContract(pm, c, filename);
-                            if (b) {
-                                //testCase.result = TestCaseKind.Skipped("Contract excluded by `--forbid-contract`.")
-                                successful++;
-                            } else {
-                                testCase.result = JUnit.TestCaseKind.Failure("Proof not closeable.");
-                                failure++;
-                            }
-                        }
+        for (var c : contracts) {
+            var testCase = testSuite.newTestCase(c.getName());
+            printf("[INFO] Contract: %s", c.getName());
+            Printer.inc();
+            var filename = MiscTools.toValidFileName(c.getName());
+            if (args.forbidContracts.contains(c.getName())) {
+                printm(" [INFO] Contract excluded by `--forbid-contract`");
+                testCase.result = new TestCaseKind.Skipped("Contract excluded by `--forbid-contract`.");
+                ++ignored;
+            } else if (args.dryRun) {
+                printm("[INFO] Contract skipped by `--dry-run`");
+                testCase.result = new TestCaseKind.Skipped("Contract skipped by `--dry-run`.");
+                ++ignored;
+            } else {
+                Boolean b = null;
+                try {
+                    b = runContract(pm, c, filename);
+                    if (b) {
+                        successful++;
+                    } else {
+                        testCase.result = new JUnit.TestCaseKind.Failure("Proof not closeable.", null);
+                        failure++;
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    error++;
                 }
             }
-            printm("[INFO] Summary for $inputFile: " +
-                    "(successful/ignored/failure) " +
-                    "(${color(successful, GREEN)}/${color(ignored, BLUE)}/${color(failure, RED)})")
-            if (failure != 0)
-                printm("[ERR ] $inputFile failed!", fg = RED)
+            Printer.dec();
+        }
+
+        Printer.dec();
+        printf("[INFO] Summary for %s: " +
+                        "(successful/ignored/failure/error) " +
+                        "(%s/%s/%s/%s)",
+                inputFile, color(successful, GREEN), color(ignored, BLUE),
+                color(failure, RED), color(error, YELLOW));
+        if (failure != 0 || error != 0) {
+            printm("[ERR ] " + inputFile + " failed!", RED);
         }
     }
 
-    private Boolean runContract(ProofManagementApi pm, Contract c, String filename) throws ProofInputException, ProblemLoaderException {
+
+    private Boolean runContract(ProofManagementApi pm, Contract c, String filename) throws ProofInputException, ProblemLoaderException, ScriptException, IOException, InterruptedException {
         var proofApi = pm.startProof(c);
         var proof = proofApi.getProof();
         assert (proof != null);
@@ -265,7 +303,7 @@ class Checker {
             errors++;
             printm("[ERR ] ✘ Proof open.", RED);
             if (args.verbose) {
-                printm("[FINE] ${proof.openGoals().size()} remains open");
+                printf("[FINE] %s remains open", proof.openGoals().size());
             }
         }
         proof.dispose();
@@ -293,7 +331,7 @@ class Checker {
     }
 
     private boolean loadScript(AbstractUserInterfaceControl ui, Proof proof, String scriptFile) throws IOException, ScriptException, InterruptedException {
-        var script = new File(scriptFile).readText();
+        var script = Files.readString(Paths.get(scriptFile));
         var engine = new ProofScriptEngine(script, new Location(scriptFile, 1, 1));
         var startTime = System.currentTimeMillis();
         engine.execute(ui, proof);
@@ -331,18 +369,21 @@ class Checker {
             proof.getStatistics().getSummary().forEach(
                     p -> printm("[FINE] ${p.first} = ${p.second}"));
         }
+
         if (args.enableMeasuring) {
             var closedGoals = proof.getClosedSubtreeGoals(proof.root());
             var visitLineOnClosedGoals = new HashSet<Pair<String, Integer>>();
             closedGoals.forEach(it ->
-                    getPathToRoot(it).forEach(it -> {
-                                var p = it.getNodeInfo().getActiveStatement() ?.positionInfo
+                    it.node().iterateToRoot().forEach(n -> {
+                                var p = n.getNodeInfo().getActiveStatement().getPositionInfo();
                                 if (p != null) {
-                                    visitLineOnClosedGoals.add(p.fileName to p.startPosition.line)
+                                    visitLineOnClosedGoals.add(
+                                            new Pair<>(p.getFileName(), p.getStartPosition().getLine()));
                                 }
                             }
-                    );
-            printm("Visited lines:\n${visitLineOnClosedGoals.joinToString("\n")}");
+                    ));
+            printf("Visited lines:\n%s",
+                    visitLineOnClosedGoals.stream().map(Object::toString).collect(Collectors.joining()));
         }
     }
 
@@ -352,20 +393,20 @@ class Checker {
         if (proofFileCandidates == null) {
             proofFileCandidates = new ArrayList<>();
             args.proofPath.forEach(it ->
-                    proofFileCandidates.addAll(new File(it).list())
+                    proofFileCandidates.addAll(Arrays.asList(it.list()))
             );
         }
         return proofFileCandidates;
     }
 
     private String findProofFile(String filename) {
-        return proofFileCandidates.stream().filter(it ->
+        return getProofFileCandidates().stream().filter(it ->
                 it.startsWith(filename) && (it.endsWith(".proof") || it.endsWith(".proof.gz"))
         ).findFirst().orElse(null);
     }
 
     private String findScriptFile(String filename) {
-        return proofFileCandidates.stream().filter(it ->
+        return getProofFileCandidates().stream().filter(it ->
                 it.startsWith(filename) && (it.endsWith(".txt") || it.endsWith(".pscript"))
         ).findFirst().orElse(null);
     }
@@ -381,7 +422,7 @@ class Checker {
         return path.stream();
     }
 
-    private static Pair<Integer, Integer> openClosedProgramBranches(Proof self) {
+    private static Pair<Long, Long> openClosedProgramBranches(Proof self) {
         List<Node> branchingNodes = new LinkedList<>();
         self.root().subtreeIterator().forEachRemaining(
                 it -> {
@@ -391,21 +432,21 @@ class Checker {
                 });
         var programBranchingNodes = branchingNodes.stream().filter(
                 it -> {
-                    var childStmt = it.childrenIterator().asSequence().map {
-                        child -> child.nodeInfo.activeStatement
-                    }
-                    childStmt.any {
-                        c -> c != it.nodeInfo.activeStatement
-                    }
+                    final Spliterator<Node> spliterator = Spliterators.spliteratorUnknownSize(it.childrenIterator(),
+                            Spliterator.ORDERED);
+                    var s = StreamSupport.stream(spliterator, false);
+                    var childStmt = s.map(child -> child.getNodeInfo().getActiveStatement())
+                            .filter(c -> c != it.getNodeInfo().getActiveStatement())
+                            .findAny();
+                    return childStmt.isPresent();
                 });
 
-        var diverseProgramBranches = programBranchingNodes.stream().filter({
-                parent ->
-                        !parent.isClosed && parent.childrenIterator().asSequence().any{
-                it.isClosed}
-        });
+        var diverseProgramBranches = programBranchingNodes.filter(parent ->
+                !parent.isClosed() && parent.childrenStream().filter(it -> it.isClosed()).findAny().isPresent()
+        );
 
-        return new Pair<>(diverseProgramBranches.count(), programBranchingNodes.count());
+        var p = new Pair<>(diverseProgramBranches.count(), programBranchingNodes.count());
+        return p;
     }
 
 
