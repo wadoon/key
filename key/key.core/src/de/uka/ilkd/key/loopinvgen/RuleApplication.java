@@ -42,6 +42,7 @@ public class RuleApplication {
 				.getDefaultPropertiesFactory().createDefaultStrategyProperties();
 		sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_OFF);
 		sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_NONE);
+		sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_EXPAND);
 
 		ps.setStrategyProperties(sp);
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
@@ -134,7 +135,9 @@ public class RuleApplication {
 	}
 
 	Goal findLoopUnwindTacletGoal(ImmutableList<Goal> goals) {
+//		System.out.println(goals.head().proof().getSettings().settingsToString());
 		for (Goal g : goals) {
+//			System.out.println("Goal: " + g);
 			for (SequentFormula sf : g.sequent().succedent()) {
 				ImmutableList<TacletApp> tApp = findLoopUnwindTaclet(sf, g);
 				if (!tApp.isEmpty()) {

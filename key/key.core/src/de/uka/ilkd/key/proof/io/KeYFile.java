@@ -350,7 +350,6 @@ public class KeYFile implements EnvInput {
 	KeYParserF problemParser = null;
 	try {
             Debug.out("Reading KeY file", file);
-                   
             final ParserConfig normalConfig 
                     = new ParserConfig(initConfig.getServices(), initConfig.namespaces());                       
             final ParserConfig schemaConfig 
@@ -386,7 +385,8 @@ public class KeYFile implements EnvInput {
             }
 	} catch (RecognitionException e) {
             // problemParser cannot be null since exception is thrown during parsing.
-            String message = problemParser.getErrorMessage(e);
+           
+			String message = problemParser.getErrorMessage(e) + "\\ Line:"+e.line+" Column: "+e.charPositionInLine;
             throw new ProofInputException(message, e);
         } catch (IOException io) {
             throw new ProofInputException(io);            

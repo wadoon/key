@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.logic.op;
 
-import java.util.WeakHashMap;
-
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -17,6 +14,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public class AnonEventUpdate extends AbstractSortedOperator {
 
+	/*
 	private static WeakHashMap<Sort, AnonEventUpdate> anonEventUpdates =
 			new WeakHashMap<>();
 	
@@ -32,13 +30,16 @@ public class AnonEventUpdate extends AbstractSortedOperator {
 		}
 		return evUpdate;
 	}
+	*/
 	
-	private AnonEventUpdate(Sort argSort) {
-		super(new Name("\\eventStar"), new Sort[]{argSort,argSort}, Sort.UPDATE, false);
+	public static final Operator SINGLETON = new AnonEventUpdate();
+
+	private AnonEventUpdate() {
+		super(new Name("anonEvent"), new Sort[]{/* LocSet */Sort.ANY, /* int, but no order */Sort.ANY}, Sort.UPDATE, false);
 	}
 	
 	public String toString() {
-		return "\\eventStar";
+		return "anonEvent";
 	}
 
 }

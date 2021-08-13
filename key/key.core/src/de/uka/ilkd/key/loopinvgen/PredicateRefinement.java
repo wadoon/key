@@ -80,6 +80,7 @@ public class PredicateRefinement {
 	private void detectFormula(Term sf) {
 		for (Operator f : CompOps) {
 			if (sf.op().equals(f)) {
+				//System.out.println("Detected Formula: " + sf);
 				delCompPred(sf);
 				break;
 			}
@@ -212,7 +213,7 @@ public class PredicateRefinement {
 			if (sProof.proofNonEmptyIntersectionWIndex(currentIdxF, t.sub(0), locSet)) {
 				if (pred.equals(depLDT.getRPred()) && t.op().equals(depLDT.getNoR())) {
 					toDelete.add(t);
-//					System.out.println("delDepPred: Delete " + t + " because of " + sf + " and " + currentIdxF);
+//					System.out.println("READ::::" + sf);
 				} else if (pred.equals(depLDT.getWPred()) && t.op().equals(depLDT.getNoW())) {
 					toDelete.add(t);
 //					System.out.println("delDepPred: Delete " + t + " because of " + sf + " and " + currentIdxF);
@@ -322,13 +323,18 @@ public class PredicateRefinement {
 
 		if (!term.containsJavaBlockRecursive()) {
 			if (term.op() instanceof ProgramVariable) {
+//				System.out.println("PV " + term);
 				return true;
 			} else if (term.op() instanceof Function && term.sort() != Sort.FORMULA
 					&& (term.arity() == 0 || term.arity() == 1) && term.freeVars().isEmpty()) {
+//				System.out.println("FUNCTION " + term);
 				return true;
 			} else
-				for (Term sub : term.subs())
+				for (Term sub : term.subs()) {
 					isProgramOrLogicVariable(sub);
+//					System.out.println("SUB " + sub);
+				}
+					
 		}
 		return false;
 	}

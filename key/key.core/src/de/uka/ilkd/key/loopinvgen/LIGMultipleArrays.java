@@ -34,7 +34,7 @@ public class LIGMultipleArrays {
 	private final Sequent seq;
 	private final Services services;
 	private final TermBuilder tb;
-	private Term low, high, index;
+	private Term low, high, index, guard;
 	private Set<Term> arrays = new HashSet<>();
 	private final RuleApplication ruleApp;
 	private Set<Term> oldCompPred = new HashSet<>();
@@ -50,24 +50,27 @@ public class LIGMultipleArrays {
 	}
 
 	public void mainAlg() {
+		int manualItr = 0;
 		getLow(seq);
 		getIndexAndHigh(seq);
 		getLocSet(seq);
-		
+
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
 		ImmutableList<Goal> goalsAfterUnwind = null;
-		
+
 		Goal currentGoal = goalsAfterShift.head();
 		SequentFormula currentIndexFormula = null;
-		
+
 		ConstructAllCompPreds cac = new ConstructAllCompPreds(services, low, index, high);
 		Set<Term> compPreds = cac.cons();
 
 		Set<Term> depPreds = new HashSet<>();
-		for(Term arr:arrays) {
+		for (Term arr : arrays) {
 			ConstructAllDepPreds cad = new ConstructAllDepPreds(services, arr, low, index, high);
 			depPreds.addAll(cad.cons());
 		}
+//		RefineByGuard rbg = new RefineByGuard(services, compPreds, guard);
+//		compPreds = rbg.delCompPred();
 
 		do {
 			oldCompPred.removeAll(oldCompPred);
@@ -80,8 +83,12 @@ public class LIGMultipleArrays {
 			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
 
 			goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
+//			System.out.println(goalsAfterUnwind.head().sequent());
+			
 			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
+//			System.out.println(goalsAfterShift.head().sequent());
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
+//			System.out.println(currentGoal);
 
 			PredicateRefinement pr = new PredicateRefinement(services, currentGoal.sequent(), compPreds, depPreds,
 					currentIndexFormula);
@@ -90,10 +97,12 @@ public class LIGMultipleArrays {
 			compPreds = pr.refinedCompList;
 			depPreds = pr.refinedDepList;
 //			System.out.println("DP: " + depPreds);
+			manualItr++;
+		} while (!compPreds.equals(oldCompPred) || !depPreds.equals(oldDepPred) || manualItr < 6);
 
-		} while (!compPreds.equals(oldCompPred) || !depPreds.equals(oldDepPred));
-		PredicateListCompression plc = new PredicateListCompression(services, currentGoal.sequent(), currentIndexFormula);
-		//Compression is not mandetory
+		PredicateListCompression plc = new PredicateListCompression(services, currentGoal.sequent(),
+				currentIndexFormula);
+		// Compression is not mandetory
 		plc.compression(depPreds, compPreds);
 		System.out.println("LIG is the conjunction of: " + compPreds + "  size " + compPreds.size() + " and " + depPreds
 				+ " of size " + depPreds.size());
@@ -155,6 +164,41 @@ public class LIGMultipleArrays {
 		this.index = expr2term(index);
 	}
 
+	void getLoopGuard(Sequent seq) {
+		Term guard = null;
+		for (SequentFormula sf : seq.succedent()) {
+			Term formula = skipUpdates(sf.formula());
+			if (formula.op() == Modality.DIA) {
+				ProgramElement pe = formula.javaBlock().program();
+				Statement activePE;
+				if (pe instanceof ProgramPrefix) {
+					activePE = (Statement) ((ProgramPrefix) pe).getLastPrefixElement().getFirstElement();
+				} else {
+					activePE = (Statement) pe.getFirstElement();
+				}
+				if (activePE instanceof While) {
+					Expression expr = (Expression) ((While) activePE).getGuardExpression();
+					if (expr instanceof GreaterOrEquals) {
+						guard = tb.geq(expr2term(((ComparativeOperator) expr).getExpressionAt(0)),
+								expr2term(((ComparativeOperator) expr).getExpressionAt(1)));
+					} else if (expr instanceof GreaterThan) {
+						guard = tb.gt(expr2term(((ComparativeOperator) expr).getExpressionAt(0)),
+								expr2term(((ComparativeOperator) expr).getExpressionAt(1)));
+					} else if (expr instanceof LessOrEquals) {
+						guard = tb.leq(expr2term(((ComparativeOperator) expr).getExpressionAt(0)),
+								expr2term(((ComparativeOperator) expr).getExpressionAt(1)));
+					} else if (expr instanceof LessThan) {
+						guard = tb.lt(expr2term(((ComparativeOperator) expr).getExpressionAt(0)),
+								expr2term(((ComparativeOperator) expr).getExpressionAt(1)));
+					}
+
+				}
+				break;
+			}
+		}
+		this.guard = guard;
+	}
+
 	Term expr2term(Expression expr) {
 		return this.services.getTypeConverter().convertToLogicElement(expr);
 	}
@@ -162,7 +206,6 @@ public class LIGMultipleArrays {
 	private Term skipUpdates(Term formula) {
 		return formula.op() instanceof UpdateApplication ? UpdateApplication.getTarget(formula) : formula;
 	}
-
 
 	Set<LocationVariable> extractProgramVariable(Statement s) {
 		ProgramVariableCollectorWithArrayIndices pvc = new ProgramVariableCollectorWithArrayIndices(s, services);

@@ -44,69 +44,31 @@ public class PredicateListCompression {
 	}
 
 	void compression(Set<Term> depPredsList, Set<Term> compPredsList) {
-
-//		do {
-
-//			oldDepPredsList.removeAll(oldDepPredsList);
-//			oldDepPredsList.addAll(depPredsList);
-
+		
 		finalCompPredListCompression(compPredsList);
-//		finalDepPredListCompression(depPredsList);
 
-//		} while(/*!compPredsList.equals(oldCompPredsList) || */depPredsList.size()!=oldDepPredsList.size());// Logically it is not a valid condition but also !depPredsList.equal(oldDepPreds) is not working correctly because it is checking syntactic equality 
-
-//		System.out.println("LIG is the conjunction of: " + compPredsList + "  size " + compPredsList.size() + " and "
-//				+ depPredsList + " of size " + depPredsList.size());
 	}
 
-	private Set<Term> finalDepPredListCompression(Set<Term> fDepPredList) {
+	private Set<Term> depPredListCompressionBySubset(Set<Term> fDepPredList) {
 		Set<Term> toDelete = new HashSet<>();
-		Set<Term> toAdd = new HashSet<>();
+
 		for (Term depPred1 : fDepPredList) {
 			for (Term depPred2 : fDepPredList) {
 				if (depPred1.op().equals(depPred2.op()) && !depPred1.sub(0).equals(depPred2.sub(0))
-						&& depPred1.sub(0).sub(0).equals(depPred2.sub(0).sub(0))) {
+				/* && depPred1.sub(0).sub(0).equals(depPred2.sub(0).sub(0)) */) {
 					Boolean loc1SubSetloc2 = sProof.proofSubSetWIndex(currentIdxF, depPred1.sub(0), depPred2.sub(0));
-					Boolean loc2SubSetloc1 = sProof.proofSubSetWIndex(currentIdxF, depPred2.sub(0), depPred1.sub(0));
-					if (loc1SubSetloc2 && !loc2SubSetloc1) {
+
+					if (loc1SubSetloc2) {
 						toDelete.add(depPred1);
-					} else if (loc2SubSetloc1 && !loc1SubSetloc2) {
-						toDelete.add(depPred2);
-					} else if (!loc1SubSetloc2 && !loc2SubSetloc1) { // this adds uniond and locSet doesn't have proper
-																		// rules for them. That is why I'm not
-																		// compressing dep preds now.
-						toDelete.add(depPred1);
-						toDelete.add(depPred2);
-						if (depPred1.op().equals(depLDT.getNoR())) {
-							toAdd.add(tb.noR(tb.union(depPred1.sub(0), depPred2.sub(0))));
-						} else if (depPred1.op().equals(depLDT.getNoW())) {
-							toAdd.add(tb.noW(tb.union(depPred1.sub(0), depPred2.sub(0))));
-						} else if (depPred1.op().equals(depLDT.getNoRaW())) {
-							toAdd.add(tb.noRaW(tb.union(depPred1.sub(0), depPred2.sub(0))));
-						} else if (depPred1.op().equals(depLDT.getNoWaR())) {
-							toAdd.add(tb.noWaR(tb.union(depPred1.sub(0), depPred2.sub(0))));
-						} else if (depPred1.op().equals(depLDT.getNoWaW())) {
-							toAdd.add(tb.noWaW(tb.union(depPred1.sub(0), depPred2.sub(0))));
-						}
+					} else {
+						Boolean loc2SubSetloc1 = sProof.proofSubSetWIndex(currentIdxF, depPred2.sub(0),
+								depPred1.sub(0));
+						if (loc2SubSetloc1)
+							toDelete.add(depPred2);
 					}
 				}
 			}
 		}
-//		System.out.println(toDelete.size());
-		fDepPredList.addAll(toAdd);
-		// Following lines are basically fDepPredList.removeAll(toDelete) plus being
-		// semmantically correct
-		fDepPredList.removeAll(toDelete);
-		Set<Term> delete = new HashSet<>();
-		for (Term del : toDelete) {
-			for (Term pred : fDepPredList) {
-				if (del.op().equals(pred.op()) && sProof.proofSubSetWIndex(currentIdxF, del.sub(0), pred.sub(0))
-						&& sProof.proofSubSetWIndex(currentIdxF, pred.sub(0), del.sub(0))) {
-					delete.add(pred);
-				}
-			}
-		}
-		fDepPredList.removeAll(delete);
 		return fDepPredList;
 	}
 
@@ -148,5 +110,5 @@ public class PredicateListCompression {
 		}
 		fCompPredList.removeAll(toDelete);
 		return fCompPredList;
-	}	
+	}
 }
