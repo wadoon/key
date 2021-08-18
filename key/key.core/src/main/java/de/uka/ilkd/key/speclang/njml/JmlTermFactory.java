@@ -339,6 +339,14 @@ public final class JmlTermFactory {
         return new SLExpression(result);
     }
 
+    public SLExpression some(
+            Term property, Term defaultTerm,
+            KeYJavaType declsType, boolean nullable,
+            ImmutableList<LogicVariable> qvs) {
+        final Term some = tb.ifEx(qvs.head(), tb.convertToFormula(property), tb.var(qvs.head()), defaultTerm);
+        return new SLExpression(some, declsType);
+    }
+
 
     /*public SLExpression translateGeneralizedQuantifiers(KeYJavaType declsType, boolean nullable, Iterable<LogicVariable> qvs, Term t1, Term t2, KeYJavaType resultType)
                  {

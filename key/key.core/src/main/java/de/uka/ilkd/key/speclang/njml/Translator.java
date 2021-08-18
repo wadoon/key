@@ -1622,6 +1622,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
                 return termFactory.quantifiedNumOf(guard, body,
                         declVars.first, nullable, declVars.second,
                         kjtInt);
+            case JmlLexer.SOME:
+                if (declVars.second.size() != 1) {
+                    raiseError("JML construct " +
+                            "\\some needs exactly one bound variable.", ctx)
+                } else {
+                    return termFactory.some(guard, body,
+                        declVars.first, nullable, declVars.second);
+                }
             case JmlLexer.SUM:
                 return termFactory.quantifiedSum(declVars.first, nullable,
                         declVars.second, guard, body,

@@ -370,6 +370,7 @@ SEQSINGLETON: '\\seq_singleton';  //KeY extension, not official JML
 SEQSUB: '\\seq_sub';  //KeY extension, not official JML
 SETMINUS: '\\set_minus';  //KeY extension, not official JML
 SINGLETON: '\\singleton';  //KeY extension, not official JML
+SOME: '\\some';
 SPACE: '\\space';
 STATIC_INVARIANT_FOR: '\\static_invariant_for';  //KeY extension, not official JML
 STRICTLY_NOTHING: '\\strictly_nothing';  //KeY extension, not official JML
