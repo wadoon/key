@@ -1625,7 +1625,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             case JmlLexer.SOME:
                 if (declVars.second.size() != 1) {
                     raiseError("JML construct " +
-                            "\\some needs exactly one bound variable.", ctx)
+                            "\\some needs exactly one bound variable.", ctx);
                 } else {
                     return termFactory.some(guard, body,
                         declVars.first, nullable, declVars.second);
