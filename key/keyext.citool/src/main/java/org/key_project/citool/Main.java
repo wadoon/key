@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -387,14 +388,25 @@ class Checker {
         }
     }
 
-    private List<String> proofFileCandidates;
+    private List<File> proofFileCandidates;
 
-    public List<String> getProofFileCandidates() {
+    public List<File> getProofFileCandidates() {
         if (proofFileCandidates == null) {
-            proofFileCandidates = new ArrayList<>();
-            args.proofPath.forEach(it ->
-                    proofFileCandidates.addAll(Arrays.asList(it.list()))
-            );
+            proofFileCandidates = args.proofPath.stream()
+                    .flatMap(it -> {
+                        try {
+                            return Files.walk(it.toPath());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .map(Path::toFile)
+                    .filter(it -> it.getName().endsWith(".proof"))
+                    .collect(Collectors.toList());
+
+            printf("Found %d proof files", proofFileCandidates.size());
         }
         return proofFileCandidates;
     }
