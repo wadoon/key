@@ -54,11 +54,6 @@ public class JUnit {
         }
     }
 
-
-    /**
-     * @author Alexander Weigl
-     * @version 1 (3/10/20)
-     */
     public static class TestSuites extends ArrayList<TestSuite> {
         public String name;
 

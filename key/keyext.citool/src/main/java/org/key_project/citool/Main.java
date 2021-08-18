@@ -160,7 +160,10 @@ class Checker {
     public static final int MAGENTA = 35;
     public static final int CYAN = 36;
 
-    final Main.Arguments args;
+    private int errors = 0;
+    private final TestSuites testSuites = new TestSuites();
+
+    private final Main.Arguments args;
     private ChoiceSettings choiceSettings;
 
     Checker(Main.Arguments args) {
@@ -175,10 +178,6 @@ class Checker {
         }
         choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
     }
-
-
-    private int errors = 0;
-    private final TestSuites testSuites = new TestSuites();
 
     public void run() throws IOException {
         if (args.inputFile == null || args.inputFile.isEmpty()) {
@@ -270,7 +269,6 @@ class Checker {
         }
     }
 
-
     private Boolean runContract(ProofManagementApi pm, Contract c, String filename) throws ProofInputException, ProblemLoaderException, ScriptException, IOException, InterruptedException {
         var proofApi = pm.startProof(c);
         var proof = proofApi.getProof();
@@ -331,9 +329,9 @@ class Checker {
         return proof.closed();
     }
 
-    private boolean loadScript(AbstractUserInterfaceControl ui, Proof proof, String scriptFile) throws IOException, ScriptException, InterruptedException {
-        var script = Files.readString(Paths.get(scriptFile));
-        var engine = new ProofScriptEngine(script, new Location(scriptFile, 1, 1));
+    private boolean loadScript(AbstractUserInterfaceControl ui, Proof proof, File scriptFile) throws IOException, ScriptException, InterruptedException {
+        var script = Files.readString(scriptFile.toPath());
+        var engine = new ProofScriptEngine(script, new Location(scriptFile.toURL(), 1, 1));
         var startTime = System.currentTimeMillis();
         engine.execute(ui, proof);
         var stopTime = System.currentTimeMillis();
@@ -343,8 +341,8 @@ class Checker {
         return proof.closed();
     }
 
-    private boolean loadProof(String keyFile) throws ProblemLoaderException {
-        var env = KeYEnvironment.load(new File(keyFile));
+    private boolean loadProof(File keyFile) throws ProblemLoaderException {
+        var env = KeYEnvironment.load(keyFile);
         try {
             var proof = env.getLoadedProof();
             try {
@@ -363,7 +361,6 @@ class Checker {
             env.dispose();
         }
     }
-
 
     private void printStatistics(Proof proof) {
         if (args.verbose) {
@@ -411,15 +408,15 @@ class Checker {
         return proofFileCandidates;
     }
 
-    private String findProofFile(String filename) {
+    private File findProofFile(String filename) {
         return getProofFileCandidates().stream().filter(it ->
-                it.startsWith(filename) && (it.endsWith(".proof") || it.endsWith(".proof.gz"))
+                it.getName().startsWith(filename) && (it.getName().endsWith(".proof") || it.getName().endsWith(".proof.gz"))
         ).findFirst().orElse(null);
     }
 
-    private String findScriptFile(String filename) {
+    private File findScriptFile(String filename) {
         return getProofFileCandidates().stream().filter(it ->
-                it.startsWith(filename) && (it.endsWith(".txt") || it.endsWith(".pscript"))
+                it.getName().startsWith(filename) && (it.getName().endsWith(".txt") || it.getName().endsWith(".pscript"))
         ).findFirst().orElse(null);
     }
 
@@ -460,7 +457,6 @@ class Checker {
         var p = new Pair<>(diverseProgramBranches.count(), programBranchingNodes.count());
         return p;
     }
-
 
     //region Measuring
     class MeasuringMacro extends SequentialProofMacro {
