@@ -74,7 +74,7 @@ public class SMTFocusResults {
             }
 
             Semisequent succedent = goal.node().sequent().succedent();
-            for (SequentFormula sf : antecedent) {
+            for (SequentFormula sf : succedent) {
                 if (!unsatCore.contains(i)) {
                     // TODO: ugly way of acessing. Can be done better?!
                     SchemaVariable schema = hideRight.collectSchemaVars().iterator().next();
