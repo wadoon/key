@@ -198,7 +198,9 @@ public class ReplayVisitor extends SMTProofBaseVisitor<Void> {
     public Void visitIdentifier(IdentifierContext ctx) {
         ParserRuleContext def = smtReplayer.getSymbolDef(ctx.getText(), ctx);
         if (def != null) {
-            Node old = smtReplayer.getKnownReplayedNode(ctx.getText());
+            // TODO: depends also on the context (i.e., the lemmas/hidden rules that are present on
+            //  the current branch!
+            Node old = smtReplayer.getKnownReplayedNode(ctx.getText(), hypoTaclets);
             // ctx has already been replayed on another branch: close by reference
             if (old != null) {
 
@@ -213,7 +215,11 @@ public class ReplayVisitor extends SMTProofBaseVisitor<Void> {
                 goal.apply(app);
                 goal.setBranchLabel("Closed by reference to " + old.serialNr());
             } else {
-                smtReplayer.addKnownReplayedNode(ctx.getText(), goal.node());
+                // first time we visit this identifier -> replay
+
+                //smtReplayer.addKnownReplayedNode(ctx.getText(), goal.node());
+
+                smtReplayer.addKnownReplayedNode(ctx.getText(), goal.node(), hypoTaclets);
 
                 //System.out.println(ctx.getText() + " (proof term)");
                 // continue proof replay with the partial tree from the symbol table

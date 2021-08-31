@@ -17,7 +17,6 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -65,14 +64,26 @@ public class SMTReplayer {
     // translation context (contained in SMTExprInContext)!
     private final Map<SMTExprInContext, Term> translationToTermMap;
     private final Map<String, Term> skMap = new HashMap<>();
-    private final Map<String, Node> knownReplayedNodes = new HashMap<>();
+    private final Map<String, Map<Map<Term, NoPosTacletApp>, Node>>
+        knownReplayedNodes = new HashMap<>();
 
-    public void addKnownReplayedNode(String text, Node node) {
-        knownReplayedNodes.put(text, node);
+    public void addKnownReplayedNode(String text, Node node,
+                                     Map<Term, NoPosTacletApp> hypoTaclets) {
+        // TODO: this seems to work, but is very slow!
+        knownReplayedNodes.computeIfAbsent(text, e -> new HashMap<>()).put(hypoTaclets, node);
+        //knownReplayedNodes.put(new Pair<>(text, new HashMap<>(hypoTaclets)), node);
     }
 
-    public Node getKnownReplayedNode(String key) {
-        return knownReplayedNodes.get(key);
+    public Node getKnownReplayedNode(String key,
+                                     Map<Term, NoPosTacletApp> hypoTaclets) {
+        // TODO: this seems to work, but is very slow!
+        //return knownReplayedNodes.get(new Pair<>(key, hypoTaclets));
+
+        Map<Map<Term, NoPosTacletApp>, Node> v1 = knownReplayedNodes.get(key);
+        if (v1 != null) {
+            return v1.get(hypoTaclets);
+        }
+        return null;
     }
 
     public static class SMTExprInContext {

@@ -69,7 +69,11 @@ public class Lemma extends ProofRule {
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         goal = goals.get(0);
-        SequentFormula cutFormula = ReplayTools.getLastAddedSuc(goal);
+
+        // TODO: problem if cutFormula is already present on sequent ...
+        SequentFormula interm = ReplayTools.getLastAddedSuc(goal);
+        // ensure that we have the exact instance that is present on sequent:
+        SequentFormula cutFormula = ReplayTools.findEquivalentInstanceInSequent(goal.sequent(), interm, false);
 
         // notRight
         SequentFormula seqForm = cutFormula;

@@ -298,6 +298,29 @@ public final class ReplayTools {
         return null;
     }
 
+    /**
+     * Searches the given SequentFormula for an instance that is equal to the given one. If the
+     * given SequentFormula is already present on the sequent, it is returned.
+     * Needed to fetch the exact instance, since some internal methods (e.g., indexOf in
+     * Semisequent) need the exact instance present on the sequent to work.
+     * TODO: check equality modulo term labels?
+     * @param sequent the sequent to search
+     * @param equiv the formula to search for
+     * @param ante indicates whether to search in antecedent or succedent
+     * @return the found instance or null if none is found
+     */
+    public static SequentFormula findEquivalentInstanceInSequent(Sequent sequent,
+                                                                 SequentFormula equiv,
+                                                                 boolean ante) {
+        Semisequent semi = ante ? sequent.antecedent() : sequent.succedent();
+        for (SequentFormula sf : semi.asList()) {
+            if (sf.equals(equiv) || sf.toString().equals(equiv.toString())) {
+                return sf;
+            }
+        }
+        return null;
+    }
+
     public static Goal focus(SequentFormula formula, Goal goal, boolean antec) {
         FocusRule focusRule = FocusRule.INSTANCE;
         PosInOccurrence pio = new PosInOccurrence(formula, PosInTerm.getTopLevel(), antec);
