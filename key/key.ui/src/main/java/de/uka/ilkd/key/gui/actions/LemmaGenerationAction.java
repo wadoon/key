@@ -15,10 +15,12 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -331,8 +333,30 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                             base = base.prependReverse(taclets);
                             proof.getInitConfig().setTaclets(base);
 
+                            try {
+                                // open InputStream and close it directly -> ensures that file is
+                                // copied to FileRepo if necessary
+                                FileRepo fileRepo = proof.getInitConfig().getFileRepo();
+
+                                if (fileRepo != null) {
+                                    fileRepo.getInputStream(fileForLemmata.toPath()).close();
+
+                                    for (File f : filesForAxioms) {
+                                        fileRepo.getInputStream(f.toPath()).close();
+                                    }
+                                }
+                            } catch (IOException e) {
+                                handleException(e);
+                            }
+
                             // add an include-statement to the proof for the lemma file
                             proof.prefixHeader("\\include \"" + fileForLemmata + "\";\n\n");
+
+                            // add include-statements for axiom/declaration files
+                            for (File ffa : filesForAxioms) {
+                                // TODO: reverses the order. Is this a problem?
+                                proof.prefixHeader("\\include \"" + ffa + "\";\n");
+                            }
 
                             for (Taclet taclet : taclets) {
                                 for (Goal goal : proof.openGoals()) {
