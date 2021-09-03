@@ -164,7 +164,11 @@ public class FloatHandler implements SMTHandler {
                 Operator subOp = t.op();
                 String termType = t.sort().toString();
 
-                if (subOp instanceof ProgramVariable ||((Function)subOp).isSkolemConstant()|| services.getTypeConverter().getHeapLDT().isSelectOp(subOp)) {
+                if (subOp instanceof ProgramVariable ||
+                        ((Function) subOp).isSkolemConstant() ||
+                        services.getTypeConverter().getHeapLDT().isSelectOp(subOp) ||
+                        ((Function) subOp).sort().equals(floatLDT.targetSort())) {
+
 
                     if (termType.equals("float"))
                         translatedSubs.add(trans.translate(t, SExpr.Type.FLOAT));
