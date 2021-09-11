@@ -125,55 +125,120 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         cml.add(c);
     }
 
+
+    private static int appendComments(ProgramElement last, List<Comment> comments, int commentIndex) {
+        int commentCount = comments.size();
+        ProgramElement pe = last;
+        while (commentIndex < commentCount) {
+            Comment current = comments.get(commentIndex);
+            Position cpos = current.getStartPosition();
+            while (pe.getEndPosition().compareTo(cpos) < 0) {
+                if (pe.getASTParent() == null) {
+                    return commentIndex;
+                }
+                pe = pe.getASTParent();
+            }
+            if (!(pe instanceof StatementBlock)) {
+                // shouldn't happen
+                return commentIndex;
+            }
+            StatementBlock block = (StatementBlock) pe;
+            Statement newEmpty = pe.getFactory().createEmptyStatement();
+            ASTList<Statement> body = block.getBody();
+            body.add(newEmpty);
+            block.setBody(body);
+            ASTList<Comment> cml = new ASTArrayList<Comment>();
+            newEmpty.setComments(cml);
+            while (commentIndex < commentCount && pe.getEndPosition().compareTo(cpos) > 0) {
+                current.setPrefixed(false);
+                cml.add(current);
+                commentIndex += 1;
+                if (commentIndex == commentCount) {
+                    return commentIndex;
+                }
+                current = comments.get(commentIndex);
+                cpos = current.getStartPosition();
+            }
+        }
+        return commentIndex;
+    }
+
+    private static Position getPrevBlockEnd(ProgramElement pePrev, ProgramElement peNext) {
+        Position startPos = peNext.getFirstElement().getStartPosition();
+        ProgramElement pe = pePrev;
+        Position endPos = ZERO_POSITION;
+        while (pe != null) {
+            if (pe.getEndPosition().compareTo(startPos) > 0) {
+                return endPos;
+            }
+            endPos = pe.getEndPosition();
+            pe = pe.getASTParent();
+        }
+        return endPos;
+    }
+
     /**
        Perform post work on the created element. Creates parent links
        and assigns comments.
      */
-    private static void postWork(ProgramElement pe) {
+    private static void postWork(ProgramElement programElem) {
         List<Comment> comments = ProofJavaParser.getComments();
         int commentIndex = 0;
         int commentCount = comments.size();
-        Position cpos = ZERO_POSITION;
-        Comment current = null;
-        if (commentIndex < commentCount) {
-            current = comments.get(commentIndex);
-            cpos = current.getFirstElement().getStartPosition();
+        if (commentCount == 0) {
+            return;
         }
-        TreeWalker tw = new TreeWalker(pe);
+        Comment current = comments.get(commentIndex);
+        Position cpos = current.getFirstElement().getStartPosition();
+
+        ProgramElement pePrev = programElem;
+        ProgramElement peNext = programElem;
+        TreeWalker tw = new TreeWalker(programElem);
         while (tw.next()) {
-            pe = tw.getProgramElement();
-            if (pe instanceof NonTerminalProgramElement) {
-                ((NonTerminalProgramElement)pe).makeParentRoleValid();
+            peNext = tw.getProgramElement();
+
+            if (peNext instanceof NonTerminalProgramElement) {
+                ((NonTerminalProgramElement)peNext).makeParentRoleValid();
             }
-	    if (pe.getFirstElement()!=null) {
-		Position pos = pe.getFirstElement().getStartPosition();
-		while ((commentIndex < commentCount)
-		       && pos.compareTo(cpos) > 0) {
-		    current.setPrefixed(true);
-		    attachComment(current, pe);
-		    commentIndex += 1;
-		    if (commentIndex < commentCount) {
-			current = comments.get(commentIndex);
-			cpos = current.getFirstElement().getStartPosition();
-		    }
-		}
+            if (peNext.getFirstElement() == null) {
+                // Apparently these are nodes with no source and no position... skip them
+                continue;
             }
-        }
-        if (commentIndex < commentCount) {
-            while (pe.getASTParent() != null) {
-                pe = pe.getASTParent();
+
+            Position startPos = peNext.getFirstElement().getStartPosition();
+            if (startPos.compareTo(cpos) < 0) {
+                pePrev = peNext;
+                continue;
             }
-            ASTList<Comment> cml = pe.getComments();
-            if (cml == null) {
-                pe.setComments(cml = new ASTArrayList<Comment>());
-            }
-            do {
+            Position endPos = getPrevBlockEnd(pePrev, peNext);
+
+            while ((commentIndex < commentCount) && endPos.compareTo(cpos) > 0) {
+                // Append remaining comments to the previous block
+                commentIndex = appendComments(pePrev, comments, commentIndex);
+                if (commentIndex == commentCount) {
+                   return;
+                }
                 current = comments.get(commentIndex);
-                current.setPrefixed(false);
-                cml.add(current);
+                cpos = current.getFirstElement().getStartPosition();
+            }
+            while ((commentIndex < commentCount) && startPos.compareTo(cpos) > 0) {
+                // Append comments to the next node
+                current.setPrefixed(true);
+                attachComment(current, peNext);
                 commentIndex += 1;
-            } while (commentIndex < commentCount);
+                if (commentIndex == commentCount) {
+                    return;
+                }
+                current = comments.get(commentIndex);
+                cpos = current.getFirstElement().getStartPosition();
+            }
+            pePrev = peNext;
         }
+        // Append all remaining comments to the previous block
+        if (commentIndex < commentCount) {
+            commentIndex = appendComments(pePrev, comments, commentIndex);
+        }
+
     }
 
     /**
