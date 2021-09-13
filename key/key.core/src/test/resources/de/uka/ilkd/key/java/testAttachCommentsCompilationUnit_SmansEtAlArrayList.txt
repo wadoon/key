@@ -1,3 +1,13 @@
+(73/73) -- recoder.java.CompilationUnit
+  * /*@ accessible \inv: footprint;       @ invariant
+  * /*@ model \locset footprint;       @ accessible fo
+(1/73) -- recoder.java.declaration.ClassDeclaration
+  * /*@ accessible \inv: footprint;       @ invariant
+  * /*@ model \locset footprint;       @ accessible fo
+(67/1) -- recoder.java.declaration.FieldDeclaration
+  * /*@ accessible \inv: footprint;       @ invariant
+  * /*@ model \locset footprint;       @ accessible fo
+  * /*@model @*/
 (3/3) -- recoder.java.reference.TypeReference
   * /*@nullable@*/
 (3/13) -- recoder.java.declaration.ConstructorDeclaration
