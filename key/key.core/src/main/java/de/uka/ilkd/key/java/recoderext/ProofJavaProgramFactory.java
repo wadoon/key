@@ -17,10 +17,6 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.util.List;
-
 import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
 import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.parser.proofjava.ProofJavaParser;
@@ -31,12 +27,7 @@ import recoder.io.ProjectSettings;
 import recoder.io.PropertyNames;
 import recoder.java.*;
 import recoder.java.SourceElement.Position;
-import recoder.java.declaration.ConstructorDeclaration;
-import recoder.java.declaration.FieldDeclaration;
-import recoder.java.declaration.MemberDeclaration;
-import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.ParameterDeclaration;
-import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.*;
 import recoder.java.reference.MethodReference;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.VariableReference;
@@ -45,21 +36,31 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.util.StringUtils;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 public class ProofJavaProgramFactory extends JavaProgramFactory {
 
     /**
-     Protected constructor - use {@link #getInstance} instead.
+     * Protected constructor - use {@link #getInstance} instead.
      */
-    protected ProofJavaProgramFactory() {}
+    protected ProofJavaProgramFactory() {
+    }
 
     /**
-     The singleton instance of the program factory.
+     * The singleton instance of the program factory.
      */
     private static ProofJavaProgramFactory theFactory
-	= new ProofJavaProgramFactory();
+            = new ProofJavaProgramFactory();
 
     /**
-     Returns the single instance of this class.
+     * Returns the single instance of this class.
      */
     public static JavaProgramFactory getInstance() {
         return theFactory;
@@ -68,100 +69,26 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     @Override
     public void initialize(ServiceConfiguration cfg) {
 
-      super.initialize(cfg);
-      ProjectSettings settings = cfg.getProjectSettings();
+        super.initialize(cfg);
+        ProjectSettings settings = cfg.getProjectSettings();
       /*// that is the original recoder code:
       ProofJavaParser.setAwareOfAssert(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
               PropertyNames.JDK1_4)));
       ProofJavaParser.setJava5(ALLOW_JAVA5);
       */
-      ProofJavaParser.setJava5(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
-              PropertyNames.JAVA_5)));
-      ProofJavaParser.setAwareOfAssert(true);
+        ProofJavaParser.setJava5(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
+                PropertyNames.JAVA_5)));
+        ProofJavaParser.setAwareOfAssert(true);
 
-  }
+    }
 
 
     /**
-     For internal reuse and synchronization.
+     * For internal reuse and synchronization.
      */
     private static final ProofJavaParser parser = new ProofJavaParser(System.in);
 
     private static final Position ZERO_POSITION = new Position(0, 0);
-
-    private static void attachComment(Comment c, ProgramElement pe) {
-        ProgramElement dest = pe;
-        if (!c.isPrefixed()) {
-            NonTerminalProgramElement ppe = dest.getASTParent();
-            int i = 0;
-            if (ppe != null) {
-                for (; ppe.getChildAt(i) != dest; i++) {}
-            }
-            if (i == 0) { // before syntactical parent
-		c.setPrefixed(true);
-            } else {
-                dest = ppe.getChildAt(i - 1);
-                while (dest instanceof NonTerminalProgramElement) {
-                    ppe = (NonTerminalProgramElement)dest;
-                    i = ppe.getChildCount();
-                    if (i == 0) {
-                        break;
-                    }
-                    dest = ppe.getChildAt(i - 1);
-                }
-            }
-        }
-        if (c instanceof SingleLineComment && c.isPrefixed()) {
-            Position p = dest.getFirstElement().getRelativePosition();
-            if (p.getLine() < 1) {
-                p.setLine(1);
-                dest.getFirstElement().setRelativePosition(p);
-            }
-        }
-        ASTList<Comment> cml = dest.getComments();
-        if (cml == null) {
-            dest.setComments(cml = new ASTArrayList<Comment>());
-        }
-        cml.add(c);
-    }
-
-
-    private static int appendComments(ProgramElement last, List<Comment> comments, int commentIndex) {
-        int commentCount = comments.size();
-        ProgramElement pe = last;
-        while (commentIndex < commentCount) {
-            Comment current = comments.get(commentIndex);
-            Position cpos = current.getStartPosition();
-            while (pe.getEndPosition().compareTo(cpos) < 0) {
-                if (pe.getASTParent() == null) {
-                    return commentIndex;
-                }
-                pe = pe.getASTParent();
-            }
-            if (!(pe instanceof StatementBlock)) {
-                // shouldn't happen
-                return commentIndex;
-            }
-            StatementBlock block = (StatementBlock) pe;
-            Statement newEmpty = pe.getFactory().createEmptyStatement();
-            ASTList<Statement> body = block.getBody();
-            body.add(newEmpty);
-            block.setBody(body);
-            ASTList<Comment> cml = new ASTArrayList<Comment>();
-            newEmpty.setComments(cml);
-            while (commentIndex < commentCount && pe.getEndPosition().compareTo(cpos) > 0) {
-                current.setPrefixed(false);
-                cml.add(current);
-                commentIndex += 1;
-                if (commentIndex == commentCount) {
-                    return commentIndex;
-                }
-                current = comments.get(commentIndex);
-                cpos = current.getStartPosition();
-            }
-        }
-        return commentIndex;
-    }
 
     private static Position getPrevBlockEnd(ProgramElement pePrev, ProgramElement peNext) {
         Position startPos = peNext.getFirstElement().getStartPosition();
@@ -178,246 +105,190 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     }
 
     /**
-       Perform post work on the created element. Creates parent links
-       and assigns comments.
+     * Perform post work on the created element. Creates parent links
+     * and assigns comments.
      */
-    private static void postWork(ProgramElement programElem) {
-        List<Comment> comments = ProofJavaParser.getComments();
-        int commentIndex = 0;
-        int commentCount = comments.size();
-        if (commentCount == 0) {
-            return;
-        }
-        Comment current = comments.get(commentIndex);
-        Position cpos = current.getFirstElement().getStartPosition();
-
-        ProgramElement pePrev = programElem;
-        ProgramElement peNext = programElem;
-        TreeWalker tw = new TreeWalker(programElem);
-        while (tw.next()) {
-            peNext = tw.getProgramElement();
-
-            if (peNext instanceof NonTerminalProgramElement) {
-                ((NonTerminalProgramElement)peNext).makeParentRoleValid();
-            }
-            if (peNext.getFirstElement() == null) {
-                // Apparently these are nodes with no source and no position... skip them
-                continue;
-            }
-
-            Position startPos = peNext.getFirstElement().getStartPosition();
-            if (startPos.compareTo(cpos) < 0) {
-                pePrev = peNext;
-                continue;
-            }
-            Position endPos = getPrevBlockEnd(pePrev, peNext);
-
-            while ((commentIndex < commentCount) && endPos.compareTo(cpos) > 0) {
-                // Append remaining comments to the previous block
-                commentIndex = appendComments(pePrev, comments, commentIndex);
-                if (commentIndex == commentCount) {
-                   return;
-                }
-                current = comments.get(commentIndex);
-                cpos = current.getFirstElement().getStartPosition();
-            }
-            while ((commentIndex < commentCount) && startPos.compareTo(cpos) > 0) {
-                // Append comments to the next node
-                current.setPrefixed(true);
-                attachComment(current, peNext);
-                commentIndex += 1;
-                if (commentIndex == commentCount) {
-                    return;
-                }
-                current = comments.get(commentIndex);
-                cpos = current.getFirstElement().getStartPosition();
-            }
-            pePrev = peNext;
-        }
-        // Append all remaining comments to the previous block
-        if (commentIndex < commentCount) {
-            commentIndex = appendComments(pePrev, comments, commentIndex);
-        }
-
+    private static void postWork(@Nonnull ProgramElement programElem) {
+        new PostWorkProcessor(programElem).run();
     }
 
     /**
-     Parse a {@link CompilationUnit} from the given reader.
+     * Parse a {@link CompilationUnit} from the given reader.
      */
     @Override
     public CompilationUnit parseCompilationUnit(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try {
-		ProofJavaParser.initialize(in);
-		CompilationUnit res = ProofJavaParser.CompilationUnit();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                CompilationUnit res = ProofJavaParser.CompilationUnit();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
         }
     }
 
     /**
-     Parse a {@link TypeDeclaration} from the given reader.
+     * Parse a {@link TypeDeclaration} from the given reader.
      */
     @Override
     public TypeDeclaration parseTypeDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		TypeDeclaration res = ProofJavaParser.TypeDeclaration();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                TypeDeclaration res = ProofJavaParser.TypeDeclaration();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse a {@link FieldDeclaration} from the given reader.
+     * Parse a {@link FieldDeclaration} from the given reader.
      */
     @Override
     public FieldDeclaration parseFieldDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		FieldDeclaration res = ProofJavaParser.FieldDeclaration();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                FieldDeclaration res = ProofJavaParser.FieldDeclaration();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse a {@link MethodDeclaration} from the given reader.
+     * Parse a {@link MethodDeclaration} from the given reader.
      */
     @Override
     public MethodDeclaration parseMethodDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		MethodDeclaration res = ProofJavaParser.MethodDeclaration();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                MethodDeclaration res = ProofJavaParser.MethodDeclaration();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse a {@link MemberDeclaration} from the given reader.
+     * Parse a {@link MemberDeclaration} from the given reader.
      */
     @Override
     public MemberDeclaration parseMemberDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		MemberDeclaration res = ProofJavaParser.ClassBodyDeclaration();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                MemberDeclaration res = ProofJavaParser.ClassBodyDeclaration();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse a {@link ParameterDeclaration} from the given reader.
+     * Parse a {@link ParameterDeclaration} from the given reader.
      */
     @Override
     public ParameterDeclaration parseParameterDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		ParameterDeclaration res = ProofJavaParser.FormalParameter();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                ParameterDeclaration res = ProofJavaParser.FormalParameter();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse a {@link ConstructorDeclaration} from the given reader.
+     * Parse a {@link ConstructorDeclaration} from the given reader.
      */
     @Override
     public ConstructorDeclaration parseConstructorDeclaration(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		ConstructorDeclaration res = ProofJavaParser.ConstructorDeclaration();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                ConstructorDeclaration res = ProofJavaParser.ConstructorDeclaration();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse a {@link TypeReference} from the given reader.
+     * Parse a {@link TypeReference} from the given reader.
      */
     @Override
     public TypeReference parseTypeReference(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		TypeReference res = ProofJavaParser.ResultType();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                TypeReference res = ProofJavaParser.ResultType();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse an {@link Expression} from the given reader.
+     * Parse an {@link Expression} from the given reader.
      */
     @Override
     public Expression parseExpression(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		Expression res = ProofJavaParser.Expression();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                Expression res = ProofJavaParser.Expression();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
 
     /**
-     Parse some {@link Statement}s from the given reader.
+     * Parse some {@link Statement}s from the given reader.
      */
     @Override
     public ASTList<Statement> parseStatements(Reader in) throws IOException, ParserException {
-        synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		ASTList<Statement> res = ProofJavaParser.GeneralizedStatements();
-		for (int i = 0; i < res.size(); i += 1) {
-		    postWork(res.get(i));
-		}
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                ASTList<Statement> res = ProofJavaParser.GeneralizedStatements();
+                for (int i = 0; i < res.size(); i += 1) {
+                    postWork(res.get(i));
+                }
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
@@ -427,16 +298,16 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
      */
     @Override
     public StatementBlock parseStatementBlock(Reader in)
-	throws IOException, ParserException {
-	synchronized(parser) {
-	    try{
-		ProofJavaParser.initialize(in);
-		StatementBlock res = ProofJavaParser.StartBlock();
-		postWork(res);
-		return res;
-	    } catch (ParseException e) {
-		throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
-	    }
+            throws IOException, ParserException {
+        synchronized (parser) {
+            try {
+                ProofJavaParser.initialize(in);
+                StatementBlock res = ProofJavaParser.StartBlock();
+                postWork(res);
+                return res;
+            } catch (ParseException e) {
+                throw (ParserException) (new ParserException(e.getMessage())).initCause(e);
+            }
 
         }
     }
@@ -445,31 +316,31 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
      * Create a {@link PassiveExpression}.
      */
     public PassiveExpression createPassiveExpression(Expression e) {
-	return new PassiveExpression(e);
+        return new PassiveExpression(e);
     }
 
     /**
      * Create a {@link PassiveExpression}.
      */
     public PassiveExpression createPassiveExpression() {
-	return new PassiveExpression();
+        return new PassiveExpression();
     }
 
     /**
      * Create a {@link MethodSignature}.
      */
     public MethodSignature createMethodSignature(Identifier methodName,
-        ASTList<TypeReference> paramTypes) {
-       return new MethodSignature(methodName, paramTypes);
+                                                 ASTList<TypeReference> paramTypes) {
+        return new MethodSignature(methodName, paramTypes);
     }
 
     /**
      * Create a {@link MethodCallStatement}.
      */
     public MethodCallStatement createMethodCallStatement(Expression resVar,
-							 ExecutionContext ec,
-							 StatementBlock block) {
-	return new MethodCallStatement(resVar, ec, block);
+                                                         ExecutionContext ec,
+                                                         StatementBlock block) {
+        return new MethodCallStatement(resVar, ec, block);
     }
 
     public LoopScopeBlock createLoopScopeBlock() {
@@ -488,21 +359,22 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
      * Create a {@link MethodBodyStatement}.
      */
     public MethodBodyStatement createMethodBodyStatement(TypeReference bodySource,
-							 Expression resVar,
-							 MethodReference methRef) {
-	return new MethodBodyStatement(bodySource, resVar, methRef);
+                                                         Expression resVar,
+                                                         MethodReference methRef) {
+        return new MethodBodyStatement(bodySource, resVar, methRef);
     }
 
     /**
      * Create a {@link CatchAllStatement}.
      */
     public Statement createCatchAllStatement(VariableReference param,
-					     StatementBlock body) {
-	return new CatchAllStatement(param, body);
+                                             StatementBlock body) {
+        return new CatchAllStatement(param, body);
     }
 
     /**
      * Create a comment.
+     *
      * @param text comment text
      */
     @Override
@@ -512,6 +384,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 
     /**
      * Create a comment.
+     *
      * @param text comment text
      */
     @Override
@@ -593,3 +466,184 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         return new CcatchReturnValParameterDeclaration(e);
     }
 }
+
+class PostWorkProcessor implements Runnable {
+    private final ProgramElement programElem;
+    private final List<Comment> comments;
+
+    private final List<ProgramElement> children = new ArrayList<>(1024);
+
+    public PostWorkProcessor(ProgramElement programElem) {
+        this.programElem = programElem;
+        this.comments = ProofJavaParser.getComments();
+
+        TreeWalker tw = new TreeWalker(programElem);
+        while (tw.next()) {
+            children.add(tw.getProgramElement());
+        }
+    }
+
+    @Override
+    public void run() {
+        if (!children.isEmpty()) {
+            makeParentValid();
+            if (!comments.isEmpty()) {
+                attachComments();
+            }
+        }
+    }
+
+    private void makeParentValid() {
+        children.stream()
+                .filter(NonTerminalProgramElement.class::isInstance)
+                .forEach(it -> ((NonTerminalProgramElement) it).makeParentRoleValid());
+    }
+
+    private void attachComments() {
+        // This works similar to a merge algoritm.
+        // We assume that `children` and `comments` are both sorted by their appearance.
+        // In the core, this is a adapted merging algorithm where two sorted lists are weaved together.
+        // and should be doable in O(#comments+#nodes) time.
+
+
+        Queue<ProgramElement> iterNodes = new LinkedList<>(children);
+
+        ProgramElement currentNode = null;
+        ProgramElement closestParent = null;
+
+        //simple merge algorithm
+        for (Comment currentComment : comments) {
+            // fixate a comment and position
+            Position posComment = currentComment.getStartPosition();
+
+            //find the next node where
+            while (!iterNodes.isEmpty()) {
+                currentNode = iterNodes.peek();
+
+                if (currentNode.getFirstElement() == null) {
+                    // Apparently these are nodes with no source and no position... skip them
+                    continue;
+                }
+
+                Position posNode = currentNode.getFirstElement().getStartPosition();
+
+                if (posNode.compareTo(posComment) < 0) {
+                    // currentNode starts before currentComment
+
+                    iterNodes.poll(); // go to the next node
+
+                    // currentComment ends before currentNode, therefore currentNode wraps the currentComment
+                    if (currentComment.getEndPosition().compareTo(currentNode.getEndPosition()) <= 0) {
+                        closestParent = currentNode;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            //at this point, following is asserted
+            // (A) pos of currentNode is the next node after comment if such node exists in children
+            // (B) currentNode is non-null
+            // (C) closestParent is non-null if the comment is within closestParent
+            //     and there is no other "smaller" parent possible
+
+            assert currentNode != null;
+            attachComment(currentComment, currentNode, closestParent);
+        }
+        /*
+        Position posComment = current.getFirstElement().getStartPosition();
+
+        ProgramElement pePrev = programElem;
+        ProgramElement peNext;
+        TreeWalker tw = new TreeWalker(programElem);
+        while (tw.next()) {
+            peNext = tw.getProgramElement();
+            Position startPos = peNext.getFirstElement().getStartPosition();
+
+            if (startPos.compareTo(posComment) < 0) {
+                pePrev = peNext;
+                continue;
+            }
+            Position endPos = getPrevBlockEnd(pePrev, peNext);
+
+            while ((commentIndex < commentCount) && endPos.compareTo(posComment) > 0) {
+                // Append remaining comments to the previous block
+                commentIndex = appendComments(pePrev, comments, commentIndex);
+                if (commentIndex == commentCount) {
+                    return;
+                }
+                current = comments.get(commentIndex);
+                posComment = current.getFirstElement().getStartPosition();
+            }
+            while ((commentIndex < commentCount) && startPos.compareTo(posComment) > 0) {
+                // Append comments to the next node
+                current.setPrefixed(true);
+                attachComment(current, peNext);
+                commentIndex += 1;
+                if (commentIndex == commentCount) {
+                    return;
+                }
+                current = comments.get(commentIndex);
+                posComment = current.getFirstElement().getStartPosition();
+            }
+            pePrev = peNext;
+        }
+
+        // Append all remaining comments to the previous block
+        if (commentIndex < commentCount) {
+            commentIndex = appendComments(pePrev, comments, commentIndex);
+        }
+         */
+    }
+
+    private void attachComment(@Nonnull Comment currentComment,
+                               @Nonnull ProgramElement currentNode,
+                               @Nullable ProgramElement closestParent) {
+        if (closestParent != null && within(currentComment, closestParent)) {
+            //DEFAULT CASE: the currentNode is the valid successor of the currentComment
+            // aka both lies within the same closest parent
+            if (within(currentNode, closestParent)) {
+                attachComment(currentComment, currentNode);
+            } else {
+                // comment is the last entity in the current parent
+                attachComment(currentComment, createLastStatement(closestParent));
+            }
+        } else {
+            // This case is strange: The JML comment is outside
+            // Occurs on /*@pure*/ on method declarations
+            // or on comments before the class declaration
+            attachComment(currentComment, currentNode);
+        }
+    }
+
+    private ProgramElement createLastStatement(ProgramElement parent) {
+        if (parent instanceof StatementBlock) {
+            StatementBlock block = (StatementBlock) parent;
+            Statement newEmpty = parent.getFactory().createEmptyStatement();
+            ASTList<Statement> body = block.getBody();
+            body.add(newEmpty);
+            block.setBody(body);
+            return newEmpty;
+        }
+        if (parent instanceof ClassDeclaration) {
+            return parent;
+        }
+        assert false;
+        return parent;
+    }
+
+    private boolean within(SourceElement comment, ProgramElement parent) {
+        return comment.getStartPosition().compareTo(parent.getStartPosition()) >= 0
+                && comment.getEndPosition().compareTo(parent.getEndPosition()) <= 0;
+    }
+
+    private static void attachComment(Comment c, ProgramElement pe) {
+        ASTList<Comment> cml = pe.getComments();
+        if (cml == null) {
+            cml = new ASTArrayList<>();
+            pe.setComments(cml);
+        }
+        cml.add(c);
+    }
+}
+
