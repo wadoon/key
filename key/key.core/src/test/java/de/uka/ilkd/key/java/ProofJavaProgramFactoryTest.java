@@ -142,6 +142,21 @@ public class ProofJavaProgramFactoryTest {
         */
     }
 
+
+    @Test
+    public void testAttachCommentsCompilationUnit_LockSpec() throws IOException {
+        File inputFile = new File("../key.ui/examples/heap/permissions/lockspec/src/LockSpec.java");
+        File expectedFile = new File(FindResources.getTestResourcesDirectory(),
+                "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_LockSpec.txt");
+        String expected = IOUtil.readFrom(expectedFile);
+        final CompilationUnit cu = getCompilationUnit(inputFile);
+
+        String out = getActualResult(cu);
+        System.out.println(out);
+        Assert.assertEquals("Difference in attached comments", expected, out);
+    }
+
+
     private String getActualResult(CompilationUnit cu) {
         Function<String, String> prepareComment = it ->
                 it.substring(0, Math.min(50, it.length())).replace('\n', ' ').trim();
