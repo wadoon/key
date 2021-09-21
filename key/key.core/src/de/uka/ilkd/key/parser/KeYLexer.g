@@ -212,8 +212,9 @@ lexer grammar KeYLexer;
 	FORMULA : '\\formula';
 	TERM : '\\term';
 	UPDATE : '\\update';
-	EVENT_UPDATE : '\\eventUpdate';
-	ANON_EVENT_UPDATE : '\\anonEvent';
+	EVENTUPDATE: '\\event';
+	ANONEVENTUPDATE: '\\anonEvUp';
+	
 	VARIABLES : '\\variables';
 	VARIABLE : '\\variable';
 	SKOLEMTERM : '\\skolemTerm';
@@ -283,7 +284,6 @@ lexer grammar KeYLexer;
 	IFEX   : '\\ifEx';
 	THEN : '\\then';
 	ELSE : '\\else';
-	EVENTUPDATE: '\\event';
 	
     // inclusion and stuff, things that (usually) come at the beginning
 	// of the file

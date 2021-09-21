@@ -46,6 +46,7 @@ public class PredicateListCompression {
 	void compression(Set<Term> depPredsList, Set<Term> compPredsList) {
 		
 		finalCompPredListCompression(compPredsList);
+		depPredListCompressionBySubset(depPredsList);
 
 	}
 

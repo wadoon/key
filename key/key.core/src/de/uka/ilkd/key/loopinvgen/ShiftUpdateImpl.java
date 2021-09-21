@@ -44,6 +44,7 @@ public class ShiftUpdateImpl {
 				updateList = updateList.prepend(update.sub(1)).prepend(update.sub(0));
 			}
 		}
+		//TODO here we have to increase the time stamp. Ask Richard how to access the timestamp? can we just add it to the antecedent from the beginning?
 	}
 
 	// update: a:=t

@@ -386,7 +386,7 @@ public class KeYFile implements EnvInput {
 	} catch (RecognitionException e) {
             // problemParser cannot be null since exception is thrown during parsing.
            
-			String message = problemParser.getErrorMessage(e) + "\\ Line:"+e.line+" Column: "+e.charPositionInLine;
+			String message = problemParser.getErrorMessage(e) + " Line:"+e.line+" Column: "+e.charPositionInLine;
             throw new ProofInputException(message, e);
         } catch (IOException io) {
             throw new ProofInputException(io);            

@@ -2,6 +2,7 @@ package java.lang;
 
 public class Object {  
 
+	public static int arrayFct(int arg) {}
     
     /*@ public normal_behavior
       @   assignable \nothing;
