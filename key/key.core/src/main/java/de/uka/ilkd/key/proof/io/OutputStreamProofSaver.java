@@ -560,7 +560,7 @@ public class OutputStreamProofSaver {
     private void printSingleBuiltInRuleApp(IBuiltInRuleApp appliedRuleApp,
             Node node, String prefix, Appendable output) throws IOException {
         output.append(prefix);
-        output.append(" (builtin \"");
+        output.append("(builtin \"");
         output.append(appliedRuleApp.rule().name().toString());
         output.append("\"");
         output.append(posInOccurrence2Proof(node.sequent(),
