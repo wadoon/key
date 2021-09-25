@@ -489,7 +489,7 @@ public final class Main {
         }
 
         if (cl.isSet(NO_PRUNING_CLOSED)) {
-            GeneralSettings.noPruningClosed = true;
+            GeneralSettings.noPruningClosed = false;
         }
 
         if (cl.isSet(KEEP_FILEREPOS)) {

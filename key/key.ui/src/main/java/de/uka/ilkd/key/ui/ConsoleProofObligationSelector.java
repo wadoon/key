@@ -90,6 +90,8 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
 
                 ui.createProofEnvironmentAndRegisterProof(po, pl, initConfig);
 
+                mediator.setProof(pl.getFirstProof());
+
             } catch (ProofInputException exc) {
                 exc.printStackTrace();
             }

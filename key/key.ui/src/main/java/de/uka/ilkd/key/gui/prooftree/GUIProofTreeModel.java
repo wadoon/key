@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Stack;
 import java.util.WeakHashMap;
 
+import javax.annotation.Nonnull;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -444,15 +445,15 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     }
 
 
+    /** stores exactly the paths that are expanded in the proof tree */
+    private @Nonnull Collection<TreePath> expansionState = Collections.emptySet();
 
-    Collection<TreePath> expansionState = Collections.emptySet();
-
-    public void storeExpansionState(Collection<TreePath> c) {
-       expansionState = c;
+    public void setExpansionState(@Nonnull Collection<TreePath> c) {
+        expansionState = c;
     }
 
-    public Collection<TreePath> getExpansionState() {
-       return expansionState;
+    public @Nonnull Collection<TreePath> getExpansionState() {
+        return expansionState;
     }
 
     TreePath selection;
