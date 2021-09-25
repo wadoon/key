@@ -196,8 +196,7 @@ public class TestCaseGenerator {
         compileWithOpenJML = createCompileWithOpenJML(settings.getOpenjmlPath(), settings.getObjenesisPath());
         oracleGenerator  =new OracleGenerator(services,rflCreator, useRFL);
         if(junitFormat){
-            //System.out.println("Translating oracle");
-            oracleMethods = new LinkedList<OracleMethod>();
+            oracleMethods = new LinkedList<>();
             oracleMethodCall = getOracleAssertion(oracleMethods);
         }
     }

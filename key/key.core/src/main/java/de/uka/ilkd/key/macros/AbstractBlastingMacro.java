@@ -236,7 +236,6 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
             String name = rule.name().toString();
 
-            // System.out.println(rule.name());
 
             return name.equals("pullOut")
                     // ||name.startsWith("applyEq")

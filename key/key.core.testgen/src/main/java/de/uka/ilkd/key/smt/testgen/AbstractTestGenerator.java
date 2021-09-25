@@ -250,7 +250,7 @@ public abstract class AbstractTestGenerator {
                res.add(p);
             }
          } catch (final Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.error("Could not create a proof for testing", e);
          }
       }
       return res;
