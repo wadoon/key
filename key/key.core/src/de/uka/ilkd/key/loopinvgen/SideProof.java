@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -33,7 +34,7 @@ public class SideProof {
 	boolean proofSubSetWIndex(SequentFormula cIndexFormula, Term loc1, Term loc2) {
 		Term fml = tb.subset(loc1, loc2);
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
-		sideSeq = sideSeq.addFormula(cIndexFormula, true, true).sequent();
+//		sideSeq = sideSeq.addFormula(cIndexFormula, true, true).sequent();
 
 		Set<Term> locSetVars = new HashSet<Term>();
 		for (Term t : loc1.subs()) {
@@ -46,6 +47,7 @@ public class SideProof {
 		Set<Term> anteFmlVars = new HashSet<Term>();
 		for (SequentFormula sfAnte : seq.antecedent()) {
 			anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
+//			System.out.println("anteFmlVars" + anteFmlVars + " for " + ProofSaver.printAnything(sfAnte.formula(), services, true));
 			for (Term tfv : anteFmlVars) {
 				if (locSetVars.contains(tfv)) {
 					sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
@@ -65,18 +67,20 @@ public class SideProof {
 			}
 		}
 
+
 		boolean closed = isProvable(sideSeq, services);
 		// true: Holds, false: Unknown
-//		System.out.println("Subset proof" + ProofSaver.printAnything(sideSeq, services));// Human readable v
-//		if (closed) {
-//			System.out.println("This proof is closed:  " + sideSeq);
-//		}
+		if (closed) {
+//			System.out.println("CCCC\n"+ProofSaver.printAnything(sideSeq, services));		
+//	System.out.println(loc1 + " is subset of " + loc2);
+		}
 		return closed;
 	}
 
-	boolean proofLT(Term ts1, Term ts2) {
+	boolean proofLT(SequentFormula cIndexFormula, Term ts1, Term ts2) {
 		Term fml = tb.lt(ts1, ts2);
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
+//		sideSeq = sideSeq.addFormula(cIndexFormula, true, true).sequent();
 
 		Set<Term> locSetVars = new HashSet<Term>();
 		for (Term t : ts1.subs()) {
@@ -117,16 +121,18 @@ public class SideProof {
 		Set<Term> locSetVars = new HashSet<Term>();
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml_1), false, true).sequent();
 
-		sideSeq = sideSeq.addFormula(cIndexFormula, true, true).sequent();
+//		sideSeq = sideSeq.addFormula(cIndexFormula, true, true).sequent();
 
 		for (Term t : ts1.subs())
 			locSetVars.addAll(collectProgramAndLogicVariables(t));
 		for (Term t : ts2.subs())
 			locSetVars.addAll(collectProgramAndLogicVariables(t));
+		System.out.println("locsetvars: " + locSetVars);
 
 		Set<Term> anteFmlVars = new HashSet<Term>();
 		for (SequentFormula sfAnte : seq.antecedent()) {
 			anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
+			
 			for (Term tfv : anteFmlVars) {
 				if (locSetVars.contains(tfv)) {
 					sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
@@ -147,6 +153,10 @@ public class SideProof {
 		}
 //		System.out.println(sideSeq);
 		boolean closed = isProvable(sideSeq, services);
+		if(!closed) {
+			System.out.println("===================================\n"+ProofSaver.printAnything(sideSeq, services));		
+			System.out.println(ts1 + " intersect " + ts2 + " is empty.");
+		}
 //		System.out.println(closed);
 		return closed;
 	}

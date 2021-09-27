@@ -275,7 +275,8 @@ lexer grammar KeYLexer;
 	NO_EVENT_UPDATE: '\\noEventUpdate';
 	NO_DEPENDENCE_LDT: '\\noDependenceLDT';
 	ONLY_EVENT_UPDATES: '\\onlyEventUpdates';
-	APPLY_EVENT_ON_RIGID: '\\applyEventOnRigid'; 
+	APPLY_EVENT_ON_RIGID: '\\applyEventOnRigid';
+	APPLY_ANON_EVENT_ON_RIGID: '\\applyAnonEventOnRigid'; 
 	// Quantifiers, binding, substitution
         FORALL : '\\forall' | '\u2200';
         EXISTS : '\\exists' | '\u2203';

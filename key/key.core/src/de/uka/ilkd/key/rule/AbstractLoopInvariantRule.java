@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -606,16 +607,23 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
             anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
             
-            final Name anonEventStar = new Name(
-                    tb.newName("anon_MemAcc_LOOP"));
-            final Function anonEventStarFunc = new Function(anonEventStar, 
-            		services.getTypeConverter().getIntegerLDT().targetSort());
-            services.getNamespaces().functions().addSafely(anonEventStarFunc);
-            final Term anonEventStarTerm= tb.label(tb.func(anonEventStarFunc),
+            final Name anonLocSet = new Name(
+                    tb.newName("anonLocSet"));
+            final Function anonLocSetFunction = new Function(anonLocSet, 
+            		services.getTypeConverter().getLocSetLDT().targetSort());
+            services.getNamespaces().functions().addSafely(anonLocSetFunction);
+            final Term anonLocSetAsTerm = tb.label(tb.func(anonLocSetFunction),
+                    ParameterlessTermLabel.ANON_HEAP_LABEL);
+            
+            final Function anonId = new Function(new Name(tb.newName("anonId")), 
+            		services.getTypeConverter().getIntegerLDT().targetSort(),
+            		new ImmutableArray<Sort>(), null, true/* unique! */);
+            services.getNamespaces().functions().addSafely(anonId);
+            final Term anonIdTerm = tb.label(tb.func(anonId),
                     ParameterlessTermLabel.ANON_HEAP_LABEL);
             
  			anonUpdate = tb.parallel(anonUpdate, 
-            		tb.anonEventUpdate(tb.func(timestampAnonymizedValue), anonEventStarTerm));
+            		tb.anonEventUpdate(anonLocSetAsTerm, anonIdTerm));
 
             wellFormedAnon = and(tb, wellFormedAnon,
                     tb.wellFormed(tAnon.anonHeap));

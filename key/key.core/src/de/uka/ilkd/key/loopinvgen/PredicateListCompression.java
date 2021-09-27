@@ -55,7 +55,7 @@ public class PredicateListCompression {
 
 		for (Term depPred1 : fDepPredList) {
 			for (Term depPred2 : fDepPredList) {
-				if (depPred1.op().equals(depPred2.op()) && !depPred1.sub(0).equals(depPred2.sub(0))
+				if (depPred1.op().name().equals(depPred2.op().name()) && !depPred1.sub(0).equals(depPred2.sub(0))
 				/* && depPred1.sub(0).sub(0).equals(depPred2.sub(0).sub(0)) */) {
 					Boolean loc1SubSetloc2 = sProof.proofSubSetWIndex(currentIdxF, depPred1.sub(0), depPred2.sub(0));
 
@@ -70,6 +70,7 @@ public class PredicateListCompression {
 				}
 			}
 		}
+		System.out.println("deleted by compression: " + fDepPredList);
 		return fDepPredList;
 	}
 

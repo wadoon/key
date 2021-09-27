@@ -3854,6 +3854,7 @@ varexp[TacletBuilder b]
     | varcond_onlyEventUpdates[b]
     | varcond_noEventUpdate[b]
     | varcond_applyEventOnRigid[b]
+    | varcond_applyAnonEventOnRigid[b]
     | varcond_noDependenceLDT[b]
   ) 
   | 
@@ -4319,6 +4320,17 @@ varcond_applyEventOnRigid [TacletBuilder b]
                                                              (SchemaVariable)x2));
    }
 ;
+
+varcond_applyAnonEventOnRigid [TacletBuilder b]
+:
+   APPLY_ANON_EVENT_ON_RIGID LPAREN u=varId COMMA x=varId COMMA x2=varId RPAREN 
+   {
+      b.addVariableCondition(new ApplyAnonEventOnRigid((UpdateSV)u, 
+                                                             (SchemaVariable)x, 
+                                                             (SchemaVariable)x2));
+   }
+;
+
 
 varcond_noDependenceLDT [TacletBuilder b]
 :

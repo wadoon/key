@@ -312,7 +312,7 @@ public class TestPredicateConstruction {
 		Term formulaRight;
 
 		try {
-			formulaRight = parse("{i:=3}\\<{" + "			while (i<a.length) {a[i] = a[i+1];" + "			i++;}"
+			formulaRight = parse("{i:=0}\\<{" + "			while (i<a.length) {a[i] = a[i+1];" + "			i++;}"
 					+ "		}\\>true");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -376,7 +376,7 @@ public class TestPredicateConstruction {
 //		cur.mainAlg2(seq);
 	}
 
-	public void testCase9_P() {
+	public void testCase9_PF() {
 
 		Term succFormula;
 
@@ -413,6 +413,44 @@ public class TestPredicateConstruction {
 		cur.mainAlg();
 	}
 
+	public void testCase9_P() {
+
+		Term succFormula;
+
+		try {
+			succFormula = parse("{i:=0}\\<{" + "			while (i<a.length-1) {a[i] = a[i+1];" + "			i++;}"
+					+ "		}\\>true");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
+
+		String[] arrLeft = { /* "i=0", */"a!=null", "a.length > 10" };
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+
+		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
+		cur.mainAlg();
+	}
+
+	
 	public void testCase9_N() {
 
 		Term formula;
