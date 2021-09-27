@@ -265,16 +265,23 @@ public final class ProblemInitializer {
         final Includes includes = envInput.readIncludes();
 
         if (fileRepo != null) {
-            // set the paths in the FileRepo (all three methods can deal with null parameters)
-            fileRepo.setJavaPath(javaPath);
-            fileRepo.setClassPath(classPath);
-            fileRepo.setBootClassPath(bootClassPath);
+            // Set the paths in the FileRepo (all three methods can deal with null parameters).
+            // Paths can only be set once for each FileRepo, and are set earlier when loading a
+            // proof bundle!
+            if (!fileRepo.isJavaPathSet()) {
+                fileRepo.setJavaPath(javaPath);
+            }
+            if (!fileRepo.isClassPathSet()) {
+                fileRepo.setClassPath(classPath);
+            }
+            if (!fileRepo.isBootClassPathSet()) {
+                fileRepo.setBootClassPath(bootClassPath);
+            }
         }
 
         //create Recoder2KeY, set classpath
         final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(),
                                            initConfig.namespaces());
-        //r2k.setFileRepository(envInput.getFileRepository()); xxx  // TODO:
         r2k.setClassPath(bootClassPath, classPath);
 
         //read Java (at least the library classes)

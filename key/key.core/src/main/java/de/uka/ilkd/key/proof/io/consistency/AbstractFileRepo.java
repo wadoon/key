@@ -172,7 +172,6 @@ public abstract class AbstractFileRepo implements FileRepo {
         String rulesURLStr = RULES_URL.toString();
         String reduxURLStr = REDUX_URL.toString();
         return urlStr.startsWith(rulesURLStr) || urlStr.startsWith(reduxURLStr);
-
     }
 
     protected Path getJavaPath() {
@@ -201,6 +200,14 @@ public abstract class AbstractFileRepo implements FileRepo {
      */
     protected void addFile(Path p) {
         files.add(p);
+    }
+
+    /**
+     * Removes the given file from the list of files to save.
+     * @param p the path of the file to remove
+     */
+    protected void removeFile(Path p) {
+        files.remove(p);
     }
 
     protected Set<Proof> getRegisteredProofs() {
@@ -242,29 +249,29 @@ public abstract class AbstractFileRepo implements FileRepo {
         Files.createFile(savePath);
 
         // write files to ZIP
-        ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(savePath));
+        try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(savePath))) {
 
-        for (Path p : files) {
-            // use the correct name for saving!
-            zos.putNextEntry(new ZipEntry(getSaveName(p).toString()));
+            for (Path p : files) {
+                // use the correct name for saving!
+                zos.putNextEntry(new ZipEntry(getSaveName(p).toString()));
 
-            InputStream is;
-            // filtering for *.key/*.proof files
-            if (KEY_MATCHER.matches(p)) {
-                // adapt file references to point to the copied files
-                is = adaptFileRefs(p);
-            } else {
-                // open InputStream to file without modification
-                is = getInputStreamInternal(p);
+                InputStream is;
+                // filtering for *.key/*.proof files
+                if (KEY_MATCHER.matches(p)) {
+                    // adapt file references to point to the copied files
+                    is = adaptFileRefs(p);
+                } else {
+                    // open InputStream to file without modification
+                    is = getInputStreamInternal(p);
+                }
+
+                // we use this method instead of IOUtil.copy() because zos must not be closed
+                copy(is, zos);
+                is.close();
+
+                zos.closeEntry();
             }
-
-            // we use this method instead of IOUtil.copy() because zos must not be closed
-            copy(is, zos);
-            is.close();
-
-            zos.closeEntry();
         }
-        zos.close();
     }
 
     /**
@@ -382,7 +389,7 @@ public abstract class AbstractFileRepo implements FileRepo {
 
     @Override
     public void setBootClassPath(File path) throws IllegalStateException {
-        if (bootclasspath != null) {
+        if (isBootClassPathSet()) {
             throw new IllegalStateException("Bootclasspath is already set!");
         }
         if (path != null) {
@@ -392,7 +399,7 @@ public abstract class AbstractFileRepo implements FileRepo {
 
     @Override
     public void setClassPath(List<File> paths)  throws IllegalStateException {
-        if (classpath != null) {
+        if (isClassPathSet()) {
             throw new IllegalStateException("Classpath is already set!");
         }
         if (paths != null) {
@@ -406,12 +413,27 @@ public abstract class AbstractFileRepo implements FileRepo {
 
     @Override
     public void setJavaPath(String path) throws IllegalStateException {
-        if (javaPath != null) {
+        if (isJavaPathSet()) {
             throw new IllegalStateException("JavaPath is already set!");
         }
         if (path != null) {
             javaPath = Paths.get(path).toAbsolutePath().normalize();
         }
+    }
+
+    @Override
+    public boolean isBootClassPathSet() {
+        return bootclasspath != null;
+    }
+
+    @Override
+    public boolean isClassPathSet() {
+        return classpath != null;
+    }
+
+    @Override
+    public boolean isJavaPathSet() {
+        return javaPath != null;
     }
 
     @Override

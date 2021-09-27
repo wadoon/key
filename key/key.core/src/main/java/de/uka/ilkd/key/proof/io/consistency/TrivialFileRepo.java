@@ -38,7 +38,7 @@ public class TrivialFileRepo implements FileRepo {
     }
 
     @Override
-    public OutputStream createOutputStream(Path path) throws FileNotFoundException {
+    public OutputStream createOutputStream(Path path) throws IOException {
         return new FileOutputStream(path.toFile());
     }
 

@@ -159,7 +159,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    public OutputStream createOutputStream(Path path) throws FileNotFoundException {
+    public OutputStream createOutputStream(Path path) throws IOException {
         if (path.isAbsolute()) {
             // programming error!
             throw new IllegalArgumentException("The path is not relative: " + path);

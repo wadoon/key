@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
+import javax.annotation.Nonnull;
 import javax.swing.*;
 
 import org.key_project.util.collection.ImmutableSet;
@@ -77,12 +78,12 @@ import de.uka.ilkd.key.util.ThreadUtilities;
  * @author Mattias Ulbrich
  */
 public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceControl {
-    private final MainWindow mainWindow;
+    private final @Nonnull MainWindow mainWindow;
 
     private final LinkedList<InteractiveRuleApplicationCompletion> completions =
             new LinkedList<InteractiveRuleApplicationCompletion>();
 
-    public WindowUserInterfaceControl(MainWindow mainWindow) {
+    public WindowUserInterfaceControl(@Nonnull MainWindow mainWindow) {
         this.mainWindow = mainWindow;
         completions.add(new FunctionalOperationContractCompletion());
         completions.add(new DependencyContractCompletion());
@@ -375,7 +376,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @return the saved proof as a file
      */
     public File saveProof(Proof proof, String fileExtension) {
-        final MainWindow mainWindow = MainWindow.getInstance();
         final KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose filename to save proof");
         fc.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
 
@@ -415,9 +415,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param proof the proof to save
      */
     public void saveProofBundle(Proof proof) {
-        final MainWindow mainWindow = MainWindow.getInstance();
-        final KeYFileChooser fileChooser =
-            KeYFileChooser.getFileChooser("Choose filename to save proof");
+        final KeYFileChooser fileChooser = KeYFileChooser.getFileChooser("Choose filename to save proof");
         fileChooser.setFileFilter(KeYFileChooser.PROOF_BUNDLE_FILTER);
 
         Pair<File, String> f = fileName(proof, ".zproof");

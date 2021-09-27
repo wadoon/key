@@ -35,7 +35,7 @@ public class MemoryFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    public OutputStream createOutputStream(Path path) {
+    public OutputStream createOutputStream(Path path) throws IOException {
         // TODO Auto-generated method stub
         return null;
     }

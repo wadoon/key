@@ -23,6 +23,7 @@ import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.nparser.KeYLexer;
@@ -419,63 +420,8 @@ public abstract class AbstractProblemLoader {
             ret.setJavaFile(file.getAbsolutePath());
             ret.setIgnoreOtherJavaFiles(loadSingleJavaFile);
             return ret;
-        } else if (filename.endsWith(".zproof")) {            // zipped proof package
-            /* TODO: Currently it is not possible to load proof bundles with multiple proofs.
-             *  This feature is still pending, since the functionality to save multiple proofs in
-             *  one (consistent!) package is not yet implemented (see ProofManagement tool from
-             *  1st HacKeYthon).
-             *  The current implementation allows the user to pick one of the proofs via a dialog.
-             *  The user choice is given to the AbstractProblem Loader via the proofName field.
-             */
-            if (proofFilename == null) {    // no proof to load given -> try to determine one
-                // create a list of all *.proof files (only top level in bundle)
-                ZipFile bundle = new ZipFile(file);
-                List<Path> proofs = bundle.stream()
-                    .filter(e -> !e.isDirectory())
-                    .filter(e -> e.getName().endsWith(".proof"))
-                    .map(e -> Paths.get(e.getName()))
-                    .collect(Collectors.toList());
-                if (!proofs.isEmpty()) {
-                    // load first proof found in file
-                    proofFilename = proofs.get(0).toFile();
-                } else {
-                    // no proof found in bundle!
-                    throw new IOException("The bundle contains no proof to load!");
-                }
-            }
-
-            // we are sure proofFilename is set now:
-            // assert proofFilename != null;
-
-            // unzip to a temporary directory
-            Path tmpDir = Files.createTempDirectory("KeYunzip");
-            IOUtil.extractZip(file.toPath(), tmpDir);
-
-            // hook for deleting tmpDir + content at program exit
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                try {
-                    // delete the temporary directory with all contained files
-                    Files.walk(tmpDir)
-                         .sorted(Comparator.reverseOrder())
-                         .map(Path::toFile)
-                         .forEach(File::delete);
-                } catch (IOException e) {
-                    // this is called at program exist, so we only print a console message
-                    e.printStackTrace();
-                }
-            }));
-
-            // point the FileRepo to the temporary directory
-            fileRepo.setBaseDir(tmpDir);
-
-            // create new KeYUserProblemFile pointing to the (unzipped) proof file
-            PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**.proof");
-
-            // construct the absolute path to the unzipped proof file
-            Path unzippedProof = tmpDir.resolve(proofFilename.toPath());
-
-            return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
-                fileRepo, control, profileOfNewProofs, false);
+        } else if (filename.endsWith(".zproof")) {            // zipped proof bundle
+            return loadSingleProofFromBundle(fileRepo);
         } else if (filename.endsWith(".key") || filename.endsWith(".proof")
               || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
@@ -498,6 +444,106 @@ public abstract class AbstractProblemLoader {
                                 + "\n not found.");
             }
         }
+    }
+
+    /**
+     * Creates a single KeYUserProblemFile for loading a single proof (with the filename
+     * {@link #proofFilename}) from the proof bundle in {@link #file}. If the proof to load is not
+     * specified, the proof found first is loaded.
+     *
+     * @implNote extracts the bundle to a temporary directory that is deleted at program exit
+     * @param fileRepo the FileRepo where the
+     * @return a new KeYUserProblemFile pointing to the (unzipped) proof file
+     * @throws IOException if an I/O error occurs or the zip archive contains no proof
+     */
+    private KeYUserProblemFile loadSingleProofFromBundle(FileRepo fileRepo) throws IOException {
+        /* TODO: Currently it is not possible to load proof bundles with multiple proofs.
+         *  This feature is still pending, since the functionality to save multiple proofs in
+         *  one (consistent!) package is not yet implemented (see ProofManagement tool from
+         *  1st HacKeYthon).
+         *  The current implementation allows the user to pick one of the proofs via a dialog.
+         *  The user choice is given to the AbstractProblem Loader via the proofName field.
+         */
+        if (proofFilename == null) {    // no proof to load given -> try to determine one
+            // create a list of all *.proof files (only top level in bundle)
+            try (ZipFile bundle = new ZipFile(file)) {
+                List<Path> proofs = bundle.stream()
+                        .filter(e -> !e.isDirectory())
+                        .filter(e -> e.getName().endsWith(".proof"))
+                        .map(e -> Paths.get(e.getName()))
+                        .collect(Collectors.toList());
+                if (!proofs.isEmpty()) {
+                    // load first proof found in file
+                    proofFilename = proofs.get(0).toFile();
+                } else {
+                    // no proof found in bundle!
+                    throw new IOException("The bundle contains no proof to load!");
+                }
+            }
+        }
+
+        // unzip to a temporary directory
+        Path tmpDir = Files.createTempDirectory("KeYunzip");
+        IOUtil.extractZip(file.toPath(), tmpDir);
+
+        /* hook for deleting tmpDir + content at program exit. Probably a better alternative would
+         * be to register a ProofDisposedListener to Proof. However, the proof is not yet created
+         * here. */
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (Files.exists(tmpDir)) {
+                // delete the temporary directory with all contained files
+                try (Stream<Path> stream = Files.walk(tmpDir)) {
+                    stream.sorted(Comparator.reverseOrder())
+                        .filter(Files::exists)
+                        .forEach(path -> {
+                            try {
+                                Files.delete(path);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                } catch (IOException e) {
+                    // this is called at program exit, so we only print a console message
+                    e.printStackTrace();
+                }
+            }
+        }));
+
+        // point the FileRepo to the temporary directory
+        fileRepo.setBaseDir(tmpDir);
+
+        // we assume that the source is a correct FileRepo so we set the
+        fileRepo.setJavaPath(tmpDir.resolve("src").toString());
+        fileRepo.setClassPath(List.of(tmpDir.resolve("classpath").toFile()));
+        fileRepo.setBootClassPath(tmpDir.resolve("bootclasspath").toFile());
+
+        // register all files from the zip to the repo
+        try (Stream<Path> stream = Files.walk(tmpDir)) {
+            stream.filter(p -> !Files.isDirectory(p)).forEach(p -> {
+                try {
+                    // TODO: instead of opening and instantly closing the InputStream there should
+                    //  really be a method register(Path) or similar in FileRepo
+                    fileRepo.getInputStream(p).close();
+                } catch (IOException e) {
+                    // probably we can do nothing really useful here
+                    e.printStackTrace();
+                }
+            });
+        }
+
+        // construct the absolute path to the unzipped proof file
+        Path unzippedProof = tmpDir.resolve(proofFilename.toPath());
+
+        // in bundles, the proof name is used as file name (e.g. "contraposition.proof")
+        String proofName = proofFilename.toString();
+        if (proofName.endsWith(".proof")) {
+            // this avoids double ".proof" extensions when the proof is saved again
+            proofName = proofName.substring(0, proofName.length() - 6);
+        }
+
+        // create a new KeYUserProblemFile pointing to the (unzipped) proof file
+        return new KeYUserProblemFile(proofName, unzippedProof.toFile(),
+                fileRepo, control, profileOfNewProofs, false);
     }
 
     /**

@@ -1,11 +1,6 @@
 package de.uka.ilkd.key.proof.io.consistency;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -14,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Debug;
@@ -249,7 +245,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
     /////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public OutputStream createOutputStream(Path path) throws FileNotFoundException {
+    public OutputStream createOutputStream(Path path) throws IOException {
 
         if (path.isAbsolute()) {
             // programming error!
@@ -263,8 +259,19 @@ public final class DiskFileRepo extends AbstractFileRepo {
         // -> do not do this, since there exists no copy of the file except in repo
         // Path translation = baseDir.resolve(path);
         // map.put(translation, absTarget);
+
         addFile(path);
 
+        // in case the proof was loaded from a bundle, we want to replace it (thus, delete it here)
+        if (Files.exists(absTarget)) {
+            Files.delete(absTarget);
+
+            // Remove the path from the map and from the files set to prevent problems with
+            // duplicate entry problems in zip.
+            Path orig = getBaseDir().resolve(path);
+            map.remove(orig);
+            removeFile(orig);
+        }
         return new FileOutputStream(absTarget.toFile());
     }
 
@@ -331,18 +338,17 @@ public final class DiskFileRepo extends AbstractFileRepo {
      * @throws IOException if the directory or one of its files is not accessible
      */
     private void deleteDiskContent() throws IOException {
-        if (!isDisposed() && !GeneralSettings.keepFileRepos) {
-            Files.walk(tmpDir)
-                 .sorted(Comparator.reverseOrder())
-                 //.map(Path::toFile)
-                 .forEach(path -> {
-                     try {
-                         Files.delete(path);
-                         //path.delete();
-                     } catch (IOException e) {
-                         e.printStackTrace();
-                     }
-                 });
+        if (!isDisposed() && !GeneralSettings.keepFileRepos && Files.exists(tmpDir)) {
+            try (Stream<Path> stream = Files.walk(tmpDir)) {
+                stream.sorted(Comparator.reverseOrder())
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+            }
         }
     }
 }

@@ -14,8 +14,9 @@ import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.io.RuleSource;
 
 /**
- * This interface provides access to files.
- * In addition, it can be used to save a consistent zip bundle containing all proof relevant files.
+ * Instead of directly opening an Input/OutputStream when loading source files or saving proofs, a
+ * FileRepo should be used as an intermediate layer. This enables the use of various features such
+ * as ensured source consistency or saving proofs as bundles (see implementations for details).
  *
  * @author Wolfram Pfeifer
  */
@@ -29,7 +30,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @throws FileNotFoundException if the file does not exist
      * @throws IOException on IO errors, e.g. if the user has no permission to read the file
      */
-    public InputStream getInputStream(Path path) throws FileNotFoundException, IOException;
+    InputStream getInputStream(Path path) throws IOException;
 
     /**
      * Provides access to the InputStream of a RuleSource. The file the RuleSource is read from
@@ -40,7 +41,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @return an InputStream of the RuleSource, or <code>null</code>
      * @throws IOException on IO errors
      */
-    public InputStream getInputStream(RuleSource ruleSource) throws IOException;
+    InputStream getInputStream(RuleSource ruleSource) throws IOException;
 
     /**
      * Provides access to the InputStream of a file identified by an URL. The file is registered to
@@ -51,43 +52,58 @@ public interface FileRepo extends ProofDisposedListener {
      * @return an InputStream to the file identified by the URL, or <code>null</code>
      * @throws IOException on IO errors
      */
-    public InputStream getInputStream(URL url) throws IOException;
+    InputStream getInputStream(URL url) throws IOException;
 
     /**
-     * This method can be used to write a file that has no counterpart outside to the FileRepo.
+     * This method can be used to write a file that has no counterpart outside to the FileRepo. If
+     * there is already a file with the same name as the given one (happens for example if the proof
+     * was loaded from a bundle), it is replaced.
      * @param path the path of the file to store. The path must be relative to the base directory
      *      of the proof package.
      * @return an OutputStream to the file in the FileRepo
-     * @throws FileNotFoundException if a file with the given path exists
+     * @throws IOException if a file with the given path exists but can not be replaced for some
+     *                     reason
      */
-    public OutputStream createOutputStream(Path path) throws FileNotFoundException;
+    OutputStream createOutputStream(Path path) throws IOException;
 
     /**
      * Register the proof in the FileRepo.
      * @param proof the proof to register
      */
-    public void registerProof(Proof proof);
+    void registerProof(Proof proof);
 
     /**
      * Sets the bootclasspath (containing available classes from the Java Class Library).
      * @param path the bootclasspath to set (the method does nothing if null is given)
      * @throws IllegalStateException if the java path is already set
      */
-    public void setBootClassPath(File path) throws IllegalStateException;
+    void setBootClassPath(File path) throws IllegalStateException;
+
+    default boolean isBootClassPathSet() {
+        return false;
+    }
 
     /**
      * Sets the classpath.
      * @param classPath the classpath to set (the method does nothing if null is given)
      * @throws IllegalStateException if the java path is already set
      */
-    public void setClassPath(List<File> classPath) throws IllegalStateException;
+    void setClassPath(List<File> classPath) throws IllegalStateException;
+
+    default boolean isClassPathSet() {
+        return false;
+    }
 
     /**
      * Sets the java path (where the source files are located).
      * @param javaPath the java path to set (the method does nothing if null is given)
      * @throws IllegalStateException if the java path is already set
      */
-    public void setJavaPath(String javaPath) throws IllegalStateException;
+    void setJavaPath(String javaPath) throws IllegalStateException;
+
+    default boolean isJavaPathSet() {
+        return false;
+    }
 
     /**
      * Sets the base directory of the proof, i.e. the main directory where the proof is loaded from.
@@ -100,5 +116,5 @@ public interface FileRepo extends ProofDisposedListener {
      * @param path The path of the base directory. If a file is given, then its parent directory is
      *             set as base path.
      */
-    public void setBaseDir(Path path);
+    void setBaseDir(Path path);
 }
