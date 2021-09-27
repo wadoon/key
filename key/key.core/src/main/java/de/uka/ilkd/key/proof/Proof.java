@@ -686,12 +686,13 @@ public class Proof implements Named {
                             }
 
                             linkedGoal.setLinkedGoal(null);
-                            SwingUtilities.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    pruneProof(linkedGoal);
-                                }
-                            });
+                            /* Make sure the linked goal is pruned first immediately, before
+                             * continuing with the rest of the pruning.
+                             * Previously this was called via SwingUtilities.invokeLater(...).
+                             * However, not doing so solves an error where the linked goal had
+                             * already been removed from the proof before its pruning was actually
+                             * executed. */
+                            pruneProof(linkedGoal);
                         }
                     }
                 }
@@ -706,7 +707,6 @@ public class Proof implements Named {
                 reOpenGoal(firstGoal);
             }
 
-            // TODO: WP: test interplay with merge rules
             // Cutting a linked goal (linked by a "defocusing" merge
             // operation, see {@link MergeRule}) unlinks this goal again.
             if (firstGoal.isLinked()) {
