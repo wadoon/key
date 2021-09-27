@@ -299,7 +299,10 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 final ProblemInitializer problemInitializer = new ProblemInitializer(mainWindow.getUserInterface(),
                                 new Services(proof.getServices().getProfile()),
                                 mainWindow.getUserInterface());
-                
+
+                FileRepo fileRepo = mainWindow.getMediator().getSelectedProof().getInitConfig().getFileRepo();
+                problemInitializer.setFileRepo(fileRepo);
+
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
                                                       mainWindow.getUserInterface(),
                                                       problemInitializer,
