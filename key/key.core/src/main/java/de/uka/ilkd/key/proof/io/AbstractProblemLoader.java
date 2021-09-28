@@ -452,7 +452,7 @@ public abstract class AbstractProblemLoader {
      * specified, the proof found first is loaded.
      *
      * @implNote extracts the bundle to a temporary directory that is deleted at program exit
-     * @param fileRepo the FileRepo where the
+     * @param fileRepo the FileRepo for loading/saving source files and proofs
      * @return a new KeYUserProblemFile pointing to the (unzipped) proof file
      * @throws IOException if an I/O error occurs or the zip archive contains no proof
      */
@@ -489,33 +489,30 @@ public abstract class AbstractProblemLoader {
         /* hook for deleting tmpDir + content at program exit. Probably a better alternative would
          * be to register a ProofDisposedListener to Proof. However, the proof is not yet created
          * here. */
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (Files.exists(tmpDir)) {
-                // delete the temporary directory with all contained files
-                try (Stream<Path> stream = Files.walk(tmpDir)) {
-                    stream.sorted(Comparator.reverseOrder())
-                        .filter(Files::exists)
-                        .forEach(path -> {
-                            try {
-                                Files.delete(path);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        });
-                } catch (IOException e) {
-                    // this is called at program exit, so we only print a console message
-                    e.printStackTrace();
-                }
-            }
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> deleteIfExists(tmpDir)));
 
         // point the FileRepo to the temporary directory
         fileRepo.setBaseDir(tmpDir);
 
-        // we assume that the source is a correct FileRepo so we set the
-        fileRepo.setJavaPath(tmpDir.resolve("src").toString());
-        fileRepo.setClassPath(List.of(tmpDir.resolve("classpath").toFile()));
-        fileRepo.setBootClassPath(tmpDir.resolve("bootclasspath").toFile());
+        // we assume that the source is a correct FileRepo, so we set the paths if the directories
+        // are present in the repo (this is not 100% correct: if the bundle contains multiple
+        // proofs where one of them uses classpath and another one not, it may fail)
+        Path srcPath = tmpDir.resolve("src");
+        Path cpPath = tmpDir.resolve("classpath");
+        Path bcpPath = tmpDir.resolve("bootclasspath");
+        if (Files.exists(srcPath)) {
+            fileRepo.setJavaPath(srcPath.toString());
+        }
+        if (Files.exists(cpPath)) {
+            try (Stream<Path> stream = Files.walk(cpPath, 1)) {
+                List<File> cps = stream.filter(p -> p.endsWith(".jar") || p.endsWith(".zip")
+                        || Files.isDirectory(p)).map(Path::toFile).collect(Collectors.toList());
+                fileRepo.setClassPath(cps);
+            }
+        }
+        if (Files.exists(bcpPath)) {
+            fileRepo.setBootClassPath(bcpPath.toFile());
+        }
 
         // register all files from the zip to the repo
         try (Stream<Path> stream = Files.walk(tmpDir)) {
@@ -544,6 +541,30 @@ public abstract class AbstractProblemLoader {
         // create a new KeYUserProblemFile pointing to the (unzipped) proof file
         return new KeYUserProblemFile(proofName, unzippedProof.toFile(),
                 fileRepo, control, profileOfNewProofs, false);
+    }
+
+    /* Helper to delete the tmp dir with the unzipped files from the bundle. Expected to be run at
+     * JVM shutdown, so errors are reported just to the console.
+     * @param tmpDir the temporary directory that is to be deleted from disk with all its content
+     */
+    private static void deleteIfExists(Path tmpDir) {
+        if (Files.exists(tmpDir)) {
+            // delete the temporary directory with all contained files
+            try (Stream<Path> stream = Files.walk(tmpDir)) {
+                stream.sorted(Comparator.reverseOrder())
+                    .filter(Files::exists)
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+            } catch (IOException e) {
+                // this is called at program exit, so we only print a console message
+                e.printStackTrace();
+            }
+        }
     }
 
     /**

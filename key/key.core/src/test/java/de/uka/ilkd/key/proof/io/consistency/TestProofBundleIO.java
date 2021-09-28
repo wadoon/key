@@ -1,15 +1,12 @@
 package de.uka.ilkd.key.proof.io.consistency;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -23,6 +20,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofBundleSaver;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
+import static org.junit.Assert.*;
 
 /**
  * This class contains test cases for loading and saving proof bundles.
@@ -58,6 +57,71 @@ public class TestProofBundleIO {
         ProofIndependentSettings.DEFAULT_INSTANCE
                                 .getGeneralSettings()
                                 .setEnsureSourceConsistency(ensureConsistency);
+    }
+
+    /**
+     * Tests loading a proof bundle and subsequent saving preserves the files in the bundle. As a
+     * side effect, pruning of closed branches/proofs is tested in interplay with a merge rule.
+     * <br><br>
+     * This test performs the following steps:
+     * <ol>
+     * <li>loads the bundle, which opens the first proof in it (for method m)</li>
+     * <li>prunes the proof to its root</li>
+     * <li>saves the proof as a bundle again (this should update/replace the proof of m, but keep
+     *      all other files in the repo intact)</li>
+     * <li>unzips the bundle (to check if the expected files are present)</li>
+     * <li>loads the single proof from the unzipped directory (tests that javaSrc directive is
+     *      adapted correctly)</li>
+     * </ol>
+     * @throws Exception on errors (should not happen)
+     */
+    @Test
+    public void testLoadSaveBundle() throws Exception {
+        Path bundle = testDir.resolve("testbundle.zproof");
+
+        // enable pruning of closed branches temporarily for the test
+        boolean pruningDisabled = GeneralSettings.noPruningClosed;
+        GeneralSettings.noPruningClosed = false;
+
+        Proof proofForM = loadBundle(bundle);
+        assertEquals("A[A::m(boolean)].JML operation contract.0", proofForM.name().toString());
+        assertTrue(proofForM.closed());
+
+        proofForM.pruneProof(proofForM.root());
+        assertFalse(proofForM.closed());
+
+        Path resavedBundle = testDir.resolve("testbundle_saved.zproof");
+        ProofBundleSaver saver = new ProofBundleSaver(proofForM, resavedBundle.toFile());
+        saver.save();
+
+        Path unzip = resavedBundle.getParent().resolve("unzip");
+        IOUtil.extractZip(resavedBundle, unzip);
+
+        // test: classpath/bootclasspath empty (no such subdirectories exists)
+        assertFalse(Files.exists(unzip.resolve("classpath")));
+        assertFalse(Files.exists(unzip.resolve("bootclasspath")));
+
+        // test: all files present in the original repo are present in the re-saved one
+        assertTrue(Files.exists(unzip.resolve("src")));
+        assertTrue(Files.exists(unzip.resolve("src").resolve("A.java")));
+        assertTrue(Files.exists(unzip.resolve("src").resolve("Gcd.java")));
+        assertTrue(Files.exists(unzip.resolve("A(A__f()).JML operation contract.0.proof")));
+        assertTrue(Files.exists(unzip.resolve("A(A__g()).JML operation contract.0.proof")));
+
+        Path singleProof = unzip.resolve("A(A__m(boolean)).JML operation contract.0.proof");
+        assertTrue(Files.exists(singleProof));
+
+        // test: the proof can be loaded again and was updated as expected by the pruning operation
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(singleProof.toFile());
+        Proof reloadedProofForM = env.getLoadedProof();
+        assertFalse(reloadedProofForM.closed());
+        assertEquals(1, reloadedProofForM.countNodes());
+
+        // clean up
+        GeneralSettings.noPruningClosed = pruningDisabled;
+        env.dispose();
+        Files.delete(resavedBundle);
+        IOUtil.delete(unzip.toFile());
     }
 
     /**
