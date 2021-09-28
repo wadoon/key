@@ -282,10 +282,13 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 super(mainWindow);
         }
         private static final long serialVersionUID = 1L;
+        private LoadUserTacletsDialog chooser;
 
         @Override
         protected void loadTaclets() {
-                LoadUserTacletsDialog chooser = new LoadUserTacletsDialog(LoadUserTacletsDialog.Mode.LOAD);
+                if (chooser == null) {
+                    chooser = new LoadUserTacletsDialog(LoadUserTacletsDialog.Mode.LOAD);
+                }
 
                 boolean loaded = chooser.showAsDialog();
 
@@ -300,7 +303,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                                 new Services(proof.getServices().getProfile()),
                                 mainWindow.getUserInterface());
 
-                FileRepo fileRepo = mainWindow.getMediator().getSelectedProof().getInitConfig().getFileRepo();
+                // ensure that proof and taclet files share the same FileRepo
+                FileRepo fileRepo = proof.getInitConfig().getFileRepo();
                 problemInitializer.setFileRepo(fileRepo);
 
                 TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
