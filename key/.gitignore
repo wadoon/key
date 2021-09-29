@@ -34,3 +34,6 @@ bin/
 .settings
 .project
 .classpath
+*.iml
+key.ipr
+key.iws
