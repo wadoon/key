@@ -78,7 +78,6 @@ public class ConstructAllDepPreds {
 //		depPredList.addAll(predCons(tb.singleton(a, tb.arr(tb.subtract(i, tb.one())))));
 //		depPredList.addAll(predCons(tb.singleton(a, tb.arr(tb.add(i, tb.one())))));
 //		depPredList.addAll(predCons(tb.singleton(a, tb.arr(tb.subtract(i, tb.one())))));
-		
 		return depPredList;
 	}
 }

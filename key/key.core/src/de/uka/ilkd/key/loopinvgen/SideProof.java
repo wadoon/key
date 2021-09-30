@@ -31,7 +31,7 @@ public class SideProof {
 		seq = sequent;
 	}
 
-	boolean proofSubSetWIndex(SequentFormula cIndexFormula, Term loc1, Term loc2) {
+	boolean proofSubSet(Term loc1, Term loc2) {
 		Term fml = tb.subset(loc1, loc2);
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
 //		sideSeq = sideSeq.addFormula(cIndexFormula, true, true).sequent();
@@ -45,39 +45,50 @@ public class SideProof {
 		}
 
 		Set<Term> anteFmlVars = new HashSet<Term>();
-		for (SequentFormula sfAnte : seq.antecedent()) {
-			anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
-//			System.out.println("anteFmlVars" + anteFmlVars + " for " + ProofSaver.printAnything(sfAnte.formula(), services, true));
-			for (Term tfv : anteFmlVars) {
-				if (locSetVars.contains(tfv)) {
-					sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
-					break;
+		Set<SequentFormula> tempAnteToAdd = new HashSet<SequentFormula>();
+		Set<SequentFormula> tempSuccToAdd = new HashSet<SequentFormula>();
+		int size;
+
+		do {
+			size = locSetVars.size();
+			for (SequentFormula sfAnte : seq.antecedent()) {
+				anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
+
+				for (Term tfv : anteFmlVars) {
+					if (locSetVars.contains(tfv)) {
+						if (tempAnteToAdd.add(sfAnte)) {
+							sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
+							locSetVars.addAll(anteFmlVars);
+							break;
+						}
+					}
 				}
 			}
-		}
 
-		Set<Term> succFmlVars = new HashSet<Term>();
-		for (SequentFormula sfSucc : seq.succedent()) {
-			succFmlVars = collectProgramAndLogicVariables(sfSucc.formula());
-			for (Term tfv : succFmlVars) {
-				if (locSetVars.contains(tfv)) {
-					sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
-					break;
+			Set<Term> succFmlVars = new HashSet<Term>();
+			for (SequentFormula sfSucc : seq.succedent()) {
+				succFmlVars = collectProgramAndLogicVariables(sfSucc.formula());
+				for (Term tfv : succFmlVars) {
+					if (locSetVars.contains(tfv)) {
+						if (tempAnteToAdd.add(sfSucc)) {
+							sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
+							locSetVars.addAll(succFmlVars);
+							break;
+						}
+					}
 				}
 			}
-		}
-
-
+		} while (size != locSetVars.size());
 		boolean closed = isProvable(sideSeq, services);
 		// true: Holds, false: Unknown
 		if (closed) {
-//			System.out.println("CCCC\n"+ProofSaver.printAnything(sideSeq, services));		
-//	System.out.println(loc1 + " is subset of " + loc2);
+//			System.out.println("========================\n"+ProofSaver.printAnything(sideSeq, services));		
+//			System.out.println(loc1 + " is NOT subset of " + loc2);
 		}
 		return closed;
 	}
 
-	boolean proofLT(SequentFormula cIndexFormula, Term ts1, Term ts2) {
+	boolean proofLT(Term ts1, Term ts2) {
 		Term fml = tb.lt(ts1, ts2);
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
 //		sideSeq = sideSeq.addFormula(cIndexFormula, true, true).sequent();
@@ -91,73 +102,97 @@ public class SideProof {
 		}
 
 		Set<Term> anteFmlVars = new HashSet<Term>();
-		for (SequentFormula sfAnte : seq.antecedent()) {
-			anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
-			for (Term tfv : anteFmlVars) {
-				if (locSetVars.contains(tfv)) {
-					sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
-					break;
-				}
-			}
-		}
+		Set<SequentFormula> tempAnteToAdd = new HashSet<SequentFormula>();
+		Set<SequentFormula> tempSuccToAdd = new HashSet<SequentFormula>();
+		int size;
 
-		Set<Term> succFmlVars = new HashSet<Term>();
-		for (SequentFormula sfSucc : seq.succedent()) {
-			succFmlVars = collectProgramAndLogicVariables(sfSucc.formula());
-			for (Term tfv : succFmlVars) {
-				if (locSetVars.contains(tfv)) {
-					sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
-					break;
+		do {
+			size = locSetVars.size();
+			for (SequentFormula sfAnte : seq.antecedent()) {
+				anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
+
+				for (Term tfv : anteFmlVars) {
+					if (locSetVars.contains(tfv)) {
+						if (tempAnteToAdd.add(sfAnte)) {
+							sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
+							locSetVars.addAll(anteFmlVars);
+							break;
+						}
+					}
 				}
 			}
-		}
+
+			Set<Term> succFmlVars = new HashSet<Term>();
+			for (SequentFormula sfSucc : seq.succedent()) {
+				succFmlVars = collectProgramAndLogicVariables(sfSucc.formula());
+				for (Term tfv : succFmlVars) {
+					if (locSetVars.contains(tfv)) {
+						if (tempAnteToAdd.add(sfSucc)) {
+							sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
+							locSetVars.addAll(succFmlVars);
+							break;
+						}
+					}
+				}
+			}
+		} while (size != locSetVars.size());
 
 		boolean closed = isProvable(sideSeq, services);
 		return closed;
 	}
 
-	boolean proofNonEmptyIntersectionWIndex(SequentFormula cIndexFormula, Term ts1, Term ts2) {
+	boolean proofNonEmptyIntersection(Term ts1, Term ts2) {
 		Term fml_1 = tb.not(tb.equals(tb.intersect(ts1, ts2), tb.empty()));
 		Set<Term> locSetVars = new HashSet<Term>();
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml_1), false, true).sequent();
-
-//		sideSeq = sideSeq.addFormula(cIndexFormula, true, true).sequent();
 
 		for (Term t : ts1.subs())
 			locSetVars.addAll(collectProgramAndLogicVariables(t));
 		for (Term t : ts2.subs())
 			locSetVars.addAll(collectProgramAndLogicVariables(t));
-		System.out.println("locsetvars: " + locSetVars);
+//		System.out.println("locsetvars: " + locSetVars);
+//		System.out.println("Original sequent ====>>>>>>\n" + ProofSaver.printAnything(seq, services));
 
 		Set<Term> anteFmlVars = new HashSet<Term>();
-		for (SequentFormula sfAnte : seq.antecedent()) {
-			anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
-			
-			for (Term tfv : anteFmlVars) {
-				if (locSetVars.contains(tfv)) {
-					sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
-					break;
-				}
-			}
-		}
+		Set<SequentFormula> tempAnteToAdd = new HashSet<SequentFormula>();
+		Set<SequentFormula> tempSuccToAdd = new HashSet<SequentFormula>();
+		int size;
 
-		Set<Term> succFmlVars = new HashSet<Term>();
-		for (SequentFormula sfSucc : seq.succedent()) {
-			succFmlVars = collectProgramAndLogicVariables(sfSucc.formula());
-			for (Term tfv : succFmlVars) {
-				if (locSetVars.contains(tfv)) {
-					sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
-					break;
+		do {
+			size = locSetVars.size();
+			for (SequentFormula sfAnte : seq.antecedent()) {
+				anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
+				for (Term tfv : anteFmlVars) {
+					if (locSetVars.contains(tfv)) {
+						if (tempAnteToAdd.add(sfAnte)) {
+							sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
+							locSetVars.addAll(anteFmlVars);
+							break;
+						}
+					}
 				}
 			}
-		}
-//		System.out.println(sideSeq);
+
+			Set<Term> succFmlVars = new HashSet<Term>();
+			for (SequentFormula sfSucc : seq.succedent()) {
+				succFmlVars = collectProgramAndLogicVariables(sfSucc.formula());
+				for (Term tfv : succFmlVars) {
+					if (locSetVars.contains(tfv)) {
+						if (tempAnteToAdd.add(sfSucc)) {
+							sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
+							locSetVars.addAll(succFmlVars);
+							break;
+						}
+					}
+				}
+			}
+		} while (size != locSetVars.size());
+		// System.out.println(sideSeq);
 		boolean closed = isProvable(sideSeq, services);
-		if(!closed) {
-			System.out.println("===================================\n"+ProofSaver.printAnything(sideSeq, services));		
-			System.out.println(ts1 + " intersect " + ts2 + " is empty.");
-		}
-//		System.out.println(closed);
+//		if (closed) {
+//			System.out.println(ts1 + " intersect " + ts2 + " is NOT empty. Because:");
+//			System.out.println(ProofSaver.printAnything(sideSeq, services));
+//		}
 		return closed;
 	}
 

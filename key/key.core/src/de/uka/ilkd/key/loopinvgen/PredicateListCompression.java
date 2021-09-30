@@ -55,22 +55,22 @@ public class PredicateListCompression {
 
 		for (Term depPred1 : fDepPredList) {
 			for (Term depPred2 : fDepPredList) {
-				if (depPred1.op().name().equals(depPred2.op().name()) && !depPred1.sub(0).equals(depPred2.sub(0))
+				if (depPred1.op().equals(depPred2.op()) && !depPred1.sub(0).equals(depPred2.sub(0))
 				/* && depPred1.sub(0).sub(0).equals(depPred2.sub(0).sub(0)) */) {
-					Boolean loc1SubSetloc2 = sProof.proofSubSetWIndex(currentIdxF, depPred1.sub(0), depPred2.sub(0));
+					Boolean loc1SubSetloc2 = sProof.proofSubSet(depPred1.sub(0), depPred2.sub(0));
 
 					if (loc1SubSetloc2) {
 						toDelete.add(depPred1);
 					} else {
-						Boolean loc2SubSetloc1 = sProof.proofSubSetWIndex(currentIdxF, depPred2.sub(0),
-								depPred1.sub(0));
+						Boolean loc2SubSetloc1 = sProof.proofSubSet(depPred2.sub(0), depPred1.sub(0));
 						if (loc2SubSetloc1)
 							toDelete.add(depPred2);
 					}
 				}
 			}
 		}
-		System.out.println("deleted by compression: " + fDepPredList);
+		fDepPredList.removeAll(toDelete);
+		System.out.println("deleted by compression: " + toDelete);
 		return fDepPredList;
 	}
 
@@ -111,6 +111,7 @@ public class PredicateListCompression {
 			}
 		}
 		fCompPredList.removeAll(toDelete);
+		System.out.println("deleted by compression: " + toDelete);
 		return fCompPredList;
 	}
 }

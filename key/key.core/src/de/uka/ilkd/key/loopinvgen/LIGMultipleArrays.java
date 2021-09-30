@@ -51,14 +51,12 @@ public class LIGMultipleArrays {
 	}
 
 	public void mainAlg() {
-		int manualItr = 0;
+//		int manualItr = 0;
 		getLow(seq);
 		getIndexAndHigh(seq);
 		getLocSet(seq);
 
-//		System.out.println(ProofSaver.printAnything(services.getProof().openGoals().head().sequent(), services));
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
-//		System.out.println(ProofSaver.printAnything(goalsAfterShift.head().sequent(), services));
 		ImmutableList<Goal> goalsAfterUnwind = null;
 
 		Goal currentGoal = goalsAfterShift.head();
@@ -72,30 +70,16 @@ public class LIGMultipleArrays {
 			ConstructAllDepPreds cad = new ConstructAllDepPreds(services, arr, low, index, high);
 			depPreds.addAll(cad.cons());
 		}
-//		RefineByGuard rbg = new RefineByGuard(services, compPreds, guard);
-//		compPreds = rbg.delCompPred();
-
 		do {
 			oldCompPred.removeAll(oldCompPred);
 			oldCompPred.addAll(compPreds);
 			oldDepPred.removeAll(oldDepPred);
 			oldDepPred.addAll(depPreds);
 
-//			System.out.println("Before Unwind:  "+ ProofSaver.printAnything(currentGoal.sequent(), services));
 			goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
-//			System.out.println(goalsAfterUnwind.head().sequent());
-			
-//			for (Goal pg:goalsAfterUnwind) {
-//				System.out.println("After Unwind:  "+ ProofSaver.printAnything(pg.sequent(), services));
-//			}
+
 			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
-//			System.out.println(goalsAfterShift.head().sequent());
-			for (Goal pg:goalsAfterUnwind) {
-//				System.out.println("After Shift:  "+ProofSaver.printAnything(pg.sequent(), services));
-			}
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
-//			System.out.println(currentGoal);
-//			System.out.println("Current Goal:   "+ProofSaver.printAnything(currentGoal.sequent(), services));
 			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
 			PredicateRefinement pr = new PredicateRefinement(services, currentGoal.sequent(), compPreds, depPreds,
 					currentIndexFormula);
@@ -103,14 +87,18 @@ public class LIGMultipleArrays {
 
 			compPreds = pr.refinedCompList;
 			depPreds = pr.refinedDepList;
-//			System.out.println("DP: " + depPreds);
-			manualItr++;
-		} while (!compPreds.equals(oldCompPred) || !depPreds.equals(oldDepPred) || manualItr < 6);
+//			manualItr++;
+		} while (compPreds.size() != oldCompPred.size() || depPreds.size() != oldDepPred.size());// while
+																									// (!compPreds.equals(oldCompPred)
+																									// ||
+																									// !depPreds.equals(oldDepPred)
+																									// || manualItr <
+																									// 10);
 
-//		PredicateListCompression plc = new PredicateListCompression(services, currentGoal.sequent(),
-//				currentIndexFormula);
-//		 Compression is not mandetory
-//		plc.compression(depPreds, compPreds);
+		PredicateListCompression plc = new PredicateListCompression(services, currentGoal.sequent(),
+				currentIndexFormula);
+////		 Compression is not mandetory
+		plc.compression(depPreds, compPreds);
 		System.out.println("LIG is the conjunction of: " + compPreds + "  size " + compPreds.size() + " and " + depPreds
 				+ " of size " + depPreds.size());
 	}

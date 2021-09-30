@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 
 public class PredicateRefinement {
 
@@ -69,31 +70,25 @@ public class PredicateRefinement {
 			detectFormula(sf.formula());
 		}
 		refinedCompList = compList;
-//		refinedDepList = depPredRefineSubSet(delEmptyLocSet(depList));
-//		delEmptyLocSet(currentIdxF, depList);
-//		refinedDepList = depPredRefineSubSet(currentIdxF, delEmptyLocSet(currentIdxF, depList));
 		refinedDepList = depPredRefineSubSet(currentIdxF, depList);
-//		System.out.println("depList: " + depList);
-//		System.out.println("RefinedDepList: " + refinedDepList);
 	}
 
 	private void detectFormula(Term sf) {
 		for (Operator f : CompOps) {
 			if (sf.op().equals(f)) {
-				// System.out.println("Detected Formula: " + sf);
 				delCompPred(sf);
 				break;
 			}
 		}
-
 		if (sf.op().equals(depLDT.getRPred()) || sf.op().equals(depLDT.getWPred())) {
 			delDepPred(sf, depList);
 		}
 
-//		else if (sf.op() instanceof UpdateApplication) { //TODO: check if it is correct. Because it ignores the effect of the update.
-//			Term belowupdate = UpdateApplication.getTarget(sf);
-//			detectFormula(belowupdate);
-//		}
+		else if (sf.op() instanceof UpdateApplication) { // TODO: check if it is correct. Because it ignores the effect
+															// of the update.
+			System.out.println("Update " + sf);
+		}
+
 	}
 
 	private void delCompPred(Term sf) {
@@ -155,11 +150,9 @@ public class PredicateRefinement {
 				} else if (compT.sub(0).equals(rh)) {
 					toDelete.addAll(oneSideMatch(sf, compT, lh, compT.sub(1)));
 				}
-
 			}
 			compList.removeAll(toDelete);
 		}
-
 	}
 
 	private Set<Term> oneSideMatch(Term sf, Term compT, Term rh, Term x) {
@@ -173,13 +166,13 @@ public class PredicateRefinement {
 			}
 			// l >= x || l > x
 			else if (compT.op().equals(geq) || compT.op().equals(gt)) {
-				if (sProof.proofLT(currentIdxF, rh, x)) {
+				if (sProof.proofLT(rh, x)) {
 					toDelete.add(compT);
 				}
 			}
 			// l <= x || l < x
 			else if (compT.op().equals(leq) || compT.op().equals(lt)) {
-				if (sProof.proofLT(currentIdxF, x, rh)) {
+				if (sProof.proofLT(x, rh)) {
 					toDelete.add(compT);
 				}
 			}
@@ -188,7 +181,7 @@ public class PredicateRefinement {
 		else if (sf.op().equals(gt) || sf.op().equals(geq)) {
 			// l == x || l <= x || l < x
 			if (compT.op().equals(eq) || compT.op().equals(leq) || compT.op().equals(lt)) {
-				if (sProof.proofLT(currentIdxF, x, rh)) {
+				if (sProof.proofLT(x, rh)) {
 					toDelete.add(compT);
 				}
 			}
@@ -197,7 +190,7 @@ public class PredicateRefinement {
 		else if (sf.op().equals(lt) || sf.op().equals(leq)) {
 			// l == x || l >= x || l > x
 			if (compT.op().equals(eq) || compT.op().equals(geq) || compT.op().equals(gt)) {
-				if (sProof.proofLT(currentIdxF, rh, x)) {
+				if (sProof.proofLT(rh, x)) {
 					toDelete.add(compT);
 				}
 			}
@@ -209,19 +202,31 @@ public class PredicateRefinement {
 		Operator pred = sf.op();
 		Term locSet = sf.sub(0);
 		Set<Term> toDelete = new HashSet<Term>();
+		Set<Term> tempDelete = new HashSet<Term>();
 		for (Term t : dpList) {
 			if (pred.equals(depLDT.getRPred()) && t.op().equals(depLDT.getNoR())) {
-				if (sProof.proofNonEmptyIntersectionWIndex(currentIdxF, t.sub(0), locSet)) {
+				if (sProof.proofNonEmptyIntersection(t.sub(0), locSet)) {
 					toDelete.add(t);
 				}
 			} else if (pred.equals(depLDT.getWPred()) && t.op().equals(depLDT.getNoW())) {
-				if (sProof.proofNonEmptyIntersectionWIndex(currentIdxF, t.sub(0), locSet)) {
+				if (sProof.proofNonEmptyIntersection(t.sub(0), locSet)) {
 					toDelete.add(t);
 				}
 			}
 		}
-	dpList.removeAll(toDelete);
-
+		dpList.removeAll(toDelete);
+		for (Term del : toDelete) {
+			for(Term dpPred : dpList) {
+				if(dpPred.op().equals(del.op())) {
+					if(sProof.proofNonEmptyIntersection(dpPred.sub(0), del.sub(0))) {
+						tempDelete.add(dpPred);
+//						System.out.println(dpPred + " is deleted because of " + del);
+//						System.out.println(ProofSaver.printAnything(seq, services));
+					}	
+				}
+			}
+		}
+		dpList.removeAll(tempDelete);
 	}
 
 	private Set<Term> depPredRefineSubSet(SequentFormula cIndexF, Set<Term> dependencePredicatesSet) {
@@ -266,21 +271,19 @@ public class PredicateRefinement {
 			if (sf1.formula().op().equals(depLDT.getRPred())) {
 				for (SequentFormula sf2 : ante) {
 					if (sf2.formula().op().equals(depLDT.getWPred())) {
-						if (sProof.proofNonEmptyIntersectionWIndex(currentIdxF, sf2.formula().sub(0),
-								sf1.formula().sub(0))) {
+						if (sProof.proofNonEmptyIntersection(sf2.formula().sub(0), sf1.formula().sub(0))) {
 							formulaIntersect = tb.intersect(sf1.formula().sub(0), sf2.formula().sub(0));
-							if (sProof.proofLT(currentIdxF, sf2.formula().sub(1), sf1.formula().sub(1))) {
+							if (sProof.proofLT(sf2.formula().sub(1), sf1.formula().sub(1))) {
 								for (Term term : dependencePredicatesSet) {
-									if (term.op().equals(depLDT.getNoRaW()) && sProof.proofNonEmptyIntersectionWIndex(
-											currentIdxF, term.sub(0), formulaIntersect)) {
+									if (term.op().equals(depLDT.getNoRaW()) && sProof.proofNonEmptyIntersection(
+											term.sub(0), formulaIntersect)) {
 										toDelete.add(term);
 									}
 								}
-							} else if (sProof.proofLT(currentIdxF, sf1.formula().sub(1), sf2.formula().sub(1))) {
+							} else if (sProof.proofLT(sf1.formula().sub(1), sf2.formula().sub(1))) {
 								for (Term term : dependencePredicatesSet) {
 									if (term.op().equals(depLDT.getNoWaR())) {
-										if (sProof.proofNonEmptyIntersectionWIndex(currentIdxF, term.sub(0),
-												formulaIntersect)) {
+										if (sProof.proofNonEmptyIntersection(term.sub(0), formulaIntersect)) {
 											toDelete.add(term);
 //											System.out.println(term + " is deleted because of " + sf1 + " and " + sf2);
 //											toAdd.add(tb.noWaR(tb.setMinus(term.sub(0), formulaIntersect)));
@@ -294,13 +297,12 @@ public class PredicateRefinement {
 				}
 			} else if (sf1.formula().op().equals(depLDT.getWPred())) {
 				for (SequentFormula sf2 : ante) {
-					if (sf2.formula().op().equals(depLDT.getWPred()) && sProof.proofNonEmptyIntersectionWIndex(
-							currentIdxF, sf2.formula().sub(0), sf1.formula().sub(0)) && !sf2.equals(sf1)) {
+					if (sf2.formula().op().equals(depLDT.getWPred()) && sProof.proofNonEmptyIntersection(
+							sf2.formula().sub(0), sf1.formula().sub(0)) && !sf2.equals(sf1)) {
 						formulaIntersect = tb.intersect(sf2.formula().sub(0), sf1.formula().sub(0));
 						for (Term term : dependencePredicatesSet) {
 							if (term.op().name().equals(depLDT.getNoWaW())) {
-								if (sProof.proofNonEmptyIntersectionWIndex(currentIdxF, term.sub(0),
-										formulaIntersect)) {
+								if (sProof.proofNonEmptyIntersection(term.sub(0), formulaIntersect)) {
 									toDelete.add(term);
 //									toAdd.add(tb.noWaW(tb.setMinus(term.sub(0), formulaIntersect)));
 								}
@@ -314,11 +316,9 @@ public class PredicateRefinement {
 		dependencePredicatesSet.removeAll(toDelete);
 		for (Term delPred : toDelete) {
 			for (Term subSetPred : dependencePredicatesSet) {
-				if (delPred.op().name().equals(subSetPred.op().name())) {
-//					System.out.println("same op name");
-					if (sProof.proofSubSetWIndex(currentIdxF, subSetPred.sub(0), delPred.sub(0))) {
+				if (delPred.op().equals(subSetPred.op())) {
+					if (sProof.proofNonEmptyIntersection(subSetPred.sub(0), delPred.sub(0))) {
 						toDeleteSubset.add(subSetPred);
-//						System.out.println(subSetPred + " is deleed because of " + delPred);
 					}
 				}
 			}
