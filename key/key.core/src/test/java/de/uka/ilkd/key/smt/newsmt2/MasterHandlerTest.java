@@ -136,7 +136,7 @@ public class MasterHandlerTest {
             Path srcDir = Files.createTempDirectory("SMT_key_" + name);
             Path tmpSrc = srcDir.resolve("src.java");
             Files.write(tmpSrc, sources);
-            lines.add(0, "\\javaSource \"" + srcDir + "\";\n");
+            lines.add(0, "\\javaSource \"" + srcDir + "\";" + System.lineSeparator());
         }
 
         Path tmpKey = Files.createTempFile("SMT_key_" + name, ".key");
@@ -171,10 +171,11 @@ public class MasterHandlerTest {
         Process proc = new ProcessBuilder("z3", "-in", "-T:5").start();
         OutputStream os = proc.getOutputStream();
         os.write(translation.getBytes());
-        os.write("\n\n(check-sat)".getBytes());
+        os.write((System.lineSeparator() + System.lineSeparator() + "(check-sat)").getBytes());
         os.close();
 
-        String[] response = Streams.toString(proc.getInputStream()).split("\n");
+        // the \\R regex matches any possible linebreak
+        String[] response = Streams.toString(proc.getInputStream()).split("\\R");
 
         try {
             String lookFor = null;
@@ -212,7 +213,9 @@ public class MasterHandlerTest {
             System.out.println("Z3 input");
             System.out.println(translation);
 
-            System.out.println("\n\nZ3 response");
+            System.out.println();
+            System.out.println();
+            System.out.println("Z3 response");
             for (String s : response) {
                 System.out.println(s);
             }

@@ -42,39 +42,51 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         sb.append("; --- Preamble");
         sb.append(SMTHandlerServices.getInstance().getPreamble());
 
-        sb.append("; --- Declarations\n");
+        sb.append("; --- Declarations");
+        sb.append(System.lineSeparator());
         extractSortDeclarations(sequent, services, master, sequentAsserts);
         for (Writable decl : master.getDeclarations()) {
             decl.appendTo(sb);
-            sb.append("\n");
+            sb.append(System.lineSeparator());
         }
 
-        sb.append("\n; --- Axioms\n");
+        sb.append(System.lineSeparator());
+        sb.append("; --- Axioms");
+        sb.append(System.lineSeparator());
         for (Writable ax : master.getAxioms()) {
             ax.appendTo(sb);
-            sb.append("\n");
+            sb.append(System.lineSeparator());
         }
 
-        sb.append("\n; --- Sequent\n");
+        sb.append(System.lineSeparator());
+        sb.append("; --- Sequent");
+        sb.append(System.lineSeparator());
         for (SExpr ass : sequentSMTAsserts) {
             SExpr assertion = new SExpr("assert", ass);
             assertion.appendTo(sb);
-            sb.append("\n");
+            sb.append(System.lineSeparator());
         }
 
-        sb.append("\n(check-sat)");
+        sb.append(System.lineSeparator());
+        sb.append("(check-sat)");
 
         if(!master.getUnknownValues().isEmpty()) {
-            sb.append("\n\n; --- Translation of unknown values\n");
+            sb.append(System.lineSeparator());
+            sb.append(System.lineSeparator());
+            sb.append("; --- Translation of unknown values");
+            sb.append(System.lineSeparator());
             for (Term t : master.getUnknownValues().keySet()) {
-                sb.append("; " + master.getUnknownValues().get(t).toString() + " :  " + t.toString() + "\n");
+                sb.append("; " + master.getUnknownValues().get(t).toString() + " :  " + t.toString());
+                sb.append(System.lineSeparator());
             }
         }
 
         // any exceptions?
         List<Throwable> exceptions = master.getExceptions();
         for (Throwable t : exceptions) {
-            sb.append("\n; " + t.toString().replace("\n", "\n;"));
+            sb.append(System.lineSeparator());
+            sb.append("; " + t.toString().replace(System.lineSeparator(),
+                System.lineSeparator() + ";"));
             t.printStackTrace();
         }
 

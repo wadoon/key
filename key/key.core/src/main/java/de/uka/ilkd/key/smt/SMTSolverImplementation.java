@@ -370,7 +370,8 @@ final class SMTSolverImplementation implements SMTSolver, Runnable {
 
         for (Message m : solverCommunication.getOutMessages()) {
             String s = m.getContent();
-            output.append(s).append("\n");
+            output.append(s);
+            output.append(System.lineSeparator());
         }
 
         // queries are now included in message list of SolverCommunication
