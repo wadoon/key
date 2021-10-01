@@ -70,7 +70,7 @@ public class PredicateListCompression {
 			}
 		}
 		fDepPredList.removeAll(toDelete);
-		System.out.println("deleted by compression: " + toDelete);
+//		System.out.println("deleted by compression: " + toDelete);
 		return fDepPredList;
 	}
 
@@ -111,7 +111,7 @@ public class PredicateListCompression {
 			}
 		}
 		fCompPredList.removeAll(toDelete);
-		System.out.println("deleted by compression: " + toDelete);
+//		System.out.println("deleted by compression: " + toDelete);
 		return fCompPredList;
 	}
 }

@@ -189,8 +189,8 @@ public class SideProof {
 		} while (size != locSetVars.size());
 		// System.out.println(sideSeq);
 		boolean closed = isProvable(sideSeq, services);
-//		if (closed) {
-//			System.out.println(ts1 + " intersect " + ts2 + " is NOT empty. Because:");
+//		if (!closed) {
+//			System.out.println(ts1 + " intersect " + ts2 + " is EMPTY. Because:");
 //			System.out.println(ProofSaver.printAnything(sideSeq, services));
 //		}
 		return closed;
