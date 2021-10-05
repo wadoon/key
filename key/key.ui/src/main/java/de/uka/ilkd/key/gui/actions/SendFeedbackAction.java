@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.Container;
-import java.awt.Desktop;
 import java.awt.Dialog;
 import java.awt.FlowLayout;
 import java.awt.Window;
@@ -15,27 +14,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URI;
+import java.net.MalformedURLException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ExceptionDialog;
+import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
@@ -44,6 +36,7 @@ import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.KeYConstants;
+import org.key_project.util.java.IOUtil;
 
 /**
  * {@link AbstractAction} used by {@link ExceptionDialog} in KeY report error
@@ -269,8 +262,15 @@ public class SendFeedbackAction extends AbstractAction {
         @Override
         boolean isEnabled() {
             if(throwable != null) {
-                Location location = ExceptionTools.getLocation(throwable);
-                return location != null && location.getFilename() != null;
+                Location location = null;
+                try {
+                    location = ExceptionTools.getLocation(throwable);
+                } catch (MalformedURLException e) {
+                    // no valid location could be extracted
+                    e.printStackTrace();
+                    return false;
+                }
+                return Location.isValidLocation(location);
             }
             return false;
         }
@@ -278,8 +278,11 @@ public class SendFeedbackAction extends AbstractAction {
         @Override
         byte[] retrieveFileData() throws IOException {
             Location location = ExceptionTools.getLocation(throwable);
-            String sourceFileName = location.getFilename();
-            return Files.readAllBytes(new File(sourceFileName).toPath());
+            /* Certainly there are more efficient methods than reading to string with IOUtil
+             * (using default charset) and then writing back to byte[] (using default charset
+             * again). However, this way it is a very concise and easy to read. */
+            String source = IOUtil.readFrom(location.getFileURL());
+            return source.getBytes(Charset.defaultCharset());
         }
     }
 
@@ -330,12 +333,8 @@ public class SendFeedbackAction extends AbstractAction {
     }
 
     private class SendAction implements ActionListener {
-        private static final String MAIL_BODY =
-                "Please attach the file %s with the chosen metadata to this mail and send it.%%0a%%0a" +
-                "Thanks for your feedack, %%0athe KeY team";
-
-        JDialog dialog;
-        JTextArea message;
+        private final JDialog dialog;
+        private final JTextArea message;
 
         public SendAction(JDialog dialog, JTextArea bugDescription) {
             this.dialog = dialog;
@@ -346,30 +345,26 @@ public class SendFeedbackAction extends AbstractAction {
         public void actionPerformed(ActionEvent arg0) {
 
             try {
-                File reportFile = File.createTempFile("key-bugreport", ".zip");
-
                 int confirmed = JOptionPane.showConfirmDialog(
                         parent,
                         "A zip archive containing the selected data will be created.\n"
-                                + "A new e-mail client window will open.\n"
-                                + "Please attach the file " + reportFile +
-                                " to the mail and send it.", "Send Bug Report",
-                                JOptionPane.OK_CANCEL_OPTION);
+                                + "To report a problem, send it in an e-mail to the KeY developers\n"
+                                + "at " + FEEDBACK_RECIPIENT + ".", "Send Bug Report",
+                        JOptionPane.OK_CANCEL_OPTION);
 
-                if (confirmed == JOptionPane.OK_OPTION) {
-                    saveMetaDataToFile(reportFile, message.getText());
-                    if (Desktop.isDesktopSupported()) {
-                        Desktop desktop = Desktop.getDesktop();
-                        URI uriMailTo = new URI("mailto:" + FEEDBACK_RECIPIENT + "?" +
-                                "subject=KeY%20feedback&body=" +
-                                String.format(MAIL_BODY, reportFile).replace(" ", "%20"));
-                        desktop.mail(uriMailTo);
-                    } else {
-                        JOptionPane.showMessageDialog(parent,
-                                "A mail window cannot be automatically opened on your system.\n"+
-                                "Please send the file " + reportFile + " to address " +
-                                FEEDBACK_RECIPIENT);
-                    }
+                if(confirmed != JOptionPane.OK_OPTION) {
+                    return;
+                }
+
+                KeYFileChooser fileChooser = KeYFileChooser.getFileChooser("Select path to save");
+                fileChooser.setFileFilter(KeYFileChooser.ZIP_FILTER);
+
+                int answer = fileChooser.showSaveDialog(parent);
+                if (answer == JFileChooser.APPROVE_OPTION) {
+                    saveMetaDataToFile(fileChooser.getSelectedFile(), message.getText());
+                    JOptionPane.showMessageDialog(parent,
+                            String.format("Your message has been saved to the file %s.",
+                                    fileChooser.getSelectedFile()));
                 }
             } catch (Exception e) {
                 ExceptionDialog.showDialog(parent, e);
@@ -425,7 +420,7 @@ public class SendFeedbackAction extends AbstractAction {
 
     public SendFeedbackAction(final Window parent, final Throwable exception) {
         this.parent = parent;
-        putValue(NAME, "Send feedback");
+        putValue(NAME, "Send feedback...");
         this.throwable = exception;
     }
 
@@ -464,7 +459,7 @@ public class SendFeedbackAction extends AbstractAction {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
 
-        JButton sendFeedbackReportButton = new JButton("Send Feedback");
+        JButton sendFeedbackReportButton = new JButton("Send Feedback...");
         sendFeedbackReportButton.addActionListener(new SendAction(dialog, bugDescription));
 
         JButton cancelButton = new JButton("Cancel");

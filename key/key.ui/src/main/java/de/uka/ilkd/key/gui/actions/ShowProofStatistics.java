@@ -17,6 +17,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,13 +30,7 @@ import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.UIManager;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -261,6 +257,17 @@ public class ShowProofStatistics extends MainWindowAction {
             buttonPane.add(csvButton);
             buttonPane.add(htmlButton);
 
+            getRootPane().setDefaultButton(okButton);
+            getRootPane().addKeyListener(new KeyAdapter() {
+
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        getRootPane().getDefaultButton().doClick();
+                    }
+                }
+            });
+
             setLayout(new BorderLayout());
             add(scrollPane, BorderLayout.CENTER);
             add(buttonPane, BorderLayout.PAGE_END);
@@ -277,13 +284,21 @@ public class ShowProofStatistics extends MainWindowAction {
             setLocationRelativeTo(mainWindow);
         }
 
+        @Override
+        public void setVisible(boolean visible) {
+            super.setVisible(visible);
+            if (visible) {
+                requestFocus();
+            }
+        }
+
         private void export(String fileExtension, String fileName, String text) {
             KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(
                     "Choose filename to save statistics");
             fileChooser.setFileFilter(KeYFileChooser.STATISTICS_FILTER);
-            fileChooser.selectFile(new File(fileName + "." + fileExtension));
-            boolean approved = fileChooser.showSaveDialog(this);
-            if (approved) {
+            fileChooser.setSelectedFile(new File(fileName + "." + fileExtension));
+            int result = fileChooser.showSaveDialog(this);
+            if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 try(BufferedWriter writer = new BufferedWriter(
                             new OutputStreamWriter(new FileOutputStream(file)));) {
