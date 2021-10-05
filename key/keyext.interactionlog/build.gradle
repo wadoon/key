@@ -1,10 +1,17 @@
 plugins {
     id "org.jetbrains.kotlin.jvm" version "1.5.31"
     id 'org.jetbrains.dokka' version '0.9.18'
+
+    id 'com.github.johnrengelman.shadow' version "5.0.0"
 }
 
-repositories {
-    jcenter() // or maven { url 'https://dl.bintray.com/kotlin/dokka' }
+configurations {
+    plugin
+    implementation.extendsFrom(plugin)
+}
+
+shadowJar {
+    configurations = [project.configurations.plugin]
 }
 
 dokka {
@@ -16,10 +23,11 @@ dependencies {
     implementation project(":key.util")
     implementation project(":key.core")
     implementation project(":key.ui")
-    implementation group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.12.1'
-    implementation group: 'com.atlassian.commonmark', name: 'commonmark-ext-gfm-tables', version: '0.12.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.9.1'
+
+    plugin "com.atlassian.commonmark:commonmark:0.12.1"
+    plugin "com.atlassian.commonmark:commonmark-ext-gfm-tables:0.12.1"
+    plugin "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    plugin 'com.fasterxml.jackson.core:jackson-databind:2.9.9.1'
 }
 
 
