@@ -30,6 +30,8 @@ import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import keyext.extract_preconditions.projections.AbstractTermProjection;
 import keyext.extract_preconditions.projections.LeaveOutProjection;
+import keyext.extract_preconditions.projections.NoProjection;
+import keyext.extract_preconditions.strategies.ResolveIntermediateVariablesStrategy;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -153,10 +155,10 @@ public class ExtractorTest {
                 Set<Name> blackList = new HashSet<>();
                 //blackList.add(new Name("self"));
                 //blackList.add(new Name("heap"));
-                AbstractTermProjection projection =
-                    new LeaveOutProjection(currentUnclosed.programVariables,
+                AbstractTermProjection projection = new NoProjection(currentProof.getServices());
+                    /*new LeaveOutProjection(currentUnclosed.programVariables,
                         currentProof.getServices(),
-                        true, blackList);
+                        true, blackList);*/
                 //AbstractTermProjection projection = new NoProjection(currentProof.getServices());
                 PreconditionExtractor preconditionExtractor =
                     new PreconditionExtractor(
@@ -254,6 +256,11 @@ public class ExtractorTest {
                     closeProvable.applyTo(env.getUi(), proof.root(), null, null);
                     // Simplify heaps
                     HeapSimplificationMacro heapSimplifier = new HeapSimplificationMacro();
+                    heapSimplifier.applyTo(env.getUi(), proof.root(), null, null);
+                    // Resolve Variables through ApplyEqReverse
+                    proof.setActiveStrategy(new ResolveIntermediateVariablesStrategy());
+                    env.getUi().getProofControl().startAndWaitForAutoMode(proof);
+                    // Simplify heaps again
                     heapSimplifier.applyTo(env.getUi(), proof.root(), null, null);
                     // Close Closables
                     closeProvable.applyTo(env.getUi(), proof.root(), null, null);
