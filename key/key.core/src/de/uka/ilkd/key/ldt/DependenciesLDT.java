@@ -25,6 +25,10 @@ public class DependenciesLDT extends LDT {
 	private final Function rPred;
 	private final Function wPred;
 
+	private final Function nothingMarker;
+	private final Function readMarker;
+	private final Function writeMarker;
+
 
 	public DependenciesLDT(TermServices services) {
 		super(NAME, services);
@@ -35,6 +39,10 @@ public class DependenciesLDT extends LDT {
 		noWaW	         = addFunction(services, "noWaW");
 		rPred	         = addFunction(services, "rPred");
 		wPred	         = addFunction(services, "wPred");
+		
+		readMarker  = addFunction(services, "read");
+		writeMarker = addFunction(services, "write");
+		nothingMarker = addFunction(services, "nothing");
 	}
 
 	public Function getNoR() {
@@ -63,6 +71,18 @@ public class DependenciesLDT extends LDT {
 
 	public Function getWPred() {
 		return wPred;
+	}
+
+	public Function getNothingMarker() {
+		return nothingMarker;
+	}
+
+	public Function getReadMarker() {
+		return readMarker;
+	}
+
+	public Function getWriteMarker() {
+		return writeMarker;
 	}
 
 	@Override

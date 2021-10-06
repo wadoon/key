@@ -43,6 +43,7 @@ public class RuleApplication {
 		sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_OFF);
 		sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_NONE);
 		sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_EXPAND);
+		sp.setProperty(StrategyProperties.MPS_OPTIONS_KEY, StrategyProperties.MPS_MERGE);
 
 		ps.setStrategyProperties(sp);
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
@@ -124,8 +125,8 @@ public class RuleApplication {
 			assert tApp.size() == 1;
 			TacletApp app = tApp.head();
 			app = app.tryToInstantiate(services);
-			currentGoal.apply(app);
-			ps.start(ImmutableSLList.<Goal>nil().prepend(currentGoal));
+			ImmutableList<Goal> goals = currentGoal.apply(app);
+			ps.start(goals);
 //			System.out.println("Number of Open Goals after applying unwind: " + currentGoal.proof().openGoals().size());
 
 			return currentGoal.proof().openGoals();// Or proof.openFoals()?

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 
 public class ShiftUpdateImpl {
 	private final Goal goal;
@@ -151,16 +152,26 @@ public class ShiftUpdateImpl {
 	 * @param update the {@link Term} with an event update at top level
 	 * @param renamingUpdate the {@link Term} representing the renaming update
 	 */
+	
+
 	private void shiftEventUpdate(Term update, Term renamingUpdate) {
 		Term term4EventUpdate;
-		if (update.sub(0).toString().equals("read"))
-			term4EventUpdate = tb.rPred(update.sub(1), update.sub(2));
-		else if (update.sub(0).toString().equals("write"))
+		if (update.sub(0).equals(services.getTypeConverter().getDependenciesLDT().getReadMarker()))
+			term4EventUpdate = tb.rPred(update.sub(1), update.sub(2)); //why do I get the time stamp from events?
+		else if (update.sub(0).equals(services.getTypeConverter().getDependenciesLDT().getWriteMarker()))
 			term4EventUpdate = tb.wPred(update.sub(1), update.sub(2));
+		else if (update.sub(0).equals(services.getTypeConverter().getDependenciesLDT().getNothingMarker()))
+			term4EventUpdate = tb.skip();
 		else
 			throw new RuntimeException("Unknown event update");
 
 		goal.addFormula(new SequentFormula(tb.apply(renamingUpdate, term4EventUpdate)), true, true);
 	}
+	
+//	private void shiftEventUpdateNew(Term update, Term renamingUpdate) {
+//		final Term term4EventUpdate = tb.ife(update.sub(0).equals(services.getTypeConverter().getDependenciesLDT().getReadMarker()), tb.rPred(update.sub(1), update.sub(2)), tb.wPred(update.sub(1), update.sub(2)));
+//		//How about nothing?
+//		goal.addFormula(new SequentFormula(tb.apply(renamingUpdate, term4EventUpdate)), true, true);
+//	}
 
 }

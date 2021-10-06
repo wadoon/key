@@ -224,6 +224,10 @@ public class SideProof {
 //		if (!info.getProof().closed()) {
 //			System.out.println("Open Goals: " + info.getProof().openGoals());
 //		}
+System.out.println("==>" + info.getAppliedRuleApps());
+if (!info.getProof().closed()) {
+	System.out.println(" proof could not be closed for " + ProofSaver.printAnything(seq2prove, services));
+}
 		return info.getProof().closed();
 	}
 

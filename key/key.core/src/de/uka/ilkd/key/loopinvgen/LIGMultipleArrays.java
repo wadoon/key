@@ -97,13 +97,13 @@ public class LIGMultipleArrays {
 
 		PredicateListCompression plc = new PredicateListCompression(services, currentGoal.sequent(),
 				currentIndexFormula);
-////		 Compression is not mandetory
+//		 Compression is not mandetory
 		plc.compression(depPreds, compPreds);
-//		System.out.println("LIG is the conjunction of: " + compPreds + "  size " + compPreds.size() + " and ");
-//		for (Term term : depPreds) {
-//			System.out.println(term);
-//		}
-//		System.out.println(" of size " + depPreds.size());
+		System.out.println("LIG is the conjunction of: " + compPreds + "  size " + compPreds.size() + " and ");
+		for (Term term : depPreds) {
+			System.out.println(term);
+		}
+		System.out.println(" of size " + depPreds.size());
 	}
 
 	private SequentFormula currentIndexEq(Sequent seq2, Term index2) {

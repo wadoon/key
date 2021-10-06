@@ -70,6 +70,26 @@ public class PredicateListCompression {
 			}
 		}
 		fDepPredList.removeAll(toDelete);
+		toDelete.removeAll(toDelete);
+		
+		for (Term depPred1 : fDepPredList) {
+			for (Term depPred2 : fDepPredList) {
+				if (depPred1.op().equals(depLDT.getNoR())) {
+					if(depPred2.op().equals(depLDT.getNoRaW()) || depPred2.op().equals(depLDT.getNoWaR())) {
+						if(sProof.proofSubSet(depPred2.sub(0), depPred1.sub(0))){
+							toDelete.add(depPred2);
+						}
+					}
+				} else if (depPred1.op().equals(depLDT.getNoW())) {
+					if(depPred2.op().equals(depLDT.getNoRaW()) || depPred2.op().equals(depLDT.getNoWaR()) || depPred2.op().equals(depLDT.getNoWaW())) {
+						if(sProof.proofSubSet(depPred2.sub(0), depPred1.sub(0))){
+							toDelete.add(depPred2);
+						}
+					}
+				}
+			}
+		}
+		fDepPredList.removeAll(toDelete);
 //		System.out.println("deleted by compression: " + toDelete);
 		return fDepPredList;
 	}

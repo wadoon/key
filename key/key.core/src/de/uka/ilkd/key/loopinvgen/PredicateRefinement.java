@@ -198,6 +198,8 @@ public class PredicateRefinement {
 
 	private void delDepPred(Term sf, Set<Term> dpList) {
 		Operator pred = sf.op();
+		System.out.println("AAAA====> " + ProofSaver.printAnything(sf, services));				
+		
 		Term locSet = sf.sub(0);
 		Set<Term> toDelete = new HashSet<Term>();
 		Set<Term> tempDelete = new HashSet<Term>();
@@ -207,6 +209,7 @@ public class PredicateRefinement {
 					toDelete.add(t);
 				}
 			} else if (pred.equals(depLDT.getWPred()) && t.op().equals(depLDT.getNoW())) {
+System.out.println("Checking for " + ProofSaver.printAnything(t, services));				
 				if (sProof.proofNonEmptyIntersection(t.sub(0), locSet)) {
 					toDelete.add(t);
 //					System.out.println(t);
