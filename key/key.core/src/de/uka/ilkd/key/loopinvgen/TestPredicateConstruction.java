@@ -221,6 +221,45 @@ public class TestPredicateConstruction {
 		cur.mainAlg();
 	}
 
+	public void shiftArrayToLeftWithAiliasing() {
+
+		Term succFormula;
+
+		try {
+			succFormula = parse("{i:=0}\\<{" + "			while (i<a.length-1) {a[i] = b[i+1];" + "			i++;}"
+					+ "		}\\>true");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
+
+		String[] arrLeft = {"a!=null", "a.length > 10", "a=b"};
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+
+		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
+		cur.mainAlg();
+	}
+
+	
+	
 	public void stencil() {
 
 		Term succFormula;
@@ -269,7 +308,6 @@ public class TestPredicateConstruction {
 		try {
 			
 			formula = parse("{i:=0}\\<{while (i<=a.length-1) {"
-//							+ "				a[i] = 1;"
 							+ "				if(a[i]> 0){"
 							+ "					a[i] = 1;"
 							+ "				}\n"
@@ -560,7 +598,7 @@ public class TestPredicateConstruction {
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		long start = System.currentTimeMillis();
-		tpc.condition();
+		tpc.shiftArrayToLeftWithAiliasing();
 		long end = System.currentTimeMillis();
 		System.out.println(end - start);
 	}

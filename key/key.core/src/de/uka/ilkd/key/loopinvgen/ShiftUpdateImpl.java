@@ -154,24 +154,29 @@ public class ShiftUpdateImpl {
 	 */
 	
 
-	private void shiftEventUpdate(Term update, Term renamingUpdate) {
-		Term term4EventUpdate;
-		if (update.sub(0).equals(services.getTypeConverter().getDependenciesLDT().getReadMarker()))
-			term4EventUpdate = tb.rPred(update.sub(1), update.sub(2)); //why do I get the time stamp from events?
-		else if (update.sub(0).equals(services.getTypeConverter().getDependenciesLDT().getWriteMarker()))
-			term4EventUpdate = tb.wPred(update.sub(1), update.sub(2));
-		else if (update.sub(0).equals(services.getTypeConverter().getDependenciesLDT().getNothingMarker()))
-			term4EventUpdate = tb.skip();
-		else
-			throw new RuntimeException("Unknown event update");
-
-		goal.addFormula(new SequentFormula(tb.apply(renamingUpdate, term4EventUpdate)), true, true);
-	}
-	
-//	private void shiftEventUpdateNew(Term update, Term renamingUpdate) {
-//		final Term term4EventUpdate = tb.ife(update.sub(0).equals(services.getTypeConverter().getDependenciesLDT().getReadMarker()), tb.rPred(update.sub(1), update.sub(2)), tb.wPred(update.sub(1), update.sub(2)));
-//		//How about nothing?
+//	private void shiftEventUpdate(Term update, Term renamingUpdate) {
+//		Term term4EventUpdate;
+//		if (update.sub(0).op().equals(services.getTypeConverter().getDependenciesLDT().getReadMarker()))
+//			term4EventUpdate = tb.rPred(update.sub(1), update.sub(2)); 
+//		else if (update.sub(0).op().equals(services.getTypeConverter().getDependenciesLDT().getWriteMarker()))
+//			term4EventUpdate = tb.wPred(update.sub(1), update.sub(2));
+//		else if (update.sub(0).op().equals(services.getTypeConverter().getDependenciesLDT().getNothingMarker()))
+//			term4EventUpdate = tb.skip();
+//		else
+//			throw new RuntimeException("Unknown event update");
+//
 //		goal.addFormula(new SequentFormula(tb.apply(renamingUpdate, term4EventUpdate)), true, true);
 //	}
+	
+	private void shiftEventUpdate(Term update, Term renamingUpdate) {
+		Term t1 = update.sub(0);
+		Term t2 = tb.func(services.getTypeConverter().getDependenciesLDT().getReadMarker());
+		Term cond1 = tb.equals(t1, t2);
+		Term t3 = tb.func(services.getTypeConverter().getDependenciesLDT().getWriteMarker());
+		Term cond2 = tb.equals(t1, t3);
+		
+		final Term term4EventUpdate = tb.ife(cond1, tb.rPred(update.sub(1), update.sub(2)), tb.ife(cond2, tb.wPred(update.sub(1), update.sub(2)), tb.tt()));
+		goal.addFormula(new SequentFormula(tb.apply(renamingUpdate, term4EventUpdate)), true, true);
+	}
 
 }

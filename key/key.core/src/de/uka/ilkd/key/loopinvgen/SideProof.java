@@ -31,6 +31,64 @@ public class SideProof {
 		seq = sequent;
 	}
 
+	boolean proofEquality(Term loc1, Term loc2) {
+		Term fml = tb.equals(loc1, loc2);
+		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
+
+		Set<Term> locSetVars = new HashSet<Term>();
+		for (Term t : loc1.subs()) {
+			locSetVars.addAll(collectProgramAndLogicVariables(t));
+		}
+		for (Term t : loc2.subs()) {
+			locSetVars.addAll(collectProgramAndLogicVariables(t));
+		}
+
+		Set<Term> anteFmlVars = new HashSet<Term>();
+		Set<SequentFormula> tempAnteToAdd = new HashSet<SequentFormula>();
+		Set<SequentFormula> tempSuccToAdd = new HashSet<SequentFormula>();
+		int size;
+
+		do {
+			size = locSetVars.size();
+			for (SequentFormula sfAnte : seq.antecedent()) {
+				anteFmlVars = collectProgramAndLogicVariables(sfAnte.formula());
+
+				for (Term tfv : anteFmlVars) {
+					if (locSetVars.contains(tfv)) {
+						if (tempAnteToAdd.add(sfAnte)) {
+							sideSeq = sideSeq.addFormula(sfAnte, true, true).sequent();
+							locSetVars.addAll(anteFmlVars);
+							break;
+						}
+					}
+				}
+			}
+
+			Set<Term> succFmlVars = new HashSet<Term>();
+			for (SequentFormula sfSucc : seq.succedent()) {
+				succFmlVars = collectProgramAndLogicVariables(sfSucc.formula());
+				for (Term tfv : succFmlVars) {
+					if (locSetVars.contains(tfv)) {
+						if (tempAnteToAdd.add(sfSucc)) {
+							sideSeq = sideSeq.addFormula(sfSucc, false, true).sequent();
+							locSetVars.addAll(succFmlVars);
+							break;
+						}
+					}
+				}
+			}
+		} while (size != locSetVars.size());
+		boolean closed = isProvable(sideSeq, services);
+		// true: Holds, false: Unknown
+//		if (!closed) {
+//			System.out.println("========================\n"+ProofSaver.printAnything(sideSeq, services));		
+//			System.out.println(loc1 + " is NOT equal to " + loc2);
+//		}
+//		else System.out.println("Yaaaaaaaaaaaaaaaaaaaaaaaaay");
+		return closed;
+	}
+	
+	
 	boolean proofSubSet(Term loc1, Term loc2) {
 		Term fml = tb.subset(loc1, loc2);
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
@@ -224,10 +282,10 @@ public class SideProof {
 //		if (!info.getProof().closed()) {
 //			System.out.println("Open Goals: " + info.getProof().openGoals());
 //		}
-System.out.println("==>" + info.getAppliedRuleApps());
-if (!info.getProof().closed()) {
-	System.out.println(" proof could not be closed for " + ProofSaver.printAnything(seq2prove, services));
-}
+//System.out.println("==>" + info.getAppliedRuleApps());
+//if (!info.getProof().closed()) {
+//	System.out.println(" proof could not be closed for " + ProofSaver.printAnything(seq2prove, services));
+//}
 		return info.getProof().closed();
 	}
 

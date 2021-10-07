@@ -81,7 +81,6 @@ public class PredicateRefinement {
 		}
 		if (sf.op().equals(depLDT.getRPred()) || sf.op().equals(depLDT.getWPred())) {
 			delDepPred(sf, depList);
-			depPredRefine(sf, depList);
 		} else if (sf.op() instanceof UpdateApplication) { // TODO: check if it is correct. Because it ignores the effect
 															// of the update.
 			System.out.println("Update " + sf);
@@ -198,7 +197,7 @@ public class PredicateRefinement {
 
 	private void delDepPred(Term sf, Set<Term> dpList) {
 		Operator pred = sf.op();
-		System.out.println("AAAA====> " + ProofSaver.printAnything(sf, services));				
+//		System.out.println("AAAA====> " + ProofSaver.printAnything(sf, services));				
 		
 		Term locSet = sf.sub(0);
 		Set<Term> toDelete = new HashSet<Term>();
@@ -209,29 +208,18 @@ public class PredicateRefinement {
 					toDelete.add(t);
 				}
 			} else if (pred.equals(depLDT.getWPred()) && t.op().equals(depLDT.getNoW())) {
-System.out.println("Checking for " + ProofSaver.printAnything(t, services));				
+//System.out.println("Checking for " + ProofSaver.printAnything(t, services));				
 				if (sProof.proofNonEmptyIntersection(t.sub(0), locSet)) {
 					toDelete.add(t);
-//					System.out.println(t);
 				}
 			}
 		}
 		dpList.removeAll(toDelete);
-//		for (Term del : toDelete) {
-//			for(Term dpPred : dpList) {
-//				if(dpPred.op().equals(del.op())) {
-//					if(sProof.proofNonEmptyIntersection(dpPred.sub(0), del.sub(0))) {
-//						tempDelete.add(dpPred);
-//					}	
-//				}
-//			}
-//		}
-//		dpList.removeAll(tempDelete);
+		depPredRefine(sf, dpList);
 	}
 
-	private Set<Term> depPredRefine(Term sf, Set<Term> dependencePredicatesSet) {
+	private void depPredRefine(Term sf, Set<Term> dependencePredicatesSet) {
 		Set<Term> toDelete = new HashSet<Term>();
-		Set<Term> tempDelete = new HashSet<Term>();
 		Semisequent ante = seq.antecedent();
 		Term formulaIntersect = null;
 
@@ -275,18 +263,8 @@ System.out.println("Checking for " + ProofSaver.printAnything(t, services));
 				}
 			}
 		dependencePredicatesSet.removeAll(toDelete);
-//		for (Term delPred : toDelete) {
-//			for (Term subSetPred : dependencePredicatesSet) {
-//				if (delPred.op().equals(subSetPred.op())) {
-//					if (sProof.proofNonEmptyIntersection(subSetPred.sub(0), delPred.sub(0))) {
-//						tempDelete.add(subSetPred);
-//					}
-//				}
-//			}
-//		}
-//		dependencePredicatesSet.removeAll(tempDelete);
-		return dependencePredicatesSet;
 	}
+
 	private boolean isProgramOrLogicVariable(Term term) {
 
 		if (!term.containsJavaBlockRecursive()) {
