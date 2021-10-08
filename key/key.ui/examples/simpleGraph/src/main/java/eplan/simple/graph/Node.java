@@ -7,11 +7,12 @@ public final class Node {
     final private /*@ spec_public @*/ int id;
 
     /*@ public normal_behavior
-      @ assignable \strictly_nothing;
-      @ ensures this.id == id;
+      @ requires (\forall Node n; n.id != p_id);
+      @ assignable \nothing;
+      @ ensures this.id == p_id;
       @*/
-    public Node(int id) {
-        this.id = id;
+    public Node(int p_id) {
+        this.id = p_id;
     }
 
     /*@ public normal_behavior
