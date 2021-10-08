@@ -485,12 +485,13 @@ public class MergeRule implements BuiltInRule {
 		
         
         if (eventUpdatesState1.size() < eventUpdatesState2.size()) {
+//        	System.out.println("merge events");
         	LinkedList<Term> tmp = eventUpdatesState2;
         	eventUpdatesState2 = eventUpdatesState1;
         	eventUpdatesState1 = tmp;		
         }
         
-        for (int i = 0; i<eventUpdatesState1.size();i++) {
+        for (int i = 0; i<=eventUpdatesState1.size();i++) {
         	final Term evUpd1 = eventUpdatesState1.pop();
         	
         	final Term kind2;
@@ -515,7 +516,7 @@ public class MergeRule implements BuiltInRule {
         			locset2, distinguishingFormula, services);
         	final Term timestamp = MergeByIfThenElse.createIfThenElseTerm(state1, state2, evUpd1.sub(2), 
         			timestamp2, distinguishingFormula, services);
-        	newElementaryUpdates = newElementaryUpdates.append(tb.eventUpdate(kind, locset, timestamp)); 	
+        	newElementaryUpdates = newElementaryUpdates.append(tb.eventUpdate(kind, locset, timestamp));
         }
         
         

@@ -3,11 +3,8 @@ package de.uka.ilkd.key.loopinvgen;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.antlr.runtime.RecognitionException;
-import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -15,20 +12,13 @@ import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.statement.EmptyStatement;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
-import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
@@ -36,10 +26,7 @@ import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.merge.MergeProcedure;
-import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
 
 public class TestPredicateConstruction {
 
@@ -53,8 +40,8 @@ public class TestPredicateConstruction {
 	TestPredicateConstruction() {
 		services = HelperClassParsingTests.createServices(new File(pathToTestKeYFile));
 		tb = services.getTermBuilder();
-		tf = tb.tf();
 		nss = services.getNamespaces();
+		tf = tb.tf();
 	}
 
 	private KeYParserF stringDeclParser(String s) {
@@ -108,7 +95,7 @@ public class TestPredicateConstruction {
 		}
 	}
 
-	public void shiftArrayToLeft() {
+	public void shiftArrayToLeft() { //Done
 
 		Term succFormula;
 
@@ -116,7 +103,6 @@ public class TestPredicateConstruction {
 			succFormula = parse("{i:=0}\\<{" + "			while (i<a.length-1) {a[i] = a[i+1];" + "			i++;}"
 					+ "		}\\>true");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
 			if (e.getCause() != null) {
 				System.out.println(e.getCause().getMessage());
@@ -132,7 +118,6 @@ public class TestPredicateConstruction {
 				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
 			if (e.getCause() != null) {
 				System.out.println(e.getCause().getMessage());
@@ -145,46 +130,7 @@ public class TestPredicateConstruction {
 		cur.mainAlg();
 	}
 	
-//	public void shiftArrayToRight() {
-//
-//		Term succFormula;
-//
-//		try {
-//			succFormula = parse("{i:=a.length-1}\\<{" + "			while (i > 0) {a[i] = a[i-1];" + "			i--;}"
-//					+ "		}\\>true");
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			System.out.println(e.getMessage());
-//			if (e.getCause() != null) {
-//				System.out.println(e.getCause().getMessage());
-//			}
-//			e.printStackTrace();
-//			return;
-//		}
-//		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
-//
-//		String[] arrLeft = {"a!=null", "a.length > 10" };
-//		try {
-//			for (String fml : arrLeft) {
-//				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
-//			}
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			System.out.println(e.getMessage());
-//			if (e.getCause() != null) {
-//				System.out.println(e.getCause().getMessage());
-//			}
-//			e.printStackTrace();
-//			return;
-//		}
-//
-//		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
-//		cur.mainAlg();
-//	}
-
-
-
-	public void shiftArrayToLeftWithFunc() {
+	public void shiftArrayToLeftWithFunc() { //Done
 
 		Term succFormula;
 
@@ -221,46 +167,7 @@ public class TestPredicateConstruction {
 		cur.mainAlg();
 	}
 
-	public void shiftArrayToLeftWithAiliasing() {
-
-		Term succFormula;
-
-		try {
-			succFormula = parse("{i:=0}\\<{" + "			while (i<a.length-1) {a[i] = b[i+1];" + "			i++;}"
-					+ "		}\\>true");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			System.out.println(e.getMessage());
-			if (e.getCause() != null) {
-				System.out.println(e.getCause().getMessage());
-			}
-			e.printStackTrace();
-			return;
-		}
-		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
-
-		String[] arrLeft = {"a!=null", "a.length > 10", "a=b"};
-		try {
-			for (String fml : arrLeft) {
-				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			System.out.println(e.getMessage());
-			if (e.getCause() != null) {
-				System.out.println(e.getCause().getMessage());
-			}
-			e.printStackTrace();
-			return;
-		}
-
-		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
-		cur.mainAlg();
-	}
-
-	
-	
-	public void stencil() {
+	public void stencil() { //Done
 
 		Term succFormula;
 
@@ -297,18 +204,82 @@ public class TestPredicateConstruction {
 		cur.mainAlg();
 	}
 
-	public void condition() {
+	public void shiftArrayToLeftWithAiliasing() { //Done
+		Term succFormula;
+		try {
+			succFormula = parse("{i:=0}\\<{" + "			while (i<a.length-1) {a[i] = b[i+1];" + "			i++;}"
+					+ "		}\\>true");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
+		String[] arrLeft = {"a!=null", "a.length > 10", "a=b"};
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+
+		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
+		cur.mainAlg();
+	}
+	
+	public void shiftArrayToLeftWithoutAiliasing() { //Done
+		Term succFormula;
+
+		try {
+			succFormula = parse("{i:=0}\\<{" + "			while (i<a.length-1) {a[i] = b[i+1];" + "			i++;}"
+					+ "		}\\>true");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
+
+		String[] arrLeft = {"a!=null", "a.length > 10", "a!=b", "b!=null", "a.length=b.length"};
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return;
+		}
+		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
+		cur.mainAlg();
+	}
+
+	
+	public void condition() { //Done
 		Term formula;
-
 		Recoder2KeY r2k = new Recoder2KeY(services, nss);
 		
 		//// a bit of a lengthy parsing
-		
 		try {
 			
 			formula = parse("{i:=0}\\<{while (i<=a.length-1) {"
-							+ "				if(a[i]> 0){"
+							+ "				if(i > (a.length-1)/2){"
 							+ "					a[i] = 1;"
 							+ "				}\n"
 							+ "				else {"
@@ -340,13 +311,8 @@ public class TestPredicateConstruction {
 		
 		// recreate formula
 		formula = tb.apply(formula.sub(0), tb.dia(JavaBlock.createJavaBlock((StatementBlock)s), tb.tt()));
-		
 //		System.out.println("Formula with merge point: "+ProofSaver.printAnything(formula, services));
 
-		//////////////////////////
-		
-		
-		
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
 		String[] arrLeft = { /* "i=0", */"a!=null", "a.length>10" };
 		try {
@@ -366,8 +332,7 @@ public class TestPredicateConstruction {
 		cur.mainAlg();
 	}
 
-
-	public void condition2() {
+	public void conditionDifferentNumberOfEvents() {
 
 		Term formula;
 
@@ -379,7 +344,7 @@ public class TestPredicateConstruction {
 			
 			formula = parse("{i:=0}\\<{while (i<=a.length-1) {"
 //							+ "				a[i] = 1;"
-							+ "				if(a[i]> 0){"
+							+ "				if(i> (a.length-1)/2){"
 							+ "					a[i] = 1;"
 							+ "				}\n"
 							+ "				else {"
@@ -440,40 +405,6 @@ public class TestPredicateConstruction {
 	
 	
 	
-	public void testCase10() {
-
-		Term formula;
-
-		try {
-			formula = parse("{i:=0}\\<{" + "			while (i<=a.length-1) {a[i] = b[i];" + "			i++;}"
-					+ "		}\\>true");
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			if (e.getCause() != null) {
-				System.out.println(e.getCause().getMessage());
-			}
-			e.printStackTrace();
-			return;
-		}
-		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
-
-		String[] arrLeft = { /* "i=0", */"a!=null", "b!=null" };
-		try {
-			for (String fml : arrLeft) {
-				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
-
-			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			if (e.getCause() != null) {
-				System.out.println(e.getCause().getMessage());
-			}
-			e.printStackTrace();
-			return;
-		}
-		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
-		cur.mainAlg();
-	}
 
 	public void testCaseFor_mbps() {
 
@@ -594,55 +525,11 @@ public class TestPredicateConstruction {
 	}
 
 	
-	
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		long start = System.currentTimeMillis();
-		tpc.shiftArrayToLeftWithAiliasing();
+		tpc.conditionDifferentNumberOfEvents();
 		long end = System.currentTimeMillis();
 		System.out.println(end - start);
 	}
-
-	
-	
-	public class MergePointInline extends CreatingASTVisitor { 
-		
-		private List<MergeContract> contracts = new LinkedList<>();
-		
-		public MergePointInline(ProgramElement root, boolean preservesPos, Services services) {
-			super(root, preservesPos, services);
-		}
-		
-		public ProgramElement inline()
-	    {
-	        stack.push(new ExtList());
-	        walk(root());
-	        ExtList el = stack.peek();
-	        return el.get(ProgramElement.class);
-	    }
-
-	    public List<MergeContract> getContracts() {
-			return contracts;
-		}
-
-		protected void doAction(ProgramElement element)
-	    {
-	        if (element instanceof EmptyStatement) {
-	        	final KeYJavaType mergePointIndexType = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
-				LocationVariable newIndexVar = new LocationVariable(new ProgramElementName(tb.newName("#mpIndex", nss)), 
-	        			mergePointIndexType);	            
-	        	final MergePointStatement mergePoint = new MergePointStatement(newIndexVar);
-				final MergeProcedure mergeProcedure = new MergeByIfThenElse();
-	        	final MergeContract mergeContract = new UnparameterizedMergeContract(mergeProcedure, 
-						mergePoint, mergePointIndexType);
-	        	this.contracts.add(mergeContract);
-	        	addChild(mergePoint);
-	            changed();
-	        }
-	        else {
-	            super.doAction(element);
-	        }
-	    }
-	};
-	
 }
