@@ -1,5 +1,6 @@
 package org.key_project.ui.interactionlog
 
+import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import org.key_project.ui.interactionlog.model.InteractionLog
@@ -12,30 +13,13 @@ import java.io.File
  */
 object InteractionLogFacade {
 
-    val mapper = ObjectMapper().also {
-        it.enable(SerializationFeature.INDENT_OUTPUT)
-        //it.configure(JsonParser.Feature.ALLOW_COMMENTS, true)
-        //it.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+    val mapper = ObjectMapper().apply {
+        enable(SerializationFeature.INDENT_OUTPUT)
+        findAndRegisterModules();
+        configure(JsonParser.Feature.ALLOW_COMMENTS, true)
+        configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
         //it.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
         //it.configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true)
-        /*it.registerSubtypes(
-                AutoModeInteraction::class.java,
-                NodeInteraction::class.java,
-                MacroInteraction::class.java,
-                SettingChangeInteraction::class.java,
-                UserNoteInteraction::class.java,
-                BuiltInRuleInteraction::class.java,
-                ContractBuiltInRuleInteraction::class.java,
-                LoopContractInternalBuiltInRuleInteraction::class.java,
-                MergeRuleBuiltInRuleInteraction::class.java,
-                OSSBuiltInRuleInteraction::class.java,
-                SMTBuiltInRuleInteraction::class.java,
-                //UseDependencyContractBuiltInRuleInteraction1::class.java,
-                PruneInteraction::class.java,
-                RuleInteraction::class.java,
-                NodeIdentifier::class.java,
-                Interaction::class.java)
-         */
     }
 
 

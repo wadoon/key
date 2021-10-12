@@ -3,14 +3,12 @@ package org.key_project.ui.interactionlog.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import de.uka.ilkd.key.api.ProofMacroApi
 import de.uka.ilkd.key.control.InteractionListener
+import de.uka.ilkd.key.gui.MainWindow
 import de.uka.ilkd.key.logic.PosInOccurrence
 import de.uka.ilkd.key.logic.Sequent
-import de.uka.ilkd.key.logic.Term
 import de.uka.ilkd.key.macros.ProofMacro
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo
-import de.uka.ilkd.key.macros.scripts.EngineState
-import de.uka.ilkd.key.macros.scripts.RuleCommand
-import de.uka.ilkd.key.pp.LogicPrinter
+import de.uka.ilkd.key.macros.scripts.ScriptException
 import de.uka.ilkd.key.proof.Goal
 import de.uka.ilkd.key.proof.Node
 import de.uka.ilkd.key.proof.Proof
@@ -28,6 +26,7 @@ import java.io.Serializable
 import java.io.StringWriter
 import java.lang.ref.WeakReference
 import java.util.*
+import javax.swing.JOptionPane
 
 
 /**
@@ -79,7 +78,7 @@ abstract class NodeInteraction(@Transient var serialNr: Int? = null) : Interacti
     var nodeId: NodeIdentifier? = null
 
     constructor(node: Node) : this(node.serialNr()) {
-        this.nodeId = NodeIdentifier.get(node)
+        this.nodeId = NodeIdentifier.create(node)
     }
 
     fun getNode(proof: Proof): Node {
@@ -120,7 +119,7 @@ class MacroInteraction() : NodeInteraction() {
         else
             ImmutableSLList.nil()
         this.openGoalSerialNumbers = openGoals.map { g -> g.node().serialNr() }
-        this.openGoalNodeIds = openGoals.map { g -> NodeIdentifier.get(g.node()) }
+        this.openGoalNodeIds = openGoals.map { g -> NodeIdentifier.create(g.node()) }
     }
 
     override fun toString(): String {
@@ -168,8 +167,8 @@ class NodeIdentifier() : Serializable {
 
     override fun toString(): String {
         return treePath.stream()
-                .map { it.toString() }
-                .reduce("") { a, b -> a + b } +
+            .map { it.toString() }
+            .reduce("") { a, b -> a + b } +
                 " => " + serialNr
     }
 
@@ -193,11 +192,11 @@ class NodeIdentifier() : Serializable {
     companion object {
         private const val serialVersionUID = 7147788921672163642L
 
-        operator fun get(g: Goal): NodeIdentifier {
-            return get(g.node())
+        fun create(g: Goal): NodeIdentifier {
+            return create(g.node())
         }
 
-        operator fun get(node: Node): NodeIdentifier {
+        fun create(node: Node): NodeIdentifier {
             var n: Node? = node
             val list = LinkedList<Int>()
             do {
@@ -217,16 +216,16 @@ class NodeIdentifier() : Serializable {
 class PruneInteraction() : NodeInteraction() {
     constructor(node: Node) : this() {
         serialNr = node.serialNr()
-        nodeId = NodeIdentifier.get(node)
+        nodeId = NodeIdentifier.create(node)
     }
 
     override val markdown: String
         get() = """
-                ## Prune
+            ## Prune
 
-                * **Date**: $created
-                * Prune to node: `$nodeId`
-                """
+            * **Date**: $created
+            * Prune to node: `$nodeId`
+            """.trimIndent()
 
     override val proofScriptRepresentation: String
         get() = "prune $nodeId\n"
@@ -238,8 +237,8 @@ class PruneInteraction() : NodeInteraction() {
     @Throws(Exception::class)
     override fun reapplyStrict(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
         nodeId?.findNode(goal.proof())
-                ?.get()
-                ?.also { goal.proof().pruneProof(it) }
+            ?.get()
+            ?.also { goal.proof().pruneProof(it) }
     }
 
     companion object {
@@ -281,10 +280,8 @@ class OccurenceIdentifier {
     }
 
     companion object {
-
-        operator fun get(p: PosInOccurrence?): OccurenceIdentifier {
-            if (p == null)
-                return OccurenceIdentifier()
+        fun create(p: PosInOccurrence?): OccurenceIdentifier {
+            if (p == null) return OccurenceIdentifier()
 
             val indices = ArrayList<Int>()
             val iter = p.iterator()
@@ -354,11 +351,7 @@ class SettingChangeInteraction() : Interaction() {
             # Setting changed: ${type?.name}
 
             **Date**: $created
-
-            ```
-            $writer
-            ```
-            """.trimIndent()
+            """.trimIndent() + "```\n$writer\n```"
         }
 
     constructor(settings: Properties, type: InteractionListener.SettingType) : this() {
@@ -381,10 +374,6 @@ class SettingChangeInteraction() : Interaction() {
             InteractionListener.SettingType.STRATEGY -> settings.strategySettings.readSettings(savedSettings)
         }
     }
-
-    companion object {
-        private val serialVersionUID = 1L
-    }
 }
 
 
@@ -392,7 +381,7 @@ class AutoModeInteraction() : Interaction() {
     // copined from ApplyStrategyInfo info
     var infoMessage: String? = null
     var timeInMillis: Long = 0
-    var appliedRuleAppsCount = 0;
+    var appliedRuleAppsCount = 0
     var errorMessage: String? = null
     var nrClosedGoals = 0
 
@@ -414,8 +403,10 @@ class AutoModeInteraction() : Interaction() {
             * Started on node:
             $initialNodes 
             
-            ${if (openGoalNodeIds.isEmpty()) "* **Closed all goals**"
-            else "* Finished on nodes:"}}
+            ${
+                if (openGoalNodeIds.isEmpty()) "* **Closed all goals**"
+                else "* Finished on nodes:"
+            }}
             $finalNodes
 
             * Provided Macro info:
@@ -433,12 +424,12 @@ class AutoModeInteraction() : Interaction() {
     constructor(initialNodes: List<Node>, info: ApplyStrategyInfo) : this() {
         infoMessage = info.reason()
         timeInMillis = info.time
-        appliedRuleAppsCount = info.appliedRuleApps;
+        appliedRuleAppsCount = info.appliedRuleApps
         errorMessage = info.exception?.message
         nrClosedGoals = info.closedGoals
-        this.initialNodeIds = initialNodes.map { NodeIdentifier.get(it) }
+        this.initialNodeIds = initialNodes.map { NodeIdentifier.create(it) }
         val openGoals = info.proof.openGoals()
-        this.openGoalNodeIds = openGoals.map { NodeIdentifier.get(it) }
+        this.openGoalNodeIds = openGoals.map { NodeIdentifier.create(it) }
     }
 
     override fun toString(): String {
@@ -463,12 +454,14 @@ class RuleInteraction() : NodeInteraction() {
     var ruleName: String? = null
     var posInOccurence: OccurenceIdentifier? = null
     var arguments = HashMap<String, String>()
+    var ruleOccurence: Int? = null
 
     constructor(node: Node, app: RuleApp) : this() {
         ruleName = app.rule().displayName()
-        nodeId = NodeIdentifier.get(node)
-        this.posInOccurence = OccurenceIdentifier.get(app.posInOccurrence())
+        nodeId = NodeIdentifier.create(node)
+        this.posInOccurence = OccurenceIdentifier.create(app.posInOccurrence())
         if (app is TacletApp) {
+            arguments = HashMap(app.arguments())
             /*SequentFormula seqForm = pos.getPosInOccurrence().sequentFormula();
                 String sfTerm = LogicPrinter.quickPrintTerm(seqForm.formula(), services);
                 String onTerm = LogicPrinter.quickPrintTerm(pos.getPosInOccurrence().subTerm(), services);
@@ -476,22 +469,7 @@ class RuleInteraction() : NodeInteraction() {
                 sb.append("\n    on=`").append(onTerm).append("`");
                 sb.append("\n    occ=?;");
                 */
-            val iter = app.instantiations().pairIterator()
-            while (iter.hasNext()) {
-                val entry = iter.next()
-                val p = entry.key().toString()
 
-                val inst = entry.value().instantiation
-                val v: String
-
-                if (inst is Term) {
-                    v = LogicPrinter.quickPrintTerm(inst, null)
-                } else {
-                    v = inst.toString()
-                }
-
-                arguments[p] = v
-            }
         }
     }
 
@@ -499,31 +477,34 @@ class RuleInteraction() : NodeInteraction() {
         get() {
             val formula = posInOccurence
             val parameters =
-                    arguments.map { (key, value) -> "* $key : `$value`" }
-                            .joinToString("\n")
+                arguments.map { (key, value) -> "              * $key : `$value`" }
+                    .joinToString("\n")
 
             return """
             ## Rule `$ruleName` applied
             
-            **Date**:             $created
+            **Date**: $created
             
             * Applied on `$formula`
             * The used parameter for the taclet instantation are 
-            $parameters 
+            ${if(arguments.isEmpty()) "empty" else parameters }
             
             """.trimIndent()
         }
 
     override val proofScriptRepresentation: String
         get() {
-            val args = arguments.forEach { (k, v) ->
-                "     inst_${firstWord(k)} = \"${v.trim { it <= ' ' }}\"\n"
-            }
+            val args =
+                if (arguments.isEmpty()) ""
+                else
+                    arguments.map { (k, v) ->
+                        "                 inst_${firstWord(k)} = \"${v.trim { it <= ' ' }}\"\n"
+                    }.joinToString("\n")
 
             return """
             rule $ruleName
-                 on = ${posInOccurence?.term}
-                 formula = ${posInOccurence?.toplevelTerm}
+                 on = \"${posInOccurence?.term}\"
+                 formula = \"${posInOccurence?.toplevelTerm}\"
                  $args;
             """.trimIndent()
         }
@@ -541,21 +522,30 @@ class RuleInteraction() : NodeInteraction() {
             t.substring(0, p)
     }
 
-    @Throws(Exception::class)
     override fun reapplyStrict(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
-        val ruleCommand = RuleCommand()
-        val state = EngineState(goal.proof())
-        val parameter: RuleCommand.Parameters?
+        val rh = RuleHelper(goal, ruleName!!, posInOccurence, arguments, ruleOccurence, true)
         try {
-            parameter = ruleCommand.evaluateArguments(state, arguments)
-            ruleCommand.execute(uic, parameter, state)
-        } catch (e: Exception) {
-            throw IllegalStateException("Rule application", e)
+            var theApp = rh.makeRuleApp()
+            if (theApp is TacletApp) {
+                val completeApp: RuleApp? = theApp.tryToInstantiate(goal.proof().services)
+                theApp = completeApp ?: theApp
+            }
+            goal.apply(theApp)
+        } catch (e: ScriptException) {
+            JOptionPane.showMessageDialog(MainWindow.getInstance(), e.message)
         }
 
-    }
-
-    companion object {
-        private val serialVersionUID = -3178292652264875668L
+        /*
+           val ruleCommand = RuleCommand()
+            val state = EngineState(goal.proof())
+            try {
+                val parameter = ruleCommand.evaluateArguments(state, arguments)
+                ruleCommand.execute(uic, parameter, state)
+            } catch (e: Exception) {
+                throw IllegalStateException("Rule application", e)
+            }
+            */
     }
 }
+
+

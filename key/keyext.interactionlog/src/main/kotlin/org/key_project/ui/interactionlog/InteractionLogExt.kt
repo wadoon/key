@@ -1,15 +1,12 @@
 package org.key_project.ui.interactionlog
 
 import bibliothek.gui.dock.common.CLocation
-import bibliothek.gui.dock.common.SingleCDockable
 import de.uka.ilkd.key.core.KeYSelectionEvent
 import de.uka.ilkd.key.core.KeYSelectionListener
 import de.uka.ilkd.key.gui.MainWindow
 import de.uka.ilkd.key.gui.actions.KeyAction
 import de.uka.ilkd.key.gui.actions.MainWindowAction
-import de.uka.ilkd.key.gui.docking.DockingHelper
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension
-import de.uka.ilkd.key.gui.fonticons.IconFactory
 import org.key_project.ui.BoundsPopupMenuListener
 import org.key_project.ui.interactionlog.api.InteractionRecorderListener
 import org.key_project.ui.interactionlog.model.InteractionLog
@@ -24,7 +21,8 @@ import javax.swing.filechooser.FileNameExtensionFilter
  * @version 1 (13.02.19)
  */
 @KeYGuiExtension.Info(name = "Interaction Logging", optional = true, experimental = true, priority = 10000)
-class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExtension.Toolbar, InteractionRecorderListener {
+class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExtension.Toolbar,
+    InteractionRecorderListener {
     companion object {
         val recorder = InteractionRecorder()
 
@@ -44,7 +42,13 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
         val listener = BoundsPopupMenuListener(true, false)
 
         interactionLogSelection.renderer = object : DefaultListCellRenderer() {
-            override fun getListCellRendererComponent(list: JList<*>?, value: Any?, index: Int, isSelected: Boolean, cellHasFocus: Boolean): Component {
+            override fun getListCellRendererComponent(
+                list: JList<*>?,
+                value: Any?,
+                index: Int,
+                isSelected: Boolean,
+                cellHasFocus: Boolean
+            ): Component {
                 val v = value ?: "No log loaded."
                 return super.getListCellRendererComponent(list, v, index, isSelected, cellHasFocus)
             }
@@ -57,7 +61,6 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
         toolbar.add(PauseLoggingAction())
         toolbar.add(interactionLogSelection)
 
-
         recorder.addListener(object : InteractionRecorderListener {
             override fun onNewInteractionLog(recorder: InteractionRecorder, log: InteractionLog) {
                 interactionLogSelection.addItem(log)
@@ -68,6 +71,9 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
                 interactionLogSelection.removeItem(log)
             }
         })
+
+        toolbar.add(JToggleButton(AutoSaveAction()))
+        toolbar.add(SaveAsAction())
     }
 
 
@@ -87,23 +93,24 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
 
     override fun getMainMenuActions(mainWindow: MainWindow): List<Action> {
         return Arrays.asList(
-                /*ilv.actionAddUserNote,
-                ilv.actionExportMarkdown,
-                ilv.actionJumpIntoTree,
-                ilv.actionLoad,
-                ilv.actionSave,
-                ilv.actionTryReapply,
-                ilv.actionKPSExport,
-                ilv.actionToggleFavourite,
-                ilv.actionExportMarkdown,
-                ilv.actionMUCopyClipboard,
-                ilv.actionPauseLogging*/)
+            /*ilv.actionAddUserNote,
+            ilv.actionExportMarkdown,
+            ilv.actionJumpIntoTree,
+            ilv.actionLoad,
+            ilv.actionSave,
+            ilv.actionTryReapply,
+            ilv.actionKPSExport,
+            ilv.actionToggleFavourite,
+            ilv.actionExportMarkdown,
+            ilv.actionMUCopyClipboard,
+            ilv.actionPauseLogging*/
+        )
     }
 
 
     private inner class PauseLoggingAction : KeyAction() {
         init {
-            isSelected = InteractionLogExt.recorder.isDisableAll
+            isSelected = recorder.isDisableAll
             priority = -1
             menuPath = InteractionLogView.MENU_ILOG
             putValue(Action.SHORT_DESCRIPTION, "Activation or Deactivation of interaction logging")
@@ -117,23 +124,23 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
         }
 
         private fun update() {
-            if (!isSelected) {
-                setIcon(IconFactory.INTERLOG_PAUSE.get())
-                name = "Pause Interaction Logging"
+            name = if (!isSelected) {
+                setIcon(InteractionLogView.INTERLOG_PAUSE.get())
+                "Pause Interaction Logging"
             } else {
-                setIcon(IconFactory.INTERLOG_RESUME.get())
-                name = "Resume Interaction Logging"
+                setIcon(InteractionLogView.INTERLOG_RESUME.get())
+                "Resume Interaction Logging"
             }
         }
 
         override fun actionPerformed(e: ActionEvent) {
             isSelected = !isSelected
-            InteractionLogExt.recorder.isDisableAll = isSelected
+            recorder.isDisableAll = isSelected
         }
     }
 
 
-    private inner class LoadAction internal constructor() : KeyAction() {
+    private inner class LoadAction() : KeyAction() {
         init {
             name = "Load"
             putValue(Action.SHORT_DESCRIPTION, "Load Interaction Log")
@@ -146,7 +153,8 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
         override fun actionPerformed(e: ActionEvent) {
             val fileChooser = JFileChooser()
             fileChooser.fileFilter = FileNameExtensionFilter(
-                    "InteractionLog", "xml")
+                "InteractionLog", "json"
+            )
             val returnValue = fileChooser.showOpenDialog(null)
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 try {
@@ -154,10 +162,12 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
                     recorder.readInteractionLog(file)
                     //addInteractionLog(importedLog);
                 } catch (exception: Exception) {
-                    JOptionPane.showMessageDialog(null,
-                            exception.cause,
-                            "IOException",
-                            JOptionPane.WARNING_MESSAGE)
+                    JOptionPane.showMessageDialog(
+                        null,
+                        exception.cause,
+                        "IOException",
+                        JOptionPane.WARNING_MESSAGE
+                    )
                     exception.printStackTrace()
                 }
 
@@ -196,5 +206,51 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
             }
         }
     }
+
+
 }
 
+class AutoSaveAction : KeyAction() {
+    init {
+        name = "Enable/Disable Auto Save"
+    }
+
+    override fun actionPerformed(e: ActionEvent?) {
+        TODO("Not yet implemented")
+    }
+}
+
+class SaveAsAction : KeyAction() {
+    init {
+        name = "Save As ..."
+        putValue(Action.SHORT_DESCRIPTION, "Save the current selected interaction into a file.")
+        setIcon(InteractionLogView.ICON_SAVE_AS.get(InteractionLogView.SMALL_ICON_SIZE))
+        priority = 0
+        menuPath = InteractionLogView.MENU_ILOG
+        lookupAcceleratorKey()
+    }
+
+    override fun actionPerformed(e: ActionEvent) {
+        val fileChooser = JFileChooser()
+        fileChooser.fileFilter = FileNameExtensionFilter(
+            "InteractionLog", "json"
+        )
+        val returnValue = fileChooser.showOpenDialog(null)
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            try {
+                val file = fileChooser.selectedFile
+                InteractionLogExt.recorder.readInteractionLog(file)
+                //addInteractionLog(importedLog);
+            } catch (exception: Exception) {
+                JOptionPane.showMessageDialog(
+                    null,
+                    exception.cause,
+                    "IOException",
+                    JOptionPane.WARNING_MESSAGE
+                )
+                exception.printStackTrace()
+            }
+
+        }
+    }
+}

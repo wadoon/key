@@ -31,8 +31,8 @@ sealed class BuiltInRuleInteraction() : NodeInteraction() {
     var occurenceIdentifier: OccurenceIdentifier? = null
 
     constructor(node: Node, pio: PosInOccurrence) : this() {
-        this.nodeIdentifier = NodeIdentifier.get(node)
-        this.occurenceIdentifier = OccurenceIdentifier.get(pio)
+        this.nodeIdentifier = NodeIdentifier.create(node)
+        this.occurenceIdentifier = OccurenceIdentifier.create(pio)
     }
 }
 
@@ -45,8 +45,8 @@ class ContractBuiltInRuleInteraction() : BuiltInRuleInteraction() {
     var contractName: String? = null
 
     constructor(app: ContractRuleApp, node: Node) : this() {
-        nodeIdentifier = NodeIdentifier.get(node)
-        occurenceIdentifier = OccurenceIdentifier.get(app.posInOccurrence())
+        nodeIdentifier = NodeIdentifier.create(node)
+        occurenceIdentifier = OccurenceIdentifier.create(app.posInOccurrence())
         contractName = app.instantiation.name
         contractType = app.instantiation.typeName
     }
@@ -75,8 +75,8 @@ class LoopContractInternalBuiltInRuleInteraction() : BuiltInRuleInteraction() {
     var contractName: String? = null
 
     constructor(app: LoopContractInternalBuiltInRuleApp, node: Node) : this() {
-        nodeIdentifier = NodeIdentifier.get(node)
-        occurenceIdentifier = OccurenceIdentifier.get(app.posInOccurrence())
+        nodeIdentifier = NodeIdentifier.create(node)
+        occurenceIdentifier = OccurenceIdentifier.create(app.posInOccurrence())
         contractName = app.contract.name
         displayName = app.contract.displayName
         println(app.statement)
@@ -94,8 +94,8 @@ class LoopInvariantBuiltInRuleInteraction() : BuiltInRuleInteraction() {
     var contractName: String? = null
 
     constructor(app: LoopInvariantBuiltInRuleApp, node: Node) : this() {
-        nodeIdentifier = NodeIdentifier.get(node)
-        occurenceIdentifier = OccurenceIdentifier.get(app.posInOccurrence())
+        nodeIdentifier = NodeIdentifier.create(node)
+        occurenceIdentifier = OccurenceIdentifier.create(app.posInOccurrence())
         println(app.loopStatement)
         println(app.executionContext)
     }
@@ -108,8 +108,8 @@ class LoopInvariantBuiltInRuleInteraction() : BuiltInRuleInteraction() {
  */
 class MergeRuleBuiltInRuleInteraction() : BuiltInRuleInteraction() {
     constructor(app: MergeRuleBuiltInRuleApp, node: Node) : this() {
-        nodeIdentifier = NodeIdentifier.get(node)
-        occurenceIdentifier = OccurenceIdentifier.get(app.posInOccurrence())
+        nodeIdentifier = NodeIdentifier.create(node)
+        occurenceIdentifier = OccurenceIdentifier.create(app.posInOccurrence())
     }
 }
 
@@ -133,8 +133,8 @@ class OSSBuiltInRuleInteraction() : BuiltInRuleInteraction() {
         )
 
     constructor(app: OneStepSimplifierRuleApp, node: Node) : this() {
-        nodeIdentifier = NodeIdentifier.get(node)
-        occurenceIdentifier = OccurenceIdentifier.get(app.posInOccurrence())
+        nodeIdentifier = NodeIdentifier.create(node)
+        occurenceIdentifier = OccurenceIdentifier.create(app.posInOccurrence())
     }
 
     override fun toString(): String {
@@ -157,8 +157,8 @@ class OSSBuiltInRuleInteraction() : BuiltInRuleInteraction() {
  */
 class SMTBuiltInRuleInteraction() : BuiltInRuleInteraction() {
     constructor(app: RuleAppSMT, node: Node) : this() {
-        nodeIdentifier = NodeIdentifier.get(node)
-        occurenceIdentifier = OccurenceIdentifier.get(app.posInOccurrence())
+        nodeIdentifier = NodeIdentifier.create(node)
+        occurenceIdentifier = OccurenceIdentifier.create(app.posInOccurrence())
         println(app.ifInsts())
     }
 
@@ -181,7 +181,7 @@ class SMTBuiltInRuleInteraction() : BuiltInRuleInteraction() {
  */
 class UseDependencyContractBuiltInRuleInteraction() : BuiltInRuleInteraction() {
     constructor(app: UseDependencyContractApp, node: Node) : this() {
-        nodeIdentifier = NodeIdentifier.get(node)
-        occurenceIdentifier = OccurenceIdentifier.get(app.posInOccurrence())
+        nodeIdentifier = NodeIdentifier.create(node)
+        occurenceIdentifier = OccurenceIdentifier.create(app.posInOccurrence())
     }
 }

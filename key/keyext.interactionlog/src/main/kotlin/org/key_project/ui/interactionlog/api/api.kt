@@ -8,6 +8,7 @@ import org.key_project.ui.interactionlog.InteractionRecorder
 import org.key_project.ui.interactionlog.model.InteractionLog
 import java.awt.Color
 import java.io.Serializable
+import java.time.LocalDateTime
 import java.util.*
 import javax.swing.Icon
 
@@ -20,7 +21,7 @@ abstract class Interaction : Serializable, Markdownable, Scriptable, Reapplicabl
     var graphicalStyle = InteractionGraphicStyle()
         protected set
 
-    var created = Date()
+    var created = LocalDateTime.now()
 
     var isFavoured = false
 
