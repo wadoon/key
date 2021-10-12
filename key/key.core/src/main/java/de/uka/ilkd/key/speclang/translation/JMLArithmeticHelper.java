@@ -24,6 +24,8 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -41,6 +43,12 @@ public class JMLArithmeticHelper {
     private final DoubleLDT doubleLDT;
     private final RealLDT realLDT;
 
+    /* Names in the LDT lookup tables are not the operators, but
+     * string versions, so we have to keep a map. */
+    private static final Map<String, String> COMPARISON_MAP = Map.of(
+            ">=", "geq", "<=", "leq", ">", "gt",
+            "<", "lt"
+            );
 
     //-------------------------------------------------------------------------
     //constructors
@@ -227,13 +235,15 @@ public class JMLArithmeticHelper {
                 ldt = doubleLDT;
             else // int, long, or bigint does not matter
                 ldt = integerLDT;
-            fun = ldt.getFunctionFor(opStr, services);
+            fun = ldt.getFunctionFor(COMPARISON_MAP.get(opStr), services);
+            if (fun == null) {
+                raiseError("Operator " + opStr + " not defined for " + ldt.name());
+            }
             return new SLExpression(tb.func(fun,
                     promote(a.getTerm(), resultType),
-                    promote(b.getTerm(), resultType)),
-                    resultType);
+                    promote(b.getTerm(), resultType)));
         } catch (RuntimeException e) {
-            raiseError("Error in comparison expression " + a + " + " + b + ":", e);
+            raiseError("Error in comparison expression " + a + " " + opStr + " " + b, e);
             return null; //unreachable
         }
     }
