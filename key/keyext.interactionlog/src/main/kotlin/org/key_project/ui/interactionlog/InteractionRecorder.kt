@@ -5,7 +5,6 @@ import de.uka.ilkd.key.control.InteractionListener
 import de.uka.ilkd.key.logic.PosInOccurrence
 import de.uka.ilkd.key.macros.ProofMacro
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo
-import de.uka.ilkd.key.proof.Goal
 import de.uka.ilkd.key.proof.Node
 import de.uka.ilkd.key.proof.Proof
 import de.uka.ilkd.key.proof.ProofEvent
@@ -155,11 +154,12 @@ class InteractionRecorder : InteractionListener, AutoModeListener {
         emit(state, interaction)
     }
 
-    override fun runBuiltInRule(goal: Goal, app: IBuiltInRuleApp, rule: BuiltInRule,
-                                pos: PosInOccurrence, forced: Boolean) {
+    override fun runBuiltInRule(
+        node: Node, app: IBuiltInRuleApp, rule: BuiltInRule,
+        pos: PosInOccurrence, forced: Boolean) {
         if (isDisableAll) return
-        val state = get(goal.proof())
-        val interaction = BuiltInRuleInteractionFactory.create(goal.node(), app)
+        val state = get(node.proof())
+        val interaction = BuiltInRuleInteractionFactory.create(node, app)
         state.add(interaction)
         emit(state, interaction)
     }
@@ -184,11 +184,10 @@ class InteractionRecorder : InteractionListener, AutoModeListener {
         emit(state, interaction)
     }
 
-    override fun runRule(goal: Goal, app: RuleApp) {
+    override fun runRule(goal: Node, app: RuleApp) {
         if (isDisableAll) return
         val state = get(goal.proof())
-        val interaction = RuleInteraction(
-                goal.node(), app)
+        val interaction = RuleInteraction(goal, app)
         state.add(interaction)
         emit(state, interaction)
     }

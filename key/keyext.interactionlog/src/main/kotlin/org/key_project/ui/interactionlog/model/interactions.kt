@@ -5,6 +5,7 @@ import de.uka.ilkd.key.api.ProofMacroApi
 import de.uka.ilkd.key.control.InteractionListener
 import de.uka.ilkd.key.gui.MainWindow
 import de.uka.ilkd.key.logic.PosInOccurrence
+import de.uka.ilkd.key.logic.PosInTerm
 import de.uka.ilkd.key.logic.Sequent
 import de.uka.ilkd.key.macros.ProofMacro
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo
@@ -21,9 +22,8 @@ import org.key_project.ui.interactionlog.api.Interaction
 import org.key_project.util.RandomName
 import org.key_project.util.collection.ImmutableSLList
 import java.awt.Color
-import java.io.IOException
+import java.io.File
 import java.io.Serializable
-import java.io.StringWriter
 import java.lang.ref.WeakReference
 import java.util.*
 import javax.swing.JOptionPane
@@ -42,6 +42,10 @@ class InteractionLog {
     @get:JsonIgnore
     @field:JsonIgnore
     val listeners = arrayListOf<() -> Unit>()
+
+    @get:JsonIgnore
+    @field:JsonIgnore
+    var savePath : File? = null
 
     val name: String
     var created = Date()
@@ -254,19 +258,19 @@ class PruneInteraction() : NodeInteraction() {
 class OccurenceIdentifier {
     var path: Array<Int>? = null
     var term: String? = null
-    var toplevelTerm: String? = null
     var termHash: Int = 0
+    var toplevelFormula: String? = null
+    var formulaNumber: Int = 0
     var isAntec: Boolean = false
 
     override fun toString(): String {
-        if (path == null) {
-            return " @toplevel"
-        }
-        return if (path!!.size != 0) {
-            term + " under " + toplevelTerm + "(Path: " + Arrays.toString(path) + ")"
-        } else {
-            term!! + " @toplevel"
-        }
+        return path?.let {
+            if (it.isNotEmpty()) {
+                term!! + " under " + toplevelFormula + "(Path: " + Arrays.toString(path) + ")"
+            } else {
+                term!! + " @toplevel"
+            }
+        } ?: " @toplevel"
     }
 
     fun rebuildOn(goal: Goal): PosInOccurrence? {
@@ -275,12 +279,18 @@ class OccurenceIdentifier {
     }
 
     private fun rebuildOn(seq: Sequent): PosInOccurrence? {
-        //TODO
-        return null
+        //val formulas = if (isAntec) seq.antecedent() else seq.succedent()
+        val path = path
+        val pit = if (path != null && path.isNotEmpty())
+            PosInTerm(path.toIntArray())
+        else
+            PosInTerm.getTopLevel()
+
+        return PosInOccurrence.findInSequent(seq, formulaNumber, pit)
     }
 
     companion object {
-        fun create(p: PosInOccurrence?): OccurenceIdentifier {
+        fun create(seq: Sequent, p: PosInOccurrence?): OccurenceIdentifier {
             if (p == null) return OccurenceIdentifier()
 
             val indices = ArrayList<Int>()
@@ -290,10 +300,11 @@ class OccurenceIdentifier {
             }
 
             val occ = OccurenceIdentifier()
+            occ.formulaNumber = seq.formulaNumberInSequent(p.isInAntec, p.sequentFormula())
             occ.path = indices.toTypedArray()
             occ.term = iter.subTerm.toString()
             occ.termHash = iter.subTerm.hashCode()
-            occ.toplevelTerm = p.topLevel().subTerm().toString()
+            occ.toplevelFormula = p.topLevel().subTerm().toString()
             occ.isAntec = p.isInAntec
             return occ
         }
@@ -340,18 +351,16 @@ class SettingChangeInteraction() : Interaction() {
 
     override val markdown: String
         get() {
-            val writer = StringWriter()
-            try {
-                savedSettings?.store(writer, "")
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
+            val props = savedSettings?.map { (k, v) ->
+                "* **`$k`** : `$v`\n"
+            }?.joinToString()
 
             return """
             # Setting changed: ${type?.name}
 
             **Date**: $created
-            """.trimIndent() + "```\n$writer\n```"
+            
+            """.trimIndent() + props
         }
 
     constructor(settings: Properties, type: InteractionListener.SettingType) : this() {
@@ -459,7 +468,7 @@ class RuleInteraction() : NodeInteraction() {
     constructor(node: Node, app: RuleApp) : this() {
         ruleName = app.rule().displayName()
         nodeId = NodeIdentifier.create(node)
-        this.posInOccurence = OccurenceIdentifier.create(app.posInOccurrence())
+        this.posInOccurence = OccurenceIdentifier.create(node.sequent(), app.posInOccurrence())
         if (app is TacletApp) {
             arguments = HashMap(app.arguments())
             /*SequentFormula seqForm = pos.getPosInOccurrence().sequentFormula();
@@ -486,10 +495,9 @@ class RuleInteraction() : NodeInteraction() {
             **Date**: $created
             
             * Applied on `$formula`
-            * The used parameter for the taclet instantation are 
-            ${if(arguments.isEmpty()) "empty" else parameters }
-            
-            """.trimIndent()
+            * The used parameter for the taclet instantation are             
+            """.trimIndent() +
+                    if (arguments.isEmpty()) "empty" else parameters
         }
 
     override val proofScriptRepresentation: String
@@ -503,8 +511,8 @@ class RuleInteraction() : NodeInteraction() {
 
             return """
             rule $ruleName
-                 on = \"${posInOccurence?.term}\"
-                 formula = \"${posInOccurence?.toplevelTerm}\"
+                 on = "${posInOccurence?.term}"
+                 formula = "${posInOccurence?.toplevelFormula}"
                  $args;
             """.trimIndent()
         }

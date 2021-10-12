@@ -32,7 +32,7 @@ sealed class BuiltInRuleInteraction() : NodeInteraction() {
 
     constructor(node: Node, pio: PosInOccurrence) : this() {
         this.nodeIdentifier = NodeIdentifier.create(node)
-        this.occurenceIdentifier = OccurenceIdentifier.create(pio)
+        this.occurenceIdentifier = OccurenceIdentifier.create(node.sequent(), pio)
     }
 }
 
@@ -46,7 +46,7 @@ class ContractBuiltInRuleInteraction() : BuiltInRuleInteraction() {
 
     constructor(app: ContractRuleApp, node: Node) : this() {
         nodeIdentifier = NodeIdentifier.create(node)
-        occurenceIdentifier = OccurenceIdentifier.create(app.posInOccurrence())
+        occurenceIdentifier = OccurenceIdentifier.create(node.sequent(), app.posInOccurrence())
         contractName = app.instantiation.name
         contractType = app.instantiation.typeName
     }
@@ -76,7 +76,7 @@ class LoopContractInternalBuiltInRuleInteraction() : BuiltInRuleInteraction() {
 
     constructor(app: LoopContractInternalBuiltInRuleApp, node: Node) : this() {
         nodeIdentifier = NodeIdentifier.create(node)
-        occurenceIdentifier = OccurenceIdentifier.create(app.posInOccurrence())
+        occurenceIdentifier = OccurenceIdentifier.create(node.sequent(), app.posInOccurrence())
         contractName = app.contract.name
         displayName = app.contract.displayName
         println(app.statement)
@@ -95,7 +95,7 @@ class LoopInvariantBuiltInRuleInteraction() : BuiltInRuleInteraction() {
 
     constructor(app: LoopInvariantBuiltInRuleApp, node: Node) : this() {
         nodeIdentifier = NodeIdentifier.create(node)
-        occurenceIdentifier = OccurenceIdentifier.create(app.posInOccurrence())
+        occurenceIdentifier = OccurenceIdentifier.create(node.sequent(), app.posInOccurrence())
         println(app.loopStatement)
         println(app.executionContext)
     }
@@ -109,7 +109,7 @@ class LoopInvariantBuiltInRuleInteraction() : BuiltInRuleInteraction() {
 class MergeRuleBuiltInRuleInteraction() : BuiltInRuleInteraction() {
     constructor(app: MergeRuleBuiltInRuleApp, node: Node) : this() {
         nodeIdentifier = NodeIdentifier.create(node)
-        occurenceIdentifier = OccurenceIdentifier.create(app.posInOccurrence())
+        occurenceIdentifier = OccurenceIdentifier.create(node.sequent(), app.posInOccurrence())
     }
 }
 
@@ -120,21 +120,24 @@ class MergeRuleBuiltInRuleInteraction() : BuiltInRuleInteraction() {
  */
 class OSSBuiltInRuleInteraction() : BuiltInRuleInteraction() {
     override val markdown: String
-        get() = String.format("## One step simplification%n" + "* applied on %n  * Term:%s%n  * Toplevel %s%n",
-                occurenceIdentifier?.term,
-                occurenceIdentifier?.toplevelTerm)
+        get() = String.format(
+            "## One step simplification%n" + "* applied on %n  * Term:%s%n  * Toplevel %s%n",
+            occurenceIdentifier?.term,
+            occurenceIdentifier?.toplevelFormula
+        )
 
     override val proofScriptRepresentation: String
-        get() = String.format("one_step_simplify %n" +
-                "\t     on = \"%s\"%n" +
-                "\tformula = \"%s\"%n;%n",
-                occurenceIdentifier?.term,
-                occurenceIdentifier?.toplevelTerm
+        get() = String.format(
+            "one_step_simplify %n" +
+                    "\t     on = \"%s\"%n" +
+                    "\tformula = \"%s\"%n;%n",
+            occurenceIdentifier?.term,
+            occurenceIdentifier?.toplevelFormula
         )
 
     constructor(app: OneStepSimplifierRuleApp, node: Node) : this() {
         nodeIdentifier = NodeIdentifier.create(node)
-        occurenceIdentifier = OccurenceIdentifier.create(app.posInOccurrence())
+        occurenceIdentifier = OccurenceIdentifier.create(node.sequent(), app.posInOccurrence())
     }
 
     override fun toString(): String {
@@ -158,7 +161,7 @@ class OSSBuiltInRuleInteraction() : BuiltInRuleInteraction() {
 class SMTBuiltInRuleInteraction() : BuiltInRuleInteraction() {
     constructor(app: RuleAppSMT, node: Node) : this() {
         nodeIdentifier = NodeIdentifier.create(node)
-        occurenceIdentifier = OccurenceIdentifier.create(app.posInOccurrence())
+        occurenceIdentifier = OccurenceIdentifier.create(node.sequent(), app.posInOccurrence())
         println(app.ifInsts())
     }
 
@@ -182,6 +185,6 @@ class SMTBuiltInRuleInteraction() : BuiltInRuleInteraction() {
 class UseDependencyContractBuiltInRuleInteraction() : BuiltInRuleInteraction() {
     constructor(app: UseDependencyContractApp, node: Node) : this() {
         nodeIdentifier = NodeIdentifier.create(node)
-        occurenceIdentifier = OccurenceIdentifier.create(app.posInOccurrence())
+        occurenceIdentifier = OccurenceIdentifier.create(node.sequent(), app.posInOccurrence())
     }
 }

@@ -145,9 +145,9 @@ class InteractionLogView(val interactionLog: InteractionLog, private var mediato
         add(splitPane)
 
         listInteraction.addListSelectionListener {
-            listInteraction.selectedValue?.apply {
-                txtDetails.text = "<html>${toHtml()}</html>"
-                txtScript.text = proofScriptRepresentation
+            listInteraction.selectedValuesList?.apply {
+                txtDetails.text = "<html>${joinToString("<hr>") { it.toHtml() }}</html>"
+                txtScript.text = joinToString("\n") { it.proofScriptRepresentation }
             }
         }
 
@@ -287,6 +287,7 @@ class InteractionLogView(val interactionLog: InteractionLog, private var mediato
                         activeInteractionLog,
                         fileChooser.selectedFile
                     )
+                    activeInteractionLog.savePath = fileChooser.selectedFile
                 } catch (exception: Exception) {
                     JOptionPane.showMessageDialog(
                         MainWindow.getInstance(),
@@ -394,7 +395,6 @@ class InteractionLogView(val interactionLog: InteractionLog, private var mediato
     }
 
     private abstract inner class AbstractFileSaveAction : KeyAction() {
-
         override fun actionPerformed(e: ActionEvent) {
             val fc = getFileChooser()
             val choice = fc.showSaveDialog(e.source as Component)

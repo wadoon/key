@@ -8,6 +8,7 @@ import de.uka.ilkd.key.gui.actions.KeyAction
 import de.uka.ilkd.key.gui.actions.MainWindowAction
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension
 import org.key_project.ui.BoundsPopupMenuListener
+import org.key_project.ui.interactionlog.api.Interaction
 import org.key_project.ui.interactionlog.api.InteractionRecorderListener
 import org.key_project.ui.interactionlog.model.InteractionLog
 import java.awt.Component
@@ -37,6 +38,7 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
 
     private var toolbar = JToolBar("interaction logging")
     private val interactionLogSelection = JComboBox<InteractionLog>()
+    private var autoSaveEnabled: Boolean = false
 
     init {
         val listener = BoundsPopupMenuListener(true, false)
@@ -62,13 +64,23 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
         toolbar.add(interactionLogSelection)
 
         recorder.addListener(object : InteractionRecorderListener {
+            override fun onInteraction(recorder: InteractionRecorder, log: InteractionLog, event: Interaction) {
+                if (autoSaveEnabled) {
+                    log.savePath?.let { path ->
+                        InteractionLogFacade.storeInteractionLog(log, path)
+                        MainWindow.getInstance().setStatusLine("Interaction log ${log.name} saved.")
+                    }
+                }
+            }
+
             override fun onNewInteractionLog(recorder: InteractionRecorder, log: InteractionLog) {
                 interactionLogSelection.addItem(log)
-                println(log)
+                //create a log message
             }
 
             override fun onDisposeInteractionLog(recorder: InteractionRecorder, log: InteractionLog) {
                 interactionLogSelection.removeItem(log)
+                //create a log message
             }
         })
 
@@ -94,16 +106,16 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
     override fun getMainMenuActions(mainWindow: MainWindow): List<Action> {
         return Arrays.asList(
             /*ilv.actionAddUserNote,
-            ilv.actionExportMarkdown,
-            ilv.actionJumpIntoTree,
-            ilv.actionLoad,
-            ilv.actionSave,
-            ilv.actionTryReapply,
-            ilv.actionKPSExport,
-            ilv.actionToggleFavourite,
-            ilv.actionExportMarkdown,
-            ilv.actionMUCopyClipboard,
-            ilv.actionPauseLogging*/
+                ilv.actionExportMarkdown,
+                ilv.actionJumpIntoTree,
+                ilv.actionLoad,
+                ilv.actionSave,
+                ilv.actionTryReapply,
+                ilv.actionKPSExport,
+                ilv.actionToggleFavourite,
+                ilv.actionExportMarkdown,
+                ilv.actionMUCopyClipboard,
+                ilv.actionPauseLogging*/
         )
     }
 
@@ -175,7 +187,6 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
         }
     }
 
-
     private inner class ShowLogAction(window: MainWindow) : MainWindowAction(window) {
         init {
             name = "Load"
@@ -189,68 +200,80 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
         override fun actionPerformed(e: ActionEvent?) {
             showLog()
         }
+    }
 
-        private val map = HashMap<InteractionLog, InteractionLogView>()
-
-        private fun showLog(log: InteractionLog? = null) {
-            val l = log ?: interactionLogSelection.selectedItem as? InteractionLog
-            if (l != null) {
-                val view = map.computeIfAbsent(l) {
-                    InteractionLogView(l, mainWindow.mediator)
-                }
-                mainWindow.dockControl.addDockable(view.dockable)
-                view.dockable.isVisible = true
-                view.dockable.setLocation(CLocation.base().normalEast(.3))
-            } else {
-                mainWindow.setStatusLine("No interaction is loaded or selected.")
+    private val map = HashMap<InteractionLog, InteractionLogView>()
+    private fun showLog(log: InteractionLog? = null) {
+        val l = log ?: interactionLogSelection.selectedItem as? InteractionLog
+        if (l != null) {
+            val view = map.computeIfAbsent(l) {
+                InteractionLogView(l, MainWindow.getInstance().mediator)
             }
+            MainWindow.getInstance().dockControl.addDockable(view.dockable)
+            view.dockable.isVisible = true
+            view.dockable.setLocation(CLocation.base().normalEast(.3))
+        } else {
+            MainWindow.getInstance().setStatusLine("No interaction is loaded or selected.")
         }
     }
 
-
-}
-
-class AutoSaveAction : KeyAction() {
-    init {
-        name = "Enable/Disable Auto Save"
-    }
-
-    override fun actionPerformed(e: ActionEvent?) {
-        TODO("Not yet implemented")
-    }
-}
-
-class SaveAsAction : KeyAction() {
-    init {
-        name = "Save As ..."
-        putValue(Action.SHORT_DESCRIPTION, "Save the current selected interaction into a file.")
-        setIcon(InteractionLogView.ICON_SAVE_AS.get(InteractionLogView.SMALL_ICON_SIZE))
-        priority = 0
-        menuPath = InteractionLogView.MENU_ILOG
-        lookupAcceleratorKey()
-    }
-
-    override fun actionPerformed(e: ActionEvent) {
-        val fileChooser = JFileChooser()
-        fileChooser.fileFilter = FileNameExtensionFilter(
-            "InteractionLog", "json"
-        )
-        val returnValue = fileChooser.showOpenDialog(null)
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
-            try {
-                val file = fileChooser.selectedFile
-                InteractionLogExt.recorder.readInteractionLog(file)
-                //addInteractionLog(importedLog);
-            } catch (exception: Exception) {
-                JOptionPane.showMessageDialog(
-                    null,
-                    exception.cause,
-                    "IOException",
-                    JOptionPane.WARNING_MESSAGE
-                )
-                exception.printStackTrace()
+    inner class AutoSaveAction : KeyAction() {
+        init {
+            name = "Enable/Disable Auto Save"
+            name = "Save As ..."
+            putValue(Action.SHORT_DESCRIPTION, "Save the current selected interaction into a file.")
+            setIcon(InteractionLogView.ICON_SAVE_AS.get(InteractionLogView.SMALL_ICON_SIZE))
+            priority = 0
+            menuPath = InteractionLogView.MENU_ILOG
+            lookupAcceleratorKey()
+            isSelected = false
+            addPropertyChangeListener { evt ->
+                if (evt.propertyName == Action.SELECTED_KEY)
+                    onAutoSaveChange(isSelected)
             }
+        }
 
+        override fun actionPerformed(e: ActionEvent?) {
+            onAutoSaveChange(isSelected)
+        }
+    }
+
+    private fun onAutoSaveChange(active: Boolean) {
+        autoSaveEnabled = active
+    }
+
+    class SaveAsAction : KeyAction() {
+        init {
+            name = "Save As ..."
+            putValue(Action.SHORT_DESCRIPTION, "Save the current selected interaction into a file.")
+            setIcon(InteractionLogView.ICON_SAVE_AS.get(InteractionLogView.SMALL_ICON_SIZE))
+            priority = 0
+            menuPath = InteractionLogView.MENU_ILOG
+            lookupAcceleratorKey()
+        }
+
+        override fun actionPerformed(e: ActionEvent) {
+            val fileChooser = JFileChooser()
+            fileChooser.fileFilter = FileNameExtensionFilter(
+                "InteractionLog", "json"
+            )
+            val returnValue = fileChooser.showOpenDialog(null)
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                try {
+                    val file = fileChooser.selectedFile
+                    recorder.readInteractionLog(file)
+                    //addInteractionLog(importedLog);
+                } catch (exception: Exception) {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        exception.cause,
+                        "IOException",
+                        JOptionPane.WARNING_MESSAGE
+                    )
+                    exception.printStackTrace()
+                }
+
+            }
         }
     }
 }

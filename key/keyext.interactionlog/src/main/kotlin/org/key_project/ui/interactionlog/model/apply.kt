@@ -215,7 +215,7 @@ class RuleHelper(
      * @return true if `sf` matches.
      */
     private fun isFormulaSearchedFor(sf: SequentFormula): Boolean {
-        val formula = occId?.toplevelTerm
+        val formula = occId?.toplevelFormula
         if (formula != null) {
             val actual = sf.formula().formatTermString(services)
             if (actual == formula) {
