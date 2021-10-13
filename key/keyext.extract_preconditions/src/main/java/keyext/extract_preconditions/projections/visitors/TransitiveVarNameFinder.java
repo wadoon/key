@@ -2,6 +2,7 @@ package keyext.extract_preconditions.projections.visitors;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.util.collection.ImmutableList;
 
@@ -74,9 +75,11 @@ public class TransitiveVarNameFinder extends VarNameVisitor {
     }
 
     @Override
-    public void handleVariables(Set<Name> variablesFound) {
+    public void handleVariables(Set<Name> foundVariables,
+                                Set<ProgramVariable> variablesFound,
+                                Set<Function> foundFunctions) {
         boolean isParam = false;
-        for (Name curName : variablesFound) {
+        for (Name curName : foundVariables) {
             if (this.transitiveVarNameClosure.contains(curName)
                 && !this.transitiveBlackList.contains(curName)) {
                 isParam = true;
@@ -84,7 +87,7 @@ public class TransitiveVarNameFinder extends VarNameVisitor {
             }
         }
         if (isParam) {
-            for (Name curName : variablesFound) {
+            for (Name curName : foundVariables) {
                 if (!this.transitiveBlackList.contains(curName)) {
                     this.transitiveVarNameClosure.add(curName);
                 }

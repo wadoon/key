@@ -1,10 +1,7 @@
 package keyext.extract_preconditions.projections.visitors;
 
-import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.util.collection.ImmutableList;
 
@@ -58,9 +55,11 @@ public class AdmissibleLeafFinder extends VarNameVisitor {
     }
 
     @Override
-    public void handleVariables(Set<Name> variablesFound) {
+    public void handleVariables(Set<Name> foundVariables,
+                                Set<ProgramVariable> variablesFound,
+                                Set<Function> foundFunctions) {
         boolean consideredVariables = false;
-        for (Name curName : variablesFound) {
+        for (Name curName : foundVariables) {
             if (this.blacklist.contains(curName)) {
                 continue;
             }

@@ -28,9 +28,13 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
+import keyext.extract_preconditions.printers.JsonPreconditionPrinter;
+import keyext.extract_preconditions.printers.PreconditionPrinter;
+import keyext.extract_preconditions.printers.SimplePreconditionPrinter;
 import keyext.extract_preconditions.projections.AbstractTermProjection;
 import keyext.extract_preconditions.projections.LeaveOutProjection;
 import keyext.extract_preconditions.projections.NoProjection;
+import keyext.extract_preconditions.projections.SimpleProjection;
 import keyext.extract_preconditions.strategies.ResolveIntermediateVariablesStrategy;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -155,7 +159,8 @@ public class ExtractorTest {
                 Set<Name> blackList = new HashSet<>();
                 //blackList.add(new Name("self"));
                 //blackList.add(new Name("heap"));
-                AbstractTermProjection projection = new NoProjection(currentProof.getServices());
+                AbstractTermProjection projection = new SimpleProjection(currentProof.getServices());
+                    //new NoProjection(currentProof.getServices());
                     /*new LeaveOutProjection(currentUnclosed.programVariables,
                         currentProof.getServices(),
                         true, blackList);*/
@@ -166,11 +171,11 @@ public class ExtractorTest {
                         ui,
                         projection
                     );
-                Term precondition = preconditionExtractor.extract();
+                ImmutableList<Term> preconditionList = preconditionExtractor.extract();
                 System.out.println(
                     "Found precondition for " + currentProof.name() + ":");
-                System.out
-                    .println(LogicPrinter.quickPrintTerm(precondition, currentProof.getServices()));
+                PreconditionPrinter printer = new JsonPreconditionPrinter(currentProof.getServices());
+                printer.print(preconditionList);
                 currentProof.dispose();
             }
         } catch (Exception exception) {

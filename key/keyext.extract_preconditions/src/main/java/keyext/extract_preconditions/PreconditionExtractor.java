@@ -70,7 +70,7 @@ public class PreconditionExtractor {
      * @throws Exception            If Macros/Strategies throw an exception during processing
      * @throws InterruptedException If extraction is interrupted
      */
-    public Term extract() throws Exception, InterruptedException {
+    public ImmutableList<Term> extract() throws Exception, InterruptedException {
         ImmutableList<Term> goalPreconditons = ImmutableSLList.nil();
         for (Goal currentGoal : this.proof.openGoals()) {
             goalPreconditons = goalPreconditons.append(this.extractFromGoal(currentGoal));
@@ -78,14 +78,13 @@ public class PreconditionExtractor {
         // Goal is missed if any of the preconditions are missed so we need an OR
         ImmutableList<Term> projectedDisjunction = ImmutableSLList.nil();
         for (Term currentTerm : goalPreconditons) {
+            JunctorSimplificationVisitor simplifier = new JunctorSimplificationVisitor(this.proofServices.getTermBuilder());
+            this.projection.projectTerm(currentTerm).execPostOrder(simplifier);
             projectedDisjunction = projectedDisjunction.append(
-                this.projection.projectTerm(currentTerm)
+                simplifier.getSimplified()
             );
         }
-        Term result = this.proofServices.getTermBuilder().or(projectedDisjunction);
-        JunctorSimplificationVisitor simplifier = new JunctorSimplificationVisitor(this.proofServices.getTermBuilder());
-        result.execPostOrder(simplifier);
-        return simplifier.getSimplified();
+        return projectedDisjunction;
     }
 
     /**

@@ -13,18 +13,23 @@ import java.util.Set;
 /**
  * Visitor which collects all visited ProgramVariables
  */
-class FindVarNamesVisitor extends DefaultVisitor {
+public class FindVarNamesVisitor extends DefaultVisitor {
 
     /**
      * The set of all found variables
      */
-    private final Set<Name> foundVariables;
+    protected final Set<Name> foundVariables;
+
+    protected final Set<ProgramVariable> foundProgramVariables;
+    protected final Set<Function> foundFunctions;
 
     /**
      * Constructor for a FindVarNamesVisitor.
      */
     public FindVarNamesVisitor() {
         foundVariables = new HashSet<>();
+        foundProgramVariables = new HashSet<>();
+        foundFunctions = new HashSet<>();
     }
 
     /**
@@ -35,6 +40,14 @@ class FindVarNamesVisitor extends DefaultVisitor {
      */
     public Set<Name> getVariables() {
         return foundVariables;
+    }
+
+    public Set<ProgramVariable> getFoundProgramVariables() {
+        return foundProgramVariables;
+    }
+
+    public Set<Function> getFoundFunctions() {
+        return foundFunctions;
     }
 
     @Override
@@ -61,12 +74,14 @@ class FindVarNamesVisitor extends DefaultVisitor {
         if (visited.op() instanceof ProgramVariable) {
             ProgramVariable var = (ProgramVariable) visited.op();
             this.foundVariables.add(var.name());
+            this.foundProgramVariables.add(var);
         }
         if (visited.op() instanceof Function) {
             Function fun = (Function) visited.op();
             Name funName = visited.op().name();
             if (fun.sort().name().toString().equals("Field")) {
                 this.foundVariables.add(funName);
+                this.foundFunctions.add(fun);
             } else if (isSelectTerm(visited)){
                 visited.sub(2).execPostOrder(this);
             } else if (isStoreTerm(visited)) {
@@ -81,11 +96,11 @@ class FindVarNamesVisitor extends DefaultVisitor {
      *
      * Based on implementation in ExpressionBuilder
      */
-    private static boolean isSelectTerm(Term term) {
+    protected static boolean isSelectTerm(Term term) {
         return term.op().name().toString().endsWith("::select") && term.arity() == 3;
     }
 
-    private static boolean isStoreTerm(Term term) {
+    protected static boolean isStoreTerm(Term term) {
         return term.op().name().toString().endsWith("store") && term.arity() == 4;
     }
 

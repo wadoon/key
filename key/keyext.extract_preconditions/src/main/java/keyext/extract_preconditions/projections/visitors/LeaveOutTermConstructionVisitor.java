@@ -150,7 +150,7 @@ public class LeaveOutTermConstructionVisitor implements Visitor {
      * @param visited Node currently visisted
      * @return true if node should be included
      */
-    private boolean shouldIncludeNode(Term visited) {
+    protected boolean shouldIncludeNode(Term visited) {
         AdmissibleLeafFinder admissibilityVisitor = new AdmissibleLeafFinder(this.programVariables, this.blacklist);
         visited.execPostOrder(admissibilityVisitor);
 
