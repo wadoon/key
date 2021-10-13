@@ -13,6 +13,7 @@ import org.key_project.ui.interactionlog.api.InteractionRecorderListener
 import org.key_project.ui.interactionlog.model.InteractionLog
 import java.awt.Component
 import java.awt.event.ActionEvent
+import java.io.File
 import java.util.*
 import javax.swing.*
 import javax.swing.filechooser.FileNameExtensionFilter
@@ -66,10 +67,12 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
         recorder.addListener(object : InteractionRecorderListener {
             override fun onInteraction(recorder: InteractionRecorder, log: InteractionLog, event: Interaction) {
                 if (autoSaveEnabled) {
-                    log.savePath?.let { path ->
-                        InteractionLogFacade.storeInteractionLog(log, path)
-                        MainWindow.getInstance().setStatusLine("Interaction log ${log.name} saved.")
+                    val path = log.savePath ?: File(log.name + ".json").also {
+                        log.savePath = it
                     }
+
+                    InteractionLogFacade.storeInteractionLog(log, path)
+                    MainWindow.getInstance().setStatusLine("Interaction log ${log.name} saved.")
                 }
             }
 
@@ -220,21 +223,32 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
     inner class AutoSaveAction : KeyAction() {
         init {
             name = "Enable/Disable Auto Save"
-            name = "Save As ..."
-            putValue(Action.SHORT_DESCRIPTION, "Save the current selected interaction into a file.")
-            setIcon(InteractionLogView.ICON_SAVE_AS.get(InteractionLogView.SMALL_ICON_SIZE))
+            putValue(Action.SHORT_DESCRIPTION, "If enabled, interaction log are stored on every interaction.")
             priority = 0
             menuPath = InteractionLogView.MENU_ILOG
             lookupAcceleratorKey()
-            isSelected = false
             addPropertyChangeListener { evt ->
-                if (evt.propertyName == Action.SELECTED_KEY)
+                if (evt.propertyName == Action.SELECTED_KEY) {
                     onAutoSaveChange(isSelected)
+                    update()
+                }
             }
+            isSelected = false
+        }
+
+        private fun update() {
+            setIcon(
+                (if (isSelected)
+                    InteractionLogView.ICON_AUTO_SAVE_ENABLED
+                else
+                    InteractionLogView.ICON_AUTO_SAVE_DISABLED)
+                    .get(InteractionLogView.SMALL_ICON_SIZE)
+            )
         }
 
         override fun actionPerformed(e: ActionEvent?) {
             onAutoSaveChange(isSelected)
+            update()
         }
     }
 
@@ -242,7 +256,7 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
         autoSaveEnabled = active
     }
 
-    class SaveAsAction : KeyAction() {
+    inner class SaveAsAction : KeyAction() {
         init {
             name = "Save As ..."
             putValue(Action.SHORT_DESCRIPTION, "Save the current selected interaction into a file.")
@@ -253,26 +267,27 @@ class InteractionLogExt : KeYGuiExtension, KeYGuiExtension.MainMenu, KeYGuiExten
         }
 
         override fun actionPerformed(e: ActionEvent) {
-            val fileChooser = JFileChooser()
-            fileChooser.fileFilter = FileNameExtensionFilter(
-                "InteractionLog", "json"
-            )
-            val returnValue = fileChooser.showOpenDialog(null)
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-                try {
-                    val file = fileChooser.selectedFile
-                    recorder.readInteractionLog(file)
-                    //addInteractionLog(importedLog);
-                } catch (exception: Exception) {
-                    JOptionPane.showMessageDialog(
-                        null,
-                        exception.cause,
-                        "IOException",
-                        JOptionPane.WARNING_MESSAGE
-                    )
-                    exception.printStackTrace()
+            (interactionLogSelection.selectedItem as? InteractionLog)?.let {
+                val fileChooser = JFileChooser()
+                fileChooser.fileFilter = FileNameExtensionFilter(
+                    "InteractionLog", "json"
+                )
+                val returnValue = fileChooser.showSaveDialog(MainWindow.getInstance())
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        val file = fileChooser.selectedFile
+                        InteractionLogFacade.storeInteractionLog(it, file)
+                        it.savePath = file
+                    } catch (exception: Exception) {
+                        JOptionPane.showMessageDialog(
+                            MainWindow.getInstance(),
+                            exception.message,
+                            "IOException",
+                            JOptionPane.WARNING_MESSAGE
+                        )
+                        exception.printStackTrace()
+                    }
                 }
-
             }
         }
     }

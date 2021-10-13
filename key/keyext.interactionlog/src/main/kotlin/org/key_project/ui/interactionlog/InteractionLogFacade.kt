@@ -29,9 +29,10 @@ object InteractionLogFacade {
      * @throws JAXBException
      */
     @JvmStatic
-    fun readInteractionLog(inputFile: File): InteractionLog {
-        return mapper.readValue(inputFile, InteractionLog::class.java)
-    }
+    fun readInteractionLog(inputFile: File): InteractionLog =
+        mapper.readValue(inputFile, InteractionLog::class.java).also {
+            it.savePath = inputFile
+        }
 
     /**
      * @param log

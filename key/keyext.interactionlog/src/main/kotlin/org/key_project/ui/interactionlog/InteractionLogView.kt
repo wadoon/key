@@ -470,6 +470,8 @@ class InteractionLogView(val interactionLog: InteractionLog, private var mediato
     }
 
     companion object {
+        val ICON_AUTO_SAVE_ENABLED = IconFontProvider(FontAwesomeSolid.MAGIC)
+        val ICON_AUTO_SAVE_DISABLED = IconFontProvider(FontAwesomeSolid.MAGIC, Color.gray)
         val ICON_LOAD = IconFontProvider(FontAwesomeSolid.TRUCK_LOADING)
         val ICON_ADD_USER_ACTION = IconFontProvider(FontAwesomeRegular.STICKY_NOTE)
         val ICON_TOGGLE_FAVOURITE = IconFontProvider(FontAwesomeSolid.HEART, Color.red)
