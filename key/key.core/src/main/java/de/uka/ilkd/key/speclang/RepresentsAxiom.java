@@ -195,12 +195,12 @@ public final class RepresentsAxiom extends ClassAxiom {
                     originalParamVars, atPreVars, toLimit, false, services));
             return res;
         } else {
-           if (originalPre != null)
+           if (originalPre != null) {
                //FIXME weigl: this was a runtime exception, I am not sure why.
                //             I need a little bit help, why this is triggerd for my JML thing.
-               System.err.println(
-                       "Only functional represents for model methods is currently supported," +
-                               " this should not have occurred.");
+               throw new IllegalStateException("Only functional represents for model methods is currently supported,"
+                       + "this should not have occured.");
+           }
             Taclet tacletWithShowSatisfiability = tg.generateRelationalRepresentsTaclet(tacletName,
                     originalRep,
                     kjt,

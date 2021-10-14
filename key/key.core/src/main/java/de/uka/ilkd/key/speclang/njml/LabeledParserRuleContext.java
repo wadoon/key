@@ -3,14 +3,15 @@ package de.uka.ilkd.key.speclang.njml;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * This class maps a {@link ParserRuleContext} to a {@link TermLabel}.
  */
 public class LabeledParserRuleContext {
-    @NotNull
+    @Nonnull
     public final ParserRuleContext first;
     @Nullable
     public final TermLabel second;

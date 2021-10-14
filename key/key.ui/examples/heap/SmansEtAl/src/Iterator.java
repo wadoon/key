@@ -62,6 +62,6 @@ class Iterator {
     
     /*@ model \locset footprint;
       @ accessible footprint: footprint;
-      @ represents footprint = \locset_of(list, index);
+      @ represents footprint = \locset(list, index);
       @*/    
 }

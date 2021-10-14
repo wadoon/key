@@ -21,6 +21,8 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
+
 
 /**
  * Common superinterface of all constructs created by the specification

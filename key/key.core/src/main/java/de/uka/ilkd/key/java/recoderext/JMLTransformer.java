@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import com.google.common.base.Strings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
@@ -24,6 +24,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.StringUtil;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.Method;
@@ -37,6 +38,8 @@ import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
+import javax.annotation.Nonnull;
+import java.io.StringReader;
 import java.util.*;
 
 import static java.lang.String.format;
@@ -410,6 +413,42 @@ public final class JMLTransformer extends RecoderModelTransformer {
         methodDecl.setComments(newComments);
     }
 
+    private void transformAssertStatement(TextualJMLAssertStatement stat,
+                                          Comment[] originalComments) throws SLTranslationException {
+        if (originalComments.length <= 0) throw new IllegalArgumentException();
+
+        // determine parent, child index
+        StatementBlock astParent = (StatementBlock) originalComments[0]
+                .getParent().getASTParent();
+        int childIndex = astParent
+                .getIndexOfChild(originalComments[0].getParent());
+
+        ParserRuleContext ctx = stat.getContext().first;
+
+        // Convert to block with block contract, attach to AST.
+        de.uka.ilkd.key.java.Position pos = new de.uka.ilkd.key.java.Position(
+                ctx.start.getLine(),
+                ctx.start.getCharPositionInLine());
+
+        try {
+            String comment = String.format(
+                    "/*@ normal_behavior\n"
+                    + "  @ %s %s\n"
+                    + "  @ assignable \\strictly_nothing;\n"
+                    + "  @*/", stat.getKind() == Kind.ASSERT ? "ensures" : "ensures_free", stat.getClauseText());
+
+            StatementBlock block = services.getProgramFactory().parseStatementBlock(
+                    new StringReader(String.format("{\n%s\n{;;}}", comment)));
+
+            updatePositionInformation(block, pos);
+            doAttach(block, astParent, childIndex);
+        } catch (Throwable e) {
+            throw new SLTranslationException(
+                    String.format("%s (%s)", e.getMessage(), e.getClass().getName()),
+                    ctx.start.getTokenSource().getSourceName(), pos, e);
+        }
+    }
+
     private void transformSetStatement(TextualJMLSetStatement stat,
                                        Comment[] originalComments) throws SLTranslationException {
         assert originalComments.length > 0;
@@ -575,7 +614,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         // call preparser
         JmlIO io = new JmlIO();
         ImmutableList<TextualJMLConstruct> constructs
-                = io.parseMethodlevel(concatenatedComment, fileName, pos);
+                = io.parseMethodLevel(concatenatedComment, fileName, pos);
         warnings = warnings.append(io.getWarnings());
 
         // handle ghost declarations and set assignments in textual constructs
@@ -586,6 +625,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 transformSetStatement((TextualJMLSetStatement) c, comments);
             } else if (c instanceof TextualJMLMergePointDecl) {
                 transformMergePointDecl((TextualJMLMergePointDecl) c, comments);
+            } else if (c instanceof TextualJMLAssertStatement) {
+                transformAssertStatement((TextualJMLAssertStatement) c, comments);
             } else if (c instanceof TextualJMLProofCommand) {
                 transformProofCommand((TextualJMLProofCommand) c, comments);
             }
@@ -651,7 +692,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             // iterate over all type declarations of the compilation unit
             TypeDeclarationCollector tdc = new TypeDeclarationCollector();
             tdc.walk(unit);
-            HashSet<TypeDeclaration> typeDeclarations = tdc.result();
+            Set<TypeDeclaration> typeDeclarations = tdc.result();
             for (TypeDeclaration td : typeDeclarations) {
                 // collect pre-existing operations
                 List<? extends Constructor> constructorList = td
@@ -684,7 +725,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 // iterate over all type declarations of the compilation unit
                 TypeDeclarationCollector tdc = new TypeDeclarationCollector();
                 tdc.walk(unit);
-                HashSet<TypeDeclaration> typeDeclarations = tdc.result();
+                Set<TypeDeclaration> typeDeclarations = tdc.result();
                 for (TypeDeclaration td : typeDeclarations) {
                     // collect pre-existing operations
                     List<? extends Constructor> constructorList = typeDeclaration2Constructores
@@ -750,7 +791,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
         final HashSet<TypeDeclaration> result = new LinkedHashSet<>();
 
-        public void walk(SourceElement s) {
+        public void walk(@Nonnull SourceElement s) {
             s.accept(this);
             if (s instanceof NonTerminalProgramElement) {
                 NonTerminalProgramElement pe = (NonTerminalProgramElement) s;
@@ -760,17 +801,19 @@ public final class JMLTransformer extends RecoderModelTransformer {
             }
         }
 
+        @Override
         public void visitClassDeclaration(ClassDeclaration td) {
             result.add(td);
             super.visitClassDeclaration(td);
         }
 
+        @Override
         public void visitInterfaceDeclaration(InterfaceDeclaration td) {
             result.add(td);
             super.visitInterfaceDeclaration(td);
         }
 
-        public HashSet<TypeDeclaration> result() {
+        public Set<TypeDeclaration> result() {
             return result;
         }
     }

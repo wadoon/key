@@ -18,9 +18,10 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 
 /**
@@ -94,13 +95,13 @@ public class JavaIntegerSemanticsHelper {
     //public interface
     //-------------------------------------------------------------------------
 
-    public boolean isIntegerTerm(@NotNull SLExpression a)  {
+    public boolean isIntegerTerm(@Nonnull SLExpression a)  {
 	assert a.isTerm();
 	return a.getTerm().sort() == integerLDT.targetSort();
     }
 
 
-    public SLExpression buildPromotedOrExpression(@NotNull SLExpression a, @NotNull SLExpression b)
+    public SLExpression buildPromotedOrExpression(@Nonnull SLExpression a, @Nonnull SLExpression b)
             throws SLTranslationException {
         assert a != null;
         assert b != null;
@@ -197,11 +198,21 @@ public class JavaIntegerSemanticsHelper {
                 add = integerLDT.getAdd();
             else
                 add = integerLDT.getJavaAddInt();
-            return new SLExpression(tb.func(add, a.getTerm(), b.getTerm()),
+            return new SLExpression(tb.func(add, a.getTerm(),
+                    castIfneeded(b.getTerm(), resultType)),
                     resultType);
         } catch (RuntimeException e) {
             raiseError("Error in additive expression " + a + " + " + b + ":",e);
             return null; //unreachable
+        }
+    }
+
+    private Term castIfneeded(Term term, KeYJavaType resultType) {
+        if (term.sort().equals(resultType.getSort())) {
+            return term;
+        } else {
+            return tb.cast(resultType.getSort(), term);
+            // javaAddFloat((float)1, 1.f)
         }
     }
 

@@ -13,14 +13,19 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
+import com.sun.java.accessibility.util.Translator;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -457,14 +462,20 @@ public class TestJMLTranslator {
 
     @Test
     public void testSubtypeExpression() {
-        Term result = jmlIO.parseExpression(
+        Term resultTypeofClass = jmlIO.parseExpression(
                 "( \\exists TestClass t; t != null; \\typeof(t) <: \\type(java.lang.Object) )");
+        Term resultTypeofPrimitive = jmlIO.parseExpression(
+                "( \\exists int i; \\typeof(i) <: \\type(int) )");
 
-        assertNotNull(result);
+        assertNotNull(resultTypeofClass);
+        assertNotNull(resultTypeofPrimitive);
 
-        Sort sds = javaInfo.objectSort();
-        Function ioFunc = sds.getInstanceofSymbol(services);
-        assertTrue(termContains(result, ioFunc));
+        Function ioFuncObject = javaInfo.objectSort().getInstanceofSymbol(services);
+        Function ioFuncInt =
+        		services.getNamespaces().sorts().lookup("int").getInstanceofSymbol(services);
+        
+        assertTrue(termContains(resultTypeofClass, ioFuncObject));
+        assertTrue(termContains(resultTypeofPrimitive, ioFuncInt));
     }
 
 
@@ -500,4 +511,5 @@ public class TestJMLTranslator {
                 ProofSaver.printTerm(expected, services), ProofSaver.printTerm(result, services)),
                 condition);
     }
+
 }

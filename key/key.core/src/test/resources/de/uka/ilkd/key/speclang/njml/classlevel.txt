@@ -1380,6 +1380,12 @@ model int f(int x) {
  return x+1;
 }
 --- Contract ---
+/*@
+  @ model int f(int x) {
+  @  return x+1;
+  @ }
+*/
+--- Contract ---
 /*@ model_behaviour
   @   requires true;
   @ model int f(int x) {

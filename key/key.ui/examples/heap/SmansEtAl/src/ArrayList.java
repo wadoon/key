@@ -68,6 +68,6 @@ class ArrayList {
     
     /*@ model \locset footprint;
       @ accessible footprint: footprint;
-      @ represents footprint = \locset_of(count, items, items[*]);
+      @ represents footprint = \storeref(count, items, items[*]);
       @*/    
 }

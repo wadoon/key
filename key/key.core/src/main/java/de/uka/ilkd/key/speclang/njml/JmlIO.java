@@ -17,12 +17,13 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -70,7 +71,7 @@ public class JmlIO {
      * @param atPres      i do not know
      * @param atBefores   i do not know
      */
-    public JmlIO(@NotNull Services services,
+    public JmlIO(@Nonnull Services services,
                  @Nullable KeYJavaType specInClass,
                  @Nullable ProgramVariable selfVar,
                  @Nullable ImmutableList<ProgramVariable> paramVars,
@@ -89,9 +90,11 @@ public class JmlIO {
     }
 
     //region translations
+
     /**
-     * @param clause
-     * @return
+     * Interpret the given parse tree as a represents clause
+     *
+     * @throws ClassCastException if unsuitable parser rule context is given
      */
     @SuppressWarnings("unchecked")
     public Pair<IObserverFunction, Term> translateRepresents(ParserRuleContext clause) {
@@ -100,11 +103,15 @@ public class JmlIO {
     }
 
     /**
-     * @param clause
-     * @return
+     * Interpret a given represents clause.
+     * <p>
+     * Note weigl: This method does not add the given term label to the returned objects. I am not
+     * if this is currently wanted/needed.
+     *
+     * @throws ClassCastException if unsuitable parser rule context is given@param clause
      */
-    public Pair<IObserverFunction, Term> translateRepresents(LabeledParserRuleContext clause) {
-        //TODO no represents label
+    public @Nonnull
+    Pair<IObserverFunction, Term> translateRepresents(@Nonnull LabeledParserRuleContext clause) {
         Pair<IObserverFunction, Term> p = translateRepresents(clause.first);
         return new Pair<>(p.first, p.second);
     }
@@ -127,75 +134,56 @@ public class JmlIO {
 
 
     /**
-     * @param parserRuleContext
-     * @param type
-     * @return
+     * Interpret a labeled term (breaks clauses, continue clauses).
      */
-    public Pair<Label, Term> translateLabeledClause(
-            ParserRuleContext parserRuleContext, OriginTermLabel.SpecType type) {
-        Pair<Label, Term> t = (Pair<Label, Term>) interpret(parserRuleContext);
-        return new Pair<>(t.first, attachTermLabel(t.second, type));
-    }
-
-    /**
-     * @param parserRuleContext
-     * @param type
-     * @return
-     */
+    @SuppressWarnings("unchecked")
     public Pair<Label, Term> translateLabeledClause(
             LabeledParserRuleContext parserRuleContext, OriginTermLabel.SpecType type) {
-        Pair<Label, Term> t = (Pair<Label, Term>) interpret(parserRuleContext.first);//TODO weigl label
+        Pair<Label, Term> t = (Pair<Label, Term>) interpret(parserRuleContext.first);
         return new Pair<>(t.first, attachTermLabel(t.second, type));
     }
 
 
     /**
-     * @param ctx
-     * @return
+     * Interpret a merge params.
      */
     public MergeParamsSpec translateMergeParams(JmlParser.MergeparamsspecContext ctx) {
         return (MergeParamsSpec) interpret(ctx);
     }
 
     /**
-     * @param concatenatedComment
-     * @param fileName
-     * @param pos
-     * @return
+     * Parse and interpret class level comments.
      */
-    public ImmutableList<TextualJMLConstruct> parseClassLevel(String concatenatedComment, String fileName, Position pos) {
+    public ImmutableList<TextualJMLConstruct> parseClassLevel(
+            String concatenatedComment, String fileName, Position pos) {
         return parseClassLevel(new PositionedString(concatenatedComment, fileName, pos));
     }
 
     /**
-     * @param positionedString
-     * @return
+     * Parse and interpret class level comments.
      */
     private ImmutableList<TextualJMLConstruct> parseClassLevel(PositionedString positionedString) {
-        return JmlFacade.parseClasslevel(positionedString);
+        JmlLexer lexer = JmlFacade.createLexer(positionedString);
+        return parseClassLevel(lexer);
     }
 
     /**
-     * @return
+     * returns the gathered interpretation warnings, e.g., deprecated constructs.
      */
     public ImmutableList<PositionedString> getWarnings() {
         return warnings;
     }
 
     /**
-     * @param concatenatedComment
-     * @param fileName
-     * @param position
-     * @return
+     * Parse and interpret the given string as a method level construct.
      */
-    public ImmutableList<TextualJMLConstruct> parseMethodlevel(String concatenatedComment, String fileName, Position position) {
-        return JmlFacade.parseMethodlevel(new PositionedString(concatenatedComment, fileName, position));
-
+    public ImmutableList<TextualJMLConstruct> parseMethodLevel(
+            String concatenatedComment, String fileName, Position position) {
+        return parseMethodLevel(new PositionedString(concatenatedComment, fileName, position));
     }
 
     /**
-     * @param p
-     * @return
+     * Parse and interpret the given string as an JML expression in the current context.
      */
     public Term parseExpression(PositionedString p) {
         ParserRuleContext ctx = JmlFacade.parseExpr(p);
@@ -204,8 +192,7 @@ public class JmlIO {
     }
 
     /**
-     * @param ctx
-     * @return
+     * Interpret the given parse tree as an JML expression in the current context.
      */
     private Object interpret(ParserRuleContext ctx) {
         Translator visitor = new Translator(services, specInClass, selfVar, paramVars, resultVar,
@@ -217,10 +204,10 @@ public class JmlIO {
     }
 
     /**
-     * @param expr
-     * @return
+     * Interpret the given parse tree as an JML expression in the current context.
      */
-    public Term translateTerm(ParserRuleContext expr) {
+    public @Nonnull
+    Term translateTerm(@Nonnull ParserRuleContext expr) {
         Object interpret = interpret(expr);
         if (interpret instanceof SLExpression) {
             return ((SLExpression) interpret).getTerm();
@@ -230,8 +217,8 @@ public class JmlIO {
     }
 
     /**
-     * @param expr
-     * @return
+     * Interpret the given parse tree as an JML expression in the current context.
+     * Label is attached.
      */
     public Term translateTerm(LabeledParserRuleContext expr) {
         Term term = translateTerm(expr.first);
@@ -242,25 +229,22 @@ public class JmlIO {
     }
 
     /**
-     * @param expr
-     * @param type
-     * @return
+     * Interpret the given parse tree as an JML expression in the current context.
+     * Attach both given labels {@code type} and in labeled parse tree.
      */
     public Term translateTerm(LabeledParserRuleContext expr, OriginTermLabel.SpecType type) {
         Term term = translateTerm(expr.first);
         OriginTermLabel origin = new OriginTermLabel(new OriginTermLabel.Origin(type));
         if (expr.second != null)
             return services.getTermBuilder().addLabel(term, expr.second);
-                    //new ImmutableArray<>(origin, expr.second));
         else
             return services.getTermBuilder().addLabel(term, origin);
     }
 
 
     /**
-     * @param expr
-     * @param type
-     * @return
+     * Interpret the given parse tree as an JML expression in the current context.
+     * Given label is attached.
      */
     public Term translateTerm(ParserRuleContext expr, OriginTermLabel.SpecType type) {
         Term t = translateTerm(expr);
@@ -268,8 +252,7 @@ public class JmlIO {
     }
 
     /**
-     * @param input
-     * @return
+     * Parses and interpret the given input as an JML expression in the current context.
      */
     public Term parseExpression(String input) {
         ParserRuleContext ctx = JmlFacade.parseExpr(input);
@@ -285,7 +268,8 @@ public class JmlIO {
      * @return a information flow specification from the given context.
      * @throws ClassCastException if the {@code expr} is not suitable
      */
-    public @NotNull InfFlowSpec translateInfFlow(@NotNull ParserRuleContext expr) {
+    public @Nonnull
+    InfFlowSpec translateInfFlow(@Nonnull ParserRuleContext expr) {
         return (InfFlowSpec) this.interpret(expr);
     }
 
@@ -294,7 +278,7 @@ public class JmlIO {
      * Like {@link #translateInfFlow(ParserRuleContext)} but this method can also handles the given label.
      */
     public InfFlowSpec translateInfFlow(LabeledParserRuleContext expr) {
-        return translateInfFlow(expr.first);//TODO weigl label?
+        return translateInfFlow(expr.first);
     }
 
     /**
@@ -304,32 +288,27 @@ public class JmlIO {
      * @return a dependency contract
      * @throws ClassCastException if the {@code ctx} is not suitable
      */
+    @SuppressWarnings("unchecked")
     public Triple<IObserverFunction, Term, Term> translateDependencyContract(ParserRuleContext ctx) {
         return (Triple<IObserverFunction, Term, Term>) interpret(ctx);
     }
 
     /**
-     * @param ctx
-     * @return
+     * Translates a dependency contract.
+     * <p>
+     * Note (weigl): No label is currently attached.
+     *
+     * @throws ClassCastException if the {@code ctx} is not suitable
      */
     public Triple<IObserverFunction, Term, Term> translateDependencyContract(LabeledParserRuleContext ctx) {
         return translateDependencyContract(ctx.first);
     }
     //endregion
 
-    /*
-     * @return public Object parse(PositionedString expr) {
-     * ParserRuleContext ctx = JmlFacade.parseTop(expr);
-     * return ctx.accept(new Translator(services, specInClass, selfVar, paramVars, resultVar,
-     * excVar, atPres, atBefores));
-     * }
-     */
-
-
     //region builder methods
+
     /**
-     * @param selfVar
-     * @return
+     * Sets the variable representing the {@code this} reference.
      */
     public JmlIO selfVar(ProgramVariable selfVar) {
         this.selfVar = selfVar;
@@ -337,8 +316,8 @@ public class JmlIO {
     }
 
     /**
-     * @param params
-     * @return
+     * Sets the current list of known parameter.
+     * Can also be used to give additionally variables.
      */
     public JmlIO parameters(ImmutableList<ProgramVariable> params) {
         this.paramVars = params;
@@ -346,26 +325,20 @@ public class JmlIO {
     }
 
     /**
-     * @param excVar
-     * @return
+     * Sets the variable that is used to store exceptions.
      */
     public JmlIO exceptionVariable(ProgramVariable excVar) {
         this.excVar = excVar;
         return this;
     }
 
-    /**
-     * @param atPres
-     * @return
-     */
     public JmlIO atPres(Map<LocationVariable, Term> atPres) {
         this.atPres = atPres;
         return this;
     }
 
     /**
-     * @param resultVar
-     * @return
+     * Sets the variable representing {@code \result}.
      */
     public JmlIO resultVariable(ProgramVariable resultVar) {
         this.resultVar = resultVar;
@@ -373,8 +346,7 @@ public class JmlIO {
     }
 
     /**
-     * @param services
-     * @return
+     * Sets the current services
      */
     public JmlIO services(Services services) {
         this.services = services;
@@ -382,26 +354,20 @@ public class JmlIO {
     }
 
     /**
-     * @param classType
-     * @return
+     * Sets the sort/type of the class containing the interpreted JML.
      */
     public JmlIO classType(KeYJavaType classType) {
         this.specInClass = classType;
         return this;
     }
 
-    /**
-     * @param atBefores
-     * @return
-     */
     public JmlIO atBefore(Map<LocationVariable, Term> atBefores) {
         this.atBefores = atBefores;
         return this;
     }
 
-
     /**
-     * @return
+     * Clears the internal fields.
      */
     public JmlIO clear() {
         resultVariable(null);
@@ -409,10 +375,68 @@ public class JmlIO {
         atPres(null);
         classType(null);
         selfVar(null);
-        warnings = ImmutableSLList.nil();
+        clearWarnings();
         exceptionVariable(null);
         parameters(ImmutableSLList.nil());
         return this;
+    }
+
+    public void clearWarnings() {
+        warnings = ImmutableSLList.nil();
+    }
+    //endregion
+
+
+    //region
+
+    /**
+     * Parses a JML constructs on class level, e.g., invariants and methods contracts,  and returns a parse tree.
+     */
+    public ImmutableList<TextualJMLConstruct> parseClassLevel(JmlLexer lexer) {
+        @Nonnull JmlParser p = JmlFacade.createParser(lexer);
+        JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
+        p.getErrorReporter().throwException();
+        jmlCheck(ctx);
+        TextualTranslator translator = new TextualTranslator();
+        ctx.accept(translator);
+        return translator.constructs;
+    }
+
+    private void jmlCheck(ParserRuleContext ctx) {
+        List<PositionedString> warn = new ArrayList<>();
+        for (JmlCheck check : JmlChecks.getJmlChecks()) {
+            List<PositionedString> w = check.check(ctx);
+            warn.addAll(w);
+        }
+        this.warnings = warnings.prepend(ImmutableList.fromList(warn));
+    }
+
+
+    /**
+     * Parses a JML constructs on class level, e.g., invariants and methods contracts, and returns a parse tree.
+     */
+    public ImmutableList<TextualJMLConstruct> parseClassLevel(String content) {
+        return parseClassLevel(JmlFacade.createLexer(content));
+    }
+
+    /**
+     * Parses a JML constructs which occurs inside methods (mostly JML statements) and returns a parse tree.
+     */
+    public ImmutableList<TextualJMLConstruct> parseMethodLevel(PositionedString positionedString) {
+        return parseMethodLevel(JmlFacade.createLexer(positionedString));
+    }
+
+    /**
+     * Parses a JML constructs which occurs inside methods (mostly JML statements) and returns a parse tree.
+     */
+    private ImmutableList<TextualJMLConstruct> parseMethodLevel(JmlLexer lexer) {
+        @Nonnull JmlParser p = JmlFacade.createParser(lexer);
+        JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
+        p.getErrorReporter().throwException();
+        jmlCheck(ctx);
+        TextualTranslator translator = new TextualTranslator();
+        ctx.accept(translator);
+        return translator.constructs;
     }
     //endregion
 }

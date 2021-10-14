@@ -2,16 +2,26 @@ parser grammar JmlParser;
 
 options { tokenVocab=JmlLexer; }
 
+@header {
+  import de.uka.ilkd.key.util.parsing.*;
+}
+
+@members {
+  private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
+  public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
+}
+
+
 classlevel_comments: classlevel_comment* EOF;
 classlevel_comment: classlevel_element | modifiers | set_statement;
 classlevel_element0: modifiers? (classlevel_element modifiers?);
 classlevel_element
-  : class_invariant /*| depends_clause*/ | method_specification
-  | method_declaration | field_declaration | represents_clause
-  | history_constraint | initially_clause | class_axiom
+  : class_invariant /*| depends_clause*/     | method_specification
+  | method_declaration  | field_declaration  | represents_clause
+  | history_constraint  | initially_clause   | class_axiom
   | monitors_for_clause | readable_if_clause | writable_if_clause
-  | datagroup_clause  | set_statement | nowarn_pragma
-  | accessible_clause | assert_statement | assume_statement
+  | datagroup_clause    | set_statement      | nowarn_pragma
+  | accessible_clause   | assert_statement   | assume_statement
   ;
 
 methodlevel_comment: (modifiers? methodlevel_element modifiers?)* EOF;
@@ -144,6 +154,12 @@ field_declaration: type IDENT (EMPTYBRACKETS)* initialiser? SEMI_TOPLEVEL;
 method_declaration: type IDENT param_list (BODY|SEMI_TOPLEVEL);
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
 param_decl: ((NON_NULL | NULLABLE))? t=IDENT ((AXIOM_NAME_BEGIN AXION_NAME_END | EMPTYBRACKETS))* p=IDENT;
+//old_clause: OLD modifiers type IDENT INITIALISER ;
+
+field_declaration: type IDENT (LBRACKET RBRACKET)* initialiser? SEMI_TOPLEVEL;
+method_declaration: type IDENT param_list (BODY|SEMI_TOPLEVEL);
+param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
+param_decl: ((NON_NULL | NULLABLE))? t=IDENT (LBRACKET RBRACKET)* p=IDENT;
 history_constraint: CONSTRAINT expression;
 datagroup_clause: (in_group_clause | maps_into_clause);
 monitors_for_clause: MONITORS_FOR expression;
@@ -170,7 +186,7 @@ loop_specification
     | variant_function)*;
 
 loop_invariant: LOOP_INVARIANT targetHeap? expression SEMI_TOPLEVEL;
-variant_function: DECREASING expression SEMI_TOPLEVEL;
+variant_function: DECREASING expression (COMMA expression)* SEMI_TOPLEVEL;
 //loop_separates_clause: SEPARATES expression;
 //loop_determines_clause: DETERMINES expression;
 assume_statement: ASSUME expression SEMI_TOPLEVEL;
@@ -238,7 +254,8 @@ relationalexpr
 
 st_expr: shiftexpr ST shiftexpr;
 instance_of: shiftexpr INSTANCEOF typespec;
-relational_chain:  shiftexpr ( op+=(LT | GT | LEQ | GEQ) shiftexpr)+;
+relational_chain:  shiftexpr ( (op+=(GT | GEQ) shiftexpr)
+                             | (op+=(LT | LEQ) shiftexpr))+;
 relational_lockset: shiftexpr (LOCKSET_LT|LOCKSET_LEQ) postfixexpr;
 
 shiftexpr: additiveexpr (op+=(SHIFTRIGHT|SHIFTLEFT|UNSIGNEDSHIFTRIGHT) additiveexpr)*;
@@ -311,7 +328,6 @@ jmlprimary
   | NOT_ASSIGNED LPAREN storeRefUnion RPAREN                                          #primaryNotAssigned
   | FRESH LPAREN expressionlist RPAREN                                                #primaryFresh
   | REACH LPAREN storeref COMMA expression COMMA expression (COMMA expression)? RPAREN #primaryReach
-  | LOCSET_OF LPAREN storeRefUnion RPAREN                                                   #primaryLocsetOf
   | REACHLOCS LPAREN storeref COMMA expression (COMMA expression)? RPAREN             #primaryReachLocs
   | DURATION LPAREN expression RPAREN                                                 #primaryDuration
   | SPACE LPAREN expression RPAREN                                                    #primarySpace
@@ -330,7 +346,9 @@ jmlprimary
   | VALUES                                                                            #primaryValues
   | STRING_EQUAL LPAREN expression COMMA expression RPAREN                            #primaryStringEq
   | EMPTYSET                                                                          #primaryEmptySet
-  | createLocset                                                                      #primaryignor9
+  | STOREREF LPAREN storeRefUnion RPAREN                                              #primaryStoreRef
+  | LOCSET LPAREN fieldarrayaccess (COMMA fieldarrayaccess)* RPAREN                   #primaryCreateLocset
+  | SINGLETON LPAREN expression RPAREN                                                #primaryCreateLocsetSingleton
   | UNION LPAREN storeRefUnion RPAREN                                                 #primaryUnion
   | INTERSECT LPAREN storeRefIntersect RPAREN                                         #primaryIntersect
   | SETMINUS LPAREN storeref COMMA storeref RPAREN                                    #primarySetMinux
@@ -343,6 +361,14 @@ jmlprimary
   | NEWELEMSFRESH LPAREN storeref RPAREN                                             #primaryNewElemsfrehs
   | sequence                                                                         #primaryignore10
   ;
+
+fieldarrayaccess: (ident|this_|super_) (fieldarrayaccess_suffix)*;
+fieldarrayaccess_suffix
+    : DOT (ident | inv | this_ | super_ | TRANSIENT | INV)
+    | LBRACKET (expression) RBRACKET
+;
+
+super_: SUPER;
 
 sequence
   : SEQEMPTY                                                              #sequenceEmpty

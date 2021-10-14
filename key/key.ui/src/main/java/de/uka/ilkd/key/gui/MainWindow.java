@@ -24,7 +24,9 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.Main;
+
 import de.uka.ilkd.key.gui.actions.*;
+
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -57,7 +59,7 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
@@ -149,6 +151,8 @@ public final class MainWindow extends JFrame {
             new HidePackagePrefixToggleAction(this);
     private final ToggleSequentViewTooltipAction toggleSequentViewTooltipAction =
             new ToggleSequentViewTooltipAction(this);
+    private final ToggleSourceViewTooltipAction toggleSourceViewTooltipAction =
+            new ToggleSourceViewTooltipAction(this);
     private final TermLabelMenu termLabelMenu;
     public boolean frozen = false;
     JCheckBoxMenuItem saveSMTFile;
@@ -252,10 +256,10 @@ public final class MainWindow extends JFrame {
         proofListener = new MainProofListener();
         userInterface = new WindowUserInterfaceControl(this);
         mediator = getMainWindowMediator(userInterface);
+        termLabelMenu = new TermLabelMenu(this);
         currentGoalView = new CurrentGoalView(this);
         emptySequent = new EmptySequent(this);
         sequentViewSearchBar = new SequentViewSearchBar(emptySequent);
-        termLabelMenu = new TermLabelMenu(this);
         proofListView = new JScrollPane();
         autoModeAction = new AutoModeAction(this);
         //mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
@@ -797,6 +801,7 @@ public final class MainWindow extends JFrame {
         view.add(termLabelMenu);
         view.add(new JCheckBoxMenuItem(hidePackagePrefixToggleAction));
         view.add(new JCheckBoxMenuItem(toggleSequentViewTooltipAction));
+        view.add(new JCheckBoxMenuItem(toggleSourceViewTooltipAction));
 
         view.addSeparator();
         {
@@ -821,7 +826,7 @@ public final class MainWindow extends JFrame {
     }
 
     private JMenu createSelectionMenu() {
-        JMenu goalSelection = new JMenu("Select Goal ...");
+        JMenu goalSelection = new JMenu("Select Goal");
         goalSelection.add(goalSelectAboveAction);
         goalSelection.add(goalSelectBelowAction);
         return goalSelection;
@@ -860,7 +865,7 @@ public final class MainWindow extends JFrame {
         proof.add(new SearchNextAction(this));
         proof.add(new SearchPreviousAction(this));
         {
-            JMenu searchModeMenu = new JMenu("Change Search Mode to...");
+            JMenu searchModeMenu = new JMenu("Search Mode");
 
             for (SequentViewSearchBar.SearchMode mode : SequentViewSearchBar.SearchMode.values()) {
                 searchModeMenu.add(new SearchModeChangeAction(this, mode));
@@ -915,7 +920,7 @@ public final class MainWindow extends JFrame {
      */
     public void updateSMTSelectMenu() {
         Collection<SolverTypeCollection> solverUnions = ProofIndependentSettings.DEFAULT_INSTANCE.
-                getSMTSettings().getUsableSolverUnions();
+                getSMTSettings().getUsableSolverUnions(Main.isExperimentalMode());
 
         if (solverUnions == null || solverUnions.isEmpty()) {
             updateDPSelectionMenu();
@@ -1099,27 +1104,6 @@ public final class MainWindow extends JFrame {
         JOptionPane.showMessageDialog(this, message, title, JOptionPane.WARNING_MESSAGE);
     }
 
-    /**
-     * Brings up a dialog displaying a message.
-     *
-     * @param modal whether or not the message should be displayed in a modal dialog.
-     */
-    public void popupInformationMessage(Object message, String title, boolean modal) {
-        if (modal) {
-            popupInformationMessage(message, title);
-        } else {
-            if (!(message instanceof Component)) {
-                throw new InternalError("only messages of type " + Component.class + " supported, yet");
-            }
-            JFrame dlg = new JFrame(title);
-            dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            dlg.getContentPane().add((Component) message);
-            dlg.pack();
-            GuiUtilities.setCenter(dlg, this);
-            dlg.setVisible(true);
-        }
-    }
-
     public TaskTree getProofList() {
         return proofList;
     }
@@ -1226,7 +1210,7 @@ public final class MainWindow extends JFrame {
      *
      * @see RecentFileMenu#addRecentFile(String)
      */
-    public void addRecentFile(@NotNull String absolutePath) {
+    public void addRecentFile(@Nonnull String absolutePath) {
         recentFileMenu.addRecentFile(absolutePath);
     }
 
@@ -1703,7 +1687,8 @@ public final class MainWindow extends JFrame {
                 public void run() {
 
                     SMTSettings settings = new SMTSettings(proof.getSettings().getSMTSettings(),
-                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), proof);
+                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                            proof.getSettings().getNewSMTSettings(), proof);
                     SolverLauncher launcher = new SolverLauncher(settings);
                     launcher.addListener(new SolverListener(settings, proof));
                     launcher.launch(solverUnion.getTypes(),

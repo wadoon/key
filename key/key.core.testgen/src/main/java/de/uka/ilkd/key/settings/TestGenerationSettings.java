@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.settings;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.io.File;
 import java.util.Collection;
@@ -88,6 +88,11 @@ public class TestGenerationSettings implements Settings, Cloneable {
     @Override
     public void addSettingsListener(SettingsListener l) {
         listeners.add(l);
+    }
+
+    @Override
+    public void removeSettingsListener(SettingsListener l) {
+        listeners.remove(l);
     }
 
     //FIXME weigl: This method seems broken. I would expect: clone() = new TGS(this)
@@ -269,7 +274,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 
     private static @Nullable TestGenerationSettings instance;
 
-    public static @NotNull TestGenerationSettings getInstance() {
+    public static @Nonnull TestGenerationSettings getInstance() {
         if (instance == null) {
             instance = new TestGenerationSettings();
             ProofIndependentSettings.DEFAULT_INSTANCE.addSettings(instance);

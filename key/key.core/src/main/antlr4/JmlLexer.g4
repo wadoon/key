@@ -22,107 +22,10 @@ import java.util.stream.Collectors;
 
    boolean semicolonOnToplevel() { return bracketLevel==0 && bracesLevel == 0 && parenthesisLevel==0; }
 
-
-    Pattern keyForbidden = Pattern.compile("-key($|[+-])");
-    public void setCommentMarkers(Collection<String> str) {
-    		String p = "(" + str.stream().collect(Collectors.joining("|")) + ")($|[+-])";
-    		keyForbidden = Pattern.compile(p);
-    }
-
-        /**
-         * Lookahead for determining if we are at the start of comment and not a "JML starter".
-         * <p>
-         * This method reads from the input stream to check the annotation markers between the
-         * comment start and the "@"
-         * This method returns true for starter "//" if we the comment begins with
-         * <ul>
-         * <li> "//" + End-of-line
-         * <li> "// "
-         * <li> "// @"
-         * <li> "//+"
-         * <li> "//-"
-         * <li> "//-key+openjml@"  (or similar)
-         * </ul>
-         * <p>
-         * (same for "/*")
-         * <p>
-         * It returns true if starter is followed by a sequence of "+", "-" or Java identifier
-         * characters, and then "@" and the sequence does not contain "-key".
-         * <p>
-         * It implements JML Ref Manual 4.4:
-         * <quote>
-         * An annotation-key is a + or - sign followed by an ident (see section 4.6 Tokens). Note that
-         * no white space can appear within, before, or after the annotation-key. Tools will provide a
-         * way to enable a selection of annotation-key identifiers. These identifiers, hereafter called
-         * "keys" provide for conditional inclusion of JML annotations as follows:
-         * <ul>
-         * <li> a JML annotation with no keys is always included,
-         * <li> a JML annotation with at least one positive-key is only included if at least one of
-         * these positive keys is enabled and there are no negative-keys in the annotation that have
-         * enabled keys, and
-         * <li> a JML annotation with an enabled negative-key is ignored (even if there are enabled
-         * positive-keys).
-         * </ul>
-         * </quote>
-         * <p>
-         * This method resets the position on the input stream (mark/rewind).
-         */
-        private boolean isComment(String starter) {
-            int mark = _input.mark();
-            int startPos = _input.index();
-            try {
-                // matching the starter string
-                for (int i = 0; i < starter.length(); i++) {
-                    if (_input.LA(1) == starter.charAt(i)) {
-                        _input.consume();
-                    } else {
-                        return false;
-                    }
-                }
-                StringBuilder markerBuilder = new StringBuilder();
-                while (true) {
-                    final char point = (char) _input.LA(1);
-                    if (point == '@') { // annotation marker finished
-                        if (markerBuilder.length() == 0) {
-                            // no markers --> active
-                            return false;
-                        }
-                        String[] markers = markerBuilder.toString().split("(?=[+-])");
-                        boolean plusFound = false;
-                        boolean plusKeyFound = false;
-                        for (int i = 0; i < markers.length; i++) {
-                            String marker = markers[i];
-                            if (marker.equalsIgnoreCase("-key") ||
-                                    marker.length() < 2 ||
-                                    !marker.matches("[+-].+")) {
-                                // 1) -key
-                                // 2) + or - alone
-                                // 3) identifier w/o +/-
-                                // means: this is a comment
-                                return true;
-                            } else if (marker.equalsIgnoreCase("+key")) {
-                                plusKeyFound = true;
-                            } else if (marker.startsWith("+")) {
-                                plusFound = true;
-                            }
-                        }
-                        // it is only a comment if "+" encountered, but not "+key"
-                        return plusFound && !plusKeyFound;
-                    } else if (Character.isJavaIdentifierPart(point) || point == '-' || point == '+') {
-                        markerBuilder.append(point);
-                        _input.consume();
-                    } else {
-                        return true;
-                    }
-                }
-            } finally {
-                _input.seek(startPos);
-                _input.release(mark);
-            }
-        }
+   private JmlMarkerDecision jmlMarkerDecision = new JmlMarkerDecision(this);
 }
 
-tokens {BODY, COMMENT, STRING_LITERAL, COMMAND}
+tokens {BODY, COMMENT, STRING_LITERAL}
 
 MODEL_BEHAVIOUR: 'model_' BEHAVIOR ;
 ABSTRACT: 'abstract';
@@ -167,10 +70,6 @@ PURE: 'pure';
 RETURN_BEHAVIOR: 'return_' BEHAVIOR;
 FINAL: 'final';
 MODEL: 'model'/*  -> pushMode(expr)*/;
-
-AXIOM_NAME_BEGIN:'[';
-AXIOM_NAME_END:']';
-EMPTYBRACKETS:'[]';
 
 fragment Pred: '_redundantly'?; //suffix
 fragment Pfree: '_free'?;       //suffix
@@ -236,6 +135,8 @@ JML_ML_END: '*/' -> channel(HIDDEN);
 WS: (' ' | '\t' | '\n' | '\r' | '@')+ -> channel(HIDDEN);
 NEST_START: '{|' ;
 NEST_END: '|}' ;
+C_RBRACKET: ']' -> type(RBRACKET);
+C_LBRACKET: '[' -> type(LBRACKET);
 SEMICOLON : ';' -> type(SEMI_TOPLEVEL);
 BODY_START: '{' -> more, pushMode(body);
 C_EQUAL: '=' -> type(EQUAL_SINGLE), pushMode(expr);
@@ -247,11 +148,11 @@ C_COLON: ':' -> type(COLON);
 C_DOT: '.' -> type(DOT);
 C_COMMA: ',' -> type(COMMA);
 
-SL_COMMENT: {isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> channel(HIDDEN);
-ML_COMMENT: {isComment("/*")}? '/*' -> more, pushMode(mlComment);
+SL_COMMENT: {jmlMarkerDecision.isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> channel(HIDDEN);
+ML_COMMENT: {jmlMarkerDecision.isComment("/*")}? '/*' -> more, pushMode(mlComment);
 
-JML_SL_START: '//' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
-JML_ML_START: '/*' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
+JML_SL_START: {!jmlMarkerDecision.isComment("//")}? '//' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
+JML_ML_START: {!jmlMarkerDecision.isComment("/*")}?'/*' ([+-] [a-zA-Z_0-9]*)* '@' -> channel(HIDDEN);
 
 ERROR_CHAR: .;
 
@@ -334,6 +235,7 @@ LBLNEG: '\\lblneg';
 LBLPOS: '\\lblpos';
 LOCKSET: '\\lockset';
 LOCSET: '\\locset';  //KeY extension, not official JML
+STOREREF: '\\storeref';  //KeY extension, not official JML
 MAP: '\\map';  //KeY extension, not official JML
 MAPEMPTY: '\\map_empty';  //KeY extension, not official JML
 MAP_GET: '\\map_get';  //KeY extension, not official JML
@@ -359,7 +261,6 @@ PRE: '\\pre';
 PRODUCT: '\\product';
 REACH: '\\reach';
 REACHLOCS: '\\reachLocs';  //KeY extension, not official JML
-LOCSET_OF: '\\locset_of';  //KeY extension, not official JML
 REAL: '\\real';
 RESULT: '\\result';
 SAME: '\\same';
@@ -401,8 +302,8 @@ E_JML_CMD_START: '//!' ~[\n\r]* -> type(COMMAND);
 E_JML_SL_START: '//@' -> type(JML_SL_START), channel(HIDDEN);
 E_JML_ML_START: '/*@' -> type(JML_ML_START), channel(HIDDEN);
 E_JML_ML_END: '*/' -> channel(HIDDEN);
-E_SL_COMMENT: {isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> type(COMMENT), channel(HIDDEN);
-E_ML_COMMENT: {isComment("/*")}? '/*' -> more, pushMode(mlComment);
+E_SL_COMMENT: {jmlMarkerDecision.isComment("//")}? ('//' ('\n'|'\r'|EOF) | '//' ~'@' ~('\n'|'\r')*) -> type(COMMENT), channel(HIDDEN);
+E_ML_COMMENT: {jmlMarkerDecision.isComment("/*")}? '/*' -> more, pushMode(mlComment);
 
 AND: '&';
 BITWISENOT: '~';
@@ -517,7 +418,7 @@ mode body;
 BRACE: '{' ->  more, pushMode(body);
 END_BODY: {_modeStack.peek() != body}? '}' -> popMode, type(BODY);
 END_BRACE: '}' -> more, popMode;
-//S: '"' ~('"') '"' -> more; //TODO refine
+//S: '"' ~('"') '"' -> more;
 //not working, IGNORE: '@' -> skip, more;
 ANY_CHAR: . -> more;
 

@@ -266,9 +266,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * Computes the Term that can be evaluated, from the user given condition
     * @param condition the condition given by the user
     * @return the {@link Term} that represents the condition
-    * @throws SLTranslationException if the Term could not be parsed
     */
-   private Term computeTermForCondition(String condition) throws SLTranslationException {
+   private Term computeTermForCondition(String condition) {
       if(condition==null){
          return getProof().getServices().getTermBuilder().tt();
       }

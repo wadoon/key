@@ -1,24 +1,47 @@
 package de.uka.ilkd.key.speclang.njml;
 
-import com.google.common.base.Stopwatch;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.misc.Interval;
-import org.jetbrains.annotations.NotNull;
+import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
 
+import javax.annotation.Nonnull;
+
 /**
+ * This facade provides facilities for the creation of lexer and parser of JML.
+ * It is the programatically frontend for the {@code JMLLexer.g4} and {@code JMLParser.g4}.
+ * This class is rather a thin layer upon ANTLR4.
+ * <p>
+ * As a normal KeY developer you should rather {@link JmlIO}. {@link JmlIO} provides
+ * a translation from strings into KeY constructs.
+ *
  * @author Alexander Weigl
  * @version 1 (5/10/20)
+ * @see JmlIO
  */
-public class JmlFacade {
-    public static JmlLexer createLexer(CharStream strea) {
-        JmlLexer lexer = new JmlLexer(strea);
-        return lexer;
+public final class JmlFacade {
+
+    private JmlFacade() {
     }
 
-    public static JmlLexer createLexer(PositionedString ps) {
+    /**
+     * Creates an JML lexer for the give stream.
+     */
+    public static @Nonnull
+    JmlLexer createLexer(@Nonnull CharStream stream) {
+        return new JmlLexer(stream);
+    }
+
+    /**
+     * Creates a JML lexer for the given string with position.
+     * The position information of the lexer is changed accordingly.
+     */
+    public static @Nonnull
+    JmlLexer createLexer(@Nonnull PositionedString ps) {
         CharStream result = CharStreams.fromString(ps.text, ps.fileName);
         JmlLexer lexer = createLexer(result);
         lexer.getInterpreter().setCharPositionInLine(ps.pos.getColumn());
@@ -26,14 +49,26 @@ public class JmlFacade {
         return lexer;
     }
 
-    public static JmlLexer createLexer(String expr) {
-        return createLexer(CharStreams.fromString(expr));
+    /**
+     * Creates a JML lexer for a given string.
+     */
+    public static @Nonnull
+    JmlLexer createLexer(@Nonnull String content) {
+        return createLexer(CharStreams.fromString(content));
     }
 
-    public static ParserRuleContext parseExpr(PositionedString expr) {
+    /**
+     * Parse the given string as an JML expr. Position information are updated accordingly
+     * to the position given with the string.
+     */
+    public static @Nonnull
+    ParserRuleContext parseExpr(@Nonnull PositionedString expr) {
         return getExpressionContext(createLexer(expr));
     }
 
+    /**
+     * Parse the given string as an JML expr.
+     */
     public static ParserRuleContext parseExpr(String expr) {
         return getExpressionContext(createLexer(expr));
     }
@@ -53,66 +88,28 @@ public class JmlFacade {
         return c;
     }
 
-    static JmlParser createParser(JmlLexer lexer) {
+    /**
+     * Create a JML parser for a given lexer.
+     * This method adds a exception-throwing error listeners to the parser.
+     *
+     * @see SyntaxErrorReporter
+     */
+    public static @Nonnull
+    JmlParser createParser(@Nonnull JmlLexer lexer) {
         JmlParser p = new JmlParser(new CommonTokenStream(lexer));
-        p.addErrorListener(new BaseErrorListener() {
-            @Override
-            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-                Token t = (Token) offendingSymbol;
-                System.err.println(t.getTokenSource().getInputStream().getText(Interval.of(0, 10000)));
-                throw new RuntimeException("line " + line + ":" + charPositionInLine + " " + msg);
-            }
-        });
+        p.addErrorListener(p.getErrorReporter());
         return p;
     }
 
-    public static ParserRuleContext parseTop(PositionedString expr) {
-        JmlParser p = createParser(createLexer(expr));
-        Stopwatch sw = Stopwatch.createStarted();
-        JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
-        //System.out.println("JmlFacade.parseTop: " + sw.toString());
+    /**
+     * Parses a given clause, like {@code ensures} or {@code requires} and returns a parse tree.
+     */
+    public static @Nonnull
+    ParserRuleContext parseClause(@Nonnull String content) {
+        JmlParser p = createParser(createLexer(content));
+        JmlParser.ClauseContext ctx = p.clauseEOF().clause();
+        p.getErrorReporter().throwException();
         return ctx;
-    }
-
-    public static ParserRuleContext parseClause(String s) {
-        JmlParser p = createParser(createLexer(s));
-        return p.clauseEOF().clause();
-    }
-
-    static ImmutableList<TextualJMLConstruct> parseClasslevel(JmlLexer lexer) {
-        @NotNull JmlParser p = createParser(lexer);
-        Stopwatch sw = Stopwatch.createStarted();
-        JmlParser.Classlevel_commentsContext ctx = p.classlevel_comments();
-        TextualTranslator translator = new TextualTranslator();
-        ctx.accept(translator);
-        //System.out.println("JmlFacade.parseClasslevel: " + sw);
-        return translator.constructs;
-    }
-
-    public static ImmutableList<TextualJMLConstruct> parseClasslevel(PositionedString positionedString) {
-        return parseClasslevel(createLexer(positionedString));
-    }
-
-    public static ImmutableList<TextualJMLConstruct> parseClasslevel(String string) {
-        return parseClasslevel(createLexer(string));
-    }
-
-    public static ImmutableList<TextualJMLConstruct> parseMethodlevel(PositionedString positionedString) {
-        return parseMethodlevel(createLexer(positionedString));
-    }
-
-    private static ImmutableList<TextualJMLConstruct> parseMethodlevel(JmlLexer lexer) {
-        @NotNull JmlParser p = createParser(lexer);
-        Stopwatch sw = Stopwatch.createStarted();
-        JmlParser.Methodlevel_commentContext ctx = p.methodlevel_comment();
-        TextualTranslator translator = new TextualTranslator();
-        ctx.accept(translator);
-        //System.out.println("JmlFacade.parseMethodlevel: " + sw);
-        return translator.constructs;
-    }
-
-    public static void TODO() {
-        throw new IllegalStateException("to be implemented");
     }
 }
 

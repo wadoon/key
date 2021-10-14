@@ -96,16 +96,11 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private KeYJavaType[] sortKJTs(KeYJavaType[] kjts) {
-
-        Arrays.sort(kjts, new Comparator<KeYJavaType> () {
-            @Override
-            public int compare(KeYJavaType o1, KeYJavaType o2) {
-                assert o1.getFullName() != null : "type without name: " + o1;
-                assert o2.getFullName() != null : "type without name: " + o2;
-                return o1.getFullName().compareTo(o2.getFullName());
-            }
+        Arrays.sort(kjts, (o1, o2) -> {
+            assert o1.getFullName() != null : "type without name: " + o1;
+            assert o2.getFullName() != null : "type without name: " + o2;
+            return o1.getFullName().compareTo(o2.getFullName());
         });
-
         return kjts;
     }
 
@@ -118,7 +113,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             if (kjt.getJavaType() instanceof TypeDeclaration
                 && ((TypeDeclaration)kjt.getJavaType()).isLibraryClass()) {
                 final String filePath =
-                    path + "/" + kjt.getFullName().replace(".", "/") + ".key";
+                        String.format("%s/%s.key", path, kjt.getFullName().replace(".", "/"));
                 RuleSource rs = null;
 
                 //external or internal path?
@@ -246,8 +241,8 @@ public final class SLEnvInput extends AbstractEnvInput {
                                          final SpecificationRepository specRepos,
                                          final IProgramMethod pm,
                                          final ImmutableSet<SpecificationElement>
-                                                 methodSpecs)
-            throws ProofInputException {
+                                                    methodSpecs)
+                                      throws ProofInputException {
         //merge point statements
         final JavaASTCollector mpsCollector =
                 new JavaASTCollector(pm.getBody(), MergePointStatement.class);
@@ -257,32 +252,12 @@ public final class SLEnvInput extends AbstractEnvInput {
                     specExtractor.extractMergeContracts(pm,
                             (MergePointStatement) mps,
                             ((Contract) methodSpecs.iterator().next())
-                                    .getOrigVars().params);
+                            .getOrigVars().params);
 
             mergeContracts
-                    .forEach(mc -> specRepos.addMergeContract(mc));
+            .forEach(specRepos::addMergeContract);
         }
     }
-
-    private void addProofCommandStatement(SpecExtractor specExtractor,
-                                         final SpecificationRepository specRepos,
-                                         final IProgramMethod pm)
-            throws ProofInputException {
-        //merge point statements
-        /*final JavaASTCollector mpsCollector = new JavaASTCollector(pm.getBody(), MergePointStatement.class);
-        mpsCollector.start();
-        for (ProgramElement mps : mpsCollector.getNodes()) {
-            final ImmutableSet<MergeContract> mergeContracts = //
-                    specExtractor.extractMergeContracts(pm,
-                            (MergePointStatement) mps,
-                            ((Contract) methodSpecs.iterator().next())
-                                    .getOrigVars().params);
-
-            mergeContracts
-                    .forEach(mc -> specRepos.addMergeContract(mc));
-        }*/
-    }
-
 
     private void addLabeledBlockContracts(SpecExtractor specExtractor,
                                           final SpecificationRepository specRepos,
@@ -366,7 +341,6 @@ public final class SLEnvInput extends AbstractEnvInput {
                 addLoopContracts(specExtractor, specRepos, kjt, pm);
                 addBlockAndLoopContracts(specExtractor, specRepos, pm);
                 addMergePointStatements(specExtractor, specRepos, pm, methodSpecs);
-                addProofCommandStatement(specExtractor, specRepos, pm);
                 addLabeledBlockContracts(specExtractor, specRepos, pm);
                 addLabeledLoopContracts(specExtractor, specRepos, pm);
             }

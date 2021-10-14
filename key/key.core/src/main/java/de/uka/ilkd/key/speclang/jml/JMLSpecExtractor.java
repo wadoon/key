@@ -691,7 +691,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         final JmlIO io = new JmlIO();
 
         final ImmutableList<TextualJMLConstruct> constructs =
-                io.parseMethodlevel(concatenatedComment, fileName, position);
+                io.parseMethodLevel(concatenatedComment, fileName, position);
         warnings = warnings.append(io.getWarnings());
         return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
     }
@@ -725,7 +725,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         // call preparser
         JmlIO io = new JmlIO();
         ImmutableList<TextualJMLConstruct> constructs =
-                io.parseMethodlevel(concatenatedComment, fileName, pos);
+                io.parseMethodLevel(concatenatedComment, fileName, pos);
         warnings = warnings.append(io.getWarnings());
 
         // create JML loop invariant out of last construct

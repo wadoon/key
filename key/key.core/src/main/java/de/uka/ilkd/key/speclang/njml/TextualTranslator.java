@@ -6,7 +6,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -14,7 +14,7 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.Cla
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT_FREE;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.*;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
-import static de.uka.ilkd.key.speclang.njml.JmlFacade.TODO;
+import static de.uka.ilkd.key.speclang.njml.Translator.raiseError;
 
 class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public ImmutableList<TextualJMLConstruct> constructs = ImmutableSLList.nil();
@@ -146,8 +146,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitCaptures_clause(JmlParser.Captures_clauseContext ctx) {
-        //methodContract.addClause(CAPTURES, ctx)
-        TODO();
+        raiseError("Captures clauses are not supported by KeY.", ctx);
         return null;
     }
 
@@ -160,20 +159,20 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitWorking_space_clause(JmlParser.Working_space_clauseContext ctx) {
-        TODO();
-        return super.visitWorking_space_clause(ctx);
+        raiseError("working space clauses are not supported by KeY.", ctx);
+        return null;
     }
 
     @Override
     public Object visitDuration_clause(JmlParser.Duration_clauseContext ctx) {
-        TODO();
-        return super.visitDuration_clause(ctx);
+        raiseError("Duration clauses are not supported by KeY.", ctx);
+        return null;
     }
 
     @Override
     public Object visitWhen_clause(JmlParser.When_clauseContext ctx) {
-        TODO();
-        return super.visitWhen_clause(ctx);
+        raiseError("When clauses are not supported by KeY.", ctx);
+        return null;
     }
 
     @Override
@@ -217,17 +216,12 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         final LabeledParserRuleContext ctx2 = new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.DECREASES);
         if (loopContract != null) {
             loopContract.setVariant(ctx2);
-        } else
+        } else {
+            assert methodContract != null;
             methodContract.addClause(DECREASES, ctx2);
+        }
         return null;
     }
-
-    /*    @Override
-    public Object visitDepends_clause(JmlParser.Depends_clauseContext ctx) {
-        TextualJMLDepends depends = new TextualJMLDepends(mods, ctx);
-        constructs = constructs.append(depends);
-        return null;
-    }*/
 
     @Override
     public Object visitInitially_clause(JmlParser.Initially_clauseContext ctx) {
@@ -259,7 +253,6 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitDetermines_clause(JmlParser.Determines_clauseContext ctx) {
-        assert methodContract != null;
         if (methodContract != null)
             methodContract.addClause(INFORMATION_FLOW, ctx);
         else if (loopContract != null) {
@@ -271,9 +264,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitLoop_determines_clause(JmlParser.Loop_determines_clauseContext ctx) {
-        TODO();
-        //loopContract.addClause(TextualJMLLoopSpec.Clause.INFORMATION_FLOW, ctx);
-        return super.visitLoop_determines_clause(ctx);
+        raiseError("Loop determines clauses are not supported by KeY.", ctx);
+        return null;
     }
 
     @Override
@@ -318,8 +310,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitName_clause(JmlParser.Name_clauseContext ctx) {
-        TODO();
-        return super.visitName_clause(ctx);
+        raiseError("Name clauses are not supported by KeY.", ctx);
+        return null;
     }
 
     private void acceptAll(Iterable<? extends ParserRuleContext> ctxs) {
@@ -328,6 +320,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private <T> T accept(ParserRuleContext ctx) {
         if (ctx == null) return null;
         return (T) ctx.accept(this);
@@ -422,35 +415,20 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
-        TextualJMLSpecCase b = new TextualJMLSpecCase(ImmutableSLList.nil(), Behavior.NONE);
+        TextualJMLAssertStatement b = new TextualJMLAssertStatement(
+                TextualJMLAssertStatement.Kind.ASSUME,
+                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSUME));
         constructs = constructs.prepend(b);
-        b.addClause(ENSURES_FREE, new LabeledParserRuleContext(ctx,
-                OriginTermLabel.SpecType.ENSURES_FREE));
         return null;
     }
 
 
     @Override
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
-        /*
-             * Produce a (textual) block contract from a JML assert statement.
-             * The resulting contract has an empty precondition, the assert expression
-             * as a postcondition, and strictly_nothing as frame.
-            public static TextualJMLSpecCase assert2blockContract(ImmutableList<String> mods, PositionedString assertStm) {
-                final TextualJMLSpecCase res = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
-                res.addName(new PositionedString("assert " + assertStm.text, assertStm.fileName, assertStm.pos));
-                res.addClause(Clause.ENSURES, assertStm);
-                res.addClause(Clause.ASSIGNABLE, new PositionedString("assignable \\strictly_nothing;", assertStm.fileName, assertStm.pos));
-                res.setPosition(assertStm);
-                return res;
-            }
-            */
-        TextualJMLSpecCase b = new TextualJMLSpecCase(ImmutableSLList.nil(), Behavior.NORMAL_BEHAVIOR);
+        TextualJMLAssertStatement b = new TextualJMLAssertStatement(
+                TextualJMLAssertStatement.Kind.ASSERT,
+                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSERT));
         constructs = constructs.prepend(b);
-        b.addName("assert " + ctx.getText());
-        b.addClause(ENSURES,
-                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ENSURES));
-        b.addClause(ASSIGNABLE, JmlFacade.parseClause("assignable \\strictly_nothing;"));
         return null;
     }
 
