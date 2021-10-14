@@ -353,7 +353,7 @@ class SettingChangeInteraction() : Interaction() {
         get() {
             val props = savedSettings?.map { (k, v) ->
                 "* **`$k`** : `$v`\n"
-            }?.joinToString()
+            }?.joinToString("\n")
 
             return """
             # Setting changed: ${type?.name}
