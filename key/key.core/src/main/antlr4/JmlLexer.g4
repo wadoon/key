@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
    private JmlMarkerDecision jmlMarkerDecision = new JmlMarkerDecision(this);
 }
 
-tokens {BODY, COMMENT, STRING_LITERAL}
+tokens {BODY, COMMENT, STRING_LITERAL,COMMAND}
 
 MODEL_BEHAVIOUR: 'model_' BEHAVIOR ;
 ABSTRACT: 'abstract';

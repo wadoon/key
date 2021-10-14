@@ -7,9 +7,9 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.NodeInfo;
-import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**

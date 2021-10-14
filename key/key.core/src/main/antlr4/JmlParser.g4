@@ -150,12 +150,6 @@ returns_clause: RETURNS predornot? SEMI_TOPLEVEL;
 name_clause: SPEC_NAME STRING_LITERAL SEMICOLON ;
 old_clause: OLD modifiers type IDENT INITIALISER ;
 
-field_declaration: type IDENT (EMPTYBRACKETS)* initialiser? SEMI_TOPLEVEL;
-method_declaration: type IDENT param_list (BODY|SEMI_TOPLEVEL);
-param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;
-param_decl: ((NON_NULL | NULLABLE))? t=IDENT ((AXIOM_NAME_BEGIN AXION_NAME_END | EMPTYBRACKETS))* p=IDENT;
-//old_clause: OLD modifiers type IDENT INITIALISER ;
-
 field_declaration: type IDENT (LBRACKET RBRACKET)* initialiser? SEMI_TOPLEVEL;
 method_declaration: type IDENT param_list (BODY|SEMI_TOPLEVEL);
 param_list: LPAREN (param_decl (COMMA param_decl)*)? RPAREN;

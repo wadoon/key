@@ -127,7 +127,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             if (javaMods.contains(mod)) {
                 sb.append(mod);
             } else {
-                sb.append(Strings.repeat(" ", mod.length()));
+                sb.append(StringUtil.repeat(" ", mod.length()));
             }
             sb.append(" ");
         }

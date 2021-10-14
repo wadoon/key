@@ -1275,8 +1275,6 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         final JmlParser.Merge_point_statementContext ctx = mergePointDecl.getMergeProc();
 
-        final JmlParser.Merge_point_statementContext ctx = mergePointDecl.getMergeProc();
-
         final String mergeProcStr = ctx.proc == null
                 ? MergeByIfThenElse.instance().toString() //default merge procedure
                 : ctx.proc.getText().replaceAll("\"", "");
