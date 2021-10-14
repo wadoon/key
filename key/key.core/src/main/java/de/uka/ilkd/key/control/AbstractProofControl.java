@@ -242,7 +242,7 @@ public abstract class AbstractProofControl implements ProofControl {
     @Override
     public void applyInteractive(RuleApp app, Goal goal) {
         goal.node().getNodeInfo().setInteractiveRuleApplication(true);
-        var node = goal.node();
+        Node node = goal.node();
         goal.apply(app);
         emitInteractiveRuleApplication(node, app);
     }
