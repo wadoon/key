@@ -924,6 +924,10 @@ public class TermBuilder {
         return tf.createTerm(AnonEventUpdate.SINGLETON, locset, anonUnique);
     }
     
+    public Term inverseEventUpdate(Term marker, Term locset, Term label) {
+        return tf.createTerm(InverseEventUpdate.SINGLETON, marker, locset, label);
+    }
+    
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
     //TODO: defining an ADT and then removing these. Input Should not be an array.
     

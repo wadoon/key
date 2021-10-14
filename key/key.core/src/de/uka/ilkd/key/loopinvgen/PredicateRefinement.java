@@ -3,6 +3,7 @@ package de.uka.ilkd.key.loopinvgen;
 import java.util.HashSet;
 import java.util.Set;
 
+import antlr.NameSpace;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -85,7 +86,35 @@ public class PredicateRefinement {
 															// of the update.
 			System.out.println("Update " + sf);
 		}
+		
+		else if(sf.op().name().toString().equals("if-then-else")){
+			conditionalDelDepPred(sf, depList);
+		}
 		refinedDepList = depList;
+	}
+
+	private void conditionalDelDepPred(Term sf, Set<Term> depList) {
+//		Operator pred = sf.op();
+////		System.out.println("AAAA====> " + ProofSaver.printAnything(sf, services));				
+//		
+//		Term locSet = sf.sub(0);
+//		Set<Term> toDelete = new HashSet<Term>();
+//		Set<Term> tempDelete = new HashSet<Term>();
+//		for (Term t : depList) {
+//			if (pred.equals(depLDT.getRPred()) && t.op().equals(depLDT.getNoR())) {
+//				if (sProof.proofNonEmptyIntersection(t.sub(0), locSet)) {
+//					toDelete.add(t);
+//				}
+//			} else if (pred.equals(depLDT.getWPred()) && t.op().equals(depLDT.getNoW())) {
+////System.out.println("Checking for " + ProofSaver.printAnything(t, services));				
+//				if (sProof.proofNonEmptyIntersection(t.sub(0), locSet)) {
+//					toDelete.add(t);
+//				}
+//			}
+//		}
+//		dpList.removeAll(toDelete);
+//		depPredRefine(sf, dpList);
+		
 	}
 
 	private void delCompPred(Term sf) {

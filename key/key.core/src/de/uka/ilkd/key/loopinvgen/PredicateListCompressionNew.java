@@ -13,23 +13,24 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 
-public class PredicateListCompression {
+public class PredicateListCompressionNew {
 	private final DependenciesLDT depLDT;
 	private final Services services;
 	private final TermBuilder tb;
 	private final Sequent seq;
-	private final SequentFormula currentIdxF;
+//	private final SequentFormula currentIdxF;
 	private final IntegerLDT intLDT;
 	private final Set<Operator> CompOps = new HashSet<>();
 	private final Function lt, leq, gt, geq;
 	private SideProof sProof;
 	private final boolean ailias;
+	private Set<Term> allPreds = new HashSet<>();
 
-	public PredicateListCompression(Services s, Sequent sequent, SequentFormula currentIndexFormula, boolean ailiasing) {
+	public PredicateListCompressionNew(Services s, Sequent sequent, Set<Term> preds, boolean ailiasing) {
 		services = s;
 		tb = services.getTermBuilder();
 		seq = sequent;
-		currentIdxF = currentIndexFormula;
+//		currentIdxF = currentIndexFormula;
 		depLDT = services.getTypeConverter().getDependenciesLDT();
 
 		intLDT = services.getTypeConverter().getIntegerLDT();
@@ -41,14 +42,28 @@ public class PredicateListCompression {
 		CompOps.add(gt);
 		geq = intLDT.getGreaterOrEquals();
 		CompOps.add(geq);
-		sProof = new SideProof(services, seq);
+		sProof = new SideProof(services, seq, 500);
 		ailias = ailiasing;
+		allPreds = preds;
 	}
 
-	void compression(Set<Term> depPredsList, Set<Term> compPredsList) {
-
-		finalCompPredListCompression(compPredsList);
-		depPredListCompressionBySubset(depPredsList);
+	public Set<Term> compression() {
+		
+		Set<Term> compPredsList = new HashSet<>();
+		Set<Term> depPredsList= new HashSet<>();
+		Set<Term> result= new HashSet<>();
+		for (Term term : allPreds) {
+			if(term.op().equals(depLDT.getNoR()) || term.op().equals(depLDT.getNoW()) || term.op().equals(depLDT.getNoRaW()) || term.op().equals(depLDT.getNoWaR()) || term.op().equals(depLDT.getNoWaW())) {
+				depPredsList.add(term);
+			}
+			else if(term.op().equals(lt) || term.op().equals(leq) || term.op().equals(gt) || term.op().equals(geq) || term.op().equals(depLDT.getNoWaW())){
+				compPredsList.add(term);
+			}
+			else{System.out.println("Unknown predicate " + term);}
+		}
+		result.addAll(finalCompPredListCompression(compPredsList));
+		result.addAll(depPredListCompressionBySubset(depPredsList));
+		return result;
 
 	}
 

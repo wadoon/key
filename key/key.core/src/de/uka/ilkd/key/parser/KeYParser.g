@@ -2560,6 +2560,11 @@ elementary_update_term returns[Term _elementary_update_term=null]
          {
                 result = getServices().getTermBuilder().anonEventUpdate(locset, anonUnique);
          }
+         |
+         INVERSEEVENTUPDATE LPAREN marker=equivalence_term COMMA locset=equivalence_term COMMA label2=equivalence_term RPAREN
+         {
+                result = getServices().getTermBuilder().inverseEventUpdate(marker, locset, label2);
+         }
    ;
         catch [TermCreationException ex] {
               raiseException
@@ -3856,6 +3861,7 @@ varexp[TacletBuilder b]
     | varcond_applyEventOnRigid[b]
     | varcond_applyAnonEventOnRigid[b]
     | varcond_noDependenceLDT[b]
+    | varcond_applyInverseEventOnRigid[b]
   ) 
   | 
   ( (NOT_ {negated = true;} )? 
@@ -4326,6 +4332,16 @@ varcond_applyAnonEventOnRigid [TacletBuilder b]
    APPLY_ANON_EVENT_ON_RIGID LPAREN u=varId COMMA x=varId COMMA x2=varId RPAREN 
    {
       b.addVariableCondition(new ApplyAnonEventOnRigid((UpdateSV)u, 
+                                                             (SchemaVariable)x, 
+                                                             (SchemaVariable)x2));
+   }
+;
+
+varcond_applyInverseEventOnRigid [TacletBuilder b]
+:
+   APPLY_INVERSE_EVENT_ON_RIGID LPAREN u=varId COMMA x=varId COMMA x2=varId RPAREN 
+   {
+      b.addVariableCondition(new ApplyInverseEventOnRigid((UpdateSV)u, 
                                                              (SchemaVariable)x, 
                                                              (SchemaVariable)x2));
    }

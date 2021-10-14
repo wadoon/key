@@ -20,14 +20,13 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 
 public class ShiftUpdateImpl {
 	private final Goal goal;
 	private final Services services;
 	private final TermBuilder tb;
 
-	
 	public ShiftUpdateImpl(Goal g) {
 		goal = g;
 		services = g.proof().getServices();
@@ -40,7 +39,7 @@ public class ShiftUpdateImpl {
 		g.removeFormula(pos);
 
 		final Term renameUpdate = generateRenameUpdate(loopFormula);
-		
+
 		// rename all existing formulas in sequent except program formula
 		renameFormulasOnSemisequent(renameUpdate, g.sequent().antecedent(), true);
 		renameFormulasOnSemisequent(renameUpdate, g.sequent().succedent(), false);
@@ -52,14 +51,20 @@ public class ShiftUpdateImpl {
 	}
 
 	/**
-	 * assumes that the current sequent of the goal contains already all formulas prefixed with the renaming update
-	 * the method then generates for each elementary update <code>lhs:=rhs</code> the equation <code>lhs == {renamingUpdate}{lhs:=rhs}lhs</code>
-	 * and for each event update <code>\event(kind,ls,ts)</code> the formula <code>{renamingUpdate}'kindPred'(ls,t)</code> where <code>kindPred</code> is
-	 * the corresponding dependence predicate for the kind (read or write) of the event update
+	 * assumes that the current sequent of the goal contains already all formulas
+	 * prefixed with the renaming update the method then generates for each
+	 * elementary update <code>lhs:=rhs</code> the equation
+	 * <code>lhs == {renamingUpdate}{lhs:=rhs}lhs</code> and for each event update
+	 * <code>\event(kind,ls,ts)</code> the formula
+	 * <code>{renamingUpdate}'kindPred'(ls,t)</code> where <code>kindPred</code> is
+	 * the corresponding dependence predicate for the kind (read or write) of the
+	 * event update
+	 * 
 	 * @param renameUpdate the {@link Term} representing the renaming update
-	 * @param g the current {@link Goal}
-	 * @param pos the {@link PosInOccurrence} of the loopFormula
-	 * @param loopFormula the {@link Term} representing the formula containing the loop 
+	 * @param g            the current {@link Goal}
+	 * @param pos          the {@link PosInOccurrence} of the loopFormula
+	 * @param loopFormula  the {@link Term} representing the formula containing the
+	 *                     loop
 	 */
 	private void doShift(final Term renameUpdate, Goal g, PosInOccurrence pos, final Term loopFormula) {
 		ImmutableList<Term> updateList = ImmutableSLList.<Term>nil().prepend(UpdateApplication.getUpdate(loopFormula));
@@ -79,32 +84,40 @@ public class ShiftUpdateImpl {
 	}
 
 	/**
-	 * constructs the renaming update for the loop formula. It assumes the the loop formula has 
-	 * the shape <code>{l1:=r2 || ... || ln:=rn || eventupdates} and constructs an update that
-	 * renames each left-hand side of the elementary update <code>li:=ri</code> 
+	 * constructs the renaming update for the loop formula. It assumes the the loop
+	 * formula has the shape
+	 * <code>{l1:=r2 || ... || ln:=rn || eventupdates} and constructs an update that
+	 * renames each left-hand side of the elementary update <code>li:=ri</code>
+	 * 
 	 * @param loopFormula the {@link Term} with formula containing the loop
-	 * @return a parallel update <code>{l1:=l1'|| ... || ln:=ln'}</code> that renames each left hand side of the original update
+	 * @return a parallel update <code>{l1:=l1'|| ... || ln:=ln'}</code> that
+	 *         renames each left hand side of the original update
 	 */
 	private Term generateRenameUpdate(Term loopFormula) {
 		ImmutableList<Term> updateList = ImmutableSLList.<Term>nil().prepend(UpdateApplication.getUpdate(loopFormula));
-		
+
 		// collect updated locations
+		// collect inverseUpdate of each event
 		HashSet<UpdateableOperator> updatedLocations = new HashSet<>();
+		ImmutableList<Term> inverseEventUpdates = ImmutableSLList.<Term>nil();
+
 		while (!updateList.isEmpty()) {
 			final Term update = updateList.head();
 			updateList = updateList.tail();
 			if (update.op() instanceof ElementaryUpdate) {
-				updatedLocations.add(((ElementaryUpdate)update.op()).lhs());
+				updatedLocations.add(((ElementaryUpdate) update.op()).lhs());
+			} else if (update.op() instanceof EventUpdate) {
+				inverseEventUpdates = inverseEventUpdates.append(tb.inverseEventUpdate(update.sub(0), update.sub(1), update.sub(2)));
 			} else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
 				updateList = updateList.prepend(update.sub(1)).prepend(update.sub(0));
-			}	
+			}
 		}
-		
+
 		// create renaming update
 		ImmutableList<Term> renameUpdates = ImmutableSLList.<Term>nil();
-		for(UpdateableOperator lhs : updatedLocations) {
+		for (UpdateableOperator lhs : updatedLocations) {
 			// Defining a fresh constant symbol a'
-			final Name freshConsSymb = new Name(tb.newName("f_"+lhs.name().toString(), services.getNamespaces()));
+			final Name freshConsSymb = new Name(tb.newName("f_" + lhs.name().toString(), services.getNamespaces()));
 			final Function freshConsFunc = new Function(freshConsSymb, lhs.sort(), true);
 			services.getNamespaces().functions().addSafely(freshConsFunc);
 			final Term freshCons = tb.func(freshConsFunc);
@@ -112,26 +125,34 @@ public class ShiftUpdateImpl {
 			// Assigning it to a: a := a' and adding to list of rename updates
 			renameUpdates = renameUpdates.prepend(tb.elementary(lhs, freshCons));
 		}
-		final Term renameUpdate = tb.parallel(renameUpdates);
-		return renameUpdate;
+
+		renameUpdates = renameUpdates.append(inverseEventUpdates);
+
+		final Term parallelRenames = tb.parallel(renameUpdates);
+		return parallelRenames;
 	}
 
 	/**
 	 * applies the renaming update on each formula of the given semisequent
+	 * 
 	 * @param renameUpdate the {@link Term} representing the renaming update
-	 * @param semi the {@link Semisequent} 
-	 * @param antec a boolean being true if the semisequent is the antecedent of {@link #goal}
+	 * @param semi         the {@link Semisequent}
+	 * @param antec        a boolean being true if the semisequent is the antecedent
+	 *                     of {@link #goal}
 	 */
 	private void renameFormulasOnSemisequent(final Term renameUpdate, Semisequent semi, boolean antec) {
-		for (SequentFormula sf : semi) { 
+		for (SequentFormula sf : semi) {
 			final PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), antec);
 			goal.changeFormula(new SequentFormula(tb.apply(renameUpdate, sf.formula())), pio);
 		}
 	}
-	
+
 	/**
-	 * constructs for an elementary update <code>lhs:=rhs</code> the equation <code>lhs == {renamingUpdate}{lhs:=rhs}lhs</code>
-	 * @param update a {@link Term} denoting the elementary update (assumes {@link ElementaryUpdate} as top level operator) 
+	 * constructs for an elementary update <code>lhs:=rhs</code> the equation
+	 * <code>lhs == {renamingUpdate}{lhs:=rhs}lhs</code>
+	 * 
+	 * @param update         a {@link Term} denoting the elementary update (assumes
+	 *                       {@link ElementaryUpdate} as top level operator)
 	 * @param renamingUpdate the {@link Term} representing the renaming update
 	 */
 	private void shiftElementaryUpdate(Term update, Term renamingUpdate) {
@@ -147,35 +168,28 @@ public class ShiftUpdateImpl {
 	}
 
 	/**
-	 * adds for one event update <code>\event(kind,ls,ts)</code> the formula <code>{renamingUpdate}'kindPred'(ls,t)</code> where <code>kindPred</code> is
-	 * the corresponding dependence predicate for the kind (read or write) of the event update
-	 * @param update the {@link Term} with an event update at top level
+	 * adds for one event update <code>\event(kind,ls,ts)</code> the formula
+	 * <code>{renamingUpdate}'kindPred'(ls,t)</code> where <code>kindPred</code> is
+	 * the corresponding dependence predicate for the kind (read or write) of the
+	 * event update
+	 * 
+	 * @param eventUpdate    the {@link Term} with an event update at top level
 	 * @param renamingUpdate the {@link Term} representing the renaming update
 	 */
-	
 
-//	private void shiftEventUpdate(Term update, Term renamingUpdate) {
-//		Term term4EventUpdate;
-//		if (update.sub(0).op().equals(services.getTypeConverter().getDependenciesLDT().getReadMarker()))
-//			term4EventUpdate = tb.rPred(update.sub(1), update.sub(2)); 
-//		else if (update.sub(0).op().equals(services.getTypeConverter().getDependenciesLDT().getWriteMarker()))
-//			term4EventUpdate = tb.wPred(update.sub(1), update.sub(2));
-//		else if (update.sub(0).op().equals(services.getTypeConverter().getDependenciesLDT().getNothingMarker()))
-//			term4EventUpdate = tb.skip();
-//		else
-//			throw new RuntimeException("Unknown event update");
-//
-//		goal.addFormula(new SequentFormula(tb.apply(renamingUpdate, term4EventUpdate)), true, true);
-//	}
-	
-	private void shiftEventUpdate(Term update, Term renamingUpdate) {
-		Term t1 = update.sub(0);
-		Term t2 = tb.func(services.getTypeConverter().getDependenciesLDT().getReadMarker());
-		Term cond1 = tb.equals(t1, t2);
-		Term t3 = tb.func(services.getTypeConverter().getDependenciesLDT().getWriteMarker());
-		Term cond2 = tb.equals(t1, t3);
-		
-		final Term term4EventUpdate = tb.ife(cond1, tb.rPred(update.sub(1), update.sub(2)), tb.ife(cond2, tb.wPred(update.sub(1), update.sub(2)), tb.tt()));
+	private void shiftEventUpdate(Term eventUpdate, Term renamingUpdate) {
+		Term updateTS = eventUpdate.sub(2);
+		Term locSet = eventUpdate.sub(1);
+		Term eventMarker = eventUpdate.sub(0);
+		Term readMarker = tb.func(services.getTypeConverter().getDependenciesLDT().getReadMarker());
+		Term cond1 = tb.equals(eventMarker, readMarker);
+		Term writeMarker = tb.func(services.getTypeConverter().getDependenciesLDT().getWriteMarker());
+		Term cond2 = tb.equals(eventMarker, writeMarker);
+
+		// Generating rPred and wPred
+		final Term term4EventUpdate = tb.ife(cond1, tb.rPred(locSet, eventUpdate.sub(2)),
+				tb.ife(cond2, tb.wPred(locSet, eventUpdate.sub(2)), tb.tt()));
+
 		goal.addFormula(new SequentFormula(tb.apply(renamingUpdate, term4EventUpdate)), true, true);
 	}
 

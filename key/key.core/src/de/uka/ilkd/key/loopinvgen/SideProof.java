@@ -24,13 +24,20 @@ public class SideProof {
 	private final Services services;
 	private final TermBuilder tb;
 	private final Sequent seq;
+	private final int maxRuleApp;
 
-	public SideProof(Services s, Sequent sequent) {
+	public SideProof(Services s, Sequent sequent, int maxRuleApp) {
 		services = s;
 		tb = services.getTermBuilder();
 		seq = sequent;
+		this.maxRuleApp = maxRuleApp;
 	}
 
+	public SideProof(Services s, Sequent sequent) {
+		this(s, sequent, 10000);
+	}
+
+	
 	boolean proofEquality(Term loc1, Term loc2) {
 		Term fml = tb.equals(loc1, loc2);
 		Sequent sideSeq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(fml), false, true).sequent();
@@ -273,7 +280,7 @@ public class SideProof {
 
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
 
-		ps.setMaxRuleApplications(10000);
+		ps.setMaxRuleApplications(maxRuleApp);
 		ps.setTimeout(-1);
 //		System.out.println("strategy prop. " + sp);
 
@@ -283,10 +290,13 @@ public class SideProof {
 //			System.out.println("Open Goals: " + info.getProof().openGoals());
 //		}
 //System.out.println("==>" + info.getAppliedRuleApps());
-//if (!info.getProof().closed()) {
-//	System.out.println(" proof could not be closed for " + ProofSaver.printAnything(seq2prove, services));
-//}
-		return info.getProof().closed();
+
+		boolean closed  = info.getProof().closed();
+//		if(!closed) {
+//			System.out.println(" proof could not be closed for " + ProofSaver.printAnything(seq2prove, services));
+//		}
+//		System.out.println(closed);
+		return closed;
 	}
 
 //	Term expr2term(Expression expr) {

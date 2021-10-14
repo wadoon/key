@@ -112,7 +112,7 @@ public class TestPredicateConstruction {
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
-		String[] arrLeft = { "a!=null", "a.length > 10" };
+		String[] arrLeft = { "noW(arrayRange(a,0,a.length))","noR(arrayRange(a,0,a.length))","a!=null", "a.length > 10" };
 		try {
 			for (String fml : arrLeft) {
 				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
@@ -125,9 +125,13 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return;
 		}
-
-		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
-		cur.mainAlg();
+////	Old system:
+//		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
+//		cur.mainAlg();
+		
+////	New system:
+		LIGNew curNew = new LIGNew(services, seq);
+		curNew.mainAlg();
 	}
 	
 	public void shiftArrayToLeftWithFunc() { //Done
@@ -314,7 +318,7 @@ public class TestPredicateConstruction {
 //		System.out.println("Formula with merge point: "+ProofSaver.printAnything(formula, services));
 
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
-		String[] arrLeft = { /* "i=0", */"a!=null", "a.length>10" };
+		String[] arrLeft = { /* "i=0", */"noR(arrayRange(a,0,a.length))", "noW(arrayRange(a,0,a.length))","a!=null", "a.length>10" };
 		try {
 			for (String fml : arrLeft) {
 				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
@@ -328,7 +332,7 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return;
 		}
-		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
+		LIGNew cur = new LIGNew(services, seq);
 		cur.mainAlg();
 	}
 
@@ -384,7 +388,7 @@ public class TestPredicateConstruction {
 		
 		
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(formula), false, true).sequent();
-		String[] arrLeft = { /* "i=0", */"a!=null", "a.length>10" };
+		String[] arrLeft = { /* "i=0", */"noW(arrayRange(a,0,a.length))","noR(arrayRange(a,0,a.length))","a!=null", "a.length>10" };
 		try {
 			for (String fml : arrLeft) {
 				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
@@ -398,8 +402,13 @@ public class TestPredicateConstruction {
 			e.printStackTrace();
 			return;
 		}
-		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
-		cur.mainAlg();
+		//// Old System
+//		LIGMultipleArrays cur = new LIGMultipleArrays(services, seq);
+//		cur.mainAlg();
+		//// New System
+		LIGNew curNew = new LIGNew(services, seq);
+		curNew.mainAlg();
+	
 	}
 
 	
@@ -528,7 +537,7 @@ public class TestPredicateConstruction {
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		long start = System.currentTimeMillis();
-		tpc.conditionDifferentNumberOfEvents();
+		tpc.condition();
 		long end = System.currentTimeMillis();
 		System.out.println(end - start);
 	}

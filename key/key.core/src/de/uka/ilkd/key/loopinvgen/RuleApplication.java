@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -71,9 +72,8 @@ public class RuleApplication {
 				break;
 			}
 		}
-		if (app != null) {
-			currentGoal.apply(app);
-			ps.start(ImmutableSLList.<Goal>nil().prepend(currentGoal));
+		if (app != null) {		
+			ps.start(currentGoal.apply(app));
 //			System.out.println("Number of Open Goals after applying Shift: " + currentGoal.proof().openGoals().size());
 			return currentGoal.proof().openGoals();
 //			return services.getProof().openEnabledGoals();
@@ -105,7 +105,7 @@ public class RuleApplication {
 		}
 		return null;
 	}
-	
+
 /////////////////////////////////////Loop Unwind///////////////////////////////////////////
 
 	ImmutableList<Goal> applyUnwindRule(ImmutableList<Goal> openGoals) {
@@ -126,27 +126,25 @@ public class RuleApplication {
 			TacletApp app = tApp.head();
 			app = app.tryToInstantiate(services);
 			ImmutableList<Goal> goals = currentGoal.apply(app);
-			ps.start(goals);
-//			System.out.println("Number of Open Goals after applying unwind: " + currentGoal.proof().openGoals().size());
 
-			return currentGoal.proof().openGoals();// Or proof.openFoals()?
+			ps.start(goals);
+
+//			System.out.println("Number of Open Goals after applying unwind: " + currentGoal.proof().openGoals().size());
+			return currentGoal.proof().openGoals();
 //			return services.getProof().openEnabledGoals();
 		}
 		return null;
 	}
 
 	Goal findLoopUnwindTacletGoal(ImmutableList<Goal> goals) {
-//		System.out.println(goals.head().proof().getSettings().settingsToString());
 		for (Goal g : goals) {
-//			System.out.println("Goal: " + g);
 			for (SequentFormula sf : g.sequent().succedent()) {
 				ImmutableList<TacletApp> tApp = findLoopUnwindTaclet(sf, g);
 				if (!tApp.isEmpty()) {
-//					System.out.println("Goal of taclet loopUnwind" + " is: " + g);
 					return g;
 				}
 			}
-//			System.out.println("Taclet loopUnwind" + " is not applicable at " + g);
+//			System.out.println("Taclet loopUnwind is not applicable at " + g);
 		}
 		return null;
 	}

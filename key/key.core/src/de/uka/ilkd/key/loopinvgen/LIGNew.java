@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.expression.operator.GreaterThan;
 import de.uka.ilkd.key.java.expression.operator.LessOrEquals;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -28,11 +27,9 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import javafx.css.PseudoClass;
 
-public class LIGMultipleArrays {
+public class LIGNew {
 
 	private final Sequent seq;
 	private final Services services;
@@ -40,10 +37,11 @@ public class LIGMultipleArrays {
 	private Term low, high, index, guard;
 	private Set<Term> arrays = new HashSet<>();
 	private final RuleApplication ruleApp;
-	private Set<Term> oldCompPred = new HashSet<>();
-	private Set<Term> oldDepPred = new HashSet<>();
-
-	public LIGMultipleArrays(Services s, Sequent sequent) {
+	private Set<Term> oldPreds = new HashSet<>();
+	private Set<Term> allPreds = new HashSet<>();
+	
+	
+	public LIGNew(Services s, Sequent sequent) {
 		seq = sequent;
 		ruleApp = new RuleApplication(s, seq);
 //		services = proof.getServices();// New service after unwind
@@ -53,7 +51,6 @@ public class LIGMultipleArrays {
 	}
 
 	public void mainAlg() {
-		int manualItr = 0;
 		getLow(seq);
 		getIndexAndHigh(seq);
 		getLocSet(seq);
@@ -62,62 +59,68 @@ public class LIGMultipleArrays {
 		ImmutableList<Goal> goalsAfterUnwind = null;
 
 		Goal currentGoal = goalsAfterShift.head();
-		SequentFormula currentIndexFormula = null;
 
 		ConstructAllCompPreds cac = new ConstructAllCompPreds(services, low, index, high);
-		Set<Term> compPreds = cac.cons();
+		allPreds.addAll(cac.cons());
 
 		Set<Term> depPreds = new HashSet<>();
 		for (Term arr : arrays) {
 			ConstructAllDepPreds cad = new ConstructAllDepPreds(services, arr, low, index, high);
 			depPreds.addAll(cad.cons());
 		}
+		allPreds.addAll(depPreds);
+		PredicateRefinementNew pr0 = new PredicateRefinementNew(services, currentGoal.sequent(), allPreds);
+		allPreds=pr0.predicateCheckAndRefine();
+		System.out.println(ProofSaver.printAnything(seq, services));
+		
 		do {
-			oldCompPred.removeAll(oldCompPred);
-			oldCompPred.addAll(compPreds);
-			oldDepPred.removeAll(oldDepPred);
-			oldDepPred.addAll(depPreds);
+			oldPreds.removeAll(oldPreds);
+			oldPreds.addAll(allPreds);
 
 			goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
 			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
 			System.out.println(goalsAfterShift);
 			
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
-			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
-			PredicateRefinement pr = new PredicateRefinement(services, currentGoal.sequent(), compPreds, depPreds,
-					currentIndexFormula);
-			pr.readAndRefineAntecedentPredicates();
+//			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
+			PredicateRefinementNew pr = new PredicateRefinementNew(services, currentGoal.sequent(), allPreds);
+			allPreds=pr.predicateCheckAndRefine();
 
-			compPreds = pr.refinedCompList;
-			depPreds = pr.refinedDepList;
-			System.out.println("manualItr: " + manualItr);
-			manualItr++;
-		} while (compPreds.size() != oldCompPred.size() || depPreds.size() != oldDepPred.size());// !compPreds.equals(oldCompPred) || !depPreds.equals(oldDepPred) || manualItr < 10
-
-		PredicateListCompression plc = new PredicateListCompression(services, currentGoal.sequent(),
-				currentIndexFormula, false);
-//		 Compression is not mandetory
-//		plc.compression(depPreds, compPreds);
-		System.out.println("LIG is the conjunction of: " + compPreds + "  size " + compPreds.size() + " and ");
-		for (Term term : depPreds) {
+			
+		} while (allPreds.size() != oldPreds.size());
+		
+		
+		
+		System.out.println("===========Terminated===========");
+		System.out.println("LIG is the conjunction of: ");
+		for (Term term : allPreds) {
 			System.out.println(term);
 		}
-		System.out.println(" of size " + depPreds.size());
+		System.out.println(" of size " + allPreds.size());
+		
+		PredicateListCompressionNew plcNew = new PredicateListCompressionNew(services, currentGoal.sequent(), allPreds, false);
+//		 Compression is not mandetory
+		allPreds = plcNew.compression();
+		System.out.println("LIG is the conjunction of: ");
+		for (Term term : allPreds) {
+			System.out.println(term);
+		}
+		System.out.println(" of size " + allPreds.size());
 	}
 
-	private SequentFormula currentIndexEq(Sequent seq2, Term index2) {
-		for (SequentFormula sf : seq2.antecedent()) {
-			Term formula = sf.formula();
-			if (formula.op() instanceof Equality) {
-				Term current_i = formula.sub(0);
-				if (current_i.equals(index2)) {
-//					System.out.println("i's formula: " + sf);
-					return sf;
-				}
-			}
-		}
-		return null;
-	}
+//	private SequentFormula currentIndexEq(Sequent seq2, Term index2) {
+//		for (SequentFormula sf : seq2.antecedent()) {
+//			Term formula = sf.formula();
+//			if (formula.op() instanceof Equality) {
+//				Term current_i = formula.sub(0);
+//				if (current_i.equals(index2)) {
+////					System.out.println("i's formula: " + sf);
+//					return sf;
+//				}
+//			}
+//		}
+//		return null;
+//	}
 
 	void getLow(Sequent seq) {
 		for (SequentFormula sf : seq.succedent()) {
