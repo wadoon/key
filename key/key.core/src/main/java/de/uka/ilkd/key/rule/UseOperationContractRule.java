@@ -423,7 +423,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         return result;
     }
 
-    private static StatementBlock replaceStatement(JavaBlock jb,
+    public static StatementBlock replaceStatement(JavaBlock jb,
             StatementBlock replacement) {
         PosInProgram pos = getPosInProgram(jb);
         int lastPos = pos.last();

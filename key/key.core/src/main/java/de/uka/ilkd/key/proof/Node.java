@@ -601,7 +601,7 @@ public class Node {
                     cachedName = LINKED_GOAL;
                 } else if (goal.isAutomatic()) {
                     cachedName = OPEN_GOAL;
-                } else if (goal != null) {
+                } else {
                     cachedName = INTERACTIVE_GOAL;
                 }
                 return cachedName;

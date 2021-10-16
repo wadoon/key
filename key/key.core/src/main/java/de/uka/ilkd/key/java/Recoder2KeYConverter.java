@@ -938,7 +938,7 @@ public class Recoder2KeYConverter {
 
     public JavaStatement convert(
             de.uka.ilkd.key.java.recoderext.ProofCommandStatement l) {
-        return new ProofCommandStatement(l.getCommand());
+        return new ProofCommandStatement(l.getCommand(), positionInfo(l));
     }
 
 

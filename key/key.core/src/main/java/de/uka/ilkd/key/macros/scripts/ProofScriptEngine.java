@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -75,7 +76,7 @@ public class ProofScriptEngine {
     }
 
     @SuppressWarnings("unchecked")
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof)
+    public void execute(UserInterfaceControl uiControl, Proof proof)
             throws IOException, InterruptedException, ScriptException {
 
         ScriptLineParser mlp = new ScriptLineParser(new StringReader(script));
@@ -144,7 +145,7 @@ public class ProofScriptEngine {
 
                 Object o = command.evaluateArguments(stateMap, argMap);
                 final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
-                command.execute(uiControl, o, stateMap);
+                command.execute((AbstractUserInterfaceControl) uiControl, o, stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
             } catch (InterruptedException ie) {
                 throw ie;

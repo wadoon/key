@@ -16,6 +16,11 @@ public class ProofCommandStatement extends JavaStatement {
         this.command = command;
     }
 
+    public ProofCommandStatement(String command, PositionInfo positionInfo) {
+        super(positionInfo);
+        this.command = command;
+    }
+
     @Override
     public int getChildCount() {
         return 0;

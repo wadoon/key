@@ -3,17 +3,18 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.java.ProofCommandStatement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.NodeInfo;
 import org.key_project.util.collection.ImmutableList;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
 /**
- * @author Alexander Weigl
+ * @author Alexander Weigl, Mattias Ulbrich
  * @version 1 (11/16/20)
  */
 public class ProofCommandStatementRule implements BuiltInRule {
@@ -21,32 +22,43 @@ public class ProofCommandStatementRule implements BuiltInRule {
     private static final String DISPLAY_NAME = "Apply command";
     private static final Name NAME = new Name("apply_embedded_proof_command");
 
+    public static ProofCommandStatement getCommand(PosInOccurrence pio) {
+        SourceElement act = getActiveStatement(pio);
+        if (act instanceof ProofCommandStatement) {
+            return (ProofCommandStatement) act;
+        }
+        throw new IllegalArgumentException("Unexpected pio: " + pio);
+    }
+
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        SourceElement activeStatement = getProofCommand(pio);
+        SourceElement activeStatement = getActiveStatement(pio);
         if (activeStatement == null) return false;
         if (activeStatement instanceof ProofCommandStatement) {
-            ProofCommandStatement cmd = (ProofCommandStatement) activeStatement;
-            String name = cmd.getCommand();
-            switch (name.trim()) {
-                case "ignore":
-                    return true;
-            }
-
+            return true;
         }
         return false;
     }
 
     @Nullable
-    private SourceElement getProofCommand(PosInOccurrence pio) {
-        final Term term = pio.subTerm();
-        if (term == null) return null;
+    private static SourceElement getActiveStatement(PosInOccurrence pio) {
+        if (pio == null || !pio.isTopLevel()) {
+            return null;
+        }
+        Term term = pio.subTerm();
+        if (term == null) {
+            return null;
+        }
+        if(term.op() == UpdateApplication.UPDATE_APPLICATION) {
+            term = term.sub(1);
+        }
         final JavaBlock javaBlock = term.javaBlock();
-        if (javaBlock == null) return null;
+        if (javaBlock == null) {
+            return null;
+        }
 
-        @Nullable SourceElement activeStatement = NodeInfo.computeActiveStatement(javaBlock.program().getFirstElement());
-        return activeStatement;
+        return NodeInfo.computeActiveStatement(javaBlock.program().getFirstElement());
     }
 
     @Override
@@ -56,68 +68,30 @@ public class ProofCommandStatementRule implements BuiltInRule {
 
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        return new IBuiltInRuleApp() {
-            @Override
-            public BuiltInRule rule() {
-                return ProofCommandStatementRule.INSTANCE;
-            }
-
-            @Override
-            public IBuiltInRuleApp tryToInstantiate(Goal goal) {
-                return null;
-            }
-
-            @Override
-            public IBuiltInRuleApp forceInstantiate(Goal goal) {
-                return null;
-            }
-
-            @Override
-            public List<LocationVariable> getHeapContext() {
-                return null;
-            }
-
-            @Override
-            public boolean isSufficientlyComplete() {
-                return false;
-            }
-
-            @Override
-            public ImmutableList<PosInOccurrence> ifInsts() {
-                return null;
-            }
-
-            @Override
-            public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
-                return null;
-            }
-
-            @Override
-            public IBuiltInRuleApp replacePos(PosInOccurrence newPos) {
-                return null;
-            }
-
-            @Override
-            public PosInOccurrence posInOccurrence() {
-                return pos;
-            }
-
-            @Override
-            public ImmutableList<Goal> execute(Goal goal, Services services) {
-                return ProofCommandStatementRule.this.apply(goal, services, this);
-            }
-
-            @Override
-            public boolean complete() {
-                return true;
-            }
-        };
+        return new DefaultBuiltInRuleApp(this, pos);
     }
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)  {
-        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
-        return null;
+        TermBuilder tb = services.getTermBuilder();
+        PosInOccurrence pio = ruleApp.posInOccurrence();
+        assert pio.isTopLevel();
+        Term term = pio.subTerm();
+        Term upd = null;
+        if (term.op() == UpdateApplication.UPDATE_APPLICATION) {
+            upd = term.sub(0);
+            term = term.sub(1);
+        }
+        JavaBlock jb = term.javaBlock();
+        StatementBlock block = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
+        JavaBlock newJB = JavaBlock.createJavaBlock(block);
+        Term newTerm = tb.prog((Modality) term.op(), newJB, term.sub(0));
+        if (upd != null) {
+            newTerm = tb.apply(upd, newTerm);
+        }
+        ImmutableList<Goal> result = goal.split(1);
+        result.head().changeFormula(new SequentFormula(newTerm), pio);
+        return result;
     }
 
     @Override
