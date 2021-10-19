@@ -88,6 +88,8 @@ subprojects {
     // Setting UTF-8 as the java source encoding.
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
+        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
     }
 
     tasks.withType(Javadoc) {
