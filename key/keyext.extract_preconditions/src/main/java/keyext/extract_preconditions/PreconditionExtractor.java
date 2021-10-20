@@ -8,17 +8,21 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.SingleProof;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Quadruple;
 import keyext.extract_preconditions.macros.PreconditionSemanticsBlastingMacro;
 import keyext.extract_preconditions.projections.AbstractTermProjection;
 import keyext.extract_preconditions.projections.visitors.JunctorSimplificationVisitor;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Class allowing the extraction of preconditions for a proof's open goals
@@ -26,6 +30,7 @@ import org.key_project.util.collection.ImmutableSLList;
  * @author steuber
  */
 public class PreconditionExtractor {
+    private static final String EXTERNAL_SERVICE_EXTRACTION_METHOD = "stop";
     /**
      * The proof under consideration
      */
@@ -70,10 +75,23 @@ public class PreconditionExtractor {
      * @throws Exception            If Macros/Strategies throw an exception during processing
      * @throws InterruptedException If extraction is interrupted
      */
-    public ImmutableList<Term> extract() throws Exception, InterruptedException {
+    public Pair<ImmutableList<Term>,Map<String, ImmutableList<Term>>> extract() throws Exception, InterruptedException {
         ImmutableList<Term> goalPreconditons = ImmutableSLList.nil();
+        Map<String, ImmutableList<Term>> namedPreconditions = new HashMap<>();
         for (Goal currentGoal : this.proof.openGoals()) {
-            goalPreconditons = goalPreconditons.append(this.extractFromGoal(currentGoal));
+            String precondFor = this.isPreconditionFor(currentGoal);
+            if (precondFor == null) {
+                goalPreconditons = goalPreconditons.append(this.extractFromGoal(currentGoal));
+            } else {
+                if (!namedPreconditions.containsKey(precondFor)) {
+                    namedPreconditions.put(precondFor, ImmutableSLList.nil());
+                }
+                for (Term curTerm : this.extractFromGoal(currentGoal)) {
+                    JunctorSimplificationVisitor simplifier = new JunctorSimplificationVisitor(this.proofServices.getTermBuilder());
+                    this.projection.projectTerm(curTerm).execPostOrder(simplifier);
+                    namedPreconditions.put(precondFor,namedPreconditions.get(precondFor).append(simplifier.getSimplified()));
+                }
+            }
         }
         // Goal is missed if any of the preconditions are missed so we need an OR
         ImmutableList<Term> projectedDisjunction = ImmutableSLList.nil();
@@ -84,7 +102,21 @@ public class PreconditionExtractor {
                 simplifier.getSimplified()
             );
         }
-        return projectedDisjunction;
+        return new Pair<>(projectedDisjunction,namedPreconditions);
+    }
+
+    private String isPreconditionFor(Goal currentGoal) {
+        Node curNode = currentGoal.node().parent();
+        Node prevNode = currentGoal.node();
+        while(curNode.parent()!=null) {
+            if (curNode.getAppliedRuleApp().rule() instanceof UseOperationContractRule
+                && prevNode.getNodeInfo().getBranchLabel().startsWith("Pre ("+EXTERNAL_SERVICE_EXTRACTION_METHOD)) {
+                return prevNode.getNodeInfo().getBranchLabel();
+            }
+            prevNode = curNode;
+            curNode = curNode.parent();
+        }
+        return null;
     }
 
     /**

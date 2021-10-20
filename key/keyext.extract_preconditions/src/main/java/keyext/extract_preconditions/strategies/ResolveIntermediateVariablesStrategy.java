@@ -4,15 +4,20 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
+import org.key_project.util.collection.ImmutableList;
 
 public class ResolveIntermediateVariablesStrategy implements Strategy {
+
+    private ImmutableList<ProgramVariable> projectionVariablesList;
+
+    public ResolveIntermediateVariablesStrategy(ImmutableList<ProgramVariable> projectionVariablesListParam) {
+        projectionVariablesList = projectionVariablesListParam;
+    }
 
     @Override
     public Name name() {
@@ -21,17 +26,19 @@ public class ResolveIntermediateVariablesStrategy implements Strategy {
 
     @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
-
         if (app.rule() instanceof OneStepSimplifier) {
             return NumberRuleAppCost.getZeroCost();
-        } else if (app.rule().name().toString().equals("applyEqReverse")
+        } else if ((app.rule().name().toString().equals("applyEqReverse")
+            || app.rule().name().toString().equals("applyEq"))
             && !pio.subTerm().toString().equals("TRUE")
             && !pio.subTerm().toString().equals("FALSE")
             && !pio.subTerm().toString().equals("self")
             && !pio.subTerm().toString().equals("heap")
             && !pio.subTerm().toString().equals("null")) {
             return NumberRuleAppCost.create(1);
-        }
+        }/* else if (app.rule().name().toString().contains("inv_axiom")) {
+            return NumberRuleAppCost.create(2);
+        }*/
 
         return TopRuleAppCost.INSTANCE;
     }
@@ -50,10 +57,35 @@ public class ResolveIntermediateVariablesStrategy implements Strategy {
         } else {
             return false;
         }*/
-        if (app.rule().name().toString().equals("applyEqReverse")) {
+        if (app.rule().name().toString().equals("applyEqReverse")
+            || app.rule().name().toString().equals("applyEq")) {
             TacletApp p_app = (TacletApp) app;
             IfFormulaInstantiation ifInst = p_app.ifFormulaInstantiations ().head ();
-            return isNotSelfApplication(pio, ifInst);
+            if (isNotSelfApplication(pio, ifInst)) {
+                NoPosTacletApp applyEqReverseApp = ((NoPosTacletApp) app);
+                SchemaVariable replaceVar;
+                if (app.rule().name().toString().equals("applyEqReverse")) {
+                    replaceVar =applyEqReverseApp.instantiations().lookupVar(new Name("s"));
+                }  else {
+                    replaceVar =applyEqReverseApp.instantiations().lookupVar(new Name("t1"));
+                }
+                Term replaceTerm = (Term) applyEqReverseApp.instantiations().getInstantiation(replaceVar);
+                // Check if term contains fields
+                if (replaceTerm.toString().contains("select")) {
+                    return true;
+                }
+                // Check if term contains projection variables
+                if (projectionVariablesList!=null) {
+                    for (ProgramVariable inputVar : projectionVariablesList) {
+                        if (replaceTerm.toString().contains(inputVar.name().toString())) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+                // Do not replace something with a "result" variable (would be useless)
+                //!pio.sequentFormula().formula().sub(0).op().name().toString().contains("result");
         }
         return true;
 

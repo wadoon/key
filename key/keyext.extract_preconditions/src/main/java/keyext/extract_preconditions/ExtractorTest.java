@@ -28,6 +28,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 import keyext.extract_preconditions.printers.JsonPreconditionPrinter;
 import keyext.extract_preconditions.printers.PreconditionPrinter;
 import keyext.extract_preconditions.printers.SimplePreconditionPrinter;
@@ -171,7 +172,7 @@ public class ExtractorTest {
                         ui,
                         projection
                     );
-                ImmutableList<Term> preconditionList = preconditionExtractor.extract();
+                Pair<ImmutableList<Term>, Map<String, ImmutableList<Term>>> preconditionList = preconditionExtractor.extract();
                 System.out.println(
                     "Found precondition for " + currentProof.name() + ":");
                 PreconditionPrinter printer = new JsonPreconditionPrinter(currentProof.getServices());
@@ -234,6 +235,7 @@ public class ExtractorTest {
                     // Set proof strategy options
                     StrategyProperties sp =
                         proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+                    // We want to use method contracts instead of expanding the method
                     sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
                         StrategyProperties.METHOD_CONTRACT);
                     sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
@@ -242,8 +244,9 @@ public class ExtractorTest {
                         StrategyProperties.QUERY_ON);
                     sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
                         StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+                    // Important: We want to unroll the proof as much as possible and not stop at the first unclosable goal!
                     sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY,
-                        StrategyProperties.STOPMODE_NONCLOSE);
+                        StrategyProperties.STOPMODE_DEFAULT);
                     proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
                     // Make sure that the new options are used
                     int maxSteps = MAX_STEPS;
@@ -263,7 +266,7 @@ public class ExtractorTest {
                     HeapSimplificationMacro heapSimplifier = new HeapSimplificationMacro();
                     heapSimplifier.applyTo(env.getUi(), proof.root(), null, null);
                     // Resolve Variables through ApplyEqReverse
-                    proof.setActiveStrategy(new ResolveIntermediateVariablesStrategy());
+                    proof.setActiveStrategy(new ResolveIntermediateVariablesStrategy(projectionVariablesList));
                     env.getUi().getProofControl().startAndWaitForAutoMode(proof);
                     // Simplify heaps again
                     heapSimplifier.applyTo(env.getUi(), proof.root(), null, null);

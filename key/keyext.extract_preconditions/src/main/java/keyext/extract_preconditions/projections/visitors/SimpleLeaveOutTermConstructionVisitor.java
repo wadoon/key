@@ -40,7 +40,8 @@ public class SimpleLeaveOutTermConstructionVisitor extends LeaveOutTermConstruct
             if (isBuiltinObjectProperty(visited)) {
                 return;
             }
-            if (isSelectTerm(visited) && visited.sub(2).op().name().toString().endsWith("<created>")) {
+            if ((isSelectTerm(visited) && visited.sub(2).op().name().toString().endsWith("<created>"))
+                || visited.op().name().toString().endsWith("<inv>")){
                 this.admit=false;
             } else if (visited.op() instanceof Function) {
                 if (visited.op().name().toString().endsWith("exactInstance")
