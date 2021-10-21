@@ -5,6 +5,7 @@ public class Graph {
     /*@ public invariant (\forall int i;(\forall int j; 0<=i && i<=j && j<edges.length && edges[i] == edges[j]; i == j));@*/
     /*@ public invariant (\forall int i; i>=0 && i<edges.length; \invariant_for(edges[i])); @*/
 
+    /*@ public invariant (\forall int i;(\forall int j; 0<=i && i<=j && j<edges.length && edges[i].id == edges[j].id; i == j));@*/
 
     /*
       1. aktuelle Loesung mit Schleifeninvariante wiederholt Teil der Objektinvariante (\forall int i; i>=0 && i<edges.length; \invariant_for(edges[i]))
@@ -16,7 +17,10 @@ public class Graph {
     final private /*@ spec_public @*/ Edge[] edges;
 
     /*@ public normal_behavior
-      @ assignable \strictly_nothing;
+      @ requires (\forall int i;(\forall int j; 0<=i && i<=j && j<edges.length && edges[i].id == edges[j].id; i == j));
+      @ requires (\forall int i;(\forall int j; 0<=i && i<=j && j<edges.length && edges[i] == edges[j]; i == j));
+      @ requires (\forall int i; i>=0 && i<edges.length; \invariant_for(edges[i]));
+      @ assignable \nothing;
       @ ensures this.edges == edges;
       @*/
     public Graph(Edge[] edges) {
@@ -36,8 +40,7 @@ public class Graph {
 
         /*@ loop_invariant
           @  k>=0 && k<=edges.length &&
-          @  (\forall int j; j>=0 && j<k; res[2*j] == edges[j].start && res[2*j + 1] == edges[j].end) &&
-          @  (\forall int i; i>=0 && i<edges.length; \invariant_for(edges[i]) );
+          @  (\forall int j; j>=0 && j<k; res[2*j] == edges[j].start && res[2*j + 1] == edges[j].end);
           @ assignable res[*];
           @ decreases edges.length - k;
           @*/
