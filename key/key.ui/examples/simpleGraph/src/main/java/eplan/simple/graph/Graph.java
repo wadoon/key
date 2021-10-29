@@ -88,13 +88,35 @@ public class Graph {
             Edge tempEdge = edges[i];
             Node startNode = tempEdge.getStart();
             Node endNode = tempEdge.getEnd();
-            if (startNode.equals(connectedNode)) {
-                returnval[pos] = tempEdge;
-                pos++;
-            }
-            if (endNode.equals(connectedNode)) {
-                returnval[pos] = tempEdge;
-                pos++;
+
+            //@ ghost int oldPos = pos;
+            //@ ghost Edge oldE = returnval[pos];
+            //@ ghost Edge oldE1 = returnval[pos + 1];
+
+            /*@ normal_behavior
+              @ requires returnval != null && startNode != null && endNode != null && connectedNode != null
+                              && pos >= 0 && pos + 1 < returnval.length;
+              @ assignable returnval[pos..pos+1];
+              @ ensures (pos == oldPos) ==> (returnval[pos] == oldE) &&
+              @                               (returnval[pos+1] == oldE1);
+              @ ensures (pos > oldPos) ==>  (\forall int j; j >= oldPos && j < pos; returnval[j] == tempEdge);
+              @ ensures pos >= oldPos && pos <= oldPos + 2;
+              @*/
+            {
+                if (startNode.equals(connectedNode)) {
+                    returnval[pos] = tempEdge;
+                    pos++;
+                }
+                // merge_point
+                // merge_proc "MergeByIfThenElse";
+                ;
+                if (endNode.equals(connectedNode)) {
+                    returnval[pos] = tempEdge;
+                    pos++;
+                }
+                // merge_point
+                // merge_proc "MergeByIfThenElse";
+                ;
             }
         }
         return returnval;
