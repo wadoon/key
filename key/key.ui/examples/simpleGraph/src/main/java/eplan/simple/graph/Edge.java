@@ -4,6 +4,7 @@ public final class Edge {
 
 
     /*@ public invariant \invariant_for(start) && \invariant_for(end); @*/
+    //@ accessible \inv: start, end;
     final private /*@ spec_public @*/ int id;
     final private /*@ spec_public @*/ Node start;
     final private /*@ spec_public @*/ Node end;
@@ -20,6 +21,12 @@ public final class Edge {
         this.start = start;
         this.end = end;
     }
+
+    /*@ public normal_behavior
+      @ assignable \strictly_nothing;
+      @ accessible ((Edge)o).id, this.id, this.start, this.end;
+      @ ensures \result == ((o instanceof Edge) && ((Edge)o).id == id);
+      @*/
     public boolean equals(Object o) {
         if (!(o instanceof Edge)) {
             return false;
@@ -29,6 +36,7 @@ public final class Edge {
 
     /*@ public normal_behavior
       @ assignable \strictly_nothing;
+      @ accessible this.id, this.start, this.end;
       @ ensures \result == this.id;
       @*/
     public int getId() {
@@ -37,6 +45,7 @@ public final class Edge {
 
     /*@ public normal_behavior
       @ assignable \strictly_nothing;
+      @ accessible this.start, this.end;
       @ ensures \result == this.start;
       @*/
     public Node getStart() {
@@ -45,6 +54,7 @@ public final class Edge {
 
     /*@ public normal_behavior
       @ assignable \strictly_nothing;
+      @ accessible this.end, this.start;
       @ ensures \result == this.end;
       @*/
     public Node getEnd() {

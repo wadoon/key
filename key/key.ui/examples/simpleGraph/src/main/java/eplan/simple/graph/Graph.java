@@ -52,6 +52,85 @@ public class Graph {
         return res;
     }
 
+    /*@ public normal_behavior
+      @ requires dir && \invariant_for(e);
+      @ assignable \nothing;
+      @ ensures \result != null && \result.length == 2*edges.length;
+      @ ensures (\forall int j; j >= 0 && j < \result.length;
+                    \result[j] == null || \result[j].getStart() == e.getEnd() || \result[j].getEnd() == e.getEnd());
+      @*/
+    public /*@ nullable @*/ Edge[] getNeighborEdges(Edge e, boolean dir) {
+        Edge[] returnval = new Edge[2*edges.length];
+        int pos = 0;
+        Node connectedNode;
+        if(dir) {
+            connectedNode = e.getEnd();
+        }
+        else {
+            connectedNode = e.getStart();
+        }
+
+        // merge_point
+        // merge_proc "MergeByPredicateAbstraction"
+        // merge_params {conjunctive: (Node n) -> {n != null, n == e.getEnd() || n == e.getStart()}};
+        ;
+
+        /*@ loop_invariant
+          @ i >= 0 && i <= edges.length && pos >= 0 && pos <= 2*i &&
+          @  (\forall int j; j >= 0 && j < pos;
+          @          returnval[j].getStart() == e.getEnd() || returnval[j].getEnd() == e.getEnd()) &&
+          @  (\forall int j; j >= pos && j < returnval.length;
+          @          returnval[j] == null);
+          @ assignable returnval[*];
+          @ decreases edges.length - i;
+          @*/
+        for (int i = 0; i < edges.length; i++) {
+            Edge tempEdge = edges[i];
+            Node startNode = tempEdge.getStart();
+            Node endNode = tempEdge.getEnd();
+            if (startNode.equals(connectedNode)) {
+                returnval[pos] = tempEdge;
+                pos++;
+            }
+            if (endNode.equals(connectedNode)) {
+                returnval[pos] = tempEdge;
+                pos++;
+            }
+        }
+        return returnval;
+        //return getNeighborsForConnectedNode(connectedNode);
+    }
+
+    /*@ public normal_behavior
+      @ requires \invariant_for(connectedNode);
+      @ assignable \nothing;
+      @ ensures \result != null && \result.length == 2*edges.length;
+      @*/
+    private /*@ nullable @*/ Edge[] getNeighborsForConnectedNode(Node connectedNode) {
+        Edge[] returnval = new Edge[2*edges.length];
+        int pos = 0;
+
+        /*@ loop_invariant
+          @ i >= 0 && i <= edges.length && pos >= 0 && pos <= 2*i;
+          @ assignable returnval[*];
+          @ decreases edges.length - i;
+          @*/
+        for (int i = 0; i < edges.length; i++) {
+            Edge tempEdge = edges[i];
+            Node startNode = tempEdge.getStart();
+            Node endNode = tempEdge.getEnd();
+            if (startNode.equals(connectedNode)) {
+                returnval[pos] = tempEdge;
+                pos++;
+            }
+            if (endNode.equals(connectedNode)) {
+                returnval[pos] = tempEdge;
+                pos++;
+            }
+        }
+        return returnval;
+    }
+
     public Edge[] getAllEdgesAt(Node n) {
         return null;
     }
