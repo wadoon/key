@@ -11,5 +11,14 @@ include "key.core.example"
 include "key.core.symbolic_execution.example"
 include 'keyext.interactionlog'
 include 'keyext.ui.testgen'
-include 'key.java'
+
+
+include('key.java:javaparser-core-testing')
+include('key.java:javaparser-core-serialization')
+include('key.java:javaparser-symbol-solver-testing')
+include('key.java:javaparser-core-generators')
+include('key.java:javaparser-core')
+include('key.java:javaparser-core-metamodel-generator')
+include('key.java:javaparser-core-testing-bdd')
+include('key.java:javaparser-symbol-solver-core')
 
