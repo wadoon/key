@@ -14,14 +14,17 @@ import java.util.ServiceLoader;
  * @version 1 (21.04.17)
  */
 public class ProofScriptCommandApi {
-    private Map<String, ProofScriptCommand> commandMap = new HashMap<>();
+    private final Map<String, ProofScriptCommand<?>> commandMap = new HashMap<>();
 
+    /**
+     * Creates a new instance of this class by loading the commands via the {@link ServiceLoader}
+     */
     public ProofScriptCommandApi() {
         initialize();
     }
 
     private void initialize() {
-        ServiceLoader<ProofScriptCommand> loader = ServiceLoader.load(ProofScriptCommand.class);
+        var loader = ServiceLoader.load(ProofScriptCommand.class);
         loader.forEach(psc -> commandMap.put(psc.getName(), psc));
     }
 
@@ -32,7 +35,7 @@ public class ProofScriptCommandApi {
      *
      * @return a collection of proof script commands
      */
-    public Collection<ProofScriptCommand> getScriptCommands() {
+    public Collection<ProofScriptCommand<?>> getScriptCommands() {
         return commandMap.values();
     }
 
