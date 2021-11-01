@@ -1,5 +1,5 @@
 plugins {
-    id 'ca.coglinc.javacc' version '2.4.0'
+    //id 'ca.coglinc.javacc' version '2.4.0'
     id 'antlr'
 }
 
@@ -9,17 +9,22 @@ configurations { antlr4 }
 
 dependencies {
     api project(':key.util')
-    api group: group, name: 'recoderkey', version: '1.0'
+
+    //
+    api 'com.github.javaparser:javaparser-core:3.23.2-SNAPSHOT'
+    api 'com.github.javaparser:javaparser-core-serialization:3.23.2-SNAPSHOT'
+    api 'com.github.javaparser:javaparser-symbol-solver-core:3.23.2-SNAPSHOT'
+
+    //api group: group, name: 'recoderkey', version: '1.0'
     implementation group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
     implementation group: 'org.antlr', name:'antlr-runtime', version:'3.5.2'
     implementation group: 'antlr', name: 'antlr', version: '2.7.7'
 
-    javacc  group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
+    //javacc  group: 'net.java.dev.javacc', name:'javacc', version:'4.0'
     antlr   group: 'org.antlr', name:'antlr', version:'3.5.2'   // use ANTLR version 3
 
-    antlr4 "org.antlr:antlr4:4.7.1"
-    implementation "org.antlr:antlr4-runtime:4.7.1"
-    //implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+    antlr4 'org.antlr:antlr4:4.9.2'
+    implementation 'org.antlr:antlr4-runtime:4.9.2'
 }
 
 // The target directory for JavaCC (parser generation)
@@ -41,7 +46,7 @@ generateTestGrammarSource {
 }
 
 // Generate code from JavaCC grammars.
-compileJavacc {
+/*compileJavacc {
     outputDirectory = javaCCOutputDirMain
     inputDirectory = file("src/main/javacc")
     doLast {
@@ -55,7 +60,7 @@ compileJavacc {
             into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/proofjava/"
         }
     }
-}
+}*/
 
 task generateSMTListings {
     def pack = "de/uka/ilkd/key/smt/newsmt2"
