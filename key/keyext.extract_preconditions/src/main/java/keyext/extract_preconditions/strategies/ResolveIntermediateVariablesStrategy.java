@@ -63,25 +63,65 @@ public class ResolveIntermediateVariablesStrategy implements Strategy {
             IfFormulaInstantiation ifInst = p_app.ifFormulaInstantiations ().head ();
             if (isNotSelfApplication(pio, ifInst)) {
                 NoPosTacletApp applyEqReverseApp = ((NoPosTacletApp) app);
+                // Term which is used to replace original variable
                 SchemaVariable replaceVar;
+                // Variable which is being substituted
+                SchemaVariable substitutedVar;
                 if (app.rule().name().toString().equals("applyEqReverse")) {
                     replaceVar =applyEqReverseApp.instantiations().lookupVar(new Name("s"));
+                    substitutedVar =applyEqReverseApp.instantiations().lookupVar(new Name("t1"));
                 }  else {
                     replaceVar =applyEqReverseApp.instantiations().lookupVar(new Name("t1"));
+                    substitutedVar =applyEqReverseApp.instantiations().lookupVar(new Name("s"));
                 }
+                // This decision is more complicated than it initially seems because we need to avoid applyEq/applyEqReverse loops
+                // Given an equation a=b and some appearance b...
+                // This is the term which will replace an appearance of b (i.e. this term is a)
                 Term replaceTerm = (Term) applyEqReverseApp.instantiations().getInstantiation(replaceVar);
-                // Check if term contains fields
-                if (replaceTerm.toString().contains("select")) {
-                    return true;
-                }
-                // Check if term contains projection variables
-                if (projectionVariablesList!=null) {
-                    for (ProgramVariable inputVar : projectionVariablesList) {
-                        if (replaceTerm.toString().contains(inputVar.name().toString())) {
-                            return true;
-                        }
+                // This is the term which will be substituted on appearance (i.e. b)
+                Term substitutedTerm = (Term) applyEqReverseApp.instantiations().getInstantiation(substitutedVar);
+                boolean replaceTermContainsProjectionVariable = false;
+                boolean substitutedTermContainsProjectionVariable = false;
+                boolean replaceTermContainsSelect = false;
+                boolean substitutedTermContainsSelect = false;
+                for (ProgramVariable inputVar : projectionVariablesList) {
+                    if (replaceTerm.toString().contains(inputVar.name().toString())) {
+                        replaceTermContainsProjectionVariable=true;
+                    }
+                    if (substitutedTerm.toString().contains(inputVar.name().toString())) {
+                        substitutedTermContainsProjectionVariable=true;
                     }
                 }
+                if (replaceTerm.toString().contains("select")) {
+                    replaceTermContainsSelect=true;
+                }
+                if (substitutedTerm.toString().contains("select")) {
+                    substitutedTermContainsSelect=true;
+                }
+                if (isConstant(substitutedTerm)) {
+                    return false;
+                }
+                if (substitutedTermContainsProjectionVariable
+                    && replaceTermContainsProjectionVariable
+                    && replaceTerm.toString().length()<substitutedTerm.toString().length()) {
+                    return true;
+                } else if (!substitutedTermContainsProjectionVariable
+                    && replaceTermContainsProjectionVariable) {
+                    return true;
+                } else if (!replaceTermContainsProjectionVariable
+                            && !substitutedTermContainsProjectionVariable) {
+                    if (substitutedTermContainsSelect
+                        && replaceTermContainsSelect
+                        && replaceTerm.toString().length()<substitutedTerm.toString().length()) {
+                        return true;
+                    }
+                    if (!substitutedTermContainsSelect
+                        && replaceTermContainsSelect) {
+                        return true;
+                    }
+                }
+                return false;
+            } else {
                 return false;
             }
                 // Do not replace something with a "result" variable (would be useless)
@@ -89,6 +129,11 @@ public class ResolveIntermediateVariablesStrategy implements Strategy {
         }
         return true;
 
+    }
+
+    private boolean isConstant(Term substitutedTerm) {
+        return (substitutedTerm.op() instanceof Function &&
+                    substitutedTerm.op().name().toString().equals("Z"));
     }
 
     // Modified version from CheckApplyEqFeature:
