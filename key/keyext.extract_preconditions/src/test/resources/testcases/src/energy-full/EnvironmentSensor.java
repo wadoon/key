@@ -25,7 +25,7 @@ public final class EnvironmentSensor {
     /*@ public normal_behavior
       @ ensures_free this.windSpeed >= 0;
       @ ensures_free this.sunIrradiance >= 0;
-      @ assignable this.windSpeed, this.sunIrradiance;
+      @ assignable this.*;
       @*/ 
     public void updateValues();
 }

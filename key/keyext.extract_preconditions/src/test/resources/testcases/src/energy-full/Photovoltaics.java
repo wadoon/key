@@ -1,5 +1,5 @@
 
-public class Photovoltaics extends EnergyProducer {
+public final class Photovoltaics extends EnergyProducer {
     
     /* Modes 0 -- 4 represent the maximum solar irradiance which can be handled.
      */
@@ -7,7 +7,7 @@ public class Photovoltaics extends EnergyProducer {
     /*@ public normal_behavior
       @ requires 0 <= mode && mode <= 4;
       @ ensures this.mode == mode;
-      @ assignable this.mode;
+      @ assignable this.*;
       @*/
     public Photovoltaics(int mode) {
         this.mode = mode;

@@ -1,5 +1,5 @@
 
-public class GasTurbine extends EnergyProducer {
+public final class GasTurbine extends EnergyProducer {
     
     /* Modes:
      * 0: fuel tank empty
@@ -12,7 +12,7 @@ public class GasTurbine extends EnergyProducer {
     /*@ public normal_behavior
       @ requires 0 <= mode && mode <= 4;
       @ ensures this.mode == mode;
-      @ assignable this.mode;
+      @ assignable this.*;
       @*/
     public GasTurbine(int mode) {
         this.mode = mode;

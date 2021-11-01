@@ -17,8 +17,7 @@ public final class Capacitor {
     private /*@spec_public@*/ int mode;
     
     /*@ public normal_behavior
-      @ ensures this.mode==0;
-      @ assignable this.mode;
+      @ assignable this.*;
       @*/
     public Capacitor() {
         this.mode = 0;
@@ -26,7 +25,7 @@ public final class Capacitor {
     
     /*@ public normal_behavior
       @ requires addedCharge >= 0;
-      @ //requires ! (addedCharge >= 1 & this.mode >= 4 + addedCharge * -1 & this.mode >= 0 &  this.mode <= 3);
+      @// requires mode + addedCharge < 4;
       @ ensures this.mode >= \old(this.mode) + addedCharge;
       @ assignable this.mode;
       @*/

@@ -39,15 +39,16 @@ public class Main {
         Capacitor capacitor = new Capacitor();
         EnvironmentSensor sensor = new EnvironmentSensor();
         
-        if (checkState(capacitor, producer, sensor, producerType)) {
+        if (checkState(capacitor, producer, sensor)) {
+
             producer.run(capacitor, sensor);
         }
     }
 
-    public final boolean checkState(Capacitor capacitor, EnergyProducer producer, EnvironmentSensor sensor, int producerType) {
-        if (producerType==0) {
+    public final boolean checkState(Capacitor capacitor, EnergyProducer producer, EnvironmentSensor sensor) {
+        if (producer instanceof GasTurbine) {
             return capacitor.getMode() <= 3;
-        } else if (producerType==1) {
+        } else if (producer instanceof WindTurbine) {
             WindTurbine windTurbine = (WindTurbine) producer;
             return capacitor.getMode() <= 4 - sensor.getWindSpeed() / 2
                     && sensor.getWindSpeed() < windTurbine.getMode();
