@@ -22,6 +22,13 @@ public class DependenciesLDT extends LDT {
 	private final Function noRaW;
 	private final Function noWaR;
 	private final Function noWaW;
+	
+	private final Function relaxedNoR;
+	private final Function relaxedNoW;
+	private final Function relaxedNoRaW;
+	private final Function relaxedNoWaR;
+	private final Function relaxedNoWaW;
+	
 	private final Function rPred;
 	private final Function wPred;
 
@@ -37,6 +44,13 @@ public class DependenciesLDT extends LDT {
 		noRaW	         = addFunction(services, "noRaW");
 		noWaR	         = addFunction(services, "noWaR");
 		noWaW	         = addFunction(services, "noWaW");
+		
+		relaxedNoR	         = addFunction(services, "relaxedNoR");
+		relaxedNoW	         = addFunction(services, "relaxedNoW");
+		relaxedNoRaW	         = addFunction(services, "relaxedNoRaW");
+		relaxedNoWaR	         = addFunction(services, "relaxedNoWaR");
+		relaxedNoWaW	         = addFunction(services, "relaxedNoWaW");
+		
 		rPred	         = addFunction(services, "rPred");
 		wPred	         = addFunction(services, "wPred");
 		
@@ -63,6 +77,26 @@ public class DependenciesLDT extends LDT {
 
 	public Function getNoWaW() {
 		return noWaW;
+	}
+	
+	public Function getRelaxedNoR() {
+		return relaxedNoR;
+	}
+
+	public Function getRelaxedNoW() {
+		return relaxedNoW;
+	}
+
+	public Function getRelaxedNoRaW() {
+		return relaxedNoRaW;
+	}
+
+	public Function getRelaxedNoWaR() {
+		return relaxedNoWaR;
+	}
+
+	public Function getRelaxedNoWaW() {
+		return relaxedNoWaW;
 	}
 	
 	public Function getRPred() {
