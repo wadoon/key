@@ -47,7 +47,7 @@ public final class TypeConverter {
     // Maps LDT names to LDT instances.
     private final Map<Name, LDT> LDTs = new HashMap<>();
 
-    private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
+    private ImmutableList<LDT> models = ImmutableSLList.nil();
 
     private HeapLDT heapLDT = null;
     //private IntegerLDT integerLDT = null;
@@ -57,13 +57,25 @@ public final class TypeConverter {
         this.tb = services.getTermBuilder();
     }
 
+    public static boolean isArithmeticOperator
+            (de.uka.ilkd.key.java.expression.Operator op) {
+        return op instanceof Divide || op instanceof Times ||
+                op instanceof Plus || op instanceof Minus ||
+                op instanceof Modulo || op instanceof ShiftLeft ||
+                op instanceof ShiftRight || op instanceof BinaryAnd ||
+                op instanceof BinaryNot || op instanceof BinaryOr ||
+                op instanceof BinaryXOr || op instanceof Negative ||
+                op instanceof PreIncrement || op instanceof PostIncrement ||
+                op instanceof PreDecrement || op instanceof PostDecrement;
+    }
+
     public void init() {
         init(LDT.getNewLDTInstances(services));
     }
 
     private void init(Map<Name, LDT> map) {
         LDTs.putAll(map);
-        models = ImmutableSLList.<LDT>nil();
+        models = ImmutableSLList.nil();
         for (LDT ldt : LDTs.values()) {
             models = models.prepend(ldt);
         }
@@ -160,7 +172,6 @@ public final class TypeConverter {
         }
     }
 
-
     private Term convertReferencePrefix(ReferencePrefix prefix,
                                         ExecutionContext ec) {
         Debug.out("typeconverter: (prefix, class)", prefix,
@@ -196,7 +207,6 @@ public final class TypeConverter {
         }
     }
 
-
     public Term findThisForSortExact(Sort s, ExecutionContext ec) {
         ProgramElement pe = ec.getRuntimeInstance();
         if (pe == null) return null;
@@ -211,7 +221,6 @@ public final class TypeConverter {
         Term inst = convertToLogicElement(pe, ec);
         return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), false);
     }
-
 
     public Term findThisForSort(Sort s,
                                 Term self,
@@ -293,7 +302,6 @@ public final class TypeConverter {
                 ("TypeConverter could not handle this");
     }
 
-
     public Term convertArrayReference(ArrayReference ar,
                                       ExecutionContext ec) {
         final Term[] index = new Term[ar.getDimensionExpressions().size()];
@@ -321,11 +329,9 @@ public final class TypeConverter {
                 tb.func(instanceOfSymbol, obj));
     }
 
-
     public Term convertToLogicElement(ProgramElement pe) {
         return convertToLogicElement(pe, null);
     }
-
 
     public Term convertToLogicElement(ProgramElement pe,
                                       ExecutionContext ec) {
@@ -355,14 +361,11 @@ public final class TypeConverter {
         } else if (pe instanceof recoder.abstraction.PrimitiveType) {
             throw new IllegalArgumentException("TypeConverter could not handle"
                     + " this primitive type");
-        } else if (pe instanceof MetaClassReference) {
-            assert false : "not supported";
-        }
+        } else assert !(pe instanceof MetaClassReference) : "not supported";
         throw new IllegalArgumentException
                 ("TypeConverter: Unknown or not convertable ProgramElement " + pe +
                         " of type " + pe.getClass());
     }
-
 
     /**
      * dispatches the given literal and converts it
@@ -383,22 +386,6 @@ public final class TypeConverter {
             }
         }
     }
-
-    public static boolean isArithmeticOperator
-            (de.uka.ilkd.key.java.expression.Operator op) {
-        if (op instanceof Divide || op instanceof Times ||
-                op instanceof Plus || op instanceof Minus ||
-                op instanceof Modulo || op instanceof ShiftLeft ||
-                op instanceof ShiftRight || op instanceof BinaryAnd ||
-                op instanceof BinaryNot || op instanceof BinaryOr ||
-                op instanceof BinaryXOr || op instanceof Negative ||
-                op instanceof PreIncrement || op instanceof PostIncrement ||
-                op instanceof PreDecrement || op instanceof PostDecrement) {
-            return true;
-        }
-        return false;
-    }
-
 
     /**
      * performs binary numeric promotion on the argument types

@@ -13,36 +13,36 @@
 
 package de.uka.ilkd.key.java;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.PackageReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
 /**
- *  Package specification.
+ * Package specification.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 
 public class PackageSpecification
- extends JavaNonTerminalProgramElement
- implements PackageReferenceContainer {
+        extends JavaNonTerminalProgramElement
+        implements PackageReferenceContainer {
 
 
     /**
-     *  Reference.
+     * Reference.
      */
 
     protected final PackageReference reference;
 
     /**
      * Package specification.
+     *
      * @param children an ExtList with children
      */
 
     public PackageSpecification(ExtList children) {
-	super(children);
-	reference=children.get(PackageReference.class);
+        super(children);
+        reference = children.get(PackageReference.class);
     }
 
 
@@ -52,9 +52,10 @@ public class PackageSpecification
 
 
     /**
- *      Returns the number of children of this node.
- *      @return an int giving the number of children of this node
-    */
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
         int result = 0;
@@ -63,13 +64,14 @@ public class PackageSpecification
     }
 
     /**
- *      Returns the child at the specified index in this node's "virtual"
- *      child array
- *      @param index an index into this node's "virtual" child array
- *      @return the program element at the given position
- *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
- *                 of bounds
-    */
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
+     */
 
     public ProgramElement getChildAt(int index) {
         if (reference != null) {
@@ -79,20 +81,23 @@ public class PackageSpecification
     }
 
     /**
- *      Get package reference.
- *      @return the package reference.
+     * Get package reference.
+     *
+     * @return the package reference.
      */
 
     public PackageReference getPackageReference() {
         return reference;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnPackageSpecification(this);
+        v.performActionOnPackageSpecification(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

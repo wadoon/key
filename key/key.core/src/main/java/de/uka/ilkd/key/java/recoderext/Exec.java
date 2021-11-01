@@ -13,17 +13,7 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.StatementContainer;
-import recoder.java.VariableScope;
+import recoder.java.*;
 import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.java.statement.Branch;
@@ -31,6 +21,10 @@ import recoder.java.statement.BranchStatement;
 import recoder.java.statement.Catch;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * An exec statement. Initial code copied from recoder's Try.
@@ -67,8 +61,7 @@ public class Exec extends BranchStatement
     /**
      * Exec.
      *
-     * @param body
-     *            a statement block.
+     * @param body a statement block.
      */
 
     public Exec(StatementBlock body) {
@@ -79,10 +72,8 @@ public class Exec extends BranchStatement
     /**
      * Exec.
      *
-     * @param body
-     *            a statement block.
-     * @param branches
-     *            a branch mutable list.
+     * @param body     a statement block.
+     * @param branches a branch mutable list.
      */
     public Exec(StatementBlock body, ASTList<Branch> branches) {
         setBranchList(branches);
@@ -93,8 +84,7 @@ public class Exec extends BranchStatement
     /**
      * Exec.
      *
-     * @param proto
-     *            a Exec.
+     * @param proto a Exec.
      */
     protected Exec(Exec proto) {
         super(proto);
@@ -167,11 +157,9 @@ public class Exec extends BranchStatement
      * Returns the child at the specified index in this node's "virtual" child
      * array
      *
-     * @param index
-     *            an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
@@ -221,13 +209,10 @@ public class Exec extends BranchStatement
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
      *
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
     @Override
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -283,8 +268,7 @@ public class Exec extends BranchStatement
     /**
      * Set body.
      *
-     * @param body
-     *            a statement block.
+     * @param body a statement block.
      */
 
     public void setBody(StatementBlock body) {
@@ -329,8 +313,7 @@ public class Exec extends BranchStatement
     /**
      * Set branch list.
      *
-     * @param branches
-     *            a branch mutable list.
+     * @param branches a branch mutable list.
      */
     public void setBranchList(ASTList<Branch> branches) {
         this.branches = branches;

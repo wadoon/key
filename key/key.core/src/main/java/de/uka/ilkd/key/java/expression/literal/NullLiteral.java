@@ -21,8 +21,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Name;
 
 /**
- *  Null literal.
- *  Is used as singleton. 
+ * Null literal.
+ * Is used as singleton.
  */
 
 public class NullLiteral extends Literal {
@@ -33,24 +33,26 @@ public class NullLiteral extends Literal {
      * Constructor for the transformation of COMPOST ASTs to KeY.
      */
     private NullLiteral() {
-	super();
+        super();
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnNullLiteral(this);
+        v.performActionOnNullLiteral(this);
     }
 
-    
+
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printNullLiteral(this);
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaInfo().getNullType();
+        return javaServ.getJavaInfo().getNullType();
     }
 
     @Override

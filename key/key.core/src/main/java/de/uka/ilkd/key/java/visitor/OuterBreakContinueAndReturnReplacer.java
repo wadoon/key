@@ -13,22 +13,7 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Stack;
-
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
@@ -38,6 +23,12 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import org.key_project.util.ExtList;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Stack;
 
 public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
@@ -58,11 +49,11 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     private StatementBlock result;
 
     public OuterBreakContinueAndReturnReplacer(final StatementBlock block,
-            final Iterable<Label> alwaysInnerLabels, final Label breakOutLabel,
-            final Map<Label, ProgramVariable> breakFlags,
-            final Map<Label, ProgramVariable> continueFlags, final ProgramVariable returnFlag,
-            final ProgramVariable returnValue, final ProgramVariable exception,
-            final Services services) {
+                                               final Iterable<Label> alwaysInnerLabels, final Label breakOutLabel,
+                                               final Map<Label, ProgramVariable> breakFlags,
+                                               final Map<Label, ProgramVariable> continueFlags, final ProgramVariable returnFlag,
+                                               final ProgramVariable returnValue, final ProgramVariable exception,
+                                               final Services services) {
         super(block, services);
         for (Label label : alwaysInnerLabels) {
             this.labels.add(label);
@@ -97,7 +88,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     @Override
     protected void walk(final ProgramElement node) {
         if (node.getPositionInfo() != PositionInfo.UNDEFINED) {
-            stack.push(new ExtList(new Object[] { node.getPositionInfo() }));
+            stack.push(new ExtList(new Object[]{node.getPositionInfo()}));
         } else {
             stack.push(new ExtList());
         }
@@ -143,13 +134,13 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     }
 
     private void performActionOnJump(final LabelJumpStatement x,
-            final Map<Label, ProgramVariable> flags) {
+                                     final Map<Label, ProgramVariable> flags) {
         if (isJumpToOuterLabel(x)) {
             final ProgramVariable flag = flags.get(x.getLabel());
             assert flag != null : "a label flag must not be null";
             final Statement assign = KeYJavaASTFactory.assign(flag, BooleanLiteral.TRUE,
                     x.getPositionInfo());
-            final Statement[] statements = new Statement[] { assign, breakOut };
+            final Statement[] statements = new Statement[]{assign, breakOut};
             addChild(new StatementBlock(statements));
             changed();
         } else {
@@ -173,11 +164,11 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
                     x.getPositionInfo());
             final Statement[] statements;
             if (returnValue == null) {
-                statements = new Statement[] { assignFlag, breakOut };
+                statements = new Statement[]{assignFlag, breakOut};
             } else {
                 Statement assignValue = KeYJavaASTFactory.assign(returnValue, x.getExpression(),
                         x.getPositionInfo());
-                statements = new Statement[] { assignFlag, assignValue, breakOut };
+                statements = new Statement[]{assignFlag, assignValue, breakOut};
             }
             addChild(new StatementBlock(statements));
             changed();

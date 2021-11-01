@@ -47,8 +47,7 @@ public class CcatchReturnValParameterDeclaration extends
     /**
      * Parameter declaration.
      *
-     * @param proto
-     *            a parameter declaration.
+     * @param proto a parameter declaration.
      */
     protected CcatchReturnValParameterDeclaration(
             CcatchReturnValParameterDeclaration proto) {
@@ -100,11 +99,9 @@ public class CcatchReturnValParameterDeclaration extends
      * Returns the child at the specified index in this node's "virtual" child
      * array
      *
-     * @param index
-     *            an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
@@ -130,13 +127,10 @@ public class CcatchReturnValParameterDeclaration extends
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
      *
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
     @Override
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -163,8 +157,7 @@ public class CcatchReturnValParameterDeclaration extends
     /**
      * Set parameter container.
      *
-     * @param c
-     *            a parameter container.
+     * @param c a parameter container.
      */
     @Override
     public void setParameterContainer(ParameterContainer c) {
@@ -175,7 +168,7 @@ public class CcatchReturnValParameterDeclaration extends
     public CcatchReturnValParameterDeclaration deepClone() {
         if (delegate != null) {
             return new CcatchReturnValParameterDeclaration(
-                delegate.deepClone());
+                    delegate.deepClone());
         } else {
             return new CcatchReturnValParameterDeclaration();
         }

@@ -13,21 +13,16 @@
 
 package de.uka.ilkd.key.java.recoderext.adt;
 
-import recoder.java.Identifier;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
+import recoder.java.*;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTList;
 
 public class MethodSignature extends JavaNonTerminalProgramElement {
 
     private static final long serialVersionUID = 6966957683489654730L;
-    private Identifier methodName;
-    private ASTList<TypeReference> paramTypes;
-   
+    private final Identifier methodName;
+    private final ASTList<TypeReference> paramTypes;
+
     public MethodSignature(Identifier methodName, ASTList<TypeReference> paramTypes) {
         super();
         this.methodName = methodName;
@@ -38,7 +33,7 @@ public class MethodSignature extends JavaNonTerminalProgramElement {
     public ProgramElement getChildAt(int i) {
         if (i == 0) return methodName;
         i--;
-        if (i>=0 && i<paramTypes.size()) {
+        if (i >= 0 && i < paramTypes.size()) {
             return paramTypes.get(i);
         }
         return null;
@@ -46,7 +41,7 @@ public class MethodSignature extends JavaNonTerminalProgramElement {
 
     @Override
     public int getChildCount() {
-        return 1+paramTypes.size();
+        return 1 + paramTypes.size();
     }
 
     @Override
@@ -75,7 +70,7 @@ public class MethodSignature extends JavaNonTerminalProgramElement {
     @Override
     public SourceElement deepClone() {
         throw new IllegalStateException("Not implemented in "
-                +"MethodSignature");
+                + "MethodSignature");
     }
 
 

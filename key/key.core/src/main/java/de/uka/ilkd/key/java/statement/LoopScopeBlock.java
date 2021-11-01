@@ -13,23 +13,14 @@
 
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.ProgramPrefixUtil;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Loop scope block. TODO
@@ -46,7 +37,7 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * TODO
-     * 
+     *
      * @param body
      */
     public LoopScopeBlock(StatementBlock body) {
@@ -60,7 +51,7 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * TODO
-     * 
+     *
      * @param e
      * @param body
      */
@@ -76,9 +67,8 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * Synchronized block.
-     * 
-     * @param children
-     *            a list with all children
+     *
+     * @param children a list with all children
      */
     public LoopScopeBlock(ExtList children) {
         super(children);
@@ -136,7 +126,7 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
     @Override
@@ -147,12 +137,10 @@ public class LoopScopeBlock extends JavaStatement
     /**
      * Return the expression at the specified index in this node's "virtual"
      * expression array.
-     * 
-     * @param index
-     *            an index for an expression.
+     *
+     * @param index an index for an expression.
      * @return the expression with the given index.
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     @Override
     public Expression getExpressionAt(int index) {
@@ -164,7 +152,7 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * Get expression.
-     * 
+     *
      * @return the expression.
      */
     public IProgramVariable getIndexPV() {
@@ -173,7 +161,7 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
     @Override
@@ -189,12 +177,10 @@ public class LoopScopeBlock extends JavaStatement
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
@@ -212,7 +198,7 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * Get body.
-     * 
+     *
      * @return the statement block.
      */
     public StatementBlock getBody() {
@@ -221,7 +207,7 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * Get the number of statements in this container.
-     * 
+     *
      * @return the number of statements.
      */
     @Override
@@ -232,14 +218,10 @@ public class LoopScopeBlock extends JavaStatement
     /**
      * Return the statement at the specified index in this node's "virtual"
      * statement array.
-     * 
-     * @param index
-     *            an index for a statement.
-     * 
+     *
+     * @param index an index for a statement.
      * @return the statement with the given index.
-     * 
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     @Override
     public Statement getStatementAt(int index) {
@@ -257,9 +239,8 @@ public class LoopScopeBlock extends JavaStatement
     /**
      * Calls the corresponding method of a visitor in order to perform some
      * action/transformation on this element
-     * 
-     * @param v
-     *            the Visitor
+     *
+     * @param v the Visitor
      */
     @Override
     public void visit(Visitor v) {

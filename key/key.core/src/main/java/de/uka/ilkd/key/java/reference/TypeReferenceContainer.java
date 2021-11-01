@@ -16,15 +16,15 @@ package de.uka.ilkd.key.java.reference;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 
 /**
- *  Type reference container.
- *  
+ * Type reference container.
  */
 
 public interface TypeReferenceContainer extends NonTerminalProgramElement {
 
     /**
-     *      Get the number of type references in this container.
-     *      @return the number of type references.
+     * Get the number of type references in this container.
+     *
+     * @return the number of type references.
      */
     int getTypeReferenceCount();
 

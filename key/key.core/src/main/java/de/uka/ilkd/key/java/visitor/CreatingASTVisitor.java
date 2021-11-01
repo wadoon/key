@@ -13,12 +13,6 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ClassInitializer;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -28,19 +22,16 @@ import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
-import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
-import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
-import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * Walks through a java AST in depth-left-fist-order.
@@ -49,7 +40,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     protected static final Boolean CHANGED = Boolean.TRUE;
 
-    /**  */
+    /**
+     *
+     */
     protected Deque<ExtList> stack = new ArrayDeque<ExtList>();
 
     boolean preservesPositionInfo = true;
@@ -57,17 +50,31 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     /**
      * create the CreatingASTVisitor
      *
-     * @param root
-     *            the ProgramElement where to begin
-     * @param preservesPos
-     *            whether the position should be preserved
-     * @param services
-     *            the services instance
+     * @param root         the ProgramElement where to begin
+     * @param preservesPos whether the position should be preserved
+     * @param services     the services instance
      */
     public CreatingASTVisitor(ProgramElement root, boolean preservesPos,
-            Services services) {
+                              Services services) {
         super(root, services);
         this.preservesPositionInfo = preservesPos;
+    }
+
+    /**
+     * returns the position of pe2 in the virtual child array of pe1
+     *
+     * @param pe1 A {@link NonTerminalProgramElement}
+     * @param pe2 A {@link ProgramElement}
+     * @return pe2's position in pe1
+     */
+    protected static int getPosition(NonTerminalProgramElement pe1,
+                                     ProgramElement pe2) {
+        int n = pe1.getChildCount();
+        int i = 0;
+        while ((i < n) && (pe1.getChildAt(i) != pe2)) {
+            i++;
+        }
+        return (i == n) ? -1 : i;
     }
 
     public boolean preservesPositionInfo() {
@@ -89,6 +96,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     /**
      * called if the program element x is unchanged
+     *
      * @param x The {@link SourceElement}.
      */
     @Override
@@ -158,12 +166,12 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     protected void performActionOnMergeContract(MergePointStatement oldLoop,
-            MergePointStatement newLoop) {
+                                                MergePointStatement newLoop) {
         // do nothing
     }
 
     protected void performActionOnLoopInvariant(LoopStatement oldLoop,
-            LoopStatement newLoop) {
+                                                LoopStatement newLoop) {
         // do nothing
     }
 
@@ -440,7 +448,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-
     @Override
     public void performActionOnDefault(Default x) {
         DefaultAction def = new DefaultAction(x) {
@@ -558,9 +565,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             changeList.removeFirst();
             PositionInfo pi = changeList
                     .removeFirstOccurrence(PositionInfo.class); // Methodframe
-                                                                // cannot occur
-                                                                // in original
-                                                                // program
+            // cannot occur
+            // in original
+            // program
 
             if (!preservesPositionInfo()) {
                 pi = PositionInfo.UNDEFINED;
@@ -987,7 +994,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     @Override
     public void performActionOnNewArray(NewArray x) {
         DefaultAction def = new DefaultAction(x) {
-            NewArray y = (NewArray) pe;
+            final NewArray y = (NewArray) pe;
 
             @Override
             ProgramElement createNewElement(ExtList children) {
@@ -1337,21 +1344,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    private class ParameterDeclarationAction extends DefaultAction {
-        ParameterDeclaration x;
-
-        ParameterDeclarationAction(ParameterDeclaration x) {
-            super(x);
-            this.x = x;
-        }
-
-        @Override
-        ProgramElement createNewElement(ExtList changeList) {
-            return new ParameterDeclaration(changeList,
-                    x.parentIsInterfaceDeclaration(), x.isVarArg());
-        }
-    }
-
     // eee
     @Override
     public void performActionOnForUpdates(final ForUpdates x) {
@@ -1521,22 +1513,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    /**
-     * returns the position of pe2 in the virtual child array of pe1
-     * @param pe1 A {@link NonTerminalProgramElement}
-     * @param pe2 A {@link ProgramElement}
-     * @return pe2's position in pe1
-     */
-    protected static int getPosition(NonTerminalProgramElement pe1,
-            ProgramElement pe2) {
-        int n = pe1.getChildCount();
-        int i = 0;
-        while ((i < n) && (pe1.getChildAt(i) != pe2)) {
-            i++;
-        }
-        return (i == n) ? -1 : i;
-    }
-
     protected void changed() {
         ExtList list = stack.peek();
         if (list.isEmpty() || list.getFirst() != CHANGED) {
@@ -1560,6 +1536,21 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         stack.pop();
         for (int i = 0, sz = arr.size(); i < sz; i++) {
             addToTopOfStack(arr.get(i));
+        }
+    }
+
+    private class ParameterDeclarationAction extends DefaultAction {
+        ParameterDeclaration x;
+
+        ParameterDeclarationAction(ParameterDeclaration x) {
+            super(x);
+            this.x = x;
+        }
+
+        @Override
+        ProgramElement createNewElement(ExtList changeList) {
+            return new ParameterDeclaration(changeList,
+                    x.parentIsInterfaceDeclaration(), x.isVarArg());
         }
     }
 

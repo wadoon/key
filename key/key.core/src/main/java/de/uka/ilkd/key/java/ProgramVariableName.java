@@ -11,12 +11,13 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-/** represents a name of a program variable
+/**
+ * represents a name of a program variable
  */
 package de.uka.ilkd.key.java;
 
-public interface ProgramVariableName 
-    extends de.uka.ilkd.key.java.TerminalProgramElement {
+public interface ProgramVariableName
+        extends de.uka.ilkd.key.java.TerminalProgramElement {
 
 
 //     public Comment[] getComments();

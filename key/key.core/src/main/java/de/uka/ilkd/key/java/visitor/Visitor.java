@@ -24,12 +24,7 @@ import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -184,7 +179,7 @@ public interface Visitor {
     void performActionOnFieldSpecification(FieldSpecification x);
 
     void performActionOnImplicitFieldSpecification
-        (ImplicitFieldSpecification x);
+            (ImplicitFieldSpecification x);
 
     void performActionOnBinaryAnd(BinaryAnd x);
 
@@ -219,7 +214,7 @@ public interface Visitor {
     void performActionOnTimesAssignment(TimesAssignment x);
 
     void performActionOnUnsignedShiftRightAssignment(
-        UnsignedShiftRightAssignment x);
+            UnsignedShiftRightAssignment x);
 
     void performActionOnBinaryNot(BinaryNot x);
 
@@ -385,7 +380,7 @@ public interface Visitor {
 
     void performActionOnTransactionStatement(TransactionStatement transSt);
 
-    public void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
+    void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
 
     void performActionOnExec(Exec exec);
 

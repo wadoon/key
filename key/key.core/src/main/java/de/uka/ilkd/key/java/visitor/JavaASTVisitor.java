@@ -12,7 +12,6 @@
 //
 
 package de.uka.ilkd.key.java.visitor;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.*;
@@ -25,19 +24,14 @@ import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Extends the JavaASTWalker to use the visitor mechanism. The
@@ -45,13 +39,15 @@ import de.uka.ilkd.key.speclang.MergeContract;
  * they call the method <code> doDefaultAction(ProgramElement) </code>.
  */
 public abstract class JavaASTVisitor extends JavaASTWalker
-    implements Visitor {
+        implements Visitor {
 
     protected final Services services;
 
 
-    /** create the JavaASTVisitor
-     * @param root the ProgramElement where to begin
+    /**
+     * create the JavaASTVisitor
+     *
+     * @param root     the ProgramElement where to begin
      * @param services the Services object
      */
     public JavaASTVisitor(ProgramElement root, Services services) {
@@ -63,23 +59,23 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     @Override
     protected void walk(ProgramElement node) {
         super.walk(node);
-        if(node instanceof LoopStatement && services != null) {
+        if (node instanceof LoopStatement && services != null) {
             LoopSpecification li = services.getSpecificationRepository()
-                                       .getLoopSpec((LoopStatement) node);
-            if(li != null) {
+                    .getLoopSpec((LoopStatement) node);
+            if (li != null) {
                 performActionOnLoopInvariant(li);
             }
         } else if (node instanceof StatementBlock && services != null) {
             ImmutableSet<BlockContract> bcs =
-                services.getSpecificationRepository()
-                    .getBlockContracts((StatementBlock) node);
+                    services.getSpecificationRepository()
+                            .getBlockContracts((StatementBlock) node);
             for (BlockContract bc : bcs) {
                 performActionOnBlockContract(bc);
             }
 
             ImmutableSet<LoopContract> lcs =
-                services.getSpecificationRepository()
-                    .getLoopContracts((StatementBlock) node);
+                    services.getSpecificationRepository()
+                            .getLoopContracts((StatementBlock) node);
             for (LoopContract lc : lcs) {
                 performActionOnLoopContract(lc);
             }
@@ -101,8 +97,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
 
-    /** the action that is performed just before leaving the node the
+    /**
+     * the action that is performed just before leaving the node the
      * last time
+     *
      * @param node the node described above
      */
     protected abstract void doDefaultAction(SourceElement node);
@@ -711,7 +709,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 
     @Override
     public void performActionOnSchemaVariable(SchemaVariable x) {
-        doDefaultAction((ProgramSV)x);
+        doDefaultAction((ProgramSV) x);
     }
 
     @Override

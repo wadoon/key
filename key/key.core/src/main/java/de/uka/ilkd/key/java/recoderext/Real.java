@@ -18,8 +18,8 @@ import recoder.service.ProgramModelInfo;
 
 /**
  * recoder extension for JML's \real type.
- * @author bruns
  *
+ * @author bruns
  */
 public final class Real extends PrimitiveType {
 

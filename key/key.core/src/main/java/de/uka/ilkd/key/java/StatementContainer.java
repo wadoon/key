@@ -15,15 +15,16 @@ package de.uka.ilkd.key.java;
 
 
 /**
- *  Statement container.
+ * Statement container.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 
 public interface StatementContainer extends NonTerminalProgramElement {
 
     /**
- *      Get the number of statements in this container.
- *      @return the number of statements.
+     * Get the number of statements in this container.
+     *
+     * @return the number of statements.
      */
     int getStatementCount();
 

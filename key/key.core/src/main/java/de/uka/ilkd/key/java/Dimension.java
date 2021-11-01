@@ -15,14 +15,14 @@ package de.uka.ilkd.key.java;
 
 public class Dimension {
 
-    private int dim;
+    private final int dim;
 
     public Dimension(int dim) {
-	this.dim=dim;
+        this.dim = dim;
     }
 
     public int getDimension() {
-	return dim;
+        return dim;
     }
 
 }

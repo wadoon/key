@@ -1,17 +1,6 @@
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.Stack;
-
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
@@ -19,15 +8,17 @@ import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.LoopApplyHeadRule;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
+import org.key_project.util.ExtList;
+
+import java.util.Stack;
 
 /**
  * This replaces all breaks and continues in a loop with {@code break l}, where {@code l} is a
  * specified label. It is used in the transformation of a for loop to a while loop.
  *
+ * @author lanzinger
  * @see LoopApplyHeadRule
  * @see LoopContractImpl
- *
- * @author lanzinger
  */
 public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
@@ -51,21 +42,15 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
     private StatementBlock result;
 
     /**
-     *
-     * @param block
-     *            a block that begins with a loop.
-     * @param loopLabels
-     *            all labels belonging to the loop.
-     * @param breakLabel
-     *            the label used for break statements.
-     * @param continueLabel
-     *            the label used for continue statements.
-     * @param services
-     *            services.
+     * @param block         a block that begins with a loop.
+     * @param loopLabels    all labels belonging to the loop.
+     * @param breakLabel    the label used for break statements.
+     * @param continueLabel the label used for continue statements.
+     * @param services      services.
      */
     public InnerBreakAndContinueReplacer(final StatementBlock block,
-            final Iterable<Label> loopLabels, final Label breakLabel, final Label continueLabel,
-            final Services services) {
+                                         final Iterable<Label> loopLabels, final Label breakLabel, final Label continueLabel,
+                                         final Services services) {
         super(block, services);
         for (Label label : loopLabels) {
             this.loopLabels.add(label);
@@ -108,7 +93,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
     @Override
     protected void walk(final ProgramElement node) {
         if (node.getPositionInfo() != PositionInfo.UNDEFINED) {
-            stack.push(new ExtList(new Object[] { node.getPositionInfo() }));
+            stack.push(new ExtList(new Object[]{node.getPositionInfo()}));
         } else {
             stack.push(new ExtList());
         }

@@ -32,7 +32,7 @@ public class EmptyMapLiteral extends Literal {
 
     @Override
     public boolean equalsModRenaming(SourceElement o,
-            NameAbstractionTable nat) {
+                                     NameAbstractionTable nat) {
         return o == this;
     }
 

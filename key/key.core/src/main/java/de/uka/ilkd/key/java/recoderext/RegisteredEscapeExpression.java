@@ -9,8 +9,7 @@ import java.util.List;
 /**
  * This class handles all escape expressions in set-statements, that are registered
  * in JMLTranslator.jml2jdl
- * 
- * 
+ *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class RegisteredEscapeExpression extends EscapeExpression {
@@ -19,7 +18,7 @@ public class RegisteredEscapeExpression extends EscapeExpression {
      * generated UID
      */
     private static final long serialVersionUID = 5400879603292633806L;
-    
+
     private final String mapEscape;
 
     RegisteredEscapeExpression(String mapEscape, List<Expression> arguments) {

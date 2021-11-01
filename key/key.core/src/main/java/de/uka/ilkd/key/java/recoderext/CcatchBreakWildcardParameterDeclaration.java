@@ -41,7 +41,7 @@ public class CcatchBreakWildcardParameterDeclaration
 
     @Override
     public boolean replaceChild(recoder.java.ProgramElement arg0,
-            recoder.java.ProgramElement arg1) {
+                                recoder.java.ProgramElement arg1) {
         return false;
     }
 

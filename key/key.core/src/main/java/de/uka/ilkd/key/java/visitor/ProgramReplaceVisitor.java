@@ -13,9 +13,6 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -25,6 +22,8 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used to
@@ -32,22 +31,18 @@ import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
  */
 public class ProgramReplaceVisitor extends CreatingASTVisitor {
 
-    private ProgramElement result = null;
-
     private final SVInstantiations svinsts;
+    private ProgramElement result = null;
 
     /**
      * create the ProgramReplaceVisitor
      *
-     * @param root
-     *            the ProgramElement where to begin
-     * @param services
-     *            The Services object.
-     * @param svi
-     *            Schema Variable Instantiations
+     * @param root     the ProgramElement where to begin
+     * @param services The Services object.
+     * @param svi      Schema Variable Instantiations
      */
     public ProgramReplaceVisitor(ProgramElement root, Services services,
-            SVInstantiations svi) {
+                                 SVInstantiations svi) {
         super(root, false, services);
         svinsts = svi;
     }
@@ -60,7 +55,9 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
         node.visit(this);
     }
 
-    /** starts the walker */
+    /**
+     * starts the walker
+     */
     @Override
     public void start() {
         assert result == null : "ProgramReplaceVisitor is not designed for multiple walks";
@@ -102,8 +99,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
         if (inst instanceof ProgramElement) {
             addChild((ProgramElement) inst);
         } else if (inst instanceof ImmutableArray/* <ProgramElement> */) {
-            @SuppressWarnings("unchecked")
-            final ImmutableArray<ProgramElement> instArray = (ImmutableArray<ProgramElement>) inst;
+            @SuppressWarnings("unchecked") final ImmutableArray<ProgramElement> instArray = (ImmutableArray<ProgramElement>) inst;
             // the assertion ensures the intended instanceof check from above
             assert instArray.size() == 0
                     || instArray.last() instanceof ProgramElement;
@@ -114,8 +110,8 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
                     .convertToProgramElement((Term) inst));
         } else {
             throw new IllegalStateException(
-                "programreplacevisitor: Instantiation missing "
-                        + "for schema variable " + sv);
+                    "programreplacevisitor: Instantiation missing "
+                            + "for schema variable " + sv);
         }
         changed();
     }

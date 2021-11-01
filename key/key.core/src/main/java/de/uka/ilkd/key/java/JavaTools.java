@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.java;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
@@ -23,11 +21,13 @@ import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import org.key_project.util.ExtList;
 
-/** Miscellaneous static methods related to Java blocks or statements in KeY.
+/**
+ * Miscellaneous static methods related to Java blocks or statements in KeY.
  * Mostly moved from key.util.MiscTools here.
- * @author bruns
  *
+ * @author bruns
  */
 public final class JavaTools {
 
@@ -41,7 +41,7 @@ public final class JavaTools {
         while ((result instanceof ProgramPrefix
                 || result instanceof CatchAllStatement)
                 && !(result instanceof StatementBlock
-                        && ((StatementBlock) result).isEmpty())) {
+                && ((StatementBlock) result).isEmpty())) {
             if (result instanceof LabeledStatement) {
                 result = ((LabeledStatement) result).getChildAt(1);
             } else if (result instanceof CatchAllStatement) {
@@ -57,31 +57,31 @@ public final class JavaTools {
      * Returns the passed java block without its active statement.
      */
     public static JavaBlock removeActiveStatement(JavaBlock jb,
-            Services services) {
+                                                  Services services) {
         assert jb.program() != null;
         final SourceElement activeStatement = JavaTools.getActiveStatement(jb);
         Statement newProg = (Statement)
-            (new CreatingASTVisitor(jb.program(), false, services) {
-            private boolean done = false;
+                (new CreatingASTVisitor(jb.program(), false, services) {
+                    private boolean done = false;
 
-            public ProgramElement go() {
-                stack.push(new ExtList());
-                walk(root());
-                ExtList el = stack.peek();
-                return el.get(ProgramElement.class);
-            }
+                    public ProgramElement go() {
+                        stack.push(new ExtList());
+                        walk(root());
+                        ExtList el = stack.peek();
+                        return el.get(ProgramElement.class);
+                    }
 
-            @Override
-            public void doAction(ProgramElement node) {
-                if (!done && node == activeStatement) {
-                    done = true;
-                    stack.pop();
-                    changed();
-                } else {
-                    super.doAction(node);
-                }
-            }
-        }).go();
+                    @Override
+                    public void doAction(ProgramElement node) {
+                        if (!done && node == activeStatement) {
+                            done = true;
+                            stack.pop();
+                            changed();
+                        } else {
+                            super.doAction(node);
+                        }
+                    }
+                }).go();
 
         StatementBlock newSB = newProg instanceof StatementBlock
                 ? (StatementBlock) newProg
@@ -93,7 +93,7 @@ public final class JavaTools {
      * Returns the innermost method frame of the passed java block
      */
     public static MethodFrame getInnermostMethodFrame(ProgramElement pe,
-            Services services) {
+                                                      Services services) {
         final MethodFrame result = new JavaASTVisitor(pe, services) {
             private MethodFrame res;
 
@@ -120,16 +120,16 @@ public final class JavaTools {
      * Returns the innermost method frame of the passed java block
      */
     public static MethodFrame getInnermostMethodFrame(JavaBlock jb,
-            Services services) {
+                                                      Services services) {
         return getInnermostMethodFrame(jb.program(), services);
     }
 
     public static ExecutionContext getInnermostExecutionContext(
-        						JavaBlock jb, 
+            JavaBlock jb,
             Services services) {
         final MethodFrame frame = getInnermostMethodFrame(jb, services);
-    return frame == null 
-               ? null
+        return frame == null
+                ? null
                 : (ExecutionContext) frame.getExecutionContext();
     }
 

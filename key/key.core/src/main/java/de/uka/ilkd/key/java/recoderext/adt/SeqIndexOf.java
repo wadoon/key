@@ -25,7 +25,8 @@ public class SeqIndexOf extends Operator {
 
     /**
      * Creates an "index of" operator.
-     * @param seq Sequence to operate on
+     *
+     * @param seq  Sequence to operate on
      * @param elem The element to look for in the sequence
      */
     public SeqIndexOf(Expression seq, Expression elem) {
@@ -40,37 +41,37 @@ public class SeqIndexOf extends Operator {
     }
 
 
-    @Override    
+    @Override
     public SeqIndexOf deepClone() {
         return new SeqIndexOf(this);
     }
 
 
-    @Override    
+    @Override
     public int getArity() {
         return 2;
     }
 
 
-    @Override    
+    @Override
     public int getPrecedence() {
         return 0;
     }
 
 
-    @Override    
+    @Override
     public int getNotation() {
         return PREFIX;
     }
 
 
-    @Override    
+    @Override
     public void accept(SourceVisitor v) {
 
     }
-    
+
     @Override
-    public String toSource(){
-        return "\\indexOf("+children.get(0).toSource()+","+children.get(1).toSource()+")";
+    public String toSource() {
+        return "\\indexOf(" + children.get(0).toSource() + "," + children.get(1).toSource() + ")";
     }
 }

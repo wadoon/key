@@ -13,12 +13,6 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.Map;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -27,13 +21,13 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
-import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
+import org.key_project.util.collection.ImmutableList;
+
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Map;
 
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used
@@ -48,10 +42,8 @@ public class ProgramVariableCollector extends JavaASTVisitor {
      * this constructor is equivalent to
      * <tt>ProggramVariableCollector(root, false)</tt>
      *
-     * @param root
-     *            the ProgramElement which is the root of the AST
-     * @param services
-     *            the Services object
+     * @param root     the ProgramElement which is the root of the AST
+     * @param services the Services object
      */
     public ProgramVariableCollector(ProgramElement root, Services services) {
         super(root, services);
@@ -92,9 +84,9 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     @Override
     public void performActionOnMergeContract(MergeContract x) {
         assert (x instanceof UnparameterizedMergeContract)
-                    || (x instanceof PredicateAbstractionMergeContract)
+                || (x instanceof PredicateAbstractionMergeContract)
                 : "Unexpected type of merge contract: "
-                        + x.getClass().getSimpleName();
+                + x.getClass().getSimpleName();
 
         if (x instanceof UnparameterizedMergeContract) {
             return;
@@ -134,9 +126,9 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         }
 
         // free invariants
-        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             Term inv = x.getFreeInvariant(heap, selfTerm, atPres, services);
-            if(inv != null) {
+            if (inv != null) {
                 inv.execPostOrder(tpvc);
             }
         }

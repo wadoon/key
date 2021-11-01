@@ -13,66 +13,22 @@
 
 package de.uka.ilkd.key.java;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.NullType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.recoderext.ClassFileDeclarationManager;
-import de.uka.ilkd.key.java.recoderext.ClassInitializeMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.ClassPreparationMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.ConstantStringExpressionEvaluator;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
-import de.uka.ilkd.key.java.recoderext.CreateBuilder;
-import de.uka.ilkd.key.java.recoderext.CreateObjectBuilder;
-import de.uka.ilkd.key.java.recoderext.EnumClassBuilder;
-import de.uka.ilkd.key.java.recoderext.ExtendedIdentifier;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
-import de.uka.ilkd.key.java.recoderext.InstanceAllocationMethodBuilder;
-import de.uka.ilkd.key.java.recoderext.JMLTransformer;
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.java.recoderext.LocalClassTransformation;
-import de.uka.ilkd.key.java.recoderext.ObjectTypeIdentifier;
-import de.uka.ilkd.key.java.recoderext.PrepareObjectBuilder;
-import de.uka.ilkd.key.java.recoderext.RecoderModelTransformer;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.java.recoderext.*;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.DirectoryFileCollection;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
-import de.uka.ilkd.key.util.FileCollection;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.ZipFileCollection;
+import de.uka.ilkd.key.util.*;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import recoder.ParserException;
 import recoder.ProgramFactory;
 import recoder.bytecode.ByteCodeParser;
@@ -82,7 +38,6 @@ import recoder.io.DataFileLocation;
 import recoder.io.DataLocation;
 import recoder.io.PropertyNames;
 import recoder.java.CompilationUnit;
-import recoder.java.ProgramElement;
 import recoder.java.declaration.ClassInitializer;
 import recoder.java.declaration.MethodDeclaration;
 import recoder.list.generic.ASTArrayList;
@@ -93,26 +48,31 @@ import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.KeYCrossReferenceSourceInfo;
 import recoder.service.UnresolvedReferenceException;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.*;
+
 /**
  * This class is the bridge between recoder ast data structures and KeY data
  * structures. Syntactical entities and types can be transferred from recoder to
  * KeY.
- * 
+ * <p>
  * It manages the entire contact with the recoder framework and ensures that
  * their cross-referencing data is always uptodate. Prior to reading any source
  * code, special classes (i.e. stubs for some needed library classes) are parsed
  * in to have them available at any time.
- * 
+ * <p>
  * To use a Recoder2KeY bridge to convert data structures you can use the
  * functions: {@link #readCompilationUnit(String)},
  * {@link #readCompilationUnitsAsFiles(String[])} or the
  * {@link #readBlock(String, Context)}-methods.
- * 
+ * <p>
  * Results are often stored in caches.
- * 
+ * <p>
  * It used to be monolithic but now uses separate classes for doing the actual
  * conversion and type conversion.
- * 
+ *
  * @see Recoder2KeYConverter
  * @see Recoder2KeYTypeConverter
  */
@@ -120,13 +80,17 @@ import recoder.service.UnresolvedReferenceException;
 public class Recoder2KeY implements JavaReader {
 
     /**
+     * counter used to enumerate the anonymous implicit classes
+     */
+    private static int interactCounter = 0;
+    private final Services services;
+    /**
      * the set of File objects that describes the classpath to be searched
      * for classes.
-     * it may contain a null file which indicates that the default classes are 
+     * it may contain a null file which indicates that the default classes are
      * not to be read.
      */
     private List<File> classPath;
-    
     /**
      * the File object that describes the directory from which the internal
      * classes are to be read. They are read in differently - therefore the
@@ -134,68 +98,50 @@ public class Recoder2KeY implements JavaReader {
      * be read from an internal repository.
      */
     private File bootClassPath;
-
     /**
      * this mapping stores the relation between recoder and KeY entities in a
      * bidirectional way.
-     * 
+     * <p>
      * It is used for syntactical structures and types.
      */
-    private KeYRecoderMapping mapping;
-
+    private final KeYRecoderMapping mapping;
     /**
      * Recoder's serviceConfiguration that is used throughout this process.
      */
-    private KeYCrossReferenceServiceConfiguration servConf;
-
-    /**
-     * counter used to enumerate the anonymous implicit classes
-     * 
-     */
-    private static int interactCounter = 0;
-
+    private final KeYCrossReferenceServiceConfiguration servConf;
     /**
      * this flag indicates whether we are currently parsing library classes
      * (special classes)
      */
     private boolean parsingLibs = false;
-
     /**
      * the object that handles the transformation from recoder AST to KeY AST
      */
-    private Recoder2KeYConverter converter;
-
+    private final Recoder2KeYConverter converter;
     /**
      * the object that handles the transformation from recoder types to KeY
      * types
      */
-    private Recoder2KeYTypeConverter typeConverter;
-
+    private final Recoder2KeYTypeConverter typeConverter;
     /**
-     * the list of classnames that contain the classes that are referenced but not 
+     * the list of classnames that contain the classes that are referenced but not
      * defined. For those classe types a dummy stub is created at parse time.
      */
     private Collection<? extends CompilationUnit> dynamicallyCreatedCompilationUnits;
-    
-    private final Services services;
 
     /**
      * create a new Recoder2KeY transformation object.
-     * 
+     * <p>
      * The converter and type converter associated with this object will be
      * created. Several properties of the recoder framework will be set up.
-     * 
+     * <p>
      * The classpath is set to null, the mapping is retrieved from the services,
      * as well as the underlying type converter
-     * 
-     * @param servConf
-     *            the service configuration to be used, not null
-     * @param rec2key
-     *            the mapping to store mapped types and mapped ASTs to, not null
-     * @param nss
-     *            the namespaces to work upon, not null
-     * @param tc
-     *            the type converter, not null
+     *
+     * @param servConf the service configuration to be used, not null
+     * @param rec2key  the mapping to store mapped types and mapped ASTs to, not null
+     * @param nss      the namespaces to work upon, not null
+     * @param tc       the type converter, not null
      */
     public Recoder2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf, KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
         this(services, servConf, null, rec2key, nss, tc);
@@ -203,44 +149,35 @@ public class Recoder2KeY implements JavaReader {
 
     /**
      * create a new Recoder2KeY transformation object.
-     * 
+     * <p>
      * The converter and type converter associated with this object will be
      * created. Several properties of the recoder framework will be set up.
-     * 
+     * <p>
      * The classpath is set to null, the mapping is retrieved from the services,
      * as well as the underlying type converter
-     * 
-     * @param services
-     *            services to retrieve objects from, not null
-     * @param nss
-     *            the namespaces to work upon, not null
+     *
+     * @param services services to retrieve objects from, not null
+     * @param nss      the namespaces to work upon, not null
      */
     public Recoder2KeY(Services services, NamespaceSet nss) {
-        this(services,services.getJavaInfo().getKeYProgModelInfo().getServConf(), null, services.getJavaInfo().rec2key(), nss, services.getTypeConverter());
+        this(services, services.getJavaInfo().getKeYProgModelInfo().getServConf(), null, services.getJavaInfo().rec2key(), nss, services.getTypeConverter());
     }
 
     /**
      * create a new Recoder2KeY transformation object.
-     * 
+     * <p>
      * The converter and type converter associated with this object will be
      * created. Several properties of the recoder framework will be set up.
-     * 
-     * @param servConf
-     *            the service configuration to be used, not null
-     * @param classPath
-     *            the classpath to look up source files, ignored if null
-     * @param rec2key
-     *            the mapping to store mapped types and mapped ASTs to, not null
-     * @param nss
-     *            the namespaces to work upon, not null
-     * @param tc
-     *            the type converter, not null
-     * 
-     * @throws IllegalArgumentException
-     *             if arguments are not valid (null e.g.)
+     *
+     * @param servConf  the service configuration to be used, not null
+     * @param classPath the classpath to look up source files, ignored if null
+     * @param rec2key   the mapping to store mapped types and mapped ASTs to, not null
+     * @param nss       the namespaces to work upon, not null
+     * @param tc        the type converter, not null
+     * @throws IllegalArgumentException if arguments are not valid (null e.g.)
      */
-    private Recoder2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf, String classPath, 
-	    KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
+    private Recoder2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf, String classPath,
+                        KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
 
         if (servConf == null)
             throw new IllegalArgumentException("service configuration is null");
@@ -250,8 +187,8 @@ public class Recoder2KeY implements JavaReader {
 
         if (nss == null)
             throw new IllegalArgumentException("namespaces is null");
-        
-        if(!(servConf.getProjectSettings().getErrorHandler() instanceof KeYRecoderExcHandler))
+
+        if (!(servConf.getProjectSettings().getErrorHandler() instanceof KeYRecoderExcHandler))
             throw new IllegalArgumentException("Recoder2KeY needs a KeyRecoderExcHandler as exception handler");
 
         this.services = services;
@@ -259,25 +196,95 @@ public class Recoder2KeY implements JavaReader {
         this.mapping = rec2key;
         this.converter = makeConverter(services, nss);
         this.typeConverter = new Recoder2KeYTypeConverter(services, tc, nss, this);
-        
+
         // set up recoder:
         recoder.util.Debug.setLevel(500);
-        
+
         // do not look up classes anywhere but in the included classes 
         // or the specified classpaths
         servConf.getProjectSettings().setProperty(PropertyNames.CLASS_SEARCH_MODE, "");
 
     }
-    
-    
-    
+
+    /**
+     * reduce the size of a string to a maximum of 150 characters. Introduces
+     * ellipses [...]
+     */
+    private static String trim(String s) {
+        return trim(s, 150);
+    }
+
+    /**
+     * reduce the size of a string to a maximum of length.
+     */
+    private static String trim(String s, int length) {
+        if (s.length() > length)
+            return s.substring(0, length - 5) + "[...]";
+        return s;
+    }
+
+    /**
+     * tries to parse recoders exception position information
+     */
+    private static int[] extractPositionInfo(String errorMessage) {
+        if (errorMessage == null || errorMessage.indexOf('@') == -1) {
+            return new int[0];
+        }
+        int line = -1;
+        int column = -1;
+        try {
+            String pos = errorMessage.substring(errorMessage.indexOf("@") + 1);
+            pos = pos.substring(0, pos.indexOf(" "));
+            line = Integer.parseInt(pos.substring(0, pos.indexOf('/')));
+            column = Integer.parseInt(pos.substring(pos.indexOf('/') + 1));
+        } catch (NumberFormatException nfe) {
+            Debug.out("recoder2key:unresolved reference at " + "line:" + line + " column:" + column);
+            return new int[0];
+        } catch (StringIndexOutOfBoundsException siexc) {
+            return new int[0];
+        }
+        return new int[]{line, column};
+    }
+
+    /**
+     * report an error in form of a ConvertException. The cause is always
+     * attached to the resulting exception.
+     *
+     * @param message message to be used.
+     * @param t       the cause of the exceptional case
+     * @throws ConvertException always
+     */
+    public static void reportError(String message, Throwable t) {
+        // Attention: this highly depends on Recoders exception messages!
+        Throwable cause = t;
+        if (t instanceof ExceptionHandlerException) {
+            if (t.getCause() != null) {
+                cause = t.getCause();
+            }
+        }
+
+        if (cause instanceof PosConvertException) {
+            throw (PosConvertException) cause;
+        }
+
+        int[] pos = extractPositionInfo(cause.toString());
+        final RuntimeException rte;
+        if (pos.length > 0) {
+            rte = new PosConvertException(message, pos[0], pos[1]);
+            rte.initCause(cause);
+        } else {
+            rte = new ConvertException(message, cause);
+        }
+
+        throw rte;
+    }
+
     /**
      * create the ast converter. This is overwritten in SchemaRecoder2KeY to use
      * schema-aware converters.
-     * @param services 
-     * 
-     * @param nss the namespaces provided to the constructor 
-     * 
+     *
+     * @param services
+     * @param nss      the namespaces provided to the constructor
      * @return a newley created converter
      */
     protected Recoder2KeYConverter makeConverter(Services services, NamespaceSet nss) {
@@ -286,7 +293,7 @@ public class Recoder2KeY implements JavaReader {
 
     /**
      * return the associated converter object
-     * 
+     *
      * @return not null
      */
     public Recoder2KeYConverter getConverter() {
@@ -295,7 +302,7 @@ public class Recoder2KeY implements JavaReader {
 
     /**
      * return the associated type converter object
-     * 
+     *
      * @return not null
      */
     public Recoder2KeYTypeConverter getTypeConverter() {
@@ -303,22 +310,23 @@ public class Recoder2KeY implements JavaReader {
     }
 
     /**
-     * set this to true before parsing special classes and to false afterwards.
-     * 
-     * @param v
-     *            the state of the special parsing flage
-     */
-    private void setParsingLibs(boolean v) {
-        parsingLibs = v;
-    }
-
-    /**
      * are we currently parsing library code (special classes)?
-     * 
+     *
      * @return true iff currently parsing special classes.
      */
     public boolean isParsingLibs() {
         return parsingLibs;
+    }
+
+    // ----- parsing of compilation units
+
+    /**
+     * set this to true before parsing special classes and to false afterwards.
+     *
+     * @param v the state of the special parsing flage
+     */
+    private void setParsingLibs(boolean v) {
+        parsingLibs = v;
     }
 
     public KeYCrossReferenceServiceConfiguration getServiceConfiguration() {
@@ -337,28 +345,24 @@ public class Recoder2KeY implements JavaReader {
         }
     }
 
-    // ----- parsing of compilation units
-
     /**
      * parse a list of java files and transform it to the corresponding KeY
      * entities.
-     *
+     * <p>
      * Each element of the array is treated as a filename to read in.
      *
-     * @param cUnitStrings
-     *            a list of strings, each element is interpreted as a file to be
-     *            read. not null.
-     * @param fileRepo the fileRepo which will store the files
+     * @param cUnitStrings a list of strings, each element is interpreted as a file to be
+     *                     read. not null.
+     * @param fileRepo     the fileRepo which will store the files
      * @return a new list containing the recoder compilation units corresponding
-     *         to the given files.
-     * @throws ParseExceptionInFile
-     *             any exception occurring while treating the file is wrapped
-     *             into a parse exception that contains the filename.
+     * to the given files.
+     * @throws ParseExceptionInFile any exception occurring while treating the file is wrapped
+     *                              into a parse exception that contains the filename.
      */
 
     public de.uka.ilkd.key.java.CompilationUnit[]
-            readCompilationUnitsAsFiles(String[] cUnitStrings, FileRepo fileRepo)
-                    throws ParseExceptionInFile {
+    readCompilationUnitsAsFiles(String[] cUnitStrings, FileRepo fileRepo)
+            throws ParseExceptionInFile {
 
         List<recoder.java.CompilationUnit> cUnits =
                 recoderCompilationUnitsAsFiles(cUnitStrings, fileRepo);
@@ -377,13 +381,14 @@ public class Recoder2KeY implements JavaReader {
 
     /**
      * Helper method for parsing a single compilation unit when a FileRepo is present.
+     *
      * @param fileRepo the FileRepo that provides the InputStream
      * @param filename the name of the file to read
      * @return the parsed compilation unit
      * @throws ParseExceptionInFile exceptions are wrapped into this to provide location information
      */
     private CompilationUnit readViaFileRepo(FileRepo fileRepo, String filename)
-        throws ParseExceptionInFile {
+            throws ParseExceptionInFile {
         try (InputStream is = fileRepo.getInputStream(Paths.get(filename));
              Reader fr = new InputStreamReader(is, StandardCharsets.UTF_8);
              BufferedReader br = new BufferedReader(fr)) {
@@ -393,9 +398,12 @@ public class Recoder2KeY implements JavaReader {
         }
     }
 
+    // ----- parsing libraries
+
     /**
      * Helper method for parsing a single compilation unit directly from a file, in case no FileRepo
      * is present.
+     *
      * @param filename the name of the file to read
      * @return the parsed compilation unit
      * @throws ParseExceptionInFile exceptions are wrapped into this to provide location information
@@ -411,18 +419,17 @@ public class Recoder2KeY implements JavaReader {
 
     /**
      * parse a list of java files.
-     *
+     * <p>
      * Each element of the array is treated as a filename to read in.
      *
-     * @param cUnitStrings
-     *            a list of strings, each element is interpreted as a file to be
-     *            read. not null.
-     * @param fileRepo the fileRepo which will store the files
+     * @param cUnitStrings a list of strings, each element is interpreted as a file to be
+     *                     read. not null.
+     * @param fileRepo     the fileRepo which will store the files
      * @return a new list containing the recoder compilation units corresponding
-     *         to the given files.
+     * to the given files.
      */
     private List<recoder.java.CompilationUnit> recoderCompilationUnitsAsFiles(String[] cUnitStrings,
-            FileRepo fileRepo) {
+                                                                              FileRepo fileRepo) {
         List<recoder.java.CompilationUnit> cUnits = new ArrayList<recoder.java.CompilationUnit>();
         parseSpecialClasses(fileRepo);
         try {
@@ -454,7 +461,7 @@ public class Recoder2KeY implements JavaReader {
             // transform program
             transformModel(cUnits);
         } catch (Exception ex) {
-            if(ex.getCause() instanceof UnresolvedReferenceException) {
+            if (ex.getCause() instanceof UnresolvedReferenceException) {
                 String extraMsg = "Consider using a classpath if this is a classtype that cannot be resolved\n";
                 reportError(extraMsg + ex.getCause().getMessage(), ex);
             } else {
@@ -463,25 +470,23 @@ public class Recoder2KeY implements JavaReader {
         }
         return cUnits;
     }
-    
+
     /**
      * read a compilation unit, given as a string.
-     * 
-     * @param cUnitString
-     *            a string represents a compilation unit
+     *
+     * @param cUnitString a string represents a compilation unit
      * @return a KeY structured compilation unit.
      */
     public de.uka.ilkd.key.java.CompilationUnit readCompilationUnit(String cUnitString) {
-        final recoder.java.CompilationUnit cc = recoderCompilationUnits(new String[] { cUnitString }).get(0);
+        final recoder.java.CompilationUnit cc = recoderCompilationUnits(new String[]{cUnitString}).get(0);
         return (de.uka.ilkd.key.java.CompilationUnit) getConverter().process(cc);
     }
 
     /**
      * read a number of compilation units, each given as a string.
-     * 
-     * @param cUnitStrings
-     *            an array of strings, each element represents a compilation
-     *            unit
+     *
+     * @param cUnitStrings an array of strings, each element represents a compilation
+     *                     unit
      * @return a list of KeY structured compilation units.
      */
     List<recoder.java.CompilationUnit> recoderCompilationUnits(String[] cUnitStrings) {
@@ -494,8 +499,8 @@ public class Recoder2KeY implements JavaReader {
             for (int i = 0; i < cUnitStrings.length; i++) {
                 current = i;
                 Debug.out("Reading " + trim(cUnitStrings[i]));
-                    sr = new BufferedReader(new StringReader(cUnitStrings[i]));                
-                    cUnits.add(servConf.getProgramFactory().parseCompilationUnit(sr));
+                sr = new BufferedReader(new StringReader(cUnitStrings[i]));
+                cUnits.add(servConf.getProgramFactory().parseCompilationUnit(sr));
             }
             // run cross referencer
             final ChangeHistory changeHistory = servConf.getChangeHistory();
@@ -523,19 +528,17 @@ public class Recoder2KeY implements JavaReader {
             }
         } finally {
             if (sr != null) {
-            	try {
-	            sr.close();
+                try {
+                    sr.close();
                 } catch (IOException e) {
-                    reportError("IOError reading java program " + 
-                	    cUnitStrings[current] + ". May be file not found or missing permissions.", e);
+                    reportError("IOError reading java program " +
+                            cUnitStrings[current] + ". May be file not found or missing permissions.", e);
                 }
             }
         }
         return cUnits;
     }
 
-    // ----- parsing libraries
-    
     public void setClassPath(File bootClassPath, List<File> classPath) {
         this.classPath = classPath;
         this.bootClassPath = bootClassPath;
@@ -544,53 +547,54 @@ public class Recoder2KeY implements JavaReader {
     /**
      * get the list of names of classes that have been created dynamically due
      * to lacking definitions.
-     * 
+     * <p>
      * For all classes that are referenced but not defined, an empty dummy stub
      * is created. This method returns the list of their fully qualified class
      * names.
-     * 
-     * @author mu, on rb's specification ;)
+     *
      * @return an unmodifiable list of fully qualified class names
+     * @author mu, on rb's specification ;)
      */
     public List<String> getDynamicallyCreatedClasses() {
         List<String> ret = new ArrayList<String>();
-        if(dynamicallyCreatedCompilationUnits != null) {
+        if (dynamicallyCreatedCompilationUnits != null) {
             for (CompilationUnit cu : dynamicallyCreatedCompilationUnits) {
                 ret.add(cu.getPrimaryTypeDeclaration().getFullName());
             }
         }
         return ret;
     }
-    
+
     /**
      * This method loads the internal classes - also called the "boot" classes.
-     * 
+     * <p>
      * If {@link #bootClassPath} is set to null, it locates java classes that
      * are stored internally within the jar-file or the binary directory. The
      * JAVALANG.TXT file lists all files to be loaded. The files are found using
      * a special {@link JavaReduxFileCollection}.
-     * 
+     * <p>
      * If, however, {@link #bootClassPath} is assigned a value, this is treated
      * as a directory (not a JAR file at the moment) and all files in this
      * directory are read in. This is done using a
      * {@link DirectoryFileCollection}.
+     *
      * @param fileRepo the FileRepo that provides the InputStream to resources
      */
     private void parseInternalClasses(ProgramFactory pf, List<recoder.java.CompilationUnit> rcuList,
-            FileRepo fileRepo) throws IOException, ParseException, ParserException {
-        
+                                      FileRepo fileRepo) throws IOException, ParseException, ParserException {
+
         FileCollection bootCollection;
         FileCollection.Walker walker = null;
-        if(bootClassPath == null) {
+        if (bootClassPath == null) {
             bootCollection = new JavaReduxFileCollection(services.getProfile());
             walker = bootCollection.createWalker(".java");
         } else {
             bootCollection = new DirectoryFileCollection(bootClassPath);
-            walker = bootCollection.createWalker(new String[] {".java", ".jml"} );
+            walker = bootCollection.createWalker(new String[]{".java", ".jml"});
         }
-        
-        
-        while(walker.step()) {
+
+
+        while (walker.step()) {
             DataLocation loc = walker.getCurrentDataLocation();
             try (InputStream is = walker.openCurrent(fileRepo);
                  Reader isr = new InputStreamReader(is);
@@ -600,22 +604,22 @@ public class Recoder2KeY implements JavaReader {
                 rcu.setDataLocation(loc);
                 // done by parser : rcu.makeAllParentRolesValid();
                 rcuList.add(rcu);
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 throw new ParseExceptionInFile(loc.toString(), ex);
             }
-            
+
             if (Debug.ENABLE_DEBUG) {
                 Debug.out("parsed: " + loc);
             }
         }
-        
+
     }
-    
+
     /**
      * reads compilation units that will be treated as library classes.
-     * 
+     * <p>
      * Proceed as follows:
-     * 
+     *
      * <ol>
      * <li> If "classPath" is set and contains at least one entry
      * <ol>
@@ -627,11 +631,11 @@ public class Recoder2KeY implements JavaReader {
      * <li>else read a special collection of classes that is stored internally
      * </ol>
      *
-     * @author mulbrich
      * @param fileRepo the FileRepo for obtaining InputStreams
      * @throws ParserException
      * @throws IOException
      * @throws ParseException
+     * @author mulbrich
      */
     private List<recoder.java.CompilationUnit> parseLibs(FileRepo fileRepo)
             throws ParseException, IOException, ParserException {
@@ -642,9 +646,9 @@ public class Recoder2KeY implements JavaReader {
 
         parseInternalClasses(pf, rcuList, fileRepo);
 
-        if(classPath != null) {
-            for(File cp : classPath) {
-                if(cp.isDirectory()) {
+        if (classPath != null) {
+            for (File cp : classPath) {
+                if (cp.isDirectory()) {
                     sources.add(new DirectoryFileCollection(cp));
                 } else {
                     sources.add(new ZipFileCollection(cp));
@@ -659,7 +663,7 @@ public class Recoder2KeY implements JavaReader {
         // -- read jml files --
         for (FileCollection fc : sources) {
             FileCollection.Walker walker = fc.createWalker(".jml");
-            while(walker.step()) {
+            while (walker.step()) {
                 currentDataLocation = walker.getCurrentDataLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
                      Reader isr = new InputStreamReader(is);
@@ -669,7 +673,7 @@ public class Recoder2KeY implements JavaReader {
                     rcu.setDataLocation(currentDataLocation);
                     removeCodeFromClasses(rcu, false);
                     rcuList.add(rcu);
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(), ex);
                 }
             }
@@ -678,7 +682,7 @@ public class Recoder2KeY implements JavaReader {
         // -- read java files --
         for (FileCollection fc : sources) {
             FileCollection.Walker walker = fc.createWalker(".java");
-            while(walker.step()) {
+            while (walker.step()) {
                 currentDataLocation = walker.getCurrentDataLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
                      Reader isr = new InputStreamReader(is);
@@ -688,70 +692,70 @@ public class Recoder2KeY implements JavaReader {
                     rcu.setDataLocation(currentDataLocation);
                     removeCodeFromClasses(rcu, true);
                     rcuList.add(rcu);
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(), ex);
                 }
             }
         }
 
         // -- read class files --
-        ClassFileDeclarationManager manager = new ClassFileDeclarationManager(pf); 
+        ClassFileDeclarationManager manager = new ClassFileDeclarationManager(pf);
         ByteCodeParser parser = new ByteCodeParser();
         for (FileCollection fc : sources) {
             FileCollection.Walker walker = fc.createWalker(".class");
-            while(walker.step()) {
+            while (walker.step()) {
                 currentDataLocation = walker.getCurrentDataLocation();
                 try (InputStream is = new BufferedInputStream(walker.openCurrent(fileRepo))) {
                     ClassFile cf = parser.parseClassFile(is);
                     manager.addClassFile(cf, currentDataLocation);
-                } catch(Exception ex) {
+                } catch (Exception ex) {
                     throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(), ex);
                 }
             }
         }
         rcuList.addAll(manager.getCompilationUnits());
-        
+
         recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(
                 new StringReader("public class " +
                         JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS + " { public static void " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_METHOD + "() {}  }"));
         rcuList.add(rcu);
 
         return rcuList;
-        
+
     }
 
     /*
      * removes code from a parsed compilation unit. This includes method bodies,
      * initial assignments, compile-time constants, static blocks.
-     * 
+     *
      * This is done for classes that are read in a classpath-context. For these
      * classes only contracts (if present) are to be considered.
-     * 
+     *
      * No need to inform changeHistory since the class is not yet registered.
      * Method bodies are set to null, i.e. all methods are stubs only
-     * 
+     *
      * TODO remove jml-model methods (or similar) also?
      * FIXME this does not work if jml set statements are last in a method
      * TODO leave it out all together?
      */
     private void removeCodeFromClasses(CompilationUnit rcu, boolean allowed) {
         TreeWalker tw = new TreeWalker(rcu);
-        
-        while(tw.next()) {
+
+        while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
             if (pe instanceof MethodDeclaration) {
                 MethodDeclaration methDecl = (MethodDeclaration) pe;
-                if(!allowed && methDecl.getBody() != null) {
-                    Debug.log4jWarn("Method body ("+methDecl.getName()+") should not be allowed: "+rcu.getDataLocation(),
-                	            Recoder2KeY.class.getName());
+                if (!allowed && methDecl.getBody() != null) {
+                    Debug.log4jWarn("Method body (" + methDecl.getName() + ") should not be allowed: " + rcu.getDataLocation(),
+                            Recoder2KeY.class.getName());
                 }
                 methDecl.setBody(null);
             }
             /*
             // This is deactivated to allow compile time constants in declaration stub files.
-            // see bug #1114 
+            // see bug #1114
             if (pe instanceof recoder.java.declaration.FieldSpecification) {
-                recoder.java.declaration.FieldSpecification fieldSpec = 
+                recoder.java.declaration.FieldSpecification fieldSpec =
                     (recoder.java.declaration.FieldSpecification) pe;
                 if(!allowed && fieldSpec.getInitializer() != null) {
                     Debug.log4jWarn("Field initializer ("+fieldSpec.getName()+") should not be allowed: "+rcu.getDataLocation(),
@@ -762,19 +766,21 @@ public class Recoder2KeY implements JavaReader {
             */
             if (pe instanceof ClassInitializer) {
                 ClassInitializer classInit = (ClassInitializer) pe;
-                if(!allowed && classInit.getBody() != null) {
-                    Debug.log4jWarn("There should be no class initializers: "+rcu.getDataLocation(),
-                	    	    Recoder2KeY.class.getName());
+                if (!allowed && classInit.getBody() != null) {
+                    Debug.log4jWarn("There should be no class initializers: " + rcu.getDataLocation(),
+                            Recoder2KeY.class.getName());
                 }
                 classInit.setBody(null);
             }
         }
     }
 
+    // ----- methods dealing with blocks.
+
     /**
      * makes sure that the special classes (library classes) have been parsed
      * in.
-     *
+     * <p>
      * If not parsed yet, the special classes are read in and converted.
      * This method throws only runtime exceptions for historical reasons.
      */
@@ -789,7 +795,7 @@ public class Recoder2KeY implements JavaReader {
     /**
      * makes sure that the special classes (library classes) have been parsed
      * in.
-     *
+     * <p>
      * If not parsed yet, the special classes are read in and converted.
      * This method throws only runtime exceptions for historical reasons.
      *
@@ -820,53 +826,53 @@ public class Recoder2KeY implements JavaReader {
             // TODO if duplicated files, take first one only!
             changeHistory.attached(specialClasses.get(i));
         }
-        
-        
+
+
         CrossReferenceSourceInfo sourceInfo = servConf.getCrossReferenceSourceInfo();
         assert sourceInfo instanceof KeYCrossReferenceSourceInfo :
-            "SourceInfo is not of type KeYCrossReferenceSourceInfo";
-        KeYCrossReferenceSourceInfo keySourceInfo = 
-            (KeYCrossReferenceSourceInfo)sourceInfo;
-        
+                "SourceInfo is not of type KeYCrossReferenceSourceInfo";
+        KeYCrossReferenceSourceInfo keySourceInfo =
+                (KeYCrossReferenceSourceInfo) sourceInfo;
+
         keySourceInfo.setIgnoreUnresolvedClasses(true);
 
         if (changeHistory.needsUpdate()) {
             changeHistory.updateModel();
         }
-        
+
         dynamicallyCreatedCompilationUnits = keySourceInfo.getCreatedStubClasses();
         specialClasses.addAll(dynamicallyCreatedCompilationUnits);
         keySourceInfo.setIgnoreUnresolvedClasses(false);
-        
+
         changeHistory.updateModel();
 
         transformModel(specialClasses);
-        
+
 //        NameInfo ni = servConf.getNameInfo();
 //        System.out.println("Known types:");
 //        for(ClassType ct : ni.getClassTypes()) {
 //            System.out.println(ct.getFullName());
 //        }
-        
+
         // make them available to the rec2key mapping
-        for(recoder.java.CompilationUnit cu : specialClasses) {
+        for (recoder.java.CompilationUnit cu : specialClasses) {
             DataLocation dl = cu.getOriginalDataLocation();
             assert dl != null : "DataLocation not set on " + cu.toSource();
             getConverter().processCompilationUnit(cu, dl);
         }
-        
+
         // Ensure that rec2key is complete (at least the NullType needs to be available!)
         if (!rec2key().mapped(servConf.getNameInfo().getNullType())) {
-           Sort objectSort = (Sort)services.getNamespaces().sorts().lookup(new Name("java.lang.Object"));
-           assert objectSort != null;
-           NullSort nullSort = new NullSort(objectSort);
-           KeYJavaType result = new KeYJavaType(NullType.JAVA_NULL, nullSort);
-           if(services.getNamespaces().sorts().lookup(nullSort.name()) == null) {
-              services.getNamespaces().sorts().add(nullSort);
-           }
-           rec2key().put(servConf.getNameInfo().getNullType(), result);
+            Sort objectSort = services.getNamespaces().sorts().lookup(new Name("java.lang.Object"));
+            assert objectSort != null;
+            NullSort nullSort = new NullSort(objectSort);
+            KeYJavaType result = new KeYJavaType(NullType.JAVA_NULL, nullSort);
+            if (services.getNamespaces().sorts().lookup(nullSort.name()) == null) {
+                services.getNamespaces().sorts().add(nullSort);
+            }
+            rec2key().put(servConf.getNameInfo().getNullType(), result);
         }
-        
+
         // tell the mapping that we have parsed the special classes
         rec2key().parsedSpecial(true);
 
@@ -875,53 +881,52 @@ public class Recoder2KeY implements JavaReader {
 
     /**
      * Transform a list of compilation units.
-     * 
+     * <p>
      * Once a compilation unit has been parsed in and prior to converting it to
      * the KeY structures, several transformations have to be performed upon it.
-     * 
+     * <p>
      * You can add your own Transformation here. Make sure it is in the correct
      * order.
-     * 
-     * @param cUnits
-     *            a list of compilation units, not null.
+     *
+     * @param cUnits a list of compilation units, not null.
      */
 
     protected void transformModel(List<recoder.java.CompilationUnit> cUnits) {
 
         RecoderModelTransformer.TransformerCache cache = new RecoderModelTransformer.TransformerCache(cUnits);
-        
-        ConstructorNormalformBuilder cnb; 
-                
-        RecoderModelTransformer[] transformer = new RecoderModelTransformer[] {
+
+        ConstructorNormalformBuilder cnb;
+
+        RecoderModelTransformer[] transformer = new RecoderModelTransformer[]{
                 new EnumClassBuilder(servConf, cache),
                 new JMLTransformer(servConf, cache),
                 new ImplicitFieldAdder(servConf, cache),
                 new InstanceAllocationMethodBuilder(servConf, cache),
                 cnb = new ConstructorNormalformBuilder(servConf, cache),
                 new ClassPreparationMethodBuilder(servConf, cache),
-                new ClassInitializeMethodBuilder(servConf, cache), 
-                new PrepareObjectBuilder(servConf, cache), 
+                new ClassInitializeMethodBuilder(servConf, cache),
+                new PrepareObjectBuilder(servConf, cache),
                 new CreateBuilder(servConf, cache),
                 new CreateObjectBuilder(servConf, cache),
                 new LocalClassTransformation(servConf, cache),
                 new ConstantStringExpressionEvaluator(servConf, cache)
         };
 
-        
+
         final ChangeHistory cHistory = servConf.getChangeHistory();
         for (RecoderModelTransformer aTransformer : transformer) {
             if (Debug.ENABLE_DEBUG) {
-                Debug.out("current transformer : " + aTransformer.toString());
+                Debug.out("current transformer : " + aTransformer);
             }
             aTransformer.execute();
         }
-        
+
         converter.locClass2finalVar = cnb.getLocalClass2FinalVar();
 
         if (cHistory.needsUpdate()) {
             cHistory.updateModel();
         }
-        
+
         // recoder changes the data location to some imaginary files
         // undo this by setting the original locations
         for (recoder.java.CompilationUnit cu : cUnits) {
@@ -929,16 +934,13 @@ public class Recoder2KeY implements JavaReader {
         }
     }
 
-    // ----- methods dealing with blocks.
-
     /**
      * wraps a RECODER StatementBlock in a method
-     * 
+     * <p>
      * it is wrapped in a method called
      * <code>&lt;virtual_method_for_parsing&gt;</code>.
-     * 
-     * @param block
-     *            the recoder.java.StatementBlock to wrap
+     *
+     * @param block the recoder.java.StatementBlock to wrap
      * @return the enclosing recoder.java.MethodDeclaration
      */
     protected recoder.java.declaration.MethodDeclaration embedBlock(recoder.java.StatementBlock block) {
@@ -955,12 +957,10 @@ public class Recoder2KeY implements JavaReader {
 
     /**
      * wraps a RECODER MethodDeclaration in a class
-     * 
-     * @param mdecl
-     *            the recoder.java.declaration.MethodDeclaration to wrap
-     * @param context
-     *            the recoder.java.declaration.ClassDeclaration where the method
-     *            has to be embedded
+     *
+     * @param mdecl   the recoder.java.declaration.MethodDeclaration to wrap
+     * @param context the recoder.java.declaration.ClassDeclaration where the method
+     *                has to be embedded
      * @return the enclosing recoder.java.declaration.ClassDeclaration
      */
     protected recoder.java.declaration.ClassDeclaration embedMethod(recoder.java.declaration.MethodDeclaration mdecl, Context context) {
@@ -994,7 +994,7 @@ public class Recoder2KeY implements JavaReader {
 
     /**
      * creates an empty RECODER compilation unit with a temporary name.
-     * 
+     *
      * @return the new recoder.java.CompilationUnit
      */
     public Context createEmptyContext() {
@@ -1005,9 +1005,8 @@ public class Recoder2KeY implements JavaReader {
     /**
      * create a new context with a temporary name and make a list of variables
      * visible from within. Use the default source info.
-     * 
-     * @param pvs
-     *            a list of variables
+     *
+     * @param pvs a list of variables
      * @return a newly created context.
      */
 
@@ -1018,12 +1017,9 @@ public class Recoder2KeY implements JavaReader {
     /**
      * create a new Context with a temporary name and make a list of variables
      * visible from within.
-     * 
-     * @param vars
-     *            a list of variables
-     * @param csi
-     *            a special source info
-     * 
+     *
+     * @param vars a list of variables
+     * @param csi  a special source info
      * @return a newly created context.
      */
     protected Context createContext(ImmutableList<ProgramVariable> vars, recoder.service.CrossReferenceSourceInfo csi) {
@@ -1034,17 +1030,15 @@ public class Recoder2KeY implements JavaReader {
 
     /**
      * add a list of variables to a context
-     * 
-     * @param classContext
-     *            context to add to
-     * @param vars
-     *            vars to add
+     *
+     * @param classContext context to add to
+     * @param vars         vars to add
      */
     private void addProgramVariablesToClassContext(recoder.java.declaration.ClassDeclaration classContext, ImmutableList<ProgramVariable> vars,
-            recoder.service.CrossReferenceSourceInfo csi) {
+                                                   recoder.service.CrossReferenceSourceInfo csi) {
 
-        HashMap<String, recoder.java.declaration.VariableSpecification> names2var = 
-            new LinkedHashMap<String, recoder.java.declaration.VariableSpecification>();
+        HashMap<String, recoder.java.declaration.VariableSpecification> names2var =
+                new LinkedHashMap<String, recoder.java.declaration.VariableSpecification>();
         Iterator<ProgramVariable> it = vars.iterator();
         java.util.HashSet<String> names = new java.util.HashSet<String>();
         ASTList<recoder.java.declaration.MemberDeclaration> list = classContext.getMembers();
@@ -1055,7 +1049,8 @@ public class Recoder2KeY implements JavaReader {
             classContext.setMembers(list);
         }
 
-        l: while (it.hasNext()) {
+        l:
+        while (it.hasNext()) {
             VariableSpecification keyVarSpec;
             ProgramVariable var = it.next();
             if (names.contains(var.name().toString())) {
@@ -1079,7 +1074,7 @@ public class Recoder2KeY implements JavaReader {
 
             String typeName = "";
             Type javaType = var.getKeYJavaType().getJavaType();
-            if(javaType == null) continue;
+            if (javaType == null) continue;
             typeName = javaType.getFullName();
 
             recoder.java.declaration.FieldDeclaration recVar = new recoder.java.declaration.FieldDeclaration(null, name2typeReference(typeName),
@@ -1100,7 +1095,7 @@ public class Recoder2KeY implements JavaReader {
 
     /**
      * look up in the mapping the variable specification for a program variable.
-     * 
+     * <p>
      * used by addProgramVariablesToClassContext
      */
     private VariableSpecification lookupVarSpec(ProgramVariable pv) {
@@ -1114,9 +1109,8 @@ public class Recoder2KeY implements JavaReader {
 
     /**
      * given a name as string, construct a recoder type reference from it.
-     * 
-     * @param typeName
-     *            non-null type name as string
+     *
+     * @param typeName non-null type name as string
      * @return a freshly created type reference to the given type.
      */
     private recoder.java.reference.TypeReference name2typeReference(String typeName) {
@@ -1124,8 +1118,8 @@ public class Recoder2KeY implements JavaReader {
         String baseType = TypeNameTranslator.getBaseType(typeName);
         int idx = baseType.indexOf('.');
         int lastIndex = 0;
-        String anonType="";
-        while (idx != -1 && baseType.charAt(lastIndex) >= 'a' 
+        String anonType = "";
+        while (idx != -1 && baseType.charAt(lastIndex) >= 'a'
                 && baseType.charAt(lastIndex) <= 'z') {
             String s = baseType.substring(lastIndex, idx);
             pr = new recoder.java.reference.PackageReference
@@ -1133,7 +1127,7 @@ public class Recoder2KeY implements JavaReader {
             lastIndex = idx + 1;
             idx = baseType.indexOf('.', lastIndex);
         }
-        baseType = anonType+baseType;
+        baseType = anonType + baseType;
         recoder.java.Identifier typeId;
         if (baseType.charAt(0) == '<') {
             typeId = new ImplicitIdentifier(baseType.substring(lastIndex));
@@ -1141,7 +1135,7 @@ public class Recoder2KeY implements JavaReader {
             typeId = new ObjectTypeIdentifier(baseType.substring(lastIndex));
         }
         recoder.java.reference.TypeReference result =
-            new recoder.java.reference.TypeReference(pr, typeId);
+                new recoder.java.reference.TypeReference(pr, typeId);
         result.setDimensions(TypeNameTranslator.getDimensions(typeName));
         return result;
     }
@@ -1149,12 +1143,10 @@ public class Recoder2KeY implements JavaReader {
     /**
      * parses a given JavaBlock using the context to determine the right
      * references and returns a statement block of recoder.
-     * 
-     * @param block
-     *            a String describing a java block
-     * @param context
-     *            recoder.java.CompilationUnit in which the block has to be
-     *            interpreted
+     *
+     * @param block   a String describing a java block
+     * @param context recoder.java.CompilationUnit in which the block has to be
+     *                interpreted
      * @return the parsed and resolved recoder statement block
      */
     recoder.java.StatementBlock recoderBlock(String block, Context context) {
@@ -1172,7 +1164,7 @@ public class Recoder2KeY implements JavaReader {
             servConf.getChangeHistory().attached(bl);
             servConf.getChangeHistory().attached(context.getCompilationUnitContext());
             servConf.getChangeHistory().updateModel();
-        
+
             // normalise constant string expressions
             List<CompilationUnit> cunits = new ArrayList<CompilationUnit>();
             cunits.add(context.getCompilationUnitContext());
@@ -1216,8 +1208,8 @@ public class Recoder2KeY implements JavaReader {
             reportError(e.getMessage(), e);
         } finally {
             if (sr != null) {
-        	try {
-	            sr.close();
+                try {
+                    sr.close();
                 } catch (IOException e) {
                 }
             }
@@ -1225,15 +1217,15 @@ public class Recoder2KeY implements JavaReader {
         return bl;
     }
 
+    // ----- helpers
+
     /**
      * parses a given JavaBlock using the context to determine the right
      * references
-     * 
-     * @param block
-     *            a String describing a java block
-     * @param context
-     *            recoder.java.CompilationUnit in which the block has to be
-     *            interprested
+     *
+     * @param block   a String describing a java block
+     * @param context recoder.java.CompilationUnit in which the block has to be
+     *                interprested
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readBlock(String block, Context context) {
@@ -1246,31 +1238,31 @@ public class Recoder2KeY implements JavaReader {
     /**
      * parses a given JavaBlock using the context to determine the right
      * references using an empty context
-     * 
-     * @param block
-     *            a String describing a java block
+     *
+     * @param block a String describing a java block
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readBlockWithEmptyContext(String block) {
         return readBlock(block, createEmptyContext());
     }
 
+    // ----- error handling
+
     /**
      * parses a given JavaBlock using a namespace to determine the right
      * references using an empty context. The variables of the namespace are
      * used to create a new class context
-     * 
-     * @param s
-     *            a String describing a java block
+     *
+     * @param s a String describing a java block
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> varns, String s) {
         Iterator<IProgramVariable> it = varns.allElements().iterator();
-        ImmutableList<ProgramVariable> pvs = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> pvs = ImmutableSLList.nil();
         while (it.hasNext()) {
             Named n = it.next();
             if (n instanceof ProgramVariable) {
-                pvs = pvs.append((ProgramVariable) n); //preserve the order (nested namespaces!) 
+                pvs = pvs.append((ProgramVariable) n); //preserve the order (nested namespaces!)
             }
         }
         return readBlock(s, createContext(pvs));
@@ -1278,9 +1270,9 @@ public class Recoder2KeY implements JavaReader {
 
     /**
      * make a new classdeclaration with a temporary name.
-     * 
+     * <p>
      * The name is a unique implicit identifier.
-     * 
+     *
      * @return a newly created recoder ClassDeclaration with a unique name
      */
     private recoder.java.declaration.ClassDeclaration interactClassDecl() {
@@ -1289,87 +1281,6 @@ public class Recoder2KeY implements JavaReader {
         interactCounter++;
         classContext.setProgramModelInfo(servConf.getCrossReferenceSourceInfo());
         return classContext;
-    }
-
-    // ----- helpers
-
-    /**
-     * reduce the size of a string to a maximum of 150 characters. Introduces
-     * ellipses [...]
-     */
-    private static String trim(String s) {
-        return trim(s, 150);
-    }
-
-    /**
-     * reduce the size of a string to a maximum of length.
-     */
-    private static String trim(String s, int length) {
-        if (s.length() > length)
-            return s.substring(0, length - 5) + "[...]";
-        return s;
-    }
-
-    // ----- error handling
-
-    /**
-     * tries to parse recoders exception position information
-     */
-    private static int[] extractPositionInfo(String errorMessage) {
-        if (errorMessage == null || errorMessage.indexOf('@') == -1) {
-            return new int[0];
-        }
-        int line = -1;
-        int column = -1;
-        try {
-            String pos = errorMessage.substring(errorMessage.indexOf("@") + 1);
-            pos = pos.substring(0, pos.indexOf(" "));
-            line = Integer.parseInt(pos.substring(0, pos.indexOf('/')));
-            column = Integer.parseInt(pos.substring(pos.indexOf('/') + 1));
-        } catch (NumberFormatException nfe) {
-            Debug.out("recoder2key:unresolved reference at " + "line:" + line + " column:" + column);
-            return new int[0];
-        } catch (StringIndexOutOfBoundsException siexc) {
-            return new int[0];
-        }
-        return new int[] { line, column };
-    }
-
-    /**
-     * report an error in form of a ConvertException. The cause is always
-     * attached to the resulting exception.
-     *
-     * @param message
-     *            message to be used.
-     * @param t
-     *            the cause of the exceptional case
-     * @throws ConvertException
-     *             always
-     */
-    public static void reportError(String message, Throwable t) {
-        // Attention: this highly depends on Recoders exception messages!
-        Throwable cause = t;
-        if  (t instanceof ExceptionHandlerException) {
-            if (t.getCause() != null) {
-                cause = t.getCause();
-            }
-        }
-
-        if(cause instanceof PosConvertException) {
-            throw (PosConvertException)cause;
-        }
-
-        int[] pos = extractPositionInfo(cause.toString());
-        final RuntimeException rte;
-        if (pos.length > 0) {
-            rte = new PosConvertException(message, pos[0], pos[1]);
-            rte.initCause(cause);
-        } else {
-            rte = new ConvertException(message);
-            rte.initCause(cause);
-        }
-
-        throw rte;
     }
 
 }

@@ -26,13 +26,6 @@ public abstract class EscapeExpression extends Operator {
 
     protected final String functionName;
 
-    /**
-     * @return the functionName
-     */
-    public String getFunctionName() {
-        return functionName;
-    }
-
     protected EscapeExpression(String functionName, List<Expression> arguments) {
         this.functionName = functionName;
         children = new ASTArrayList<Expression>(arguments);
@@ -45,6 +38,13 @@ public abstract class EscapeExpression extends Operator {
             return new RegisteredEscapeExpression(functionName, arguments);
         }
         throw new Error("Unknown escaped symbol used in JML code: " + functionName);
+    }
+
+    /**
+     * @return the functionName
+     */
+    public String getFunctionName() {
+        return functionName;
     }
 
     /**

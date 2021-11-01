@@ -13,11 +13,10 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import org.key_project.util.ExtList;
 
 public class ProgramElementReplacer extends CreatingASTVisitor {
 
@@ -25,13 +24,11 @@ public class ProgramElementReplacer extends CreatingASTVisitor {
     private ProgramElement newElement;
     private boolean done;
 
-    public ProgramElementReplacer(JavaProgramElement program, Services services)
-    {
+    public ProgramElementReplacer(JavaProgramElement program, Services services) {
         super(program, false, services);
     }
 
-    public ProgramElement replace(ProgramElement oldElement, ProgramElement newElement)
-    {
+    public ProgramElement replace(ProgramElement oldElement, ProgramElement newElement) {
         this.oldElement = oldElement;
         this.newElement = newElement;
         done = false;
@@ -41,14 +38,12 @@ public class ProgramElementReplacer extends CreatingASTVisitor {
         return el.get(ProgramElement.class);
     }
 
-    protected void doAction(ProgramElement element)
-    {
+    protected void doAction(ProgramElement element) {
         if (!done && element == oldElement) {
             done = true;
             addChild(newElement);
             changed();
-        }
-        else {
+        } else {
             super.doAction(element);
         }
     }

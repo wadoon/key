@@ -13,21 +13,21 @@
 
 package de.uka.ilkd.key.java.declaration.modifier;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.declaration.Modifier;
+import org.key_project.util.ExtList;
 
 
 /**
- *  The JML modifier "ghost".
+ * The JML modifier "ghost".
  */
 public class Ghost extends Modifier {
 
-    public Ghost() {}
+    public Ghost() {
+    }
 
 
     public Ghost(ExtList children) {
-        super (children);
+        super(children);
     }
 
 

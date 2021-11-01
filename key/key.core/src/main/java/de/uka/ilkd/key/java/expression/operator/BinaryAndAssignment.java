@@ -13,15 +13,15 @@
 
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
 /**
- *  Binary and assignment.
- *  @author <TT>AutoDoc</TT>
+ * Binary and assignment.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public class BinaryAndAssignment extends Assignment {
@@ -38,8 +38,9 @@ public class BinaryAndAssignment extends Assignment {
 
 
     /**
- *      Get arity.
- *      @return the int value.
+     * Get arity.
+     *
+     * @return the int value.
      */
 
     public int getArity() {
@@ -47,8 +48,9 @@ public class BinaryAndAssignment extends Assignment {
     }
 
     /**
- *      Get precedence.
- *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
 
     public int getPrecedence() {
@@ -56,20 +58,23 @@ public class BinaryAndAssignment extends Assignment {
     }
 
     /**
- *      Get notation.
- *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
 
     public int getNotation() {
         return INFIX;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnBinaryAndAssignment(this);
+        v.performActionOnBinaryAndAssignment(this);
     }
 
 

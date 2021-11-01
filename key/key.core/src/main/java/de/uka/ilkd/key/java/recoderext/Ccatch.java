@@ -13,21 +13,15 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import recoder.java.ParameterContainer;
-import recoder.java.ProgramElement;
-import recoder.java.SourceElement;
-import recoder.java.SourceVisitor;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
-import recoder.java.VariableScope;
+import recoder.java.*;
 import recoder.java.declaration.ParameterDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.java.statement.Branch;
 import recoder.util.Debug;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * A ccatch statement (branch of exec statement). Initial code copied from
@@ -67,10 +61,8 @@ public class Ccatch extends Branch
     /**
      * Ccatch.
      *
-     * @param e
-     *            a parameter declaration.
-     * @param body
-     *            a statement.
+     * @param e    a parameter declaration.
+     * @param body a statement.
      */
     public Ccatch(ParameterDeclaration e, StatementBlock body) {
         super();
@@ -83,13 +75,11 @@ public class Ccatch extends Branch
     /**
      * Ccatch.
      *
-     * @param e
-     *            a parameter declaration.
-     * @param body
-     *            a statement.
+     * @param e    a parameter declaration.
+     * @param body a statement.
      */
     public Ccatch(CcatchNonstandardParameterDeclaration e,
-            StatementBlock body) {
+                  StatementBlock body) {
         super();
         setBody(body);
         setNonStdParameterDeclaration(e);
@@ -100,8 +90,7 @@ public class Ccatch extends Branch
     /**
      * Ccatch.
      *
-     * @param proto
-     *            a Ccatch.
+     * @param proto a Ccatch.
      */
     protected Ccatch(Ccatch proto) {
         super(proto);
@@ -167,11 +156,9 @@ public class Ccatch extends Branch
      * Returns the child at the specified index in this node's "virtual" child
      * array
      *
-     * @param index
-     *            an index into this node's "virtual" child array
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {
@@ -216,13 +203,10 @@ public class Ccatch extends Branch
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
      *
-     * @param p
-     *            the old child.
-     * @param p
-     *            the new child.
+     * @param p the old child.
+     * @param p the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException
-     *                if the new child cannot take over the role of the old one.
+     * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
     @Override
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
@@ -327,8 +311,7 @@ public class Ccatch extends Branch
     /**
      * Set body.
      *
-     * @param statement
-     *            a statement.
+     * @param statement a statement.
      */
     public void setBody(Statement statement) {
         body = (StatementBlock) statement;
@@ -337,8 +320,7 @@ public class Ccatch extends Branch
     /**
      * Set parent.
      *
-     * @param parent
-     *            a try.
+     * @param parent a try.
      */
     public void setParent(Exec parent) {
         this.parent = parent;
@@ -362,6 +344,15 @@ public class Ccatch extends Branch
     }
 
     /**
+     * Set parameter declaration.
+     *
+     * @param p a parameter declaration.
+     */
+    public void setParameterDeclaration(ParameterDeclaration p) {
+        parameter = Optional.ofNullable(p);
+    }
+
+    /**
      * Get parameter declaration.
      *
      * @return the parameter declaration.
@@ -373,18 +364,7 @@ public class Ccatch extends Branch
     /**
      * Set parameter declaration.
      *
-     * @param p
-     *            a parameter declaration.
-     */
-    public void setParameterDeclaration(ParameterDeclaration p) {
-        parameter = Optional.ofNullable(p);
-    }
-
-    /**
-     * Set parameter declaration.
-     *
-     * @param p
-     *            a parameter declaration.
+     * @param p a parameter declaration.
      */
     public void setNonStdParameterDeclaration(
             CcatchNonstandardParameterDeclaration p) {

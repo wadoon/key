@@ -16,7 +16,6 @@ package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-import recoder.java.CompilationUnit;
 import recoder.kit.UnitKit;
 import recoder.service.UnresolvedReferenceException;
 
@@ -40,7 +39,7 @@ public class PosConvertException extends ConvertException implements HasLocation
     /**
      * The column
      */
-    private int column;
+    private final int column;
 
     /**
      * Instantiates a new exception with position information.

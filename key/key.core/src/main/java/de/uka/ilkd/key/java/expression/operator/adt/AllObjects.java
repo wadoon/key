@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.java.expression.operator.adt;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -22,6 +20,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
 public class AllObjects extends Operator {
 
@@ -41,10 +40,10 @@ public class AllObjects extends Operator {
 
 
     public void visit(Visitor v) {
-	v.performActionOnAllObjects(this);
+        v.performActionOnAllObjects(this);
     }
 
-    
+
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printAllObjects(this);
     }
@@ -54,6 +53,6 @@ public class AllObjects extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
-    }    
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+    }
 }

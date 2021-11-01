@@ -13,11 +13,10 @@
 
 package de.uka.ilkd.key.java.expression.operator.adt;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.expression.operator.BinaryOperator;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
 public class SetMinus extends BinaryOperator {
 
@@ -37,10 +36,10 @@ public class SetMinus extends BinaryOperator {
 
 
     public void visit(Visitor v) {
-	v.performActionOnSetMinus(this);
+        v.performActionOnSetMinus(this);
     }
 
-    
+
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printSetMinus(this);
     }

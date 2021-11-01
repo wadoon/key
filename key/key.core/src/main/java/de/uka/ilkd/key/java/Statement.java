@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.java;
 
 /**
- *  Statement.
+ * Statement.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 

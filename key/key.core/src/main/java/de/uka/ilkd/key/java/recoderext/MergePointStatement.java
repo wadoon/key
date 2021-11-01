@@ -20,12 +20,10 @@ import recoder.java.statement.JavaStatement;
 public class MergePointStatement extends JavaStatement
         implements ExpressionContainer {
     private static final long serialVersionUID = 8513553210611636414L;
-
-    private StatementContainer astParent;
     private final ParserRuleContext mergeProc;
-
     // The indexPV is not used when parsing JML specs, but only for taclets
     protected Expression indexPV;
+    private StatementContainer astParent;
 
     public MergePointStatement(ParserRuleContext mergeProc) {
         makeParentRoleValid();

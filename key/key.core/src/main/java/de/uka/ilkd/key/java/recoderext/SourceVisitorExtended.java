@@ -19,7 +19,6 @@ import recoder.java.SourceVisitor;
  * Adds visitor methods for recoder extensions.
  *
  * @author bubel
- *
  */
 public class SourceVisitorExtended extends SourceVisitor {
 

@@ -53,16 +53,14 @@ import static java.lang.String.format;
  */
 public final class JMLTransformer extends RecoderModelTransformer {
 
+    public static final ImmutableList<String> javaMods = ImmutableSLList
+            .<String>nil().prepend("abstract", "final", "private", "protected",
+                    "public", "static");
     /**
      * JML markers left and right.
      */
     private static final String JML = "/*@";
     private static final String JMR = "@*/";
-
-    public static final ImmutableList<String> javaMods = ImmutableSLList
-            .<String>nil().prepend("abstract", "final", "private", "protected",
-                    "public", "static");
-
     private static ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
 
     private final HashMap<TypeDeclaration, List<Method>> typeDeclaration2Methods;
@@ -91,6 +89,17 @@ public final class JMLTransformer extends RecoderModelTransformer {
     // -------------------------------------------------------------------------
     // private helper methods
     // -------------------------------------------------------------------------
+
+    public static String getFullText(ParserRuleContext context) {
+        if (context.start == null || context.stop == null
+                || context.start.getStartIndex() < 0 || context.stop.getStopIndex() < 0)
+            return context.getText(); // Fallback
+        return context.start.getInputStream().getText(Interval.of(context.start.getStartIndex(), context.stop.getStopIndex()));
+    }
+
+    public static ImmutableList<PositionedString> getWarningsOfLastInstance() {
+        return warnings;
+    }
 
     /**
      * Concatenates the passed comments in a position-preserving way. (see also
@@ -140,14 +149,6 @@ public final class JMLTransformer extends RecoderModelTransformer {
         return new PositionedString(sb.toString(),
                 ctx.start.getTokenSource().getSourceName(), pos);
     }
-
-    public static String getFullText(ParserRuleContext context) {
-        if (context.start == null || context.stop == null
-                || context.start.getStartIndex() < 0 || context.stop.getStopIndex() < 0)
-            return context.getText(); // Fallback
-        return context.start.getInputStream().getText(Interval.of(context.start.getStartIndex(), context.stop.getStopIndex()));
-    }
-
 
     /**
      * Puts the JML modifiers from the passed list into a string enclosed in JML
@@ -210,6 +211,10 @@ public final class JMLTransformer extends RecoderModelTransformer {
         return result;
     }
 
+    // -------------------------------------------------------------------------
+    // private transformation methods
+    // -------------------------------------------------------------------------
+
     private Comment[] getCommentsAndSetParent(ProgramElement pe) {
         assert pe != null;
         if (pe.getComments() == null) {
@@ -224,10 +229,6 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
         return result;
     }
-
-    // -------------------------------------------------------------------------
-    // private transformation methods
-    // -------------------------------------------------------------------------
 
     private void transformFieldDecl(TextualJMLFieldDecl decl,
                                     Comment[] originalComments) throws SLTranslationException {
@@ -433,9 +434,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
         try {
             String comment = String.format(
                     "/*@ normal_behavior\n"
-                    + "  @ %s %s\n"
-                    + "  @ assignable \\strictly_nothing;\n"
-                    + "  @*/", stat.getKind() == Kind.ASSERT ? "ensures" : "ensures_free", stat.getClauseText());
+                            + "  @ %s %s\n"
+                            + "  @ assignable \\strictly_nothing;\n"
+                            + "  @*/", stat.getKind() == Kind.ASSERT ? "ensures" : "ensures_free", stat.getClauseText());
 
             StatementBlock block = services.getProgramFactory().parseStatementBlock(
                     new StringReader(String.format("{\n%s\n{;;}}", comment)));
@@ -614,6 +615,10 @@ public final class JMLTransformer extends RecoderModelTransformer {
         }
     }
 
+    // -------------------------------------------------------------------------
+    // RecoderModelTransformer - abstract methods implementation
+    // -------------------------------------------------------------------------
+
     private void transformMethodlevelComments(MethodDeclaration md,
                                               String fileName) throws SLTranslationException {
         StatementBlock body = md.getBody();
@@ -621,10 +626,6 @@ public final class JMLTransformer extends RecoderModelTransformer {
             transformMethodlevelCommentsHelper(body, fileName);
         }
     }
-
-    // -------------------------------------------------------------------------
-    // RecoderModelTransformer - abstract methods implementation
-    // -------------------------------------------------------------------------
 
     protected void makeExplicit(TypeDeclaration td) {
         assert false;
@@ -758,10 +759,6 @@ public final class JMLTransformer extends RecoderModelTransformer {
             // runtimeE.setStackTrace(e.getStackTrace());
             // throw runtimeE;
         }
-    }
-
-    public static ImmutableList<PositionedString> getWarningsOfLastInstance() {
-        return warnings;
     }
 
     // -------------------------------------------------------------------------

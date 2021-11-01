@@ -13,19 +13,6 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -36,27 +23,27 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
-import de.uka.ilkd.key.java.visitor.CreatingASTVisitor.DefaultAction;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.AuxiliaryContract;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
-import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  * Walks through a java AST in depth-left-first-order. This visitor replaces a
@@ -80,15 +67,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * creates a visitor that replaces the program variables in the given
      * statement by new ones with the same name
      *
-     * @param st
-     *            the statement where the prog vars are replaced
-     * @param map
-     *            the HashMap with the replacements
-     * @param services
-     *            the services instance
+     * @param st       the statement where the prog vars are replaced
+     * @param map      the HashMap with the replacements
+     * @param services the services instance
      */
     public ProgVarReplaceVisitor(ProgramElement st,
-            Map<ProgramVariable, ProgramVariable> map, Services services) {
+                                 Map<ProgramVariable, ProgramVariable> map, Services services) {
         super(st, true, services);
         this.replaceMap = map;
         assert services != null;
@@ -98,18 +82,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * creates a visitor that replaces the program variables in the given
      * statement
      *
-     * @param st
-     *            the statement where the prog vars are replaced
-     * @param map
-     *            the HashMap with the replacements
-     * @param replaceall
-     *            decides if all variables are to be replaced
-     * @param services
-     *            the services instance
+     * @param st         the statement where the prog vars are replaced
+     * @param map        the HashMap with the replacements
+     * @param replaceall decides if all variables are to be replaced
+     * @param services   the services instance
      */
     public ProgVarReplaceVisitor(ProgramElement st,
-            Map<ProgramVariable, ProgramVariable> map, boolean replaceall,
-            Services services) {
+                                 Map<ProgramVariable, ProgramVariable> map, boolean replaceall,
+                                 Services services) {
         this(st, map, services);
         this.replaceallbynew = replaceall;
     }
@@ -157,6 +137,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     /**
      * the action that is performed just before leaving the node the last time
+     *
      * @param node the node described above
      */
     @Override
@@ -164,7 +145,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         node.visit(this);
     }
 
-    /** starts the walker */
+    /**
+     * starts the walker
+     */
     @Override
     public void start() {
         stack.push(new ExtList());
@@ -328,7 +311,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     protected void performActionOnMergeContract(MergePointStatement oldMps,
-            MergePointStatement newMps) {
+                                                MergePointStatement newMps) {
         ImmutableSet<MergeContract> oldContracts = services
                 .getSpecificationRepository().getMergeContracts(oldMps);
         services.getSpecificationRepository().removeMergeContracts(oldMps);
@@ -375,7 +358,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                     pred.getPredicateFormWithPlaceholder().first,
                                     services))
                             .collect(Collectors.toCollection(
-                                () -> new ArrayList<AbstractionPredicate>())));
+                                    () -> new ArrayList<AbstractionPredicate>())));
 
         } else {
             if (!changed) {
@@ -590,7 +573,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     public void performActionOnLoopInvariant(LoopStatement oldLoop,
-            LoopStatement newLoop) {
+                                             LoopStatement newLoop) {
         final TermBuilder tb = services.getTermBuilder();
         LoopSpecification inv = services.getSpecificationRepository()
                 .getLoopSpec(oldLoop);

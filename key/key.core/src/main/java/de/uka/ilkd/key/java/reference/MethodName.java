@@ -15,10 +15,9 @@ package de.uka.ilkd.key.java.reference;
 
 
 /**
- *  Method name.
+ * Method name.
  */
-public interface MethodName extends de.uka.ilkd.key.java.TerminalProgramElement{
+public interface MethodName extends de.uka.ilkd.key.java.TerminalProgramElement {
 
-    
-    
+
 }

@@ -28,22 +28,21 @@ public class CcatchSVWrapper extends Ccatch
     }
 
     /**
-     * sets the schema variable of sort statement
-     *
-     * @param sv
-     *            the SchemaVariable
-     */
-    @Override
-    public void setSV(SchemaVariable sv) {
-        this.sv = sv;
-    }
-
-    /**
      * returns a String name of this meta construct.
      */
     @Override
     public SchemaVariable getSV() {
         return sv;
+    }
+
+    /**
+     * sets the schema variable of sort statement
+     *
+     * @param sv the SchemaVariable
+     */
+    @Override
+    public void setSV(SchemaVariable sv) {
+        this.sv = sv;
     }
 
     @Override
@@ -73,7 +72,7 @@ public class CcatchSVWrapper extends Ccatch
 
     @Override
     public boolean replaceChild(recoder.java.ProgramElement p1,
-            recoder.java.ProgramElement p2) {
+                                recoder.java.ProgramElement p2) {
         return false;
     }
 
