@@ -1,5 +1,12 @@
 
 public class Main {
+
+    /*@ public normal_behavior
+      @ requires false;
+      @ ensures true;
+      @ assignable \strictly_nothing;
+      @*/
+    public native void stopProducerRun();
     
     /*
      * This example includes several challenges for our approach:
@@ -40,7 +47,7 @@ public class Main {
         EnvironmentSensor sensor = new EnvironmentSensor();
         
         if (checkState(capacitor, producer, sensor)) {
-
+            stopProducerRun();
             producer.run(capacitor, sensor);
         }
     }
