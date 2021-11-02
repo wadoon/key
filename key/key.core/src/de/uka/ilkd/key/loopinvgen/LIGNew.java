@@ -99,7 +99,7 @@ public class LIGNew {
 		System.out.println(" of size " + allPreds.size());
 		
 		PredicateListCompressionNew plcNew = new PredicateListCompressionNew(services, currentGoal.sequent(), allPreds, false);
-//		 Compression is not mandetory
+
 		allPreds = plcNew.compression();
 		System.out.println("LIG is the conjunction of: ");
 		for (Term term : allPreds) {
@@ -107,20 +107,6 @@ public class LIGNew {
 		}
 		System.out.println(" of size " + allPreds.size());
 	}
-
-//	private SequentFormula currentIndexEq(Sequent seq2, Term index2) {
-//		for (SequentFormula sf : seq2.antecedent()) {
-//			Term formula = sf.formula();
-//			if (formula.op() instanceof Equality) {
-//				Term current_i = formula.sub(0);
-//				if (current_i.equals(index2)) {
-////					System.out.println("i's formula: " + sf);
-//					return sf;
-//				}
-//			}
-//		}
-//		return null;
-//	}
 
 	void getLow(Sequent seq) {
 		for (SequentFormula sf : seq.succedent()) {

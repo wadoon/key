@@ -125,11 +125,16 @@ public class ShiftUpdateImpl {
 			// Assigning it to a: a := a' and adding to list of rename updates
 			renameUpdates = renameUpdates.prepend(tb.elementary(lhs, freshCons));
 		}
-
-		renameUpdates = renameUpdates.append(inverseEventUpdates);
-
+		//Old:
+//		renameUpdates = renameUpdates.append(inverseEventUpdates);
+//
+//		final Term parallelRenames = tb.parallel(renameUpdates);
+//		return parallelRenames;
+		//New:
 		final Term parallelRenames = tb.parallel(renameUpdates);
-		return parallelRenames;
+		final Term parallelInverses = tb.parallel(inverseEventUpdates);
+		final Term updateAndEventRename = tb.sequential(parallelRenames, parallelInverses);
+		return updateAndEventRename;
 	}
 
 	/**

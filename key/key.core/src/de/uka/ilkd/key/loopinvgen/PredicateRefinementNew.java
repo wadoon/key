@@ -51,7 +51,7 @@ public class PredicateRefinementNew {
 		}
 		
 		final boolean provable = sProof.isProvable(sideSeq, services);
-		if (!provable&& pred.op() == services.getTypeConverter().getDependenciesLDT().getNoR()) {
+		if (!provable && pred.op() == services.getTypeConverter().getDependenciesLDT().getNoWaW()) {
 			System.out.println("NOT Proved: " + sideSeq);}
 //		else if (provable && pred.op() == services.getTypeConverter().getDependenciesLDT().getNoR()) {
 //			System.out.println("Check: " + ProofSaver.printAnything(sideSeq, services));

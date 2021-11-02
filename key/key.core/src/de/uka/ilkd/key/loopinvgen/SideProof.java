@@ -146,10 +146,10 @@ public class SideProof {
 		} while (size != locSetVars.size());
 		boolean closed = isProvable(sideSeq, services);
 		// true: Holds, false: Unknown
-		if (closed) {
+//		if (closed) {
 //			System.out.println("========================\n"+ProofSaver.printAnything(sideSeq, services));		
 //			System.out.println(loc1 + " is NOT subset of " + loc2);
-		}
+//		}
 		return closed;
 	}
 
