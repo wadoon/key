@@ -43,6 +43,7 @@ public class LIGNew {
 	
 	public LIGNew(Services s, Sequent sequent) {
 		seq = sequent;
+		System.out.println(seq);
 		ruleApp = new RuleApplication(s, seq);
 //		services = proof.getServices();// New service after unwind
 		services = ruleApp.services;
@@ -54,12 +55,15 @@ public class LIGNew {
 		getLow(seq);
 		getIndexAndHigh(seq);
 		getLocSet(seq);
-
+		
+		System.out.println("Goals before shift: "+services.getProof().openGoals());
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
+//		System.out.println("number of goals after shift: " + goalsAfterShift.size());
+		System.out.println("Goals after shift: "+ goalsAfterShift);
 		ImmutableList<Goal> goalsAfterUnwind = null;
 
 		Goal currentGoal = goalsAfterShift.head();
-
+//		System.out.println(currentGoal);
 		ConstructAllCompPreds cac = new ConstructAllCompPreds(services, low, index, high);
 		allPreds.addAll(cac.cons());
 
@@ -73,39 +77,39 @@ public class LIGNew {
 		allPreds=pr0.predicateCheckAndRefine();
 		System.out.println(ProofSaver.printAnything(seq, services));
 		
-		do {
-			oldPreds.removeAll(oldPreds);
-			oldPreds.addAll(allPreds);
-
-			goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
-			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
-			System.out.println(goalsAfterShift);
-			
-			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
-//			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
-			PredicateRefinementNew pr = new PredicateRefinementNew(services, currentGoal.sequent(), allPreds);
-			allPreds=pr.predicateCheckAndRefine();
-
-			
-		} while (allPreds.size() != oldPreds.size());
-		
+//		do {
+//			oldPreds.removeAll(oldPreds);
+//			oldPreds.addAll(allPreds);
+//
+//			goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
+//			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
+//			System.out.println(goalsAfterShift);
+//			
+//			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
+////			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);
+//			PredicateRefinementNew pr = new PredicateRefinementNew(services, currentGoal.sequent(), allPreds);
+//			allPreds=pr.predicateCheckAndRefine();
+//
+//			
+//		} while (allPreds.size() != oldPreds.size());
+//		
 		
 		
 		System.out.println("===========Terminated===========");
-		System.out.println("LIG is the conjunction of: ");
-		for (Term term : allPreds) {
-			System.out.println(term);
-		}
-		System.out.println(" of size " + allPreds.size());
-		
-		PredicateListCompressionNew plcNew = new PredicateListCompressionNew(services, currentGoal.sequent(), allPreds, false);
-
-		allPreds = plcNew.compression();
-		System.out.println("LIG is the conjunction of: ");
-		for (Term term : allPreds) {
-			System.out.println(term);
-		}
-		System.out.println(" of size " + allPreds.size());
+//		System.out.println("LIG is the conjunction of: ");
+//		for (Term term : allPreds) {
+//			System.out.println(term);
+//		}
+//		System.out.println(" of size " + allPreds.size());
+//		
+//		PredicateListCompressionNew plcNew = new PredicateListCompressionNew(services, currentGoal.sequent(), allPreds, false);
+//
+//		allPreds = plcNew.compression();
+//		System.out.println("LIG is the conjunction of: ");
+//		for (Term term : allPreds) {
+//			System.out.println(term);
+//		}
+//		System.out.println(" of size " + allPreds.size());
 	}
 
 	void getLow(Sequent seq) {

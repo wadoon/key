@@ -95,7 +95,7 @@ public class TestPredicateConstruction {
 		}
 	}
 
-	public void shiftArrayToLeft() { //Done
+	public void shiftArrayToLeft() {
 
 		Term succFormula;
 

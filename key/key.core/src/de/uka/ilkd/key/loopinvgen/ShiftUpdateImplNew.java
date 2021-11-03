@@ -22,15 +22,17 @@ import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
-public class ShiftUpdateImpl {
+public class ShiftUpdateImplNew {
 	private final Goal goal;
 	private final Services services;
 	private final TermBuilder tb;
+	private Term keepParallelUpdateRenames;
 
-	public ShiftUpdateImpl(Goal g) {
+	public ShiftUpdateImplNew(Goal g) {
 		goal = g;
 		services = g.proof().getServices();
 		tb = services.getTermBuilder();
+		keepParallelUpdateRenames = null;
 	}
 
 	public void shiftUpdate(Goal g, PosInOccurrence pos) {
@@ -43,11 +45,13 @@ public class ShiftUpdateImpl {
 		// rename all existing formulas in sequent except program formula
 		renameFormulasOnSemisequent(renameUpdate, g.sequent().antecedent(), true);
 		renameFormulasOnSemisequent(renameUpdate, g.sequent().succedent(), false);
+		System.out.println("After rename: "+ g.sequent());
 
 		doShift(renameUpdate, g, pos, loopFormula);
-
+		System.out.println("After complete shift: "+ g.sequent());
 		// add program formula again
 		g.addFormula(new SequentFormula(UpdateApplication.getTarget(loopFormula)), pos.isInAntec(), true);
+		System.out.println("Putting program back: "+ g.sequent());
 	}
 
 	/**
@@ -56,7 +60,7 @@ public class ShiftUpdateImpl {
 	 * elementary update <code>lhs:=rhs</code> the equation
 	 * <code>lhs == {renamingUpdate}{lhs:=rhs}lhs</code> and for each event update
 	 * <code>\event(kind,ls,ts)</code> the formula
-	 * <code>{renamingUpdate}'kindPred'(ls,t)</code> where <code>kindPred</code> is
+	 * <code>{renamingUpdate}'kindPred'({\invEvent(kind,ls,ts)}{\event(kind, ls , ts)}ls,t)</code> where <code>kindPred</code> is
 	 * the corresponding dependence predicate for the kind (read or write) of the
 	 * event update
 	 * 
@@ -74,7 +78,7 @@ public class ShiftUpdateImpl {
 			if (update.op() instanceof ElementaryUpdate) {
 				shiftElementaryUpdate(update, renameUpdate);
 			} else if (update.op() instanceof EventUpdate) {
-				shiftEventUpdate(update, renameUpdate);
+				shiftEventUpdate(update);
 			} else if (update.op() == UpdateJunctor.SKIP) {
 				// intentionally empty
 			} else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
@@ -90,7 +94,7 @@ public class ShiftUpdateImpl {
 	 * renames each left-hand side of the elementary update <code>li:=ri</code>
 	 * 
 	 * @param loopFormula the {@link Term} with formula containing the loop
-	 * @return a parallel update <code>{l1:=l1'|| ... || ln:=ln'}</code> that
+	 * @return a parallel update <code>{l1:=l1'|| ... || ln:=ln'}{\event(kind,l1,ts),\event(kind,l1',ts),...}</code> that
 	 *         renames each left hand side of the original update
 	 */
 	private Term generateRenameUpdate(Term loopFormula) {
@@ -125,16 +129,11 @@ public class ShiftUpdateImpl {
 			// Assigning it to a: a := a' and adding to list of rename updates
 			renameUpdates = renameUpdates.prepend(tb.elementary(lhs, freshCons));
 		}
-		//Old:
-//		renameUpdates = renameUpdates.append(inverseEventUpdates);
-//
-//		final Term parallelRenames = tb.parallel(renameUpdates);
-//		return parallelRenames;
-		//New:
-		final Term parallelRenames = tb.parallel(renameUpdates);
-		final Term parallelInverses = tb.parallel(inverseEventUpdates);
-		final Term updateAndEventRename = tb.sequential(parallelRenames, parallelInverses);
-		return updateAndEventRename;
+
+		keepParallelUpdateRenames = tb.parallel(renameUpdates);
+		final Term parallelInversesEvents = tb.parallel(inverseEventUpdates);
+		final Term updateRenameAndInverseEvents = tb.sequential(keepParallelUpdateRenames, parallelInversesEvents);
+		return updateRenameAndInverseEvents;
 	}
 
 	/**
@@ -147,6 +146,7 @@ public class ShiftUpdateImpl {
 	 */
 	private void renameFormulasOnSemisequent(final Term renameUpdate, Semisequent semi, boolean antec) {
 		for (SequentFormula sf : semi) {
+			System.out.println(sf);
 			final PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), antec);
 			goal.changeFormula(new SequentFormula(tb.apply(renameUpdate, sf.formula())), pio);
 		}
@@ -174,7 +174,7 @@ public class ShiftUpdateImpl {
 
 	/**
 	 * adds for one event update <code>\event(kind,ls,ts)</code> the formula
-	 * <code>{renamingUpdate}'kindPred'(ls,t)</code> where <code>kindPred</code> is
+	 * <code>{renamingUpdate}'kindPred'({\invEvent(kind,ls,ts)}{\event(kind,ls,ts)}ls,t)</code> where <code>kindPred</code> is
 	 * the corresponding dependence predicate for the kind (read or write) of the
 	 * event update
 	 * 
@@ -182,20 +182,21 @@ public class ShiftUpdateImpl {
 	 * @param renamingUpdate the {@link Term} representing the renaming update
 	 */
 
-	private void shiftEventUpdate(Term eventUpdate, Term renamingUpdate) {
+	private void shiftEventUpdate(Term eventUpdate) {
 		Term updateTS = eventUpdate.sub(2);
 		Term locSet = eventUpdate.sub(1);
 		Term eventMarker = eventUpdate.sub(0);
+		Term inverseEvent = tb.inverseEventUpdate(eventMarker, locSet, updateTS);
 		Term readMarker = tb.func(services.getTypeConverter().getDependenciesLDT().getReadMarker());
 		Term cond1 = tb.equals(eventMarker, readMarker);
 		Term writeMarker = tb.func(services.getTypeConverter().getDependenciesLDT().getWriteMarker());
 		Term cond2 = tb.equals(eventMarker, writeMarker);
-
+		
 		// Generating rPred and wPred
-		final Term term4EventUpdate = tb.ife(cond1, tb.rPred(locSet, eventUpdate.sub(2)),
-				tb.ife(cond2, tb.wPred(locSet, eventUpdate.sub(2)), tb.tt()));
-
-		goal.addFormula(new SequentFormula(tb.apply(renamingUpdate, term4EventUpdate)), true, true);
+		final Term linkTerm4EventUpdate = tb.ife(cond1, tb.rPred(tb.apply(tb.apply(inverseEvent,eventUpdate), locSet), eventUpdate.sub(2)),
+				tb.ife(cond2, tb.wPred(tb.apply(tb.apply(inverseEvent,eventUpdate), locSet), eventUpdate.sub(2)), tb.tt()));
+		// Applying the update rename on the rPred and wPred
+		goal.addFormula(new SequentFormula(tb.apply(keepParallelUpdateRenames, linkTerm4EventUpdate)), true, true);
 	}
 
 }

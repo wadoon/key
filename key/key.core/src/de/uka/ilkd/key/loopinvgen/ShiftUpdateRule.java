@@ -22,7 +22,7 @@ public class ShiftUpdateRule implements BuiltInRule {
         final ImmutableList<Goal> newGoals = goal.split(1);
         final Goal newGoal = newGoals.head();
         
-        ShiftUpdateImpl worker = new ShiftUpdateImpl(newGoal);
+        ShiftUpdateImplNew worker = new ShiftUpdateImplNew(newGoal);
         worker.shiftUpdate(newGoal, ruleApp.posInOccurrence());
         
         return newGoals;

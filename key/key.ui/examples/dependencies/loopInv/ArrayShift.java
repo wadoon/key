@@ -2,7 +2,6 @@ public class ArrayShift{
 	public int[] a;
 	/*@public normal_behavior
 	 @ requires a.length > 10;
-	 @ requires \dl_noR(\dl_arrayRange(a,0,a.length-1)) && \dl_noW(\dl_arrayRange(a,0,a.length-1));
 	 @ ensures \dl_noRaW(\dl_arrayRange(a,0,a.length-1));
 	 @ diverges true;
 	 @*/
