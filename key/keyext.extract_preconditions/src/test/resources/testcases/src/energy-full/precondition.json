@@ -1,0 +1,164 @@
+[
+  {
+    "contract": "Capacitor[Capacitor::addCharge(int)].JML normal_behavior operation contract.0",
+    "precondition": {
+      "error_preconditions": [
+        {
+          "variables": {
+            "addedCharge": "int",
+            "self": "Capacitor",
+            "self.mode": "int"
+          },
+          "term": "  addedCharge >= 1& self.mode >= 4 + addedCharge * -1& self.mode >= 0& self.mode <= 3& !self = null"
+        }
+      ],
+      "service_preconditions": []
+    }
+  },
+  {
+    "contract": "EnvironmentSensor[EnvironmentSensor::EnvironmentSensor()].JML normal_behavior operation contract.0",
+    "precondition": {
+      "error_preconditions": [
+        {
+          "variables": {
+            "e_1": "EnvironmentSensor"
+          },
+          "term": "!e_1 = null"
+        }
+      ],
+      "service_preconditions": []
+    }
+  },
+  {
+    "contract": "EnvironmentSensor[EnvironmentSensor::updateValues()].JML normal_behavior operation contract.0",
+    "precondition": {
+      "error_preconditions": [
+        {
+          "variables": {
+            "self": "EnvironmentSensor"
+          },
+          "term": "!self = null"
+        }
+      ],
+      "service_preconditions": []
+    }
+  },
+  {
+    "contract": "WindTurbine[EnergyProducer::run(Capacitor,EnvironmentSensor)].JML normal_behavior operation contract.0",
+    "precondition": {
+      "error_preconditions": [
+        {
+          "variables": {
+            "result": "int",
+            "s": "EnvironmentSensor",
+            "c": "Capacitor",
+            "s.windSpeed": "int",
+            "c.mode": "int",
+            "exc_0": "java.lang.Throwable",
+            "r_3": "java.lang.RuntimeException",
+            "self": "WindTurbine",
+            "self.mode": "int"
+          },
+          "term": "  self.mode <= -1 + s.windSpeed& c.mode >= 0& c.mode <= 3& s.windSpeed >= 1& self.mode >= 0& self.mode <= 4& exc_0 = null& s.windSpeed = result& !r_3 = null& !self = null& !s = null& !c = null"
+        }
+      ],
+      "service_preconditions": []
+    }
+  },
+  {
+    "contract": "Main[Main::main1(int,int)].JML normal_behavior operation contract.0",
+    "precondition": {
+      "error_preconditions": [],
+      "service_preconditions": [
+        {
+          "service": "Pre (stopProducerRun)",
+          "variables": {
+            "exc_6": "java.lang.Throwable",
+            "self_2": "EnvironmentSensor",
+            "exc_5": "java.lang.Throwable",
+            "self_1": "Capacitor",
+            "exc_4": "java.lang.Throwable",
+            "self_0": "Photovoltaics",
+            "exc_3": "java.lang.Throwable",
+            "exc_2": "java.lang.Throwable",
+            "exc_1": "java.lang.Throwable",
+            "exc_0": "java.lang.Throwable",
+            "self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>": "int",
+            "self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>": "int",
+            "result_2": "int",
+            "exc_8": "java.lang.Throwable",
+            "result_4": "int",
+            "producerMode": "int",
+            "exc_7": "java.lang.Throwable",
+            "producerType": "int",
+            "self_1.mode@anon_heap_Capacitor<<anonHeapFunction>>": "int",
+            "self": "Main"
+          },
+          "term": "     producerMode<=   self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2* 2&    self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>>= 1+ producerMode&   producerMode / 2= \\if (producerMode >= 0)\\then (producerMode / 2)\\else (producerMode * -1 / 2 * -1)& producerMode / 2 <= 2& producerMode >= producerMode / 2 * 2& producerMode <= 1 + producerMode / 2 * 2& producerMode / 2 = quotient_1&    self_1.mode@anon_heap_Capacitor<<anonHeapFunction>><= 4+ producerMode / 2 * -1&     self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2= quotient_0&    self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>>=   self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2* 2&    self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>><= 1+   self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2* 2& (     self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>>= 0|     self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>* -1/ 2* -1=   self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2)&      self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2>= 2&      self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2>= 1+ producerMode / 2&    self_1.mode@anon_heap_Capacitor<<anonHeapFunction>>>= 5+   self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2* -1& producerMode / 2 >= 0& producerMode >= 0& producerMode <= 4& exc_0 = null& result_2 = producerMode&    self_1.mode@anon_heap_Capacitor<<anonHeapFunction>>>= 0&    self_1.mode@anon_heap_Capacitor<<anonHeapFunction>><= 3& (exc_1 = null)<<impl>>& exc_2 = null&    self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>>= 1&    self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>>= 1& exc_3 = null& exc_4 = null& exc_5 = null& exc_6 = null& exc_7 = null& exc_8 = null& result_4 = producerMode& !self_2 = null& !self_1 = null& !self_0 = null& !producerType = 1& !producerType = 0& !self = null"
+        },
+        {
+          "service": "Pre (stopProducerRun)",
+          "variables": {
+            "self_2": "EnvironmentSensor",
+            "self_1": "Capacitor",
+            "exc_4": "java.lang.Throwable",
+            "self_0": "Photovoltaics",
+            "exc_3": "java.lang.Throwable",
+            "exc_2": "java.lang.Throwable",
+            "exc_1": "java.lang.Throwable",
+            "exc_0": "java.lang.Throwable",
+            "self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>": "int",
+            "self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>": "int",
+            "producerMode": "int",
+            "producerType": "int",
+            "self_1.mode@anon_heap_Capacitor<<anonHeapFunction>>": "int",
+            "self": "Main"
+          },
+          "term": "      self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2= quotient_0&    self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>>=   self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2* 2&    self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>><= 1+   self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2* 2& (     self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>>= 0|     self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>* -1/ 2* -1=   self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2)&    self_1.mode@anon_heap_Capacitor<<anonHeapFunction>><= 4+   self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2* -1& producerMode >= 0& producerMode <= 4& exc_0 = null&      self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2<= 4&    self_1.mode@anon_heap_Capacitor<<anonHeapFunction>>>= 0&    self_1.mode@anon_heap_Capacitor<<anonHeapFunction>><= 3& (exc_1 = null)<<impl>>& exc_2 = null&      self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2>= 0&    self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>>= 1&    self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>>= 1& exc_3 = null& exc_4 = null& !self_2 = null& !self_1 = null& !self_0 = null& !producerType = 1& !producerType = 0& !self = null"
+        },
+        {
+          "service": "Pre (stopProducerRun)",
+          "variables": {
+            "exc_6": "java.lang.Throwable",
+            "self_2": "EnvironmentSensor",
+            "exc_5": "java.lang.Throwable",
+            "self_1": "Capacitor",
+            "exc_4": "java.lang.Throwable",
+            "self_0": "WindTurbine",
+            "exc_3": "java.lang.Throwable",
+            "exc_2": "java.lang.Throwable",
+            "exc_1": "java.lang.Throwable",
+            "exc_0": "java.lang.Throwable",
+            "self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>": "int",
+            "self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>": "int",
+            "result_2": "int",
+            "producerMode": "int",
+            "producerType": "int",
+            "self_1.mode@anon_heap_Capacitor<<anonHeapFunction>>": "int",
+            "self": "Main"
+          },
+          "term": "     self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>><= -1+ producerMode&     self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2= quotient_0&      self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2<= 1&    producerMode>= 1+   self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2* 2&    self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>>=   self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2* 2&    self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>><= 1+   self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2* 2& (     self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>>= 0|     self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>* -1/ 2* -1=   self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2)&    self_1.mode@anon_heap_Capacitor<<anonHeapFunction>><= 4+   self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2* -1& producerType = 1& producerMode <= 4& (exc_0 = null)<<impl>>& exc_1 = null&    self_1.mode@anon_heap_Capacitor<<anonHeapFunction>>>= 0&    self_1.mode@anon_heap_Capacitor<<anonHeapFunction>><= 3&    self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>>= 1&      self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>/ 2>= 0& producerMode >= 2&    self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>>= 1& (exc_2 = null)<<impl>>& exc_3 = null& (exc_4 = null)<<impl>>& (exc_5 = null)<<impl>>& exc_6 = null& result_2 = producerMode& !self_2 = null& !self_1 = null& !self_0 = null& !self = null"
+        },
+        {
+          "service": "Pre (stopProducerRun)",
+          "variables": {
+            "self_2": "EnvironmentSensor",
+            "self_1": "Capacitor",
+            "self_0": "GasTurbine",
+            "exc_3": "java.lang.Throwable",
+            "exc_2": "java.lang.Throwable",
+            "exc_1": "java.lang.Throwable",
+            "exc_0": "java.lang.Throwable",
+            "self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>": "int",
+            "self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>": "int",
+            "producerMode": "int",
+            "producerType": "int",
+            "self_1.mode@anon_heap_Capacitor<<anonHeapFunction>>": "int",
+            "self": "Main"
+          },
+          "term": "  producerType = 0& producerMode >= 0& producerMode <= 4& (exc_0 = null)<<impl>>& exc_1 = null&    self_1.mode@anon_heap_Capacitor<<anonHeapFunction>>>= 0&    self_1.mode@anon_heap_Capacitor<<anonHeapFunction>><= 3&    self_2.sunIrradiance@anon_heap_EnvironmentSensor<<anonHeapFunction>>>= 1&    self_2.windSpeed@anon_heap_EnvironmentSensor<<anonHeapFunction>>>= 1& (exc_2 = null)<<impl>>& exc_3 = null& !self_2 = null& !self_1 = null& !self_0 = null& !self = null"
+        }
+      ]
+    }
+  }
+]

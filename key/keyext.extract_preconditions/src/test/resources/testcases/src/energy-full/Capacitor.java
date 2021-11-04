@@ -17,6 +17,7 @@ public final class Capacitor {
     private /*@spec_public@*/ int mode;
     
     /*@ public normal_behavior
+      @ ensures \invariant_for(this);
       @ assignable this.*;
       @*/
     public Capacitor() {

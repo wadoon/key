@@ -3,6 +3,13 @@ public final class EnvironmentSensor {
 
     private /*@spec_public@*/ int windSpeed;
     private /*@spec_public@*/ int sunIrradiance;
+
+    /*@ public normal_behavior
+      @ ensures_free this.sunIrradiance>0;
+      @ ensures_free this.windSpeed>0;
+      @ assignable this.*;
+      @*/
+    public EnvironmentSensor();
     
     /*@ public normal_behavior
       @ ensures \result == this.windSpeed;
