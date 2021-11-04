@@ -155,7 +155,13 @@ public class ExtractorTest {
     private static void extractPreconditions(List<UnclosedProof> unclosedProofs, KeYEnvironment<?> env) {
         UserInterfaceControl ui = env.getUi();
         try {
+            System.out.println("[");
+            boolean isFirst=true;
             for (UnclosedProof currentUnclosed : unclosedProofs) {
+                if (!isFirst) {
+                    System.out.println(",");
+                }
+                isFirst=false;
                 Proof currentProof = currentUnclosed.proof;
                 Set<Name> blackList = new HashSet<>();
                 //blackList.add(new Name("self"));
@@ -173,12 +179,14 @@ public class ExtractorTest {
                         projection
                     );
                 Pair<ImmutableList<Term>, Map<String, ImmutableList<Term>>> preconditionList = preconditionExtractor.extract();
-                System.out.println(
-                    "Found precondition for " + currentProof.name() + ":");
+                System.out.print(
+                    "{\n\"contract\":\"" + currentProof.name() + "\",\n\"precondition\":");
                 PreconditionPrinter printer = new JsonPreconditionPrinter(currentProof.getServices());
                 printer.print(preconditionList);
+                System.out.print("}");
                 currentProof.dispose();
             }
+            System.out.println("]");
         } catch (Exception exception) {
             exception.printStackTrace();
         } finally {
