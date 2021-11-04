@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.util.SpecDataLocation;
 import recoder.java.declaration.ClassDeclaration;
 import recoder.java.declaration.TypeDeclaration;
@@ -40,7 +38,7 @@ class Context {
      *                               recoder.java.CompilationUnit
      * @param classContext           a recoder.java.declaration.ClassDeclaration
      */
-    public Context(KeYCrossReferenceServiceConfiguration servConf,
+    public Context(KeYTransformationPipelineServices servConf,
                    recoder.java.CompilationUnit compilationUnitContext,
                    ClassDeclaration classContext) {
         this.compilationUnitContext = compilationUnitContext;
@@ -53,7 +51,7 @@ class Context {
      * @param compilationUnitContext a
      *                               recoder.java.declaration.CompilationUnit
      */
-    public Context(KeYCrossReferenceServiceConfiguration servConf,
+    public Context(KeYTransformationPipelineServices servConf,
                    recoder.java.CompilationUnit compilationUnitContext) {
         this(servConf, compilationUnitContext, createClassDecl(servConf));
     }
@@ -64,7 +62,7 @@ class Context {
      *
      * @param classContext a recoder.java.declaration.ClassDeclaration
      */
-    public Context(KeYCrossReferenceServiceConfiguration servConf,
+    public Context(KeYTransformationPipelineServices servConf,
                    ClassDeclaration classContext) {
         this(servConf, createCompUnit(classContext), classContext);
     }
@@ -85,7 +83,7 @@ class Context {
     }
 
     private static recoder.java.declaration.ClassDeclaration createClassDecl
-            (KeYCrossReferenceServiceConfiguration servConf) {
+            (KeYTransformationPipelineServices servConf) {
         return servConf.getProgramFactory().createClassDeclaration
                 (null, new ImplicitIdentifier(PARSING_CONTEXT_CLASS_NAME),
                         null, null, null);

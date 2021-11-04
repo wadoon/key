@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import recoder.java.JavaProgramFactory;
 import recoder.service.ConstantEvaluator;
 import recoder.service.DefaultConstantEvaluator;
@@ -62,7 +61,7 @@ public class ConstantExpressionEvaluator {
 
     private ConstantEvaluator getRecoderConstantEvaluator() {
         if (recCe == null) {
-            KeYCrossReferenceServiceConfiguration servConf =
+            KeYTransformationPipelineServices servConf =
                     services.getJavaInfo().getKeYProgModelInfo().getServConf();
             recCe = new DefaultConstantEvaluator(servConf);
         }

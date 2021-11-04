@@ -55,6 +55,10 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
         return result;
     }
 
+    static <T> ImmutableList<T> fromList(T... args) {
+        return fromList(Arrays.asList(args));
+    }
+
     /**
      * prepends element to the list (non-destructive)
      *

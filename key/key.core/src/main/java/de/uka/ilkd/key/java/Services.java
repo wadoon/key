@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -103,7 +101,7 @@ public class Services implements TermServices {
         nameRecorder = new NameRecorder();
     }
 
-    private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping rec2key,
+    private Services(Profile profile, KeYTransformationPipelineServices crsc, KeYRecoderMapping rec2key,
                      HashMap<String, Counter> counters, ServiceCaches caches) {
         assert profile != null;
         assert counters != null;
@@ -226,7 +224,7 @@ public class Services implements TermServices {
     public Services copy(Profile profile, boolean shareCaches) {
         Debug.assertTrue
                 (!(getJavaInfo().getKeYProgModelInfo().getServConf()
-                                instanceof SchemaCrossReferenceServiceConfiguration),
+                                instanceof SchemaTransformationPipelineServices),
                         "services: tried to copy schema cross reference service config.");
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         Services s = new Services
@@ -271,7 +269,7 @@ public class Services implements TermServices {
     public Services copyPreservesLDTInformation() {
         Debug.assertTrue
                 (!(javainfo.getKeYProgModelInfo().getServConf()
-                                instanceof SchemaCrossReferenceServiceConfiguration),
+                                instanceof SchemaTransformationPipelineServices),
                         "services: tried to copy schema cross reference service config.");
         Services s = new Services(getProfile());
         s.setTypeConverter(getTypeConverter().copy(s));

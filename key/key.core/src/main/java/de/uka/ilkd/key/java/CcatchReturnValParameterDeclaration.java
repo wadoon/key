@@ -27,8 +27,8 @@ import java.io.IOException;
  *
  * @author Dominic Steinhöfel
  */
-public class CcatchReturnValParameterDeclaration extends
-        CcatchNonstandardParameterDeclaration implements ParameterContainer {
+public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParameterDeclaration
+        implements ParameterContainer {
 
     private final ParameterDeclaration delegate;
 

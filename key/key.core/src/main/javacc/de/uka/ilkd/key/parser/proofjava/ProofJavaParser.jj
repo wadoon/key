@@ -30,7 +30,6 @@ package de.uka.ilkd.key.parser.proofjava;
 
 import java.io.*;
 import java.util.*;
-import de.uka.ilkd.key.parser.ParserUtil;
 import recoder.list.generic.*;
 import recoder.java.*;
 import recoder.java.declaration.*;
@@ -42,7 +41,6 @@ import recoder.java.reference.*;
 import recoder.java.statement.*;
 import recoder.io.*;
 
-import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.recoderext.adt.*;
 import recoder.abstraction.TypeArgument.WildcardMode;
 
@@ -355,6 +353,38 @@ public class ProofJavaParser {
         UncollatedReferenceQualifier name = null;
 
     }
+
+    /** return value containers for primary expression.
+        need only be allocated once per parser. */
+    static PrimarySuffixReturnValue suffix = new PrimarySuffixReturnValue();
+    static PrimaryPrefixReturnValue prefix = new PrimaryPrefixReturnValue();
+
+
+}}
+
+    /** return value containers for primary expression.
+        need only be allocated once per parser. */
+    static PrimarySuffixReturnValue suffix = new PrimarySuffixReturnValue();
+    static PrimaryPrefixReturnValue prefix = new PrimaryPrefixReturnValue();
+
+
+}}
+
+    /** return value containers for primary expression.
+        need only be allocated once per parser. */
+    static PrimarySuffixReturnValue suffix = new PrimarySuffixReturnValue();
+    static PrimaryPrefixReturnValue prefix = new PrimaryPrefixReturnValue();
+
+
+}}
+
+    /** return value containers for primary expression.
+        need only be allocated once per parser. */
+    static PrimarySuffixReturnValue suffix = new PrimarySuffixReturnValue();
+    static PrimaryPrefixReturnValue prefix = new PrimaryPrefixReturnValue();
+
+
+}}
 
     /** return value containers for primary expression.
         need only be allocated once per parser. */

@@ -15,7 +15,6 @@ package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -37,7 +36,7 @@ public class KeYProgModelInfo {
 
 
     private final Services services;
-    private KeYCrossReferenceServiceConfiguration sc = null;
+    private KeYTransformationPipelineServices sc = null;
     private final KeYRecoderMapping mapping;
     private final TypeConverter typeConverter;
     private final HashMap<KeYJavaType, HashMap<String, IProgramMethod>> implicits =
@@ -46,12 +45,12 @@ public class KeYProgModelInfo {
 
     public KeYProgModelInfo(Services services, TypeConverter typeConverter,
                             KeYRecoderExcHandler keh) {
-        this(services, new KeYCrossReferenceServiceConfiguration(keh),
+        this(services, new KeYTransformationPipelineServices(keh),
                 new KeYRecoderMapping(), typeConverter);
         exceptionHandler = keh;
     }
 
-    KeYProgModelInfo(Services services, KeYCrossReferenceServiceConfiguration crsc,
+    KeYProgModelInfo(Services services, KeYTransformationPipelineServices crsc,
                      KeYRecoderMapping krm, TypeConverter typeConverter) {
         this.services = services;
         sc = crsc;
@@ -64,7 +63,7 @@ public class KeYProgModelInfo {
         return mapping;
     }
 
-    public KeYCrossReferenceServiceConfiguration getServConf() {
+    public KeYTransformationPipelineServices getServConf() {
         return sc;
     }
 

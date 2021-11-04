@@ -18,7 +18,6 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.recoderext.ProgramVariableSVWrapper;
 import de.uka.ilkd.key.java.recoderext.TypeSVWrapper;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
@@ -307,7 +306,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     }
 
     public SchemaVariable convert(
-            de.uka.ilkd.key.java.recoderext.ProgramVariableSVWrapper svw) {
+            ProgramVariableSVWrapper svw) {
 
         return svw.getSV();
     }

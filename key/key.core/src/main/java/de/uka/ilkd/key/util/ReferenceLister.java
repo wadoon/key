@@ -28,7 +28,7 @@ import recoder.java.CompilationUnit;
 import recoder.java.ProgramElement;
 import recoder.java.reference.TypeReference;
 import recoder.service.SourceInfo;
-import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
+import de.uka.ilkd.key.java.transformations.JavaFacade;
 
 /**
  * Find out for a collection of Java files which referenced types are not defined
@@ -107,6 +107,6 @@ public class ReferenceLister {
 
 class RefSolverServiceConfiguration extends CrossReferenceServiceConfiguration {
     protected ProgramFactory makeProgramFactory() {
-        return ProofJavaProgramFactory.getInstance();
+        return JavaFacade.getInstance();
     }
 }

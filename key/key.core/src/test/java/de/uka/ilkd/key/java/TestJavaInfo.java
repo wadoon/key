@@ -20,7 +20,7 @@ import junit.framework.TestCase;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.transformations.pipeline.ImplicitFieldAdder;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 

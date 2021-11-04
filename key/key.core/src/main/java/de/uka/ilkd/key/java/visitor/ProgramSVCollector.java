@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * This visitor is used to collect all appearing SchemaVariables in a
@@ -26,14 +25,12 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 public class ProgramSVCollector extends JavaASTWalker {
 
-    private ImmutableList<SchemaVariable> result =
-            ImmutableSLList.nil();
+    private ImmutableList<SchemaVariable> result;
 
     /**
      * the instantiations needed for unwind loop constructs
      */
-    private SVInstantiations instantiations =
-            SVInstantiations.EMPTY_SVINSTANTIATIONS;
+    private SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
     /**
      * create the ProgramSVCollector
@@ -42,8 +39,7 @@ public class ProgramSVCollector extends JavaASTWalker {
      * @param vars the IList<SchemaVariable> where to add the new found
      *             ones
      */
-    public ProgramSVCollector(ProgramElement root,
-                              ImmutableList<SchemaVariable> vars) {
+    public ProgramSVCollector(ProgramElement root, ImmutableList<SchemaVariable> vars) {
         super(root);
         result = vars;
     }
@@ -80,8 +76,6 @@ public class ProgramSVCollector extends JavaASTWalker {
      * the action that is performed just before leaving the node the last time.
      * Not only schema variables must be taken into consideration, but also
      * program meta constructs with implicit schema variables containment
-     *
-     * @see ProgramTransformerWithSV
      */
     protected void doAction(ProgramElement node) {
         if (node instanceof SchemaVariable) {

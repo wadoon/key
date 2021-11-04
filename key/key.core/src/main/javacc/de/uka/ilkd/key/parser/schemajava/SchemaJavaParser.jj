@@ -46,9 +46,7 @@ import recoder.io.*;
 
 import recoder.abstraction.TypeArgument.WildcardMode;
 
-import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.java.recoderext.adt.*;
-import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -437,6 +435,38 @@ public class SchemaJavaParser {
 	UncollatedReferenceQualifier name  = null;
 
     }
+
+    /** return value containers for primary expression.
+	need only be allocated once per parser. */
+    static PrimarySuffixReturnValue suffix = new PrimarySuffixReturnValue();
+    static PrimaryPrefixReturnValue prefix = new PrimaryPrefixReturnValue();
+
+
+}}
+
+    /** return value containers for primary expression.
+	need only be allocated once per parser. */
+    static PrimarySuffixReturnValue suffix = new PrimarySuffixReturnValue();
+    static PrimaryPrefixReturnValue prefix = new PrimaryPrefixReturnValue();
+
+
+}}
+
+    /** return value containers for primary expression.
+	need only be allocated once per parser. */
+    static PrimarySuffixReturnValue suffix = new PrimarySuffixReturnValue();
+    static PrimaryPrefixReturnValue prefix = new PrimaryPrefixReturnValue();
+
+
+}}
+
+    /** return value containers for primary expression.
+	need only be allocated once per parser. */
+    static PrimarySuffixReturnValue suffix = new PrimarySuffixReturnValue();
+    static PrimaryPrefixReturnValue prefix = new PrimaryPrefixReturnValue();
+
+
+}}
 
     /** return value containers for primary expression.
 	need only be allocated once per parser. */

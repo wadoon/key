@@ -24,8 +24,7 @@ import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.*;
-import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
+import de.uka.ilkd.key.java.transformations.pipeline.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -955,7 +954,7 @@ public class Recoder2KeYConverter {
      * @author m.u.
      */
     public EnumClassDeclaration convert(
-            de.uka.ilkd.key.java.recoderext.EnumClassDeclaration td) {
+            de.uka.ilkd.key.java.transformations.EnumClassDeclaration td) {
 
         KeYJavaType kjt = getKeYJavaType(td);
         ExtList classMembers = collectChildren(td);

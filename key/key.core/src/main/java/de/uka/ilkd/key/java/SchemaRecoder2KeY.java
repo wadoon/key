@@ -13,9 +13,6 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
-import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.java.recoderext.SchemaJavaProgramFactory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -44,8 +41,8 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
     private final static HashMap<?, ?> recClass2schemakeyClassCons =
             new LinkedHashMap<Object, Object>(400);
     // could this be the servConf of the super class?
-    private static final SchemaCrossReferenceServiceConfiguration schemaServConf =
-            new SchemaCrossReferenceServiceConfiguration(new KeYRecoderExcHandler());
+    private static final SchemaTransformationPipelineServices schemaServConf =
+            new SchemaTransformationPipelineServices(new KeYRecoderExcHandler());
     /**
      * the namespace containing the program schema variables allowed here
      */

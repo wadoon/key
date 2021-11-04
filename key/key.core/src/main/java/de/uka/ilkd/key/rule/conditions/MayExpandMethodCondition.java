@@ -19,7 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
+import de.uka.ilkd.key.java.transformations.pipeline.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;

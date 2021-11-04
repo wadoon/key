@@ -17,7 +17,6 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.KeYRecoderMapping;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.NamespaceSet;
 
 public class ParserConfig {
@@ -53,7 +52,7 @@ public class ParserConfig {
 	return services.getTypeConverter();
     }
 
-    public KeYCrossReferenceServiceConfiguration serviceConfiguration() {
+    public KeYTransformationPipelineServices serviceConfiguration() {
 	return services.getJavaInfo().
 	    getKeYProgModelInfo().getServConf();
     }

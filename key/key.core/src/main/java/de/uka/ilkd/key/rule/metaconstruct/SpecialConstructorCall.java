@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.SpecialConstructorReference;
 import de.uka.ilkd.key.java.reference.ThisConstructorReference;
+import de.uka.ilkd.key.java.transformations.pipeline.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -36,8 +37,7 @@ public class SpecialConstructorCall extends ProgramTransformer {
      * The normal form identifier {@link ProgramElementName}.
      */
     private static final ProgramElementName NORMALFORM_IDENTIFIER = new ProgramElementName(
-        de.uka.ilkd.key.java.recoderext.//
-                ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
+        ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
 
     /**
      * @param consRef
