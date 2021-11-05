@@ -45,13 +45,13 @@ public class ShiftUpdateImplNew {
 		// rename all existing formulas in sequent except program formula
 		renameFormulasOnSemisequent(renameUpdate, g.sequent().antecedent(), true);
 		renameFormulasOnSemisequent(renameUpdate, g.sequent().succedent(), false);
-		System.out.println("After rename: "+ g.sequent());
+//		System.out.println("After rename: "+ g.sequent());
 
 		doShift(renameUpdate, g, pos, loopFormula);
-		System.out.println("After complete shift: "+ g.sequent());
+//		System.out.println("After complete shift: "+ g.sequent());
 		// add program formula again
 		g.addFormula(new SequentFormula(UpdateApplication.getTarget(loopFormula)), pos.isInAntec(), true);
-		System.out.println("Putting program back: "+ g.sequent());
+//		System.out.println("Putting program back: "+ ProofSaver.printAnything(g.sequent(), services));
 	}
 
 	/**
@@ -146,7 +146,7 @@ public class ShiftUpdateImplNew {
 	 */
 	private void renameFormulasOnSemisequent(final Term renameUpdate, Semisequent semi, boolean antec) {
 		for (SequentFormula sf : semi) {
-			System.out.println(sf);
+//			System.out.println(sf);
 			final PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), antec);
 			goal.changeFormula(new SequentFormula(tb.apply(renameUpdate, sf.formula())), pio);
 		}
@@ -193,8 +193,16 @@ public class ShiftUpdateImplNew {
 		Term cond2 = tb.equals(eventMarker, writeMarker);
 		
 		// Generating rPred and wPred
-		final Term linkTerm4EventUpdate = tb.ife(cond1, tb.rPred(tb.apply(tb.apply(inverseEvent,eventUpdate), locSet), eventUpdate.sub(2)),
-				tb.ife(cond2, tb.wPred(tb.apply(tb.apply(inverseEvent,eventUpdate), locSet), eventUpdate.sub(2)), tb.tt()));
+		final Term linkTerm4EventUpdate = 
+				tb.ife(cond1, 
+							tb.rPred(
+									tb.apply(inverseEvent, 
+											tb.apply(eventUpdate, locSet)),
+									eventUpdate.sub(2)),
+				tb.ife(cond2,
+						tb.wPred(
+								tb.apply(inverseEvent,
+										tb.apply(eventUpdate, locSet)), eventUpdate.sub(2)), tb.tt()));
 		// Applying the update rename on the rPred and wPred
 		goal.addFormula(new SequentFormula(tb.apply(keepParallelUpdateRenames, linkTerm4EventUpdate)), true, true);
 	}
