@@ -19,10 +19,10 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.lang.SMTSort;

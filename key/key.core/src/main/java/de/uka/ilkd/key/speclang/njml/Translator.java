@@ -1,17 +1,17 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.CharLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.literal.LongLiteral;
-import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-import de.uka.ilkd.key.java.transformations.pipeline.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.expression.literal.CharLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.LongLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.StringLiteral;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -1343,7 +1343,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         KeYJavaType typ = accept(ctx.referencetype());
         assert typ != null;
         Term resTerm = tb.equals(tb.var(
-                        javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, typ)),
+                        javaInfo.getAttribute(PipelineConstants.IMPLICIT_CLASS_INITIALIZED, typ)),
                 tb.TRUE());
         return new SLExpression(resTerm);
     }

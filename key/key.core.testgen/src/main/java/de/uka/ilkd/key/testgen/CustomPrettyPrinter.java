@@ -3,7 +3,7 @@ package de.uka.ilkd.key.testgen;
 import java.io.Writer;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 

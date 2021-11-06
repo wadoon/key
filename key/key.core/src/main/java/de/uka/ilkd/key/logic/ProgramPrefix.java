@@ -15,8 +15,8 @@ package de.uka.ilkd.key.logic;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.NonTerminalProgramElement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 
 /**
  * this interface is implemented by program elements that may be matched

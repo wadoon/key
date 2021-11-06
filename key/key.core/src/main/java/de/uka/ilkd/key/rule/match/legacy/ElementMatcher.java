@@ -2,8 +2,8 @@ package de.uka.ilkd.key.rule.match.legacy;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.AbstractSV;

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.SMTTranslator;

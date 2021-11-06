@@ -13,10 +13,14 @@
 
 package de.uka.ilkd.key.util;
 
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -25,34 +29,30 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import de.uka.ilkd.key.java.recoderext.URLDataLocation;
-import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import recoder.io.DataLocation;
-
 
 /**
  * Allows to iterate a zip file to return all matching entries
  * as InpuStreams.
- * 
+ *
  * @author MU
  */
 
 
 public class ZipFileCollection implements FileCollection {
-    
+
     File file;
     ZipFile zipFile;
-    
-    public ZipFileCollection(File file)  {
+
+    public ZipFileCollection(File file) {
         this.file = file;
     }
 
 
     public Walker createWalker(String[] extensions) throws IOException {
-        if(zipFile == null)
+        if (zipFile == null)
             try {
                 zipFile = new ZipFile(file);
-            } catch(ZipException ex) {
+            } catch (ZipException ex) {
                 IOException iox = new IOException("can't open " + file + ": " + ex.getMessage());
                 iox.initCause(ex);
                 throw iox;
@@ -61,7 +61,7 @@ public class ZipFileCollection implements FileCollection {
     }
 
     public Walker createWalker(String extension) throws IOException {
-        return createWalker(new String[] { extension });
+        return createWalker(new String[]{extension});
     }
 
     class Walker implements FileCollection.Walker {
@@ -73,20 +73,20 @@ public class ZipFileCollection implements FileCollection {
         public Walker(String[] extensions) {
             this.enumeration = zipFile.entries();
             this.extensions = new ArrayList<String>();
-            for(String extension : extensions) {
-              this.extensions.add(extension.toLowerCase());
+            for (String extension : extensions) {
+                this.extensions.add(extension.toLowerCase());
             }
         }
 
         public String getCurrentName() {
-            if(currentEntry == null)
+            if (currentEntry == null)
                 throw new NoSuchElementException();
             else
-                return file.getAbsolutePath() + File.separatorChar +  currentEntry.getName();
+                return file.getAbsolutePath() + File.separatorChar + currentEntry.getName();
         }
 
         public InputStream openCurrent() throws IOException {
-            if(currentEntry == null)
+            if (currentEntry == null)
                 throw new NoSuchElementException();
             else
                 return zipFile.getInputStream(currentEntry);
@@ -107,37 +107,42 @@ public class ZipFileCollection implements FileCollection {
 
         public boolean step() {
             currentEntry = null;
-            while(enumeration.hasMoreElements() && currentEntry == null) {
+            while (enumeration.hasMoreElements() && currentEntry == null) {
                 currentEntry = enumeration.nextElement();
-                for(String extension : extensions) {
-                  if(extension != null && !currentEntry.getName().toLowerCase().endsWith(extension))
-                     currentEntry = null;
-                  else
-                     break;
+                for (String extension : extensions) {
+                    if (extension != null && !currentEntry.getName().toLowerCase().endsWith(extension))
+                        currentEntry = null;
+                    else
+                        break;
                 }
             }
             return currentEntry != null;
         }
-        
+
         public String getType() {
             return "zip";
         }
 
-        public DataLocation getCurrentDataLocation() {
+        public URL getCurrentDataLocation() {
             // dont use ArchiveDataLocation this keeps the zip open and keeps reference to it!
             try {
                 // since we actually return a zip/jar, we use URLDataLocation
                 URI uri = MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
-                return new URLDataLocation(uri.toURL());
+                return uri.toURL();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return SpecDataLocation.UNKNOWN_LOCATION;       // fallback
+            try {
+                return new URL("file", "", "unknown");       // fallback
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
     }
-    
+
     @Override
     public String toString() {
-        return "ZipFileCollection["+ file + "]";
+        return "ZipFileCollection[" + file + "]";
     }
 }

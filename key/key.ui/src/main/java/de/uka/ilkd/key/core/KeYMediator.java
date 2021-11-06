@@ -31,7 +31,7 @@ import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ServiceCaches;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;

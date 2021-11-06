@@ -18,7 +18,7 @@ import java.util.Iterator;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.java.visitor.ProgramSVCollector;
+import de.uka.ilkd.key.java.ast.visitor.ProgramSVCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;

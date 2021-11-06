@@ -13,19 +13,15 @@
 
 package de.uka.ilkd.key.java.transformations.pipeline;
 
-import de.uka.ilkd.key.java.transformations.InstanceAllocationMethodBuilder;
-import recoder.java.Expression;
-import recoder.java.Identifier;
-import recoder.java.Statement;
-import recoder.java.BlockStmt;
-import recoder.java.declaration.*;
-import recoder.java.reference.MethodReference;
-import recoder.java.reference.Type;
-import recoder.java.reference.VariableReference;
-import recoder.java.statement.Return;
-import recoder.kit.ProblemReport;
-import recoder.kit.TypeKit;
-import recoder.list.generic.NodeList;
+import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.key.KeyMethodBodyStatement;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.ReturnStmt;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -44,14 +40,12 @@ public class CreateObjectBuilder extends JavaTransformer {
 
     public static final String IMPLICIT_OBJECT_CREATE = "<createObject>";
     public static final String NEW_OBJECT_VAR_NAME = "__NEW__";
-    private final HashMap<TypeDeclaration<?>, Identifier> class2identifier;
+    private final HashMap<TypeDeclaration<?>, SimpleName> class2SimpleName;
 
 
-    public CreateObjectBuilder
-            (TransformationPipelineServices services,
-             TransformerCache cache) {
-        super(services, cache);
-        class2identifier = new LinkedHashMap<TypeDeclaration<?>, Identifier>();
+    public CreateObjectBuilder(TransformationPipelineServices services) {
+        super(services);
+        class2SimpleName = new LinkedHashMap<>();
     }
 
 
@@ -59,99 +53,54 @@ public class CreateObjectBuilder extends JavaTransformer {
      * Creates the body of the static <code>&lt;createObject&gt;</code>
      * method.
      */
-    private BlockStmt createBody(TypeDeclaration<?> recoderClass) {
+    private BlockStmt createBody(ClassOrInterfaceDeclaration recoderClass) {
+        var result = new BlockStmt();
+        final var thisType = services.getType(recoderClass);
+        var local = new VariableDeclarationExpr(thisType, NEW_OBJECT_VAR_NAME);
+        result.addStatement(local);
 
-        NodeList<Statement> result = new NodeList<Statement>(10);
-        LocalVariableDeclaration local = declare(NEW_OBJECT_VAR_NAME, class2identifier.get(recoderClass));
+        var arguments = new NodeList<Expression>();
 
-
-        result.add(local);
-
-        final NodeList<Expression> arguments = new NodeList<Expression>(0);
-
-        result.add
-                (assign(new VariableReference
-                                (new Identifier(NEW_OBJECT_VAR_NAME)),
-                        new MethodReference(new Type
-                                (class2identifier.get(recoderClass)),
-                                new ImplicitIdentifier
-                                        (InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
+        result.addStatement(
+                assign(new NameExpr(NEW_OBJECT_VAR_NAME),
+                        new MethodCallExpr(
+                                new TypeExpr(thisType),
+                                PipelineConstants.IMPLICIT_INSTANCE_ALLOCATE,
                                 arguments)));
 
-        MethodReference createRef =
-                (new MethodReference(new VariableReference
-                        (new Identifier(NEW_OBJECT_VAR_NAME)),
-                        new ImplicitIdentifier
-                                (CreateBuilder.IMPLICIT_CREATE)));
+        MethodCallExpr createRef = new MethodCallExpr(new NameExpr(NEW_OBJECT_VAR_NAME), CreateBuilder.IMPLICIT_CREATE);
 
         // July 08 - mulbrich: wraps createRef into a method body statement to
         // avoid unnecessary dynamic dispatch.
         // Method body statement are not possible for anonymous classes, however.
         // Use a method call there
-        if (recoderClass.getIdentifier() == null) {
+        if (recoderClass.getName() == null) {//TODO weigl recheck
             // anonymous
-            result.add
-                    (new MethodReference(new VariableReference
-                            (new Identifier(NEW_OBJECT_VAR_NAME)),
-                            new ImplicitIdentifier
-                                    (CreateBuilder.IMPLICIT_CREATE)));
+            result.addStatement(
+                    new MethodCallExpr(new NameExpr(new SimpleName(NEW_OBJECT_VAR_NAME)), CreateBuilder.IMPLICIT_CREATE));
         } else {
-            Type tyref;
-            tyref = makeTyRef(recoderClass);
-            result.add(new MethodBodyStatement(tyref, null, createRef));
+            result.addStatement(new KeyMethodBodyStatement(null, createRef, thisType));
         }
 
         // TODO why does the method return a value? Is the result ever used??
-        result.add(new Return
-                (new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME))));
-
-        return new BlockStmt(result);
-
-    }
-
-    /*
-     * make a type reference. There are special classes which need to be handled
-     * differently. (<Default> for instance)
-     */
-    private Type makeTyRef(TypeDeclaration<?> recoderClass) {
-        Identifier id = recoderClass.getIdentifier();
-        if (id instanceof ImplicitIdentifier)
-            return new Type(id);
-        else
-            return TypeKit.createType(getProgramFactory(), recoderClass);
+        result.addStatement(new ReturnStmt(new NameExpr(NEW_OBJECT_VAR_NAME)));
+        return result;
     }
 
 
     /**
-     * creates the implicit static <code>&lt;createObject&gt;</code>
+     * appends and creates the implicit static <code>&lt;createObject&gt;</code>
      * method that takes the object to be created out of the pool
-     *
-     * @param type the TypeDeclaration for which the
-     *             <code>&lt;prepare&gt;</code> is created
-     * @return the implicit <code>&lt;prepare&gt;</code> method
      */
-    public MethodDeclaration createMethod(TypeDeclaration<?> type) {
-        NodeList<Modifier> modifiers = new NodeList<Modifier>(2);
-        modifiers.add(new Modifier(Modifier.Keyword.PUBLIC));
-        modifiers.add(new Modifier(Modifier.Keyword.PUBLIC));
-
-        MethodDeclaration md = new MethodDeclaration
-                (modifiers,
-                        new Type(class2identifier.get(type)),
-                        new ImplicitIdentifier(IMPLICIT_OBJECT_CREATE),
-                        new NodeList<Parameter>(0),
-                        null,
-                        createBody(type));
-        md.makeAllParentRolesValid();
-        return md;
+    public void createMethod(ClassOrInterfaceDeclaration type) {
+        var md = type.addMethod(
+                IMPLICIT_OBJECT_CREATE,
+                Modifier.Keyword.PUBLIC, Modifier.Keyword.STATIC);
+        md.setType(new ClassOrInterfaceType(null, type.getName(), null));
+        md.setBody(createBody(type));
     }
 
-    public ProblemReport analyze() {
-        for (final TypeDeclaration<?> cd : TypeDeclaration<?>s()) {
-            class2identifier.put(cd, getId(cd));
-        }
-        setProblemReport(NO_PROBLEM);
-        return NO_PROBLEM;
+    public void prepare() {
     }
 
     /**
@@ -159,14 +108,9 @@ public class CreateObjectBuilder extends JavaTransformer {
      *
      * @param td the TypeDeclaration
      */
-    protected void makeExplicit(TypeDeclaration td) {
-        if (td instanceof TypeDeclaration<?>) {
-            attach(createMethod((TypeDeclaration<?>) td), td,
-                    td.getMembers().size());
-//  	    java.io.StringWriter sw = new java.io.StringWriter();
-//  	    services.getProgramFactory().getPrettyPrinter(sw).visitTypeDeclaration<?>((TypeDeclaration<?>)td);
-//  	    System.out.println(sw.toString());
-//  	    try { sw.close(); } catch (Exception e) {}		
+    protected void apply(TypeDeclaration<?> td) {
+        if (td instanceof ClassOrInterfaceDeclaration) {
+            createMethod((ClassOrInterfaceDeclaration) td);
         }
     }
 

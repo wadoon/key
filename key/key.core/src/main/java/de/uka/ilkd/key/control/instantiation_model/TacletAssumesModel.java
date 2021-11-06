@@ -21,15 +21,13 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
-import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.MissingInstantiationException;

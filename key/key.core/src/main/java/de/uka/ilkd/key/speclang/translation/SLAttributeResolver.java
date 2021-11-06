@@ -13,15 +13,15 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.MemberDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.java.transformations.pipeline.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.ast.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
@@ -116,12 +116,12 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                 if(attribute == null) {
                     attribute 
                     	= lookupVisibleAttribute(
-                    		ImplicitFieldAdder.FINAL_VAR_PREFIX + name, 
+                    		PipelineConstants.FINAL_VAR_PREFIX + name,
                     		containingType);
                 }
                 final LocationVariable et 
                 	= (LocationVariable) javaInfo.getAttribute(
-                		ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, 
+                		PipelineConstants.IMPLICIT_ENCLOSING_THIS,
                 		containingType);
                 if(et != null && attribute == null){
                     containingType = et.getKeYJavaType();

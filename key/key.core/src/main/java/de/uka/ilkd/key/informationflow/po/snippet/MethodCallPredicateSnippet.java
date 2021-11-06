@@ -3,7 +3,7 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;

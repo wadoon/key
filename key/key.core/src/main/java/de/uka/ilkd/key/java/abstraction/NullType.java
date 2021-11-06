@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.java.abstraction;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.ast.expression.Literal;
 import org.key_project.util.collection.ImmutableList;
 
 /**

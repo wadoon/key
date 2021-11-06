@@ -14,19 +14,16 @@
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.declaration.modifier.Final;
-import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.declaration.modifier.Public;
-import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.expression.*;
-import de.uka.ilkd.key.java.expression.literal.*;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
-import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Final;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
+import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.literal.*;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqGet;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqLength;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.Range;
@@ -1016,7 +1013,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSingleton(de.uka.ilkd.key.java.expression.operator.adt.Singleton x) throws java.io.IOException {
+    public void printSingleton(de.uka.ilkd.key.java.ast.expression.operator.adt.Singleton x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\singleton", x);
@@ -1026,7 +1023,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSetUnion(de.uka.ilkd.key.java.expression.operator.adt.SetUnion x) throws java.io.IOException {
+    public void printSetUnion(de.uka.ilkd.key.java.ast.expression.operator.adt.SetUnion x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\set_union", x);
@@ -1038,7 +1035,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printIntersect(de.uka.ilkd.key.java.expression.operator.Intersect x) throws java.io.IOException {
+    public void printIntersect(de.uka.ilkd.key.java.ast.expression.operator.Intersect x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\intersect", x);
@@ -1050,7 +1047,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSetMinus(de.uka.ilkd.key.java.expression.operator.adt.SetMinus x) throws java.io.IOException {
+    public void printSetMinus(de.uka.ilkd.key.java.ast.expression.operator.adt.SetMinus x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\set_minus", x);
@@ -1062,7 +1059,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printAllFields(de.uka.ilkd.key.java.expression.operator.adt.AllFields x) throws java.io.IOException {
+    public void printAllFields(de.uka.ilkd.key.java.ast.expression.operator.adt.AllFields x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\all_fields", x);
@@ -1072,7 +1069,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printAllObjects(de.uka.ilkd.key.java.expression.operator.adt.AllObjects x) throws java.io.IOException {
+    public void printAllObjects(de.uka.ilkd.key.java.ast.expression.operator.adt.AllObjects x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\all_objects", x);
@@ -1107,7 +1104,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSeqSingleton(de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton x) throws java.io.IOException {
+    public void printSeqSingleton(de.uka.ilkd.key.java.ast.expression.operator.adt.SeqSingleton x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\seq_singleton", x);
@@ -1117,7 +1114,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSeqConcat(de.uka.ilkd.key.java.expression.operator.adt.SeqConcat x) throws java.io.IOException {
+    public void printSeqConcat(de.uka.ilkd.key.java.ast.expression.operator.adt.SeqConcat x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\seq_concat", x);
@@ -1129,7 +1126,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printIndexOf(de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf x) throws java.io.IOException {
+    public void printIndexOf(de.uka.ilkd.key.java.ast.expression.operator.adt.SeqIndexOf x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\indexOf", x);
@@ -1141,7 +1138,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSeqSub(de.uka.ilkd.key.java.expression.operator.adt.SeqSub x) throws java.io.IOException {
+    public void printSeqSub(de.uka.ilkd.key.java.ast.expression.operator.adt.SeqSub x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\seq_sub", x);
@@ -1155,7 +1152,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSeqReverse(de.uka.ilkd.key.java.expression.operator.adt.SeqReverse x) throws java.io.IOException {
+    public void printSeqReverse(de.uka.ilkd.key.java.ast.expression.operator.adt.SeqReverse x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\seq_reverse", x);

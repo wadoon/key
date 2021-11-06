@@ -23,6 +23,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import de.uka.ilkd.key.java.ast.visitor.JavaASTWalker;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -34,7 +35,7 @@ import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -727,7 +728,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             if (b.isEmpty()) {
                 return 0;
             }
-            return new de.uka.ilkd.key.java.visitor.JavaASTWalker(b.program()) {
+            return new JavaASTWalker(b.program()) {
                 private int counter = 0;
 
                 @Override

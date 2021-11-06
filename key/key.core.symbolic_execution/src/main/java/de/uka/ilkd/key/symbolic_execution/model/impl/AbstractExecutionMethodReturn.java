@@ -3,8 +3,8 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;

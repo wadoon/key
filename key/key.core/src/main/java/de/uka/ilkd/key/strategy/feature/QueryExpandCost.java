@@ -17,7 +17,7 @@ import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;

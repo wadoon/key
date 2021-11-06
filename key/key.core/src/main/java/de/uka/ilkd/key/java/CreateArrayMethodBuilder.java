@@ -17,21 +17,23 @@ import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.declaration.modifier.Private;
-import de.uka.ilkd.key.java.declaration.modifier.Protected;
-import de.uka.ilkd.key.java.declaration.modifier.Static;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.operator.LessThan;
-import de.uka.ilkd.key.java.expression.operator.PostIncrement;
-import de.uka.ilkd.key.java.transformations.pipeline.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.transformations.InstanceAllocationMethodBuilder;
-import de.uka.ilkd.key.java.transformations.PrepareObjectBuilder;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.LoopInitializer;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Static;
+import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.LessThan;
+import de.uka.ilkd.key.java.ast.expression.operator.PostIncrement;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.For;
+import de.uka.ilkd.key.java.ast.statement.Return;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -47,6 +49,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants.IMPLICIT_INSTANCE_ALLOCATE;
+import static de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants.IMPLICIT_OBJECT_PREPARE;
+
 /**
  * This class creates the <code>&lt;createArray&gt;</code> method for array
  * creation and in particular its helper method
@@ -55,15 +60,12 @@ import java.util.Map;
  * RecodeR.
  */
 public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
-
-    public static final String IMPLICIT_ARRAY_CREATE = "<createArray>";
-
-    public static final String IMPLICIT_ARRAY_CREATION_HELPER = "<createArrayHelper>";
+    public static final String IMPLICIT_ARRAY_CREATE = "$createArray";
+    public static final String IMPLICIT_ARRAY_CREATION_HELPER = "$createArrayHelper";
 
     // as these methods are thought to be only preliminary(we cache some
     // information here)
-    private final Map<String, ProgramVariable> cache =
-            new LinkedHashMap<String, ProgramVariable>(3);
+    private final Map<String, ProgramVariable> cache = new LinkedHashMap<>(3);
 
     /**
      * keeps the currently used integer type
@@ -101,14 +103,14 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * available objects
      */
     protected List<Statement> createArray(ImmutableList<Field> fields) {
-        LinkedList<Statement> result = new LinkedList<Statement>();
+        LinkedList<Statement> result = new LinkedList<>();
         ImmutableList<Field> implicitFields = filterImplicitFields(fields);
 
         // declared only in Object so we have to look there
-        ProgramVariable initialized = findInObjectFields(ImplicitFieldAdder.IMPLICIT_INITIALIZED);
+        ProgramVariable initialized = findInObjectFields(PipelineConstants.IMPLICIT_INITIALIZED);
         if (initialized == null) {
             // only if createObject for Object is called
-            initialized = find(ImplicitFieldAdder.IMPLICIT_INITIALIZED,
+            initialized = find(PipelineConstants.IMPLICIT_INITIALIZED,
                     implicitFields);
         }
 
@@ -231,7 +233,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
                 modifiers,
                 arrayTypeReference,
                 new ProgramElementName(
-                        InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
+                        IMPLICIT_INSTANCE_ALLOCATE),
                 new ParameterDeclaration[]{param}, null, null, false);
 
         return new ProgramMethod(md,
@@ -251,19 +253,18 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final ProgramVariable newObject = (ProgramVariable) local
                 .getVariables().get(0)
                 .getProgramVariable();
-        final LinkedList<Statement> body = new LinkedList<Statement>();
+        final LinkedList<Statement> body = new LinkedList<>();
 
         body.addLast(local);
         body.addLast(assign(
                 newObject,
                 new MethodReference(
                         new ImmutableArray<Expression>(paramLength),
-                        new ProgramElementName(
-                                InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
+                        new ProgramElementName(IMPLICIT_INSTANCE_ALLOCATE),
                         arrayRef)));
 
         body.add(new MethodReference(
-                new ImmutableArray<Expression>(),
+                new ImmutableArray<>(),
                 new ProgramElementName(
                         CreateArrayMethodBuilder.IMPLICIT_ARRAY_CREATION_HELPER),
                 newObject));
@@ -309,12 +310,11 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         final List<Statement> body = createArray(fields);
 
-        body.add(new MethodReference(new ImmutableArray<Expression>(),
-                new ProgramElementName(
-                        PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE), null));
+        body.add(new MethodReference(new ImmutableArray<>(),
+                new ProgramElementName(IMPLICIT_OBJECT_PREPARE), null));
 
         body.add(assign(attribute(thisRef,
-                        findInObjectFields(ImplicitFieldAdder.IMPLICIT_INITIALIZED)),
+                        findInObjectFields(PipelineConstants.IMPLICIT_INITIALIZED)),
                 BooleanLiteral.TRUE));
 
         body.add(new Return(thisRef));
@@ -424,8 +424,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         final MethodDeclaration md = new MethodDeclaration(
                 new Modifier[]{new Private()}, arrayRef,
-                new ProgramElementName(
-                        PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE),
+                new ProgramElementName(IMPLICIT_OBJECT_PREPARE),
                 new ParameterDeclaration[0], null, body, false);
 
         return new ProgramMethod(md,

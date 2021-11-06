@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;

@@ -18,10 +18,10 @@ import java.util.regex.Pattern;
 
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.visitor.LabelCollector;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.visitor.LabelCollector;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;

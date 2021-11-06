@@ -15,26 +15,27 @@ package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
 
+import de.uka.ilkd.key.java.ast.visitor.Visitor;
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.NameAbstractionTable;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.ast.SourceData;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.ReferenceSuffix;
-import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.FieldReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.ReferenceSuffix;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
@@ -186,7 +187,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 
     
     @Override
-    public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
+    public void visit(Visitor v) {
 	v.performActionOnProgramVariable(this);
     }
 

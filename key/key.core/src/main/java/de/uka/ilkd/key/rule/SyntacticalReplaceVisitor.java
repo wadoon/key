@@ -25,14 +25,14 @@ import java.util.Stack;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
-import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
+import de.uka.ilkd.key.java.ast.ContextStatementBlock;
+import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.visitor.ProgramContextAdder;
+import de.uka.ilkd.key.java.ast.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;

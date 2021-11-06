@@ -2,7 +2,7 @@ package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LogicVariable;

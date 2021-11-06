@@ -12,7 +12,7 @@
 // 
 package de.uka.ilkd.key.strategy.termfeature;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 

@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.translation.Recoder2KeY;
 import junit.framework.TestCase;
 
 import org.key_project.util.ExtList;
@@ -34,7 +36,7 @@ public class TestContextStatementBlock extends TestCase {
     public void setUp() {
 	JavaInfo ji = TacletForTests.javaInfo();
 	Services services = TacletForTests.services();
-	Recoder2KeY c2k 
+	Recoder2KeY c2k
 	    = new Recoder2KeY(services,ji.getKeYProgModelInfo().getServConf(),
 			      ji.rec2key(),
 			      new NamespaceSet(),
@@ -58,12 +60,12 @@ public class TestContextStatementBlock extends TestCase {
 	assertTrue("Prefix should end with an assignment", 
 		   PosInProgram.getProgramAt(prefixEnd, blockOne.program()) 
 		   instanceof 
-		   de.uka.ilkd.key.java.declaration.LocalVariableDeclaration);
+		   de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration);
 	PosInProgram suffixStart = PosInProgram.TOP.down(2);
 	assertTrue("Suffix should start with an ++", 
 		   PosInProgram.getProgramAt(suffixStart, blockOne.program()) 
 		   instanceof 
-		   de.uka.ilkd.key.java.expression.operator.PostIncrement);
+		   de.uka.ilkd.key.java.ast.expression.operator.PostIncrement);
 	for (int i=size-2; i>=1; i--) {
 	    statementList.add
 		(stContainer.getChildAt(i));

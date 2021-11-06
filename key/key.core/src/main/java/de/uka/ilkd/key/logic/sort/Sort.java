@@ -15,7 +15,7 @@ package de.uka.ilkd.key.logic.sort;
 
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.TermServices;

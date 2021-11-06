@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.proof.ReplacementMap.NoIrrelevantLabelsReplacementMap;
 import org.key_project.util.Streams;
 

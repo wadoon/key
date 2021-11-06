@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.speclang.njml;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.translation.Recoder2KeY;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;

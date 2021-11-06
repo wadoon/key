@@ -27,8 +27,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;

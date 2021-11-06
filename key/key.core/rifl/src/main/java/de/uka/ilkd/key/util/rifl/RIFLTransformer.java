@@ -17,7 +17,7 @@ import java.io.*;
 import javax.xml.parsers.*;
 
 
-import de.uka.ilkd.key.java.transformations.JavaFacade;
+import de.uka.ilkd.key.java.api.JavaService;
 import de.uka.ilkd.key.util.Debug;
 import org.xml.sax.*;
 import recoder.CrossReferenceServiceConfiguration;
@@ -62,7 +62,7 @@ public class RIFLTransformer {
 
     //private static final String TMP_PATH = System.getProperty("java.io.tmpdir");
     private static final JavaProgramFactory JPF =
-            JavaFacade.getInstance();
+            JavaService.getInstance();
 
     /**
      * Entry point for the stand-alone RIFL to JML* tool.

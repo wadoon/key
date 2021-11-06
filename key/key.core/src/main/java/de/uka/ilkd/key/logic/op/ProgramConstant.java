@@ -14,7 +14,8 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.visitor.Visitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
@@ -50,7 +51,7 @@ public final class ProgramConstant extends ProgramVariable {
 
 
     @Override
-    public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
+    public void visit(Visitor v) {
         v.performActionOnProgramConstant(this);
     }
 

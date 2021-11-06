@@ -20,7 +20,7 @@ import javax.swing.JMenuItem;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;

@@ -15,7 +15,7 @@ package de.uka.ilkd.key.symbolic_execution.model;
 
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;

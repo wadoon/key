@@ -22,7 +22,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;

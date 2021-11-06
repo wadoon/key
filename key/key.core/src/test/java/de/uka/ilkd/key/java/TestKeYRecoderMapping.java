@@ -15,11 +15,14 @@ package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
 
+import de.uka.ilkd.key.java.ast.ModelElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.translation.KeYRecoderMapping;
 import junit.framework.TestCase;
 
 import org.junit.Assert;
 
-import de.uka.ilkd.key.java.statement.EmptyStatement;
+import de.uka.ilkd.key.java.ast.statement.EmptyStatement;
 
 public class TestKeYRecoderMapping extends TestCase{
 

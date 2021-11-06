@@ -14,8 +14,8 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.ast.reference.FieldReference;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;

@@ -15,7 +15,7 @@ package de.uka.ilkd.key.logic.op;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;

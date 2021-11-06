@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.abstraction;
 
+import de.uka.ilkd.key.java.ast.NamedModelElement;
+
 /**
  * An entity of the program meta model.
  *
@@ -20,7 +22,7 @@ package de.uka.ilkd.key.java.abstraction;
  * @author RN
  */
 public interface ProgramModelElement
-        extends de.uka.ilkd.key.java.NamedModelElement {
+        extends NamedModelElement {
 
     /**
      * Returns the maximal expanded name including all applicable

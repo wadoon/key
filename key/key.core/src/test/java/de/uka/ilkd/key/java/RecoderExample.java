@@ -14,14 +14,18 @@
 package de.uka.ilkd.key.java;
 
 
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.translation.Recoder2KeY;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.statement.Guard;
-import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.JavaStatement;
-import de.uka.ilkd.key.java.statement.Then;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.ast.statement.Guard;
+import de.uka.ilkd.key.java.ast.statement.If;
+import de.uka.ilkd.key.java.ast.statement.JavaStatement;
+import de.uka.ilkd.key.java.ast.statement.Then;
+import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.rule.TacletForTests;
@@ -85,7 +89,7 @@ public class RecoderExample {
     public static void main(String[] args) {
 	System.out.println("Starting...");
 	RecoderExample ex=new RecoderExample();
-	Recoder2KeY c2k=new Recoder2KeY(TacletForTests.services(), 
+	Recoder2KeY c2k=new Recoder2KeY(TacletForTests.services(),
 	                                new NamespaceSet());
 	String prg="{ int i=0; while (i<5) { i++;} }";
 	JavaBlock block=c2k.readBlock(prg,c2k.createEmptyContext());

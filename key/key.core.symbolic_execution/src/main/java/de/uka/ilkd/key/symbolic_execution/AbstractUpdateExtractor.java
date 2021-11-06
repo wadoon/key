@@ -18,7 +18,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.ObjectUtil;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;

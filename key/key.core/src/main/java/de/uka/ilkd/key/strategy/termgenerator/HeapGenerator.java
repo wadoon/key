@@ -3,7 +3,7 @@ package de.uka.ilkd.key.strategy.termgenerator;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;

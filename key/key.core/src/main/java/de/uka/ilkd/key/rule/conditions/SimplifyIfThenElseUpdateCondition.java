@@ -18,7 +18,7 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;

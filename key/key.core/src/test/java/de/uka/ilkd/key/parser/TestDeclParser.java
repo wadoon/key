@@ -13,15 +13,11 @@
 
 package de.uka.ilkd.key.parser;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.translation.Recoder2KeY;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
@@ -39,8 +35,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import static org.junit.Assert.*;
 

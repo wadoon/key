@@ -18,11 +18,11 @@ import java.util.TreeMap;
 
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
@@ -184,7 +184,7 @@ public abstract class LDT implements Named {
      * operator and the subterms 
      */
     public abstract boolean isResponsible(
-	    		de.uka.ilkd.key.java.expression.Operator op, 
+	    		de.uka.ilkd.key.java.ast.expression.Operator op,
                         Term[] subs, 
                         Services services, 
                         ExecutionContext ec);
@@ -202,7 +202,7 @@ public abstract class LDT implements Named {
      * operator and the subterms 
      */
     public abstract boolean isResponsible(
-	    		de.uka.ilkd.key.java.expression.Operator op, 
+	    		de.uka.ilkd.key.java.ast.expression.Operator op,
 	    		Term left, 
 	    		Term right, 
 	    		Services services, ExecutionContext ec);
@@ -219,7 +219,7 @@ public abstract class LDT implements Named {
      * operator and the subterm
      */
     public abstract boolean isResponsible(
-	    		de.uka.ilkd.key.java.expression.Operator op, 
+	    		de.uka.ilkd.key.java.ast.expression.Operator op,
 	    		Term sub, 
 	    		TermServices services, 
 	    		ExecutionContext ec);
@@ -236,7 +236,7 @@ public abstract class LDT implements Named {
      * @return  the function symbol for the given operation 
      */
     public abstract Function getFunctionFor(
-	    		de.uka.ilkd.key.java.expression.Operator op, 
+	    		de.uka.ilkd.key.java.ast.expression.Operator op,
 	    		Services services, 
 	    		ExecutionContext ec);
 

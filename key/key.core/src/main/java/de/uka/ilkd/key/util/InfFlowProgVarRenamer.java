@@ -3,9 +3,9 @@ package de.uka.ilkd.key.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;

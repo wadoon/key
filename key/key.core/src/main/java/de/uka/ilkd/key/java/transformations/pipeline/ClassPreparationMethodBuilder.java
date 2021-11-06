@@ -20,7 +20,7 @@ import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BooleanLiteralExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.SimpleName;
-import com.github.javaparser.ast.key.sv.KeyPassiveExpression;
+import com.github.javaparser.ast.key.KeyPassiveExpression;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
@@ -94,7 +94,7 @@ public class ClassPreparationMethodBuilder extends JavaTransformer {
         result.add(
                 new ExpressionStmt(
                         new AssignExpr(
-                                new KeyPassiveExpression(new NameExpr(ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED)),
+                                new KeyPassiveExpression(new NameExpr(PipelineConstants.IMPLICIT_CLASS_PREPARED)),
                                 new BooleanLiteralExpr(true),
                                 AssignExpr.Operator.ASSIGN)));
         return result;

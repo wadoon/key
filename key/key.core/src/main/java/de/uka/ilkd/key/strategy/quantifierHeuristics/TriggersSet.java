@@ -20,12 +20,12 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.transformations.pipeline.ImplicitFieldAdder;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -328,7 +328,7 @@ public class TriggersSet {
             // we do not want to match on expressions a.<created>
 
             if(term.op() == services.getTypeConverter().getHeapLDT().getSelect(term.sort(), services)) {
-        	if(term.sub(2).op().name().toString().endsWith(ImplicitFieldAdder.IMPLICIT_CREATED)) {
+        	if(term.sub(2).op().name().toString().endsWith(PipelineConstants.IMPLICIT_CREATED)) {
                     return false;
                 }
             }

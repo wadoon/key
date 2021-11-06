@@ -18,7 +18,7 @@ import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;

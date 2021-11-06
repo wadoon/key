@@ -2,7 +2,7 @@ package de.uka.ilkd.key.symbolic_execution.model;
 
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 
 /**
  * An extended {@link IExecutionNode} which groups several child nodes.

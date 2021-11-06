@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.java.transformations.EnumClassDeclaration;
-import de.uka.ilkd.key.java.transformations.JavaFacade;
+import de.uka.ilkd.key.java.api.JavaService;
 import junit.framework.TestCase;
 import recoder.DefaultServiceConfiguration;
 import recoder.ParserException;
@@ -27,7 +27,7 @@ public class TestEnumClassDeclaration extends TestCase {
     ProgramFactory factory;
 
     protected void setUp() throws Exception {
-        factory = JavaFacade.getInstance();
+        factory = JavaService.getInstance();
         ServiceConfiguration sc = new DefaultServiceConfiguration();
         sc.getProjectSettings().setProperty("java5", "true");
         factory.initialize(sc);

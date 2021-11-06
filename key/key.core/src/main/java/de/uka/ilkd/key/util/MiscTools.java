@@ -40,19 +40,18 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.KeYCollections;
 
 import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.recoderext.URLDataLocation;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -72,9 +71,6 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
-import recoder.io.ArchiveDataLocation;
-import recoder.io.DataFileLocation;
-import recoder.io.DataLocation;
 
 /**
  * Collection of some common, stateless functionality. Stolen from the weissInvariants side branch.
@@ -809,7 +805,7 @@ public final class MiscTools {
      * @param loc the given DataLocation
      * @return an URI identifying the resource of the DataLocation
      */
-    public static URI extractURI(DataLocation loc) {
+    /*public static URI extractURI(DataLocation loc) {
         if (loc == null) {
             throw new IllegalArgumentException("The given DataLocation is null!");
         }
@@ -817,7 +813,7 @@ public final class MiscTools {
         try {
             switch (loc.getType()) {
             case "URL":                                                     // URLDataLocation
-                return ((URLDataLocation)loc).getUrl().toURI();
+                return (loc).getUrl().toURI();
             case "ARCHIVE":                                                 // ArchiveDataLocation
                 // format: "ARCHIVE:<filename>?<itemname>"
                 ArchiveDataLocation adl = (ArchiveDataLocation) loc;
@@ -842,7 +838,7 @@ public final class MiscTools {
         }
         throw new IllegalArgumentException("The given DataLocation can not be converted" +
                 " into a valid URI: " + loc);
-    }
+    }*/
 
     /**
      * Creates a URI (that contains a URL) pointing to the entry with the given name inside

@@ -14,47 +14,47 @@
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.KeYRecoderMapping;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.translation.KeYRecoderMapping;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
 import de.uka.ilkd.key.logic.NamespaceSet;
 
+/**
+ * @deprecated weigl: Could not find a good use to keep this class. Only needed in some test cases
+ */
+@Deprecated
 public class ParserConfig {
+    private final Services services;
+    private final NamespaceSet nss;
 
-    private Services services;
-    private NamespaceSet nss;
-
-    
-    public ParserConfig(Services services, 
-			NamespaceSet nss) {
-	this.services = services;
-	this.nss      = nss;
+    public ParserConfig(Services services, NamespaceSet nss) {
+        this.services = services;
+        this.nss = nss;
     }
 
-
     public Services services() {
-	return services;
+        return services;
     }
 
     public NamespaceSet namespaces() {
-	return nss;
+        return nss;
     }
 
     public JavaInfo javaInfo() {
-	return services.getJavaInfo();
+        return services.getJavaInfo();
     }
 
     public KeYRecoderMapping keyRecoderMapping() {
-	return services.getJavaInfo().rec2key();
+        return services.getJavaInfo().rec2key();
     }
 
     public TypeConverter typeConverter() {
-	return services.getTypeConverter();
+        return services.getTypeConverter();
     }
 
-    public KeYTransformationPipelineServices serviceConfiguration() {
-	return services.getJavaInfo().
-	    getKeYProgModelInfo().getServConf();
+    public TransformationPipelineServices serviceConfiguration() {
+        return services.getJavaInfo().getKeYProgModelInfo().getServConf();
     }
 
 }

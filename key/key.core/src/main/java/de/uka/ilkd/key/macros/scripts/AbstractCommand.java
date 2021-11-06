@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.macros.scripts.meta.ArgumentsLifter;
 import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;

@@ -18,15 +18,15 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.FieldReference;
+import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
@@ -426,29 +426,29 @@ public final class HeapLDT extends LDT {
     }
     
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-                                 Term[] subs, 
-                                 Services services, 
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op,
+                                 Term[] subs,
+                                 Services services,
                                  ExecutionContext ec) {
 	return false;
     }
     
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-                		 Term left, 
-                		 Term right, 
-                		 Services services, 
-                		 ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op,
+                                 Term left,
+                                 Term right,
+                                 Services services,
+                                 ExecutionContext ec) {
 	return false;
     }
 
     
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-	    			 Term sub, 
-	    			 TermServices services, 
-	    			 ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op,
+                                 Term sub,
+                                 TermServices services,
+                                 ExecutionContext ec) {
 	return false;
     }
 
@@ -461,9 +461,9 @@ public final class HeapLDT extends LDT {
     
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, 
-	    			   Services serv, 
-	    			   ExecutionContext ec) {
+    public Function getFunctionFor(de.uka.ilkd.key.java.ast.expression.Operator op,
+                                   Services serv,
+                                   ExecutionContext ec) {
 	assert false;
 	return null;
     }

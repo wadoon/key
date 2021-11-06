@@ -4,7 +4,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 
 /**
  * A generic {@link Term} replace visitor based on a filter predicate and a

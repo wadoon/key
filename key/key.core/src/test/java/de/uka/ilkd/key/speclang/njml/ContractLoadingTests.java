@@ -2,7 +2,7 @@ package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.api.KeYApi;
 import de.uka.ilkd.key.api.ProofManagementApi;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
 import org.junit.Test;

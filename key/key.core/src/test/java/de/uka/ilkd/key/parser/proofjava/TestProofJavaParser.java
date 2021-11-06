@@ -17,7 +17,7 @@ import junit.framework.TestCase;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.java.Expression;
-import de.uka.ilkd.key.java.transformations.JavaFacade;
+import de.uka.ilkd.key.java.api.JavaService;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 
 /**
@@ -35,13 +35,13 @@ public class TestProofJavaParser extends TestCase {
 
     static ServiceConfiguration sc;
 
-    static JavaFacade factory;
+    static JavaService factory;
 
     protected void setUp() throws Exception {
         super.setUp();
         sc = new KeYTransformationPipelineServices(
                 new KeYRecoderExcHandler());
-        factory = (JavaFacade) sc.getProgramFactory();
+        factory = (JavaService) sc.getProgramFactory();
     }
 
     public void testGenericWithWithoutSpaces() throws ParserException {

@@ -14,8 +14,8 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Label;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

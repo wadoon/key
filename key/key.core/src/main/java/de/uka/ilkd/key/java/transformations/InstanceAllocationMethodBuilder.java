@@ -19,6 +19,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformer;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
 
 /**
@@ -27,7 +28,6 @@ import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServi
  * The functionality will be described using taclets
  */
 public class InstanceAllocationMethodBuilder extends JavaTransformer {
-    public static final String IMPLICIT_INSTANCE_ALLOCATE = "<allocate>";
 
     public InstanceAllocationMethodBuilder(TransformationPipelineServices services) {
         super(services);
@@ -37,7 +37,7 @@ public class InstanceAllocationMethodBuilder extends JavaTransformer {
         NodeList<Modifier> modifiers = new NodeList<>();
         modifiers.add(new Modifier(Modifier.Keyword.PUBLIC));
         modifiers.add(new Modifier(Modifier.Keyword.STATIC));
-        MethodDeclaration md = type.addMethod(IMPLICIT_INSTANCE_ALLOCATE, Modifier.Keyword.PUBLIC, Modifier.Keyword.STATIC);
+        MethodDeclaration md = type.addMethod(PipelineConstants.IMPLICIT_INSTANCE_ALLOCATE, Modifier.Keyword.PUBLIC, Modifier.Keyword.STATIC);
         md.setType(new ClassOrInterfaceType(null, type.getFullyQualifiedName().get()));
         return md;
     }

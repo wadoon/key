@@ -13,9 +13,9 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;

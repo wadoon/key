@@ -30,7 +30,7 @@ import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletAssumesModel;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.util.Debug;

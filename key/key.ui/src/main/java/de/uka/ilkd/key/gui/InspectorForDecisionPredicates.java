@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;

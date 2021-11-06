@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.translation.Recoder2KeY;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
@@ -12,7 +12,6 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.antlr.runtime.RecognitionException;
 
 import java.io.File;
 import java.io.IOException;

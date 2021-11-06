@@ -16,13 +16,11 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.StringLiteralExpr;
-import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitorWithDefaults;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.transformations.ConstantEvaluator;
-import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformer;
-import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+import de.uka.ilkd.key.java.transformations.EvaluationException;
+
+import java.util.Objects;
 
 public class ConstantStringExpressionEvaluator extends JavaTransformer {
 
@@ -36,18 +34,18 @@ public class ConstantStringExpressionEvaluator extends JavaTransformer {
             @Override
             public void defaultAction(Node n, Object arg) {
                 if (n instanceof Expression) {
-                    ConstantEvaluator cee = services.getConstantEvaluator();
-                    Type expType = services.getType((Expression) n);
-                    if (!(pe instanceof NullLiteral) && expType != null && expType.getFullName().equals("java.lang.String")) {
-                        boolean isCTC = false;
+                    var e = (Expression) n;
+                    ConstantExpressionEvaluator cee = services.getConstantEvaluator();
+                    var expType = e.calculateResolvedType();
+                    if (!e.isNullLiteralExpr() && expType != null
+                            && expType.isReferenceType()
+                            && Objects.equals(expType.asReferenceType().getQualifiedName(),
+                            "java.lang.String")) {
                         try {
-                            isCTC = cee.isCompileTimeConstant((Expression) pe, res);
-                        } catch (java.lang.ArithmeticException t) {
+                            var expression = cee.evaluate(e);
+                            e.replace(expression);
+                        } catch (EvaluationException t) {
                             //
-                        }
-                        if (isCTC && res.getTypeCode() == ConstantEvaluator.STRING_TYPE) {
-                            n.replace(new StringLiteralExpr(evaluated));
-                            continue;
                         }
                     }
                 }

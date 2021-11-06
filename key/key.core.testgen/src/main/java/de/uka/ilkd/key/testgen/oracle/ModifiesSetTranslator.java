@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.testgen.oracle;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Term;
 

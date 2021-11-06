@@ -15,12 +15,12 @@ package de.uka.ilkd.key.java;
 
 import java.io.File;
 
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import junit.framework.TestCase;
 
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.transformations.pipeline.ImplicitFieldAdder;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
@@ -102,13 +102,13 @@ public class TestJavaInfo extends TestCase {
     }
     
     private static final String[] implictFieldsClassOnly = new String[]{
-        ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS, ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS,
-        ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED
+        PipelineConstants.IMPLICIT_CLASS_ERRONEOUS, PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS,
+        PipelineConstants.IMPLICIT_CLASS_INITIALIZED, PipelineConstants.IMPLICIT_CLASS_PREPARED
     };
     
     private static final String[] generalImplicitFields = new String[]{
-      ImplicitFieldAdder.IMPLICIT_CREATED,
-      ImplicitFieldAdder.IMPLICIT_INITIALIZED
+      PipelineConstants.IMPLICIT_CREATED,
+      PipelineConstants.IMPLICIT_INITIALIZED
     };
     
     
@@ -139,13 +139,13 @@ public class TestJavaInfo extends TestCase {
         KeYJavaType rte = javaInfo.getKeYJavaType("java.lang.RuntimeException");
         
         
-        assertTrue("Did not find locally declared attribute " + ImplicitFieldAdder.IMPLICIT_CREATED,
-                javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, obj)!= null);
+        assertTrue("Did not find locally declared attribute " + PipelineConstants.IMPLICIT_CREATED,
+                javaInfo.getAttribute(PipelineConstants.IMPLICIT_CREATED, obj)!= null);
         
-        assertTrue("Attribute " + ImplicitFieldAdder.IMPLICIT_CREATED + 
+        assertTrue("Attribute " + PipelineConstants.IMPLICIT_CREATED +
                 " is locally declared in class java.lang.Object and should not be " +
                 "returned by this method for type java.lang.RuntimeException",
-                javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, rte) == null);
+                javaInfo.getAttribute(PipelineConstants.IMPLICIT_CREATED, rte) == null);
         
     }
     

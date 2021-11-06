@@ -18,7 +18,6 @@ import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
-import de.uka.ilkd.key.java.transformations.PrepareObjectBuilder;
 
 /**
  * The Java DL requires some implicit fields, that are available in each
@@ -38,7 +37,7 @@ import de.uka.ilkd.key.java.transformations.PrepareObjectBuilder;
  * all instances of a transformation set has been outsourced to a transformation
  * cache.
  */
-public abstract class JavaTransformer {
+public abstract class JavaTransformer  {
     /**
      *
      */
@@ -50,16 +49,13 @@ public abstract class JavaTransformer {
      * compilation units, the declared classes, and information
      * for local classes.
      */
-    protected final TransformerCache cache;
+    protected final TransformationPipelineServices.TransformerCache cache;
 
     /**
      * creates a transformer for the recoder model
      *
      * @param services the CrossReferenceServiceConfiguration to access
      *                 model information
-     * @param cache    a cache object that stores information which is needed by
-     *                 and common to many transformations. it includes the compilation units,
-     *                 the declared classes, and information for local classes.
      */
     public JavaTransformer(TransformationPipelineServices services) {
         this.services = services;

@@ -26,7 +26,7 @@ import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.lemmatagenerator.LoadUserTacletsDialog;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaSelectionDialog;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;

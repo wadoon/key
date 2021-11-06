@@ -25,7 +25,6 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import de.uka.ilkd.key.java.transformations.PrepareObjectBuilder;
 
 /**
  * If an allocation expression <code>new Class(...)</code> occurs, a new object
@@ -51,12 +50,12 @@ public class CreateBuilder extends JavaTransformer {
      */
     private BlockStmt createBody() {
         NodeList<Statement> result = new NodeList<>();
-        result.add(assign(attribute(new ThisExpr(), ImplicitFieldAdder.IMPLICIT_INITIALIZED),
+        result.add(assign(attribute(new ThisExpr(), PipelineConstants.IMPLICIT_INITIALIZED),
                 new BooleanLiteralExpr(false)));
 
         result.add(
                 new ExpressionStmt(
-                        new MethodCallExpr(PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE_ENTER)));
+                        new MethodCallExpr(PipelineConstants.IMPLICIT_OBJECT_PREPARE_ENTER)));
 
         result.add(new ReturnStmt(new ThisExpr()));
 

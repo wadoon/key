@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.parser.proofjava.ParseException;
-import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 import org.antlr.runtime.RecognitionException;
 
@@ -32,29 +30,19 @@ public final class ExceptionTools {
      *                               inside the given Throwable can not be successfully converted to a URL and thus
      *                               no Location can be created
      */
-    public static @Nullable
-    Location getLocation(@Nonnull Throwable exc) throws MalformedURLException {
+    @Nullable
+    public static Location getLocation(@Nonnull Throwable exc) throws MalformedURLException {
         Location location = null;
         if (exc instanceof HasLocation) {
             return ((HasLocation) exc).getLocation();
         } else if (exc instanceof RecognitionException) {
             location = getLocation((RecognitionException) exc);
-        } else if (exc instanceof ParseException) {
-            location = getLocation((ParseException) exc);
         }
 
         if (location == null && exc.getCause() != null) {
             location = getLocation(exc.getCause());
         }
-
         return location;
-    }
-
-    @Nullable
-    private static Location getLocation(ParseException exc) throws MalformedURLException {
-        // JavaCC has 1-based column numbers
-        Token token = exc.currentToken;
-        return token == null ? null : new Location("", token.next.beginLine, token.next.beginColumn);
     }
 
 
@@ -63,8 +51,7 @@ public final class ExceptionTools {
         // ANTLR 3 - Recognition Exception.
         if (exc.input != null) {
             // ANTLR has 0-based column numbers, hence +1.
-            return new Location(exc.input.getSourceName(),
-                    exc.line, exc.charPositionInLine + 1);
+            return new Location(exc.input.getSourceName(), exc.line, exc.charPositionInLine + 1);
         }
         return null;
     }

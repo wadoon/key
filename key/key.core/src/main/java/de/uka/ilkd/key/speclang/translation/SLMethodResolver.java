@@ -16,11 +16,11 @@ package de.uka.ilkd.key.speclang.translation;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.transformations.pipeline.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -79,7 +79,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             pm = javaInfo.getToplevelPM(containingType, methodName, signature);
 
             LocationVariable et = (LocationVariable) javaInfo.getAttribute(
-                    ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
+                    PipelineConstants.IMPLICIT_ENCLOSING_THIS, containingType);
             if(et!=null && pm==null){
                 containingType = et.getKeYJavaType();
                 if(recTerm!=null){

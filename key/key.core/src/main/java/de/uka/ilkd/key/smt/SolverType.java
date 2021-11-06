@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 

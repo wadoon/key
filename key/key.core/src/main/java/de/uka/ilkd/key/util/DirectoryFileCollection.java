@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +25,6 @@ import java.util.NoSuchElementException;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import recoder.io.DataFileLocation;
-import recoder.io.DataLocation;
 
 /**
  * This class is used to describe a directory structure as a repository for
@@ -179,7 +179,7 @@ public class DirectoryFileCollection implements FileCollection {
             return "file";
         }
 
-        public DataLocation getCurrentDataLocation() {
+        public URL getCurrentDataLocation() {
             return new DataFileLocation(currentFile);
         }
     }

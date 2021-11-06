@@ -23,5 +23,4 @@ public interface JavaReader {
     JavaBlock readBlockWithEmptyContext(String s);
 
     JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> varns, String s);
-
 }

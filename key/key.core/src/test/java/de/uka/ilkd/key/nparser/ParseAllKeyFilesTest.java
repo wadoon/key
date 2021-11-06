@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.nparser;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.antlr.v4.runtime.CommonToken;

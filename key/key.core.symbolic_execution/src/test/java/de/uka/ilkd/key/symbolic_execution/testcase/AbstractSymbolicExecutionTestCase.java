@@ -40,13 +40,13 @@ import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.statement.Try;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;

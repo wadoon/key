@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.speclang.njml;
 
-import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.ast.Label;
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;

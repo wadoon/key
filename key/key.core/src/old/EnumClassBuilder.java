@@ -16,7 +16,7 @@ package de.uka.ilkd.key.java.transformations;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.validator.ProblemReporter;
-import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.ast.reference.FieldReference;
 import de.uka.ilkd.key.util.Debug;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.convenience.TreeWalker;

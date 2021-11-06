@@ -55,10 +55,10 @@ documentation of the Recoder framework.
             {@link de.uka.ilkd.key.java.Expression} and {@link de.uka.ilkd.key.java.Statement} are
             self-explanatory. A {@link de.uka.ilkd.key.java.LoopInitializer} is a special
             {@link de.uka.ilkd.key.java.Statement} valid as initializer of
-            {@link de.uka.ilkd.key.java.statement.For} loops.
+            {@link de.uka.ilkd.key.java.ast.statement.For} loops.
             {@link de.uka.ilkd.key.java.LoopInitializer} is subtyped by
-            {@link de.uka.ilkd.key.java.expression.ExpressionStatement} and
-            {@link de.uka.ilkd.key.java.declaration.LocalVariableDeclaration}).
+            {@link de.uka.ilkd.key.java.ast.expression.ExpressionStatement} and
+            {@link de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration}).
     <P>
         Concrete classes and further abstractions are bundled in the
         {@link de.uka.ilkd.key.java.expression} and {@link de.uka.ilkd.key.java.statement} packages.
@@ -92,29 +92,29 @@ documentation of the Recoder framework.
     <P>
         <DT>References</DT>
     <DD>
-        A {@link de.uka.ilkd.key.java.Reference} is an explicite use of an entity. Most of
-        these {@link de.uka.ilkd.key.java.Reference}s are
-        {@link de.uka.ilkd.key.java.reference.NameReference}s
-        and as such {@link de.uka.ilkd.key.java.NamedProgramElement}s, e.g. the
-        {@link de.uka.ilkd.key.java.reference.TypeReference}.
-        Subtypes of {@link de.uka.ilkd.key.java.Reference}s are bundled in the
-        {@link de.uka.ilkd.key.java.reference} package.
-    </DD>
+    A {@link de.uka.ilkd.key.java.Reference} is an explicite use of an entity. Most of
+    these {@link de.uka.ilkd.key.java.Reference}s are
+    {@link de.uka.ilkd.key.java.ast.reference.NameReference}s
+    and as such {@link de.uka.ilkd.key.java.NamedProgramElement}s, e.g. the
+    {@link de.uka.ilkd.key.java.ast.reference.TypeReference}.
+    Subtypes of {@link de.uka.ilkd.key.java.Reference}s are bundled in the
+    {@link de.uka.ilkd.key.java.reference} package.
+</DD>
     <P>
         <DT>Modifiers and Declarations</DT>
     <DD>
-        {@link de.uka.ilkd.key.java.declaration.Modifier}s are (exclusively) used in the
-        context of {@link de.uka.ilkd.key.java.Declaration}s.
-        {@link de.uka.ilkd.key.java.declaration.Modifier}s occur explicitly, since they occur
-        as syntactical tokens that might be indented and commented.
-        {@link de.uka.ilkd.key.java.Declaration}s are either
-        declarations of types or other entities such as
-        {@link de.uka.ilkd.key.java.declaration.MemberDeclaration} or
-        {@link de.uka.ilkd.key.java.declaration.VariableDeclaration}. Concrete
-        {@link de.uka.ilkd.key.java.declaration.Modifier}s and
-        {@link de.uka.ilkd.key.java.Declaration}s are
-        bundled in the {@link de.uka.ilkd.key.java.declaration.modifier} and
-        {@link de.uka.ilkd.key.java.declaration} packages.
-    </DD>
+    {@link de.uka.ilkd.key.java.ast.declaration.Modifier}s are (exclusively) used in the
+    context of {@link de.uka.ilkd.key.java.Declaration}s.
+    {@link de.uka.ilkd.key.java.ast.declaration.Modifier}s occur explicitly, since they occur
+    as syntactical tokens that might be indented and commented.
+    {@link de.uka.ilkd.key.java.Declaration}s are either
+    declarations of types or other entities such as
+    {@link de.uka.ilkd.key.java.ast.declaration.MemberDeclaration} or
+    {@link de.uka.ilkd.key.java.ast.declaration.VariableDeclaration}. Concrete
+    {@link de.uka.ilkd.key.java.ast.declaration.Modifier}s and
+    {@link de.uka.ilkd.key.java.Declaration}s are
+    bundled in the {@link de.uka.ilkd.key.java.ast.declaration.modifier} and
+    {@link de.uka.ilkd.key.java.declaration} packages.
+</DD>
 </DL>
 </BODY>

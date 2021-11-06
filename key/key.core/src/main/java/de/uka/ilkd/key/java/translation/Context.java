@@ -1,0 +1,93 @@
+// This file is part of KeY - Integrated Deductive Software Design
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2014 Karlsruhe Institute of Technology, Germany
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General
+// Public License. See LICENSE.TXT for details.
+//
+
+package de.uka.ilkd.key.java.translation;
+
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
+import de.uka.ilkd.key.util.SpecDataLocation;
+
+/**
+ * this class stores recoder related contextinformation used to parse
+ * in program parts in which non-declared variables are used
+ */
+class Context {
+
+    public static final String PARSING_CONTEXT_CLASS_NAME = "$KeYSpecialParsing";
+    private final ClassOrInterfaceDeclaration type;
+
+    /**
+     * creates a new context object
+     */
+    public Context(TransformationPipelineServices servConf,
+                   ClassOrInterfaceDeclaration type) {
+        this.type = type;
+    }
+
+    /**
+     * creates a new context object
+     *
+     * @param compilationUnitContext a
+     *                               recoder.java.declaration.CompilationUnit
+     */
+    public Context(KeYTransformationPipelineServices servConf,
+                   recoder.java.CompilationUnit compilationUnitContext) {
+        this(servConf, compilationUnitContext, createClassDecl(servConf));
+    }
+
+
+    /**
+     * creates a new context object
+     *
+     * @param classContext a recoder.java.declaration.ClassDeclaration
+     */
+    public Context(KeYTransformationPipelineServices servConf,
+                   ClassDeclaration classContext) {
+        this(servConf, createCompUnit(classContext), classContext);
+    }
+
+    private static recoder.java.CompilationUnit createCompUnit
+            (ClassDeclaration classContext) {
+        recoder.java.CompilationUnit cu = new recoder.java.CompilationUnit
+                (null, new ASTArrayList<recoder.java.Import>(0), inList(classContext));
+        cu.setDataLocation(new SpecDataLocation("INTERNAL", classContext.getFullName()));
+        return cu;
+    }
+
+
+    public static ASTList<TypeDeclaration> inList(TypeDeclaration td) {
+        ASTList<TypeDeclaration> tdml = new ASTArrayList<TypeDeclaration>();
+        tdml.add(td);
+        return tdml;
+    }
+
+    private static recoder.java.declaration.ClassDeclaration createClassDecl(KeYTransformationPipelineServices servConf) {
+        return servConf.getProgramFactory().createClassDeclaration
+                (null, new ImplicitIdentifier(PARSING_CONTEXT_CLASS_NAME),
+                        null, null, null);
+    }
+
+    /**
+     * returns the compilation context
+     */
+    public recoder.java.CompilationUnit getCompilationUnitContext() {
+        return compilationUnitContext;
+    }
+
+    /**
+     * returns the compilation context
+     */
+    public ClassDeclaration getClassContext() {
+        return classContext;
+    }
+}

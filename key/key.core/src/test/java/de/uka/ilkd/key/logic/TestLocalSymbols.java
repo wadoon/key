@@ -12,7 +12,7 @@ import org.junit.Ignore;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.macros.AbstractPropositionalExpansionMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.macros.scripts.ScriptException;

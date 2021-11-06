@@ -16,7 +16,7 @@ package de.uka.ilkd.key.proof_references.testcase;
 import java.io.File;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 

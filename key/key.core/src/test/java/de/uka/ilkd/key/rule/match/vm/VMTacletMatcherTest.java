@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.ParserException;

@@ -38,7 +38,7 @@ import de.uka.ilkd.key.gui.utilities.ClickableMessageBox;
 import de.uka.ilkd.key.gui.utilities.ClickableMessageBox.ClickableMessageBoxListener;
 import de.uka.ilkd.key.gui.utilities.InspectorForFormulas;
 import de.uka.ilkd.key.gui.utilities.StdDialog;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;

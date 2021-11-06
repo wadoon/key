@@ -16,8 +16,9 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.ast.visitor.DeclarationProgramVariableCollector;
 import junit.framework.TestCase;
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.translation.Recoder2KeY;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;

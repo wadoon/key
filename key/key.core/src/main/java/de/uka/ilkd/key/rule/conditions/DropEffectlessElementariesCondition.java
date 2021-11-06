@@ -15,7 +15,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Set;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;

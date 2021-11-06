@@ -18,12 +18,14 @@ package de.uka.ilkd.key.rule.match.legacy;
 
 import java.io.File;
 
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.translation.Recoder2KeY;
 import junit.framework.TestCase;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
@@ -250,22 +252,22 @@ public class TestLegacyTacletMatch extends TestCase {
 
     public void testProgramMatch1() {
         Services services = TacletForTests.services();
-        de.uka.ilkd.key.java.Recoder2KeY c2k
-        = new de.uka.ilkd.key.java.Recoder2KeY(services,
+        Recoder2KeY c2k
+        = new Recoder2KeY(services,
                 new NamespaceSet());
         JavaBlock jb=c2k.readBlock("{ int i; int j; i=++j;"
                 +" while(true) {break;}}", 
                 c2k.createEmptyContext());
 
-        de.uka.ilkd.key.java.StatementBlock sb
-        =(de.uka.ilkd.key.java.StatementBlock)jb.program();
+        StatementBlock sb
+        =(StatementBlock)jb.program();
 
         JavaBlock javaBlock = JavaBlock.createJavaBlock
-                (new de.uka.ilkd.key.java.StatementBlock
+                (new StatementBlock
                         (new ImmutableArray<Statement>
-                        (new de.uka.ilkd.key.java.Statement[]{
-                                (de.uka.ilkd.key.java.Statement)sb.getChildAt(2),
-                                (de.uka.ilkd.key.java.Statement)sb.getChildAt(3)
+                        (new Statement[]{
+                                (Statement)sb.getChildAt(2),
+                                (Statement)sb.getChildAt(3)
                         })));
 
 

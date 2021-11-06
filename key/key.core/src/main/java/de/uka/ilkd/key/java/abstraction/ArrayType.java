@@ -15,7 +15,7 @@
 
 package de.uka.ilkd.key.java.abstraction;
 
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 
 /**
  * A program model element representing array types.

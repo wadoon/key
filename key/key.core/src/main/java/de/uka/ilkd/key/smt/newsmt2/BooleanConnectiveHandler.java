@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;

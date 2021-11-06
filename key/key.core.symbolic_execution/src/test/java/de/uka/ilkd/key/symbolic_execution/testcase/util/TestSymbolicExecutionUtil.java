@@ -14,8 +14,8 @@
 package de.uka.ilkd.key.symbolic_execution.testcase.util;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;

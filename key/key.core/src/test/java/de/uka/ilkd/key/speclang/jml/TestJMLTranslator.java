@@ -14,10 +14,10 @@
 package de.uka.ilkd.key.speclang.jml;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.transformations.pipeline.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
@@ -376,7 +376,7 @@ public class TestJMLTranslator {
         assertEquals(result.op(), Equality.EQUALS);
         assertTrue(termContains(result, TB.var(
                 javaInfo.getAttribute(
-                        ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED,
+                        PipelineConstants.IMPLICIT_CLASS_INITIALIZED,
                         testClassType))));
     }
 

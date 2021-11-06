@@ -14,14 +14,8 @@
 package de.uka.ilkd.key.java.transformations.pipeline;
 
 import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.validator.ProblemReporter;
-import de.uka.ilkd.key.java.abstraction.Variable;
-import de.uka.ilkd.key.java.reference.VariableReference;
-import de.uka.ilkd.key.java.transformations.pipeline.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformer;
-import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
-
-import java.util.List;
+import com.github.javaparser.ast.expr.FieldAccessExpr;
+import com.github.javaparser.ast.expr.ThisExpr;
 
 /**
  * Local and anonymous classes may access variables from the creating context
@@ -41,21 +35,15 @@ public class LocalClassTransformation extends JavaTransformer {
         super(services);
     }
 
+    @Override
     protected void apply(TypeDeclaration<?> td) {
-        List<Variable> outerVars = getLocalClass2FinalVar().get(td);
-        CrossReferenceSourceInfo si = services.getCrossReferenceSourceInfo();
-
+        var outerVars = services.getFinalVariables(td);
         if (outerVars != null) {
-            for (final Variable v : outerVars) {
-                for (final VariableReference vr : si.getReferences(v)) {
-                    if (si.getContainingReferenceType(vr) !=
-                            si.getContainingReferenceType((Node) v)) {
-                        FieldReference fr = new FieldReference(new ThisReference(),
-                                new ImplicitIdentifier(ImplicitFieldAdder.FINAL_VAR_PREFIX +
-                                        v.getName()));
-                        vr.getParentNode().get().replaceChild(vr, fr);
-                        td.makeAllParentRolesValid();
-                    }
+            for (var v : outerVars) {
+                for (final var vr : services.getUsages(v, td)) {
+                    FieldAccessExpr fr = new FieldAccessExpr(new ThisExpr(),
+                            PipelineConstants.FINAL_VAR_PREFIX + v.getName());
+                    //TODO td.replace(vr, fr);
                 }
             }
         }

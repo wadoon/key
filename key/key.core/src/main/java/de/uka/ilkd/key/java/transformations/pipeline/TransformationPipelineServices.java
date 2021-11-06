@@ -1,19 +1,30 @@
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import com.github.javaparser.ast.type.PrimitiveType;
-import com.github.javaparser.ast.type.ReferenceType;
-import com.github.javaparser.ast.type.Type;
-import de.uka.ilkd.key.java.transformations.ConstantEvaluator;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.type.*;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedTypeDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
+import com.github.javaparser.resolution.types.ResolvedReferenceType;
+import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
+import com.github.javaparser.symbolsolver.resolution.SymbolSolver;
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.util.Debug;
 
 import javax.annotation.Nonnull;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -23,8 +34,24 @@ public class TransformationPipelineServices {
     @Nonnull
     private final TransformerCache cache;
 
-    public TransformationPipelineServices(@Nonnull TransformerCache cache) {
+    @Nonnull
+    private final SymbolSolver resolver;
+
+    @Nonnull
+    private final JavaParser parser;
+
+    public TransformationPipelineServices(
+            @Nonnull JavaParser parser,
+            @Nonnull TransformerCache cache,
+            @Nonnull SymbolSolver resolver) {
         this.cache = cache;
+        this.resolver = resolver;
+        this.parser = parser;
+    }
+
+    @Nonnull
+    public SymbolSolver getResolver() {
+        return resolver;
     }
 
     @Nonnull
@@ -32,12 +59,12 @@ public class TransformationPipelineServices {
         return cache;
     }
 
-    public ConstantEvaluator getConstantEvaluator() {
-        return new ConstantEvaluator();
+    public ConstantExpressionEvaluator getConstantEvaluator() {
+        return new ConstantExpressionEvaluator(javaParser);
     }
 
 
-    protected TypeDeclaration<?> containingClass(TypeDeclaration<?> td) {
+    /*protected TypeDeclaration<?> containingClass(TypeDeclaration<?> td) {
         Node container = td.getContainingReferenceType();
         if (container == null) {
             container = td.getParentNode().get();
@@ -46,29 +73,20 @@ public class TransformationPipelineServices {
             container = container.getParentNode().get();
         }
         return (TypeDeclaration<?>) container;
+    }*/
+
+
+    public String getId(TypeDeclaration<?> td) {
+        return td.getNameAsString();
     }
 
-
-    public String getId(TypeDeclaration td) {
-        if (td.getIdentifier() != null) {
-            return td.getIdentifier().clone();
-        }
-
-        final ReferenceType firstActualSupertype = getAllSupertypes(td).get(1);
-        return firstActualSupertype instanceof TypeDeclaration ?
-                getId((TypeDeclaration) firstActualSupertype) :
-                new Identifier(firstActualSupertype.getName());
-
-    }
-
-    protected MethodDeclaration containingMethod(TypeDeclaration td) {
+    protected MethodDeclaration containingMethod(TypeDeclaration<?> td) {
         Node container = td.getParentNode().get();
         while (container != null && !(container instanceof MethodDeclaration)) {
             container = container.getParentNode().get();
         }
         return (MethodDeclaration) container;
     }
-
 
     /**
      * returns the default value of the given type
@@ -143,7 +161,7 @@ public class TransformationPipelineServices {
      * constant fields is due to binary compatibility reasons.
      */
     private boolean isConstant(Expression expr) {
-        ConstantEvaluator ce = getConstantEvaluator();
+        ConstantExpressionEvaluator ce = getConstantEvaluator();
         try {
             return ce.isCompileTimeConstant(expr);
         } catch (EvaluationException e) {
@@ -154,5 +172,279 @@ public class TransformationPipelineServices {
 
     public boolean isConstant(Optional<Expression> initializer) {
         return initializer.map(this::isConstant).orElse(false);
+    }
+
+    public ClassOrInterfaceType getType(TypeDeclaration<?> decl) {
+        return new ClassOrInterfaceType(null, decl.getName(), null);
+    }
+
+    public ResolvedTypeDeclaration getJavaLangObject() {
+        return resolver.solveType(getType("java", "lang", "Object"));
+    }
+
+    public Type getType(ResolvedType type) {
+        if (type.isArray()) {
+            //TODO weigl type.arrayLevel()
+            return new ArrayType(getType(type.asArrayType().getComponentType()));
+        }
+
+        if (type.isReferenceType()) {
+            return getType(type.asReferenceType().getQualifiedName().split("[.]"));
+        }
+
+        if (type.isPrimitive()) {
+            return new PrimitiveType(PrimitiveType.Primitive.valueOf(type.asPrimitive().name()));
+        }
+
+        return null;
+    }
+
+    public JavaParser getParser() {
+        return parser;
+    }
+
+    public List<SymbolReference<? extends ResolvedValueDeclaration>> getUsages(ResolvedFieldDeclaration v, Node node) {
+        //TODO
+        return Collections.emptyList();//;resolver.solveSymbol(v.getName(), node);
+    }
+
+    /**
+     * The list of statements is the smallest list that contains a copy
+     * assignment for each instance field initializer of class cd,
+     * e.g. <code> i = 0; </code> for <code> public int i = 0; </code> or
+     * a reference to the private method
+     * <code>&lt;objectInitializer&gt;<i>i</i> refering to the i-th object
+     * initializer of cd. These private declared methods are created on
+     * the fly. Example for
+     * <code><pre>
+     * class C {
+     * int i = 0;
+     * {
+     * int j = 3;
+     * i = j + 5;
+     * }
+     * <p>
+     * public C () {} ...
+     * }</pre>
+     * </code> the following list of size two is returned
+     * <code><pre>
+     * [ i = 0;,  &lt;objectInitializer&gt;0(); ]
+     * </pre></code>
+     * where <code><pre>
+     * private &lt;objectInitializer&gt;0() {
+     * int j = 3;
+     * i = j + 5;
+     * }</pre>
+     * </code>
+     *
+     * @param cd the TypeDeclaration<?> of which the initilizers have to
+     *           be collected
+     * @return the list of copy assignments and method references
+     * realising the initializers.
+     */
+    public NodeList<Statement> getInitializers(ClassOrInterfaceDeclaration cd) {
+        NodeList<Statement> result = new NodeList<>();
+        NodeList<MethodDeclaration> mdl = new NodeList<>();
+
+        var initializers =
+                cd.getMembers().stream()
+                        .filter(BodyDeclaration::isInitializerDeclaration)
+                        .map(it -> (InitializerDeclaration) it)
+                        .filter(it -> !it.isStatic())
+                        .collect(Collectors.toList());
+
+
+        for (InitializerDeclaration initializer : initializers) {
+
+            String name = PipelineConstants.OBJECT_INITIALIZER_IDENTIFIER + mdl.size();
+            var initializerMethod = cd.addMethod(name, Modifier.Keyword.PRIVATE);
+            initializerMethod.setBody(initializer.getBody().clone());
+            mdl.add(initializerMethod);
+            result.add(new ExpressionStmt(new MethodCallExpr(null, new NameExpr(name))));
+        }
+
+        var memberFields =
+                cd.getMembers().stream()
+                        .filter(BodyDeclaration::isFieldDeclaration)
+                        .map(it -> (FieldDeclaration) it)
+                        .filter(it -> !it.isStatic())
+                        .collect(Collectors.toList());
+
+        for (FieldDeclaration field : memberFields) {
+            for (VariableDeclarator variable : field.getVariables()) {
+                if (variable.getInitializer().isPresent()) {
+                    Expression fieldInit = variable.getInitializer().get();
+                    final var access = new FieldAccessExpr(
+                            new ThisExpr(), new NodeList<>(), variable.getName());
+                    var fieldCopy = new AssignExpr(access, fieldInit.clone(), AssignExpr.Operator.ASSIGN);
+                    result.add(new ExpressionStmt(fieldCopy));
+                }
+            }
+        }
+        return result;
+    }
+
+    public static <N extends Node> NodeList<N> cloneList(NodeList<N> list) {
+        if (list == null) {
+            return null;
+        }
+        var seq = list.stream()
+                .map(Node::clone)
+                .map(it -> (N) it)
+                .collect(Collectors.toList());
+        return new NodeList<>(seq);
+    }
+
+    public Expression getDefaultValue(ResolvedType type) {
+        if (type.isPrimitive()) {
+            var p = type.asPrimitive();
+            if (p.isBoolean()) {
+                return new BooleanLiteralExpr(false);
+            }
+
+            switch (p.name()) {
+                case "int":
+                case "byte":
+                case "short":
+                    return new IntegerLiteralExpr("0");
+                case "char":
+                    return new CharLiteralExpr("0");
+                case "float":
+                case "double":
+                    return new DoubleLiteralExpr("0.0");
+            }
+        }
+
+        if (type.isReferenceType()
+                || type.isNull()
+                || type.isArray()) {
+            return new NullLiteralExpr();
+        }
+
+        if (type.isVoid()) {
+            throw new RuntimeException();
+        }
+
+        return null;
+    }
+
+    /**
+     * Cache of important data. This is done mainly for performance reasons.
+     * It contains the following info:
+     * - list of comp. units
+     * - their class declarations
+     * - a mapping from local classes to their needed final variables.
+     * <p>
+     * Objects are created upon the first request.
+     *
+     * @author MU
+     */
+    public class TransformerCache {
+        private final NodeList<CompilationUnit> cUnits = new NodeList<>();
+        private Set<TypeDeclaration<?>> classDeclarations;
+        private HashMap<ReferenceType, List<Name>> localClass2FinalVar;
+        private HashMap<TypeDeclaration, List<ReferenceType>> typeDeclaration2allSupertypes;
+
+        public TransformerCache(List<CompilationUnit> cUnits) {
+            this.cUnits.addAll(cUnits);
+        }
+
+        public Set<TypeDeclaration<?>> typeDeclarations() {
+            if (classDeclarations == null) {
+                init();
+            }
+            return classDeclarations;
+        }
+
+        private void init() {
+            class FindTypes extends VoidVisitorAdapter<Void> {
+                @Override
+                public void visit(EnumDeclaration n, Void arg) {
+                    classDeclarations.add(n);
+                    super.visit(n, arg);
+                }
+
+                @Override
+                public void visit(ClassOrInterfaceDeclaration n, Void arg) {
+                    classDeclarations.add(n);
+                    super.visit(n, arg);
+                }
+
+                @Override
+                public void visit(RecordDeclaration n, Void arg) {
+                    classDeclarations.add(n);
+                    super.visit(n, arg);
+                }
+
+                @Override
+                public void visit(AnnotationDeclaration n, Void arg) {
+                    classDeclarations.add(n);
+                    super.visit(n, arg);
+                }
+            }
+            cUnits.accept(new FindTypes(), null);
+        }
+
+        public Set<ClassOrInterfaceDeclaration> classDeclarations() {
+            return typeDeclarations().stream()
+                    .filter(it -> it.isClassOrInterfaceDeclaration())
+                    .map(it -> (ClassOrInterfaceDeclaration) it)
+                    .collect(Collectors.toSet());
+        }
+
+        public Set<EnumDeclaration> enumDeclarations() {
+            return typeDeclarations().stream()
+                    .filter(it -> it.isEnumDeclaration())
+                    .map(it -> (EnumDeclaration) it)
+                    .collect(Collectors.toSet());
+        }
+
+
+        public Set<RecordDeclaration> recordDeclarations() {
+            return typeDeclarations().stream()
+                    .filter(it -> it.isRecordDeclaration())
+                    .map(it -> (RecordDeclaration) it)
+                    .collect(Collectors.toSet());
+        }
+
+        public List<ResolvedReferenceType> getAllSupertypes(TypeDeclaration<?> td) {
+            return td.resolve().getAncestors();
+            /*
+            if (td.isEnumDeclaration()) {
+                return Collections.singletonList(getType("java", "lang", "Enum"));
+            }
+
+            if (td.isRecordDeclaration()) {
+                return Collections.singletonList(getType("java", "lang", "Record"));
+            }
+
+            if (td.isAnnotationDeclaration()) {
+                return Collections.emptyList();
+            }
+
+            ClassOrInterfaceDeclaration cd = (ClassOrInterfaceDeclaration) td;
+            var a = cd.resolve();
+            return typeDeclaration2allSupertypes.get(td);*/
+        }
+
+        public List<CompilationUnit> getUnits() {
+            return cUnits;
+        }
+
+    }
+
+    public Collection<ResolvedFieldDeclaration> getFinalVariables(TypeDeclaration<?> n) {
+        var seq = new LinkedList<ResolvedFieldDeclaration>();
+        while (n.isNestedType()) {
+            n = (TypeDeclaration<?>) n.getParentNode().get();
+            var fields = n.resolve().getAllNonStaticFields();
+            seq.addAll(fields);
+        }
+        return seq;
+    }
+
+    public LinkedList<ResolvedFieldDeclaration> getFinalVariables(LambdaExpr n) {
+        var seq = new LinkedList<ResolvedFieldDeclaration>();
+        return seq;
     }
 }

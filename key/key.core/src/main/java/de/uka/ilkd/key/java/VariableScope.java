@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.java.ast.ScopeDefiningElement;
+
 /**
  * The property of a non terminal program element to define a scope for
  * variables.

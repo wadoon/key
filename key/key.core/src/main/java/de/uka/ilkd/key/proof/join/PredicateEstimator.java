@@ -17,7 +17,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Node;

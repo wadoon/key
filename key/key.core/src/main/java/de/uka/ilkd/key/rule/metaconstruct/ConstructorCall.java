@@ -16,20 +16,19 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.java.transformations.pipeline.ConstructorNormalformBuilder;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.ast.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.transformations.pipeline.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.expression.operator.New;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -52,7 +51,7 @@ public class ConstructorCall extends ProgramTransformer {
      * The normal form identifier.
      */
     private static final String NORMALFORM_IDENTIFIER = //
-            ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
+            PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
 
     // @ invariant (newObjectSV == null) != (newObjectVar == null);
     private final SchemaVariable newObjectSV;
@@ -141,7 +140,7 @@ public class ConstructorCall extends ProgramTransformer {
 
         int j = 0;
         if (services.getJavaInfo().getAttribute(
-            ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType) != null) {
+            PipelineConstants.IMPLICIT_ENCLOSING_THIS, classType) != null) {
             j = 1;
         }
         final ProgramVariable[] argumentVariables = new ProgramVariable[arguments
@@ -154,7 +153,7 @@ public class ConstructorCall extends ProgramTransformer {
 
         if (j == 1) {
             Sort s = services.getJavaInfo().getAttribute(
-                ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType).sort();
+                PipelineConstants.IMPLICIT_ENCLOSING_THIS, classType).sort();
             Expression enclosingThis = (Expression) (constructorReference
                     .getReferencePrefix() instanceof Expression
                             ? constructorReference.getReferencePrefix()

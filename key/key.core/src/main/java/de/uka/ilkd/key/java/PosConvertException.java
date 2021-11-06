@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.java;
 
 
+import de.uka.ilkd.key.java.ast.CompilationUnit;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 import recoder.kit.UnitKit;

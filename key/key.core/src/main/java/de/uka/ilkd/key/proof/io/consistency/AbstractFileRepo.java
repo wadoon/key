@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.translation.Recoder2KeY;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.io.RuleSource;

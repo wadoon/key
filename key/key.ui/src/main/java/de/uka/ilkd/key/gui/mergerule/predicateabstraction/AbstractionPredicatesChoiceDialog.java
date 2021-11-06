@@ -18,7 +18,7 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.mergerule.predicateabstraction.ObservableArrayList.ObservableArrayListChangeListener;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;

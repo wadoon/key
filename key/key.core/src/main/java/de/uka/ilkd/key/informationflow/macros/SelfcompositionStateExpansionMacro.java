@@ -5,7 +5,7 @@ import java.util.Set;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.UpdateApplication;

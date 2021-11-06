@@ -15,7 +15,7 @@ package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.transformations.pipeline.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
@@ -58,7 +58,7 @@ public final class SLTypeResolver extends SLExpressionResolver {
                             return new SLExpression(containingType);
                         }
                         ProgramVariable et = javaInfo.getAttribute(
-                                ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
+                                PipelineConstants.IMPLICIT_ENCLOSING_THIS, containingType);
                         if(et != null) {
                             containingType = et.getKeYJavaType();
                         }else{

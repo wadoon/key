@@ -14,11 +14,11 @@
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.recoderext.URLDataLocation;
+import de.uka.ilkd.key.java.translation.Recoder2KeY;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.KeYResourceManager;
-import recoder.io.DataLocation;
 
 import java.io.*;
 import java.net.URL;
@@ -160,7 +160,7 @@ public class JavaReduxFileCollection implements FileCollection {
             this.iterator = iterator;
         }
 
-        public DataLocation getCurrentDataLocation()
+        public URL getCurrentDataLocation()
                 throws NoSuchElementException {
             if (currentURL == null)
                 throw new NoSuchElementException("Location of " + current + " not found.");

@@ -15,9 +15,9 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import org.key_project.util.java.StringUtil;
 
-import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.ast.Expression;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.statement.Throw;
+import de.uka.ilkd.key.java.ast.statement.Throw;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;

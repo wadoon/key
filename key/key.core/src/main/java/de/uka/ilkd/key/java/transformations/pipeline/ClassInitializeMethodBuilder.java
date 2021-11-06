@@ -21,15 +21,10 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.key.sv.KeyPassiveExpression;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import com.github.javaparser.ast.type.ReferenceType;
-import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.VoidType;
-import de.uka.ilkd.key.java.transformations.ConstantEvaluator;
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
-import de.uka.ilkd.key.util.Debug;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Optional;
 
 import static de.uka.ilkd.key.java.transformations.pipeline.ClassPreparationMethodBuilder.CLASS_PREPARE_IDENTIFIER;
@@ -45,19 +40,6 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
     public static final String CLASS_INITIALIZE_IDENTIFIER = "<clinit>";
 
     /**
-     * maps a class to its static NON CONSTANT fields
-     */
-    private final HashMap<TypeDeclaration<?>, NodeList<Statement>> class2initializers;
-
-    /**
-     * maps a class to its superclass
-     */
-    private final HashMap<TypeDeclaration<?>, Type> class2super;
-
-    private ReferenceType javaLangObject;
-
-
-    /**
      * Creates an instance of the class preparation method model
      * transformer. Information about the current recoder model can be
      * accessed via the given service configuration. The implicit
@@ -66,15 +48,9 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      *
      * @param services the CrossReferenceServiceConfiguration with the
      *                 information about the recoder model
-     * @param cache    a cache object that stores information which is needed by
-     *                 and common to many transformations. it includes the
-     *                 compilation units, the declared classes, and information
-     *                 for local classes.
      */
     public ClassInitializeMethodBuilder(TransformationPipelineServices services) {
         super(services);
-        class2initializers = new LinkedHashMap<>(1024);
-        class2super = new LinkedHashMap<>(512);
     }
 
     /**
@@ -92,7 +68,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
         if (!result) {
             return false;
         }
-        ConstantEvaluator ce = services.getConstantEvaluator();
+        ConstantExpressionEvaluator ce = services.getConstantEvaluator();
 
         try {
             Optional<Expression> init = decl.getInitializer();
@@ -161,34 +137,6 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
         return result;
     }
 
-    public void prepare() {
-        javaLangObject = services.getNameInfo().getJavaLangObject();
-        if (javaLangObject != null) {
-            Debug.fail("Could not find class java.lang.Object or only as bytecode");
-        }
-        for (var cd : cache.classDeclarations()) {
-            class2initializers.put(cd, getInitializers(cd));
-            if (cd instanceof ClassOrInterfaceDeclaration) {
-                ClassOrInterfaceDeclaration clazz = (ClassOrInterfaceDeclaration) cd;
-                if (!clazz.equals(javaLangObject)) {
-                    Type superType;
-                    if (clazz.isInterface()) {
-                        superType = services.getType("java", "lang", "Object");
-                    } else {
-                        superType = clazz.getExtendedTypes(0).clone();
-                    }
-                    class2super.put(cd, superType);
-                }
-            }
-        }
-
-        for (var cu : cache.getUnits()) {
-            for (var td : cu.getTypes()) {
-                class2initializers.put(td, getInitializers(td));
-            }
-        }
-    }
-
     /**
      * creates the following catch clause
      * <code><pre>
@@ -203,12 +151,12 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
         NodeList<Statement> catcher = new NodeList<Statement>();
         var resetInitInProgress =
                 assign(new KeyPassiveExpression(
-                                new NameExpr(new SimpleName(ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS))),
+                                new NameExpr(new SimpleName(PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS))),
                         new BooleanLiteralExpr(false));
 
         var markErroneous =
                 assign(new KeyPassiveExpression(
-                                new NameExpr(new SimpleName(ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS))),
+                                new NameExpr(new SimpleName(PipelineConstants.IMPLICIT_CLASS_ERRONEOUS))),
                         new BooleanLiteralExpr(true));
 
         Parameter param = new Parameter(
@@ -231,13 +179,12 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      */
     private TryStmt createInitializerExecutionTryBlock(TypeDeclaration<?> td) {
         // try block
-        NodeList<Statement> initializerExecutionBody;
-        initializerExecutionBody = class2initializers.get(td);
-        if (initializerExecutionBody == null) {
-            initializerExecutionBody = new NodeList<Statement>();
+        NodeList<Statement> initializerExecutionBody = getInitializers(td);
+        if (initializerExecutionBody == null && initializerExecutionBody.isNonEmpty()) {
+            initializerExecutionBody = new NodeList<>();
         }
 
-        if (td instanceof ClassOrInterfaceDeclaration && !td.equals(javaLangObject)) {
+        if (td instanceof ClassOrInterfaceDeclaration && !td.resolve().isJavaLangObject()) {
             var cd = (ClassOrInterfaceDeclaration) td;
             final var superType = cd.getExtendedTypes(0);
             final var scope = new NameExpr(superType.getName()); //TODO convert fqn
@@ -287,7 +234,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
                 new UnaryExpr(
                         new KeyPassiveExpression(
                                 new FieldAccessExpr(new ThisExpr(),
-                                        ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED)),
+                                        PipelineConstants.IMPLICIT_CLASS_PREPARED)),
                         UnaryExpr.Operator.LOGICAL_COMPLEMENT),
                 new BlockStmt(clNotPreparedBody),
                 null);
@@ -306,7 +253,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
         // IF <classErroneous> : clErroneousBody : null
         IfStmt isClassErroneous = new IfStmt(
                 new KeyPassiveExpression(
-                        new NameExpr(ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS)),
+                        new NameExpr(PipelineConstants.IMPLICIT_CLASS_ERRONEOUS)),
                 new BlockStmt(clErroneousBody),
                 null);
 
@@ -316,7 +263,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
         // @(CLASS_INIT_IN_PROGRESS) = true
         clInitNotInProgressBody.add(assign(
                 new KeyPassiveExpression(
-                        new NameExpr(ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
+                        new NameExpr(PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
                 new BooleanLiteralExpr(true)));
 
 
@@ -325,24 +272,24 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
         clInitNotInProgressBody.add(
                 assign(
                         new KeyPassiveExpression(
-                                new NameExpr(ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
+                                new NameExpr(PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
                         new BooleanLiteralExpr(false)));
         clInitNotInProgressBody.add(
                 assign(
                         new KeyPassiveExpression((
-                                new NameExpr(ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS))),
+                                new NameExpr(PipelineConstants.IMPLICIT_CLASS_ERRONEOUS))),
                         new BooleanLiteralExpr(false)));
         clInitNotInProgressBody.add(
                 assign(
                         new KeyPassiveExpression(
-                                new NameExpr(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED)),
+                                new NameExpr(PipelineConstants.IMPLICIT_CLASS_INITIALIZED)),
                         new BooleanLiteralExpr(true)));
 
 
         IfStmt isClassInitializationInProgress = new IfStmt(
                 new UnaryExpr(
                         new KeyPassiveExpression(
-                                new NameExpr(ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
+                                new NameExpr(PipelineConstants.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
                         UnaryExpr.Operator.LOGICAL_COMPLEMENT),
                 new BlockStmt(clInitNotInProgressBody),
                 null);
@@ -352,7 +299,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
         IfStmt isClassInitialized = new IfStmt(
                 new UnaryExpr(
                         new KeyPassiveExpression(
-                                new NameExpr(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED)),
+                                new NameExpr(PipelineConstants.IMPLICIT_CLASS_INITIALIZED)),
                         UnaryExpr.Operator.LOGICAL_COMPLEMENT),
                 new BlockStmt(clInitializeBody),
                 null);
