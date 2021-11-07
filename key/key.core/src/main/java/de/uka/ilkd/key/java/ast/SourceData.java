@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java.ast;
 
+import de.uka.ilkd.key.Services;
+
 /**
  * This class keeps track of the next element to match, which is provided by
  * calling method {@link #getSource()}. The rough idea is to store the parent ast

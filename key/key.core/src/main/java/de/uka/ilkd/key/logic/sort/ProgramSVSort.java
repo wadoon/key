@@ -16,6 +16,7 @@ package de.uka.ilkd.key.logic.sort;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.ast.reference.*;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 
@@ -34,7 +35,7 @@ import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.DLEmbeddedExpression;
 import de.uka.ilkd.key.java.ast.expression.operator.Instanceof;

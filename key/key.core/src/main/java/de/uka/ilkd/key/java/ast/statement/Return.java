@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.java.ast.statement;
 
-import de.uka.ilkd.key.java.ast.Expression;
 import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ast.Expression;
 import de.uka.ilkd.key.java.ast.visitor.Visitor;
 import org.key_project.util.ExtList;
 

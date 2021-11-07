@@ -16,17 +16,15 @@ package de.uka.ilkd.key;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.api.JavaService;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
-import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
 import de.uka.ilkd.key.java.translation.KeYProgModelInfo;
-import de.uka.ilkd.key.java.translation.KeYRecoderMapping;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import org.key_project.util.lookup.Lookup;
 
 import java.util.HashMap;
@@ -88,6 +86,7 @@ public class Services implements TermServices {
             return new TermProgramVariableCollector(services);
         }
     };
+    private JavaService javaService;
 
     /**
      * creates a new Services object with a new TypeConverter and a new
@@ -96,7 +95,7 @@ public class Services implements TermServices {
     public Services(Profile profile) {
         assert profile != null;
         this.profile = profile;
-        this.counters = new LinkedHashMap<String, Counter>();
+        this.counters = new LinkedHashMap<>();
         this.caches = new ServiceCaches();
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
@@ -107,8 +106,7 @@ public class Services implements TermServices {
         nameRecorder = new NameRecorder();
     }
 
-    private Services(Profile profile, TransformationPipelineServices crsc, KeYRecoderMapping rec2key,
-                     HashMap<String, Counter> counters, ServiceCaches caches) {
+    private Services(Profile profile, HashMap<String, Counter> counters, ServiceCaches caches) {
         assert profile != null;
         assert counters != null;
         assert caches != null;
@@ -438,6 +436,10 @@ public class Services implements TermServices {
         lookup.register(getNameRecorder());
         lookup.register(getVariableNamer());
         return lookup;
+    }
+
+    public JavaService getJavaService() {
+        return javaService;
     }
 
     public interface ITermProgramVariableCollectorFactory {

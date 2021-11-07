@@ -1,10 +1,12 @@
 package de.uka.ilkd.key.java.ast.visitor;
 
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.LoopApplyHeadRule;
 import de.uka.ilkd.key.speclang.LoopContractImpl;

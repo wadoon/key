@@ -11,9 +11,10 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.java.ast.expression;
+package de.uka.ilkd.key.java.ast.expression.literal;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
@@ -69,15 +70,14 @@ public abstract class Literal extends JavaProgramElement implements Expression, 
 
     /**
      * retrieves the literal's type (as it is independant of the
-     * execution context, it is same as using {@link #getKeYJavaType(Services)})
+     * execution context, it is same as using {@link #getKeYJavaType(de.uka.ilkd.key.Services)})
      *
      * @param javaServ the Services offering access to the Java model
      * @param ec       the ExecutionContext in which the expression is evaluated
      * @return the literal's type
      */
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ,
-                                      ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return getKeYJavaType(javaServ);
     }
 

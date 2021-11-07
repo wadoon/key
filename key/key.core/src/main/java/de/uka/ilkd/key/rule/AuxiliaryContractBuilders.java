@@ -1,70 +1,26 @@
 package de.uka.ilkd.key.rule;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
-import de.uka.ilkd.key.java.ast.Expression;
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ast.Label;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
+import com.github.javaparser.ast.key.KeyTransactionStatement;
 import de.uka.ilkd.key.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.NotEquals;
-import de.uka.ilkd.key.java.ast.statement.Branch;
-import de.uka.ilkd.key.java.ast.statement.Break;
-import de.uka.ilkd.key.java.ast.statement.Catch;
-import de.uka.ilkd.key.java.ast.statement.Continue;
-import de.uka.ilkd.key.java.ast.statement.If;
-import de.uka.ilkd.key.java.ast.statement.JavaStatement;
-import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
-import de.uka.ilkd.key.java.ast.statement.LoopStatement;
-import de.uka.ilkd.key.java.ast.statement.MethodFrame;
-import de.uka.ilkd.key.java.ast.statement.TransactionStatement;
-import de.uka.ilkd.key.java.ast.statement.Try;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.ast.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.ast.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.java.ast.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.java.ast.visitor.ProgramElementReplacer;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -80,6 +36,15 @@ import de.uka.ilkd.key.speclang.BlockWellDefinedness;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  * This contains various builders used in building formulae and terms for block and loop contracts.
@@ -145,42 +110,29 @@ public final class AuxiliaryContractBuilders {
         private final ProgramVariable exceptionParameter;
 
         /**
-         *
-         * @param labels
-         *            all labels belonging to the block.
-         * @param block
-         *            the block.
-         * @param variables
-         *            the variables.
-         * @param exceptionParameter
-         *            the exception variable.
-         * @param services
-         *            services.
+         * @param labels             all labels belonging to the block.
+         * @param block              the block.
+         * @param variables          the variables.
+         * @param exceptionParameter the exception variable.
+         * @param services           services.
          */
         public ValidityProgramConstructor(final Iterable<Label> labels, final StatementBlock block,
-                final BlockContract.Variables variables, final ProgramVariable exceptionParameter,
-                final Services services) {
+                                          final BlockContract.Variables variables, final ProgramVariable exceptionParameter,
+                                          final Services services) {
             this(labels, block, variables, exceptionParameter, services, null);
         }
 
         /**
-         *
-         * @param labels
-         *            all labels belonging to the block.
-         * @param block
-         *            the block.
-         * @param variables
-         *            the variables.
-         * @param exceptionParameter
-         *            the exception variable.
-         * @param services
-         *            services.
-         * @param alreadyDeclared
-         *            the subset of variables that have already been declared.
+         * @param labels             all labels belonging to the block.
+         * @param block              the block.
+         * @param variables          the variables.
+         * @param exceptionParameter the exception variable.
+         * @param services           services.
+         * @param alreadyDeclared    the subset of variables that have already been declared.
          */
         public ValidityProgramConstructor(final Iterable<Label> labels, final StatementBlock block,
-                final BlockContract.Variables variables, final ProgramVariable exceptionParameter,
-                final Services services, final BlockContract.Variables alreadyDeclared) {
+                                          final BlockContract.Variables variables, final ProgramVariable exceptionParameter,
+                                          final Services services, final BlockContract.Variables alreadyDeclared) {
             this.labels = labels;
             this.block = block;
             this.variables = variables;
@@ -191,7 +143,6 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
          * @return block'
          */
         public StatementBlock construct() {
@@ -255,7 +206,6 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
          * @return {@code true} iff there is a result.
          */
         private boolean occursReturnAndIsReturnTypeNotVoid() {
@@ -290,11 +240,8 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param block
-         *            a block.
-         * @param labels
-         *            labels that should be added to the block.
+         * @param block  a block.
+         * @param labels labels that should be added to the block.
          * @return a labeled statement.
          */
         private Statement label(final StatementBlock block, Iterable<Label> labels) {
@@ -306,37 +253,31 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param block
-         *            a block.
-         * @param breakOutLabel
-         *            a label belonging to the block.
+         * @param block         a block.
+         * @param breakOutLabel a label belonging to the block.
          * @return the block with all outer breaks, continues, and returns replaced.
          * @see OuterBreakContinueAndReturnReplacer
          */
         private StatementBlock replaceOuterBreaksContinuesAndReturns(final StatementBlock block,
-                final Label breakOutLabel) {
+                                                                     final Label breakOutLabel) {
             return new OuterBreakContinueAndReturnReplacer(block, labels, breakOutLabel,
                     variables.breakFlags, variables.continueFlags, variables.returnFlag,
                     variables.result, variables.exception, services).replace();
         }
 
         /**
-         *
-         * @param labeledBlock
-         *            the labeled block.
-         * @param exceptionParameter
-         *            the exception variable.
+         * @param labeledBlock       the labeled block.
+         * @param exceptionParameter the exception variable.
          * @return wraps the labeled block in a try-catch structure
          */
         private Statement wrapInTryCatch(final Statement labeledBlock,
-                final ProgramVariable exceptionParameter) {
+                                         final ProgramVariable exceptionParameter) {
             Catch katch = KeYJavaASTFactory.catchClause(
                     KeYJavaASTFactory.parameterDeclaration(services.getJavaInfo(),
                             exceptionParameter.getKeYJavaType(), exceptionParameter),
                     new StatementBlock(
                             KeYJavaASTFactory.assign(variables.exception, exceptionParameter)));
-            return new Try(new StatementBlock(labeledBlock), new Branch[] { katch });
+            return new Try(new StatementBlock(labeledBlock), new Branch[]{katch});
         }
     }
 
@@ -362,28 +303,22 @@ public final class AuxiliaryContractBuilders {
         private final Services services;
 
         /**
-         *
-         * @param goal
-         *            If this is not null, all created variables are added to it. If it is null, the
-         *            variables are instead added to the {@code services}' namespace.
-         * @param placeholderVariables
-         *            the placeholders from which to create the variables.
-         * @param services services.
+         * @param goal                 If this is not null, all created variables are added to it. If it is null, the
+         *                             variables are instead added to the {@code services}' namespace.
+         * @param placeholderVariables the placeholders from which to create the variables.
+         * @param services             services.
          */
         public VariablesCreatorAndRegistrar(final Goal goal,
-                final BlockContract.Variables placeholderVariables, final Services services) {
+                                            final BlockContract.Variables placeholderVariables, final Services services) {
             this.goal = goal;
             this.placeholderVariables = placeholderVariables;
             this.services = services;
         }
 
         /**
-         *
-         * @param self
-         *            the self term
-         * @param existingPO
-         *            {@code true} if we are applying a rule in an existing proof obligation,
-         *            {@code false} if we are creating a new proof obligation.
+         * @param self       the self term
+         * @param existingPO {@code true} if we are applying a rule in an existing proof obligation,
+         *                   {@code false} if we are creating a new proof obligation.
          * @return the registered variables.
          */
         public Variables createAndRegister(Term self, boolean existingPO) {
@@ -391,18 +326,14 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-        *
-        * @param self
-        *            the self term
-        * @param existingPO
-        *            {@code true} if we are applying a rule in an existing proof obligation,
-        *            {@code false} if we are creating a new proof obligation.
-        * @param pe
-        *              if {@code existingPO == false}, all contracts on blocks in this
-        *              program element  will have their remembrance variables replaced by
-        *              the one created here.
-        * @return the registered variables.
-        */
+         * @param self       the self term
+         * @param existingPO {@code true} if we are applying a rule in an existing proof obligation,
+         *                   {@code false} if we are creating a new proof obligation.
+         * @param pe         if {@code existingPO == false}, all contracts on blocks in this
+         *                   program element  will have their remembrance variables replaced by
+         *                   the one created here.
+         * @return the registered variables.
+         */
         public Variables createAndRegister(Term self, boolean existingPO, ProgramElement pe) {
             if (existingPO) {
                 // In an existing PO, the outer remembrance vars already exist and refer to the
@@ -452,8 +383,7 @@ public final class AuxiliaryContractBuilders {
         /**
          * Creates and registers copies of the remembrance variables and heaps.
          *
-         * @param suffix
-         *            a suffix for the new variables' names.
+         * @param suffix a suffix for the new variables' names.
          * @return a {@link Variables} object containing the new {@link ProgramVariables}.
          */
         public Variables createAndRegisterCopies(String suffix) {
@@ -469,15 +399,12 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param map
-         *            a map containing variables.
-         * @param suffix
-         *            a suffix.
+         * @param map    a map containing variables.
+         * @param suffix a suffix.
          * @return the map with the suffix appended to every variable's name.
          */
         private <K> Map<K, LocationVariable> appendSuffix(final Map<K, LocationVariable> map,
-                final String suffix) {
+                                                          final String suffix) {
             final Map<K, LocationVariable> result = new LinkedHashMap<>();
 
             for (Entry<K, LocationVariable> entry : map.entrySet()) {
@@ -496,13 +423,11 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param placeholderFlags
-         *            the placeholder flags.
+         * @param placeholderFlags the placeholder flags.
          * @return newly created and registered flags with the same names.
          */
         private Map<Label, ProgramVariable>
-                createAndRegisterFlags(final Map<Label, ProgramVariable> placeholderFlags) {
+        createAndRegisterFlags(final Map<Label, ProgramVariable> placeholderFlags) {
             Map<Label, ProgramVariable> result = new LinkedHashMap<Label, ProgramVariable>();
             for (Map.Entry<Label, ProgramVariable> flag : placeholderFlags.entrySet()) {
                 result.put(flag.getKey(), createAndRegisterVariable(flag.getValue()));
@@ -511,9 +436,7 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param remembranceVariables
-         *            the placeholder remembrance variables.
+         * @param remembranceVariables the placeholder remembrance variables.
          * @return newly created and registered remembrance variables with the same names.
          */
         private Map<LocationVariable, LocationVariable> createAndRegisterRemembranceVariables(
@@ -529,13 +452,11 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param placeholderVariable
-         *            a placeholder variable
+         * @param placeholderVariable a placeholder variable
          * @return a newly created and registered variable with the same name.
          */
         private LocationVariable
-                createAndRegisterVariable(final ProgramVariable placeholderVariable) {
+        createAndRegisterVariable(final ProgramVariable placeholderVariable) {
             if (placeholderVariable != null) {
                 String newName
                         = services.getTermBuilder().newName(placeholderVariable.name().toString());
@@ -562,8 +483,8 @@ public final class AuxiliaryContractBuilders {
         /**
          * Replace the outer remembrance variables of all contracts on blocks in {@code pe}.
          *
-         * @param pe the program elements.
-         * @param outerRemembranceHeaps the new outer remembrance heaps.
+         * @param pe                        the program elements.
+         * @param outerRemembranceHeaps     the new outer remembrance heaps.
          * @param outerRemembranceVariables the new outer remembrance variables.
          * @see #createAndRegister(Term, boolean, ProgramElement)
          */
@@ -573,20 +494,20 @@ public final class AuxiliaryContractBuilders {
                 Map<LocationVariable, LocationVariable> outerRemembranceVariables) {
             ImmutableSet<JavaStatement> innerBlocksAndLoops =
                     new JavaASTVisitor(pe, services) {
-                private ImmutableSet<JavaStatement> statements = DefaultImmutableSet.nil();
+                        private ImmutableSet<JavaStatement> statements = DefaultImmutableSet.nil();
 
-                @Override
-                protected void doDefaultAction(SourceElement node) {
-                    if (node instanceof StatementBlock || node instanceof LoopStatement) {
-                        statements = statements.add((JavaStatement) node);
-                    }
-                }
+                        @Override
+                        protected void doDefaultAction(SourceElement node) {
+                            if (node instanceof StatementBlock || node instanceof LoopStatement) {
+                                statements = statements.add((JavaStatement) node);
+                            }
+                        }
 
-                public ImmutableSet<JavaStatement> run() {
-                    walk(root());
-                    return statements;
-                }
-            }.run();
+                        public ImmutableSet<JavaStatement> run() {
+                            walk(root());
+                            return statements;
+                        }
+                    }.run();
 
             IntroAtPreDefsOp transformer = (IntroAtPreDefsOp)
                     AbstractTermTransformer.INTRODUCE_ATPRE_DEFINITIONS;
@@ -611,11 +532,8 @@ public final class AuxiliaryContractBuilders {
         private final BlockContract.Variables variables;
 
         /**
-         *
-         * @param variables
-         *            the variables for the contract being applied.
-         * @param services
-         *            services.
+         * @param variables the variables for the contract being applied.
+         * @param services  services.
          */
         public UpdatesBuilder(final BlockContract.Variables variables, final Services services) {
             super(services.getTermFactory(), services);
@@ -623,9 +541,7 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param heaps
-         *            the heaps.
+         * @param heaps the heaps.
          * @return a remembrance update for the specified heaps.
          */
         public Term buildRemembranceUpdate(final List<LocationVariable> heaps) {
@@ -636,7 +552,7 @@ public final class AuxiliaryContractBuilders {
             }
             for (Map.Entry<LocationVariable,
                     LocationVariable> remembranceVariable : variables.remembranceLocalVariables
-                            .entrySet()) {
+                    .entrySet()) {
                 result = parallel(result, elementary(remembranceVariable.getValue(),
                         var(remembranceVariable.getKey())));
             }
@@ -644,19 +560,18 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
          * @return an outer remembrance update.
          */
         public Term buildOuterRemembranceUpdate() {
             Term result = skip();
 
-            for (LocationVariable var: variables.outerRemembranceHeaps.keySet()) {
+            for (LocationVariable var : variables.outerRemembranceHeaps.keySet()) {
                 final Term update
                         = elementary(variables.outerRemembranceHeaps.get(var), var(var));
                 result = parallel(result, update);
             }
 
-            for (LocationVariable var: variables.outerRemembranceVariables.keySet()) {
+            for (LocationVariable var : variables.outerRemembranceVariables.keySet()) {
                 final Term update
                         = elementary(variables.outerRemembranceVariables.get(var), var(var));
                 result = parallel(result, update);
@@ -666,15 +581,12 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param anonymisationHeaps
-         *            anonymization heaps.
-         * @param modifiesClauses
-         *            modifies clauses for the specified heaps.
+         * @param anonymisationHeaps anonymization heaps.
+         * @param modifiesClauses    modifies clauses for the specified heaps.
          * @return an anonymization update for the specified modifies clauses.
          */
         public Term buildAnonOutUpdate(final Map<LocationVariable, Function> anonymisationHeaps,
-                final Map<LocationVariable, Term> modifiesClauses) {
+                                       final Map<LocationVariable, Term> modifiesClauses) {
             return buildAnonOutUpdate(
                     variables.remembranceLocalVariables.keySet(),
                     anonymisationHeaps,
@@ -683,19 +595,15 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param el
-         *            a program element
-         * @param anonymisationHeaps
-         *            anonymization heaps.
-         * @param modifiesClauses
-         *            modifies clauses for the specified heaps.
+         * @param el                 a program element
+         * @param anonymisationHeaps anonymization heaps.
+         * @param modifiesClauses    modifies clauses for the specified heaps.
          * @return an anonymization update for the specified modifies clauses and for every modified
-         *         variable that occurs in the specified program element.
+         * variable that occurs in the specified program element.
          */
         public Term buildAnonOutUpdate(final ProgramElement el,
-                final Map<LocationVariable, Function> anonymisationHeaps,
-                final Map<LocationVariable, Term> modifiesClauses) {
+                                       final Map<LocationVariable, Function> anonymisationHeaps,
+                                       final Map<LocationVariable, Term> modifiesClauses) {
             return buildAnonOutUpdate(
                     el,
                     anonymisationHeaps,
@@ -704,49 +612,39 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param el
-         *            a program element
-         * @param anonymisationHeaps
-         *            anonymization heaps.
-         * @param modifiesClauses
-         *            modifies clauses for the specified heaps.
-         * @param prefix
-         *         a prefix for the name of the anon functions.
+         * @param el                 a program element
+         * @param anonymisationHeaps anonymization heaps.
+         * @param modifiesClauses    modifies clauses for the specified heaps.
+         * @param prefix             a prefix for the name of the anon functions.
          * @return an anonymization update for the specified modifies clauses and for every modified
-         *         variable that occurs in the specified program element.
+         * variable that occurs in the specified program element.
          */
         public Term buildAnonOutUpdate(final ProgramElement el,
-                final Map<LocationVariable, Function> anonymisationHeaps,
-                final Map<LocationVariable, Term> modifiesClauses,
-                final String prefix) {
+                                       final Map<LocationVariable, Function> anonymisationHeaps,
+                                       final Map<LocationVariable, Term> modifiesClauses,
+                                       final String prefix) {
             return buildAnonOutUpdate(
                     MiscTools.getLocalOuts(el, services).stream()
-                        .filter(LocationVariable.class::isInstance)
-                        .map(LocationVariable.class::cast)
-                        .collect(Collectors.toSet()),
+                            .filter(LocationVariable.class::isInstance)
+                            .map(LocationVariable.class::cast)
+                            .collect(Collectors.toSet()),
                     anonymisationHeaps,
                     modifiesClauses,
                     prefix);
         }
 
         /**
-         *
-         * @param vars
-         *            a set of variables
-         * @param anonymisationHeaps
-         *            anonymization heaps.
-         * @param modifiesClauses
-         *            modifies clauses for the specified heaps.
-         * @param prefix
-         *         a prefix for the name of the anon functions.
+         * @param vars               a set of variables
+         * @param anonymisationHeaps anonymization heaps.
+         * @param modifiesClauses    modifies clauses for the specified heaps.
+         * @param prefix             a prefix for the name of the anon functions.
          * @return an anonymization update for the specified modifies clauses and for every
-         *         variable in the specified set.
+         * variable in the specified set.
          */
         public Term buildAnonOutUpdate(final Set<LocationVariable> vars,
-                final Map<LocationVariable, Function> anonymisationHeaps,
-                final Map<LocationVariable, Term> modifiesClauses,
-                final String prefix) {
+                                       final Map<LocationVariable, Function> anonymisationHeaps,
+                                       final Map<LocationVariable, Term> modifiesClauses,
+                                       final String prefix) {
             Term result = buildLocalVariablesAnonUpdate(vars, prefix);
             for (Map.Entry<LocationVariable, Function> anonymisationHeap : anonymisationHeaps
                     .entrySet()) {
@@ -764,9 +662,7 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param anonymisationHeaps
-         *            anonymization heaps.
+         * @param anonymisationHeaps anonymization heaps.
          * @return an anonymization update for all heap locations.
          */
         public Term buildAnonInUpdate(final Map<LocationVariable, Function> anonymisationHeaps) {
@@ -790,15 +686,12 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param vars
-         *            a collection of variables.
-         * @param prefix
-         *            a prefix for the name of the anonymization constants.
+         * @param vars   a collection of variables.
+         * @param prefix a prefix for the name of the anonymization constants.
          * @return an anonymization update for the specified variables.
          */
         private Term buildLocalVariablesAnonUpdate(Collection<LocationVariable> vars,
-                String prefix) {
+                                                   String prefix) {
             Term result = skip();
 
             for (LocationVariable variable : vars) {
@@ -842,21 +735,15 @@ public final class AuxiliaryContractBuilders {
         private final BlockContract.Variables variables;
 
         /**
-         *
-         * @param contract
-         *            the contract being applied.
-         * @param heaps
-         *            the heaps.
-         * @param variables
-         *            the variables.
-         * @param self
-         *            the self term.
-         * @param services
-         *            services.
+         * @param contract  the contract being applied.
+         * @param heaps     the heaps.
+         * @param variables the variables.
+         * @param self      the self term.
+         * @param services  services.
          */
         public ConditionsAndClausesBuilder(final AuxiliaryContract contract,
-                final List<LocationVariable> heaps, final BlockContract.Variables variables,
-                final Term self, final Services services) {
+                                           final List<LocationVariable> heaps, final BlockContract.Variables variables,
+                                           final Term self, final Services services) {
             super(services.getTermFactory(), services);
             this.contract = contract;
             this.heaps = heaps;
@@ -865,7 +752,6 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
          * @return the termified variables.
          */
         public AuxiliaryContract.Terms getTerms() {
@@ -873,7 +759,6 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
          * @return the contract's precondition.
          */
         public Term buildPrecondition() {
@@ -888,7 +773,6 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
          * @return the contract's free precondition.
          */
         public Term buildFreePrecondition() {
@@ -903,7 +787,6 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
          * @return the condition that all heaps are well-formed.
          */
         public Term buildWellFormedHeapsCondition() {
@@ -915,35 +798,29 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param localInVariables
-         *            all free local variables in the block.
+         * @param localInVariables all free local variables in the block.
          * @return the condition that all of those variables have valid values.
          */
         public Term
-                buildReachableInCondition(final ImmutableSet<ProgramVariable> localInVariables) {
+        buildReachableInCondition(final ImmutableSet<ProgramVariable> localInVariables) {
             return buildReachableCondition(localInVariables);
         }
 
         /**
-         *
-         * @param localOutVariables
-         *            all free local variables modified by the block.
+         * @param localOutVariables all free local variables modified by the block.
          * @return the condition that all of those variables have valid values.
          */
         public Term
-                buildReachableOutCondition(final ImmutableSet<ProgramVariable> localOutVariables) {
+        buildReachableOutCondition(final ImmutableSet<ProgramVariable> localOutVariables) {
             final Term reachableResult
                     = (variables.result != null) ? reachableValue(variables.result)
-                            : services.getTermBuilder().tt();
+                    : services.getTermBuilder().tt();
             return and(buildReachableCondition(localOutVariables), reachableResult,
                     reachableValue(variables.exception));
         }
 
         /**
-         *
-         * @param variables
-         *            a set of variables.
+         * @param variables a set of variables.
          * @return the condition that all of those variables have valid values.
          */
         public Term buildReachableCondition(final ImmutableSet<ProgramVariable> variables) {
@@ -955,7 +832,6 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
          * @return the contract's modifies clause.
          */
         public Map<LocationVariable, Term> buildModifiesClauses() {
@@ -967,7 +843,6 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
          * @return the loop contract's decreases clause.
          */
         public Term buildDecreasesCheck() {
@@ -991,7 +866,6 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
          * @return the contract's postcondition.
          */
         public Term buildPostcondition() {
@@ -1004,7 +878,6 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
          * @return the contract's postcondition.
          */
         public Term buildFreePostcondition() {
@@ -1017,9 +890,7 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param modifiesClauses
-         *            the contract's modifies clauses
+         * @param modifiesClauses the contract's modifies clauses
          * @return the contract's framing condition.
          */
         public Term buildFrameCondition(final Map<LocationVariable, Term> modifiesClauses) {
@@ -1041,7 +912,6 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
          * @return a map from every variable to its remembrance variable, for every heap.
          */
         private Map<LocationVariable, Map<Term, Term>> constructRemembranceVariables() {
@@ -1055,7 +925,7 @@ public final class AuxiliaryContractBuilders {
             }
             for (Map.Entry<LocationVariable,
                     LocationVariable> remembranceLocalVariable : variables.remembranceLocalVariables
-                            .entrySet()) {
+                    .entrySet()) {
                 result.get(getBaseHeapFunction()).put(var(remembranceLocalVariable.getKey()),
                         var(remembranceLocalVariable.getValue()));
             }
@@ -1063,7 +933,6 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
          * @return the base heap.
          */
         private LocationVariable getBaseHeapFunction() {
@@ -1071,9 +940,7 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param anonymisationHeaps
-         *            anonymisation heaps.
+         * @param anonymisationHeaps anonymisation heaps.
          * @return the condition that all anonymisation heaps are well-formed.
          */
         public Term buildWellFormedAnonymisationHeapsCondition(
@@ -1089,7 +956,6 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
          * @return the condition that at most one flag for abrupt termination is {@code true}.
          */
         public Term buildAtMostOneFlagSetCondition() {
@@ -1121,20 +987,15 @@ public final class AuxiliaryContractBuilders {
          * Builds the assumptions for the {@code self} variable
          * ({@code self != null & self.created == true & exactInstance(self)})
          *
-         * @param heaps
-         *            the heaps.
-         * @param pm
-         *            the method containg the block.
-         * @param selfKJT
-         *            the self variable's type.
-         * @param self
-         *            the self variable.
-         * @param services
-         *            services.
+         * @param heaps    the heaps.
+         * @param pm       the method containg the block.
+         * @param selfKJT  the self variable's type.
+         * @param self     the self variable.
+         * @param services services.
          * @return the assumptions for the {@code self} variable.
          */
         public Term buildSelfConditions(List<LocationVariable> heaps, IProgramMethod pm,
-                KeYJavaType selfKJT, Term self, Services services) {
+                                        KeYJavaType selfKJT, Term self, Services services) {
             if (self != null && !pm.isConstructor()) {
                 Term notNull = not(equals(self, NULL()));
 
@@ -1160,9 +1021,7 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param flags
-         *            a collection of boolean variables.
+         * @param flags a collection of boolean variables.
          * @return the condition that all flags are {@code false}.
          */
         private List<Term> buildFlagsNotSetConditions(final Collection<ProgramVariable> flags) {
@@ -1174,9 +1033,7 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param flag
-         *            a boolean variable.
+         * @param flag a boolean variable.
          * @return the condition that the flag is {@code false}.
          */
         private Term buildFlagNotSetCondition(final ProgramVariable flag) {
@@ -1230,29 +1087,20 @@ public final class AuxiliaryContractBuilders {
         private final AbstractAuxiliaryContractRule rule;
 
         /**
-         *
-         * @param application
-         *            the rule application.
-         * @param termLabelState
-         *            the term label state.
-         * @param instantiation
-         *            the instantiation
-         * @param labels
-         *            all labels belonging to the block.
-         * @param variables
-         *            the contract's variables.
-         * @param occurrence
-         *            the position at which the rule is applied.
-         * @param services
-         *            services.
-         * @param rule
-         *            the rule being applied.
+         * @param application    the rule application.
+         * @param termLabelState the term label state.
+         * @param instantiation  the instantiation
+         * @param labels         all labels belonging to the block.
+         * @param variables      the contract's variables.
+         * @param occurrence     the position at which the rule is applied.
+         * @param services       services.
+         * @param rule           the rule being applied.
          */
         public GoalsConfigurator(final AbstractAuxiliaryContractBuiltInRuleApp application,
-                final TermLabelState termLabelState, final Instantiation instantiation,
-                final List<Label> labels, final AuxiliaryContract.Variables variables,
-                final PosInOccurrence occurrence, final Services services,
-                final AbstractAuxiliaryContractRule rule) {
+                                 final TermLabelState termLabelState, final Instantiation instantiation,
+                                 final List<Label> labels, final AuxiliaryContract.Variables variables,
+                                 final PosInOccurrence occurrence, final Services services,
+                                 final AbstractAuxiliaryContractRule rule) {
             this.application = application;
             this.termLabelState = termLabelState;
             this.instantiation = instantiation;
@@ -1266,13 +1114,12 @@ public final class AuxiliaryContractBuilders {
         /**
          * Adds information flow properties to the specified goal.
          *
-         * @param goal
-         *            a goal.
+         * @param goal a goal.
          */
         private static void addInfFlow(final Goal goal) {
             final boolean oldInfFlowCheckInfoValue
                     = goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null
-                            && goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
+                    && goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
             StrategyInfoUndoMethod undo = new StrategyInfoUndoMethod() {
                 @Override
                 public void undo(de.uka.ilkd.key.util.properties.Properties strategyInfos) {
@@ -1284,93 +1131,64 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param services
-         *            services.
+         * @param services services.
          * @return additional program variables necessary for loop contract rules.
          */
         private static ProgramVariable[] createLoopVariables(final Services services) {
             ProgramVariable conditionVariable
                     = AbstractAuxiliaryContractRule.createLocalVariable("cond",
-                            services.getJavaInfo().getKeYJavaType("boolean"), services);
+                    services.getJavaInfo().getKeYJavaType("boolean"), services);
 
             ProgramVariable brokeLoopVariable
                     = AbstractAuxiliaryContractRule.createLocalVariable("brokeLoop",
-                            services.getJavaInfo().getKeYJavaType("boolean"), services);
+                    services.getJavaInfo().getKeYJavaType("boolean"), services);
 
             ProgramVariable continuedLoopVariable
                     = AbstractAuxiliaryContractRule.createLocalVariable("continuedLoop",
-                            services.getJavaInfo().getKeYJavaType("boolean"), services);
-            final ProgramVariable[] loopVariables = new ProgramVariable[] { conditionVariable,
-                brokeLoopVariable, continuedLoopVariable };
+                    services.getJavaInfo().getKeYJavaType("boolean"), services);
+            final ProgramVariable[] loopVariables = new ProgramVariable[]{conditionVariable,
+                    brokeLoopVariable, continuedLoopVariable};
             return loopVariables;
         }
 
         /**
-         *
-         * @param goal
-         *            the current goal
-         * @param contract
-         *            a loop contract.
-         * @param unfold
-         *            the evaluation of the loop guard.
-         * @param body
-         *            the loop body.
-         * @param tail
-         *            all statements in the block after the loop.
-         * @param modality
-         *            the contract's modality.
-         * @param bodyBreakFound
-         *            whether or not the body contains a break statement.
-         * @param context
-         *            the context update.
-         * @param remember
-         *            the remembrance update.
-         * @param rememberNext
-         *            the remembracne update for the next loop iteration.
-         * @param decreasesCheck
-         *            the decreases check.
-         * @param anonOut
-         *            the anonOut update.
-         * @param anonOut2
-         *            a copy of the anonOut update.
-         * @param post
-         *            the current loop iteration's postconditon.
-         * @param postNext
-         *            the next loop iteration's postconditon.
-         * @param postAfterTail
-         *            the formula {@code [[tail]] -> post} where {@code [[]]} the contract's
-         *            modality.
-         * @param pre
-         *            the contract's precondition.
-         * @param brokeLoop
-         *            the formula {@code brokeLoop = true}
-         * @param notBrokeLoop
-         *            the formula {@code not brokeLoop = true}
-         * @param exceptionEqNull
-         *            the formula {@code exception = null}
-         * @param exceptionNeqNull
-         *            the formula {@code not exception = null}
-         * @param cond
-         *            the formula {@code cond = true}
-         * @param notCond
-         *            the formula {@code not cond = true}
-         * @param abrupt
-         *            the formula for abrupt termination.
-         * @param notAbrupt
-         *            the negation of the formula for abrupt termination.
-         * @param tb
-         *            a term builder.
+         * @param goal             the current goal
+         * @param contract         a loop contract.
+         * @param unfold           the evaluation of the loop guard.
+         * @param body             the loop body.
+         * @param tail             all statements in the block after the loop.
+         * @param modality         the contract's modality.
+         * @param bodyBreakFound   whether or not the body contains a break statement.
+         * @param context          the context update.
+         * @param remember         the remembrance update.
+         * @param rememberNext     the remembracne update for the next loop iteration.
+         * @param decreasesCheck   the decreases check.
+         * @param anonOut          the anonOut update.
+         * @param anonOut2         a copy of the anonOut update.
+         * @param post             the current loop iteration's postconditon.
+         * @param postNext         the next loop iteration's postconditon.
+         * @param postAfterTail    the formula {@code [[tail]] -> post} where {@code [[]]} the contract's
+         *                         modality.
+         * @param pre              the contract's precondition.
+         * @param brokeLoop        the formula {@code brokeLoop = true}
+         * @param notBrokeLoop     the formula {@code not brokeLoop = true}
+         * @param exceptionEqNull  the formula {@code exception = null}
+         * @param exceptionNeqNull the formula {@code not exception = null}
+         * @param cond             the formula {@code cond = true}
+         * @param notCond          the formula {@code not cond = true}
+         * @param abrupt           the formula for abrupt termination.
+         * @param notAbrupt        the negation of the formula for abrupt termination.
+         * @param tb               a term builder.
          * @return the sequent for the validity branch in a loop contract rule.
          */
         private static Term buildLoopValiditySequent(final Goal goal,
-                final LoopContract contract, JavaBlock unfold,
-                JavaBlock body, JavaBlock tail, final Modality modality, boolean bodyBreakFound,
-                final Term context, final Term remember, final Term rememberNext,
-                final Term decreasesCheck, Term anonOut, Term anonOut2, Term post, Term postNext,
-                Term postAfterTail, Term pre, Term brokeLoop, Term notBrokeLoop,
-                Term exceptionEqNull, Term exceptionNeqNull, Term cond, Term notCond, Term abrupt,
-                Term notAbrupt, final TermBuilder tb) {
+                                                     final LoopContract contract, JavaBlock unfold,
+                                                     JavaBlock body, JavaBlock tail, final Modality modality, boolean bodyBreakFound,
+                                                     final Term context, final Term remember, final Term rememberNext,
+                                                     final Term decreasesCheck, Term anonOut, Term anonOut2, Term post, Term postNext,
+                                                     Term postAfterTail, Term pre, Term brokeLoop, Term notBrokeLoop,
+                                                     Term exceptionEqNull, Term exceptionNeqNull, Term cond, Term notCond, Term abrupt,
+                                                     Term notAbrupt, final TermBuilder tb) {
             Term update;
             if (goal == null) {
                 // We are building a proof obligation for a loop contract.
@@ -1412,9 +1230,9 @@ public final class AuxiliaryContractBuilders {
         }
 
         private static Term buildSimplifiedPostBody(boolean bodyBreakFound, final Term rememberNext,
-                final Term decreasesCheck, Term anonOut, Term post, Term postNext, Term pre,
-                Term brokeLoop, Term notBrokeLoop, Term abrupt, Term notAbrupt,
-                final TermBuilder tb) {
+                                                    final Term decreasesCheck, Term anonOut, Term post, Term postNext, Term pre,
+                                                    Term brokeLoop, Term notBrokeLoop, Term abrupt, Term notAbrupt,
+                                                    final TermBuilder tb) {
             final Term postBody;
             if (bodyBreakFound) {
                 postBody = tb.and(tb.imp(tb.or(brokeLoop, abrupt), post),
@@ -1429,10 +1247,10 @@ public final class AuxiliaryContractBuilders {
         }
 
         private static Term buildFullPostBody(boolean bodyBreakFound, JavaBlock tail,
-                final Modality modality, final Term rememberNext, final Term decreasesCheck,
-                Term anonOut, Term post, Term postNext, Term postAfterTail, Term pre,
-                Term brokeLoop, Term notBrokeLoop, Term abrupt, Term notAbrupt,
-                final TermBuilder tb) {
+                                              final Modality modality, final Term rememberNext, final Term decreasesCheck,
+                                              Term anonOut, Term post, Term postNext, Term postAfterTail, Term pre,
+                                              Term brokeLoop, Term notBrokeLoop, Term abrupt, Term notAbrupt,
+                                              final TermBuilder tb) {
             final Term postBody;
             if (bodyBreakFound) {
                 postBody = tb.and(tb.imp(brokeLoop, postAfterTail), tb.imp(abrupt, post), tb.imp(
@@ -1450,7 +1268,7 @@ public final class AuxiliaryContractBuilders {
         }
 
         private static Term createAbruptTerms(final AuxiliaryContract.Terms terms,
-                Term exceptionNeqNull, final TermBuilder tb) {
+                                              Term exceptionNeqNull, final TermBuilder tb) {
             Set<Term> abruptTerms = new LinkedHashSet<>();
             abruptTerms.add(exceptionNeqNull);
             if (terms.returnFlag != null) {
@@ -1466,26 +1284,18 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param goal
-         *            If this is not {@code null}, the returned formula is added to this goal.
-         * @param contract
-         *            the contract being applied.
-         * @param update
-         *            the update.
-         * @param anonUpdate
-         *            the anonymization update.
-         * @param heap
-         *            the heap.
-         * @param anonHeap
-         *            the anonymization heap.
-         * @param localIns
-         *            all free local variables in the block.
+         * @param goal       If this is not {@code null}, the returned formula is added to this goal.
+         * @param contract   the contract being applied.
+         * @param update     the update.
+         * @param anonUpdate the anonymization update.
+         * @param heap       the heap.
+         * @param anonHeap   the anonymization heap.
+         * @param localIns   all free local variables in the block.
          * @return the well-definedness formula.
          */
         public Term setUpWdGoal(final Goal goal, final BlockContract contract, final Term update,
-                final Term anonUpdate, final LocationVariable heap, final Function anonHeap,
-                final ImmutableSet<ProgramVariable> localIns) {
+                                final Term anonUpdate, final LocationVariable heap, final Function anonHeap,
+                                final ImmutableSet<ProgramVariable> localIns) {
             // FIXME: Handling of \old-references needs to be investigated,
             // however only completeness is lost, soundness is guaranteed
             final BlockWellDefinedness bwd
@@ -1495,7 +1305,7 @@ public final class AuxiliaryContractBuilders {
             final Term anon = anonHeap != null ? services.getTermBuilder().func(anonHeap) : null;
             final SequentFormula wdBlock
                     = bwd.generateSequent(variables.self, variables.exception, variables.result,
-                            heap, heapAtPre, anon, localIns, update, anonUpdate, services);
+                    heap, heapAtPre, anon, localIns, update, anonUpdate, services);
 
             if (goal != null) {
                 goal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
@@ -1506,25 +1316,18 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param goal
-         *            If this is not {@code null}, the returned term is added to this goal.
-         * @param updates
-         *            the updates.
-         * @param assumptions
-         *            the preconditions.
-         * @param postconditions
-         *            the postconditions.
-         * @param exceptionParameter
-         *            the exception variable.
-         * @param terms
-         *            the termified variables.
+         * @param goal               If this is not {@code null}, the returned term is added to this goal.
+         * @param updates            the updates.
+         * @param assumptions        the preconditions.
+         * @param postconditions     the postconditions.
+         * @param exceptionParameter the exception variable.
+         * @param terms              the termified variables.
          * @return the term for the validity goal.
          */
         public Term setUpValidityGoal(final Goal goal, final Term[] updates,
-                final Term[] assumptions, final Term[] postconditions,
-                final ProgramVariable exceptionParameter,
-                final AuxiliaryContract.Terms terms) {
+                                      final Term[] assumptions, final Term[] postconditions,
+                                      final ProgramVariable exceptionParameter,
+                                      final AuxiliaryContract.Terms terms) {
             final TermBuilder tb = services.getTermBuilder();
             JavaBlock newJavaBlock = getJavaBlock(exceptionParameter);
             Term newPost = tb.and(postconditions);
@@ -1568,52 +1371,37 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param goal
-         *            If this is not {@code null}, the returned term is added to this goal.
-         * @param contract
-         *            the contract being applied.
-         * @param context
-         *            the context update.
-         * @param remember
-         *            the remembrance update for the current loop iteration.
-         * @param rememberNext
-         *            the remembrance update for the next loop iteration.
-         * @param anonOutHeaps
-         *            the heaps used in the anonOut update.
-         * @param modifiesClauses
-         *            the modified clauses.
-         * @param assumptions
-         *            the assumptions.
-         * @param decreasesCheck
-         *            the decreases check.
-         * @param postconditions
-         *            the current loop iteration's postconditions.
-         * @param postconditionsNext
-         *            the next loop iteration's postconditions.
-         * @param exceptionParameter
-         *            the exception variable.
-         * @param terms
-         *            the termified variables.
-         * @param nextVars
-         *            the variables for the next loop iteration.
+         * @param goal               If this is not {@code null}, the returned term is added to this goal.
+         * @param contract           the contract being applied.
+         * @param context            the context update.
+         * @param remember           the remembrance update for the current loop iteration.
+         * @param rememberNext       the remembrance update for the next loop iteration.
+         * @param anonOutHeaps       the heaps used in the anonOut update.
+         * @param modifiesClauses    the modified clauses.
+         * @param assumptions        the assumptions.
+         * @param decreasesCheck     the decreases check.
+         * @param postconditions     the current loop iteration's postconditions.
+         * @param postconditionsNext the next loop iteration's postconditions.
+         * @param exceptionParameter the exception variable.
+         * @param terms              the termified variables.
+         * @param nextVars           the variables for the next loop iteration.
          * @return the term for the validity goal in a loop contract rule app.
          */
         public Term setUpLoopValidityGoal(final Goal goal, final LoopContract contract,
-                final Term context, final Term remember, final Term rememberNext,
-                final Map<LocationVariable, Function> anonOutHeaps,
-                final Map<LocationVariable, Term> modifiesClauses, final Term[] assumptions,
-                final Term decreasesCheck, final Term[] postconditions,
-                final Term[] postconditionsNext, final ProgramVariable exceptionParameter,
-                final AuxiliaryContract.Terms terms,
-                final AuxiliaryContract.Variables nextVars) {
+                                          final Term context, final Term remember, final Term rememberNext,
+                                          final Map<LocationVariable, Function> anonOutHeaps,
+                                          final Map<LocationVariable, Term> modifiesClauses, final Term[] assumptions,
+                                          final Term decreasesCheck, final Term[] postconditions,
+                                          final Term[] postconditionsNext, final ProgramVariable exceptionParameter,
+                                          final AuxiliaryContract.Terms terms,
+                                          final AuxiliaryContract.Variables nextVars) {
             final TermBuilder tb = services.getTermBuilder();
             final Modality modality = instantiation.modality;
 
             final ProgramVariable[] loopVariables = createLoopVariables(services);
             OuterBreakContinueAndReturnCollector collector
                     = new OuterBreakContinueAndReturnCollector(contract.getBody(),
-                            new LinkedList<>(), services);
+                    new LinkedList<>(), services);
 
             List<Break> bodyBreaks = collector.getBreaks();
             List<Continue> bodyContinues = collector.getContinues();
@@ -1682,15 +1470,12 @@ public final class AuxiliaryContractBuilders {
         /**
          * Sets up the precondition goal.
          *
-         * @param goal
-         *            the precondition goal.
-         * @param update
-         *            the update.
-         * @param preconditions
-         *            the preconditions.
+         * @param goal          the precondition goal.
+         * @param update        the update.
+         * @param preconditions the preconditions.
          */
         public void setUpPreconditionGoal(final Goal goal, final Term update,
-                final Term[] preconditions) {
+                                          final Term[] preconditions) {
             final TermBuilder tb = services.getTermBuilder();
             goal.setBranchLabel("Precondition");
             Term fullPrecondition = tb.apply(update, tb.and(preconditions), null);
@@ -1705,15 +1490,12 @@ public final class AuxiliaryContractBuilders {
         /**
          * Sets up the usage goal.
          *
-         * @param goal
-         *            the usage goal.
-         * @param updates
-         *            the updates.
-         * @param assumptions
-         *            the preconditions.
+         * @param goal        the usage goal.
+         * @param updates     the updates.
+         * @param assumptions the preconditions.
          */
         public void setUpUsageGoal(final Goal goal, final Term[] updates,
-                final Term[] assumptions) {
+                                   final Term[] assumptions) {
             final TermBuilder tb = services.getTermBuilder();
             goal.setBranchLabel("Usage");
             Term uAssumptions = tb.applySequential(updates, tb.and(assumptions));
@@ -1726,11 +1508,9 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param block
-         *            a block.
+         * @param block a block.
          * @return the block wrapped in a method frame if one is available, otherwise the block
-         *         itself.
+         * itself.
          */
         private Statement wrapInMethodFrameIfContextIsAvailable(final StatementBlock block) {
             if (instantiation.context == null) {
@@ -1740,27 +1520,21 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
-         *
-         * @param contract
-         *            the contract being applied.
-         * @param conditionVariable
-         *            the variable used to store the loop guard's value.
-         * @param exceptionParameter
-         *            the exception variable.
-         * @param breakFlags
-         *            the break flags.
-         * @param continueFlags
-         *            the continue flags.
+         * @param contract           the contract being applied.
+         * @param conditionVariable  the variable used to store the loop guard's value.
+         * @param exceptionParameter the exception variable.
+         * @param breakFlags         the break flags.
+         * @param continueFlags      the continue flags.
          * @return Java blocks for every program fragment.
          */
         private JavaBlock[] createJavaBlocks(final LoopContract contract,
-                ProgramVariable conditionVariable, final ProgramVariable exceptionParameter,
-                Map<Label, ProgramVariable> breakFlags, Map<Label, ProgramVariable> continueFlags) {
+                                             ProgramVariable conditionVariable, final ProgramVariable exceptionParameter,
+                                             Map<Label, ProgramVariable> breakFlags, Map<Label, ProgramVariable> continueFlags) {
             AuxiliaryContract.Variables bodyVariables
                     = new Variables(variables.self, breakFlags, continueFlags, variables.returnFlag,
-                            variables.result, variables.exception, variables.remembranceHeaps,
-                            variables.remembranceLocalVariables, variables.outerRemembranceHeaps,
-                            variables.outerRemembranceVariables, services);
+                    variables.result, variables.exception, variables.remembranceHeaps,
+                    variables.remembranceLocalVariables, variables.outerRemembranceHeaps,
+                    variables.outerRemembranceVariables, services);
 
             JavaBlock unfold = JavaBlock.createJavaBlock(new StatementBlock(
                     wrapInMethodFrameIfContextIsAvailable(new ValidityProgramConstructor(labels,
@@ -1772,22 +1546,21 @@ public final class AuxiliaryContractBuilders {
                     .createJavaBlock(new StatementBlock(wrapInMethodFrameIfContextIsAvailable(
                             new ValidityProgramConstructor(labels, contract.getBody(),
                                     bodyVariables, exceptionParameter, services, variables)
-                                            .construct())));
+                                    .construct())));
 
             JavaBlock tail = JavaBlock
                     .createJavaBlock(new StatementBlock(finishTransactionIfModalityIsTransactional(
                             wrapInMethodFrameIfContextIsAvailable(
                                     new ValidityProgramConstructor(labels, contract.getTail(),
                                             variables, exceptionParameter, services, variables)
-                                                    .construct()))));
-            return new JavaBlock[] { unfold, body, tail };
+                                            .construct()))));
+            return new JavaBlock[]{unfold, body, tail};
         }
 
-        private StatementBlock
-                finishTransactionIfModalityIsTransactional(final Statement statement) {
+        private StatementBlock finishTransactionIfModalityIsTransactional(final Statement statement) {
             if (instantiation.isTransactional()) {
-                return new StatementBlock(statement, new TransactionStatement(
-                        de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH));
+                return new StatementBlock(statement,
+                        new TransactionStatement(KeyTransactionStatement.TransactionType.FINISH));
             } else {
                 if (statement instanceof StatementBlock) {
                     return (StatementBlock) statement;
@@ -1810,7 +1583,7 @@ public final class AuxiliaryContractBuilders {
         }
 
         private JavaBlock replaceBlock(final JavaBlock java, final JavaStatement oldBlock,
-                final StatementBlock newBlock) {
+                                       final StatementBlock newBlock) {
             Statement newProgram = (Statement) new ProgramElementReplacer(java.program(), services)
                     .replace(oldBlock, newBlock);
             return JavaBlock.createJavaBlock(
@@ -1834,7 +1607,7 @@ public final class AuxiliaryContractBuilders {
             }
             ifCascade.add(KeYJavaASTFactory.ifThen(
                     new NotEquals(new ExtList(
-                            new Expression[] { variables.exception, NullLiteral.NULL })),
+                            new Expression[]{variables.exception, NullLiteral.NULL})),
                     KeYJavaASTFactory.throwClause(variables.exception)));
             return new StatementBlock(ifCascade.toArray(new Statement[ifCascade.size()]));
         }
@@ -1858,7 +1631,7 @@ public final class AuxiliaryContractBuilders {
         }
 
         private final Map<Label, ProgramVariable> collectContinueFlags(final LoopContract contract,
-                ProgramVariable continuedLoopVariable, List<Continue> bodyContinues) {
+                                                                       ProgramVariable continuedLoopVariable, List<Continue> bodyContinues) {
             Map<Label, ProgramVariable> continueFlags
                     = new LinkedHashMap<>(variables.continueFlags);
             continueFlags.remove(null);
@@ -1872,8 +1645,8 @@ public final class AuxiliaryContractBuilders {
         }
 
         private Term[] createPosts(final Goal goal, final Term[] postconditions,
-                final Term[] postconditionsNext, final AuxiliaryContract.Terms terms,
-                final TermBuilder tb) {
+                                   final Term[] postconditionsNext, final AuxiliaryContract.Terms terms,
+                                   final TermBuilder tb) {
             Term post = tb.and(postconditions);
             post = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services, post,
                     ImmutableSLList.<LocationVariable>nil()
@@ -1889,7 +1662,7 @@ public final class AuxiliaryContractBuilders {
                     terms.exception);
             postNext = TermLabelManager.refactorTerm(termLabelState, services, null, postNext, rule,
                     goal, AbstractAuxiliaryContractRule.NEW_POSTCONDITION_TERM_HINT, null);
-            final Term[] posts = new Term[] { post, postNext };
+            final Term[] posts = new Term[]{post, postNext};
             return posts;
         }
     }

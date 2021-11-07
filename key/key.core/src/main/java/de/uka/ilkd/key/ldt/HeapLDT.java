@@ -22,7 +22,7 @@ import de.uka.ilkd.key.java.ast.Expression;
 import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.FieldReference;

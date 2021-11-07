@@ -18,8 +18,11 @@
 package de.uka.ilkd.key.java.api;
 
 import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.DataKey;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.resolution.SymbolResolver;
@@ -31,11 +34,38 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
 
+/**
+ * Provides RAW interface to the {@link JavaParser} classes.
+ *
+ * @author weigl
+ */
 public class JavaService {
-    private ParserConfiguration parserConfiguration = createParserConfiguration();
-    private SymbolResolver symbolResolver = createSymbolResolver();
     private JavaMode mode = JavaMode.KEY;
+    private ParserConfiguration parserConfiguration;
+    private TypeSolver typeResolver;
+    private SymbolResolver symbolResolver;
+
+    public JavaService() {
+        this(true, Collections.emptyList());
+    }
+
+    public JavaService(boolean useReflection, List<File> classPath) {
+        parserConfiguration = createParserConfiguration();
+        typeResolver = createTypeResolver(useReflection, classPath);
+        symbolResolver = createSymbolResolver();
+    }
+
+    public TypeSolver getTypeSolver() {
+        return typeResolver;
+    }
+
+    public JavaSymbolSolver createSymbolSolver() {
+        return new JavaSymbolSolver(typeResolver);
+    }
+
 
     public static class KeyNodeMetadata {
         NodeList<Comment> attachedComments = new NodeList<>();
@@ -44,6 +74,69 @@ public class JavaService {
     public static final DataKey<KeyNodeMetadata> KEY_NODE_METADATA_DATA_KEY = new DataKey<>() {
     };
 
+    protected ParserConfiguration createParserConfiguration() {
+        var p = new ParserConfiguration();
+        p.setAttributeComments(true);
+        p.setCharacterEncoding(StandardCharsets.UTF_8);
+        p.setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17);
+        p.setLexicalPreservationEnabled(true);
+        p.setIgnoreAnnotationsWhenAttributingComments(true);
+        p.setSymbolResolver(createSymbolResolver());
+        return p;
+    }
+
+    public SymbolResolver getSymbolResolver() {
+        return symbolResolver;
+    }
+
+    private SymbolResolver createSymbolResolver() {
+        return new JavaSymbolSolver(typeResolver);
+    }
+
+    protected TypeSolver createTypeResolver(boolean useReflection, List<File> classPath) {
+        final ReflectionTypeSolver standardLibraryTypeSolver = new ReflectionTypeSolver();
+
+        final CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver();
+        if (useReflection) {
+            combinedTypeSolver.add(standardLibraryTypeSolver);
+        }
+        for (File file : classPath) {
+            final JavaParserTypeSolver processedProjectTypeSolver = new JavaParserTypeSolver(file);
+            combinedTypeSolver.add(processedProjectTypeSolver);
+        }
+        return combinedTypeSolver;
+    }
+
+    protected TypeSolver createTypeResolver(File sourceDirectory) {
+        return createTypeResolver(true, List.of(sourceDirectory));
+    }
+
+    /**
+     * @return
+     */
+    public JavaParser createJavaParser() {
+        JavaParser jp = new JavaParser(parserConfiguration);
+        return jp;
+    }
+
+    /**
+     * @param unit
+     */
+    public void injectSymbolResolver(CompilationUnit unit) {
+        injectSymbolResolver(unit, symbolResolver);
+    }
+
+    public static void injectSymbolResolver(CompilationUnit unit, SymbolResolver symbolResolver) {
+        unit.setData(Node.SYMBOL_RESOLVER_KEY, symbolResolver);
+    }
+}
+
+class CommentAttacher implements ParseResult.PostProcessor {
+
+    @Override
+    public void process(ParseResult<? extends Node> result, ParserConfiguration configuration) {
+
+    }
 
     /*
     // attaches a single comment to a Node
@@ -90,6 +183,7 @@ public class JavaService {
         data.attachedComments.add(c);
     }
 */
+
     /*
     // appends all comments with pos < endPos to the end of the last a block
     private static int appendComments(Node last,
@@ -246,34 +340,4 @@ public class JavaService {
         }
     }
     */
-    protected ParserConfiguration createParserConfiguration() {
-        var p = new ParserConfiguration();
-        p.setAttributeComments(true);
-        p.setCharacterEncoding(StandardCharsets.UTF_8);
-        p.setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17);
-        p.setLexicalPreservationEnabled(true);
-        p.setIgnoreAnnotationsWhenAttributingComments(true);
-        p.setSymbolResolver(createSymbolResolver());
-        return p;
-    }
-
-    private SymbolResolver createSymbolResolver() {
-        return new JavaSymbolSolver(createTypeResolver(new File("."))); //TODO weigl
-    }
-
-    private TypeSolver createTypeResolver(File sourceDirectory) {
-        final ReflectionTypeSolver standardLibraryTypeSolver = new ReflectionTypeSolver();
-        final JavaParserTypeSolver processedProjectTypeSolver = new JavaParserTypeSolver(sourceDirectory);
-
-        final CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver(
-                standardLibraryTypeSolver,
-                processedProjectTypeSolver
-        );
-        return combinedTypeSolver;
-    }
-
-    public JavaParser createJavaParser() {
-        JavaParser jp = new JavaParser(parserConfiguration);
-        return jp;
-    }
 }

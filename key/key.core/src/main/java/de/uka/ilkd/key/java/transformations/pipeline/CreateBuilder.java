@@ -89,7 +89,7 @@ public class CreateBuilder extends JavaTransformer {
      *
      * @param td the TypeDeclaration
      */
-    protected void apply(TypeDeclaration<?> td) {
+    public void apply(TypeDeclaration<?> td) {
         td.addMember(createMethod(td));
     }
 

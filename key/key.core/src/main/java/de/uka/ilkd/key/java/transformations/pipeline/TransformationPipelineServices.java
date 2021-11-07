@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.transformations.pipeline;
 
-import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
@@ -17,7 +16,7 @@ import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.model.resolution.SymbolReference;
-import com.github.javaparser.symbolsolver.resolution.SymbolSolver;
+import de.uka.ilkd.key.java.api.JavaService;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.util.Debug;
@@ -35,23 +34,11 @@ public class TransformationPipelineServices {
     private final TransformerCache cache;
 
     @Nonnull
-    private final SymbolSolver resolver;
+    private final JavaService javaService;
 
-    @Nonnull
-    private final JavaParser parser;
-
-    public TransformationPipelineServices(
-            @Nonnull JavaParser parser,
-            @Nonnull TransformerCache cache,
-            @Nonnull SymbolSolver resolver) {
+    public TransformationPipelineServices(@Nonnull JavaService javaService, @Nonnull TransformerCache cache) {
         this.cache = cache;
-        this.resolver = resolver;
-        this.parser = parser;
-    }
-
-    @Nonnull
-    public SymbolSolver getResolver() {
-        return resolver;
+        this.javaService = javaService;
     }
 
     @Nonnull
@@ -60,7 +47,7 @@ public class TransformationPipelineServices {
     }
 
     public ConstantExpressionEvaluator getConstantEvaluator() {
-        return new ConstantExpressionEvaluator(javaParser);
+        return new ConstantExpressionEvaluator(javaService.createJavaParser());
     }
 
 
@@ -179,7 +166,7 @@ public class TransformationPipelineServices {
     }
 
     public ResolvedTypeDeclaration getJavaLangObject() {
-        return resolver.solveType(getType("java", "lang", "Object"));
+        return javaService.getTypeSolver().getSolvedJavaLangObject();
     }
 
     public Type getType(ResolvedType type) {
@@ -197,10 +184,6 @@ public class TransformationPipelineServices {
         }
 
         return null;
-    }
-
-    public JavaParser getParser() {
-        return parser;
     }
 
     public List<SymbolReference<? extends ResolvedValueDeclaration>> getUsages(ResolvedFieldDeclaration v, Node node) {
@@ -339,11 +322,11 @@ public class TransformationPipelineServices {
      *
      * @author MU
      */
-    public class TransformerCache {
+    public static class TransformerCache {
         private final NodeList<CompilationUnit> cUnits = new NodeList<>();
         private Set<TypeDeclaration<?>> classDeclarations;
-        private HashMap<ReferenceType, List<Name>> localClass2FinalVar;
-        private HashMap<TypeDeclaration, List<ReferenceType>> typeDeclaration2allSupertypes;
+        //private HashMap<ReferenceType, List<Name>> localClass2FinalVar;
+        //private HashMap<TypeDeclaration, List<ReferenceType>> typeDeclaration2allSupertypes;
 
         public TransformerCache(List<CompilationUnit> cUnits) {
             this.cUnits.addAll(cUnits);

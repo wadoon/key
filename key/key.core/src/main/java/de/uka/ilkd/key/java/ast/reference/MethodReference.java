@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.ast.reference;
 
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.Expression;

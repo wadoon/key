@@ -13,7 +13,9 @@
 
 package de.uka.ilkd.key.java.ast.reference;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.Expression;
 import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
@@ -26,8 +28,7 @@ import org.key_project.util.ExtList;
 
 
 public class VariableReference extends JavaNonTerminalProgramElement
-        implements NameReference, Expression,
-        ReferencePrefix {
+        implements NameReference, Expression, ReferencePrefix {
 
     protected final ProgramVariable variable;
 
@@ -129,8 +130,7 @@ public class VariableReference extends JavaNonTerminalProgramElement
      * @param ec       the execution context
      * @return the KeY java type
      */
-    public KeYJavaType getKeYJavaType(Services javaServ,
-                                      ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return getKeYJavaType();
     }
 

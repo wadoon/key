@@ -18,7 +18,7 @@ import org.key_project.util.ExtList;
 import de.uka.ilkd.key.java.ast.Expression;
 import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.Intersect;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.AllFields;

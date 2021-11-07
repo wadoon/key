@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.java.ast.statement;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramPrefixUtil;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;

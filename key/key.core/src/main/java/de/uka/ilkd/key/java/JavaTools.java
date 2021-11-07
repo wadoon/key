@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.Statement;
@@ -60,8 +61,7 @@ public final class JavaTools {
     /**
      * Returns the passed java block without its active statement.
      */
-    public static JavaBlock removeActiveStatement(JavaBlock jb,
-                                                  Services services) {
+    public static JavaBlock removeActiveStatement(JavaBlock jb, Services services) {
         assert jb.program() != null;
         final SourceElement activeStatement = JavaTools.getActiveStatement(jb);
         Statement newProg = (Statement)

@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -31,7 +32,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
@@ -51,15 +51,12 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-import recoder.io.PathList;
-import recoder.io.ProjectSettings;
 
 import java.io.*;
 import java.util.*;
 
 
 public final class ProblemInitializer {
-
 
     private static InitConfig baseConfig;
     private final Services services;
@@ -246,12 +243,12 @@ public final class ProblemInitializer {
      * Helper for readEnvInput().
      */
     private void readJava(EnvInput envInput, InitConfig initConfig)
-                throws ProofInputException {
+            throws ProofInputException {
         //this method must only be called once per init config
         assert !initConfig.getServices()
-                          .getJavaInfo()
-                          .rec2key()
-                          .parsedSpecial();
+                .getJavaInfo()
+                .rec2key()
+                .parsedSpecial();
         assert initConfig.getServices().getJavaModel() == null;
 
         //read Java source and classpath settings
@@ -260,7 +257,7 @@ public final class ProblemInitializer {
         final List<File> classPath = envInput.readClassPath();
         final File bootClassPath;
         try {
-         bootClassPath = envInput.readBootClassPath();
+            bootClassPath = envInput.readBootClassPath();
         } catch (IOException ioe) {
             throw new ProofInputException(ioe);
         }
@@ -276,32 +273,32 @@ public final class ProblemInitializer {
 
         //create Recoder2KeY, set classpath
         final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(),
-                                           initConfig.namespaces());
+                initConfig.namespaces());
         //r2k.setFileRepository(envInput.getFileRepository()); xxx  // TODO:
         r2k.setClassPath(bootClassPath, classPath);
 
         //read Java (at least the library classes)
-        if(javaPath != null) {
+        if (javaPath != null) {
             reportStatus("Reading Java source");
             final ProjectSettings settings
-                =  initConfig.getServices()
-                             .getJavaInfo()
-                             .getKeYProgModelInfo()
-                             .getServConf()
-                             .getProjectSettings();
+                    = initConfig.getServices()
+                    .getJavaInfo()
+                    .getKeYProgModelInfo()
+                    .getServConf()
+                    .getProjectSettings();
             final PathList searchPathList = settings.getSearchPathList();
-            if(searchPathList.find(javaPath) == null) {
+            if (searchPathList.find(javaPath) == null) {
                 searchPathList.add(javaPath);
             }
-        Collection<String> var = getClasses(javaPath);
-            if(envInput.isIgnoreOtherJavaFiles()) {
+            Collection<String> var = getClasses(javaPath);
+            if (envInput.isIgnoreOtherJavaFiles()) {
                 String file = envInput.getJavaFile();
                 if (var.contains(file)) {
                     var = Collections.singletonList(file);
                 }
             }
             //support for single file loading
-        final String[] cus = var.toArray(new String[var.size()]);
+            final String[] cus = var.toArray(new String[var.size()]);
             try {
                 r2k.readCompilationUnitsAsFiles(cus, fileRepo);
             } catch (ParseExceptionInFile e) {
@@ -313,10 +310,10 @@ public final class ProblemInitializer {
         }
         File initialFile = envInput.getInitialFile();
         initConfig.getServices().setJavaModel(JavaModel.createJavaModel(javaPath,
-                                                                        classPath,
-                                                                        bootClassPath,
-                                                                        includes,
-                                                                        initialFile));
+                classPath,
+                bootClassPath,
+                includes,
+                initialFile));
     }
 
     /**
@@ -490,7 +487,7 @@ public final class ProblemInitializer {
                 baseConfig = currentBaseConfig;
             }
             InitConfig ic = prepare(envInput, currentBaseConfig);
-            if(Debug.ENABLE_DEBUG) print(ic);
+            if (Debug.ENABLE_DEBUG) print(ic);
             return ic;
         }
     }
@@ -630,7 +627,7 @@ public final class ProblemInitializer {
             //final work
             setUpProofHelper(po, pa);
 
-            if(Debug.ENABLE_DEBUG) print(pa.getFirstProof());
+            if (Debug.ENABLE_DEBUG) print(pa.getFirstProof());
 
             //done
             proofCreated(pa);

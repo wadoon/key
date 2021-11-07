@@ -223,7 +223,7 @@ public class ConstructorNormalformBuilder extends JavaTransformer {
      *
      * @param td the TypeDeclaration
      */
-    protected void apply(TypeDeclaration<?> td) {
+    public void apply(TypeDeclaration<?> td) {
         if (td instanceof ClassOrInterfaceDeclaration) {
             var cd = (ClassOrInterfaceDeclaration) td;
             var constructors = td.getConstructors();

@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.java.ast.reference;
 
-import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Reference;
 import de.uka.ilkd.key.java.ast.visitor.Visitor;

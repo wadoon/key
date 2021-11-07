@@ -13,7 +13,9 @@
 
 package de.uka.ilkd.key.java.ast.statement;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramPrefixUtil;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
 import de.uka.ilkd.key.java.ast.visitor.Visitor;

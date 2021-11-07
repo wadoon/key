@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.ast;
 
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.IExecutionContext;
@@ -292,7 +293,7 @@ public class ContextStatementBlock extends StatementBlock {
         final int lastMatchedPos = newSource.getChildPos();
         final PosInProgram suffixStart = prefixEnd.up().down(lastMatchedPos);
 
-        /** add context block instantiation */
+        /* add context block instantiation */
         matchCond = matchCond.setInstantiations
                 (instantiations.replace(prefixEnd,
                         suffixStart,

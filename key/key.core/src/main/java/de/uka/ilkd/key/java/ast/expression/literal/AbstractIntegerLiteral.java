@@ -15,7 +15,6 @@ package de.uka.ilkd.key.java.ast.expression.literal;
 
 import de.uka.ilkd.key.java.ast.NameAbstractionTable;
 import de.uka.ilkd.key.java.ast.SourceElement;
-import de.uka.ilkd.key.java.ast.expression.Literal;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import org.key_project.util.ExtList;

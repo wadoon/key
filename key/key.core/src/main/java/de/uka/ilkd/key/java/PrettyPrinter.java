@@ -15,15 +15,19 @@ package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.declaration.modifier.Final;
 import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
 import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
 import de.uka.ilkd.key.java.ast.expression.Operator;
+import de.uka.ilkd.key.java.ast.expression.*;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqGet;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqLength;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.Range;
@@ -407,7 +411,7 @@ public class PrettyPrinter {
      *
      * @param slc the comment to delay.
      */
-    protected void scheduleComment(SingleLineComment slc) {
+    public void scheduleComment(SingleLineComment slc) {
     }
 
     /**
@@ -2745,8 +2749,7 @@ public class PrettyPrinter {
     }
 
 
-    protected void printMethodReference(MethodReference x,
-                                        boolean withSemicolon)
+    protected void printMethodReference(MethodReference x, boolean withSemicolon)
             throws java.io.IOException {
         printHeader(x);
         // Mark statement start ...

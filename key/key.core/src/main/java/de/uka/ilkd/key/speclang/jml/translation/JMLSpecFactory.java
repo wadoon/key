@@ -13,17 +13,19 @@
 
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
 import de.uka.ilkd.key.java.ast.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
 import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -75,7 +77,7 @@ public class JMLSpecFactory {
 
     public static final String AT_PRE = "AtPre";
     protected final de.uka.ilkd.key.logic.TermBuilder tb;
-    protected final de.uka.ilkd.key.java.Services services;
+    protected final de.uka.ilkd.key.Services services;
     protected final ContractFactory cf;
     private int invCounter;
     /**

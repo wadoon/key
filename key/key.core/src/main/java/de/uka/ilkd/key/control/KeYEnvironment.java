@@ -253,7 +253,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
       AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce, forceNewProfileOfNewProofs); 
       InitConfig initConfig = loader.getInitConfig();
 
-      return new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig, loader.getProof(), loader.getProofScript(), loader.getResult());
+      return new KeYEnvironment<>(ui, initConfig, loader.getProof(), loader.getProofScript(), loader.getResult());
    }
    
    public static KeYEnvironment<DefaultUserInterfaceControl> load(File keyFile) throws ProblemLoaderException {

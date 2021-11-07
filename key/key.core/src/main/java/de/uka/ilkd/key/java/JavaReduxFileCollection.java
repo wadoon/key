@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.recoderext.URLDataLocation;
 import de.uka.ilkd.key.java.translation.Recoder2KeY;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
@@ -59,7 +58,7 @@ public class JavaReduxFileCollection implements FileCollection {
      * This list stores all resources to be retrieved. It is fed by the
      * constructor.
      */
-    private final List<String> resources = new ArrayList<String>();
+    private final List<String> resources = new ArrayList<>();
 
     /**
      * Instantiates a new file collection.
@@ -165,7 +164,7 @@ public class JavaReduxFileCollection implements FileCollection {
             if (currentURL == null)
                 throw new NoSuchElementException("Location of " + current + " not found.");
 
-            return new URLDataLocation(currentURL);
+            return currentURL;
         }
 
         public String getCurrentName() throws NoSuchElementException {

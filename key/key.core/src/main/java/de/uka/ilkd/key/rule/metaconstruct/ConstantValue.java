@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.Services;
-import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;

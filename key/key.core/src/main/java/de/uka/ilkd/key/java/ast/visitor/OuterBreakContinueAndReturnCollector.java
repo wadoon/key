@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.ast.Label;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.statement.*;
 
 import java.util.LinkedList;
 import java.util.List;

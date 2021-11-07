@@ -14,8 +14,7 @@
 package de.uka.ilkd.key.java.ast;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ast.reference.PackageReference;
-import de.uka.ilkd.key.java.ast.reference.PackageReferenceContainer;
+import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.visitor.Visitor;
 import org.key_project.util.ExtList;
 
@@ -24,15 +23,12 @@ import org.key_project.util.ExtList;
  * taken from COMPOST and changed to achieve an immutable structure
  */
 
-public class PackageSpecification
-        extends JavaNonTerminalProgramElement
+public class PackageSpecification extends JavaNonTerminalProgramElement
         implements PackageReferenceContainer {
-
 
     /**
      * Reference.
      */
-
     protected final PackageReference reference;
 
     /**

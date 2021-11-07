@@ -13,81 +13,60 @@
 
 package de.uka.ilkd.key.java.translation;
 
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
-import de.uka.ilkd.key.util.SpecDataLocation;
+import com.github.javaparser.resolution.SymbolResolver;
+import de.uka.ilkd.key.java.api.JavaService;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * this class stores recoder related contextinformation used to parse
  * in program parts in which non-declared variables are used
  */
 class Context {
-
+    public static final AtomicInteger CLASS_COUNTER = new AtomicInteger();
     public static final String PARSING_CONTEXT_CLASS_NAME = "$KeYSpecialParsing";
-    private final ClassOrInterfaceDeclaration type;
+    private final CompilationUnit unit;
 
     /**
      * creates a new context object
      */
-    public Context(TransformationPipelineServices servConf,
-                   ClassOrInterfaceDeclaration type) {
-        this.type = type;
+    public Context(CompilationUnit unit) {
+        this.unit = unit;
     }
 
-    /**
-     * creates a new context object
-     *
-     * @param compilationUnitContext a
-     *                               recoder.java.declaration.CompilationUnit
-     */
-    public Context(KeYTransformationPipelineServices servConf,
-                   recoder.java.CompilationUnit compilationUnitContext) {
-        this(servConf, compilationUnitContext, createClassDecl(servConf));
+    public static Context createDefault() {
+        CompilationUnit unit = new CompilationUnit();
+        var type = new ClassOrInterfaceDeclaration(null, false,
+                PARSING_CONTEXT_CLASS_NAME + CLASS_COUNTER.getAndIncrement());
+        type.addModifier(Modifier.Keyword.PUBLIC);
+        unit.addType(type);
+        return new Context(unit);
     }
 
-
-    /**
-     * creates a new context object
-     *
-     * @param classContext a recoder.java.declaration.ClassDeclaration
-     */
-    public Context(KeYTransformationPipelineServices servConf,
-                   ClassDeclaration classContext) {
-        this(servConf, createCompUnit(classContext), classContext);
+    public static Context createDefault(JavaService service) {
+        return createDefault(service.getSymbolResolver());
     }
 
-    private static recoder.java.CompilationUnit createCompUnit
-            (ClassDeclaration classContext) {
-        recoder.java.CompilationUnit cu = new recoder.java.CompilationUnit
-                (null, new ASTArrayList<recoder.java.Import>(0), inList(classContext));
-        cu.setDataLocation(new SpecDataLocation("INTERNAL", classContext.getFullName()));
-        return cu;
-    }
-
-
-    public static ASTList<TypeDeclaration> inList(TypeDeclaration td) {
-        ASTList<TypeDeclaration> tdml = new ASTArrayList<TypeDeclaration>();
-        tdml.add(td);
-        return tdml;
-    }
-
-    private static recoder.java.declaration.ClassDeclaration createClassDecl(KeYTransformationPipelineServices servConf) {
-        return servConf.getProgramFactory().createClassDeclaration
-                (null, new ImplicitIdentifier(PARSING_CONTEXT_CLASS_NAME),
-                        null, null, null);
+    private static Context createDefault(SymbolResolver symbolResolver) {
+        var context = createDefault();
+        JavaService.injectSymbolResolver(context.getCompilationUnitContext(), symbolResolver);
+        return context;
     }
 
     /**
      * returns the compilation context
      */
-    public recoder.java.CompilationUnit getCompilationUnitContext() {
-        return compilationUnitContext;
+    public CompilationUnit getCompilationUnitContext() {
+        return unit;
     }
 
     /**
      * returns the compilation context
      */
-    public ClassDeclaration getClassContext() {
-        return classContext;
+    public ClassOrInterfaceDeclaration getClassContext() {
+        return (ClassOrInterfaceDeclaration) unit.getPrimaryType().get();
     }
 }

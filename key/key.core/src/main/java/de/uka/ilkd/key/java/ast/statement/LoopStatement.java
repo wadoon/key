@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.java.ast.statement;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ast.*;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;

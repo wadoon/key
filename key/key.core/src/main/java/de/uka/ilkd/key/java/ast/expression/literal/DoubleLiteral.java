@@ -19,7 +19,6 @@ import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.ast.expression.Literal;
 import de.uka.ilkd.key.java.ast.visitor.Visitor;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.logic.Name;

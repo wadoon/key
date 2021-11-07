@@ -13,14 +13,13 @@
 
 package de.uka.ilkd.key.java.translation;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.Modifier;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.recoderext.TypeSVWrapper;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
@@ -28,7 +27,6 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-import recoder.list.generic.ASTList;
 
 import java.util.List;
 

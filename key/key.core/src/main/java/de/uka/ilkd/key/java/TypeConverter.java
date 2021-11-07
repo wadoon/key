@@ -18,12 +18,14 @@ import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.ast.Expression;
 import de.uka.ilkd.key.java.ast.ProgramElement;
-import de.uka.ilkd.key.java.ast.expression.Literal;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.Singleton;
 import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
+import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.Name;
@@ -37,10 +39,11 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import recoder.service.ConstantEvaluator;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.lang.Integer.parseInt;
 
 public final class TypeConverter {
 
@@ -361,9 +364,6 @@ public final class TypeConverter {
         } else if (pe instanceof de.uka.ilkd.key.java.ast.expression.Operator) {
             return translateOperator
                     ((de.uka.ilkd.key.java.ast.expression.Operator) pe, ec);
-        } else if (pe instanceof recoder.abstraction.PrimitiveType) {
-            throw new IllegalArgumentException("TypeConverter could not handle"
-                    + " this primitive type");
         } else assert !(pe instanceof MetaClassReference) : "not supported";
         throw new IllegalArgumentException
                 ("TypeConverter: Unknown or not convertable ProgramElement " + pe +
@@ -724,8 +724,7 @@ public final class TypeConverter {
     }
 
 
-    public boolean isImplicitNarrowing
-            (Expression expr, PrimitiveType to) {
+    public boolean isImplicitNarrowing(Expression expr, PrimitiveType to) {
 
         int minValue, maxValue;
         if (to == PrimitiveType.JAVA_BYTE) {
@@ -741,18 +740,17 @@ public final class TypeConverter {
             return false;
         }
 
-        ConstantExpressionEvaluator cee =
-                services.getConstantExpressionEvaluator();
+        ConstantExpressionEvaluator cee = services.getConstantExpressionEvaluator();
+        try {
+            var literal = cee.evaluate(expr);
+            if (literal.isIntegerLiteralExpr()) {
+                int value = parseInt(literal.asIntegerLiteralExpr().getValue());
+                return (minValue <= value) && (value <= maxValue);
+            }
+        } catch (EvaluationException e) {
 
-        ConstantEvaluator.EvaluationResult res =
-                new ConstantEvaluator.EvaluationResult();
-
-        if (!cee.isCompileTimeConstant(expr, res) ||
-                res.getTypeCode() != ConstantEvaluator.INT_TYPE) {
-            return false;
         }
-        int value = res.getInt();
-        return (minValue <= value) && (value <= maxValue);
+        return false;
     }
 
 

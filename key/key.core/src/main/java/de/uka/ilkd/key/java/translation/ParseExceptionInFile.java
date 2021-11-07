@@ -16,7 +16,7 @@ import java.net.MalformedURLException;
  *
  * @author mulbrich
  */
-public class ParseExceptionInFile extends Exception implements HasLocation {
+public class ParseExceptionInFile extends RuntimeException implements HasLocation {
     private static final long serialVersionUID = -4228093987853508329L;
     private final String filename;
 

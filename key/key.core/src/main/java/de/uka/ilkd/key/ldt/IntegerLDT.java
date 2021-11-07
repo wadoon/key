@@ -19,7 +19,7 @@ import de.uka.ilkd.key.java.ast.Expression;
 import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.literal.AbstractIntegerLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;

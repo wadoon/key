@@ -18,7 +18,6 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.expression.Literal;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.ast.visitor.Visitor;
 import de.uka.ilkd.key.ldt.CharListLDT;

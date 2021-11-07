@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReferenceContainer;
 
 public class AnnotationUseSpecification extends Modifier implements TypeReferenceContainer {
 
+
     protected final TypeReference tr;
 
     public AnnotationUseSpecification(TypeReference tr) {

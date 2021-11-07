@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.ast.statement;
 
+import com.github.javaparser.ast.key.KeyTransactionStatement;
 import de.uka.ilkd.key.java.ast.NameAbstractionTable;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceData;
@@ -21,19 +22,14 @@ import de.uka.ilkd.key.java.ast.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 public class TransactionStatement extends JavaStatement {
-
-    public static final String[] names = {
-            "#beginJavaCardTransaction", "#commitJavaCardTransaction", "#finishJavaCardTransaction", "#abortJavaCardTransaction"
-    };
-
-    private final int type;
+    private final KeyTransactionStatement.TransactionType type;
 
     public TransactionStatement(int type) {
+        this(KeyTransactionStatement.TransactionType.values()[type]);
+    }
+
+    public TransactionStatement(KeyTransactionStatement.TransactionType type) {
         super();
-        if (type != de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.COMMIT
-                && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH && type != de.uka.ilkd.key.java.recoderext.TransactionStatement.ABORT) {
-            throw new IllegalArgumentException("Wrong transaction statement type " + type);
-        }
         this.type = type;
     }
 
@@ -61,7 +57,7 @@ public class TransactionStatement extends JavaStatement {
     }
 
     public String toString() {
-        return names[type - 1];
+        return type.symbol;
     }
 
     public boolean equals(Object o) {

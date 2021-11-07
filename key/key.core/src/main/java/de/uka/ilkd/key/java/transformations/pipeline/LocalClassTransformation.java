@@ -36,7 +36,7 @@ public class LocalClassTransformation extends JavaTransformer {
     }
 
     @Override
-    protected void apply(TypeDeclaration<?> td) {
+    public void apply(TypeDeclaration<?> td) {
         var outerVars = services.getFinalVariables(td);
         if (outerVars != null) {
             for (var v : outerVars) {

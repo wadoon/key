@@ -68,7 +68,7 @@ public abstract class JavaTransformer  {
      * descend in inner classes you have to implement the recursion by
      * yourself.
      */
-    protected abstract void apply(TypeDeclaration<?> td);
+    public abstract void apply(TypeDeclaration<?> td);
 
 
     /*

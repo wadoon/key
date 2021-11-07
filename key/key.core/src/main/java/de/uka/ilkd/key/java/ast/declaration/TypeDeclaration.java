@@ -13,12 +13,13 @@
 
 package de.uka.ilkd.key.java.ast.declaration;
 
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.ast.NamedProgramElement;
 import de.uka.ilkd.key.java.ast.ParentIsInterfaceDeclaration;
 import de.uka.ilkd.key.java.ast.SourceElement;
-import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import org.key_project.util.ExtList;

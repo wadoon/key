@@ -19,7 +19,6 @@ import java.net.URL;
 import java.util.NoSuchElementException;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import recoder.io.DataLocation;
 
 /**
  * This class encapsulates a collection of files which is arbitrarily organised.

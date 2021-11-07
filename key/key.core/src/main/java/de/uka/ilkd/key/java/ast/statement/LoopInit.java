@@ -17,7 +17,7 @@
 
 package de.uka.ilkd.key.java.ast.statement;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.visitor.Visitor;
 import org.key_project.util.ExtList;

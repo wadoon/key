@@ -13,9 +13,11 @@
 
 package de.uka.ilkd.key.java.ast.statement;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.Services;
+import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -122,8 +124,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
                                boolean useSpecification,
                                ProgramElement scope) {
         this.method = method;
-        this.bodySource =
-                new TypeRef(method.getContainerType());
+        this.bodySource = new TypeRef(method.getContainerType());
         this.resultVar = res;
         this.useSpecification = useSpecification;
 

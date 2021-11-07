@@ -108,7 +108,7 @@ public class CreateObjectBuilder extends JavaTransformer {
      *
      * @param td the TypeDeclaration
      */
-    protected void apply(TypeDeclaration<?> td) {
+    public void apply(TypeDeclaration<?> td) {
         if (td instanceof ClassOrInterfaceDeclaration) {
             createMethod((ClassOrInterfaceDeclaration) td);
         }

@@ -13,48 +13,42 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.ast.Expression;
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.ast.Label;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.Services;
-import de.uka.ilkd.key.java.ast.Statement;
-import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import org.key_project.util.ExtList;
 
 /**
  * This class is used to perform program transformations needed for the symbolic
  * execution of a switch-case statement.
  */
 public class SwitchToIf extends ProgramTransformer {
-
-    public static int labelCount = 0;
+    private static int labelCount = 0;
     private boolean noNewBreak = true;
 
     /**
      * creates a switch-to-if ProgramTransformer
      *
-     * @param _switch
-     *            the Statement contained by the meta construct
+     * @param switchStmt the Statement contained by the meta construct
      */
-    public SwitchToIf(SchemaVariable _switch) {
-        super("switch-to-if", (ProgramSV) _switch);
+    public SwitchToIf(SchemaVariable switchStmt) {
+        super("switch-to-if", (ProgramSV) switchStmt);
     }
 
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
-            SVInstantiations insts) {
+                                      SVInstantiations insts) {
         Switch sw = (Switch) pe;
         int i = 0;
         ExtList extL = new ExtList();
@@ -70,17 +64,17 @@ public class SwitchToIf extends ProgramTransformer {
         Statement[] ifs = new Statement[sw.getBranchCount()];
         final ExecutionContext ec = insts.getExecutionContext();
         ProgramVariable exV = KeYJavaASTFactory.localVariable(name,
-            sw.getExpression().getKeYJavaType(services, ec));
+                sw.getExpression().getKeYJavaType(services, ec));
         Statement s = KeYJavaASTFactory.declare(name,
-            sw.getExpression().getKeYJavaType(services, ec));
+                sw.getExpression().getKeYJavaType(services, ec));
         result = KeYJavaASTFactory.block(s,
-            KeYJavaASTFactory.assign(exV, sw.getExpression()));
+                KeYJavaASTFactory.assign(exV, sw.getExpression()));
 
         // mulbrich: Added additional null check for enum constants
         if (!(sw.getExpression().getKeYJavaType(services, ec)
                 .getJavaType() instanceof PrimitiveType)) {
             result = KeYJavaASTFactory.insertStatementInBlock(result,
-                mkIfNullCheck(services, exV));
+                    mkIfNullCheck(services, exV));
         }
 
         extL.add(exV);
@@ -89,8 +83,8 @@ public class SwitchToIf extends ProgramTransformer {
             if (sw.getBranchAt(i) instanceof Case) {
                 extL.add(((Case) sw.getBranchAt(i)).getExpression());
                 ifs[i] = KeYJavaASTFactory.ifThen(
-                    KeYJavaASTFactory.equalsOperator(extL),
-                    collectStatements(sw, i));
+                        KeYJavaASTFactory.equalsOperator(extL),
+                        collectStatements(sw, i));
                 extL.remove(((Case) sw.getBranchAt(i)).getExpression());
             } else {
                 for (int j = 0; j < sw.getBranchCount(); j++) {
@@ -98,8 +92,8 @@ public class SwitchToIf extends ProgramTransformer {
                         extL.add(((Case) sw.getBranchAt(j)).getExpression());
                         if (defCond != null) {
                             defCond = KeYJavaASTFactory.logicalAndOperator(
-                                defCond,
-                                KeYJavaASTFactory.notEqualsOperator(extL));
+                                    defCond,
+                                    KeYJavaASTFactory.notEqualsOperator(extL));
                         } else {
                             defCond = KeYJavaASTFactory.notEqualsOperator(extL);
                         }
@@ -107,16 +101,16 @@ public class SwitchToIf extends ProgramTransformer {
                     }
                 }
                 ifs[i] = KeYJavaASTFactory.ifThen(defCond,
-                    collectStatements(sw, i));
+                        collectStatements(sw, i));
             }
             i++;
         }
         result = KeYJavaASTFactory.insertStatementInBlock(result, ifs);
         if (noNewBreak) {
-            return new ProgramElement[] { result };
+            return new ProgramElement[]{result};
         } else {
-            return new ProgramElement[] { KeYJavaASTFactory.labeledStatement(l,
-                result, PositionInfo.UNDEFINED) };
+            return new ProgramElement[]{KeYJavaASTFactory.labeledStatement(l,
+                    result, PositionInfo.UNDEFINED)};
         }
     }
 
@@ -125,7 +119,7 @@ public class SwitchToIf extends ProgramTransformer {
      * <code>if(v == null) throw new NullPointerException();</code>
      *
      * @return an if-statement that performs a null check, wrapped in a
-     *         single-element array.
+     * single-element array.
      */
 
     private Statement[] mkIfNullCheck(Services services, ProgramVariable var) {
@@ -136,7 +130,7 @@ public class SwitchToIf extends ProgramTransformer {
 
         final Expression cnd = KeYJavaASTFactory.equalsNullOperator(var);
 
-        return new Statement[] { KeYJavaASTFactory.ifThen(cnd, t) };
+        return new Statement[]{KeYJavaASTFactory.ifThen(cnd, t)};
     }
 
     /**
@@ -167,7 +161,7 @@ public class SwitchToIf extends ProgramTransformer {
             }
             if (p instanceof Case) {
                 return KeYJavaASTFactory.caseBlock(((Case) p).getExpression(),
-                    s);
+                        s);
             }
             if (p instanceof Default) {
                 return KeYJavaASTFactory.defaultBlock(s);
@@ -188,15 +182,15 @@ public class SwitchToIf extends ProgramTransformer {
         }
         if (p instanceof If) {
             return KeYJavaASTFactory.ifElse(((If) p).getExpression(),
-                (Then) recChangeBreaks(((If) p).getThen(), b),
-                (Else) recChangeBreaks(((If) p).getElse(), b));
+                    (Then) recChangeBreaks(((If) p).getThen(), b),
+                    (Else) recChangeBreaks(((If) p).getElse(), b));
         }
         if (p instanceof StatementBlock) {
             Statement[] s = new Statement[((StatementBlock) p)
                     .getStatementCount()];
             for (int i = 0; i < ((StatementBlock) p).getStatementCount(); i++) {
                 s[i] = (Statement) recChangeBreaks(
-                    ((StatementBlock) p).getStatementAt(i), b);
+                        ((StatementBlock) p).getStatementAt(i), b);
             }
             return KeYJavaASTFactory.block(s);
         }
@@ -207,8 +201,8 @@ public class SwitchToIf extends ProgramTransformer {
                 branches[i] = (Branch) recChangeBreaks(((Try) p).getBranchAt(i), b);
             }
             return KeYJavaASTFactory.tryBlock(
-                (StatementBlock) recChangeBreaks(((Try) p).getBody(), b),
-                branches);
+                    (StatementBlock) recChangeBreaks(((Try) p).getBody(), b),
+                    branches);
         }
         return p;
     }
@@ -217,10 +211,8 @@ public class SwitchToIf extends ProgramTransformer {
      * Collects the Statements in a switch statement from branch
      * <code>count</code> downward.
      *
-     * @param s
-     *            the switch statement.
-     * @param count
-     *            the branch where the collecting of statements starts.
+     * @param s     the switch statement.
+     * @param count the branch where the collecting of statements starts.
      */
     private StatementBlock collectStatements(Switch s, int count) {
         int n = 0;

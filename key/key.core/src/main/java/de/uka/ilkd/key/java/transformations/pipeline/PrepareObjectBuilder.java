@@ -142,7 +142,7 @@ public class PrepareObjectBuilder extends JavaTransformer {
      *
      * @param td the TypeDeclaration
      */
-    protected void apply(TypeDeclaration<?> td) {
+    public void apply(TypeDeclaration<?> td) {
         if (td instanceof ClassOrInterfaceDeclaration) {
             td.addMember(createMethod(td));
             td.addMember(createMethodPrepareEnter(td));

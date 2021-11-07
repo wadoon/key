@@ -19,7 +19,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.util.ExtList;
-import recoder.java.declaration.EnumConstantDeclaration;
 
 import java.util.ArrayList;
 import java.util.List;

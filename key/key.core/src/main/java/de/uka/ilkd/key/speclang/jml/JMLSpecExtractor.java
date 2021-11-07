@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;

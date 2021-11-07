@@ -13,7 +13,9 @@
 
 package de.uka.ilkd.key.java.ast.statement;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.VariableScope;
 import de.uka.ilkd.key.java.ast.Expression;
 import de.uka.ilkd.key.java.ast.LoopInitializer;
 import de.uka.ilkd.key.java.ast.SourceElement;

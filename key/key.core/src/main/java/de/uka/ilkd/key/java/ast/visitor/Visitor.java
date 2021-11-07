@@ -14,13 +14,14 @@
 package de.uka.ilkd.key.java.ast.visitor;
 
 import de.uka.ilkd.key.java.ast.*;
-import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.expression.*;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
-import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.*;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;

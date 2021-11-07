@@ -14,14 +14,14 @@
 package de.uka.ilkd.key.java.ast;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.visitor.Visitor;
 import org.key_project.util.ExtList;
 
 /**
  * Import.
  */
-public class Import extends JavaNonTerminalProgramElement
-        implements TypeReferenceContainer, PackageReferenceContainer {
+public class Import extends JavaNonTerminalProgramElement implements TypeReferenceContainer, PackageReferenceContainer {
 
     /**
      * Multi import flag.

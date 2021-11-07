@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.java.recoderext.MergePointStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;

@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.java.ast.statement;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.VariableScope;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.ast.visitor.Visitor;

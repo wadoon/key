@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.nparser.builder;
 
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.literal.StringLiteral;
 import de.uka.ilkd.key.java.translation.Recoder2KeY;
 import de.uka.ilkd.key.java.translation.SchemaJavaReader;
-import de.uka.ilkd.key.java.translation.SchemaRecoder2KeY;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.*;

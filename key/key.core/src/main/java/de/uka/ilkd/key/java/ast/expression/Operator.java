@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.ast.expression;
 
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
@@ -233,11 +234,11 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * overriden from JavaProgramElement.
      */
     public String reuseSignature(Services services, ExecutionContext ec) {
-        return super.reuseSignature(services, ec) + "(" +
-                services.getTypeConverter().getKeYJavaType(this, ec).getName() + ")";
+        return String.format("%s(%s)",
+                super.reuseSignature(services, ec),
+                services.getTypeConverter().getKeYJavaType(this, ec).getName());
     }
 
-    public abstract KeYJavaType getKeYJavaType(Services javaServ,
-                                               ExecutionContext ec);
+    public abstract KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec);
 
 }

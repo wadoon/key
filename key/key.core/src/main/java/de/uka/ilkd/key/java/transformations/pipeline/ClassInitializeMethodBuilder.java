@@ -18,7 +18,7 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.ast.key.sv.KeyPassiveExpression;
+import com.github.javaparser.ast.key.KeyPassiveExpression;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.VoidType;
@@ -336,7 +336,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformer {
      *
      * @param td the TypeDeclaration
      */
-    protected void apply(TypeDeclaration<?> td) {
+    public void apply(TypeDeclaration<?> td) {
         td.addMember(createInitializeMethod(td));
     }
 }

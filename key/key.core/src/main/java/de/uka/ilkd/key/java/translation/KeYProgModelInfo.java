@@ -29,42 +29,22 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.Constructor;
-import recoder.java.CompilationUnit;
 
 import java.util.*;
 
 public class KeYProgModelInfo {
-    private final Services services;
     private TransformationPipelineServices sc = null;
-    private final KeYRecoderMapping mapping;
     private final TypeConverter typeConverter;
     private final HashMap<KeYJavaType, HashMap<String, IProgramMethod>> implicits = new LinkedHashMap<>();
     private KeYRecoderExcHandler exceptionHandler = null;
 
-    public KeYProgModelInfo(Services services, TypeConverter typeConverter,
-                            KeYRecoderExcHandler keh) {
-        this(services, new TransformationPipelineServices(keh),
-                new KeYRecoderMapping(), typeConverter);
+    public KeYProgModelInfo(TypeConverter typeConverter, KeYRecoderExcHandler keh) {
+        this(typeConverter);
         exceptionHandler = keh;
     }
 
-    KeYProgModelInfo(Services services, TransformationPipelineServices crsc,
-                     KeYRecoderMapping krm, TypeConverter typeConverter) {
-        this.services = services;
-        sc = crsc;
+    KeYProgModelInfo(TypeConverter typeConverter) {
         this.typeConverter = typeConverter;
-        this.mapping = krm;
-    }
-
-
-    public KeYRecoderMapping rec2key() {
-        return mapping;
-    }
-
-    public TransformationPipelineServices getServConf() {
-        return sc;
     }
 
     public KeYRecoderExcHandler getExceptionHandler() {
@@ -77,7 +57,6 @@ public class KeYProgModelInfo {
      *
      * @return a Set object containing the KeY-elements.
      */
-
     public Set<?> allElements() {
         return rec2key().elemsKeY();
     }
@@ -102,7 +81,6 @@ public class KeYProgModelInfo {
      *
      * @return the list of visible methods of this type and its supertypes.
      */
-
     public ImmutableList<Method> getAllMethods(KeYJavaType kjt) {
         List<recoder.abstraction.Method> rmethods = getAllRecoderMethods(kjt);
         ImmutableList<Method> result = ImmutableSLList.nil();
@@ -726,7 +704,7 @@ public class KeYProgModelInfo {
     }
 
     private Recoder2KeY createRecoder2KeY(NamespaceSet nss) {
-        return new Recoder2KeY(services, sc, rec2key(), nss, typeConverter);
+        return new Recoder2KeY(services, sc, rec2key(), nss, typeConverter, cp);
     }
 
     /**

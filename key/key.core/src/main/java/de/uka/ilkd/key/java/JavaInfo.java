@@ -24,7 +24,6 @@ import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.translation.KeYProgModelInfo;
-import de.uka.ilkd.key.java.translation.KeYRecoderMapping;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -48,21 +47,22 @@ import java.util.*;
  * services.
  */
 public final class JavaInfo {
-
-
     /**
      * the name of the class used as default execution context
      */
-    protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
-    protected static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
-    protected Services services;
+    public static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "$Default";
+    public static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "$defaultMethod";
+
+    private Services services;
+
     /**
      * as accessed very often caches:
      * KeYJavaType of
      * java.lang.Object, java.lang.Clonable, java.io.Serializable
      * in </em>in this order</em>
      */
-    protected KeYJavaType[] commonTypes = new KeYJavaType[3];
+    private KeYJavaType[] commonTypes = new KeYJavaType[3];
+
     /**
      * The default execution context is for the case of program statements on
      * the top level. It is equivalent to a static class belonging the default
@@ -72,9 +72,12 @@ public final class JavaInfo {
      * {@link de.uka.ilkd.key.java.ast.statement.MethodFrame}, which contains a
      * valid execution context.
      */
-    protected ExecutionContext defaultExecutionContext;
-    protected boolean commonTypesCacheValid;
+    private ExecutionContext defaultExecutionContext;
+
+    private boolean commonTypesCacheValid;
+
     private KeYProgModelInfo kpmi;
+
     /**
      * the type of null
      */
@@ -84,7 +87,7 @@ public final class JavaInfo {
     private HashMap<Type, KeYJavaType> type2KJTCache = null;
     private HashMap<String, KeYJavaType> name2KJTCache = null;
     private final LRUCache<Pair<KeYJavaType, KeYJavaType>, ImmutableList<KeYJavaType>> commonSubtypeCache
-            = new LRUCache<Pair<KeYJavaType, KeYJavaType>, ImmutableList<KeYJavaType>>(200);
+            = new LRUCache<>(200);
     private int nameCachedSize = 0;
     private int sortCachedSize = 0;
     /**
@@ -99,7 +102,7 @@ public final class JavaInfo {
      * caches the observer for {@code <inv>}
      */
     private ObserverFunction inv;
-    private final HashMap<KeYJavaType, ObserverFunction> staticInvs = new LinkedHashMap<KeYJavaType, ObserverFunction>();
+    private final HashMap<KeYJavaType, ObserverFunction> staticInvs = new LinkedHashMap<>();
 
 
     /**
@@ -155,14 +158,6 @@ public final class JavaInfo {
 
     void setKeYProgModelInfo(KeYProgModelInfo kpmi) {
         this.kpmi = kpmi;
-    }
-
-    /**
-     * convenience method that returns the Recoder-to-KeY mapping underlying
-     * the KeYProgModelInfo of this JavaInfo
-     */
-    public KeYRecoderMapping rec2key() {
-        return getKeYProgModelInfo().rec2key();
     }
 
     /**
@@ -232,7 +227,7 @@ public final class JavaInfo {
      */
     public KeYJavaType getTypeByName(String fullName) {
         fullName = translateArrayType(fullName);
-        if (name2KJTCache == null || kpmi.rec2key().size() > nameCachedSize) {
+        if (name2KJTCache == null) {
             buildNameCache();
         }
         return name2KJTCache.get(fullName);
@@ -242,8 +237,8 @@ public final class JavaInfo {
      * caches all known types using their qualified name as retrieval key
      */
     private void buildNameCache() {
-        nameCachedSize = kpmi.rec2key().size();
-        name2KJTCache = new LinkedHashMap<String, KeYJavaType>();
+        //nameCachedSize = kpmi.rec2key().size();
+        name2KJTCache = new LinkedHashMap<>();
         for (final Object o : kpmi.allElements()) {
             if (o != null && o instanceof KeYJavaType) {
                 final KeYJavaType oKJT = (KeYJavaType) o;
@@ -327,7 +322,7 @@ public final class JavaInfo {
      * program type model
      */
     public Set<KeYJavaType> getAllKeYJavaTypes() {
-        final Set<KeYJavaType> result = new LinkedHashSet<KeYJavaType>();
+        final Set<KeYJavaType> result = new LinkedHashSet<>();
         for (final Object o : kpmi.allElements()) {
             if (o instanceof KeYJavaType) {
                 result.add((KeYJavaType) o);
@@ -432,16 +427,16 @@ public final class JavaInfo {
     }
 
     private void updateSort2KJTCache() {
-        if (sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize) {
-            sortCachedSize = kpmi.rec2key().size();
-            sort2KJTCache = new HashMap<Sort, List<KeYJavaType>>();
+        if (sort2KJTCache == null /*|| kpmi.rec2key().size() > sortCachedSize*/) {
+            sortCachedSize = /*kpmi.rec2key().size()*/1;
+            sort2KJTCache = new HashMap<>();
             for (final Object o : kpmi.allElements()) {
                 if (o instanceof KeYJavaType) {
                     final KeYJavaType oKJT = (KeYJavaType) o;
                     Sort s = oKJT.getSort();
                     List<KeYJavaType> l = sort2KJTCache.get(s);
                     if (l == null) {
-                        l = new LinkedList<KeYJavaType>();
+                        l = new LinkedList<>();
                         sort2KJTCache.put(s, l);
                     }
                     if (!l.contains(oKJT)) {
@@ -462,7 +457,7 @@ public final class JavaInfo {
      */
     public KeYJavaType getKeYJavaType(Type t) {
         if (type2KJTCache == null) {
-            type2KJTCache = new LinkedHashMap<Type, KeYJavaType>();
+            type2KJTCache = new LinkedHashMap<>();
             for (final Object o : kpmi.allElements()) {
                 if (o instanceof KeYJavaType) {
                     final KeYJavaType oKJT = (KeYJavaType) o;
@@ -637,7 +632,7 @@ public final class JavaInfo {
     }
 
     private List<List<KeYJavaType>> termArrayToSignature(Term[] args) {
-        List<List<KeYJavaType>> signature = new LinkedList<List<KeYJavaType>>();
+        List<List<KeYJavaType>> signature = new LinkedList<>();
         for (Term arg : args) {
             signature.add(lookupSort2KJTCache(arg.sort()));
         }
@@ -1295,10 +1290,11 @@ public final class JavaInfo {
             if (!kpmi.rec2key().parsedSpecial()) {
                 readJava("{}");
             }
-            final KeYJavaType kjt =
-                    getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
+            final KeYJavaType kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
             defaultExecutionContext =
-                    new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.nil()), null);
+                    new ExecutionContext(new TypeRef(kjt),
+                            getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD,
+                                    ImmutableSLList.nil()), null);
         }
         return defaultExecutionContext;
     }
@@ -1369,7 +1365,7 @@ public final class JavaInfo {
      * @return the list of common subtypes of types <tt>k1</tt> and <tt>k2</tt>
      */
     public ImmutableList<KeYJavaType> getCommonSubtypes(KeYJavaType k1, KeYJavaType k2) {
-        final Pair<KeYJavaType, KeYJavaType> ck = new Pair<KeYJavaType, KeYJavaType>(k1, k2);
+        final Pair<KeYJavaType, KeYJavaType> ck = new Pair<>(k1, k2);
         ImmutableList<KeYJavaType> result = commonSubtypeCache.get(ck);
 
         if (result != null) {
@@ -1431,7 +1427,7 @@ public final class JavaInfo {
                         services.getTypeConverter().getHeapLDT().targetSort(),
                         getJavaLangObject(),
                         false,
-                        new ImmutableArray<KeYJavaType>(),
+                        new ImmutableArray<>(),
                         HeapContext.getModHeaps(services, false).size(),
                         1);
                 services.getNamespaces().functions().add(inv);
@@ -1471,7 +1467,7 @@ public final class JavaInfo {
                         services.getTypeConverter().getHeapLDT().targetSort(),
                         target,
                         true,
-                        new ImmutableArray<KeYJavaType>(),
+                        new ImmutableArray<>(),
                         HeapContext.getModHeaps(services, false).size(),
                         1);
                 services.getNamespaces().functions().add(inv);

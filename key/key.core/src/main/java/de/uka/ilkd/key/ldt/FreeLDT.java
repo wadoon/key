@@ -18,7 +18,7 @@ import org.key_project.util.ExtList;
 import de.uka.ilkd.key.java.ast.Expression;
 import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.FreeLiteral;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;

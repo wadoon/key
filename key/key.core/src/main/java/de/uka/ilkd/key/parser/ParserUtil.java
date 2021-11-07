@@ -1,9 +1,8 @@
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.parser.proofjava.Token;
+import com.github.javaparser.Token;
+import com.github.javaparser.ast.expr.*;
 import de.uka.ilkd.key.util.parsing.LocatableException;
-import recoder.java.Expression;
-import recoder.java.reference.UncollatedReferenceQualifier;
 
 import java.net.URL;
 
@@ -18,12 +17,10 @@ public final class ParserUtil {
      */
     public static void checkValidSingletonReference(Expression expr, Token tok) {
         //weigl: I hope I catch them all.
-        if (expr instanceof VariableReference
-                || expr instanceof ThisReference
-                || expr instanceof ArrayReference
-                || expr instanceof ArrayLengthReference
-                || expr instanceof UncollatedReferenceQualifier
-                || expr instanceof SuperReference) {
+        if (expr instanceof NameExpr
+                || expr instanceof ThisExpr
+                || expr instanceof SuperExpr
+                || expr instanceof FieldAccessExpr) {
             return;
         }
         Location loc = new Location((URL) null, tok.beginLine, tok.beginColumn);

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.ast.*;
@@ -27,6 +28,8 @@ import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -2014,7 +2017,7 @@ public abstract class KeYJavaASTFactory {
      * modifiers typePrefix.baseType[] variable = init;
      * </pre>
      *
-     * @param modifiers  the {@link Modifiers}
+     * @param modifiers  the a list of {@link  Modifier}s
      * @param variable   the named and typed {@link IProgramVariable} to be declared
      * @param init       the {@link Expression} <code>variable</code> is initialized
      *                   with
@@ -2696,7 +2699,7 @@ public abstract class KeYJavaASTFactory {
      * </pre>
      *
      * @param statement the {@link Statement} to be executed
-     * @param branches  the try-catch {@link Branch}
+     * @param branch    the try-catch {@link Branch}
      * @return a new {@link Try} block for the execution of <code>branch</code>
      * depending on the events during the execution of
      * <code>statement</code>
