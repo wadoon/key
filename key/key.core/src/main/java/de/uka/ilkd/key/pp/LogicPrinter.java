@@ -82,6 +82,9 @@ import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * The front end for the Sequent pretty-printer. It prints a sequent and its
@@ -101,6 +104,7 @@ import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
  *
  */
 public class LogicPrinter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogicPrinter.class);
 
     /**
      * The default and minimal value of the max. number of characters to put in one
@@ -1800,7 +1804,7 @@ public class LogicPrinter {
             r = prgPrinter.getRangeOfFirstExecutableStatement();
         } catch (java.io.IOException e) {
             layouter.print("ERROR");
-            System.err.println("Error while printing Java program \n" + e);
+            LOGGER.error("Error while printing Java program \n" + e);
             throw new RuntimeException("Error while printing Java program \n" + e);
         }
         // send first executable statement range
@@ -2526,7 +2530,7 @@ public class LogicPrinter {
                 break;
 
             default:
-                System.err.println("Unexpected LogicPrinter mark: " + markType);
+                LOGGER.error("Unexpected LogicPrinter mark: {}", markType);
             }
         }
     }

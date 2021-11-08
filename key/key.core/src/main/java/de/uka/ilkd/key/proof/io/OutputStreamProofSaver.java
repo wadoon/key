@@ -76,6 +76,8 @@ import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Saves a proof to a given {@link OutputStream}.
@@ -83,6 +85,8 @@ import de.uka.ilkd.key.util.MiscTools;
  * @author Kai Wallisch
  */
 public class OutputStreamProofSaver {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OutputStreamProofSaver.class);
+
 
     /**
      * Extracts java source directory from {@link Proof#header()}, if it exists.
@@ -127,10 +131,10 @@ public class OutputStreamProofSaver {
         final StringBuffer logstr = new StringBuffer();
         // Advance the Log entries
         if (proof.userLog == null) {
-            proof.userLog = new Vector<String>();
+            proof.userLog = new Vector<>();
         }
         if (proof.keyVersionLog == null) {
-            proof.keyVersionLog = new Vector<String>();
+            proof.keyVersionLog = new Vector<>();
         }
         proof.userLog.add(System.getProperty("user.name"));
         proof.keyVersionLog.add(internalVersion);
@@ -829,7 +833,7 @@ public class OutputStreamProofSaver {
         try {
             pe.prettyPrint(prgPrinter);
         } catch (final IOException ioe) {
-            System.err.println(ioe);
+            LOGGER.error("", ioe);
         }
         return sw.getBuffer();
     }
@@ -846,7 +850,7 @@ public class OutputStreamProofSaver {
         try {
             logicPrinter.printTerm(t);
         } catch (final IOException ioe) {
-            System.err.println(ioe);
+            LOGGER.info("", ioe);
         }
         result = logicPrinter.result();
         if (result.charAt(result.length() - 1) == '\n') {
@@ -875,8 +879,7 @@ public class OutputStreamProofSaver {
         } else if (val == null) {
             return null;
         } else {
-            System.err
-                    .println("Don't know how to prettyprint " + val.getClass());
+            LOGGER.warn("Don't know how to prettyprint " + val.getClass());
             // try to String by chance
             return new StringBuffer(val.toString());
         }

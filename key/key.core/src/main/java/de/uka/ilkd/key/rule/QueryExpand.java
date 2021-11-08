@@ -67,6 +67,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -80,16 +82,17 @@ import de.uka.ilkd.key.util.Pair;
  */
 public class QueryExpand implements BuiltInRule {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(QueryExpand.class);
     public static final QueryExpand INSTANCE = new QueryExpand();
 
     private static final int DEFAULT_MAP_SIZE = 200;
 
-    private static Name QUERY_DEF_NAME = new Name("Evaluate Query");
+	private static Name QUERY_DEF_NAME = new Name("Evaluate Query");
 
 
     /** Stores a number that indicates the time when term occurred for the first time where
      * this rule was applicable. The time is the number of rules applied on this branch.*/
-    private WeakHashMap<Term,Long> timeOfTerm = new WeakHashMap<Term,Long>(DEFAULT_MAP_SIZE);
+    private WeakHashMap<Term,Long> timeOfTerm = new WeakHashMap<>(DEFAULT_MAP_SIZE);
 
 
     @Override
@@ -203,7 +206,7 @@ public class QueryExpand implements BuiltInRule {
         		   lvTrms[i] = tb.var(instVars[i]);
         		   lvSorts[i] = instVars[i].sort();
         	   }
-        	   ImmutableArray<Sort> imArrlvSorts = new ImmutableArray<Sort>(lvSorts);
+        	   ImmutableArray<Sort> imArrlvSorts = new ImmutableArray<>(lvSorts);
         	   placeHolderResult    = new Function(new Name(logicResultName), query.sort(), imArrlvSorts);
         	   placeHolderResultTrm = tb.func(placeHolderResult, lvTrms, null); //I'm not sure about the third parameter!
            }
@@ -213,7 +216,7 @@ public class QueryExpand implements BuiltInRule {
            // construct method call   {heap:=h || p1:arg1 || ... || pn:=argn}
            //                                  \[ res = o.m(p1,..,pn); \] (c = res)
 
-           ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
+           ArrayList<ProgramElement> stmnt = new ArrayList<>();
 
            stmnt.add(KeYJavaASTFactory.declare(result, progResultType));
 
@@ -257,7 +260,7 @@ public class QueryExpand implements BuiltInRule {
 
            //topLevel = tb.ex(logicResultQV, topLevel); //Alternative way to declare the symbol
 
-           return new Pair<Term,Term>(topLevel, placeHolderResultTrm);
+           return new Pair<>(topLevel, placeHolderResultTrm);
     }
 
 
@@ -279,7 +282,7 @@ public class QueryExpand implements BuiltInRule {
             i++;
         }
 
-        return new ImmutableArray<ProgramVariable>(args);
+        return new ImmutableArray<>(args);
     }
 
 
@@ -296,8 +299,8 @@ public class QueryExpand implements BuiltInRule {
     public Term evaluateQueries(Services services,  Term term, boolean positiveContext, boolean allowExpandBelowInstQuantifier){
     	//System.out.println("---------- evaluateQueries on:  ---------------- "+term+"\n-------------------------------\n");
     	final int depth =term.depth();
-    	List<QueryEvalPos> qeps = new Vector<QueryEvalPos>();
-    	Vector<Integer> path = new Vector<Integer>(depth);
+    	List<QueryEvalPos> qeps = new Vector<>();
+    	Vector<Integer> path = new Vector<>(depth);
     	path.setSize(depth);
     	final ImmutableSLList<QuantifiableVariable> instVars;
     	if(allowExpandBelowInstQuantifier){
@@ -419,7 +422,7 @@ public class QueryExpand implements BuiltInRule {
 
 
     private Vector<Term> collectQueries(Term t){
-    	Vector<Term> queries = new Vector<Term>();
+    	Vector<Term> queries = new Vector<>();
     	collectQueriesRecursively(t,queries);
     	return queries;
     }
@@ -660,7 +663,7 @@ public class QueryExpand implements BuiltInRule {
 
     public Long getTimeOfQuery(Term t){
     	if(t==null || !(t.op() instanceof IProgramMethod)){
-    		System.err.println("QueryExpand::getAgeOfQuery(t). The term is expected to be a query but it is:"+(t!=null?t:"null"));
+    		LOGGER.warn("QueryExpand::getAgeOfQuery(t). The term is expected to be a query but it is:"+(t!=null?t:"null"));
     		return null;
     	}
     	return timeOfTerm.get(t);

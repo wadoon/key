@@ -59,6 +59,9 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.annotation.Nonnull;
 
 import javax.swing.*;
@@ -87,6 +90,9 @@ public final class MainWindow extends JFrame {
     private static final long serialVersionUID = 5853419918923902636L;
     private static final String PARA =
             "<p style=\"font-family: lucida;font-size: 12pt;font-weight: bold\">";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainWindow.class);
+
     private static MainWindow instance = null;
     /**
      * Search bar for Sequent Views.
@@ -331,9 +337,9 @@ public final class MainWindow extends JFrame {
 
     public static MainWindow getInstance(boolean ensureIsVisible) {
         if (GraphicsEnvironment.isHeadless()) {
-            System.err.println("Error: KeY started in graphical mode, but no graphical environment present.");
-            System.err.println("Please use the --auto option to start KeY in batch mode.");
-            System.err.println("Use the --help option for more command line options.");
+            LOGGER.error("Error: KeY started in graphical mode, but no graphical environment present.");
+            LOGGER.error("Please use the --auto option to start KeY in batch mode.");
+            LOGGER.error("Use the --help option for more command line options.");
             System.exit(-1);
         }
         if (instance == null) {
@@ -789,7 +795,7 @@ public final class MainWindow extends JFrame {
                 vs.setUseSystemLaF(((JCheckBoxMenuItem) e.getSource()).
                         isSelected());
                 // TODO: inform that this requires a restart
-                System.out.println("Info: Look and feel changed for next start of KeY.");
+                LOGGER.warn("Info: Look and feel changed for next start of KeY.");
             }
         });
 //        view.add(laf); // uncomment this line to include the option in the menu

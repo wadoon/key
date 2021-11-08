@@ -27,6 +27,9 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Type declaration.
  * taken from COMPOST and changed to achieve an immutable structure
@@ -35,6 +38,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
         implements NamedProgramElement, MemberDeclaration,
         TypeDeclarationContainer, ClassType, VariableScope, TypeScope {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TypeDeclaration.class);
     protected final ProgramElementName name;
 
     protected final ProgramElementName fullName;
@@ -71,7 +75,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
         super(mods);
         this.name = name;
         this.fullName = fullName;
-        this.members = new ImmutableArray<MemberDeclaration>(members);
+	this.members = new ImmutableArray<>(members);
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
         this.isLibrary = isLibrary;
     }
@@ -92,8 +96,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
         super(children);
         this.name = name;
         this.fullName = fullName;
-        this.members = new ImmutableArray<MemberDeclaration>
-                (children.collect(MemberDeclaration.class));
+	this.members = new ImmutableArray<>(children.collect(MemberDeclaration.class));
         ParentIsInterfaceDeclaration piid = children.get(ParentIsInterfaceDeclaration.class);
         if (piid != null) {
             this.parentIsInterfaceDeclaration = (piid).getValue();
@@ -185,7 +188,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * TO BE IMPLEMENTED
      */
     public de.uka.ilkd.key.java.abstraction.Package getPackage(Services s) {
-        System.err.println("Method in class TypeDeclaration not implemented.");
+       LOGGER.error("Method in class TypeDeclaration not implemented." );
         return null;
     }
 
@@ -198,7 +201,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * TO BE IMPLEMENTED
      */
     public ImmutableList<ClassType> getAllSupertypes(Services services) {
-        System.err.println("Method in class TypeDeclaration not implemented.");
+	LOGGER.error("Method in class TypeDeclaration not implemented." );
         return null;
     }
 
@@ -206,7 +209,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * TO BE IMPLEMENTED
      */
     public ImmutableList<Field> getFields(Services services) {
-        System.err.println("Method in class TypeDeclaration not implemented.");
+        LOGGER.error("Method in class TypeDeclaration not implemented." );
         return null;
     }
 
@@ -235,7 +238,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * TO BE IMPLEMENTED
      */
     public ImmutableList<Method> getMethods(Services services) {
-        System.err.println("Method in class TypeDeclaration not implemented.");
+	LOGGER.error("Method in class TypeDeclaration not implemented." );
         return null;
     }
 
@@ -244,7 +247,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * TO BE IMPLEMENTED
      */
     public ImmutableList<Method> getAllMethods(Services services) {
-        System.err.println("Method in class TypeDeclaration not implemented.");
+	LOGGER.error("Method in class TypeDeclaration not implemented." );
         return null;
     }
 
@@ -252,7 +255,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * TO BE IMPLEMENTED
      */
     public ImmutableList<Constructor> getConstructors(Services services) {
-        System.err.println("Method in class TypeDeclaration not implemented.");
+      	LOGGER.error("Method in class TypeDeclaration not implemented." );
         return null;
     }
 
@@ -260,7 +263,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * TO BE IMPLEMENTED
      */
     public ImmutableList<ClassType> getTypes(Services services) {
-        System.err.println("Method in class TypeDeclaration not implemented.");
+	LOGGER.error("Method in class TypeDeclaration not implemented." );
         return null;
     }
 
@@ -268,7 +271,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * TO BE IMPLEMENTED
      */
     public ImmutableList<ClassType> getAllTypes(Services services) {
-        System.err.println("Method in class TypeDeclaration not implemented.");
+	LOGGER.error("Method in class TypeDeclaration not implemented." );
         return null;
     }
 

@@ -33,6 +33,9 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -41,7 +44,8 @@ import javax.annotation.Nonnull;
  * @author Martin Hentschel
  */
 public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserInterfaceControl implements RuleCompletionHandler, ProofEnvironmentListener, ProofDisposedListener {
-   protected boolean saveOnly = false;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractMediatorUserInterfaceControl.class);
+    protected boolean saveOnly = false;
 
    private final MediatorProofControl proofControl = createProofControl();
 
@@ -138,7 +142,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
           }
           return true;
       } else {
-          System.out.println(macro.getClass().getSimpleName() + " not applicable!");
+          LOGGER.info("{} not applicable!", macro.getClass().getSimpleName());
       }
       return false;
   }

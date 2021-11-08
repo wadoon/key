@@ -23,6 +23,8 @@ import org.key_project.util.collection.ImmutableArray;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A node representing a single source file containing
@@ -33,9 +35,8 @@ import java.io.StringWriter;
  * used as an immutable class
  */
 
-public class CompilationUnit
-        extends JavaNonTerminalProgramElement
-        implements TypeDeclarationContainer, TypeScope {
+public class CompilationUnit extends JavaNonTerminalProgramElement implements TypeDeclarationContainer, TypeScope {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompilationUnit.class);
 
     /**
      * Package spec.
@@ -263,9 +264,7 @@ public class CompilationUnit
             pp.setIndentationLevel(3);
             prettyPrint(pp);
         } catch (IOException e) {
-            System.err.println("Pretty printing of compilation unit failed");
-            System.err.println("Due to " + e);
-            e.printStackTrace();
+	    LOGGER.error("Pretty printing of compilation unit failed", e);
         }
         return sw.toString();
     }

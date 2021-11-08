@@ -205,9 +205,6 @@ public class PrettyPrinter {
      */
     protected void markStart(int n, Object stmt) {
         if (!startAlreadyMarked) {
-
-            // System.err.println("Mark start ... called");
-
             firstStatementStart = getCurrentPos() + n;
             firstStatement = stmt;
             startAlreadyMarked = true;
@@ -221,9 +218,6 @@ public class PrettyPrinter {
      */
     protected void markEnd(int n, Object stmt) {
         if (!endAlreadyMarked && (firstStatement == stmt)) {
-
-            //  System.err.println("Mark end ... called ");
-
             firstStatementEnd = getCurrentPos() + n;
             endAlreadyMarked = true;
         }

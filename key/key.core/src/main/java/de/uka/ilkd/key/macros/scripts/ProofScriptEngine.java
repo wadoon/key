@@ -18,6 +18,8 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Mattias Ulbrich
@@ -27,6 +29,8 @@ public class ProofScriptEngine {
     private static final String SYSTEM_COMMAND_PREFIX = "@";
     private static final int MAX_CHARS_PER_COMMAND = 80;
     private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptEngine.class);
+
 
     private final Location initialLocation;
     private final String script;
@@ -136,11 +140,9 @@ public class ProofScriptEngine {
                     throw new ScriptException("Unknown command " + name);
                 }
 
-                if (!name.startsWith(SYSTEM_COMMAND_PREFIX)
-                        && stateMap.isEchoOn()) {
-                    System.out.format("%5d: %s%n", ++cnt, cmd);
+                if (!name.startsWith(SYSTEM_COMMAND_PREFIX) && stateMap.isEchoOn()) {
+                    LOGGER.info("{}: {}", ++cnt, cmd);
                 }
-                // write("/tmp/weiglProofScripts_%d.txt", cnt, proof);
 
                 Object o = command.evaluateArguments(stateMap, argMap);
                 final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
@@ -163,20 +165,11 @@ public class ProofScriptEngine {
                     break;
                 }
             } catch (Exception e) {
-                //@formatter:off
-                //System.out.println("GOALS:" + proof.getSubtreeGoals(proof.root()).size());
-                //proof.getSubtreeGoals(stateMap.getProof().root()).forEach(g -> {
-                //            System.out.println("====");
-                //            System.out.println(g.sequent());
-                //            System.out.println("====");
-                //        }
-                //);
-                //@formatter:on
-
+                LOGGER.debug("GOALS: {}", proof.getSubtreeGoals(proof.root()).size());
+                proof.getSubtreeGoals(stateMap.getProof().root()).forEach(g -> LOGGER.debug("{}", g.sequent()));
                 throw new ScriptException(
-                        "Error while executing script: " + e.getMessage()
-                                + "\n\nCommand: "
-                                + argMap.get(ScriptLineParser.LITERAL_KEY),
+                        String.format("Error while executing script: '%s' on command: '%s'",
+                                e.getMessage(), argMap.get(ScriptLineParser.LITERAL_KEY)),
                         initialLocation.getFileURL(), mlp.getLine(),
                         mlp.getColumn(), e);
             }
@@ -186,14 +179,6 @@ public class ProofScriptEngine {
     public EngineState getStateMap() {
         return stateMap;
     }
-
-//    private void write(String s, int cnt, Proof proof) {
-//        try (FileWriter fw = new FileWriter(String.format(s, cnt))) {
-//            fw.write(proof.toString());
-//        } catch (IOException e) {
-//            System.err.println(e.getMessage());
-//        }
-//    }
 
     /**
      * Set the routine that is executed before every successfully executed

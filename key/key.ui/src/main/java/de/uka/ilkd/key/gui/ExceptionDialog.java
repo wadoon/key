@@ -20,6 +20,8 @@ import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.util.ExceptionTools;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -41,8 +43,9 @@ import java.util.stream.Collectors;
 public class ExceptionDialog extends JDialog {
 
     public final static Font MESSAGE_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 12);
-
     private static final long serialVersionUID = -4532724315711726522L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionDialog.class);
+
     private JScrollPane stScroll;
     private JTextArea stTextArea;
 
@@ -66,8 +69,7 @@ public class ExceptionDialog extends JDialog {
         } catch (MalformedURLException e) {
             // We must not suppress the dialog here -> catch and print only to error stream
             location = null;
-            System.err.println("Creating a Location failed for " + exception);
-            e.printStackTrace();
+            LOGGER.warn("Creating a Location failed for ", e);
         }
         init();
     }
@@ -183,8 +185,7 @@ public class ExceptionDialog extends JDialog {
                     append(StringUtil.NEW_LINE).
                     append(pointLine);
             } catch (IOException e) {
-                System.err.println("Creating an error line did not work for " + location);
-                e.printStackTrace();
+            LOGGER.warn("Creating an error line did not work {}", location, e);
             }
         }
 

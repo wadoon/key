@@ -45,13 +45,16 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Responsible for program variable naming issues.
  */
 public abstract class VariableNamer implements InstantiationProposer {
-    
+	private static final Logger LOGGER = LoggerFactory.getLogger(VariableNamer.class);
+
     //-------------------------------------------------------------------------
     //member variables
     //-------------------------------------------------------------------------
@@ -666,9 +669,8 @@ public abstract class VariableNamer implements InstantiationProposer {
 	    }
 	    if ("".equals(name)) throw new Exception();
 	    proposal = "["+name+"]";
-	} catch(Exception e) { // bad style, but this is really non-critical
-	    //System.err.println(e);
-	    //e.printStackTrace();
+	} catch(Exception e) {
+		LOGGER.info("",e);
 	    return getProposal(app, sv, services, null, previousProposals);
 	}
 	return proposal;

@@ -22,12 +22,15 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProofInfo {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProofInfo.class);
 
-	private Proof proof;	
+	private final Proof proof;
 
-	private Services services;
+	private final Services services;
 
 	public ProofInfo(Proof proof) {
 		this.proof = proof;
@@ -89,7 +92,7 @@ public class ProofInfo {
 		try{
 			post = t.sub(1).sub(1).sub(0);
 		}catch(Exception e){
-			System.err.println("Could not get PostCondition");
+			LOGGER.warn("Could not get PostCondition", e);
 		}
 
 		return post;
@@ -246,9 +249,4 @@ public class ProofInfo {
 		}		
 		return null;		
 	}
-
-
-
-
-
 }

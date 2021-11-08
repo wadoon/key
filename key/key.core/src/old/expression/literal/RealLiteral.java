@@ -15,6 +15,9 @@ package de.uka.ilkd.key.java.recoderext.expression.literal;
 
 import de.uka.ilkd.key.java.recoderext.KeYRecoderExtension;
 import org.key_project.util.ExtList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.java.Expression;
 import recoder.java.SourceVisitor;
 import recoder.java.expression.Literal;
@@ -29,6 +32,7 @@ import java.math.BigDecimal;
 public final class RealLiteral extends Literal implements KeYRecoderExtension {
 
     private static final long serialVersionUID = 7138964492857394183L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RealLiteral.class);
     private final String value;
 
     public RealLiteral(int value) {
@@ -88,7 +92,7 @@ public final class RealLiteral extends Literal implements KeYRecoderExtension {
         try {
             hash = (int) Double.parseDouble(value);
         } finally {
-            System.err.println("Strange value for BigIntLiteral: " + this);
+            LOGGER.warn("Strange value for BigIntLiteral: " + this);
         }
         return hash;
     }

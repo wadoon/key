@@ -44,6 +44,8 @@ import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementations of this class are used generate test cases or a given {@link Proof}.
@@ -52,6 +54,7 @@ import de.uka.ilkd.key.util.SideProofUtil;
  * Subclasses are used to realize the user interface specific functionality.
  */
 public abstract class AbstractTestGenerator {
+   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTestGenerator.class);
    private final UserInterfaceControl ui;
    private final Proof originalProof;
    private SolverLauncher launcher;
@@ -140,7 +143,7 @@ public abstract class AbstractTestGenerator {
                       + "A test case will not be generated.");
           } catch (final Exception e) {
              log.writeln(e.getLocalizedMessage());
-             System.err.println(e);
+             LOGGER.warn("",e);
           } finally {
               ptl.taskFinished(info);
           }
@@ -247,7 +250,7 @@ public abstract class AbstractTestGenerator {
                res.add(p);
             }
          } catch (final Exception e) {
-            System.err.println(e.getMessage());
+            LOGGER.error("Could not create a proof for testing", e);
          }
       }
       return res;

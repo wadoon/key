@@ -11,7 +11,6 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-/** common superclass of TacletIfSelectionDialog and TacletMatchCompletionDialog */
 package de.uka.ilkd.key.gui;
 
 
@@ -49,7 +48,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.pp.StringBackend;
 
-
+/** common superclass of TacletIfSelectionDialog and TacletMatchCompletionDialog */
 public abstract class ApplyTacletDialog extends JDialog {
 
 
@@ -143,16 +142,11 @@ public abstract class ApplyTacletDialog extends JDialog {
                 new NotationInfo(), backend, mediator.getServices(), true,
                 MainWindow.getInstance().getVisibleTermLabels());
         
-//        tp.printTaclet(taclet, model[0].tacletApp().instantiations(),
-        tp.printTaclet(taclet, 
+        tp.printTaclet(taclet,
         	       SVInstantiations.EMPTY_SVINSTANTIATIONS,
         	       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(), 
-//        	       ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(), 
         	       false);
         tacletSB.append(backend.getString());
-        
-        //logger.info(tacletSB);
-        //System.out.println(tacletSB);
         
         panel.setAlignmentY(Component.TOP_ALIGNMENT);
         // show taclet
