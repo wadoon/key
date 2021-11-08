@@ -23,7 +23,6 @@ import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.translation.ParseExceptionInFile;
-import de.uka.ilkd.key.java.translation.Recoder2KeY;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -271,25 +270,17 @@ public final class ProblemInitializer {
             fileRepo.setBootClassPath(bootClassPath);
         }
 
-        //create Recoder2KeY, set classpath
-        final Recoder2KeY r2k = new Recoder2KeY(initConfig.getServices(),
-                initConfig.namespaces());
-        //r2k.setFileRepository(envInput.getFileRepository()); xxx  // TODO:
+        final var r2k = initConfig.getServices()
+                .getJavaInfo()
+                .getKeYProgModelInfo()
+                .rec2key();
         r2k.setClassPath(bootClassPath, classPath);
 
         //read Java (at least the library classes)
         if (javaPath != null) {
             reportStatus("Reading Java source");
-            final ProjectSettings settings
-                    = initConfig.getServices()
-                    .getJavaInfo()
-                    .getKeYProgModelInfo()
-                    .getServConf()
-                    .getProjectSettings();
-            final PathList searchPathList = settings.getSearchPathList();
-            if (searchPathList.find(javaPath) == null) {
-                searchPathList.add(javaPath);
-            }
+
+
             Collection<String> var = getClasses(javaPath);
             if (envInput.isIgnoreOtherJavaFiles()) {
                 String file = envInput.getJavaFile();

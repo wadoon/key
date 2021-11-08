@@ -25,6 +25,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import org.key_project.util.lookup.Lookup;
 
 import java.util.HashMap;
@@ -102,7 +103,7 @@ public class Services implements TermServices {
         this.specRepos = new SpecificationRepository(this);
         cee = new ConstantExpressionEvaluator(this);
         typeconverter = new TypeConverter(this);
-        javainfo = new JavaInfo(new KeYProgModelInfo(this, typeconverter, new KeYRecoderExcHandler()), this);
+        javainfo = new JavaInfo(new KeYProgModelInfo(typeconverter, new KeYRecoderExcHandler()), this);
         nameRecorder = new NameRecorder();
     }
 
@@ -225,13 +226,10 @@ public class Services implements TermServices {
      * @return The created copy.
      */
     public Services copy(Profile profile, boolean shareCaches) {
-        Debug.assertTrue
-                (!(getJavaInfo().getKeYProgModelInfo().getServConf()
-                                instanceof TransformationPipelineServices),
-                        "services: tried to copy schema cross reference service config.");
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        Services s = new Services(profile, getJavaInfo().getKeYProgModelInfo().getServConf(),
-                getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
+        Services s = new Services(profile,
+                //getJavaInfo().getKeYProgModelInfo().getServConf(),
+                //getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
                 copyCounters(), newCaches);
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
@@ -270,10 +268,6 @@ public class Services implements TermServices {
      * as the actual one
      */
     public Services copyPreservesLDTInformation() {
-        Debug.assertTrue
-                (!(javainfo.getKeYProgModelInfo().getServConf()
-                                instanceof TransformationPipelineServices),
-                        "services: tried to copy schema cross reference service config.");
         Services s = new Services(getProfile());
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
@@ -285,7 +279,9 @@ public class Services implements TermServices {
 
     public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-        final Services s = new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key(),
+        final Services s = new Services(getProfile(),
+                //getJavaInfo().getKeYProgModelInfo().getServConf(),
+                //getJavaInfo().getKeYProgModelInfo().rec2key(),
                 copyCounters(), newCaches);
         s.proof = p_proof;
         s.specRepos = specRepos;

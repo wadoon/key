@@ -13,28 +13,43 @@
 
 package de.uka.ilkd.key.java.translation;
 
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
-import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.model.typesystem.NullType;
-import com.github.javaparser.symbolsolver.resolution.SymbolSolver;
 import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.CreateArrayMethodBuilder;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.Expression;
 import de.uka.ilkd.key.java.ast.ModelElement;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Final;
+import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
+import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -91,14 +106,14 @@ public class Recoder2KeYTypeConverter {
     }
 
     private KeYJavaType lookupInCache(com.github.javaparser.ast.type.Type t) {
-        ModelElement result = recoder2key.rec2key().toKeY(t);
+        ModelElement result = recoder2key.toKeY(t);
         Debug.assertTrue(result instanceof KeYJavaType || result == null,
                 "result must be a KeYJavaType here", result);
         return (KeYJavaType) result;
     }
 
     private void storeInCache(Type t, KeYJavaType kjt) {
-        recoder2key.rec2key().put(t, kjt);
+        recoder2key.put(t, kjt);
     }
 
 
@@ -117,8 +132,7 @@ public class Recoder2KeYTypeConverter {
      * @see #getKeYJavaType(Type)
      */
     public KeYJavaType getKeYJavaType(String typeName) {
-        resolver.
-        recoder.abstraction.Type ty = ni.getType(typeName);
+        resolver.recoder.abstraction.Type ty = ni.getType(typeName);
         return getKeYJavaType(ty);
     }
 
@@ -194,7 +208,7 @@ public class Recoder2KeYTypeConverter {
     public KeYJavaType getKeYJavaType(ClassOrInterfaceType t) {
         s = namespaces.sorts().lookup(new Name(t.getFullName()));
         if (s == null) {
-            recoder.abstraction.ClassType ct = (recoder.abstraction.ClassType) t;
+            ClassOrInterfaceDeclaration ct = (ClassOrInterfaceDeclaration) t;
             if (ct.isInterface()) {
                 KeYJavaType objectType = getKeYJavaType("java.lang.Object");
                 if (objectType == null) {
@@ -214,7 +228,7 @@ public class Recoder2KeYTypeConverter {
         // the unknown classtype has no modelinfo so surround with null check
         if (t.getProgramModelInfo() != null) {
             List<? extends recoder.abstraction.Constructor> cl = t.getProgramModelInfo().getConstructors(
-                    (recoder.abstraction.ClassType) t);
+                    (ClassOrInterfaceDeclaration) t);
             if (cl.size() == 1
                     && (cl.get(0) instanceof recoder.abstraction.DefaultConstructor)) {
                 getRecoder2KeYConverter().processDefaultConstructor(
@@ -319,13 +333,7 @@ public class Recoder2KeYTypeConverter {
         ImmutableSet<Sort> ss = DefaultImmutableSet.nil();
         for (var aSuper : supers) {
             ss = ss.add(getKeYJavaType(aSuper).getSort());
-        }       
-
-        /* ??
-		if (classType.getName() == null) {
-
-		}
-         */
+        }
 
         if (ss.isEmpty() && !isObject(classType)) {
             ss = ss.add(javaInfo.objectSort());
@@ -340,8 +348,8 @@ public class Recoder2KeYTypeConverter {
      * @param ct the type to be checked, not null
      * @return true iff the name is Object
      */
-    private boolean isObject(recoder.abstraction.ClassType ct) {
-        return "java.lang.Object".equals(ct.getFullName())
+    private boolean isObject(ClassOrInterfaceDeclaration ct) {
+        return "java.lang.Object".equals(ct.getFullyQualifiedName())
                 || "Object".equals(ct.getName());
     }
 
@@ -352,10 +360,9 @@ public class Recoder2KeYTypeConverter {
      * @param supers the set of (direct?) super-sorts
      * @return a freshly created Sort object
      */
-    private Sort createObjectSort(recoder.abstraction.ClassType ct, ImmutableSet<Sort> supers) {
+    private Sort createObjectSort(ClassOrInterfaceDeclaration ct, ImmutableSet<Sort> supers) {
         final boolean abstractOrInterface = ct.isAbstract() || ct.isInterface();
-        final Name name = new Name(
-                Recoder2KeYConverter.makeAdmissibleName(ct.getFullName()));
+        final Name name = new Name(Recoder2KeYConverter.makeAdmissibleName(ct.getFullName()));
         Sort result = new SortImpl(name, supers, abstractOrInterface);
         return result;
     }
@@ -367,20 +374,16 @@ public class Recoder2KeYTypeConverter {
      * @param arrayType
      * @return the ArrayDeclaration of the given type
      */
-    public ArrayDeclaration createArrayType(KeYJavaType baseType,
-                                            KeYJavaType arrayType) {
+    public ArrayDeclaration createArrayType(KeYJavaType baseType, KeYJavaType arrayType) {
         ExtList members = new ExtList();
-        if (recoder2key.rec2key().getSuperArrayType() == null) {
-            createSuperArrayType(); // we want to have exactly one
-            // length attribute for this R2K
-            // instance (resolving
-            // a.length=a.length might get
-            // impossible otherwise),
-            // therefore we introduce a 'super
-            // array class' which contains the
-            // length attribute
+        if (recoder2key.getSuperArrayType() == null) {
+            createSuperArrayType();
+            // we want to have exactly one length attribute for this R2K
+            // instance (resolving a.length=a.length might get
+            // impossible otherwise), therefore we introduce a 'super
+            // array class' which contains the length attribute
         }
-        final FieldDeclaration length = ((SuperArrayDeclaration) recoder2key.rec2key()
+        final FieldDeclaration length = ((SuperArrayDeclaration) recoder2key
                 .getSuperArrayType().getJavaType()).length();
         final TypeReference baseTypeRef;
 
@@ -391,12 +394,9 @@ public class Recoder2KeYTypeConverter {
                     .name().toString()), 0, null, baseType);
         }
         members.add(baseTypeRef);
-        addImplicitArrayMembers(members, arrayType, baseType,
-                (ProgramVariable) length.getFieldSpecifications()
-                        .get(0).getProgramVariable());
-
-        return new ArrayDeclaration(members, baseTypeRef, recoder2key.rec2key()
-                .getSuperArrayType());
+        addImplicitArrayMembers(members, arrayType, baseType, (ProgramVariable) length.getFieldSpecifications()
+                .get(0).getProgramVariable());
+        return new ArrayDeclaration(members, baseTypeRef, recoder2key.getSuperArrayType());
     }
 
     /**
@@ -406,11 +406,10 @@ public class Recoder2KeYTypeConverter {
      * <code>length</code>
      */
     private FieldDeclaration createSuperArrayType() {
-        KeYJavaType integerType = getKeYJavaType(getServiceConfiguration()
-                .getNameInfo().getIntType());
+        KeYJavaType integerType = getKeYJavaType(PrimitiveType.JAVA_INT);
 
         final KeYJavaType superArrayType = new KeYJavaType();
-        recoder2key.rec2key().setSuperArrayType(superArrayType);
+        recoder2key.setSuperArrayType(superArrayType);
 
         FieldSpecification specLength = new FieldSpecification(
                 new LocationVariable(new ProgramElementName("length"),
@@ -437,8 +436,7 @@ public class Recoder2KeYTypeConverter {
                                          KeYJavaType baseType, ProgramVariable len) {
 
         de.uka.ilkd.key.java.abstraction.Type base = baseType.getJavaType();
-        int dimension = base instanceof ArrayType ? ((ArrayType) base)
-                .getDimension() + 1 : 1;
+        int dimension = base instanceof ArrayType ? ((ArrayType) base).getDimension() + 1 : 1;
         TypeRef parentReference = new TypeRef(new ProgramElementName(""
                 + parent.getSort().name()), dimension, null, parent);
 

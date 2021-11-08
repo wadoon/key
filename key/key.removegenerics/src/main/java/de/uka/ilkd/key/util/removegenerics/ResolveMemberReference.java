@@ -16,7 +16,7 @@ package de.uka.ilkd.key.util.removegenerics;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.abstraction.ArrayType;
-import recoder.abstraction.ClassType;
+import     ClassOrInterfaceDeclaration;
 import recoder.abstraction.Field;
 import recoder.abstraction.Method;
 import recoder.abstraction.Type;

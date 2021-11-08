@@ -46,7 +46,6 @@ import java.util.Map;
 import static java.lang.Integer.parseInt;
 
 public final class TypeConverter {
-
     private final TermBuilder tb;
     private final Services services;
 
@@ -58,7 +57,7 @@ public final class TypeConverter {
     private HeapLDT heapLDT = null;
     //private IntegerLDT integerLDT = null;
 
-    TypeConverter(Services s) {
+    public TypeConverter(Services s) {
         this.services = s;
         this.tb = services.getTermBuilder();
     }
@@ -755,9 +754,6 @@ public final class TypeConverter {
 
 
     public boolean isIdentical(Type from, Type to) {
-        // XXX causes bug #1163
-//		from = getKeYJavaType ( from );
-//		to   = getKeYJavaType ( to   );
         return from == to;
     }
 

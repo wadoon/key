@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.translation.KeYProgModelInfo;
+import de.uka.ilkd.key.java.translation.Recoder2KeY;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -109,12 +110,12 @@ public final class JavaInfo {
      * creates a new JavaInfo object by giving a KeYProgModelInfo to access
      * the Recoder SourceInfo and using the given {@link Services} object.
      */
-    protected JavaInfo(KeYProgModelInfo kpmi, Services s) {
+    private JavaInfo(KeYProgModelInfo kpmi, Services s) {
         this.kpmi = kpmi;
         services = s;
     }
 
-    protected JavaInfo(JavaInfo proto, Services s) {
+    private JavaInfo(JavaInfo proto, Services s) {
         this(proto.getKeYProgModelInfo().copy(), s);
         nullType = proto.getNullType();
     }
@@ -1400,8 +1401,7 @@ public final class JavaInfo {
     public ProgramVariable getArrayLength() {
         if (length == null) {
             final SuperArrayDeclaration sad =
-                    (SuperArrayDeclaration)
-                            rec2key().getSuperArrayType().getJavaType();
+                    (SuperArrayDeclaration) rec2key().getSuperArrayType().getJavaType();
             length =
                     (ProgramVariable) sad.length().getVariables().
                             get(0).getProgramVariable();
@@ -1409,6 +1409,10 @@ public final class JavaInfo {
         }
 
         return length;
+    }
+
+    private Recoder2KeY rec2key() {
+        return kpmi.rec2key();
     }
 
     /**
@@ -1549,12 +1553,11 @@ public final class JavaInfo {
     /**
      * inner class used to filter certain types of program elements
      */
-    static abstract class Filter {
-
+    abstract static class Filter {
         /**
          * the universally satisfied filter
          */
-        final static Filter TRUE = new Filter() {
+        static final Filter TRUE = new Filter() {
 
             public boolean isSatisfiedBy(ProgramElement pe) {
                 return true;

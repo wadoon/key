@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.ast;
 
+import com.github.javaparser.ast.Node;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -28,9 +29,7 @@ import java.net.URI;
  */
 public abstract class JavaSourceElement implements SourceElement {
 
-
     private final PositionInfo posInfo;
-
 
     /**
      * Java source element.

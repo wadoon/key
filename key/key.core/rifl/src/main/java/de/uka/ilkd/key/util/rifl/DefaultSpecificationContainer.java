@@ -75,7 +75,7 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 	@Override
 	public String field(recoder.java.declaration.FieldDeclaration fd, Type type) {
 		final recoder.java.declaration.FieldSpecification fs = fd.getVariables().get(0);
-		final recoder.abstraction.ClassTypeContainer ctype = fs.getContainingClassType();
+		final     ClassOrInterfaceDeclarationContainer ctype = fs.getContainingClassType();
 		final String inClass = ctype.getName();
 		final String inPackage = ctype.getPackage().getFullName();
 		return field(inPackage, inClass, fs.getName(), type);
@@ -89,7 +89,7 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 	@Override
 	public String parameter(recoder.java.declaration.MethodDeclaration md, int index, Type type) {
 		final String[] paramTypes = extractParamTypes(md);
-		final recoder.abstraction.ClassType ctype = md.getContainingClassType();
+		final     ClassOrInterfaceDeclaration ctype = md.getContainingClassType();
 		return parameter(ctype.getPackage().getFullName(), ctype.getName(),
 		                 md.getName(), paramTypes, index, type);
 	}
@@ -102,7 +102,7 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
 
 	@Override
 	public String returnValue(recoder.java.declaration.MethodDeclaration md, Type type) {
-		final recoder.abstraction.ClassType ctype = md.getContainingClassType();
+		final     ClassOrInterfaceDeclaration ctype = md.getContainingClassType();
 		return returnValue(ctype.getPackage().getFullName(), ctype.getName(),
 				           md.getName(), extractParamTypes(md), type);
 	}

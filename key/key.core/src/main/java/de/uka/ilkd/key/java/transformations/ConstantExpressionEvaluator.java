@@ -29,7 +29,11 @@ public class ConstantExpressionEvaluator {
     }
 
     public Expression evaluate(Expression expression) throws EvaluationException {
-        List<SnippetEvent> value = jShell.eval(expression.toString());
+        return evaluate(expression.toString());
+    }
+
+    public Expression evaluate(String expression) throws EvaluationException {
+        List<SnippetEvent> value = jShell.eval(expression);
         assert value.size() == 1;
         SnippetEvent evt = value.get(0);
         if (evt.exception() != null) {
@@ -37,5 +41,9 @@ public class ConstantExpressionEvaluator {
         }
         return javaParser.parseExpression(evt.value()).getResult().orElseThrow(
                 () -> new EvaluationException("Could not evaluate " + expression, evt.exception()));
+    }
+
+    public Expression evaluate(de.uka.ilkd.key.java.ast.Expression expr) throws EvaluationException {
+        return evaluate(expr.toString());
     }
 }

@@ -23,7 +23,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import de.uka.ilkd.key.util.rifl.SpecificationEntity.Type;
-import recoder.abstraction.ClassType;
+import     ClassOrInterfaceDeclaration;
 import recoder.java.*;
 import recoder.java.declaration.*;
 import recoder.list.generic.ASTArrayList;

@@ -185,7 +185,7 @@ public class PositionInfo {
      *
      * @param parent the parent class of this PositionInfo
      */
-    void setParentClassURI(URI parent) {
+    public void setParentClassURI(URI parent) {
         parentClassURI = (parent == null ? null : parent.normalize());
     }
 

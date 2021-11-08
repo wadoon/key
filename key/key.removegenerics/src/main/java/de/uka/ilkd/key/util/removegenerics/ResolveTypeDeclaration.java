@@ -19,7 +19,7 @@ import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
-import recoder.abstraction.ClassType;
+import     ClassOrInterfaceDeclaration;
 import recoder.abstraction.Method;
 import recoder.abstraction.Type;
 import recoder.java.Comment;

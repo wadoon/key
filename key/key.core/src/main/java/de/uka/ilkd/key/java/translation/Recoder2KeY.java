@@ -26,8 +26,10 @@ import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.resolution.MethodUsage;
 import de.uka.ilkd.key.Services;
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.api.JavaService;
 import de.uka.ilkd.key.java.ast.CompilationUnit;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -455,6 +457,7 @@ public class Recoder2KeY implements JavaReader {
     public void setClassPath(File bootClassPath, List<File> classPath) {
         this.classPath = classPath;
         this.bootClassPath = bootClassPath;
+        javaService.setClassPath(bootClassPath, classPath);
     }
 
     /**
@@ -939,4 +942,29 @@ public class Recoder2KeY implements JavaReader {
         }
         return readBlock(s, createContext(pvs));
     }
+
+    public KeYJavaType getSuperArrayType() {
+        return null; //TODO weigl
+    }
+
+    public boolean parsedSpecial() {
+        return false;
+    }
+
+    public Set<?> elemsKeY() {
+        return null;
+    }
+
+    public Node toRecoder(KeYJavaType kjt) {
+        return null;
+    }
+
+    public Type toRecoder(de.uka.ilkd.key.java.abstraction.Type n) {
+        return null;
+    }
+
+    public ProgramElement toKeY(MethodUsage rm) {
+        return null;
+    }
+
 }
