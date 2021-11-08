@@ -162,28 +162,31 @@ public class ExceptionDialog extends JDialog {
         exTextArea.setWrapStyleWord(true);
 
         String orgMsg = exception.getMessage();
-        if(orgMsg == null){
+        if (orgMsg == null) {
             orgMsg = "";
         }
         StringBuilder message = new StringBuilder(orgMsg);
 
-        try {
+        if (location != null) {
             // read the content via URLs openStream() method
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader(IOUtil.openStream(location.getFileURL().toString())));
-            List<String> list = br.lines()
+            try (InputStream is = IOUtil.openStream(location.getFileURL().toString());
+                 InputStreamReader isr = new InputStreamReader(is);
+                 BufferedReader br = new BufferedReader(isr)) {
+
+                List<String> list = br.lines()
                     // optimization: read only as far as necessary
                     .limit(location.getLine())
                     .collect(Collectors.toList());
-            String line = list.get(location.getLine() - 1);
-            String pointLine = StringUtil.repeat(" ", location.getColumn() - 1) + "^";
-            message.append(StringUtil.NEW_LINE).
+                String line = list.get(location.getLine() - 1);
+                String pointLine = StringUtil.repeat(" ", location.getColumn() - 1) + "^";
+                message.append(StringUtil.NEW_LINE).
                     append(StringUtil.NEW_LINE).
                     append(line).
                     append(StringUtil.NEW_LINE).
                     append(pointLine);
-        } catch (IOException e) {
+            } catch (IOException e) {
             LOGGER.warn("Creating an error line did not work {}", location, e);
+            }
         }
 
         exTextArea.setText(message.toString());
@@ -263,7 +266,7 @@ public class ExceptionDialog extends JDialog {
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(getParent());
     }
 
 // in earlier versions, KeY supported several exceptions.

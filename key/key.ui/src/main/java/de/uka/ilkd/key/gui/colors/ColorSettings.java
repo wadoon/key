@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
 
@@ -54,7 +55,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
     }
 
     public static Color fromHex(String s) {
-        Long i = Long.decode(s);
+        long i = Long.decode(s);
         return new Color(
                 (int) ((i >> 16) & 0xFF),
                 (int) ((i >> 8) & 0xFF),
@@ -84,26 +85,34 @@ public class ColorSettings extends AbstractPropertiesSettings {
     private ColorProperty createColorProperty(String key,
                                               String description,
                                               Color defaultValue) {
+        Optional<ColorProperty> item =
+                getProperties().filter(it -> it.getKey().equals(key))
+                        .findFirst();
+        if (item.isPresent()) {
+            return item.get();
+        }
+
         ColorProperty pe = new ColorProperty(key, description, defaultValue);
         propertyEntries.add(pe);
         return pe;
     }
 
     public Stream<ColorProperty> getProperties() {
-        return propertyEntries.stream().map(it -> (ColorProperty) it);
+        return propertyEntries.stream().map(ColorProperty.class::cast);
     }
 
     /**
      * A property for handling colors.
      */
     public class ColorProperty implements PropertyEntry<Color> {
-        private final String key, description;
+        private final String key;
+        private final String description;
         private Color currentValue;
 
         public ColorProperty(String key, String description, Color defaultValue) {
             this.key = key;
             this.description = description;
-            if (!properties.contains(key)) {
+            if (!properties.containsKey(key)) {
                 set(defaultValue);
             }
         }
@@ -163,5 +172,10 @@ public class ColorSettings extends AbstractPropertiesSettings {
         public String getDescription() {
             return description;
         }
+    }
+
+    @Override
+    public void readSettings(Properties props) {
+        this.properties.putAll(props);
     }
 }

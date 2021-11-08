@@ -328,7 +328,6 @@ public final class ExampleChooser extends JDialog {
         getContentPane().setLayout(new BoxLayout(getContentPane(),
                 BoxLayout.Y_AXIS));
         setSize(800, 400);
-        setLocationRelativeTo(MainWindow.getInstance());
     }
 
 
@@ -466,6 +465,7 @@ public final class ExampleChooser extends JDialog {
         if (instance == null) {
             instance = new ExampleChooser(examplesDir);
         }
+        instance.setLocationRelativeTo(instance.getOwner());
         instance.setVisible(true);
 
         //return result

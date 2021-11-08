@@ -123,10 +123,10 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
         logArea.setText("Running script from URL '" + url + "':\n");
         cp.add(new JScrollPane(logArea), BorderLayout.CENTER);
 
-        JButton cancel = new JButton("Cancel");
-        cancel.addActionListener(e -> interruptionPerformed());
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(e -> interruptionPerformed());
         JPanel panel = new JPanel(new FlowLayout());
-        panel.add(cancel);
+        panel.add(cancelButton);
         cp.add(panel, BorderLayout.SOUTH);
 
         dlg.setSize(750, 400);

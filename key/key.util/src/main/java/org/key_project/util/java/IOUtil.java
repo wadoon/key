@@ -408,7 +408,6 @@ public final class IOUtil {
         }
     }
 
-
     /**
      * A line information returned from {@link IOUtil#computeLineInformation(File)} and
      * {@link IOUtil#computeLineInformation(InputStream)}.
