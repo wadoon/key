@@ -202,7 +202,8 @@ public class ShiftUpdateImplNew {
 				tb.ife(cond2,
 						tb.wPred(
 								tb.apply(inverseEvent,
-										tb.apply(eventUpdate, locSet)), eventUpdate.sub(2)), tb.tt()));
+										tb.apply(eventUpdate, locSet)),
+								eventUpdate.sub(2)), tb.tt()));
 		// Applying the update rename on the rPred and wPred
 		goal.addFormula(new SequentFormula(tb.apply(keepParallelUpdateRenames, linkTerm4EventUpdate)), true, true);
 	}

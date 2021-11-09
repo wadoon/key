@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.prover.GoalChooser;
 import de.uka.ilkd.key.prover.StopCondition;
@@ -123,10 +124,15 @@ public class ApplyStrategy extends AbstractProverCore {
         } else {
             assert g != null;
             g.apply(app);
-            return new SingleRuleApplicationInfo(g, app);
+//            if (COUNTER % 2000 == 0) {
+//    		try  { new de.uka.ilkd.key.proof.io.ProofSaver(g.proof(), "C:\\Users\\Asma\\test.proof", "").save();} catch (java.io.IOException io) {System.out.println("oops"+io);}
+//            System.out.println(ProofSaver.printAnything(g.sequent(), g.proof().getServices()));
+//            } COUNTER++;
+    		return new SingleRuleApplicationInfo(g, app);
         }
     }
 
+//    static long COUNTER=0;
 
     /**
      * applies rules until this is no longer

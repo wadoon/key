@@ -24,7 +24,7 @@ public class SideProof {
 	private final Services services;
 	private final TermBuilder tb;
 	private final Sequent seq;
-	private final int maxRuleApp;
+	private int maxRuleApp;
 
 	public SideProof(Services s, Sequent sequent, int maxRuleApp) {
 		services = s;
@@ -318,5 +318,9 @@ public class SideProof {
 					res.addAll(collectProgramAndLogicVariables(sub));
 		}
 		return res;
+	}
+
+	public void setMaxStep(int i) {
+		maxRuleApp = i;
 	}
 }
