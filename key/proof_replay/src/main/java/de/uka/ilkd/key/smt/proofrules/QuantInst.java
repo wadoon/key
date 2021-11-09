@@ -11,10 +11,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.smt.DefCollector;
-import de.uka.ilkd.key.smt.ReplayTools;
-import de.uka.ilkd.key.smt.ReplayVisitor;
-import de.uka.ilkd.key.smt.SMTProofParser;
+import de.uka.ilkd.key.smt.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -50,7 +47,7 @@ public class QuantInst extends ProofRule {
         SequentFormula all = ReplayTools.getLastAddedSuc(goal, 1);
         goal = ReplayTools.applyNoSplitTopLevelSuc(goal, "notRight", all);
 
-        int instVarCount = extractInstVarCount(ctx);
+        int instVarCount = extractInstVarCount(ctx, replayVisitor.getSmtReplayer());
 
         for (int i = 0; i < instVarCount; i++) {
             // allLeft
@@ -107,17 +104,17 @@ public class QuantInst extends ProofRule {
         return goal;
     }
 
-    private int extractInstVarCount(ProofsexprContext ctx) {
+    public static int extractInstVarCount(ProofsexprContext ctx, SMTProofExploiter exploiter) {
         ProofsexprContext conclusionCtx = extractRuleConclusionCtx(ctx);
         // conclusionCtx should be: (or (not (forall (x) (P x))) (P a))
         SMTProofParser.NoprooftermContext or = ReplayTools
-            .ensureNoproofLookUp(conclusionCtx.noproofterm(), replayVisitor);
+            .ensureNoproofLookUp(conclusionCtx.noproofterm(), exploiter);
         SMTProofParser.NoprooftermContext notAll = ReplayTools
-            .ensureNoproofLookUp(or.noproofterm(1), replayVisitor);
+            .ensureNoproofLookUp(or.noproofterm(1), exploiter);
         SMTProofParser.NoprooftermContext all = ReplayTools
-            .ensureNoproofLookUp(notAll.noproofterm(1), replayVisitor);
+            .ensureNoproofLookUp(notAll.noproofterm(1), exploiter);
         SMTProofParser.NoprooftermContext matrix = ReplayTools
-            .ensureNoproofLookUp(all.noproofterm(0), replayVisitor);
+            .ensureNoproofLookUp(all.noproofterm(0), exploiter);
         return all.sorted_var().size();
     }
 
@@ -162,5 +159,51 @@ public class QuantInst extends ProofRule {
 
         // now convert instantiation to KeY term
         return inst.accept(new DefCollector(replayVisitor.getSmtReplayer(), services));
+    }
+
+    public static Term extractQuantifierInstantiation(ProofsexprContext quantInstCtx,
+                                                      int varIndex,
+                                                      SMTProofExploiter exploiter,
+                                                      Services services) {
+        ProofsexprContext conclusionCtx = extractRuleConclusionCtx(quantInstCtx);
+        // conclusionCtx should be: (or (not (forall (x) (P x))) (P a))
+        SMTProofParser.NoprooftermContext or = ReplayTools
+            .ensureNoproofLookUp(conclusionCtx.noproofterm(), exploiter);
+        SMTProofParser.NoprooftermContext notAll = ReplayTools
+            .ensureNoproofLookUp(or.noproofterm(1), exploiter);
+        SMTProofParser.NoprooftermContext all = ReplayTools
+            .ensureNoproofLookUp(notAll.noproofterm(1), exploiter);
+        SMTProofParser.NoprooftermContext matrix = ReplayTools
+            .ensureNoproofLookUp(all.noproofterm(0), exploiter);
+
+        String varName = all.sorted_var(varIndex).SYMBOL().getText();
+        List<Integer> pos = ReplayTools.extractPosition(varName, matrix);
+
+        assert pos != null && pos.size() >= 1;
+
+        // (or (not (all (or a b c))) a' b' c')
+        // pos contains position of bound variable inside (or a b c), but we are interested in
+        // position inside (or ... a' b' c') -> skip notAll (first child of or)
+
+        if (or.noproofterm().size() > 3) {  // 3: "or" + notAll + a
+            //if (matrix.func != null && matrix.func.getText().equals("or")) {
+            pos.set(0, pos.get(0) + 1);     // + 2: skip "or" and skip notAll subterm
+
+            // position in the top level "or" has been merged into pos[0]
+            // does not have to be removed since it is overwritten by set
+            //pos.remove(1);
+        } else {
+            // (or (not (all a))) a')
+            pos.add(0, 2);      // descend into a'
+        }
+
+        SMTProofParser.NoprooftermContext inst = or;
+        for (Integer i : pos) {
+            // fix: each subterm could be a symbol bound by let -> lookup first
+            inst = ReplayTools.ensureNoproofLookUp(inst, exploiter).noproofterm(i);
+        }
+
+        // now convert instantiation to KeY term
+        return inst.accept(new DefCollector(exploiter, services));
     }
 }

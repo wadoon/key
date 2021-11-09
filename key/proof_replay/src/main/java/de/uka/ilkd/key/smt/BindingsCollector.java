@@ -9,18 +9,18 @@ import static de.uka.ilkd.key.smt.SMTProofParser.*;
  * This visitor is responsible for collecting all variables bound by let and their definitions in
  * the symbol table.
  */
-class BindingsCollector extends SMTProofBaseVisitor<NamedParserRuleContext> {
+public class BindingsCollector extends SMTProofBaseVisitor<NamedParserRuleContext> {
     // empty namespace is root of all namespaces
     private static final Namespace<NamedParserRuleContext> EMPTY_NAMESPACE = new Namespace<>();
 
-    private final SMTReplayer smtReplayer;
+    private final SMTProofExploiter smtProofExploiter;
 
     //private Namespace<NamedParserRuleContext> nextNS = EMPTY_NAMESPACE;
 
     //private Deque<ParserRuleContext> contextStack = new LinkedList<>();
 
-    public BindingsCollector(SMTReplayer smtReplayer) {
-        this.smtReplayer = smtReplayer;
+    public BindingsCollector(SMTProofExploiter smtProofExploiter) {
+        this.smtProofExploiter = smtProofExploiter;
     }
 
     // every context must either have a new namespace (in case of let proofsexpr or noproofterm)
@@ -138,17 +138,17 @@ class BindingsCollector extends SMTProofBaseVisitor<NamedParserRuleContext> {
 
         if (ctx.rulename != null && ctx.rulename.getText().equals("let")) {
             Namespace<NamedParserRuleContext> ns;
-            if (smtReplayer.getNamespaces().get(ctx) == null) {
+            if (smtProofExploiter.getNamespaces().get(ctx) == null) {
                 Namespace<NamedParserRuleContext> parentNS = getParentOrEmptyNS(ctx);
                 ns = new Namespace<>(parentNS);
             } else {
-                ns = new Namespace<>(smtReplayer.getNamespaces().get(ctx));
+                ns = new Namespace<>(smtProofExploiter.getNamespaces().get(ctx));
             }
             for (Var_bindingContext vb : ctx.var_binding()) {
                 ns.add(visitVar_binding(vb));
             }
-            //smtReplayer.getNamespaces().put(ctx.proofsexpr(0), nextNS);
-            smtReplayer.getNamespaces().put(ctx.proofsexpr(0), ns);
+            //smtProofExploiter.getNamespaces().put(ctx.proofsexpr(0), nextNS);
+            smtProofExploiter.getNamespaces().put(ctx.proofsexpr(0), ns);
             visitProofsexpr(ctx.proofsexpr(0));
         } else {
             super.visitProofsexpr(ctx);
@@ -163,18 +163,18 @@ class BindingsCollector extends SMTProofBaseVisitor<NamedParserRuleContext> {
 
         if (ctx.rulename != null && ctx.rulename.getText().equals("let")) {
             Namespace<NamedParserRuleContext> ns;
-            if (smtReplayer.getNamespaces().get(ctx) == null) {
+            if (smtProofExploiter.getNamespaces().get(ctx) == null) {
                 Namespace<NamedParserRuleContext> parentNS = getParentOrEmptyNS(ctx);
                 ns = new Namespace<>(parentNS);
             } else {
-                ns = new Namespace<>(smtReplayer.getNamespaces().get(ctx));
+                ns = new Namespace<>(smtProofExploiter.getNamespaces().get(ctx));
             }
             for (Var_bindingContext vb : ctx.var_binding()) {
                 ns.add(visitVar_binding(vb));
             }
             // returned from varbinding: nextNS contains new symbols
-            //smtReplayer.getNamespaces().put(ctx.noproofterm(0), nextNS);
-            smtReplayer.getNamespaces().put(ctx.noproofterm(0), ns);
+            //smtProofExploiter.getNamespaces().put(ctx.noproofterm(0), nextNS);
+            smtProofExploiter.getNamespaces().put(ctx.noproofterm(0), ns);
             visitNoproofterm(ctx.noproofterm(0));
         } else {
             super.visitNoproofterm(ctx);
@@ -205,11 +205,11 @@ class BindingsCollector extends SMTProofBaseVisitor<NamedParserRuleContext> {
         if (parentCtx == null) {
             parentNS = EMPTY_NAMESPACE;
         } else {
-            parentNS = smtReplayer.getNamespaces().get(parentCtx);
+            parentNS = smtProofExploiter.getNamespaces().get(parentCtx);
         }
-        if (smtReplayer.getNamespaces().get(ctx) == null) {
+        if (smtProofExploiter.getNamespaces().get(ctx) == null) {
             // do not overwrite!
-            smtReplayer.getNamespaces().put(ctx, parentNS);
+            smtProofExploiter.getNamespaces().put(ctx, parentNS);
         }
     }
 
@@ -219,7 +219,7 @@ class BindingsCollector extends SMTProofBaseVisitor<NamedParserRuleContext> {
         if (parentCtx == null) {
             parentNS = EMPTY_NAMESPACE;
         } else {
-            parentNS = smtReplayer.getNamespaces().get(parentCtx);
+            parentNS = smtProofExploiter.getNamespaces().get(parentCtx);
         }
         return parentNS;
     }

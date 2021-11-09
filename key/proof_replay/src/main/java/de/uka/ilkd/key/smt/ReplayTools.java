@@ -386,14 +386,15 @@ public final class ReplayTools {
     /**
      * Ensures that the top level symbol is not a symbol bound by let, but an actual context.
      * @param ctx the context which may or may not be a symbol bound by let
-     * @param replayer the replayer that stores the symbol definitions
+     * @param exploiter the exploiter that stores the symbol definitions
      * @return a context that is ensured not to be a symbol bound by let (however, subterms may
      *  contain other symbols again!)
      */
-    public static ParserRuleContext ensureLookup(ParserRuleContext ctx, SMTReplayer replayer) {
-        ParserRuleContext def = replayer.getSymbolDef(ctx.getText(), ctx);
+    public static ParserRuleContext ensureLookup(ParserRuleContext ctx,
+                                                 SMTProofExploiter exploiter) {
+        ParserRuleContext def = exploiter.getSymbolDef(ctx.getText(), ctx);
         if (def != null) {
-            return ensureLookup(def, replayer);
+            return ensureLookup(def, exploiter);
         } else {
             return ctx;
         }
@@ -405,7 +406,7 @@ public final class ReplayTools {
     }
 
     public static NoprooftermContext ensureNoproofLookUp(ParserRuleContext ctx,
-                                                         SMTReplayer replayer) {
+                                                         SMTProofExploiter replayer) {
         ParserRuleContext lookup = ensureLookup(ctx, replayer);
         if (lookup instanceof NoprooftermContext) {
             return (NoprooftermContext) lookup;

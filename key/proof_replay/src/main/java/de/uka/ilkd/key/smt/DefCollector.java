@@ -24,7 +24,7 @@ import static de.uka.ilkd.key.smt.SMTProofParser.*;
  * @author Wolfram Pfeifer
  */
 public class DefCollector extends SMTProofBaseVisitor<Term> {
-    private final SMTReplayer smtReplayer;
+    private final SMTProofExploiter exploiter;
     private final Services services;
     private final TermFactory tf;
     private final TermBuilder tb;
@@ -39,25 +39,25 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
      * correctly. */
     private final Deque<Pair<QuantifiableVariable, Term>> skolemSymbols;
 
-    public DefCollector(SMTReplayer smtReplayer, Services services) {
+    public DefCollector(SMTProofExploiter exploiter, Services services) {
         // no symbols bound by proof-bind/lambda -> empty stack
-        this(smtReplayer, services, new LinkedList<>(), new LinkedList<>());
+        this(exploiter, services, new LinkedList<>(), new LinkedList<>());
     }
 
-    public DefCollector(SMTReplayer smtReplayer, Deque<QuantifiableVariable> boundVars,
+    public DefCollector(SMTProofExploiter exploiter, Deque<QuantifiableVariable> boundVars,
                         Services services) {
-        this(smtReplayer, services, new LinkedList<>(), boundVars);
+        this(exploiter, services, new LinkedList<>(), boundVars);
     }
 
-    public DefCollector(SMTReplayer smtReplayer, Services services,
+    public DefCollector(SMTProofExploiter exploiter, Services services,
                         Deque<Pair<QuantifiableVariable, Term>> skolemSymbols) {
-        this(smtReplayer, services, skolemSymbols, new LinkedList<>());
+        this(exploiter, services, skolemSymbols, new LinkedList<>());
     }
 
-    public DefCollector(SMTReplayer smtReplayer, Services services,
+    public DefCollector(SMTProofExploiter exploiter, Services services,
                         Deque<Pair<QuantifiableVariable, Term>> skolemSymbols,
                         Deque<QuantifiableVariable> boundVars) {
-        this.smtReplayer = smtReplayer;
+        this.exploiter = exploiter;
         this.services = services;
         this.tf = services.getTermFactory();
         this.tb = services.getTermBuilder();
@@ -95,7 +95,7 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
             if (ctx.rulename.getText().equals("proof-bind")) {
                 // could be lambda or symbol (bound by let)
                 ProofsexprContext next = ctx.proofsexpr(0);
-                ParserRuleContext def = smtReplayer.getSymbolDef(next.getText(), next);
+                ParserRuleContext def = exploiter.getSymbolDef(next.getText(), next);
                 if (def != null) {      // bound by let
                     //System.out.println(next.getText() + " (shared noproofterm)");
                     next = (ProofsexprContext) def;
@@ -131,14 +131,14 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
             // last proofsexpr holds the succedent of the rule application
             ParseTree succedent = ctx.proofsexpr(ctx.proofsexpr().size() - 1);
 
-            ParserRuleContext def = smtReplayer.getSymbolDef(succedent.getText(), ctx);
+            ParserRuleContext def = exploiter.getSymbolDef(succedent.getText(), ctx);
             if (def != null) {
                 //System.out.println(succedent.getText() + " (shared noproofterm)");
                 // descend further if this still is a symbol bound by let
                 return visit(def);
-            } else if (smtReplayer.getTranslationToTerm(succedent.getText()) != null) {
+            } else if (exploiter.getTranslationToTerm(succedent.getText()) != null) {
                 // not a symbol -> should be in KeY translation table
-                return smtReplayer.getTranslationToTerm(succedent.getText());
+                return exploiter.getTranslationToTerm(succedent.getText());
             } else {
                 return visit(succedent);
             }
@@ -171,7 +171,7 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
         NamedParserRuleContext nprc = ctxNS.lookup(ctx.getText());
         ParserRuleContext proofsexpr = nprc.getCtx();*/
 
-        ParserRuleContext proofsexpr = smtReplayer.getSymbolDef(ctx.getText(), ctx);
+        ParserRuleContext proofsexpr = exploiter.getSymbolDef(ctx.getText(), ctx);
 
         if (proofsexpr != null) {
             // descend into nested let term
@@ -181,7 +181,7 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
 
         // TODO: caching while ignoring bound vars leads to replacing bound vars by skolem constants
         // term may be in cache already
-        Term cached = smtReplayer.getTranslationToTerm(ctx.getText());
+        Term cached = exploiter.getTranslationToTerm(ctx.getText());
         if (cached != null) {
             return cached;
         }
@@ -375,14 +375,14 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
                 // Note that we ignore the parameters (we do not visit them) here, since the
                 // correct definition is found by the SkolemCollector.
                 String skName = ctx.func.getText();
-                Term skDef = smtReplayer.getSkolemSymbolDef(skName);
+                Term skDef = exploiter.getSkolemSymbolDef(skName);
                 if (skDef != null) {
                     // found definition of skolem symbol (was already in map)
                     return skDef;
                 } else {    // try to find definition of skolem symbol
-                    SkolemCollector skColl = new SkolemCollector(smtReplayer, skName, services);
+                    SkolemCollector skColl = new SkolemCollector(exploiter, skName, services);
                     // collect all skolem symbols and their definitions using ifEx/eps terms
-                    skColl.visit(smtReplayer.getProofStart());
+                    skColl.visit(exploiter.getProofStart());
                     skDef = skColl.getRawTerm();
                     //skDef = smtReplayer.getSkolemSymbolDef(ctx.getText());
                     //skDef = smtReplayer.getSkolemSymbolDef(skName);
@@ -510,7 +510,7 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
             varName = origVarName.substring(4);
         }*/
 
-        Term cached = smtReplayer.getTranslationToTerm(origVarName);
+        Term cached = exploiter.getTranslationToTerm(origVarName);
         if (cached != null) {
             if (cached.op() instanceof QuantifiableVariable) {
                 return (QuantifiableVariable) cached.op();
@@ -655,15 +655,15 @@ public class DefCollector extends SMTProofBaseVisitor<Term> {
 
         // if it is not found until now, the symbol could be a currently unknown skolem symbol
         // introduced by an sk rule in a proof leaf
-        Term skDef = smtReplayer.getSkolemSymbolDef(ctx.getText());
+        Term skDef = exploiter.getSkolemSymbolDef(ctx.getText());
         if (skDef != null) {
             // found definition of skolem symbol (was already in map)
             return skDef;
         } else {    // try to find definition of skolem symbol  -> skolem constant here!
-            SkolemCollector skColl = new SkolemCollector(smtReplayer, ctx.getText(), services);
+            SkolemCollector skColl = new SkolemCollector(exploiter, ctx.getText(), services);
             // collect all skolem symbols and their definitions using ifEx/eps terms
             //skColl.visit(smtReplayer.getTree());
-            skColl.visit(smtReplayer.getProofStart());
+            skColl.visit(exploiter.getProofStart());
             skDef = skColl.getRawTerm();
             //skDef = smtReplayer.getSkolemSymbolDef(ctx.getText());
             if (skDef != null) {

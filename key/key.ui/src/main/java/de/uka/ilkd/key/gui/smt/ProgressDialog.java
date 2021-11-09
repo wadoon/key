@@ -59,6 +59,7 @@ public class ProgressDialog extends JDialog{
         private static final long serialVersionUID = 1L;
         private final ProgressTable   table;
         private JButton  replayButton;
+        private JButton  quantInstButton;
         private JButton  applyButton;
         private JButton  stopButton;
         private JScrollPane scrollPane;
@@ -77,6 +78,7 @@ public class ProgressDialog extends JDialog{
         public void discardButtonClicked();
         public void additionalInformationChosen(Object obj);
         public void replayButtonClicked();
+        public void quantInstButtonClicked();
     }
 
     public ProgressDialog(ProgressModel model,ProgressDialogListener listener, boolean counterexample,
@@ -107,6 +109,8 @@ public class ProgressDialog extends JDialog{
                 	buttonBox.add(getApplyButton());
                     buttonBox.add(Box.createHorizontalStrut(5));
                     buttonBox.add(getReplayButton());
+                    buttonBox.add(Box.createHorizontalStrut(5));
+                    buttonBox.add(getQuantInstButton());
                     buttonBox.add(Box.createHorizontalStrut(5));
                 }
                 
@@ -211,6 +215,25 @@ public class ProgressDialog extends JDialog{
             }
             return replayButton;
         }
+
+    private JButton getQuantInstButton() {
+        if (quantInstButton == null) {
+            quantInstButton = new JButton("Extract Instantiations");
+            quantInstButton.setEnabled(false);
+            quantInstButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        listener.quantInstButtonClicked();
+                    } catch(Exception exception) {
+                        // There may be exceptions during replay that should not be lost.
+                        ExceptionDialog.showDialog(ProgressDialog.this, exception);
+                    }
+                }
+            });
+        }
+        return quantInstButton;
+    }
         
         private JButton getApplyButton() {
                 if(applyButton == null){
@@ -278,6 +301,8 @@ public class ProgressDialog extends JDialog{
                         applyButton.setEnabled(true);
                         if (replayButton != null)
                             replayButton.setEnabled(true);
+                        if (quantInstButton != null)
+                            quantInstButton.setEnabled(true);
                         break;
                 case stopModus:
                         stopButton.setText("Stop");
@@ -285,6 +310,8 @@ public class ProgressDialog extends JDialog{
                         applyButton.setEnabled(false);
                         if (replayButton != null)
                             replayButton.setEnabled(false);
+                        if (quantInstButton != null)
+                            quantInstButton.setEnabled(false);
                         break;
                         
                 }

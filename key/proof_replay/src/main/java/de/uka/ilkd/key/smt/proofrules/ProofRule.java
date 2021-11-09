@@ -135,7 +135,7 @@ public abstract class ProofRule {
         return term;
     }
 
-    protected ProofsexprContext extractRuleConclusionCtx(ProofsexprContext ctx) {
+    protected static ProofsexprContext extractRuleConclusionCtx(ProofsexprContext ctx) {
         return ctx.proofsexpr(ctx.proofsexpr().size() - 1);
     }
 

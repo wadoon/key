@@ -56,6 +56,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SolverType;
+import de.uka.ilkd.key.smt.quant_inst.QuantInstExploiter;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 public class SolverListener implements SolverLauncherListener {
@@ -264,6 +265,22 @@ public class SolverListener implements SolverLauncherListener {
             }
         }
 
+    private void exploitQuantInst() {
+        KeYMediator mediator = MainWindow.getInstance().getMediator();
+        mediator.stopInterface(true);
+        try {
+            for (SMTProblem problem : smtProblems) {
+                if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
+
+                    QuantInstExploiter extractor = new QuantInstExploiter(problem);
+                    extractor.apply();
+                }
+            }
+        } finally {
+            mediator.startInterface(true);
+        }
+    }
+
         private void applyResults() {
             KeYMediator mediator = MainWindow.getInstance().getMediator();
             mediator.stopInterface(true);
@@ -384,6 +401,12 @@ public class SolverListener implements SolverLauncherListener {
         private void replayEvent(final SolverLauncher launcher) {
             launcher.stop();
             replayResults();
+            progressDialog.setVisible(false);
+        }
+
+        private void quantInstEvent(final SolverLauncher launcher) {
+            launcher.stop();
+            exploitQuantInst();
             progressDialog.setVisible(false);
         }
 
@@ -702,6 +725,11 @@ public class SolverListener implements SolverLauncherListener {
             @Override
             public void replayButtonClicked() {
                 replayEvent(launcher);
+            }
+
+            @Override
+            public void quantInstButtonClicked() {
+                quantInstEvent(launcher);
             }
 
             @Override

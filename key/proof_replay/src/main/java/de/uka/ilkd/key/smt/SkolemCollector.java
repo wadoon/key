@@ -23,7 +23,7 @@ import static de.uka.ilkd.key.smt.SMTProofParser.*;
  * @author Wolfram Pfeifer
  */
 class SkolemCollector extends SMTProofBaseVisitor<Void> {
-    private final SMTReplayer smtReplayer;
+    private final SMTProofExploiter exploiter;
     private final String skVariable;
     private final Services services;
     private final SMTSymbolRetranslator retranslator;
@@ -39,8 +39,8 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
     /** used to carry variables bound by a quantifier into nested contexts */
     private final Deque<QuantifiableVariable> boundVars = new LinkedList<>();
 
-    public SkolemCollector(SMTReplayer smtReplayer, String skVariable, Services services) {
-        this.smtReplayer = smtReplayer;
+    public SkolemCollector(SMTProofExploiter exploiter, String skVariable, Services services) {
+        this.exploiter = exploiter;
         this.skVariable = skVariable;
         this.services = services;
         this.retranslator = new SMTSymbolRetranslator(services);
@@ -62,7 +62,7 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
             NoprooftermContext rhs = eqSat.noproofterm(2);
 
             // unwrap let if necessary
-            lhs = ReplayTools.ensureNoproofLookUp(lhs, smtReplayer);
+            lhs = ReplayTools.ensureNoproofLookUp(lhs, exploiter);
 
             // look for position of bound variable in quantifier term
             String boundVarName;
@@ -76,7 +76,7 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
 
                 // lhs.noproofterm(0) is 'not'
                 NoprooftermContext lookup = ReplayTools.ensureNoproofLookUp(lhs.noproofterm(1),
-                                                                            smtReplayer);
+                    exploiter);
                 if (lookup.quant != null && lookup.quant.getText().equals("forall")) {  // not all
                     boundVarName = lookup.sorted_var(0).SYMBOL().getText();
                     qvPos = ReplayTools.extractPosition(boundVarName, lookup.noproofterm(0));
@@ -97,7 +97,7 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
             // look for the skolem symbol name
             SMTProofParser.NoprooftermContext skSymbol = rhs;
             for (Integer i : qvPos) {
-                skSymbol = ReplayTools.ensureNoproofLookUp(skSymbol, smtReplayer).noproofterm(i);
+                skSymbol = ReplayTools.ensureNoproofLookUp(skSymbol, exploiter).noproofterm(i);
             }
 
             // abort if the name of the found skolem symbol does not equal the searched one
@@ -120,7 +120,7 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
                 }
             }
 
-            DefCollector collector = new DefCollector(smtReplayer, boundVars, services);
+            DefCollector collector = new DefCollector(exploiter, boundVars, services);
             Term term = collector.visit(lhs);
 
             if (term.op() == Quantifier.EX) {
@@ -201,7 +201,7 @@ class SkolemCollector extends SMTProofBaseVisitor<Void> {
 
     @Override
     public Void visitIdentifier(IdentifierContext ctx) {
-        ParserRuleContext letDef = smtReplayer.getSymbolDef(ctx.getText(), ctx);
+        ParserRuleContext letDef = exploiter.getSymbolDef(ctx.getText(), ctx);
         if (letDef != null) {
             visit(letDef);
         }
