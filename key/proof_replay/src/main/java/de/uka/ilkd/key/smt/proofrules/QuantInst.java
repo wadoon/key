@@ -162,13 +162,18 @@ public class QuantInst extends ProofRule {
     }
 
     public static Term extractQuantifierInstantiation(ProofsexprContext quantInstCtx,
-                                                      int varIndex,
+                                                      //int varIndex,
                                                       SMTProofExploiter exploiter,
                                                       Services services) {
+        //String s = ReplayTools.getOriginalText(quantInstCtx);
+        //System.out.println(s);
+
         ProofsexprContext conclusionCtx = extractRuleConclusionCtx(quantInstCtx);
         // conclusionCtx should be: (or (not (forall (x) (P x))) (P a))
         SMTProofParser.NoprooftermContext or = ReplayTools
             .ensureNoproofLookUp(conclusionCtx.noproofterm(), exploiter);
+
+        /*
         SMTProofParser.NoprooftermContext notAll = ReplayTools
             .ensureNoproofLookUp(or.noproofterm(1), exploiter);
         SMTProofParser.NoprooftermContext all = ReplayTools
@@ -202,8 +207,11 @@ public class QuantInst extends ProofRule {
             // fix: each subterm could be a symbol bound by let -> lookup first
             inst = ReplayTools.ensureNoproofLookUp(inst, exploiter).noproofterm(i);
         }
+        */
+
+        SMTProofParser.NoprooftermContext instantiated = or.noproofterm(2);
 
         // now convert instantiation to KeY term
-        return inst.accept(new DefCollector(exploiter, services));
+        return instantiated.accept(new DefCollector(exploiter, services));
     }
 }

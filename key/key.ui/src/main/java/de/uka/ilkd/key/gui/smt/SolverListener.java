@@ -276,6 +276,8 @@ public class SolverListener implements SolverLauncherListener {
                     extractor.apply();
                 }
             }
+        } catch (Throwable exc) {
+            exc.printStackTrace();
         } finally {
             mediator.startInterface(true);
         }
