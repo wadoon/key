@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.List;
 
-import recoder.backport.Backport;
+//import recoder.backport.Backport;
 import recoder.io.PropertyNames;
 import recoder.java.CompilationUnit;
 import recoder.service.SemanticsChecker;
@@ -54,7 +54,7 @@ public class ReadCorpus extends RecoderTestCase {
 			inputPath += base +"lib/*.jar";
 		
 		if (RUN_TRANSFORMATIONS) {
-			Backport.main(inputPath, "d:/tmp/corpus_trans");
+			//Backport.main(inputPath, "d:/tmp/corpus_trans");
 			return; // done, don't do any more
 		}
 		
