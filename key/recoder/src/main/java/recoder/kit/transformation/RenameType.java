@@ -1,11 +1,15 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.kit.transformation;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
-import recoder.abstraction.ArrayType;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.Type;
-import recoder.java.ProgramElement;
 import recoder.java.declaration.ConstructorDeclaration;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.reference.TypeReference;
@@ -13,58 +17,103 @@ import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
 import recoder.service.NameInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-
+/**
+ * Transformation that renames a type declaration and all known references to
+ * that type. The new name should not hide another type in the declaration
+ * context.
+ * <P>
+ * <B>Implementation warning: </B> does not (yet) check vadility of new name in
+ * the context.
+ * 
+ * @author AL
+ */
 public class RenameType extends TwoPassTransformation {
-    private final TypeDeclaration type;
 
-    private final String newName;
+    private TypeDeclaration type;
+
+    private String newName;
 
     private List<TypeReference> refs;
 
     private List<? extends Constructor> cons;
 
+    /**
+     * Creates a new transformation object that renames a type declaration and
+     * all known references to that type. The new name should not hide another
+     * type in the declaration context.
+     * 
+     * @param sc
+     *            the service configuration to use.
+     * @param type
+     *            the type declaration to be renamed; may not be <CODE>null
+     *            </CODE> and may not be an anonymous type.
+     * @param newName
+     *            the new name for the element; may not be <CODE>null</CODE>
+     *            and must denote a valid identifier name.
+     */
     public RenameType(CrossReferenceServiceConfiguration sc, TypeDeclaration type, String newName) {
         super(sc);
-        if (type == null)
+        if (type == null) {
             throw new IllegalArgumentException("Missing type");
-        if (type.getName() == null)
+        }
+        if (type.getName() == null) {
             throw new IllegalArgumentException("May not rename anonymous types");
-        if (newName == null)
+        }
+        if (newName == null) {
             throw new IllegalArgumentException("Missing name");
+        }
         this.type = type;
         this.newName = newName;
     }
 
+    /**
+     * Collects all references to the type and all existing array variants, as
+     * well as all constructor declarations. Constructor references are not
+     * relevant, as they are either nameless (super / this), or contain a type
+     * reference already.
+     * 
+     * @return the problem report.
+     */
     public ProblemReport analyze() {
-        this.refs = new ArrayList<TypeReference>();
-        if (this.newName.equals(this.type.getName()))
+        refs = new ArrayList<TypeReference>();
+        if (newName.equals(type.getName())) {
             return setProblemReport(IDENTITY);
+        }
         NameInfo ni = getNameInfo();
-        this.refs.addAll(getCrossReferenceSourceInfo().getReferences(this.type));
-        this.cons = this.type.getConstructors();
-        if (this.cons == null)
-            this.cons = new ArrayList<Constructor>(0);
-        ArrayType arrayType = ni.getArrayType(this.type);
-        while (arrayType != null) {
-            this.refs.addAll(getCrossReferenceSourceInfo().getReferences(arrayType));
-            arrayType = ni.getArrayType(arrayType);
+        refs.addAll(getCrossReferenceSourceInfo().getReferences(type));
+        cons = type.getConstructors();
+        if (cons == null) {
+            cons = Collections.emptyList();
+        }
+        Type atype = ni.getArrayType(type);
+        while (atype != null) {
+            refs.addAll(getCrossReferenceSourceInfo().getReferences(atype));
+            atype = ni.getArrayType(atype);
         }
         return setProblemReport(EQUIVALENCE);
     }
 
+    /**
+     * Locally renames the type declaration, all type references and
+     * constructors collected in the analyzation phase.
+     * 
+     * @exception IllegalStateException
+     *                if the analyzation has not been called.
+     * @see #analyze()
+     */
     public void transform() {
         super.transform();
         ProgramFactory pf = getProgramFactory();
-        replace(this.type.getIdentifier(), pf.createIdentifier(this.newName));
-        int i;
-        for (i = this.cons.size() - 1; i >= 0; i--) {
-            Constructor con = this.cons.get(i);
-            if (con instanceof ConstructorDeclaration)
-                replace(((ConstructorDeclaration) con).getIdentifier(), pf.createIdentifier(this.newName));
+        replace(type.getIdentifier(), pf.createIdentifier(newName));
+        for (int i = cons.size() - 1; i >= 0; i -= 1) {
+            Constructor con = cons.get(i);
+            if (con instanceof ConstructorDeclaration) {
+                replace(((ConstructorDeclaration) con).getIdentifier(), pf.createIdentifier(newName));
+            }
         }
-        for (i = this.refs.size() - 1; i >= 0; i--)
-            replace(this.refs.get(i).getIdentifier(), pf.createIdentifier(this.newName));
+        for (int i = refs.size() - 1; i >= 0; i -= 1) {
+            replace(refs.get(i).getIdentifier(), pf.createIdentifier(newName));
+        }
     }
 }
+

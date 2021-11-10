@@ -1,29 +1,95 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.java.expression.operator;
 
-import recoder.java.*;
+import recoder.java.Expression;
+import recoder.java.ExpressionContainer;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.ProgramElement;
+import recoder.java.Reference;
+import recoder.java.SourceElement;
+import recoder.java.SourceVisitor;
 import recoder.java.expression.ArrayInitializer;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.ReferenceSuffix;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTList;
 
+/**
+ * The array allocation operator. There are two variants for NewArray:
+ * <OL>
+ * <LI>Ordinary array construction <BR>
+ * <tt>new XYZ[d<sub>1</sub>]...[d<sub>n</sub>]</tt>
+ * <LI>Initialized array construction <BR>
+ * <tt>new XYZ[]...[] { a<sub>1</sub>, ..., a<sub>n</sub> }
+ </OL>
+ Contrary to an ordinary New, a NewArray is no ConstructorReference (since
+ all ArrayType constructors are predefined) and is not used as a Statement
+ (since there are no side effects in the constructor). No access path is
+ required for new, since there is no inner class problem.
+ <P>
+ NewArray has either a list of dimension length expressions, or
+ a single ArrayInitializer.
+ */
+
 public class NewArray extends TypeOperator implements Reference, ReferencePrefix {
-    private static final long serialVersionUID = 836360320945022449L;
+
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = 836360320945022449L;
+
+	/**
+     * Dimensions.
+     */
 
     protected int dimensions;
 
+    /**
+     * Array initializer.
+     */
+
     protected ArrayInitializer arrayInitializer;
+
+    /**
+     * Reference parent.
+     */
 
     protected ReferenceSuffix referenceParent;
 
+    /**
+     * New array.
+     */
+
     public NewArray() {
+        // nothing to do
     }
+
+    /**
+     * New array.
+     * 
+     * @param arrayName
+     *            a type reference.
+     * @param dimExpr
+     *            an expression mutable list.
+     */
 
     public NewArray(TypeReference arrayName, ASTList<Expression> dimExpr) {
         setTypeReference(arrayName);
         setArguments(dimExpr);
         makeParentRoleValid();
     }
+
+    /**
+     * New array.
+     * 
+     * @param arrayName
+     *            a type reference.
+     * @param dimensions
+     *            an int value.
+     * @param initializer
+     *            an array initializer.
+     */
 
     public NewArray(TypeReference arrayName, int dimensions, ArrayInitializer initializer) {
         setTypeReference(arrayName);
@@ -32,172 +98,332 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
         makeParentRoleValid();
     }
 
+    /**
+     * New array.
+     * 
+     * @param proto
+     *            a new array.
+     */
+
     protected NewArray(NewArray proto) {
         super(proto);
-        if (proto.arrayInitializer != null)
-            this.arrayInitializer = proto.arrayInitializer.deepClone();
-        this.dimensions = proto.dimensions;
+        if (proto.arrayInitializer != null) {
+            arrayInitializer = proto.arrayInitializer.deepClone();
+        }
+        dimensions = proto.dimensions;
         makeParentRoleValid();
     }
+
+    /**
+     * Deep clone.
+     * 
+     * @return the object.
+     */
 
     public NewArray deepClone() {
         return new NewArray(this);
     }
 
+    /**
+     * Make parent role valid.
+     */
+
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (this.arrayInitializer != null)
-            this.arrayInitializer.setExpressionContainer(this);
+        if (arrayInitializer != null) {
+            arrayInitializer.setExpressionContainer(this);
+        }
     }
 
     public SourceElement getLastElement() {
-        if (this.arrayInitializer != null)
-            return this.arrayInitializer.getLastElement();
+        if (arrayInitializer != null) {
+            return arrayInitializer.getLastElement();
+        }
         return this;
     }
 
     public int getChildPositionCode(ProgramElement child) {
-        if (this.children != null) {
-            int index = this.children.indexOf(child);
-            if (index >= 0)
-                return index << 4 | 0x0;
+        // role 0 (IDX): subexpression, or parameters
+        // role 1: type reference (for type operators only)
+        // role 2: prefix (for New only)
+        // role 3: class declaration (for New only), or
+        // array initializer (for NewArray)
+        if (children != null) {
+            int index = children.indexOf(child);
+            if (index >= 0) {
+                return (index << 4) | 0;
+            }
         }
-        if (this.typeReference == child)
+        if (typeReference == child) {
             return 1;
-        if (this.arrayInitializer == child)
+        }
+        if (arrayInitializer == child) {
             return 3;
+        }
         return -1;
     }
 
+    /**
+     * Get AST parent.
+     * 
+     * @return the non terminal program element.
+     */
+
     public NonTerminalProgramElement getASTParent() {
-        if (this.expressionParent != null)
-            return this.expressionParent;
-        return this.referenceParent;
+        if (expressionParent != null) {
+            return expressionParent;
+        } else {
+            return referenceParent;
+        }
     }
+
+    /**
+     * Get arity.
+     * 
+     * @return the int value.
+     */
 
     public int getArity() {
         return 0;
     }
 
+    /**
+     * Get precedence.
+     * 
+     * @return the int value.
+     */
+
     public int getPrecedence() {
         return 0;
     }
 
+    /**
+     * Get notation.
+     * 
+     * @return the int value.
+     */
+
     public int getNotation() {
-        return 0;
+        return PREFIX;
     }
+
+    /**
+     * Get reference suffix.
+     * 
+     * @return the reference suffix.
+     */
 
     public ReferenceSuffix getReferenceSuffix() {
-        return this.referenceParent;
+        return referenceParent;
     }
+
+    /**
+     * Set reference suffix.
+     * 
+     * @param path
+     *            a reference suffix.
+     */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
-        this.referenceParent = path;
+        referenceParent = path;
     }
+
+    /**
+     * Get expression container.
+     * 
+     * @return the expression container.
+     */
 
     public ExpressionContainer getExpressionContainer() {
-        return this.expressionParent;
+        return expressionParent;
     }
+
+    /**
+     * Set expression container.
+     * 
+     * @param parent
+     *            an expression container.
+     */
 
     public void setExpressionContainer(ExpressionContainer parent) {
-        this.expressionParent = parent;
+        expressionParent = parent;
     }
+
+    /**
+     * Get dimensions.
+     * 
+     * @return the int value.
+     */
 
     public int getDimensions() {
-        return this.dimensions;
+        return dimensions;
     }
+
+    /**
+     * dim must be >= getDimensionLengths().size() If not, the dimensions are
+     * ignored during pretty print, but the model is not considered valid!
+     */
 
     public void setDimensions(int dim) {
-        this.dimensions = dim;
+        dimensions = dim;
     }
 
-    public ArrayInitializer getArrayInitializer() {
-        return this.arrayInitializer;
-    }
+    /**
+     * Set array initializer.
+     * 
+     * @param init
+     *            an array initializer.
+     */
 
     public void setArrayInitializer(ArrayInitializer init) {
-        this.arrayInitializer = init;
+        arrayInitializer = init;
     }
+
+    /**
+     * Get array initializer.
+     * 
+     * @return the array initializer.
+     */
+
+    public ArrayInitializer getArrayInitializer() {
+        return arrayInitializer;
+    }
+
+    /**
+     * Returns the number of children of this node.
+     * 
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
         int result = 0;
-        if (this.typeReference != null)
+        if (typeReference != null)
             result++;
-        if (this.children != null)
-            result += this.children.size();
-        if (this.arrayInitializer != null)
+        if (children != null)
+            result += children.size();
+        if (arrayInitializer != null)
             result++;
         return result;
     }
 
+    /**
+     * Returns the child at the specified index in this node's "virtual" child
+     * array
+     * 
+     * @param index
+     *            an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException
+     *                if <tt>index</tt> is out of bounds
+     */
+
     public ProgramElement getChildAt(int index) {
-        if (this.typeReference != null) {
+        int len;
+        if (typeReference != null) {
             if (index == 0)
-                return this.typeReference;
+                return typeReference;
             index--;
         }
-        if (this.children != null) {
-            int len = this.children.size();
-            if (len > index)
-                return this.children.get(index);
+        if (children != null) {
+            len = children.size();
+            if (len > index) {
+                return children.get(index);
+            }
             index -= len;
         }
-        if (this.arrayInitializer != null &&
-                index == 0)
-            return this.arrayInitializer;
+        if (arrayInitializer != null) {
+            if (index == 0)
+                return arrayInitializer;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
+
+    /**
+     * Get the number of expressions in this container.
+     * 
+     * @return the number of expressions.
+     */
 
     public int getExpressionCount() {
         int result = 0;
-        if (this.children != null)
-            result += this.children.size();
-        if (this.arrayInitializer != null)
+        if (children != null)
+            result += children.size();
+        if (arrayInitializer != null)
             result++;
         return result;
     }
 
+    /*
+     * Return the expression at the specified index in this node's "virtual"
+     * expression array. @param index an index for an expression. @return the
+     * expression with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     */
+
     public Expression getExpressionAt(int index) {
-        if (this.children != null) {
-            int len = this.children.size();
-            if (len > index)
-                return this.children.get(index);
+        int len;
+        if (children != null) {
+            len = children.size();
+            if (len > index) {
+                return children.get(index);
+            }
             index -= len;
         }
-        if (this.arrayInitializer != null &&
-                index == 0)
-            return this.arrayInitializer;
+        if (arrayInitializer != null) {
+            if (index == 0)
+                return arrayInitializer;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
+    /**
+     * Replace a single child in the current node. The child to replace is
+     * matched by identity and hence must be known exactly. The replacement
+     * element can be null - in that case, the child is effectively removed. The
+     * parent role of the new child is validated, while the parent link of the
+     * replaced child is left untouched.
+     * 
+     * @param p
+     *            the old child.
+     * @param p
+     *            the new child.
+     * @return true if a replacement has occured, false otherwise.
+     * @exception ClassCastException
+     *                if the new child cannot take over the role of the old one.
+     */
+
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
-        int count = (this.children == null) ? 0 : this.children.size();
+        }
+        int count;
+        count = (children == null) ? 0 : children.size();
         for (int i = 0; i < count; i++) {
-            if (this.children.get(i) == p) {
+            if (children.get(i) == p) {
                 if (q == null) {
-                    this.children.remove(i);
+                    children.remove(i);
                 } else {
                     Expression r = (Expression) q;
-                    this.children.set(i, r);
+                    children.set(i, r);
                     r.setExpressionContainer(this);
                 }
                 return true;
             }
         }
-        if (this.typeReference == p) {
+        if (typeReference == p) {
             TypeReference r = (TypeReference) q;
-            this.typeReference = r;
-            if (r != null)
+            typeReference = r;
+            if (r != null) {
                 r.setParent(this);
+            }
             return true;
         }
-        if (this.arrayInitializer == p) {
+        if (arrayInitializer == p) {
             ArrayInitializer r = (ArrayInitializer) q;
-            this.arrayInitializer = r;
-            if (r != null)
+            arrayInitializer = r;
+            if (r != null) {
                 r.setExpressionContainer(this);
+            }
             return true;
         }
         return false;

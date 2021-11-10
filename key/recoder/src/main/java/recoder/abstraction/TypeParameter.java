@@ -1,61 +1,60 @@
+/*
+ * Created on 25.11.2005
+ *
+ * This file is part of the RECODER library and protected by the LGPL.
+ * 
+ */
 package recoder.abstraction;
-
-import recoder.service.ProgramModelInfo;
 
 import java.util.List;
 
+/**
+ * @author Tobias Gutzmann
+ *
+ */
 public interface TypeParameter extends ClassType {
-    String getParameterName();
-
-    int getBoundCount();
-
-    String getBoundName(int paramInt);
-
-    List<? extends TypeArgument> getBoundTypeArguments(int paramInt);
-
-    ClassType getContainingClassType();
-
-    class EqualsImplementor {
-        public static boolean equals(TypeParameter t1, Object o) {
-            if (t1 == o)
-                return true;
-            if (!(o instanceof TypeParameter))
-                return false;
-            TypeParameter t2 = (TypeParameter) o;
-            ClassType c1 = t1.getContainingClassType();
-            ClassType c2 = t2.getContainingClassType();
-            if (c1 == null || c2 == null)
-                return false;
-            if (c1 == c2)
-                return false;
-            ProgramModelInfo pmi = c1.getProgramModelInfo();
-            if (pmi.isSubtype(c1, c2)) {
-                List<ClassType> tl = c1.getSupertypes();
-                for (int i = 0, s = tl.size(); i < s; i++) {
-                    ClassType superCT = tl.get(i);
-                    if (superCT.getTypeParameters() != null)
-                        if (superCT instanceof ParameterizedType) {
-                            TypeParameter tryUpwards = null;
-                            int ridx = -1;
-                            List<? extends TypeArgument> rl = ((ParameterizedType) superCT).getTypeArgs();
-                            for (int j = 0; j < rl.size(); j++) {
-                                TypeArgument ta = rl.get(j);
-                                if (ta.getTypeName().equals(t1.getName())) {
-                                    ridx = j;
-                                    break;
-                                }
-                            }
-                            if (ridx != -1) {
-                                tryUpwards = superCT.getTypeParameters().get(ridx);
-                                if (equals(tryUpwards, t2))
-                                    return true;
-                            }
-                        }
-                }
-            } else if (pmi.isSubtype(c2, c1)) {
-                return equals((TypeParameter) o, t1);
-            }
-            return false;
-        }
-    }
+	public String getParameterName();
+	
+	/**
+	 * Guaranteed to be >= 1. Implementations of 
+	 * this class make sure that at least 
+	 * java.lang.Object is declared.
+	 * @return The number of bounds.
+	 */
+	public int getBoundCount();
+	/**
+	 *
+	 * @param boundidx
+	 * @return the fully qualified name, unless bound refers to a type parameter, in which case it's the simple name of the type parameter.
+	 */
+	public String getBoundName(int boundidx);
+	/**
+	 * @return The type arguments to the bound at position <code>i</code>.
+     * possibly <code>null</code>.
+	 */
+	public List<? extends TypeArgument> getBoundTypeArguments(int boundidx);
+	
+	public static class DescrImp {
+		public static String getFullSignature(TypeParameter tp) {			
+			String res = tp.getParameterName();
+			String del = " extends ";
+			for (int i = 0; i < tp.getBoundCount(); i++) {
+				res += del;
+				res += tp.getBoundName(i);
+				List<? extends TypeArgument> tas = tp.getBoundTypeArguments(i);
+				if (tas != null && tas.size() > 0) {
+					res += "<";
+					String delim2 = "";
+					for (TypeArgument ta : tas) {
+						res += delim2;
+						res += ta.getFullSignature();
+						delim2 = ",";
+					}
+					res += ">";
+				}
+				del = ",";
+			}
+			return res;
+		}
+	}
 }

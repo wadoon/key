@@ -1,29 +1,82 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.java;
 
-import recoder.java.reference.*;
+import recoder.java.reference.PackageReference;
+import recoder.java.reference.PackageReferenceContainer;
+import recoder.java.reference.TypeReference;
+import recoder.java.reference.TypeReferenceContainer;
+import recoder.java.reference.TypeReferenceInfix;
+import recoder.java.reference.UncollatedReferenceQualifier;
+
+/**
+ * Import.
+ * 
+ * @author <TT>AutoDoc</TT>
+ */
 
 public class Import extends JavaNonTerminalProgramElement implements TypeReferenceContainer, PackageReferenceContainer {
-    private static final long serialVersionUID = -722260309045817264L;
 
-    protected boolean isMultiImport;
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = -722260309045817264L;
 
-    protected boolean isStaticImport;
+	/**
+     * Multi import flag.
+     */
+	private boolean isMultiImport;
 
-    protected CompilationUnit parent;
+    /**
+     * Static import flag (Java 5).
+     */
+	private boolean isStaticImport;
+    
+    /**
+     * Parent.
+     */
+	private CompilationUnit parent;
 
-    protected TypeReferenceInfix reference;
+    /**
+     * Type reference infix.
+     */
+	private TypeReferenceInfix reference;
 
-    protected Identifier staticIdentifier;
-
+    /**
+     * the identifier used if this is a static import.
+     */
+	private Identifier staticIdentifier;
+    
+    /**
+     * Import.
+     */
     public Import() {
+        // creates uninitialized import
     }
+
+    /**
+     * Creates a non-static (default) Import.
+     * Same as <code>new Import(t, multi, false)</code>
+     * 
+     * @param t
+     *            a type reference.
+     * @param multi
+     *            indicates the wildcard.
+     */
 
     public Import(TypeReference t, boolean multi) {
         setReference(t);
         setMultiImport(multi);
         makeParentRoleValid();
     }
-
+    
+    /**
+     * Creates a static Import.
+     * 
+     * @param t
+     * @param multi
+     * @param isStatic
+     */
     public Import(TypeReference t, Identifier id) {
         setReference(t);
         setStaticIdentifier(id);
@@ -31,7 +84,7 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
         setStaticImport(true);
         makeParentRoleValid();
     }
-
+    
     public Import(TypeReference t, boolean multi, boolean isStatic) {
         setReference(t);
         setMultiImport(multi);
@@ -39,6 +92,12 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
         makeParentRoleValid();
     }
 
+    /**
+     * Import.
+     * 
+     * @param t
+     *            a package reference.
+     */
     public Import(PackageReference t) {
         setReference(t);
         setMultiImport(true);
@@ -46,143 +105,264 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
         makeParentRoleValid();
     }
 
+    /**
+     * Import.
+     * 
+     * @param proto
+     *            an import.
+     */
     protected Import(Import proto) {
         super(proto);
-        if (proto.reference != null)
-            this.reference = (TypeReferenceInfix) proto.reference.deepClone();
-        if (proto.staticIdentifier != null)
-            this.staticIdentifier = proto.staticIdentifier.deepClone();
-        this.isMultiImport = proto.isMultiImport;
-        this.isStaticImport = proto.isStaticImport;
+        if (proto.reference != null) {
+            reference = (TypeReferenceInfix) proto.reference.deepClone();
+        }
+        if (proto.staticIdentifier != null) {
+            staticIdentifier = proto.staticIdentifier.deepClone();
+        }
+        isMultiImport = proto.isMultiImport;
+        isStaticImport = proto.isStaticImport;
         makeParentRoleValid();
     }
 
+    /**
+     * Make parent role valid.
+     */
     public void makeParentRoleValid() {
-        super.makeParentRoleValid();
-        if (this.staticIdentifier != null)
-            this.staticIdentifier.setParent(this);
-        if (this.reference instanceof TypeReference) {
-            ((TypeReference) this.reference).setParent(this);
-        } else if (this.reference instanceof PackageReference) {
-            ((PackageReference) this.reference).setParent(this);
-        } else if (this.reference instanceof UncollatedReferenceQualifier) {
-            ((UncollatedReferenceQualifier) this.reference).setParent(this);
-        } else {
-            throw new IllegalStateException("Unknown reference type encountered");
-        }
+        if (staticIdentifier != null)
+            staticIdentifier.setParent(this);
+        if (reference instanceof TypeReference) {
+            ((TypeReference) reference).setParent(this);
+        } else if (reference instanceof PackageReference) {
+            ((PackageReference) reference).setParent(this);
+        } else if (reference instanceof UncollatedReferenceQualifier) {
+            ((UncollatedReferenceQualifier) reference).setParent(this);
+        } else throw new IllegalStateException("Unknown reference type encountered");
     }
 
+    /**
+     * Deep clone.
+     * 
+     * @return the object.
+     */
     public Import deepClone() {
         return new Import(this);
     }
 
     public SourceElement getLastElement() {
-        return this.reference.getLastElement();
+        return reference.getLastElement();
     }
 
+    /**
+     * Checks if this import is a multi type import, also known as
+     * type-on-demand import.
+     * 
+     * @return the kind of this import.
+     */
     public boolean isMultiImport() {
-        return this.isMultiImport;
+        return isMultiImport;
     }
-
-    public void setMultiImport(boolean multi) {
-        if (!multi && this.reference instanceof PackageReference)
-            throw new IllegalArgumentException("Package imports are always multi");
-        this.isMultiImport = multi;
-    }
-
+    
+    /**
+     * Checks if this import is a static import (Java 5).
+     * 
+     * @return wether or not the import is a static import
+     */
     public boolean isStaticImport() {
-        return this.isStaticImport;
+        return isStaticImport;
     }
 
+    /**
+     * Sets this import to be a multi type import.
+     * 
+     * @param multi
+     *            denotes the wildcard for this import.
+     * @exception IllegalArgumentException
+     *                if the reference is a package and multi is <CODE>false
+     *                </CODE>.
+     */
+    public void setMultiImport(boolean multi) {
+        if (!multi && reference instanceof PackageReference) {
+            throw new IllegalArgumentException("Package imports are always multi");
+        }
+        isMultiImport = multi;
+    }
+    
     public void setStaticImport(boolean isStatic) {
-        this.isStaticImport = isStatic;
+        isStaticImport = isStatic;
     }
-
-    public Identifier getStaticIdentifier() {
-        return this.staticIdentifier;
-    }
-
+    
     public void setStaticIdentifier(Identifier id) {
-        this.staticIdentifier = id;
+        staticIdentifier = id;
+    }
+    
+    public Identifier getStaticIdentifier() {
+        return staticIdentifier;
     }
 
+    /**
+     * Get AST parent.
+     * 
+     * @return the non terminal program element.
+     */
     public NonTerminalProgramElement getASTParent() {
-        return this.parent;
+        return parent;
     }
 
+    /**
+     * Returns the number of children of this node.
+     * 
+     * @return an int giving the number of children of this node
+     */
     public int getChildCount() {
         int result = 0;
-        if (this.reference != null)
+        if (reference != null)
             result++;
-        if (this.staticIdentifier != null)
+        if (staticIdentifier != null)
             result++;
         return result;
     }
 
+    /**
+     * Returns the child at the specified index in this node's "virtual" child
+     * array
+     * 
+     * @param index
+     *            an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException
+     *                if <tt>index</tt> is out of bounds
+     */
     public ProgramElement getChildAt(int index) {
-        if (this.reference != null) {
+        if (reference != null) {
             if (index == 0)
-                return this.reference;
+                return reference;
             index--;
-        }
-        if (index == 0 && this.staticIdentifier != null)
-            return this.staticIdentifier;
+        } 
+        if (index == 0 && staticIdentifier != null)
+            return staticIdentifier;
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
-        if (child == this.reference)
+        // role 0: reference
+    	// role 1: static identifier (java 5 only)
+        if (child == reference) {
             return 0;
-        if (child == this.staticIdentifier)
+        }
+        if (child == staticIdentifier) {
             return 1;
+        }
         return -1;
     }
 
+    /**
+     * Get parent.
+     * 
+     * @return the compilation unit.
+     */
     public CompilationUnit getParent() {
-        return this.parent;
+        return parent;
     }
 
+    /**
+     * Set parent.
+     * 
+     * @param u
+     *            a compilation unit.
+     */
     public void setParent(CompilationUnit u) {
-        this.parent = u;
+        parent = u;
     }
 
+    /**
+     * Get the number of type references in this container.
+     * 
+     * @return the number of type references.
+     */
     public int getTypeReferenceCount() {
-        return (this.reference instanceof TypeReference) ? 1 : 0;
+        return (reference instanceof TypeReference) ? 1 : 0;
     }
 
+    /*
+     * Return the type reference at the specified index in this node's "virtual"
+     * type reference array. @param index an index for a type reference. @return
+     * the type reference with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     */
     public TypeReference getTypeReferenceAt(int index) {
-        if (this.reference instanceof TypeReference && index == 0)
-            return (TypeReference) this.reference;
+        if (reference instanceof TypeReference && index == 0) {
+            return (TypeReference) reference;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
+    /**
+     * Returns the type reference of this import, if there is one.
+     * 
+     * @return the reference of this import statement.
+     */
     public TypeReference getTypeReference() {
-        return (this.reference instanceof TypeReference) ? (TypeReference) this.reference : null;
+        return (reference instanceof TypeReference) ? (TypeReference) reference : null;
     }
 
+    /**
+     * Returns the package reference of this import, if there is one.
+     * Note that if reference is a URQ, this method will return <code>null</code>,
+     * although this URQ may denote a Package.
+     * 
+     * @return the reference of this import statement.
+     */
     public PackageReference getPackageReference() {
-        return (this.reference instanceof PackageReference) ? (PackageReference) this.reference : null;
+        return (reference instanceof PackageReference) ? (PackageReference) reference : null;
     }
 
+    /**
+     * Returns the reference of this import, either a type or a package
+     * reference.
+     * 
+     * @return the reference of this import statement.
+     */
     public TypeReferenceInfix getReference() {
-        return this.reference;
+        return reference;
     }
 
+    /**
+     * Set reference.
+     * 
+     * @param t
+     *            a type reference infix.
+     */
     public void setReference(TypeReferenceInfix t) {
-        this.reference = t;
+        reference = t;
     }
-
+    
+    /**
+     * Replace a single child in the current node. The child to replace is
+     * matched by identity and hence must be known exactly. The replacement
+     * element can be null - in that case, the child is effectively removed. The
+     * parent role of the new child is validated, while the parent link of the
+     * replaced child is left untouched.
+     * 
+     * @param p
+     *            the old child.
+     * @param p
+     *            the new child.
+     * @return true if a replacement has occured, false otherwise.
+     * @exception ClassCastException
+     *                if the new child cannot take over the role of the old one.
+     */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
-        if (this.reference == p) {
+        }
+        if (reference == p) {
             TypeReferenceInfix r = (TypeReferenceInfix) q;
-            this.reference = r;
+            reference = r;
             if (r instanceof TypeReference) {
                 ((TypeReference) r).setParent(this);
             } else if (r instanceof PackageReference) {
                 ((PackageReference) r).setParent(this);
-                this.isMultiImport = true;
+                isMultiImport = true;
             }
             return true;
         }
@@ -191,5 +371,11 @@ public class Import extends JavaNonTerminalProgramElement implements TypeReferen
 
     public void accept(SourceVisitor v) {
         v.visitImport(this);
+    }
+ 
+    @Override
+    public String toString() {
+    	return "<Import"+ (isStaticImport ? " static" : "") + "> " + reference.getName() + 
+    		(isMultiImport ? ".*" : "");
     }
 }

@@ -1,24 +1,42 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.service;
 
-import recoder.ModelElement;
 import recoder.convenience.Format;
+import recoder.java.CompilationUnit;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 import recoder.util.Debug;
 
+/**
+ * A detachment change of a syntax tree.
+ */
 public class DetachChange extends TreeChange {
+
+    /**
+     * The former parent of the root.
+     */
     private final NonTerminalProgramElement parent;
 
-    private int position;
+    /**
+     * The former position code in the former parent.
+     */
+    private final int position;
 
-    private AttachChange replacement;
+    /**
+     * An attach change that effectively replaced this This information may be
+     * redundant, but is not in general.
+     */
+    private final AttachChange replacement;
 
     DetachChange(ProgramElement root, NonTerminalProgramElement parent, int position) {
         super(root);
         this.parent = parent;
         this.position = position;
-        if (position < 0)
+        replacement = null;
+        if (position < 0) {
             throw new IllegalChangeReportException("Illegal position code in " + toString());
+        }
     }
 
     DetachChange(ProgramElement root, AttachChange replacement) {
@@ -27,40 +45,47 @@ public class DetachChange extends TreeChange {
         this.replacement = replacement;
         ProgramElement rep = replacement.getChangeRoot();
         this.parent = rep.getASTParent();
-        if (this.parent != null) {
-            this.position = this.parent.getChildPositionCode(rep);
-            if (this.position < 0)
+        if (parent != null) {
+            // could be a compilation unit!
+            this.position = parent.getChildPositionCode(rep);
+            if (position < 0) {
                 throw new IllegalChangeReportException("Illegal position code in " + replacement.toString());
+            }
         }
+        else position = -1;
     }
 
     public final NonTerminalProgramElement getChangeRootParent() {
-        return this.parent;
+        return parent;
     }
 
     public final int getChangePositionCode() {
-        return this.position;
+        return position;
     }
 
     public final AttachChange getReplacement() {
-        return this.replacement;
+        return replacement;
     }
 
-    final void setReplacement(AttachChange ac) {
-        this.replacement = ac;
-    }
 
     public String toString() {
-        StringBuffer buf = new StringBuffer();
-        if (isMinor())
+    	StringBuilder buf = new StringBuilder();
+        if (isMinor()) {
             buf.append("Minor ");
+        }
         buf.append("Detached: ");
-        if (getChangeRoot() instanceof recoder.java.CompilationUnit) {
+        if (getChangeRoot() instanceof CompilationUnit) {
             buf.append(Format.toString("%c %u", getChangeRoot()));
         } else {
             buf.append(Format.toString("%c %n", getChangeRoot()));
             buf.append(Format.toString(" from %c %n in %u @%p", getChangeRootParent()));
+            /*
+             * buf.append(" in role "); buf.append(getChangePositionCode() &
+             * 15); buf.append(" at index "); buf.append(getChangePositionCode() >>
+             * 4);
+             */
         }
         return buf.toString();
     }
 }
+

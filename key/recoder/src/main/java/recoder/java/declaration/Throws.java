@@ -1,124 +1,272 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.java.declaration;
 
-import recoder.java.*;
+import recoder.java.JavaNonTerminalProgramElement;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.ProgramElement;
+import recoder.java.SourceElement;
+import recoder.java.SourceVisitor;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
+/**
+ * Throws.
+ * 
+ * @author <TT>AutoDoc</TT>
+ */
+
 public class Throws extends JavaNonTerminalProgramElement implements TypeReferenceContainer {
-    private static final long serialVersionUID = 7556905452727718279L;
 
-    protected MethodDeclaration parent;
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = 7556905452727718279L;
 
-    protected ASTList<TypeReference> exceptions;
+	/**
+     * Parent.
+     */
+
+	private MethodDeclaration parent;
+
+    /**
+     * Exceptions.
+     */
+
+    private ASTList<TypeReference> exceptions;
+
+    /**
+     * Throws.
+     */
 
     public Throws() {
+        // nothing to do here
     }
+
+    /**
+     * Throws.
+     * 
+     * @param exception
+     *            a type reference.
+     */
 
     public Throws(TypeReference exception) {
-        this.exceptions = (ASTList<TypeReference>) new ASTArrayList(1);
-        this.exceptions.add(exception);
+        exceptions = new ASTArrayList<TypeReference>(1);
+        exceptions.add(exception);
         makeParentRoleValid();
     }
 
+    /**
+     * Throws.
+     * 
+     * @param list
+     *            a type reference mutable list.
+     */
+
     public Throws(ASTList<TypeReference> list) {
-        this.exceptions = list;
+        exceptions = list;
         makeParentRoleValid();
     }
+
+    /**
+     * Throws.
+     * 
+     * @param proto
+     *            a throws.
+     */
 
     protected Throws(Throws proto) {
         super(proto);
-        if (proto.exceptions != null)
-            this.exceptions = proto.exceptions.deepClone();
+        if (proto.exceptions != null) {
+            exceptions = proto.exceptions.deepClone();
+        }
         makeParentRoleValid();
     }
+
+    /**
+     * Deep clone.
+     * 
+     * @return the object.
+     */
 
     public Throws deepClone() {
         return new Throws(this);
     }
 
+    /**
+     * Make parent role valid.
+     */
+
     public void makeParentRoleValid() {
-        super.makeParentRoleValid();
-        if (this.exceptions != null)
-            for (int i = this.exceptions.size() - 1; i >= 0; i--)
-                this.exceptions.get(i).setParent(this);
+        if (exceptions != null) {
+            for (int i = exceptions.size() - 1; i >= 0; i -= 1) {
+                exceptions.get(i).setParent(this);
+            }
+        }
     }
 
     public SourceElement getLastElement() {
-        if (this.exceptions == null)
+        if (exceptions == null) {
             return this;
-        return this.exceptions.get(this.exceptions.size() - 1);
+        }
+        return exceptions.get(exceptions.size() - 1);
     }
 
+    /**
+     * Get AST parent.
+     * 
+     * @return the non terminal program element.
+     */
+
     public NonTerminalProgramElement getASTParent() {
-        return this.parent;
+        return parent;
     }
+
+    /**
+     * Returns the number of children of this node.
+     * 
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
         int result = 0;
-        if (this.exceptions != null)
-            result += this.exceptions.size();
+        if (exceptions != null)
+            result += exceptions.size();
         return result;
     }
 
+    /**
+     * Returns the child at the specified index in this node's "virtual" child
+     * array
+     * 
+     * @param index
+     *            an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException
+     *                if <tt>index</tt> is out of bounds
+     */
+
     public ProgramElement getChildAt(int index) {
-        if (this.exceptions != null)
-            return this.exceptions.get(index);
+        if (exceptions != null) {
+            return exceptions.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
-        if (this.exceptions != null) {
-            int index = this.exceptions.indexOf(child);
-            if (index >= 0)
-                return index << 4 | 0x0;
+        // role 0 (IDX): type references
+        if (exceptions != null) {
+            int index = exceptions.indexOf(child);
+            if (index >= 0) {
+                return (index << 4) | 0;
+            }
         }
         return -1;
     }
 
+    /**
+     * Replace a single child in the current node. The child to replace is
+     * matched by identity and hence must be known exactly. The replacement
+     * element can be null - in that case, the child is effectively removed. The
+     * parent role of the new child is validated, while the parent link of the
+     * replaced child is left untouched.
+     * 
+     * @param p
+     *            the old child.
+     * @param p
+     *            the new child.
+     * @return true if a replacement has occured, false otherwise.
+     * @exception ClassCastException
+     *                if the new child cannot take over the role of the old one.
+     */
+
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
-        int count = (this.exceptions == null) ? 0 : this.exceptions.size();
+        }
+        int count;
+        count = (exceptions == null) ? 0 : exceptions.size();
         for (int i = 0; i < count; i++) {
-            if (this.exceptions.get(i) == p) {
+            if (exceptions.get(i) == p) {
                 if (q == null) {
-                    this.exceptions.remove(i);
+                    exceptions.remove(i);
                 } else {
                     TypeReference r = (TypeReference) q;
-                    this.exceptions.set(i, r);
+                    exceptions.set(i, r);
                     r.setParent(this);
                 }
                 return true;
             }
         }
+
         return false;
     }
 
+    /**
+     * Get parent.
+     * 
+     * @return the method declaration.
+     */
+
     public MethodDeclaration getParent() {
-        return this.parent;
+        return parent;
     }
+
+    /**
+     * Set parent.
+     * 
+     * @param decl
+     *            a method declaration.
+     */
 
     public void setParent(MethodDeclaration decl) {
-        this.parent = decl;
+        parent = decl;
     }
+
+    /**
+     * Get exceptions.
+     * 
+     * @return the type reference mutable list.
+     */
 
     public ASTList<TypeReference> getExceptions() {
-        return this.exceptions;
+        return exceptions;
     }
+
+    /**
+     * Set exceptions.
+     * 
+     * @param list
+     *            a type reference mutable list.
+     */
 
     public void setExceptions(ASTList<TypeReference> list) {
-        this.exceptions = list;
+        exceptions = list;
     }
+
+    /**
+     * Get the number of type references in this container.
+     * 
+     * @return the number of type references.
+     */
 
     public int getTypeReferenceCount() {
-        return (this.exceptions != null) ? this.exceptions.size() : 0;
+        return (exceptions != null) ? exceptions.size() : 0;
     }
 
+    /*
+     * Return the type reference at the specified index in this node's "virtual"
+     * type reference array. @param index an index for a type reference. @return
+     * the type reference with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     */
+
     public TypeReference getTypeReferenceAt(int index) {
-        if (this.exceptions != null)
-            return this.exceptions.get(index);
+        if (exceptions != null) {
+            return exceptions.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

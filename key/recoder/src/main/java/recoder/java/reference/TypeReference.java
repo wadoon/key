@@ -1,29 +1,91 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.java.reference;
 
-import recoder.java.*;
+import recoder.convenience.Naming;
+import recoder.java.Expression;
+import recoder.java.Identifier;
+import recoder.java.JavaNonTerminalProgramElement;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.ProgramElement;
+import recoder.java.SourceElement;
+import recoder.java.SourceVisitor;
 import recoder.java.declaration.TypeArgumentDeclaration;
 import recoder.list.generic.ASTList;
 
-public class TypeReference extends JavaNonTerminalProgramElement implements TypeReferenceInfix, TypeReferenceContainer, PackageReferenceContainer, MemberReference {
-    private static final long serialVersionUID = -8415845940952618808L;
+/**
+ * TypeReferences reference {@link recoder.abstraction.Type}s by name. A
+ * TypeReference can refer to an outer or inner type and hence can also be a
+ * {@link MemberReference}, but does not have to. A TypeReference can also
+ * occur as part of a reference path and as a prefix for types, too. As a
+ * possible suffix for types, it can have other TypeReferences as a prefix,
+ * playing the role of a {@link TypeReferenceContainer}.
+ */
 
-    protected TypeReferenceContainer parent;
+public class TypeReference extends JavaNonTerminalProgramElement implements TypeReferenceInfix, TypeReferenceContainer,
+        PackageReferenceContainer, MemberReference {
+	
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = -8415845940952618808L;
 
-    protected ReferencePrefix prefix;
+	/**
+     * Parent.
+     */
 
-    protected int dimensions;
+	private TypeReferenceContainer parent;
 
-    protected ASTList<TypeArgumentDeclaration> typeArguments;
+    /**
+     * Prefix.
+     */
 
-    protected Identifier name;
+    private ReferencePrefix prefix;
+
+    /**
+     * Dimensions.
+     */
+    private int dimensions;
+
+    /**
+     * Type Arguments
+     */
+    private ASTList<TypeArgumentDeclaration> typeArguments;
+    
+    /**
+     * Name.
+     */
+
+    private Identifier name;
+
+    /**
+     * Type reference.
+     */
 
     public TypeReference() {
+    	// nothing to do here
     }
+
+    /**
+     * Type reference.
+     * 
+     * @param name
+     *            an identifier.
+     */
 
     public TypeReference(Identifier name) {
         setIdentifier(name);
         makeParentRoleValid();
     }
+
+    /**
+     * Type reference.
+     * 
+     * @param prefix
+     *            a reference prefix.
+     * @param name
+     *            an identifier.
+     */
 
     public TypeReference(ReferencePrefix prefix, Identifier name) {
         setIdentifier(name);
@@ -31,202 +93,393 @@ public class TypeReference extends JavaNonTerminalProgramElement implements Type
         makeParentRoleValid();
     }
 
+    /**
+     * Type reference.
+     * 
+     * @param name
+     *            an identifier.
+     * @param dim
+     *            an int value.
+     */
+
     public TypeReference(Identifier name, int dim) {
         setIdentifier(name);
         setDimensions(dim);
         makeParentRoleValid();
     }
-
+    
     public TypeReference(Identifier name, ASTList<TypeArgumentDeclaration> typeArgs) {
-        setIdentifier(name);
-        this.typeArguments = typeArgs;
-        makeParentRoleValid();
+    	setIdentifier(name);
+    	this.typeArguments = typeArgs;
+    	makeParentRoleValid();
     }
+
+    /**
+     * Type reference.
+     * 
+     * @param proto
+     *            a type reference.
+     */
 
     protected TypeReference(TypeReference proto) {
         super(proto);
-        if (proto.prefix != null)
-            this.prefix = (ReferencePrefix) proto.prefix.deepClone();
-        if (proto.name != null)
-            this.name = proto.name.deepClone();
-        if (proto.typeArguments != null)
-            this.typeArguments = proto.typeArguments.deepClone();
-        this.dimensions = proto.dimensions;
+        if (proto.prefix != null) {
+            prefix = (ReferencePrefix) proto.prefix.deepClone();
+        }
+        if (proto.name != null) {
+            name = proto.name.deepClone();
+        }
+        if (proto.typeArguments != null) {
+        	typeArguments = proto.typeArguments.deepClone();
+        }
+        dimensions = proto.dimensions;
         makeParentRoleValid();
     }
+
+    /**
+     * Deep clone.
+     * 
+     * @return the object.
+     */
 
     public TypeReference deepClone() {
         return new TypeReference(this);
     }
 
+    /**
+     * Make parent role valid.
+     */
+
     public void makeParentRoleValid() {
-        super.makeParentRoleValid();
-        if (this.prefix != null)
-            this.prefix.setReferenceSuffix(this);
-        if (this.name != null)
-            this.name.setParent(this);
-        if (this.typeArguments != null)
-            for (TypeArgumentDeclaration ta : this.typeArguments)
-                ta.setParent(this);
+        if (prefix != null) {
+            prefix.setReferenceSuffix(this);
+        }
+        if (name != null) {
+            name.setParent(this);
+        }
+        if (typeArguments != null) {
+        	for(TypeArgumentDeclaration ta : typeArguments) {
+        		ta.setParent(this);
+        	}
+        }
     }
 
     public SourceElement getFirstElement() {
-        return (this.prefix == null) ? this.name : this.prefix.getFirstElement();
+        return (prefix == null) ? name : prefix.getFirstElement();
     }
 
+    /**
+     * Get AST parent.
+     * 
+     * @return the non terminal program element.
+     */
+
     public NonTerminalProgramElement getASTParent() {
-        return this.parent;
+        return parent;
     }
+
+    /**
+     * Returns the number of children of this node.
+     * 
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
         int result = 0;
-        if (this.prefix != null)
+        if (prefix != null)
             result++;
-        if (this.name != null)
+        if (name != null)
             result++;
-        if (this.typeArguments != null)
-            result += this.typeArguments.size();
+        if (typeArguments != null)
+        	result += typeArguments.size();
         return result;
     }
 
+    /**
+     * Returns the child at the specified index in this node's "virtual" child
+     * array
+     * 
+     * @param index
+     *            an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException
+     *                if <tt>index</tt> is out of bounds
+     */
+
     public ProgramElement getChildAt(int index) {
-        if (this.prefix != null) {
+        if (prefix != null) {
             if (index == 0)
-                return this.prefix;
+                return prefix;
             index--;
         }
-        if (this.name != null) {
+        if (name != null) {
             if (index == 0)
-                return this.name;
+                return name;
             index--;
         }
-        if (this.typeArguments != null)
-            return this.typeArguments.get(index);
+        if (typeArguments != null) {
+        	return typeArguments.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
-        if (this.prefix == child)
+        // role 0: prefix
+        // role 1: name
+       	// role 2(idx): type argument
+        if (prefix == child) {
             return 0;
-        if (this.name == child)
+        }
+        if (name == child) {
             return 1;
-        if (this.typeArguments != null) {
-            int idx = this.typeArguments.indexOf(child);
-            if (idx != -1)
-                return idx << 4 | 0x2;
+        }
+        if (typeArguments != null) {
+        	int idx = typeArguments.indexOf(child);
+        	if (idx != -1)
+        		return (idx << 4) | 2;
         }
         return -1;
     }
 
+    /**
+     * Get the number of type references in this container.
+     * 
+     * @return the number of type references.
+     */
+
     public int getTypeReferenceCount() {
-        return (this.prefix instanceof TypeReference) ? 1 : 0;
+        return (prefix instanceof TypeReference) ? 1 : 0;
     }
+
+    /*
+     * Return the type reference at the specified index in this node's "virtual"
+     * type reference array. @param index an index for a type reference. @return
+     * the type reference with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (this.prefix instanceof TypeReference && index == 0)
-            return (TypeReference) this.prefix;
+        if (prefix instanceof TypeReference && index == 0) {
+            return (TypeReference) prefix;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
+
+    /**
+     * Get the number of expressions in this container.
+     * 
+     * @return the number of expressions.
+     */
 
     public int getExpressionCount() {
-        return (this.prefix instanceof Expression) ? 1 : 0;
+        return (prefix instanceof Expression) ? 1 : 0;
     }
 
+    /*
+     * Return the expression at the specified index in this node's "virtual"
+     * expression array. @param index an index for an expression. @return the
+     * expression with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     */
+
     public Expression getExpressionAt(int index) {
-        if (this.prefix instanceof Expression && index == 0)
-            return (Expression) this.prefix;
+        if (prefix instanceof Expression && index == 0) {
+            return (Expression) prefix;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
+    /**
+     * Replace a single child in the current node. The child to replace is
+     * matched by identity and hence must be known exactly. The replacement
+     * element can be null - in that case, the child is effectively removed. The
+     * parent role of the new child is validated, while the parent link of the
+     * replaced child is left untouched.
+     * 
+     * @param p
+     *            the old child.
+     * @param p
+     *            the new child.
+     * @return true if a replacement has occured, false otherwise.
+     * @exception ClassCastException
+     *                if the new child cannot take over the role of the old one.
+     */
+
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
-        if (this.prefix == p) {
+        }
+        if (prefix == p) {
             ReferencePrefix r = (ReferencePrefix) q;
-            this.prefix = r;
-            if (r != null)
+            prefix = r;
+            if (r != null) {
                 r.setReferenceSuffix(this);
-            return true;
-        }
-        if (this.name == p) {
-            Identifier r = (Identifier) q;
-            this.name = r;
-            if (r != null)
-                r.setParent(this);
-            return true;
-        }
-        if (this.typeArguments != null) {
-            int idx = this.typeArguments.indexOf(p);
-            if (idx != -1) {
-                if (q == null) {
-                    this.typeArguments.remove(idx);
-                } else {
-                    this.typeArguments.set(idx, q);
-                    ((TypeArgumentDeclaration) q).setParent(this);
-                }
-                return true;
             }
+            return true;
+        }
+        if (name == p) {
+            Identifier r = (Identifier) q;
+            name = r;
+            if (r != null) {
+                r.setParent(this);
+            }
+            return true;
+        }
+        if (typeArguments != null) {
+        	int idx = typeArguments.indexOf(p);
+        	if (idx != -1) {
+        		if (q == null) {
+        			typeArguments.remove(idx);
+        		} else {
+        			typeArguments.set(idx, (TypeArgumentDeclaration)q);
+        			((TypeArgumentDeclaration)q).setParent(this);
+        		}
+        		return true;
+        	}
         }
         return false;
     }
 
+    /**
+     * Get parent.
+     * 
+     * @return the type reference container.
+     */
+
     public TypeReferenceContainer getParent() {
-        return this.parent;
+        return parent;
     }
+
+    /**
+     * Set parent.
+     * 
+     * @param elem
+     *            a type reference container.
+     */
 
     public void setParent(TypeReferenceContainer elem) {
-        this.parent = elem;
+        parent = elem;
     }
+
+    /**
+     * Get reference prefix.
+     * 
+     * @return the reference prefix.
+     */
 
     public ReferencePrefix getReferencePrefix() {
-        return this.prefix;
+        return prefix;
     }
 
-    public void setReferencePrefix(ReferencePrefix x) {
-        this.prefix = x;
-    }
+    /**
+     * Get the package reference.
+     * 
+     * @return the package reference.
+     */
 
     public PackageReference getPackageReference() {
-        return (this.prefix instanceof PackageReference) ? (PackageReference) this.prefix : null;
+        return (prefix instanceof PackageReference) ? (PackageReference) prefix : null;
     }
+
+    /**
+     * Set reference prefix.
+     * 
+     * @param x
+     *            a reference prefix.
+     */
+
+    public void setReferencePrefix(ReferencePrefix x) {
+        prefix = x;
+    }
+
+    /**
+     * Get reference suffix.
+     * 
+     * @return the reference suffix.
+     */
 
     public ReferenceSuffix getReferenceSuffix() {
-        return (this.parent instanceof ReferenceSuffix) ? (ReferenceSuffix) this.parent : null;
+        return (parent instanceof ReferenceSuffix) ? (ReferenceSuffix) parent : null;
     }
+
+    /**
+     * Set reference suffix.
+     * 
+     * @param x
+     *            a reference suffix, must also be a type reference container.
+     */
 
     public void setReferenceSuffix(ReferenceSuffix x) {
-        this.parent = (TypeReferenceContainer) x;
+        parent = (TypeReferenceContainer) x;
     }
+
+    /**
+     * Get dimensions.
+     * 
+     * @return the int value.
+     */
 
     public int getDimensions() {
-        return this.dimensions;
+        return dimensions;
     }
+
+    /**
+     * Set dimensions.
+     * 
+     * @param dim
+     *            an int value.
+     */
 
     public void setDimensions(int dim) {
-        this.dimensions = dim;
+        dimensions = dim;
     }
+
+    /**
+     * Get name.
+     * 
+     * @return the string.
+     */
 
     public final String getName() {
-        return (this.name == null) ? null : this.name.getText();
+        return (name == null) ? null : name.getText();
     }
+
+    /**
+     * Get identifier.
+     * 
+     * @return the identifier.
+     */
 
     public Identifier getIdentifier() {
-        return this.name;
+        return name;
     }
 
+    /**
+     * Set identifier.
+     * 
+     * @param id
+     *            an identifier.
+     */
+
     public void setIdentifier(Identifier id) {
-        this.name = id;
+        name = id;
     }
 
     public void accept(SourceVisitor v) {
         v.visitTypeReference(this);
     }
-
-    public ASTList<TypeArgumentDeclaration> getTypeArguments() {
-        return this.typeArguments;
-    }
-
+    
     public void setTypeArguments(ASTList<TypeArgumentDeclaration> ta) {
-        this.typeArguments = ta;
+    	this.typeArguments = ta;
     }
+    
+    public ASTList<TypeArgumentDeclaration> getTypeArguments() {
+    	return typeArguments;
+    }
+    
+    @Override
+    public String toString() {
+    	return "<TypeReference> " + Naming.toPathName(this);
+    }
+
 }

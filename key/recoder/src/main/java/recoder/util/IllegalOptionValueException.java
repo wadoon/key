@@ -1,9 +1,17 @@
+// This file is part of the RECODER library and protected by the LGPL
+
 package recoder.util;
 
+/**
+ * @author RN
+ */
 public class IllegalOptionValueException extends OptionException {
-    private static final long serialVersionUID = 3501805964861992020L;
 
-    String val;
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = 3501805964861992020L;
+	String val;
 
     public IllegalOptionValueException(String opt, String val) {
         super(opt);
@@ -11,6 +19,7 @@ public class IllegalOptionValueException extends OptionException {
     }
 
     public String toString() {
-        return "Illegal value \"" + this.val + "\" for option \"" + this.opt + "\"";
+        return "Illegal value \"" + val + "\" for option \"" + opt + "\"";
     }
+
 }

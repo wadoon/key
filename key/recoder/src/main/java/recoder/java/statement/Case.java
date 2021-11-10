@@ -1,22 +1,68 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.java.statement;
 
-import recoder.java.*;
+import recoder.java.Expression;
+import recoder.java.ExpressionContainer;
+import recoder.java.ProgramElement;
+import recoder.java.SourceElement;
+import recoder.java.SourceVisitor;
+import recoder.java.Statement;
 import recoder.list.generic.ASTList;
 
+/**
+ * Case.
+ * 
+ * @author <TT>AutoDoc</TT>
+ */
+
 public class Case extends Branch implements ExpressionContainer {
-    private static final long serialVersionUID = 4344680443480425524L;
 
-    protected Expression expression;
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = 4344680443480425524L;
 
-    protected ASTList<Statement> body;
+	/**
+     * Expression.
+     */
+
+	private Expression expression;
+
+    /**
+     * Body.
+     */
+
+	private ASTList<Statement> body;
+
+    /**
+     * Case.
+     */
 
     public Case() {
+    	super();
     }
+
+    /**
+     * Case.
+     * 
+     * @param e
+     *            an expression.
+     */
 
     public Case(Expression e) {
         setExpression(e);
         makeParentRoleValid();
     }
+
+    /**
+     * Case.
+     * 
+     * @param e
+     *            an expression.
+     * @param body
+     *            a statement mutable list.
+     */
 
     public Case(Expression e, ASTList<Statement> body) {
         setBody(body);
@@ -24,89 +70,162 @@ public class Case extends Branch implements ExpressionContainer {
         makeParentRoleValid();
     }
 
+    /**
+     * Case.
+     * 
+     * @param proto
+     *            a case.
+     */
+
     protected Case(Case proto) {
         super(proto);
-        if (proto.expression != null)
-            this.expression = proto.expression.deepClone();
-        if (proto.body != null)
-            this.body = proto.body.deepClone();
+        if (proto.expression != null) {
+            expression = proto.expression.deepClone();
+        }
+        if (proto.body != null) {
+            body = proto.body.deepClone();
+        }
         makeParentRoleValid();
     }
+
+    /**
+     * Deep clone.
+     * 
+     * @return the object.
+     */
 
     public Case deepClone() {
         return new Case(this);
     }
 
+    /**
+     * Make parent role valid.
+     */
+
     public void makeParentRoleValid() {
-        super.makeParentRoleValid();
-        if (this.expression != null)
-            this.expression.setExpressionContainer(this);
-        if (this.body != null)
-            for (int i = 0; i < this.body.size(); i++)
-                this.body.get(i).setStatementContainer(this);
+        if (expression != null) {
+            expression.setExpressionContainer(this);
+        }
+        if (body != null) {
+            for (int i = 0; i < body.size(); i += 1) {
+                body.get(i).setStatementContainer(this);
+            }
+        }
     }
 
-    public Switch getParent() {
-        return (Switch) this.parent;
-    }
+    /**
+     * Set parent.
+     * 
+     * @param parent
+     *            a switch.
+     */
 
     public void setParent(Switch parent) {
         this.parent = parent;
     }
 
-    public int getChildCount() {
-        int result = 0;
-        if (this.expression != null)
-            result++;
-        if (this.body != null)
-            result += this.body.size();
-        return result;
+    @Override
+    public Switch getParent() {
+    	return (Switch)parent;
     }
 
+    
+    /**
+     * Returns the number of children of this node.
+     * 
+     * @return an int giving the number of children of this node
+     */
+
+    public int getChildCount() {
+        int result = 0;
+        if (expression != null)
+            result++;
+        if (body != null)
+            result += body.size();
+        return result;
+    }
+    
+
+    /**
+     * Returns the child at the specified index in this node's "virtual" child
+     * array
+     * 
+     * @param index
+     *            an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException
+     *                if <tt>index</tt> is out of bounds
+     */
+
     public ProgramElement getChildAt(int index) {
-        if (this.expression != null) {
+        int len;
+        if (expression != null) {
             if (index == 0)
-                return this.expression;
+                return expression;
             index--;
         }
-        if (this.body != null) {
-            int len = this.body.size();
-            if (len > index)
-                return this.body.get(index);
+        if (body != null) {
+            len = body.size();
+            if (len > index) {
+                return body.get(index);
+            }
             index -= len;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
-        if (this.expression == child)
+        // role 0: expression
+        // role 1 (IDX): body
+        if (expression == child) {
             return 0;
-        if (this.body != null) {
-            int index = this.body.indexOf(child);
-            if (index >= 0)
-                return index << 4 | 0x1;
+        }
+        if (body != null) {
+            int index = body.indexOf(child);
+            if (index >= 0) {
+                return (index << 4) | 1;
+            }
         }
         return -1;
     }
 
+    /**
+     * Replace a single child in the current node. The child to replace is
+     * matched by identity and hence must be known exactly. The replacement
+     * element can be null - in that case, the child is effectively removed. The
+     * parent role of the new child is validated, while the parent link of the
+     * replaced child is left untouched.
+     * 
+     * @param p
+     *            the old child.
+     * @param p
+     *            the new child.
+     * @return true if a replacement has occured, false otherwise.
+     * @exception ClassCastException
+     *                if the new child cannot take over the role of the old one.
+     */
+
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        int count;
+        if (p == null) {
             throw new NullPointerException();
-        if (this.expression == p) {
+        }
+        if (expression == p) {
             Expression r = (Expression) q;
-            this.expression = r;
-            if (r != null)
+            expression = r;
+            if (r != null) {
                 r.setExpressionContainer(this);
+            }
             return true;
         }
-        int count = (this.body == null) ? 0 : this.body.size();
+        count = (body == null) ? 0 : body.size();
         for (int i = 0; i < count; i++) {
-            if (this.body.get(i) == p) {
+            if (body.get(i) == p) {
                 if (q == null) {
-                    this.body.remove(i);
+                    body.remove(i);
                 } else {
                     Statement r = (Statement) q;
-                    this.body.set(i, r);
+                    body.set(i, r);
                     r.setStatementContainer(this);
                 }
                 return true;
@@ -115,51 +234,104 @@ public class Case extends Branch implements ExpressionContainer {
         return false;
     }
 
+    /**
+     * Get the number of expressions in this container.
+     * 
+     * @return the number of expressions.
+     */
+
     public int getExpressionCount() {
-        return (this.expression != null) ? 1 : 0;
+        return (expression != null) ? 1 : 0;
     }
+
+    /*
+     * Return the expression at the specified index in this node's "virtual"
+     * expression array. @param index an index for an expression. @return the
+     * expression with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     */
 
     public Expression getExpressionAt(int index) {
-        if (this.expression != null && index == 0)
-            return this.expression;
+        if (expression != null && index == 0) {
+            return expression;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
+
+    /**
+     * Get the number of statements in this container.
+     * 
+     * @return the number of statements.
+     */
 
     public int getStatementCount() {
-        return (this.body != null) ? this.body.size() : 0;
+        return (body != null) ? body.size() : 0;
     }
 
+    /*
+     * Return the statement at the specified index in this node's "virtual"
+     * statement array. @param index an index for a statement. @return the
+     * statement with the given index. @exception ArrayIndexOutOfBoundsException
+     * if <tt> index </tt> is out of bounds.
+     */
+
     public Statement getStatementAt(int index) {
-        if (this.body != null)
-            return this.body.get(index);
+        if (body != null) {
+            return body.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
+    /**
+     * Get expression.
+     * 
+     * @return the expression.
+     */
+
     public Expression getExpression() {
-        return this.expression;
+        return expression;
     }
+
+    /**
+     * Set expression.
+     * 
+     * @param e
+     *            an expression.
+     */
 
     public void setExpression(Expression e) {
-        if (e == null)
+        if (e == null) {
             throw new NullPointerException("Cases must have an expression");
-        this.expression = e;
+        }
+        expression = e;
     }
+
+    /**
+     * The body may be empty (null), to define a fall-through. Attaching an
+     * {@link EmptyStatement}would create a single ";".
+     */
 
     public ASTList<Statement> getBody() {
-        return this.body;
+        return body;
     }
 
+    /**
+     * Set body.
+     * 
+     * @param list
+     *            a statement mutable list.
+     */
+
     public void setBody(ASTList<Statement> list) {
-        this.body = list;
+        body = list;
     }
 
     public void accept(SourceVisitor v) {
         v.visitCase(this);
     }
-
+    
     public SourceElement getLastElement() {
-        if (this.body == null || this.body.size() == 0)
-            return this;
-        return this.body.get(this.body.size() - 1).getLastElement();
+    	if (body == null || body.size() == 0) return this;
+        return body.get(body.size()-1).getLastElement();
     }
 }

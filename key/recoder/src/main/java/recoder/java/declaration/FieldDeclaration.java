@@ -1,40 +1,99 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.java.declaration;
 
-import recoder.java.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import recoder.java.ProgramElement;
+import recoder.java.SourceVisitor;
 import recoder.java.reference.TypeReference;
+import recoder.java.reference.UncollatedReferenceQualifier;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+/**
+ * Field declaration.
+ * 
+ * @author <TT>AutoDoc</TT>
+ */
 
 public class FieldDeclaration extends VariableDeclaration implements MemberDeclaration {
-    private static final long serialVersionUID = 2577966836277961911L;
 
-    protected TypeDeclaration parent;
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = 2577966836277961911L;
 
-    protected ASTList<FieldSpecification> fieldSpecs;
+	/**
+     * Parent.
+     */
+
+	TypeDeclaration parent;
+
+    /**
+     * Field specs.
+     */
+
+    ASTList<FieldSpecification> fieldSpecs;
+
+    /**
+     * Field declaration.
+     */
 
     public FieldDeclaration() {
+        // nothing to do here
     }
 
-    public FieldDeclaration(TypeReference typeRef, Identifier name) {
+    /**
+     * Field declaration.
+     * 
+     * @param typeRef
+     *            a type reference.
+     * @param name
+     *            an identifier.
+     */
+
+    public FieldDeclaration(TypeReference typeRef, FieldSpecification fs) {
         setTypeReference(typeRef);
-        ASTArrayList aSTArrayList = new ASTArrayList(1);
-        aSTArrayList.add(getFactory().createFieldSpecification(name));
-        setFieldSpecifications((ASTList<FieldSpecification>) aSTArrayList);
+        ASTList<FieldSpecification> list = new ASTArrayList<FieldSpecification>(1); 
+        list.add(fs);
+        setFieldSpecifications(list);
         makeParentRoleValid();
     }
 
-    public FieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, Identifier name, Expression init) {
+    /**
+     * Field declaration.
+     * 
+     * @param mods
+     *            a modifier mutable list.
+     * @param typeRef
+     *            a type reference.
+     * @param name
+     *            an identifier.
+     * @param init
+     *            an expression.
+     */
+
+    public FieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, FieldSpecification fs) {
         setDeclarationSpecifiers(mods);
         setTypeReference(typeRef);
-        ASTArrayList aSTArrayList = new ASTArrayList(1);
-        aSTArrayList.add(getFactory().createFieldSpecification(name, init));
-        setFieldSpecifications((ASTList<FieldSpecification>) aSTArrayList);
+        ASTList<FieldSpecification> list = new ASTArrayList<FieldSpecification>(1); 
+        list.add(fs);
+        setFieldSpecifications(list);
         makeParentRoleValid();
     }
+
+    /**
+     * Field declaration.
+     * 
+     * @param mods
+     *            a modifier mutable list.
+     * @param typeRef
+     *            a type reference.
+     * @param vars
+     *            a variable specification mutable list.
+     */
 
     public FieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, ASTList<FieldSpecification> vars) {
         setDeclarationSpecifiers(mods);
@@ -43,124 +102,210 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
         makeParentRoleValid();
     }
 
+    /**
+     * Field declaration.
+     * 
+     * @param proto
+     *            a field declaration.
+     */
+
     protected FieldDeclaration(FieldDeclaration proto) {
         super(proto);
-        if (proto.fieldSpecs != null)
-            this.fieldSpecs = proto.fieldSpecs.deepClone();
+        if (proto.fieldSpecs != null) {
+            fieldSpecs = proto.fieldSpecs.deepClone();
+        }
         makeParentRoleValid();
     }
+
+    /**
+     * Deep clone.
+     * 
+     * @return the object.
+     */
 
     public FieldDeclaration deepClone() {
         return new FieldDeclaration(this);
     }
 
-    public NonTerminalProgramElement getASTParent() {
-        return this.parent;
+    /**
+     * Get AST parent.
+     * 
+     * @return the non terminal program element.
+     */
+
+    public TypeDeclaration getASTParent() {
+        return parent;
     }
+
+    /**
+     * Get member parent.
+     * 
+     * @return the type declaration.
+     */
 
     public TypeDeclaration getMemberParent() {
-        return this.parent;
+        return parent;
     }
 
+    /**
+     * Set member parent.
+     * 
+     * @param p
+     *            a type declaration.
+     */
+
     public void setMemberParent(TypeDeclaration p) {
-        this.parent = p;
+        parent = p;
     }
+
+    /**
+     * Make parent role valid.
+     */
 
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (this.fieldSpecs != null)
-            for (int i = this.fieldSpecs.size() - 1; i >= 0; i--)
-                this.fieldSpecs.get(i).setParent(this);
+        if (fieldSpecs != null) {
+            for (int i = fieldSpecs.size() - 1; i >= 0; i -= 1) {
+                fieldSpecs.get(i).setParent(this);
+            }
+        }
     }
 
     public ASTList<FieldSpecification> getFieldSpecifications() {
-        return this.fieldSpecs;
+        return fieldSpecs;
     }
 
     public void setFieldSpecifications(ASTList<FieldSpecification> l) {
-        this.fieldSpecs = l;
+        fieldSpecs = l;
     }
 
     public List<FieldSpecification> getVariables() {
-        return new ArrayList<FieldSpecification>(this.fieldSpecs);
+        return new ArrayList<FieldSpecification>(fieldSpecs);
     }
+
+    /**
+     * Returns the number of children of this node.
+     * 
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
         int result = 0;
-        if (this.declarationSpecifiers != null)
-            result += this.declarationSpecifiers.size();
-        if (this.typeReference != null)
+        if (declarationSpecifiers != null)
+            result += declarationSpecifiers.size();
+        if (getTypeReference() != null)
             result++;
-        if (this.fieldSpecs != null)
-            result += this.fieldSpecs.size();
+        if (fieldSpecs != null)
+            result += fieldSpecs.size();
         return result;
     }
 
+    /**
+     * Returns the child at the specified index in this node's "virtual" child
+     * array
+     * 
+     * @param index
+     *            an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException
+     *                if <tt>index</tt> is out of bounds
+     */
+
     public ProgramElement getChildAt(int index) {
-        if (this.declarationSpecifiers != null) {
-            int len = this.declarationSpecifiers.size();
-            if (len > index)
-                return this.declarationSpecifiers.get(index);
+        int len;
+        if (declarationSpecifiers != null) {
+            len = declarationSpecifiers.size();
+            if (len > index) {
+                return declarationSpecifiers.get(index);
+            }
             index -= len;
         }
-        if (this.typeReference != null) {
+        if (getTypeReference() != null) {
             if (index == 0)
-                return this.typeReference;
+                return getTypeReference();
             index--;
         }
-        if (this.fieldSpecs != null)
-            return this.fieldSpecs.get(index);
+        if (fieldSpecs != null) {
+            return fieldSpecs.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
-        if (this.declarationSpecifiers != null) {
-            int index = this.declarationSpecifiers.indexOf(child);
-            if (index >= 0)
-                return index << 4 | 0x0;
+        // role 0 (IDX): modifier
+        // role 1: type reference
+        // role 2 (IDX): var specs
+        if (declarationSpecifiers != null) {
+            int index = declarationSpecifiers.indexOf(child);
+            if (index >= 0) {
+                return (index << 4) | 0;
+            }
         }
-        if (this.typeReference == child)
+        if (getTypeReference() == child) {
             return 1;
-        if (this.fieldSpecs != null) {
-            int index = this.fieldSpecs.indexOf(child);
-            if (index >= 0)
-                return index << 4 | 0x2;
+        }
+        if (fieldSpecs != null) {
+            int index = fieldSpecs.indexOf(child);
+            if (index >= 0) {
+                return (index << 4) | 2;
+            }
         }
         return -1;
     }
 
+    /**
+     * Replace a single child in the current node. The child to replace is
+     * matched by identity and hence must be known exactly. The replacement
+     * element can be null - in that case, the child is effectively removed. The
+     * parent role of the new child is validated, while the parent link of the
+     * replaced child is left untouched.
+     * 
+     * @param p
+     *            the old child.
+     * @param p
+     *            the new child.
+     * @return true if a replacement has occured, false otherwise.
+     * @exception ClassCastException
+     *                if the new child cannot take over the role of the old one.
+     */
+
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
-        int count = (this.declarationSpecifiers == null) ? 0 : this.declarationSpecifiers.size();
-        int i;
-        for (i = 0; i < count; i++) {
-            if (this.declarationSpecifiers.get(i) == p) {
+        }
+        int count;
+        count = (declarationSpecifiers == null) ? 0 : declarationSpecifiers.size();
+        for (int i = 0; i < count; i++) {
+            if (declarationSpecifiers.get(i) == p) {
                 if (q == null) {
-                    this.declarationSpecifiers.remove(i);
+                    declarationSpecifiers.remove(i);
                 } else {
                     DeclarationSpecifier r = (DeclarationSpecifier) q;
-                    this.declarationSpecifiers.set(i, r);
+                    declarationSpecifiers.set(i, r);
                     r.setParent(this);
                 }
                 return true;
             }
         }
-        if (this.typeReference == p) {
+        if (getTypeReference() == p) {
+        	if (q instanceof UncollatedReferenceQualifier)
+        		q = ((UncollatedReferenceQualifier)q).toTypeReference(); // TODO does this belong here?
             TypeReference r = (TypeReference) q;
-            this.typeReference = r;
-            if (r != null)
+            setTypeReference(r);
+            if (r != null) {
                 r.setParent(this);
+            }
             return true;
         }
-        count = (this.fieldSpecs == null) ? 0 : this.fieldSpecs.size();
-        for (i = 0; i < count; i++) {
-            if (this.fieldSpecs.get(i) == p) {
+
+        count = (fieldSpecs == null) ? 0 : fieldSpecs.size();
+        for (int i = 0; i < count; i++) {
+            if (fieldSpecs.get(i) == p) {
                 if (q == null) {
-                    this.fieldSpecs.remove(i);
+                    fieldSpecs.remove(i);
                 } else {
                     FieldSpecification r = (FieldSpecification) q;
-                    this.fieldSpecs.set(i, r);
+                    fieldSpecs.set(i, r);
                     r.setParent(this);
                 }
                 return true;
@@ -169,29 +314,60 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
         return false;
     }
 
+    /**
+     * Test whether the declaration is final. Fields of interfaces are always
+     * final.
+     */
+
     public boolean isFinal() {
-        return (getASTParent() instanceof InterfaceDeclaration || super.isFinal());
+        return (getASTParent() instanceof InterfaceDeclaration) || super.isFinal();
     }
+
+    /**
+     * Test whether the declaration is private.
+     */
 
     public boolean isPrivate() {
         return super.isPrivate();
     }
 
+    /**
+     * Test whether the declaration is protected.
+     */
+
     public boolean isProtected() {
         return super.isProtected();
     }
 
+    /**
+     * Test whether the declaration is public. Fields of interfaces are always
+     * public.
+     */
+
     public boolean isPublic() {
-        return (getASTParent() instanceof InterfaceDeclaration || super.isPublic());
+        return (getASTParent() instanceof InterfaceDeclaration) || super.isPublic();
     }
+
+    /**
+     * Test whether the declaration is static. Fields of interfaces are always
+     * static.
+     */
 
     public boolean isStatic() {
-        return (getASTParent() instanceof InterfaceDeclaration || super.isStatic());
+        return (getASTParent() instanceof InterfaceDeclaration) || super.isStatic();
     }
 
+    /**
+     * Test whether the declaration is transient.
+     */
+
     public boolean isTransient() {
-        return (!(getASTParent() instanceof InterfaceDeclaration) && super.isTransient());
+        return !(getASTParent() instanceof InterfaceDeclaration) && super.isTransient();
     }
+
+    /**
+     * Test whether the declaration is strict FP.
+     */
 
     public boolean isStrictFp() {
         return super.isStrictFp();

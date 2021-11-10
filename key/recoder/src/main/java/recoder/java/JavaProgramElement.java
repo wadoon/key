@@ -1,31 +1,86 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.java;
 
 import recoder.ModelException;
 import recoder.list.generic.ASTList;
 
+/**
+ * Top level implementation of a Java {@link ProgramElement}.
+ * 
+ * @author AL
+ */
+
 public abstract class JavaProgramElement extends JavaSourceElement implements ProgramElement {
-    protected ASTList<Comment> comments;
+	private static int cur_id = 0;
+	private final int id = cur_id++;
+	
+	public int getID() { 
+		return id; 
+	}
+	
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
+     * Comments.
+     */
+
+	private ASTList<Comment> comments;
+
+    /**
+     * Java program element.
+     */
 
     public JavaProgramElement() {
+        // nothing to do here
     }
+
+    /**
+     * Java program element.
+     * 
+     * @param proto
+     *            a java program element.
+     */
 
     protected JavaProgramElement(JavaProgramElement proto) {
         super(proto);
-        if (proto.comments != null)
-            this.comments = proto.comments.deepClone();
+        if (proto.comments != null) {
+            comments = proto.comments.deepClone();
+        }
+//        getFactory().trace(this);
     }
+
+    /**
+     * Get comments.
+     * 
+     * @return the comments.
+     */
 
     public ASTList<Comment> getComments() {
-        return this.comments;
+        return comments;
     }
+
+    /**
+     * Set comments.
+     * 
+     * @param c
+     *            a comment list.
+     */
 
     public void setComments(ASTList<Comment> list) {
-        this.comments = list;
-        if (this.comments != null)
-            for (int i = 0; i < this.comments.size(); i++)
-                this.comments.get(i).setParent(this);
+        comments = list;
+        if (comments != null) {
+            for (int i = 0; i < comments.size(); i++) {
+                comments.get(i).setParent(this);
+            }
+        }
     }
 
+    /** Defaults to do nothing. */
+
     public void validate() throws ModelException {
+        /* Defaults to do nothing. */
     }
 }

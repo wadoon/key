@@ -1,19 +1,54 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.java.statement;
 
-import recoder.java.*;
+import java.util.Collections;
+import java.util.List;
+
+import recoder.java.Expression;
+import recoder.java.LoopInitializer;
+import recoder.java.SourceElement;
+import recoder.java.SourceVisitor;
+import recoder.java.Statement;
+import recoder.java.VariableScope;
 import recoder.java.declaration.LocalVariableDeclaration;
 import recoder.java.declaration.VariableSpecification;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
 
-import java.util.ArrayList;
-import java.util.List;
+/**
+ * For.
+ * 
+ * @author <TT>AutoDoc</TT>
+ */
 
 public class For extends LoopStatement implements VariableScope {
-    private static final long serialVersionUID = 6315865704532091022L;
+
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = 6315865704532091022L;
+
+	/**
+     * For.
+     */
 
     public For() {
+        // nothing to do
     }
+
+    /**
+     * For.
+     * 
+     * @param inits
+     *            a loop initializer mutable list.
+     * @param guard
+     *            an expression.
+     * @param updates
+     *            an expression mutable list.
+     * @param body
+     *            a statement.
+     */
 
     public For(ASTList<LoopInitializer> inits, Expression guard, ASTList<Expression> updates, Statement body) {
         super(body);
@@ -23,22 +58,47 @@ public class For extends LoopStatement implements VariableScope {
         makeParentRoleValid();
     }
 
+    /**
+     * For.
+     * 
+     * @param proto
+     *            a for.
+     */
+
     protected For(For proto) {
         super(proto);
         makeParentRoleValid();
     }
+
+    /**
+     * Deep clone.
+     * 
+     * @return the object.
+     */
 
     public For deepClone() {
         return new For(this);
     }
 
     public SourceElement getLastElement() {
-        return (this.body != null) ? this.body.getLastElement() : this;
+        return (body != null) ? body.getLastElement() : this;
     }
+
+    /**
+     * Is exit condition.
+     * 
+     * @return the boolean value.
+     */
 
     public boolean isExitCondition() {
         return false;
     }
+
+    /**
+     * Is checked before iteration.
+     * 
+     * @return the boolean value.
+     */
 
     public boolean isCheckedBeforeIteration() {
         return true;
@@ -49,27 +109,30 @@ public class For extends LoopStatement implements VariableScope {
     }
 
     public void setDefinedScope(boolean defined) {
+        // ignore.
     }
 
     public List<VariableSpecification> getVariablesInScope() {
-        if (this.inits != null) {
-            LoopInitializer li = this.inits.get(0);
-            if (li instanceof LocalVariableDeclaration)
+        if (inits != null) {
+            LoopInitializer li = inits.get(0);
+            if (li instanceof LocalVariableDeclaration) {
                 return ((LocalVariableDeclaration) li).getVariables();
+            }
         }
-        return new ArrayList<VariableSpecification>();
+        return Collections.emptyList();
     }
 
     public VariableSpecification getVariableInScope(String name) {
         Debug.assertNonnull(name);
-        if (this.inits != null) {
-            LoopInitializer li = this.inits.get(0);
+        if (inits != null) {
+            LoopInitializer li = inits.get(0);
             if (li instanceof LocalVariableDeclaration) {
-                List<VariableSpecification> vars = ((LocalVariableDeclaration) li).getVariables();
-                for (int i = 0, s = vars.size(); i < s; i++) {
+            	List<VariableSpecification> vars = ((LocalVariableDeclaration) li).getVariables();
+                for (int i = 0, s = vars.size(); i < s; i += 1) {
                     VariableSpecification v = vars.get(i);
-                    if (name.equals(v.getName()))
+                    if (name.equals(v.getName())) {
                         return v;
+                    }
                 }
             }
         }

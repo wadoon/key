@@ -1,40 +1,42 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.service;
 
 import recoder.Service;
+import recoder.abstraction.EnumConstant;
 import recoder.abstraction.PrimitiveType;
 import recoder.abstraction.Type;
 import recoder.java.Expression;
 
+/**
+ * Constant folder to evaluate Java compile-time constants.
+ * 
+ * @author AL
+ */
 public interface ConstantEvaluator extends Service {
-    int BOOLEAN_TYPE = 0;
 
-    int BYTE_TYPE = 1;
+    /**
+     * Encoding for relevant types - Java has no typeswitch instruction and
+     * cannot easily afford to pass wrapper objects.
+     */
+    int BOOLEAN_TYPE = 0, BYTE_TYPE = 1, SHORT_TYPE = 2, CHAR_TYPE = 3, INT_TYPE = 4, LONG_TYPE = 5, FLOAT_TYPE = 6,
+            DOUBLE_TYPE = 7, STRING_TYPE = 8, ENUM_CONSTANT_TYPE = 9;
 
-    int SHORT_TYPE = 2;
-
-    int CHAR_TYPE = 3;
-
-    int INT_TYPE = 4;
-
-    int LONG_TYPE = 5;
-
-    int FLOAT_TYPE = 6;
-
-    int DOUBLE_TYPE = 7;
-
-    int STRING_TYPE = 8;
-
-    Type getCompileTimeConstantType(Expression paramExpression);
-
-    boolean isCompileTimeConstant(Expression paramExpression);
-
-    boolean isCompileTimeConstant(Expression paramExpression, EvaluationResult paramEvaluationResult);
-
+    /**
+     * Carrier for intermediate evaluation results. Explicit replacement for a
+     * familiy of polymorphic types, helps to prevent expensive object
+     * allocations.
+     */
     final class EvaluationResult {
-        private int type = -1;
+
+        private int type;
 
         private boolean booleanValue;
 
+        /*
+         * it might be possible to reuse most values by keeping everything
+         * shorter than int in the intValue
+         */
         private byte byteValue;
 
         private short shortValue;
@@ -50,118 +52,174 @@ public interface ConstantEvaluator extends Service {
         private double doubleValue;
 
         private String stringValue;
+        
+        private EnumConstant enumConstant;
+
+        public EvaluationResult() {
+            type = -1;
+        }
 
         public PrimitiveType getPrimitiveType(NameInfo ni) {
-            return DefaultConstantEvaluator.translateType(this.type, ni);
+            return DefaultConstantEvaluator.translateType(type, ni);
         }
 
         public int getTypeCode() {
-            return this.type;
+            return type;
         }
 
         public boolean getBoolean() {
-            return this.booleanValue;
-        }
-
-        public void setBoolean(boolean value) {
-            this.booleanValue = value;
-            this.type = 0;
+            return booleanValue;
         }
 
         public byte getByte() {
-            return this.byteValue;
-        }
-
-        public void setByte(byte value) {
-            this.byteValue = value;
-            this.type = 1;
+            return byteValue;
         }
 
         public short getShort() {
-            return this.shortValue;
-        }
-
-        public void setShort(short value) {
-            this.shortValue = value;
-            this.type = 2;
+            return shortValue;
         }
 
         public char getChar() {
-            return this.charValue;
-        }
-
-        public void setChar(char value) {
-            this.charValue = value;
-            this.type = 3;
+            return charValue;
         }
 
         public int getInt() {
-            return this.intValue;
-        }
-
-        public void setInt(int value) {
-            this.intValue = value;
-            this.type = 4;
+            return intValue;
         }
 
         public long getLong() {
-            return this.longValue;
-        }
-
-        public void setLong(long value) {
-            this.longValue = value;
-            this.type = 5;
+            return longValue;
         }
 
         public float getFloat() {
-            return this.floatValue;
-        }
-
-        public void setFloat(float value) {
-            this.floatValue = value;
-            this.type = 6;
+            return floatValue;
         }
 
         public double getDouble() {
-            return this.doubleValue;
-        }
-
-        public void setDouble(double value) {
-            this.doubleValue = value;
-            this.type = 7;
+            return doubleValue;
         }
 
         public String getString() {
-            return this.stringValue;
+            return stringValue;
+        }
+        
+        public EnumConstant getEnumConstant() {
+        	return enumConstant;
         }
 
+        public void setByte(byte value) {
+            byteValue = value;
+            type = BYTE_TYPE;
+        }
+
+        public void setShort(short value) {
+            shortValue = value;
+            type = SHORT_TYPE;
+        }
+
+        public void setChar(char value) {
+            charValue = value;
+            type = CHAR_TYPE;
+        }
+
+        public void setInt(int value) {
+            intValue = value;
+            type = INT_TYPE;
+        }
+
+        public void setLong(long value) {
+            longValue = value;
+            type = LONG_TYPE;
+        }
+
+        public void setFloat(float value) {
+            floatValue = value;
+            type = FLOAT_TYPE;
+        }
+
+        public void setDouble(double value) {
+            doubleValue = value;
+            type = DOUBLE_TYPE;
+        }
+
+        public void setBoolean(boolean value) {
+            booleanValue = value;
+            type = BOOLEAN_TYPE;
+        }
+
+        // internalizes strings (required for String constant comparations!)
         public void setString(String value) {
-            this.stringValue = (value == null) ? null : value.intern();
-            this.type = 8;
+            stringValue = (value == null) ? null : value.intern();
+            type = STRING_TYPE;
+        }
+        
+        public void setEnumConstant(EnumConstant enumConstant) {
+        	this.enumConstant = enumConstant;
+        	type = ENUM_CONSTANT_TYPE;
         }
 
         public String toString() {
-            switch (this.type) {
-                case 0:
-                    return String.valueOf(this.booleanValue);
-                case 1:
-                    return String.valueOf(this.byteValue);
-                case 2:
-                    return String.valueOf(this.shortValue);
-                case 3:
-                    return String.valueOf(this.charValue);
-                case 4:
-                    return String.valueOf(this.intValue);
-                case 5:
-                    return String.valueOf(this.longValue);
-                case 6:
-                    return String.valueOf(this.floatValue);
-                case 7:
-                    return String.valueOf(this.doubleValue);
-                case 8:
-                    return "\"" + this.stringValue + "\"";
+            switch (type) {
+            case BOOLEAN_TYPE:
+                return String.valueOf(booleanValue);
+            case BYTE_TYPE:
+                return String.valueOf(byteValue);
+            case SHORT_TYPE:
+                return String.valueOf(shortValue);
+            case CHAR_TYPE:
+                return String.valueOf(charValue);
+            case INT_TYPE:
+                return String.valueOf(intValue);
+            case LONG_TYPE:
+                return String.valueOf(longValue);
+            case FLOAT_TYPE:
+                return String.valueOf(floatValue);
+            case DOUBLE_TYPE:
+                return String.valueOf(doubleValue);
+            case STRING_TYPE:
+                return "\"" + stringValue + "\"";
+            case ENUM_CONSTANT_TYPE:
+            	return enumConstant.getFullName();
+            default:
+                return "Unknown type";
             }
-            return "Unknown type";
         }
     }
+
+    /**
+     * Returns the type of a constant expression if it is a compile-time
+     * constant as defined in the Java language specification, or <CODE>null
+     * </CODE> if it is not.
+     * 
+     * @param expr
+     *            the expression to evaluate.
+     * @return the type of the expression, or <CODE>null</CODE> if the
+     *         expression is not constant.
+     */
+    Type getCompileTimeConstantType(Expression expr);
+
+    /**
+     * Checks if the given expression is a compile-time constant as defined in
+     * the Java language specification.
+     * 
+     * @param expr
+     *            the expression to evaluate.
+     * @return <CODE>true</CODE>, if the expression is a compile-time
+     *         constant, <CODE>false</CODE> otherwise.
+     */
+    boolean isCompileTimeConstant(Expression expr);
+
+    /**
+     * Checks if the given expression is a compile-time constant as defined in
+     * the Java language specification, and derives the result.
+     * 
+     * @param expr
+     *            the expression to evaluate.
+     * @param res
+     *            the result of the evaluation; contains the type encoding and
+     *            the result value.
+     * @return <CODE>true</CODE>, if the expression is a compile-time
+     *         constant, <CODE>false</CODE> otherwise.
+     */
+    boolean isCompileTimeConstant(Expression expr, EvaluationResult res);
 }

@@ -1,54 +1,67 @@
-package recoder.convenience;
+// This file is part of the RECODER library and protected by the LGPL.
 
-import recoder.java.CompilationUnit;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
+package recoder.convenience;
 
 import java.util.List;
 
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.ProgramElement;
+
+/**
+ * Walks all syntax trees from a list of program elements in depth-first order.
+ * 
+ * @author AL
+ */
 public class ForestWalker extends AbstractTreeWalker {
-    List<CompilationUnit> unitList;
 
-    int unitIndex;
+    private List<? extends ProgramElement> rootList;
 
-    public ForestWalker(List<CompilationUnit> units) {
-        super(units.size() * 8);
-        this.unitList = units;
-        this.unitIndex = 0;
-        if (this.unitList.size() > 0)
-            reset(this.unitList.get(this.unitIndex));
+    private int unitIndex;
+
+    public ForestWalker(List<? extends ProgramElement> roots) {
+        super(roots.size() * 8);
+        this.rootList = roots;
+        unitIndex = 0;
+        if (rootList.size() > 0) {
+            reset(rootList.get(unitIndex));
+        }
     }
 
     public boolean next() {
-        if (this.count == 0) {
-            this.current = null;
-            if (this.unitIndex >= this.unitList.size() - 1)
+        if (count == 0) {
+            current = null;
+            if (unitIndex >= rootList.size() - 1) {
                 return false;
-            this.unitIndex++;
-            reset(this.unitList.get(this.unitIndex));
+            }
+            unitIndex += 1;
+            reset(rootList.get(unitIndex));
             return next();
         }
-        this.current = this.stack[--this.count];
-        if (this.current instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement nt = (NonTerminalProgramElement) this.current;
+        current = stack[--count]; // pop
+        if (current instanceof NonTerminalProgramElement) {
+            NonTerminalProgramElement nt = (NonTerminalProgramElement) current;
             int s = nt.getChildCount();
-            if (this.count + s >= this.stack.length) {
-                ProgramElement[] newStack = new ProgramElement[Math.max(this.stack.length * 2, this.count + s)];
-                System.arraycopy(this.stack, 0, newStack, 0, this.count);
-                this.stack = newStack;
+            if (count + s >= stack.length) {
+                ProgramElement[] newStack = new ProgramElement[Math.max(stack.length * 2, count + s)];
+                System.arraycopy(stack, 0, newStack, 0, count);
+                stack = newStack;
             }
-            for (int i = s - 1; i >= 0; i--)
-                this.stack[this.count++] = nt.getChildAt(i);
+            for (int i = s - 1; i >= 0; i -= 1) {
+                stack[count++] = nt.getChildAt(i); // push
+            }
         }
         return true;
     }
 
     public boolean equals(Object x) {
-        if (!(x instanceof ForestWalker))
+        if (!(x instanceof ForestWalker)) {
             return false;
+        }
         ForestWalker fw = (ForestWalker) x;
-        if (!super.equals(x))
+        if (!super.equals(x)) {
             return false;
-        return (fw.unitIndex == this.unitIndex && fw.unitList.equals(this.unitList));
+        }
+        return (fw.unitIndex == unitIndex && fw.rootList.equals(rootList));
     }
+
 }

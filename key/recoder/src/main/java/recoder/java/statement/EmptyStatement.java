@@ -1,33 +1,90 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.java.statement;
 
-import recoder.java.*;
+import recoder.java.JavaProgramElement;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.SourceVisitor;
+import recoder.java.Statement;
+import recoder.java.StatementContainer;
+import recoder.java.TerminalProgramElement;
+
+/**
+ * Empty statement.
+ * 
+ * @author <TT>AutoDoc</TT>
+ */
 
 public class EmptyStatement extends JavaProgramElement implements Statement, TerminalProgramElement {
-    private static final long serialVersionUID = 7235639345998336043L;
 
-    protected StatementContainer parent;
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = 7235639345998336043L;
+	/**
+     * Parent.
+     */
+
+	private StatementContainer parent;
+
+    /**
+     * Empty statement.
+     */
 
     public EmptyStatement() {
+    	super();
     }
+
+    /**
+     * Empty statement.
+     * 
+     * @param proto
+     *            an empty statement.
+     */
 
     protected EmptyStatement(EmptyStatement proto) {
         super(proto);
     }
 
+    /**
+     * Deep clone.
+     * 
+     * @return the object.
+     */
+
     public EmptyStatement deepClone() {
         return new EmptyStatement(this);
     }
 
+    /**
+     * Get AST parent.
+     * 
+     * @return the non terminal program element.
+     */
+
     public NonTerminalProgramElement getASTParent() {
-        return this.parent;
+        return parent;
     }
+
+    /**
+     * Get statement container.
+     * 
+     * @return the statement container.
+     */
 
     public StatementContainer getStatementContainer() {
-        return this.parent;
+        return parent;
     }
 
+    /**
+     * Set statement container.
+     * 
+     * @param c
+     *            a statement container.
+     */
+
     public void setStatementContainer(StatementContainer c) {
-        this.parent = c;
+        parent = c;
     }
 
     public void accept(SourceVisitor v) {

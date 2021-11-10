@@ -1,124 +1,272 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.java.reference;
 
-import recoder.java.*;
+import recoder.java.Expression;
+import recoder.java.Identifier;
+import recoder.java.ProgramElement;
+import recoder.java.SourceElement;
+import recoder.java.SourceVisitor;
 
-public class FieldReference extends VariableReference implements MemberReference, ReferenceSuffix, TypeReferenceContainer, ExpressionContainer {
-    private static final long serialVersionUID = -1475141413582182288L;
+/**
+ * Field reference.
+ * 
+ * @author <TT>AutoDoc</TT>
+ */
 
-    protected ReferencePrefix prefix;
+public class FieldReference extends VariableReference implements MemberReference, ReferenceSuffix,
+        TypeReferenceContainer {
+
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = -1475141413582182288L;
+	
+	/**
+     * Reference prefix.
+     */
+
+	private ReferencePrefix prefix;
+
+    /**
+     * Field reference.
+     */
 
     public FieldReference() {
+    	// nothing to do
     }
+
+    /**
+     * Field reference.
+     * 
+     * @param id
+     *            an identifier.
+     */
 
     public FieldReference(Identifier id) {
         super(id);
     }
 
+    /**
+     * Field reference.
+     * 
+     * @param prefix
+     *            a reference prefix.
+     * @param id
+     *            an identifier.
+     */
+
     public FieldReference(ReferencePrefix prefix, Identifier id) {
         super(id);
         setReferencePrefix(prefix);
-        makeParentRoleValid();
+        makeParentRoleValid(); // neccessary for prefix
     }
+
+    /**
+     * Field reference.
+     * 
+     * @param proto
+     *            a field reference.
+     */
 
     protected FieldReference(FieldReference proto) {
         super(proto);
-        if (proto.prefix != null)
-            this.prefix = (ReferencePrefix) proto.prefix.deepClone();
+        if (proto.prefix != null) {
+            prefix = (ReferencePrefix) proto.prefix.deepClone();
+        }
         makeParentRoleValid();
     }
+
+    /**
+     * Deep clone.
+     * 
+     * @return the object.
+     */
 
     public FieldReference deepClone() {
         return new FieldReference(this);
     }
 
+    /**
+     * Make parent role valid.
+     */
+
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (this.prefix != null)
-            this.prefix.setReferenceSuffix(this);
+        if (prefix != null) {
+            prefix.setReferenceSuffix(this);
+        }
     }
+
+    /**
+     * Returns the number of children of this node.
+     * 
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
         int result = 0;
-        if (this.prefix != null)
+        if (prefix != null)
             result++;
-        if (this.name != null)
+        if (name != null)
             result++;
         return result;
     }
 
+    /**
+     * Returns the child at the specified index in this node's "virtual" child
+     * array
+     * 
+     * @param index
+     *            an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException
+     *                if <tt>index</tt> is out of bounds
+     */
+
     public ProgramElement getChildAt(int index) {
-        if (this.prefix != null) {
+        if (prefix != null) {
             if (index == 0)
-                return this.prefix;
+                return prefix;
             index--;
         }
-        if (this.name != null &&
-                index == 0)
-            return this.name;
+        if (name != null) {
+            if (index == 0)
+                return name;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
-        if (this.prefix == child)
+        // role 0: prefix
+        // role 1: name
+        if (prefix == child) {
             return 0;
-        if (this.name == child)
+        }
+        if (name == child) {
             return 1;
+        }
         return -1;
     }
 
+    /**
+     * Get reference prefix.
+     * 
+     * @return the reference prefix.
+     */
+
     public ReferencePrefix getReferencePrefix() {
-        return this.prefix;
+        return prefix;
     }
+
+    /**
+     * Set reference prefix.
+     * 
+     * @param prefix
+     *            a reference prefix.
+     */
 
     public void setReferencePrefix(ReferencePrefix prefix) {
         this.prefix = prefix;
     }
 
+    /**
+     * Get the number of type references in this container.
+     * 
+     * @return the number of type references.
+     */
+
     public int getTypeReferenceCount() {
-        return (this.prefix instanceof TypeReference) ? 1 : 0;
+        return (prefix instanceof TypeReference) ? 1 : 0;
     }
+
+    /*
+     * Return the type reference at the specified index in this node's "virtual"
+     * type reference array. @param index an index for a type reference. @return
+     * the type reference with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     */
 
     public TypeReference getTypeReferenceAt(int index) {
-        if (this.prefix instanceof TypeReference && index == 0)
-            return (TypeReference) this.prefix;
+        if (prefix instanceof TypeReference && index == 0) {
+            return (TypeReference) prefix;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
+
+    /**
+     * Get the number of expressions in this container.
+     * 
+     * @return the number of expressions.
+     */
 
     public int getExpressionCount() {
-        return (this.prefix instanceof Expression) ? 1 : 0;
+        return (prefix instanceof Expression) ? 1 : 0;
     }
 
+    /*
+     * Return the expression at the specified index in this node's "virtual"
+     * expression array. @param index an index for an expression. @return the
+     * expression with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     */
+
     public Expression getExpressionAt(int index) {
-        if (this.prefix instanceof Expression && index == 0)
-            return (Expression) this.prefix;
+        if (prefix instanceof Expression && index == 0) {
+            return (Expression) prefix;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
+    /**
+     * Replace a single child in the current node. The child to replace is
+     * matched by identity and hence must be known exactly. The replacement
+     * element can be null - in that case, the child is effectively removed. The
+     * parent role of the new child is validated, while the parent link of the
+     * replaced child is left untouched.
+     * 
+     * @param p
+     *            the old child.
+     * @param p
+     *            the new child.
+     * @return true if a replacement has occured, false otherwise.
+     * @exception ClassCastException
+     *                if the new child cannot take over the role of the old one.
+     */
+
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
-        if (this.prefix == p) {
+        }
+        if (prefix == p) {
             ReferencePrefix r = (ReferencePrefix) q;
-            this.prefix = r;
-            if (r != null)
+            prefix = r;
+            if (r != null) {
                 r.setReferenceSuffix(this);
+            }
             return true;
         }
-        if (this.name == p) {
+        if (name == p) {
             Identifier r = (Identifier) q;
-            this.name = r;
-            if (r != null)
+            name = r;
+            if (r != null) {
                 r.setParent(this);
+            }
             return true;
         }
         return false;
     }
 
     public SourceElement getFirstElement() {
-        return (this.prefix == null) ? this.name : this.prefix.getFirstElement();
+        return (prefix == null) ? name : prefix.getFirstElement();
     }
 
     public void accept(SourceVisitor v) {
         v.visitFieldReference(this);
+    }
+    
+    @Override
+    public String toString() {
+    	return "<FieldReference> " + getName(); 
     }
 }

@@ -1,11 +1,44 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder;
 
 import recoder.io.ClassFileRepository;
 import recoder.io.ProjectSettings;
 import recoder.io.SourceFileRepository;
-import recoder.service.*;
+import recoder.service.ByteCodeInfo;
+import recoder.service.ChangeHistory;
+import recoder.service.ConstantEvaluator;
+import recoder.service.ImplicitElementInfo;
+import recoder.service.NameInfo;
+import recoder.service.SourceInfo;
 
+/**
+ * A configuration of services that can work together.
+ * <P>
+ * To exchange a service S1 by a service S2, simply override the corresponding
+ * <CODE>makeS</CODE> method.
+ * <P>
+ * To provide a complete new Service S, add the following code to a subclass of
+ * the DefaultServiceConfiguration:
+ * 
+ * <PRE>
+ * private S s; 
+ * protected void makeServices() { 
+ *   super.makeServices(); 
+ *   s = makeS(); 
+ * } 
+ * protected void initServices() { 
+ *   super.initServices();
+ *   s.initialize(this); 
+ * } 
+ * protected S makeS() { 
+ *   return new S1(...); 
+ * } 
+ * public final S getS() { return s; }
+ * </PRE>
+ */
 public abstract class ServiceConfiguration {
+
     private ProjectSettings projectSettings;
 
     private ProgramFactory programFactory;
@@ -31,70 +64,76 @@ public abstract class ServiceConfiguration {
         initServices();
     }
 
+    /**
+     * Called during service initialization: constructs services.
+     */
     protected void makeServices() {
-        this.changeHistory = makeChangeHistory();
-        this.projectSettings = makeProjectSettings();
-        this.programFactory = makeProgramFactory();
-        this.sourceFileRepository = makeSourceFileRepository();
-        this.classFileRepository = makeClassFileRepository();
-        this.sourceInfo = makeSourceInfo();
-        this.byteCodeInfo = makeByteCodeInfo();
-        this.nameInfo = makeNameInfo();
-        this.constantEvaluator = makeConstantEvaluator();
-        this.implicitElementInfo = makeImplicitElementInfo();
+        changeHistory = makeChangeHistory();
+        projectSettings = makeProjectSettings();
+        programFactory = makeProgramFactory();
+        sourceFileRepository = makeSourceFileRepository();
+        classFileRepository = makeClassFileRepository();
+        sourceInfo = makeSourceInfo();
+        byteCodeInfo = makeByteCodeInfo();
+        implicitElementInfo = makeImplicitElementInfo(); // must be before name info...
+        nameInfo = makeNameInfo();
+        constantEvaluator = makeConstantEvaluator();
     }
 
+    /**
+     * Called during service initialization: constructs services.
+     */
     protected void initServices() {
-        this.changeHistory.initialize(this);
-        this.projectSettings.initialize(this);
-        this.programFactory.initialize(this);
-        this.sourceFileRepository.initialize(this);
-        this.classFileRepository.initialize(this);
-        this.sourceInfo.initialize(this);
-        this.byteCodeInfo.initialize(this);
-        this.implicitElementInfo.initialize(this);
-        this.nameInfo.initialize(this);
-        this.constantEvaluator.initialize(this);
+        changeHistory.initialize(this);
+        projectSettings.initialize(this);
+        programFactory.initialize(this);
+        sourceFileRepository.initialize(this);
+        classFileRepository.initialize(this);
+        implicitElementInfo.initialize(this);
+        sourceInfo.initialize(this);
+        byteCodeInfo.initialize(this);
+        nameInfo.initialize(this);
+        constantEvaluator.initialize(this);
     }
 
     public final ProjectSettings getProjectSettings() {
-        return this.projectSettings;
+        return projectSettings;
     }
 
     public final ProgramFactory getProgramFactory() {
-        return this.programFactory;
+        return programFactory;
     }
 
     public final ChangeHistory getChangeHistory() {
-        return this.changeHistory;
+        return changeHistory;
     }
 
     public final SourceFileRepository getSourceFileRepository() {
-        return this.sourceFileRepository;
+        return sourceFileRepository;
     }
 
     public final ClassFileRepository getClassFileRepository() {
-        return this.classFileRepository;
+        return classFileRepository;
     }
 
     public final SourceInfo getSourceInfo() {
-        return this.sourceInfo;
+        return sourceInfo;
     }
 
     public final ByteCodeInfo getByteCodeInfo() {
-        return this.byteCodeInfo;
+        return byteCodeInfo;
     }
 
     public final ImplicitElementInfo getImplicitElementInfo() {
-        return this.implicitElementInfo;
+        return implicitElementInfo;
     }
 
     public final NameInfo getNameInfo() {
-        return this.nameInfo;
+        return nameInfo;
     }
 
     public final ConstantEvaluator getConstantEvaluator() {
-        return this.constantEvaluator;
+        return constantEvaluator;
     }
 
     protected abstract ProjectSettings makeProjectSettings();
@@ -116,4 +155,5 @@ public abstract class ServiceConfiguration {
     protected abstract NameInfo makeNameInfo();
 
     protected abstract ConstantEvaluator makeConstantEvaluator();
+
 }

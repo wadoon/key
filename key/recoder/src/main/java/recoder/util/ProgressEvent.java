@@ -2,10 +2,20 @@ package recoder.util;
 
 import java.util.EventObject;
 
+/**
+ * Event indicating a processing progress.
+ * 
+ * @since 0.72
+ * @author AL
+ */
 public class ProgressEvent extends EventObject {
-    private static final long serialVersionUID = -8564312802396719743L;
 
-    private int workCount;
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = -8564312802396719743L;
+
+	private int workCount;
 
     private int workMax;
 
@@ -21,23 +31,23 @@ public class ProgressEvent extends EventObject {
     }
 
     public int getWorkToDoCount() {
-        return this.workMax;
-    }
-
-    protected void setWorkToDoCount(int count) {
-        this.workMax = count;
+        return workMax;
     }
 
     public int getWorkDoneCount() {
-        return this.workCount;
+        return workCount;
+    }
+
+    public Object getState() {
+        return state;
     }
 
     protected void setWorkDoneCount(int count) {
         this.workCount = count;
     }
 
-    public Object getState() {
-        return this.state;
+    protected void setWorkToDoCount(int count) {
+        this.workMax = count;
     }
 
     protected void setState(Object state) {
@@ -49,4 +59,5 @@ public class ProgressEvent extends EventObject {
         this.workMax = workToDo;
         this.state = state;
     }
+
 }

@@ -1,9 +1,6 @@
-package recoder.bytecode;
+// This file is part of the RECODER library and protected by the LGPL.
 
-import recoder.ParserException;
-import recoder.abstraction.ElementValuePair;
-import recoder.abstraction.TypeArgument;
-import recoder.convenience.Naming;
+package recoder.bytecode;
 
 import java.io.DataInput;
 import java.io.DataInputStream;
@@ -14,983 +11,1129 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ByteCodeParser {
-    protected static final byte CLASS = 7;
-    protected static final byte FIELD_REF = 9;
-    protected static final byte METHOD_REF = 10;
-    protected static final byte INTERFACE_METHOD_REF = 11;
-    protected static final byte STRING = 8;
-    protected static final byte INTEGER = 3;
-    protected static final byte FLOAT = 4;
-    protected static final byte LONG = 5;
-    protected static final byte DOUBLE = 6;
-    protected static final byte NAME_AND_TYPE = 12;
-    protected static final byte UTF8 = 1;
-    public boolean readJava5Signatures = true;
-    private DataInput in;
-    private String className;
-    private String fullName;
-    private String pathPrefix;
-    private String shortName;
-    private String superName;
-    private int accessFlags;
-    private String[] interfaceNames;
-    private ArrayList<FieldInfo> fields;
-    private ArrayList<MethodInfo> methods;
-    private ArrayList<ConstructorInfo> constructors;
-    private String[] innerClasses;
-    private String[] pool;
-    private Object currentDefaultValue;
-    private AnnotationUseInfo[][] currentParamAnnotations;
-    private ClassFile cf;
-    private final String[] longRes;
+import recoder.abstraction.ClassTypeContainer;
+import recoder.abstraction.TypeArgument;
+import recoder.abstraction.TypeArgument.WildcardMode;
+import recoder.convenience.Naming;
 
-    private final Set<String> staticInners;
+/**
+ * Simple ByteCode parser.
+ * 
+ * @author AL
+ */
+public class ByteCodeParser extends AbstractBytecodeParser  {
 
-    public ByteCodeParser() {
-        this.longRes = new String[256];
-        this.staticInners = new HashSet<String>(256);
-    }
+	// Warning: this instance is not reentrant at all
 
-    static String decodeType(String in) throws ByteCodeFormatException {
-        int j, dim = 0;
-        int i = 0;
-        char c = in.charAt(i);
-        if (c == '[') {
-            dim = i;
-            do {
-                i++;
-                c = in.charAt(i);
-            } while (c == '[');
-            dim = i - dim;
-        }
-        String type = null;
-        switch (c) {
-            case 'B':
-                type = "byte";
-                return Naming.toArrayTypeName(type, dim);
-            case 'C':
-                type = "char";
-                return Naming.toArrayTypeName(type, dim);
-            case 'D':
-                type = "double";
-                return Naming.toArrayTypeName(type, dim);
-            case 'F':
-                type = "float";
-                return Naming.toArrayTypeName(type, dim);
-            case 'I':
-                type = "int";
-                return Naming.toArrayTypeName(type, dim);
-            case 'J':
-                type = "long";
-                return Naming.toArrayTypeName(type, dim);
-            case 'S':
-                type = "short";
-                return Naming.toArrayTypeName(type, dim);
-            case 'Z':
-                type = "boolean";
-                return Naming.toArrayTypeName(type, dim);
-            case 'V':
-                type = "void";
-                return Naming.toArrayTypeName(type, dim);
-            case 'L':
-                j = in.indexOf(';', i);
-                type = in.substring(i + 1, j).replace('/', '.').replace('$', '.');
-                return Naming.toArrayTypeName(type, dim);
-        }
-        throw new ByteCodeFormatException("Illegal type code");
-    }
+	private DataInput in;
 
-    public ClassFile parseClassFile(InputStream is, String location) throws ParserException, IOException {
-        return parseClassFile(new DataInputStream(is), location);
-    }
+	private String className;
 
-    public ClassFile parseClassFile(InputStream is) throws ParserException, IOException {
-        return parseClassFile(new DataInputStream(is), (String) null);
-    }
+	private String fullName;
 
-    public ClassFile parseClassFile(DataInput inStr) throws ParserException, IOException {
-        return parseClassFile(inStr, null);
-    }
+	private String pathPrefix;
 
-    public ClassFile parseClassFile(DataInput inStr, String location) throws ParserException, IOException {
-        this.cf = new ClassFile();
-        this.in = inStr;
-        if (inStr.readInt() != -889275714)
-            throw new ByteCodeFormatException("Bad magic in bytecode file");
-        int minorVersion = inStr.readUnsignedShort();
-        int majorVersion = inStr.readUnsignedShort();
-        int constantPoolCount = inStr.readUnsignedShort();
-        makeConstantPool(constantPoolCount);
-        this.accessFlags = inStr.readUnsignedShort();
-        this.className = this.pool[inStr.readUnsignedShort()];
-        this.className = this.className.replace('/', '.');
-        this.fullName = this.className.replace('$', '.');
-        int ldp = this.fullName.lastIndexOf('.');
-        this.pathPrefix = (ldp > 0) ? this.fullName.substring(0, ldp) : "";
-        this.shortName = this.fullName.substring(ldp + 1);
-        this.superName = this.pool[inStr.readUnsignedShort()];
-        if (this.superName != null)
-            this.superName = this.superName.replace('/', '.').replace('$', '.');
-        int interfacesCount = inStr.readUnsignedShort();
-        this.interfaceNames = new String[interfacesCount];
-        for (int i = 0; i < interfacesCount; i++) {
-            this.interfaceNames[i] = this.pool[inStr.readUnsignedShort()];
-            this.interfaceNames[i] = this.interfaceNames[i].replace('/', '.').replace('$', '.');
-        }
-        int fieldsCount = inStr.readUnsignedShort();
-        this.fields = new ArrayList<FieldInfo>(fieldsCount);
-        for (int j = 0; j < fieldsCount; j++)
-            this.fields.add(readFieldInfo());
-        int methodsCount = inStr.readUnsignedShort();
-        this.methods = new ArrayList<MethodInfo>();
-        this.constructors = new ArrayList<ConstructorInfo>();
-        for (int k = 0; k < methodsCount; k++) {
-            MethodInfo minfo = readMethodInfo();
-            if (minfo != null)
-                if (minfo instanceof ConstructorInfo) {
-                    this.constructors.add((ConstructorInfo) minfo);
-                } else {
-                    this.methods.add(minfo);
-                }
-        }
-        ArrayList<AnnotationUseInfo> annotations = new ArrayList<AnnotationUseInfo>();
-        ArrayList<TypeParameterInfo> typeParams = new ArrayList<TypeParameterInfo>();
-        ArrayList<List<TypeArgumentInfo>> typeArgList = new ArrayList<List<TypeArgumentInfo>>();
-        ArrayList<String> typeNames = new ArrayList<String>();
-        this.innerClasses = readAttributesForClassFile(annotations, typeParams, typeArgList, typeNames);
-        annotations.trimToSize();
-        typeParams.trimToSize();
-        this.pool = null;
-        this.cf.setLocation(location);
-        this.cf.setPhysicalName(this.className);
-        this.cf.setFullName(this.fullName);
-        this.cf.setName(this.shortName);
-        this.cf.setSuperName(this.superName);
-        this.cf.setAccessFlags(this.accessFlags);
-        this.cf.setInterfaceNames(this.interfaceNames);
-        this.fields.trimToSize();
-        this.cf.setFields(this.fields);
-        this.constructors.trimToSize();
-        this.cf.setConstructors(this.constructors);
-        this.methods.trimToSize();
-        this.cf.setMethods(this.methods);
-        this.cf.setInnerClassNames(this.innerClasses);
-        this.cf.setAnnotations(annotations);
-        this.cf.setTypeParameters(typeParams);
-        if (typeArgList.size() > 0) {
-            this.cf.superClassTypeArguments = typeArgList.get(0);
-            if (typeArgList.size() > 1) {
-                ArrayList[] arrayOfArrayList = new ArrayList[typeArgList.size() - 1];
-                this.cf.superInterfacesTypeArguments = (List<TypeArgumentInfo>[]) arrayOfArrayList;
-                for (int m = 1; m < typeArgList.size(); m++)
-                    this.cf.superInterfacesTypeArguments[m - 1] = typeArgList.get(m);
-            }
-        }
-        return this.cf;
-    }
+	private String shortName;
 
-    protected void makeConstantPool(int count) throws IOException, ByteCodeFormatException {
-        this.pool = new String[count];
-        int[] targetIndex = new int[count];
-        int i;
-        for (i = 1; i < count; i++) {
-            int j;
-            byte tag = this.in.readByte();
-            switch (tag) {
-                case 7:
-                case 8:
-                    j = this.in.readUnsignedShort();
-                    if (this.pool[j] != null) {
-                        this.pool[i] = this.pool[j];
-                        break;
-                    }
-                    targetIndex[i] = j;
-                    break;
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                    this.in.skipBytes(4);
-                    break;
-                case 3:
-                    this.pool[i] = String.valueOf(this.in.readInt());
-                    break;
-                case 4:
-                    this.pool[i] = String.valueOf(this.in.readFloat());
-                    break;
-                case 5:
-                    this.pool[i] = String.valueOf(this.in.readLong());
-                    i++;
-                    break;
-                case 6:
-                    this.pool[i] = String.valueOf(this.in.readDouble());
-                    i++;
-                    break;
-                case 1:
-                    this.pool[i] = this.in.readUTF();
-                    break;
-                default:
-                    throw new ByteCodeFormatException("Bad Constant Pool Type " + tag);
-            }
-        }
-        for (i = 1; i < count; i++) {
-            if (targetIndex[i] > 0)
-                this.pool[i] = this.pool[targetIndex[i]];
-        }
-    }
+	private String superName;
 
-    private String[] decodeTypes(String inStr) throws ByteCodeFormatException {
-        int count = 0;
-        if (inStr.charAt(0) != '(')
-            throw new ByteCodeFormatException("Bad method descriptor");
-        boolean returnValue = false;
-        int i = 1;
-        while (i < inStr.length()) {
-            int j, dim = 0;
-            char c = inStr.charAt(i);
-            if (c == ')') {
-                if (returnValue)
-                    throw new ByteCodeFormatException("Bad method descriptor");
-                returnValue = true;
-                i++;
-                c = inStr.charAt(i);
-            }
-            if (c == '[') {
-                dim = i;
-                do {
-                    i++;
-                    c = inStr.charAt(i);
-                } while (c == '[');
-                dim = i - dim;
-            }
-            String type = null;
-            switch (c) {
-                case 'B':
-                    type = "byte";
-                    i++;
-                    break;
-                case 'C':
-                    type = "char";
-                    i++;
-                    break;
-                case 'D':
-                    type = "double";
-                    i++;
-                    break;
-                case 'F':
-                    type = "float";
-                    i++;
-                    break;
-                case 'I':
-                    type = "int";
-                    i++;
-                    break;
-                case 'J':
-                    type = "long";
-                    i++;
-                    break;
-                case 'S':
-                    type = "short";
-                    i++;
-                    break;
-                case 'Z':
-                    type = "boolean";
-                    i++;
-                    break;
-                case 'V':
-                    if (!returnValue)
-                        throw new ByteCodeFormatException("Void parameter type");
-                    type = "void";
-                    i++;
-                    break;
-                case 'L':
-                    j = inStr.indexOf(';', i);
-                    type = inStr.substring(i + 1, j).replace('/', '.').replace('$', '.');
-                    i = j + 1;
-                    break;
-                default:
-                    throw new ByteCodeFormatException("Illegal type code " + c);
-            }
-            this.longRes[count++] = Naming.toArrayTypeName(type, dim);
-        }
-        String[] r = new String[count];
-        System.arraycopy(this.longRes, 0, r, 0, count);
-        return r;
-    }
+	private int accessFlags;
 
-    private String[] readAttributesForMethod(ArrayList<AnnotationUseInfo> emptyListForAnnotations, String[] prereadParams, List<TypeArgumentInfo>[] typeArgs, List<TypeParameterInfo> typeParams) throws IOException, ByteCodeFormatException {
-        String[] exceptions = null;
-        int count = this.in.readUnsignedShort();
-        for (int i = 0; i < count; i++) {
-            String name = this.pool[this.in.readUnsignedShort()];
-            int length = this.in.readInt();
-            if ("Exceptions".equals(name)) {
-                if (exceptions != null)
-                    throw new ByteCodeFormatException("Multiple exceptions lists");
-                int number = this.in.readUnsignedShort();
-                exceptions = new String[number];
-                for (int j = 0; j < number; j++)
-                    exceptions[j] = this.pool[this.in.readUnsignedShort()].replace('/', '.').replace('$', '.');
-            } else if ("Signature".equals(name)) {
-                if (this.readJava5Signatures) {
-                    List[] arrayOfList = readMethodSignature(prereadParams, typeParams);
-                    for (int jj = 0; jj < typeArgs.length; jj++)
-                        typeArgs[jj] = arrayOfList[jj];
-                } else {
-                    this.in.skipBytes(length);
-                }
-            } else if ("RuntimeVisibleAnnotation".equals(name) || "RuntimeInvisibleAnnotation".equals(name)) {
-                if (this.readJava5Signatures) {
-                    int number = this.in.readUnsignedShort();
-                    emptyListForAnnotations.ensureCapacity(number);
-                    for (int j = 0; j < number; j++)
-                        emptyListForAnnotations.add(readAnnotation());
-                } else {
-                    this.in.skipBytes(length);
-                }
-            } else if ("RuntimeVisibleParameterAnnotations".equals(name) || "RuntimeInvisibleParameterAnnotations".equals(name)) {
-                if (this.readJava5Signatures) {
-                    int paramNum = this.in.readUnsignedByte();
-                    this.currentParamAnnotations = new AnnotationUseInfo[paramNum][];
-                    for (int j = 0; j < paramNum; j++) {
-                        int number = this.in.readUnsignedShort();
-                        this.currentParamAnnotations[j] = new AnnotationUseInfo[number];
-                        for (int k = 0; k < number; k++)
-                            this.currentParamAnnotations[j][k] = readAnnotation();
-                    }
-                } else {
-                    this.in.skipBytes(length);
-                }
-            } else if ("AnnotationDefault".equals(name)) {
-                if (this.readJava5Signatures) {
-                    if (this.currentDefaultValue != null)
-                        throw new ByteCodeFormatException("Multiple annotation defaults!");
-                    this.currentDefaultValue = readElementValue();
-                } else {
-                    this.in.skipBytes(length);
-                }
-            } else {
-                this.in.skipBytes(length);
-            }
-        }
-        return exceptions;
-    }
+	private String[] interfaceNames;
 
-    private String[] readAttributesForClassFile(ArrayList<AnnotationUseInfo> emptyListForAnnotations, List<TypeParameterInfo> emptyListForTypeParams, List<List<TypeArgumentInfo>> emptyListForTypeArgumentLists, List<String> emptyListForTypeNames) throws IOException, ByteCodeFormatException {
-        String[] innerClassesRes = null;
-        int count = this.in.readUnsignedShort();
-        for (int i = 0; i < count; i++) {
-            String name = this.pool[this.in.readUnsignedShort()];
-            int length = this.in.readInt();
-            if ("InnerClasses".equals(name)) {
-                if (innerClassesRes != null)
-                    throw new ByteCodeFormatException("Multiple inner classes lists");
-                int number = this.in.readUnsignedShort();
-                innerClassesRes = new String[number];
-                int k = 0;
-                for (int j = 0; j < number; j++) {
-                    String s = readInnerClassInfo();
-                    if (s != null)
-                        innerClassesRes[k++] = s;
-                }
-                if (k != number) {
-                    String[] tmpInnerClassesRes = new String[k];
-                    System.arraycopy(innerClassesRes, 0, tmpInnerClassesRes, 0, k);
-                    innerClassesRes = tmpInnerClassesRes;
-                }
-            } else if ("RuntimeVisibleAnnotations".equals(name) || "RuntimeInvisibleAnnotations".equals(name)) {
-                if (this.readJava5Signatures) {
-                    if (emptyListForAnnotations.size() != 0)
-                        throw new ByteCodeFormatException("Multiple annotation lists");
-                    int number = this.in.readUnsignedShort();
-                    emptyListForAnnotations.ensureCapacity(number);
-                    for (int j = 0; j < number; j++)
-                        emptyListForAnnotations.add(readAnnotation());
-                } else {
-                    this.in.skipBytes(length);
-                }
-            } else if ("EnclosingMethod".equals(name)) {
-                this.in.skipBytes(length);
-            } else if ("Synthetic".equals(name)) {
-                this.in.skipBytes(length);
-            } else if ("SourceFile".equals(name)) {
-                this.in.skipBytes(length);
-            } else if ("Signature".equals(name)) {
-                if (this.readJava5Signatures) {
-                    ReadClassSignatureResult res = readClassSignature();
-                    for (TypeParameterInfo tai : res.typeParams)
-                        emptyListForTypeParams.add(tai);
-                    for (List<TypeArgumentInfo> tai : res.typeArgumentArray)
-                        emptyListForTypeArgumentLists.add(tai);
-                    for (String n : res.typeNameArray)
-                        emptyListForTypeNames.add(n);
-                } else {
-                    this.in.skipBytes(length);
-                }
-            } else if ("Deprecated".equals(name)) {
-                this.in.skipBytes(length);
-            } else {
-                this.in.skipBytes(length);
-            }
-        }
-        return innerClassesRes;
-    }
+	private ArrayList<FieldInfo> fields;
 
-    private String[] readAttributesForField(ArrayList<AnnotationUseInfo> emptyListForAnnotations, List<TypeArgumentInfo> emptyListForTypeArgs) throws IOException, ByteCodeFormatException {
-        assert emptyListForAnnotations != null && emptyListForAnnotations.isEmpty();
-        String constant = null;
-        String type = null;
-        int count = this.in.readUnsignedShort();
-        for (int i = 0; i < count; i++) {
-            String id = this.pool[this.in.readUnsignedShort()];
-            int length = this.in.readInt();
-            if ("ConstantValue".equals(id)) {
-                if (constant != null)
-                    throw new ByteCodeFormatException("Multiple constant values for field");
-                constant = this.pool[this.in.readUnsignedShort()];
-            } else if ("Signature".equals(id)) {
-                if (this.readJava5Signatures) {
-                    type = readFieldSignature(this.pool[this.in.readUnsignedShort()], emptyListForTypeArgs);
-                } else {
-                    this.in.skipBytes(length);
-                }
-            } else if ("RuntimeVisibleAnnotation".equals(id) || "RuntimeInvisibleAnnotation".equals(id)) {
-                if (this.readJava5Signatures) {
-                    int number = this.in.readUnsignedShort();
-                    emptyListForAnnotations.ensureCapacity(number);
-                    for (int j = 0; j < number; j++)
-                        emptyListForAnnotations.add(readAnnotation());
-                } else {
-                    this.in.skipBytes(length);
-                }
-            } else {
-                this.in.skipBytes(length);
-            }
-        }
-        return new String[]{constant, type};
-    }
+	private ArrayList<MethodInfo> methods;
 
-    FieldInfo readFieldInfo() throws IOException, ByteCodeFormatException {
-        int fieldAccessFlags = this.in.readUnsignedShort();
-        String name = this.pool[this.in.readUnsignedShort()];
-        String type = decodeType(this.pool[this.in.readUnsignedShort()]);
-        ArrayList<AnnotationUseInfo> annotations = new ArrayList<AnnotationUseInfo>();
-        ArrayList<TypeArgumentInfo> typeArgs = new ArrayList<TypeArgumentInfo>();
-        String[] tmp = readAttributesForField(annotations, typeArgs);
-        String constant = tmp[0];
-        if (tmp[1] != null)
-            type = tmp[1];
-        FieldInfo res = new FieldInfo(fieldAccessFlags, name, type, this.cf, constant, typeArgs);
-        res.setAnnotations(annotations);
-        return res;
-    }
+	private ArrayList<ConstructorInfo> constructors;
 
-    MethodInfo readMethodInfo() throws IOException, ByteCodeFormatException {
-        MethodInfo res;
-        int methAccessFlags = this.in.readUnsignedShort();
-        String name = this.pool[this.in.readUnsignedShort()];
-        boolean isConstructor = "<init>".equals(name);
-        boolean isInitializer = false;
-        if (isConstructor) {
-            name = this.shortName;
-        } else {
-            isInitializer = "<clinit>".equals(name);
-        }
-        String[] types = decodeTypes(this.pool[this.in.readUnsignedShort()]);
-        ArrayList<AnnotationUseInfo> annotations = new ArrayList<AnnotationUseInfo>();
-        this.currentDefaultValue = null;
-        this.currentParamAnnotations = null;
-        List[] arrayOfList = new List[types.length];
-        ArrayList<TypeParameterInfo> typeParams = new ArrayList<TypeParameterInfo>();
-        String[] exceptions = readAttributesForMethod(annotations, types, arrayOfList, typeParams);
-        String rtype = types[types.length - 1];
-        int firstParam = 0;
-        int paramCount = types.length - 1;
-        if (isConstructor && types[0].equals(this.pathPrefix) && !this.staticInners.contains(this.fullName)) {
-            firstParam = 1;
-            paramCount--;
-        }
-        String[] ptypes = new String[paramCount];
-        System.arraycopy(types, firstParam, ptypes, 0, paramCount);
-        if (isInitializer)
-            return null;
-        if (isConstructor) {
-            res = new ConstructorInfo(methAccessFlags, name, ptypes, exceptions, this.cf);
-        } else if ((this.accessFlags & 0x2000) != 0) {
-            res = new AnnotationPropertyInfo(methAccessFlags, rtype, name, this.cf, this.currentDefaultValue);
-        } else {
-            res = new MethodInfo(methAccessFlags, rtype, name, ptypes, exceptions, this.cf);
-        }
-        res.setAnnotations(annotations);
-        res.paramAnnotations = this.currentParamAnnotations;
-        if (arrayOfList.length != 0) {
-            setTypeArgParentRec(arrayOfList, res);
-            res.paramTypeArgs = (List<TypeArgumentInfo>[]) arrayOfList;
-        }
-        if (typeParams.size() != 0) {
-            typeParams.trimToSize();
-            res.typeParms = typeParams;
-        }
-        return res;
-    }
+	private String[] innerClasses;
 
-    private void setTypeArgParentRec(List<? extends TypeArgument>[] typeArgs, MethodInfo res) {
-        for (int i = 0; i < typeArgs.length; i++) {
-            if (typeArgs[i] != null)
-                setTypeArgParentRec(typeArgs[i], res);
-        }
-    }
+	private String[] pool;
+	
+	private Object currentDefaultValue; // used by readAttributesForMethod
+	
+	private AnnotationUseInfo currentParamAnnotations[][]; // used by readAttributesForMethod
+	
+	/**
+	 * whether or not to read java 5 signatures (i.e. generic information etc...)
+	 */
+	private boolean readJava5Signatures;
 
-    private void setTypeArgParentRec(List<? extends TypeArgument> typeArgs, MethodInfo res) {
-        for (TypeArgument ta : typeArgs) {
-            TypeArgumentInfo tai = (TypeArgumentInfo) ta;
-            tai.parent = res;
-            if (tai.typeArgs != null)
-                setTypeArgParentRec(tai.typeArgs, res);
-        }
-    }
+	private ClassFile cf;
+	
+	public ByteCodeParser() {
+		super();
+	}
+	
+	public ClassFile parseClassFile(InputStream is, String location, boolean useJava5Signatures) throws ByteCodeFormatException, IOException {
+		readJava5Signatures = useJava5Signatures;
+		return parseClassFile((DataInput) new DataInputStream(is), location);
+	}
 
-    public String readInnerClassInfo() throws IOException {
-        String name = this.pool[this.in.readUnsignedShort()];
-        if (name != null)
-            name = name.replace('/', '.').replace('$', '.');
-        this.in.readUnsignedShort();
-        this.in.readUnsignedShort();
-        int innerClassAccessFlags = this.in.readUnsignedShort();
-        if (name != null && (innerClassAccessFlags & 0x8) != 0)
-            this.staticInners.add(name);
-        if (name != null)
-            if (!this.fullName.equals(name.substring(0, name.lastIndexOf('.')))) {
-                name = null;
-            } else if (!Character.isJavaIdentifierStart(name.charAt(name.lastIndexOf('.') + 1))) {
-                name = null;
-            }
-        return name;
-    }
+//	public ClassFile parseClassFile(InputStream is) throws ByteCodeFormatException, IOException {
+//		return parseClassFile((DataInput) new DataInputStream(is), null);
+//	}
 
-    private Object readElementValue() throws IOException, ByteCodeFormatException {
-        Object res;
-        String typename, constname, tr;
-        int num, i, tag = this.in.readByte();
-        switch (tag) {
-            case 66:
-                res = Byte.valueOf(this.pool[this.in.readUnsignedShort()]);
-                return res;
-            case 67:
-                res = Character.valueOf(this.pool[this.in.readUnsignedShort()].toCharArray()[0]);
-                return res;
-            case 68:
-                res = Double.valueOf(this.pool[this.in.readUnsignedShort()]);
-                return res;
-            case 70:
-                res = Float.valueOf(this.pool[this.in.readUnsignedShort()]);
-                return res;
-            case 73:
-                res = Integer.valueOf(this.pool[this.in.readUnsignedShort()]);
-                return res;
-            case 74:
-                res = Long.valueOf(this.pool[this.in.readUnsignedShort()]);
-                return res;
-            case 83:
-                res = Short.valueOf(this.pool[this.in.readUnsignedShort()]);
-                return res;
-            case 90:
-                res = Boolean.valueOf(this.pool[this.in.readUnsignedShort()]);
-                return res;
-            case 115:
-                res = this.pool[this.in.readUnsignedShort()];
-                return res;
-            case 101:
-                typename = this.pool[this.in.readUnsignedShort()];
-                constname = this.pool[this.in.readUnsignedShort()];
-                res = new EnumConstantReferenceInfo(typename, constname);
-                return res;
-            case 99:
-                tr = this.pool[this.in.readUnsignedShort()];
-                tr.replace('/', '.').replace('$', '.');
-                res = new TypeNameReferenceInfo(tr);
-                return res;
-            case 64:
-                res = readAnnotation();
-                return res;
-            case 91:
-                num = this.in.readUnsignedShort();
-                res = new Object[num];
-                for (i = 0; i < num; i++)
-                    ((Object[]) res)[i] = readElementValue();
-                return res;
-        }
-        throw new ByteCodeFormatException("Illegal tag in element-value: " + tag);
-    }
+//	public ClassFile parseClassFile(DataInput inStr) throws ByteCodeFormatException, IOException {
+//		return parseClassFile(inStr, null);
+//	}
 
-    private AnnotationUseInfo readAnnotation() throws IOException, ByteCodeFormatException {
-        String name = this.pool[this.in.readUnsignedShort()];
-        if (name == null)
-            throw new ByteCodeFormatException();
-        name = name.replace('/', '.').replace('$', '.').substring(1, name.length() - 1);
-        int number = this.in.readUnsignedShort();
-        List<ElementValuePair> evpl = new ArrayList<ElementValuePair>(number);
-        for (int i = 0; i < number; i++) {
-            String elementName = this.pool[this.in.readUnsignedShort()];
-            Object value = readElementValue();
-            ElementValuePairInfo evpi = new ElementValuePairInfo(elementName, value, name);
-            evpl.add(evpi);
-        }
-        return new AnnotationUseInfo(name, evpl);
-    }
+	private ClassFile parseClassFile(DataInput inStr, String location) throws ByteCodeFormatException, IOException {
+		cf = new ClassFile();
 
-    private ReadClassSignatureResult readClassSignature() throws IOException, ByteCodeFormatException {
-        ReadClassSignatureResult res = new ReadClassSignatureResult();
-        String sig = this.pool[this.in.readUnsignedShort()];
-        int start = 0;
-        if (sig.charAt(0) == '<') {
-            res.typeParams = readFormalTypeParameters(sig);
-            start = 1;
-            for (int o = 1; o > 0; start++) {
-                if (sig.charAt(start) == '<') {
-                    o++;
-                } else if (sig.charAt(start) == '>') {
-                    o--;
-                }
-            }
-        }
-        List<List<TypeArgumentInfo>> l1 = new ArrayList<List<TypeArgumentInfo>>();
-        List<String> l2 = new ArrayList<String>();
-        while (start != sig.length()) {
-            int end = start;
-            int o = 0;
-            while (sig.charAt(++end) != ';' || o > 0) {
-                if (sig.charAt(end) == '<') {
-                    o++;
-                    continue;
-                }
-                if (sig.charAt(end) == '>')
-                    o--;
-            }
-            end++;
-            String sig2 = sig.substring(start, end);
-            ArrayList<TypeArgumentInfo> ral = new ArrayList<TypeArgumentInfo>();
-            l2.add(readFieldSignature(sig2, ral));
-            l1.add(ral);
-            start = end;
-        }
-        if (res.typeParams == null)
-            res.typeParams = new ArrayList<TypeParameterInfo>();
-        res.typeArgumentArray = l1;
-        res.typeNameArray = l2;
-        return res;
-    }
+		this.in = inStr;
+		if (inStr.readInt() != 0xCAFEBABE) {
+			throw new ByteCodeFormatException("Bad magic in bytecode file");
+		}
+		@SuppressWarnings("all") int minorVersion = inStr.readUnsignedShort();
+		@SuppressWarnings("all") int majorVersion = inStr.readUnsignedShort();
+		int constantPoolCount = inStr.readUnsignedShort();
+		makeConstantPool(constantPoolCount);
+		accessFlags = inStr.readUnsignedShort();
+		className = pool[inStr.readUnsignedShort()];
+		
+		className = className.replace('/', '.');
+		fullName = className.replace('$', '.');
+		
+		int ldp = fullName.lastIndexOf('.');
+		pathPrefix = ldp > 0 ? fullName.substring(0, ldp) : "";
+		shortName = fullName.substring(ldp + 1);
+		superName = pool[inStr.readUnsignedShort()];
+		if (superName != null) {
+			superName = superName.replace('/', '.').replace('$', '.');
+		}
+		int interfacesCount = inStr.readUnsignedShort();
+		interfaceNames = new String[interfacesCount];
+		for (int i = 0; i < interfacesCount; i += 1) {
+			interfaceNames[i] = pool[inStr.readUnsignedShort()];
+			interfaceNames[i] = interfaceNames[i].replace('/', '.').replace('$', '.');
+		}
+		int fieldsCount = inStr.readUnsignedShort();
+		fields = new ArrayList<FieldInfo>(fieldsCount);
+		for (int i = 0; i < fieldsCount; i += 1) {
+			fields.add(readFieldInfo());
+		}
+		int methodsCount = inStr.readUnsignedShort();
+		methods = new ArrayList<MethodInfo>();
+		constructors = new ArrayList<ConstructorInfo>();
+		for (int i = 0; i < methodsCount; i += 1) {
+			MethodInfo minfo = readMethodInfo();
+			if (minfo == null) {
+				// class initializer: do nothing
+			} else if (minfo instanceof ConstructorInfo) {
+				constructors.add((ConstructorInfo) minfo);
+			} else {
+				methods.add(minfo);
+			}
+		}
+		ArrayList<AnnotationUseInfo> annotations = new ArrayList<AnnotationUseInfo>();
+		ArrayList<TypeParameterInfo> typeParams = new ArrayList<TypeParameterInfo>();
+		ArrayList<List<TypeArgumentInfo>> typeArgList = new ArrayList<List<TypeArgumentInfo>>();
+		ArrayList<String> typeNames = new ArrayList<String>();
+		innerClasses = readAttributesForClassFile(annotations, typeParams, typeArgList, typeNames);
+		annotations.trimToSize();
+		typeParams.trimToSize();
+		pool = null;
 
-    private List<TypeParameterInfo> readFormalTypeParameters(String sig) throws ByteCodeFormatException {
-        List<TypeParameterInfo> res = new ArrayList<TypeParameterInfo>();
-        int rpos = 1;
-        int cnt = 0;
-        while (sig.charAt(rpos) != '>') {
-            cnt++;
-            int lpos = rpos;
-            while (sig.charAt(rpos) != ':')
-                rpos++;
-            String paramName = sig.substring(lpos, rpos);
-            List<String> boundNames = new ArrayList<String>();
-            List<List<TypeArgumentInfo>> boundArgs = new ArrayList<List<TypeArgumentInfo>>();
-            while (true) {
-                String typeName;
-                lpos = ++rpos;
-                if (sig.charAt(lpos) == '[')
-                    throw new ByteCodeFormatException();
-                switch (sig.charAt(lpos)) {
-                    case ':':
-                        typeName = "java.lang.Object";
-                        break;
-                    case 'L':
-                        while (sig.charAt(rpos) != ';')
-                            rpos++;
-                        typeName = sig.substring(lpos + 1, rpos).replace('/', '.');
-                        rpos++;
-                        break;
-                    case 'T':
-                        throw new UnsupportedOperationException("TODO");
-                    default:
-                        throw new ByteCodeFormatException();
-                }
-                int idx = typeName.indexOf('<');
-                List<TypeArgumentInfo> typeArgs = null;
-                if (idx != -1) {
-                    typeArgs = makeTypeArgs(typeName.substring(idx));
-                    typeName = typeName.substring(0, idx);
-                    rpos += 2;
-                }
-                boundNames.add(typeName);
-                boundArgs.add(typeArgs);
-                if (sig.charAt(rpos) != ':') {
-                    String[] bn = new String[boundNames.size()];
-                    boundNames.toArray(bn);
-                    List[] arrayOfList = new List[boundArgs.size()];
-                    boundArgs.toArray(arrayOfList);
-                    TypeParameterInfo n = new TypeParameterInfo(paramName, bn, arrayOfList, this.cf);
-                    res.add(n);
-                }
-            }
-        }
-        return res;
-    }
+		cf.setLocation(location);
+		cf.setPhysicalName(className);
+		cf.setFullName(fullName);
+		cf.setName(shortName);
+		cf.setSuperName(superName);
+		cf.setAccessFlags(accessFlags);
+		cf.setInterfaceNames(interfaceNames);
+		fields.trimToSize();
+		cf.setFields(fields);
+		constructors.trimToSize();
+		cf.setConstructors(constructors);
+		methods.trimToSize();
+		cf.setMethods(methods);
+		cf.setInnerClassNames(innerClasses);
+		cf.setAnnotations(annotations);
+		cf.setTypeParameters(typeParams);
+		if (typeArgList.size() > 0) {
+			((ArrayList<TypeArgumentInfo>)typeArgList.get(0)).trimToSize();
+			cf.superClassTypeArguments = typeArgList.get(0);
+			if (typeArgList.size() > 1) {
+				@SuppressWarnings("unchecked") ArrayList<TypeArgumentInfo>[] arrayLists = new ArrayList[typeArgList.size()-1];
+				cf.superInterfacesTypeArguments = arrayLists;
+				for (int i = 1; i < typeArgList.size(); i++) {
+					((ArrayList<TypeArgumentInfo>)typeArgList.get(i)).trimToSize();
+					cf.superInterfacesTypeArguments[i-1] = typeArgList.get(i);
+				}
+			}
+		}
+		return cf;
+	}
 
-    private List<TypeArgumentInfo> makeTypeArgs(String tn) throws ByteCodeFormatException {
-        ArrayList<TypeArgumentInfo> res = new ArrayList<TypeArgumentInfo>();
-        assert tn.charAt(0) == '<';
-        int pos = 1;
-        while (true) {
-            TypeArgument.WildcardMode wm;
-            String typeName = null;
-            switch (tn.charAt(pos)) {
-                case '+':
-                    wm = TypeArgument.WildcardMode.Extends;
-                    pos++;
-                    break;
-                case '-':
-                    wm = TypeArgument.WildcardMode.Super;
-                    pos++;
-                    break;
-                case '*':
-                    wm = TypeArgument.WildcardMode.Any;
-                    pos++;
-                    break;
-                default:
-                    wm = TypeArgument.WildcardMode.None;
-                    break;
-            }
-            if (wm != TypeArgument.WildcardMode.Any) {
-                int o;
-                boolean isTypeVariable = false;
-                int dim = 0;
-                while (tn.charAt(pos) == '[') {
-                    dim++;
-                    pos++;
-                }
-                int rpos = pos;
-                switch (tn.charAt(pos)) {
-                    case 'L':
-                        o = 1;
-                        while (rpos < tn.length() && o > 0 && (tn.charAt(rpos) != ';' || o != 1)) {
-                            if (tn.charAt(rpos) == '<')
-                                o++;
-                            if (tn.charAt(rpos) == '>')
-                                o--;
-                            rpos++;
-                        }
-                        typeName = tn.substring(pos + 1, rpos).replace('/', '.');
-                        if (typeName.equals(""))
-                            typeName = "java.lang.Object";
-                        while (typeName.endsWith(";") || typeName.endsWith(">"))
-                            typeName = typeName.substring(0, typeName.length() - 1);
-                        typeName = Naming.toArrayTypeName(typeName, dim);
-                        rpos++;
-                        break;
-                    case 'T':
-                        while (rpos < tn.length() && Character.isJavaIdentifierPart(tn.charAt(rpos)))
-                            rpos++;
-                        typeName = tn.substring(pos + 1, rpos);
-                        typeName = Naming.toArrayTypeName(typeName, dim);
-                        isTypeVariable = true;
-                        rpos++;
-                        break;
-                    case 'B':
-                        if (dim == 0)
-                            throw new ByteCodeFormatException("primitive type not allowed as type argument");
-                        typeName = "byte";
-                        rpos++;
-                        break;
-                    case 'C':
-                        if (dim == 0)
-                            throw new ByteCodeFormatException("primitive type not allowed as type argument");
-                        typeName = "char";
-                        rpos++;
-                        break;
-                    case 'D':
-                        if (dim == 0)
-                            throw new ByteCodeFormatException("primitive type not allowed as type argument");
-                        typeName = "double";
-                        rpos++;
-                        break;
-                    case 'F':
-                        if (dim == 0)
-                            throw new ByteCodeFormatException("primitive type not allowed as type argument");
-                        typeName = "float";
-                        rpos++;
-                        break;
-                    case 'I':
-                        if (dim == 0)
-                            throw new ByteCodeFormatException("primitive type not allowed as type argument");
-                        typeName = "int";
-                        rpos++;
-                        break;
-                    case 'J':
-                        if (dim == 0)
-                            throw new ByteCodeFormatException("primitive type not allowed as type argument");
-                        typeName = "long";
-                        rpos++;
-                        break;
-                    case 'S':
-                        if (dim == 0)
-                            throw new ByteCodeFormatException("primitive type not allowed as type argument");
-                        typeName = "short";
-                        rpos++;
-                        break;
-                    case 'Z':
-                        if (dim == 0)
-                            throw new ByteCodeFormatException("primitive type not allowed as type argument");
-                        typeName = "boolean";
-                        rpos++;
-                        break;
-                    default:
-                        throw new ByteCodeFormatException();
-                }
-                int idx = typeName.indexOf('<');
-                List<TypeArgumentInfo> typeArgs = null;
-                if (idx != -1) {
-                    typeArgs = makeTypeArgs(typeName.substring(idx));
-                    typeName = typeName.substring(0, idx);
-                    typeName = Naming.toArrayTypeName(typeName, dim);
-                }
-                res.add(new TypeArgumentInfo(wm, typeName.replace('$', '.'), typeArgs, this.cf, isTypeVariable));
-                pos = rpos;
-            } else {
-                res.add(new TypeArgumentInfo(wm, null, null, this.cf, false));
-            }
-            if (pos >= tn.length()) {
-                res.trimToSize();
-                return res;
-            }
-        }
-    }
+	protected final static byte CLASS = 7;
 
-    private String readFieldSignature(String sig, List<TypeArgumentInfo> emptyListForTypeArgs) throws IOException, ByteCodeFormatException {
-        int lpos, idx;
-        String res = null;
-        int rpos = sig.indexOf('(') + 1;
-        int dim = 0;
-        while (sig.charAt(rpos) == '[') {
-            dim++;
-            rpos++;
-        }
-        switch (sig.charAt(rpos)) {
-            case 'L':
-                lpos = rpos;
-                while (sig.charAt(rpos) != ';') {
-                    if (sig.charAt(rpos) == '<') {
-                        int talpos = rpos;
-                        int o = 1;
-                        while (o > 0) {
-                            rpos++;
-                            if (sig.charAt(rpos) == '<')
-                                o++;
-                            if (sig.charAt(rpos) == '>')
-                                o--;
-                        }
-                        String targs = sig.substring(talpos, rpos);
-                        emptyListForTypeArgs.addAll(makeTypeArgs(targs));
-                    }
-                    rpos++;
-                }
-                idx = sig.indexOf('<');
-                res = Naming.toArrayTypeName(sig.substring(lpos + 1, (idx == -1) ? (sig.length() - 1) : idx).replace('/', '.'), dim);
-                rpos++;
-                return res;
-            case 'T':
-                lpos = rpos;
-                while (sig.charAt(rpos) != ';')
-                    rpos++;
-                res = Naming.toArrayTypeName(sig.substring(lpos + 1, rpos), dim);
-                rpos++;
-                return res;
-            case 'B':
-            case 'C':
-            case 'D':
-            case 'F':
-            case 'I':
-            case 'J':
-            case 'S':
-            case 'Z':
-                rpos++;
-                return res;
-        }
-        rpos++;
-        return res;
-    }
+	protected final static byte FIELD_REF = 9;
 
-    private List<TypeArgumentInfo>[] readMethodSignature(String[] prereadParams, List<TypeParameterInfo> listForTypeParams) throws IOException, ByteCodeFormatException {
-        ArrayList[] arrayOfArrayList = new ArrayList[prereadParams.length];
-        String sig = this.pool[this.in.readUnsignedShort()];
-        if (sig.charAt(0) == '<')
-            listForTypeParams.addAll(readFormalTypeParameters(sig));
-        int cur = -1;
-        int rpos = sig.indexOf('(') + 1;
-        boolean hasReturnValue = false;
-        while (!hasReturnValue) {
-            int lpos;
-            cur++;
-            if (sig.charAt(rpos) == ')') {
-                hasReturnValue = true;
-                rpos++;
-            }
-            int dim = 0;
-            while (sig.charAt(rpos) == '[') {
-                dim++;
-                rpos++;
-            }
-            switch (sig.charAt(rpos)) {
-                case 'L':
-                    lpos = rpos;
-                    while (sig.charAt(rpos) != ';') {
-                        if (sig.charAt(rpos) == '<') {
-                            int talpos = rpos;
-                            int o = 1;
-                            while (o > 0) {
-                                rpos++;
-                                if (sig.charAt(rpos) == '<')
-                                    o++;
-                                if (sig.charAt(rpos) == '>')
-                                    o--;
-                            }
-                            String targs = sig.substring(talpos, rpos);
-                            arrayOfArrayList[cur] = (ArrayList) makeTypeArgs(targs);
-                        }
-                        rpos++;
-                    }
-                    rpos++;
-                    continue;
-                case 'T':
-                    lpos = rpos;
-                    while (sig.charAt(rpos) != ';')
-                        rpos++;
-                    prereadParams[cur] = Naming.toArrayTypeName(sig.substring(lpos + 1, rpos), dim);
-                    rpos++;
-                    continue;
-                case 'B':
-                case 'C':
-                case 'D':
-                case 'F':
-                case 'I':
-                case 'J':
-                case 'S':
-                case 'Z':
-                    rpos++;
-                    continue;
-            }
-            rpos++;
-        }
-        return (List<TypeArgumentInfo>[]) arrayOfArrayList;
-    }
+	protected final static byte METHOD_REF = 10;
 
-    private static class ReadClassSignatureResult {
-        List<TypeParameterInfo> typeParams;
+	protected final static byte INTERFACE_METHOD_REF = 11;
 
-        List<List<TypeArgumentInfo>> typeArgumentArray;
+	protected final static byte STRING = 8;
 
-        List<String> typeNameArray;
+	protected final static byte INTEGER = 3;
 
-        private ReadClassSignatureResult() {
-        }
-    }
+	protected final static byte FLOAT = 4;
+
+	protected final static byte LONG = 5;
+
+	protected final static byte DOUBLE = 6;
+
+	protected final static byte NAME_AND_TYPE = 12;
+
+	protected final static byte UTF8 = 1;
+
+	protected void makeConstantPool(int count) throws IOException, ByteCodeFormatException {
+		pool = new String[count];
+		int[] targetIndex = new int[count];
+		int[] dblIndex = new int[count];
+		for (int i = 1; i < count; i += 1) {
+			int j;
+			byte tag = in.readByte();
+			switch (tag) {
+			case CLASS:
+			case STRING:
+				j = in.readUnsignedShort();
+				if (pool[j] != null) {
+					pool[i] = pool[j];
+				} else {
+					targetIndex[i] = j;
+				}
+				break;
+			case FIELD_REF:
+			case METHOD_REF:
+			case INTERFACE_METHOD_REF:
+				in.skipBytes(4);
+				break;
+			case NAME_AND_TYPE:
+				// added in 0.95 - evaluate EnclosingMethod attribute
+				short ch1 = in.readShort();
+				short ch2 = in.readShort();
+				if (ch1 > i || ch2 > i) {
+					targetIndex[i] = ch1;
+					dblIndex[i] = ch2;
+				} else {
+					pool[i] = pool[ch1] + pool[ch2];
+				}
+				break;
+			case INTEGER:
+				pool[i] = String.valueOf(in.readInt());
+				break;
+			case FLOAT:
+				pool[i] = String.valueOf(in.readFloat());
+				break;
+			case LONG:
+				pool[i] = String.valueOf(in.readLong());
+				i += 1; // strange, but true
+				break;
+			case DOUBLE:
+				pool[i] = String.valueOf(in.readDouble());
+				i += 1; // strange, but true
+				break;
+			case UTF8:
+				pool[i] = in.readUTF();
+				break;
+			default:
+				throw new ByteCodeFormatException("Bad Constant Pool Type " + tag);
+			}
+		}
+		// 2nd pass
+		for (int i = 1; i < count; i += 1) {
+			if (targetIndex[i] > 0) {
+				pool[i] = pool[targetIndex[i]];
+				if (dblIndex[i] > 0)
+					pool[i] += pool[dblIndex[i]];
+			}
+		}
+	}
+
+	static String decodeType(String in) throws ByteCodeFormatException {
+		int dim = 0;
+		int i = 0;
+		char c = in.charAt(i);
+		if (c == '[') {
+			dim = i;
+			do {
+				i += 1;
+				c = in.charAt(i);
+			} while (c == '[');
+			dim = i - dim;
+		}
+		String type = null;
+		switch (c) {
+		case 'B':
+			type = "byte";
+			break;
+		case 'C':
+			type = "char";
+			break;
+		case 'D':
+			type = "double";
+			break;
+		case 'F':
+			type = "float";
+			break;
+		case 'I':
+			type = "int";
+			break;
+		case 'J':
+			type = "long";
+			break;
+		case 'S':
+			type = "short";
+			break;
+		case 'Z':
+			type = "boolean";
+			break;
+		case 'V':
+			type = "void";
+			break;
+		case 'L':
+			int j = in.indexOf(';', i);
+			type = in.substring(i + 1, j).replace('/', '.').replace('$', '.');
+			break;
+		default:
+			throw new ByteCodeFormatException("Illegal type code");
+		}
+		return Naming.toArrayTypeName(type, dim);
+	}
+
+	// this is not thread-safe, but fast
+	private String[] longRes = new String[256];
+
+	public final String[] decodeTypes(String inStr) throws ByteCodeFormatException {
+		int count = 0;
+		if (inStr.charAt(0) != '(') {
+			throw new ByteCodeFormatException("Bad method descriptor");
+		}
+		boolean returnValue = false;
+		int i = 1;
+		while (i < inStr.length()) {
+			int dim = 0;
+			char c = inStr.charAt(i);
+			if (c == ')') {
+				if (returnValue) {
+					throw new ByteCodeFormatException("Bad method descriptor");
+				}
+				returnValue = true;
+				i += 1;
+				c = inStr.charAt(i);
+			}
+			if (c == '[') {
+				dim = i;
+				do {
+					i += 1;
+					c = inStr.charAt(i);
+				} while (c == '[');
+				dim = i - dim;
+			}
+			String type = null;
+			switch (c) {
+			case 'B':
+				type = "byte";
+				i += 1;
+				break;
+			case 'C':
+				type = "char";
+				i += 1;
+				break;
+			case 'D':
+				type = "double";
+				i += 1;
+				break;
+			case 'F':
+				type = "float";
+				i += 1;
+				break;
+			case 'I':
+				type = "int";
+				i += 1;
+				break;
+			case 'J':
+				type = "long";
+				i += 1;
+				break;
+			case 'S':
+				type = "short";
+				i += 1;
+				break;
+			case 'Z':
+				type = "boolean";
+				i += 1;
+				break;
+			case 'V':
+				if (!returnValue) {
+					throw new ByteCodeFormatException("Void parameter type");
+				}
+				type = "void";
+				i += 1;
+				break;
+			case 'L':
+				int j = inStr.indexOf(';', i);
+				type = inStr.substring(i + 1, j).replace('/', '.').replace('$', '.');
+				i = j + 1;
+				break;
+			default:
+				throw new ByteCodeFormatException("Illegal type code " + c);
+			}
+			longRes[count++] = Naming.toArrayTypeName(type, dim);
+		}
+		String[] r = new String[count];
+		System.arraycopy(longRes, 0, r, 0, count);
+		return r;
+	}
+
+	private String[] readAttributesForMethod(ArrayList<AnnotationUseInfo> emptyListForAnnotations, String[] prereadParams, List<TypeArgumentInfo> typeArgs[], List<TypeParameterInfo> typeParams) throws IOException, ByteCodeFormatException {
+		String[] exceptions = null;
+		int count = in.readUnsignedShort();
+		for (int i = 0; i < count; i += 1) {
+			String name = pool[in.readUnsignedShort()];
+			int length = in.readInt();
+			if ("Exceptions".equals(name)) {
+				if (exceptions != null) {
+					throw new ByteCodeFormatException("Multiple exceptions lists");
+				}
+				int number = in.readUnsignedShort();
+				exceptions = new String[number];
+				for (int j = 0; j < number; j += 1) {
+					exceptions[j] = pool[in.readUnsignedShort()].replace('/', '.').replace('$', '.');
+					// apparently does not use the usual type encoding with
+					// ("L")
+				}
+			} else if ("Signature".equals(name)) {
+				if (readJava5Signatures) {
+					List<TypeArgumentInfo> typeArgInfos[] = readMethodSignature(prereadParams, typeParams, null);
+					for (int jj = 0; jj < typeArgs.length; jj++)
+						typeArgs[jj] = typeArgInfos[jj];
+				} else in.skipBytes(length);
+			} else if ("RuntimeVisibleAnnotation".equals(name) ||
+					"RuntimeInvisibleAnnotation".equals(name)
+			) {
+				if (readJava5Signatures) {
+					int number = in.readUnsignedShort();
+					emptyListForAnnotations.ensureCapacity(number);
+					for (int j = 0; j < number; j++) {
+						emptyListForAnnotations.add(readAnnotation());
+					}
+				} else in.skipBytes(length);
+			} else if ("RuntimeVisibleParameterAnnotations".equals(name)
+					|| "RuntimeInvisibleParameterAnnotations".equals(name)) {
+				if (readJava5Signatures) {
+					int paramNum = in.readUnsignedByte();
+					currentParamAnnotations = new AnnotationUseInfo[paramNum][];
+					for (int j = 0; j < paramNum; j++) {
+						int number = in.readUnsignedShort();
+						currentParamAnnotations[j] = new AnnotationUseInfo[number]; 
+						for (int k = 0; k < number; k++) {
+							currentParamAnnotations[j][k] = readAnnotation();
+						}
+					}
+				} else in.skipBytes(length);
+			} else if ("AnnotationDefault".equals(name)) {
+				if (readJava5Signatures) {
+					// TODO look into this!
+//					if (currentDefaultValue != null)
+//						throw new ByteCodeFormatException("Multiple annotation defaults!");
+					currentDefaultValue = readElementValue();
+				} else in.skipBytes(length);
+			} else {
+				in.skipBytes(length);
+			}
+		}
+		return exceptions;
+	}
+
+	/**
+	 * 
+	 * @return the inner classes.
+	 * @throws IOException
+	 * @throws ByteCodeFormatException
+	 */
+	private String[] readAttributesForClassFile(ArrayList<AnnotationUseInfo> emptyListForAnnotations, List<TypeParameterInfo> emptyListForTypeParams,
+			List<List<TypeArgumentInfo>> emptyListForTypeArgumentLists,
+			List<String> emptyListForTypeNames) throws IOException,
+			ByteCodeFormatException {
+		String[] innerClassesRes = null;
+		int count = in.readUnsignedShort();
+		for (int i = 0; i < count; i++) {
+			String name = pool[in.readUnsignedShort()];
+			int length = in.readInt();
+			if ("InnerClasses".equals(name)) {
+				if (innerClassesRes != null) {
+					throw new ByteCodeFormatException("Multiple inner classes lists");
+				}
+				int number = in.readUnsignedShort();
+				innerClassesRes = new String[number];
+				int k = 0;
+				for (int j = 0; j < number; j++) {
+					String s = readInnerClassInfo();
+					if (s != null)
+						innerClassesRes[k++] = s; 
+				}
+				if (k != number) {
+					String tmpInnerClassesRes[] = new String[k];
+					System.arraycopy(innerClassesRes, 0, tmpInnerClassesRes, 0, k);
+					innerClassesRes = tmpInnerClassesRes;
+				}
+			} else if ("RuntimeVisibleAnnotations".equals(name) 
+					|| "RuntimeInvisibleAnnotations".equals(name)) {
+				if (readJava5Signatures) {
+					// TODO look into this!
+//					if (emptyListForAnnotations.size() != 0) {
+//						throw new ByteCodeFormatException("Multiple annotation lists");
+//					}
+					int number = in.readUnsignedShort();
+					emptyListForAnnotations.ensureCapacity(number);
+					for (int j = 0; j < number; j++) {
+						emptyListForAnnotations.add(readAnnotation());
+					}
+				} else in.skipBytes(length);
+			} else if ("EnclosingMethod".equals(name)) {
+				short clazz = in.readShort();
+				short meth = in.readShort();
+				if (meth != 0) {
+					// local or anonymous class. Store in ClassFile, it is evaluated on demand by ByteCodeInfo.
+					String clName = pool[clazz];
+					String mDesc = pool[meth];
+					cf.enclosingMethod = clName + "." + mDesc;
+				} // else nothing to do
+			} else if ("Synthetic".equals(name)) {
+				// not currently used
+				in.skipBytes(length);
+			} else if ("SourceFile".equals(name)) {
+				// not currently used
+				in.skipBytes(length);
+			} else if ("Signature".equals(name)) {
+				if (readJava5Signatures) {
+					ReadClassSignatureResult res = readClassSignature(); 
+					for (TypeParameterInfo tai : res.typeParams)
+						emptyListForTypeParams.add(tai);
+					for (List<TypeArgumentInfo> tai : res.typeArgumentArray)
+						emptyListForTypeArgumentLists.add(tai);
+					for (String n : res.typeNameArray)
+						emptyListForTypeNames.add(n);
+				} else in.skipBytes(length);
+			} else if ("Deprecated".equals(name)) {
+				in.skipBytes(length);
+			} else {
+				in.skipBytes(length);
+			}
+		}
+		return innerClassesRes;
+	}
+
+	private String[] readAttributesForField(ArrayList<AnnotationUseInfo> emptyListForAnnotations,
+										    List<TypeArgumentInfo> emptyListForTypeArgs) throws IOException, ByteCodeFormatException {
+		assert emptyListForAnnotations != null && emptyListForAnnotations.isEmpty();
+		
+		String constant = null;
+		String type = null;
+		int count = in.readUnsignedShort();
+		for (int i = 0; i < count; i += 1) {
+			String id = pool[in.readUnsignedShort()];
+			int length = in.readInt();
+			if ("ConstantValue".equals(id)) {
+				if (constant != null) {
+					throw new ByteCodeFormatException("Multiple constant values for field");
+				}
+				constant = pool[in.readUnsignedShort()];
+			} else if ("Signature".equals(id)) {
+				if (readJava5Signatures)
+					type = readFieldSignature(pool[in.readUnsignedShort()], emptyListForTypeArgs);
+				else in.skipBytes(length);
+			} else if ("RuntimeVisibleAnnotation".equals(id) ||
+					"RuntimeInvisibleAnnotation".equals(id)
+			) {
+				if (readJava5Signatures) {
+					int number = in.readUnsignedShort();
+					emptyListForAnnotations.ensureCapacity(number);
+					for (int j = 0; j < number; j++) {
+						emptyListForAnnotations.add(readAnnotation());
+					}
+				} else in.skipBytes(length);
+			} else {
+				in.skipBytes(length);
+			}
+		}
+		return new String[]{constant, type};
+	}
+
+	// one of the many hacks... :-/
+	private boolean readAttributes_ret_is_type_arg = false;
+	
+	FieldInfo readFieldInfo() throws IOException, ByteCodeFormatException {
+		int fieldAccessFlags = in.readUnsignedShort();
+		String name = pool[in.readUnsignedShort()]; // name
+		String type = decodeType(pool[in.readUnsignedShort()]); // descriptor
+		ArrayList<AnnotationUseInfo> annotations = new ArrayList<AnnotationUseInfo>();
+		ArrayList<TypeArgumentInfo> typeArgs = new ArrayList<TypeArgumentInfo>();
+		String[] tmp = readAttributesForField(annotations, typeArgs); // constant value, typeargs, annotations, possibly different type
+		String constant = tmp[0];
+		if (tmp[1] != null)
+			type = tmp[1].replace('$', '.'); // TODO do we really need to overwrite the field name?
+		FieldInfo res;
+		if ((fieldAccessFlags & AccessFlags.ENUM) > 0)
+			res = new EnumConstantInfo(fieldAccessFlags, name, type, cf, constant, typeArgs);
+		else 
+			res = new FieldInfo(fieldAccessFlags, name, type, readAttributes_ret_is_type_arg, cf, constant, typeArgs);
+		res.setAnnotations(annotations);
+		return res; 
+	}
+	
+	MethodInfo readMethodInfo() throws IOException, ByteCodeFormatException {
+		int methAccessFlags = in.readUnsignedShort();
+		String name = pool[in.readUnsignedShort()];
+		boolean isConstructor = "<init>".equals(name);
+		boolean isInitializer = false;
+		if (isConstructor) {
+			name = shortName;
+		} else {
+			isInitializer = "<clinit>".equals(name);
+		}
+		String[] types = decodeTypes(pool[in.readUnsignedShort()]); // descriptor
+		ArrayList<AnnotationUseInfo> annotations = new ArrayList<AnnotationUseInfo>();
+		currentDefaultValue = null;
+		currentParamAnnotations = null;
+		@SuppressWarnings("unchecked") List<TypeArgumentInfo> typeArgs[] = new List[types.length];
+		ArrayList<TypeParameterInfo> typeParams = new ArrayList<TypeParameterInfo>();
+		String[] exceptions = readAttributesForMethod(annotations, types, typeArgs, typeParams);
+		String rtype = types[types.length - 1];
+		int firstParam = 0;
+		int paramCount = types.length - 1;
+		
+		// this.accsesFlags will never (at least with Java 1.5 VM) be STATIC. We have to get the information
+		// from the the InnerClasses attribute of the outer class. But how ???
+		//if (isConstructor && (this.accessFlags & AccessFlags.STATIC) == 0 && types[0].equals(pathPrefix)) {
+		// TODO this is a very, very ugly hack for now and might not always work. Also see readInnerClassInfo()
+		if (isConstructor && types[0].equals(pathPrefix) && !staticInners.contains(fullName)) {
+			// we are the constructor of a non-static member (i.e. inner) class!
+			
+			// TODO maybe complain if parent type hasn't been read yet? That should be handled by name info, though 
+			firstParam = 1;
+			paramCount -= 1;
+		}
+		String[] ptypes = new String[paramCount];
+		System.arraycopy(types, firstParam, ptypes, 0, paramCount);
+		if (isInitializer) {
+			return null;
+		}
+		MethodInfo res;
+		if (isConstructor)
+			res = new ConstructorInfo(methAccessFlags, name, ptypes, exceptions, cf);
+		else {
+			if ((accessFlags & 0x2000) != 0) 
+				res = new AnnotationPropertyInfo(methAccessFlags, rtype, readAttributes_ret_is_type_arg, name, cf, currentDefaultValue);
+			else
+				res = new MethodInfo(methAccessFlags, rtype, readAttributes_ret_is_type_arg, name, ptypes, exceptions, cf);
+		}
+		
+		res.setAnnotations(annotations);
+		res.paramAnnotations = currentParamAnnotations;
+		if (typeArgs.length != 0) {
+			setTypeArgParentRec(typeArgs, res); // and another ugly hack
+			res.paramTypeArgs = typeArgs;
+		}
+		if (typeParams.size() != 0) {
+			typeParams.trimToSize();
+			res.typeParms = typeParams;
+			for (TypeParameterInfo tpi : typeParams) {
+				tpi.setContainer(res);
+			}
+		}
+		return res;
+	}
+
+	private void setTypeArgParentRec(List<? extends TypeArgument>[] typeArgs, MethodInfo res) {
+		for(int i = 0; i < typeArgs.length; i++) {
+			if (typeArgs[i] != null)
+				setTypeArgParentRec(typeArgs[i], res);
+		}
+	}
+	private void setTypeArgParentRec(List<? extends TypeArgument> typeArgs, MethodInfo res) {
+		for(TypeArgument ta: typeArgs) {
+			TypeArgumentInfo tai = (TypeArgumentInfo)ta;
+			tai.parent = res;
+			if (tai.typeArgs != null) {
+				setTypeArgParentRec(tai.typeArgs, res);
+			}
+		}
+	}
+	
+	/**
+	 * TODO this is a very, very ugly hack and might not always work (see readMethodInfo())
+	 */
+	private Set<String> staticInners = new HashSet<String>(256);
+
+	public String readInnerClassInfo() throws IOException {
+		String name = pool[in.readUnsignedShort()]; // inner class info index
+		if (name != null) {
+			name = name.replace('/', '.').replace('$', '.');
+		} 
+		
+		// the next two entries seem to be pretty useless for our purposes
+		/*int outerClassInfoIndex = */ in.readUnsignedShort();
+		/*int innerNameIndex = */ in.readUnsignedShort();
+		int innerClassAccessFlags =  in.readUnsignedShort();
+		if (name != null && (innerClassAccessFlags & AccessFlags.STATIC) == 0) {
+			staticInners.add(name);
+			if (name.equals(fullName))
+				cf.isInner = true;
+		}
+		if (name != null) {
+			// we may still reject this: it might not be a member type!
+			if (!fullName.equals(name.substring(0, name.lastIndexOf('.')))) 
+				name = null; // this indicates that that type is used, but not that that type is declared here!
+			else if (!Character.isJavaIdentifierStart(name.charAt(name.lastIndexOf('.')+1)))
+				name = null; // anonymous class
+		}
+		return name;
+		// return new InnerClassInfo(accessFlags, name, cf);
+	}
+
+	
+	private Object readElementValue() throws IOException, ByteCodeFormatException {
+		Object res;
+		int tag = in.readByte();
+		switch (tag) {
+		case 'B':
+			res = Byte.valueOf(pool[in.readUnsignedShort()]);
+			break;
+		case 'C':
+			// TODO this needs to be verified !!!!
+			res = Character.valueOf(pool[in.readUnsignedShort()].toCharArray()[0]);
+			break;
+		case 'D':
+			res = Double.valueOf(pool[in.readUnsignedShort()]);
+			break;
+		case 'F':
+			res = Float.valueOf(pool[in.readUnsignedShort()]);
+			break;
+		case 'I':
+			res = Integer.valueOf(pool[in.readUnsignedShort()]);
+			break;
+		case 'J':
+			res = Long.valueOf(pool[in.readUnsignedShort()]);
+			break;
+		case 'S':
+			res = Short.valueOf(pool[in.readUnsignedShort()]);
+			break;
+		case 'Z':
+			res = Boolean.valueOf(pool[in.readUnsignedShort()]);
+			break;
+		case 's':
+			res = pool[in.readUnsignedShort()];
+			break;
+		case 'e':
+			String typename = pool[in.readUnsignedShort()];
+			String constname = pool[in.readUnsignedShort()];
+			res = new EnumConstantReferenceInfo(typename, constname);
+			break;
+		case 'c':
+			String tr = pool[in.readUnsignedShort()];
+			tr.replace('/', '.').replace('$', '.');
+			res = new TypeNameReferenceInfo(tr);
+			break;
+		case '@':
+			res = readAnnotation();
+			break;
+		case '[':
+			int num = in.readUnsignedShort();
+			res = new Object[num];
+			for (int i = 0; i < num; i++) {
+				((Object[])res)[i] = readElementValue();
+			}
+			break;
+		default:
+			throw new ByteCodeFormatException("Illegal tag in element-value: " + tag);
+		}
+		return res;
+	}
+
+	private AnnotationUseInfo readAnnotation() throws IOException, ByteCodeFormatException {
+		String name = pool[in.readUnsignedShort()]; // annotation index
+		if (name == null)
+			throw new ByteCodeFormatException();
+		name = name.replace('/', '.').replace('$', '.').substring(1,name.length()-1);
+		int number = in.readUnsignedShort();
+		List<ElementValuePairInfo> evpl = new ArrayList<ElementValuePairInfo>(number);
+		AnnotationUseInfo res = new AnnotationUseInfo(name, evpl);
+		for (int i = 0; i < number; i++) {
+			String elementName = pool[in.readUnsignedShort()];
+			Object value = readElementValue();
+			ElementValuePairInfo evpi = new ElementValuePairInfo(elementName, value);
+			evpl.add(evpi);
+		}
+		return res;
+	}
+	
+	private static class ReadClassSignatureResult {
+		List<TypeParameterInfo> typeParams;
+		List<List<TypeArgumentInfo>> typeArgumentArray;
+		List<String> typeNameArray;
+	}
+	
+	private ReadClassSignatureResult readClassSignature() throws IOException, ByteCodeFormatException {
+		ReadClassSignatureResult res = new ReadClassSignatureResult();
+		String sig = pool[in.readUnsignedShort()];
+		int start = 0;
+		if (sig.charAt(0) == '<') { // formal type parameters are present, process.
+			res.typeParams = readFormalTypeParameters(sig, cf);
+			start = 1;
+			for(int o = 1; o > 0; start++) {
+				if (sig.charAt(start) == '<')
+					o++;
+				else if (sig.charAt(start) == '>')
+					o--;
+			}
+		}
+		List<List<TypeArgumentInfo>> l1 = new ArrayList<List<TypeArgumentInfo>>();
+		List<String> l2 = new ArrayList<String>();
+		while (start != sig.length()) {
+			// read proper super types
+			int end = start;
+			int o = 0;
+			while (sig.charAt(++end) != ';' || o > 0) {
+				if (sig.charAt(end) == '<') o++;
+				else if (sig.charAt(end) == '>') o--;
+			}
+			end++;
+			String sig2 = sig.substring(start, end);
+			ArrayList<TypeArgumentInfo> ral = new ArrayList<TypeArgumentInfo>();
+			l2.add(readFieldSignature(sig2, ral));
+			l1.add(ral);
+			start = end;
+		}
+		if (res.typeParams == null) res.typeParams = new ArrayList<TypeParameterInfo>();
+		res.typeArgumentArray = l1;
+		res.typeNameArray = l2;
+		return res;
+	}
+	
+	private List<TypeParameterInfo> readFormalTypeParameters(String sig, ClassTypeContainer container) throws ByteCodeFormatException {
+		List<TypeParameterInfo> res = new ArrayList<TypeParameterInfo>();
+		int rpos = 1;
+		int lpos;
+		// loop until done
+		while (sig.charAt(rpos) != '>') { // read until formal type parameters are all read
+			lpos = rpos;
+			// read name of type parameter
+			while (sig.charAt(rpos) != ':') {
+				rpos++;
+			}
+			String paramName = sig.substring(lpos, rpos); // parameter name
+			List<String> boundNames = new ArrayList<String>();
+			List<List<TypeArgumentInfo>> boundArgs = new ArrayList<List<TypeArgumentInfo>>();
+			do {
+				rpos++; // consume ':' 
+				lpos = rpos; // first character
+				if(sig.charAt(lpos) == '[') {
+					// this may not happen: arrays not allowed as type bounds!
+					throw new ByteCodeFormatException();
+				}
+				String typeName;
+				switch(sig.charAt(lpos)) {
+					case ':':
+						typeName = "java.lang.Object"; // allowed for class bound only, but 
+						   							   // we assume that bytecode isn't corrupted.
+						break;
+					case 'L': 
+					case 'T':
+						int intopen = 0;
+						while (sig.charAt(rpos) != ';' || intopen > 0) {
+							if (sig.charAt(rpos) == '<')
+								intopen++;
+							if (sig.charAt(rpos) == '>')
+								intopen--;
+							rpos++;
+						}
+						typeName = sig.substring(lpos+1,rpos).replace('/','.');
+						rpos++; // skip ';'
+						break;
+//					case 'T': throw new UnsupportedOperationException("TODO");
+					default:
+						throw new ByteCodeFormatException();
+				}
+				int idx = typeName.indexOf('<');
+				List<TypeArgumentInfo> typeArgs = null;
+				if (idx != -1) {
+					typeArgs = makeTypeArgs(typeName.substring(idx));
+					typeName = typeName.substring(0, idx);
+					//rpos += 2; // skip tailing >;
+				}
+				boundNames.add(typeName);
+				boundArgs.add(typeArgs);
+			} while(sig.charAt(rpos) == ':'); // continue while there is another bound
+			String bn[] = new String[boundNames.size()];
+			boundNames.toArray(bn);
+			@SuppressWarnings("unchecked") List<TypeArgumentInfo>[] tai = new List[boundArgs.size()];
+			boundArgs.toArray(tai);
+			TypeParameterInfo n = new TypeParameterInfo(paramName, bn, tai, container);
+			res.add(n);
+		}
+		return res;
+	}
+	
+	private List<TypeArgumentInfo> makeTypeArgs(String tn) throws ByteCodeFormatException {
+		// dirty fix to help fix bug 2343547 
+		// even dirtier: work for inner types as well, e.g.,
+		// a.A<T>.B - omit everything past T>
+		{
+			while (tn.endsWith(">;") || tn.endsWith(">"))
+				tn = tn.substring(0, tn.lastIndexOf(">"));
+		}
+		
+		ArrayList<TypeArgumentInfo> res = new ArrayList<TypeArgumentInfo>();
+		assert tn.charAt(0) == '<';
+		int pos = 1; // skip first character
+		do {
+			WildcardMode wm;
+			String typeName = null;
+			switch(tn.charAt(pos)) {
+				case '+':
+					wm = WildcardMode.Extends; // TODO check !!
+					pos++;
+					break;
+				case '-':
+					wm = WildcardMode.Super; // TODO check!!
+					pos++;
+					break;
+				case '*':
+					wm = WildcardMode.Any; 
+					pos++; 
+					break;
+				default:
+					wm = WildcardMode.None;
+					break;
+			}
+			if (wm != WildcardMode.Any) {
+				boolean isTypeVariable = false;
+				int dim = 0;
+				while (tn.charAt(pos) == '[') {
+					dim++; pos++;
+				}
+				int rpos = pos; 
+				switch (tn.charAt(pos)) {
+				case 'L': 
+					int o = 1;
+					while (rpos < tn.length() && o > 0 && !(tn.charAt(rpos) == ';' && o == 1)) {
+						if (tn.charAt(rpos) == '<') o++;
+						if (tn.charAt(rpos) == '>') o--;
+						rpos++;
+					}
+					typeName = tn.substring(pos+1,rpos).replace('/','.');
+					if (typeName.equals(""))
+						typeName = "java.lang.Object"; // allowed for class bound only, but 
+					// we assume that bytecode isn't corrupted.
+					while (typeName.endsWith(";") || typeName.endsWith(">"))
+						typeName = typeName.substring(0, typeName.length()-1);
+					typeName = Naming.toArrayTypeName(typeName, dim);
+					rpos++; // skip ';'
+					break;
+				case 'T':
+					while (rpos < tn.length() && Character.isJavaIdentifierPart(tn.charAt(rpos)))
+						rpos++;
+					typeName = tn.substring(pos+1, rpos);
+					typeName = Naming.toArrayTypeName(typeName, dim);
+					isTypeVariable = true;
+					rpos++;
+					break;
+				case 'B':
+					if (dim == 0) throw new ByteCodeFormatException("primitive type not allowed as type argument");
+					typeName = "byte";
+					rpos++;
+					break;
+				case 'C':
+					if (dim == 0) throw new ByteCodeFormatException("primitive type not allowed as type argument");
+					typeName = "char";
+					rpos++;
+					break;
+				case 'D':
+					if (dim == 0) throw new ByteCodeFormatException("primitive type not allowed as type argument");
+					typeName = "double";
+					rpos++;
+					break;
+				case 'F':
+					if (dim == 0) throw new ByteCodeFormatException("primitive type not allowed as type argument");
+					typeName = "float";
+					rpos++;
+					break;
+				case 'I':
+					if (dim == 0) throw new ByteCodeFormatException("primitive type not allowed as type argument");
+					typeName = "int";
+					rpos++;
+					break;
+				case 'J':
+					if (dim == 0) throw new ByteCodeFormatException("primitive type not allowed as type argument");
+					typeName = "long";
+					rpos++;
+					break;
+				case 'S':
+					if (dim == 0) throw new ByteCodeFormatException("primitive type not allowed as type argument");
+					typeName = "short";
+					rpos++;
+					break;
+				case 'Z':
+					if (dim == 0) throw new ByteCodeFormatException("primitive type not allowed as type argument");
+					typeName = "boolean";
+					rpos++;
+					break;	
+				default:
+					throw new ByteCodeFormatException();
+				}
+				int idx = typeName.indexOf('<');
+				List<TypeArgumentInfo> typeArgs = null;
+				if (idx != -1) {
+					typeArgs = makeTypeArgs(typeName.substring(idx));
+					typeName = typeName.substring(0, idx);
+					typeName = Naming.toArrayTypeName(typeName, dim); // TODO double work...
+				}
+				res.add(new TypeArgumentInfo(wm, typeName.replace('$', '.'), typeArgs, cf, isTypeVariable));
+				pos = rpos;
+			} else {
+				res.add(new TypeArgumentInfo(wm, null, null, cf, false));
+			}
+		} while(pos < tn.length());
+		res.trimToSize();
+		return res;
+	}
+	
+	
+	
+	private String readFieldSignature(String sig, List<TypeArgumentInfo> emptyListForTypeArgs) throws ByteCodeFormatException {
+		String res = null;
+		readAttributes_ret_is_type_arg = false;
+		int rpos = sig.indexOf('(') + 1;
+		
+		int dim = 0;
+		while (sig.charAt(rpos) == '[') {
+			dim++;
+			rpos++;
+		}
+		switch (sig.charAt(rpos)) {
+		case 'L': 
+			int lpos = rpos;
+			while (sig.charAt(rpos) != ';') {
+				if (sig.charAt(rpos) == '<') {
+					int talpos = rpos;
+					int o = 1;
+					while (o > 0) {
+						rpos++;
+						if (sig.charAt(rpos) == '<')
+							o++;
+						if (sig.charAt(rpos) == '>')
+							o--;
+					}
+					String targs = sig.substring(talpos, rpos);
+					emptyListForTypeArgs.addAll(makeTypeArgs(targs));
+				}
+				rpos++;
+			}
+			//String typeName = sig.substring(lpos+1,rpos).replace('/','.');
+			int idx = sig.indexOf('<');
+			res = Naming.toArrayTypeName(sig.substring(lpos+1, idx == -1 ? sig.length()-1 : idx).replace('/', '.'), dim);
+			rpos++; // skip ';'
+			break;
+		case 'T': 
+			lpos = rpos;
+			while (sig.charAt(rpos) != ';')
+				rpos++;
+			res = Naming.toArrayTypeName(sig.substring(lpos+1, rpos), dim);
+			rpos++;
+			readAttributes_ret_is_type_arg = true;
+			break;
+		case 'B':
+		case 'C':
+		case 'D':
+		case 'F':
+		case 'I':
+		case 'J':
+		case 'S':
+		case 'Z':
+			rpos++; // base types are already properly read
+			break;
+		default:
+			rpos++;
+		//throw new ByteCodeFormatException();
+		}
+		return res;
+	}
+	
+	private List<TypeArgumentInfo>[] readMethodSignature(String [] prereadParams, List<TypeParameterInfo> listForTypeParams, MethodInfo forMethod) throws IOException, ByteCodeFormatException {
+		readAttributes_ret_is_type_arg = false;
+		@SuppressWarnings("unchecked") List<TypeArgumentInfo> res[] = new ArrayList[prereadParams.length];
+		String sig = pool[in.readUnsignedShort()];
+		if (sig.charAt(0) == '<') {
+			listForTypeParams.addAll(readFormalTypeParameters(sig, forMethod));
+		}
+		int cur = -1;
+		int rpos = sig.indexOf('(') + 1;
+		boolean hasReturnValue = false;
+		while (!hasReturnValue) {
+			cur++;
+			if (sig.charAt(rpos) == ')') {
+				hasReturnValue = true;
+				rpos++; // skip )
+			}
+			int dim = 0;
+			while (sig.charAt(rpos) == '[') {
+				dim++;
+				rpos++;
+			}
+			switch (sig.charAt(rpos)) {
+				case 'L': 
+					int lpos = rpos;
+					while (sig.charAt(rpos) != ';') {
+						if (sig.charAt(rpos) == '<') {
+							int talpos = rpos;
+							int o = 1;
+							while (o > 0) {
+								rpos++;
+								if (sig.charAt(rpos) == '<')
+									o++;
+								if (sig.charAt(rpos) == '>')
+									o--;
+							}
+							String targs = sig.substring(talpos, rpos);
+							res[cur] = makeTypeArgs(targs);
+						}
+						rpos++;
+					}
+					//String typeName = sig.substring(lpos+1,rpos).replace('/','.');
+					rpos++; // skip ';'
+					break;
+				case 'T': 
+					lpos = rpos;
+					while (sig.charAt(rpos) != ';')
+						rpos++;
+					prereadParams[cur] = Naming.toArrayTypeName(sig.substring(lpos+1, rpos), dim);
+					rpos++;
+					readAttributes_ret_is_type_arg = true;
+					break;
+				case 'B':
+				case 'C':
+				case 'D':
+				case 'F':
+				case 'I':
+				case 'J':
+				case 'S':
+				case 'Z':
+					rpos++; // base types are already properly read
+					break;
+				default:
+					rpos++;
+					//throw new ByteCodeFormatException();
+			}
+		}
+
+//		if (cur+1 != prereadParams.length) { //<= this may actually happen with enum constructors
+//			throw new ByteCodeFormatException(); 
+//		}
+		return res;
+	}
 }

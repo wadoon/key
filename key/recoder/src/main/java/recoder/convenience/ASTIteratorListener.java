@@ -1,22 +1,90 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.convenience;
 
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 
+/**
+ * A listener for AST traversal events signaled by ASTIterators.
+ * 
+ * @author RN
+ */
 public interface ASTIteratorListener {
-    int ENTER_NONE = 0;
 
-    int ENTER_SOME = 1;
+    /**
+     * Return value for ASTListener methods, that signals that no child node
+     * should be entered.
+     */
+    int ENTER_NONE = ASTIterator.ENTER_NONE;
 
-    int ENTER_ALL = 2;
+    /**
+     * Return value for ASTListener methods, that signals that only some
+     * children nodes should be entered - each child will be queried separately.
+     */
+    int ENTER_SOME = ASTIterator.ENTER_SOME;
 
-    void enteringNode(ASTIterator paramASTIterator, ProgramElement paramProgramElement);
+    /**
+     * Return value for ASTListener methods, that signals that all children
+     * should be entered without further questions.
+     */
+    int ENTER_ALL = ASTIterator.ENTER_ALL;
 
-    void leavingNode(ASTIterator paramASTIterator, ProgramElement paramProgramElement);
+    /**
+     * This method is called whenever an AST node is entered.
+     * 
+     * @param it
+     *            the ASTIterator that called this method.
+     * @param node
+     *            the node that is currently entered.
+     */
+    void enteringNode(ASTIterator it, ProgramElement node);
 
-    int enterChildren(ASTIterator paramASTIterator, NonTerminalProgramElement paramNonTerminalProgramElement);
+    /**
+     * This method is called just before an AST node is left.
+     * 
+     * @param it
+     *            the ASTIterator that called this method.
+     * @param node
+     *            the node that is about to be left.
+     */
+    void leavingNode(ASTIterator it, ProgramElement node);
 
-    boolean enterChildNode(ASTIterator paramASTIterator, NonTerminalProgramElement paramNonTerminalProgramElement, ProgramElement paramProgramElement);
+    /**
+     * Called to determine whether or not children nodes should be visited.
+     * 
+     * @param it
+     *            the ASTIterator that called this method.
+     * @param thisNode
+     *            the current node.
+     * @return either ENTER_NONE, ENTER_SOME or ENTER_ALL.
+     */
+    int enterChildren(ASTIterator it, NonTerminalProgramElement thisNode);
 
-    void returnedFromChildNode(ASTIterator paramASTIterator, NonTerminalProgramElement paramNonTerminalProgramElement, ProgramElement paramProgramElement);
+    /**
+     * Determines whether or not a given child node should be visited.
+     * 
+     * @param it
+     *            the ASTIterator that called this method.
+     * @param thisNode
+     *            the current node.
+     * @param childNode
+     *            the child node that might be visited next.
+     * @return <tt>true</tt> if the iterator should proceed to the given child
+     *         node.
+     */
+    boolean enterChildNode(ASTIterator it, NonTerminalProgramElement thisNode, ProgramElement childNode);
+
+    /**
+     * Called immediately after the iterator returned from the child node.
+     * 
+     * @param it
+     *            the ASTIterator that called this method.
+     * @param thisNode
+     *            the current node.
+     * @param childNode
+     *            the child node that has just been visited.
+     */
+    void returnedFromChildNode(ASTIterator it, NonTerminalProgramElement thisNode, ProgramElement childNode);
+
 }

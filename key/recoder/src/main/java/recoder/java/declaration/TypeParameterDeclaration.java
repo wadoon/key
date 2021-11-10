@@ -1,196 +1,290 @@
+/*
+ * Created on 23.11.2005
+ *
+ * This file is part of the RECODER library and protected by the LGPL.
+ * 
+ */
 package recoder.java.declaration;
 
 import recoder.ModelException;
 import recoder.abstraction.ClassType;
+import recoder.abstraction.ErasedType;
+import recoder.abstraction.Type;
 import recoder.abstraction.TypeParameter;
 import recoder.convenience.Naming;
 import recoder.java.Identifier;
 import recoder.java.ProgramElement;
 import recoder.java.SourceElement;
 import recoder.java.SourceVisitor;
-import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
 import recoder.list.generic.ASTList;
+import recoder.service.SourceInfo;
 
+/**
+ * @author Tobias Gutzmann
+ *
+ */
 public class TypeParameterDeclaration extends TypeDeclaration implements TypeReferenceContainer, TypeParameter {
-    private static final long serialVersionUID = -6480521507901415027L;
 
-    protected ASTList<TypeReference> bound;
+	/**
+	 * serialization id 
+	 */
+	private static final long serialVersionUID = -6480521507901415027L;
+	
+	private ASTList<TypeReference> bound;
+	/**
+	 * 
+	 */
+	public TypeParameterDeclaration() {
+		super();
+	}
+	
+	public TypeParameterDeclaration(Identifier name, ASTList<TypeReference> bound) {
+		super(name);
+		this.bound = bound;
+		makeParentRoleValid();
+	}
 
-    public TypeParameterDeclaration() {
-    }
+	/**
+	 * @param proto
+	 */
+	protected TypeParameterDeclaration(TypeParameterDeclaration proto) {
+		super(proto);
+		if (proto.bound != null)
+			bound = proto.bound.deepClone();
+		makeParentRoleValid();
+	}
 
-    public TypeParameterDeclaration(Identifier name, ASTList<TypeReference> bound) {
-        super(name);
-        this.bound = bound;
-        makeParentRoleValid();
-    }
+	/* (non-Javadoc)
+	 * @see recoder.java.reference.TypeReferenceContainer#getTypeReferenceCount()
+	 */
+	public int getTypeReferenceCount() {
+		return bound == null ? 0 : bound.size();
+	}
 
-    protected TypeParameterDeclaration(TypeParameterDeclaration proto) {
-        super(proto);
-        if (proto.bound != null)
-            this.bound = proto.bound.deepClone();
-        makeParentRoleValid();
-    }
+	/* (non-Javadoc)
+	 * @see recoder.java.reference.TypeReferenceContainer#getTypeReferenceAt(int)
+	 */
+	public TypeReference getTypeReferenceAt(int index) {
+		if (bound != null)
+			return bound.get(index);
+		throw new ArrayIndexOutOfBoundsException(index);
+	}
 
-    public int getTypeReferenceCount() {
-        return (this.bound == null) ? 0 : this.bound.size();
-    }
+	/* (non-Javadoc)
+	 * @see recoder.java.NonTerminalProgramElement#getChildCount()
+	 */
+	public int getChildCount() {
+		return (name != null ? 1 : 0) + (bound != null ? bound.size() : 0);
+	}
 
-    public TypeReference getTypeReferenceAt(int index) {
-        if (index == 0 && this.bound != null)
-            return this.bound.get(index);
-        throw new ArrayIndexOutOfBoundsException(index);
-    }
+	/* (non-Javadoc)
+	 * @see recoder.java.NonTerminalProgramElement#getChildAt(int)
+	 */
+	public ProgramElement getChildAt(int index) {
+		if (name != null) {
+			if (index == 0)
+				return name;
+			index--;
+		}
+		if (bound != null) {
+			return bound.get(index); // may throw exception
+		}
+		throw new ArrayIndexOutOfBoundsException();
+	}
 
-    public int getChildCount() {
-        return ((this.name != null) ? 1 : 0) + ((this.bound != null) ? this.bound.size() : 0);
-    }
+	/* (non-Javadoc)
+	 * @see recoder.java.NonTerminalProgramElement#getChildPositionCode(recoder.java.ProgramElement)
+	 */
+	public int getChildPositionCode(ProgramElement child) {
+		// 0      : name
+		// 1(idx) : bound
+		if (child == name) return 0;
+		int idx = bound.indexOf(child);
+		if (idx != -1)
+			return (idx << 4) | 1;
+		return -1;
+	}
 
-    public ProgramElement getChildAt(int index) {
-        if (this.name != null) {
-            if (index == 0)
-                return this.name;
-            index--;
-        }
-        if (this.bound != null)
-            return this.bound.get(index);
-        throw new ArrayIndexOutOfBoundsException();
-    }
+	/* (non-Javadoc)
+	 * @see recoder.java.NonTerminalProgramElement#replaceChild(recoder.java.ProgramElement, recoder.java.ProgramElement)
+	 */
+	public boolean replaceChild(ProgramElement p, ProgramElement q) {
+		if (p == null)
+			throw new NullPointerException();
+		if (p == name) {
+			name = (Identifier)q;
+			if (name != null)
+				name.setParent(this);
+			return true;
+		}
+		if (bound != null) {
+			int idx = bound.indexOf(p);
+			if (idx != -1) {
+				if (q == null) {
+					bound.remove(idx);
+				} else {
+					TypeReference tr = (TypeReference)q;
+					bound.set(idx, tr);
+					tr.setParent(this);
+				}
+			}
+			return true;
+		}
+		return false;
+	}
 
-    public int getChildPositionCode(ProgramElement child) {
-        if (child == this.name)
-            return 0;
-        int idx = this.bound.indexOf(child);
-        if (idx != -1)
-            return idx << 4 | 0x1;
-        return -1;
-    }
+	/* (non-Javadoc)
+	 * @see recoder.java.SourceElement#accept(recoder.java.SourceVisitor)
+	 */
+	public void accept(SourceVisitor v) {
+		v.visitTypeParameter(this);
+	}
+	
+	/* (non-Javadoc)
+	 * @see recoder.java.SourceElement#deepClone()
+	 */
+	public TypeParameterDeclaration deepClone() {
+		return new TypeParameterDeclaration(this);
+	}
 
-    public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
-            throw new NullPointerException();
-        if (p == this.name) {
-            this.name = (Identifier) q;
-            if (this.name != null)
-                this.name.setParent(this);
-            return true;
-        }
-        if (this.bound != null) {
-            int idx = this.bound.indexOf(p);
-            if (idx != -1)
-                if (q == null) {
-                    this.bound.remove(idx);
-                } else {
-                    TypeReference tr = (TypeReference) q;
-                    this.bound.set(idx, tr);
-                    tr.setParent(this);
-                }
-            return true;
-        }
-        return false;
-    }
+	@Override
+	public void makeParentRoleValid() {
+		super.makeParentRoleValid();
+		if (bound != null) {
+			for (TypeReference tr : bound) 
+				tr.setParent(this);
+		}
+	}
 
-    public void accept(SourceVisitor v) {
-        v.visitTypeParameter(this);
-    }
+	@Override
+	public void validate() throws ModelException {
+		if (members != null && members.size() != 0)
+			throw new ModelException("No members allowed in TypeParameter");
+	}
 
-    public TypeParameterDeclaration deepClone() {
-        return new TypeParameterDeclaration(this);
-    }
+	public boolean isInterface() {
+		return false;
+	}
 
-    public void makeParentRoleValid() {
-        super.makeParentRoleValid();
-        if (this.bound != null)
-            for (TypeReference tr : this.bound)
-                tr.setParent(this);
-    }
+	public boolean isOrdinaryInterface() {
+		return false;
+	}
 
-    public void validate() throws ModelException {
-        if (this.members != null && this.members.size() != 0)
-            throw new ModelException("No members allowed in TypeParameter");
-    }
+	public boolean isAnnotationType() {
+		return false;
+	}
 
-    public boolean isInterface() {
-        return false;
-    }
+	public boolean isEnumType() {
+		return false;
+	}
 
-    public boolean isOrdinaryInterface() {
-        return false;
-    }
+	public boolean isOrdinaryClass() {
+		return false;
+	}
 
-    public boolean isAnnotationType() {
-        return false;
-    }
+	@Override
+	public ASTList<TypeParameterDeclaration> getTypeParameters() {
+		return null;
+	}
+	
+	public ASTList<TypeReference> getBounds() {
+		return bound;
+	}
 
-    public boolean isEnumType() {
-        return false;
-    }
+	public String getParameterName() {
+		return getName();
+	}
 
-    public boolean isOrdinaryClass() {
-        return false;
-    }
+	public int getBoundCount() {
+		return bound == null || bound.isEmpty() ? 1 : bound.size(); // no bound: java.lang.Object!
+	}
 
-    public ASTList<TypeParameterDeclaration> getTypeParameters() {
-        return null;
-    }
+	public String getBoundName(int boundidx) {
+		if ((bound == null || bound.isEmpty()) && boundidx == 0) {
+			return "java.lang.Object";
+		}
+		// drop type arguments. This avoids recursion! 
+		Type t = ((SourceInfo)getProgramModelInfo()).getType(
+				Naming.toPathName(bound.get(boundidx)), bound.get(boundidx));
+		if (t instanceof TypeParameter)
+			return t.getName(); // this is what happens when run with bytecode; be consistent.
+		if (t == null) {
+			// can happen if bound name is unknown type. For simplicity, return the name of the bound.
+			// Quite sure that there are already warnings somewhere...
+			return Naming.toPathName(bound.get(boundidx));
+		}
+		return t.getFullName();
+	}
 
-    public ASTList<TypeReference> getBounds() {
-        return this.bound;
-    }
+	public ASTList<TypeArgumentDeclaration> getBoundTypeArguments(int boundidx) {
+		if ((bound == null || bound.isEmpty()) && boundidx == 0)
+			return null;
+		return bound.get(boundidx).getTypeArguments();
+	}
+	
+	public void setBound(ASTList<TypeReference> bound) {
+		this.bound = bound;
+	}
 
-    public String getParameterName() {
-        return getName();
-    }
+	@Override
+	public SourceElement getFirstElement() {
+		return name;
+	}
+	
+	@Override
+	public SourceElement getLastElement() {
+		if (bound != null)
+			return bound.get(bound.size()-1);
+		return name;
+	}
 
-    public int getBoundCount() {
-        return (this.bound == null) ? 0 : this.bound.size();
-    }
+	@Override
+	public ClassType getTypeInScope(String tname) {
+		return null;
+	}
 
-    public String getBoundName(int boundidx) {
-        return Naming.toPathName(this.bound.get(boundidx));
-    }
+	@Override
+	public void addTypeToScope(ClassType type, String tname) {
+		throw new UnsupportedOperationException();
+	}
 
-    public ASTList<TypeArgumentDeclaration> getBoundTypeArguments(int boundidx) {
-        return this.bound.get(boundidx).getTypeArguments();
-    }
+	@Override
+	public void addVariableToScope(VariableSpecification var) {
+		throw new UnsupportedOperationException();
+	}
 
-    public boolean equals(Object o) {
-        return TypeParameter.EqualsImplementor.equals(this, o);
-    }
+	@Override
+	public void removeTypeFromScope(String tname) {
+		throw new UnsupportedOperationException();
+	}
 
-    public void setBound(ASTList<TypeReference> bound) {
-        this.bound = bound;
-    }
+	@Override
+	public void removeVariableFromScope(String tname) {
+		throw new UnsupportedOperationException();
+	}
+	
+	public String getFullSignature() {
+		return TypeParameter.DescrImp.getFullSignature(this);
+	}
 
-    public SourceElement getFirstElement() {
-        return this.name;
-    }
+	public boolean isInner() {
+		return false;
+	}
 
-    public SourceElement getLastElement() {
-        if (this.bound != null)
-            return this.bound.get(this.bound.size() - 1);
-        return this.name;
-    }
+	@Override
+	public ErasedType getErasedType() {
+		// TODO return getFirstBound().erasedType() !!!!
+		return super.getErasedType();
+	}
+	
+	public ClassType getBaseClassType() {
+		if (bound == null || bound.size() == 0)
+			return getProgramModelInfo().getServiceConfiguration().getNameInfo().getJavaLangObject();
+		return ((ClassType)((SourceInfo)getProgramModelInfo()).getType(bound.get(0))).getBaseClassType();
+	}
 
-    public ClassType getTypeInScope(String tname) {
-        return null;
-    }
 
-    public void addTypeToScope(ClassType type, String tname) {
-        throw new UnsupportedOperationException();
-    }
 
-    public void addVariableToScope(VariableSpecification var) {
-        throw new UnsupportedOperationException();
-    }
-
-    public void removeTypeFromScope(String tname) {
-        throw new UnsupportedOperationException();
-    }
-
-    public void removeVariableFromScope(String tname) {
-        throw new UnsupportedOperationException();
-    }
 }

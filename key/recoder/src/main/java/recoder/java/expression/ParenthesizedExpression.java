@@ -1,87 +1,205 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.java.expression;
 
-import recoder.java.*;
+import recoder.java.Expression;
+import recoder.java.ExpressionContainer;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.ProgramElement;
+import recoder.java.SourceElement;
+import recoder.java.SourceVisitor;
+import recoder.java.StatementContainer;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.ReferenceSuffix;
 
-public class ParenthesizedExpression extends Operator implements ExpressionStatement, ReferencePrefix {
-    private static final long serialVersionUID = 5087638517523549125L;
+/**
+ * Redundant Parentheses. Modelled as a special "identity" unary "infix"
+ * operator.
+ */
 
+public class ParenthesizedExpression extends Operator implements ExpressionStatement, ReferencePrefix {
+
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = 5087638517523549125L;
+
+	/**
+     * Access parent.
+     */
     protected ReferenceSuffix accessParent;
 
+    /**
+     * Statement parent.
+     */
     protected StatementContainer statementParent;
 
+    /**
+     * Parenthesized expression.
+     */
+
     public ParenthesizedExpression() {
+        // nothing to do
     }
+
+    /**
+     * Parenthesized expression.
+     * 
+     * @param child
+     *            an expression.
+     */
 
     public ParenthesizedExpression(Expression child) {
         super(child);
         makeParentRoleValid();
     }
 
+    /**
+     * Parenthesized expression.
+     * 
+     * @param proto
+     *            a parenthesized expression.
+     */
     protected ParenthesizedExpression(ParenthesizedExpression proto) {
         super(proto);
         makeParentRoleValid();
     }
 
+    /**
+     * Deep clone.
+     * 
+     * @return the object.
+     */
     public ParenthesizedExpression deepClone() {
         return new ParenthesizedExpression(this);
     }
 
+    /**
+     * Get AST parent.
+     * 
+     * @return the non terminal program element.
+     */
     public NonTerminalProgramElement getASTParent() {
-        if (this.expressionParent != null)
-            return this.expressionParent;
-        if (this.accessParent != null)
-            return this.accessParent;
-        return this.statementParent;
+        if (expressionParent != null) {
+            return expressionParent;
+        } else if (accessParent != null) {
+            return accessParent;
+        } else {
+            return statementParent;
+        }
     }
 
+    /**
+     * Get statement container.
+     * 
+     * @return the statement container.
+     */
     public StatementContainer getStatementContainer() {
-        return this.statementParent;
+        return statementParent;
     }
 
+    /**
+     * Set statement container.
+     * 
+     * @param parent
+     *            a statement container.
+     */
     public void setStatementContainer(StatementContainer parent) {
-        this.statementParent = parent;
-        this.expressionParent = null;
-        this.accessParent = null;
+        statementParent = parent;
+        expressionParent = null;
+        accessParent = null;
     }
 
+    /**
+     * Set expression container.
+     * 
+     * @param c
+     *            an expression container.
+     */
     public void setExpressionContainer(ExpressionContainer c) {
-        this.expressionParent = c;
-        this.statementParent = null;
-        this.accessParent = null;
+        expressionParent = c;
+        statementParent = null;
+        accessParent = null;
     }
+
+    /**
+     * Returns the number of children of this node.
+     * 
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
-        return (this.children != null) ? this.children.size() : 0;
+        return (children != null) ? children.size() : 0;
     }
 
+    /**
+     * Returns the child at the specified index in this node's "virtual" child
+     * array
+     * 
+     * @param index
+     *            an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException
+     *                if <tt>index</tt> is out of bounds
+     */
     public ProgramElement getChildAt(int index) {
-        if (this.children != null)
-            return this.children.get(index);
+        if (children != null) {
+            return children.get(index);
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
+    /**
+     * Get reference suffix.
+     * 
+     * @return the reference suffix.
+     */
+
     public ReferenceSuffix getReferenceSuffix() {
-        return this.accessParent;
+        return accessParent;
     }
+
+    /**
+     * Set reference suffix.
+     * 
+     * @param path
+     *            a reference suffix.
+     */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
-        this.accessParent = path;
-        this.expressionParent = null;
-        this.statementParent = null;
+        accessParent = path;
+        expressionParent = null;
+        statementParent = null;
     }
 
+    /**
+     * Get arity.
+     * 
+     * @return the int value.
+     */
     public int getArity() {
         return 1;
     }
+
+    /**
+     * Get precedence.
+     * 
+     * @return the int value.
+     */
 
     public int getPrecedence() {
         return 0;
     }
 
+    /**
+     * Get notation.
+     * 
+     * @return the int value.
+     */
+
     public int getNotation() {
-        return 1;
+        return INFIX;
+        /* Only unary infix operator;) */
     }
 
     public SourceElement getFirstElement() {
@@ -96,3 +214,4 @@ public class ParenthesizedExpression extends Operator implements ExpressionState
         v.visitParenthesizedExpression(this);
     }
 }
+

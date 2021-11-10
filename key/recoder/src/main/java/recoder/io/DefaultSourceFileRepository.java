@@ -1,255 +1,370 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.io;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 import recoder.AbstractService;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.convenience.Naming;
-import recoder.java.*;
+import recoder.java.CompilationUnit;
+import recoder.java.Identifier;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.PackageSpecification;
+import recoder.java.PrettyPrinter;
+import recoder.java.ProgramElement;
+import recoder.java.declaration.TypeDeclaration;
+import recoder.java.reference.PackageReference;
+import recoder.service.AttachChange;
 import recoder.service.ChangeHistory;
 import recoder.service.ChangeHistoryEvent;
 import recoder.service.ChangeHistoryListener;
+import recoder.service.DetachChange;
 import recoder.service.TreeChange;
 import recoder.util.Debug;
 import recoder.util.ProgressListener;
 import recoder.util.ProgressListenerManager;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.*;
-import java.util.*;
+/**
+ * @author RN
+ * @author AL
+ */
+public class DefaultSourceFileRepository extends AbstractService implements SourceFileRepository,
+        ChangeHistoryListener, PropertyChangeListener {
 
-public class DefaultSourceFileRepository extends AbstractService implements SourceFileRepository, ChangeHistoryListener, PropertyChangeListener {
-    public static final FilenameFilter JAVA_FILENAME_FILTER = new FilenameFilter() {
-        public boolean accept(File dir, String name) {
-            return name.endsWith(".java");
-        }
-    };
-    private static final boolean DEBUG = false;
+    private final static boolean DEBUG = false;
+
+    /**
+     * Cache: data location to compilation units.
+     */
     private final Map<DataLocation, CompilationUnit> location2cu = new HashMap<DataLocation, CompilationUnit>();
+
+    /**
+     * Set of units that have been changed and have to be rewritten.
+     */
     private final Set<CompilationUnit> changedUnits = new HashSet<CompilationUnit>();
+
+    /**
+     * Set of units that are obsolete and should be deleted.
+     */
     private final Set<DataLocation> deleteUnits = new HashSet<DataLocation>();
-    ProgressListenerManager listeners = new ProgressListenerManager(this);
+
+    /**
+     * The change history service.
+     */
     private ChangeHistory changeHistory;
+
+    /**
+     * Cached search path list.
+     */
     private PathList searchPathList;
+
+    /**
+     * Cached output path.
+     */
     private File outputPath;
 
+    /**
+     * Progress listener management.
+     */
+    ProgressListenerManager listeners = new ProgressListenerManager(this);
+
+    /**
+     * NAI
+     */
+    private Properties locationSpecificVersion;//=new Properties();
+
+    /**
+     * @param config
+     *            the configuration this services becomes part of.
+     */
     public DefaultSourceFileRepository(ServiceConfiguration config) {
         super(config);
     }
 
     public void initialize(ServiceConfiguration cfg) {
         super.initialize(cfg);
-        this.changeHistory = cfg.getChangeHistory();
-        this.changeHistory.addChangeHistoryListener(this);
+        changeHistory = cfg.getChangeHistory();
+        changeHistory.addChangeHistoryListener(this);
         ProjectSettings settings = cfg.getProjectSettings();
         settings.addPropertyChangeListener(this);
-        this.searchPathList = settings.getSearchPathList();
-        this.outputPath = new File(settings.getProperty("output.path"));
+        searchPathList = settings.getSearchPathList();
+        outputPath = new File(settings.getProperty(PropertyNames.OUTPUT_PATH));
+        locationSpecificVersion=settings.getLocationSpecificVersionProperties();	//NAI
     }
 
     protected final PathList getSearchPathList() {
-        return this.searchPathList;
+        return searchPathList;
     }
 
     protected final File getOutputPath() {
-        return this.outputPath;
+        return outputPath;
     }
 
     public void addProgressListener(ProgressListener l) {
-        this.listeners.addProgressListener(l);
+        listeners.addProgressListener(l);
     }
 
     public void removeProgressListener(ProgressListener l) {
-        this.listeners.removeProgressListener(l);
+        listeners.removeProgressListener(l);
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
         String changedProp = evt.getPropertyName();
-        if (changedProp.equals("input.path")) {
-            this.searchPathList = this.serviceConfiguration.getProjectSettings().getSearchPathList();
-        } else if (changedProp.equals("output.path")) {
-            this.outputPath = new File(this.serviceConfiguration.getProjectSettings().getProperty("output.path"));
+        if (changedProp.equals(PropertyNames.INPUT_PATH)) {
+            // should check for admissibility of the new path
+            // if it has been added only, there is nothing to do
+            // otherwise, for all class types check if the location
+            // would have changed; if so, invalidate them
+            searchPathList = serviceConfiguration.getProjectSettings().getSearchPathList();
+        } else if (changedProp.equals(PropertyNames.OUTPUT_PATH)) {
+            outputPath = new File(serviceConfiguration.getProjectSettings().getProperty(PropertyNames.OUTPUT_PATH));
         }
     }
 
+    // remove cu from repository
     private void deregister(CompilationUnit cu) {
         DataLocation loc = cu.getDataLocation();
-        if (loc != null &&
-                this.location2cu.get(loc) == cu) {
-            this.location2cu.remove(loc);
-            this.changedUnits.remove(cu);
-            DataLocation orig = cu.getOriginalDataLocation();
-            if (!loc.equals(orig))
-                this.deleteUnits.add(loc);
+        if (loc != null) {
+            if (location2cu.get(loc) == cu) {
+                location2cu.remove(loc);
+                changedUnits.remove(cu); // no need to write it back
+                if (DEBUG)
+                    Debug.log("Deregistering " + loc);
+                DataLocation orig = cu.getOriginalDataLocation();
+                if (!loc.equals(orig)) {
+                    // remove it except when from original location
+                    deleteUnits.add(loc);
+                }
+            }
         }
     }
 
+    // add cu to repository
     private void register(CompilationUnit cu) {
         DataLocation loc = cu.getDataLocation();
         if (loc == null) {
-            this.changedUnits.add(cu);
+            changedUnits.add(cu); // assume the file is not up to date
             loc = createDataLocation(cu);
             cu.setDataLocation(loc);
         }
-        if (this.location2cu.get(loc) != cu) {
-            this.deleteUnits.remove(loc);
-            this.location2cu.put(loc, cu);
+        if (location2cu.get(loc) != cu) {
+            if (DEBUG)
+                Debug.log("Registering " + loc);
+            deleteUnits.remove(loc);
+            location2cu.put(loc, cu);
         }
     }
 
+    // check if the given program element can influence on the canonical
+    // name of the compilation unit
     private boolean isPartOfUnitName(ProgramElement pe) {
-        if (pe instanceof recoder.java.Identifier || pe instanceof recoder.java.reference.PackageReference)
+        if (pe instanceof Identifier || pe instanceof PackageReference) {
             return isPartOfUnitName(pe.getASTParent());
-        if (pe instanceof recoder.java.PackageSpecification)
+        }
+        if (pe instanceof PackageSpecification) {
             return true;
-        if (pe instanceof recoder.java.declaration.TypeDeclaration) {
+        }
+        if (pe instanceof TypeDeclaration) {
             NonTerminalProgramElement parent = pe.getASTParent();
-            return (parent instanceof CompilationUnit && ((CompilationUnit) parent).getPrimaryTypeDeclaration() == pe);
+            return (parent instanceof CompilationUnit)
+                    && (((CompilationUnit) parent).getPrimaryTypeDeclaration() == pe);
         }
         return false;
     }
 
+    // possible optimization: react on replacements
     public void modelChanged(ChangeHistoryEvent changes) {
-        List<TreeChange> changed = changes.getChanges();
-        for (int i = changed.size() - 1; i >= 0; i--) {
+    	List<TreeChange> changed = changes.getChanges();
+        for (int i = changed.size() - 1; i >= 0; i -= 1) {
             TreeChange tc = changed.get(i);
             ProgramElement pe = tc.getChangeRoot();
             CompilationUnit cu = tc.getCompilationUnit();
             if (pe == cu) {
-                if (tc instanceof recoder.service.AttachChange) {
+                if (tc instanceof AttachChange) {
                     register(cu);
-                } else if (tc instanceof recoder.service.DetachChange) {
+                } else if (tc instanceof DetachChange) {
                     deregister(cu);
                 }
             } else {
                 if (isPartOfUnitName(pe)) {
-                    DataLocation loc = cu.getDataLocation();
-                    DataLocation loc2 = createDataLocation(cu);
+                    // re-register under new location
+                    DataLocation loc = cu.getDataLocation(); // old location
+                    DataLocation loc2 = createDataLocation(cu); // new location
                     if (!loc.equals(loc2)) {
                         deregister(cu);
                         cu.setDataLocation(loc2);
                         register(cu);
                     }
                 }
-                this.changedUnits.add(cu);
+                changedUnits.add(cu);
             }
-            if (cu == null)
+            if (cu == null) {
                 Debug.log("Null Unit changed in " + tc);
+            }
         }
     }
 
+    /**
+     * Searches for the location of the source file for the given class.
+     * 
+     * @param classname
+     *            the name of the class for which the source file should be
+     *            looked up.
+     */
     public DataLocation findSourceFile(String classname) {
+        // possible optimzation: cache it !!!
         String file = Naming.dot(Naming.makeFilename(classname), "java");
         return getSearchPathList().find(file);
     }
 
-    protected CompilationUnit getCompilationUnitFromLocation(DataLocation loc) throws ParserException {
+    protected CompilationUnit getCompilationUnitFromLocation(DataLocation loc) {
         Debug.assertNonnull(loc, "Null location for compilation unit");
-        CompilationUnit result = this.location2cu.get(loc);
-        if (result != null)
+        CompilationUnit result = location2cu.get(loc);
+        if (result != null) {
             return result;
+        }
+        // ok - lets parse the sources
         try {
+            //NAI - check if there is a configuration for the java version
+            String locationStr=loc.toString();
+            String version=null;
+            Iterator<Object> keys=locationSpecificVersion.keySet().iterator();            
+            while(keys.hasNext()){
+            	String location=(String)keys.next();
+            	if(locationStr.startsWith(location)){
+            		version=(String)locationSpecificVersion.get(location);
+            	}
+            }
+            // /NAI
+        	
             Reader in;
             if (!loc.hasReaderSupport() || (in = loc.getReader()) == null) {
                 Debug.error("Location of source file provides no reader");
                 return null;
             }
-            result = this.serviceConfiguration.getProgramFactory().parseCompilationUnit(in);
+            if (version != null)
+            	result = serviceConfiguration.getProgramFactory().parseCompilationUnit(in, version);
+            else
+            	result = serviceConfiguration.getProgramFactory().parseCompilationUnit(in);
             in.close();
             loc.readerClosed();
             result.setDataLocation(loc);
-            this.location2cu.put(loc, result);
-            this.changeHistory.attached(result);
-        } catch (IOException e) {
-            Reader in;
-            Debug.error("Exception while reading from input stream: " + in);
-        } catch (ParserException pe) {
-            Debug.error("Exception while parsing unit " + loc);
-            throw pe;
-        }
+            location2cu.put(loc, result); //let this be done by the history
+            changeHistory.attached(result);
+        } catch (Throwable e) {
+        	getServiceConfiguration().getProjectSettings().
+        	getErrorHandler().reportError(new Exception(
+        			e.getClass().getSimpleName() + " occured while parsing " + loc + "\n"
+        			+ e.getMessage()));
+        } 
         return result;
     }
 
-    public CompilationUnit getCompilationUnitFromFile(String filename) throws ParserException {
+    public CompilationUnit getCompilationUnitFromFile(String filename) {
         Debug.assertNonnull(filename);
         File f = new File(filename);
         DataLocation loc = null;
         if (f.isFile() && f.isAbsolute()) {
             String newfilename = getSearchPathList().getRelativeName(filename);
             if (newfilename.equals(filename)) {
+                // not part of the regular search path; load anyway...
                 loc = new DataFileLocation(f);
             } else {
                 loc = getSearchPathList().find(newfilename);
             }
         } else {
             loc = getSearchPathList().find(filename);
+            // System.err.println("Location for " + filename +": " + loc);
         }
-        return (loc != null) ? getCompilationUnitFromLocation(loc) : null;
+        return loc != null ? getCompilationUnitFromLocation(loc) : null;
     }
 
-    public List<CompilationUnit> getCompilationUnitsFromFiles(String[] filenames) throws ParserException {
+    public List<CompilationUnit> getCompilationUnitsFromFiles(String[] filenames) {
         Debug.assertNonnull(filenames);
         List<CompilationUnit> res = new ArrayList<CompilationUnit>();
-        this.listeners.fireProgressEvent(0, filenames.length, "Importing Source Files");
-        for (int i = 0; i < filenames.length; i++) {
-            this.listeners.fireProgressEvent(i, "Parsing " + filenames[i]);
+        listeners.fireProgressEvent(0, filenames.length, "Importing Source Files");
+        for (int i = 0; i < filenames.length; i += 1) {
+            listeners.fireProgressEvent(i, "Parsing " + filenames[i].toString());
             CompilationUnit cu = getCompilationUnitFromFile(filenames[i]);
-            if (cu != null)
+            if (cu != null) {
                 res.add(cu);
+            }
         }
-        this.listeners.fireProgressEvent(filenames.length);
+        listeners.fireProgressEvent(filenames.length);
         return res;
     }
 
     public CompilationUnit getCompilationUnit(String classname) {
         DataLocation loc = findSourceFile(classname);
-        if (loc == null || loc instanceof ArchiveDataLocation)
-            return null;
-        try {
-            return getCompilationUnitFromLocation(loc);
-        } catch (ParserException pe) {
-            this.serviceConfiguration.getProjectSettings().getErrorHandler().reportError(pe);
+        if (loc == null || loc instanceof ArchiveDataLocation) {
             return null;
         }
+        return getCompilationUnitFromLocation(loc);
     }
 
     public List<CompilationUnit> getCompilationUnits() {
-        this.changeHistory.updateModel();
+        changeHistory.updateModel(); // update arrival of CU's
         return getKnownCompilationUnits();
     }
 
     public List<CompilationUnit> getKnownCompilationUnits() {
-        int n = this.location2cu.size();
+        int n = location2cu.size();
         List<CompilationUnit> res = new ArrayList<CompilationUnit>(n);
-        for (CompilationUnit cu : this.location2cu.values())
+        for (CompilationUnit cu : location2cu.values()) {
             res.add(cu);
+        }
         return res;
     }
+
+    public final static FilenameFilter JAVA_FILENAME_FILTER = new FilenameFilter() {
+        public boolean accept(File dir, String name) {
+            return name.endsWith(".java");
+        }
+    };
 
     public List<CompilationUnit> getAllCompilationUnitsFromPath() throws ParserException {
         return getAllCompilationUnitsFromPath(JAVA_FILENAME_FILTER);
     }
 
-    public List<CompilationUnit> getAllCompilationUnitsFromPath(FilenameFilter filter) throws ParserException {
-        DataLocation[] locations = getSearchPathList().findAll(filter);
+    public List<CompilationUnit> getAllCompilationUnitsFromPath(FilenameFilter filter) {
+        DataLocation[] locations = getSearchPathList()
+        	.findAll(filter, getServiceConfiguration().getProjectSettings().getErrorHandler());
         List<CompilationUnit> res = new ArrayList<CompilationUnit>(locations.length);
-        this.listeners.fireProgressEvent(0, res.size(), "Importing Source Files From Path");
+        listeners.fireProgressEvent(0, res.size(), "Importing Source Files From Path");
         for (int i = 0; i < locations.length; i++) {
-            this.listeners.fireProgressEvent(i, "Parsing " + locations[i]);
+            listeners.fireProgressEvent(i, "Parsing " + locations[i]);
             CompilationUnit cu = getCompilationUnitFromLocation(locations[i]);
             res.add(cu);
         }
-        this.listeners.fireProgressEvent(locations.length);
+        listeners.fireProgressEvent(locations.length);
         return res;
     }
 
     public boolean isUpToDate(CompilationUnit cu) {
         Debug.assertNonnull(cu);
-        if (cu.getDataLocation() == null)
+        if (cu.getDataLocation() == null) {
             return false;
-        return !this.changedUnits.contains(cu);
+        }
+        return !changedUnits.contains(cu);
     }
 
+    // create a new data location given the current position of the unit
     protected DataLocation createDataLocation(CompilationUnit cu) {
         String filename = Naming.toCanonicalFilename(cu);
         File f = new File(getOutputPath(), filename);
@@ -258,23 +373,27 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
 
     private void printUnit(CompilationUnit cu) throws IOException {
         DataLocation location = cu.getDataLocation();
+        // create output path name
         if (location == null || cu.getOriginalDataLocation() == location) {
-            if (location != null)
-                this.location2cu.remove(location);
+            if (location != null) {
+                location2cu.remove(location);
+            }
             location = createDataLocation(cu);
             cu.setDataLocation(location);
-            this.location2cu.put(location, cu);
+            location2cu.put(location, cu);
         }
-        if (!location.isWritable())
+        if (!location.isWritable()) {
             throw new IOException("Data location for " + location + " is not writable");
+        }
         if (location instanceof DataFileLocation) {
             File f = ((DataFileLocation) location).getFile();
             File parent = new File(f.getParent());
-            if (!parent.exists())
+            if (!parent.exists()) {
                 parent.mkdirs();
+            }
         }
         Writer w = location.getWriter();
-        PrettyPrinter pprinter = this.serviceConfiguration.getProgramFactory().getPrettyPrinter(w);
+        PrettyPrinter pprinter = serviceConfiguration.getProgramFactory().getPrettyPrinter(w);
         cu.accept(pprinter);
         w.flush();
         w.close();
@@ -284,35 +403,49 @@ public class DefaultSourceFileRepository extends AbstractService implements Sour
     public void print(CompilationUnit cu) throws IOException {
         Debug.assertNonnull(cu);
         printUnit(cu);
-        this.changedUnits.remove(cu);
+        changedUnits.remove(cu);
     }
 
     public void printAll(boolean always) throws IOException {
-        this.changeHistory.updateModel();
-        int size = always ? this.location2cu.size() : this.changedUnits.size();
-        this.listeners.fireProgressEvent(0, size, "Exporting Source Files");
+        changeHistory.updateModel(); // update arrival of new cu's
+        int size = always ? location2cu.size() : changedUnits.size();
+        listeners.fireProgressEvent(0, size, "Exporting Source Files");
         CompilationUnit[] units = new CompilationUnit[size];
         int j = 0;
-        for (CompilationUnit cu : always ? (Object<?>) this.location2cu.values() : (Object<?>) this.changedUnits)
+        for(CompilationUnit cu : always ? location2cu.values() : changedUnits) { 
             units[j++] = cu;
-        for (int i = 0; i < size; i++) {
-            printUnit(units[i]);
-            this.listeners.fireProgressEvent(i + 1, units[i]);
         }
-        this.changedUnits.clear();
+        if (DEBUG) {
+            Debug.log("printing...");
+        }
+        for (int i = 0; i < size; i += 1) {
+            if (DEBUG) {
+                Debug.log("units[i].getName()");
+            }
+            printUnit(units[i]);
+            listeners.fireProgressEvent(i + 1, units[i]);
+        }
+        changedUnits.clear();
     }
 
+    /**
+     * Deletes all superfluous (renamed, detached) compilation unit files. Does
+     * not remove source files from other sources.
+     */
     public void cleanUp() {
-        for (DataLocation loc : this.deleteUnits) {
+        for (DataLocation loc : deleteUnits) {
             if (loc instanceof DataFileLocation) {
                 File f = ((DataFileLocation) loc).getFile();
                 f.delete();
             }
         }
-        this.deleteUnits.clear();
+        deleteUnits.clear();
+
     }
 
     public String information() {
-        return "" + this.location2cu.size() + " compilation units (" + this.changedUnits.size() + " currently changed)";
+        return "" + location2cu.size() + " compilation units (" + changedUnits.size() + " currently changed)";
     }
+
 }
+

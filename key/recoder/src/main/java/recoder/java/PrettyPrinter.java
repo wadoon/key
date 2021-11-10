@@ -1,65 +1,331 @@
-package recoder.java;
+// This file is part of the RECODER library and protected by the LGPL.
 
-import recoder.io.PropertyNames;
-import recoder.java.declaration.*;
-import recoder.java.declaration.modifier.*;
-import recoder.java.expression.*;
-import recoder.java.expression.literal.*;
-import recoder.java.expression.operator.*;
-import recoder.java.reference.*;
-import recoder.java.statement.*;
-import recoder.list.generic.ASTList;
-import recoder.util.StringUtils;
+package recoder.java;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import recoder.io.PropertyNames;
+import recoder.java.SourceElement.Position;
+import recoder.java.declaration.AnnotationDeclaration;
+import recoder.java.declaration.AnnotationElementValuePair;
+import recoder.java.declaration.AnnotationPropertyDeclaration;
+import recoder.java.declaration.AnnotationUseSpecification;
+import recoder.java.declaration.ClassDeclaration;
+import recoder.java.declaration.ClassInitializer;
+import recoder.java.declaration.EnumConstantDeclaration;
+import recoder.java.declaration.EnumConstantSpecification;
+import recoder.java.declaration.EnumDeclaration;
+import recoder.java.declaration.Extends;
+import recoder.java.declaration.FieldDeclaration;
+import recoder.java.declaration.Implements;
+import recoder.java.declaration.InterfaceDeclaration;
+import recoder.java.declaration.LocalVariableDeclaration;
+import recoder.java.declaration.MethodDeclaration;
+import recoder.java.declaration.ParameterDeclaration;
+import recoder.java.declaration.Throws;
+import recoder.java.declaration.TypeArgumentDeclaration;
+import recoder.java.declaration.TypeParameterDeclaration;
+import recoder.java.declaration.UnionTypeParameterDeclaration;
+import recoder.java.declaration.VariableDeclaration;
+import recoder.java.declaration.VariableSpecification;
+import recoder.java.declaration.modifier.Abstract;
+import recoder.java.declaration.modifier.Final;
+import recoder.java.declaration.modifier.Native;
+import recoder.java.declaration.modifier.Private;
+import recoder.java.declaration.modifier.Protected;
+import recoder.java.declaration.modifier.Public;
+import recoder.java.declaration.modifier.Static;
+import recoder.java.declaration.modifier.StrictFp;
+import recoder.java.declaration.modifier.Synchronized;
+import recoder.java.declaration.modifier.Transient;
+import recoder.java.declaration.modifier.Volatile;
+import recoder.java.expression.ArrayInitializer;
+import recoder.java.expression.Assignment;
+import recoder.java.expression.ElementValueArrayInitializer;
+import recoder.java.expression.Operator;
+import recoder.java.expression.ParenthesizedExpression;
+import recoder.java.expression.literal.BooleanLiteral;
+import recoder.java.expression.literal.CharLiteral;
+import recoder.java.expression.literal.DoubleLiteral;
+import recoder.java.expression.literal.FloatLiteral;
+import recoder.java.expression.literal.IntLiteral;
+import recoder.java.expression.literal.LongLiteral;
+import recoder.java.expression.literal.NullLiteral;
+import recoder.java.expression.literal.StringLiteral;
+import recoder.java.expression.operator.BinaryAnd;
+import recoder.java.expression.operator.BinaryAndAssignment;
+import recoder.java.expression.operator.BinaryNot;
+import recoder.java.expression.operator.BinaryOr;
+import recoder.java.expression.operator.BinaryOrAssignment;
+import recoder.java.expression.operator.BinaryXOr;
+import recoder.java.expression.operator.BinaryXOrAssignment;
+import recoder.java.expression.operator.Conditional;
+import recoder.java.expression.operator.CopyAssignment;
+import recoder.java.expression.operator.Divide;
+import recoder.java.expression.operator.DivideAssignment;
+import recoder.java.expression.operator.Equals;
+import recoder.java.expression.operator.GreaterOrEquals;
+import recoder.java.expression.operator.GreaterThan;
+import recoder.java.expression.operator.Instanceof;
+import recoder.java.expression.operator.LessOrEquals;
+import recoder.java.expression.operator.LessThan;
+import recoder.java.expression.operator.LogicalAnd;
+import recoder.java.expression.operator.LogicalNot;
+import recoder.java.expression.operator.LogicalOr;
+import recoder.java.expression.operator.Minus;
+import recoder.java.expression.operator.MinusAssignment;
+import recoder.java.expression.operator.Modulo;
+import recoder.java.expression.operator.ModuloAssignment;
+import recoder.java.expression.operator.Negative;
+import recoder.java.expression.operator.New;
+import recoder.java.expression.operator.NewArray;
+import recoder.java.expression.operator.NotEquals;
+import recoder.java.expression.operator.Plus;
+import recoder.java.expression.operator.PlusAssignment;
+import recoder.java.expression.operator.Positive;
+import recoder.java.expression.operator.PostDecrement;
+import recoder.java.expression.operator.PostIncrement;
+import recoder.java.expression.operator.PreDecrement;
+import recoder.java.expression.operator.PreIncrement;
+import recoder.java.expression.operator.ShiftLeft;
+import recoder.java.expression.operator.ShiftLeftAssignment;
+import recoder.java.expression.operator.ShiftRight;
+import recoder.java.expression.operator.ShiftRightAssignment;
+import recoder.java.expression.operator.Times;
+import recoder.java.expression.operator.TimesAssignment;
+import recoder.java.expression.operator.TypeCast;
+import recoder.java.expression.operator.UnsignedShiftRight;
+import recoder.java.expression.operator.UnsignedShiftRightAssignment;
+import recoder.java.reference.AnnotationPropertyReference;
+import recoder.java.reference.ArrayReference;
+import recoder.java.reference.EnumConstructorReference;
+import recoder.java.reference.FieldReference;
+import recoder.java.reference.MetaClassReference;
+import recoder.java.reference.MethodReference;
+import recoder.java.reference.PackageReference;
+import recoder.java.reference.SuperConstructorReference;
+import recoder.java.reference.SuperReference;
+import recoder.java.reference.ThisConstructorReference;
+import recoder.java.reference.ThisReference;
+import recoder.java.reference.TypeReference;
+import recoder.java.reference.UncollatedReferenceQualifier;
+import recoder.java.reference.VariableReference;
+import recoder.java.statement.Assert;
+import recoder.java.statement.Break;
+import recoder.java.statement.Case;
+import recoder.java.statement.Catch;
+import recoder.java.statement.Continue;
+import recoder.java.statement.Default;
+import recoder.java.statement.Do;
+import recoder.java.statement.Else;
+import recoder.java.statement.EmptyStatement;
+import recoder.java.statement.EnhancedFor;
+import recoder.java.statement.Finally;
+import recoder.java.statement.For;
+import recoder.java.statement.If;
+import recoder.java.statement.LabeledStatement;
+import recoder.java.statement.LoopStatement;
+import recoder.java.statement.Return;
+import recoder.java.statement.Switch;
+import recoder.java.statement.SynchronizedBlock;
+import recoder.java.statement.Then;
+import recoder.java.statement.Throw;
+import recoder.java.statement.Try;
+import recoder.java.statement.While;
+import recoder.util.StringUtils;
+
+/**
+ * A configurable pretty printer for Java source elements. The settings of the
+ * pretty printer are given by the current project settings and cannot be
+ * changed. Instances of this class are available from
+ * {@link recoder.ProgramFactory#getPrettyPrinter}. Remember to <CODE>close()
+ * </CODE> the writer once finished.
+ * 
+ * @author AL
+ */
 public class PrettyPrinter extends SourceVisitor implements PropertyNames {
-    private static final char[] BLANKS = new char[128];
-    private static final char[] FEEDS = new char[8];
 
-    static {
-        int i;
-        for (i = 0; i < FEEDS.length; i++)
-            FEEDS[i] = '\n';
-        for (i = 0; i < BLANKS.length; i++)
-            BLANKS[i] = ' ';
-    }
+    /**
+     * A snapshot of the system properties at creation time of this instance.
+     */
+    private Properties properties;
 
-    private final Properties properties;
+    /**
+     * The destination writer stream.
+     */
     private Writer out = null;
-    private int line = 1;
-    private int column = 1;
-    private int level = 0;
-    private final List<SingleLineComment> singleLineCommentWorkList = new ArrayList<SingleLineComment>();
-    private boolean isPrintingSingleLineComments = false;
-    private boolean hasJustPrintedComment = false;
-    private final SourceElement.Position overwritePosition;
-    private int indentation;
-    private boolean overwriteIndentation;
-    private boolean overwriteParsePositions;
 
+    /**
+     * Line number.
+     */
+    private int line = 1;
+
+    /**
+     * Column number. Used to keep track of indentations.
+     */
+    private int column = 1;
+
+    /**
+     * Level.
+     */
+    private int level = 0;
+
+    /**
+     * Worklist of single line comments that must be delayed till the next
+     * linefeed.
+     */
+    private List<SingleLineComment> singleLineCommentWorkList = new ArrayList<SingleLineComment>();
+
+    /**
+     * Flag to indicate if a single line comment is being put out. Needed to
+     * disable the worklist meanwhile.
+     */
+    private boolean isPrintingSingleLineComments = false;
+    
+    /**
+     * Flag to indicate that a single/multi line comment has just been printed and
+     * a line feed is mandatory. Needed if no relative start positions of PEs present:
+     * After a single line comment, there must always be a line feed; for multi line
+     * comments, we use a heuristic: print a line feed after a multi line comment that
+     * spans more than one line.
+     * 
+     */
+    private boolean hasJustPrintedComment = false;
+
+    /**
+     * Set up a pretty printer with given options. Note that it is not wise to
+     * change the options during pretty printing - nothing dangerous will
+     * happen, but the results might look strange. It can make sense to change
+     * options between source files, however.
+     */
     protected PrettyPrinter(Writer out, Properties props) {
-        this.overwritePosition = new SourceElement.Position(0, 0);
         setWriter(out);
-        this.properties = props;
+        properties = props;
         cacheFrequentlyUsed();
     }
 
+    /**
+     * Set a new stream to write to. Useful to redirect the output while
+     * retaining all other settings. Resets the current source positions and
+     * comments.
+     */
+    public void setWriter(Writer out) {
+        if (out == null) {
+            throw new IllegalArgumentException("Impossible to write to null");
+        }
+        this.out = out;
+        column = 1;
+        line = 1;
+        singleLineCommentWorkList.clear();
+        isPrintingSingleLineComments = false;
+    }
+
+    /**
+     * Gets the currently used writer. Be careful when using.
+     * 
+     * @return the currently used writer.
+     */
+    public Writer getWriter() {
+        return out;
+    }
+
+    /**
+     * Get current line number.
+     * 
+     * @return the line number, starting with 0.
+     */
+    public int getLine() {
+        return line;
+    }
+
+    /**
+     * Get current column number.
+     * 
+     * @return the column number, starting with 0.
+     */
+    public int getColumn() {
+        return column;
+    }
+
+    /**
+     * Get indentation level.
+     * 
+     * @return the int value.
+     */
+    public int getIndentationLevel() {
+        return level;
+    }
+
+    /**
+     * Set indentation level.
+     * 
+     * @param level
+     *            an int value.
+     */
+    public void setIndentationLevel(int level) {
+        this.level = level;
+    }
+
+    /**
+     * Get total indentation.
+     * 
+     * @return the int value.
+     */
+    public int getTotalIndentation() {
+        return indentation * level;
+    }
+
+    /**
+     * Change level.
+     * 
+     * @param delta
+     *            an int value.
+     */
+    public void changeLevel(int delta) {
+        level += delta;
+    }
+
+    private static char[] BLANKS = new char[128];
+
+    private static char[] FEEDS = new char[8];
+
+    static {
+        for (int i = 0; i < FEEDS.length; i++) {
+            FEEDS[i] = '\n';
+        }
+        for (int i = 0; i < BLANKS.length; i++) {
+            BLANKS[i] = ' ';
+        }
+    }
+    
+    /**
+     * Replace all unicode characters above ? by their explicit representation.
+     * @param str
+     *            the input string.
+     * @return the encoded string.
+     */
     protected static String encodeUnicodeChars(String str) {
         int len = str.length();
-        StringBuffer buf = new StringBuffer(len + 4);
-        for (int i = 0; i < len; i++) {
+        StringBuilder buf = new StringBuilder(len + 4);
+        for (int i = 0; i < len; i += 1) {
             char c = str.charAt(i);
-            if (c >= '\u0100') {
-                if (c < '\u1000') {
-                    buf.append("\\u0" + Integer.toString(c, 16));
-                } else {
-                    buf.append("\\u" + Integer.toString(c, 16));
-                }
+            // TODO Is that all ? 
+            // should be checked  by someone who knows a lot about unicode characters... 
+            if (c >= 0x0100 || c<= 0x001F ||
+            	(c >= 0x007F && c <= 0x009F)) {
+            	buf.append("\\u");
+            	if (c < 0x1000)
+            		buf.append("0");
+            	if (c < 0x100)
+            		buf.append("0");
+            	if (c < 0x10)
+            		buf.append("0");
+                buf.append(Integer.toString(c, 16));
             } else {
                 buf.append(c);
             }
@@ -67,51 +333,17 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         return buf.toString();
     }
 
-    public Writer getWriter() {
-        return this.out;
-    }
-
-    public void setWriter(Writer out) {
-        if (out == null)
-            throw new IllegalArgumentException("Impossible to write to null");
-        this.out = out;
-        this.column = 1;
-        this.line = 1;
-        this.singleLineCommentWorkList.clear();
-        this.isPrintingSingleLineComments = false;
-    }
-
-    public int getLine() {
-        return this.line;
-    }
-
-    public int getColumn() {
-        return this.column;
-    }
-
-    public int getIndentationLevel() {
-        return this.level;
-    }
-
-    public void setIndentationLevel(int level) {
-        this.level = level;
-    }
-
-    public int getTotalIndentation() {
-        return this.indentation * this.level;
-    }
-
-    public void changeLevel(int delta) {
-        this.level += delta;
-    }
-
+    /**
+     * Convenience method to write indentation chars.
+     */
     protected void printIndentation(int lf, int blanks) {
-        if (lf > 0)
+        if (lf > 0) {
             do {
                 int n = Math.min(lf, FEEDS.length);
                 print(FEEDS, 0, n);
                 lf -= n;
             } while (lf > 0);
+        }
         while (blanks > 0) {
             int n = Math.min(blanks, BLANKS.length);
             print(BLANKS, 0, n);
@@ -119,36 +351,58 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         }
     }
 
-    protected SourceElement.Position setElementIndentation(int minlf, int minblanks, SourceElement element) {
-        SourceElement.Position indent = element.getRelativePosition();
-        if (this.hasJustPrintedComment && element.getStartPosition() == SourceElement.Position.UNDEFINED && element.getStartPosition() == SourceElement.Position.UNDEFINED)
-            minlf = Math.max(1, minlf);
-        this.hasJustPrintedComment = false;
-        if (indent == SourceElement.Position.UNDEFINED) {
-            if (minlf > 0)
+    /**
+     * Shared and reused position object.
+     */
+    private Position overwritePosition = new Position(0, 0);
+
+    /**
+     * Sets the indentation of the specified element to at least the specified
+     * minimum.
+     * 
+     * @return the final relative position of the element.
+     */
+    protected Position setElementIndentation(int minlf, int minblanks, SourceElement element) {
+        Position indent = element.getRelativePosition();
+        if (hasJustPrintedComment) {
+        	minlf = Math.max(1, minlf);
+            hasJustPrintedComment = false;
+        } 
+        if (indent == Position.UNDEFINED) {
+            if (minlf > 0) {
                 minblanks += getTotalIndentation();
-            indent = new SourceElement.Position(minlf, minblanks);
-        } else if (this.overwriteIndentation) {
-            if (minlf > 0)
+            }
+            indent = new Position(minlf, minblanks);
+        } else if (overwriteIndentation) {
+            if (minlf > 0) {
                 minblanks += getTotalIndentation();
+            }
             indent.setPosition(minlf, minblanks);
         } else {
-            if (minlf > 0 && indent.getColumn() == 0 && indent.getLine() == 0)
+            if (minlf > 0 && indent.getColumn() == 0 && indent.getLine() == 0) {
                 indent.setLine(1);
-            if (indent.getLine() > 0 && !(element instanceof Comment))
+            }
+            if (indent.getLine() > 0 && !(element instanceof Comment)) { 
+                // do not change comment indentation!
                 minblanks += getTotalIndentation();
-            if (minblanks > indent.getColumn())
+            }
+            if (minblanks > indent.getColumn()) {
                 indent.setColumn(minblanks);
+            }
         }
         element.setRelativePosition(indent);
         return indent;
     }
 
+    /**
+     * Sets the indentation of the specified element to at least the specified
+     * minimum and writes it.
+     */
     protected void printElementIndentation(int minlf, int minblanks, SourceElement element) {
-        SourceElement.Position indent = setElementIndentation(minlf, minblanks, element);
+        Position indent = setElementIndentation(minlf, minblanks, element);
         printIndentation(indent.getLine(), indent.getColumn());
-        if (this.overwriteParsePositions) {
-            indent.setPosition(this.line, this.column);
+        if (overwriteParsePositions) {
+            indent.setPosition(line, column);
             element.setStartPosition(indent);
         }
     }
@@ -161,162 +415,320 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printElementIndentation(0, 0, element);
     }
 
+    /**
+     * Adds indentation for a program element if necessary and if required, but
+     * does not print the indentation itself.
+     */
     protected void printElement(int lf, int levelChange, int blanks, SourceElement elem) {
-        this.level += levelChange;
+        level += levelChange;
         setElementIndentation(lf, blanks, findFirstElementInclComment(elem));
         elem.accept(this);
     }
 
+    /**
+     * Write a source element.
+     * 
+     * @param lf
+     *            an int value.
+     * @param blanks
+     *            an int value.
+     * @param elem
+     *            a source element.
+     */
     protected void printElement(int lf, int blanks, SourceElement elem) {
         setElementIndentation(lf, blanks, findFirstElementInclComment(elem));
         elem.accept(this);
     }
 
+    /**
+     * Write source element.
+     * 
+     * @param blanks
+     *            an int value.
+     * @param elem
+     *            a source element.
+     */
     protected void printElement(int blanks, SourceElement elem) {
         setElementIndentation(0, blanks, findFirstElementInclComment(elem));
         elem.accept(this);
     }
 
+    /**
+     * Write source element.
+     * 
+     * @param elem
+     *            a source element.
+     */
     protected void printElement(SourceElement elem) {
         setElementIndentation(0, 0, findFirstElementInclComment(elem));
         elem.accept(this);
     }
 
-    protected void printProgramElementList(int firstLF, int levelChange, int firstBlanks, String separationSymbol, int separationLF, int separationBlanks, List<? extends ProgramElement> list) {
+    /**
+     * Write a complete ProgramElementList.
+     */
+    protected void printProgramElementList(int firstLF, int levelChange, int firstBlanks, String separationSymbol,
+            int separationLF, int separationBlanks, List<? extends ProgramElement> list) {
         int s = list.size();
-        if (s == 0)
+        if (s == 0) {
+        	level += levelChange;
             return;
+        }
         printElement(firstLF, levelChange, firstBlanks, list.get(0));
-        for (int i = 1; i < s; i++) {
+        for (int i = 1; i < s; i += 1) {
             print(separationSymbol);
             printElement(separationLF, separationBlanks, list.get(i));
         }
     }
 
+    /**
+     * Write a complete ProgramElementList using "Keyword" style.
+     * 
+     * @param list
+     *            a program element list.
+     */
     protected void printKeywordList(List<? extends ProgramElement> list) {
-        printProgramElementList(0, 0, 0, "", 0, 1, list);
+    	printProgramElementList(0, 0, 0, "", 0, 1, list);
     }
 
-    protected void printCommaList(int firstLF, int levelChange, int firstBlanks, List<? extends ProgramElement> list) {
+    protected void printCommaList(int firstLF, int levelChange, int firstBlanks, List<?extends ProgramElement> list) {
         printProgramElementList(firstLF, levelChange, firstBlanks, ",", 0, 1, list);
     }
 
+    /**
+     * Write comma list.
+     * 
+     * @param list
+     *            a program element list.
+     */
     protected void printCommaList(int separationBlanks, List<? extends ProgramElement> list) {
         printProgramElementList(0, 0, 0, ",", 0, separationBlanks, list);
     }
 
+    /**
+     * Write comma list.
+     * 
+     * @param list
+     *            a program element list.
+     */
     protected void printCommaList(List<? extends ProgramElement> list) {
-        printProgramElementList(0, 0, 0, ",", 0, 1, list);
+    	printProgramElementList(0, 0, 0, ",", 0, 1, list);
     }
 
+    /**
+     * Write a complete ProgramElementList using "Line" style.
+     */
     protected void printLineList(int firstLF, int levelChange, List<? extends ProgramElement> list) {
         printProgramElementList(firstLF, levelChange, 0, "", 1, 0, list);
     }
 
+    /**
+     * Write a complete ProgramElementList using "Block" style.
+     */
     protected void printBlockList(int firstLF, int levelChange, List<? extends ProgramElement> list) {
         printProgramElementList(firstLF, levelChange, 0, "", 2, 0, list);
     }
-
+    
     private void dumpComments() {
-        int size = this.singleLineCommentWorkList.size();
+        int size = singleLineCommentWorkList.size();
         if (size > 0) {
-            this.isPrintingSingleLineComments = true;
-            for (int i = 0; i < size; i++)
-                this.singleLineCommentWorkList.get(i).accept(this);
-            this.singleLineCommentWorkList.clear();
-            this.isPrintingSingleLineComments = false;
+            isPrintingSingleLineComments = true;
+            for (int i = 0; i < size; i++) {
+                singleLineCommentWorkList.get(i).accept(this);
+            }
+            singleLineCommentWorkList.clear();
+            isPrintingSingleLineComments = false;
         }
     }
 
+    /**
+     * Write a single character.
+     * 
+     * @param c
+     *            an int value.
+     * @exception PrettyPrintingException
+     *                wrapping an IOException.
+     */
     protected void print(int c) {
-        if (c == 10) {
-            if (!this.isPrintingSingleLineComments)
+        if (c == '\n') {
+            if (!isPrintingSingleLineComments) {
                 dumpComments();
-            this.column = 1;
-            this.line++;
+            }
+            column = 1;
+            line += 1;
         } else {
-            this.column++;
+            column += 1;
         }
         try {
-            this.out.write(c);
+            out.write(c);
         } catch (IOException ioe) {
             throw new PrettyPrintingException(ioe);
         }
     }
 
+    /**
+     * Write a sequence of characters.
+     * 
+     * @param cbuf
+     *            an array of char.
+     * @param off
+     *            an int value.
+     * @param len
+     *            an int value.
+     */
     protected void print(char[] cbuf, int off, int len) {
         boolean col = false;
-        for (int i = off + len - 1; i >= off; i--) {
+
+        for (int i = off + len - 1; i >= off; i -= 1) {
             if (cbuf[i] == '\n') {
-                if (!this.isPrintingSingleLineComments)
+                if (!isPrintingSingleLineComments) {
                     dumpComments();
-                this.line++;
+                }
+                line += 1;
                 if (!col) {
-                    this.column = off + len - 1 - i + 1;
+                    column = (off + len - 1 - i) + 1;
                     col = true;
                 }
             }
         }
-        if (!col)
-            this.column += len;
+        if (!col) {
+            column += len;
+            //int i;
+            //  for (i = off + len - 1; (i >= off && cbuf[i] != '\n'); i -= 1) ;
+            //  column = (i >= off) ? (off + len - 1 - i) : (column + len);
+        }
         try {
-            this.out.write(cbuf, off, len);
+            out.write(cbuf, off, len);
         } catch (IOException ioe) {
             throw new PrettyPrintingException(ioe);
         }
     }
 
+    /**
+     * Writes a string.
+     * 
+     * @param str
+     *            a string.
+     * @exception PrettyPrintingException
+     *                wrapping an IOException.
+     */
     protected void print(String str) {
         int i = str.lastIndexOf('\n');
         if (i >= 0) {
-            this.column = str.length() - i + 1 + 1;
+            column = str.length() - i + 1 + 1;
             do {
                 dumpComments();
-                this.line++;
+                line += 1;
                 i = str.lastIndexOf('\n', i - 1);
             } while (i >= 0);
         } else {
-            this.column += str.length();
+            column += str.length();
         }
         try {
-            this.out.write(str);
+            out.write(str);
         } catch (IOException ioe) {
             throw new PrettyPrintingException(ioe);
         }
     }
 
+    /**
+     * Indentation (cached).
+     */
+    private int indentation;
+
+    /*
+     * Wrap threshold (cached). private int wrap;
+     */
+
+    /**
+     * Overwrite indentation flag (cached).
+     */
+    private boolean overwriteIndentation;
+
+    /**
+     * Overwrite parse positions flag (cached).
+     */
+    private boolean overwriteParsePositions;
+
     public boolean getBooleanProperty(String key) {
-        return StringUtils.parseBooleanProperty(this.properties.getProperty(key));
+        return StringUtils.parseBooleanProperty(properties.getProperty(key));
     }
 
+    // parse and cache some important settings
     private void cacheFrequentlyUsed() {
-        this.indentation = Integer.parseInt(this.properties.getProperty("indentationAmount"));
-        if (this.indentation < 0)
+        indentation = Integer.parseInt(properties.getProperty(INDENTATION_AMOUNT));
+        if (indentation < 0) {
             throw new IllegalArgumentException("Negative indentation");
-        this.overwriteIndentation = getBooleanProperty("overwriteIndentation");
-        this.overwriteParsePositions = getBooleanProperty("overwriteParsePositions");
+        }
+        /*
+         * wrap = Integer.parseInt(properties.getProperty("wrappingThreshold"));
+         * if (wrap < 40) { throw new IllegalArgumentException("Wrapping
+         * threshold " + wrap + " is useless"); }
+         */
+        overwriteIndentation = getBooleanProperty(OVERWRITE_INDENTATION);
+        overwriteParsePositions = getBooleanProperty(OVERWRITE_PARSE_POSITIONS);
     }
 
+    /**
+     * Get indentation amount (blanks per level).
+     * 
+     * @return the value of getIntegerProperty("indentationAmount").
+     */
     protected int getIndentation() {
-        return this.indentation;
+        return indentation;
     }
 
+    /**
+     * Returns true if the pretty printer should also reformat existing code.
+     * 
+     * @return the value of the overwriteIndentation property.
+     */
     protected boolean isOverwritingIndentation() {
-        return this.overwriteIndentation;
+        return overwriteIndentation;
     }
 
+    /**
+     * Returns true if the pretty printer should reset the parse positions
+     * accordingly.
+     * 
+     * @return the value of the overwriteParsePositions property.
+     */
     protected boolean isOverwritingParsePositions() {
-        return this.overwriteParsePositions;
+        return overwriteParsePositions;
     }
 
+    /**
+     * Print program element header.
+     * 
+     * @param lf
+     *            an int value.
+     * @param blanks
+     *            an int value.
+     * @param elem
+     *            a program element.
+     */
     protected void printHeader(int lf, int blanks, ProgramElement elem) {
         printHeader(lf, 0, blanks, elem);
     }
 
+    /**
+     * Print program element header.
+     * 
+     * @param blanks
+     *            an int value.
+     * @param elem
+     *            a program element.
+     */
     protected void printHeader(int blanks, ProgramElement elem) {
         printHeader(0, 0, blanks, elem);
     }
 
+    /**
+     * Print program element header.
+     * 
+     * @param elem
+     *            a program element.
+     */
     protected void printHeader(ProgramElement elem) {
         printHeader(0, 0, 0, elem);
     }
@@ -324,54 +736,99 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     private SourceElement findFirstElementInclComment(SourceElement x) {
         if (!(x instanceof ProgramElement))
             return x.getFirstElement();
-        ASTList<Comment> aSTList = ((ProgramElement) x).getComments();
-        int s = (aSTList == null) ? 0 : aSTList.size();
+        List<Comment> cl = ((ProgramElement)x).getComments(); 
+        int s = cl == null ? 0 : cl.size();
         for (int i = 0; i < s; i++) {
-            Comment c = aSTList.get(i);
-            if (c.isPrefixed())
+            Comment c = cl.get(i);
+            if (c.isPrefixed()) {
                 return c;
+            }
         }
         return x.getFirstElement();
     }
-
+    
+    /**
+     * Print program element header.
+     * 
+     * @param lf
+     *            number of line feeds.
+     * @param levelChange
+     *            the level change.
+     * @param blanks
+     *            number of white spaces.
+     * @param x
+     *            the program element.
+     */
     protected void printHeader(int lf, int levelChange, int blanks, ProgramElement x) {
-        this.level += levelChange;
-        if (lf > 0)
+        level += levelChange;
+        if (lf > 0) {
             blanks += getTotalIndentation();
+        }
         SourceElement first = findFirstElementInclComment(x);
+
         setElementIndentation(lf, blanks, first);
-        this.hasJustPrintedComment = false;
+        /*
+         * Position indent = first.getRelativePosition(); 
+         * if (indent == Position.UNDEFINED) { 
+         *      indent = new Position(lf, blanks); 
+         * } else if (overwriteIndentation) { 
+         *      indent.setPosition(lf, blanks); 
+         * } else { 
+         *      if (lf > indent.getLine()) { 
+         *          indent.setLine(lf); 
+         *      } 
+         *      if (blanks > indent.getColumn()) { 
+         *          indent.setColumn(blanks); 
+         *      }
+         * }
+         * first.setRelativePosition(indent);
+         */
+        hasJustPrintedComment = false;
         int s = (x.getComments() != null) ? x.getComments().size() : 0;
-        for (int i = 0; i < s; i++) {
+        for (int i = 0; i < s; i += 1) {
             Comment c = x.getComments().get(i);
             if (c.isPrefixed()) {
                 c.accept(this);
-                this.hasJustPrintedComment = true;
             }
         }
     }
 
+    /**
+     * Sets end positions if required, and prints program element footer.
+     * 
+     * @param x
+     *            the program element.
+     */
     protected void printFooter(ProgramElement x) {
-        if (this.overwriteParsePositions) {
-            this.overwritePosition.setPosition(this.line, this.column);
-            x.setEndPosition(this.overwritePosition);
+        // also in visitComment!
+        if (overwriteParsePositions) {
+            overwritePosition.setPosition(line, column);
+            x.setEndPosition(overwritePosition);
         }
         int s = (x.getComments() != null) ? x.getComments().size() : 0;
-        for (int i = 0; i < s; i++) {
+        for (int i = 0; i < s; i += 1) {
             Comment c = x.getComments().get(i);
-            if (!c.isPrefixed() && !c.isContainerComment())
+            if (!c.isPrefixed() && !c.isContainerComment()) {
                 if (c instanceof SingleLineComment) {
-                    this.singleLineCommentWorkList.add((SingleLineComment) c);
+                    // Store until the next line feed is written.
+                    singleLineCommentWorkList.add((SingleLineComment) c);
                 } else {
                     c.accept(this);
                 }
+            }
         }
     }
 
+    /**
+     * 
+     * @param x
+     * @return true if any comment has been printed, false otherwise
+     */
     protected boolean printContainerComments(ProgramElement x) {
+        // TODO overwriteParsePositions???
         boolean commentPrinted = false;
         int s = (x.getComments() != null) ? x.getComments().size() : 0;
-        for (int i = 0; i < s; i++) {
+        for (int i = 0; i < s; i += 1) {
             Comment c = x.getComments().get(i);
             if (c.isContainerComment()) {
                 c.accept(this);
@@ -383,53 +840,58 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     }
 
     protected void printOperator(Operator x, String symbol) {
-        ASTList<SourceElement> aSTList = x.getArguments();
-        if (aSTList != null) {
+        List<Expression> children = x.getArguments();
+        if (children != null) {
             boolean addParentheses = x.isToBeParenthesized();
-            if (addParentheses)
-                print(40);
+            if (addParentheses) {
+                print('(');
+            }
             switch (x.getArity()) {
-                case 2:
-                    printElement(0, aSTList.get(0));
-                    if (getBooleanProperty("glueInfixOperators")) {
-                        printElementIndentation(0, x);
-                        print(symbol);
-                        printElement(aSTList.get(1));
-                        break;
-                    }
+            case 2:
+                printElement(0, children.get(0));
+                if (getBooleanProperty(GLUE_INFIX_OPERATORS)) {
+                    printElementIndentation(0, x);
+                    print(symbol);
+                    printElement(children.get(1));
+                } else {
                     printElementIndentation(1, x);
                     print(symbol);
-                    printElement(1, aSTList.get(1));
-                    break;
-                case 1:
-                    switch (x.getNotation()) {
-                        case 0:
-                            printElementIndentation(x);
-                            print(symbol);
-                            if (getBooleanProperty("glueUnaryOperators")) {
-                                printElement(0, aSTList.get(0));
-                                break;
-                            }
-                            printElement(1, aSTList.get(0));
-                            break;
-                        case 2:
-                            printElement(0, aSTList.get(0));
-                            if (getBooleanProperty("glueUnaryOperators")) {
-                                printElementIndentation(x);
-                                print(symbol);
-                                break;
-                            }
-                            printElementIndentation(1, x);
-                            print(symbol);
-                            break;
+                    printElement(1, children.get(1));
+                }
+                break;
+            case 1:
+                switch (x.getNotation()) {
+                case Operator.PREFIX:
+                    printElementIndentation(x);
+                    print(symbol);
+                    if (getBooleanProperty(GLUE_UNARY_OPERATORS)) {
+                        printElement(0, children.get(0));
+                    } else {
+                        printElement(1, children.get(0));
                     }
                     break;
+                case Operator.POSTFIX:
+                    printElement(0, children.get(0));
+                    if (getBooleanProperty(GLUE_UNARY_OPERATORS)) {
+                        printElementIndentation(x);
+                        print(symbol);
+                    } else {
+                        printElementIndentation(1, x);
+                        print(symbol);
+                    }
+                    break;
+                default:
+                    break;
+                }
             }
-            if (addParentheses)
-                print(41);
-            if (x instanceof Assignment && (
-                    (Assignment) x).getStatementContainer() != null)
-                print(59);
+            if (addParentheses) {
+                print(')');
+            }
+            if (x instanceof Assignment) {
+                if (((Assignment) x).getStatementContainer() != null) {
+                    print(';');
+                }
+            }
         }
     }
 
@@ -507,7 +969,7 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printElementIndentation(m, x);
         print("package");
         printElement(1, x.getPackageReference());
-        print(59);
+        print(';');
         printFooter(x);
     }
 
@@ -516,17 +978,19 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         if (x.getReferencePrefix() != null) {
             printElement(x.getReferencePrefix());
             printElementIndentation(x);
-            print(46);
+            print('.');
         }
-        if (x.getIdentifier() != null)
+        if (x.getIdentifier() != null) {
             printElement(x.getIdentifier());
-        if (x.getTypeArguments() != null && x.getTypeArguments().size() > 0) {
-            print(60);
-            printCommaList(x.getTypeArguments());
-            print(62);
         }
-        for (int i = 0; i < x.getDimensions(); i++)
+        if (x.getTypeArguments() != null && x.getTypeArguments().size() > 0) {
+        	print('<');
+        	printCommaList(x.getTypeArguments());
+        	print('>');
+        }
+        for (int i = 0; i < x.getDimensions(); i += 1) {
             print("[]");
+        }
         printFooter(x);
     }
 
@@ -535,10 +999,11 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         if (x.getReferencePrefix() != null) {
             printElement(x.getReferencePrefix());
             printElementIndentation(x);
-            print(46);
+            print('.');
         }
-        if (x.getIdentifier() != null)
+        if (x.getIdentifier() != null) {
             printElement(x.getIdentifier());
+        }
         printFooter(x);
     }
 
@@ -555,55 +1020,64 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     public void visitArrayInitializer(ArrayInitializer x) {
         printHeader(x);
         printElementIndentation(x);
-        print(123);
+        print('{');
         printContainerComments(x);
-        if (x.getArguments() != null)
+
+        if (x.getArguments() != null) {
             printCommaList(0, 0, 1, x.getArguments());
+        }
         if (x.getArguments() != null && x.getArguments().size() > 0 && x.getRelativePosition().getLine() > 0) {
             printIndentation(1, getTotalIndentation());
-            print(125);
+            print('}');
         } else {
             print(" }");
         }
         printFooter(x);
     }
-
+    
     public void visitElementValueArrayInitializer(ElementValueArrayInitializer x) {
-        printHeader(x);
-        printElementIndentation(x);
-        print(123);
-        if (x.getElementValues() != null)
-            printCommaList(0, 0, 1, x.getElementValues());
+    	printHeader(x);
+    	printElementIndentation(x);
+    	print('{');
+    	if (x.getElementValues() != null) {
+    		printCommaList(0, 0, 1, x.getElementValues());
+    	}
         if (x.getElementValues() != null && x.getElementValues().size() > 0 && x.getRelativePosition().getLine() > 0) {
             printIndentation(1, getTotalIndentation());
-            print(125);
+            print('}');
         } else {
             print(" }");
-        }
-        printFooter(x);
+        }    	
+    	printFooter(x);
     }
 
     public void visitCompilationUnit(CompilationUnit x) {
-        this.line = this.column = 1;
+        line = column = 1;
         printHeader(x);
         setIndentationLevel(0);
         boolean hasPackageSpec = (x.getPackageSpecification() != null);
-        if (hasPackageSpec)
+        if (hasPackageSpec) {
             printElement(x.getPackageSpecification());
-        boolean hasImports = (x.getImports() != null && x.getImports().size() > 0);
-        if (hasImports)
+        }
+        boolean hasImports = (x.getImports() != null) && (x.getImports().size() > 0);
+        if (hasImports) {
             printLineList((x.getPackageSpecification() != null) ? 2 : 1, 0, x.getImports());
-        if (x.getDeclarations() != null)
+        }
+        if (x.getDeclarations() != null) {
             printBlockList((hasImports || hasPackageSpec) ? 2 : 0, 0, x.getDeclarations());
+        }
         printFooter(x);
+        // we do this linefeed here to allow flushing of the pretty printer
+        // single line comment work list
         printIndentation(1, 0);
     }
-
+    
     public void visitClassDeclaration(ClassDeclaration x) {
         printHeader(x);
         int m = 0;
-        if (x.getDeclarationSpecifiers() != null)
+        if (x.getDeclarationSpecifiers() != null) {
             m = x.getDeclarationSpecifiers().size();
+        }
         if (m > 0) {
             printKeywordList(x.getDeclarationSpecifiers());
             m = 1;
@@ -614,36 +1088,40 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
             printElement(1, x.getIdentifier());
         }
         if (x.getTypeParameters() != null && x.getTypeParameters().size() > 0) {
-            print("<");
-            printCommaList(x.getTypeParameters());
-            print("> ");
+        	print("<");
+        	printCommaList(x.getTypeParameters());
+        	print("> ");
         }
-        if (x.getExtendedTypes() != null)
+        if (x.getExtendedTypes() != null) {
             printElement(1, x.getExtendedTypes());
-        if (x.getImplementedTypes() != null)
+        }
+        if (x.getImplementedTypes() != null) {
             printElement(1, x.getImplementedTypes());
-        if (x.getIdentifier() != null)
-            print(32);
-        print(123);
+        }
+        if (x.getIdentifier() != null) {
+            print(' ');
+        }
+        print('{');
         printContainerComments(x);
         if (x.getMembers() != null && !x.getMembers().isEmpty()) {
             printBlockList(2, 1, x.getMembers());
             changeLevel(-1);
         }
         printIndentation(1, getTotalIndentation());
-        print(125);
+        print('}');
         printFooter(x);
     }
-
+    
     public void visitInterfaceDeclaration(InterfaceDeclaration x) {
-        visitInterfaceDeclaration(x, false);
+    	visitInterfaceDeclaration(x, false);
     }
 
     private void visitInterfaceDeclaration(InterfaceDeclaration x, boolean annotation) {
         printHeader(x);
         int m = 0;
-        if (x.getDeclarationSpecifiers() != null)
+        if (x.getDeclarationSpecifiers() != null) {
             m = x.getDeclarationSpecifiers().size();
+        }
         if (m > 0) {
             printKeywordList(x.getDeclarationSpecifiers());
             m = 1;
@@ -651,29 +1129,31 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         if (x.getIdentifier() != null) {
             printElementIndentation(m, x);
             if (annotation)
-                print("@");
+            	print("@");
             print("interface");
             printElement(1, x.getIdentifier());
         }
         if (x.getTypeParameters() != null && x.getTypeParameters().size() > 0) {
-            print("<");
-            printCommaList(x.getTypeParameters());
-            print("> ");
+        	print("<");
+        	printCommaList(x.getTypeParameters());
+        	print("> ");
         }
-        if (x.getExtendedTypes() != null)
+        if (x.getExtendedTypes() != null) {
             printElement(1, x.getExtendedTypes());
+        }
         print(" {");
+        printContainerComments(x);
         if (x.getMembers() != null && !x.getMembers().isEmpty()) {
             printBlockList(2, 1, x.getMembers());
             changeLevel(-1);
         }
         printIndentation(1, getTotalIndentation());
-        print(125);
+        print('}');
         printFooter(x);
     }
-
+    
     public void visitAnnotationDeclaration(AnnotationDeclaration x) {
-        visitInterfaceDeclaration(x, true);
+    	visitInterfaceDeclaration(x, true);
     }
 
     public void visitFieldDeclaration(FieldDeclaration x) {
@@ -685,9 +1165,10 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         }
         printElement((m > 0) ? 1 : 0, x.getTypeReference());
         List<? extends VariableSpecification> varSpecs = x.getVariables();
-        if (varSpecs != null)
+        if (varSpecs != null) {
             printCommaList(0, 0, 1, varSpecs);
-        print(59);
+        }
+        print(';');
         printFooter(x);
     }
 
@@ -700,17 +1181,19 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         }
         printElement((m > 0) ? 1 : 0, x.getTypeReference());
         List<? extends VariableSpecification> varSpecs = x.getVariables();
-        if (varSpecs != null)
+        if (varSpecs != null) {
             printCommaList(0, 0, 1, varSpecs);
-        if (!(x.getStatementContainer() instanceof recoder.java.statement.LoopStatement))
-            print(59);
+        }
+        if (!(x.getStatementContainer() instanceof LoopStatement)) {
+            print(';');
+        }
         printFooter(x);
     }
-
+    
     protected void visitVariableDeclaration(VariableDeclaration x) {
-        visitVariableDeclaration(x, false);
+    	visitVariableDeclaration(x, false);
     }
-
+    
     protected void visitVariableDeclaration(VariableDeclaration x, boolean spec) {
         printHeader(x);
         int m = 0;
@@ -719,11 +1202,14 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
             printKeywordList(x.getDeclarationSpecifiers());
         }
         printElement((m > 0) ? 1 : 0, x.getTypeReference());
-        if (spec)
-            print(" ...");
+        if (spec) {
+        	print(" ...");
+        	//printElement(spec);
+        }
         List<? extends VariableSpecification> varSpecs = x.getVariables();
-        if (varSpecs != null)
+        if (varSpecs != null) {
             printCommaList(0, 0, 1, varSpecs);
+        }
         printFooter(x);
     }
 
@@ -735,15 +1221,14 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
             printKeywordList(x.getDeclarationSpecifiers());
         }
         if (x.getTypeParameters() != null && x.getTypeParameters().size() > 0) {
-            if (m > 0) {
-                print(32);
-            } else {
-                printElementIndentation(x);
-            }
-            print(60);
-            printCommaList(x.getTypeParameters());
-            print(62);
-            m = 1;
+        	if (m > 0)
+        		print(' ');
+        	else 
+        		printElementIndentation(x); 
+        	print('<');
+        	printCommaList(x.getTypeParameters());
+        	print('>');
+        	m = 1; // print another blank afterwards
         }
         if (x.getTypeReference() != null) {
             if (m > 0) {
@@ -752,26 +1237,29 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
                 printElement(x.getTypeReference());
             }
             printElement(1, x.getIdentifier());
-        } else if (m > 0) {
-            printElement(1, x.getIdentifier());
         } else {
-            printElement(x.getIdentifier());
+            if (m > 0) {
+                printElement(1, x.getIdentifier());
+            } else {
+                printElement(x.getIdentifier());
+            }
         }
-        if (getBooleanProperty("glueParameterLists")) {
-            print(40);
+        if (getBooleanProperty(GLUE_PARAMETER_LISTS)) {
+            print('(');
         } else {
             print(" (");
         }
         if (x.getParameters() != null) {
-            ASTList aSTList = x.getParameters();
-            printCommaList(getBooleanProperty("glueParameters") ? 0 : 1, (List<? extends ProgramElement>) aSTList);
+        	List<? extends ParameterDeclaration> params = x.getParameters();
+            printCommaList(getBooleanProperty(GLUE_PARAMETERS) ? 0 : 1, params);
         }
-        print(41);
-        if (x.getThrown() != null)
+        print(')');
+        if (x.getThrown() != null) {
             printElement(1, x.getThrown());
+        }
         if (x instanceof AnnotationPropertyDeclaration) {
-            AnnotationPropertyDeclaration apd = (AnnotationPropertyDeclaration) x;
-            Expression e = apd.getDefaultValueExpression();
+            AnnotationPropertyDeclaration apd = (AnnotationPropertyDeclaration)x;
+            Expression e = apd.getDefaultValueExpression(); 
             if (e != null) {
                 print(" default ");
                 e.accept(this);
@@ -780,11 +1268,11 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         if (x.getBody() != null) {
             printElement(1, x.getBody());
         } else {
-            print(59);
+            print(';');
         }
         printFooter(x);
     }
-
+    
     public void visitClassInitializer(ClassInitializer x) {
         printHeader(x);
         int m = 0;
@@ -792,32 +1280,35 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
             m = x.getDeclarationSpecifiers().size();
             printKeywordList(x.getDeclarationSpecifiers());
         }
-        if (x.getBody() != null)
-            printElement((m > 0) ? 1 : 0, x.getBody());
+        if (x.getBody() != null) {
+            printElement(m > 0 ? 1 : 0, x.getBody());
+        }
         printFooter(x);
     }
 
     public void visitStatementBlock(StatementBlock x) {
         printHeader(x);
         printElementIndentation(x);
-        print(123);
+        print('{');
         boolean doNotPossiblyPrintIndentation = printContainerComments(x);
         if (x.getBody() != null && x.getBody().size() > 0) {
-            printLineList(1, 1, x.getBody());
+            printLineList(1, +1, x.getBody());
             changeLevel(-1);
-            SourceElement.Position firstStatementEndPosition = x.getBody().get(0).getEndPosition();
-            SourceElement.Position blockEndPosition = x.getEndPosition();
-            if (x.getBody().size() > 1 || firstStatementEndPosition.equals(SourceElement.Position.UNDEFINED) || blockEndPosition.equals(SourceElement.Position.UNDEFINED) || firstStatementEndPosition.getLine() < blockEndPosition.getLine()) {
+            Position firstStatementEndPosition = x.getBody().get(0).getEndPosition();
+            Position blockEndPosition = x.getEndPosition();
+            if (x.getBody().size() > 1 || firstStatementEndPosition.equals(Position.UNDEFINED)
+                    || blockEndPosition.equals(Position.UNDEFINED)
+                    || firstStatementEndPosition.getLine() < blockEndPosition.getLine())
                 printIndentation(1, getTotalIndentation());
-            } else {
+            else
                 printIndentation(0, blockEndPosition.getColumn() - firstStatementEndPosition.getColumn() - 1);
-            }
         } else if (!doNotPossiblyPrintIndentation) {
+            // keep old indentation
             int lf = x.getEndPosition().getLine() - x.getStartPosition().getLine();
             if (lf > 0)
                 printIndentation(lf, getIndentation());
         }
-        print(125);
+        print('}');
         printFooter(x);
     }
 
@@ -825,9 +1316,10 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printHeader(x);
         printElementIndentation(x);
         print("break");
-        if (x.getIdentifier() != null)
+        if (x.getIdentifier() != null) {
             printElement(1, x.getIdentifier());
-        print(59);
+        }
+        print(';');
         printFooter(x);
     }
 
@@ -835,9 +1327,10 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printHeader(x);
         printElementIndentation(x);
         print("continue");
-        if (x.getIdentifier() != null)
+        if (x.getIdentifier() != null) {
             printElement(1, x.getIdentifier());
-        print(59);
+        }
+        print(';');
         printFooter(x);
     }
 
@@ -845,9 +1338,10 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printHeader(x);
         printElementIndentation(x);
         print("return");
-        if (x.getExpression() != null)
+        if (x.getExpression() != null) {
             printElement(1, x.getExpression());
-        print(59);
+        }
+        print(';');
         printFooter(x);
     }
 
@@ -855,9 +1349,10 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printHeader(x);
         printElementIndentation(x);
         print("throw");
-        if (x.getExpression() != null)
+        if (x.getExpression() != null) {
             printElement(1, x.getExpression());
-        print(59);
+        }
+        print(';');
         printFooter(x);
     }
 
@@ -866,33 +1361,40 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printElementIndentation(x);
         print("do");
         if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
-            print(59);
-        } else if (getBooleanProperty("glueStatementBlocks")) {
-            printElement(1, x.getBody());
-        } else if (x.getBody() instanceof StatementBlock) {
-            printElement(1, 0, x.getBody());
+            print(';');
+            //w.printElement(1, body);
         } else {
-            printElement(1, 1, 0, x.getBody());
-            changeLevel(-1);
+            if (getBooleanProperty(GLUE_STATEMENT_BLOCKS)) {
+                printElement(1, x.getBody());
+            } else {
+                if (x.getBody() instanceof StatementBlock) {
+                    printElement(1, 0, x.getBody());
+                } else {
+                    printElement(1, +1, 0, x.getBody());
+                    changeLevel(-1);
+                }
+            }
         }
-        if (getBooleanProperty("glueStatementBlocks")) {
+        if (getBooleanProperty(GLUE_STATEMENT_BLOCKS)) {
             print(" while");
         } else {
             printIndentation(1, getTotalIndentation());
             print("while");
         }
-        if (getBooleanProperty("glueParameterLists")) {
-            print(40);
+        if (getBooleanProperty(GLUE_PARAMETER_LISTS)) {
+            print('(');
         } else {
             print(" (");
         }
         if (x.getGuard() != null) {
-            boolean glueExprParentheses = getBooleanProperty("glueExpressionParentheses");
-            if (!glueExprParentheses)
-                print(32);
+            boolean glueExprParentheses = getBooleanProperty(GLUE_EXPRESSION_PARENTHESES);
+            if (!glueExprParentheses) {
+                print(' ');
+            }
             printElement(x.getGuard());
-            if (!glueExprParentheses)
-                print(32);
+            if (!glueExprParentheses) {
+                print(' ');
+            }
         }
         print(");");
         printFooter(x);
@@ -901,81 +1403,100 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     public void visitFor(For x) {
         printHeader(x);
         printElementIndentation(x);
-        print(getBooleanProperty("glueControlExpressions") ? "for(" : "for (");
-        boolean glueExprParentheses = getBooleanProperty("glueExpressionParentheses");
-        if (!glueExprParentheses)
-            print(32);
-        if (x.getInitializers() != null)
+        print(getBooleanProperty(GLUE_CONTROL_EXPRESSIONS) ? "for(" : "for (");
+        boolean glueExprParentheses = getBooleanProperty(GLUE_EXPRESSION_PARENTHESES);
+        if (!glueExprParentheses) {
+            print(' ');
+        }
+        if (x.getInitializers() != null) {
             printCommaList(x.getInitializers());
-        print(59);
-        if (x.getGuard() != null)
+        }
+        print(';');
+        if (x.getGuard() != null) {
             printElement(1, x.getGuard());
-        print(59);
-        if (x.getUpdates() != null)
+        }
+        print(';');
+        if (x.getUpdates() != null) {
             printCommaList(0, 0, 1, x.getUpdates());
-        if (!glueExprParentheses)
-            print(32);
-        print(41);
+        }
+        if (!glueExprParentheses) {
+            print(' ');
+        }
+        print(')');
         if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
-            print(59);
-        } else if (getBooleanProperty("glueStatementBlocks")) {
-            printElement(1, x.getBody());
-        } else if (x.getBody() instanceof StatementBlock) {
-            printElement(1, 0, x.getBody());
+            print(';');
         } else {
-            printElement(1, 1, 0, x.getBody());
-            changeLevel(-1);
+            if (getBooleanProperty(GLUE_STATEMENT_BLOCKS)) {
+                printElement(1, x.getBody());
+            } else {
+                if (x.getBody() instanceof StatementBlock) {
+                    printElement(1, 0, x.getBody());
+                } else {
+                    printElement(1, +1, 0, x.getBody());
+                    changeLevel(-1);
+                }
+            }
         }
         printFooter(x);
     }
-
+    
     public void visitEnhancedFor(EnhancedFor x) {
         printHeader(x);
         printElementIndentation(x);
-        print(getBooleanProperty("glueControlExpressions") ? "for(" : "for (");
-        boolean glueExprParentheses = getBooleanProperty("glueExpressionParentheses");
-        if (!glueExprParentheses)
-            print(32);
-        printCommaList(x.getInitializers());
-        print(58);
-        printElement(1, x.getGuard());
-        if (!glueExprParentheses)
-            print(32);
-        print(41);
-        if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
-            print(59);
-        } else if (getBooleanProperty("glueStatementBlocks")) {
-            printElement(1, x.getBody());
-        } else {
-            printElement(1, 1, 0, x.getBody());
-            changeLevel(-1);
+        print(getBooleanProperty(GLUE_CONTROL_EXPRESSIONS) ? "for(" : "for (");
+        boolean glueExprParentheses = getBooleanProperty(GLUE_EXPRESSION_PARENTHESES);
+        if (!glueExprParentheses) {
+            print(' ');
         }
+        printCommaList(x.getInitializers()); // must not be null for enhanced for loop
+        print(':');
+        printElement(1, x.getGuard()); // must not be null for enhanced for loop
+        if (!glueExprParentheses) {
+            print (' ');
+        }
+        print(')');
+        if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
+            print(';');
+        } else {
+            if (getBooleanProperty(GLUE_STATEMENT_BLOCKS)) {
+                printElement(1, x.getBody());
+            } else { 
+                printElement(1, +1, 0, x.getBody());
+                changeLevel(-1);
+            }
+    	}
         printFooter(x);
     }
 
     public void visitWhile(While x) {
         printHeader(x);
         printElementIndentation(x);
-        print(getBooleanProperty("glueControlExpressions") ? "while(" : "while (");
-        boolean glueExpParentheses = getBooleanProperty("glueExpressionParentheses");
-        if (!glueExpParentheses)
-            print(32);
-        if (x.getGuard() != null)
+        print(getBooleanProperty(GLUE_CONTROL_EXPRESSIONS) ? "while(" : "while (");
+        boolean glueExpParentheses = getBooleanProperty(GLUE_EXPRESSION_PARENTHESES);
+        if (!glueExpParentheses) {
+            print(' ');
+        }
+        if (x.getGuard() != null) {
             printElement(x.getGuard());
+        }
         if (glueExpParentheses) {
-            print(41);
+            print(')');
         } else {
             print(" )");
         }
         if (x.getBody() == null || x.getBody() instanceof EmptyStatement) {
-            print(59);
-        } else if (getBooleanProperty("glueStatementBlocks")) {
-            printElement(1, x.getBody());
-        } else if (x.getBody() instanceof StatementBlock) {
-            printElement(1, 0, x.getBody());
+            print(';');
         } else {
-            printElement(1, 1, 0, x.getBody());
-            changeLevel(-1);
+            if (getBooleanProperty(GLUE_STATEMENT_BLOCKS)) {
+                printElement(1, x.getBody());
+            } else {
+                if (x.getBody() instanceof StatementBlock) {
+                    printElement(1, 0, x.getBody());
+                } else {
+                    printElement(1, +1, 0, x.getBody());
+                    changeLevel(-1);
+                }
+            }
         }
         printFooter(x);
     }
@@ -984,47 +1505,53 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printHeader(x);
         printElementIndentation(x);
         print("assert");
-        if (x.getCondition() != null)
+        if (x.getCondition() != null) {
             printElement(1, x.getCondition());
+        }
         if (x.getMessage() != null) {
             print(" :");
             printElement(1, x.getMessage());
         }
-        print(59);
+        print(';');
         printFooter(x);
     }
 
     public void visitIf(If x) {
         printHeader(x);
         printElementIndentation(x);
-        print(getBooleanProperty("glueControlExpressions") ? "if(" : "if (");
-        boolean glueExpr = getBooleanProperty("glueExpressionParentheses");
-        if (x.getExpression() != null)
+        print(getBooleanProperty(GLUE_CONTROL_EXPRESSIONS) ? "if(" : "if (");
+        boolean glueExpr = getBooleanProperty(GLUE_EXPRESSION_PARENTHESES);
+        if (x.getExpression() != null) {
             if (glueExpr) {
                 printElement(x.getExpression());
             } else {
                 printElement(1, x.getExpression());
             }
+        }
         if (glueExpr) {
-            print(41);
+            print(')');
         } else {
             print(" )");
         }
-        if (x.getThen() != null)
-            if (getBooleanProperty("glueStatementBlocks")) {
+        if (x.getThen() != null) {
+            if (getBooleanProperty(GLUE_STATEMENT_BLOCKS)) {
                 printElement(1, x.getThen());
-            } else if (x.getThen().getBody() instanceof StatementBlock) {
-                printElement(1, 0, x.getThen());
             } else {
-                printElement(1, 1, 0, x.getThen());
-                changeLevel(-1);
+                if (x.getThen().getBody() instanceof StatementBlock) {
+                    printElement(1, 0, x.getThen());
+                } else {
+                    printElement(1, +1, 0, x.getThen());
+                    changeLevel(-1);
+                }
             }
-        if (x.getElse() != null)
-            if (getBooleanProperty("glueSequentialBranches")) {
+        }
+        if (x.getElse() != null) {
+            if (getBooleanProperty(GLUE_SEQUENTIAL_BRANCHES)) {
                 printElement(1, x.getElse());
             } else {
                 printElement(1, 0, x.getElse());
             }
+        }
         printFooter(x);
     }
 
@@ -1032,18 +1559,20 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printHeader(x);
         printElementIndentation(x);
         print("switch (");
-        if (x.getExpression() != null)
+        if (x.getExpression() != null) {
             printElement(x.getExpression());
+        }
         print(") {");
-        if (x.getBranchList() != null)
-            if (getBooleanProperty("glueSequentialBranches")) {
-                printLineList(1, 1, x.getBranchList());
+        if (x.getBranchList() != null) {
+            if (getBooleanProperty(GLUE_SEQUENTIAL_BRANCHES)) {
+                printLineList(1, +1, x.getBranchList());
                 changeLevel(-1);
             } else {
                 printLineList(1, 0, x.getBranchList());
             }
+        }
         printIndentation(1, getTotalIndentation());
-        print(125);
+        print('}');
         printFooter(x);
     }
 
@@ -1051,31 +1580,40 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printHeader(x);
         printElementIndentation(x);
         print("try");
-        if (x.getBody() != null)
-            if (getBooleanProperty("glueStatementBlocks")) {
+    	if (x.getVariableDeclarations() != null) {
+    		print("(");
+    		printProgramElementList(0, 0, 0, "", 0, 1, x.getVariableDeclarations());
+    		print(")");
+    	}
+        if (x.getBody() != null) {
+            if (getBooleanProperty(GLUE_STATEMENT_BLOCKS)) {
                 printElement(1, x.getBody());
             } else {
                 printElement(1, 0, x.getBody());
             }
-        if (x.getBranchList() != null)
-            if (getBooleanProperty("glueSequentialBranches")) {
-                for (int i = 0; i < x.getBranchList().size(); i++)
+        }
+        if (x.getBranchList() != null) {
+            if (getBooleanProperty(GLUE_SEQUENTIAL_BRANCHES)) {
+                for (int i = 0; i < x.getBranchList().size(); i++) {
                     printElement(1, x.getBranchList().get(i));
+                }
             } else {
                 printLineList(1, 0, x.getBranchList());
             }
+        }
         printFooter(x);
     }
-
+    
     public void visitLabeledStatement(LabeledStatement x) {
         printHeader(x);
         if (x.getIdentifier() != null) {
             printElement(x.getIdentifier());
             printElementIndentation(x);
-            print(58);
+            print(':');
         }
-        if (x.getBody() != null)
+        if (x.getBody() != null) {
             printElement(1, 0, x.getBody());
+        }
         printFooter(x);
     }
 
@@ -1084,12 +1622,13 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printElementIndentation(x);
         print("synchronized");
         if (x.getExpression() != null) {
-            print(40);
+            print('(');
             printElement(x.getExpression());
-            print(41);
+            print(')');
         }
-        if (x.getBody() != null)
+        if (x.getBody() != null) {
             printElement(1, x.getBody());
+        }
         printFooter(x);
     }
 
@@ -1107,20 +1646,21 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
                 print(".");
                 printElement(x.getStaticIdentifier());
             }
-            print(59);
+            print(';');
         }
         printFooter(x);
     }
-
+    
     public void visitUncollatedReferenceQualifier(UncollatedReferenceQualifier x) {
         printHeader(x);
         if (x.getReferencePrefix() != null) {
             printElement(x.getReferencePrefix());
             printElementIndentation(x);
-            print(46);
+            print('.');
         }
-        if (x.getIdentifier() != null)
+        if (x.getIdentifier() != null) {
             printElement(x.getIdentifier());
+        }
         printFooter(x);
     }
 
@@ -1147,10 +1687,11 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     public void visitVariableSpecification(VariableSpecification x) {
         printHeader(x);
         printElement(x.getIdentifier());
-        for (int i = 0; i < x.getDimensions(); i++)
+        for (int i = 0; i < x.getDimensions(); i += 1) {
             print("[]");
+        }
         if (x.getInitializer() != null) {
-            print(" = ");
+            print(" =");
             printElement(0, 0, 1, x.getInitializer());
         }
         printFooter(x);
@@ -1280,15 +1821,17 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printHeader(x);
         boolean addParentheses = x.isToBeParenthesized();
         if (x.getArguments() != null) {
-            if (addParentheses)
-                print(40);
+            if (addParentheses) {
+                print('(');
+            }
             printElement(0, x.getArguments().get(0));
             print(" ?");
             printElement(1, x.getArguments().get(1));
             print(" :");
             printElement(1, x.getArguments().get(2));
-            if (addParentheses)
-                print(41);
+            if (addParentheses) {
+                print(')');
+            }
         }
         printFooter(x);
     }
@@ -1338,86 +1881,114 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     public void visitNewArray(NewArray x) {
         printHeader(x);
         boolean addParentheses = x.isToBeParenthesized();
-        if (addParentheses)
-            print(40);
+        if (addParentheses) {
+            print('(');
+        }
         printElementIndentation(x);
         print("new");
         printElement(1, x.getTypeReference());
         int i = 0;
-        if (x.getArguments() != null)
-            for (; i < x.getArguments().size(); i++) {
-                print(91);
+        if (x.getArguments() != null) {
+            for (; i < x.getArguments().size(); i += 1) {
+                print('[');
                 printElement(x.getArguments().get(i));
-                print(93);
+                print(']');
             }
-        for (; i < x.getDimensions(); i++)
+        }
+        for (; i < x.getDimensions(); i += 1) {
             print("[]");
-        if (x.getArrayInitializer() != null)
+        }
+        if (x.getArrayInitializer() != null) {
             printElement(1, x.getArrayInitializer());
-        if (addParentheses)
-            print(41);
+        }
+        if (addParentheses) {
+            print(')');
+        }
         printFooter(x);
     }
 
     public void visitInstanceof(Instanceof x) {
         printHeader(x);
         boolean addParentheses = x.isToBeParenthesized();
-        if (addParentheses)
-            print(40);
-        if (x.getArguments() != null)
+        if (addParentheses) {
+            print('(');
+        }
+        if (x.getArguments() != null) {
             printElement(0, x.getArguments().get(0));
+        }
         printElementIndentation(1, x);
         print("instanceof");
-        if (x.getTypeReference() != null)
+        if (x.getTypeReference() != null) {
             printElement(1, x.getTypeReference());
-        if (addParentheses)
-            print(41);
+        }
+        if (addParentheses) {
+            print(')');
+        }
         printFooter(x);
     }
 
     public void visitNew(New x) {
         printHeader(x);
         boolean addParentheses = x.isToBeParenthesized();
-        if (addParentheses)
-            print(40);
+        if (addParentheses) {
+            print('(');
+        }
         if (x.getReferencePrefix() != null) {
             printElement(0, x.getReferencePrefix());
-            print(46);
+            print('.');
         }
         printElementIndentation(x);
         print("new");
+        
+        if (x.getConstructorRefTypeArguments() != null && x.getConstructorRefTypeArguments().size() > 0) {
+        	print('<');
+        	printCommaList(x.getConstructorRefTypeArguments());
+        	print('>');
+        }
+        
         printElement(1, x.getTypeReference());
-        if (getBooleanProperty("glueParameterLists")) {
-            print(40);
+        if (x.withDiamondOperator()) {
+        	print("<>");
+        }
+        if (getBooleanProperty(GLUE_PARAMETER_LISTS)) {
+            print('(');
         } else {
             print(" (");
         }
-        if (x.getArguments() != null)
+        if (x.getArguments() != null) {
             printCommaList(x.getArguments());
-        print(41);
-        if (x.getClassDeclaration() != null)
+        }
+        print(')');
+        if (x.getClassDeclaration() != null) {
             printElement(1, x.getClassDeclaration());
-        if (addParentheses)
-            print(41);
-        if (x.getStatementContainer() != null)
-            print(59);
+        }
+        if (addParentheses) {
+            print(')');
+        }
+        if (x.getStatementContainer() != null) {
+            print(';');
+        }
         printFooter(x);
     }
 
     public void visitTypeCast(TypeCast x) {
         printHeader(x);
         boolean addParentheses = x.isToBeParenthesized();
-        if (addParentheses)
-            print(40);
+        if (addParentheses) {
+            print('(');
+        }
         printElementIndentation(x);
-        print(40);
-        if (x.getTypeReference() != null)
+        print('(');
+        if (x.getTypeReference() != null) {
             printElement(0, x.getTypeReference());
-        print(41);
-        if (x.getArguments() != null)
+        }
+        print(')');
+        if (x.getArguments() != null) {
             printElement(0, x.getArguments().get(0));
-        if (addParentheses)
-            print(41);
+        }
+        if (addParentheses) {
+            print(')');
+        }
         printFooter(x);
     }
 
@@ -1458,9 +2029,24 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     }
 
     public void visitPlus(Plus x) {
-        printHeader(x);
-        printOperator(x, "+");
-        printFooter(x);
+    	ArrayList<Plus> plusses = new ArrayList<Plus>();
+    	printHeader(x);
+    	while (x.getArguments().get(0) instanceof Plus) {
+    		plusses.add(x);
+    		x = (Plus)x.getArguments().get(0);
+    	}
+    	for (Plus p: plusses) {
+    		printHeader(p);
+    	}
+    	printOperator(x, "+");
+    	Collections.reverse(plusses);
+    	for (Plus p: plusses) {
+    		int indent = getBooleanProperty(GLUE_INFIX_OPERATORS) ? 0 : 1;
+    		printElementIndentation(indent, x);
+    		print("+");
+    		printElement(indent, p.getArguments().get(1));
+    		printFooter(p);
+    	}
     }
 
     public void visitPositive(Positive x) {
@@ -1495,14 +2081,15 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
 
     public void visitArrayReference(ArrayReference x) {
         printHeader(x);
-        if (x.getReferencePrefix() != null)
+        if (x.getReferencePrefix() != null) {
             printElement(x.getReferencePrefix());
+        }
         if (x.getDimensionExpressions() != null) {
             int s = x.getDimensionExpressions().size();
-            for (int i = 0; i < s; i++) {
-                print(91);
+            for (int i = 0; i < s; i += 1) {
+                print('[');
                 printElement(x.getDimensionExpressions().get(i));
-                print(93);
+                print(']');
             }
         }
         printFooter(x);
@@ -1513,17 +2100,19 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         if (x.getReferencePrefix() != null) {
             printElement(x.getReferencePrefix());
             printElementIndentation(x);
-            print(46);
+            print('.');
         }
-        if (x.getIdentifier() != null)
+        if (x.getIdentifier() != null) {
             printElement(x.getIdentifier());
+        }
         printFooter(x);
     }
 
     public void visitVariableReference(VariableReference x) {
         printHeader(x);
-        if (x.getIdentifier() != null)
+        if (x.getIdentifier() != null) {
             printElement(x.getIdentifier());
+        }
         printFooter(x);
     }
 
@@ -1532,7 +2121,7 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         if (x.getTypeReference() != null) {
             printElement(x.getTypeReference());
             printElementIndentation(x);
-            print(46);
+            print('.');
         }
         print("class");
         printFooter(x);
@@ -1542,52 +2131,74 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printHeader(x);
         if (x.getReferencePrefix() != null) {
             printElement(x.getReferencePrefix());
-            print(46);
+            // printElementIndentation(x); not yet implemented
+            print('.');
         }
         if (x.getTypeArguments() != null && x.getTypeArguments().size() > 0) {
-            print(60);
-            printCommaList(x.getTypeArguments());
-            print(62);
+        	// a prefix must be present to allow type arguments. Why is not clear,
+        	// so we leave this here in case it'll change sometime
+        	print('<');
+        	printCommaList(x.getTypeArguments());
+        	print('>');
         }
-        if (x.getIdentifier() != null)
+        if (x.getIdentifier() != null) {
             printElement(x.getIdentifier());
-        if (getBooleanProperty("glueParameterLists")) {
-            print(40);
+        }
+        if (getBooleanProperty(GLUE_PARAMETER_LISTS)) {
+            print('(');
         } else {
             print(" (");
         }
-        if (x.getArguments() != null)
+        if (x.getArguments() != null) {
             printCommaList(x.getArguments());
-        print(41);
-        if (x.getStatementContainer() != null)
-            print(59);
+        }
+        print(')');
+        if (x.getStatementContainer() != null) {
+            print(';');
+        }
         printFooter(x);
     }
 
     public void visitSuperConstructorReference(SuperConstructorReference x) {
         printHeader(x);
+        
+        if (x.getTypeArguments() != null && x.getTypeArguments().size() > 0) {
+        	print('<');
+        	printCommaList(x.getTypeArguments());
+        	print('>');
+        }
+        
         if (x.getReferencePrefix() != null) {
             printElement(x.getReferencePrefix());
-            print(46);
+            print('.');
         }
         printElementIndentation(x);
-        if (getBooleanProperty("glueParameterLists")) {
+        if (getBooleanProperty(GLUE_PARAMETER_LISTS)) {
             print("super(");
         } else {
             print("super (");
         }
-        if (x.getArguments() != null)
+        if (x.getArguments() != null) {
             printCommaList(x.getArguments());
+        }
         print(");");
         printFooter(x);
     }
 
     public void visitThisConstructorReference(ThisConstructorReference x) {
         printHeader(x);
+        
+        if (x.getTypeArguments() != null && x.getTypeArguments().size() > 0) {
+        	print('<');
+        	printCommaList(x.getTypeArguments());
+        	print('>');
+        }
+        
         printElementIndentation(x);
-        print(getBooleanProperty("glueParameterLists") ? "this(" : "this (");
-        if (x.getArguments() != null)
+        print(getBooleanProperty(GLUE_PARAMETER_LISTS) ? "this(" : "this (");
+        if (x.getArguments() != null) {
             printCommaList(x.getArguments());
+        }
         print(");");
         printFooter(x);
     }
@@ -1618,21 +2229,11 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printFooter(x);
     }
 
-    public void visitArrayLengthReference(ArrayLengthReference x) {
-        printHeader(x);
-        if (x.getReferencePrefix() != null) {
-            printElement(x.getReferencePrefix());
-            print(46);
-        }
-        printElementIndentation(x);
-        print("length");
-        printFooter(x);
-    }
-
     public void visitThen(Then x) {
         printHeader(x);
-        if (x.getBody() != null)
+        if (x.getBody() != null) {
             printElement(x.getBody());
+        }
         printFooter(x);
     }
 
@@ -1640,15 +2241,18 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printHeader(x);
         printElementIndentation(x);
         print("else");
-        if (x.getBody() != null)
-            if (getBooleanProperty("glueStatementBlocks")) {
+        if (x.getBody() != null) {
+            if (getBooleanProperty(GLUE_STATEMENT_BLOCKS)) {
                 printElement(1, x.getBody());
-            } else if (x.getBody() instanceof StatementBlock) {
-                printElement(1, 0, x.getBody());
             } else {
-                printElement(1, 1, 0, x.getBody());
-                changeLevel(-1);
+                if (x.getBody() instanceof StatementBlock) {
+                    printElement(1, 0, x.getBody());
+                } else {
+                    printElement(1, +1, 0, x.getBody());
+                    changeLevel(-1);
+                }
             }
+        }
         printFooter(x);
     }
 
@@ -1656,11 +2260,12 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printHeader(x);
         printElementIndentation(x);
         print("case");
-        if (x.getExpression() != null)
+        if (x.getExpression() != null) {
             printElement(1, x.getExpression());
-        print(58);
+        }
+        print(':');
         if (x.getBody() != null && x.getBody().size() > 0) {
-            printLineList(1, 1, x.getBody());
+            printLineList(1, +1, x.getBody());
             changeLevel(-1);
         }
         printFooter(x);
@@ -1668,18 +2273,20 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
 
     public void visitCatch(Catch x) {
         printHeader(x);
-        if (getBooleanProperty("glueControlExpressions")) {
+        if (getBooleanProperty(GLUE_CONTROL_EXPRESSIONS)) {
             printElementIndentation(x);
             print("catch(");
         } else {
             printElementIndentation(x);
             print("catch (");
         }
-        if (x.getParameterDeclaration() != null)
+        if (x.getParameterDeclaration() != null) {
             printElement(x.getParameterDeclaration());
-        print(41);
-        if (x.getBody() != null)
+        }
+        print(')');
+        if (x.getBody() != null) {
             printElement(1, x.getBody());
+        }
         printFooter(x);
     }
 
@@ -1688,7 +2295,7 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printElementIndentation(x);
         print("default:");
         if (x.getBody() != null && x.getBody().size() > 0) {
-            printLineList(1, 1, x.getBody());
+            printLineList(1, +1, x.getBody());
             changeLevel(-1);
         }
         printFooter(x);
@@ -1698,8 +2305,9 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printHeader(x);
         printElementIndentation(x);
         print("finally");
-        if (x.getBody() != null)
+        if (x.getBody() != null) {
             printElement(1, x.getBody());
+        }
         printFooter(x);
     }
 
@@ -1779,94 +2387,106 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         print("volatile");
         printFooter(x);
     }
-
+    
     public void visitAnnotationUse(AnnotationUseSpecification a) {
+        // TODO better indentation handling
         printHeader(a);
         printElementIndentation(a);
-        print(64);
+        print('@');
         printElement(a.getTypeReference());
-        ASTList aSTList = a.getElementValuePairs();
-        if (aSTList != null) {
-            print(40);
-            printCommaList(0, 0, 0, (List<? extends ProgramElement>) aSTList);
-            print(41);
+        List<AnnotationElementValuePair> evp = a.getElementValuePairs();
+        if (evp != null) {
+            print('(');
+            printCommaList(0, 0, 0, evp);
+            print(')');
         }
         printFooter(a);
     }
-
+    
     public void visitElementValuePair(AnnotationElementValuePair x) {
+        // TODO better indentation handling
         printHeader(x);
         printElementIndentation(x);
         AnnotationPropertyReference id = x.getElement();
         if (id != null) {
             printElement(id);
-            print(" =");
+            print (" =");
         }
         ProgramElement ev = x.getElementValue();
-        if (ev != null)
+        if (ev != null) {
             printElement(ev);
+        }
         printFooter(x);
+    }
+    
+    public void visitAnnotationPropertyReference(AnnotationPropertyReference x) {
+    	printHeader(x);
+    	printElementIndentation(x);
+    	Identifier id = x.getIdentifier();
+    	if (id != null) {
+    		printElement(id);
+    	}
+    	printFooter(x);
     }
 
-    public void visitAnnotationPropertyReference(AnnotationPropertyReference x) {
-        printHeader(x);
-        printElementIndentation(x);
-        Identifier id = x.getIdentifier();
-        if (id != null)
-            printElement(id);
-        printFooter(x);
-    }
 
     public void visitEmptyStatement(EmptyStatement x) {
         printHeader(x);
         printElementIndentation(x);
-        print(59);
+        print(';');
         printFooter(x);
     }
 
     public void visitComment(Comment x) {
         printElementIndentation(x);
         print(x.getText());
-        if (this.overwriteParsePositions) {
-            this.overwritePosition.setPosition(this.line, Math.max(0, this.column - 1));
-            x.getLastElement().setEndPosition(this.overwritePosition);
+        if (x instanceof SingleLineComment) {
+        	hasJustPrintedComment = true;
+        } else if (!x.getText().endsWith("\n") && x.getText().contains("\n")){
+        	hasJustPrintedComment = true;
+        }
+        if (overwriteParsePositions) {
+            overwritePosition.setPosition(line, Math.max(0, column - 1));
+            x.getLastElement().setEndPosition(overwritePosition);
         }
     }
 
     public void visitParenthesizedExpression(ParenthesizedExpression x) {
         printHeader(x);
         printElementIndentation(x);
-        print(40);
-        if (x.getArguments() != null)
+        print('(');
+        if (x.getArguments() != null) {
             printElement(x.getArguments().get(0));
-        print(41);
+        }
+        print(')');
         printFooter(x);
     }
-
+    
     public void visitEnumConstructorReference(EnumConstructorReference x) {
-        printHeader(x);
-        printElementIndentation(x);
-        ASTList aSTList = x.getArguments();
-        if (aSTList != null) {
-            print(40);
-            printCommaList((List<? extends ProgramElement>) aSTList);
-            print(41);
-        }
-        if (x.getClassDeclaration() != null)
-            printElement(x.getClassDeclaration());
+    	printHeader(x);
+    	printElementIndentation(x);
+    	List<? extends Expression> exprs = x.getArguments();
+    	if (exprs != null) {
+    		print('(');
+    		printCommaList(exprs);
+    		print(')');
+    	}
+    	if (x.getClassDeclaration() != null) {
+    		printElement(x.getClassDeclaration());
+    	}
     }
-
+    
     public void visitEnumConstantDeclaration(EnumConstantDeclaration x) {
-        printHeader(x);
-        printElementIndentation(x);
-        if (x.getAnnotations() != null && x.getAnnotations().size() != 0) {
-            printKeywordList(x.getAnnotations());
-            print(32);
-        }
-        printElement(1, x.getEnumConstantSpecification());
-        printFooter(x);
+    	printHeader(x);
+    	printElementIndentation(x);
+    	if (x.getAnnotations() != null && x.getAnnotations().size() != 0) {
+    		printKeywordList(x.getAnnotations());
+   			print(' ');
+    	}
+   		printElement(1, x.getEnumConstantSpecification());
+   		printFooter(x);
     }
-
+    
     public void visitEnumConstantSpecification(EnumConstantSpecification x) {
         printHeader(x);
         printElement(x.getIdentifier());
@@ -1874,61 +2494,95 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printFooter(x);
     }
 
+    
     public void visitEnumDeclaration(EnumDeclaration x) {
         printHeader(x);
         int m = 0;
-        if (x.getDeclarationSpecifiers() != null)
+        if (x.getDeclarationSpecifiers() != null) {
             m = x.getDeclarationSpecifiers().size();
+        }
         if (m > 0) {
             printKeywordList(x.getDeclarationSpecifiers());
             m = 1;
         }
+        // unlike class declarations, enum declarations always require an identifier
         printElementIndentation(m, x);
         print("enum");
         printElement(1, x.getIdentifier());
-        print(32);
-        print(123);
+        if (x.getImplementedTypes() != null) {
+            printElement(1, x.getImplementedTypes());
+        }
+        print(' ');
+        print('{');
         printContainerComments(x);
+//        if (x.getMembers() != null && !x.getMembers().isEmpty()) {
+//            //printBlockList(2, 1, x.getMembers());
+//            printCommaList(2, 1, 1, x.getMembers())
+//            changeLevel(-1);
+//        }
         printCommaList(2, 1, 1, x.getConstants());
         print(";");
         changeLevel(-1);
+        
         printBlockList(2, 1, x.getNonConstantMembers());
         changeLevel(-1);
+        
         printIndentation(1, getTotalIndentation());
-        print(125);
-        printFooter(x);
+        print('}');
+        printFooter(x);    
     }
-
+    
     public void visitTypeArgument(TypeArgumentDeclaration x) {
-        printHeader(x);
-        switch (x.getWildcardMode()) {
-            case Any:
-                print("?");
-                break;
-            case Extends:
-                print("? extends ");
-                break;
-            case Super:
-                print("? super ");
-                break;
-        }
-        if (x.getTypeReferenceCount() == 1)
-            printElement(x.getTypeReferenceAt(0));
-        printFooter(x);
+    	printHeader(x);
+    	switch (x.getWildcardMode()) {
+    		case None:
+    			break;
+    		case Any:
+    			print("?");
+    			break;
+    		case Extends:
+    			print("? extends ");
+    			break;
+    		case Super:
+    			print("? super ");
+    			break;
+    	}
+    	if (x.getTypeReferenceCount() == 1)
+    		printElement(x.getTypeReferenceAt(0));
+    	printFooter(x);
     }
-
+    
+    
     public void visitTypeParameter(TypeParameterDeclaration x) {
+    	printHeader(x);
+    	if (x.getIdentifier() != null)
+    		printElement(x.getIdentifier());
+    	if (x.getBounds() != null && x.getBounds().size() != 0) {
+    		print(" extends ");
+    		printProgramElementList(0, 0, 0, "&", 0, 1, x.getBounds());
+    	}
+    	printFooter(x);
+    }
+    
+    public void visitParameterDeclaration(ParameterDeclaration x) {
+    	visitVariableDeclaration(x, x.isVarArg());
+    }
+    
+    @Override
+    public void visitUnionTypeParameterDeclaration(
+    		UnionTypeParameterDeclaration x) {
         printHeader(x);
-        if (x.getIdentifier() != null)
-            printElement(x.getIdentifier());
-        if (x.getBounds() != null && x.getBounds().size() != 0) {
-            print(" extends ");
-            printProgramElementList(0, 0, 0, "&", 0, 1, x.getBounds());
+        int m = 0;
+        if (x.getDeclarationSpecifiers() != null) {
+            m = x.getDeclarationSpecifiers().size();
+            printKeywordList(x.getDeclarationSpecifiers());
+        }
+        printProgramElementList(0, 0, (m > 0) ? 1 : 0, " |", 0, 0, x.getTypeReferences());
+        List<? extends VariableSpecification> varSpecs = x.getVariables();
+        if (varSpecs != null) {
+            printProgramElementList(0, 0, 1, ",", 0, 1, varSpecs);
         }
         printFooter(x);
-    }
-
-    public void visitParameterDeclaration(ParameterDeclaration x) {
-        visitVariableDeclaration(x, x.isVarArg());
     }
 }
+

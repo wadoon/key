@@ -1,13 +1,6 @@
-package recoder.io;
+// This file is part of the RECODER library and protected by the LGPL.
 
-import recoder.AbstractService;
-import recoder.ParserException;
-import recoder.ServiceConfiguration;
-import recoder.bytecode.ByteCodeParser;
-import recoder.bytecode.ClassFile;
-import recoder.convenience.Naming;
-import recoder.service.ErrorHandler;
-import recoder.util.Debug;
+package recoder.io;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -18,13 +11,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import recoder.AbstractService;
+import recoder.ServiceConfiguration;
+import recoder.bytecode.ASMBytecodeParser;
+import recoder.bytecode.AbstractBytecodeParser;
+import recoder.bytecode.ByteCodeParser;
+import recoder.bytecode.ClassFile;
+import recoder.convenience.Naming;
+import recoder.service.ErrorHandler;
+import recoder.util.Debug;
+
+/**
+ * @author RN
+ * @author AL
+ */
 public class DefaultClassFileRepository extends AbstractService implements ClassFileRepository, PropertyChangeListener {
-    private final Map<String, ClassFile> classname2cf = new HashMap<String, ClassFile>(64);
 
-    private final ByteCodeParser bytecodeParser = new ByteCodeParser();
+    // private PathList searchPath;
+	private final Map<String, ClassFile> classname2cf = new HashMap<String, ClassFile>(64);
 
+    /**
+     * Cached search path list.
+     */
     private PathList searchPathList;
 
+    /**
+     * @param config
+     *            the configuration this services becomes part of.
+     */
     public DefaultClassFileRepository(ServiceConfiguration config) {
         super(config);
     }
@@ -33,45 +47,61 @@ public class DefaultClassFileRepository extends AbstractService implements Class
         super.initialize(cfg);
         ProjectSettings settings = cfg.getProjectSettings();
         settings.addPropertyChangeListener(this);
-        this.searchPathList = settings.getSearchPathList();
+        searchPathList = settings.getSearchPathList();
     }
 
     protected final PathList getSearchPathList() {
-        return this.searchPathList;
+        return searchPathList;
     }
 
     ErrorHandler getErrorHandler() {
-        return this.serviceConfiguration.getProjectSettings().getErrorHandler();
+        return serviceConfiguration.getProjectSettings().getErrorHandler();
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
         String changedProp = evt.getPropertyName();
-        if (changedProp.equals("input.path"))
-            this.searchPathList = this.serviceConfiguration.getProjectSettings().getSearchPathList();
+        if (changedProp.equals(PropertyNames.INPUT_PATH)) {
+
+            // should check for admissibility of the new path
+            // if it has been added only, there is nothing to do
+            // otherwise, for all class types check if the location
+            // would have changed; if so, invalidate them
+            searchPathList = serviceConfiguration.getProjectSettings().getSearchPathList();
+        }
     }
 
+    /**
+     * Searches for the location of the class file for the given class.
+     * 
+     * @param classname
+     *            the name of the class for which the class file should be
+     *            looked up.
+     */
     public DataLocation findClassFile(String classname) {
         return getSearchPathList().find(Naming.dot(Naming.makeFilename(classname), "class"));
     }
 
     public ClassFile getClassFile(String classname) {
-        ClassFile result = this.classname2cf.get(classname);
-        if (result != null)
+        ClassFile result = classname2cf.get(classname);
+        if (result != null) {
             return result;
+        }
         DataLocation loc = findClassFile(classname);
         if (loc == null) {
             String innername = classname;
             int ldp = innername.length() - 1;
-            StringBuffer sb = new StringBuffer(innername);
+            StringBuilder sb = new StringBuilder(innername);
             while (true) {
                 ldp = innername.lastIndexOf('.', ldp);
-                if (ldp == -1)
+                if (ldp == -1) {
                     return null;
+                }
                 sb.setCharAt(ldp, '$');
                 innername = sb.toString();
-                result = this.classname2cf.get(innername);
-                if (result != null)
+                result = classname2cf.get(innername);
+                if (result != null) {
                     return result;
+                }
                 loc = findClassFile(innername);
                 if (loc != null) {
                     classname = innername;
@@ -82,30 +112,44 @@ public class DefaultClassFileRepository extends AbstractService implements Class
         try {
             InputStream is = loc.getInputStream();
             Debug.assertNonnull(is, "No input stream for data location");
-            this.bytecodeParser.readJava5Signatures = this.serviceConfiguration.getProjectSettings().java5Allowed();
-            result = this.bytecodeParser.parseClassFile(is, loc.toString());
+            final AbstractBytecodeParser bytecodeParser;
+            if (useOldBytecodeParser()) {
+            	bytecodeParser = new ByteCodeParser();
+            } else {
+            	bytecodeParser = new ASMBytecodeParser();
+            }
+        	boolean readJava5Signatures = serviceConfiguration.getProjectSettings().java5Allowed();
+            result = bytecodeParser.parseClassFile(is, loc.toString(), readJava5Signatures);
             is.close();
             loc.inputStreamClosed();
-            this.classname2cf.put(classname, result);
+            //result.setLocation(loc.toString());
+            classname2cf.put(classname, result);
         } catch (IOException e) {
             getErrorHandler().reportError(e);
             result = null;
-        } catch (ParserException pe) {
+        }/* catch (ParserException pe) {
             getErrorHandler().reportError(pe);
-            result = null;
-        }
+        }*/
         return result;
     }
 
-    public List<ClassFile> getKnownClassFiles() {
-        int n = this.classname2cf.size();
+    private boolean useOldBytecodeParser() {
+		return Boolean.valueOf(serviceConfiguration.getProjectSettings().getProperty(PropertyNames.USE_OLD_BYTECODE_PARSER));
+	}
+
+	public List<ClassFile> getKnownClassFiles() {
+        int n = classname2cf.size();
         List<ClassFile> res = new ArrayList<ClassFile>(n);
-        for (ClassFile cf : this.classname2cf.values())
-            res.add(cf);
+        for (ClassFile cf : classname2cf.values())
+        	res.add(cf);
         return res;
     }
 
     public String information() {
-        return "" + this.classname2cf.size() + " class files";
+        return "" + classname2cf.size() + " class files";
+    }
+    
+    public void reset() {
+    	classname2cf.clear();
     }
 }

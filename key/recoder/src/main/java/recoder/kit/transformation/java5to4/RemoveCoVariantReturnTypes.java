@@ -1,155 +1,203 @@
+/*
+ * Created on 31.03.2006
+ *
+ * This file is part of the RECODER library and protected by the LGPL.
+ * 
+ */
 package recoder.kit.transformation.java5to4;
 
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
-import recoder.ModelException;
 import recoder.ProgramFactory;
-import recoder.abstraction.*;
-import recoder.convenience.TreeWalker;
-import recoder.java.Expression;
-import recoder.java.NonTerminalProgramElement;
+import recoder.abstraction.ArrayType.ArrayCloneMethod;
+import recoder.abstraction.ClassType;
+import recoder.abstraction.ErasedMethod;
+import recoder.abstraction.Member;
+import recoder.abstraction.Method;
+import recoder.abstraction.PrimitiveType;
+import recoder.abstraction.Type;
+import recoder.bytecode.MethodInfo;
+import recoder.convenience.ForestWalker;
+import recoder.java.CompilationUnit;
 import recoder.java.ProgramElement;
+import recoder.java.StatementContainer;
 import recoder.java.declaration.MethodDeclaration;
-import recoder.java.declaration.TypeArgumentDeclaration;
+import recoder.java.declaration.TypeDeclaration;
+import recoder.java.expression.operator.TypeCast;
 import recoder.java.reference.MemberReference;
 import recoder.java.reference.MethodReference;
 import recoder.java.reference.TypeReference;
 import recoder.kit.MethodKit;
+import recoder.kit.MiscKit;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
 import recoder.kit.TypeKit;
-import recoder.list.generic.ASTArrayList;
-import recoder.list.generic.ASTList;
-import recoder.service.DefaultSourceInfo;
-import recoder.service.ProgramModelInfo;
+import recoder.kit.transformation.java5to4.Util.IntroduceCast;
+import recoder.service.CrossReferenceSourceInfo;
+import recoder.service.SourceInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-
+/**
+ * Currently requires generics to be already resolved. It does *not* 
+ * add type arguments to return type replacements.
+ * @author Tobias Gutzmann
+ *
+ */
 public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
-    private final NonTerminalProgramElement root;
 
-    private List<Item> items;
+	private static class ReturnTypeRefReplacement {
+		TypeReference typeParamRef;
+		TypeReference replacement;
+		ReturnTypeRefReplacement(TypeReference from, TypeReference to) {
+			this.typeParamRef = from;
+			this.replacement = to;
+		}
+	}
+	
+	private Dictionary<Method, Type> visitedMethods;
+	private List<CompilationUnit> cul;
+	private List<IntroduceCast> casts;
+	private List<ReturnTypeRefReplacement> covariantReturnTypes;
+	
+	public RemoveCoVariantReturnTypes(CrossReferenceServiceConfiguration sc, List<CompilationUnit> cul) {
+		super(sc);
+		this.cul = cul;
+	}
+	
+	private void handleTypeDeclaration(TypeDeclaration td) {
+		CrossReferenceSourceInfo si = getCrossReferenceSourceInfo();
+		for (Method m : td.getMethods()) {
+			if (m.getReturnType() == null)
+				continue; // void
+			if (visited(m) != null)
+				continue; // already seen.
+			if (m.getReturnType() instanceof PrimitiveType)
+				continue; // no covariance allowed.
+		    // Note: we can NOT use MethodKit.getAllRedefinedMethods!!
+			List<Method> meths = MethodKit.getAllRelatedMethods(si, m);
 
-    public RemoveCoVariantReturnTypes(CrossReferenceServiceConfiguration sc, NonTerminalProgramElement root) {
-        super(sc);
-        this.root = root;
-    }
+			for (Method toadd : meths) {
+				// marks the method to not be considered again.
+				visitedMethods.put(toadd, getNameInfo().getUnknownType()); // may be overwritten later.
+			}
+			if (meths.size() > 1) {
+				ClassType returnType = null;
+				// find most general type.
+				for (Method redefined : meths) {
+					ClassType rt = (ClassType)redefined.getReturnType();
+					rt = rt.getBaseClassType();
+					if (returnType == null) {
+						returnType = rt;
+						continue;
+					}
+					if (returnType == rt)
+						continue;
+					if (si.isSubtype(returnType, rt))
+						returnType = rt;
+					else if (!si.isSubtype(rt, returnType)) {
+						returnType = getNameInfo().getJavaLangObject();
+						break;
+					}
+				}
+				for (Method redefined : meths) {
+					if (redefined instanceof MethodDeclaration &&
+							returnType != redefined.getReturnType())
+						createItem((MethodDeclaration)redefined, returnType);
+				}
+			}
+		}
+	}
+	
+	@Override
+	public ProblemReport analyze() {
+		this.visitedMethods = new Hashtable<Method, Type>();
+		this.casts = new ArrayList<IntroduceCast>();
+		this.covariantReturnTypes = new ArrayList<ReturnTypeRefReplacement>();
+		
+		SourceInfo si = getSourceInfo();
+		// first make a forest walk, finding all method references that target bytecode directly
+		// and all type declarations (including anonymous types).
+		ForestWalker fw = new ForestWalker(cul);
+		while (fw.next()) {
+			ProgramElement pe = fw.getProgramElement();
+			if (pe instanceof TypeDeclaration) {
+				handleTypeDeclaration((TypeDeclaration)pe);
+			}
+			else if (pe instanceof MethodReference) {
+				MethodReference mr = (MethodReference)pe;
+				Method m = si.getMethod(mr);
+				if (m instanceof ErasedMethod)
+					m = ((ErasedMethod)m).getGenericMethod();
+				if (m instanceof ArrayCloneMethod) {
+					Type req = Util.getRequiredContextType(si, mr, true);
+					if (!(mr.getASTParent() instanceof TypeCast) && req != null && req != getNameInfo().getJavaLangObject())
+						casts.add(new IntroduceCast(mr, TypeKit.createTypeReference(si, m.getReturnType(), mr, false)));
+				} else if (m instanceof MethodInfo) {
+					Type retType = m.getReturnType();
+					if (retType == null || retType instanceof PrimitiveType)
+						continue;
+					List<Method> lm = MethodKit.getAllRedefinedMethods(m); // here we can (hopefully) use this.
+					if (!lm.isEmpty()) {
+						List<ClassType> types = new ArrayList<ClassType>(lm.size());
+						for (Method om : lm)
+							types.add((ClassType)om.getReturnType());
+						ClassType newCT = si.getCommonSupertype(types.toArray(new ClassType[lm.size()]));
+						ClassType req = (ClassType)Util.getRequiredContextType(si, mr, true);
+						if (req != null && !si.isSubtype(newCT, req))
+							casts.add(new IntroduceCast(mr, TypeKit.createTypeReference(si, req, mr, false)));
+					}
+				}
+			}
+		}
+		if (casts.isEmpty() && covariantReturnTypes.isEmpty())
+			return setProblemReport(IDENTITY);
+		return super.analyze();
+	}
+	
+	private Type visited(Method md) {
+		return visitedMethods.get(md);
+	}	
 
-    public ProblemReport analyze() {
-        this.items = new ArrayList<Item>();
-        TreeWalker tw = new TreeWalker(this.root);
-        while (tw.next()) {
-            ProgramElement pe = tw.getProgramElement();
-            if (pe instanceof MethodDeclaration) {
-                MethodDeclaration md = (MethodDeclaration) pe;
-                Type returnType = getSourceInfo().getReturnType(md);
-                if (returnType == null || returnType instanceof recoder.abstraction.PrimitiveType)
-                    continue;
-                List<Method> ml = MethodKit.getRedefinedMethods(md);
-                if (ml.size() == 0)
-                    continue;
-                List<ClassType> ctml = new ArrayList<ClassType>(ml.size());
-                for (int i = 0; i < ml.size(); i++) {
-                    Type rt = getSourceInfo().getReturnType(ml.get(i));
-                    if (rt instanceof ClassType && ctml.indexOf(rt) == -1)
-                        ctml.add((ClassType) rt);
-                }
-                List<ClassType> ctml_copy = new ArrayList<ClassType>();
-                ctml_copy.addAll(ctml);
-                TypeKit.removeCoveredSubtypes(getSourceInfo(), ctml);
-                if (ctml.size() != 1) {
-                    if (ctml.size() == 0 && returnType instanceof recoder.abstraction.ArrayType)
-                        continue;
-                    throw new ModelException();
-                }
-                Type originalType = ctml.get(0);
-                if (((DefaultSourceInfo) getSourceInfo()).containsTypeParameter(originalType))
-                    originalType = makeSomething(originalType);
-                if (originalType != returnType) {
-                    TypeReference originalTypeReference = TypeKit.createTypeReference(getProgramFactory(), originalType);
-                    TypeReference castToReference = TypeKit.createTypeReference(getProgramFactory(), returnType);
-                    ASTList<TypeArgumentDeclaration> targs = md.getTypeReference().getTypeArguments();
-                    if (targs != null && targs.size() > 0)
-                        castToReference.setTypeArguments(targs.deepClone());
-                    if (originalType instanceof ParameterizedType) {
-                        ParameterizedType pt = (ParameterizedType) originalType;
-                        targs = TypeKit.makeTypeArgRef(getProgramFactory(), pt.getTypeArgs());
-                        originalTypeReference.setTypeArguments(targs);
-                    }
-                    this.items.add(new Item(md, getCrossReferenceSourceInfo().getReferences(md), originalTypeReference, castToReference));
-                }
-            }
-        }
-        return super.analyze();
-    }
+	private void createItem(MethodDeclaration md, ClassType originalType) {
+		visitedMethods.put(md, originalType);
 
-    private Type makeSomething(Type originalType) {
-        if (originalType instanceof ParameterizedType) {
-            ParameterizedType pt = (ParameterizedType) originalType;
-            ClassType baseType = (ClassType) makeSomething0(pt.getGenericType());
-            ASTArrayList aSTArrayList = new ASTArrayList(pt.getTypeArgs().size());
-            for (TypeArgument ta : pt.getTypeArgs())
-                aSTArrayList.add(makeSomething1(ta));
-            return new ParameterizedType(baseType, aSTArrayList);
-        }
-        return makeSomething0(originalType);
-    }
-
-    private Type makeSomething0(Type originalType) {
-        ClassType classType;
-        if (!(originalType instanceof TypeParameter))
-            return originalType;
-        TypeParameter tp = (TypeParameter) originalType;
-        if (tp.getBoundCount() == 0) {
-            classType = getNameInfo().getJavaLangObject();
-        } else {
-            String tname = tp.getBoundName(0);
-            classType = getNameInfo().getClassType(tname);
-            if (classType.isInterface())
-                classType = getNameInfo().getJavaLangObject();
-        }
-        return classType;
-    }
-
-    private TypeArgumentDeclaration makeSomething1(TypeArgument ta) {
-        TypeArgumentDeclaration res = new TypeArgumentDeclaration();
-        res.setTypeReference(TypeKit.createTypeReference(getProgramFactory(), ta.getTypeName()));
-        if (ta.getTypeArguments() != null && ta.getTypeArguments().size() > 0) {
-            ASTArrayList aSTArrayList = new ASTArrayList(ta.getTypeArguments().size());
-            for (TypeArgument t : ta.getTypeArguments())
-                aSTArrayList.add(makeSomething1(t));
-            res.getTypeReference().setTypeArguments(aSTArrayList);
-            res.getTypeReference().makeParentRoleValid();
-        }
-        return res;
-    }
-
-    public void transform() {
-        super.transform();
-        ProgramFactory f = getProgramFactory();
-        for (Item it : this.items) {
-            replace(it.md.getTypeReference(), it.rt.deepClone());
-            for (int i = 0; i < it.mrl.size(); i++) {
-                MethodReference mr = (MethodReference) it.mrl.get(i);
-                replace(mr, f.createParenthesizedExpression(f.createTypeCast(mr.deepClone(), it.t.deepClone())));
-            }
-        }
-    }
-
-    private static class Item {
-        MethodDeclaration md;
-
-        List<MemberReference> mrl;
-
-        TypeReference t;
-
-        TypeReference rt;
-
-        Item(MethodDeclaration md, List<MemberReference> mrl, TypeReference rt, TypeReference t) {
-            this.md = md;
-            this.mrl = mrl;
-            this.rt = rt;
-            this.t = t;
-        }
-    }
+		List<MemberReference> references = getCrossReferenceSourceInfo().getReferences(md);
+		TypeReference newReturnTypeReference = TypeKit.createTypeReference(getSourceInfo(), originalType, md, false);
+		covariantReturnTypes.add(new ReturnTypeRefReplacement(md.getTypeReference(), newReturnTypeReference));
+		
+		for (MemberReference memRef : references) {
+			MethodReference mr = (MethodReference)memRef;
+			
+			Type reqType = Util.getRequiredContextType(getSourceInfo(), mr, true);
+			if (reqType instanceof PrimitiveType)
+				reqType = getSourceInfo().getBoxedType((PrimitiveType)reqType);
+			if (reqType == null || getSourceInfo().isSubtype(originalType, (ClassType)reqType))
+				continue; // skip this one, cast is not necessary.
+			if (!getSourceInfo().isVisibleFor((Member)reqType, MiscKit.getParentTypeDeclaration(mr))) {
+				reqType = getSourceInfo().getType(mr); // need to use a visible type!
+			}
+			casts.add(new IntroduceCast(mr, TypeKit.createTypeReference(getSourceInfo(), reqType, mr, false)));
+		}
+	}
+	
+	@Override
+	public void transform() {
+		super.transform();
+		System.out.println("casts: " + casts.size() + " covariantReturnTypes: " + covariantReturnTypes.size());
+		ProgramFactory f = getProgramFactory();
+		for (ReturnTypeRefReplacement rtrr : covariantReturnTypes) {
+			if (rtrr.typeParamRef.getASTParent().getIndexOfChild(rtrr.typeParamRef) != -1)
+				replace(rtrr.typeParamRef, rtrr.replacement);
+		}
+		Util.sortCasts(casts);
+		for (IntroduceCast c : casts) {
+			MiscKit.unindent(c.toBeCasted);
+			if (c.toBeCasted.getASTParent().getIndexOfChild(c.toBeCasted) != -1 
+				&&	!(c.toBeCasted.getASTParent() instanceof StatementContainer))
+					replace(c.toBeCasted, f.createParenthesizedExpression(f.createTypeCast(c.toBeCasted.deepClone(), c.castedType)));
+		}
+	}
 }

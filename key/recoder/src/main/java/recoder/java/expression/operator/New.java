@@ -1,7 +1,16 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.java.expression.operator;
 
-import recoder.java.*;
+import recoder.java.Expression;
+import recoder.java.ExpressionContainer;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.ProgramElement;
+import recoder.java.SourceElement;
+import recoder.java.SourceVisitor;
+import recoder.java.StatementContainer;
 import recoder.java.declaration.ClassDeclaration;
+import recoder.java.declaration.TypeArgumentDeclaration;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.TypeDeclarationContainer;
 import recoder.java.expression.ExpressionStatement;
@@ -11,19 +20,73 @@ import recoder.java.reference.ReferenceSuffix;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTList;
 
-public class New extends TypeOperator implements ConstructorReference, ExpressionStatement, ReferencePrefix, ReferenceSuffix, TypeDeclarationContainer {
-    private static final long serialVersionUID = -4983184360698832328L;
+/**
+ * The object allocation operator. There are two variants for New:
+ * <OL>
+ * <LI>Class constructor call <BR>
+ * <tt>new XYZ(a<sub>1</sub>, ..., a<sub>n</sub>)</tt><BR>
+ * if getType() instanceof UserType
+ * <LI>Anonymous Inner Class definition and construction <BR>
+ * <tt>new XYZ(a<sub>1</sub>, ..., a<sub>n</sub>)
+ { m<sub>1</sub>, ..., m<sub>k</sub> }</tt>
+ * <BR>
+ * if getType() instanceof UserType && getClassDeclaration() !=<tt>null</tt>
+ * </OL>
+ * The access path is <tt>null</tt> in most cases, except when an inner class
+ * constructor is invoked from an outer instance.
+ */
 
+public class New extends TypeOperator implements ConstructorReference, ExpressionStatement, ReferencePrefix,
+        ReferenceSuffix, TypeDeclarationContainer {
+	
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = -4983184360698832328L;
+
+	/**
+     * Anonymous class.
+     */
     protected ClassDeclaration anonymousClass;
 
+    /**
+     * Access path.
+     */
     protected ReferencePrefix accessPath;
+
+    /**
+     * Reference parent.
+     */
 
     protected ReferenceSuffix referenceParent;
 
+    /**
+     * Statement parent.
+     */
     protected StatementContainer statementParent;
 
+    private boolean withDiamondOperator;
+    
+    private ASTList<TypeArgumentDeclaration> constructorCallTypeArgs;
+    
+    /**
+     * New.
+     */
+
     public New() {
+        // nothing to do
     }
+
+    /**
+     * New.
+     * 
+     * @param accessPath
+     *            a reference prefix.
+     * @param constructorName
+     *            a type reference.
+     * @param arguments
+     *            an expression mutable list.
+     */
 
     public New(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments) {
         setReferencePrefix(accessPath);
@@ -32,216 +95,453 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
         makeParentRoleValid();
     }
 
-    public New(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments, ClassDeclaration anonymousClass) {
+    /**
+     * New.
+     * 
+     * @param accessPath
+     *            a reference prefix.
+     * @param constructorName
+     *            a type reference.
+     * @param arguments
+     *            an expression mutable list.
+     * @param anonymousClass
+     *            a class declaration.
+     */
+
+    public New(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments,
+            ClassDeclaration anonymousClass) {
         this(accessPath, constructorName, arguments);
         setClassDeclaration(anonymousClass);
         makeParentRoleValid();
     }
 
+    /**
+     * New.
+     * 
+     * @param proto
+     *            a new.
+     */
+
     protected New(New proto) {
         super(proto);
-        if (proto.anonymousClass != null)
-            this.anonymousClass = proto.anonymousClass.deepClone();
-        if (proto.accessPath != null)
-            this.accessPath = (ReferencePrefix) proto.accessPath.deepClone();
+        if (proto.anonymousClass != null) {
+            anonymousClass = proto.anonymousClass.deepClone();
+        }
+        if (proto.accessPath != null) {
+            accessPath = (ReferencePrefix) proto.accessPath.deepClone();
+        }
         makeParentRoleValid();
     }
+
+    /**
+     * Deep clone.
+     * 
+     * @return the object.
+     */
 
     public New deepClone() {
         return new New(this);
     }
 
+    /**
+     * Make parent role valid.
+     */
+
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
-        if (this.children != null)
-            for (int i = this.children.size() - 1; i >= 0; i--)
-                this.children.get(i).setExpressionContainer(this);
-        if (this.accessPath != null)
-            this.accessPath.setReferenceSuffix(this);
-        if (this.anonymousClass != null)
-            this.anonymousClass.setParent(this);
+        if (children != null) {
+            for (int i = children.size() - 1; i >= 0; i -= 1) {
+                children.get(i).setExpressionContainer(this);
+            }
+        }
+        if (accessPath != null) {
+            accessPath.setReferenceSuffix(this);
+        }
+        if (anonymousClass != null) {
+            anonymousClass.setParent(this);
+        }
+        if (constructorCallTypeArgs != null) {
+        	for (TypeArgumentDeclaration ta : constructorCallTypeArgs) {
+        		ta.setParent(this);
+        	}
+        }
     }
 
     public SourceElement getFirstElement() {
-        return (this.accessPath != null) ? this.accessPath.getFirstElement() : this;
+        return (accessPath != null) ? accessPath.getFirstElement() : this;
     }
 
     public SourceElement getLastElement() {
         return getChildAt(getChildCount() - 1).getLastElement();
     }
 
+    /**
+     * Get AST parent.
+     * 
+     * @return the non terminal program element.
+     */
+
     public NonTerminalProgramElement getASTParent() {
-        if (this.statementParent != null)
-            return this.statementParent;
-        if (this.expressionParent != null)
-            return this.expressionParent;
-        return this.referenceParent;
+        if (statementParent != null) {
+            return statementParent;
+        } else if (expressionParent != null) {
+            return expressionParent;
+        } else {
+            return referenceParent;
+        }
     }
+
+    /**
+     * Get arity.
+     * 
+     * @return the int value.
+     */
 
     public int getArity() {
         return 0;
     }
 
+    /**
+     * Get precedence.
+     * 
+     * @return the int value.
+     */
+
     public int getPrecedence() {
         return 0;
     }
 
+    /**
+     * Get notation.
+     * 
+     * @return the int value.
+     */
+
     public int getNotation() {
-        return 0;
+        return PREFIX;
     }
 
+    /**
+     * Get statement container.
+     * 
+     * @return the statement container.
+     */
     public StatementContainer getStatementContainer() {
-        return this.statementParent;
+        return statementParent;
     }
 
-    public void setStatementContainer(StatementContainer parent) {
-        this.statementParent = parent;
-    }
+    /**
+     * Get expression container.
+     * 
+     * @return the expression container.
+     */
 
     public ExpressionContainer getExpressionContainer() {
-        return this.expressionParent;
+        return expressionParent;
     }
+
+    /**
+     * Set expression container.
+     * 
+     * @param parent
+     *            an expression container.
+     */
 
     public void setExpressionContainer(ExpressionContainer parent) {
-        this.expressionParent = parent;
+        expressionParent = parent;
     }
+
+    /**
+     * Set statement container.
+     * 
+     * @param parent
+     *            a statement container.
+     */
+
+    public void setStatementContainer(StatementContainer parent) {
+        statementParent = parent;
+    }
+
+    /**
+     * Get class declaration.
+     * 
+     * @return the class declaration.
+     */
 
     public ClassDeclaration getClassDeclaration() {
-        return this.anonymousClass;
+        return anonymousClass;
     }
+
+    /**
+     * Set class declaration.
+     * 
+     * @param decl
+     *            a class declaration.
+     */
 
     public void setClassDeclaration(ClassDeclaration decl) {
-        this.anonymousClass = decl;
+        anonymousClass = decl;
     }
+
+    /**
+     * Get the number of type declarations in this container.
+     * 
+     * @return the number of type declarations.
+     */
 
     public int getTypeDeclarationCount() {
-        return (this.anonymousClass != null) ? 1 : 0;
+        return (anonymousClass != null) ? 1 : 0;
     }
 
+    /*
+     * Return the type declaration at the specified index in this node's
+     * "virtual" type declaration array. @param index an index for a type
+     * declaration. @return the type declaration with the given index.
+     * @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of
+     * bounds.
+     */
+
     public TypeDeclaration getTypeDeclarationAt(int index) {
-        if (this.anonymousClass != null && index == 0)
-            return this.anonymousClass;
+        if (anonymousClass != null && index == 0) {
+            return anonymousClass;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
+    /**
+     * Returns the number of children of this node.
+     * 
+     * @return an int giving the number of children of this node
+     */
+
     public int getChildCount() {
         int result = 0;
-        if (this.accessPath != null)
+        if (accessPath != null)
             result++;
-        if (this.typeReference != null)
+        if (typeReference != null)
             result++;
-        if (this.children != null)
-            result += this.children.size();
-        if (this.anonymousClass != null)
+        if (children != null)
+            result += children.size();
+        if (anonymousClass != null)
             result++;
+        if (constructorCallTypeArgs != null)
+        	result += constructorCallTypeArgs.size();
         return result;
     }
 
+    /**
+     * Returns the child at the specified index in this node's "virtual" child
+     * array
+     * 
+     * @param index
+     *            an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException
+     *                if <tt>index</tt> is out of bounds
+     */
+
     public ProgramElement getChildAt(int index) {
-        if (this.accessPath != null) {
+        int len;
+        if (accessPath != null) {
             if (index == 0)
-                return this.accessPath;
+                return accessPath;
             index--;
         }
-        if (this.typeReference != null) {
+        if (typeReference != null) {
             if (index == 0)
-                return this.typeReference;
+                return typeReference;
             index--;
         }
-        if (this.children != null) {
-            int len = this.children.size();
-            if (len > index)
-                return this.children.get(index);
+        if (children != null) {
+            len = children.size();
+            if (len > index) {
+                return children.get(index);
+            }
             index -= len;
         }
-        if (this.anonymousClass != null) {
+        if (anonymousClass != null) {
             if (index == 0)
-                return this.anonymousClass;
+                return anonymousClass;
             index--;
+        }
+        if (constructorCallTypeArgs != null) {
+        	return constructorCallTypeArgs.get(index);
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
-        if (this.children != null) {
-            int index = this.children.indexOf(child);
-            if (index >= 0)
-                return index << 4 | 0x0;
+        // role 0 (IDX): parameter
+        // role 1: type reference (for type operators only)
+        // role 2: prefix (for New only)
+        // role 3: class declaration (for New only)
+    	// role 4 (IDX): type arguments
+        if (children != null) {
+            int index = children.indexOf(child);
+            if (index >= 0) {
+                return (index << 4) | 0;
+            }
         }
-        if (this.typeReference == child)
+        if (typeReference == child) {
             return 1;
-        if (this.accessPath == child)
+        }
+        if (accessPath == child) {
             return 2;
-        if (this.anonymousClass == child)
+        }
+        if (anonymousClass == child) {
             return 3;
+        }
+        if (constructorCallTypeArgs != null) {
+        	int index = constructorCallTypeArgs.indexOf(child);
+        	if (index >= 0) {
+        		return (index << 4) | 4;
+        	}
+        }
         return -1;
     }
 
+    /**
+     * Replace a single child in the current node. The child to replace is
+     * matched by identity and hence must be known exactly. The replacement
+     * element can be null - in that case, the child is effectively removed. The
+     * parent role of the new child is validated, while the parent link of the
+     * replaced child is left untouched.
+     * 
+     * @param p
+     *            the old child.
+     * @param p
+     *            the new child.
+     * @return true if a replacement has occured, false otherwise.
+     * @exception ClassCastException
+     *                if the new child cannot take over the role of the old one.
+     */
+
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
-        int count = (this.children == null) ? 0 : this.children.size();
+        }
+        int count;
+        count = (children == null) ? 0 : children.size();
         for (int i = 0; i < count; i++) {
-            if (this.children.get(i) == p) {
+            if (children.get(i) == p) {
                 if (q == null) {
-                    this.children.remove(i);
+                    children.remove(i);
                 } else {
                     Expression r = (Expression) q;
-                    this.children.set(i, r);
+                    children.set(i, r);
                     r.setExpressionContainer(this);
                 }
                 return true;
             }
         }
-        if (this.typeReference == p) {
+        if (typeReference == p) {
             TypeReference r = (TypeReference) q;
-            this.typeReference = r;
-            if (r != null)
+            typeReference = r;
+            if (r != null) {
                 r.setParent(this);
+            }
             return true;
         }
-        if (this.accessPath == p) {
+        if (accessPath == p) {
             ReferencePrefix r = (ReferencePrefix) q;
-            this.accessPath = r;
-            if (r != null)
+            accessPath = r;
+            if (r != null) {
                 r.setReferenceSuffix(this);
+            }
             return true;
         }
-        if (this.anonymousClass == p) {
+        if (anonymousClass == p) {
             ClassDeclaration r = (ClassDeclaration) q;
-            this.anonymousClass = r;
-            if (r != null)
+            anonymousClass = r;
+            if (r != null) {
                 r.setParent(this);
+            }
             return true;
         }
         return false;
     }
 
+    /**
+     * Get reference prefix.
+     * 
+     * @return the reference prefix.
+     */
+
     public ReferencePrefix getReferencePrefix() {
-        return this.accessPath;
+        return accessPath;
     }
+
+    /**
+     * Set reference prefix.
+     * 
+     * @param x
+     *            a reference prefix.
+     */
 
     public void setReferencePrefix(ReferencePrefix x) {
-        this.accessPath = x;
+        accessPath = x;
     }
+
+    /**
+     * Get reference suffix.
+     * 
+     * @return the reference suffix.
+     */
 
     public ReferenceSuffix getReferenceSuffix() {
-        return this.referenceParent;
+        return referenceParent;
     }
+
+    /**
+     * Set reference suffix.
+     * 
+     * @param path
+     *            a reference suffix.
+     */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
-        this.referenceParent = path;
+        referenceParent = path;
     }
+
+    /**
+     * Get arguments.
+     * 
+     * @return the expression mutable list.
+     */
 
     public ASTList<Expression> getArguments() {
-        return this.children;
+        return children;
     }
 
+    /**
+     * Set arguments.
+     * 
+     * @param list
+     *            an expression mutable list.
+     */
+
     public void setArguments(ASTList<Expression> list) {
-        this.children = list;
+        children = list;
     }
 
     public void accept(SourceVisitor v) {
         v.visitNew(this);
     }
+    
+    public ASTList<TypeArgumentDeclaration> getConstructorRefTypeArguments() {
+    	return constructorCallTypeArgs;
+    }
+    
+    public void setConstructorRefTypeArguments(ASTList<TypeArgumentDeclaration> list) {
+    	constructorCallTypeArgs = list;
+    }
+    
+    public boolean withDiamondOperator() {
+    	return withDiamondOperator;
+    }
+
+    public void setWithDiamondOperator(boolean flag) {
+    	this.withDiamondOperator = flag;
+    }
+
 }

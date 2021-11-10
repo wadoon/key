@@ -71,11 +71,11 @@ CHANGES
 
 NOTES
 =====
-- Java Language Specification 3rd edition, ง 10.8 states:
+- Java Language Specification 3rd edition, ยง 10.8 states:
     "The direct superclass of an array type is Object.
      Every array type implements the interfaces Cloneable and java.io.Serializable."
-  However, ง4.10.3 lists other rules for *sub*typing. In our opinion, both
-  definitions don't go along too well. Recoder follows ง4.10.3, and applies
+  However, ยง4.10.3 lists other rules for *sub*typing. In our opinion, both
+  definitions don't go along too well. Recoder follows ยง4.10.3, and applies
   those rules reversely to supertyping as well. In particular, the
   direct supertypes of String[] are:
     java.lang.Object[]

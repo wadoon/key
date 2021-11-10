@@ -1,15 +1,23 @@
-package recoder.java;
+// This file is part of the RECODER library and protected by the LGPL.
 
-import recoder.java.declaration.VariableSpecification;
+package recoder.java;
 
 import java.util.List;
 
+import recoder.java.declaration.VariableSpecification;
+
+/**
+ * The property of a non terminal program element to define a scope for
+ * variables.
+ */
+
 public interface VariableScope extends ScopeDefiningElement {
-    List<? extends VariableSpecification> getVariablesInScope();
 
-    VariableSpecification getVariableInScope(String paramString);
+	List<? extends VariableSpecification> getVariablesInScope();
 
-    void addVariableToScope(VariableSpecification paramVariableSpecification);
+    VariableSpecification getVariableInScope(String name);
 
-    void removeVariableFromScope(String paramString);
+    void addVariableToScope(VariableSpecification var);
+
+    void removeVariableFromScope(String name);
 }

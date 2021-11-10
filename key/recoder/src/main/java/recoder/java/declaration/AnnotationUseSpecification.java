@@ -1,154 +1,241 @@
+/*
+ * Created on 24.02.2005
+ *
+ * This file is part of the RECODER library and protected by the LGPL.
+ */
 package recoder.java.declaration;
 
 import recoder.abstraction.AnnotationUse;
-import recoder.java.*;
+import recoder.java.Declaration;
+import recoder.java.Expression;
+import recoder.java.ExpressionContainer;
+import recoder.java.JavaNonTerminalProgramElement;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.PackageSpecification;
+import recoder.java.ProgramElement;
+import recoder.java.SourceVisitor;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
 import recoder.list.generic.ASTList;
 
+/**
+ * Use of an annotation, usually within a declaration. However, it may occur
+ * as part as an ElementValuePair, so the interface Expression is implemented as well.
+ * 
+ * @author gutzmann
+ *
+ */
 public class AnnotationUseSpecification extends JavaNonTerminalProgramElement implements AnnotationUse, DeclarationSpecifier, TypeReferenceContainer, Expression {
-    private static final long serialVersionUID = 6354411799881814722L;
 
-    protected NonTerminalProgramElement parent;
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = 6354411799881814722L;
 
-    protected TypeReference reference;
-
-    protected ASTList<AnnotationElementValuePair> elementValuePairs;
-
+	/**
+     * Parent. Either an expression container, a declaration, or a PackageSpecification
+     */
+	private NonTerminalProgramElement parent;
+    
+	private TypeReference reference;
+    
+	private ASTList<AnnotationElementValuePair> elementValuePairs;
+    
+    /**
+     * 
+     */
     public AnnotationUseSpecification() {
+        super();
     }
-
+    
     public AnnotationUseSpecification(TypeReference reference) {
         this.reference = reference;
         makeParentRoleValid();
     }
 
-    public AnnotationUseSpecification(AnnotationUseSpecification proto) {
+    /**
+     * @param proto
+     */
+    protected AnnotationUseSpecification(AnnotationUseSpecification proto) {
         super(proto);
-        this.reference = (TypeReference) proto.parent.deepClone();
-        this.elementValuePairs = proto.elementValuePairs.deepClone();
+        if (proto.reference != null)
+        	this.reference = proto.reference.deepClone();
+        if (proto.elementValuePairs != null)
+        	this.elementValuePairs = proto.elementValuePairs.deepClone();
         makeParentRoleValid();
     }
 
+    /* (non-Javadoc)
+     * @see recoder.java.SourceElement#accept(recoder.java.SourceVisitor)
+     */
     public void accept(SourceVisitor v) {
         v.visitAnnotationUse(this);
     }
 
+    /* (non-Javadoc)
+     * @see recoder.java.SourceElement#deepClone()
+     */
     public AnnotationUseSpecification deepClone() {
         return new AnnotationUseSpecification(this);
     }
 
+    /* (non-Javadoc)
+     * @see recoder.java.NonTerminalProgramElement#getChildCount()
+     */
     public int getChildCount() {
         int res = 0;
-        if (this.reference != null)
-            res++;
-        if (this.elementValuePairs != null)
-            res += this.elementValuePairs.size();
+        if (reference != null) res++;
+        if (elementValuePairs != null)
+            res += elementValuePairs.size();
         return res;
     }
 
+    /* (non-Javadoc)
+     * @see recoder.java.NonTerminalProgramElement#getChildAt(int)
+     */
     public ProgramElement getChildAt(int index) {
-        if (this.reference != null) {
+        if (reference != null) {
             if (index == 0)
-                return this.reference;
-            index--;
+                return reference;
+            index--; // correct offset
         }
-        return this.elementValuePairs.get(index);
+        return elementValuePairs.get(index);// may throw IndexOutOfBoundsException
     }
 
+    /* (non-Javadoc)
+     * @see recoder.java.NonTerminalProgramElement#getChildPositionCode(recoder.java.ProgramElement)
+     */
     public int getChildPositionCode(ProgramElement child) {
-        if (child == null)
-            throw new NullPointerException();
-        if (child == this.reference)
-            return 0;
-        if (this.elementValuePairs != null) {
-            int idx = this.elementValuePairs.indexOf(child);
+        if (child == null) throw new NullPointerException();
+        // role 0: reference
+        // role 1 (idx): element value pair
+        if (child == reference) return 0;
+        if (elementValuePairs != null) {
+            int idx = elementValuePairs.indexOf(child);
             if (idx >= -1)
-                return idx << 4 | 0x1;
+                return (idx << 4) | 1;
         }
         return -1;
     }
 
+    /* (non-Javadoc)
+     * @see recoder.java.NonTerminalProgramElement#makeParentRoleValid()
+     */
     public void makeParentRoleValid() {
-        super.makeParentRoleValid();
-        if (this.reference != null)
-            this.reference.setParent(this);
-        if (this.elementValuePairs != null)
-            for (int i = 0, max = this.elementValuePairs.size(); i < max; i++)
-                this.elementValuePairs.get(i).setParent(this);
+        if (reference != null) reference.setParent(this);
+        if (elementValuePairs != null)
+            for (int i = 0, max = elementValuePairs.size(); i < max; i++)
+                elementValuePairs.get(i).setParent(this);
     }
 
+    /* (non-Javadoc)
+     * @see recoder.java.NonTerminalProgramElement#replaceChild(recoder.java.ProgramElement, recoder.java.ProgramElement)
+     */
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
-        if (p == this.reference) {
-            TypeReference tr = (TypeReference) q;
-            this.reference = tr;
+        }
+        if (p == reference) {
+            TypeReference tr = (TypeReference)q; 
+            reference = tr;
             if (tr != null)
-                tr.setParent(this);
+            	tr.setParent(this);
             return true;
         }
-        for (int i = 0; i < this.elementValuePairs.size(); i++) {
-            AnnotationElementValuePair evp = this.elementValuePairs.get(i);
-            if (p == evp)
+        for (int i = 0; i < elementValuePairs.size(); i++) {
+            AnnotationElementValuePair evp = elementValuePairs.get(i);
+            if (p == evp) {
                 if (q == null) {
-                    this.elementValuePairs.remove(i);
+                    elementValuePairs.remove(i);
                 } else {
                     AnnotationElementValuePair r = (AnnotationElementValuePair) q;
-                    this.elementValuePairs.set(i, r);
+                    elementValuePairs.set(i, r);
                     r.setParent(this);
-                }
+                }            
+            }
         }
         return false;
     }
+    
+    /**
+     * Get AST parent.
+     * 
+     * @return the non terminal program element.
+     */
 
     public NonTerminalProgramElement getASTParent() {
-        return this.parent;
+        return parent;
     }
 
+    /**
+     * Get parent iff it is a declaration.
+     * 
+     * @return the declaration.
+     */
+
     public Declaration getParentDeclaration() {
-        return (this.parent instanceof Declaration) ? (Declaration) this.parent : null;
+        return parent instanceof Declaration ? (Declaration)parent : null;
     }
+
+    /**
+     * Set parent.
+     * 
+     * @param parent
+     *            a declaration.
+     */
 
     public void setParent(Declaration parent) {
         this.parent = parent;
     }
-
+    
     public void setParent(PackageSpecification parent) {
-        this.parent = parent;
+    	this.parent = parent;
     }
-
+    
     public TypeReference getTypeReference() {
-        return this.reference;
+        return reference;
     }
-
+    
     public void setTypeReference(TypeReference tr) {
         this.reference = tr;
     }
 
+    /* (non-Javadoc)
+     * @see recoder.java.reference.TypeReferenceContainer#getTypeReferenceCount()
+     */
     public int getTypeReferenceCount() {
-        return (this.reference == null) ? 0 : 1;
+        return reference == null ? 0 : 1;
     }
 
+    /* (non-Javadoc)
+     * @see recoder.java.reference.TypeReferenceContainer#getTypeReferenceAt(int)
+     */
     public TypeReference getTypeReferenceAt(int index) {
-        if (index == 0 && this.reference != null)
-            return this.reference;
+        if (index == 0 && reference != null)
+            return reference;
         throw new ArrayIndexOutOfBoundsException(index);
     }
-
-    public ASTList<AnnotationElementValuePair> getElementValuePairs() {
-        return this.elementValuePairs;
-    }
-
+    
     public void setElementValuePairs(ASTList<AnnotationElementValuePair> elementValuePairs) {
         this.elementValuePairs = elementValuePairs;
     }
+    
+    public ASTList<AnnotationElementValuePair> getElementValuePairs() {
+        return elementValuePairs;
+    }
 
+    /* (non-Javadoc)
+     * @see recoder.java.Expression#getExpressionContainer()
+     */
     public ExpressionContainer getExpressionContainer() {
-        return (this.parent instanceof ExpressionContainer) ? (ExpressionContainer) this.parent : null;
+        return parent instanceof ExpressionContainer ? (ExpressionContainer)parent : null; 
     }
 
+    /* (non-Javadoc)
+     * @see recoder.java.Expression#setExpressionContainer(recoder.java.ExpressionContainer)
+     */
     public void setExpressionContainer(ExpressionContainer c) {
-        this.parent = c;
+        parent = c;
     }
+
 }

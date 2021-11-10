@@ -1,74 +1,347 @@
+// This file is part of the RECODER library and protected by the LGPL
+
 package recoder.java;
 
-import recoder.DefaultServiceConfiguration;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.nio.CharBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
 import recoder.ParserException;
 import recoder.ProgramFactory;
 import recoder.ServiceConfiguration;
+import recoder.abstraction.TypeArgument.WildcardMode;
 import recoder.convenience.TreeWalker;
 import recoder.io.ProjectSettings;
-import recoder.java.declaration.*;
-import recoder.java.declaration.modifier.*;
+import recoder.io.PropertyNames;
+import recoder.java.SourceElement.Position;
+import recoder.java.declaration.AnnotationDeclaration;
+import recoder.java.declaration.AnnotationElementValuePair;
+import recoder.java.declaration.AnnotationPropertyDeclaration;
+import recoder.java.declaration.AnnotationUseSpecification;
+import recoder.java.declaration.ClassDeclaration;
+import recoder.java.declaration.ClassInitializer;
+import recoder.java.declaration.ConstructorDeclaration;
+import recoder.java.declaration.DeclarationSpecifier;
+import recoder.java.declaration.EnumConstantDeclaration;
+import recoder.java.declaration.EnumConstantSpecification;
+import recoder.java.declaration.EnumDeclaration;
+import recoder.java.declaration.Extends;
+import recoder.java.declaration.FieldDeclaration;
+import recoder.java.declaration.FieldSpecification;
+import recoder.java.declaration.Implements;
+import recoder.java.declaration.InterfaceDeclaration;
+import recoder.java.declaration.LocalVariableDeclaration;
+import recoder.java.declaration.MemberDeclaration;
+import recoder.java.declaration.MethodDeclaration;
+import recoder.java.declaration.ParameterDeclaration;
+import recoder.java.declaration.Throws;
+import recoder.java.declaration.TypeArgumentDeclaration;
+import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.TypeParameterDeclaration;
+import recoder.java.declaration.UnionTypeParameterDeclaration;
+import recoder.java.declaration.VariableSpecification;
+import recoder.java.declaration.modifier.Abstract;
+import recoder.java.declaration.modifier.Final;
+import recoder.java.declaration.modifier.Native;
+import recoder.java.declaration.modifier.Private;
+import recoder.java.declaration.modifier.Protected;
+import recoder.java.declaration.modifier.Public;
+import recoder.java.declaration.modifier.Static;
+import recoder.java.declaration.modifier.StrictFp;
+import recoder.java.declaration.modifier.Synchronized;
+import recoder.java.declaration.modifier.Transient;
+import recoder.java.declaration.modifier.VisibilityModifier;
+import recoder.java.declaration.modifier.Volatile;
 import recoder.java.expression.ArrayInitializer;
+import recoder.java.expression.ElementValueArrayInitializer;
 import recoder.java.expression.ParenthesizedExpression;
-import recoder.java.expression.literal.*;
-import recoder.java.expression.operator.*;
-import recoder.java.reference.*;
-import recoder.java.statement.*;
+import recoder.java.expression.literal.BooleanLiteral;
+import recoder.java.expression.literal.CharLiteral;
+import recoder.java.expression.literal.DoubleLiteral;
+import recoder.java.expression.literal.FloatLiteral;
+import recoder.java.expression.literal.IntLiteral;
+import recoder.java.expression.literal.LongLiteral;
+import recoder.java.expression.literal.NullLiteral;
+import recoder.java.expression.literal.StringLiteral;
+import recoder.java.expression.operator.BinaryAnd;
+import recoder.java.expression.operator.BinaryAndAssignment;
+import recoder.java.expression.operator.BinaryNot;
+import recoder.java.expression.operator.BinaryOr;
+import recoder.java.expression.operator.BinaryOrAssignment;
+import recoder.java.expression.operator.BinaryXOr;
+import recoder.java.expression.operator.BinaryXOrAssignment;
+import recoder.java.expression.operator.Conditional;
+import recoder.java.expression.operator.CopyAssignment;
+import recoder.java.expression.operator.Divide;
+import recoder.java.expression.operator.DivideAssignment;
+import recoder.java.expression.operator.Equals;
+import recoder.java.expression.operator.GreaterOrEquals;
+import recoder.java.expression.operator.GreaterThan;
+import recoder.java.expression.operator.Instanceof;
+import recoder.java.expression.operator.LessOrEquals;
+import recoder.java.expression.operator.LessThan;
+import recoder.java.expression.operator.LogicalAnd;
+import recoder.java.expression.operator.LogicalNot;
+import recoder.java.expression.operator.LogicalOr;
+import recoder.java.expression.operator.Minus;
+import recoder.java.expression.operator.MinusAssignment;
+import recoder.java.expression.operator.Modulo;
+import recoder.java.expression.operator.ModuloAssignment;
+import recoder.java.expression.operator.Negative;
+import recoder.java.expression.operator.New;
+import recoder.java.expression.operator.NewArray;
+import recoder.java.expression.operator.NotEquals;
+import recoder.java.expression.operator.Plus;
+import recoder.java.expression.operator.PlusAssignment;
+import recoder.java.expression.operator.Positive;
+import recoder.java.expression.operator.PostDecrement;
+import recoder.java.expression.operator.PostIncrement;
+import recoder.java.expression.operator.PreDecrement;
+import recoder.java.expression.operator.PreIncrement;
+import recoder.java.expression.operator.ShiftLeft;
+import recoder.java.expression.operator.ShiftLeftAssignment;
+import recoder.java.expression.operator.ShiftRight;
+import recoder.java.expression.operator.ShiftRightAssignment;
+import recoder.java.expression.operator.Times;
+import recoder.java.expression.operator.TimesAssignment;
+import recoder.java.expression.operator.TypeCast;
+import recoder.java.expression.operator.UnsignedShiftRight;
+import recoder.java.expression.operator.UnsignedShiftRightAssignment;
+import recoder.java.reference.AnnotationPropertyReference;
+import recoder.java.reference.ArrayReference;
+import recoder.java.reference.EnumConstructorReference;
+import recoder.java.reference.FieldReference;
+import recoder.java.reference.MetaClassReference;
+import recoder.java.reference.MethodReference;
+import recoder.java.reference.PackageReference;
+import recoder.java.reference.ReferencePrefix;
+import recoder.java.reference.SuperConstructorReference;
+import recoder.java.reference.SuperReference;
+import recoder.java.reference.ThisConstructorReference;
+import recoder.java.reference.ThisReference;
+import recoder.java.reference.TypeReference;
+import recoder.java.reference.UncollatedReferenceQualifier;
+import recoder.java.reference.VariableReference;
+import recoder.java.statement.Assert;
+import recoder.java.statement.Branch;
+import recoder.java.statement.Break;
+import recoder.java.statement.Case;
+import recoder.java.statement.Catch;
+import recoder.java.statement.Continue;
+import recoder.java.statement.Default;
+import recoder.java.statement.Do;
+import recoder.java.statement.Else;
+import recoder.java.statement.EmptyStatement;
+import recoder.java.statement.EnhancedFor;
+import recoder.java.statement.Finally;
+import recoder.java.statement.For;
+import recoder.java.statement.If;
+import recoder.java.statement.LabeledStatement;
+import recoder.java.statement.Return;
+import recoder.java.statement.Switch;
+import recoder.java.statement.SynchronizedBlock;
+import recoder.java.statement.Then;
+import recoder.java.statement.Throw;
+import recoder.java.statement.Try;
+import recoder.java.statement.While;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.parser.JavaCCParser;
 import recoder.util.StringUtils;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.*;
-import java.nio.CharBuffer;
-import java.util.ArrayList;
-import java.util.List;
-
 public class JavaProgramFactory implements ProgramFactory, PropertyChangeListener {
-    private static final SourceElement.Position ZERO_POSITION = new SourceElement.Position(0, 0);
-    private static final JavaProgramFactory theFactory = new JavaProgramFactory();
-    private static ServiceConfiguration serviceConfiguration;
-    private static StringWriter writer = new StringWriter();
-    private static PrettyPrinter sourcePrinter;
-    private static boolean useAddNewlineReader = true;
-    private static final JavaCCParser parser = new JavaCCParser(System.in);
 
-    public static JavaProgramFactory getInstance() {
-        return theFactory;
+    /**
+     * No longer a singleton as of Recoder 0.93
+     */
+    public JavaProgramFactory() { 
+    	// nothing to do
+    }
+    
+    // TODO I rather have this removed for the future...
+    public JavaCCParser getParser() {
+    	return parser;
+    }
+    
+    public static class TraceItem {
+    	public final ProgramElement pe;
+    	public final String st;
+    	public TraceItem(ProgramElement pe) {
+    		this.pe = pe;
+    		StackTraceElement[] ste = new Throwable().getStackTrace();
+    		int startIdx = 3;
+    		while (ste[startIdx].toString().indexOf("<init>") != -1
+    				|| ste[startIdx].toString().indexOf(".deepClone(") != -1)
+    			startIdx++;
+    		st = "\t"+ste[startIdx+0]+"\n\t"+ste[startIdx+1]+"\n\t"+ste[startIdx+2];
+    	}
+    	@Override
+    	public boolean equals(Object o) {
+    		if (o == pe)
+    			return true; // TODO hack!!
+    		if (!(o instanceof TraceItem))
+    			return false;
+    		return ((TraceItem)o).pe == pe;
+    	}
+    	@Override
+    	public int hashCode() {
+    		return pe.hashCode();
+    	}
+    	@Override
+    	public String toString() {
+    		return pe.toString() + "\n" + st;
+    	}
+    }
+    
+    private HashMap<ProgramElement, TraceItem> createdItems;
+    private boolean doTrace = false;
+    private boolean autoTrace = true; // TODO...
+    /**
+     * debug method
+     * @since 0.90
+     */
+    public void beginTracing() {
+    	createdItems = new HashMap<ProgramElement, TraceItem>(1000);
+    	doTrace = true;
+    }
+    
+    public void detrace(ProgramElement pe) {
+    	TreeWalker tw = new TreeWalker(pe);
+    	while (tw.next()) {
+    		createdItems.remove(tw.getProgramElement());
+    	}
+    }
+    
+    public TraceItem getTraceItem(ProgramElement pe) {
+    	return createdItems.get(pe);
+    }
+    
+
+    /**
+     * debug method
+     * @since 0.90
+     */
+    public Collection<TraceItem> endTracing() {
+    	doTrace = false;
+    	return createdItems.values();
+    }
+    
+    // only to be called from JavaSourceElement prototype-constructor and internally!!
+    public void trace(ProgramElement pe) {
+    	if (doTrace && autoTrace) {
+    		createdItems.put(pe, new TraceItem(pe));
+    	}
+    }
+    
+    public void manTrace(ProgramElement pe) {
+    	if (doTrace)
+    		createdItems.put(pe, new TraceItem(pe));
     }
 
-    private static void attachComment(Comment c, ProgramElement pe) {
-        ASTArrayList aSTArrayList;
-        ProgramElement dest = pe;
-        if (c.isPrefixed() && pe instanceof CompilationUnit && ((CompilationUnit) pe).getChildCount() > 0) {
-            ProgramElement fc = ((CompilationUnit) pe).getChildAt(0);
-            int distcu = c.getStartPosition().getLine();
-            int distfc = fc.getStartPosition().getLine() - c.getEndPosition().getLine();
-            if (c instanceof SingleLineComment)
-                distcu--;
-            if (distcu >= distfc)
-                dest = fc;
-        } else if (!c.isPrefixed()) {
+    /**
+     * The singleton instance of the program factory.
+     */
+    private ServiceConfiguration serviceConfiguration;
+
+    /**
+     * StringWriter for toSource.
+     */
+    private StringWriter writer = new StringWriter();
+
+    /**
+     * PrettyPrinter, for toSource.
+     */
+    private PrettyPrinter sourcePrinter;
+    
+    private boolean useAddNewlineReader = true;
+
+    /**
+     * Called by the service configuration indicating that all services are
+     * known. Services may now start communicating or linking among their
+     * configuration partners. The service configuration can be memorized if it
+     * has not been passed in by a constructor already.
+     * 
+     * @param cfg
+     *            the service configuration this services has been assigned to.
+     */
+    public void initialize(ServiceConfiguration cfg) {
+        serviceConfiguration = cfg;
+        
+        ProjectSettings settings = serviceConfiguration.getProjectSettings();
+        settings.addPropertyChangeListener(this);
+        writer = new StringWriter();
+        sourcePrinter = new PrettyPrinter(writer, settings.getProperties());
+        parser.setAwareOfAssert(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
+                PropertyNames.JDK1_4)));
+        parser.setJava5(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
+                PropertyNames.JAVA_5)));
+        parser.setJava7(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
+        		PropertyNames.JAVA_7)));
+    }
+
+    /**
+     * Returns the service configuration this service is a part of.
+     * 
+     * @return the configuration of this service.
+     */
+    public ServiceConfiguration getServiceConfiguration() {
+        return serviceConfiguration;
+    }
+
+    /**
+     * For internal reuse and synchronization.
+     */
+    private JavaCCParser parser = new JavaCCParser(System.in);
+
+    private final static Position ZERO_POSITION = new Position(0, 0);
+    
+    private void attachComment(Comment c, ProgramElement pe) {
+    	ProgramElement dest = pe;
+
+    	if (c.isPrefixed() && pe instanceof CompilationUnit && ((CompilationUnit)pe).getChildCount() > 0) {
+    		// may need attach to first child element
+    		ProgramElement fc = ((CompilationUnit)pe).getChildAt(0);
+    		int distcu = c.getStartPosition().getLine();
+    		int distfc = fc.getStartPosition().getLine() - c.getEndPosition().getLine();
+    		if (c instanceof SingleLineComment) distcu--;
+    		if (distcu >= distfc) {
+    			dest = fc; 
+    		}
+    	}
+    	else if (!c.isPrefixed()) {
             NonTerminalProgramElement ppe = dest.getASTParent();
             int i = 0;
-            if (ppe != null)
-                for (; ppe.getChildAt(i) != dest; i++) ;
-            if (i == 0) {
+            if (ppe != null) {
+                while (ppe.getChildAt(i) != dest) i++;
+            }
+            if (i == 0) { // before syntactical parent
                 c.setPrefixed(true);
             } else {
                 dest = ppe.getChildAt(i - 1);
                 while (dest instanceof NonTerminalProgramElement) {
                     ppe = (NonTerminalProgramElement) dest;
                     i = ppe.getChildCount();
-                    if (i == 0)
+                    if (i == 0) {
                         break;
+                    }
                     dest = ppe.getChildAt(i - 1);
                 }
+                // Comments attached better - Fix by T.Gutzmann
                 ppe = dest.getASTParent();
                 boolean doChange = false;
-                while (ppe != null && ppe.getASTParent() != null && ppe.getEndPosition().compareTo(dest.getEndPosition()) >= 0 && ppe.getASTParent().getEndPosition().compareTo(c.getStartPosition()) <= 0) {
+                while (ppe != null && ppe.getASTParent() != null
+                        && ppe.getEndPosition().compareTo(dest.getEndPosition()) >= 0
+                        && ppe.getASTParent().getEndPosition().compareTo(c.getStartPosition()) <= 0) {
                     ppe = ppe.getASTParent();
                     doChange = true;
                 }
@@ -77,15 +350,21 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                 if (dest instanceof NonTerminalProgramElement) {
                     ppe = (NonTerminalProgramElement) dest;
                     if (ppe.getEndPosition().compareTo(c.getStartPosition()) >= 0) {
-                        while (ppe.getChildCount() > 0 && ppe.getChildAt(ppe.getChildCount() - 1).getEndPosition().compareTo(ppe.getEndPosition()) == 0 && ppe.getChildAt(ppe.getChildCount() - 1) instanceof NonTerminalProgramElement) {
+                        while (ppe.getChildCount() > 0
+                                && ppe.getChildAt(ppe.getChildCount() - 1).getEndPosition().compareTo(
+                                        ppe.getEndPosition()) == 0
+                                // TODO Gutzmann - this shouldn't be neccessary
+                                && ppe.getChildAt(ppe.getChildCount() - 1) instanceof NonTerminalProgramElement) {
                             ppe = (NonTerminalProgramElement) ppe.getChildAt(ppe.getChildCount() - 1);
                             dest = ppe;
                         }
                         c.setContainerComment(true);
                     }
                 }
-                if (!c.isContainerComment() && pe != dest)
+                if (!c.isContainerComment() && pe != dest) {
+                    // if in between two program elements in same line, prefer prefixing/look at number of whitespaces
                     if (pe.getFirstElement().getStartPosition().getLine() == dest.getLastElement().getEndPosition().getLine()) {
+                        // TODO strategy when looking at # of whitespaces ?!
                         int before = c.getStartPosition().getColumn() - dest.getLastElement().getEndPosition().getColumn();
                         int after = pe.getFirstElement().getStartPosition().getColumn() - c.getEndPosition().getColumn();
                         if (after <= before) {
@@ -93,70 +372,79 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                             c.setPrefixed(true);
                         }
                     }
-            }
-        }
-        if (c.isPrefixed()) {
-            NonTerminalProgramElement npe = dest.getASTParent();
-            while (npe != null && npe.getStartPosition().equals(dest.getStartPosition())) {
-                dest = npe;
-                npe = npe.getASTParent();
-            }
-        } else {
-            NonTerminalProgramElement npe = dest.getASTParent();
-            while (npe != null && npe.getEndPosition().equals(dest.getEndPosition())) {
-                dest = npe;
-                npe = npe.getASTParent();
-            }
-        }
-        if (c.isPrefixed() && c.getEndPosition().getLine() < dest.getStartPosition().getLine()) {
-            NonTerminalProgramElement npe = dest.getASTParent();
-            if (npe != null) {
-                int idx = npe.getIndexOfChild(dest);
-                if (idx > 0) {
-                    int distPre = dest.getStartPosition().getLine() - c.getEndPosition().getLine();
-                    int distPost = c.getStartPosition().getLine() - npe.getChildAt(idx - 1).getEndPosition().getLine();
-                    if (c instanceof SingleLineComment)
-                        distPost--;
-                    if (distPost < distPre) {
-                        dest = npe.getChildAt(idx - 1);
-                        c.setPrefixed(false);
-                    }
-                }
-            }
-        } else if (!c.isPrefixed() && c.getStartPosition().getLine() > dest.getEndPosition().getLine()) {
-            NonTerminalProgramElement npe = dest.getASTParent();
-            if (npe != null) {
-                int idx = npe.getIndexOfChild(dest);
-                if (idx + 1 < npe.getChildCount()) {
-                    int distPre = npe.getChildAt(idx + 1).getStartPosition().getLine() - c.getEndPosition().getLine();
-                    int distPost = c.getStartPosition().getLine() - dest.getEndPosition().getLine();
-                    if (c instanceof SingleLineComment)
-                        distPost--;
-                    if (distPre <= distPost) {
-                        dest = npe.getChildAt(idx + 1);
-                        c.setPrefixed(true);
-                    }
                 }
             }
         }
+    	if (c.isPrefixed()) {
+    		// once again, go up as long as possible
+    		NonTerminalProgramElement npe = dest.getASTParent();
+    		while (npe != null && npe.getStartPosition().equals(dest.getStartPosition())) {
+    			dest = npe;
+    			npe = npe.getASTParent();
+    		}
+    	} else if (!c.isContainerComment()) {
+    		NonTerminalProgramElement npe = dest.getASTParent();
+    		while (npe != null && npe.getEndPosition().equals(dest.getEndPosition())) {
+    			dest = npe;
+    			npe = npe.getASTParent();
+    		}
+    	}
+    	// if this is a full line comment, may need to change
+    	if (c.isPrefixed() && c.getEndPosition().getLine() <  dest.getStartPosition().getLine()) {
+    		NonTerminalProgramElement npe = dest.getASTParent();
+    		if (npe != null) {
+    			int idx = npe.getIndexOfChild(dest);
+    			if (idx > 0) {
+    				// calculate distance, maybe attach to next element
+    				int distPre = dest.getStartPosition().getLine() - c.getEndPosition().getLine();
+    				int distPost = c.getStartPosition().getLine() - npe.getChildAt(idx-1).getEndPosition().getLine();
+    				if (c instanceof SingleLineComment)
+    					distPost--; // prefer postfix comment in this case
+    				if (distPost < distPre) {
+    					dest = npe.getChildAt(idx-1);
+    					c.setPrefixed(false);
+    				}
+    			}
+    		}
+    	} else if (!c.isPrefixed() && c.getStartPosition().getLine() > dest.getEndPosition().getLine()) {
+    		NonTerminalProgramElement npe = dest.getASTParent();
+    		if (npe != null) {
+    			int idx = npe.getIndexOfChild(dest);
+    			if (idx+1 < npe.getChildCount()) {
+    				int distPre = npe.getChildAt(idx+1).getStartPosition().getLine() - c.getEndPosition().getLine();
+    				int distPost = c.getStartPosition().getLine() - dest.getEndPosition().getLine();
+    				if (c instanceof SingleLineComment)
+    					distPost--;
+    				if (distPre <= distPost) {
+    					dest = npe.getChildAt(idx+1);
+    					c.setPrefixed(true);
+    				}
+    			}
+    		}
+    	}
+    	
         if (c instanceof SingleLineComment && c.isPrefixed()) {
-            SourceElement.Position p = dest.getFirstElement().getRelativePosition();
+            Position p = dest.getFirstElement().getRelativePosition();
             if (p.getLine() < 1) {
                 p.setLine(1);
                 dest.getFirstElement().setRelativePosition(p);
             }
         }
         ASTList<Comment> cml = dest.getComments();
-        if (cml == null)
-            dest.setComments((ASTList<Comment>) (aSTArrayList = new ASTArrayList()));
-        aSTArrayList.add(c);
+        if (cml == null) {
+            dest.setComments(cml = new ASTArrayList<Comment>(1));
+        }
+        cml.add(c);
     }
 
-    private static void postWork(ProgramElement pe) {
-        List<Comment> comments = JavaCCParser.getComments();
-        int commentIndex = 0;
+    /**
+     * Perform post work on the created element. Creates parent links and
+     * assigns comments.
+     */
+    private void postWork(ProgramElement pe, List<Comment> comments) {
+    	int commentIndex = 0;
         int commentCount = comments.size();
-        SourceElement.Position cpos = ZERO_POSITION;
+        Position cpos = ZERO_POSITION;
         Comment current = null;
         if (commentIndex < commentCount) {
             current = comments.get(commentIndex);
@@ -165,12 +453,34 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         TreeWalker tw = new TreeWalker(pe);
         while (tw.next()) {
             pe = tw.getProgramElement();
-            if (pe instanceof NonTerminalProgramElement)
+            if (pe instanceof NonTerminalProgramElement) {
                 ((NonTerminalProgramElement) pe).makeParentRoleValid();
-            SourceElement.Position pos = pe.getFirstElement().getStartPosition();
-            while (commentIndex < commentCount && pos.compareTo(cpos) > 0) {
+            }
+            if (pe instanceof StatementBlock || pe instanceof ArrayInitializer || pe instanceof TypeDeclaration) {
+            	// Just another hotfix...
+            	while (
+            		(	(pe instanceof StatementBlock && ((StatementBlock)pe).getStatementCount() == 0)
+            		|| (pe instanceof ArrayInitializer && (((ArrayInitializer)pe).getArguments() == null || ((ArrayInitializer)pe).getArguments().size() == 0))
+            		|| (pe instanceof TypeDeclaration && (((TypeDeclaration)pe).getMembers() == null ||((TypeDeclaration)pe).getMembers().size() == 0)))
+            		&& (pe.getStartPosition().compareTo(cpos) < 0 && pe.getEndPosition().compareTo(cpos) > 0)) {
+            			current.setContainerComment(true);
+            			ASTList<Comment> cml = pe.getComments();
+            	        if (cml == null) {
+            	            pe.setComments(cml = new ASTArrayList<Comment>(1));
+            	        }
+            	        cml.add(current);
+            	        commentIndex += 1;
+            	        if (commentIndex < commentCount) {
+            	        	current = comments.get(commentIndex);
+            	        	cpos = current.getFirstElement().getStartPosition();
+            	        } else break;
+            	}
+            }
+
+            Position pos = pe.getFirstElement().getStartPosition();
+            while ((commentIndex < commentCount) && pos.compareTo(cpos) > 0) {
                 attachComment(current, pe);
-                commentIndex++;
+                commentIndex += 1;
                 if (commentIndex < commentCount) {
                     current = comments.get(commentIndex);
                     cpos = current.getFirstElement().getStartPosition();
@@ -178,10 +488,16 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             }
         }
         if (commentIndex < commentCount) {
-            while (pe.getASTParent() != null)
+            while (pe.getASTParent() != null) {
                 pe = pe.getASTParent();
+            }
+
+            /*
+             * postfixed comments may need to be attached to a child of current
+             * program element, so move down AST while child is closer to comment
+             * position.
+             */
             do {
-                ASTArrayList aSTArrayList;
                 current = comments.get(commentIndex);
                 ProgramElement dest = pe;
                 ProgramElement newDest = null;
@@ -190,22 +506,486 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                     if (npe.getChildCount() == 0)
                         break;
                     newDest = npe.getChildAt(npe.getChildCount() - 1);
-                    if ((npe.getEndPosition().compareTo(current.getStartPosition()) > 0 || (npe.getEndPosition().compareTo(current.getStartPosition()) == 0 && newDest.getEndPosition().compareTo(current.getStartPosition()) <= 0)) && dest != newDest)
+                    if ((npe.getEndPosition().compareTo(current.getStartPosition()) > 0 || ((npe.getEndPosition()
+                            .compareTo(current.getStartPosition()) == 0) && newDest.getEndPosition().compareTo(
+                            current.getStartPosition()) <= 0))
+                            && dest != newDest)
                         dest = newDest;
+                    else
+                        break;
                 }
                 ASTList<Comment> cml = dest.getComments();
-                if (cml == null)
-                    dest.setComments((ASTList<Comment>) (aSTArrayList = new ASTArrayList()));
+                if (cml == null) {
+                    dest.setComments(cml = new ASTArrayList<Comment>(1));
+                }
                 current.setPrefixed(false);
-                aSTArrayList.add(current);
-                ++commentIndex;
+                cml.add(current);
+                commentIndex += 1;
             } while (commentIndex < commentCount);
         }
     }
+    
+    private class AddNewlineReader extends Reader {
+    	private Reader reader;
+    	AddNewlineReader(Reader reader) {
+    		this.reader = reader;
+    	}
+    	@Override
+		public void mark(int readAheadLimit) throws IOException {
+			reader.mark(readAheadLimit);
+		}
+		@Override
+		public boolean markSupported() {
+			return reader.markSupported();
+		}
+		@Override
+		public int read() throws IOException {
+			return reader.read();
+		}
+		@Override
+		public int read(char[] cbuf) throws IOException {
+			return reader.read(cbuf);
+		}
+		@Override
+		public int read(CharBuffer target) throws IOException {
+			return reader.read(target);
+		}
+		@Override
+		public boolean ready() throws IOException {
+			return reader.ready();
+		}
+		@Override
+		public void reset() throws IOException {
+			reader.reset();
+		}
+		@Override
+		public long skip(long n) throws IOException {
+			return reader.skip(n);
+		}		
+		@Override
+		public void close() throws IOException {
+			reader.close();
+		}
+		private boolean added = false;
+		@Override
+		public int read(char[] cbuf, int off, int len) throws IOException {
+			if (added) return -1;
+			int result = reader.read(cbuf, off, len);
+			if (!added && result < len) {
+				if (result == -1) result++;
+				cbuf[off+result++] = '\n';
+				added = true;
+			}			
+			return result;
+		}
+    }
 
+    /**
+     * used SOLELY for testing: when set to "true", each CompilationUnit
+     * is deepClone()d before returned. Doesn't do any harm to set to
+     * true, but affects performance and possibly even memory
+     * consumption. 
+     */
+    public static boolean TESTING_DeepClone_Each_CU_before_return = false;
+    
+    /**
+     * Parse a {@link CompilationUnit}from the given reader.
+     */
+    @SuppressWarnings("resource") // ok as AddNewlineReader doesn't hold any resource. Caller will close underlying stream.
+	public CompilationUnit parseCompilationUnit(Reader in) throws IOException, ParserException {
+//    	try {
+//    		JavaLexer jl = new JavaLexer(new ANTLRReaderStream(in));
+//    		TokenStream ts = new CommonTokenStream(jl);
+//    		//ts.consume();
+//    		JavaParser jp = new JavaParser(ts);
+//    		jp.factory = this;
+//    		CompilationUnit cu = jp.compilationUnit();
+//    		postWork(cu, jp.getComments());
+//    		return cu;
+//    	} catch (Exception e) {
+//    		throw new RuntimeException(e);
+//    	}
+    	        synchronized 
+        (parser) {
+            parser.initialize(useAddNewlineReader ? new AddNewlineReader(in) : in, this);
+            CompilationUnit res = parser.CompilationUnit();
+            postWork(res, parser.getComments());
+            if (TESTING_DeepClone_Each_CU_before_return)
+            	res = res.deepClone(); // for testing purposes.
+            return res;
+        }
+    }
+    
+    /**
+     * Parse a {@link CompilationUnit}from the given reader.
+     * The supplied sourceVersion parameter describes the java version.
+     * @author NAI
+     * 
+     * @param in
+     * @param sourceVersion allowed values: "1.3", "1.4", "5". Defaults to Java 1.4 behavior if sourceVersion is <code>null</code> or any other string.
+     * @return
+     * @throws IOException
+     * @throws ParserException
+     */
+    @SuppressWarnings("resource") // ok as AddNewlineReader doesn't hold any resource. Caller will close underlying stream.
+    public CompilationUnit parseCompilationUnit(Reader in, String sourceVersion) throws IOException, ParserException {
+    	//default java version is java1.4
+    	boolean java14=true;
+    	boolean java5=false;
+    	boolean java7=false;
+    	if(sourceVersion!=null){
+    		if(sourceVersion.equals("1.3") || sourceVersion.startsWith("1.3.")){
+    			java14=false;
+    			java5=false;
+    			java7=false;
+    		}
+    		if(sourceVersion.equals("1.4") || sourceVersion.startsWith("1.4.")){
+    			java14=true;
+    			java5=false;
+    			java7=false;
+    		}
+    		if(sourceVersion.equals("1.5") || sourceVersion.startsWith("1.5.")){
+    			java14=true;
+    			java5=true;
+    			java7=false;
+    		}
+    		if(sourceVersion.equals("5") || sourceVersion.startsWith("5.")){
+    			java14=true;
+    			java5=true;
+    			java7=false;
+    		}
+    		if (sourceVersion.equals("1.7") || sourceVersion.startsWith("1.7.")) {
+    			java14 = java5 = java7 = true;
+    		}
+    		if (sourceVersion.equals("7") || sourceVersion.startsWith("7.")) {
+    			java14 = java5 = java7 = true;
+    		}
+    	}
+        synchronized 
+        (parser) {
+        	boolean wasJava14=parser.isAwareOfAssert();
+        	boolean wasJava5 =parser.isJava5();
+        	boolean wasJava7 = parser.isJava7();
+        	
+        	parser.setAwareOfAssert(java14);
+            parser.setJava5(java5);
+            parser.setJava7(java7);
+            parser.initialize(useAddNewlineReader ? new AddNewlineReader(in) : in, this);
+            CompilationUnit res = parser.CompilationUnit();
+            postWork(res, parser.getComments());
+
+            parser.setAwareOfAssert(wasJava14);
+            parser.setJava5(wasJava5);
+            parser.setJava7(wasJava7);
+                        
+            return res;
+        }
+    }
+
+    /**
+     * Parse a {@link TypeDeclaration}from the given reader.
+     */
+    public TypeDeclaration parseTypeDeclaration(Reader in) throws IOException, ParserException {
+        synchronized (parser) {
+            parser.initialize(in, this);
+            TypeDeclaration res = parser.TypeDeclaration();
+            postWork(res, parser.getComments());
+            return res;
+        }
+    }
+    
+    public TypeArgumentDeclaration parseTypeArgumentDeclaration(Reader in) throws IOException, ParserException {
+    	synchronized(parser) {
+    		parser.initialize(in, this);
+    		TypeArgumentDeclaration res = parser.TypeArgument();
+    		postWork(res, parser.getComments());
+    		return res;
+    	}
+    }
+
+    /**
+     * Parse a {@link FieldDeclaration}from the given reader.
+     */
+    public FieldDeclaration parseFieldDeclaration(Reader in) throws IOException, ParserException {
+        synchronized (parser) {
+            parser.initialize(in, this);
+            FieldDeclaration res = parser.FieldDeclaration();
+            postWork(res, parser.getComments());
+            return res;
+        }
+    }
+
+    /**
+     * Parse a {@link MethodDeclaration}from the given reader.
+     */
+    public MethodDeclaration parseMethodDeclaration(Reader in) throws IOException, ParserException {
+        synchronized (parser) {
+            parser.initialize(in, this);
+            MethodDeclaration res = parser.MethodDeclaration();
+            postWork(res, parser.getComments());
+            return res;
+        }
+    }
+
+    /**
+     * Parse a {@link MemberDeclaration}from the given reader.
+     */
+    public MemberDeclaration parseMemberDeclaration(Reader in) throws IOException, ParserException {
+        synchronized (parser) {
+            parser.initialize(in, this);
+            MemberDeclaration res = parser.ClassBodyDeclaration();
+            postWork(res, parser.getComments());
+            return res;
+        }
+    }
+
+    /**
+     * Parse a {@link ParameterDeclaration}from the given reader.
+     */
+    public ParameterDeclaration parseParameterDeclaration(Reader in) throws IOException, ParserException {
+        synchronized (parser) {
+            parser.initialize(in, this);
+            ParameterDeclaration res = parser.FormalParameter();
+            postWork(res, parser.getComments());
+            return res;
+        }
+    }
+
+    /**
+     * Parse a {@link ConstructorDeclaration}from the given reader.
+     */
+    public ConstructorDeclaration parseConstructorDeclaration(Reader in) throws IOException, ParserException {
+        synchronized (parser) {
+            parser.initialize(in, this);
+            ConstructorDeclaration res = parser.ConstructorDeclaration();
+            postWork(res, parser.getComments());
+            return res;
+        }
+    }
+
+    /**
+     * Parse a {@link TypeReference}from the given reader.
+     */
+    public TypeReference parseTypeReference(Reader in) throws IOException, ParserException {
+        synchronized (parser) {
+            parser.initialize(in, this);
+            TypeReference res = parser.ResultType();
+            postWork(res, parser.getComments());
+            return res;
+        }
+    }
+    
+    public PackageReference parsePackageReference(Reader in) throws IOException, ParserException {
+        synchronized (parser) {
+            parser.initialize(in, this);
+            PackageReference res = parser.Name().toPackageReference();
+            postWork(res, parser.getComments());
+            return res;
+        }
+    }
+
+    /**
+     * Parse an {@link Expression}from the given reader.
+     */
+    public Expression parseExpression(Reader in) throws IOException, ParserException {
+        synchronized (parser) {
+            parser.initialize(in, this);
+            Expression res = parser.Expression();
+            postWork(res, parser.getComments());
+            return res;
+        }
+    }
+
+    /**
+     * Parse some {@link Statement}s from the given reader.
+     */
+    public ASTList<Statement> parseStatements(Reader in) throws IOException, ParserException {
+        synchronized (parser) {
+            parser.initialize(in, this);
+            ASTList<Statement> res = parser.GeneralizedStatements();
+            for (int i = 0; i < res.size(); i += 1) {
+                postWork(res.get(i), parser.getComments());
+            }
+            return res;
+        }
+    }
+
+    /**
+     * Parse a {@link StatementBlock}from the given string.
+     */
+    public StatementBlock parseStatementBlock(Reader in) throws IOException, ParserException {
+        synchronized (parser) {
+            parser.initialize(in, this);
+            StatementBlock res = parser.Block();
+            postWork(res, parser.getComments());
+            return res;
+        }
+    }
+    
+    /**
+     * Parse a {@link CompilationUnit}from the given string.
+     */
+    public CompilationUnit parseCompilationUnit(String in) throws ParserException {
+        try {
+            return parseCompilationUnit(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse {@link CompilationUnit}s from the given string.
+     */
+    public List<CompilationUnit> parseCompilationUnits(String[] ins) throws ParserException {
+        try {
+        	List<CompilationUnit> cus = new ArrayList<CompilationUnit>();
+            for (int i = 0; i < ins.length; i++) {
+                CompilationUnit cu = parseCompilationUnit(new FileReader(ins[i]));
+                cus.add(cu);
+            }
+            return cus;
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a {@link TypeDeclaration}from the given string.
+     */
+    public TypeDeclaration parseTypeDeclaration(String in) throws ParserException {
+        try {
+            return parseTypeDeclaration(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a {@link MemberDeclaration}from the given string.
+     */
+    public MemberDeclaration parseMemberDeclaration(String in) throws ParserException {
+        try {
+            return parseMemberDeclaration(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a {@link FieldDeclaration}from the given string.
+     */
+    public FieldDeclaration parseFieldDeclaration(String in) throws ParserException {
+        try {
+            return parseFieldDeclaration(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a {@link MethodDeclaration}from the given string.
+     */
+    public MethodDeclaration parseMethodDeclaration(String in) throws ParserException {
+        try {
+            return parseMethodDeclaration(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a {@link ParameterDeclaration}from the given string.
+     */
+    public ParameterDeclaration parseParameterDeclaration(String in) throws ParserException {
+        try {
+            return parseParameterDeclaration(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a {@link ConstructorDeclaration}from the given string.
+     */
+    public ConstructorDeclaration parseConstructorDeclaration(String in) throws ParserException {
+        try {
+            return parseConstructorDeclaration(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a {@link TypeReference}from the given string.
+     */
+    public TypeReference parseTypeReference(String in) throws ParserException {
+        try {
+            return parseTypeReference(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a {@link TypeReference}from the given string.
+     */
+    public PackageReference parsePackageReference(String in) throws ParserException {
+        try {
+            return parsePackageReference(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse an {@link Expression}from the given string.
+     */
+    public Expression parseExpression(String in) throws ParserException {
+        try {
+            return parseExpression(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+    /**
+     * Parse a list of {@link Statement}s from the given string.
+     */
+    public ASTList<Statement> parseStatements(String in) throws ParserException {
+        try {
+            return parseStatements(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+    
+    public StatementBlock parseStatementBlock(String in) throws ParserException {
+        try {
+            return parseStatementBlock(new StringReader(in));
+        } catch (IOException ioe) {
+            throw new ParserException(("" + ioe));
+        }
+    }
+
+
+
+    /**
+     * Replacement for Integer.parseInt allowing "supercharged" non-decimal
+     * constants. In contrast to Integer.parseInt, works for 0x80000000 and
+     * higher octal and hex constants as well as -MIN_VALUE which is allowed in
+     * case that the minus sign has been interpreted as an unary minus. The
+     * method will return Integer.MIN_VALUE in that case; this is fine as
+     * -MIN_VALUE == MIN_VALUE.<br>
+     * As of Recoder 0.96, also supports underscores in integer literals (where allowed). This is done always and not configurable.
+     */
     public static int parseInt(String nm) throws NumberFormatException {
         int radix;
         boolean negative = false;
+        int result;
+
+        // remove underscores (Java7).
+        nm = nm.replaceAll("_", "");
+        
         int index = 0;
         if (nm.startsWith("-")) {
             negative = true;
@@ -214,6 +994,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         if (nm.startsWith("0x", index) || nm.startsWith("0X", index)) {
             index += 2;
             radix = 16;
+        } else if (nm.startsWith("0b", index) || nm.startsWith("0B", index)) {
+        	index += 2;
+        	radix = 2;
         } else if (nm.startsWith("0", index) && nm.length() > 1 + index) {
             index++;
             radix = 8;
@@ -226,28 +1009,46 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         if (radix == 16 && len == 8) {
             char first = nm.charAt(index);
             index++;
-            int i = Integer.valueOf(nm.substring(index), radix).intValue();
-            i |= Character.digit(first, 16) << 28;
-            return negative ? -i : i;
-        }
-        if (radix == 8 && len == 11) {
+            result = Integer.valueOf(nm.substring(index), radix).intValue();
+            result |= Character.digit(first, 16) << 28;
+            return negative ? -result : result;
+        } else if (radix == 8 && len == 11) {
             char first = nm.charAt(index);
             index++;
-            int i = Integer.valueOf(nm.substring(index), radix).intValue();
-            i |= Character.digit(first, 8) << 30;
-            return negative ? -i : i;
+            result = Integer.valueOf(nm.substring(index), radix).intValue();
+            result |= Character.digit(first, 8) << 30; // TODO check! (why is it << 30 here and << 63 for long?)
+            return negative ? -result : result;
+        } else if (radix == 2 && len == 32) {
+        	char first = nm.charAt(index);
+        	index++;
+        	result = Integer.valueOf(nm.substring(index), radix).intValue();
+        	result |= Character.digit(first, 2) << 31;
+        	return negative ? -result : result;
         }
-        if (!negative && radix == 10 && len == 10 && nm.indexOf("2147483648", index) == index)
+        if (!negative && radix == 10 && len == 10 && nm.indexOf("2147483648", index) == index) {
             return Integer.MIN_VALUE;
-        int result = Integer.valueOf(nm.substring(index), radix).intValue();
+        }
+        result = Integer.valueOf(nm.substring(index), radix).intValue();
         return negative ? -result : result;
     }
 
+    /**
+     * Replacement for Long.parseLong which is not available in JDK 1.1 and does
+     * not handle 'l' or 'L' suffices in JDK 1.2.
+     * As of Recoder 0.96, also supports underscores in integer literals (where allowed). This is done always and not configurable.
+     */
     public static long parseLong(String nm) throws NumberFormatException {
+    	// fixes a bug
+    	if (nm.equalsIgnoreCase("0L"))
+    		return 0;
+    	
         int radix;
-        if (nm.equalsIgnoreCase("0L"))
-            return 0L;
         boolean negative = false;
+        long result;
+
+        // remove underscores (Java7).
+        nm = nm.replaceAll("_", "");
+        
         int index = 0;
         if (nm.startsWith("-")) {
             negative = true;
@@ -256,262 +1057,53 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         if (nm.startsWith("0x", index) || nm.startsWith("0X", index)) {
             index += 2;
             radix = 16;
+        } else if (nm.startsWith("0b", index) || nm.startsWith("0B", index)) {
+        	index += 2;
+        	radix = 2;
         } else if (nm.startsWith("0", index) && nm.length() > 1 + index) {
             index++;
             radix = 8;
         } else {
             radix = 10;
         }
+
         if (nm.startsWith("-", index))
             throw new NumberFormatException("Negative sign in wrong position");
         int endIndex = nm.length();
-        if (nm.endsWith("L") || nm.endsWith("l"))
-            endIndex--;
+        if (nm.endsWith("L") || nm.endsWith("l")) {
+            endIndex -= 1;
+        }
+
         int len = endIndex - index;
         if (radix == 16 && len == 16) {
             char first = nm.charAt(index);
-            index++;
-            long l = Long.valueOf(nm.substring(index, endIndex), radix).longValue();
-            l |= Character.digit(first, 16) << 60L;
-            return negative ? -l : l;
-        }
-        if (radix == 8 && len == 21) {
+            index += 1;
+            result = Long.valueOf(nm.substring(index, endIndex), radix).longValue();
+            result |= (long) Character.digit(first, 16) << 60;
+            return negative ? -result : result;
+        } else if (radix == 8 && len == 21) {
             char first = nm.charAt(index);
-            index++;
-            long l = Long.valueOf(nm.substring(index, endIndex), radix).longValue();
-            l |= (Character.digit(first, 8) << 63);
-            return negative ? -l : l;
+            index += 1;
+            result = Long.valueOf(nm.substring(index, endIndex), radix).longValue();
+            result |= Character.digit(first, 8) << 63;  // TODO check! (why is it << 63 here and << 30 for int?)
+            return negative ? -result : result;
+        } else if (radix == 2 && len == 64) {
+        	char first = nm.charAt(index);
+        	index++;
+        	result = Long.valueOf(nm.substring(index), radix).longValue();
+        	result |= Character.digit(first, 2) << 63;
+        	return negative ? -result : result;
         }
-        if (!negative && radix == 10 && len == 19 && nm.indexOf("9223372036854775808", index) == index)
+        if (!negative && radix == 10 && len == 19 && nm.indexOf("9223372036854775808", index) == index) {
             return Long.MIN_VALUE;
-        long result = Long.valueOf(nm.substring(index, endIndex), radix).longValue();
+        }
+        result = Long.valueOf(nm.substring(index, endIndex), radix).longValue();
         return negative ? -result : result;
     }
 
-    public static void main(String[] args) throws Exception {
-        if (args.length < 1) {
-            System.err.println("Requires a java source file as argument");
-            System.exit(1);
-        }
-        try {
-            CompilationUnit cu = (new DefaultServiceConfiguration()).getProgramFactory().parseCompilationUnit(new FileReader(args[0]));
-            System.out.println(cu.toSource());
-        } catch (IOException ioe) {
-            System.err.println(ioe);
-            ioe.printStackTrace();
-        } catch (ParserException pe) {
-            System.err.println(pe);
-            pe.printStackTrace();
-        }
-    }
-
-    public void initialize(ServiceConfiguration cfg) {
-        serviceConfiguration = cfg;
-        ProjectSettings settings = serviceConfiguration.getProjectSettings();
-        settings.addPropertyChangeListener(this);
-        writer = new StringWriter();
-        sourcePrinter = new PrettyPrinter(writer, settings.getProperties());
-        JavaCCParser.setAwareOfAssert(StringUtils.parseBooleanProperty(settings.getProperties().getProperty("jdk1.4")));
-        JavaCCParser.setJava5(StringUtils.parseBooleanProperty(settings.getProperties().getProperty("java5")));
-    }
-
-    public ServiceConfiguration getServiceConfiguration() {
-        return serviceConfiguration;
-    }
-
-    public CompilationUnit parseCompilationUnit(Reader in) throws IOException, ParserException {
-        synchronized (parser) {
-            JavaCCParser.initialize(useAddNewlineReader ? new AddNewlineReader(in) : in);
-            CompilationUnit res = JavaCCParser.CompilationUnit();
-            postWork(res);
-            return res;
-        }
-    }
-
-    public TypeDeclaration parseTypeDeclaration(Reader in) throws IOException, ParserException {
-        synchronized (parser) {
-            JavaCCParser.initialize(in);
-            TypeDeclaration res = JavaCCParser.TypeDeclaration();
-            postWork(res);
-            return res;
-        }
-    }
-
-    public FieldDeclaration parseFieldDeclaration(Reader in) throws IOException, ParserException {
-        synchronized (parser) {
-            JavaCCParser.initialize(in);
-            FieldDeclaration res = JavaCCParser.FieldDeclaration();
-            postWork(res);
-            return res;
-        }
-    }
-
-    public MethodDeclaration parseMethodDeclaration(Reader in) throws IOException, ParserException {
-        synchronized (parser) {
-            JavaCCParser.initialize(in);
-            MethodDeclaration res = JavaCCParser.MethodDeclaration();
-            postWork(res);
-            return res;
-        }
-    }
-
-    public MemberDeclaration parseMemberDeclaration(Reader in) throws IOException, ParserException {
-        synchronized (parser) {
-            JavaCCParser.initialize(in);
-            MemberDeclaration res = JavaCCParser.ClassBodyDeclaration();
-            postWork(res);
-            return res;
-        }
-    }
-
-    public ParameterDeclaration parseParameterDeclaration(Reader in) throws IOException, ParserException {
-        synchronized (parser) {
-            JavaCCParser.initialize(in);
-            ParameterDeclaration res = JavaCCParser.FormalParameter();
-            postWork(res);
-            return res;
-        }
-    }
-
-    public ConstructorDeclaration parseConstructorDeclaration(Reader in) throws IOException, ParserException {
-        synchronized (parser) {
-            JavaCCParser.initialize(in);
-            ConstructorDeclaration res = JavaCCParser.ConstructorDeclaration();
-            postWork(res);
-            return res;
-        }
-    }
-
-    public TypeReference parseTypeReference(Reader in) throws IOException, ParserException {
-        synchronized (parser) {
-            JavaCCParser.initialize(in);
-            TypeReference res = JavaCCParser.ResultType();
-            postWork(res);
-            return res;
-        }
-    }
-
-    public Expression parseExpression(Reader in) throws IOException, ParserException {
-        synchronized (parser) {
-            JavaCCParser.initialize(in);
-            Expression res = JavaCCParser.Expression();
-            postWork(res);
-            return res;
-        }
-    }
-
-    public ASTList<Statement> parseStatements(Reader in) throws IOException, ParserException {
-        synchronized (parser) {
-            JavaCCParser.initialize(in);
-            ASTList<Statement> res = JavaCCParser.GeneralizedStatements();
-            for (int i = 0; i < res.size(); i++)
-                postWork(res.get(i));
-            return res;
-        }
-    }
-
-    public StatementBlock parseStatementBlock(Reader in) throws IOException, ParserException {
-        synchronized (parser) {
-            JavaCCParser.initialize(in);
-            StatementBlock res = JavaCCParser.Block();
-            postWork(res);
-            return res;
-        }
-    }
-
-    public CompilationUnit parseCompilationUnit(String in) throws ParserException {
-        try {
-            return parseCompilationUnit(new StringReader(in));
-        } catch (IOException ioe) {
-            throw new ParserException("" + ioe);
-        }
-    }
-
-    public List<CompilationUnit> parseCompilationUnits(String[] ins) throws ParserException {
-        try {
-            List<CompilationUnit> cus = new ArrayList<CompilationUnit>();
-            for (int i = 0; i < ins.length; i++) {
-                CompilationUnit cu = parseCompilationUnit(new FileReader(ins[i]));
-                cus.add(cu);
-            }
-            return cus;
-        } catch (IOException ioe) {
-            throw new ParserException("" + ioe);
-        }
-    }
-
-    public TypeDeclaration parseTypeDeclaration(String in) throws ParserException {
-        try {
-            return parseTypeDeclaration(new StringReader(in));
-        } catch (IOException ioe) {
-            throw new ParserException("" + ioe);
-        }
-    }
-
-    public MemberDeclaration parseMemberDeclaration(String in) throws ParserException {
-        try {
-            return parseMemberDeclaration(new StringReader(in));
-        } catch (IOException ioe) {
-            throw new ParserException("" + ioe);
-        }
-    }
-
-    public FieldDeclaration parseFieldDeclaration(String in) throws ParserException {
-        try {
-            return parseFieldDeclaration(new StringReader(in));
-        } catch (IOException ioe) {
-            throw new ParserException("" + ioe);
-        }
-    }
-
-    public MethodDeclaration parseMethodDeclaration(String in) throws ParserException {
-        try {
-            return parseMethodDeclaration(new StringReader(in));
-        } catch (IOException ioe) {
-            throw new ParserException("" + ioe);
-        }
-    }
-
-    public ParameterDeclaration parseParameterDeclaration(String in) throws ParserException {
-        try {
-            return parseParameterDeclaration(new StringReader(in));
-        } catch (IOException ioe) {
-            throw new ParserException("" + ioe);
-        }
-    }
-
-    public ConstructorDeclaration parseConstructorDeclaration(String in) throws ParserException {
-        try {
-            return parseConstructorDeclaration(new StringReader(in));
-        } catch (IOException ioe) {
-            throw new ParserException("" + ioe);
-        }
-    }
-
-    public TypeReference parseTypeReference(String in) throws ParserException {
-        try {
-            return parseTypeReference(new StringReader(in));
-        } catch (IOException ioe) {
-            throw new ParserException("" + ioe);
-        }
-    }
-
-    public Expression parseExpression(String in) throws ParserException {
-        try {
-            return parseExpression(new StringReader(in));
-        } catch (IOException ioe) {
-            throw new ParserException("" + ioe);
-        }
-    }
-
-    public ASTList<Statement> parseStatements(String in) throws ParserException {
-        try {
-            return parseStatements(new StringReader(in));
-        } catch (IOException ioe) {
-            throw new ParserException("" + ioe);
-        }
-    }
-
+    /**
+     * Creates a syntactical representation of the source element.
+     */
     String toSource(JavaSourceElement jse) {
         synchronized (writer) {
             sourcePrinter.setIndentationLevel(0);
@@ -523,6 +1115,14 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         }
     }
 
+    /**
+     * Returns a new suitable {@link recoder.java.PrettyPrinter}obeying the
+     * current project settings for the specified writer,
+     * 
+     * @param out
+     *            the (initial) writer to print to.
+     * @return a new pretty printer.
+     */
     public PrettyPrinter getPrettyPrinter(Writer out) {
         return new PrettyPrinter(out, serviceConfiguration.getProjectSettings().getProperties());
     }
@@ -530,1188 +1130,3385 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
     public void propertyChange(PropertyChangeEvent evt) {
         sourcePrinter = new PrettyPrinter(writer, serviceConfiguration.getProjectSettings().getProperties());
         String changedProp = evt.getPropertyName();
-        if (changedProp.equals("jdk1.4"))
-            JavaCCParser.setAwareOfAssert(StringUtils.parseBooleanProperty(evt.getNewValue().toString()));
-        if (changedProp.equals("java5"))
-            JavaCCParser.setJava5(StringUtils.parseBooleanProperty(evt.getNewValue().toString()));
-        if (changedProp.equals("extra_newline_at_end_of_file"))
-            useAddNewlineReader = StringUtils.parseBooleanProperty(evt.getNewValue().toString());
+        if (changedProp.equals(PropertyNames.JDK1_4)) {
+            parser.setAwareOfAssert(StringUtils.parseBooleanProperty(evt.getNewValue().toString()));
+            // call automatically sets Java_5 to false if neccessary.
+        } else if (changedProp.equals(PropertyNames.JAVA_5)) {
+            parser.setJava5(StringUtils.parseBooleanProperty(evt.getNewValue().toString()));
+            // call automatically sets awareOfAssert to true if neccessary.
+        } else if (changedProp.equals(PropertyNames.JAVA_7)) {
+        	parser.setJava7(StringUtils.parseBooleanProperty(evt.getNewValue().toString()));
+        } else if (changedProp.equals(PropertyNames.ADD_NEWLINE_AT_END_OF_FILE)) {
+        	useAddNewlineReader = StringUtils.parseBooleanProperty(evt.getNewValue().toString());
+        } 
     }
 
+    /**
+     * Creates a new {@link Comment}.
+     * 
+     * @return a new instance of Comment.
+     */
     public Comment createComment() {
-        return new Comment();
+        Comment res = new Comment();
+        res.setFactory(this);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Comment}.
+     * 
+     * @return a new instance of Comment.
+     */
     public Comment createComment(String text) {
-        return new Comment(text);
+        Comment res = new Comment(text);
+        res.setFactory(this);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Comment}.
+     * 
+     * @return a new instance of Comment.
+     */
     public Comment createComment(String text, boolean prefixed) {
-        return new Comment(text, prefixed);
+        Comment res = new Comment(text, prefixed);
+        res.setFactory(this);
+        return res;
     }
 
+    /**
+     * Creates a new {@link CompilationUnit}.
+     * 
+     * @return a new instance of CompilationUnit.
+     */
     public CompilationUnit createCompilationUnit() {
-        return new CompilationUnit();
+        CompilationUnit res = new CompilationUnit();
+        res.setFactory(this);
+        return res;
     }
 
-    public CompilationUnit createCompilationUnit(PackageSpecification pkg, ASTList<Import> imports, ASTList<TypeDeclaration> typeDeclarations) {
-        return new CompilationUnit(pkg, imports, typeDeclarations);
+    /**
+     * Creates a new {@link CompilationUnit}.
+     * 
+     * @return a new instance of CompilationUnit.
+     */
+    public CompilationUnit createCompilationUnit(PackageSpecification pkg, ASTList<Import> imports,
+    		ASTList<TypeDeclaration> typeDeclarations) {
+        CompilationUnit res = new CompilationUnit(pkg, imports, typeDeclarations);
+        res.setFactory(this);
+        return res;
     }
 
+    /**
+     * Creates a new {@link DocComment}.
+     * 
+     * @return a new instance of DocComment.
+     */
     public DocComment createDocComment() {
-        return new DocComment();
+        DocComment res = new DocComment();
+        res.setFactory(this);
+        return res;
     }
 
+    /**
+     * Creates a new {@link DocComment}.
+     * 
+     * @return a new instance of DocComment.
+     */
     public DocComment createDocComment(String text) {
-        return new DocComment(text);
+        DocComment res = new DocComment(text);
+        res.setFactory(this);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Identifier}.
+     * 
+     * @return a new instance of Identifier.
+     */
     public Identifier createIdentifier() {
-        return new Identifier();
+        Identifier res = new Identifier();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Identifier}.
+     * 
+     * @return a new instance of Identifier.
+     */
     public Identifier createIdentifier(String text) {
-        return new Identifier(text);
+        Identifier res = new Identifier(text);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Import}.
+     * 
+     * @return a new instance of Import.
+     */
     public Import createImport() {
-        return new Import();
+        Import res = new Import();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Import}.
+     * 
+     * @return a new instance of Import.
+     */
     public Import createImport(TypeReference t, boolean multi) {
-        return new Import(t, multi);
+        Import res = new Import(t, multi);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Import}.
+     * 
+     * @return a new instance of Import.
+     */
     public Import createImport(PackageReference t) {
-        return new Import(t);
+        Import res = new Import(t);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
-
+    
     public Import createStaticImport(TypeReference t) {
-        return new Import(t, true, true);
+        Import res = new Import(t, true, true);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
-
+    
     public Import createStaticImport(TypeReference t, Identifier id) {
-        return new Import(t, id);
+        Import res = new Import(t, id);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link PackageSpecification}.
+     * 
+     * @return a new instance of PackageSpecification.
+     */
     public PackageSpecification createPackageSpecification() {
-        return new PackageSpecification();
+        PackageSpecification res =  new PackageSpecification();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link PackageSpecification}.
+     * 
+     * @return a new instance of PackageSpecification.
+     */
     public PackageSpecification createPackageSpecification(PackageReference pkg) {
-        return new PackageSpecification(pkg);
+        PackageSpecification res =  new PackageSpecification(pkg);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link SingleLineComment}.
+     * 
+     * @return a new instance of SingleLineComment.
+     */
     public SingleLineComment createSingleLineComment() {
-        return new SingleLineComment();
+        SingleLineComment res = new SingleLineComment();
+        res.setFactory(this);
+        return res;
     }
 
+    /**
+     * Creates a new {@link SingleLineComment}.
+     * 
+     * @return a new instance of SingleLineComment.
+     */
     public SingleLineComment createSingleLineComment(String text) {
-        return new SingleLineComment(text);
+        SingleLineComment res = new SingleLineComment(text);
+        res.setFactory(this);
+        return res;
     }
 
+    /**
+     * Creates a new {@link TypeReference}.
+     * 
+     * @return a new instance of TypeReference.
+     */
     public TypeReference createTypeReference() {
-        return new TypeReference();
+        TypeReference res = new TypeReference();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link TypeReference}.
+     * 
+     * @return a new instance of TypeReference.
+     */
     public TypeReference createTypeReference(Identifier name) {
-        return new TypeReference(name);
+        TypeReference res = new TypeReference(name);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link TypeReference}.
+     * 
+     * @return a new instance of TypeReference.
+     */
     public TypeReference createTypeReference(ReferencePrefix prefix, Identifier name) {
-        return new TypeReference(prefix, name);
+        TypeReference res =  new TypeReference(prefix, name);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link TypeReference}.
+     * 
+     * @return a new instance of TypeReference.
+     */
     public TypeReference createTypeReference(Identifier name, int dim) {
-        return new TypeReference(name, dim);
+        TypeReference res = new TypeReference(name, dim);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link PackageReference}.
+     * 
+     * @return a new instance of PackageReference.
+     */
     public PackageReference createPackageReference() {
-        return new PackageReference();
+        PackageReference res = new PackageReference();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link PackageReference}.
+     * 
+     * @return a new instance of PackageReference.
+     */
     public PackageReference createPackageReference(Identifier id) {
-        return new PackageReference(id);
+        PackageReference res = new PackageReference(id);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link PackageReference}.
+     * 
+     * @return a new instance of PackageReference.
+     */
     public PackageReference createPackageReference(PackageReference path, Identifier id) {
-        return new PackageReference(path, id);
+        PackageReference res = new PackageReference(path, id);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link UncollatedReferenceQualifier}.
+     * 
+     * @return a new instance of UncollatedReferenceQualifier.
+     */
     public UncollatedReferenceQualifier createUncollatedReferenceQualifier() {
-        return new UncollatedReferenceQualifier();
+        UncollatedReferenceQualifier res = new UncollatedReferenceQualifier();
+        res.setFactory(this);
+        return res;
     }
 
+    /**
+     * Creates a new {@link UncollatedReferenceQualifier}.
+     * 
+     * @return a new instance of UncollatedReferenceQualifier.
+     */
     public UncollatedReferenceQualifier createUncollatedReferenceQualifier(Identifier id) {
-        return new UncollatedReferenceQualifier(id);
+        UncollatedReferenceQualifier res = new UncollatedReferenceQualifier(id);
+        res.setFactory(this);
+        return res;
     }
 
+    /**
+     * Creates a new {@link UncollatedReferenceQualifier}.
+     * 
+     * @return a new instance of UncollatedReferenceQualifier.
+     */
     public UncollatedReferenceQualifier createUncollatedReferenceQualifier(ReferencePrefix prefix, Identifier id) {
-        return new UncollatedReferenceQualifier(prefix, id);
+    	UncollatedReferenceQualifier res = new UncollatedReferenceQualifier(prefix, id);
+        res.setFactory(this);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ClassDeclaration}.
+     * 
+     * @return a new instance of ClassDeclaration.
+     */
     public ClassDeclaration createClassDeclaration() {
-        return new ClassDeclaration();
+        ClassDeclaration res = new ClassDeclaration();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
-    public ClassDeclaration createClassDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name, Extends extended, Implements implemented, ASTList<MemberDeclaration> members) {
-        return new ClassDeclaration(declSpecs, name, extended, implemented, members);
+    /**
+     * Creates a new {@link ClassDeclaration}.
+     * 
+     * @return a new instance of ClassDeclaration.
+     */
+    public ClassDeclaration createClassDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name, Extends extended,
+            Implements implemented, ASTList<MemberDeclaration> members) {
+        ClassDeclaration res = new ClassDeclaration(declSpecs, name, extended, implemented, members);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ClassDeclaration}.
+     * 
+     * @return a new instance of ClassDeclaration.
+     */
     public ClassDeclaration createClassDeclaration(ASTList<MemberDeclaration> members) {
-        return new ClassDeclaration(members);
+        ClassDeclaration res = new ClassDeclaration(members);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
-
+    
+    public TypeArgumentDeclaration createTypeArgumentDeclaration(TypeReference ref) {
+    	TypeArgumentDeclaration res = new TypeArgumentDeclaration(ref);
+    	res.setFactory(this);
+    	trace(res);
+    	return res;
+    }
+    
+    public TypeArgumentDeclaration createTypeArgumentDeclaration(TypeReference ref, WildcardMode wm) {
+    	TypeArgumentDeclaration res = new TypeArgumentDeclaration(ref, wm);
+    	res.setFactory(this);
+    	trace(res);
+    	return res;
+    }
+    
+    public TypeArgumentDeclaration createTypeArgumentDeclaration() {
+    	TypeArgumentDeclaration res = new TypeArgumentDeclaration();
+    	res.setFactory(this);
+    	trace(res);
+    	return res;
+    }
+    
+    public TypeParameterDeclaration createTypeParameterDeclaration() {
+    	TypeParameterDeclaration res = new TypeParameterDeclaration();
+    	res.setFactory(this);
+    	trace(res);
+    	return res;
+    }
+    
+    /**
+     * Creates a new {@link ClassInitializer}.
+     * 
+     * @return a new instance of ClassInitializer.
+     */
     public ClassInitializer createClassInitializer() {
-        return new ClassInitializer();
+        ClassInitializer res = new ClassInitializer();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ClassInitializer}.
+     * 
+     * @return a new instance of ClassInitializer.
+     */
     public ClassInitializer createClassInitializer(StatementBlock body) {
-        return new ClassInitializer(body);
+        ClassInitializer res = new ClassInitializer(body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ClassInitializer}.
+     * 
+     * @return a new instance of ClassInitializer.
+     */
     public ClassInitializer createClassInitializer(Static modifier, StatementBlock body) {
-        return new ClassInitializer(modifier, body);
+        ClassInitializer res =new ClassInitializer(modifier, body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ConstructorDeclaration}.
+     * 
+     * @return a new instance of ConstructorDeclaration.
+     */
     public ConstructorDeclaration createConstructorDeclaration() {
-        return new ConstructorDeclaration();
+    	ConstructorDeclaration res = new ConstructorDeclaration();
+    	res.setFactory(this);
+        trace(res);
+        return res;
     }
 
-    public ConstructorDeclaration createConstructorDeclaration(VisibilityModifier modifier, Identifier name, ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body) {
-        return new ConstructorDeclaration(modifier, name, parameters, exceptions, body);
+    /**
+     * Creates a new {@link ConstructorDeclaration}.
+     * 
+     * @return a new instance of ConstructorDeclaration.
+     */
+    public ConstructorDeclaration createConstructorDeclaration(VisibilityModifier modifier, Identifier name,
+    		ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body) {
+        ConstructorDeclaration res = new ConstructorDeclaration(modifier, name, parameters, exceptions, body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Throws}.
+     * 
+     * @return a new instance of Throws.
+     */
     public Throws createThrows() {
-        return new Throws();
+       Throws res = new Throws();
+       res.setFactory(this);
+       trace(res);
+       return res;
     }
 
+    /**
+     * Creates a new {@link Throws}.
+     * 
+     * @return a new instance of Throws.
+     */
     public Throws createThrows(TypeReference exception) {
-        return new Throws(exception);
+        Throws res = new Throws(exception);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Throws}.
+     * 
+     * @return a new instance of Throws.
+     */
     public Throws createThrows(ASTList<TypeReference> list) {
-        return new Throws(list);
+        Throws res = new Throws(list);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link FieldDeclaration}.
+     * 
+     * @return a new instance of FieldDeclaration.
+     */
     public FieldDeclaration createFieldDeclaration() {
-        return new FieldDeclaration();
+        FieldDeclaration res = new FieldDeclaration();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link FieldDeclaration}.
+     * 
+     * @return a new instance of FieldDeclaration.
+     */
     public FieldDeclaration createFieldDeclaration(TypeReference typeRef, Identifier name) {
-        return new FieldDeclaration(typeRef, name);
+        FieldDeclaration res = new FieldDeclaration(typeRef, createFieldSpecification(name));
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
-    public FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, Identifier name, Expression init) {
-        return new FieldDeclaration(mods, typeRef, name, init);
+    /**
+     * Creates a new {@link FieldDeclaration}.
+     * 
+     * @return a new instance of FieldDeclaration.
+     */
+    public FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, Identifier name,
+            Expression init) {
+        FieldDeclaration res = new FieldDeclaration(mods, typeRef, createFieldSpecification(name, init));
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
-    public FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, ASTList<FieldSpecification> vars) {
-        return new FieldDeclaration(mods, typeRef, vars);
+    /**
+     * Creates a new {@link FieldDeclaration}.
+     * 
+     * @return a new instance of FieldDeclaration.
+     */
+    public FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
+    		ASTList<FieldSpecification> vars) {
+        FieldDeclaration res = new FieldDeclaration(mods, typeRef, vars);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Extends}.
+     * 
+     * @return a new instance of Extends.
+     */
     public Extends createExtends() {
-        return new Extends();
+        Extends res = new Extends();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Extends}.
+     * 
+     * @return a new instance of Extends.
+     */
     public Extends createExtends(TypeReference supertype) {
-        return new Extends(supertype);
+        Extends res = new Extends(supertype);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Extends}.
+     * 
+     * @return a new instance of Extends.
+     */
     public Extends createExtends(ASTList<TypeReference> list) {
-        return new Extends(list);
+        Extends res = new Extends(list);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Implements}.
+     * 
+     * @return a new instance of Implements.
+     */
     public Implements createImplements() {
-        return new Implements();
+        Implements res = new Implements();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Implements}.
+     * 
+     * @return a new instance of Implements.
+     */
     public Implements createImplements(TypeReference supertype) {
-        return new Implements(supertype);
+        Implements res = new Implements(supertype);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Implements}.
+     * 
+     * @return a new instance of Implements.
+     */
     public Implements createImplements(ASTList<TypeReference> list) {
-        return new Implements(list);
+        Implements res = new Implements(list);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link InterfaceDeclaration}.
+     * 
+     * @return a new instance of InterfaceDeclaration.
+     */
     public InterfaceDeclaration createInterfaceDeclaration() {
-        return new InterfaceDeclaration();
+        InterfaceDeclaration res = new InterfaceDeclaration();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
-    public InterfaceDeclaration createInterfaceDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name, Extends extended, ASTList<MemberDeclaration> members) {
-        return new InterfaceDeclaration(modifiers, name, extended, members);
+    /**
+     * Creates a new {@link InterfaceDeclaration}.
+     * 
+     * @return a new instance of InterfaceDeclaration.
+     */
+    public InterfaceDeclaration createInterfaceDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name,
+            Extends extended, ASTList<MemberDeclaration> members) {
+        InterfaceDeclaration res = new InterfaceDeclaration(modifiers, name, extended, members);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
-
+    
     public AnnotationDeclaration createAnnotationDeclaration() {
-        return new AnnotationDeclaration();
+        AnnotationDeclaration res = new AnnotationDeclaration();
+        res.setFactory(this);
+        trace(res);
+        return res;
+    }
+    
+    public AnnotationDeclaration createAnnotationDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name,
+    		ASTList<MemberDeclaration> members) {
+        AnnotationDeclaration res = new AnnotationDeclaration(modifiers, name, members);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
-    public AnnotationDeclaration createAnnotationDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name, ASTList<MemberDeclaration> members) {
-        return new AnnotationDeclaration(modifiers, name, members);
-    }
-
+    /**
+     * Creates a new {@link LocalVariableDeclaration}.
+     * 
+     * @return a new instance of LocalVariableDeclaration.
+     */
     public LocalVariableDeclaration createLocalVariableDeclaration() {
-        return new LocalVariableDeclaration();
+        LocalVariableDeclaration res = new LocalVariableDeclaration();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LocalVariableDeclaration}.
+     * 
+     * @return a new instance of LocalVariableDeclaration.
+     */
     public LocalVariableDeclaration createLocalVariableDeclaration(TypeReference typeRef, Identifier name) {
-        return new LocalVariableDeclaration(typeRef, name);
+    	VariableSpecification varSpec = createVariableSpecification(name);
+    	LocalVariableDeclaration res = new LocalVariableDeclaration(
+    			null, typeRef, varSpec);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
-    public LocalVariableDeclaration createLocalVariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, ASTList<VariableSpecification> vars) {
-        return new LocalVariableDeclaration(mods, typeRef, vars);
+    /**
+     * Creates a new {@link LocalVariableDeclaration}.
+     * 
+     * @return a new instance of LocalVariableDeclaration.
+     */
+    public LocalVariableDeclaration createLocalVariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
+    		ASTList<VariableSpecification> vars) {
+        LocalVariableDeclaration res = new LocalVariableDeclaration(mods, typeRef, vars);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
-    public LocalVariableDeclaration createLocalVariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, Identifier name, Expression init) {
-        return new LocalVariableDeclaration(mods, typeRef, name, init);
+    /**
+     * Creates a new {@link LocalVariableDeclaration}.
+     * 
+     * @return a new instance of LocalVariableDeclaration.
+     */
+    public LocalVariableDeclaration createLocalVariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
+            Identifier name, Expression init) {
+        LocalVariableDeclaration res = new LocalVariableDeclaration(mods, typeRef, 
+        		createVariableSpecification(name, init));
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link MethodDeclaration}.
+     * 
+     * @return a new instance of MethodDeclaration.
+     */
     public MethodDeclaration createMethodDeclaration() {
-        return new MethodDeclaration();
+        MethodDeclaration res = new MethodDeclaration();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
-    public MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType, Identifier name, ASTList<ParameterDeclaration> parameters, Throws exceptions) {
-        return new MethodDeclaration(modifiers, returnType, name, parameters, exceptions);
+    /**
+     * Creates a new {@link MethodDeclaration}.
+     * 
+     * @return a new instance of MethodDeclaration.
+     */
+    public MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType,
+            Identifier name, ASTList<ParameterDeclaration> parameters, Throws exceptions) {
+        MethodDeclaration res = new MethodDeclaration(modifiers, returnType, name, parameters, exceptions);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
-    public MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType, Identifier name, ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body) {
-        return new MethodDeclaration(modifiers, returnType, name, parameters, exceptions, body);
+    /**
+     * Creates a new {@link MethodDeclaration}.
+     * 
+     * @return a new instance of MethodDeclaration.
+     */
+    public MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType,
+            Identifier name, ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body) {
+        MethodDeclaration res = new MethodDeclaration(modifiers, returnType, name, parameters, exceptions, body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
-
-    public AnnotationPropertyDeclaration createAnnotationPropertyDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType, Identifier name, Expression defaultValue) {
-        return new AnnotationPropertyDeclaration(modifiers, returnType, name, defaultValue);
+    
+    public AnnotationPropertyDeclaration createAnnotationPropertyDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType,
+            Identifier name, Expression defaultValue) {
+        AnnotationPropertyDeclaration res = new AnnotationPropertyDeclaration(modifiers, returnType, name, defaultValue);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
-
+    
+    /**
+     * Creates a new {@link ParameterDeclaration}.
+     * 
+     * @return a new instance of ParameterDeclaration.
+     */
     public ParameterDeclaration createParameterDeclaration() {
-        return new ParameterDeclaration();
+        ParameterDeclaration res = new ParameterDeclaration();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ParameterDeclaration}.
+     * 
+     * @return a new instance of ParameterDeclaration.
+     */
     public ParameterDeclaration createParameterDeclaration(TypeReference typeRef, Identifier name) {
-        return new ParameterDeclaration(typeRef, name);
+        ParameterDeclaration res = new ParameterDeclaration(typeRef, createVariableSpecification(name));
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
-    public ParameterDeclaration createParameterDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, Identifier name) {
-        return new ParameterDeclaration(mods, typeRef, name);
+    /**
+     * Creates a new {@link ParameterDeclaration}.
+     * 
+     * @return a new instance of ParameterDeclaration.
+     */
+    public ParameterDeclaration createParameterDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
+            Identifier name) {
+        ParameterDeclaration res = new ParameterDeclaration(typeRef, createVariableSpecification(name));
+        res.setDeclarationSpecifiers(mods);
+        res.setFactory(this);
+        trace(res);
+        return res;
+    }
+    
+    public UnionTypeParameterDeclaration createUnionTypeParameterDeclaration() {
+    	UnionTypeParameterDeclaration res = new UnionTypeParameterDeclaration();
+    	res.setFactory(this);
+    	trace(res);
+    	return res;
     }
 
+    /**
+     * Creates a new {@link VariableSpecification}.
+     * 
+     * @return a new instance of VariableSpecification.
+     */
     public VariableSpecification createVariableSpecification() {
-        return new VariableSpecification();
+        VariableSpecification res =  new VariableSpecification();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link VariableSpecification}.
+     * 
+     * @return a new instance of VariableSpecification.
+     */
     public VariableSpecification createVariableSpecification(Identifier name) {
-        return new VariableSpecification(name);
+        VariableSpecification res = new VariableSpecification(name);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link VariableSpecification}.
+     * 
+     * @return a new instance of VariableSpecification.
+     */
     public VariableSpecification createVariableSpecification(Identifier name, Expression init) {
-        return new VariableSpecification(name, init);
+        VariableSpecification res = new VariableSpecification(name, init);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link VariableSpecification}.
+     * 
+     * @return a new instance of VariableSpecification.
+     */
     public VariableSpecification createVariableSpecification(Identifier name, int dimensions, Expression init) {
-        return new VariableSpecification(name, dimensions, init);
+        VariableSpecification res =  new VariableSpecification(name, dimensions, init);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link FieldSpecification}.
+     * 
+     * @return a new instance of FieldSpecification.
+     */
     public FieldSpecification createFieldSpecification() {
-        return new FieldSpecification();
+        FieldSpecification res = new FieldSpecification();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link FieldSpecification}.
+     * 
+     * @return a new instance of FieldSpecification.
+     */
     public FieldSpecification createFieldSpecification(Identifier name) {
-        return new FieldSpecification(name);
+        FieldSpecification res =  new FieldSpecification(name);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link FieldSpecification}.
+     * 
+     * @return a new instance of FieldSpecification.
+     */
     public FieldSpecification createFieldSpecification(Identifier name, Expression init) {
-        return new FieldSpecification(name, init);
+        FieldSpecification res =  new FieldSpecification(name, init);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link FieldSpecification}.
+     * 
+     * @return a new instance of FieldSpecification.
+     */
     public FieldSpecification createFieldSpecification(Identifier name, int dimensions, Expression init) {
-        return new FieldSpecification(name, dimensions, init);
+        FieldSpecification res = new FieldSpecification(name, dimensions, init);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ArrayInitializer}.
+     * 
+     * @return a new instance of ArrayInitializer.
+     */
     public ArrayInitializer createArrayInitializer() {
-        return new ArrayInitializer();
+        ArrayInitializer res =  new ArrayInitializer();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ArrayInitializer}.
+     * 
+     * @return a new instance of ArrayInitializer.
+     */
     public ArrayInitializer createArrayInitializer(ASTList<Expression> args) {
-        return new ArrayInitializer(args);
+        ArrayInitializer res =  new ArrayInitializer(args);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ParenthesizedExpression}.
+     * 
+     * @return a new instance of ParenthesizedExpression.
+     */
     public ParenthesizedExpression createParenthesizedExpression() {
-        return new ParenthesizedExpression();
+        ParenthesizedExpression res = new ParenthesizedExpression();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ParenthesizedExpression}.
+     * 
+     * @return a new instance of ParenthesizedExpression.
+     */
     public ParenthesizedExpression createParenthesizedExpression(Expression child) {
-        return new ParenthesizedExpression(child);
+    	ParenthesizedExpression res = new ParenthesizedExpression(child);
+    	res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link BooleanLiteral}.
+     * 
+     * @return a new instance of BooleanLiteral.
+     */
     public BooleanLiteral createBooleanLiteral() {
-        return new BooleanLiteral();
+        BooleanLiteral res = new BooleanLiteral();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link BooleanLiteral}.
+     * 
+     * @return a new instance of BooleanLiteral.
+     */
     public BooleanLiteral createBooleanLiteral(boolean value) {
-        return new BooleanLiteral(value);
+        BooleanLiteral res = new BooleanLiteral(value);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link CharLiteral}.
+     * 
+     * @return a new instance of CharLiteral.
+     */
     public CharLiteral createCharLiteral() {
-        return new CharLiteral();
+        CharLiteral res = new CharLiteral();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link CharLiteral}.
+     * 
+     * @return a new instance of CharLiteral.
+     */
     public CharLiteral createCharLiteral(char value) {
-        return new CharLiteral(value);
+        CharLiteral res = new CharLiteral(value);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link CharLiteral}.
+     * 
+     * @return a new instance of CharLiteral.
+     */
     public CharLiteral createCharLiteral(String value) {
-        return new CharLiteral(value);
+        CharLiteral res = new CharLiteral(value);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link DoubleLiteral}.
+     * 
+     * @return a new instance of DoubleLiteral.
+     */
     public DoubleLiteral createDoubleLiteral() {
-        return new DoubleLiteral();
+        DoubleLiteral res = new DoubleLiteral();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link DoubleLiteral}.
+     * 
+     * @return a new instance of DoubleLiteral.
+     */
     public DoubleLiteral createDoubleLiteral(double value) {
-        return new DoubleLiteral(value);
+        DoubleLiteral res = new DoubleLiteral(value);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link DoubleLiteral}.
+     * 
+     * @return a new instance of DoubleLiteral.
+     */
     public DoubleLiteral createDoubleLiteral(String value) {
-        return new DoubleLiteral(value);
+        DoubleLiteral res = new DoubleLiteral(value);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link FloatLiteral}.
+     * 
+     * @return a new instance of FloatLiteral.
+     */
     public FloatLiteral createFloatLiteral() {
-        return new FloatLiteral();
+        FloatLiteral res = new FloatLiteral();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link FloatLiteral}.
+     * 
+     * @return a new instance of FloatLiteral.
+     */
     public FloatLiteral createFloatLiteral(float value) {
-        return new FloatLiteral(value);
+        FloatLiteral res = new FloatLiteral(value);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link FloatLiteral}.
+     * 
+     * @return a new instance of FloatLiteral.
+     */
     public FloatLiteral createFloatLiteral(String value) {
-        return new FloatLiteral(value);
+        FloatLiteral res = new FloatLiteral(value);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link IntLiteral}.
+     * 
+     * @return a new instance of IntLiteral.
+     */
     public IntLiteral createIntLiteral() {
-        return new IntLiteral();
+        IntLiteral res = new IntLiteral();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link IntLiteral}.
+     * 
+     * @return a new instance of IntLiteral.
+     */
     public IntLiteral createIntLiteral(int value) {
-        return new IntLiteral(value);
+        IntLiteral res = new IntLiteral(value);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link IntLiteral}.
+     * 
+     * @return a new instance of IntLiteral.
+     */
     public IntLiteral createIntLiteral(String value) {
-        return new IntLiteral(value);
+        IntLiteral res = new IntLiteral(value);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LongLiteral}.
+     * 
+     * @return a new instance of LongLiteral.
+     */
     public LongLiteral createLongLiteral() {
-        return new LongLiteral();
+        LongLiteral res = new LongLiteral();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LongLiteral}.
+     * 
+     * @return a new instance of LongLiteral.
+     */
     public LongLiteral createLongLiteral(long value) {
-        return new LongLiteral(value);
+        LongLiteral res = new LongLiteral(value);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LongLiteral}.
+     * 
+     * @return a new instance of LongLiteral.
+     */
     public LongLiteral createLongLiteral(String value) {
-        return new LongLiteral(value);
+        LongLiteral res = new LongLiteral(value);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link NullLiteral}.
+     * 
+     * @return a new instance of NullLiteral.
+     */
     public NullLiteral createNullLiteral() {
-        return new NullLiteral();
+        NullLiteral res =  new NullLiteral();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link StringLiteral}.
+     * 
+     * @return a new instance of StringLiteral.
+     */
     public StringLiteral createStringLiteral() {
-        return new StringLiteral();
+        StringLiteral res = new StringLiteral();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link StringLiteral}.
+     * 
+     * @return a new instance of StringLiteral.
+     */
     public StringLiteral createStringLiteral(String value) {
-        return new StringLiteral(value);
+        StringLiteral res = new StringLiteral(value);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ArrayReference}.
+     * 
+     * @return a new instance of ArrayReference.
+     */
     public ArrayReference createArrayReference() {
-        return new ArrayReference();
+        ArrayReference res = new ArrayReference();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ArrayReference}.
+     * 
+     * @return a new instance of ArrayReference.
+     */
     public ArrayReference createArrayReference(ReferencePrefix accessPath, ASTList<Expression> initializers) {
-        return new ArrayReference(accessPath, initializers);
+        ArrayReference res = new ArrayReference(accessPath, initializers);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link FieldReference}.
+     * 
+     * @return a new instance of FieldReference.
+     */
     public FieldReference createFieldReference() {
-        return new FieldReference();
+        FieldReference res = new FieldReference();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link FieldReference}.
+     * 
+     * @return a new instance of FieldReference.
+     */
     public FieldReference createFieldReference(Identifier id) {
-        return new FieldReference(id);
+        FieldReference res = new FieldReference(id);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link FieldReference}.
+     * 
+     * @return a new instance of FieldReference.
+     */
     public FieldReference createFieldReference(ReferencePrefix prefix, Identifier id) {
-        return new FieldReference(prefix, id);
+        FieldReference res = new FieldReference(prefix, id);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link MetaClassReference}.
+     * 
+     * @return a new instance of MetaClassReference.
+     */
     public MetaClassReference createMetaClassReference() {
-        return new MetaClassReference();
+        MetaClassReference res = new MetaClassReference();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link MetaClassReference}.
+     * 
+     * @return a new instance of MetaClassReference.
+     */
     public MetaClassReference createMetaClassReference(TypeReference reference) {
-        return new MetaClassReference(reference);
+        MetaClassReference res = new MetaClassReference(reference);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link MethodReference}.
+     * 
+     * @return a new instance of MethodReference.
+     */
     public MethodReference createMethodReference() {
-        return new MethodReference();
+        MethodReference res = new MethodReference();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link MethodReference}.
+     * 
+     * @return a new instance of MethodReference.
+     */
     public MethodReference createMethodReference(Identifier name) {
-        return new MethodReference(name);
+        MethodReference res = new MethodReference(name);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link MethodReference}.
+     * 
+     * @return a new instance of MethodReference.
+     */
     public MethodReference createMethodReference(ReferencePrefix accessPath, Identifier name) {
-        return new MethodReference(accessPath, name);
+        MethodReference res = new MethodReference(accessPath, name);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link MethodReference}.
+     * 
+     * @return a new instance of MethodReference.
+     */
     public MethodReference createMethodReference(Identifier name, ASTList<Expression> args) {
-        return new MethodReference(name, args);
+        MethodReference res =new MethodReference(name, args);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link MethodReference}.
+     * 
+     * @return a new instance of MethodReference.
+     */
     public MethodReference createMethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args) {
-        return new MethodReference(accessPath, name, args);
+        MethodReference res = new MethodReference(accessPath, name, args);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
-
-    public MethodReference createMethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args, ASTList<TypeArgumentDeclaration> typeArgs) {
-        return new MethodReference(accessPath, name, args, typeArgs);
+    
+    public MethodReference createMethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args,
+    											 ASTList<TypeArgumentDeclaration> typeArgs) {
+        MethodReference res = new MethodReference(accessPath, name, args, typeArgs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
-
+    
     public AnnotationPropertyReference createAnnotationPropertyReference(String id) {
-        Identifier ident = new Identifier(id);
-        return new AnnotationPropertyReference(ident);
+    	Identifier ident = createIdentifier(id);
+    	ident.setFactory(this);
+        AnnotationPropertyReference res = new AnnotationPropertyReference(ident);
+    	res.setFactory(this);
+        trace(res);
+        return res;
     }
 
     public AnnotationPropertyReference createAnnotationPropertyReference(Identifier id) {
-        return new AnnotationPropertyReference(id);
+    	AnnotationPropertyReference res = new AnnotationPropertyReference(id);
+    	res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link SuperConstructorReference}.
+     * 
+     * @return a new instance of SuperConstructorReference.
+     */
     public SuperConstructorReference createSuperConstructorReference() {
-        return new SuperConstructorReference();
+        SuperConstructorReference res = new SuperConstructorReference();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link SuperConstructorReference}.
+     * 
+     * @return a new instance of SuperConstructorReference.
+     */
     public SuperConstructorReference createSuperConstructorReference(ASTList<Expression> arguments) {
-        return new SuperConstructorReference(arguments);
+        SuperConstructorReference res = new SuperConstructorReference(arguments);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
-    public SuperConstructorReference createSuperConstructorReference(ReferencePrefix path, ASTList<Expression> arguments) {
-        return new SuperConstructorReference(path, arguments);
+    /**
+     * Creates a new {@link SuperConstructorReference}.
+     * 
+     * @return a new instance of SuperConstructorReference.
+     */
+    public SuperConstructorReference createSuperConstructorReference(ReferencePrefix path,
+    		ASTList<Expression> arguments) {
+        SuperConstructorReference res = new SuperConstructorReference(path, arguments);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link SuperReference}.
+     * 
+     * @return a new instance of SuperReference.
+     */
     public SuperReference createSuperReference() {
-        return new SuperReference();
+        SuperReference res = new SuperReference();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link SuperReference}.
+     * 
+     * @return a new instance of SuperReference.
+     */
     public SuperReference createSuperReference(ReferencePrefix accessPath) {
-        return new SuperReference(accessPath);
+        SuperReference res = new SuperReference(accessPath);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ThisConstructorReference}.
+     * 
+     * @return a new instance of ThisConstructorReference.
+     */
     public ThisConstructorReference createThisConstructorReference() {
-        return new ThisConstructorReference();
+        ThisConstructorReference res = new ThisConstructorReference();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ThisConstructorReference}.
+     * 
+     * @return a new instance of ThisConstructorReference.
+     */
     public ThisConstructorReference createThisConstructorReference(ASTList<Expression> arguments) {
-        return new ThisConstructorReference(arguments);
+        ThisConstructorReference res = new ThisConstructorReference(arguments);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ThisReference}.
+     * 
+     * @return a new instance of ThisReference.
+     */
     public ThisReference createThisReference() {
-        return new ThisReference();
+        ThisReference res = new ThisReference();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ThisReference}.
+     * 
+     * @return a new instance of ThisReference.
+     */
     public ThisReference createThisReference(TypeReference outer) {
-        return new ThisReference(outer);
+        ThisReference res = new ThisReference(outer);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link VariableReference}.
+     * 
+     * @return a new instance of VariableReference.
+     */
     public VariableReference createVariableReference() {
-        return new VariableReference();
+        VariableReference res = new VariableReference();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link VariableReference}.
+     * 
+     * @return a new instance of VariableReference.
+     */
     public VariableReference createVariableReference(Identifier id) {
-        return new VariableReference(id);
+        VariableReference res = new VariableReference(id);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
-    public ArrayLengthReference createArrayLengthReference() {
-        return new ArrayLengthReference();
-    }
-
-    public ArrayLengthReference createArrayLengthReference(ReferencePrefix prefix) {
-        return new ArrayLengthReference(prefix);
-    }
-
+    /**
+     * Creates a new {@link BinaryAnd}.
+     * 
+     * @return a new instance of BinaryAnd.
+     */
     public BinaryAnd createBinaryAnd() {
-        return new BinaryAnd();
+        BinaryAnd res = new BinaryAnd();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link BinaryAnd}.
+     * 
+     * @return a new instance of BinaryAnd.
+     */
     public BinaryAnd createBinaryAnd(Expression lhs, Expression rhs) {
-        return new BinaryAnd(lhs, rhs);
+        BinaryAnd res = new BinaryAnd(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link BinaryAndAssignment}.
+     * 
+     * @return a new instance of BinaryAndAssignment.
+     */
     public BinaryAndAssignment createBinaryAndAssignment() {
-        return new BinaryAndAssignment();
+        BinaryAndAssignment res = new BinaryAndAssignment();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link BinaryAndAssignment}.
+     * 
+     * @return a new instance of BinaryAndAssignment.
+     */
     public BinaryAndAssignment createBinaryAndAssignment(Expression lhs, Expression rhs) {
-        return new BinaryAndAssignment(lhs, rhs);
+        BinaryAndAssignment res = new BinaryAndAssignment(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link BinaryNot}.
+     * 
+     * @return a new instance of BinaryNot.
+     */
     public BinaryNot createBinaryNot() {
-        return new BinaryNot();
+        BinaryNot res = new BinaryNot();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link BinaryNot}.
+     * 
+     * @return a new instance of BinaryNot.
+     */
     public BinaryNot createBinaryNot(Expression child) {
-        return new BinaryNot(child);
+        BinaryNot res = new BinaryNot(child);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link BinaryOr}.
+     * 
+     * @return a new instance of BinaryOr.
+     */
     public BinaryOr createBinaryOr() {
-        return new BinaryOr();
+        BinaryOr res = new BinaryOr();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link BinaryOr}.
+     * 
+     * @return a new instance of BinaryOr.
+     */
     public BinaryOr createBinaryOr(Expression lhs, Expression rhs) {
-        return new BinaryOr(lhs, rhs);
+        BinaryOr res = new BinaryOr(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link BinaryOrAssignment}.
+     * 
+     * @return a new instance of BinaryOrAssignment.
+     */
     public BinaryOrAssignment createBinaryOrAssignment() {
-        return new BinaryOrAssignment();
+        BinaryOrAssignment res = new BinaryOrAssignment();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link BinaryOrAssignment}.
+     * 
+     * @return a new instance of BinaryOrAssignment.
+     */
     public BinaryOrAssignment createBinaryOrAssignment(Expression lhs, Expression rhs) {
-        return new BinaryOrAssignment(lhs, rhs);
+        BinaryOrAssignment res = new BinaryOrAssignment(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link BinaryXOr}.
+     * 
+     * @return a new instance of BinaryXOr.
+     */
     public BinaryXOr createBinaryXOr() {
-        return new BinaryXOr();
+        BinaryXOr res = new BinaryXOr();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link BinaryXOr}.
+     * 
+     * @return a new instance of BinaryXOr.
+     */
     public BinaryXOr createBinaryXOr(Expression lhs, Expression rhs) {
-        return new BinaryXOr(lhs, rhs);
+        BinaryXOr res = new BinaryXOr(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link BinaryXOrAssignment}.
+     * 
+     * @return a new instance of BinaryXOrAssignment.
+     */
     public BinaryXOrAssignment createBinaryXOrAssignment() {
-        return new BinaryXOrAssignment();
+        BinaryXOrAssignment res = new BinaryXOrAssignment();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link BinaryXOrAssignment}.
+     * 
+     * @return a new instance of BinaryXOrAssignment.
+     */
     public BinaryXOrAssignment createBinaryXOrAssignment(Expression lhs, Expression rhs) {
-        return new BinaryXOrAssignment(lhs, rhs);
+        BinaryXOrAssignment res = new BinaryXOrAssignment(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Conditional}.
+     * 
+     * @return a new instance of Conditional.
+     */
     public Conditional createConditional() {
-        return new Conditional();
+        Conditional res = new Conditional();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Conditional}.
+     * 
+     * @return a new instance of Conditional.
+     */
     public Conditional createConditional(Expression guard, Expression thenExpr, Expression elseExpr) {
-        return new Conditional(guard, thenExpr, elseExpr);
+        Conditional res = new Conditional(guard, thenExpr, elseExpr);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link CopyAssignment}.
+     * 
+     * @return a new instance of CopyAssignment.
+     */
     public CopyAssignment createCopyAssignment() {
-        return new CopyAssignment();
+        CopyAssignment res = new CopyAssignment();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link CopyAssignment}.
+     * 
+     * @return a new instance of CopyAssignment.
+     */
     public CopyAssignment createCopyAssignment(Expression lhs, Expression rhs) {
-        return new CopyAssignment(lhs, rhs);
+        CopyAssignment res = new CopyAssignment(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Divide}.
+     * 
+     * @return a new instance of Divide.
+     */
     public Divide createDivide() {
-        return new Divide();
+        Divide res = new Divide();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Divide}.
+     * 
+     * @return a new instance of Divide.
+     */
     public Divide createDivide(Expression lhs, Expression rhs) {
-        return new Divide(lhs, rhs);
+        Divide res = new Divide(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link DivideAssignment}.
+     * 
+     * @return a new instance of DivideAssignment.
+     */
     public DivideAssignment createDivideAssignment() {
-        return new DivideAssignment();
+        DivideAssignment res = new DivideAssignment();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link DivideAssignment}.
+     * 
+     * @return a new instance of DivideAssignment.
+     */
     public DivideAssignment createDivideAssignment(Expression lhs, Expression rhs) {
-        return new DivideAssignment(lhs, rhs);
+        DivideAssignment res = new DivideAssignment(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Equals}.
+     * 
+     * @return a new instance of Equals.
+     */
     public Equals createEquals() {
-        return new Equals();
+        Equals res = new Equals();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Equals}.
+     * 
+     * @return a new instance of Equals.
+     */
     public Equals createEquals(Expression lhs, Expression rhs) {
-        return new Equals(lhs, rhs);
+        Equals res = new Equals(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link GreaterOrEquals}.
+     * 
+     * @return a new instance of GreaterOrEquals.
+     */
     public GreaterOrEquals createGreaterOrEquals() {
-        return new GreaterOrEquals();
+        GreaterOrEquals res = new GreaterOrEquals();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link GreaterOrEquals}.
+     * 
+     * @return a new instance of GreaterOrEquals.
+     */
     public GreaterOrEquals createGreaterOrEquals(Expression lhs, Expression rhs) {
-        return new GreaterOrEquals(lhs, rhs);
+        GreaterOrEquals res = new GreaterOrEquals(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link GreaterThan}.
+     * 
+     * @return a new instance of GreaterThan.
+     */
     public GreaterThan createGreaterThan() {
-        return new GreaterThan();
+        GreaterThan res = new GreaterThan();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link GreaterThan}.
+     * 
+     * @return a new instance of GreaterThan.
+     */
     public GreaterThan createGreaterThan(Expression lhs, Expression rhs) {
-        return new GreaterThan(lhs, rhs);
+        GreaterThan res = new GreaterThan(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Instanceof}.
+     * 
+     * @return a new instance of Instanceof.
+     */
     public Instanceof createInstanceof() {
-        return new Instanceof();
+        Instanceof res = new Instanceof();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Instanceof}.
+     * 
+     * @return a new instance of Instanceof.
+     */
     public Instanceof createInstanceof(Expression child, TypeReference typeref) {
-        return new Instanceof(child, typeref);
+        Instanceof res = new Instanceof(child, typeref);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LessOrEquals}.
+     * 
+     * @return a new instance of LessOrEquals.
+     */
     public LessOrEquals createLessOrEquals() {
-        return new LessOrEquals();
+        LessOrEquals res = new LessOrEquals();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LessOrEquals}.
+     * 
+     * @return a new instance of LessOrEquals.
+     */
     public LessOrEquals createLessOrEquals(Expression lhs, Expression rhs) {
-        return new LessOrEquals(lhs, rhs);
+        LessOrEquals res = new LessOrEquals(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LessThan}.
+     * 
+     * @return a new instance of LessThan.
+     */
     public LessThan createLessThan() {
-        return new LessThan();
+        LessThan res = new LessThan();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LessThan}.
+     * 
+     * @return a new instance of LessThan.
+     */
     public LessThan createLessThan(Expression lhs, Expression rhs) {
-        return new LessThan(lhs, rhs);
+        LessThan res = new LessThan(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LogicalAnd}.
+     * 
+     * @return a new instance of LogicalAnd.
+     */
     public LogicalAnd createLogicalAnd() {
-        return new LogicalAnd();
+        LogicalAnd res = new LogicalAnd();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LogicalAnd}.
+     * 
+     * @return a new instance of LogicalAnd.
+     */
     public LogicalAnd createLogicalAnd(Expression lhs, Expression rhs) {
-        return new LogicalAnd(lhs, rhs);
+        LogicalAnd res = new LogicalAnd(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LogicalNot}.
+     * 
+     * @return a new instance of LogicalNot.
+     */
     public LogicalNot createLogicalNot() {
-        return new LogicalNot();
+        LogicalNot res = new LogicalNot();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LogicalNot}.
+     * 
+     * @return a new instance of LogicalNot.
+     */
     public LogicalNot createLogicalNot(Expression child) {
-        return new LogicalNot(child);
+        LogicalNot res = new LogicalNot(child);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LogicalOr}.
+     * 
+     * @return a new instance of LogicalOr.
+     */
     public LogicalOr createLogicalOr() {
-        return new LogicalOr();
+        LogicalOr res = new LogicalOr();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LogicalOr}.
+     * 
+     * @return a new instance of LogicalOr.
+     */
     public LogicalOr createLogicalOr(Expression lhs, Expression rhs) {
-        return new LogicalOr(lhs, rhs);
+        LogicalOr res = new LogicalOr(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Minus}.
+     * 
+     * @return a new instance of Minus.
+     */
     public Minus createMinus() {
-        return new Minus();
+        Minus res = new Minus();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Minus}.
+     * 
+     * @return a new instance of Minus.
+     */
     public Minus createMinus(Expression lhs, Expression rhs) {
-        return new Minus(lhs, rhs);
+        Minus res = new Minus(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link MinusAssignment}.
+     * 
+     * @return a new instance of MinusAssignment.
+     */
     public MinusAssignment createMinusAssignment() {
-        return new MinusAssignment();
+        MinusAssignment res = new MinusAssignment();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link MinusAssignment}.
+     * 
+     * @return a new instance of MinusAssignment.
+     */
     public MinusAssignment createMinusAssignment(Expression lhs, Expression rhs) {
-        return new MinusAssignment(lhs, rhs);
+        MinusAssignment res = new MinusAssignment(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Modulo}.
+     * 
+     * @return a new instance of Modulo.
+     */
     public Modulo createModulo() {
-        return new Modulo();
+        Modulo res = new Modulo();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Modulo}.
+     * 
+     * @return a new instance of Modulo.
+     */
     public Modulo createModulo(Expression lhs, Expression rhs) {
-        return new Modulo(lhs, rhs);
+        Modulo res =new Modulo(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ModuloAssignment}.
+     * 
+     * @return a new instance of ModuloAssignment.
+     */
     public ModuloAssignment createModuloAssignment() {
-        return new ModuloAssignment();
+        ModuloAssignment res = new ModuloAssignment();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ModuloAssignment}.
+     * 
+     * @return a new instance of ModuloAssignment.
+     */
     public ModuloAssignment createModuloAssignment(Expression lhs, Expression rhs) {
-        return new ModuloAssignment(lhs, rhs);
+        ModuloAssignment res = new ModuloAssignment(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Negative}.
+     * 
+     * @return a new instance of Negative.
+     */
     public Negative createNegative() {
-        return new Negative();
+        Negative res = new Negative();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Negative}.
+     * 
+     * @return a new instance of Negative.
+     */
     public Negative createNegative(Expression child) {
-        return new Negative(child);
+        Negative res = new Negative(child);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link New}.
+     * 
+     * @return a new instance of New.
+     */
     public New createNew() {
-        return new New();
+        New res = new New();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link New}.
+     * 
+     * @return a new instance of New.
+     */
     public New createNew(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments) {
-        return new New(accessPath, constructorName, arguments);
+        New res = new New(accessPath, constructorName, arguments);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
-    public New createNew(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments, ClassDeclaration anonymousClass) {
-        return new New(accessPath, constructorName, arguments, anonymousClass);
+    /**
+     * Creates a new {@link New}.
+     * 
+     * @return a new instance of New.
+     */
+    public New createNew(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments,
+            ClassDeclaration anonymousClass) {
+        New res = new New(accessPath, constructorName, arguments, anonymousClass);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link NewArray}.
+     * 
+     * @return a new instance of NewArray.
+     */
     public NewArray createNewArray() {
-        return new NewArray();
+        NewArray res = new NewArray();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link NewArray}.
+     * 
+     * @return a new instance of NewArray.
+     */
     public NewArray createNewArray(TypeReference arrayName, ASTList<Expression> dimExpr) {
-        return new NewArray(arrayName, dimExpr);
+        NewArray res = new NewArray(arrayName, dimExpr);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link NewArray}.
+     * 
+     * @return a new instance of NewArray.
+     */
     public NewArray createNewArray(TypeReference arrayName, int dimensions, ArrayInitializer initializer) {
-        return new NewArray(arrayName, dimensions, initializer);
+        NewArray res = new NewArray(arrayName, dimensions, initializer);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link NotEquals}.
+     * 
+     * @return a new instance of NotEquals.
+     */
     public NotEquals createNotEquals() {
-        return new NotEquals();
+        NotEquals res = new NotEquals();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link NotEquals}.
+     * 
+     * @return a new instance of NotEquals.
+     */
     public NotEquals createNotEquals(Expression lhs, Expression rhs) {
-        return new NotEquals(lhs, rhs);
+        NotEquals res = new NotEquals(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Plus}.
+     * 
+     * @return a new instance of Plus.
+     */
     public Plus createPlus() {
-        return new Plus();
+        Plus res = new Plus();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Plus}.
+     * 
+     * @return a new instance of Plus.
+     */
     public Plus createPlus(Expression lhs, Expression rhs) {
-        return new Plus(lhs, rhs);
+        Plus res =  new Plus(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link PlusAssignment}.
+     * 
+     * @return a new instance of PlusAssignment.
+     */
     public PlusAssignment createPlusAssignment() {
-        return new PlusAssignment();
+        PlusAssignment res = new PlusAssignment();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link PlusAssignment}.
+     * 
+     * @return a new instance of PlusAssignment.
+     */
     public PlusAssignment createPlusAssignment(Expression lhs, Expression rhs) {
-        return new PlusAssignment(lhs, rhs);
+        PlusAssignment res = new PlusAssignment(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Positive}.
+     * 
+     * @return a new instance of Positive.
+     */
     public Positive createPositive() {
-        return new Positive();
+        Positive res = new Positive();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Positive}.
+     * 
+     * @return a new instance of Positive.
+     */
     public Positive createPositive(Expression child) {
-        return new Positive(child);
+        Positive res = new Positive(child);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link PostDecrement}.
+     * 
+     * @return a new instance of PostDecrement.
+     */
     public PostDecrement createPostDecrement() {
-        return new PostDecrement();
+        PostDecrement res = new PostDecrement();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link PostDecrement}.
+     * 
+     * @return a new instance of PostDecrement.
+     */
     public PostDecrement createPostDecrement(Expression child) {
-        return new PostDecrement(child);
+        PostDecrement res = new PostDecrement(child);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link PostIncrement}.
+     * 
+     * @return a new instance of PostIncrement.
+     */
     public PostIncrement createPostIncrement() {
-        return new PostIncrement();
+        PostIncrement res = new PostIncrement();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link PostIncrement}.
+     * 
+     * @return a new instance of PostIncrement.
+     */
     public PostIncrement createPostIncrement(Expression child) {
-        return new PostIncrement(child);
+        PostIncrement res = new PostIncrement(child);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link PreDecrement}.
+     * 
+     * @return a new instance of PreDecrement.
+     */
     public PreDecrement createPreDecrement() {
-        return new PreDecrement();
+        PreDecrement res = new PreDecrement();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link PreDecrement}.
+     * 
+     * @return a new instance of PreDecrement.
+     */
     public PreDecrement createPreDecrement(Expression child) {
-        return new PreDecrement(child);
+        PreDecrement res = new PreDecrement(child);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link PreIncrement}.
+     * 
+     * @return a new instance of PreIncrement.
+     */
     public PreIncrement createPreIncrement() {
-        return new PreIncrement();
+        PreIncrement res = new PreIncrement();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link PreIncrement}.
+     * 
+     * @return a new instance of PreIncrement.
+     */
     public PreIncrement createPreIncrement(Expression child) {
-        return new PreIncrement(child);
+        PreIncrement res = new PreIncrement(child);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ShiftLeft}.
+     * 
+     * @return a new instance of ShiftLeft.
+     */
     public ShiftLeft createShiftLeft() {
-        return new ShiftLeft();
+        ShiftLeft res =  new ShiftLeft();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ShiftLeft}.
+     * 
+     * @return a new instance of ShiftLeft.
+     */
     public ShiftLeft createShiftLeft(Expression lhs, Expression rhs) {
-        return new ShiftLeft(lhs, rhs);
+        ShiftLeft res = new ShiftLeft(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ShiftLeftAssignment}.
+     * 
+     * @return a new instance of ShiftLeftAssignment.
+     */
     public ShiftLeftAssignment createShiftLeftAssignment() {
-        return new ShiftLeftAssignment();
+        ShiftLeftAssignment res = new ShiftLeftAssignment();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ShiftLeftAssignment}.
+     * 
+     * @return a new instance of ShiftLeftAssignment.
+     */
     public ShiftLeftAssignment createShiftLeftAssignment(Expression lhs, Expression rhs) {
-        return new ShiftLeftAssignment(lhs, rhs);
+        ShiftLeftAssignment res = new ShiftLeftAssignment(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ShiftRight}.
+     * 
+     * @return a new instance of ShiftRight.
+     */
     public ShiftRight createShiftRight() {
-        return new ShiftRight();
+        ShiftRight res = new ShiftRight();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ShiftRight}.
+     * 
+     * @return a new instance of ShiftRight.
+     */
     public ShiftRight createShiftRight(Expression lhs, Expression rhs) {
-        return new ShiftRight(lhs, rhs);
+        ShiftRight res = new ShiftRight(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ShiftRightAssignment}.
+     * 
+     * @return a new instance of ShiftRightAssignment.
+     */
     public ShiftRightAssignment createShiftRightAssignment() {
-        return new ShiftRightAssignment();
+        ShiftRightAssignment res =  new ShiftRightAssignment();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link ShiftRightAssignment}.
+     * 
+     * @return a new instance of ShiftRightAssignment.
+     */
     public ShiftRightAssignment createShiftRightAssignment(Expression lhs, Expression rhs) {
-        return new ShiftRightAssignment(lhs, rhs);
+        ShiftRightAssignment res =  new ShiftRightAssignment(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Times}.
+     * 
+     * @return a new instance of Times.
+     */
     public Times createTimes() {
-        return new Times();
+        Times res =  new Times();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Times}.
+     * 
+     * @return a new instance of Times.
+     */
     public Times createTimes(Expression lhs, Expression rhs) {
-        return new Times(lhs, rhs);
+        Times res =  new Times(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link TimesAssignment}.
+     * 
+     * @return a new instance of TimesAssignment.
+     */
     public TimesAssignment createTimesAssignment() {
-        return new TimesAssignment();
+        TimesAssignment res = new TimesAssignment();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link TimesAssignment}.
+     * 
+     * @return a new instance of TimesAssignment.
+     */
     public TimesAssignment createTimesAssignment(Expression lhs, Expression rhs) {
-        return new TimesAssignment(lhs, rhs);
+        TimesAssignment res = new TimesAssignment(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link TypeCast}.
+     * 
+     * @return a new instance of TypeCast.
+     */
     public TypeCast createTypeCast() {
-        return new TypeCast();
+        TypeCast res = new TypeCast();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link TypeCast}.
+     * 
+     * @return a new instance of TypeCast.
+     */
     public TypeCast createTypeCast(Expression child, TypeReference typeref) {
-        return new TypeCast(child, typeref);
+        TypeCast res = new TypeCast(child, typeref);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link UnsignedShiftRight}.
+     * 
+     * @return a new instance of UnsignedShiftRight.
+     */
     public UnsignedShiftRight createUnsignedShiftRight() {
-        return new UnsignedShiftRight();
+        UnsignedShiftRight res = new UnsignedShiftRight();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link UnsignedShiftRight}.
+     * 
+     * @return a new instance of UnsignedShiftRight.
+     */
     public UnsignedShiftRight createUnsignedShiftRight(Expression lhs, Expression rhs) {
-        return new UnsignedShiftRight(lhs, rhs);
+        UnsignedShiftRight res = new UnsignedShiftRight(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link UnsignedShiftRightAssignment}.
+     * 
+     * @return a new instance of UnsignedShiftRightAssignment.
+     */
     public UnsignedShiftRightAssignment createUnsignedShiftRightAssignment() {
-        return new UnsignedShiftRightAssignment();
+        UnsignedShiftRightAssignment res = new UnsignedShiftRightAssignment();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link UnsignedShiftRightAssignment}.
+     * 
+     * @return a new instance of UnsignedShiftRightAssignment.
+     */
     public UnsignedShiftRightAssignment createUnsignedShiftRightAssignment(Expression lhs, Expression rhs) {
-        return new UnsignedShiftRightAssignment(lhs, rhs);
+        UnsignedShiftRightAssignment res = new UnsignedShiftRightAssignment(lhs, rhs);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Abstract}.
+     * 
+     * @return a new instance of Abstract.
+     */
     public Abstract createAbstract() {
-        return new Abstract();
+        Abstract res = new Abstract();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Final}.
+     * 
+     * @return a new instance of Final.
+     */
     public Final createFinal() {
-        return new Final();
+        Final res = new Final();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Native}.
+     * 
+     * @return a new instance of Native.
+     */
     public Native createNative() {
-        return new Native();
+        Native res = new Native();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Private}.
+     * 
+     * @return a new instance of Private.
+     */
     public Private createPrivate() {
-        return new Private();
+        Private res = new Private();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Protected}.
+     * 
+     * @return a new instance of Protected.
+     */
     public Protected createProtected() {
-        return new Protected();
+        Protected res = new Protected();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Public}.
+     * 
+     * @return a new instance of Public.
+     */
     public Public createPublic() {
-        return new Public();
+        Public res = new Public();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Static}.
+     * 
+     * @return a new instance of Static.
+     */
     public Static createStatic() {
-        return new Static();
+        Static res = new Static();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Synchronized}.
+     * 
+     * @return a new instance of Synchronized.
+     */
     public Synchronized createSynchronized() {
-        return new Synchronized();
+        Synchronized res = new Synchronized();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Transient}.
+     * 
+     * @return a new instance of Transient.
+     */
     public Transient createTransient() {
-        return new Transient();
+        Transient res = new Transient();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link StrictFp}.
+     * 
+     * @return a new instance of StrictFp.
+     */
     public StrictFp createStrictFp() {
-        return new StrictFp();
+        StrictFp res = new StrictFp();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Volatile}.
+     * 
+     * @return a new instance of Volatile.
+     */
     public Volatile createVolatile() {
-        return new Volatile();
+        Volatile res = new Volatile();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
-
+    
     public AnnotationUseSpecification createAnnotationUseSpecification() {
-        return new AnnotationUseSpecification();
+        AnnotationUseSpecification res = new AnnotationUseSpecification();
+        res.setFactory(this);
+        trace(res);
+        return res;
+    }
+    
+    public AnnotationElementValuePair createAnnotationElementValuePair(AnnotationPropertyReference ref, Expression e) {
+    	AnnotationElementValuePair res = new AnnotationElementValuePair(ref, e);
+    	res.setFactory(this);
+    	trace(res);
+    	return res;
+    }
+    
+    public ElementValueArrayInitializer createElementValueArrayInitializer() {
+    	ElementValueArrayInitializer res = new ElementValueArrayInitializer();
+    	res.setFactory(this);
+    	trace(res);
+    	return res;
     }
 
+    /**
+     * Creates a new {@link Break}.
+     * 
+     * @return a new instance of Break.
+     */
     public Break createBreak() {
-        return new Break();
+        Break res = new Break();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Break}.
+     * 
+     * @return a new instance of Break.
+     */
     public Break createBreak(Identifier label) {
-        return new Break(label);
+        Break res = new Break(label);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Case}.
+     * 
+     * @return a new instance of Case.
+     */
     public Case createCase() {
-        return new Case();
+        Case res = new Case();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Case}.
+     * 
+     * @return a new instance of Case.
+     */
     public Case createCase(Expression e) {
-        return new Case(e);
+        Case res = new Case(e);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Case}.
+     * 
+     * @return a new instance of Case.
+     */
     public Case createCase(Expression e, ASTList<Statement> body) {
-        return new Case(e, body);
+        Case res = new Case(e, body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Catch}.
+     * 
+     * @return a new instance of Catch.
+     */
     public Catch createCatch() {
-        return new Catch();
+        Catch res = new Catch();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Catch}.
+     * 
+     * @return a new instance of Catch.
+     */
     public Catch createCatch(ParameterDeclaration e, StatementBlock body) {
-        return new Catch(e, body);
+        Catch res = new Catch(e, body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Continue}.
+     * 
+     * @return a new instance of Continue.
+     */
     public Continue createContinue() {
-        return new Continue();
+        Continue res =  new Continue();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Continue}.
+     * 
+     * @return a new instance of Continue.
+     */
     public Continue createContinue(Identifier label) {
-        return new Continue(label);
+        Continue res = new Continue(label);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Default}.
+     * 
+     * @return a new instance of Default.
+     */
     public Default createDefault() {
-        return new Default();
+        Default res = new Default();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Default}.
+     * 
+     * @return a new instance of Default.
+     */
     public Default createDefault(ASTList<Statement> body) {
-        return new Default(body);
+        Default res = new Default(body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Do}.
+     * 
+     * @return a new instance of Do.
+     */
     public Do createDo() {
-        return new Do();
+        Do res = new Do();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Do}.
+     * 
+     * @return a new instance of Do.
+     */
     public Do createDo(Expression guard) {
-        return new Do(guard);
+        Do res = new Do(guard);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Do}.
+     * 
+     * @return a new instance of Do.
+     */
     public Do createDo(Expression guard, Statement body) {
-        return new Do(guard, body);
+        Do res = new Do(guard, body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Else}.
+     * 
+     * @return a new instance of Else.
+     */
     public Else createElse() {
-        return new Else();
+        Else res =  new Else();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Else}.
+     * 
+     * @return a new instance of Else.
+     */
     public Else createElse(Statement body) {
-        return new Else(body);
+        Else res =  new Else(body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link EmptyStatement}.
+     * 
+     * @return a new instance of EmptyStatement.
+     */
     public EmptyStatement createEmptyStatement() {
-        return new EmptyStatement();
+        EmptyStatement res = new EmptyStatement();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Finally}.
+     * 
+     * @return a new instance of Finally.
+     */
     public Finally createFinally() {
-        return new Finally();
+        Finally res =  new Finally();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Finally}.
+     * 
+     * @return a new instance of Finally.
+     */
     public Finally createFinally(StatementBlock body) {
-        return new Finally(body);
+        Finally res = new Finally(body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link For}.
+     * 
+     * @return a new instance of For.
+     */
     public For createFor() {
-        return new For();
+        For res = new For();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
-    public For createFor(ASTList<LoopInitializer> inits, Expression guard, ASTList<Expression> updates, Statement body) {
-        return new For(inits, guard, updates, body);
+    /**
+     * Creates a new {@link For}.
+     * 
+     * @return a new instance of For.
+     */
+    public For createFor(ASTList<LoopInitializer> inits, Expression guard, ASTList<Expression> updates,
+            Statement body) {
+        For res = new For(inits, guard, updates, body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
-
+    
     public EnhancedFor createEnhancedFor() {
-        return new EnhancedFor();
+        EnhancedFor res = new EnhancedFor();
+        res.setFactory(this);
+        trace(res);
+        return res;
+    }
+    
+    public EnumDeclaration createEnumDeclaration() {
+    	EnumDeclaration res = new EnumDeclaration();
+    	res.setFactory(this);
+    	trace(res);
+    	return res;
+    }
+    
+    public EnumConstructorReference createEnumConstructorReference() {
+    	EnumConstructorReference res = new EnumConstructorReference();
+    	res.setFactory(this);
+    	trace(res);
+    	return res;
+    }
+    
+    public EnumConstructorReference createEnumConstructorReference(ASTList<Expression> args, ClassDeclaration cd) {
+    	EnumConstructorReference res = new EnumConstructorReference(args, cd);
+    	res.setFactory(this);
+    	trace(res);
+    	return res;
+    }
+    
+    public EnumConstantSpecification createEnumConstantSpecification(Identifier id, EnumConstructorReference ref) {
+    	EnumConstantSpecification res = new EnumConstantSpecification(id, ref);
+    	res.setFactory(this);
+    	trace(res);
+    	return res;
+    }
+    
+    public EnumConstantDeclaration createEnumConstantDeclaration() {
+    	EnumConstantDeclaration res = new EnumConstantDeclaration();
+    	res.setFactory(this);
+    	trace(res);
+    	return res;
     }
 
+    /**
+     * Creates a new {@link Assert}.
+     * 
+     * @return a new instance of Assert.
+     */
     public Assert createAssert() {
-        return new Assert();
+        Assert res = new Assert();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Assert}.
+     * 
+     * @return a new instance of Assert.
+     */
     public Assert createAssert(Expression cond) {
-        return new Assert(cond);
+        Assert res = new Assert(cond);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Assert}.
+     * 
+     * @return a new instance of Assert.
+     */
     public Assert createAssert(Expression cond, Expression msg) {
-        return new Assert(cond, msg);
+        Assert res = new Assert(cond, msg);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link If}.
+     * 
+     * @return a new instance of If.
+     */
     public If createIf() {
-        return new If();
+        If res = new If();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link If}.
+     * 
+     * @return a new instance of If.
+     */
     public If createIf(Expression e, Statement thenStatement) {
-        return new If(e, thenStatement);
+        If res = new If(e, createThen(thenStatement));
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link If}.
+     * 
+     * @return a new instance of If.
+     */
     public If createIf(Expression e, Then thenBranch) {
-        return new If(e, thenBranch);
+        If res = new If(e, thenBranch);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link If}.
+     * 
+     * @return a new instance of If.
+     */
     public If createIf(Expression e, Then thenBranch, Else elseBranch) {
-        return new If(e, thenBranch, elseBranch);
+        If res = new If(e, thenBranch, elseBranch);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link If}.
+     * 
+     * @return a new instance of If.
+     */
     public If createIf(Expression e, Statement thenStatement, Statement elseStatement) {
-        return new If(e, thenStatement, elseStatement);
+        If res = new If(e, createThen(thenStatement), createElse(elseStatement));
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LabeledStatement}.
+     * 
+     * @return a new instance of LabeledStatement.
+     */
     public LabeledStatement createLabeledStatement() {
-        return new LabeledStatement();
+        LabeledStatement res = new LabeledStatement();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LabeledStatement} with an {@link EmptyStatement} as body.
+     * 
+     * @return a new instance of LabeledStatement.
+     */
     public LabeledStatement createLabeledStatement(Identifier id) {
-        return new LabeledStatement(id);
+        LabeledStatement res = new LabeledStatement(id, createEmptyStatement());
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link LabeledStatement}.
+     * 
+     * @return a new instance of LabeledStatement.
+     */
     public LabeledStatement createLabeledStatement(Identifier id, Statement statement) {
-        return new LabeledStatement(id, statement);
+        LabeledStatement res = new LabeledStatement(id, statement);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Return}.
+     * 
+     * @return a new instance of Return.
+     */
     public Return createReturn() {
-        return new Return();
+        Return res = new Return();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Return}.
+     * 
+     * @return a new instance of Return.
+     */
     public Return createReturn(Expression expr) {
-        return new Return(expr);
+        Return res = new Return(expr);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link StatementBlock}.
+     * 
+     * @return a new instance of StatementBlock.
+     */
     public StatementBlock createStatementBlock() {
-        return new StatementBlock();
+        StatementBlock res = new StatementBlock();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link StatementBlock}.
+     * 
+     * @return a new instance of StatementBlock.
+     */
     public StatementBlock createStatementBlock(ASTList<Statement> block) {
-        return new StatementBlock(block);
+        StatementBlock res = new StatementBlock(block);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Switch}.
+     * 
+     * @return a new instance of Switch.
+     */
     public Switch createSwitch() {
-        return new Switch();
+        Switch res = new Switch();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Switch}.
+     * 
+     * @return a new instance of Switch.
+     */
     public Switch createSwitch(Expression e) {
-        return new Switch(e);
+        Switch res = new Switch(e);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Switch}.
+     * 
+     * @return a new instance of Switch.
+     */
     public Switch createSwitch(Expression e, ASTList<Branch> branches) {
-        return new Switch(e, branches);
+        Switch res = new Switch(e, branches);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link SynchronizedBlock}.
+     * 
+     * @return a new instance of SynchronizedBlock.
+     */
     public SynchronizedBlock createSynchronizedBlock() {
-        return new SynchronizedBlock();
+        SynchronizedBlock res = new SynchronizedBlock();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link SynchronizedBlock}.
+     * 
+     * @return a new instance of SynchronizedBlock.
+     */
     public SynchronizedBlock createSynchronizedBlock(StatementBlock body) {
-        return new SynchronizedBlock(body);
+        SynchronizedBlock res = new SynchronizedBlock(body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link SynchronizedBlock}.
+     * 
+     * @return a new instance of SynchronizedBlock.
+     */
     public SynchronizedBlock createSynchronizedBlock(Expression e, StatementBlock body) {
-        return new SynchronizedBlock(e, body);
+        SynchronizedBlock res = new SynchronizedBlock(e, body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Then}.
+     * 
+     * @return a new instance of Then.
+     */
     public Then createThen() {
-        return new Then();
+        Then res = new Then();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Then}.
+     * 
+     * @return a new instance of Then.
+     */
     public Then createThen(Statement body) {
-        return new Then(body);
+        Then res = new Then(body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Throw}.
+     * 
+     * @return a new instance of Throw.
+     */
     public Throw createThrow() {
-        return new Throw();
+        Throw res =  new Throw();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Throw}.
+     * 
+     * @return a new instance of Throw.
+     */
     public Throw createThrow(Expression expr) {
-        return new Throw(expr);
+        Throw res = new Throw(expr);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Try}.
+     * 
+     * @return a new instance of Try.
+     */
     public Try createTry() {
-        return new Try();
+        Try res = new Try();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Try}.
+     * 
+     * @return a new instance of Try.
+     */
     public Try createTry(StatementBlock body) {
-        return new Try(body);
+        Try res = new Try(body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link Try}.
+     * 
+     * @return a new instance of Try.
+     */
     public Try createTry(StatementBlock body, ASTList<Branch> branches) {
-        return new Try(body, branches);
+        Try res = new Try(body, branches);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
-
+    
+    /**
+     * Creates a new {@link While}.
+     * 
+     * @return a new instance of While.
+     */
     public While createWhile() {
-        return new While();
+        While res = new While();
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link While}.
+     * 
+     * @return a new instance of While.
+     */
     public While createWhile(Expression guard) {
-        return new While(guard);
+        While res = new While(guard);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 
+    /**
+     * Creates a new {@link While}.
+     * 
+     * @return a new instance of While.
+     */
     public While createWhile(Expression guard, Statement body) {
-        return new While(guard, body);
-    }
-
-    private class AddNewlineReader extends Reader {
-        private final Reader reader;
-
-        private boolean added;
-
-        AddNewlineReader(Reader reader) {
-            this.added = false;
-            this.reader = reader;
-        }
-
-        public void mark(int readAheadLimit) throws IOException {
-            this.reader.mark(readAheadLimit);
-        }
-
-        public boolean markSupported() {
-            return this.reader.markSupported();
-        }
-
-        public int read() throws IOException {
-            return this.reader.read();
-        }
-
-        public int read(char[] cbuf) throws IOException {
-            return this.reader.read(cbuf);
-        }
-
-        public int read(CharBuffer target) throws IOException {
-            return this.reader.read(target);
-        }
-
-        public boolean ready() throws IOException {
-            return this.reader.ready();
-        }
-
-        public void reset() throws IOException {
-            this.reader.reset();
-        }
-
-        public long skip(long n) throws IOException {
-            return this.reader.skip(n);
-        }
-
-        public void close() throws IOException {
-            this.reader.close();
-        }
-
-        public int read(char[] cbuf, int off, int len) throws IOException {
-            if (this.added)
-                return -1;
-            int result = this.reader.read(cbuf, off, len);
-            if (!this.added && result < len) {
-                if (result == -1)
-                    result++;
-                cbuf[off + result++] = '\n';
-                this.added = true;
-            }
-            return result;
-        }
+        While res = new While(guard, body);
+        res.setFactory(this);
+        trace(res);
+        return res;
     }
 }

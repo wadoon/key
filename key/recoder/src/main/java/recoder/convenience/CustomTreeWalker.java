@@ -1,10 +1,19 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.convenience;
 
-import recoder.ModelElement;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 
+/**
+ * A tree walker that allows to customize the traversal. The walker can report
+ * elements during ascending, and may skip the traversal of certain subtrees on
+ * demand.
+ * 
+ * @author AL
+ */
 public class CustomTreeWalker extends TreeWalker {
+
     boolean isReportingReturns = false;
 
     ModelElementFilter childFilter = null;
@@ -25,73 +34,100 @@ public class CustomTreeWalker extends TreeWalker {
         super(root, initialStackCapacity);
     }
 
-    public boolean isReportingReturns() {
-        return this.isReportingReturns;
-    }
-
+    /**
+     * Decide whether non terminal elements should be reported when returning
+     * from recursion.
+     */
     public void setReportingReturns(boolean yes) {
-        this.isReportingReturns = yes;
+        isReportingReturns = yes;
     }
 
+    /**
+     * Checks whether non terminal elements are reported when returning from
+     * recursion. Default is false (no report).
+     */
+    public boolean isReportingReturns() {
+        return isReportingReturns;
+    }
+
+    /**
+     * Returns true if the current element is left. This element will not be
+     * reported any longer. If return reporting is switched off, only terminal
+     * elements will be reported as returning.
+     * 
+     * @see #isReportingReturns
+     */
     public boolean isReturning() {
-        return this.isReturning;
+        return isReturning;
     }
 
+    /**
+     * Set a filter that decides whether the children of a non terminal should
+     * be reported, or not. This setting takes effect beginning at the next call
+     * to {@link #next()}. It does not affect reports of returning nodes.
+     */
     public void setParentFilter(ModelElementFilter filter) {
-        this.parentFilter = filter;
+        parentFilter = filter;
     }
 
+    // only enter children that are accepted by the given filter
+    // this setting takes effect from now on
+    // does not affect reports of returning nodes
     public void setChildFilter(ModelElementFilter filter) {
-        this.childFilter = filter;
+        childFilter = filter;
     }
 
     public boolean next() {
-        if (this.count == 0) {
-            this.current = null;
-            this.isReturning = true;
+        if (count == 0) {
+            current = null;
+            isReturning = true;
             return false;
         }
-        this.current = this.stack[--this.count];
-        if (this.current == null) {
-            if (this.isReportingReturns) {
-                this.current = this.stack[--this.count];
-                this.isReturning = true;
+        current = stack[--count]; // pop
+        if (current == null) { // end marker
+            if (isReportingReturns) {
+                current = stack[--count]; // report corresponding entry
+                isReturning = true;
                 return true;
+            } else {
+                do {
+                    count -= 1; // skip element that we are returning from
+                    if (count == 0) {
+                        current = null;
+                        isReturning = true;
+                        return false;
+                    }
+                    current = stack[--count]; // pop
+                } while (current == null);
             }
-            do {
-                this.count--;
-                if (this.count == 0) {
-                    this.current = null;
-                    this.isReturning = true;
-                    return false;
-                }
-                this.current = this.stack[--this.count];
-            } while (this.current == null);
         }
-        if (this.current instanceof NonTerminalProgramElement) {
-            NonTerminalProgramElement nt = (NonTerminalProgramElement) this.current;
+        if (current instanceof NonTerminalProgramElement) {
+            NonTerminalProgramElement nt = (NonTerminalProgramElement) current;
             int s = nt.getChildCount();
-            if (this.count + s + 2 >= this.stack.length) {
-                ProgramElement[] newStack = new ProgramElement[Math.max(this.stack.length * 2, this.count + s + 2)];
-                System.arraycopy(this.stack, 0, newStack, 0, this.count);
-                this.stack = newStack;
+            if (count + s + 2 >= stack.length) {
+                ProgramElement[] newStack = new ProgramElement[Math.max(stack.length * 2, count + s + 2)];
+                System.arraycopy(stack, 0, newStack, 0, count);
+                stack = newStack;
             }
-            this.stack[this.count++] = nt;
-            this.stack[this.count++] = null;
-            if (this.parentFilter == null || this.parentFilter.accept(nt))
-                if (this.childFilter == null) {
-                    for (int i = s - 1; i >= 0; i--)
-                        this.stack[this.count++] = nt.getChildAt(i);
+            stack[count++] = nt; // push back
+            stack[count++] = null; // mark as end
+            if (parentFilter == null || parentFilter.accept(nt)) {
+                if (childFilter == null) {
+                    for (int i = s - 1; i >= 0; i -= 1) {
+                        stack[count++] = nt.getChildAt(i); // push
+                    }
                 } else {
-                    for (int i = s - 1; i >= 0; i--) {
+                    for (int i = s - 1; i >= 0; i -= 1) {
                         ProgramElement e = nt.getChildAt(i);
-                        if (this.childFilter.accept(e))
-                            this.stack[this.count++] = e;
+                        if (childFilter.accept(e)) {
+                            stack[count++] = e;
+                        }
                     }
                 }
-            this.isReturning = false;
+            }
+            isReturning = false;
         } else {
-            this.isReturning = true;
+            isReturning = true; // report terminal elements only once
         }
         return true;
     }

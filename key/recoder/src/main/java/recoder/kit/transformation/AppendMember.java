@@ -1,38 +1,83 @@
+// This file is part of the RECODER library and protected by the LGPL
+
 package recoder.kit.transformation;
 
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
+import recoder.abstraction.Constructor;
+import recoder.abstraction.Method;
+import recoder.abstraction.Type;
+import recoder.java.declaration.ClassInitializer;
+import recoder.java.declaration.ConstructorDeclaration;
+import recoder.java.declaration.FieldDeclaration;
 import recoder.java.declaration.MemberDeclaration;
+import recoder.java.declaration.MethodDeclaration;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.kit.ProblemReport;
 import recoder.kit.TwoPassTransformation;
-import recoder.list.generic.ASTList;
 
+/**
+ * Syntactic transformation that adds the given MemberDeclaration to the list in
+ * the given TypeDeclaration at a convenient position. No checks for redundancy
+ * or vadility are performed, such as allowed modifiers, name ambiguity. The
+ * insert position is behind the last occurance of a member of the same type in
+ * the type declaration. If there is no matching member, a predefined order of
+ * member types is followed: fields - initializers - constructors - methods -
+ * member types.
+ * 
+ * @deprecated Does not (yet) check ambiguity or conflicts.
+ *  
+ */
 public class AppendMember extends TwoPassTransformation {
-    private final boolean isVisible;
 
-    private final TypeDeclaration parent;
+    private boolean isVisible;
 
-    private final MemberDeclaration child;
+    private TypeDeclaration parent;
+
+    private MemberDeclaration child;
 
     private int insertPosition = -1;
 
-    public AppendMember(CrossReferenceServiceConfiguration sc, boolean isVisible, MemberDeclaration child, TypeDeclaration parent) {
+    /**
+     * Creates a new transformation object that adds the given MemberDeclaration
+     * to the list in the given TypeDeclaration at a convenient position.
+     * 
+     * @param sc
+     *            the service configuration to use.
+     * @param isVisible
+     *            flag indicating if this transformation shall be visible.
+     * @param decl
+     *            the declaration to modify. may not be <CODE>null</CODE> and
+     *            must denote a valid identifier name.
+     * @param code
+     *            the modifier to create, encoded using the codes from
+     *            {@link recoder.kit.ModifierKit}.
+     */
+    public AppendMember(CrossReferenceServiceConfiguration sc, boolean isVisible, MemberDeclaration child,
+            TypeDeclaration parent) {
         super(sc);
-        if (child == null || parent == null)
+        if (child == null || parent == null) {
             throw new IllegalArgumentException("Missing declaration");
+        }
         this.isVisible = isVisible;
         this.child = child;
         this.parent = parent;
     }
 
     public boolean isVisible() {
-        return this.isVisible;
+        return isVisible;
     }
 
+    /**
+     * Finds out where to insert the new member.
+     * 
+     * @return the problem report.
+     */
     public ProblemReport analyze() {
-        ASTList<MemberDeclaration> aSTList = this.parent.getMembers();
-        if (aSTList == null) {
-            this.insertPosition = 0;
+    	List<MemberDeclaration> mdl = parent.getMembers();
+        if (mdl == null) {
+            insertPosition = 0;
             return setProblemReport(NO_PROBLEM);
         }
         int lastField = -1;
@@ -40,47 +85,54 @@ public class AppendMember extends TwoPassTransformation {
         int lastConstructor = -1;
         int lastMethod = -1;
         int lastType = -1;
-        for (int i = aSTList.size() - 1; i >= 0; i--) {
-            MemberDeclaration x = aSTList.get(i);
-            if (x instanceof recoder.java.declaration.FieldDeclaration) {
+        for (int i = mdl.size() - 1; i >= 0; i -= 1) {
+            MemberDeclaration x = mdl.get(i);
+            if (x instanceof FieldDeclaration) {
                 lastField = (lastField < 0) ? i : lastField;
-            } else if (x instanceof recoder.java.declaration.ClassInitializer) {
+            } else if (x instanceof ClassInitializer) {
                 lastInitializer = (lastInitializer < 0) ? i : lastInitializer;
-            } else if (x instanceof recoder.abstraction.Constructor) {
+            } else if (x instanceof Constructor) {
                 lastConstructor = (lastConstructor < 0) ? i : lastConstructor;
-            } else if (x instanceof recoder.abstraction.Method) {
+            } else if (x instanceof Method) {
                 lastMethod = (lastMethod < 0) ? i : lastMethod;
-            } else if (x instanceof recoder.abstraction.Type) {
+            } else if (x instanceof Type) {
                 lastType = (lastType < 0) ? i : lastType;
             }
         }
-        if (this.child instanceof recoder.java.declaration.FieldDeclaration) {
+        if (child instanceof FieldDeclaration) {
             lastInitializer = lastConstructor = lastMethod = lastType = -1;
-        } else if (this.child instanceof recoder.java.declaration.ClassInitializer) {
+        } else if (child instanceof ClassInitializer) {
             lastConstructor = lastMethod = lastType = -1;
-        } else if (this.child instanceof recoder.java.declaration.ConstructorDeclaration) {
+        } else if (child instanceof ConstructorDeclaration) {
             lastMethod = lastType = -1;
-        } else if (this.child instanceof recoder.java.declaration.MethodDeclaration) {
+        } else if (child instanceof MethodDeclaration) {
             lastType = -1;
         }
         if (lastType >= 0) {
-            this.insertPosition = lastType + 1;
+            insertPosition = lastType + 1;
         } else if (lastMethod >= 0) {
-            this.insertPosition = lastMethod + 1;
+            insertPosition = lastMethod + 1;
         } else if (lastConstructor >= 0) {
-            this.insertPosition = lastConstructor + 1;
+            insertPosition = lastConstructor + 1;
         } else if (lastInitializer >= 0) {
-            this.insertPosition = lastInitializer + 1;
+            insertPosition = lastInitializer + 1;
         } else if (lastField >= 0) {
-            this.insertPosition = lastField + 1;
+            insertPosition = lastField + 1;
         } else {
-            this.insertPosition = 0;
+            insertPosition = 0;
         }
         return setProblemReport(NO_PROBLEM);
     }
 
+    /**
+     * Attaches the member at the proper position.
+     * 
+     * @exception IllegalStateException
+     *                if the analyzation has not been called.
+     * @see #analyze()
+     */
     public void transform() {
         super.transform();
-        attach(this.child, this.parent, this.insertPosition);
+        attach(child, parent, insertPosition);
     }
 }

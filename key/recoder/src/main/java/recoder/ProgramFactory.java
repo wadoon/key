@@ -1,623 +1,2236 @@
-package recoder;
+// This file is part of the RECODER library and protected by the LGPL
 
-import recoder.java.*;
-import recoder.java.declaration.*;
-import recoder.java.declaration.modifier.*;
-import recoder.java.expression.ArrayInitializer;
-import recoder.java.expression.ParenthesizedExpression;
-import recoder.java.expression.literal.*;
-import recoder.java.expression.operator.*;
-import recoder.java.reference.*;
-import recoder.java.statement.*;
-import recoder.list.generic.ASTList;
+package recoder;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 
+import recoder.abstraction.TypeArgument.WildcardMode;
+import recoder.java.Comment;
+import recoder.java.CompilationUnit;
+import recoder.java.DocComment;
+import recoder.java.Expression;
+import recoder.java.Identifier;
+import recoder.java.Import;
+import recoder.java.LoopInitializer;
+import recoder.java.PackageSpecification;
+import recoder.java.PrettyPrinter;
+import recoder.java.SingleLineComment;
+import recoder.java.Statement;
+import recoder.java.StatementBlock;
+import recoder.java.declaration.AnnotationDeclaration;
+import recoder.java.declaration.AnnotationPropertyDeclaration;
+import recoder.java.declaration.AnnotationUseSpecification;
+import recoder.java.declaration.ClassDeclaration;
+import recoder.java.declaration.ClassInitializer;
+import recoder.java.declaration.ConstructorDeclaration;
+import recoder.java.declaration.DeclarationSpecifier;
+import recoder.java.declaration.Extends;
+import recoder.java.declaration.FieldDeclaration;
+import recoder.java.declaration.FieldSpecification;
+import recoder.java.declaration.Implements;
+import recoder.java.declaration.InterfaceDeclaration;
+import recoder.java.declaration.LocalVariableDeclaration;
+import recoder.java.declaration.MemberDeclaration;
+import recoder.java.declaration.MethodDeclaration;
+import recoder.java.declaration.ParameterDeclaration;
+import recoder.java.declaration.Throws;
+import recoder.java.declaration.TypeArgumentDeclaration;
+import recoder.java.declaration.TypeDeclaration;
+import recoder.java.declaration.TypeParameterDeclaration;
+import recoder.java.declaration.VariableSpecification;
+import recoder.java.declaration.modifier.Abstract;
+import recoder.java.declaration.modifier.Final;
+import recoder.java.declaration.modifier.Native;
+import recoder.java.declaration.modifier.Private;
+import recoder.java.declaration.modifier.Protected;
+import recoder.java.declaration.modifier.Public;
+import recoder.java.declaration.modifier.Static;
+import recoder.java.declaration.modifier.StrictFp;
+import recoder.java.declaration.modifier.Synchronized;
+import recoder.java.declaration.modifier.Transient;
+import recoder.java.declaration.modifier.VisibilityModifier;
+import recoder.java.declaration.modifier.Volatile;
+import recoder.java.expression.ArrayInitializer;
+import recoder.java.expression.ParenthesizedExpression;
+import recoder.java.expression.literal.BooleanLiteral;
+import recoder.java.expression.literal.CharLiteral;
+import recoder.java.expression.literal.DoubleLiteral;
+import recoder.java.expression.literal.FloatLiteral;
+import recoder.java.expression.literal.IntLiteral;
+import recoder.java.expression.literal.LongLiteral;
+import recoder.java.expression.literal.NullLiteral;
+import recoder.java.expression.literal.StringLiteral;
+import recoder.java.expression.operator.BinaryAnd;
+import recoder.java.expression.operator.BinaryAndAssignment;
+import recoder.java.expression.operator.BinaryNot;
+import recoder.java.expression.operator.BinaryOr;
+import recoder.java.expression.operator.BinaryOrAssignment;
+import recoder.java.expression.operator.BinaryXOr;
+import recoder.java.expression.operator.BinaryXOrAssignment;
+import recoder.java.expression.operator.Conditional;
+import recoder.java.expression.operator.CopyAssignment;
+import recoder.java.expression.operator.Divide;
+import recoder.java.expression.operator.DivideAssignment;
+import recoder.java.expression.operator.Equals;
+import recoder.java.expression.operator.GreaterOrEquals;
+import recoder.java.expression.operator.GreaterThan;
+import recoder.java.expression.operator.Instanceof;
+import recoder.java.expression.operator.LessOrEquals;
+import recoder.java.expression.operator.LessThan;
+import recoder.java.expression.operator.LogicalAnd;
+import recoder.java.expression.operator.LogicalNot;
+import recoder.java.expression.operator.LogicalOr;
+import recoder.java.expression.operator.Minus;
+import recoder.java.expression.operator.MinusAssignment;
+import recoder.java.expression.operator.Modulo;
+import recoder.java.expression.operator.ModuloAssignment;
+import recoder.java.expression.operator.Negative;
+import recoder.java.expression.operator.New;
+import recoder.java.expression.operator.NewArray;
+import recoder.java.expression.operator.NotEquals;
+import recoder.java.expression.operator.Plus;
+import recoder.java.expression.operator.PlusAssignment;
+import recoder.java.expression.operator.Positive;
+import recoder.java.expression.operator.PostDecrement;
+import recoder.java.expression.operator.PostIncrement;
+import recoder.java.expression.operator.PreDecrement;
+import recoder.java.expression.operator.PreIncrement;
+import recoder.java.expression.operator.ShiftLeft;
+import recoder.java.expression.operator.ShiftLeftAssignment;
+import recoder.java.expression.operator.ShiftRight;
+import recoder.java.expression.operator.ShiftRightAssignment;
+import recoder.java.expression.operator.Times;
+import recoder.java.expression.operator.TimesAssignment;
+import recoder.java.expression.operator.TypeCast;
+import recoder.java.expression.operator.UnsignedShiftRight;
+import recoder.java.expression.operator.UnsignedShiftRightAssignment;
+import recoder.java.reference.AnnotationPropertyReference;
+import recoder.java.reference.ArrayReference;
+import recoder.java.reference.FieldReference;
+import recoder.java.reference.MetaClassReference;
+import recoder.java.reference.MethodReference;
+import recoder.java.reference.PackageReference;
+import recoder.java.reference.ReferencePrefix;
+import recoder.java.reference.SuperConstructorReference;
+import recoder.java.reference.SuperReference;
+import recoder.java.reference.ThisConstructorReference;
+import recoder.java.reference.ThisReference;
+import recoder.java.reference.TypeReference;
+import recoder.java.reference.UncollatedReferenceQualifier;
+import recoder.java.reference.VariableReference;
+import recoder.java.statement.Assert;
+import recoder.java.statement.Branch;
+import recoder.java.statement.Break;
+import recoder.java.statement.Case;
+import recoder.java.statement.Catch;
+import recoder.java.statement.Continue;
+import recoder.java.statement.Default;
+import recoder.java.statement.Do;
+import recoder.java.statement.Else;
+import recoder.java.statement.EmptyStatement;
+import recoder.java.statement.EnhancedFor;
+import recoder.java.statement.Finally;
+import recoder.java.statement.For;
+import recoder.java.statement.If;
+import recoder.java.statement.LabeledStatement;
+import recoder.java.statement.Return;
+import recoder.java.statement.Switch;
+import recoder.java.statement.SynchronizedBlock;
+import recoder.java.statement.Then;
+import recoder.java.statement.Throw;
+import recoder.java.statement.Try;
+import recoder.java.statement.While;
+import recoder.list.generic.ASTList;
+
 public interface ProgramFactory extends Service {
-    CompilationUnit parseCompilationUnit(Reader paramReader) throws IOException, ParserException;
 
-    TypeDeclaration parseTypeDeclaration(Reader paramReader) throws IOException, ParserException;
+    /**
+     * Parse a {@link CompilationUnit}from the given reader.
+     */
+    CompilationUnit parseCompilationUnit(Reader in) throws IOException, ParserException;
 
-    FieldDeclaration parseFieldDeclaration(Reader paramReader) throws IOException, ParserException;
+    /**
+     * Parse a {@link CompilationUnit}from the given reader.
+     * The supplied sourceVersion parameter describes the java version.
+     * @author NAI
+     * 
+     * @param in
+     * @param sourceVersion allowed values: "1.3", "1.4", "5". Defaults to Java 1.4 behavior if sourceVersion is <code>null</code> or any other string.
+     * @return
+     * @throws IOException
+     * @throws ParserException
+     */
+    public CompilationUnit parseCompilationUnit(Reader in, String sourceVersion) throws IOException, ParserException;
 
-    MethodDeclaration parseMethodDeclaration(Reader paramReader) throws IOException, ParserException;
+    /**
+     * Parse a {@link TypeDeclaration}from the given reader.
+     */
+    TypeDeclaration parseTypeDeclaration(Reader in) throws IOException, ParserException;
+    
+    /**
+     * Parse a {@link PackageReference} from the given reader.
+     */
+    PackageReference parsePackageReference(Reader in) throws IOException, ParserException;
 
-    MemberDeclaration parseMemberDeclaration(Reader paramReader) throws IOException, ParserException;
+    /**
+     * parse a {@link TypeArgumentDeclaration} from the given reader.
+     */
+    TypeArgumentDeclaration parseTypeArgumentDeclaration(Reader in) throws IOException, ParserException;
+    
+    /**
+     * Parse a {@link FieldDeclaration}from the given reader.
+     */
+    FieldDeclaration parseFieldDeclaration(Reader in) throws IOException, ParserException;
 
-    ParameterDeclaration parseParameterDeclaration(Reader paramReader) throws IOException, ParserException;
+    /**
+     * Parse a {@link MethodDeclaration}from the given reader.
+     */
+    MethodDeclaration parseMethodDeclaration(Reader in) throws IOException, ParserException;
 
-    ConstructorDeclaration parseConstructorDeclaration(Reader paramReader) throws IOException, ParserException;
+    /**
+     * Parse a {@link MemberDeclaration}from the given reader.
+     */
+    MemberDeclaration parseMemberDeclaration(Reader in) throws IOException, ParserException;
 
-    TypeReference parseTypeReference(Reader paramReader) throws IOException, ParserException;
+    /**
+     * Parse a {@link ParameterDeclaration}from the given reader.
+     */
+    ParameterDeclaration parseParameterDeclaration(Reader in) throws IOException, ParserException;
 
-    Expression parseExpression(Reader paramReader) throws IOException, ParserException;
+    /**
+     * Parse a {@link ConstructorDeclaration}from the given reader.
+     */
+    ConstructorDeclaration parseConstructorDeclaration(Reader in) throws IOException, ParserException;
 
-    ASTList<Statement> parseStatements(Reader paramReader) throws IOException, ParserException;
+    /**
+     * Parse a {@link TypeReference}from the given reader.
+     */
+    TypeReference parseTypeReference(Reader in) throws IOException, ParserException;
 
-    StatementBlock parseStatementBlock(Reader paramReader) throws IOException, ParserException;
+    /**
+     * Parse an {@link Expression}from the given reader.
+     */
+    Expression parseExpression(Reader in) throws IOException, ParserException;
 
-    CompilationUnit parseCompilationUnit(String paramString) throws ParserException;
+    /**
+     * Parse some {@link Statement}s from the given reader.
+     */
+    ASTList<Statement> parseStatements(Reader in) throws IOException, ParserException;
 
-    List<CompilationUnit> parseCompilationUnits(String[] paramArrayOfString) throws ParserException;
+    /**
+     * Parse a {@link StatementBlock}from the given string.
+     */
+    StatementBlock parseStatementBlock(Reader in) throws IOException, ParserException;
+    
+    StatementBlock parseStatementBlock(String in) throws ParserException;
 
-    TypeDeclaration parseTypeDeclaration(String paramString) throws ParserException;
+    /**
+     * Parse a {@link CompilationUnit}from the given string.
+     */
+    CompilationUnit parseCompilationUnit(String in) throws ParserException;
 
-    MemberDeclaration parseMemberDeclaration(String paramString) throws ParserException;
+    /**
+     * Parse {@link CompilationUnit}s from the given string.
+     */
+    List<CompilationUnit> parseCompilationUnits(String[] ins) throws ParserException;
 
-    FieldDeclaration parseFieldDeclaration(String paramString) throws ParserException;
+    /**
+     * Parse a {@link TypeDeclaration}from the given string.
+     */
+    TypeDeclaration parseTypeDeclaration(String in) throws ParserException;
 
-    MethodDeclaration parseMethodDeclaration(String paramString) throws ParserException;
+    /**
+     * Parse a {@link MemberDeclaration}from the given string.
+     */
+    MemberDeclaration parseMemberDeclaration(String in) throws ParserException;
 
-    ParameterDeclaration parseParameterDeclaration(String paramString) throws ParserException;
+    /**
+     * Parse a {@link FieldDeclaration}from the given string.
+     */
+    FieldDeclaration parseFieldDeclaration(String in) throws ParserException;
 
-    ConstructorDeclaration parseConstructorDeclaration(String paramString) throws ParserException;
+    /**
+     * Parse a {@link MethodDeclaration}from the given string.
+     */
+    MethodDeclaration parseMethodDeclaration(String in) throws ParserException;
 
-    TypeReference parseTypeReference(String paramString) throws ParserException;
+    /**
+     * Parse a {@link ParameterDeclaration}from the given string.
+     */
+    ParameterDeclaration parseParameterDeclaration(String in) throws ParserException;
 
-    Expression parseExpression(String paramString) throws ParserException;
+    /**
+     * Parse a {@link ConstructorDeclaration}from the given string.
+     */
+    ConstructorDeclaration parseConstructorDeclaration(String in) throws ParserException;
 
-    ASTList<Statement> parseStatements(String paramString) throws ParserException;
+    /**
+     * Parse a {@link TypeReference}from the given string.
+     */
+    TypeReference parseTypeReference(String in) throws ParserException;
+    
+    /**
+     * Parse a {@link PackageReference} from the given string.
+     */
+    PackageReference parsePackageReference(String in) throws ParserException;
 
-    PrettyPrinter getPrettyPrinter(Writer paramWriter);
+    /**
+     * Parse an {@link Expression}from the given string.
+     */
+    Expression parseExpression(String in) throws ParserException;
 
+    /**
+     * Parse a list of {@link Statement}s from the given string.
+     */
+    ASTList<Statement> parseStatements(String in) throws ParserException;
+
+    /**
+     * Returns a new suitable {@link recoder.java.PrettyPrinter}obeying the
+     * current project settings for the specified writer,
+     * 
+     * @param out
+     *            the (initial) writer to print to.
+     * @return a new pretty printer.
+     */
+    PrettyPrinter getPrettyPrinter(Writer out);
+
+    /**
+     * Creates a new {@link Comment}.
+     * 
+     * @return a new instance of Comment.
+     */
     Comment createComment();
 
-    Comment createComment(String paramString);
+    /**
+     * Creates a new {@link Comment}.
+     * 
+     * @return a new instance of Comment.
+     */
+    Comment createComment(String text);
 
-    Comment createComment(String paramString, boolean paramBoolean);
+    /**
+     * Creates a new {@link Comment}.
+     * 
+     * @return a new instance of Comment.
+     */
+    Comment createComment(String text, boolean prefixed);
 
+    /**
+     * Creates a new {@link CompilationUnit}.
+     * 
+     * @return a new instance of CompilationUnit.
+     */
     CompilationUnit createCompilationUnit();
 
-    CompilationUnit createCompilationUnit(PackageSpecification paramPackageSpecification, ASTList<Import> paramASTList, ASTList<TypeDeclaration> paramASTList1);
+    /**
+     * Creates a new {@link CompilationUnit}.
+     * 
+     * @return a new instance of CompilationUnit.
+     */
+    CompilationUnit createCompilationUnit(PackageSpecification pkg, ASTList<Import> imports,
+    		ASTList<TypeDeclaration> typeDeclarations);
 
+    /**
+     * Creates a new {@link DocComment}.
+     * 
+     * @return a new instance of DocComment.
+     */
     DocComment createDocComment();
 
-    DocComment createDocComment(String paramString);
+    /**
+     * Creates a new {@link DocComment}.
+     * 
+     * @return a new instance of DocComment.
+     */
+    DocComment createDocComment(String text);
 
+    /**
+     * Creates a new {@link Identifier}.
+     * 
+     * @return a new instance of Identifier.
+     */
     Identifier createIdentifier();
 
-    Identifier createIdentifier(String paramString);
+    /**
+     * Creates a new {@link Identifier}.
+     * 
+     * @return a new instance of Identifier.
+     */
+    Identifier createIdentifier(String text);
 
+    /**
+     * Creates a new {@link Import}.
+     * 
+     * @return a new instance of Import.
+     */
     Import createImport();
 
-    Import createImport(TypeReference paramTypeReference, boolean paramBoolean);
+    /**
+     * Creates a new {@link Import}.
+     * 
+     * @return a new instance of Import.
+     */
+    Import createImport(TypeReference t, boolean multi);
 
-    Import createImport(PackageReference paramPackageReference);
+    /**
+     * Creates a new {@link Import}.
+     * 
+     * @return a new instance of Import.
+     */
+    Import createImport(PackageReference t);
 
-    Import createStaticImport(TypeReference paramTypeReference);
-
-    Import createStaticImport(TypeReference paramTypeReference, Identifier paramIdentifier);
-
+    /**
+     * Creates a new {@link Import}.
+     * 
+     * @return a new instance of Import.
+     */
+    Import createStaticImport(TypeReference t);
+    
+    /**
+     * Creates a new {@link Import}.
+     * 
+     * @return a new instance of Import.
+     */
+    Import createStaticImport(TypeReference t, Identifier id);
+    
+    /**
+     * Creates a new {@link PackageSpecification}.
+     * 
+     * @return a new instance of PackageSpecification.
+     */
     PackageSpecification createPackageSpecification();
 
-    PackageSpecification createPackageSpecification(PackageReference paramPackageReference);
+    /**
+     * Creates a new {@link PackageSpecification}.
+     * 
+     * @return a new instance of PackageSpecification.
+     */
+    PackageSpecification createPackageSpecification(PackageReference pkg);
 
+    /**
+     * Creates a new {@link SingleLineComment}.
+     * 
+     * @return a new instance of SingleLineComment.
+     */
     SingleLineComment createSingleLineComment();
 
-    SingleLineComment createSingleLineComment(String paramString);
+    /**
+     * Creates a new {@link SingleLineComment}.
+     * 
+     * @return a new instance of SingleLineComment.
+     */
+    SingleLineComment createSingleLineComment(String text);
 
+    /**
+     * Creates a new {@link TypeReference}.
+     * 
+     * @return a new instance of TypeReference.
+     */
     TypeReference createTypeReference();
 
-    TypeReference createTypeReference(Identifier paramIdentifier);
+    /**
+     * Creates a new {@link TypeReference}.
+     * 
+     * @return a new instance of TypeReference.
+     */
+    TypeReference createTypeReference(Identifier name);
 
-    TypeReference createTypeReference(ReferencePrefix paramReferencePrefix, Identifier paramIdentifier);
+    /**
+     * Creates a new {@link TypeReference}.
+     * 
+     * @return a new instance of TypeReference.
+     */
+    TypeReference createTypeReference(ReferencePrefix prefix, Identifier name);
 
-    TypeReference createTypeReference(Identifier paramIdentifier, int paramInt);
+    /**
+     * Creates a new {@link TypeReference}.
+     * 
+     * @return a new instance of TypeReference.
+     */
+    TypeReference createTypeReference(Identifier name, int dim);
 
+    /**
+     * Creates a new {@link PackageReference}.
+     * 
+     * @return a new instance of PackageReference.
+     */
     PackageReference createPackageReference();
 
-    PackageReference createPackageReference(Identifier paramIdentifier);
+    /**
+     * Creates a new {@link PackageReference}.
+     * 
+     * @return a new instance of PackageReference.
+     */
+    PackageReference createPackageReference(Identifier id);
 
-    PackageReference createPackageReference(PackageReference paramPackageReference, Identifier paramIdentifier);
+    /**
+     * Creates a new {@link PackageReference}.
+     * 
+     * @return a new instance of PackageReference.
+     */
+    PackageReference createPackageReference(PackageReference path, Identifier id);
 
+    /**
+     * Creates a new {@link UncollatedReferenceQualifier}.
+     * 
+     * @return a new instance of UncollatedReferenceQualifier.
+     */
     UncollatedReferenceQualifier createUncollatedReferenceQualifier();
 
-    UncollatedReferenceQualifier createUncollatedReferenceQualifier(Identifier paramIdentifier);
+    /**
+     * Creates a new {@link UncollatedReferenceQualifier}.
+     * 
+     * @return a new instance of UncollatedReferenceQualifier.
+     */
+    UncollatedReferenceQualifier createUncollatedReferenceQualifier(Identifier id);
 
-    UncollatedReferenceQualifier createUncollatedReferenceQualifier(ReferencePrefix paramReferencePrefix, Identifier paramIdentifier);
+    /**
+     * Creates a new {@link UncollatedReferenceQualifier}.
+     * 
+     * @return a new instance of UncollatedReferenceQualifier.
+     */
+    UncollatedReferenceQualifier createUncollatedReferenceQualifier(ReferencePrefix prefix, Identifier id);
 
+    /**
+     * Creates a new {@link ClassDeclaration}.
+     * 
+     * @return a new instance of ClassDeclaration.
+     */
     ClassDeclaration createClassDeclaration();
+    
 
-    ClassDeclaration createClassDeclaration(ASTList<DeclarationSpecifier> paramASTList, Identifier paramIdentifier, Extends paramExtends, Implements paramImplements, ASTList<MemberDeclaration> paramASTList1);
+    /**
+     * Creates a new {@link ClassDeclaration}.
+     * 
+     * @return a new instance of ClassDeclaration.
+     */
+    ClassDeclaration createClassDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name, Extends extended,
+            Implements implemented, ASTList<MemberDeclaration> members);
 
-    ClassDeclaration createClassDeclaration(ASTList<MemberDeclaration> paramASTList);
+    /**
+     * Creates a new {@link ClassDeclaration}.
+     * 
+     * @return a new instance of ClassDeclaration.
+     */
+    ClassDeclaration createClassDeclaration(ASTList<MemberDeclaration> members);
 
+    
+    /*
+     * TODO DOCUMENT
+     */
+    TypeArgumentDeclaration createTypeArgumentDeclaration(TypeReference ref);
+    TypeArgumentDeclaration createTypeArgumentDeclaration(TypeReference ref, WildcardMode wm);
+    TypeArgumentDeclaration createTypeArgumentDeclaration();
+    TypeParameterDeclaration createTypeParameterDeclaration();
+    
+    /**
+     * Creates a new {@link ClassInitializer}.
+     * 
+     * @return a new instance of ClassInitializer.
+     */
     ClassInitializer createClassInitializer();
 
-    ClassInitializer createClassInitializer(StatementBlock paramStatementBlock);
+    /**
+     * Creates a new {@link ClassInitializer}.
+     * 
+     * @return a new instance of ClassInitializer.
+     */
+    ClassInitializer createClassInitializer(StatementBlock body);
 
-    ClassInitializer createClassInitializer(Static paramStatic, StatementBlock paramStatementBlock);
+    /**
+     * Creates a new {@link ClassInitializer}.
+     * 
+     * @return a new instance of ClassInitializer.
+     */
+    ClassInitializer createClassInitializer(Static modifier, StatementBlock body);
 
+    /**
+     * Creates a new {@link ConstructorDeclaration}.
+     * 
+     * @return a new instance of ConstructorDeclaration.
+     */
     ConstructorDeclaration createConstructorDeclaration();
 
-    ConstructorDeclaration createConstructorDeclaration(VisibilityModifier paramVisibilityModifier, Identifier paramIdentifier, ASTList<ParameterDeclaration> paramASTList, Throws paramThrows, StatementBlock paramStatementBlock);
+    /**
+     * Creates a new {@link ConstructorDeclaration}.
+     * 
+     * @return a new instance of ConstructorDeclaration.
+     */
+    ConstructorDeclaration createConstructorDeclaration(VisibilityModifier modifier, Identifier name,
+    		ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body);
 
+    /**
+     * Creates a new {@link Throws}.
+     * 
+     * @return a new instance of Throws.
+     */
     Throws createThrows();
 
-    Throws createThrows(TypeReference paramTypeReference);
+    /**
+     * Creates a new {@link Throws}.
+     * 
+     * @return a new instance of Throws.
+     */
+    Throws createThrows(TypeReference exception);
 
-    Throws createThrows(ASTList<TypeReference> paramASTList);
+    /**
+     * Creates a new {@link Throws}.
+     * 
+     * @return a new instance of Throws.
+     */
+    Throws createThrows(ASTList<TypeReference> list);
 
+    /**
+     * Creates a new {@link FieldDeclaration}.
+     * 
+     * @return a new instance of FieldDeclaration.
+     */
     FieldDeclaration createFieldDeclaration();
 
-    FieldDeclaration createFieldDeclaration(TypeReference paramTypeReference, Identifier paramIdentifier);
+    /**
+     * Creates a new {@link FieldDeclaration}.
+     * 
+     * @return a new instance of FieldDeclaration.
+     */
+    FieldDeclaration createFieldDeclaration(TypeReference typeRef, Identifier name);
 
-    FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> paramASTList, TypeReference paramTypeReference, Identifier paramIdentifier, Expression paramExpression);
+    /**
+     * Creates a new {@link FieldDeclaration}.
+     * 
+     * @return a new instance of FieldDeclaration.
+     */
+    FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, Identifier name,
+            Expression init);
 
-    FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> paramASTList, TypeReference paramTypeReference, ASTList<FieldSpecification> paramASTList1);
+    /**
+     * Creates a new {@link FieldDeclaration}.
+     * 
+     * @return a new instance of FieldDeclaration.
+     */
+    FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
+    		ASTList<FieldSpecification> vars);
 
+    /**
+     * Creates a new {@link Extends}.
+     * 
+     * @return a new instance of Extends.
+     */
     Extends createExtends();
 
-    Extends createExtends(TypeReference paramTypeReference);
+    /**
+     * Creates a new {@link Extends}.
+     * 
+     * @return a new instance of Extends.
+     */
+    Extends createExtends(TypeReference supertype);
 
-    Extends createExtends(ASTList<TypeReference> paramASTList);
+    /**
+     * Creates a new {@link Extends}.
+     * 
+     * @return a new instance of Extends.
+     */
+    Extends createExtends(ASTList<TypeReference> list);
 
+    /**
+     * Creates a new {@link Implements}.
+     * 
+     * @return a new instance of Implements.
+     */
     Implements createImplements();
 
-    Implements createImplements(TypeReference paramTypeReference);
+    /**
+     * Creates a new {@link Implements}.
+     * 
+     * @return a new instance of Implements.
+     */
+    Implements createImplements(TypeReference supertype);
 
-    Implements createImplements(ASTList<TypeReference> paramASTList);
+    /**
+     * Creates a new {@link Implements}.
+     * 
+     * @return a new instance of Implements.
+     */
+    Implements createImplements(ASTList<TypeReference> list);
 
+    /**
+     * Creates a new {@link InterfaceDeclaration}.
+     * 
+     * @return a new instance of InterfaceDeclaration.
+     */
     InterfaceDeclaration createInterfaceDeclaration();
 
-    InterfaceDeclaration createInterfaceDeclaration(ASTList<DeclarationSpecifier> paramASTList, Identifier paramIdentifier, Extends paramExtends, ASTList<MemberDeclaration> paramASTList1);
+    /**
+     * Creates a new {@link InterfaceDeclaration}.
+     * 
+     * @return a new instance of InterfaceDeclaration.
+     */
+    InterfaceDeclaration createInterfaceDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name, Extends extended,
+    		ASTList<MemberDeclaration> members);
 
     AnnotationDeclaration createAnnotationDeclaration();
-
-    AnnotationDeclaration createAnnotationDeclaration(ASTList<DeclarationSpecifier> paramASTList, Identifier paramIdentifier, ASTList<MemberDeclaration> paramASTList1);
-
+    
+    AnnotationDeclaration createAnnotationDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name,
+    		ASTList<MemberDeclaration> members);
+    
+    /**
+     * Creates a new {@link LocalVariableDeclaration}.
+     * 
+     * @return a new instance of LocalVariableDeclaration.
+     */
     LocalVariableDeclaration createLocalVariableDeclaration();
 
-    LocalVariableDeclaration createLocalVariableDeclaration(TypeReference paramTypeReference, Identifier paramIdentifier);
+    /**
+     * Creates a new {@link LocalVariableDeclaration}.
+     * 
+     * @return a new instance of LocalVariableDeclaration.
+     */
+    LocalVariableDeclaration createLocalVariableDeclaration(TypeReference typeRef, Identifier name);
 
-    LocalVariableDeclaration createLocalVariableDeclaration(ASTList<DeclarationSpecifier> paramASTList, TypeReference paramTypeReference, ASTList<VariableSpecification> paramASTList1);
+    /**
+     * Creates a new {@link LocalVariableDeclaration}.
+     * 
+     * @return a new instance of LocalVariableDeclaration.
+     */
+    LocalVariableDeclaration createLocalVariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
+    		ASTList<VariableSpecification> vars);
 
-    LocalVariableDeclaration createLocalVariableDeclaration(ASTList<DeclarationSpecifier> paramASTList, TypeReference paramTypeReference, Identifier paramIdentifier, Expression paramExpression);
+    /**
+     * Creates a new {@link LocalVariableDeclaration}.
+     * 
+     * @return a new instance of LocalVariableDeclaration.
+     */
+    LocalVariableDeclaration createLocalVariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
+            Identifier name, Expression init);
 
+
+    /**
+     * Creates a new {@link MethodDeclaration}.
+     * 
+     * @return a new instance of MethodDeclaration.
+     */
     MethodDeclaration createMethodDeclaration();
 
-    MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> paramASTList, TypeReference paramTypeReference, Identifier paramIdentifier, ASTList<ParameterDeclaration> paramASTList1, Throws paramThrows);
+    /**
+     * Creates a new {@link MethodDeclaration}.
+     * 
+     * @return a new instance of MethodDeclaration.
+     */
+    MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType, Identifier name,
+    		ASTList<ParameterDeclaration> parameters, Throws exceptions);
 
-    MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> paramASTList, TypeReference paramTypeReference, Identifier paramIdentifier, ASTList<ParameterDeclaration> paramASTList1, Throws paramThrows, StatementBlock paramStatementBlock);
+    /**
+     * Creates a new {@link MethodDeclaration}.
+     * 
+     * @return a new instance of MethodDeclaration.
+     */
+    MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType, Identifier name,
+    		ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body);
 
-    AnnotationPropertyDeclaration createAnnotationPropertyDeclaration(ASTList<DeclarationSpecifier> paramASTList, TypeReference paramTypeReference, Identifier paramIdentifier, Expression paramExpression);
-
+    AnnotationPropertyDeclaration createAnnotationPropertyDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType,
+            Identifier name, Expression defaultValue);
+    
+    /**
+     * Creates a new {@link ParameterDeclaration}.
+     * 
+     * @return a new instance of ParameterDeclaration.
+     */
     ParameterDeclaration createParameterDeclaration();
 
-    ParameterDeclaration createParameterDeclaration(TypeReference paramTypeReference, Identifier paramIdentifier);
+    /**
+     * Creates a new {@link ParameterDeclaration}.
+     * 
+     * @return a new instance of ParameterDeclaration.
+     */
+    ParameterDeclaration createParameterDeclaration(TypeReference typeRef, Identifier name);
 
-    ParameterDeclaration createParameterDeclaration(ASTList<DeclarationSpecifier> paramASTList, TypeReference paramTypeReference, Identifier paramIdentifier);
+    /**
+     * Creates a new {@link ParameterDeclaration}.
+     * 
+     * @return a new instance of ParameterDeclaration.
+     */
+    ParameterDeclaration createParameterDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, Identifier name);
 
+    /**
+     * Creates a new {@link VariableSpecification}.
+     * 
+     * @return a new instance of VariableSpecification.
+     */
     VariableSpecification createVariableSpecification();
 
-    VariableSpecification createVariableSpecification(Identifier paramIdentifier);
+    /**
+     * Creates a new {@link VariableSpecification}.
+     * 
+     * @return a new instance of VariableSpecification.
+     */
+    VariableSpecification createVariableSpecification(Identifier name);
 
-    VariableSpecification createVariableSpecification(Identifier paramIdentifier, Expression paramExpression);
+    /**
+     * Creates a new {@link VariableSpecification}.
+     * 
+     * @return a new instance of VariableSpecification.
+     */
+    VariableSpecification createVariableSpecification(Identifier name, Expression init);
 
-    VariableSpecification createVariableSpecification(Identifier paramIdentifier, int paramInt, Expression paramExpression);
+    /**
+     * Creates a new {@link VariableSpecification}.
+     * 
+     * @return a new instance of VariableSpecification.
+     */
+    VariableSpecification createVariableSpecification(Identifier name, int dimensions, Expression init);
 
+    /**
+     * Creates a new {@link FieldSpecification}.
+     * 
+     * @return a new instance of FieldSpecification.
+     */
     FieldSpecification createFieldSpecification();
 
-    FieldSpecification createFieldSpecification(Identifier paramIdentifier);
+    /**
+     * Creates a new {@link FieldSpecification}.
+     * 
+     * @return a new instance of FieldSpecification.
+     */
+    FieldSpecification createFieldSpecification(Identifier name);
 
-    FieldSpecification createFieldSpecification(Identifier paramIdentifier, Expression paramExpression);
+    /**
+     * Creates a new {@link FieldSpecification}.
+     * 
+     * @return a new instance of FieldSpecification.
+     */
+    FieldSpecification createFieldSpecification(Identifier name, Expression init);
 
-    FieldSpecification createFieldSpecification(Identifier paramIdentifier, int paramInt, Expression paramExpression);
+    /**
+     * Creates a new {@link FieldSpecification}.
+     * 
+     * @return a new instance of FieldSpecification.
+     */
+    FieldSpecification createFieldSpecification(Identifier name, int dimensions, Expression init);
 
+    /**
+     * Creates a new {@link ArrayInitializer}.
+     * 
+     * @return a new instance of ArrayInitializer.
+     */
     ArrayInitializer createArrayInitializer();
 
-    ArrayInitializer createArrayInitializer(ASTList<Expression> paramASTList);
+    /**
+     * Creates a new {@link ArrayInitializer}.
+     * 
+     * @return a new instance of ArrayInitializer.
+     */
+    ArrayInitializer createArrayInitializer(ASTList<Expression> args);
 
+    /**
+	 * Creates a new {@link ArrayInitializer}.
+	 * 
+	 * @return a new instance of ArrayInitializer.
+	 */
+	
     ParenthesizedExpression createParenthesizedExpression();
 
-    ParenthesizedExpression createParenthesizedExpression(Expression paramExpression);
+    /**
+     * Creates a new {@link ParenthesizedExpression}.
+     * 
+     * @return a new instance of ParenthesizedExpression.
+     */
+    ParenthesizedExpression createParenthesizedExpression(Expression child);
 
+    /**
+     * Creates a new {@link BooleanLiteral}.
+     * 
+     * @return a new instance of BooleanLiteral.
+     */
     BooleanLiteral createBooleanLiteral();
 
-    BooleanLiteral createBooleanLiteral(boolean paramBoolean);
+    /**
+     * Creates a new {@link BooleanLiteral}.
+     * 
+     * @return a new instance of BooleanLiteral.
+     */
+    BooleanLiteral createBooleanLiteral(boolean value);
 
+    /**
+     * Creates a new {@link CharLiteral}.
+     * 
+     * @return a new instance of CharLiteral.
+     */
     CharLiteral createCharLiteral();
 
-    CharLiteral createCharLiteral(char paramChar);
+    /**
+     * Creates a new {@link CharLiteral}.
+     * 
+     * @return a new instance of CharLiteral.
+     */
+    CharLiteral createCharLiteral(char value);
 
-    CharLiteral createCharLiteral(String paramString);
+    /**
+     * Creates a new {@link CharLiteral}.
+     * 
+     * @return a new instance of CharLiteral.
+     */
+    CharLiteral createCharLiteral(String value);
 
+    /**
+     * Creates a new {@link DoubleLiteral}.
+     * 
+     * @return a new instance of DoubleLiteral.
+     */
     DoubleLiteral createDoubleLiteral();
 
-    DoubleLiteral createDoubleLiteral(double paramDouble);
+    /**
+     * Creates a new {@link DoubleLiteral}.
+     * 
+     * @return a new instance of DoubleLiteral.
+     */
+    DoubleLiteral createDoubleLiteral(double value);
 
-    DoubleLiteral createDoubleLiteral(String paramString);
+    /**
+     * Creates a new {@link DoubleLiteral}.
+     * 
+     * @return a new instance of DoubleLiteral.
+     */
+    DoubleLiteral createDoubleLiteral(String value);
 
+    /**
+     * Creates a new {@link FloatLiteral}.
+     * 
+     * @return a new instance of FloatLiteral.
+     */
     FloatLiteral createFloatLiteral();
 
-    FloatLiteral createFloatLiteral(float paramFloat);
+    /**
+     * Creates a new {@link FloatLiteral}.
+     * 
+     * @return a new instance of FloatLiteral.
+     */
+    FloatLiteral createFloatLiteral(float value);
 
-    FloatLiteral createFloatLiteral(String paramString);
+    /**
+     * Creates a new {@link FloatLiteral}.
+     * 
+     * @return a new instance of FloatLiteral.
+     */
+    FloatLiteral createFloatLiteral(String value);
 
+    /**
+     * Creates a new {@link IntLiteral}.
+     * 
+     * @return a new instance of IntLiteral.
+     */
     IntLiteral createIntLiteral();
 
-    IntLiteral createIntLiteral(int paramInt);
+    /**
+     * Creates a new {@link IntLiteral}.
+     * 
+     * @return a new instance of IntLiteral.
+     */
+    IntLiteral createIntLiteral(int value);
 
-    IntLiteral createIntLiteral(String paramString);
+    /**
+     * Creates a new {@link IntLiteral}.
+     * 
+     * @return a new instance of IntLiteral.
+     */
+    IntLiteral createIntLiteral(String value);
 
+    /**
+     * Creates a new {@link LongLiteral}.
+     * 
+     * @return a new instance of LongLiteral.
+     */
     LongLiteral createLongLiteral();
 
-    LongLiteral createLongLiteral(long paramLong);
+    /**
+     * Creates a new {@link LongLiteral}.
+     * 
+     * @return a new instance of LongLiteral.
+     */
+    LongLiteral createLongLiteral(long value);
 
-    LongLiteral createLongLiteral(String paramString);
+    /**
+     * Creates a new {@link LongLiteral}.
+     * 
+     * @return a new instance of LongLiteral.
+     */
+    LongLiteral createLongLiteral(String value);
 
+    /**
+     * Creates a new {@link NullLiteral}.
+     * 
+     * @return a new instance of NullLiteral.
+     */
     NullLiteral createNullLiteral();
 
+    /**
+     * Creates a new {@link StringLiteral}.
+     * 
+     * @return a new instance of StringLiteral.
+     */
     StringLiteral createStringLiteral();
 
-    StringLiteral createStringLiteral(String paramString);
+    /**
+     * Creates a new {@link StringLiteral}.
+     * 
+     * @return a new instance of StringLiteral.
+     */
+    StringLiteral createStringLiteral(String value);
 
+    /**
+     * Creates a new {@link ArrayReference}.
+     * 
+     * @return a new instance of ArrayReference.
+     */
     ArrayReference createArrayReference();
 
-    ArrayReference createArrayReference(ReferencePrefix paramReferencePrefix, ASTList<Expression> paramASTList);
+    /**
+     * Creates a new {@link ArrayReference}.
+     * 
+     * @return a new instance of ArrayReference.
+     */
+    ArrayReference createArrayReference(ReferencePrefix accessPath, ASTList<Expression> initializers);
 
+    /**
+     * Creates a new {@link FieldReference}.
+     * 
+     * @return a new instance of FieldReference.
+     */
     FieldReference createFieldReference();
 
-    FieldReference createFieldReference(Identifier paramIdentifier);
+    /**
+     * Creates a new {@link FieldReference}.
+     * 
+     * @return a new instance of FieldReference.
+     */
+    FieldReference createFieldReference(Identifier id);
 
-    FieldReference createFieldReference(ReferencePrefix paramReferencePrefix, Identifier paramIdentifier);
+    /**
+     * Creates a new {@link FieldReference}.
+     * 
+     * @return a new instance of FieldReference.
+     */
+    FieldReference createFieldReference(ReferencePrefix prefix, Identifier id);
 
+    /**
+     * Creates a new {@link MetaClassReference}.
+     * 
+     * @return a new instance of MetaClassReference.
+     */
     MetaClassReference createMetaClassReference();
 
-    MetaClassReference createMetaClassReference(TypeReference paramTypeReference);
+    /**
+     * Creates a new {@link MetaClassReference}.
+     * 
+     * @return a new instance of MetaClassReference.
+     */
+    MetaClassReference createMetaClassReference(TypeReference reference);
 
+    /**
+     * Creates a new {@link MethodReference}.
+     * 
+     * @return a new instance of MethodReference.
+     */
     MethodReference createMethodReference();
 
-    MethodReference createMethodReference(Identifier paramIdentifier);
+    /**
+     * Creates a new {@link MethodReference}.
+     * 
+     * @return a new instance of MethodReference.
+     */
+    MethodReference createMethodReference(Identifier name);
 
-    MethodReference createMethodReference(ReferencePrefix paramReferencePrefix, Identifier paramIdentifier);
+    /**
+     * Creates a new {@link MethodReference}.
+     * 
+     * @return a new instance of MethodReference.
+     */
+    MethodReference createMethodReference(ReferencePrefix accessPath, Identifier name);
 
-    MethodReference createMethodReference(Identifier paramIdentifier, ASTList<Expression> paramASTList);
+    /**
+     * Creates a new {@link MethodReference}.
+     * 
+     * @return a new instance of MethodReference.
+     */
+    MethodReference createMethodReference(Identifier name, ASTList<Expression> args);
 
-    MethodReference createMethodReference(ReferencePrefix paramReferencePrefix, Identifier paramIdentifier, ASTList<Expression> paramASTList);
+    /**
+     * Creates a new {@link MethodReference}.
+     * 
+     * @return a new instance of MethodReference.
+     */
+    MethodReference createMethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args);
 
-    MethodReference createMethodReference(ReferencePrefix paramReferencePrefix, Identifier paramIdentifier, ASTList<Expression> paramASTList, ASTList<TypeArgumentDeclaration> paramASTList1);
+    MethodReference createMethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args,
+    		ASTList<TypeArgumentDeclaration> typeArgs);
+    
+    
+    AnnotationPropertyReference createAnnotationPropertyReference(String id);
 
-    AnnotationPropertyReference createAnnotationPropertyReference(String paramString);
-
-    AnnotationPropertyReference createAnnotationPropertyReference(Identifier paramIdentifier);
-
+    AnnotationPropertyReference createAnnotationPropertyReference(Identifier id);
+    
+    /**
+     * Creates a new {@link SuperConstructorReference}.
+     * 
+     * @return a new instance of SuperConstructorReference.
+     */
     SuperConstructorReference createSuperConstructorReference();
 
-    SuperConstructorReference createSuperConstructorReference(ASTList<Expression> paramASTList);
+    /**
+     * Creates a new {@link SuperConstructorReference}.
+     * 
+     * @return a new instance of SuperConstructorReference.
+     */
+    SuperConstructorReference createSuperConstructorReference(ASTList<Expression> arguments);
 
-    SuperConstructorReference createSuperConstructorReference(ReferencePrefix paramReferencePrefix, ASTList<Expression> paramASTList);
+    /**
+     * Creates a new {@link SuperConstructorReference}.
+     * 
+     * @return a new instance of SuperConstructorReference.
+     */
+    SuperConstructorReference createSuperConstructorReference(ReferencePrefix path, ASTList<Expression> arguments);
 
+    /**
+     * Creates a new {@link SuperReference}.
+     * 
+     * @return a new instance of SuperReference.
+     */
     SuperReference createSuperReference();
 
-    SuperReference createSuperReference(ReferencePrefix paramReferencePrefix);
+    /**
+     * Creates a new {@link SuperReference}.
+     * 
+     * @return a new instance of SuperReference.
+     */
+    SuperReference createSuperReference(ReferencePrefix accessPath);
 
+    /**
+     * Creates a new {@link ThisConstructorReference}.
+     * 
+     * @return a new instance of ThisConstructorReference.
+     */
     ThisConstructorReference createThisConstructorReference();
 
-    ThisConstructorReference createThisConstructorReference(ASTList<Expression> paramASTList);
+    /**
+     * Creates a new {@link ThisConstructorReference}.
+     * 
+     * @return a new instance of ThisConstructorReference.
+     */
+    ThisConstructorReference createThisConstructorReference(ASTList<Expression> arguments);
 
+    /**
+     * Creates a new {@link ThisReference}.
+     * 
+     * @return a new instance of ThisReference.
+     */
     ThisReference createThisReference();
 
-    ThisReference createThisReference(TypeReference paramTypeReference);
+    /**
+     * Creates a new {@link ThisReference}.
+     * 
+     * @return a new instance of ThisReference.
+     */
+    ThisReference createThisReference(TypeReference outer);
 
+    /**
+     * Creates a new {@link VariableReference}.
+     * 
+     * @return a new instance of VariableReference.
+     */
     VariableReference createVariableReference();
 
-    VariableReference createVariableReference(Identifier paramIdentifier);
+    /**
+     * Creates a new {@link VariableReference}.
+     * 
+     * @return a new instance of VariableReference.
+     */
+    VariableReference createVariableReference(Identifier id);
 
-    ArrayLengthReference createArrayLengthReference();
-
-    ArrayLengthReference createArrayLengthReference(ReferencePrefix paramReferencePrefix);
-
+    /**
+     * Creates a new {@link BinaryAnd}.
+     * 
+     * @return a new instance of BinaryAnd.
+     */
     BinaryAnd createBinaryAnd();
 
-    BinaryAnd createBinaryAnd(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link BinaryAnd}.
+     * 
+     * @return a new instance of BinaryAnd.
+     */
+    BinaryAnd createBinaryAnd(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link BinaryAndAssignment}.
+     * 
+     * @return a new instance of BinaryAndAssignment.
+     */
     BinaryAndAssignment createBinaryAndAssignment();
 
-    BinaryAndAssignment createBinaryAndAssignment(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link BinaryAndAssignment}.
+     * 
+     * @return a new instance of BinaryAndAssignment.
+     */
+    BinaryAndAssignment createBinaryAndAssignment(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link BinaryNot}.
+     * 
+     * @return a new instance of BinaryNot.
+     */
     BinaryNot createBinaryNot();
 
-    BinaryNot createBinaryNot(Expression paramExpression);
+    /**
+     * Creates a new {@link BinaryNot}.
+     * 
+     * @return a new instance of BinaryNot.
+     */
+    BinaryNot createBinaryNot(Expression child);
 
+    /**
+     * Creates a new {@link BinaryOr}.
+     * 
+     * @return a new instance of BinaryOr.
+     */
     BinaryOr createBinaryOr();
 
-    BinaryOr createBinaryOr(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link BinaryOr}.
+     * 
+     * @return a new instance of BinaryOr.
+     */
+    BinaryOr createBinaryOr(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link BinaryOrAssignment}.
+     * 
+     * @return a new instance of BinaryOrAssignment.
+     */
     BinaryOrAssignment createBinaryOrAssignment();
 
-    BinaryOrAssignment createBinaryOrAssignment(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link BinaryOrAssignment}.
+     * 
+     * @return a new instance of BinaryOrAssignment.
+     */
+    BinaryOrAssignment createBinaryOrAssignment(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link BinaryXOr}.
+     * 
+     * @return a new instance of BinaryXOr.
+     */
     BinaryXOr createBinaryXOr();
 
-    BinaryXOr createBinaryXOr(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link BinaryXOr}.
+     * 
+     * @return a new instance of BinaryXOr.
+     */
+    BinaryXOr createBinaryXOr(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link BinaryXOrAssignment}.
+     * 
+     * @return a new instance of BinaryXOrAssignment.
+     */
     BinaryXOrAssignment createBinaryXOrAssignment();
 
-    BinaryXOrAssignment createBinaryXOrAssignment(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link BinaryXOrAssignment}.
+     * 
+     * @return a new instance of BinaryXOrAssignment.
+     */
+    BinaryXOrAssignment createBinaryXOrAssignment(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link Conditional}.
+     * 
+     * @return a new instance of Conditional.
+     */
     Conditional createConditional();
 
-    Conditional createConditional(Expression paramExpression1, Expression paramExpression2, Expression paramExpression3);
+    /**
+     * Creates a new {@link Conditional}.
+     * 
+     * @return a new instance of Conditional.
+     */
+    Conditional createConditional(Expression guard, Expression thenExpr, Expression elseExpr);
 
+    /**
+     * Creates a new {@link CopyAssignment}.
+     * 
+     * @return a new instance of CopyAssignment.
+     */
     CopyAssignment createCopyAssignment();
 
-    CopyAssignment createCopyAssignment(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link CopyAssignment}.
+     * 
+     * @return a new instance of CopyAssignment.
+     */
+    CopyAssignment createCopyAssignment(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link Divide}.
+     * 
+     * @return a new instance of Divide.
+     */
     Divide createDivide();
 
-    Divide createDivide(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link Divide}.
+     * 
+     * @return a new instance of Divide.
+     */
+    Divide createDivide(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link DivideAssignment}.
+     * 
+     * @return a new instance of DivideAssignment.
+     */
     DivideAssignment createDivideAssignment();
 
-    DivideAssignment createDivideAssignment(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link DivideAssignment}.
+     * 
+     * @return a new instance of DivideAssignment.
+     */
+    DivideAssignment createDivideAssignment(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link Equals}.
+     * 
+     * @return a new instance of Equals.
+     */
     Equals createEquals();
 
-    Equals createEquals(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link Equals}.
+     * 
+     * @return a new instance of Equals.
+     */
+    Equals createEquals(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link GreaterOrEquals}.
+     * 
+     * @return a new instance of GreaterOrEquals.
+     */
     GreaterOrEquals createGreaterOrEquals();
 
-    GreaterOrEquals createGreaterOrEquals(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link GreaterOrEquals}.
+     * 
+     * @return a new instance of GreaterOrEquals.
+     */
+    GreaterOrEquals createGreaterOrEquals(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link GreaterThan}.
+     * 
+     * @return a new instance of GreaterThan.
+     */
     GreaterThan createGreaterThan();
 
-    GreaterThan createGreaterThan(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link GreaterThan}.
+     * 
+     * @return a new instance of GreaterThan.
+     */
+    GreaterThan createGreaterThan(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link Instanceof}.
+     * 
+     * @return a new instance of Instanceof.
+     */
     Instanceof createInstanceof();
 
-    Instanceof createInstanceof(Expression paramExpression, TypeReference paramTypeReference);
+    /**
+     * Creates a new {@link Instanceof}.
+     * 
+     * @return a new instance of Instanceof.
+     */
+    Instanceof createInstanceof(Expression child, TypeReference typeref);
 
+    /**
+     * Creates a new {@link LessOrEquals}.
+     * 
+     * @return a new instance of LessOrEquals.
+     */
     LessOrEquals createLessOrEquals();
 
-    LessOrEquals createLessOrEquals(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link LessOrEquals}.
+     * 
+     * @return a new instance of LessOrEquals.
+     */
+    LessOrEquals createLessOrEquals(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link LessThan}.
+     * 
+     * @return a new instance of LessThan.
+     */
     LessThan createLessThan();
 
-    LessThan createLessThan(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link LessThan}.
+     * 
+     * @return a new instance of LessThan.
+     */
+    LessThan createLessThan(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link LogicalAnd}.
+     * 
+     * @return a new instance of LogicalAnd.
+     */
     LogicalAnd createLogicalAnd();
 
-    LogicalAnd createLogicalAnd(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link LogicalAnd}.
+     * 
+     * @return a new instance of LogicalAnd.
+     */
+    LogicalAnd createLogicalAnd(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link LogicalNot}.
+     * 
+     * @return a new instance of LogicalNot.
+     */
     LogicalNot createLogicalNot();
 
-    LogicalNot createLogicalNot(Expression paramExpression);
+    /**
+     * Creates a new {@link LogicalNot}.
+     * 
+     * @return a new instance of LogicalNot.
+     */
+    LogicalNot createLogicalNot(Expression child);
 
+    /**
+     * Creates a new {@link LogicalOr}.
+     * 
+     * @return a new instance of LogicalOr.
+     */
     LogicalOr createLogicalOr();
 
-    LogicalOr createLogicalOr(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link LogicalOr}.
+     * 
+     * @return a new instance of LogicalOr.
+     */
+    LogicalOr createLogicalOr(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link Minus}.
+     * 
+     * @return a new instance of Minus.
+     */
     Minus createMinus();
 
-    Minus createMinus(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link Minus}.
+     * 
+     * @return a new instance of Minus.
+     */
+    Minus createMinus(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link MinusAssignment}.
+     * 
+     * @return a new instance of MinusAssignment.
+     */
     MinusAssignment createMinusAssignment();
 
-    MinusAssignment createMinusAssignment(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link MinusAssignment}.
+     * 
+     * @return a new instance of MinusAssignment.
+     */
+    MinusAssignment createMinusAssignment(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link Modulo}.
+     * 
+     * @return a new instance of Modulo.
+     */
     Modulo createModulo();
 
-    Modulo createModulo(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link Modulo}.
+     * 
+     * @return a new instance of Modulo.
+     */
+    Modulo createModulo(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link ModuloAssignment}.
+     * 
+     * @return a new instance of ModuloAssignment.
+     */
     ModuloAssignment createModuloAssignment();
 
-    ModuloAssignment createModuloAssignment(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link ModuloAssignment}.
+     * 
+     * @return a new instance of ModuloAssignment.
+     */
+    ModuloAssignment createModuloAssignment(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link Negative}.
+     * 
+     * @return a new instance of Negative.
+     */
     Negative createNegative();
 
-    Negative createNegative(Expression paramExpression);
+    /**
+     * Creates a new {@link Negative}.
+     * 
+     * @return a new instance of Negative.
+     */
+    Negative createNegative(Expression child);
 
+    /**
+     * Creates a new {@link New}.
+     * 
+     * @return a new instance of New.
+     */
     New createNew();
 
-    New createNew(ReferencePrefix paramReferencePrefix, TypeReference paramTypeReference, ASTList<Expression> paramASTList);
+    /**
+     * Creates a new {@link New}.
+     * 
+     * @return a new instance of New.
+     */
+    New createNew(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments);
 
-    New createNew(ReferencePrefix paramReferencePrefix, TypeReference paramTypeReference, ASTList<Expression> paramASTList, ClassDeclaration paramClassDeclaration);
+    /**
+     * Creates a new {@link New}.
+     * 
+     * @return a new instance of New.
+     */
+    New createNew(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments,
+            ClassDeclaration anonymousClass);
 
+    /**
+     * Creates a new {@link NewArray}.
+     * 
+     * @return a new instance of NewArray.
+     */
     NewArray createNewArray();
 
-    NewArray createNewArray(TypeReference paramTypeReference, ASTList<Expression> paramASTList);
+    /**
+     * Creates a new {@link NewArray}.
+     * 
+     * @return a new instance of NewArray.
+     */
+    NewArray createNewArray(TypeReference arrayName, ASTList<Expression> dimExpr);
 
-    NewArray createNewArray(TypeReference paramTypeReference, int paramInt, ArrayInitializer paramArrayInitializer);
+    /**
+     * Creates a new {@link NewArray}.
+     * 
+     * @return a new instance of NewArray.
+     */
+    NewArray createNewArray(TypeReference arrayName, int dimensions, ArrayInitializer initializer);
 
+    /**
+     * Creates a new {@link NotEquals}.
+     * 
+     * @return a new instance of NotEquals.
+     */
     NotEquals createNotEquals();
 
-    NotEquals createNotEquals(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link NotEquals}.
+     * 
+     * @return a new instance of NotEquals.
+     */
+    NotEquals createNotEquals(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link Plus}.
+     * 
+     * @return a new instance of Plus.
+     */
     Plus createPlus();
 
-    Plus createPlus(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link Plus}.
+     * 
+     * @return a new instance of Plus.
+     */
+    Plus createPlus(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link PlusAssignment}.
+     * 
+     * @return a new instance of PlusAssignment.
+     */
     PlusAssignment createPlusAssignment();
 
-    PlusAssignment createPlusAssignment(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link PlusAssignment}.
+     * 
+     * @return a new instance of PlusAssignment.
+     */
+    PlusAssignment createPlusAssignment(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link Positive}.
+     * 
+     * @return a new instance of Positive.
+     */
     Positive createPositive();
 
-    Positive createPositive(Expression paramExpression);
+    /**
+     * Creates a new {@link Positive}.
+     * 
+     * @return a new instance of Positive.
+     */
+    Positive createPositive(Expression child);
 
+    /**
+     * Creates a new {@link PostDecrement}.
+     * 
+     * @return a new instance of PostDecrement.
+     */
     PostDecrement createPostDecrement();
 
-    PostDecrement createPostDecrement(Expression paramExpression);
+    /**
+     * Creates a new {@link PostDecrement}.
+     * 
+     * @return a new instance of PostDecrement.
+     */
+    PostDecrement createPostDecrement(Expression child);
 
+    /**
+     * Creates a new {@link PostIncrement}.
+     * 
+     * @return a new instance of PostIncrement.
+     */
     PostIncrement createPostIncrement();
 
-    PostIncrement createPostIncrement(Expression paramExpression);
+    /**
+     * Creates a new {@link PostIncrement}.
+     * 
+     * @return a new instance of PostIncrement.
+     */
+    PostIncrement createPostIncrement(Expression child);
 
+    /**
+     * Creates a new {@link PreDecrement}.
+     * 
+     * @return a new instance of PreDecrement.
+     */
     PreDecrement createPreDecrement();
 
-    PreDecrement createPreDecrement(Expression paramExpression);
+    /**
+     * Creates a new {@link PreDecrement}.
+     * 
+     * @return a new instance of PreDecrement.
+     */
+    PreDecrement createPreDecrement(Expression child);
 
+    /**
+     * Creates a new {@link PreIncrement}.
+     * 
+     * @return a new instance of PreIncrement.
+     */
     PreIncrement createPreIncrement();
 
-    PreIncrement createPreIncrement(Expression paramExpression);
+    /**
+     * Creates a new {@link PreIncrement}.
+     * 
+     * @return a new instance of PreIncrement.
+     */
+    PreIncrement createPreIncrement(Expression child);
 
+    /**
+     * Creates a new {@link ShiftLeft}.
+     * 
+     * @return a new instance of ShiftLeft.
+     */
     ShiftLeft createShiftLeft();
 
-    ShiftLeft createShiftLeft(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link ShiftLeft}.
+     * 
+     * @return a new instance of ShiftLeft.
+     */
+    ShiftLeft createShiftLeft(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link ShiftLeftAssignment}.
+     * 
+     * @return a new instance of ShiftLeftAssignment.
+     */
     ShiftLeftAssignment createShiftLeftAssignment();
 
-    ShiftLeftAssignment createShiftLeftAssignment(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link ShiftLeftAssignment}.
+     * 
+     * @return a new instance of ShiftLeftAssignment.
+     */
+    ShiftLeftAssignment createShiftLeftAssignment(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link ShiftRight}.
+     * 
+     * @return a new instance of ShiftRight.
+     */
     ShiftRight createShiftRight();
 
-    ShiftRight createShiftRight(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link ShiftRight}.
+     * 
+     * @return a new instance of ShiftRight.
+     */
+    ShiftRight createShiftRight(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link ShiftRightAssignment}.
+     * 
+     * @return a new instance of ShiftRightAssignment.
+     */
     ShiftRightAssignment createShiftRightAssignment();
 
-    ShiftRightAssignment createShiftRightAssignment(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link ShiftRightAssignment}.
+     * 
+     * @return a new instance of ShiftRightAssignment.
+     */
+    ShiftRightAssignment createShiftRightAssignment(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link Times}.
+     * 
+     * @return a new instance of Times.
+     */
     Times createTimes();
 
-    Times createTimes(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link Times}.
+     * 
+     * @return a new instance of Times.
+     */
+    Times createTimes(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link TimesAssignment}.
+     * 
+     * @return a new instance of TimesAssignment.
+     */
     TimesAssignment createTimesAssignment();
 
-    TimesAssignment createTimesAssignment(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link TimesAssignment}.
+     * 
+     * @return a new instance of TimesAssignment.
+     */
+    TimesAssignment createTimesAssignment(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link TypeCast}.
+     * 
+     * @return a new instance of TypeCast.
+     */
     TypeCast createTypeCast();
 
-    TypeCast createTypeCast(Expression paramExpression, TypeReference paramTypeReference);
+    /**
+     * Creates a new {@link TypeCast}.
+     * 
+     * @return a new instance of TypeCast.
+     */
+    TypeCast createTypeCast(Expression child, TypeReference typeref);
 
+    /**
+     * Creates a new {@link UnsignedShiftRight}.
+     * 
+     * @return a new instance of UnsignedShiftRight.
+     */
     UnsignedShiftRight createUnsignedShiftRight();
 
-    UnsignedShiftRight createUnsignedShiftRight(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link UnsignedShiftRight}.
+     * 
+     * @return a new instance of UnsignedShiftRight.
+     */
+    UnsignedShiftRight createUnsignedShiftRight(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link UnsignedShiftRightAssignment}.
+     * 
+     * @return a new instance of UnsignedShiftRightAssignment.
+     */
     UnsignedShiftRightAssignment createUnsignedShiftRightAssignment();
 
-    UnsignedShiftRightAssignment createUnsignedShiftRightAssignment(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link UnsignedShiftRightAssignment}.
+     * 
+     * @return a new instance of UnsignedShiftRightAssignment.
+     */
+    UnsignedShiftRightAssignment createUnsignedShiftRightAssignment(Expression lhs, Expression rhs);
 
+    /**
+     * Creates a new {@link Abstract}.
+     * 
+     * @return a new instance of Abstract.
+     */
     Abstract createAbstract();
 
+    /**
+     * Creates a new {@link Final}.
+     * 
+     * @return a new instance of Final.
+     */
     Final createFinal();
 
+    /**
+     * Creates a new {@link Native}.
+     * 
+     * @return a new instance of Native.
+     */
     Native createNative();
 
+    /**
+     * Creates a new {@link Private}.
+     * 
+     * @return a new instance of Private.
+     */
     Private createPrivate();
 
+    /**
+     * Creates a new {@link Protected}.
+     * 
+     * @return a new instance of Protected.
+     */
     Protected createProtected();
 
+    /**
+     * Creates a new {@link Public}.
+     * 
+     * @return a new instance of Public.
+     */
     Public createPublic();
 
+    /**
+     * Creates a new {@link Static}.
+     * 
+     * @return a new instance of Static.
+     */
     Static createStatic();
 
+    /**
+     * Creates a new {@link Synchronized}.
+     * 
+     * @return a new instance of Synchronized.
+     */
     Synchronized createSynchronized();
 
+    /**
+     * Creates a new {@link Transient}.
+     * 
+     * @return a new instance of Transient.
+     */
     Transient createTransient();
 
+    /**
+     * Creates a new {@link StrictFp}.
+     * 
+     * @return a new instance of StrictFp.
+     */
     StrictFp createStrictFp();
 
+    /**
+     * Creates a new {@link Volatile}.
+     * 
+     * @return a new instance of Volatile.
+     */
     Volatile createVolatile();
 
+    /**
+     * Creates a new {@ling Annotation}.
+     * 
+     * @return a new instance of Annotation
+     */
     AnnotationUseSpecification createAnnotationUseSpecification();
-
+    
+    /**
+     * Creates a new {@link Break}.
+     * 
+     * @return a new instance of Break.
+     */
     Break createBreak();
 
-    Break createBreak(Identifier paramIdentifier);
+    /**
+     * Creates a new {@link Break}.
+     * 
+     * @return a new instance of Break.
+     */
+    Break createBreak(Identifier label);
 
+    /**
+     * Creates a new {@link Case}.
+     * 
+     * @return a new instance of Case.
+     */
     Case createCase();
 
-    Case createCase(Expression paramExpression);
+    /**
+     * Creates a new {@link Case}.
+     * 
+     * @return a new instance of Case.
+     */
+    Case createCase(Expression e);
 
-    Case createCase(Expression paramExpression, ASTList<Statement> paramASTList);
+    /**
+     * Creates a new {@link Case}.
+     * 
+     * @return a new instance of Case.
+     */
+    Case createCase(Expression e, ASTList<Statement> body);
 
+    /**
+     * Creates a new {@link Catch}.
+     * 
+     * @return a new instance of Catch.
+     */
     Catch createCatch();
 
-    Catch createCatch(ParameterDeclaration paramParameterDeclaration, StatementBlock paramStatementBlock);
+    /**
+     * Creates a new {@link Catch}.
+     * 
+     * @return a new instance of Catch.
+     */
+    Catch createCatch(ParameterDeclaration e, StatementBlock body);
 
+    /**
+     * Creates a new {@link Continue}.
+     * 
+     * @return a new instance of Continue.
+     */
     Continue createContinue();
 
-    Continue createContinue(Identifier paramIdentifier);
+    /**
+     * Creates a new {@link Continue}.
+     * 
+     * @return a new instance of Continue.
+     */
+    Continue createContinue(Identifier label);
 
+    /**
+     * Creates a new {@link Default}.
+     * 
+     * @return a new instance of Default.
+     */
     Default createDefault();
 
-    Default createDefault(ASTList<Statement> paramASTList);
+    /**
+     * Creates a new {@link Default}.
+     * 
+     * @return a new instance of Default.
+     */
+    Default createDefault(ASTList<Statement> body);
 
+    /**
+     * Creates a new {@link Do}.
+     * 
+     * @return a new instance of Do.
+     */
     Do createDo();
 
-    Do createDo(Expression paramExpression);
+    /**
+     * Creates a new {@link Do}.
+     * 
+     * @return a new instance of Do.
+     */
+    Do createDo(Expression guard);
 
-    Do createDo(Expression paramExpression, Statement paramStatement);
+    /**
+     * Creates a new {@link Do}.
+     * 
+     * @return a new instance of Do.
+     */
+    Do createDo(Expression guard, Statement body);
 
+    /**
+     * Creates a new {@link Else}.
+     * 
+     * @return a new instance of Else.
+     */
     Else createElse();
 
-    Else createElse(Statement paramStatement);
+    /**
+     * Creates a new {@link Else}.
+     * 
+     * @return a new instance of Else.
+     */
+    Else createElse(Statement body);
 
+    /**
+     * Creates a new {@link EmptyStatement}.
+     * 
+     * @return a new instance of EmptyStatement.
+     */
     EmptyStatement createEmptyStatement();
 
+    /**
+     * Creates a new {@link Finally}.
+     * 
+     * @return a new instance of Finally.
+     */
     Finally createFinally();
 
-    Finally createFinally(StatementBlock paramStatementBlock);
+    /**
+     * Creates a new {@link Finally}.
+     * 
+     * @return a new instance of Finally.
+     */
+    Finally createFinally(StatementBlock body);
 
+    /**
+     * Creates a new {@link For}.
+     * 
+     * @return a new instance of For.
+     */
     For createFor();
+    
+    /**
+     * Creates a new {@link For}.
+     * 
+     * @return a new instance of For.
+     */
+    For createFor(ASTList<LoopInitializer> inits, Expression guard, ASTList<Expression> updates, Statement body);
 
-    For createFor(ASTList<LoopInitializer> paramASTList, Expression paramExpression, ASTList<Expression> paramASTList1, Statement paramStatement);
 
+    /**
+     * Creates a new {@ling EnhancedFor}.
+     * 
+     * @return a new instance of EnhancedFor.
+     */
     EnhancedFor createEnhancedFor();
-
+    
+    /**
+     * Creates a new {@link Assert}.
+     * 
+     * @return a new instance of Assert.
+     */
     Assert createAssert();
 
-    Assert createAssert(Expression paramExpression);
+    /**
+     * Creates a new {@link Assert}.
+     * 
+     * @return a new instance of Assert.
+     */
+    Assert createAssert(Expression cond);
 
-    Assert createAssert(Expression paramExpression1, Expression paramExpression2);
+    /**
+     * Creates a new {@link Assert}.
+     * 
+     * @return a new instance of Assert.
+     */
+    Assert createAssert(Expression cond, Expression msg);
 
+    /**
+     * Creates a new {@link If}.
+     * 
+     * @return a new instance of If.
+     */
     If createIf();
 
-    If createIf(Expression paramExpression, Statement paramStatement);
+    /**
+     * Creates a new {@link If}.
+     * 
+     * @return a new instance of If.
+     */
+    If createIf(Expression e, Statement thenStatement);
 
-    If createIf(Expression paramExpression, Then paramThen);
+    /**
+     * Creates a new {@link If}.
+     * 
+     * @return a new instance of If.
+     */
+    If createIf(Expression e, Then thenBranch);
 
-    If createIf(Expression paramExpression, Then paramThen, Else paramElse);
+    /**
+     * Creates a new {@link If}.
+     * 
+     * @return a new instance of If.
+     */
+    If createIf(Expression e, Then thenBranch, Else elseBranch);
 
-    If createIf(Expression paramExpression, Statement paramStatement1, Statement paramStatement2);
+    /**
+     * Creates a new {@link If}.
+     * 
+     * @return a new instance of If.
+     */
+    If createIf(Expression e, Statement thenStatement, Statement elseStatement);
 
+    /**
+     * Creates a new {@link LabeledStatement}.
+     * 
+     * @return a new instance of LabeledStatement.
+     */
     LabeledStatement createLabeledStatement();
 
-    LabeledStatement createLabeledStatement(Identifier paramIdentifier);
+    /**
+     * Creates a new {@link LabeledStatement}.
+     * 
+     * @return a new instance of LabeledStatement.
+     */
+    LabeledStatement createLabeledStatement(Identifier id);
 
-    LabeledStatement createLabeledStatement(Identifier paramIdentifier, Statement paramStatement);
+    /**
+     * Creates a new {@link LabeledStatement}.
+     * 
+     * @return a new instance of LabeledStatement.
+     */
+    LabeledStatement createLabeledStatement(Identifier id, Statement statement);
 
+    /**
+     * Creates a new {@link Return}.
+     * 
+     * @return a new instance of Return.
+     */
     Return createReturn();
 
-    Return createReturn(Expression paramExpression);
+    /**
+     * Creates a new {@link Return}.
+     * 
+     * @return a new instance of Return.
+     */
+    Return createReturn(Expression expr);
 
+    /**
+     * Creates a new {@link StatementBlock}.
+     * 
+     * @return a new instance of StatementBlock.
+     */
     StatementBlock createStatementBlock();
 
-    StatementBlock createStatementBlock(ASTList<Statement> paramASTList);
+    /**
+     * Creates a new {@link StatementBlock}.
+     * 
+     * @return a new instance of StatementBlock.
+     */
+    StatementBlock createStatementBlock(ASTList<Statement> block);
 
+    /**
+     * Creates a new {@link Switch}.
+     * 
+     * @return a new instance of Switch.
+     */
     Switch createSwitch();
 
-    Switch createSwitch(Expression paramExpression);
+    /**
+     * Creates a new {@link Switch}.
+     * 
+     * @return a new instance of Switch.
+     */
+    Switch createSwitch(Expression e);
 
-    Switch createSwitch(Expression paramExpression, ASTList<Branch> paramASTList);
+    /**
+     * Creates a new {@link Switch}.
+     * 
+     * @return a new instance of Switch.
+     */
+    Switch createSwitch(Expression e, ASTList<Branch> branches);
 
+    /**
+     * Creates a new {@link SynchronizedBlock}.
+     * 
+     * @return a new instance of SynchronizedBlock.
+     */
     SynchronizedBlock createSynchronizedBlock();
 
-    SynchronizedBlock createSynchronizedBlock(StatementBlock paramStatementBlock);
+    /**
+     * Creates a new {@link SynchronizedBlock}.
+     * 
+     * @return a new instance of SynchronizedBlock.
+     */
+    SynchronizedBlock createSynchronizedBlock(StatementBlock body);
 
-    SynchronizedBlock createSynchronizedBlock(Expression paramExpression, StatementBlock paramStatementBlock);
+    /**
+     * Creates a new {@link SynchronizedBlock}.
+     * 
+     * @return a new instance of SynchronizedBlock.
+     */
+    SynchronizedBlock createSynchronizedBlock(Expression e, StatementBlock body);
 
+    /**
+     * Creates a new {@link Then}.
+     * 
+     * @return a new instance of Then.
+     */
     Then createThen();
 
-    Then createThen(Statement paramStatement);
+    /**
+     * Creates a new {@link Then}.
+     * 
+     * @return a new instance of Then.
+     */
+    Then createThen(Statement body);
 
+    /**
+     * Creates a new {@link Throw}.
+     * 
+     * @return a new instance of Throw.
+     */
     Throw createThrow();
 
-    Throw createThrow(Expression paramExpression);
+    /**
+     * Creates a new {@link Throw}.
+     * 
+     * @return a new instance of Throw.
+     */
+    Throw createThrow(Expression expr);
 
+    /**
+     * Creates a new {@link Try}.
+     * 
+     * @return a new instance of Try.
+     */
     Try createTry();
 
-    Try createTry(StatementBlock paramStatementBlock);
+    /**
+     * Creates a new {@link Try}.
+     * 
+     * @return a new instance of Try.
+     */
+    Try createTry(StatementBlock body);
 
-    Try createTry(StatementBlock paramStatementBlock, ASTList<Branch> paramASTList);
+    /**
+     * Creates a new {@link Try}.
+     * 
+     * @return a new instance of Try.
+     */
+    Try createTry(StatementBlock body, ASTList<Branch> branches);
 
+    /**
+     * Creates a new {@link While}.
+     * 
+     * @return a new instance of While.
+     */
     While createWhile();
 
-    While createWhile(Expression paramExpression);
+    /**
+     * Creates a new {@link While}.
+     * 
+     * @return a new instance of While.
+     */
+    While createWhile(Expression guard);
 
-    While createWhile(Expression paramExpression, Statement paramStatement);
+    /**
+     * Creates a new {@link While}.
+     * 
+     * @return a new instance of While.
+     */
+    While createWhile(Expression guard, Statement body);
 }

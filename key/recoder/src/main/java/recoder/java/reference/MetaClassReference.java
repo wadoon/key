@@ -1,124 +1,303 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.java.reference;
 
-import recoder.java.*;
+import recoder.java.Expression;
+import recoder.java.ExpressionContainer;
+import recoder.java.JavaNonTerminalProgramElement;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.ProgramElement;
+import recoder.java.Reference;
+import recoder.java.SourceElement;
+import recoder.java.SourceVisitor;
 
-public class MetaClassReference extends JavaNonTerminalProgramElement implements Reference, Expression, ReferencePrefix, ReferenceSuffix, TypeReferenceContainer {
-    private static final long serialVersionUID = -8591872994615086270L;
+/**
+ * Meta class reference.
+ * 
+ * @author <TT>AutoDoc</TT>
+ */
 
-    protected ExpressionContainer expressionParent;
+public class MetaClassReference extends JavaNonTerminalProgramElement implements Reference, Expression,
+        ReferencePrefix, ReferenceSuffix, TypeReferenceContainer {
 
-    protected ReferenceSuffix referenceParent;
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = -8591872994615086270L;
 
-    protected TypeReference typeReference;
+	/**
+     * Expression parent.
+     */
+
+	private ExpressionContainer expressionParent;
+
+    /**
+     * Reference parent.
+     */
+
+	private ReferenceSuffix referenceParent;
+
+    /**
+     * Type reference.
+     */
+
+	private TypeReference typeReference;
+
+    /**
+     * Meta class reference.
+     */
 
     public MetaClassReference() {
+        // nothing to do
     }
+
+    /**
+     * Meta class reference.
+     * 
+     * @param reference
+     *            a type reference.
+     */
 
     public MetaClassReference(TypeReference reference) {
         setTypeReference(reference);
         makeParentRoleValid();
     }
 
+    /**
+     * Meta class reference.
+     * 
+     * @param proto
+     *            a meta class reference.
+     */
+
     protected MetaClassReference(MetaClassReference proto) {
         super(proto);
-        if (proto.typeReference != null)
-            this.typeReference = proto.typeReference.deepClone();
+        if (proto.typeReference != null) {
+            typeReference = proto.typeReference.deepClone();
+        }
         makeParentRoleValid();
     }
+
+    /**
+     * Deep clone.
+     * 
+     * @return the object.
+     */
 
     public MetaClassReference deepClone() {
         return new MetaClassReference(this);
     }
 
+    /**
+     * Make parent role valid.
+     */
+
     public void makeParentRoleValid() {
-        super.makeParentRoleValid();
-        if (this.typeReference != null)
-            this.typeReference.setParent(this);
+        if (typeReference != null) {
+            typeReference.setParent(this);
+        }
     }
+
+    /**
+     * Get AST parent.
+     * 
+     * @return the non terminal program element.
+     */
 
     public NonTerminalProgramElement getASTParent() {
-        if (this.referenceParent != null)
-            return this.referenceParent;
-        return this.expressionParent;
+        if (referenceParent != null) {
+            return referenceParent;
+        } else {
+            return expressionParent;
+        }
     }
+
+    /**
+     * Returns the number of children of this node.
+     * 
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
-        return (this.typeReference != null) ? 1 : 0;
+        return (typeReference != null) ? 1 : 0;
     }
 
+    /**
+     * Returns the child at the specified index in this node's "virtual" child
+     * array
+     * 
+     * @param index
+     *            an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @exception ArrayIndexOutOfBoundsException
+     *                if <tt>index</tt> is out of bounds
+     */
+
     public ProgramElement getChildAt(int index) {
-        if (this.typeReference != null &&
-                index == 0)
-            return this.typeReference;
+        if (typeReference != null) {
+            if (index == 0)
+                return typeReference;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     public int getChildPositionCode(ProgramElement child) {
-        if (this.typeReference == child)
+        // role 0: prefix
+        if (typeReference == child) {
             return 0;
+        }
         return -1;
     }
 
+    /**
+     * Replace a single child in the current node. The child to replace is
+     * matched by identity and hence must be known exactly. The replacement
+     * element can be null - in that case, the child is effectively removed. The
+     * parent role of the new child is validated, while the parent link of the
+     * replaced child is left untouched.
+     * 
+     * @param p
+     *            the old child.
+     * @param p
+     *            the new child.
+     * @return true if a replacement has occured, false otherwise.
+     * @exception ClassCastException
+     *                if the new child cannot take over the role of the old one.
+     */
+
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
-        if (p == null)
+        if (p == null) {
             throw new NullPointerException();
-        if (this.typeReference == p) {
+        }
+        if (typeReference == p) {
             TypeReference r = (TypeReference) q;
-            this.typeReference = r;
-            if (r != null)
+            typeReference = r;
+            if (r != null) {
                 r.setReferenceSuffix(this);
+            }
             return true;
         }
         return false;
     }
 
+    /**
+     * Get reference suffix.
+     * 
+     * @return the reference suffix.
+     */
+
     public ReferenceSuffix getReferenceSuffix() {
-        return this.referenceParent;
+        return referenceParent;
     }
+
+    /**
+     * Set reference suffix.
+     * 
+     * @param path
+     *            a reference suffix.
+     */
 
     public void setReferenceSuffix(ReferenceSuffix path) {
-        this.referenceParent = path;
+        referenceParent = path;
     }
+
+    /**
+     * Get reference prefix.
+     * 
+     * @return the reference prefix.
+     */
 
     public ReferencePrefix getReferencePrefix() {
-        return this.typeReference;
+        return typeReference;
     }
+
+    /**
+     * Set reference prefix.
+     * 
+     * @param accessPath
+     *            a reference prefix.
+     */
 
     public void setReferencePrefix(ReferencePrefix accessPath) {
-        this.typeReference = (TypeReference) accessPath;
+        typeReference = (TypeReference) accessPath;
     }
+
+    /**
+     * Get expression container.
+     * 
+     * @return the expression container.
+     */
 
     public ExpressionContainer getExpressionContainer() {
-        return this.expressionParent;
+        return expressionParent;
     }
+
+    /**
+     * Set expression container.
+     * 
+     * @param c
+     *            an expression container.
+     */
 
     public void setExpressionContainer(ExpressionContainer c) {
-        this.expressionParent = c;
+        expressionParent = c;
     }
+
+    /**
+     * Get the number of type references in this container.
+     * 
+     * @return the number of type references.
+     */
 
     public int getTypeReferenceCount() {
-        return (this.typeReference != null) ? 1 : 0;
+        return (typeReference != null) ? 1 : 0;
     }
 
+    /*
+     * Return the type reference at the specified index in this node's "virtual"
+     * type reference array. @param index an index for a type reference. @return
+     * the type reference with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     */
+
     public TypeReference getTypeReferenceAt(int index) {
-        if (this.typeReference != null && index == 0)
-            return this.typeReference;
+        if (typeReference != null && index == 0) {
+            return typeReference;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 
+    /**
+     * Get type reference.
+     * 
+     * @return the type reference.
+     */
+
     public TypeReference getTypeReference() {
-        return this.typeReference;
+        return typeReference;
     }
 
+    /**
+     * Set type reference.
+     * 
+     * @param ref
+     *            a type reference.
+     */
+
     public void setTypeReference(TypeReference ref) {
-        this.typeReference = ref;
+        typeReference = ref;
     }
 
     public SourceElement getFirstElement() {
-        return (this.typeReference == null) ? this : this.typeReference.getFirstElement();
+        return (typeReference == null) ? this : typeReference.getFirstElement();
     }
 
     public void accept(SourceVisitor v) {
         v.visitMetaClassReference(this);
+    }
+    
+    @Override
+    public String toString() {
+    	return "<MetaClassReference>";
     }
 }

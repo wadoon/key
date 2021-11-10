@@ -1,52 +1,110 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import recoder.ModelException;
 import recoder.abstraction.ProgramModelElement;
 import recoder.java.Reference;
 
-import java.util.ArrayList;
-import java.util.List;
-
+/**
+ * Exception indicating that a particular reference is ambiguous.
+ * 
+ * @author AL
+ */
 public class AmbiguousReferenceException extends ModelException {
-    private static final long serialVersionUID = 1106306098306634107L;
 
-    private final Reference reference;
+    /**
+	 * serialization id
+	 */
+	private static final long serialVersionUID = 1106306098306634107L;
 
-    private final List<? extends ProgramModelElement> choices;
+	private Reference reference;
 
+    private List<? extends ProgramModelElement> choices;
+
+    /**
+     * Constructor without explanation text.
+     * 
+     * @param r
+     *            the ambiguous reference.
+     * @param choices
+     *            the possible resolutions.
+     */
     public AmbiguousReferenceException(Reference r, List<? extends ProgramModelElement> choices) {
-        this.reference = r;
+        reference = r;
         this.choices = choices;
     }
 
+    /**
+     * Constructor without explanation text.
+     * 
+     * @param r
+     *            the ambiguous reference.
+     * @param choice1
+     *            one possible resolution.
+     * @param choice2
+     *            a second possible resolution.
+     */
     public AmbiguousReferenceException(Reference r, ProgramModelElement choice1, ProgramModelElement choice2) {
-        this.reference = r;
+        reference = r;
         List<ProgramModelElement> list = new ArrayList<ProgramModelElement>(2);
         list.add(choice1);
         list.add(choice2);
         this.choices = list;
     }
 
+    /**
+     * Constructor with an explanation text.
+     * 
+     * @param s
+     *            an explanation.
+     * @param r
+     *            the ambiguous reference.
+     * @param choices
+     *            the possible resolutions.
+     */
     public AmbiguousReferenceException(String s, Reference r, List<? extends ProgramModelElement> choices) {
         super(s);
-        this.reference = r;
+        reference = r;
         this.choices = choices;
     }
 
+    /**
+     * Constructor with an explanation text.
+     * 
+     * @param s
+     *            an explanation.
+     * @param r
+     *            the ambiguous reference.
+     * @param choice1
+     *            one possible resolution.
+     * @param choice2
+     *            a second possible resolution.
+     */
     public AmbiguousReferenceException(String s, Reference r, ProgramModelElement choice1, ProgramModelElement choice2) {
         super(s);
-        this.reference = r;
+        reference = r;
         List<ProgramModelElement> list = new ArrayList<ProgramModelElement>(2);
         list.add(choice1);
         list.add(choice2);
         this.choices = list;
     }
 
+    /**
+     * Returns the reference that was found ambiguous.
+     */
     public Reference getAmbiguousReference() {
-        return this.reference;
+        return reference;
     }
 
+    /**
+     * Returns the possible choices for the ambiguous reference.
+     */
     public List<? extends ProgramModelElement> getPossibleResolutions() {
-        return this.choices;
+        return choices;
     }
+
 }

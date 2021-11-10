@@ -1,39 +1,44 @@
+// This file is part of the RECODER library and protected by the LGPL.
+
 package recoder.bytecode;
 
+// compatible with the byte code standard and with java.lang.reflect.Modifier
 public interface AccessFlags {
-    int PUBLIC = 1;
+    int PUBLIC = 0x0001;
 
-    int PRIVATE = 2;
+    int PRIVATE = 0x0002;
 
-    int PROTECTED = 4;
+    int PROTECTED = 0x0004;
 
-    int STATIC = 8;
+    int STATIC = 0x0008;
 
-    int FINAL = 16;
+    int FINAL = 0x0010;
 
-    int SUPER = 32;
+    int SUPER = 0x0020; // shared with SYNCHRONIZED
 
-    int SYNCHRONIZED = 32;
+    int SYNCHRONIZED = 0x0020;
 
-    int VOLATILE = 64;
+    int VOLATILE = 0x0040;
+    
+    int BRIDGE = 0x0040; // as of Java 5, shared with VOLATILE
 
-    int BRIDGE = 64;
+    int TRANSIENT = 0x0080;
+    
+    int VARARGS = 0x0080; // as of Java 5, shared with TRANSIENT
 
-    int TRANSIENT = 128;
+    int NATIVE = 0x0100;
 
-    int VARARGS = 128;
+    int INTERFACE = 0x0200;
 
-    int NATIVE = 256;
+    int ABSTRACT = 0x0400;
 
-    int INTERFACE = 512;
-
-    int ABSTRACT = 1024;
-
-    int STRICT = 2048;
-
-    int SYNTHETIC = 4096;
-
-    int ANNOTATION = 8192;
-
-    int ENUM = 16384;
+    int STRICT = 0x0800;
+    
+    int SYNTHETIC = 0x1000; // as of Java 5 (optional flag)
+    
+    int ANNOTATION = 0x2000; // as of Java 5
+    
+    int ENUM = 0x4000; // as of Java 5
+    
+    
 }
