@@ -46,6 +46,16 @@ public final class EnumTypeCondition extends VariableConditionAdapter {
         this.negated = negated;
     }
 
+    /**
+     * creates a condition that checks if a type is a EnumDeclaration
+     *
+     * @param resolver
+     *            the type resolver to be checked
+     */
+    public EnumTypeCondition(TypeResolver resolver) {
+        this(resolver, false);
+    }
+
     
     @Override
     public boolean check(SchemaVariable var, SVSubstitute candidate,
@@ -66,6 +76,6 @@ public final class EnumTypeCondition extends VariableConditionAdapter {
     
     @Override    
     public String toString() {
-        return (negated ? "\\not":"") + "\\isEnumType(" + resolver + ")";
+        return (negated ? "\\not":"") + "\\Enum(" + resolver + ")";
     }
 }

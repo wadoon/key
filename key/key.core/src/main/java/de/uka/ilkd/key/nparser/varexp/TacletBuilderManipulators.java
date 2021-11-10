@@ -180,7 +180,7 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder FINAL
             = new ConstructorBasedBuilder("final", FinalReferenceCondition.class, SV);
     public static final AbstractConditionBuilder ENUM_CONST
-            = new ConstructorBasedBuilder("isEnumConst", EnumConstantCondition.class, SV);
+            = new ConstructorBasedBuilder("enumConstant", EnumConstantCondition.class, SV);
     public static final AbstractConditionBuilder LOCAL_VARIABLE
             = new ConstructorBasedBuilder("isLocalVariable", LocalVariableCondition.class, SV);
     public static final AbstractConditionBuilder ARRAY_LENGTH
@@ -210,8 +210,8 @@ public class TacletBuilderManipulators {
             return new TypeCondition((TypeResolver) arguments[0], !negated, non_null);
         }
     };
-    public static final AbstractConditionBuilder ENUM_TYPE
-            = new ConstructorBasedBuilder("reference", EnumTypeCondition.class, SV, SV, SV);
+    public static final AbstractConditionBuilder ISENUMTYPE
+            = new ConstructorBasedBuilder("isEnumType", EnumTypeCondition.class, TR);
     public static final AbstractConditionBuilder CONTAINS_ASSIGNMENT
             = new ConstructorBasedBuilder("containsAssignment", ContainsAssignmentCondition.class, SV);
     public static final AbstractConditionBuilder FIELD_TYPE
@@ -313,7 +313,7 @@ public class TacletBuilderManipulators {
                 FREE_LABEL_IN_VARIABLE, DIFFERENT, FINAL, ENUM_CONST,
                 LOCAL_VARIABLE, ARRAY_LENGTH, ARRAY, REFERENCE_ARRAY, MAY_EXPAND_METHOD_2,
                 MAY_EXPAND_METHOD_3, STATIC_METHOD, THIS_REFERENCE, REFERENCE,
-                ENUM_TYPE, CONTAINS_ASSIGNMENT, FIELD_TYPE, STATIC_REFERENCE, DIFFERENT_FIELDS,
+                ISENUMTYPE, CONTAINS_ASSIGNMENT, FIELD_TYPE, STATIC_REFERENCE, DIFFERENT_FIELDS,
                 SAME_OBSERVER, applyUpdateOnRigid, DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE,
                 SUBFORMULAS, STATIC_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE,
                 META_DISJOINT, IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT
